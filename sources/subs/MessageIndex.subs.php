@@ -120,6 +120,13 @@ function messageIndexSort()
 	return $sort_methods;
 }
 
+/**
+ * This function determines if a user has posted in the list of topics,
+ * and returns the list of those topics they posted in.
+ *
+ * @param int $id_member member to check
+ * @param array $topic_ids array of topics ids to check for participation
+ */
 function topicsParticipation($id_member, $topic_ids)
 {
 	$db = database();
