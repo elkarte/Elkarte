@@ -98,7 +98,7 @@ class Help_Controller
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];
 
 		// Don't show any template layers, just the popup sub template.
-		template_layers::getInstance()->removeAll();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'popup';
 
 		// What help string should be used?

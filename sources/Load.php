@@ -1445,13 +1445,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 	{
 		loadLanguage('index+Modifications');
 		loadTemplate('Xml');
-		template_layers::getInstance()->removeAll();
+		Template_Layers::getInstance()->removeAll();
 	}
 	// These actions don't require the index template at all.
 	elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 	{
 		loadLanguage('index+Modifications');
-		template_layers::getInstance()->removeAll();
+		Template_Layers::getInstance()->removeAll();
 	}
 	else
 	{
@@ -1475,7 +1475,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 				$layers[$layer] = $key * 100;
 		else
 			$layers = array('html' => 0, 'body' => 100);
-		template_layers::getInstance()->add($layers);
+		Template_Layers::getInstance()->add($layers);
 	}
 
 	// Initialize the theme.
@@ -2618,80 +2618,4 @@ function detectServer()
 
 	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
 	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
-}
-
-class template_layers
-{
-	private $_all_layers = array();
-	private $_highest_priority = 100;
-	private $_sorted_layers = null;
-	private static $_instance = null;
-
-	public function add($layers = array(), $priority = null)
-	{
-		if (!is_array($layers))
-			$layers = array($layers, $priority === null ? $this->_highest_priority : (int) $priority);
-
-		$this->_all_layers = array_merge($this->_all_layers, $layers);
-		$this->_highest_priority = max($this->_all_layers) + 100;
-	}
-
-	public function addBefore($layer, $following, $force = false)
-	{
-		if (isset($this->_all_layers[$following]))
-			$this->add(array($layer => $this->_all_layers[$following] - 1));
-		elseif ($force)
-			$this->add($layer);
-	}
-
-	public function addAfter($layer, $previous, $force = false)
-	{
-		if (isset($this->_all_layers[$previous]))
-			$this->add(array($layer => $this->_all_layers[$previous] + 1));
-		elseif ($force)
-			$this->add($layer);
-	}
-
-	public function remove($layer)
-	{
-		if (isset($this->_all_layers[$layer]))
-			unset($this->_all_layers[$layer]);
-	}
-
-	public function removeAll()
-	{
-		$this->_all_layers = array();
-	}
-
-	public function prepareContext()
-	{
-		$this->_sorted_layers = array();
-
-		asort($this->_all_layers);
-		foreach ($this->_all_layers as $layer => $priority)
-			$this->_sorted_layers[] = $layer;
-
-		return $this->_sorted_layers;
-	}
-
-	public function reverseLayers()
-	{
-		if ($this->_sorted_layers === null)
-			$this->prepareContext();
-
-		return array_reverse($this->_sorted_layers);
-	}
-
-	public function hasLayers()
-	{
-		return !empty($this->_all_layers);
-	}
-
-	public static function getInstance()
-	{
-		if (self::$_instance === null)
-			self::$_instance = new template_layers();
-
-		return self::$_instance;
-	}
 }

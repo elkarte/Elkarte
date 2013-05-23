@@ -3038,7 +3038,7 @@ function template_header()
 
 	$checked_securityFiles = false;
 	$showed_banned = false;
-	foreach (template_layers::getInstance()->prepareContext() as $layer)
+	foreach (Template_Layers::getInstance()->prepareContext() as $layer)
 	{
 		loadSubTemplate($layer . '_above', 'ignore');
 
@@ -3165,7 +3165,7 @@ function template_footer()
 		$settings['theme_dir'] = $settings['actual_theme_dir'];
 	}
 
-	foreach (template_layers::getInstance()->reverseLayers() as $layer)
+	foreach (Template_Layers::getInstance()->reverseLayers() as $layer)
 		loadSubTemplate($layer . '_below', true);
 
 }

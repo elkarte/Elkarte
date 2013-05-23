@@ -56,14 +56,14 @@ class Post_Controller
 		// Posting an event?
 		$context['make_event'] = isset($_REQUEST['calendar']);
 		$context['robot_no_index'] = true;
-		template_layers::getInstance()->add('postarea');
+		Template_Layers::getInstance()->add('postarea');
 
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
 			fatal_lang_error('no_board', false);
 
 		if ($context['make_event'])
-			template_layers::getInstance()->add('make_event');
+			Template_Layers::getInstance()->add('make_event');
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -804,7 +804,7 @@ class Post_Controller
 			$controller = new Draft_Controller();
 			$controller->action_showDrafts($user_info['id'], $topic);
 			if (!empty($context['drafts']))
-				template_layers::getInstance()->add('load_drafts');
+				Template_Layers::getInstance()->add('load_drafts');
 		}
 
 		// Needed for the editor and message icons.
@@ -835,7 +835,7 @@ class Post_Controller
 		if ($context['make_poll'])
 		{
 			loadTemplate('Poll');
-			template_layers::getInstance()->add('poll_edit');
+			Template_Layers::getInstance()->add('poll_edit');
 		}
 
 		// Message icons - customized or not, retrieve them...
@@ -2208,7 +2208,7 @@ class Post_Controller
 			);';
 
 		// And instruct the template system to just show the spellcheck sub template.
-		template_layers::getInstance()->removeAll();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'spellcheck';
 	}
 }

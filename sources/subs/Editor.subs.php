@@ -30,7 +30,7 @@ function action_loadlocale()
 
 	loadLanguage('Editor');
 
-	template_layers::getInstance()->removeAll();
+	Template_Layers::getInstance()->removeAll();
 
 	// Lets make sure we aren't going to output anything nasty.
 	@ob_end_clean();

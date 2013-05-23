@@ -78,7 +78,7 @@ class MarkRead_Controller
 		{
 			loadTemplate('Xml');
 
-			template_layers::getInstance()->removeAll();
+			Template_Layers::getInstance()->removeAll();
 			$context['sub_template'] = 'generic_xml_buttons';
 
 			$context['xml_data'] = array(

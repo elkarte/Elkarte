@@ -220,7 +220,7 @@ if (!(\'smfForum_sessionvar\' in window))
 	window.smfForum_sessionvar = \'sesc\';
 ' . strtr($file['file_data'], array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
 
-		template_layers::getInstance()->removeAll();
+		Template_Layers::getInstance()->removeAll();
 
 		// Lets make sure we aren't going to output anything nasty.
 		@ob_end_clean();

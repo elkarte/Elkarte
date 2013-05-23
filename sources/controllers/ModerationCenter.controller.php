@@ -96,7 +96,7 @@ class ModerationCenter_Controller
 
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
-		template_layers::getInstance()->removeAll();
+		Template_Layers::getInstance()->removeAll();
 
 		loadTemplate('ModerationCenter');
 
