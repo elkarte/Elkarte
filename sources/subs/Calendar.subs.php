@@ -1039,6 +1039,33 @@ function getEventProperties($event_id)
 	return $return_value;
 }
 
+function eventInfoForTopic($id_topic)
+{
+	$db = database();
+
+	$events = array();
+
+	// Get event for this topic. If we have one.
+	$request = $db->query('', '
+		SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
+		FROM {db_prefix}calendar AS cal
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
+		WHERE cal.id_topic = {int:current_topic}
+		ORDER BY start_date',
+		array(
+			'current_topic' => $id_topic,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		$events[] = $row;
+	}
+	$db->free_result($request);
+
+	return $events;
+}
+
 /**
  * Gets all of the holidays for the listing
  *
