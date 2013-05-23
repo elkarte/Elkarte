@@ -2457,7 +2457,7 @@ function prepareSearchContext($reset = false)
 		if ($smcFunc['strlen']($message['body']) > $charLimit)
 		{
 			if (empty($context['key_words']))
-				$message['body'] = $smcFunc['substr']($message['body'], 0, $charLimit) . '<strong>...</strong>';
+				$message['body'] = Util::substr($message['body'], 0, $charLimit) . '<strong>...</strong>';
 			else
 			{
 				$matchString = '';

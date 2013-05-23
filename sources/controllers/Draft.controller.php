@@ -372,7 +372,7 @@ function saveDraft()
 	// the message and subject still need a bit more work
 	preparsecode($draft['body']);
 	if ($smcFunc['strlen']($draft['subject']) > 100)
-		$draft['subject'] = $smcFunc['substr']($draft['subject'], 0, 100);
+		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing draft, like hitting the save draft button or autosave enabled?
 	if (!empty($id_draft) && !empty($draft_info) && $draft_info['id_member'] == $user_info['id'])
@@ -475,7 +475,7 @@ function savePMDraft($recipientList)
 	// message and subject always need a bit more work
 	preparsecode($draft['body']);
 	if ($smcFunc['strlen']($draft['subject']) > 100)
-		$draft['subject'] = $smcFunc['substr']($draft['subject'], 0, 100);
+		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
 
 	// Modifying an existing PM draft?
 	if (!empty($id_pm_draft) && !empty($draft_info) && $draft_info['id_member'] == $user_info['id'])

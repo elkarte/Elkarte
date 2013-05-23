@@ -302,7 +302,7 @@ class Memberlist_Controller
 			$last_letter = '';
 			foreach ($context['members'] as $i => $dummy)
 			{
-				$this_letter = $smcFunc['strtolower']($smcFunc['substr']($context['members'][$i]['name'], 0, 1));
+				$this_letter = $smcFunc['strtolower'](Util::substr($context['members'][$i]['name'], 0, 1));
 
 				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{

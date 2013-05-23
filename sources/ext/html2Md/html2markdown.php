@@ -833,13 +833,13 @@ class Convert_Md
 			{
 				// Add the #width to the output and set up for the next pass
 				$lines[] = $matches[1];
-				$string = $smcFunc['substr']($string, $smcFunc['strlen']($matches[0]));
+				$string = Util::substr($string, $smcFunc['strlen']($matches[0]));
 			}
 			// Humm just a long word with no place to break, so we simply cut it after width characters
 			else
 			{
-				$lines[] = $smcFunc['substr']($string, 0, $width);
-				$string = $smcFunc['substr']($string, $width);
+				$lines[] = Util::substr($string, 0, $width);
+				$string = Util::substr($string, $width);
 			}
 		}
 

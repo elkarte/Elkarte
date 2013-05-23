@@ -399,7 +399,7 @@ class MergeTopics_Controller
 			$target_subject = strtr($smcFunc['htmltrim'](Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 			// Keep checking the length.
 			if ($smcFunc['strlen']($target_subject) > 100)
-				$target_subject = $smcFunc['substr']($target_subject, 0, 100);
+				$target_subject = Util::substr($target_subject, 0, 100);
 
 			// Nothing left - odd but pick the first topics subject.
 			if ($target_subject == '')

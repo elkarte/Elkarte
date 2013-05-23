@@ -378,7 +378,7 @@ class Post_Controller
 
 			// Make sure the subject isn't too long - taking into account special characters.
 			if ($smcFunc['strlen']($form_subject) > 100)
-				$form_subject = $smcFunc['substr']($form_subject, 0, 100);
+				$form_subject = Util::substr($form_subject, 0, 100);
 
 			if (isset($_REQUEST['poll']))
 			{
@@ -1364,7 +1364,7 @@ class Post_Controller
 
 		// At this point, we want to make sure the subject isn't too long.
 		if ($smcFunc['strlen']($_POST['subject']) > 100)
-			$_POST['subject'] = $smcFunc['substr']($_POST['subject'], 0, 100);
+			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
@@ -1954,7 +1954,7 @@ class Post_Controller
 
 			// Maximum number of characters.
 			if ($smcFunc['strlen']($_POST['subject']) > 100)
-				$_POST['subject'] = $smcFunc['substr']($_POST['subject'], 0, 100);
+				$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 		}
 		elseif (isset($_POST['subject']))
 		{

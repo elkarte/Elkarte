@@ -1532,7 +1532,7 @@ class PersonalMessage_Controller
 				$_POST['label'] = strtr(Util::htmlspecialchars(trim($_POST['label'])), array(',' => '&#044;'));
 
 				if ($smcFunc['strlen']($_POST['label']) > 30)
-					$_POST['label'] = $smcFunc['substr']($_POST['label'], 0, 30);
+					$_POST['label'] = Util::substr($_POST['label'], 0, 30);
 				if ($_POST['label'] != '')
 					$the_labels[] = $_POST['label'];
 			}
@@ -1564,7 +1564,7 @@ class PersonalMessage_Controller
 						$_POST['label_name'][$id] = trim(strtr(Util::htmlspecialchars($_POST['label_name'][$id]), array(',' => '&#044;')));
 
 						if ($smcFunc['strlen']($_POST['label_name'][$id]) > 30)
-							$_POST['label_name'][$id] = $smcFunc['substr']($_POST['label_name'][$id], 0, 30);
+							$_POST['label_name'][$id] = Util::substr($_POST['label_name'][$id], 0, 30);
 						if ($_POST['label_name'][$id] != '')
 						{
 							$the_labels[(int) $id] = $_POST['label_name'][$id];

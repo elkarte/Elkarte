@@ -436,7 +436,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// Not to long not to short
 	if ($smcFunc['strlen']($subject) > 100)
-		$subject = $smcFunc['substr']($subject, 0, 100);
+		$subject = Util::substr($subject, 0, 100);
 	elseif ($subject == '')
 		return pbe_emailError('error_no_subject', $email_message);
 

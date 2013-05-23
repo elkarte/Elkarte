@@ -998,7 +998,7 @@ class ManageBans_Controller
 				'function' => create_function('$rowData', '
 					global $smcFunc;
 
-					return strtr($smcFunc[\'htmlspecialchars\']($rowData[\'hostname\']), array(\'%\' => \'*\'));
+					return strtr(Util::htmlspecialchars($rowData[\'hostname\']), array(\'%\' => \'*\'));
 				'),
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(
@@ -1012,7 +1012,7 @@ class ManageBans_Controller
 				'function' => create_function('$rowData', '
 					global $smcFunc;
 
-					return strtr($smcFunc[\'htmlspecialchars\']($rowData[\'email_address\']), array(\'%\' => \'*\'));
+					return strtr(Util::htmlspecialchars($rowData[\'email_address\']), array(\'%\' => \'*\'));
 				'),
 			);
 			$listOptions['columns']['banned_entity']['sort'] = array(

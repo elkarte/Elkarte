@@ -436,7 +436,7 @@ class ManageFeatures_Controller
 
 					// Max characters...
 					if (!empty($sig_limits[1]))
-						$sig = $smcFunc['substr']($sig, 0, $sig_limits[1]);
+						$sig = Util::substr($sig, 0, $sig_limits[1]);
 					// Max lines...
 					if (!empty($sig_limits[2]))
 					{
@@ -1079,7 +1079,7 @@ class ManageFeatures_Controller
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = $smcFunc['substr'](strtr($_POST['field_name'], array(' ' => '')), 0, 6);
+				$colname = Util::substr(strtr($_POST['field_name'], array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
