@@ -1189,7 +1189,7 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 		WHERE id_board = {int:current_board}
 			AND id_member = {int:current_member}',
 		array(
-			'current_board' => $idboard,
+			'current_board' => $id_board,
 			'current_member' => $id_member,
 			'is_sent' => 0,
 		)
