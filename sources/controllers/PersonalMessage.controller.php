@@ -1094,7 +1094,7 @@ class PersonalMessage_Controller
 			preparsecode($message);
 
 			// Make sure there's still some content left without the tags.
-			if ($smcFunc['htmltrim'](strip_tags(parse_bbc(Util::htmlspecialchars($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+			if (Util::htmltrim(strip_tags(parse_bbc(Util::htmlspecialchars($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
 				$post_errors->addError('no_message');
 		}
 

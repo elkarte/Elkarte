@@ -387,7 +387,7 @@ class Emailuser_Controller
 			$report_errors->addError('session_timeout');
 
 		// Make sure we have a comment and it's clean.
-		if (!isset($_POST['comment']) || $smcFunc['htmltrim']($_POST['comment']) === '')
+		if (!isset($_POST['comment']) || Util::htmltrim($_POST['comment']) === '')
 			$report_errors->addError('no_comment');
 		$poster_comment = strtr(Util::htmlspecialchars($_POST['comment']), array("\r" => '', "\t" => ''));
 

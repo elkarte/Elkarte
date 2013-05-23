@@ -591,7 +591,7 @@ function pbe_load_text($html, $email_message, $pbe)
 	$text = pbe_fix_email_body($text, $html, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
 	// Do we even have a message left to post?
-	$text = $smcFunc['htmltrim']($text, ENT_QUOTES);
+	$text = Util::htmltrim($text, ENT_QUOTES);
 	if (empty($text))
 		return;
 

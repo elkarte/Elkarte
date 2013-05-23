@@ -789,7 +789,7 @@ function validateEventPost()
 			fatal_lang_error('invalid_date', false);
 
 		// No title?
-		if ($smcFunc['htmltrim']($_POST['evtitle']) === '')
+		if (Util::htmltrim($_POST['evtitle']) === '')
 			fatal_lang_error('no_event_title', false);
 		if (Util::strlen($_POST['evtitle']) > 100)
 			$_POST['evtitle'] = Util::substr($_POST['evtitle'], 0, 100);

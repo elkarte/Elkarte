@@ -538,7 +538,7 @@ function htmltrim__recursive($var, $level = 0)
 
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
-		return isset($smcFunc) ? $smcFunc['htmltrim']($var) : trim($var, ' ' . "\t\n\r\x0B" . '\0' . "\xA0");
+		return isset($smcFunc) ? Util::htmltrim($var) : trim($var, ' ' . "\t\n\r\x0B" . '\0' . "\xA0");
 
 	// Go through all the elements and remove the whitespace.
 	foreach ($var as $k => $v)

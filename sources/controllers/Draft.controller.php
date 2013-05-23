@@ -136,7 +136,7 @@ class Draft_Controller
 			if (empty($row['body']))
 				$row['body'] = '';
 
-			$row['subject'] = $smcFunc['htmltrim']($row['subject']);
+			$row['subject'] = Util::htmltrim($row['subject']);
 			if (empty($row['subject']))
 				$row['subject'] = $txt['drafts_none'];
 
@@ -260,7 +260,7 @@ class Draft_Controller
 			if (empty($row['body']))
 				$row['body'] = '';
 
-			$row['subject'] = $smcFunc['htmltrim']($row['subject']);
+			$row['subject'] = Util::htmltrim($row['subject']);
 			if (empty($row['subject']))
 				$row['subject'] = $txt['no_subject'];
 

@@ -1255,9 +1255,9 @@ class Post_Controller
 		}
 
 		// Check the subject and message.
-		if (!isset($_POST['subject']) || $smcFunc['htmltrim'](Util::htmlspecialchars($_POST['subject'])) === '')
+		if (!isset($_POST['subject']) || Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) === '')
 			$post_errors->addError('no_subject', 0);
-		if (!isset($_POST['message']) || $smcFunc['htmltrim'](Util::htmlspecialchars($_POST['message']), ENT_QUOTES) === '')
+		if (!isset($_POST['message']) || Util::htmltrim(Util::htmlspecialchars($_POST['message']), ENT_QUOTES) === '')
 			$post_errors->addError('no_message');
 		elseif (!empty($modSettings['max_messageLength']) && Util::strlen($_POST['message']) > $modSettings['max_messageLength'])
 			$post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
@@ -1272,11 +1272,11 @@ class Post_Controller
 			preparsecode($_POST['message']);
 
 			// Let's see if there's still some content left without the tags.
-			if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
+			if (Util::htmltrim(strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
 				$post_errors->addError('no_message');
 		}
 
-		if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && $smcFunc['htmltrim']($_POST['evtitle']) === '')
+		if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
 			$post_errors->addError('no_event');
 
 		// Validate the poll...
@@ -1948,7 +1948,7 @@ class Post_Controller
 
 		$post_errors = error_context::context('post', 1);
 
-		if (isset($_POST['subject']) && $smcFunc['htmltrim'](Util::htmlspecialchars($_POST['subject'])) !== '')
+		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
 		{
 			$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 
@@ -1964,7 +1964,7 @@ class Post_Controller
 
 		if (isset($_POST['message']))
 		{
-			if ($smcFunc['htmltrim'](Util::htmlspecialchars($_POST['message'])) === '')
+			if (Util::htmltrim(Util::htmlspecialchars($_POST['message'])) === '')
 			{
 				$post_errors->addError('no_message');
 				unset($_POST['message']);
@@ -1980,7 +1980,7 @@ class Post_Controller
 
 				preparsecode($_POST['message']);
 
-				if ($smcFunc['htmltrim'](strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '')
+				if (Util::htmltrim(strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '')
 				{
 					$post_errors->addError('no_message');
 					unset($_POST['message']);

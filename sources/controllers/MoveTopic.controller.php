@@ -183,7 +183,7 @@ class MoveTopic_Controller
 		// Rename the topic...
 		if (isset($_POST['reset_subject'], $_POST['custom_subject']) && $_POST['custom_subject'] != '')
 		{
-			$custom_subject = strtr($smcFunc['htmltrim'](Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
 			if (Util::strlen($custom_subject) > 100)
