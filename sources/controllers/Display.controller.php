@@ -436,61 +436,21 @@ class Display_Controller
 		// Create the poll info if it exists.
 		if ($context['is_poll'])
 		{
-			// Get the question and if it's locked.
-			$request = $db->query('', '
-				SELECT
-					p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
-					p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
-				FROM {db_prefix}polls AS p
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = p.id_member)
-				WHERE p.id_poll = {int:id_poll}
-				LIMIT 1',
-				array(
-					'id_poll' => $topicinfo['id_poll'],
-				)
-			);
-			$pollinfo = $db->fetch_assoc($request);
-			$db->free_result($request);
+			// Get information on the poll
+			require_once(SUBSDIR . '/Poll.subs.php');
+			$pollinfo = pollInfo($topicinfo['id_poll']);
 
-			$request = $db->query('', '
-				SELECT COUNT(DISTINCT id_member) AS total
-				FROM {db_prefix}log_polls
-				WHERE id_poll = {int:id_poll}
-					AND id_member != {int:not_guest}',
-				array(
-					'id_poll' => $topicinfo['id_poll'],
-					'not_guest' => 0,
-				)
-			);
-			list ($pollinfo['total']) = $db->fetch_row($request);
-			$db->free_result($request);
+			// Get the poll options
+			$pollOptions = pollOptionsForMember($topicinfo['id_poll'], $user_info['id']);
 
-			// Total voters needs to include guest voters
-			$pollinfo['total'] += $pollinfo['num_guest_voters'];
-
-			// Get all the options, and calculate the total votes.
-			$request = $db->query('', '
-				SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
-				FROM {db_prefix}poll_choices AS pc
-					LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
-				WHERE pc.id_poll = {int:id_poll}',
-				array(
-					'current_member' => $user_info['id'],
-					'id_poll' => $topicinfo['id_poll'],
-					'not_guest' => 0,
-				)
-			);
-			$pollOptions = array();
+			// Compute total votes.
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			while ($row = $db->fetch_assoc($request))
+			foreach ($pollOptions as $choice)
 			{
-				censorText($row['label']);
-				$pollOptions[$row['id_choice']] = $row;
-				$realtotal += $row['votes'];
-				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
+				$realtotal += $choice['votes'];
+				$pollinfo['has_voted'] |= $choice['voted_this'] != -1;
 			}
-			$db->free_result($request);
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -707,12 +667,8 @@ class Display_Controller
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
 			if (isset($_REQUEST['boardseen']))
 			{
-				$db->insert('replace',
-					'{db_prefix}log_boards',
-					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-					array($modSettings['maxMsgID'], $user_info['id'], $board),
-					array('id_member', 'id_board')
-				);
+				require_once(SUBSDIR . '/Boards.subs.php');
+				markBoardsRead($board);
 			}
 		}
 

@@ -97,6 +97,9 @@ function markBoardsRead($boards, $unread = false)
 	// I'm setting this as 'disabled'... Remove the comments to get it executed again.
 	// MessageIndex::action_messageindex() does not update log_topics at all (only the above).
 
+	// Note... (for read/unread rework)
+	// Display controller needed only to update log_boards.
+
 	//$result = $db->query('', '
 	//	SELECT MIN(id_topic)
 	//	FROM {db_prefix}log_topics
