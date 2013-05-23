@@ -290,7 +290,6 @@ class Post_Controller
 					fatal_lang_error('cannot_post_new', 'user');
 
 				// Load a list of boards for this event in the context.
-				require_once(SUBSDIR . '/Boards.subs.php');
 				$boardListOptions = array(
 					'included_boards' => in_array(0, $boards) ? null : $boards,
 					'not_redirection' => true,
@@ -955,6 +954,7 @@ class Post_Controller
 					$post_errors->addError($verification_error);
 		}
 
+		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		loadLanguage('Post');
 
@@ -1635,8 +1635,8 @@ class Post_Controller
 			}
 		}
 
-		// Marking read should be done even for editing messages....
-		// Mark all the parents read.  (since you just posted and they will be unread.)
+		// Marking boards as read.
+		// (You just posted and they will be unread.)
 		if (!$user_info['is_guest'])
 		{
 			$board_list = !empty($board_info['parent_boards']) ? array_keys($board_info['parent_boards']) : array();
@@ -1646,41 +1646,14 @@ class Post_Controller
 				$board_list[] = $board;
 
 			if (!empty($board_list))
-			{
-				$db->query('', '
-					UPDATE {db_prefix}log_boards
-					SET id_msg = {int:id_msg}
-					WHERE id_member = {int:current_member}
-						AND id_board IN ({array_int:board_list})',
-					array(
-						'current_member' => $user_info['id'],
-						'board_list' => $board_list,
-						'id_msg' => $modSettings['maxMsgID'],
-					)
-				);
-			}
+				markBoardsRead($board_list, false, false);
 		}
 
-		// Turn notification on or off.  (note this just blows smoke if it's already on or off.)
+		// Turn notification on or off.
 		if (!empty($_POST['notify']) && allowedTo('mark_any_notify'))
-		{
-			$db->insert('ignore',
-				'{db_prefix}log_notify',
-				array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int'),
-				array($user_info['id'], $topic, 0),
-				array('id_member', 'id_topic', 'id_board')
-			);
-		}
+			setTopicNotification($user_info['id'], $topic, true);
 		elseif (!$newTopic)
-			$db->query('', '
-				DELETE FROM {db_prefix}log_notify
-				WHERE id_member = {int:current_member}
-					AND id_topic = {int:current_topic}',
-				array(
-					'current_member' => $user_info['id'],
-					'current_topic' => $topic,
-				)
-			);
+			setTopicNotification($user_info, $topic, false);
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
