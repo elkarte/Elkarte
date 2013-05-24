@@ -1651,7 +1651,12 @@ function jeffsdatediff($old)
  *                 - activated_status (boolen) must be present
  *                 - time_before (integer)
  *                 - members (array of integers)
+ *                 - member_greater (integer) a member id, it will be used
+ *                   to filter only members with id_member greater than this
+ *                 - group_list (array) array of group IDs
+ *                 - notify_announcements (integer)
  *                 - order_by (string)
+ *                 - limit (int)
  * @return array
  */
 function retrieveMemberData($conditions)
@@ -1668,23 +1673,36 @@ function retrieveMemberData($conditions)
 				AND date_registered < {int:time_before}',
 		'members' => '
 				AND id_member IN ({array_int:members})',
+		'member_greater' => '
+				AND id_member > {int:member_greater}',
+		'group_list' => '
+				AND (id_group IN ({array_int:group_list}) OR id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, additional_groups) != 0)',
+		'notify_announcements' => '
+				AND notify_announcements = {int:notify_announcements}'
 	);
 
 	$query_cond = array();
 	foreach ($conditions as $key => $dummy)
-		$query_cond[] = $available_conditions[$key];
+		if (isset($available_conditions[$key]))
+			$query_cond[] = $available_conditions[$key];
 
+	if (isset($conditions['group_list']))
+		$conditions['additional_group_list'] = implode(', additional_groups) != 0 OR FIND_IN_SET(', $conditions['group_list']);
+	
 	$data = array();
 
 	if (!isset($conditions['order_by']))
 		$conditions['order_by'] = 'lngfile';
+
+	$limit = (isset($conditions['limit'])) ? '
+		LIMIT {int:limit}' : '';
 
 	// Get information on each of the members, things that are important to us, like email address...
 	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, validation_code, lngfile
 		FROM {db_prefix}members
 		WHERE is_activated = {int:activated_status}' . implode('', $query_cond) . '
-		ORDER BY {raw:order_by}',
+		ORDER BY {raw:order_by}' . $limit,
 		$conditions
 	);
 
