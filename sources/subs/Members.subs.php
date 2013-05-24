@@ -1646,31 +1646,46 @@ function jeffsdatediff($old)
 /**
  * Retrieves MemberData based on conditions
  *
- * @param string $condition
- * @param string $current_filter
- * @param int $timeBefore
- * @param array $members
+ * @param array $conditions associative array holding the conditions for the
+ *               WHERE clause of the query. Possible keys:
+ *                 - activated_status (boolen) must be present
+ *                 - time_before (integer)
+ *                 - members (array of integers)
+ *                 - order_by (string)
  * @return array
  */
-function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
+function retrieveMemberData($conditions)
 {
 	global $modSettings, $language;
 
+	// We badly need this
+	assert(isset($conditions['activated_status']));
+
 	$db = database();
 
+	$available_conditions = array(
+		'time_before' => '
+				AND date_registered < {int:time_before}',
+		'members' => '
+				AND id_member IN ({array_int:members})',
+	);
+
+	$query_cond = array();
+	foreach ($conditions as $key => $dummy)
+		$query_cond[] = $available_conditions[$key];
+
 	$data = array();
+
+	if (!isset($conditions['order_by']))
+		$conditions['order_by'] = 'lngfile';
 
 	// Get information on each of the members, things that are important to us, like email address...
 	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, validation_code, lngfile
 		FROM {db_prefix}members
-		WHERE is_activated = {int:activated_status}' . $condition . '
-		ORDER BY lngfile',
-		array(
-			'activated_status' => $current_filter,
-			'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-			'members' => empty($members) ? array() : $members,
-		)
+		WHERE is_activated = {int:activated_status}' . implode('', $query_cond) . '
+		ORDER BY {raw:order_by}',
+		$conditions
 	);
 
 	$data['member_count'] = $db->num_rows($request);
@@ -1699,58 +1714,82 @@ function retrieveMemberData($condition, $current_filter, $timeBefore, $members)
 /**
  * Activate members
  *
- * @param type $members
- * @param type $condition
- * @param type $timeBefore
- * @param type $current_filter
+ * @param array $conditions associative array holding the conditions for the
+ *               WHERE clause of the query. Possible keys:
+ *                 - activated_status (boolen) must be present
+ *                 - time_before (integer)
+ *                 - members (array of integers)
  */
-function approveMembers($members, $condition, $timeBefore, $current_filter)
+function approveMembers($conditions)
 {
 	$db = database();
+
+	// This shall be present
+	assert(isset($conditions['activated_status']));
+
+	$available_conditions = array(
+		'time_before' => '
+				AND date_registered < {int:time_before}',
+		'members' => '
+				AND id_member IN ({array_int:members})',
+	);
+
+	$query_cond = array();
+	foreach ($conditions as $key => $dummy)
+		$query_cond[] = $available_conditions[$key];
+
+	$conditions['is_activated'] = 1;
+	$conditions['blank_string'] = '';
 
 	// Approve/activate this member.
 	$db->query('', '
 		UPDATE {db_prefix}members
 		SET validation_code = {string:blank_string}, is_activated = {int:is_activated}
-		WHERE is_activated = {int:activated_status}' . $condition,
-		array(
-			'is_activated' => 1,
-			'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-			'members' => empty($members) ? array() : $members,
-			'activated_status' => $current_filter,
-			'blank_string' => '',
-		)
+		WHERE is_activated = {int:activated_status}' . implode('', $query_cond),
+		$conditions
 	);
 }
 
 /**
  * Set these members for activation
  *
- * @param type $member
- * @param type $condition
- * @param type $current_filter
- * @param type $members
- * @param type $timeBefore
- * @param type $validation_code
+ * @param array $conditions associative array holding the conditions for the
+ *               WHERE clause of the query. Possible keys:
+ *                 - selected_member (integer) must be present
+ *                 - activated_status (boolen) must be present
+ *                 - validation_code (string) must be present
+ *                 - members (array of integers)
+ *                 - time_before (integer)
  */
-function enforceReactivation($member, $condition, $current_filter, $members, $timeBefore, $validation_code)
+function enforceReactivation($conditions)
 {
 	$db = database();
+
+	// We need all of these
+	assert(isset($conditions['activated_status']));
+	assert(isset($conditions['selected_member']));
+	assert(isset($conditions['validation_code']));
+
+	$available_conditions = array(
+		'time_before' => '
+				AND date_registered < {int:time_before}',
+		'members' => '
+				AND id_member IN ({array_int:members})',
+	);
+
+	$query_cond = array();
+	foreach ($conditions as $key => $dummy)
+		$query_cond[] = $available_conditions[$key];
+
+	$conditions['not_activated'] = 0;
 
 	$db->query('', '
 		UPDATE {db_prefix}members
 		SET validation_code = {string:validation_code}, is_activated = {int:not_activated}
 		WHERE is_activated = {int:activated_status}
-			' . $condition . '
+			' . implode('', $query_cond) . '
 			AND id_member = {int:selected_member}',
-		array(
-			'not_activated' => 0,
-			'activated_status' => $current_filter,
-			'selected_member' => $member['id'],
-			'validation_code' => $validation_code,
-			'time_before' => empty($timeBefore) ? 0 : $timeBefore,
-			'members' => empty($members) ? array() : $members,
-		)
+		$conditions
 	);
 }
 /**

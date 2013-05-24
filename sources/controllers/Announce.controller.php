@@ -115,15 +115,15 @@ class Announce_Controller
 		$groups = array_merge($board_info['groups'], array(1));
 
 		if (isset($_POST['membergroups']))
-			$_POST['who'] = explode(',', $_POST['membergroups']);
+			$who = explode(',', $_POST['membergroups']);
 
 		// Check whether at least one membergroup was selected.
-		if (empty($_POST['who']))
+		if (empty($who))
 			fatal_lang_error('no_membergroup_selected');
 
 		// Make sure all membergroups are integers and can access the board of the announcement.
-		foreach ($_POST['who'] as $id => $mg)
-			$_POST['who'][$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
+		foreach ($who as $id => $mg)
+			$who[$id] = in_array((int) $mg, $groups) ? (int) $mg : 0;
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -141,20 +141,20 @@ class Announce_Controller
 
 		// Select the email addresses for this batch.
 		$request = $db->query('', '
-			SELECT mem.id_member, mem.email_address, mem.lngfile
-			FROM {db_prefix}members AS mem
-			WHERE (mem.id_group IN ({array_int:group_list}) OR mem.id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, mem.additional_groups) != 0)' . (!empty($modSettings['allow_disableAnnounce']) ? '
-				AND mem.notify_announcements = {int:notify_announcements}' : '') . '
-				AND mem.is_activated = {int:is_activated}
-				AND mem.id_member > {int:start}
-			ORDER BY mem.id_member
+			SELECT id_member, email_address, lngfile
+			FROM {db_prefix}members
+			WHERE (id_group IN ({array_int:group_list}) OR id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, additional_groups) != 0)' . (!empty($modSettings['allow_disableAnnounce']) ? '
+				AND notify_announcements = {int:notify_announcements}' : '') . '
+				AND is_activated = {int:is_activated}
+				AND id_member > {int:start}
+			ORDER BY id_member
 			LIMIT {int:chunk_size}',
 			array(
-				'group_list' => $_POST['who'],
+				'group_list' => $who,
 				'notify_announcements' => 1,
 				'is_activated' => 1,
 				'start' => $context['start'],
-				'additional_group_list' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $_POST['who']),
+				'additional_group_list' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $who),
 				// @todo Might need an interface?
 				'chunk_size' => empty($modSettings['mail_queue']) ? 50 : 500,
 			)
@@ -209,7 +209,7 @@ class Announce_Controller
 
 		$context['move'] = empty($_REQUEST['move']) ? 0 : 1;
 		$context['go_back'] = empty($_REQUEST['goback']) ? 0 : 1;
-		$context['membergroups'] = implode(',', $_POST['who']);
+		$context['membergroups'] = implode(',', $who);
 		$context['sub_template'] = 'announcement_send';
 
 		// Go back to the correct language for the user ;).
