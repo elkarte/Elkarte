@@ -849,7 +849,7 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 		return false;
 
 	if (!is_array($group_id))
-		$group_ids = array($group_id);
+		$group_id = array($group_id);
 
 	$groups = array();
 	$group_ids = array_map('intval', $group_id);
