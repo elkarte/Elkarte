@@ -1037,7 +1037,7 @@ function getGroups($groupList)
 	$db = database();
 
 	$groups = array();
-	if (in_array(0, $groups))
+	if (in_array(0, $groupList))
 	{
 		$groups[0] = array(
 			'id' => 0,
@@ -1054,7 +1054,7 @@ function getGroups($groupList)
 		WHERE mg.id_group IN ({array_int:group_list})
 		GROUP BY mg.id_group',
 		array(
-			'group_list' => $groups,
+			'group_list' => $groupList,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
