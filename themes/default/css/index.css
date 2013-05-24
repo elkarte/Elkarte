@@ -4666,10 +4666,6 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	input {
 		max-width: 230px;
 	}
-	.post_seperator {
-		border: 3px solid #222;
-		display: visible;
-	}
 	.post_wrapper {
 		border: 1px solid #ddd;
 		border-radius: 8px;
