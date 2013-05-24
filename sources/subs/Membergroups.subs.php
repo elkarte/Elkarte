@@ -1050,7 +1050,7 @@ function getGroups($groupList)
 
 	// Get all membergroups that have access to the board the announcement was made on.
 	$request = $db->query('', '
-		SELECT mg.id_group, COUNT(mem.id_member) AS num_members
+		SELECT mg.id_group, mg.group_name, COUNT(mem.id_member) AS num_members
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_group = mg.id_group OR FIND_IN_SET(mg.id_group, mem.additional_groups) != 0 OR mg.id_group = mem.id_post_group)
 		WHERE mg.id_group IN ({array_int:group_list})
@@ -1063,7 +1063,7 @@ function getGroups($groupList)
 	{
 		$groups[$row['id_group']] = array(
 			'id' => $row['id_group'],
-			'name' => '',
+			'name' => $row['group_name'],
 			'member_count' => $row['num_members'],
 		);
 	}
