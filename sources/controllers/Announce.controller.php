@@ -27,6 +27,7 @@ class Announce_Controller
 	 */
 	function action_index()
 	{
+		loadLanguage('Post');
 		// default for action=announce: action_selectgroup() function.
 		$this->action_selectgroup();
 	}
@@ -73,13 +74,9 @@ class Announce_Controller
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
+		loadTemplate('Announce');
 
 		$context['groups'] = getGroups($groups);
-
-		// Now get the membergroup names.
-		$groups_info = membergroupsById($groups, 0);
-		foreach ($groups_info as $id_group => $group_info)
-			$context['groups'][$id_group]['name'] = $group_info['group_name'];
 
 		// Get the subject of the topic we're about to announce.
 		$topic_info = getTopicInfo($topic, 'message');
