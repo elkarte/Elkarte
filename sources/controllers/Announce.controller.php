@@ -135,30 +135,24 @@ class Announce_Controller
 
 		// We need this in order to be able send emails.
 		require_once(SUBSDIR . '/Mail.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Select the email addresses for this batch.
-		$request = $db->query('', '
-			SELECT id_member, email_address, lngfile
-			FROM {db_prefix}members
-			WHERE (id_group IN ({array_int:group_list}) OR id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, additional_groups) != 0)' . (!empty($modSettings['allow_disableAnnounce']) ? '
-				AND notify_announcements = {int:notify_announcements}' : '') . '
-				AND is_activated = {int:is_activated}
-				AND id_member > {int:start}
-			ORDER BY id_member
-			LIMIT {int:chunk_size}',
-			array(
-				'group_list' => $who,
-				'notify_announcements' => 1,
-				'is_activated' => 1,
-				'start' => $context['start'],
-				'additional_group_list' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $who),
-				// @todo Might need an interface?
-				'chunk_size' => empty($modSettings['mail_queue']) ? 50 : 500,
-			)
+		$conditions = array(
+			'activated_status' => 1,
+			'member_greater' => $context['start'],
+			'group_list' => $who,
+			'order_by' => 'id_member',
+			// @todo Might need an interface?
+			'limit' => empty($modSettings['mail_queue']) ? 50 : 500,
 		);
+		if (!empty($modSettings['allow_disableAnnounce']))
+			$conditions['notify_announcements'] = 1;
+
+		$data = retrieveMemberData($conditions);
 
 		// All members have received a mail. Go to the next screen.
-		if ($db->num_rows($request) == 0)
+		if (empty($data))
 		{
 			logAction('announce_topic', array('topic' => $topic), 'user');
 			if (!empty($_REQUEST['move']) && allowedTo('move_any'))
@@ -171,7 +165,7 @@ class Announce_Controller
 
 		$announcements = array();
 		// Loop through all members that'll receive an announcement in this batch.
-		while ($row = $db->fetch_assoc($request))
+		foreach ($data as $row)
 		{
 			$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
@@ -196,7 +190,6 @@ class Announce_Controller
 			$announcements[$cur_language]['recipients'][$row['id_member']] = $row['email_address'];
 			$context['start'] = $row['id_member'];
 		}
-		$db->free_result($request);
 
 		// For each language send a different mail - low priority...
 		foreach ($announcements as $lang => $mail)
