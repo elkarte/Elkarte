@@ -674,6 +674,7 @@ class Reports_Controller
 		$db = database();
 
 		require_once(SUBSDIR . '/Members.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Fetch all the board names.
 		$request = $db->query('', '
@@ -687,27 +688,16 @@ class Reports_Controller
 			$boards[$row['id_board']] = $row['name'];
 		$db->free_result($request);
 
-		// Get every moderator.
-		$request = $db->query('', '
-			SELECT mods.id_board, mods.id_member
-			FROM {db_prefix}moderators AS mods',
-			array(
-			)
-		);
-		$moderators = array();
-		$local_mods = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$moderators[$row['id_member']][] = $row['id_board'];
-			$local_mods[$row['id_member']] = $row['id_member'];
-		}
-		$db->free_result($request);
+		$moderators = allBoardModerators();
+		$boards_moderated = array();
+		foreach ($moderators as $id_member => $row)
+			$boards_moderated[$id_member][] = $row['id_board'];
 
 		// Get a list of global moderators (i.e. members with moderation powers).
 		$global_mods = array_intersect(membersAllowedTo('moderate_board', 0), membersAllowedTo('approve_posts', 0), membersAllowedTo('remove_any', 0), membersAllowedTo('modify_any', 0));
 
 		// How about anyone else who is special?
-		$allStaff = array_merge(membersAllowedTo('admin_forum'), membersAllowedTo('manage_membergroups'), membersAllowedTo('manage_permissions'), $local_mods, $global_mods);
+		$allStaff = array_merge(membersAllowedTo('admin_forum'), membersAllowedTo('manage_membergroups'), membersAllowedTo('manage_permissions'), array_keys($moderators), $global_mods);
 
 		// Make sure everyone is there once - no admin less important than any other!
 		$allStaff = array_unique($allStaff);
@@ -763,10 +753,10 @@ class Reports_Controller
 			// What do they moderate?
 			if (in_array($row['id_member'], $global_mods))
 				$staffData['moderates'] = '<em>' . $txt['report_staff_all_boards'] . '</em>';
-			elseif (isset($moderators[$row['id_member']]))
+			elseif (isset($boards_moderated[$row['id_member']]))
 			{
 				// Get the names
-				foreach ($moderators[$row['id_member']] as $board)
+				foreach ($boards_moderated[$row['id_member']] as $board)
 					if (isset($boards[$board]))
 						$staffData['moderates'][] = $boards[$board];
 
