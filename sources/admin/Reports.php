@@ -148,33 +148,22 @@ class Reports_Controller
 
 		// Load the permission profiles.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		loadLanguage('ManagePermissions');
 		loadPermissionProfiles();
 
 		// Get every moderator.
-		$request = $db->query('', '
-			SELECT mods.id_board, mods.id_member, mem.real_name
-			FROM {db_prefix}moderators AS mods
-				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)',
-			array(
-			)
-		);
-		$moderators = array();
-		while ($row = $db->fetch_assoc($request))
-			$moderators[$row['id_board']][] = $row['real_name'];
-		$db->free_result($request);
+		$moderators = allBoardModerators();
+		$boards_moderated = array();
+		foreach ($moderators as $id_member => $row)
+			$boards_moderated[$id_member][] = $row['id_board'];
 
 		// Get all the possible membergroups!
-		$request = $db->query('', '
-			SELECT id_group, group_name, online_color
-			FROM {db_prefix}membergroups',
-			array(
-			)
-		);
+		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
 		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
-		while ($row = $db->fetch_assoc($request))
+		foreach ($all_groups as $row)
 			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
-		$db->free_result($request);
 
 		// All the fields we'll show.
 		$boardSettings = array(
@@ -230,7 +219,7 @@ class Reports_Controller
 				'theme' => $row['theme_name'],
 				'profile' => $profile_name,
 				'override_theme' => $row['override_theme'] ? $txt['yes'] : $txt['no'],
-				'moderators' => empty($moderators[$row['id_board']]) ? $txt['none'] : implode(', ', $moderators[$row['id_board']]),
+				'moderators' => empty($boards_moderated[$row['id_board']]) ? $txt['none'] : implode(', ', $boards_moderated[$row['id_board']]),
 			);
 
 			// Work out the membergroups who can and cannot access it (but only if enabled).
@@ -707,16 +696,10 @@ class Reports_Controller
 			fatal_lang_error('report_error_too_many_staff');
 
 		// Get all the possible membergroups!
-		$request = $db->query('', '
-			SELECT id_group, group_name, online_color
-			FROM {db_prefix}membergroups',
-			array(
-			)
-		);
+		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
 		$groups = array(0 => $txt['full_member']);
-		while ($row = $db->fetch_assoc($request))
+		foreach ($all_groups as $row)
 			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
-		$db->free_result($request);
 
 		// All the fields we'll show.
 		$staffSettings = array(

@@ -1391,8 +1391,8 @@ function allBoardModerators($only_id = false)
 
 	if ($only_id)
 		$request = $db->query('', '
-			SELECT mods.id_board, mods.id_member
-			FROM {db_prefix}moderators AS mods',
+			SELECT id_board, id_member
+			FROM {db_prefix}moderators',
 			array(
 			)
 		);
@@ -1410,6 +1410,33 @@ function allBoardModerators($only_id = false)
 	$db->free_result($request);
 
 	return $moderators;
+}
+
+/**
+ * Get a list of all the board moderated by a certain user
+ * @param int $id_member the id of a member
+ * @return array
+ */
+function boardsModerated($id_member)
+{
+	$db = database();
+
+	$boards = array();
+
+	$request = $db->query('', '
+		SELECT id_board
+		FROM {db_prefix}moderators
+		WHERE id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+		$boards[] = $row['id_board'];
+	$db->free_result($request);
+
+	return $boards;
 }
 
 /**

@@ -947,7 +947,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			$where = '';
 
 	$request = $db->query('', '
-		SELECT id_group, group_name, min_posts
+		SELECT id_group, group_name, min_posts, online_color
 		FROM {db_prefix}membergroups
 		WHERE 1 = 1
 			' . $where . '
@@ -970,7 +970,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			'name' => $txt['membergroups_members']
 		);
 
-	if (isset($split))
+	if (!empty($split))
 	{
 		if (empty($modSettings['permission_enable_postgroups']))
 		{
@@ -1008,15 +1008,16 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 				);
 		}
 	}
-
 	else
 		while ($row = $db->fetch_assoc($request))
 		{
 			$groups[] = array(
 				'id' => $row['id_group'],
-				'name' => $row['group_name']
+				'name' => $row['group_name'],
+				'online_color' => $row['online_color'],
 			);
 		}
+
 	$db->free_result($request);
 
 	return $groups;
