@@ -813,3 +813,90 @@ function messageAt($start, $id_topic)
 
 	return $msg;
 }
+
+/**
+ * Finds an open report for a certain message if it exists and increase the
+ * number of reports for that message, otherwise it creates one
+
+ * @param array $message array of several message details (id_msg, id_topic, etc.)
+ * @param string $poster_comment the comment made by the reporter
+ *
+ */
+function recordReport($message, $poster_comment)
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_report, ignore_all
+		FROM {db_prefix}log_reported
+		WHERE id_msg = {int:id_msg}
+			AND (closed = {int:not_closed} OR ignore_all = {int:ignored})
+		ORDER BY ignore_all DESC',
+		array(
+			'id_msg' => $message['id_msg'],
+			'not_closed' => 0,
+			'ignored' => 1,
+		)
+	);
+
+	if ($db->num_rows($request) != 0)
+		list($id_report, $ignore_all) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	if (!empty($ignore_all))
+		return false;
+
+	// Already reported? My god, we could be dealing with a real rogue here...
+	if (!empty($id_report))
+		$db->query('', '
+			UPDATE {db_prefix}log_reported
+			SET num_reports = num_reports + 1, time_updated = {int:current_time}
+			WHERE id_report = {int:id_report}',
+			array(
+				'current_time' => time(),
+				'id_report' => $id_report,
+			)
+		);
+	// Otherwise, we shall make one!
+	else
+	{
+		if (empty($message['real_name']))
+			$message['real_name'] = $message['poster_name'];
+
+		$db->insert('',
+			'{db_prefix}log_reported',
+			array(
+				'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
+				'subject' => 'string', 'body' => 'string', 'time_started' => 'int', 'time_updated' => 'int',
+				'num_reports' => 'int', 'closed' => 'int',
+			),
+			array(
+				$message['id_msg'], $message['id_topic'], $message['id_board'], $message['id_poster'], $message['real_name'],
+				$message['subject'], $message['body'] , time(), time(), 1, 0,
+			),
+			array('id_report')
+		);
+		$id_report = $db->insert_id('{db_prefix}log_reported', 'id_report');
+	}
+
+	// Now just add our report...
+	if (!empty($id_report))
+	{
+		$db->insert('',
+			'{db_prefix}log_reported_comments',
+			array(
+				'id_report' => 'int', 'id_member' => 'int', 'membername' => 'string', 'email_address' => 'string',
+				'member_ip' => 'string', 'comment' => 'string', 'time_sent' => 'int',
+			),
+			array(
+				$id_report, $user_info['id'], $user_info['name'], $user_info['email'],
+				$user_info['ip'], $poster_comment, time(),
+			),
+			array('id_comment')
+		);
+	}
+
+	return $id_report;
+}
