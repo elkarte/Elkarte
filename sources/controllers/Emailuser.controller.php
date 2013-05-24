@@ -475,18 +475,7 @@ class Emailuser_Controller
 		}
 
 		// Find out who the real moderators are - for mod preferences.
-		$request2 = $db->query('', '
-			SELECT id_member
-			FROM {db_prefix}moderators
-			WHERE id_board = {int:current_board}',
-			array(
-				'current_board' => $board,
-			)
-		);
-		$real_mods = array();
-		while ($row = $db->fetch_assoc($request2))
-			$real_mods[] = $row['id_member'];
-		$db->free_result($request2);
+		$real_mods = getBoardModerators($board, true);
 
 		// Send every moderator an email.
 		foreach ($mod_to_notify as $row)
