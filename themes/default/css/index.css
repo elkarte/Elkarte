@@ -2392,7 +2392,7 @@ ul.quickbuttons {
 	clear: right;
 	float: right;
 	text-align: right;
-	visibility: hidden;
+	/* visibility: hidden; */
 	width: 100%;
 }
 .windowbg .post_wrapper:hover ul.nojs_visible, .windowbg2 .post_wrapper:hover ul.nojs_visible {
@@ -2407,7 +2407,7 @@ ul.quickbuttons li a {
 	padding: 0 4px 0 20px;
 	display: block;
 	line-height: 2.0em;
-	float: left;
+	float: left; 
 }
 ul.quickbuttons li a.quote_button {
 	padding: 0 4px 0 16px;
@@ -2507,7 +2507,7 @@ ul.quickbuttons li.inline_mod_check {
 	margin: 0;
 }
 .quickbuttons li.quick_edit {
-	display: none;
+	/* display: none; */
 }
 ul.quickbuttons li.inline_mod_check {
 	padding: 3px 0 0 3px;
@@ -2545,6 +2545,9 @@ ul.quickbuttons li.inline_mod_check {
 .quickbuttons li:hover ul, .quickbuttons li.sfhover ul {
 	left: auto;
 	right: -1px;
+}
+.quickbuttons li ul li {
+	clear: right;
 }
 .quickbuttons li.sfhover ul li, .quickbuttons li:hover ul li{
 	display: block;
