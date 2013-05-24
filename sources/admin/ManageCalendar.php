@@ -196,7 +196,7 @@ class ManageCalendar_Controller
 	 */
 	public function action_editholiday()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		//We need this, really..
 		require_once(SUBSDIR . '/Calendar.subs.php');
@@ -217,7 +217,7 @@ class ManageCalendar_Controller
 			checkSession();
 
 			// Not too long good sir?
-			$_REQUEST['title'] =  $smcFunc['substr']($_REQUEST['title'], 0, 60);
+			$_REQUEST['title'] =  Util::substr($_REQUEST['title'], 0, 60);
 			$_REQUEST['holiday'] = isset($_REQUEST['holiday']) ? (int) $_REQUEST['holiday'] : 0;
 		
 			if (isset($_REQUEST['delete']))
@@ -308,7 +308,7 @@ class ManageCalendar_Controller
 		$this->_calendarSettings = new Settings_Form();
 
 		// Load the boards list.
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_list = getBoardList(array('not_redirection' => true), true);
 		$boards = array('');
 		foreach ($boards_list as $board)
@@ -359,7 +359,7 @@ class ManageCalendar_Controller
 		global $txt;
 
 		// Load the boards list.
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_list = getBoardList(array('not_redirection' => true), true);
 		$boards = array('');
 		foreach ($boards_list as $board)

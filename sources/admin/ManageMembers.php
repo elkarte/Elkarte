@@ -163,7 +163,9 @@ class ManageMembers_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc, $user_info;
+		global $txt, $scripturl, $context, $modSettings, $user_info;
+
+		$db = database();
 
 		// Set the current sub action.
 		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';
@@ -355,9 +357,9 @@ class ManageMembers_Controller
 				else
 				{
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
-					$parameter = strtolower(strtr($smcFunc['htmlspecialchars']($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
+					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
-					if ($smcFunc['db_case_sensitive'])
+					if ($db->db_case_sensitive())
 						$query_parts[] = '(LOWER(' . implode( ') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
 					else
 						$query_parts[] = '(' . implode( ' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
@@ -1139,7 +1141,6 @@ class ManageMembers_Controller
 		{
 			$log_action = $_POST['todo'] == 'remind' ? 'remind_member' : 'approve_member';
 
-			require_once(SOURCEDIR . '/Logging.php');
 			foreach ($member_info as $member)
 				logAction($log_action, array('member' => $member['id']), 'admin');
 		}

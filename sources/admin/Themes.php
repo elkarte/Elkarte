@@ -117,7 +117,9 @@ class Themes_Controller
 	 */
 	function action_admin()
 	{
-		global $context, $modSettings, $smcFunc;
+		global $context, $modSettings;
+
+		$db = database();
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
@@ -180,7 +182,9 @@ class Themes_Controller
 	 */
 	function action_list()
 	{
-		global $context, $boardurl, $smcFunc;
+		global $context, $boardurl;
+
+		$db = database();
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
@@ -193,7 +197,7 @@ class Themes_Controller
 			checkSession();
 			validateToken('admin-tl');
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:theme_dir}, {string:theme_url}, {string:images_url}, {string:base_theme_dir}, {string:base_theme_url}, {string:base_images_url})
@@ -209,9 +213,9 @@ class Themes_Controller
 				)
 			);
 			$themes = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$themes[$row['id_theme']][$row['variable']] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$setValues = array();
 			foreach ($themes as $id => $theme)
@@ -235,7 +239,7 @@ class Themes_Controller
 
 			if (!empty($setValues))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$setValues,
@@ -248,7 +252,7 @@ class Themes_Controller
 
 		loadTemplate('Themes');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_theme, variable, value
 			FROM {db_prefix}themes
 			WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_url}, {string:images_url})
@@ -262,7 +266,7 @@ class Themes_Controller
 			)
 		);
 		$context['themes'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (!isset($context['themes'][$row['id_theme']]))
 				$context['themes'][$row['id_theme']] = array(
@@ -270,7 +274,7 @@ class Themes_Controller
 				);
 			$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		foreach ($context['themes'] as $i => $theme)
 		{
@@ -304,7 +308,9 @@ class Themes_Controller
 	 */
 	function action_options()
 	{
-		global $txt, $context, $settings, $modSettings, $smcFunc;
+		global $txt, $context, $settings, $modSettings;
+
+		$db = database();
 
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
@@ -312,7 +318,7 @@ class Themes_Controller
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:name}, {string:theme_dir})
@@ -324,7 +330,7 @@ class Themes_Controller
 				)
 			);
 			$context['themes'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!isset($context['themes'][$row['id_theme']]))
 					$context['themes'][$row['id_theme']] = array(
@@ -334,9 +340,9 @@ class Themes_Controller
 					);
 				$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, COUNT(*) AS value
 				FROM {db_prefix}themes
 				WHERE id_member = {int:guest_member}
@@ -345,24 +351,24 @@ class Themes_Controller
 					'guest_member' => -1,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$context['themes'][$row['id_theme']]['num_default_options'] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Need to make sure we don't do custom fields.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT col_name
 				FROM {db_prefix}custom_fields',
 				array(
 				)
 			);
 			$customFields = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$customFields[] = $row['col_name'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
-			$request = $smcFunc['db_query']('themes_count', '
+			$request = $db->query('themes_count', '
 				SELECT COUNT(DISTINCT id_member) AS value, id_theme
 				FROM {db_prefix}themes
 				WHERE id_member > {int:no_member}
@@ -373,9 +379,9 @@ class Themes_Controller
 					'custom_fields' => empty($customFields) ? array() : $customFields,
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$context['themes'][$row['id_theme']]['num_members'] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// There has to be a Settings template!
 			foreach ($context['themes'] as $k => $v)
@@ -419,7 +425,7 @@ class Themes_Controller
 			{
 				// Are there options in non-default themes set that should be cleared?
 				if (!empty($old_settings))
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme != {int:default_theme}
 							AND id_member = {int:guest_member}
@@ -431,7 +437,7 @@ class Themes_Controller
 						)
 					);
 
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$setValues,
@@ -462,7 +468,7 @@ class Themes_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme = {int:default_theme}
 							AND id_member != {int:no_member}
@@ -473,7 +479,7 @@ class Themes_Controller
 							'option' => $opt,
 						)
 					);
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						INSERT INTO {db_prefix}themes
 							(id_member, id_theme, variable, value)
 						SELECT id_member, 1, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
@@ -488,7 +494,7 @@ class Themes_Controller
 				}
 				elseif ($_POST['default_options_master'][$opt] == 2)
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE variable = {string:option_name}
 							AND id_member > {int:no_member}',
@@ -502,7 +508,7 @@ class Themes_Controller
 
 			// Delete options from other themes.
 			if (!empty($old_settings))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}themes
 					WHERE id_theme != {int:default_theme}
 						AND id_member > {int:no_member}
@@ -521,7 +527,7 @@ class Themes_Controller
 				elseif ($_POST['options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility - again!
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme = {int:current_theme}
 							AND id_member != {int:no_member}
@@ -532,7 +538,7 @@ class Themes_Controller
 							'option' => $opt,
 						)
 					);
-					$smcFunc['db_query']('substring', '
+					$db->query('substring', '
 						INSERT INTO {db_prefix}themes
 							(id_member, id_theme, variable, value)
 						SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
@@ -546,7 +552,7 @@ class Themes_Controller
 				}
 				elseif ($_POST['options_master'][$opt] == 2)
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE variable = {string:option}
 							AND id_member > {int:no_member}
@@ -570,20 +576,20 @@ class Themes_Controller
 			// Don't delete custom fields!!
 			if ($_GET['th'] == 1)
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT col_name
 					FROM {db_prefix}custom_fields',
 					array(
 					)
 				);
 				$customFields = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$customFields[] = $row['col_name'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}themes
 				WHERE id_member > {int:no_member}
 					AND id_theme = {int:current_theme}
@@ -619,7 +625,7 @@ class Themes_Controller
 
 		if (empty($_REQUEST['who']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT variable, value
 				FROM {db_prefix}themes
 				WHERE id_theme IN (1, {int:current_theme})
@@ -630,9 +636,9 @@ class Themes_Controller
 				)
 			);
 			$context['theme_options'] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$context['theme_options'][$row['variable']] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			$context['theme_options_reset'] = false;
 		}
@@ -687,7 +693,9 @@ class Themes_Controller
 	 */
 	function action_setthemesettings()
 	{
-		global $txt, $context, $settings, $modSettings, $smcFunc;
+		global $txt, $context, $settings, $modSettings;
+
+		$db = database();
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 			return $this->action_admin();
@@ -779,7 +787,7 @@ class Themes_Controller
 			// If we're actually inserting something..
 			if (!empty($inserts))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$inserts,
@@ -864,7 +872,9 @@ class Themes_Controller
 	 */
 	function action_remove()
 	{
-		global $modSettings, $context, $smcFunc;
+		global $modSettings, $context;
+
+		$db = database();
 
 		checkSession('get');
 
@@ -885,7 +895,7 @@ class Themes_Controller
 				unset($known[$i]);
 		}
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}themes
 			WHERE id_theme = {int:current_theme}',
 			array(
@@ -893,7 +903,7 @@ class Themes_Controller
 			)
 		);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET id_theme = {int:default_theme}
 			WHERE id_theme = {int:current_theme}',
@@ -903,7 +913,7 @@ class Themes_Controller
 			)
 		);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_theme = {int:default_theme}
 			WHERE id_theme = {int:current_theme}',
@@ -935,7 +945,9 @@ class Themes_Controller
 	 */
 	function action_pick()
 	{
-		global $txt, $context, $modSettings, $user_info, $language, $smcFunc, $settings, $scripturl;
+		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
+
+		$db = database();
 
 		loadLanguage('Profile');
 		loadTemplate('Themes');
@@ -977,7 +989,7 @@ class Themes_Controller
 				// A variants to save for the user?
 				if (!empty($_GET['vrt']))
 				{
-					$smcFunc['db_insert']('replace',
+					$db->insert('replace',
 						'{db_prefix}themes',
 						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 						array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
@@ -994,7 +1006,7 @@ class Themes_Controller
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($_GET['vrt']) && ($_REQUEST['u'] == '0' || $_REQUEST['u'] == '-1'))
 			{
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					array($_GET['th'], 0, 'default_variant', $_GET['vrt']),
@@ -1013,7 +1025,7 @@ class Themes_Controller
 				// Remove any custom variants.
 				if (!empty($_GET['vrt']))
 				{
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						DELETE FROM {db_prefix}themes
 						WHERE id_theme = {int:current_theme}
 							AND variable = {string:theme_variant}',
@@ -1044,7 +1056,7 @@ class Themes_Controller
 
 				if (!empty($_GET['vrt']))
 				{
-					$smcFunc['db_insert']('replace',
+					$db->insert('replace',
 						'{db_prefix}themes',
 						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 						array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
@@ -1093,7 +1105,7 @@ class Themes_Controller
 		$context['available_themes'] = array();
 		if (!empty($modSettings['knownThemes']))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url}, {string:disable_user_variant})' . (!allowedTo('admin_forum') ? '
@@ -1111,7 +1123,7 @@ class Themes_Controller
 					'known_themes' => explode(',', $modSettings['knownThemes']),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!isset($context['available_themes'][$row['id_theme']]))
 					$context['available_themes'][$row['id_theme']] = array(
@@ -1121,7 +1133,7 @@ class Themes_Controller
 					);
 				$context['available_themes'][$row['id_theme']][$row['variable']] = $row['value'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
@@ -1135,7 +1147,7 @@ class Themes_Controller
 		else
 			$guest_theme = $modSettings['theme_guests'];
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_theme, COUNT(*) AS the_count
 			FROM {db_prefix}members
 			GROUP BY id_theme
@@ -1143,7 +1155,7 @@ class Themes_Controller
 			array(
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Figure out which theme it is they are REALLY using.
 			if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',',$modSettings['knownThemes'])))
@@ -1156,13 +1168,13 @@ class Themes_Controller
 			else
 				$context['available_themes'][$guest_theme]['num_users'] += $row['the_count'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Get any member variant preferences.
 		$variant_preferences = array();
 		if ($context['current_member'] > 0)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_theme, value
 				FROM {db_prefix}themes
 				WHERE variable = {string:theme_variant}
@@ -1173,9 +1185,9 @@ class Themes_Controller
 					'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $context['current_member']) : array(-1),
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$variant_preferences[$row['id_theme']] = $row['value'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Save the setting first.
@@ -1268,7 +1280,9 @@ class Themes_Controller
 	 */
 	function action_install()
 	{
-		global $boardurl, $txt, $context, $settings, $modSettings, $smcFunc;
+		global $boardurl, $txt, $context, $settings, $modSettings;
+
+		$db = database();
 
 		checkSession('request');
 
@@ -1281,7 +1295,7 @@ class Themes_Controller
 
 		if (isset($_GET['theme_id']))
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT value
 				FROM {db_prefix}themes
 				WHERE id_theme = {int:current_theme}
@@ -1294,8 +1308,8 @@ class Themes_Controller
 					'name' => 'name',
 				)
 			);
-			list ($theme_name) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list ($theme_name) = $db->fetch_row($result);
+			$db->free_result($result);
 
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
@@ -1350,7 +1364,7 @@ class Themes_Controller
 			$theme_dir = realpath($theme_dir);
 
 			// Lets get some data for the new theme.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT variable, value
 				FROM {db_prefix}themes
 				WHERE variable IN ({string:theme_templates}, {string:theme_layers})
@@ -1363,7 +1377,7 @@ class Themes_Controller
 					'theme_layers' => 'theme_layers',
 				)
 			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if ($row['variable'] == 'theme_templates')
 					$theme_templates = $row['value'];
@@ -1372,13 +1386,13 @@ class Themes_Controller
 				else
 					continue;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Lets add a theme_info.xml to this theme.
 			$xml_info = '<' . '?xml version="1.0"?' . '>
 	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:smf="http://www.simplemachines.org/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>smf:' . $smcFunc['strtolower'](str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
+		<id>smf:' . Util::strtolower(str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
 		<version>' . $modSettings['elkVersion'] . '</version>
 		<!-- Theme name, used purely for aesthetics. -->
 		<name>' . $_REQUEST['copy'] . '</name>
@@ -1498,7 +1512,7 @@ class Themes_Controller
 				{
 					$install_info['based_on'] = preg_replace('~[^A-Za-z0-9\-_ ]~', '', $install_info['based_on']);
 
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
 						FROM {db_prefix}themes AS th
 							INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
@@ -1520,8 +1534,8 @@ class Themes_Controller
 							'based_on_path' => '%' . "\\" . $install_info['based_on'],
 						)
 					);
-					$temp = $smcFunc['db_fetch_assoc']($request);
-					$smcFunc['db_free_result']($request);
+					$temp = $db->fetch_assoc($request);
+					$db->free_result($request);
 
 					// @todo An error otherwise?
 					if (is_array($temp))
@@ -1537,14 +1551,14 @@ class Themes_Controller
 			}
 
 			// Find the newest id_theme.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT MAX(id_theme)
 				FROM {db_prefix}themes',
 				array(
 				)
 			);
-			list ($id_theme) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list ($id_theme) = $db->fetch_row($result);
+			$db->free_result($result);
 
 			// This will be theme number...
 			$id_theme++;
@@ -1554,7 +1568,7 @@ class Themes_Controller
 				$inserts[] = array($id_theme, $var, $val);
 
 			if (!empty($inserts))
-				$smcFunc['db_insert']('insert',
+				$db->insert('insert',
 					'{db_prefix}themes',
 					array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 					$inserts,
@@ -1579,7 +1593,9 @@ class Themes_Controller
 	 */
 	function action_jsoption()
 	{
-		global $settings, $user_info, $smcFunc, $options;
+		global $settings, $user_info, $options;
+
+		$db = database();
 
 		// Check the session id.
 		checkSession('get');
@@ -1651,7 +1667,7 @@ class Themes_Controller
 		}
 
 		// Update the option.
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}themes',
 			array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 			array($settings['theme_id'], $user_info['id'], $_GET['var'], is_array($_GET['val']) ? implode(',', $_GET['val']) : $_GET['val']),
@@ -1679,7 +1695,9 @@ class Themes_Controller
 	 */
 	function action_edit()
 	{
-		global $context, $settings, $scripturl, $smcFunc;
+		global $context, $settings, $scripturl;
+
+		$db = database();
 
 		isAllowedTo('admin_forum');
 		loadTemplate('Themes');
@@ -2072,7 +2090,9 @@ class Themes_Controller
 	 */
 	function action_copy()
 	{
-		global $context, $settings, $smcFunc;
+		global $context, $settings;
+
+		$db = database();
 
 		isAllowedTo('admin_forum');
 		loadTemplate('Themes');
@@ -2081,7 +2101,7 @@ class Themes_Controller
 
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT th1.value, th1.id_theme, th2.value
 			FROM {db_prefix}themes AS th1
 				LEFT JOIN {db_prefix}themes AS th2 ON (th2.variable = {string:base_theme_dir} AND th2.id_theme = {int:current_theme})
@@ -2094,8 +2114,8 @@ class Themes_Controller
 				'theme_dir' => 'theme_dir',
 			)
 		);
-		list ($theme_dir, $context['theme_id'], $base_theme_dir) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($theme_dir, $context['theme_id'], $base_theme_dir) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		if (isset($_REQUEST['template']) && preg_match('~[\./\\\\:\0]~', $_REQUEST['template']) == 0)
 		{
@@ -2308,7 +2328,7 @@ function WrapAction()
 
 	// Any special layers?
 	if (isset($settings['catch_action']['layers']))
-		$context['template_layers'] = $settings['catch_action']['layers'];
+		Template_Layers::getInstance()->add($settings['catch_action']['layers']);
 
 	// Just call a function?
 	if (isset($settings['catch_action']['function']))

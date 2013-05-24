@@ -173,13 +173,13 @@ class Email_Parse
 	 */
 	private function _query_load_email($id)
 	{
-		global $smcFunc;
+		$db = database();
 
 		// Nothing to load then
 		if (empty($id))
 			return '';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT message
 			FROM {db_prefix}postby_emails_error
 			WHERE id_email = {int:id}
@@ -188,8 +188,8 @@ class Email_Parse
 				'id' => $id
 			)
 		);
-		list($message) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list($message) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		return $message;
 	}

@@ -115,7 +115,6 @@ class ManageNews_Controller
 	public function action_editnews()
 	{
 		global $txt, $modSettings, $context, $scripturl;
-		global $smcFunc;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -148,7 +147,7 @@ class ManageNews_Controller
 					unset($_POST['news'][$i]);
 				else
 				{
-					$_POST['news'][$i] = $smcFunc['htmlspecialchars']($_POST['news'][$i], ENT_QUOTES);
+					$_POST['news'][$i] = Util::htmlspecialchars($_POST['news'][$i], ENT_QUOTES);
 					preparsecode($_POST['news'][$i]);
 				}
 			}
@@ -345,7 +344,7 @@ class ManageNews_Controller
 	 */
 	public function action_mailingcompose()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];
@@ -412,7 +411,7 @@ class ManageNews_Controller
 				foreach ($_POST[$type] as $index => $member)
 				{
 					if (strlen(trim($member)) > 0)
-						$_POST[$type][$index] = $smcFunc['htmlspecialchars']($smcFunc['strtolower'](trim($member)));
+						$_POST[$type][$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
 					else
 						unset($_POST[$type][$index]);
 				}
@@ -441,7 +440,7 @@ class ManageNews_Controller
 		}
 
 		// Clean the other vars.
-		action_mailingsend(true);
+		$this->action_mailingsend(true);
 
 		// We need a couple strings from the email template file
 		loadLanguage('EmailTemplates');

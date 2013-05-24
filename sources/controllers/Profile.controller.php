@@ -28,7 +28,9 @@ if (!defined('ELKARTE'))
 function action_modifyprofile()
 {
 	global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
-	global $modSettings, $memberContext, $profile_vars, $smcFunc, $post_errors, $options, $user_settings;
+	global $modSettings, $memberContext, $profile_vars, $post_errors, $options, $user_settings;
+
+	$db = database();
 
 	// Don't reload this as we may have processed error strings.
 	if (empty($post_errors))
@@ -486,7 +488,7 @@ function action_modifyprofile()
 	// Set the template for this area... if you still can :P
 	// and add the profile layer.
 	$context['sub_template'] = $profile_include_data['function'];
-	$context['template_layers'][] = 'profile';
+	Template_Layers::getInstance()->add('profile');
 
 	// All the subactions that require a user password in order to validate.
 	$check_password = $context['user']['is_owner'] && in_array($profile_include_data['current_area'], $context['password_areas']);
@@ -602,7 +604,6 @@ function action_modifyprofile()
 			if (!empty($context['log_changes']) && !empty($modSettings['modlog_enabled']))
 			{
 				$log_changes = array();
-				require_once(SOURCEDIR . '/Logging.php');
 				foreach ($context['log_changes'] as $k => $v)
 					$log_changes[] = array(
 						'action' => $k,

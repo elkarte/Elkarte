@@ -72,7 +72,9 @@ class SplitTopics_Controller
 	 */
 	function action_splitIndex()
 	{
-		global $txt, $topic, $context, $smcFunc, $modSettings;
+		global $txt, $topic, $context, $modSettings;
+
+		$db = database();
 
 		// Validate "at".
 		if (empty($_GET['at']))
@@ -81,7 +83,7 @@ class SplitTopics_Controller
 
 		// We deal with topics here.
 		require_once(SUBSDIR . '/Topic.subs.php');
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
@@ -129,7 +131,7 @@ class SplitTopics_Controller
 	 */
 	function action_splitExecute()
 	{
-		global $txt, $context, $user_info, $smcFunc, $modSettings;
+		global $txt, $context, $user_info, $modSettings;
 		global $board, $topic, $language, $scripturl;
 
 		// Check the session to make sure they meant to do this.
@@ -143,12 +145,12 @@ class SplitTopics_Controller
 		if (empty($_SESSION['move_to_board']))
 		{
 			$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-			$context['reason'] = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+			$context['reason'] = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
 		}
 		else
 		{
 			$context['move_to_board'] = (int) $_SESSION['move_to_board'];
-			$context['reason'] = trim($smcFunc['htmlspecialchars']($_SESSION['reason']));
+			$context['reason'] = trim(Util::htmlspecialchars($_SESSION['reason']));
 		}
 		$_SESSION['move_to_board'] = $context['move_to_board'];
 		$_SESSION['reason'] = $context['reason'];
@@ -216,7 +218,7 @@ class SplitTopics_Controller
 			fatal_lang_error('splittopic_no_reason', false);
 
 		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-		$reason = !empty($_POST['reason']) ? trim($smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES)) : '';
+		$reason = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
 
 		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 		if (!empty($_POST['messageRedirect']) && empty($reason))
@@ -245,7 +247,6 @@ class SplitTopics_Controller
 	function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-		global $smcFunc;
 
 		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
@@ -258,7 +259,7 @@ class SplitTopics_Controller
 			$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
 
 		$context['move_to_board'] = !empty($_SESSION['move_to_board']) ? (int) $_SESSION['move_to_board'] : 0;
-		$context['reason'] = !empty($_SESSION['reason']) ? trim($smcFunc['htmlspecialchars']($_SESSION['reason'])) : '';
+		$context['reason'] = !empty($_SESSION['reason']) ? trim(Util::htmlspecialchars($_SESSION['reason'])) : '';
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -295,7 +296,7 @@ class SplitTopics_Controller
 				'not_selected' => array(),
 				'selected' => array(),
 			);
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_msg
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}' . (empty($_SESSION['split_selection'][$topic]) ? '' : '
@@ -312,14 +313,14 @@ class SplitTopics_Controller
 				)
 			);
 			// You can't split the last message off.
-			if (empty($context['not_selected']['start']) && $smcFunc['db_num_rows']($request) <= 1 && $_REQUEST['move'] == 'down')
+			if (empty($context['not_selected']['start']) && $db->num_rows($request) <= 1 && $_REQUEST['move'] == 'down')
 				$_REQUEST['move'] = '';
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$original_msgs['not_selected'][] = $row['id_msg'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT id_msg
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
@@ -335,9 +336,9 @@ class SplitTopics_Controller
 						'messages_per_page' => $context['messages_per_page'],
 					)
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$original_msgs['selected'][] = $row['id_msg'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 		}
 
@@ -357,7 +358,7 @@ class SplitTopics_Controller
 		// Make sure the selection is still accurate.
 		if (!empty($_SESSION['split_selection'][$topic]))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_msg
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}
@@ -370,13 +371,13 @@ class SplitTopics_Controller
 				)
 			);
 			$_SESSION['split_selection'][$topic] = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$_SESSION['split_selection'][$topic][] = $row['id_msg'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Get the number of messages (not) selected to be split.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
 			FROM {db_prefix}messages AS m
 			WHERE m.id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
@@ -388,9 +389,9 @@ class SplitTopics_Controller
 				'is_approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Fix an oversized starting page (to make sure both pageindexes are properly set).
 		if ($context['selected']['start'] >= $context['selected']['num_messages'])
@@ -455,7 +456,7 @@ class SplitTopics_Controller
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
-	global $scripturl, $user_info, $language, $txt, $smcFunc, $user_info, $topic, $board;
+	global $scripturl, $user_info, $language, $txt, $user_info, $topic, $board;
 
 	// Should be in the boardwide language.
 	if ($user_info['language'] != $language)
@@ -470,7 +471,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 	));
 
 	$msgOptions = array(
-		'subject' => $txt['moved'] . ': ' . strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($subject)), array("\r" => '', "\n" => '', "\t" => '')),
+		'subject' => $txt['moved'] . ': ' . strtr(Util::htmltrim(Util::htmlspecialchars($subject)), array("\r" => '', "\n" => '', "\t" => '')),
 		'body' => $reason,
 		'icon' => 'moved',
 		'smileys_enabled' => 1,
@@ -503,14 +504,16 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $smcFunc, $txt, $context;
+	global $user_info, $topic, $board, $modSettings, $txt, $context;
+
+	$db = database();
 
 	// Nothing to split?
 	if (empty($splitMessages))
 		fatal_lang_error('no_posts_selected', false);
 
 	// Get some board info.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, approved
 		FROM {db_prefix}topics
 		WHERE id_topic = {int:id_topic}
@@ -519,11 +522,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => $split1_ID_TOPIC,
 		)
 	);
-	list ($id_board, $split1_approved) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($id_board, $split1_approved) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// Find the new first and last not in the list. (old topic)
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			MIN(m.id_msg) AS myid_first_msg, MAX(m.id_msg) AS myid_last_msg, COUNT(*) AS message_count, m.approved
 		FROM {db_prefix}messages AS m
@@ -539,13 +542,13 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		)
 	);
 	// You can't select ALL the messages!
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('selected_all_posts', false);
 
 	$split1_first_msg = null;
 	$split1_last_msg = null;
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Get the right first and last message dependant on approved state...
 		if (empty($split1_first_msg) || $row['myid_first_msg'] < $split1_first_msg)
@@ -570,12 +573,12 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			$split1_unapprovedposts = $row['message_count'];
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 	$split1_firstMem = getMsgMemberID($split1_first_msg);
 	$split1_lastMem = getMsgMemberID($split1_last_msg);
 
 	// Find the first and last in the list. (new topic)
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT MIN(id_msg) AS myid_first_msg, MAX(id_msg) AS myid_last_msg, COUNT(*) AS message_count, approved
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:msg_list})
@@ -588,7 +591,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => $split1_ID_TOPIC,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// As before get the right first and last message dependant on approved state...
 		if (empty($split2_first_msg) || $row['myid_first_msg'] < $split2_first_msg)
@@ -618,7 +621,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			$split2_unapprovedposts = $row['message_count'];
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 	$split2_firstMem = getMsgMemberID($split2_first_msg);
 	$split2_lastMem = getMsgMemberID($split2_last_msg);
 
@@ -631,7 +634,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		fatal_lang_error('split_first_post', false);
 
 	// We're off to insert the new topic!  Use 0 for now to avoid UNIQUE errors.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}topics',
 		array(
 			'id_board' => 'int',
@@ -650,19 +653,19 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		),
 		array('id_topic')
 	);
-	$split2_ID_TOPIC = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
+	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
 		fatal_lang_error('cant_insert_topic');
 
 	// Move the messages over to the other topic.
-	$new_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
 	// Check the subject length.
-	if ($smcFunc['strlen']($new_subject) > 100)
-		$new_subject = $smcFunc['substr']($new_subject, 0, 100);
+	if (Util::strlen($new_subject) > 100)
+		$new_subject = Util::substr($new_subject, 0, 100);
 	// Valid subject?
 	if ($new_subject != '')
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET
 				id_topic = {int:id_topic},
@@ -683,7 +686,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// @fixme refactor this section, Topic.subs has the function.
 	// Any associated reported posts better follow...
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET id_topic = {int:id_topic}
 		WHERE id_msg IN ({array_int:split_msgs})',
@@ -694,7 +697,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 
 	// Mess with the old topic's first, last, and number of messages.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET
 			num_replies = {int:num_replies},
@@ -716,7 +719,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 
 	// Now, put the first/last message back to what they should be.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET
 			id_first_msg = {int:id_first_msg},
@@ -731,7 +734,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// If the new topic isn't approved ensure the first message flags this just in case.
 	if (!$split2_approved)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET approved = {int:approved}
 			WHERE id_msg = {int:id_msg}
@@ -744,7 +747,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		);
 
 	// The board has more topics now (Or more unapproved ones!).
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET ' . ($split2_approved ? '
 			num_topics = num_topics + 1' : '
@@ -762,7 +765,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Copy log topic entries.
 	// @todo This should really be chunked.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, id_msg, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic = {int:id_topic}',
@@ -770,17 +773,17 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'id_topic' => (int) $split1_ID_TOPIC,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 	{
 		$replaceEntries = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['disregarded']);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		markTopicsRead($replaceEntries, false);
 		unset($replaceEntries);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Housekeeping.
 	updateStats('topic');
@@ -810,7 +813,9 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info, $context, $smcFunc;
+	global $board, $user_info, $context;
+
+	$db = database();
 
 	// If the starting and final boards are different we have to check some permissions and stuff
 	if ($boards['destination']['id'] != $board)
@@ -832,7 +837,7 @@ function splitAttemptMove($boards, $totopic)
 			// @todo this should probably go into a function...
 			if ($boards['destination']['count_posts'] != $boards['current']['count_posts'])
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT id_member
 					FROM {db_prefix}messages
 					WHERE id_topic = {int:current_topic}
@@ -843,14 +848,14 @@ function splitAttemptMove($boards, $totopic)
 					)
 				);
 				$posters = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 				{
 					if (!isset($posters[$row['id_member']]))
 						$posters[$row['id_member']] = 0;
 
 					$posters[$row['id_member']]++;
 				}
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				foreach ($posters as $id_member => $posts)
 				{

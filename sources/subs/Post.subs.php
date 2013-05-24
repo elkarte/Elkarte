@@ -538,7 +538,9 @@ function resizeBBCImages(&$message)
 function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
 	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname;
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
 	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : $user_info['id'];
@@ -563,7 +565,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		return;
 
 	// Get the subject, body and basic poster details
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
 			IFNULL(mem.real_name, ml.poster_name) AS poster_name
 		FROM {db_prefix}topics AS t
@@ -578,11 +580,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	);
 	$topicData = array();
 	$boards_index = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		// Any attachments, we just want the number of them for display
 		$num_attachments = 0;
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(id_attach)
 			FROM {db_prefix}attachments
 			WHERE attachment_type = {int:attachment_type}
@@ -593,8 +595,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				'id_msg' => $row['id_last_msg'],
 			)
 		);
-		list($num_attachments) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list($num_attachments) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// Using the maillist function or the standard style
 		if ($maillist)
@@ -627,7 +629,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'attachments' => $num_attachments,
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Work out any exclusions...
 	foreach ($topics as $key => $id)
@@ -648,8 +650,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$digest_insert = array();
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['last_id'], $type, (int) $data['exclude']);
-	
-	$smcFunc['db_insert']('',
+
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -662,7 +664,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	if ($maillist)
 	{
 		// Find the members with *board* notifications on.
-		$members = $smcFunc['db_query']('', '
+		$members = $db->query('', '
 			SELECT
 				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, mem.warning,
 				ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, b.name, b.id_profile,
@@ -688,10 +690,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		);
 		$boards = array();
 		$sent = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($members))
+		while ($row = $db->fetch_assoc($members))
 		{
 			// for this member/board, loop through the topics and see if we should send it
-			foreach ($topicData as $id => $data) 
+			foreach ($topicData as $id => $data)
 			{
 				// Don't send it if its not from the right board
 				if ($data['board'] !== $row['id_board'])
@@ -704,7 +706,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 					continue;
 
 				// If they are not the poster do they want to know?
-				// @todo maybe if they posted via email?  
+				// @todo maybe if they posted via email?
 				if ($type !== 'reply' && $row['notify_types'] == 2)
 					continue;
 
@@ -754,14 +756,14 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 						// In group mode like google group or yahoo group, the mail is from the poster
 						// Otherwise in maillist mode, it is from the site
 						$emailfrom = !empty($modSettings['maillist_group_mode']) ? un_htmlspecialchars($data['name']) : (!empty($modSettings['maillist_sitename']) ? un_htmlspecialchars($modSettings['maillist_sitename']) : $mbname);
-						
+
 						// The email address of the sender, irrespective of the envelope name above
 						$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
 						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $emailfrom, 'm' . $data['last_id'], false, 3, null, false, $from_wrapper, $id);
 					}
 					else
 						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $data['last_id']);
-					
+
 					$sent++;
 
 					// make a note that this member was sent this topic
@@ -769,11 +771,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				}
 			}
 		}
-		$smcFunc['db_free_result']($members);
+		$db->free_result($members);
 	}
 
 	// Find the members with notification on for this topic.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started, b.name,
@@ -799,7 +801,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		)
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+	while ($row = $db->fetch_assoc($members))
 	{
 		// Don't do the excluded...
 		if ($topicData[$row['id_topic']]['exclude'] == $row['id_member'])
@@ -864,14 +866,14 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			$sent++;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	if (isset($current_language) && $current_language != $user_language)
 		loadLanguage('Post');
 
 	// Sent!
 	if ($type == 'reply' && !empty($sent))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
@@ -890,7 +892,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		{
 			if ($data['exclude'])
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_notify
 					SET sent = {int:not_sent}
 					WHERE id_topic = {int:id_topic}
@@ -908,11 +910,11 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 /**
  * Checks if a user has the correct access to get notifications
- * - validates they have proper group access to a board 
+ * - validates they have proper group access to a board
  * - if using the maillist, checks if they should get a reply-able message
  * 		- not muted
  * 		- has postby_email permission on the board
- * 
+ *
  * Returns false if they do not have the proper group access to a board
  * Sets email_perm to false if they should not get a reply-able message
  *
@@ -922,7 +924,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function validateAccess($row, $maillist, &$email_perm = true)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 	static $board_profile = array();
 
 	// No need to check for you ;)
@@ -949,7 +953,7 @@ function validateAccess($row, $maillist, &$email_perm = true)
 			// In a group that has email posting permissions on this board
 			if (!isset($board_profile[$row['id_profile']]))
 			{
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT permission, add_deny, id_group
 					FROM {db_prefix}board_permissions
 					WHERE id_profile = {int:id_profile}
@@ -959,9 +963,9 @@ function validateAccess($row, $maillist, &$email_perm = true)
 						'permission' => 'postby_email',
 					)
 				);
-				while ($row_perm = $smcFunc['db_fetch_assoc']($request))
+				while ($row_perm = $db->fetch_assoc($request))
 					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			// Get the email permission for this board / posting group
@@ -984,7 +988,9 @@ function validateAccess($row, $maillist, &$email_perm = true)
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, $smcFunc;
+	global $user_info, $txt, $modSettings;
+
+	$db = database();
 
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
@@ -1005,7 +1011,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT approved
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:id_topic}
@@ -1014,8 +1020,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_topic' => $topicOptions['id'],
 			)
 		);
-		list ($topicOptions['is_approved']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($topicOptions['is_approved']) = $db->fetch_row($request);
+		$db->free_result($request);
 	}
 
 	// If nothing was filled in as name/e-mail address, try the member table.
@@ -1073,13 +1079,13 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	call_integration_hook('integrate_create_post', array(&$msgOptions, &$topicOptions, &$posterOptions, &$message_columns, &$message_parameters));
 
 	// Insert the post.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}messages',
 		$message_columns,
 		$message_parameters,
 		array('id_msg')
 	);
-	$msgOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}messages', 'id_msg');
+	$msgOptions['id'] = $db->insert_id('{db_prefix}messages', 'id_msg');
 
 	// Something went wrong creating the message...
 	if (empty($msgOptions['id']))
@@ -1087,7 +1093,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Fix the attachments.
 	if (!empty($msgOptions['attachments']))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}attachments
 			SET id_msg = {int:id_msg}
 			WHERE id_attach IN ({array_int:attachment_list})',
@@ -1115,19 +1121,19 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		call_integration_hook('integrate_before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));
 
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}topics',
 			$topic_columns,
 			$topic_parameters,
 			array('id_topic')
 		);
-		$topicOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
+		$topicOptions['id'] = $db->insert_id('{db_prefix}topics', 'id_topic');
 
 		// The topic couldn't be created for some reason.
 		if (empty($topicOptions['id']))
 		{
 			// We should delete the post that did work, though...
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}messages
 				WHERE id_msg = {int:id_msg}',
 				array(
@@ -1139,7 +1145,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 
 		// Fix the message with the topic.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET id_topic = {int:id_topic}
 			WHERE id_msg = {int:id_msg}',
@@ -1192,7 +1198,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		call_integration_hook('integrate_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
 		// Update the number of replies and the lock/sticky status.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				' . implode(', ', $topics_columns) . '
@@ -1206,7 +1212,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Creating is modifying...in a way.
 	// @todo Why not set id_msg_modified on the insert?
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_msg_modified = {int:id_msg}
 		WHERE id_msg = {int:id_msg}',
@@ -1217,7 +1223,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Increase the number of posts and topics on the board.
 	if ($msgOptions['approved'])
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET num_posts = num_posts + 1' . ($new_topic ? ', num_topics = num_topics + 1' : '') . '
 			WHERE id_board = {int:id_board}',
@@ -1227,7 +1233,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 	else
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET unapproved_posts = unapproved_posts + 1' . ($new_topic ? ', unapproved_topics = unapproved_topics + 1' : '') . '
 			WHERE id_board = {int:id_board}',
@@ -1237,7 +1243,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 
 		// Add to the approval queue too.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}approval_queue',
 			array(
 				'id_msg' => 'int',
@@ -1255,7 +1261,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// Since it's likely they *read* it before replying, let's try an UPDATE first.
 		if (!$new_topic)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_topics
 				SET id_msg = {int:id_msg}
 				WHERE id_member = {int:current_member}
@@ -1267,7 +1273,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				)
 			);
 
-			$flag = $smcFunc['db_affected_rows']() != 0;
+			$flag = $db->affected_rows() != 0;
 		}
 
 		if (empty($flag))
@@ -1322,7 +1328,9 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings;
+
+	$db = database();
 
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
 	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
@@ -1348,7 +1356,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$message = getExistingMessage($msgOptions['id'], true);
 			$msgOptions['old_body'] = $message['body'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 	}
 	if (!empty($msgOptions['modify_time']))
@@ -1379,7 +1387,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		return true;
 
 	// Change the post.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET ' . implode(', ', $messages_columns) . '
 		WHERE id_msg = {int:id_msg}',
@@ -1389,7 +1397,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Lock and or sticky the post.
 	if ($topicOptions['sticky_mode'] !== null || $topicOptions['lock_mode'] !== null || $topicOptions['poll'] !== null)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				is_sticky = {raw:is_sticky},
@@ -1409,7 +1417,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (!empty($topicOptions['mark_as_read']) && !$user_info['is_guest'])
 	{
 		// Since it's likely they *read* it before editing, let's try an UPDATE first.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_topics
 			SET id_msg = {int:id_msg}
 			WHERE id_member = {int:current_member}
@@ -1421,7 +1429,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			)
 		);
 
-		$flag = $smcFunc['db_affected_rows']() != 0;
+		$flag = $db->affected_rows() != 0;
 
 		if (empty($flag))
 		{
@@ -1439,7 +1447,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (isset($msgOptions['subject']))
 	{
 		// Only update the subject if this was the first message in the topic.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic
 			FROM {db_prefix}topics
 			WHERE id_first_msg = {int:id_first_msg}
@@ -1448,9 +1456,9 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_first_msg' => $msgOptions['id'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 1)
+		if ($db->num_rows($request) == 1)
 			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Finally, if we are setting the approved state we need to do much more work :(
@@ -1468,7 +1476,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($msgs))
 		$msgs = array($msgs);
@@ -1477,7 +1485,7 @@ function approvePosts($msgs, $approve = true)
 		return false;
 
 	// May as well start at the beginning, working out *what* we need to change.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
 			m.body, m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.id_member,
 			t.approved AS topic_approved, b.count_posts
@@ -1499,7 +1507,7 @@ function approvePosts($msgs, $approve = true)
 	$notification_topics = array();
 	$notification_posts = array();
 	$member_post_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Easy...
 		$msgs[] = $row['id_msg'];
@@ -1571,13 +1579,13 @@ function approvePosts($msgs, $approve = true)
 		if ($row['id_member'] && empty($row['count_posts']))
 			$member_post_changes[$row['id_member']] = isset($member_post_changes[$row['id_member']]) ? $member_post_changes[$row['id_member']] + 1 : 1;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($msgs))
 		return;
 
 	// Now we have the differences make the changes, first the easy one.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET approved = {int:approved_state}
 		WHERE id_msg IN ({array_int:message_list})',
@@ -1590,7 +1598,7 @@ function approvePosts($msgs, $approve = true)
 	// If we were unapproving find the last msg in the topics...
 	if (!$approve)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, MAX(id_msg) AS id_last_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topic_list})
@@ -1601,14 +1609,14 @@ function approvePosts($msgs, $approve = true)
 				'approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_last_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// ... next the topics...
 	foreach ($topic_changes as $id => $changes)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET approved = {int:approved}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
 				num_replies = num_replies + {int:num_replies}, id_last_msg = {int:id_last_msg}
@@ -1624,7 +1632,7 @@ function approvePosts($msgs, $approve = true)
 
 	// ... finally the boards...
 	foreach ($board_changes as $id => $changes)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET num_posts = num_posts + {int:num_posts}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
 				num_topics = num_topics + {int:num_topics}, unapproved_topics = unapproved_topics + {int:unapproved_topics}
@@ -1646,7 +1654,7 @@ function approvePosts($msgs, $approve = true)
 		if (!empty($notification_posts))
 			sendApprovalNotifications($notification_posts);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}approval_queue
 			WHERE id_msg IN ({array_int:message_list})
 				AND id_attach = {int:id_attach}',
@@ -1663,7 +1671,7 @@ function approvePosts($msgs, $approve = true)
 		foreach ($msgs as $msg)
 			$msgInserts[] = array($msg);
 
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}approval_queue',
 			array('id_msg' => 'int'),
 			$msgInserts,
@@ -1691,7 +1699,7 @@ function approvePosts($msgs, $approve = true)
  */
 function approveTopics($topics, $approve = true)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($topics))
 		$topics = array($topics);
@@ -1702,7 +1710,7 @@ function approveTopics($topics, $approve = true)
 	$approve_type = $approve ? 0 : 1;
 
 	// Just get the messages to be approved and pass through...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topic_list})
@@ -1713,9 +1721,9 @@ function approveTopics($topics, $approve = true)
 		)
 	);
 	$msgs = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$msgs[] = $row['id_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return approvePosts($msgs, $approve);
 }
@@ -1727,7 +1735,9 @@ function approveTopics($topics, $approve = true)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $smcFunc;
+	global $scripturl, $language, $user_info, $modSettings;
+
+	$db = database();
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
@@ -1766,7 +1776,7 @@ function sendApprovalNotifications(&$topicData)
 	}
 
 	// These need to go into the digest too...
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -1776,7 +1786,7 @@ function sendApprovalNotifications(&$topicData)
 	);
 
 	// Find everyone who needs to know about this.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
@@ -1801,7 +1811,7 @@ function sendApprovalNotifications(&$topicData)
 	$sent = 0;
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+	while ($row = $db->fetch_assoc($members))
 	{
 		if ($row['id_group'] != 1)
 		{
@@ -1850,14 +1860,14 @@ function sendApprovalNotifications(&$topicData)
 			$sent_this_time = true;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Post');
 
 	// Sent!
 	if (!empty($sent))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
@@ -1883,7 +1893,9 @@ function sendApprovalNotifications(&$topicData)
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
-	global $board_info, $board, $smcFunc;
+	global $board_info, $board;
+
+	$db = database();
 
 	// Please - let's be sane.
 	if (empty($setboards))
@@ -1896,7 +1908,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	if (!$id_msg)
 	{
 		// Find the latest message on this board (highest id_msg.)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_board, MAX(id_last_msg) AS id_msg
 			FROM {db_prefix}topics
 			WHERE id_board IN ({array_int:board_list})
@@ -1908,9 +1920,9 @@ function updateLastMessages($setboards, $id_msg = 0)
 			)
 		);
 		$lastMsg = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$lastMsg[$row['id_board']] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 	else
 	{
@@ -1981,7 +1993,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	// Now commit the changes!
 	foreach ($parent_updates as $id_msg => $boards)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_msg_updated = {int:id_msg_updated}
 			WHERE id_board IN ({array_int:board_list})
@@ -1994,7 +2006,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	}
 	foreach ($board_updates as $board_data)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
 			WHERE id_board IN ({array_int:board_list})',
@@ -2021,7 +2033,9 @@ function updateLastMessages($setboards, $id_msg = 0)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $modSettings, $language, $scripturl, $user_info, $smcFunc;
+	global $modSettings, $language, $scripturl, $user_info;
+
+	$db = database();
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
@@ -2042,7 +2056,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	$groups = array();
 
 	// All membergroups who can approve members.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:moderate_forum}
@@ -2054,16 +2068,16 @@ function adminNotify($type, $memberID, $member_name = null)
 			'moderate_forum' => 'moderate_forum',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[] = $row['id_group'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Add administrators too...
 	$groups[] = 1;
 	$groups = array_unique($groups);
 
 	// Get a list of all members who have ability to approve accounts - these are the people who we inform.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -2077,7 +2091,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	);
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$replacements = array(
 			'USERNAME' => $member_name,
@@ -2097,7 +2111,7 @@ function adminNotify($type, $memberID, $member_name = null)
 		// And do the actual sending...
 		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
@@ -2113,7 +2127,9 @@ function adminNotify($type, $memberID, $member_name = null)
  */
 function notifyMembersBoard(&$topicData)
 {
-	global $scripturl, $language, $user_info, $modSettings, $smcFunc, $webmaster_email;
+	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -2162,7 +2178,7 @@ function notifyMembersBoard(&$topicData)
 
 	// Load the actual board names
 	$board_names = array();
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board, name
 		FROM {db_prefix}boards
 		WHERE id_board IN ({array_int:board_list})',
@@ -2170,15 +2186,15 @@ function notifyMembersBoard(&$topicData)
 			'board_list' => $board_index,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$board_names[$row['id_board']] = $row['name'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Yea, we need to add this to the digest queue.
 	$digest_insert = array();
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', $user_info['id']);
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -2188,7 +2204,7 @@ function notifyMembersBoard(&$topicData)
 	);
 
 	// Find the members with notification on for these boards.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
 			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups, b.id_profile,
@@ -2210,8 +2226,8 @@ function notifyMembersBoard(&$topicData)
 			'notify_regularity' => 2,
 		)
 	);
-	// While we have members with board notifications 
-	while ($rowmember = $smcFunc['db_fetch_assoc']($members))
+	// While we have members with board notifications
+	while ($rowmember = $db->fetch_assoc($members))
 	{
 		$email_perm = true;
 		if (validateAccess($rowmember, $maillist, $email_perm) === false)
@@ -2261,7 +2277,7 @@ function notifyMembersBoard(&$topicData)
 				$emailtype .= $send_body ? '_body' : '';
 				$emaildata = loadEmailTemplate((($maillist && $email_perm) ? 'pbe_' : '') . $emailtype, $replacements, $langloaded);
 				$emailname = (!empty($topicData[$key]['name'])) ? un_htmlspecialchars($topicData[$key]['name']) : null;
-				
+
 				// Maillist style?
 				if ($maillist && $email_perm)
 				{
@@ -2276,12 +2292,12 @@ function notifyMembersBoard(&$topicData)
 			$sentOnceAlready = 1;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	loadLanguage('index', $user_info['language']);
 
 	// Sent!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_notify
 		SET sent = {int:is_sent}
 		WHERE id_board IN ({array_int:board_list})
@@ -2302,10 +2318,12 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings, $smcFunc;
+	global $user_info, $scripturl, $modSettings;
+
+	$db = database();
 
 	// Find it by the board - better to order by board than sort the entire messages table.
-	$request = $smcFunc['db_query']('substring', '
+	$request = $db->query('substring', '
 		SELECT ml.poster_time, ml.subject, ml.id_topic, ml.poster_name, SUBSTRING(ml.body, 1, 385) AS body,
 			ml.smileys_enabled
 		FROM {db_prefix}boards AS b
@@ -2320,18 +2338,18 @@ function lastPost()
 			'is_approved' => 1,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return array();
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	// Censor the subject and post...
 	censorText($row['subject']);
 	censorText($row['body']);
 
 	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
-	if ($smcFunc['strlen']($row['body']) > 128)
-		$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+	if (Util::strlen($row['body']) > 128)
+		$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 	// Send the data.
 	return array(
@@ -2348,7 +2366,9 @@ function lastPost()
 
 function getFormMsgSubject($editing, $topic, $first_subject = '')
 {
-	global $smcFunc, $modSettings, $context;
+	global $modSettings, $context;
+
+	$db = database();
 
 	if ($editing)
 	{
@@ -2374,7 +2394,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 		if ((!empty($topic) && !empty($_REQUEST['quote'])) || !empty($_REQUEST['followup']))
 		{
 			// Make sure they _can_ quote this post, and if so get it.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
@@ -2387,13 +2407,13 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 					'is_approved' => 1,
 				)
 			);
-			if ($smcFunc['db_num_rows']($request) == 0)
+			if ($db->num_rows($request) == 0)
 				fatal_lang_error('quoted_post_deleted', false);
-			list ($form_subject, $mname, $mdate, $form_message) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
+			$db->free_result($request);
 
 			// Add 'Re: ' to the front of the quoted subject.
-			if (trim($context['response_prefix']) != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if (trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			// Censor the message and subject.
@@ -2429,7 +2449,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 			$form_subject = $first_subject;
 
 			// Add 'Re: ' to the front of the subject.
-			if (trim($context['response_prefix']) != '' && $form_subject != '' && $smcFunc['strpos']($form_subject, trim($context['response_prefix'])) !== 0)
+			if (trim($context['response_prefix']) != '' && $form_subject != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
 				$form_subject = $context['response_prefix'] . $form_subject;
 
 			// Censor the subject.

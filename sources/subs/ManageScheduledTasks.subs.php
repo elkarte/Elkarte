@@ -26,9 +26,9 @@ if (!defined('ELKARTE'))
  */
 function loadTasks($tasks)
 {
-	global $smcFunc;
+	$db = database();
 	
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_task, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE id_task IN ({array_int:tasks})
@@ -37,9 +37,9 @@ function loadTasks($tasks)
 			'tasks' => $tasks,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$task[$row['id_task']] = $row['task'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $task;
 }
@@ -52,9 +52,9 @@ function loadTasks($tasks)
  */
 function logTask($task_id, $total_time)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_scheduled_tasks',
 		array('id_task' => 'int', 'time_run' => 'int', 'time_taken' => 'float'),
 		array($task_id, time(), $total_time),
@@ -69,9 +69,9 @@ function logTask($task_id, $total_time)
  */
 function updateTaskStatus($enablers)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
 		SET disabled = CASE WHEN id_task IN ({array_int:id_task_enable}) THEN 0 ELSE 1 END',
 		array(
@@ -91,9 +91,9 @@ function updateTaskStatus($enablers)
  */
 function updateTask($id_task, $disabled, $offset, $interval, $unit)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}scheduled_tasks
 		SET disabled = {int:disabled}, time_offset = {int:time_offset}, time_unit = {string:time_unit},
 			time_regularity = {int:time_regularity}
@@ -116,11 +116,13 @@ function updateTask($id_task, $disabled, $offset, $interval, $unit)
  */
 function loadTaskDetails($id_task)
 {
-	global $smcFunc, $txt;
+	global $txt;
+
+	$db = database();
 
 	$task = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
 		FROM {db_prefix}scheduled_tasks
 		WHERE id_task = {int:id_task}',
@@ -130,10 +132,10 @@ function loadTaskDetails($id_task)
 	);
 
 	// Should never, ever, happen!
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		fatal_lang_error('no_access', false);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(
 			'id' => $row['id_task'],
@@ -148,7 +150,7 @@ function loadTaskDetails($id_task)
 			'unit' => $row['time_unit'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $task;
 }
@@ -162,16 +164,18 @@ function loadTaskDetails($id_task)
  */
 function list_getScheduledTasks()
 {
-	global $smcFunc, $txt;
+	global $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_task, next_time, time_offset, time_regularity, time_unit, disabled, task
 		FROM {db_prefix}scheduled_tasks',
 		array(
 		)
 	);
 	$known_tasks = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Find the next for regularity - don't offset as it's always server time!
 		$offset = sprintf($txt['scheduled_task_reg_starting'], date('H:i', $row['time_offset']));
@@ -188,7 +192,7 @@ function list_getScheduledTasks()
 			'regularity' => $offset . ', ' . $repeating,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $known_tasks;
 }
@@ -202,9 +206,11 @@ function list_getScheduledTasks()
  */
 function list_getTaskLogEntries($start, $items_per_page, $sort)
 {
-	global $smcFunc, $txt;
+	global $txt;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT lst.id_log, lst.id_task, lst.time_run, lst.time_taken, st.task
 		FROM {db_prefix}log_scheduled_tasks AS lst
 			INNER JOIN {db_prefix}scheduled_tasks AS st ON (st.id_task = lst.id_task)
@@ -214,14 +220,14 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
 		)
 	);
 	$log_entries = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$log_entries[] = array(
 			'id' => $row['id_log'],
 			'name' => isset($txt['scheduled_task_' . $row['task']]) ? $txt['scheduled_task_' . $row['task']] : $row['task'],
 			'time_run' => $row['time_run'],
 			'time_taken' => $row['time_taken'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $log_entries;
 }
@@ -231,16 +237,16 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
  */
 function list_getNumaction_logEntries()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_scheduled_tasks',
 		array(
 		)
 	);
-	list ($num_entries) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($num_entries) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $num_entries;
 }

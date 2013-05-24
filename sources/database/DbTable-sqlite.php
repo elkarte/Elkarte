@@ -19,7 +19,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class DbTable_SQLite
+class DbTable_SQLite extends DbTable
 {
 	private static $_tbl = null;
 
@@ -131,7 +131,7 @@ class DbTable_SQLite
 				continue;
 			}
 			elseif (isset($column['default']) && $column['default'] !== null)
-				$default = 'default \'' . $db->db_escape_string($column['default']) . '\'';
+				$default = 'default \'' . $db->escape_string($column['default']) . '\'';
 			else
 				$default = '';
 

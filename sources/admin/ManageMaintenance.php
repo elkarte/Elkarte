@@ -119,7 +119,9 @@ class ManageMaintenance_Controller
 	 */
 	public function action_database()
 	{
-		global $context, $db_type, $modSettings, $smcFunc, $maintenance;
+		global $context, $db_type, $modSettings, $maintenance;
+
+		$db = database();
 
 		// We need this, really..
 		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
@@ -227,7 +229,7 @@ class ManageMaintenance_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
@@ -775,11 +777,18 @@ class ManageMaintenance_Controller
 
 	/**
 	 * Handling function for the backup stuff.
+	 * It requires an administrator and the session hash by post.
 	 * This method simply forwards to DumpDatabase2().
 	 */
 	public function action_backup_display()
 	{
 		validateToken('admin-maint');
+
+		// Administrators only!
+		if (!allowedTo('admin_forum'))
+			fatal_lang_error('no_dump_database', 'critical');
+
+		checkSession('post');
 
 		require_once(SOURCEDIR . '/DumpDatabase.php');
 		DumpDatabase2();

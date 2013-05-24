@@ -27,12 +27,18 @@ if (!defined('ELKARTE'))
 function action_issuewarning()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext, $smcFunc;
+	global $context, $cur_profile, $memberContext;
+
+	$db = database();
 
 	$memID = currentMemberID();
 
 	// make sure the sub-template is set...
+	loadTemplate('ProfileAccount');
 	$context['sub_template'] = 'issueWarning';
+
+	// We need this because of template_load_warning_variables
+	loadTemplate('Profile');
 
 	// Get all the actual settings.
 	list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
@@ -63,7 +69,7 @@ function action_issuewarning()
 	if ($context['warning_limit'] > 0)
 	{
 		// Make sure we cannot go outside of our limit for the day.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT SUM(counter)
 			FROM {db_prefix}log_comments
 			WHERE id_recipient = {int:selected_member}
@@ -77,8 +83,8 @@ function action_issuewarning()
 				'warning' => 'warning',
 			)
 		);
-		list ($current_applied) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($current_applied) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		$context['min_allowed'] = max(0, $cur_profile['warning'] - $current_applied - $context['warning_limit']);
 		$context['max_allowed'] = min(100, $cur_profile['warning'] - $current_applied + $context['warning_limit']);
@@ -102,7 +108,7 @@ function action_issuewarning()
 		$_POST['warn_reason'] = isset($_POST['warn_reason']) ? trim($_POST['warn_reason']) : '';
 		if ($_POST['warn_reason'] == '' && !$context['user']['is_owner'])
 			$issueErrors[] = 'warning_no_reason';
-		$_POST['warn_reason'] = $smcFunc['htmlspecialchars']($_POST['warn_reason']);
+		$_POST['warn_reason'] = Util::htmlspecialchars($_POST['warn_reason']);
 
 		// If the value hasn't changed it's either no JS or a real no change (Which this will pass)
 		if ($_POST['warning_level'] == 'SAME')
@@ -178,7 +184,7 @@ function action_issuewarning()
 	if (isset($_POST['preview']))
 	{
 		$warning_body = !empty($_POST['warn_body']) ? trim(censorText($_POST['warn_body'])) : '';
-		$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim($smcFunc['htmlspecialchars']($_POST['warn_sub'])) : '';
+		$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim(Util::htmlspecialchars($_POST['warn_sub'])) : '';
 		if (empty($_POST['warn_sub']) || empty($_POST['warn_body']))
 			$issueErrors[] = 'warning_notify_blank';
 
@@ -338,7 +344,7 @@ function action_issuewarning()
 	// Any custom templates?
 	$context['notification_templates'] = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:warntpl}
@@ -349,7 +355,7 @@ function action_issuewarning()
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// If we're not warning for a message skip any that are.
 		if (!$context['warning_for_message'] && strpos($row['body'], '{MESSAGE}') !== false)
@@ -360,7 +366,7 @@ function action_issuewarning()
 			'body' => $row['body'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Setup the "default" templates.
 	foreach (array('spamming', 'offence', 'insulting') as $type)
@@ -380,7 +386,9 @@ function action_issuewarning()
  */
 function action_deleteaccount()
 {
-	global $txt, $context, $user_info, $modSettings, $cur_profile, $smcFunc;
+	global $txt, $context, $user_info, $modSettings, $cur_profile;
+
+	$db = database();
 
 	if (!$context['user']['is_owner'])
 		isAllowedTo('profile_remove_any');
@@ -395,6 +403,7 @@ function action_deleteaccount()
 	$context['page_title'] = $txt['deleteAccount'] . ': ' . $cur_profile['real_name'];
 
 	// make sure the sub-template is set...
+	loadTemplate('ProfileAccount');
 	$context['sub_template'] = 'deleteAccount';
 }
 
@@ -404,7 +413,9 @@ function action_deleteaccount()
  */
 function action_deleteaccount2()
 {
-	global $user_info, $context, $cur_profile, $modSettings, $smcFunc;
+	global $user_info, $context, $cur_profile, $modSettings;
+
+	$db = database();
 
 	// Try get more time...
 	@set_time_limit(600);
@@ -462,7 +473,7 @@ function action_deleteaccount2()
 			}
 
 			// Now delete the remaining messages.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.id_msg
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic
@@ -473,14 +484,14 @@ function action_deleteaccount2()
 				)
 			);
 			// This could take a while... but ya know it's gonna be worth it in the end.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (function_exists('apache_reset_timeout'))
 					@apache_reset_timeout();
 
 				removeMessage($row['id_msg']);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		// Only delete this poor member's account if they are actually being booted out of camp.

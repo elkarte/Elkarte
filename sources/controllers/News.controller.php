@@ -40,7 +40,9 @@ class News_Controller
 	function action_showfeed()
 	{
 		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-		global $query_this_board, $smcFunc, $forum_version, $cdata_override, $settings;
+		global $query_this_board, $forum_version, $cdata_override, $settings;
+
+		$db = database();
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
@@ -318,13 +320,15 @@ class News_Controller
 	 */
 	function action_xmlmembers($xml_format)
 	{
-		global $scripturl, $smcFunc;
+		global $scripturl;
+
+		$db = database();
 
 		if (!allowedTo('view_mlist'))
 			return array();
 
 		// Find the most recent members.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, member_name, real_name, date_registered, last_login
 			FROM {db_prefix}members
 			ORDER BY id_member DESC
@@ -334,7 +338,7 @@ class News_Controller
 			)
 		);
 		$data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Make the data look rss-ish.
 			if ($xml_format == 'rss' || $xml_format == 'rss2')
@@ -367,7 +371,7 @@ class News_Controller
 					'link' => $scripturl . '?action=profile;u=' . $row['id_member']
 				);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $data;
 	}
@@ -384,7 +388,9 @@ class News_Controller
 	function action_xmlnews($xml_format)
 	{
 		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $smcFunc, $settings, $context;
+		global $query_this_board, $settings, $context;
+
+		$db = database();
 
 		/* Find the latest posts that:
 			- are the first post in their topic.
@@ -397,7 +403,7 @@ class News_Controller
 		while (!$done)
 		{
 			$optimize_msg = implode(' AND ', $context['optimize_msg']);
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT
 					m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.modified_time,
 					m.icon, t.id_topic, t.id_board, t.num_replies,
@@ -423,9 +429,9 @@ class News_Controller
 				)
 			);
 			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
-			if ($loops < 2 && $smcFunc['db_num_rows']($request) < $_GET['limit'])
+			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
 			{
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 				if (empty($_REQUEST['boards']) && empty($board))
 					unset($context['optimize_msg']['lowest']);
 				else
@@ -437,11 +443,11 @@ class News_Controller
 				$done = true;
 		}
 		$data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && $smcFunc['strlen'](str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr($smcFunc['substr'](str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
+			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+				$row['body'] = strtr(Util::substr(str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
 
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -514,7 +520,7 @@ class News_Controller
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $data;
 	}
@@ -530,14 +536,16 @@ class News_Controller
 	function action_xmlrecent($xml_format)
 	{
 		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $smcFunc, $settings, $context;
+		global $query_this_board, $settings, $context;
+
+		$db = database();
 
 		$done = false;
 		$loops = 0;
 		while (!$done)
 		{
 			$optimize_msg = implode(' AND ', $context['optimize_msg']);
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT m.id_msg
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -556,9 +564,9 @@ class News_Controller
 				)
 			);
 			// If we don't have $_GET['limit'] results, try again with an unoptimized version covering all rows.
-			if ($loops < 2 && $smcFunc['db_num_rows']($request) < $_GET['limit'])
+			if ($loops < 2 && $db->num_rows($request) < $_GET['limit'])
 			{
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 				if (empty($_REQUEST['boards']) && empty($board))
 					unset($context['optimize_msg']['lowest']);
 				else
@@ -569,15 +577,15 @@ class News_Controller
 				$done = true;
 		}
 		$messages = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$messages[] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($messages))
 			return array();
 
 		// Find the most recent posts this user can see.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				m.smileys_enabled, m.poster_time, m.id_msg, m.subject, m.body, m.id_topic, t.id_board,
 				b.name AS bname, t.num_replies, m.id_member, m.icon, mf.id_member AS id_first_member,
@@ -601,11 +609,11 @@ class News_Controller
 			)
 		);
 		$data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Limit the length of the message, if the option is set.
-			if (!empty($modSettings['xmlnews_maxlen']) && $smcFunc['strlen'](str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
-				$row['body'] = strtr($smcFunc['substr'](str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
+			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
+				$row['body'] = strtr(Util::substr(str_replace('<br />', "\n", $row['body']), 0, $modSettings['xmlnews_maxlen'] - 3), array("\n" => '<br />')) . '...';
 
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -687,7 +695,7 @@ class News_Controller
 				);
 			}
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		return $data;
 	}
@@ -846,7 +854,7 @@ function fix_possible_url($val)
  */
 function cdata_parse($data, $ns = '')
 {
-	global $smcFunc, $cdata_override;
+	global $cdata_override;
 
 	// Are we not doing it?
 	if (!empty($cdata_override))
@@ -854,14 +862,14 @@ function cdata_parse($data, $ns = '')
 
 	$cdata = '<![CDATA[';
 
-	for ($pos = 0, $n = $smcFunc['strlen']($data); $pos < $n; null)
+	for ($pos = 0, $n = Util::strlen($data); $pos < $n; null)
 	{
 		$positions = array(
-			$smcFunc['strpos']($data, '&', $pos),
-			$smcFunc['strpos']($data, ']', $pos),
+			Util::strpos($data, '&', $pos),
+			Util::strpos($data, ']', $pos),
 		);
 		if ($ns != '')
-			$positions[] = $smcFunc['strpos']($data, '<', $pos);
+			$positions[] = Util::strpos($data, '<', $pos);
 		foreach ($positions as $k => $dummy)
 		{
 			if ($dummy === false)
@@ -872,37 +880,37 @@ function cdata_parse($data, $ns = '')
 		$pos = empty($positions) ? $n : min($positions);
 
 		if ($pos - $old > 0)
-			$cdata .= $smcFunc['substr']($data, $old, $pos - $old);
+			$cdata .= Util::substr($data, $old, $pos - $old);
 		if ($pos >= $n)
 			break;
 
-		if ($smcFunc['substr']($data, $pos, 1) == '<')
+		if (Util::substr($data, $pos, 1) == '<')
 		{
-			$pos2 = $smcFunc['strpos']($data, '>', $pos);
+			$pos2 = Util::strpos($data, '>', $pos);
 			if ($pos2 === false)
 				$pos2 = $n;
-			if ($smcFunc['substr']($data, $pos + 1, 1) == '/')
-				$cdata .= ']]></' . $ns . ':' . $smcFunc['substr']($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
+			if (Util::substr($data, $pos + 1, 1) == '/')
+				$cdata .= ']]></' . $ns . ':' . Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
 			else
-				$cdata .= ']]><' . $ns . ':' . $smcFunc['substr']($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
+				$cdata .= ']]><' . $ns . ':' . Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
 			$pos = $pos2 + 1;
 		}
-		elseif ($smcFunc['substr']($data, $pos, 1) == ']')
+		elseif (Util::substr($data, $pos, 1) == ']')
 		{
 			$cdata .= ']]>&#093;<![CDATA[';
 			$pos++;
 		}
-		elseif ($smcFunc['substr']($data, $pos, 1) == '&')
+		elseif (Util::substr($data, $pos, 1) == '&')
 		{
-			$pos2 = $smcFunc['strpos']($data, ';', $pos);
+			$pos2 = Util::strpos($data, ';', $pos);
 			if ($pos2 === false)
 				$pos2 = $n;
-			$ent = $smcFunc['substr']($data, $pos + 1, $pos2 - $pos - 1);
+			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
 
-			if ($smcFunc['substr']($data, $pos + 1, 1) == '#')
-				$cdata .= ']]>' . $smcFunc['substr']($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+			if (Util::substr($data, $pos + 1, 1) == '#')
+				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
-				$cdata .= ']]>' . $smcFunc['substr']($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
+				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 
 			$pos = $pos2 + 1;
 		}

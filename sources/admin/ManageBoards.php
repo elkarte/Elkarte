@@ -772,7 +772,7 @@ class ManageBoards_Controller
 		$this->_boardSettings = new Settings_Form();
 
 		// Load the boards list - for the recycle bin!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
 		foreach ($boards as $board)
@@ -801,7 +801,7 @@ class ManageBoards_Controller
 	public function settings()
 	{
 		// Load the boards list - for the recycle bin!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
 		foreach ($boards as $board)

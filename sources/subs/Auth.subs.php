@@ -148,48 +148,6 @@ function url_parts($local, $global)
 }
 
 /**
- * Throws guests out to the login screen when guest access is off.
- * - sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
- * - uses the 'kick_guest' sub template found in Login.template.php.
- */
-function KickGuest()
-{
-	global $txt, $context;
-
-	loadLanguage('Login');
-	loadTemplate('Login');
-
-	// Never redirect to an attachment
-	if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
-		$_SESSION['login_url'] = $_SERVER['REQUEST_URL'];
-
-	$context['sub_template'] = 'kick_guest';
-	$context['page_title'] = $txt['login'];
-}
-
-/**
- * Display a message about the forum being in maintenance mode.
- * - display a login screen with sub template 'maintenance'.
- * - sends a 503 header, so search engines don't bother indexing while we're in maintenance mode.
- */
-function InMaintenance()
-{
-	global $txt, $mtitle, $mmessage, $context;
-
-	loadLanguage('Login');
-	loadTemplate('Login');
-
-	// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
-	header('HTTP/1.1 503 Service Temporarily Unavailable');
-
-	// Basic template stuff..
-	$context['sub_template'] = 'maintenance';
-	$context['title'] = &$mtitle;
-	$context['description'] = &$mmessage;
-	$context['page_title'] = $txt['maintain_mode'];
-}
-
-/**
  * Question the verity of the admin by asking for his or her password.
  * - loads Login.template.php and uses the admin_login sub template.
  * - sends data to template so the admin is sent on to the page they
@@ -260,7 +218,7 @@ function adminLogin($type = 'admin')
  */
 function adminLogin_outputPostVars($k, $v)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($v))
 		return '
@@ -328,7 +286,9 @@ function construct_query_string($get)
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
 {
-	global $scripturl, $user_info, $modSettings, $smcFunc;
+	global $scripturl, $user_info, $modSettings;
+
+	$db = database();
 
 	// If it's not already an array, make it one.
 	if (!is_array($names))
@@ -338,7 +298,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 	foreach ($names as $i => $name)
 	{
 		// Trim, and fix wildcards for each name.
-		$names[$i] = trim($smcFunc['strtolower']($name));
+		$names[$i] = trim(Util::strtolower($name));
 
 		$maybe_email |= strpos($name, '@') !== false;
 
@@ -365,11 +325,11 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		$email_condition = '';
 
 	// Get the case of the columns right - but only if we need to as things like MySQL will go slow needlessly otherwise.
-	$member_name = $smcFunc['db_case_sensitive'] ? 'LOWER(member_name)' : 'member_name';
-	$real_name = $smcFunc['db_case_sensitive'] ? 'LOWER(real_name)' : 'real_name';
+	$member_name = $db->db_case_sensitive() ? 'LOWER(member_name)' : 'member_name';
+	$real_name = $db->db_case_sensitive() ? 'LOWER(real_name)' : 'real_name';
 
 	// Search by username, display name, and email address.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, email_address, hide_email
 		FROM {db_prefix}members
 		WHERE ({raw:member_name_search}
@@ -385,7 +345,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'limit' => $max,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$results[$row['id_member']] = array(
 			'id' => $row['id_member'],
@@ -396,7 +356,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>'
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Return all the results.
 	return $results;
@@ -415,7 +375,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function resetPassword($memID, $username = null)
 {
-	global $modSettings, $smcFunc, $language;
+	global $modSettings, $language;
 
 	// Language... and a required file.
 	loadLanguage('Login');
@@ -473,12 +433,12 @@ function resetPassword($memID, $username = null)
  */
 function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
 {
-	global $txt, $smcFunc, $user_info;
+	global $txt, $user_info;
 
 	$errors = array();
 
 	// Don't use too long a name.
-	if ($smcFunc['strlen']($username) > 25)
+	if (Util::strlen($username) > 25)
 		$errors[] = array('lang', 'error_long_name');
 
 	// No name?!  How can you register with no name?
@@ -525,10 +485,10 @@ function validateUsername($memID, $username, $return_error = false, $check_reser
  */
 function validatePassword($password, $username, $restrict_in = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	// Perform basic requirements first.
-	if ($smcFunc['strlen']($password) < (empty($modSettings['password_strength']) ? 4 : 8))
+	if (Util::strlen($password) < (empty($modSettings['password_strength']) ? 4 : 8))
 		return 'short';
 
 	// Is this enough?
@@ -538,7 +498,7 @@ function validatePassword($password, $username, $restrict_in = array())
 	// Otherwise, perform the medium strength test - checking if password appears in the restricted string.
 	if (preg_match('~\b' . preg_quote($password, '~') . '\b~', implode(' ', $restrict_in)) != 0)
 		return 'restricted_words';
-	elseif ($smcFunc['strpos']($password, $username) !== false)
+	elseif (Util::strpos($password, $username) !== false)
 		return 'restricted_words';
 
 	// If just medium, we're done.
@@ -547,7 +507,7 @@ function validatePassword($password, $username, $restrict_in = array())
 
 	// Otherwise, hard test next, check for numbers and letters, uppercase too.
 	$good = preg_match('~(\D\d|\d\D)~', $password) != 0;
-	$good &= $smcFunc['strtolower']($password) != $password;
+	$good &= Util::strtolower($password) != $password;
 
 	return $good ? null : 'chars';
 }
@@ -559,14 +519,16 @@ function validatePassword($password, $username, $restrict_in = array())
  */
 function rebuildModCache()
 {
-	global $user_info, $smcFunc;
+	global $user_info;
+
+	$db = database();
 
 	// What groups can they moderate?
 	$group_query = allowedTo('manage_membergroups') ? '1=1' : '0=1';
 
 	if ($group_query == '0=1')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
@@ -575,9 +537,9 @@ function rebuildModCache()
 			)
 		);
 		$groups = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$groups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (empty($groups))
 			$group_query = '0=1';
@@ -602,7 +564,7 @@ function rebuildModCache()
 	$boards_mod = array();
 	if (!$user_info['is_guest'])
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_board
 			FROM {db_prefix}moderators
 			WHERE id_member = {int:current_member}',
@@ -610,9 +572,9 @@ function rebuildModCache()
 				'current_member' => $user_info['id'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$boards_mod[] = $row['id_board'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	$mod_query = empty($boards_mod) ? '0=1' : 'b.id_board IN (' . implode(',', $boards_mod) . ')';
@@ -685,7 +647,7 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
  */
 function logOnline($ids, $on = false)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($ids))
 		$ids = array($ids);
@@ -693,7 +655,7 @@ function logOnline($ids, $on = false)
 	if (empty($on))
 	{
 		// set the user(s) out of log_online
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_online
 			WHERE id_member IN ({array_int:members})',
 			array(
@@ -710,9 +672,9 @@ function logOnline($ids, $on = false)
  */
 function deleteOnline($session)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_online
 		WHERE session = {string:session}',
 		array(
@@ -728,7 +690,7 @@ function deleteOnline($session)
  */
 function isFirstLogin($id_member)
 {
-	global $smcFunc;
+	$db = database();
 
 	$isFirstLogin = false;
 
@@ -741,10 +703,10 @@ function isFirstLogin($id_member)
 
 function findUser($where, $whereparams)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Find the user!
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
 		FROM {db_prefix}members
 		WHERE ' . $where . '
@@ -754,11 +716,11 @@ function findUser($where, $whereparams)
 	);
 
 	// Maybe email?
-	if ($smcFunc['db_num_rows']($request) == 0 && empty($_REQUEST['uid']))
+	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']))
 	{
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
 			FROM {db_prefix}members
 			WHERE email_address = {string:email_address}
@@ -766,12 +728,12 @@ function findUser($where, $whereparams)
 			array_merge($where_params, array(
 			))
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('no_user_with_email', false);
 	}
 
-	$member = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$member = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	return $member;
 }
@@ -783,16 +745,18 @@ function findUser($where, $whereparams)
  */
 function generateValidationCode()
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
 
-	$request = $smcFunc['db_query']('get_random_number', '
+	$db = database();
+
+	$request = $db->query('get_random_number', '
 		SELECT RAND()',
 		array(
 		)
 	);
 
-	list ($dbRand) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($dbRand) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
 }
@@ -807,25 +771,25 @@ function generateValidationCode()
  */
 function loadExistingMember($name)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Try to find the user, assuming a member_name was passed...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 			openid_uri, passwd_flood
 		FROM {db_prefix}members
-		WHERE ' . ($smcFunc['db_case_sensitive'] ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
+		WHERE ' . ($db->db_case_sensitive() ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
 		LIMIT 1',
 		array(
-			'user_name' => $smcFunc['db_case_sensitive'] ? strtolower($name) : $name,
+			'user_name' => $db->db_case_sensitive() ? strtolower($name) : $name,
 		)
 	);
 	// Didn't work. Try it as an email address.
-	if ($smcFunc['db_num_rows']($request) == 0 && strpos($name, '@') !== false)
+	if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
 	{
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
 			passwd_flood
 			FROM {db_prefix}members
@@ -838,11 +802,11 @@ function loadExistingMember($name)
 	}
 
 	// Nothing? Ah the horror...
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
 
-	$user_settings = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$user_settings = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	return $user_settings;
 }

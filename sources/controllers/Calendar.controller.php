@@ -172,7 +172,9 @@ class Calendar_Controller
 	function action_event_post()
 	{
 		global $context, $txt, $user_info, $scripturl;
-		global $modSettings, $topic, $smcFunc;
+		global $modSettings, $topic;
+
+		$db = database();
 
 		// Well - can they?
 		isAllowedTo('calendar_post');
@@ -211,7 +213,7 @@ class Calendar_Controller
 				$eventOptions = array(
 					'board' => 0,
 					'topic' => 0,
-					'title' => $smcFunc['substr']($_REQUEST['evtitle'], 0, 100),
+					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
 					'member' => $user_info['id'],
 					'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
 					'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
@@ -229,7 +231,7 @@ class Calendar_Controller
 				// There could be already a topic you are not allowed to modify
 				if (!allowedTo('post_new') && empty($modSettings['disableNoPostingCalendarEdits']))
 				{
-					$request = $smcFunc['db_query']('', '
+					$request = $db->query('', '
 						SELECT id_board, id_topic
 						FROM {db_prefix}calendar
 						WHERE id_event = {int:id_event}
@@ -237,12 +239,12 @@ class Calendar_Controller
 						array(
 							'id_event' => $_REQUEST['eventid'],
 					));
-					list ($id_board, $id_topic) = $smcFunc['db_fetch_row']($request);
-					$smcFunc['db_free_result']($request);
+					list ($id_board, $id_topic) = $db->fetch_row($request);
+					$db->free_result($request);
 				}
 
 				$eventOptions = array(
-					'title' => $smcFunc['substr']($_REQUEST['evtitle'], 0, 100),
+					'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
 					'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
 					'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
 					'board' => isset($id_board) ? (int) $id_board : 0,
@@ -251,10 +253,6 @@ class Calendar_Controller
 
 				modifyEvent($_REQUEST['eventid'], $eventOptions);
 			}
-
-			updateSettings(array(
-				'calendar_updated' => time(),
-			));
 
 			// No point hanging around here now...
 			redirectexit($scripturl . '?action=calendar;month=' . $_POST['month'] . ';year=' . $_POST['year']);
@@ -293,7 +291,7 @@ class Calendar_Controller
 				fatal_lang_error('cannot_post_new', 'permission');
 
 			// Load the list of boards and categories in the context.
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$boardListOptions = array(
 				'included_boards' => in_array(0, $boards) ? null : $boards,
 				'not_redirection' => true,
@@ -347,7 +345,7 @@ class Calendar_Controller
 	 */
 	function action_ical()
 	{
-		global $smcFunc, $forum_version, $context, $modSettings, $webmaster_email, $mbname;
+		global $forum_version, $context, $modSettings, $webmaster_email, $mbname;
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))
@@ -429,7 +427,7 @@ class Calendar_Controller
 		header('Connection: close');
 		header('Content-Disposition: attachment; filename="' . $event['title'] . '.ics"');
 		if (empty($modSettings['enableCompressedOutput']))
-			header('Content-Length: ' . $smcFunc['strlen']($filecontents));
+			header('Content-Length: ' . Util::strlen($filecontents));
 
 		// This is a calendar item!
 		header('Content-Type: text/calendar');

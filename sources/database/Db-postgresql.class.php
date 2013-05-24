@@ -29,9 +29,8 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Maps the implementations in the legacy subs file (smf_db_function_name)
-	 * to the $smcFunc['db_function_name'] variable.
-	 * @see Db.class.php#initiate
+	 * Initializes a database connection.
+	 * It returns the connection, if successful.
 	 *
 	 * @param type $db_server
 	 * @param type $db_name
@@ -39,33 +38,14 @@ class Database_PostgreSQL implements Database
 	 * @param type $db_passwd
 	 * @param type $db_prefix
 	 * @param type $db_options
-	 * @return null
+	 *
+	 * @return resource
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
 	{
-		global $smcFunc, $mysql_set_mode;
-
-		// Map some database specific functions, only do this once.
-		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'postg_fetch_assoc')
-			$smcFunc += array(
-				'db_query' => 'elk_db_query',
-				'db_quote' => 'elk_db_quote',
-				'db_insert' => 'elk_db_insert',
-				'db_insert_id' => 'elk_db_insert_id',
-				'db_fetch_assoc' => 'elk_db_fetch_assoc',
-				'db_fetch_row' => 'elk_db_fetch_row',
-				'db_free_result' => 'pg_free_result',
-				'db_num_rows' => 'pg_num_rows',
-				'db_num_fields' => 'pg_num_fields',
-				'db_escape_string' => 'pg_escape_string',
-				'db_unescape_string' => 'elk_db_unescape_string',
-				'db_affected_rows' => 'elk_db_affected_rows',
-				'last_error' => 'pg_last_error',
-				'db_case_sensitive' => true,
-			);
-
-		// initialize the instance.
-		self::$_db = new self();
+		// initialize the instance... if not done already!
+		if (self::$_db === null)
+			self::$_db = new self();
 
 		if (!empty($db_options['persist']))
 			$connection = @pg_pconnect('host=' . $db_server . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
@@ -94,11 +74,12 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @param type $db_prefix
 	 * @param type $db_name
-	 * @return type
+	 *
+	 * @return string
 	 */
-	function fix_prefix (&$db_prefix, $db_name)
+	function fix_prefix($db_prefix, $db_name)
 	{
-		return;
+		return $db_prefix;
 	}
 
 	/**
@@ -215,8 +196,8 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Just like the db_query, escape and quote a string,
-	 * but not executing the query.
+	 * This function works like $this->query(), escapes and quotes a string,
+	 * but it doesn't execute the query.
 	 *
 	 * @param string $db_string
 	 * @param string $db_values
@@ -500,7 +481,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert_id($table, $field = null, $connection = null)
 	{
-		global $db_connection, $smcFunc, $db_prefix;
+		global $db_connection, $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
@@ -508,7 +489,7 @@ class Database_PostgreSQL implements Database
 			$connection = $db_connection;
 
 		// Try get the last ID for the auto increment field.
-		$request = $smcFunc['db_query']('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
+		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array(
 			)
 		);
@@ -595,7 +576,6 @@ class Database_PostgreSQL implements Database
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-		global $smcFunc;
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
@@ -715,7 +695,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_replace_result, $db_in_transact, $smcFunc, $db_connection, $db_prefix;
+		global $db_replace_result, $db_in_transact, $db_connection, $db_prefix;
 
 		$connection = $connection === null ? $db_connection : $connection;
 
@@ -759,7 +739,7 @@ class Database_PostgreSQL implements Database
 			{
 				foreach ($data as $k => $entry)
 				{
-					$smcFunc['db_query']('', '
+					$this->query('', '
 						DELETE FROM ' . $table .
 						' WHERE ' . $where,
 						$entry, $connection
@@ -792,7 +772,7 @@ class Database_PostgreSQL implements Database
 
 			foreach ($insertRows as $entry)
 				// Do the insert.
-				$smcFunc['db_query']('', '
+				$this->query('', '
 					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
 					VALUES
 						' . $entry,
@@ -930,7 +910,8 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert_sql($tableName, $new_table = false)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
 		static $start = 0, $num_rows, $fields, $limit;
 
 		if ($new_table)
@@ -945,7 +926,7 @@ class Database_PostgreSQL implements Database
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $smcFunc['db_query']('', '
+		$result = $this->query('', '
 			SELECT *
 			FROM ' . $tableName . '
 			LIMIT ' . $start . ', ' . $limit,
@@ -955,7 +936,7 @@ class Database_PostgreSQL implements Database
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
-		$num_rows = $smcFunc['db_num_rows']($result);
+		$num_rows = $this->num_rows($result);
 
 		if ($num_rows == 0)
 			return '';
@@ -984,7 +965,7 @@ class Database_PostgreSQL implements Database
 				elseif (is_numeric($item) && (int) $item == $item)
 					$field_list[] = $item;
 				else
-					$field_list[] = '\'' . $smcFunc['db_escape_string']($item) . '\'';
+					$field_list[] = '\'' . $this->escape_string($item) . '\'';
 			}
 
 			// 'Insert' the data.
@@ -1007,7 +988,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_table_sql($tableName)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
@@ -1020,7 +1001,7 @@ class Database_PostgreSQL implements Database
 		$seq_create = '';
 
 		// Find all the fields.
-		$result = $smcFunc['db_query']('', '
+		$result = $this->query('', '
 			SELECT column_name, column_default, is_nullable, data_type, character_maximum_length
 			FROM information_schema.columns
 			WHERE table_name = {string:table}
@@ -1050,7 +1031,7 @@ class Database_PostgreSQL implements Database
 				if (preg_match('~nextval\(\'(.+?)\'(.+?)*\)~i', $row['column_default'], $matches) != 0)
 				{
 					// Get to find the next variable first!
-					$count_req = $smcFunc['db_query']('', '
+					$count_req = $this->query('', '
 						SELECT MAX("{raw:column}")
 						FROM {raw:table}',
 						array(
@@ -1072,7 +1053,7 @@ class Database_PostgreSQL implements Database
 		// Take off the last comma.
 		$schema_create = substr($schema_create, 0, -strlen($crlf) - 1);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $this->query('', '
 			SELECT CASE WHEN i.indisprimary THEN 1 ELSE 0 END AS is_primary, pg_get_indexdef(i.indexrelid) AS inddef
 			FROM pg_class AS c
 				INNER JOIN pg_index AS i ON (i.indrelid = c.oid)
@@ -1113,9 +1094,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{
-		global $smcFunc;
-
-		$request = $smcFunc['db_query']('', '
+		$request = $this->query('', '
 			SELECT tablename
 			FROM pg_tables
 			WHERE schemaname = {string:schema_public}' . ($filter == false ? '' : '
@@ -1143,11 +1122,11 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_optimize_table($table)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $this->query('', '
 				VACUUM ANALYZE {raw:table}',
 				array(
 					'table' => $table,
@@ -1174,14 +1153,14 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_backup_table($table, $backup_table)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// Do we need to drop it first?
 		$tables = $this->db_list_tables(false, $backup_table);
 		if (!empty($tables))
-			$smcFunc['db_query']('', '
+			$this->query('', '
 				DROP TABLE {raw:backup_table}',
 				array(
 					'backup_table' => $backup_table,
@@ -1189,7 +1168,7 @@ class Database_PostgreSQL implements Database
 			);
 
 		// @todo Should we create backups of sequences as well?
-		$smcFunc['db_query']('', '
+		$this->query('', '
 			CREATE TABLE {raw:backup_table}
 			(
 				LIKE {raw:table}
@@ -1200,7 +1179,7 @@ class Database_PostgreSQL implements Database
 				'table' => $table,
 			)
 		);
-		$smcFunc['db_query']('', '
+		$this->query('', '
 			INSERT INTO {raw:backup_table}
 			SELECT * FROM {raw:table}',
 			array(

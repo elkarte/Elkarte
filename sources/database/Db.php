@@ -21,8 +21,10 @@ interface Database
 	 *
 	 * @param string &db_prefix
 	 * @param string $db_name
+	 *
+	 * @return string
 	 */
-	function fix_prefix(&$db_prefix, $db_name);
+	function fix_prefix($db_prefix, $db_name);
 
 	/**
 	 * Callback for preg_replace_callback on the query.
@@ -35,7 +37,8 @@ interface Database
 	function replacement__callback($matches);
 
 	/**
-	 * Just like the db_query, escape and quote a string, but not executing the query.
+	 * This function works like $db->query(), escapes and quotes a string,
+	 * but it doesn't execute the query.
 	 *
 	 * @param string $db_string
 	 * @param array $db_values

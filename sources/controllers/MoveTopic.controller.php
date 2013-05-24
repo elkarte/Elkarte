@@ -33,7 +33,9 @@ class MoveTopic_Controller
 	 */
 	function action_movetopic()
 	{
-		global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $smcFunc, $modSettings;
+		global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $modSettings;
+
+		$db = database();
 		global $cat_tree, $boards, $boardList;
 
 		if (empty($topic))
@@ -60,7 +62,7 @@ class MoveTopic_Controller
 		loadTemplate('MoveTopic');
 
 		// Get a list of boards this moderator can move to.
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 		// No boards?
@@ -111,7 +113,9 @@ class MoveTopic_Controller
 	function action_movetopic2()
 	{
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
-		global $board, $language, $user_info, $smcFunc;
+		global $board, $language, $user_info;
+
+		$db = database();
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
@@ -179,11 +183,11 @@ class MoveTopic_Controller
 		// Rename the topic...
 		if (isset($_POST['reset_subject'], $_POST['custom_subject']) && $_POST['custom_subject'] != '')
 		{
-			$custom_subject = strtr($smcFunc['htmltrim']($smcFunc['htmlspecialchars']($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+			$custom_subject = strtr(Util::htmltrim(Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
 
 			// Keep checking the length.
-			if ($smcFunc['strlen']($custom_subject) > 100)
-				$custom_subject = $smcFunc['substr']($custom_subject, 0, 100);
+			if (Util::strlen($custom_subject) > 100)
+				$custom_subject = Util::substr($custom_subject, 0, 100);
 
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject != '')
@@ -204,7 +208,7 @@ class MoveTopic_Controller
 						cache_put_data('response_prefix', $context['response_prefix'], 600);
 					}
 
-					$smcFunc['db_query']('', '
+					$db->query('', '
 						UPDATE {db_prefix}messages
 						SET subject = {string:subject}
 						WHERE id_topic = {int:current_topic}',
@@ -215,7 +219,7 @@ class MoveTopic_Controller
 					);
 				}
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET subject = {string:custom_subject}
 					WHERE id_msg = {int:id_first_msg}',
@@ -238,7 +242,7 @@ class MoveTopic_Controller
 			if ($user_info['language'] != $language)
 				loadLanguage('index', $language);
 
-			$reason = $smcFunc['htmlspecialchars']($_POST['reason'], ENT_QUOTES);
+			$reason = Util::htmlspecialchars($_POST['reason'], ENT_QUOTES);
 			preparsecode($reason);
 
 			// Add a URL onto the message.
@@ -277,7 +281,7 @@ class MoveTopic_Controller
 
 		if ($board_from['count_posts'] != $board_info['count_posts'])
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}messages
 				WHERE id_topic = {int:current_topic}
@@ -288,14 +292,14 @@ class MoveTopic_Controller
 				)
 			);
 			$posters = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!isset($posters[$row['id_member']]))
 					$posters[$row['id_member']] = 0;
 
 				$posters[$row['id_member']]++;
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			foreach ($posters as $id_member => $posts)
 			{

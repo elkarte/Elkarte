@@ -53,7 +53,7 @@ class DbSearch_MySQL implements DbSearch
 	 */
 	function create_word_search($size)
 	{
-		global $smcFunc;
+		$db = database();
 
 		if ($size == 'small')
 			$size = 'smallint(5)';
@@ -62,7 +62,7 @@ class DbSearch_MySQL implements DbSearch
 		else
 			$size = 'int(10)';
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			CREATE TABLE {db_prefix}log_search_words (
 				id_word {raw:size} unsigned NOT NULL default {string:string_zero},
 				id_msg int(10) unsigned NOT NULL default {string:string_zero},

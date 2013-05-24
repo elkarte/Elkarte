@@ -408,7 +408,7 @@ function pbe_create_pm($pbe, $email_message)
  */
 function pbe_create_topic($pbe, $email_message, $board_info)
 {
-	global $txt, $modSettings, $smcFunc;
+	global $txt, $modSettings;
 
 	// It does not work like that
 	if (empty($pbe) || empty($email_message))
@@ -432,11 +432,11 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// First on the agenda the subject
 	$subject = pbe_clean_email_subject($email_message->subject);
-	$subject = strtr($smcFunc['htmlspecialchars']($subject), array("\r" => '', "\n" => '', "\t" => ''));
+	$subject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
 
 	// Not to long not to short
-	if ($smcFunc['strlen']($subject) > 100)
-		$subject = $smcFunc['substr']($subject, 0, 100);
+	if (Util::strlen($subject) > 100)
+		$subject = Util::substr($subject, 0, 100);
 	elseif ($subject == '')
 		return pbe_emailError('error_no_subject', $email_message);
 
@@ -574,8 +574,6 @@ function action_pbe_preview($data = null)
  */
 function pbe_load_text($html, $email_message, $pbe)
 {
-	global $smcFunc;
-
 	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 	{
 		// Some mobile responses wrap everything in a table structure so use plain text
@@ -591,14 +589,14 @@ function pbe_load_text($html, $email_message, $pbe)
 	$text = pbe_fix_email_body($text, $html, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
 	// Do we even have a message left to post?
-	$text = $smcFunc['htmltrim']($text, ENT_QUOTES);
+	$text = Util::htmltrim($text, ENT_QUOTES);
 	if (empty($text))
 		return;
 
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
-		$text = $smcFunc['htmlspecialchars']($text, ENT_QUOTES);
+		$text = Util::htmlspecialchars($text, ENT_QUOTES);
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
 	}

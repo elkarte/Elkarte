@@ -602,30 +602,28 @@ class Admin_Controller
 	 * It prepares all the data necessary for the administration front page.
 	 * It uses the Admin template along with the admin sub template.
 	 * It requires the moderate_forum, manage_membergroups, manage_bans,
-	 *  admin_forum, manage_permissions, manage_attachments, manage_smileys,
-	 *  manage_boards, edit_news, or send_mail permission.
-	 *  It uses the index administrative area.
+	 * admin_forum, manage_permissions, manage_attachments, manage_smileys,
+	 * manage_boards, edit_news, or send_mail permission.
+	 * It uses the index administrative area.
 	 *
-	 *  It can be found by going to ?action=admin.
-	*/
+	 * It can be found by going to ?action=admin.
+	 */
 	public function action_home()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
+
+		// we need a little help
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
 		// Find all of this forum's administrators...
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 		{
 			// Add a 'more'-link if there are more than 32.
 			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
 		}
-
-		// Load the credits stuff.
-		require_once(CONTROLLERDIR . '/Who.controller.php');
-		action_credits(true);
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
@@ -723,26 +721,34 @@ class Admin_Controller
 	/**
 	 * The credits section in admin panel.
 	 *
-	 *  Accessed by ?action=admin;area=credits
-	*/
+	 * Accessed by ?action=admin;area=credits
+	 */
 	public function action_credits()
 	{
-		global  $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
+
+		// we need a little help from our friends
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(CONTROLLERDIR . '/Who.controller.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
 
 		// Find all of this forum's administrators...
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 		{
 			// Add a 'more'-link if there are more than 32.
 			$context['more_admins_link'] = '<a href="' . $scripturl . '?action=moderate;area=viewgroups;sa=members;group=1">' . $txt['more'] . '</a>';
 		}
 
-		// Load the credits stuff.
-		require_once(CONTROLLERDIR . '/Who.controller.php');
-		action_credits(true);
+		// Load credits.
+		$context[$context['admin_menu_name']]['tab_data'] = array(
+			'title' => $txt['support_credits_title'],
+			'help' => '',
+			'description' => '',
+		);
+		loadLanguage('Who');
+		prepareCreditsData();
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
@@ -835,7 +841,7 @@ class Admin_Controller
 	 */
 	public function action_search()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 
@@ -847,7 +853,7 @@ class Admin_Controller
 		);
 
 		$context['search_type'] = !isset($_REQUEST['search_type']) || !isset($subactions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
-		$context['search_term'] = isset($_REQUEST['search_term']) ? $smcFunc['htmlspecialchars']($_REQUEST['search_term'], ENT_QUOTES) : '';
+		$context['search_term'] = isset($_REQUEST['search_term']) ? Util::htmlspecialchars($_REQUEST['search_term'], ENT_QUOTES) : '';
 
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];

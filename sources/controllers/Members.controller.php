@@ -63,30 +63,32 @@ class Members_Controller
 	 */
 	function action_requestmembers()
 	{
-		global $user_info, $txt, $smcFunc;
+		global $user_info, $txt;
+
+		$db = database();
 
 		checkSession('get');
 
-		$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search']) . '*';
-		$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search']));
+		$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search']) . '*';
+		$_REQUEST['search'] = trim(Util::strtolower($_REQUEST['search']));
 		$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 		if (function_exists('iconv'))
 			header('Content-Type: text/plain; charset=UTF-8');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT real_name
 			FROM {db_prefix}members
 			WHERE real_name LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '
 				AND id_member IN ({array_int:buddy_list})' : '') . '
 				AND is_activated IN (1, 11)
-			LIMIT ' . ($smcFunc['strlen']($_REQUEST['search']) <= 2 ? '100' : '800'),
+			LIMIT ' . (Util::strlen($_REQUEST['search']) <= 2 ? '100' : '800'),
 			array(
 				'buddy_list' => $user_info['buddies'],
 				'search' => $_REQUEST['search'],
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
@@ -95,7 +97,7 @@ class Members_Controller
 
 			echo $row['real_name'], "\n";
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		obExit(false);
 	}
@@ -107,17 +109,17 @@ class Members_Controller
 	 */
 	function action_findmember()
 	{
-		global $context, $scripturl, $user_info, $smcFunc;
+		global $context, $scripturl, $user_info;
 
 		checkSession('get');
 
 		// Load members template
 		loadTemplate('Members');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'find_members';
 
 		if (isset($_REQUEST['search']))
-			$context['last_search'] = $smcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
+			$context['last_search'] = Util::htmlspecialchars($_REQUEST['search'], ENT_QUOTES);
 		else
 			$_REQUEST['start'] = 0;
 
@@ -138,7 +140,7 @@ class Members_Controller
 		// If the user has done a search, well - search.
 		if (isset($_REQUEST['search']))
 		{
-			$_REQUEST['search'] = $smcFunc['htmlspecialchars']($_REQUEST['search'], ENT_QUOTES);
+			$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search'], ENT_QUOTES);
 
 			$context['results'] = findMembers(array($_REQUEST['search']), true, $context['buddy_search']);
 			$total_results = count($context['results']);

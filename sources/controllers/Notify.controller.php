@@ -98,7 +98,7 @@ class Notify_Controller
 
 		loadTemplate('Xml');
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
@@ -120,7 +120,9 @@ class Notify_Controller
 	 */
 	public function action_notifyboard()
 	{
-		global $scripturl, $txt, $board, $user_info, $context, $smcFunc;
+		global $scripturl, $txt, $board, $user_info, $context;
+
+		$db = database();
 
 		// Permissions are an important part of anything ;).
 		is_not_guest();
@@ -169,7 +171,9 @@ class Notify_Controller
 	 */
 	public function action_notifyboard_api()
 	{
-		global $scripturl, $txt, $board, $user_info, $context, $smcFunc;
+		global $scripturl, $txt, $board, $user_info, $context;
+
+		$db = database();
 
 		// Permissions are an important part of anything ;).
 		is_not_guest('', false);
@@ -186,7 +190,7 @@ class Notify_Controller
 
 		loadTemplate('Xml');
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
@@ -248,7 +252,7 @@ class Notify_Controller
 
 		loadTemplate('Xml');
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(

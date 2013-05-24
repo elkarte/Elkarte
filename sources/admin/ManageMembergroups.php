@@ -387,7 +387,7 @@ class ManageMembergroups_Controller
 			{
 				// Set default permission level.
 				require_once(ADMINDIR . '/ManagePermissions.php');
-				setPermissionLevel($_POST['level'], $id_group, 'null');
+				setPermissionLevel($_POST['level'], $id_group, null);
 			}
 			// Copy or inherit the permissions!
 			elseif ($_POST['perm_type'] == 'copy' || $_POST['perm_type'] == 'inherit')
@@ -433,7 +433,7 @@ class ManageMembergroups_Controller
 			{
 				// Only do this if they have special access requirements.
 				if (!empty($changed_boards[$board_action]))
-					assignGroupToBoards($changed_boards, $id_group, $board_action);
+					assignGroupToBoards($id_group, $changed_boards, $board_action);
 			}
 
 			// If this is joinable then set it to show group membership in people's profiles.
@@ -465,7 +465,7 @@ class ManageMembergroups_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList(array('use_permissions' => true));
 
 		// Include a list of boards per category for easy toggling.
@@ -711,7 +711,7 @@ class ManageMembergroups_Controller
 		$context['boards'] = array();
 		if ($groups['id_group'] == 2 || $groups['id_group'] > 3)
 		{
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('access' => $groups['id_group'], 'not_redirection' => true));
 
 			// Include a list of boards per category for easy toggling.

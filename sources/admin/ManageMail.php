@@ -117,8 +117,7 @@ class ManageMail_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $smcFunc;
-							return $smcFunc[\'strlen\']($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', htmlspecialchars($smcFunc[\'substr\']($rowData[\'subject\'], 0, 47))) : htmlspecialchars($rowData[\'subject\']);
+							return Util::strlen($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', htmlspecialchars(Util::substr($rowData[\'subject\'], 0, 47))) : htmlspecialchars($rowData[\'subject\']);
 						'),
 						'class' => 'smalltext',
 					),
@@ -217,8 +216,6 @@ class ManageMail_Controller
 	{
 		global $txt, $scripturl, $context, $txtBirthdayEmails;
 
-		loadLanguage('EmailTemplates');
-
 		// Some important context stuff
 		$context['page_title'] = $txt['calendar_settings'];
 		$context['sub_template'] = 'show_settings';
@@ -226,6 +223,7 @@ class ManageMail_Controller
 		// initialize the form
 		$this->_initMailSettingsForm();
 
+		// piece of redundant code, for the javascript
 		$processedBirthdayEmails = array();
 		foreach ($txtBirthdayEmails as $key => $value)
 		{
@@ -290,10 +288,13 @@ class ManageMail_Controller
 	 */
 	private function _initMailSettingsForm()
 	{
-		global $txt, $modSettings, $txtBirthdayEmails;;
+		global $txt, $modSettings, $txtBirthdayEmails;
 
 		// instantiate the form
 		$this->_mailSettings = new Settings_Form();
+
+		// we need $txtBirthdayEmails
+		loadLanguage('EmailTemplates');
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];
@@ -335,7 +336,10 @@ class ManageMail_Controller
 	 */
 	public function settings()
 	{
-		global $txt, $modSettings, $txtBirthdayEmails;;
+		global $txt, $modSettings, $txtBirthdayEmails;
+
+		// we need $txtBirthdayEmails
+		loadLanguage('EmailTemplates');
 
 		$body = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_body'];
 		$subject = $txtBirthdayEmails[(empty($modSettings['birthday_email']) ? 'happy_birthday' : $modSettings['birthday_email']) . '_subject'];

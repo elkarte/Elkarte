@@ -161,7 +161,7 @@ class AdminDebug_Controller
 				echo '
 		<table border="1" rules="all" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">';
 
-				$row = $smcFunc['db_fetch_assoc']($result);
+				$row = $db->fetch_assoc($result);
 
 				echo '
 			<tr>
@@ -220,7 +220,8 @@ if (!(\'smfForum_sessionvar\' in window))
 	window.smfForum_sessionvar = \'sesc\';
 ' . strtr($file['file_data'], array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
+
 		// Lets make sure we aren't going to output anything nasty.
 		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))

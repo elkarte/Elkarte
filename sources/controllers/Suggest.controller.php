@@ -67,9 +67,9 @@ class Suggest_Controller
 	 */
 	function action_suggest_member()
 	{
-		global $user_info, $txt, $smcFunc, $context;
+		global $user_info, $txt, $context;
 
-		$search = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
+		$search = trim(Util::strtolower($_REQUEST['search'])) . '*';
 		$search = strtr($search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -87,7 +87,6 @@ class Suggest_Controller
 	 */
 	function action_suggest_versions()
 	{
-
 		$xml_data = array(
 			'items' => array(
 				'identifier' => 'item',

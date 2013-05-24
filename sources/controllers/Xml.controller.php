@@ -58,7 +58,7 @@ function action_jumpto()
 	global $context;
 
 	// Find the boards/categories they can see.
-	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
 	$boardListOptions = array(
 		'use_permissions' => true,
 		'selected_board' => isset($context['current_board']) ? $context['current_board'] : 0,
@@ -246,13 +246,13 @@ function action_previews()
  */
 function action_newspreview()
 {
-	global $context, $smcFunc;
+	global $context;
 
 	// Needed for parse bbc
 	require_once(SUBSDIR . '/Post.subs.php');
 
 	$errors = array();
-	$news = !isset($_POST['news']) ? '' : $smcFunc['htmlspecialchars']($_POST['news'], ENT_QUOTES);
+	$news = !isset($_POST['news']) ? '' : Util::htmlspecialchars($_POST['news'], ENT_QUOTES);
 	if (empty($news))
 		$errors[] = array('value' => 'no_news');
 	else
@@ -307,7 +307,9 @@ function action_newsletterpreview()
  */
 function action_sig_preview()
 {
-	global $context, $smcFunc, $txt, $user_info;
+	global $context, $txt, $user_info;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Profile.subs.php');
 	loadLanguage('Profile');
@@ -389,7 +391,7 @@ function action_sig_preview()
  */
 function action_warning_preview()
 {
-	global $context, $smcFunc, $txt, $user_info, $scripturl, $mbname;
+	global $context, $txt, $user_info, $scripturl, $mbname;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Errors');
@@ -401,7 +403,7 @@ function action_warning_preview()
 	if (allowedTo('issue_warning'))
 	{
 		$warning_body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
-		$context['preview_subject'] = !empty($_POST['title']) ? trim($smcFunc['htmlspecialchars']($_POST['title'])) : '';
+		$context['preview_subject'] = !empty($_POST['title']) ? trim(Util::htmlspecialchars($_POST['title'])) : '';
 		if (isset($_POST['issuing']))
 		{
 			if (empty($_POST['title']) || empty($_POST['body']))
@@ -456,7 +458,7 @@ function action_warning_preview()
  */
 function action_bounce_preview()
 {
-	global $context, $smcFunc, $txt, $scripturl, $mbname, $modSettings;
+	global $context, $txt, $scripturl, $mbname, $modSettings;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 	loadLanguage('Errors');
@@ -468,7 +470,7 @@ function action_bounce_preview()
 	if (allowedTo('approve_emails'))
 	{
 		$body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
-		$context['preview_subject'] = !empty($_POST['title']) ? trim($smcFunc['htmlspecialchars']($_POST['title'])) : '';
+		$context['preview_subject'] = !empty($_POST['title']) ? trim(Util::htmlspecialchars($_POST['title'])) : '';
 
 		if (isset($_POST['issuing']))
 		{

@@ -47,7 +47,9 @@ if (!defined('ELKARTE'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	switch ($type)
 	{
@@ -69,7 +71,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		else
 		{
 			// Update the latest activated member (highest id_member) and count.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT COUNT(*), MAX(id_member)
 				FROM {db_prefix}members
 				WHERE is_activated = {int:is_activated}',
@@ -77,8 +79,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'is_activated' => 1,
 				)
 			);
-			list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list ($changes['totalMembers'], $changes['latestMember']) = $db->fetch_row($result);
+			$db->free_result($result);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			// Get the latest activated member's display name.
@@ -89,7 +91,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
 			{
 				// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}members
 					WHERE is_activated IN ({array_int:activation_status})',
@@ -97,8 +99,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 						'activation_status' => array(3, 4),
 					)
 				);
-				list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
+				list ($changes['unapprovedMembers']) = $db->fetch_row($result);
+				$db->free_result($result);
 			}
 		}
 
@@ -111,7 +113,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		else
 		{
 			// SUM and MAX on a smaller table is better for InnoDB tables.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
 				FROM {db_prefix}boards
 				WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -121,8 +123,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'blank_redirect' => '',
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
+			$row = $db->fetch_assoc($result);
+			$db->free_result($result);
 
 			updateSettings(array(
 				'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
@@ -133,7 +135,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 	case 'subject':
 		// Remove the previous subject (if any).
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_search_subjects
 			WHERE id_topic = {int:id_topic}',
 			array(
@@ -152,7 +154,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				$inserts[] = array($word, $parameter1);
 
 			if (!empty($inserts))
-				$smcFunc['db_insert']('ignore',
+				$db->insert('ignore',
 					'{db_prefix}log_search_subjects',
 					array('word' => 'string', 'id_topic' => 'int'),
 					$inserts,
@@ -168,7 +170,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		{
 			// Get the number of topics - a SUM is better for InnoDB tables.
 			// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT SUM(num_topics + unapproved_topics) AS total_topics
 				FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				WHERE id_board != {int:recycle_board}' : ''),
@@ -176,8 +178,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
+			$row = $db->fetch_assoc($result);
+			$db->free_result($result);
 
 			updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
 		}
@@ -192,7 +194,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		if ($postgroups === null || $parameter1 === null)
 		{
 			// Fetch the postgroups!
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_group, min_posts
 				FROM {db_prefix}membergroups
 				WHERE min_posts != {int:min_posts}',
@@ -201,9 +203,9 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				)
 			);
 			$postgroups = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$postgroups[$row['id_group']] = $row['min_posts'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Sort them this way because if it's done with MySQL it causes a filesort :(.
 			arsort($postgroups);
@@ -226,7 +228,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		}
 
 		// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET id_post_group = CASE ' . $conditions . '
 					ELSE 0
@@ -264,7 +266,9 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  */
 function updateMemberData($members, $data)
 {
-	global $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info;
+
+	$db = database();
 
 	$parameters = array();
 	if (is_array($members))
@@ -321,15 +325,15 @@ function updateMemberData($members, $data)
 			else
 			{
 				$member_names = array();
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT member_name
 					FROM {db_prefix}members
 					WHERE ' . $condition,
 					$parameters
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$member_names[] = $row['member_name'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			if (!empty($member_names))
@@ -371,7 +375,7 @@ function updateMemberData($members, $data)
 		$parameters['p_' . $var] = $val;
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET' . substr($setString, 0, -1) . '
 		WHERE ' . $condition,
@@ -416,7 +420,9 @@ function updateMemberData($members, $data)
  */
 function updateSettings($changeArray, $update = false, $debug = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -426,7 +432,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	{
 		foreach ($changeArray as $variable => $value)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}settings
 				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
 				WHERE variable = {string:variable}',
@@ -462,7 +468,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	if (empty($replaceArray))
 		return;
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-65534'),
 		$replaceArray,
@@ -638,7 +644,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $context, $user_info, $txt, $modSettings, $smcFunc;
+	global $context, $user_info, $txt, $modSettings;
 	static $non_twelve_hour;
 
 	// Offset the time.
@@ -693,7 +699,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
 			if (strpos($str, $token) !== false)
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? $smcFunc['ucwords'](strftime($token, $time)) : strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
 	}
 	else
 	{
@@ -811,14 +817,12 @@ function un_htmlspecialchars($string)
  */
 function shorten_subject($subject, $len)
 {
-	global $smcFunc;
-
 	// It was already short enough!
-	if ($smcFunc['strlen']($subject) <= $len)
+	if (Util::strlen($subject) <= $len)
 		return $subject;
 
 	// Shorten it by the length it was too long, and strip off junk from the end.
-	return $smcFunc['substr']($subject, 0, $len) . '...';
+	return Util::substr($subject, 0, $len) . '...';
 }
 
 /**
@@ -836,9 +840,7 @@ function shorten_subject($subject, $len)
  */
 function shorten_text($text, $len = 384, $buffer = 12)
 {
-	global $smcFunc;
-
-	$current = $smcFunc['strlen']($text);
+	$current = Util::strlen($text);
 
 	// Its to long so lets cut it down to size
 	if ($current > $len)
@@ -847,7 +849,7 @@ function shorten_text($text, $len = 384, $buffer = 12)
 		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
 
 		// Always one clown in the audience who likes long words or not using the spacebar
-		if ($smcFunc['strlen']($matches[1]) > $len + $buffer)
+		if (Util::strlen($matches[1]) > $len + $buffer)
 			$matches[1] = substr($matches[1], 0, $len);
 
 		return rtrim($matches[1]) . '...';
@@ -928,7 +930,9 @@ function permute($array)
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
 {
-	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $user_info;
+
+	$db = database();
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
 	static $disabled;
 
@@ -2467,7 +2471,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info, $context, $smcFunc;
+	global $modSettings, $txt, $user_info, $context;
+
+	$db = database();
 	static $smileyPregSearch = null, $smileyPregReplacements = array();
 
 	// No smiley set at all?!
@@ -2489,7 +2495,7 @@ function parsesmileys(&$message)
 			// Load the smileys in reverse order by length so they don't get parsed wrong.
 			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT code, filename, description
 					FROM {db_prefix}smileys',
 					array(
@@ -2498,13 +2504,13 @@ function parsesmileys(&$message)
 				$smileysfrom = array();
 				$smileysto = array();
 				$smileysdescs = array();
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$smileysfrom[] = $row['code'];
 					$smileysto[] = htmlspecialchars($row['filename']);
 					$smileysdescs[] = $row['description'];
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
 			}
@@ -2626,7 +2632,8 @@ function redirectexit($setLocation = '', $refresh = false)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt, $smcFunc;
+	global $context, $settings, $modSettings, $txt;
+
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
 	// Attempt to prevent a recursive loop.
@@ -2653,7 +2660,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -2764,7 +2771,8 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
-	global $user_settings, $smcFunc;
+	global $user_settings;
+
 	static $loaded = false;
 
 	// Under SSI this function can be called more then once.  That can cause some problems.
@@ -2922,8 +2930,8 @@ function setupThemeContext($forceload = false)
 		$context['page_title'] = '';
 
 	// Set some specific vars.
-	$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
-	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? $smcFunc['htmlspecialchars']($modSettings['meta_keywords']) : '';
+	$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? Util::htmlspecialchars($modSettings['meta_keywords']) : '';
 }
 
 /**
@@ -3030,9 +3038,9 @@ function template_header()
 
 	$checked_securityFiles = false;
 	$showed_banned = false;
-	foreach ($context['template_layers'] as $layer)
+	foreach (Template_Layers::getInstance()->prepareContext() as $layer)
 	{
-		loadSubTemplate($layer . '_above', true);
+		loadSubTemplate($layer . '_above', 'ignore');
 
 		// May seem contrived, but this is done in case the body and main layer aren't there...
 		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && !$checked_securityFiles)
@@ -3157,8 +3165,8 @@ function template_footer()
 		$settings['theme_dir'] = $settings['actual_theme_dir'];
 	}
 
-	foreach (array_reverse($context['template_layers']) as $layer)
-		loadSubTemplate($layer . '_below', true);
+	foreach (Template_Layers::getInstance()->reverseLayers() as $layer)
+		loadSubTemplate($layer . '_below', 'ignore');
 
 }
 
@@ -3319,7 +3327,9 @@ function template_css()
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	// Just make up a nice hash...
 	if ($new)
@@ -3329,7 +3339,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	// @todo: Locate all places that don't call a hash and fix that.
 	if ($file_hash === '')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT file_hash
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
@@ -3337,11 +3347,11 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 				'id_attach' => $attachment_id,
 		));
 
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($db->num_rows($request) === 0)
 			return false;
 
-		list ($file_hash) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($file_hash) = $db->fetch_row($request);
+		$db->free_result($request);
 	}
 
 	// In case of files from the old system, do a legacy call.
@@ -4024,14 +4034,16 @@ function call_integration_hook($hook, $parameters = array())
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	$integration_call = (!empty($file) && $file !== true) ? $function . ':' . $file : $function;
 
 	// Is it going to be permanent?
 	if ($permanent)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
@@ -4039,8 +4051,8 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 				'variable' => $hook,
 			)
 		);
-		list($current_functions) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list($current_functions) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		if (!empty($current_functions))
 		{
@@ -4078,12 +4090,14 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	$integration_call = (!empty($file)) ? $function . ':' . $file : $function;
 
 	// Get the permanent functions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}settings
 		WHERE variable = {string:variable}',
@@ -4091,8 +4105,8 @@ function remove_integration_function($hook, $function, $file = '')
 			'variable' => $hook,
 		)
 	);
-	list($current_functions) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($current_functions) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	if (!empty($current_functions))
 	{

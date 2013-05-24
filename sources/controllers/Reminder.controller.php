@@ -54,7 +54,9 @@ class Reminder_Controller
 	 */
 	function action_picktype()
 	{
-		global $context, $txt, $scripturl, $user_info, $webmaster_email, $smcFunc, $language, $modSettings;
+		global $context, $txt, $scripturl, $user_info, $webmaster_email, $language, $modSettings;
+
+		$db = database();
 
 		checkSession();
 		validateToken('remind');
@@ -178,7 +180,9 @@ class Reminder_Controller
 	 */
 	function action_setpassword2()
 	{
-		global $context, $txt, $modSettings, $smcFunc;
+		global $context, $txt, $modSettings;
+
+		$db = database();
 
 		checkSession();
 		validateToken('remind-sp');
@@ -247,7 +251,9 @@ class Reminder_Controller
 	 */
 	function action_secret2()
 	{
-		global $txt, $context, $modSettings, $smcFunc;
+		global $txt, $context, $modSettings;
+
+		$db = database();
 
 		checkSession();
 		validateToken('remind-sai');
@@ -320,7 +326,9 @@ class Reminder_Controller
  */
 function secretAnswerInput()
 {
-	global $txt, $context, $smcFunc;
+	global $txt, $context;
+
+	$db = database();
 
 	checkSession();
 

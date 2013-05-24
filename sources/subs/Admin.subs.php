@@ -22,11 +22,14 @@ if (!defined('ELKARTE'))
 
 /**
  * Get a list of versions that are currently installed on the server.
+ *
  * @param array $checkFor
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $db_connection, $_PHPA, $smcFunc, $memcached, $modSettings;
+	global $txt, $db_connection, $_PHPA, $memcached, $modSettings;
+
+	$db = database();
 
 	loadLanguage('Admin');
 
@@ -97,6 +100,8 @@ function getServerVersions($checkFor)
  *   language files found in the default theme directory (grouped by language).
  *
  * @param array &$versionOptions
+ *
+ * @return array
  */
 function getFileVersions(&$versionOptions)
 {
@@ -236,6 +241,7 @@ function getFileVersions(&$versionOptions)
 		foreach ($version_info['default_language_versions'] as $language => $dummy)
 			ksort($version_info['default_language_versions'][$language]);
 	}
+
 	return $version_info;
 }
 
@@ -259,7 +265,9 @@ function updateDbLastError($time)
  */
 function updateAdminPreferences()
 {
-	global $options, $context, $smcFunc, $settings, $user_info;
+	global $options, $context, $settings, $user_info;
+
+	$db = database();
 
 	// This must exist!
 	if (!isset($context['admin_preferences']))
@@ -269,7 +277,7 @@ function updateAdminPreferences()
 	$options['admin_preferences'] = serialize($context['admin_preferences']);
 
 	// Just check we haven't ended up with something theme exclusive somehow.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme != {int:default_theme}
 		AND variable = {string:admin_preferences}',
@@ -280,7 +288,7 @@ function updateAdminPreferences()
 	);
 
 	// Update the themes table.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}themes',
 		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 		array($user_info['id'], 1, 'admin_preferences', $options['admin_preferences']),
@@ -293,9 +301,9 @@ function updateAdminPreferences()
 
 /**
  * Send all the administrators a lovely email.
- * - loads all users who are admins or have the admin forum permission.
- * - uses the email template and replacements passed in the parameters.
- * - sends them an email.
+ * It loads all users who are admins or have the admin forum permission.
+ * It uses the email template and replacements passed in the parameters.
+ * It sends them an email.
  *
  * @param string $template
  * @param array $replacements
@@ -303,13 +311,15 @@ function updateAdminPreferences()
  */
 function emailAdmins($template, $replacements = array(), $additional_recipients = array())
 {
-	global $smcFunc, $language, $modSettings;
+	global $language, $modSettings;
+
+	$db = database();
 
 	// We certainly want this.
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Load all groups which are effectively admins.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:admin_forum}
@@ -322,11 +332,11 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		)
 	);
 	$groups = array(1);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[] = $row['id_group'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -339,7 +349,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		)
 	);
 	$emails_sent = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Stick their particulars in the replacement data.
 		$replacements['IDMEMBER'] = $row['id_member'];
@@ -355,7 +365,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		// Track who we emailed so we don't do it twice.
 		$emails_sent[] = $row['email_address'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Any additional users we must email this to?
 	if (!empty($additional_recipients))

@@ -19,7 +19,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class DbTable_PostgreSQL
+class DbTable_PostgreSQL extends DbTable
 {
 	private static $_tbl = null;
 
@@ -137,7 +137,7 @@ class DbTable_PostgreSQL
 				$default = 'default nextval(\'' . $table_name . '_seq\')';
 			}
 			elseif (isset($column['default']) && $column['default'] !== null)
-				$default = 'default \'' . $db->db_escape_string($column['default']) . '\'';
+				$default = 'default \'' . $db->escape_string($column['default']) . '\'';
 			else
 				$default = '';
 
@@ -400,7 +400,7 @@ class DbTable_PostgreSQL
 		// Different default?
 		if (isset($column_info['default']) && $column_info['default'] != $old_info['default'])
 		{
-			$action = $column_info['default'] !== null ? 'SET DEFAULT \'' . $db->db_escape_string($column_info['default']) . '\'' : 'DROP DEFAULT';
+			$action = $column_info['default'] !== null ? 'SET DEFAULT \'' . $db->escape_string($column_info['default']) . '\'' : 'DROP DEFAULT';
 			$db->query('', '
 				ALTER TABLE ' . $table_name . '
 				ALTER COLUMN ' . $column_info['name'] . ' ' . $action,

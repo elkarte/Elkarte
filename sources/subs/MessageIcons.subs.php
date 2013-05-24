@@ -25,11 +25,13 @@ if (!defined('ELKARTE'))
  */
 function getMessageIcons()
 {
-	global $smcFunc, $settings, $txt;
+	global $settings, $txt;
+
+	$db = database();
 
 	$icons = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
 		FROM {db_prefix}message_icons AS m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -39,7 +41,7 @@ function getMessageIcons()
 	);
 	$last_icon = 0;
 	$trueOrder = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$icons[$row['id_icon']] = array(
 			'id' => $row['id_icon'],
@@ -54,7 +56,7 @@ function getMessageIcons()
 		);
 		$last_icon = $row['id_icon'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $icons;
 }
@@ -66,10 +68,10 @@ function getMessageIcons()
  */
 function deleteMessageIcon($icons)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Do the actual delete!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}message_icons
 		WHERE id_icon IN ({array_int:icon_list})',
 		array(
@@ -85,9 +87,9 @@ function deleteMessageIcon($icons)
  */
 function updateMessageIcon($icon)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}message_icons',
 		array('id_icon' => 'int', 'id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 		$icon,
@@ -102,9 +104,9 @@ function updateMessageIcon($icon)
  */
 function addMessageIcon($icon)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}message_icons',
 		array('id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
 		$icon,
@@ -117,9 +119,9 @@ function addMessageIcon($icon)
  */
 function sortMessageIconTable()
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('alter_table_icons', '
+	$db->query('alter_table_icons', '
 		ALTER TABLE {db_prefix}message_icons
 		ORDER BY icon_order',
 		array(
@@ -137,9 +139,9 @@ function sortMessageIconTable()
  */
 function list_getMessageIcons($start, $items_per_page, $sort)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
 		FROM {db_prefix}message_icons AS m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -149,9 +151,9 @@ function list_getMessageIcons($start, $items_per_page, $sort)
 	);
 
 	$message_icons = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$message_icons[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $message_icons;
 }

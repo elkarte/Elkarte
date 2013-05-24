@@ -29,8 +29,8 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * Maps the implementations in the legacy subs file (smf_db_function_name)
-	 * to the $smcFunc['db_function_name'] variable.
+	 * Initializes a database connection.
+	 * It returns the connection, if successful.
 	 *
 	 * @param string $db_server
 	 * @param string $db_name
@@ -38,35 +38,19 @@ class Database_SQLite implements Database
 	 * @param string $db_passwd
 	 * @param string $db_prefix
 	 * @param array $db_options
+	 *
+	 * @return resource
 	 */
 	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
-		global $smcFunc, $mysql_set_mode, $db_in_transact, $sqlite_error;
-
-		// Map some database specific functions, only do this once.
-		if (!isset($smcFunc['db_fetch_assoc']) || $smcFunc['db_fetch_assoc'] != 'sqlite_fetch_array')
-			$smcFunc += array(
-				'db_query' => 'elk_db_query',
-				'db_quote' => 'elk_db_quote',
-				'db_fetch_assoc' => 'sqlite_fetch_array',
-				'db_fetch_row' => 'elk_db_fetch_row',
-				'db_free_result' => 'elk_db_free_result',
-				'db_insert' => 'elk_db_insert',
-				'db_insert_id' => 'elk_db_insert_id',
-				'db_num_rows' => 'sqlite_num_rows',
-				'db_num_fields' => 'sqlite_num_fields',
-				'db_escape_string' => 'sqlite_escape_string',
-				'db_unescape_string' => 'elk_db_unescape_string',
-				'db_affected_rows' => 'elk_db_affected_rows',
-				'last_error' => 'elk_db_last_error',
-				'db_case_sensitive' => true,
-			);
+		global $db_in_transact, $sqlite_error;
 
 		if (substr($db_name, -3) != '.db')
 			$db_name .= '.db';
 
-		// initialize the instance.
-		self::$_db = new self();
+		// initialize the instance... if not done already!
+		if (self::$_db === null)
+			self::$_db = new self();
 
 		if (!empty($db_options['persist']))
 			$connection = @sqlite_popen($db_name, 0666, $sqlite_error);
@@ -107,10 +91,12 @@ class Database_SQLite implements Database
 	 *
 	 * @param type $db_prefix
 	 * @param type $db_name
+	 *
+	 * @return string
 	 */
-	function fix_prefix(&$db_prefix, $db_name)
+	function fix_prefix($db_prefix, $db_name)
 	{
-		return false;
+		return $db_prefix;
 	}
 
 	/**
@@ -227,8 +213,8 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * Just like the db_query, escape and quote a string,
-	 * but not executing the query.
+	 * This function works like $this->query(), escapes and quotes a string,
+	 * but it doesn't execute the query.
 	 *
 	 * @param string $db_string
 	 * @param string $db_values
@@ -431,17 +417,6 @@ class Database_SQLite implements Database
 	}
 
 	/**
-	 * Last error on SQLite.
-	 */
-	function last_error()
-	{
-		global $db_connection, $sqlite_error;
-
-		$query_errno = sqlite_last_error($db_connection);
-		return $query_errno || empty($sqlite_error) ? sqlite_error_string($query_errno) : $sqlite_error;
-	}
-
-	/**
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
@@ -480,7 +455,10 @@ class Database_SQLite implements Database
 	 */
 	function last_error($database = null)
 	{
-		return sqlite_last_error($database);
+		global $db_connection, $sqlite_error;
+
+		$query_errno = sqlite_last_error(empty($database) ? $db_connection : $database);
+		return $query_errno || empty($sqlite_error) ? sqlite_error_string($query_errno) : $sqlite_error;
 	}
 
 	/**
@@ -495,7 +473,6 @@ class Database_SQLite implements Database
 		global $txt, $context, $webmaster_email, $modSettings;
 		global $forum_version, $db_connection, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
-		global $smcFunc;
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
@@ -574,7 +551,7 @@ class Database_SQLite implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_in_transact, $db_connection, $smcFunc, $db_prefix;
+		global $db_in_transact, $db_connection, $db_prefix;
 
 		$connection = $connection === null ? $db_connection : $connection;
 
@@ -618,7 +595,7 @@ class Database_SQLite implements Database
 
 			foreach ($insertRows as $entry)
 				// Do the insert.
-				$smcFunc['db_query']('',
+				$this->query('',
 					(($method === 'replace') ? 'REPLACE' : (' INSERT' . ($method === 'ignore' ? ' OR IGNORE' : ''))) . ' INTO ' . $table . '(' . implode(', ', $indexed_columns) . ')
 					VALUES
 						' . $entry,
@@ -917,7 +894,8 @@ class Database_SQLite implements Database
 	 */
 	function insert_sql($tableName, $new_table = false)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
+
 		static $start = 0, $num_rows, $fields, $limit;
 
 		if ($new_table)
@@ -932,7 +910,7 @@ class Database_SQLite implements Database
 		// This will be handy...
 		$crlf = "\r\n";
 
-		$result = $smcFunc['db_query']('', '
+		$result = $this->query('', '
 			SELECT *
 			FROM ' . $tableName . '
 			LIMIT ' . $start . ', ' . $limit,
@@ -942,7 +920,7 @@ class Database_SQLite implements Database
 		);
 
 		// The number of rows, just for record keeping and breaking INSERTs up.
-		$num_rows = $smcFunc['db_num_rows']($result);
+		$num_rows = $this->num_rows($result);
 
 		if ($num_rows == 0)
 			return '';
@@ -977,7 +955,7 @@ class Database_SQLite implements Database
 				elseif (is_numeric($item) && (int) $item == $item)
 					$field_list[] = $item;
 				else
-					$field_list[] = '\'' . $smcFunc['db_escape_string']($item) . '\'';
+					$field_list[] = '\'' . $this->escape_string($item) . '\'';
 			}
 
 			// 'Insert' the data.
@@ -1000,7 +978,7 @@ class Database_SQLite implements Database
 	 */
 	function db_table_sql($tableName)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
@@ -1012,7 +990,7 @@ class Database_SQLite implements Database
 		$index_create = '';
 
 		// Let's get the create statement directly from SQLite.
-		$result = $smcFunc['db_query']('', '
+		$result = $this->query('', '
 			SELECT sql
 			FROM sqlite_master
 			WHERE type = {string:type}
@@ -1026,7 +1004,7 @@ class Database_SQLite implements Database
 		$this->free_result($result);
 
 		// Now the indexes.
-		$result = $smcFunc['db_query']('', '
+		$result = $this->query('', '
 			SELECT sql
 			FROM sqlite_master
 			WHERE type = {string:type}
@@ -1058,11 +1036,9 @@ class Database_SQLite implements Database
 	 */
 	function db_list_tables($db_name_str = false, $filter = false)
 	{
-		global $smcFunc;
-
 		$filter = $filter == false ? '' : ' AND name LIKE \'' . str_replace("\_", "_", $filter) . '\'';
 
-		$request = $smcFunc['db_query']('', '
+		$request = $this->query('', '
 			SELECT name
 			FROM sqlite_master
 			WHERE type = {string:type}
@@ -1089,11 +1065,11 @@ class Database_SQLite implements Database
 	 */
 	function db_optimize_table($table)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $this->query('', '
 			VACUUM {raw:table}',
 			array(
 				'table' => $table,
@@ -1118,11 +1094,11 @@ class Database_SQLite implements Database
 	 */
 	function db_backup_table($table, $backup_table)
 	{
-		global $smcFunc, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
-		$result = $smcFunc['db_query']('', '
+		$result = $this->query('', '
 			SELECT sql
 			FROM sqlite_master
 			WHERE type = {string:txttable}
@@ -1169,7 +1145,7 @@ class Database_SQLite implements Database
 		if (substr($create, -2) == '))')
 			$create = substr($create, 0, -1);
 
-		$smcFunc['db_query']('', '
+		$this->query('', '
 			DROP TABLE {raw:backup_table}',
 			array(
 				'backup_table' => $backup_table,
@@ -1177,21 +1153,21 @@ class Database_SQLite implements Database
 			)
 		);
 
-		$request = $smcFunc['db_quote']('
+		$request = $this->quote('
 			CREATE TABLE {raw:backup_table} {raw:create}',
 			array(
 				'backup_table' => $backup_table,
 				'create' => $create,
 		));
 
-		$smcFunc['db_query']('', '
+		$this->query('', '
 			CREATE TABLE {raw:backup_table} {raw:create}',
 			array(
 				'backup_table' => $backup_table,
 				'create' => $create,
 		));
 
-		$request = $smcFunc['db_query']('', '
+		$request = $this->query('', '
 			INSERT INTO {raw:backup_table}
 			SELECT *
 			FROM {raw:table}',

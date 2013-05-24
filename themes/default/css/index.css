@@ -133,7 +133,7 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 	padding: 2px 4px;
 	float: right;
 	cursor: pointer;
-	border: 1px solid #ccc; 
+	border: 1px solid #ccc;
 	background: #efefef url(../images/theme/lower_section.png) 0 0 repeat-x;
 	border-radius: 2px;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
@@ -1334,10 +1334,6 @@ table.table_padding td {
 #main_content_section {
 	position: relative;
 }
-.pagesection .buttonlist  {
-	position: absolute;
-	right: 0;
-}
 .pagesection ul.buttonlist_c {
 	position: absolute;
 	right: 5px;
@@ -1346,6 +1342,9 @@ table.table_padding td {
 }
 .pagesection ul.buttonlist_c>li>ul, div.buttonlist ul>li>ul {
 	display: none;
+}
+#pagetop, #pagebot {
+	margin-top: 7px;
 }
 div.buttonlist ul>li>ul li {
 	float: none;
@@ -2393,7 +2392,7 @@ ul.quickbuttons {
 	clear: right;
 	float: right;
 	text-align: right;
-	visibility: hidden;
+	/* visibility: hidden; */
 	width: 100%;
 }
 .windowbg .post_wrapper:hover ul.nojs_visible, .windowbg2 .post_wrapper:hover ul.nojs_visible {
@@ -2408,7 +2407,7 @@ ul.quickbuttons li a {
 	padding: 0 4px 0 20px;
 	display: block;
 	line-height: 2.0em;
-	float: left;
+	float: left; 
 }
 ul.quickbuttons li a.quote_button {
 	padding: 0 4px 0 16px;
@@ -2514,7 +2513,7 @@ ul.quickbuttons li.inline_mod_check {
 	margin: 0;
 }
 .quickbuttons li.quick_edit {
-	display: none;
+	/* display: none; */
 }
 ul.quickbuttons li.inline_mod_check {
 	padding: 3px 0 0 3px;
@@ -2552,6 +2551,9 @@ ul.quickbuttons li.inline_mod_check {
 .quickbuttons li:hover ul, .quickbuttons li.sfhover ul {
 	left: auto;
 	right: -1px;
+}
+.quickbuttons li ul li {
+	clear: right;
 }
 .quickbuttons li.sfhover ul li, .quickbuttons li:hover ul li{
 	display: block;
@@ -2673,7 +2675,7 @@ ul.follow_ups>li {
 /* Styles for edit post section
 ---------------------------------------------------- */
 
-#postmodify .roundframe {
+#postmodify div.roundframe {
 	padding: 12px 12%;
 }
 #postmodify {
@@ -4603,7 +4605,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	}
 }
 /* 7" Tablets like Google Nexus (landscape) or other mobile devices */
-@media screen and (max-width: 610px) and (orientation: portrait) {
+@media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
 	 	 display: none !important;
 	 }
@@ -4650,12 +4652,31 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		float: none;
 		width: 95%;
 	}
+	.poster {
+		float: none;
+		border: 0 !important;
+		box-shadow: none !important;
+	}
+	.postarea, .moderatorbar {
+		margin: 0;
+	}
 	#basicinfo, #detailedinfo {
 		float: none;
 		width: 95%;
 	}
 	.login {
 		width: 95%;
+	}
+	.pagesection .buttonlist {
+		width: 100%;
+	}
+	input {
+		max-width: 230px;
+	}
+	.post_wrapper {
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 6px;
 	}
 }
 
@@ -4664,7 +4685,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	#top_section_notice, #logo, #topic_icons div p, .optional {
 		display: none;
 	}
-	
+
 	#guest_form input {
 		width: 50px;
 	}
@@ -4680,9 +4701,14 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		display: none;
 	}
 	.pagelinks, .buttonlist {
-		float: none !important;
-		width: 95%;
 	}
 	#main_menu ul li {
 	margin-bottom: 5px;
+	}
+	#post_header dt {
+		width: 90%;
+	}
+	input {
+		max-width: 200px;
+	}
 }

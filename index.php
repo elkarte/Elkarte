@@ -78,6 +78,7 @@ require_once(SOURCEDIR . '/Security.php');
 require_once(SOURCEDIR . '/BrowserDetect.class.php');
 require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
+require_once(SUBSDIR . '/TemplateLayers.class.php');
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)

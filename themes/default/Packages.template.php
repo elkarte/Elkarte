@@ -842,7 +842,7 @@ function template_package_confirm()
 
 function template_package_list()
 {
-	global $context, $settings, $txt, $smcFunc;
+	global $context, $settings, $txt;
 
 	echo '
 	<div id="admincenter">
@@ -920,7 +920,7 @@ function template_package_list()
 					// Show the mod type?
 					if ($package['type'] != '')
 						echo '
-								<li class="package_section">', $txt['package_type'], ':&nbsp; ', $smcFunc['ucwords']($smcFunc['strtolower']($package['type'])), '</li>';
+								<li class="package_section">', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
 					// Show the version number?
 					if ($package['version'] != '')
 						echo '

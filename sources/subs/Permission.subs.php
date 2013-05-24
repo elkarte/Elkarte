@@ -85,14 +85,14 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-	global $smcFunc;
+	$db = database();
 
 	// All the parent groups to sort out.
 	if (!is_array($parents))
 		$parents = array($parents);
 
 	// Find all the children of this group.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_parent, id_group
 		FROM {db_prefix}membergroups
 		WHERE id_parent != {int:not_inherited}
@@ -105,13 +105,13 @@ function updateChildPermissions($parents, $profile = null)
 	$children = array();
 	$parents = array();
 	$child_groups = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$children[$row['id_parent']][] = $row['id_group'];
 		$child_groups[] = $row['id_group'];
 		$parents[] = $row['id_parent'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$parents = array_unique($parents);
 
@@ -123,7 +123,7 @@ function updateChildPermissions($parents, $profile = null)
 	if ($profile < 1 || $profile === null)
 	{
 		// Fetch all the parent permissions.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:parent_list})',
@@ -132,12 +132,12 @@ function updateChildPermissions($parents, $profile = null)
 			)
 		);
 		$permissions = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['permission'], $row['add_deny']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:child_groups})',
 			array(
@@ -148,7 +148,7 @@ function updateChildPermissions($parents, $profile = null)
 		// Finally insert.
 		if (!empty($permissions))
 		{
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}permissions',
 				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 				$permissions,
@@ -163,7 +163,7 @@ function updateChildPermissions($parents, $profile = null)
 		$profileQuery = $profile === null ? '' : ' AND id_profile = {int:current_profile}';
 
 		// Again, get all the parent permissions.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_profile, id_group, permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE id_group IN ({array_int:parent_groups})
@@ -174,12 +174,12 @@ function updateChildPermissions($parents, $profile = null)
 			)
 		);
 		$permissions = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			foreach ($children[$row['id_group']] as $child)
 				$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}board_permissions
 			WHERE id_group IN ({array_int:child_groups})
 				' . $profileQuery,
@@ -192,7 +192,7 @@ function updateChildPermissions($parents, $profile = null)
 		// Do the insert.
 		if (!empty($permissions))
 		{
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}board_permissions',
 				array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 				$permissions,
@@ -211,7 +211,9 @@ class InlinePermissions_Form
 	 */
 	static function save_inline_permissions($permissions)
 	{
-		global $context, $smcFunc;
+		global $context;
+
+		$db = database();
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
@@ -239,7 +241,7 @@ class InlinePermissions_Form
 		}
 
 		// Remove the old permissions...
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}permissions
 			WHERE permission IN ({array_string:permissions})
 			' . (empty($context['illegal_permissions']) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
@@ -251,7 +253,7 @@ class InlinePermissions_Form
 
 		// ...and replace them with new ones.
 		if (!empty($insertRows))
-			$smcFunc['db_insert']('insert',
+			$db->insert('insert',
 				'{db_prefix}permissions',
 				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 				$insertRows,
@@ -278,7 +280,9 @@ class InlinePermissions_Form
 	 */
 	static function init_inline_permissions($permissions, $excluded_groups = array())
 	{
-		global $context, $txt, $modSettings, $smcFunc;
+		global $context, $txt, $modSettings;
+
+		$db = database();
 
 		loadLanguage('ManagePermissions');
 		loadTemplate('ManagePermissions');
@@ -305,7 +309,7 @@ class InlinePermissions_Form
 				),
 			);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group, CASE WHEN add_deny = {int:denied} THEN {string:deny} ELSE {string:on} END AS status, permission
 			FROM {db_prefix}permissions
 			WHERE id_group IN (-1, 0)
@@ -317,11 +321,11 @@ class InlinePermissions_Form
 				'on' => 'on',
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context[$row['permission']][$row['id_group']]['status'] = $row['status'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mg.id_group, mg.group_name, mg.min_posts, IFNULL(p.add_deny, -1) AS status, p.permission
 			FROM {db_prefix}membergroups AS mg
 				LEFT JOIN {db_prefix}permissions AS p ON (p.id_group = mg.id_group AND p.permission IN ({array_string:permissions}))
@@ -336,7 +340,7 @@ class InlinePermissions_Form
 				'permissions' => $permissions,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			// Initialize each permission as being 'off' until proven otherwise.
 			foreach ($permissions as $permission)
@@ -350,7 +354,7 @@ class InlinePermissions_Form
 
 			$context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Some permissions cannot be given to certain groups. Remove the groups.
 		foreach ($excluded_groups as $group)

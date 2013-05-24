@@ -36,7 +36,9 @@ class ManageErrors_Controller
 	 */
 	public function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
+		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
+
+		$db = database();
 
 		require_once(SUBSDIR . '/Error.subs.php');
 
@@ -250,7 +252,7 @@ class ManageErrors_Controller
 		);
 
 		loadTemplate('Errors');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'show_file';
 	}
 }

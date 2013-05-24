@@ -623,7 +623,7 @@ class ManageLanguages_Controller
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $smcFunc, $txt, $modSettings, $language;
+		global $settings, $context, $txt, $modSettings, $language;
 
 		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');
@@ -778,7 +778,7 @@ class ManageLanguages_Controller
 		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php');
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
-			'name' => $smcFunc['ucwords'](strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
 			'character_set' => 'UTF-8',
 			'locale' => $txt['lang_locale'],
 			'dictionary' => $txt['lang_dictionary'],
@@ -1046,8 +1046,7 @@ class ManageLanguages_Controller
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-
+		
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
@@ -1067,7 +1066,10 @@ class ManageLanguages_Controller
 	public function settings()
 	{
 		global $txt;
-
+		
+		// Warn the user if the backup of Settings.php failed.
+		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+		
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),

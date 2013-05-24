@@ -35,7 +35,9 @@ if (!defined('ELKARTE'))
  */
 function getBoardIndex($boardIndexOptions)
 {
-	global $smcFunc, $scripturl, $user_info, $modSettings, $txt;
+	global $scripturl, $user_info, $modSettings, $txt;
+
+	$db = database();
 	global $settings, $context;
 
 	// For performance, track the latest post while going through the boards.
@@ -46,7 +48,7 @@ function getBoardIndex($boardIndexOptions)
 		);
 
 	// Find all boards and categories, as well as related information.  This will be sorted by the natural order of boards and categories, which we control.
-	$result_boards = $smcFunc['db_query']('boardindex_fetch_boards', '
+	$result_boards = $db->query('boardindex_fetch_boards', '
 		SELECT' . ($boardIndexOptions['include_categories'] ? '
 			c.id_cat, c.name AS cat_name,' : '') . '
 			b.id_board, b.name AS board_name, b.description,
@@ -86,7 +88,7 @@ function getBoardIndex($boardIndexOptions)
 		$this_category = array();
 
 	// Run through the categories and boards (or only boards)....
-	while ($row_board = $smcFunc['db_fetch_assoc']($result_boards))
+	while ($row_board = $db->fetch_assoc($result_boards))
 	{
 		// Perhaps we are ignoring this board?
 		$ignoreThisBoard = in_array($row_board['id_board'], $user_info['ignoreboards']);
@@ -319,7 +321,7 @@ function getBoardIndex($boardIndexOptions)
 				'ref' => &$this_category[$isChild ? $row_board['id_parent'] : $row_board['id_board']]['last_post'],
 			);
 	}
-	$smcFunc['db_free_result']($result_boards);
+	$db->free_result($result_boards);
 
 	// By now we should know the most recent post...if we wanna know it that is.
 	if (!empty($boardIndexOptions['set_latest_post']) && !empty($latest_post['ref']))

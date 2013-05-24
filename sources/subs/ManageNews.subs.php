@@ -55,11 +55,11 @@ function list_getNews()
  */
 function excludeBannedMembers()
 {
-	global $smcFunc;
+	$db = database();
 
 	$excludes = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT DISTINCT mem.id_member
 		FROM {db_prefix}ban_groups AS bg
 			INNER JOIN {db_prefix}ban_items AS bi ON (bg.id_ban_group = bi.id_ban_group)
@@ -72,11 +72,11 @@ function excludeBannedMembers()
 			'current_time' => time(),
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$excludes[] = $row['id_member'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT DISTINCT bi.email_address
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -93,24 +93,24 @@ function excludeBannedMembers()
 	$condition_array = array();
 	$condition_array_params = array();
 	$count = 0;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$condition_array[] = '{string:email_' . $count . '}';
 		$condition_array_params['email_' . $count++] = $row['email_address'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($condition_array))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
 			WHERE email_address IN(' . implode(', ', $condition_array) .')',
 			$condition_array_params
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$excludes['exclude_members'][] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	return $excludes;
@@ -123,11 +123,11 @@ function excludeBannedMembers()
  */
 function getModerators()
 {
-	global $smcFunc;
+	$db = database();
 
 	$mods = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT DISTINCT mem.id_member AS identifier
 		FROM {db_prefix}members AS mem
 			INNER JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member)
@@ -136,9 +136,9 @@ function getModerators()
 			'is_activated' => 1,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$mods[] = $row['identifier'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $mods;
 }
@@ -155,11 +155,11 @@ function getModerators()
  */
 function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $counter)
 {
-	global $smcFunc;
+	$db = database();
 
 	$recipients = array();
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups, mem.id_post_group
 		FROM {db_prefix}members AS mem
 		WHERE mem.id_member > {int:min_id_member}
@@ -178,9 +178,9 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
 		))
 	);
 
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 		$recipients[] = $row;
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	return $recipients;
 }

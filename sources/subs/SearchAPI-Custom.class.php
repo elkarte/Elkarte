@@ -157,7 +157,7 @@ class Custom_Search
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		$subwords = text2words($word, $this->min_word_length, true);
 
@@ -171,7 +171,7 @@ class Custom_Search
 		{
 			foreach ($subwords as $subword)
 			{
-				if ($smcFunc['strlen']($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
+				if (Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
 				{
 					$wordsSearch['indexed_words'][] = $subword;
 					if ($isExcluded)
@@ -190,7 +190,9 @@ class Custom_Search
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
+
+		$db = database();
 
 		// we can't do anything without this
 		$db_search = db_search();
@@ -285,7 +287,9 @@ class Custom_Search
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
+
+		$db = database();
 
 		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
 
@@ -294,7 +298,7 @@ class Custom_Search
 			$inserts[] = array($word, $msgOptions['id']);
 
 		if (!empty($inserts))
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_search_words',
 				array('id_word' => 'int', 'id_msg' => 'int'),
 				$inserts,
@@ -311,7 +315,9 @@ class Custom_Search
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
+
+		$db = database();
 
 		if (isset($msgOptions['body']))
 		{
@@ -331,7 +337,7 @@ class Custom_Search
 			if (!empty($removed_words))
 			{
 				$removed_words = array_merge($removed_words, $inserted_words);
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_search_words
 					WHERE id_msg = {int:id_msg}
 						AND id_word IN ({array_int:removed_words})',
@@ -348,7 +354,7 @@ class Custom_Search
 				$inserts = array();
 				foreach ($inserted_words as $word)
 					$inserts[] = array($word, $msgOptions['id']);
-				$smcFunc['db_insert']('insert',
+				$db->insert('insert',
 					'{db_prefix}log_search_words',
 					array('id_word' => 'string', 'id_msg' => 'int'),
 					$inserts,
