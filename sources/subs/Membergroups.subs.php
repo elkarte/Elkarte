@@ -829,7 +829,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 /**
  * Returns details of membergroups based on the id
  *
- * @param array/int $group_ids the IDs of the groups.
+ * @param array/int $group_id the IDs of the groups. (Note: yes, this is $group_id and NOT $group_ids)
  * @param integer $limit = 1 the number of results returned (default 1, if null/false/0 returns all).
  * @param bool $detailed = false if true then it returns more fields (default false).
  *  false returns: id_group, group_name, group_type.
@@ -839,18 +839,17 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *
  * @return array|false
  */
-function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false, $protected = false)
+function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
 {
 	$db = database();
 
-	if (empty($group_ids))
+	if (empty($group_id))
 		return false;
 
-	if (!is_array($group_ids))
-		$group_ids = array($group_ids);
+	$group_ids = !is_array($group_id) ? array($group_id) : $group_id;
 
 	$groups = array();
-	$group_ids = array_map('intval', $group_id);
+	$group_ids = array_map('intval', $group_ids);
 
 	$request = $db->query('', '
 		SELECT id_group, group_name, group_type' . (!$detailed ? '' : ',
