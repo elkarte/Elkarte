@@ -1,14 +1,187 @@
 /* This is css file for the red color variant */
 
-.cat_bar {
-	background-color: #8d0505;
-	color: white;
+body {
+	background-color: #E0E9E9;
+}
+#wrapper {
+	background-color: #fff;
 }
 
-.catbg a {
+.navigate_section {
+	margin: 0 8px;
+}
+.navigate_section  ul{
+	background-color: #E7E7E7;
+	border: none;
+	border-bottom: 2px solid #bbb;
+	border-radius: 0;
+}
+.cat_bar {
+	background: #641212;
 	color: white;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+
+h2, .catbg, .catbg a {
+	color: white;
+}
+h1.forumtitle {
+	padding: 12px 12px 6px 12px;
+}
+h1.forumtitle a {
+	color: #fff;
+	font-size: 1.1em;
+	font-weight: bold;
+	text-shadow: 1px 1px 2px rgba(255, 0, 0, 0.5);
 }
 
 #footer_section {
-	background-color: #8d0505;
+	background-color: #232323;
+}
+#top_section {
+	margin-top: 30px;
+	padding-top: 5px;
+	color: #fff;
+	background-color: #641212;
+	border-bottom: none;
+	font-weight: normal;
+}
+#wrapper, .frame {
+	width: 100%;
+	max-width: none;
+}
+
+#upper_section , #content_section, #inner_section, #wrapper {
+	border-radius: 0;
+}
+#content_section {
+	margin-top: 8px;
+	border: none;
+}
+
+#inner_section {
+	padding: 0;
+}
+
+#inner_wrap .news {
+	width: auto;
+	padding-right: 10px;
+}
+#footer_section {
+	margin: 0;
+}
+html, body {
+	background-color: #232323;
+}
+
+#header {
+	padding: 0 2px 12px 2px;
+}
+#header, #upper_section {
+	background-color: #641212;
+}
+.table_list .info .subject {
+	color: #994015;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+#upper_section, .navigate_section {
+	margin: 0;
+	padding: 0;
+}
+#upper_section {
+	border: none;
+	color: #fff;
+}
+
+#main_menu {
+	background-color: #232323;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	box-shadow: 0 16px 20px rgba(200,200,200,0.15) inset;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+#upshrink {
+	border: none;
+	background: none;
+}
+#main_menu .dropmenu li {
+	border-right: 1px solid #343434;
+	padding-right: 10px;
+}
+
+#main_menu .dropmenu li a {
+	background: none;
+	padding: 0 0.3em;
+	margin: 0;
+	display: block;
+	border: none;
+	color: #fff;
+	border-radius: 2px;
+}
+#main_menu .dropmenu li a:hover, .dropmenu li:hover a, .dropmenu li a:focus {
+/* 	background: #597b9f; */
+	border: none;
+	color: #ccc;
+	cursor: pointer;
+	text-decoration: none;
+	box-shadow: none;
+}
+/* Level 1 active button. */
+#main_menu .dropmenu li a.active:hover, .dropmenu li:hover a.active {
+/* 	background: orange; */
+	border: none;
+	color: #ccc;
+	box-shadow: none;
+	text-shadow: none;
+}
+
+#main_menu .dropmenu li a.active {
+	border: none;
+	box-shadow: none;
+	color: #ccc;
+}
+#inner_wrap hr {
+	display: none;
+}
+div#main_menu {
+	padding: 0;
+}
+
+#info_center .cat_bar, .table_grid tr.catbg th, #show_attachments th, #searchform .roundframe .title_bar {
+	border-top: 1px dotted #616A7F;
+	border-bottom: 1px dotted #616A7F;
+}
+#collapse_button {
+	border: none;
+}
+.greeting {
+	padding-left: 14px;
+}
+li.greeting, .news p {
+	font-weight: normal;
+	color: #efefef;
+}
+#logo {
+	margin: 0;
+}
+
+.table_list .icon, .table_list .info, .table_list .stats, .table_list .lastpost, .table_list td.children {
+	background: #FBFAFA;
+}
+
+.table_list .stats p {
+	border: 1px solid #FBFAFA !important;
+}
+#inner_wrap .user {
+	padding-left: 15px;
+}
+#top_section a , #top_section strong {
+	color: #cdcdcd;
+	font-weight: normal;
 }
