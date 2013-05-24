@@ -848,11 +848,10 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 	if (empty($group_id))
 		return false;
 
-	if (!is_array($group_id))
-		$group_id = array($group_id);
+	$group_ids = !is_array($group_id) ? array($group_id) : $group_id;
 
 	$groups = array();
-	$group_ids = array_map('intval', $group_id);
+	$group_ids = array_map('intval', $group_ids);
 
 	$request = $db->query('', '
 		SELECT id_group, group_name, group_type' . (!$detailed ? '' : ',
