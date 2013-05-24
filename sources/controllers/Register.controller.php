@@ -724,7 +724,7 @@ class Register_Controller
 			{
 				// Shortcut for producing underlines.
 				$context['ul'] = '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>';
-				$context['template_layers'] = array();
+				Template_Layers::getInstance()->removeAll();
 				$context['sub_template'] = 'coppa_form';
 				$context['page_title'] = $txt['coppa_form_title'];
 				$context['coppa_body'] = str_replace(array('{PARENT_NAME}', '{CHILD_NAME}', '{USER_NAME}'), array($context['ul'], $context['ul'], $member['member_name']), $txt['coppa_form_body']);
@@ -792,7 +792,7 @@ class Register_Controller
 
 			$context['verification_sound_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
 			$context['sub_template'] = 'verification_sound';
-			$context['template_layers'] = array();
+			Template_Layers::getInstance()->removeAll();
 
 			obExit();
 		}

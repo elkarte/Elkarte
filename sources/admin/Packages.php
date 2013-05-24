@@ -1409,7 +1409,7 @@ class Packages_Controller
 		// Deal with the template stuff.
 		loadTemplate('Xml');
 		$context['sub_template'] = 'generic_xml';
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 
 		// Define the return data, this is simple.
 		$context['xml_data'] = array(
@@ -1533,7 +1533,7 @@ class Packages_Controller
 		$context['operations']['replace'] = parse_bbc('[code=' . $txt[$operation_text] . ']' . $context['operations']['replace'] . '[/code]');
 
 		// No layers
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'view_operations';
 	}
 
@@ -1843,7 +1843,7 @@ class Packages_Controller
 		{
 			loadTemplate('Xml');
 			$context['sub_template'] = 'generic_xml';
-			$context['template_layers'] = array();
+			Template_Layers::getInstance()->removeAll();
 		}
 	}
 

@@ -36,6 +36,8 @@ function action_editBuddyIgnoreLists()
 	if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
 		fatal_lang_error('no_access', false);
 
+	loadTemplate('ProfileOptions');
+
 	// Can we email the user direct?
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
 	$context['can_send_email'] = allowedTo('send_email_to_members');
@@ -73,6 +75,8 @@ function action_editBuddies($memID)
 	global $context, $user_profile, $memberContext;
 
 	$db = database();
+
+	loadTemplate('ProfileOptions');
 
 	// We want to view what we're doing :P
 	$context['sub_template'] = 'editBuddies';
@@ -189,6 +193,8 @@ function action_editIgnoreList($memID)
 
 	$db = database();
 
+	loadTemplate('ProfileOptions');
+
 	// We want to view what we're doing :P
 	$context['sub_template'] = 'editIgnoreList';
 
@@ -294,6 +300,8 @@ function action_account()
 
 	$memID = currentMemberID();
 
+	loadTemplate('ProfileOptions');
+
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
 		loadCustomFields($memID, 'account');
@@ -321,6 +329,8 @@ function action_forumProfile()
 	global $context, $user_profile, $user_info, $txt, $modSettings;
 
 	$memID = currentMemberID();
+
+	loadTemplate('ProfileOptions');
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -354,6 +364,8 @@ function action_pmprefs()
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
 
+	loadTemplate('ProfileOptions');
+
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['pm_settings_desc'];
 
@@ -372,13 +384,13 @@ function action_themepick()
 {
 	global $txt, $context, $user_profile, $modSettings, $settings, $user_info;
 
-	$db = database();
-
 	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		loadCustomFields($memID, 'theme');
+
+	loadTemplate('ProfileOptions');
 
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['theme_info'];
@@ -404,6 +416,8 @@ function action_authentication($memID, $saving = false)
 	global $context, $cur_profile, $txt, $post_errors, $modSettings;
 
 	loadLanguage('Login');
+
+	loadTemplate('ProfileOptions');
 
 	// We are saving?
 	if ($saving)
@@ -487,6 +501,8 @@ function action_notification()
 	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $settings;
 
 	$db = database();
+
+	loadTemplate('ProfileOptions');
 
 	$memID = currentMemberID();
 
@@ -974,6 +990,8 @@ function action_ignoreboards()
 	if (empty($modSettings['allow_ignore_boards']))
 		fatal_lang_error('ignoreboards_disallowed', 'user');
 
+	loadTemplate('ProfileOptions');
+
 	$context['sub_template'] = 'ignoreboards';
 	require_once(SUBSDIR . '/Boards.subs.php');
 	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
@@ -996,6 +1014,8 @@ function action_groupMembership()
 	$db = database();
 
 	$memID = currentMemberID();
+
+	loadTemplate('ProfileOptions');
 
 	$curMember = $user_profile[$memID];
 	$context['primary_group'] = $curMember['id_group'];

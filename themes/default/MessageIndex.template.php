@@ -21,42 +21,8 @@ function template_main()
 {
 	global $context, $settings, $options, $scripturl, $modSettings, $txt;
 
-	if (!empty($context['boards']) && (!empty($options['show_children']) || $context['start'] == 0))
-		template_display_child_boards();
-
-	// They can only mark read if they are logged in and it's enabled!
-	if (!$context['user']['is_logged'] || !$settings['show_mark_read'])
-		unset($context['normal_buttons']['markread']);
-
 	if (!$context['no_topic_listing'])
 	{
-		echo '
-	<div class="pagesection">
-		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
-		<div class="pagelinks floatleft">', $context['page_index'], '</div>
-		', template_button_strip($context['normal_buttons'], 'right'), '
-	</div>';
-
-		if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
-		{
-			echo '
-		<div id="description_board" class="generic_list_wrapper">
-			<h3 class="floatleft">', $context['name'], '&nbsp;-&nbsp;</h3>
-			<p>';
-
-			if (!empty($options['show_board_desc']) && $context['description'] != '')
-				echo '
-			', $context['description'], '&nbsp;';
-
-			if (!empty($context['moderators']))
-				echo '
-			', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.';
-
-			echo '
-			</p>
-		</div>';
-		}
-
 		// If Quick Moderation is enabled start the form.
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] > 0 && !empty($context['topics']))
 			echo '
@@ -266,89 +232,13 @@ function template_main()
 			echo '
 	<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 	</form>';
-
-		echo '
-	<div class="pagesection">
-		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
-			<div class="pagelinks floatleft">', $context['page_index'], '</div>
-		', template_button_strip($context['normal_buttons'], 'right'), '	
-	</div>';
 	}
-
-	// Show breadcrumbs at the bottom too.
-	theme_linktree();
-
-	echo '
-	<div class="tborder" id="topic_icons">
-		<div class="description">
-			<p class="floatright" id="message_index_jump_to">&nbsp;</p>';
-
-	if (!$context['no_topic_listing'])
-		echo '
-			<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
-				<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
-				'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
-			</p>
-			<p>
-				<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
-				<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
-			</p>';
-
-	echo '
-			<script><!-- // --><![CDATA[';
-
-	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
-		echo '
-				if (typeof(window.XMLHttpRequest) != "undefined")
-					aJumpTo[aJumpTo.length] = new JumpTo({
-						sContainerId: "quick_mod_jump_to",
-						sClassName: "qaction",
-						sJumpToTemplate: "%dropdown_list%",
-						iCurBoardId: ', $context['current_board'], ',
-						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "==",
-						sBoardPrefix: "=> ",
-						sCatSeparator: "-----------------------------",
-						sCatPrefix: "",
-						bNoRedirect: true,
-						bDisabled: true,
-						sCustomName: "move_to"
-					});';
-
-	echo '
-				if (typeof(window.XMLHttpRequest) != "undefined")
-					aJumpTo[aJumpTo.length] = new JumpTo({
-						sContainerId: "message_index_jump_to",
-						sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-						iCurBoardId: ', $context['current_board'], ',
-						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "==",
-						sBoardPrefix: "=> ",
-						sCatSeparator: "-----------------------------",
-						sCatPrefix: "",
-						sGoButtonLabel: "', $txt['quick_mod_go'], '"
-					});
-			// ]]></script>
-			<br class="clear" />
-		</div>
-	</div>';
-
-	// Javascript for inline editing.
-	echo '
-<script><!-- // --><![CDATA[
-	var oQuickModifyTopic = new QuickModifyTopic({
-		aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
-		bMouseOnDiv: false,
-	});
-// ]]></script>';
 }
 
 /**
  * Used to display child boards.
  */
-function template_display_child_boards()
+function template_display_child_boards_above()
 {
 	global $context, $txt, $scripturl, $settings;
 
@@ -463,4 +353,123 @@ function template_display_child_boards()
 			</tbody>
 		</table>
 	</div>';
+}
+
+function template_pages_and_buttons_above()
+{
+	global $modSettings, $context, $txt, $options;
+
+	if ($context['no_topic_listing'])
+		return;
+
+	echo '
+	<div class="pagesection">
+		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
+		<div class="pagelinks floatleft">', $context['page_index'], '</div>
+		', template_button_strip($context['normal_buttons'], 'right'), '
+	</div>';
+
+	if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
+	{
+		echo '
+		<div id="description_board" class="generic_list_wrapper">
+			<h3 class="floatleft">', $context['name'], '&nbsp;-&nbsp;</h3>
+			<p>';
+
+		if (!empty($options['show_board_desc']) && !empty($context['description']))
+			echo '
+			', $context['description'], '&nbsp;';
+
+		if (!empty($context['moderators']))
+			echo '
+			', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.';
+
+		echo '
+			</p>
+		</div>';
+	}
+}
+
+function template_pages_and_buttons_below()
+{
+	global $modSettings, $context, $txt, $options, $settings;
+
+	if ($context['no_topic_listing'])
+	{
+		echo '
+	<div class="pagesection">
+		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
+			<div class="pagelinks floatleft">', $context['page_index'], '</div>
+		', template_button_strip($context['normal_buttons'], 'right'), '	
+	</div>';
+	}
+
+	// Show breadcrumbs at the bottom too.
+	theme_linktree();
+
+	echo '
+	<div class="tborder" id="topic_icons">
+		<div class="description">
+			<p class="floatright" id="message_index_jump_to">&nbsp;</p>';
+
+	if (!$context['no_topic_listing'])
+		echo '
+			<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
+				<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
+				'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
+			</p>
+			<p>
+				<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
+				<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
+			</p>';
+
+	echo '
+			<script><!-- // --><![CDATA[';
+
+	if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
+		echo '
+				if (typeof(window.XMLHttpRequest) != "undefined")
+					aJumpTo[aJumpTo.length] = new JumpTo({
+						sContainerId: "quick_mod_jump_to",
+						sClassName: "qaction",
+						sJumpToTemplate: "%dropdown_list%",
+						iCurBoardId: ', $context['current_board'], ',
+						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+						sCurBoardName: "', $context['jump_to']['board_name'], '",
+						sBoardChildLevelIndicator: "==",
+						sBoardPrefix: "=> ",
+						sCatSeparator: "-----------------------------",
+						sCatPrefix: "",
+						bNoRedirect: true,
+						bDisabled: true,
+						sCustomName: "move_to"
+					});';
+
+	echo '
+				if (typeof(window.XMLHttpRequest) != "undefined")
+					aJumpTo[aJumpTo.length] = new JumpTo({
+						sContainerId: "message_index_jump_to",
+						sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
+						iCurBoardId: ', $context['current_board'], ',
+						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+						sCurBoardName: "', $context['jump_to']['board_name'], '",
+						sBoardChildLevelIndicator: "==",
+						sBoardPrefix: "=> ",
+						sCatSeparator: "-----------------------------",
+						sCatPrefix: "",
+						sGoButtonLabel: "', $txt['quick_mod_go'], '"
+					});
+			// ]]></script>
+			<br class="clear" />
+		</div>
+	</div>';
+
+	// Javascript for inline editing.
+	echo '
+<script><!-- // --><![CDATA[
+	var oQuickModifyTopic = new QuickModifyTopic({
+		aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
+		bMouseOnDiv: false,
+	});
+// ]]></script>';
 }

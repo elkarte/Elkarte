@@ -252,7 +252,7 @@ class ManageErrors_Controller
 		);
 
 		loadTemplate('Errors');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'show_file';
 	}
 }

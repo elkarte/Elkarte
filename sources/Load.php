@@ -1445,13 +1445,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 	{
 		loadLanguage('index+Modifications');
 		loadTemplate('Xml');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 	}
 	// These actions don't require the index template at all.
 	elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 	{
 		loadLanguage('index+Modifications');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 	}
 	else
 	{
@@ -1471,9 +1471,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 		// Custom template layers?
 		if (isset($settings['theme_layers']))
-			$context['template_layers'] = explode(',', $settings['theme_layers']);
+			foreach(explode(',', $settings['theme_layers']) as $key => $layer)
+				$layers[$layer] = $key * 100;
 		else
-			$context['template_layers'] = array('html', 'body');
+			$layers = array('html' => 0, 'body' => 100);
+		Template_Layers::getInstance()->add($layers);
 	}
 
 	// Initialize the theme.
@@ -1508,10 +1510,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$context['theme_variant'] = '_' . $context['theme_variant'];
 		$context['theme_variant_url'] = $context['theme_variant'] . '/';
 	}
-
-	// Let's be compatible with old themes!
-	if (!function_exists('template_html_above') && in_array('html', $context['template_layers']))
-		$context['template_layers'] = array('main');
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))

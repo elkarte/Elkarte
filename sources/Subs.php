@@ -3038,9 +3038,9 @@ function template_header()
 
 	$checked_securityFiles = false;
 	$showed_banned = false;
-	foreach ($context['template_layers'] as $layer)
+	foreach (Template_Layers::getInstance()->prepareContext() as $layer)
 	{
-		loadSubTemplate($layer . '_above', true);
+		loadSubTemplate($layer . '_above', 'ignore');
 
 		// May seem contrived, but this is done in case the body and main layer aren't there...
 		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && !$checked_securityFiles)
@@ -3165,8 +3165,8 @@ function template_footer()
 		$settings['theme_dir'] = $settings['actual_theme_dir'];
 	}
 
-	foreach (array_reverse($context['template_layers']) as $layer)
-		loadSubTemplate($layer . '_below', true);
+	foreach (Template_Layers::getInstance()->reverseLayers() as $layer)
+		loadSubTemplate($layer . '_below', 'ignore');
 
 }
 
