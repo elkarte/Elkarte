@@ -34,6 +34,8 @@ function action_summary()
 	if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
 		fatal_lang_error('not_a_user', false);
 
+	loadTemplate('ProfileInfo');
+
 	// Set up the stuff and load the user.
 	$context += array(
 		'page_title' => sprintf($txt['profile_of_username'], $memberContext[$memID]['name']),
@@ -280,6 +282,8 @@ function action_showPosts()
 	// Some initial context.
 	$context['start'] = (int) $_REQUEST['start'];
 	$context['current_member'] = $memID;
+
+	loadTemplate('ProfileInfo');
 
 	// Create the tabs for the template.
 	$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -1047,6 +1051,8 @@ function action_statPanel()
 	if (!empty($context['load_average']) && !empty($modSettings['loadavg_userstats']) && $context['load_average'] >= $modSettings['loadavg_userstats'])
 		fatal_lang_error('loadavg_userstats_disabled', false);
 
+	loadTemplate('ProfileInfo');
+
 	// General user statistics.
 	$timeDays = floor($user_profile[$memID]['total_time_logged_in'] / 86400);
 	$timeHours = floor(($user_profile[$memID]['total_time_logged_in'] % 86400) / 3600);
@@ -1247,6 +1253,7 @@ function action_showPermissions()
 	loadLanguage('ManagePermissions');
 	loadLanguage('Admin');
 	loadTemplate('ManageMembers');
+	loadTemplate('ProfileInfo');
 
 	// Load all the permission profiles.
 	require_once(SUBSDIR . '/ManagePermissions.subs.php');
@@ -1426,6 +1433,10 @@ function action_viewWarning()
 	// Firstly, can we actually even be here?
 	if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
 		fatal_lang_error('no_access', false);
+
+	loadTemplate('ProfileInfo');
+	// We need this because of template_load_warning_variables
+	loadTemplate('Profile');
 
 	// Make sure things which are disabled stay disabled.
 	$modSettings['warning_watch'] = !empty($modSettings['warning_watch']) ? $modSettings['warning_watch'] : 110;

@@ -16,19 +16,7 @@
 
 function template_main()
 {
-	global $context, $settings, $txt, $scripturl;
-
-	// Show some statistics if stat info is off.
-	if (!$settings['show_stats_index'])
-		echo '
-	<div id="index_common_stats">
-		', $txt['members'], ': ', $context['common_stats']['total_members'], ' &nbsp;&#8226;&nbsp; ', $txt['posts_made'], ': ', $context['common_stats']['total_posts'], ' &nbsp;&#8226;&nbsp; ', $txt['topics_made'], ': ', $context['common_stats']['total_topics'], '<br />
-		', $settings['show_latest_member'] ? ' ' . sprintf($txt['welcome_newest_member'], ' <strong>' . $context['common_stats']['latest_member']['link'] . '</strong>') : '' , '
-	</div>';
-
-	// Show the news fader?  (assuming there are things to show...)
-	if ($settings['show_newsfader'] && !empty($context['news_lines']))
-		template_news_fader();
+	global $context, $settings, $options, $txt, $scripturl, $modSettings;
 
 	echo '
 	<div id="boardindex_table" class="boardindex_table">
@@ -171,7 +159,30 @@ function template_main()
 	}
 	echo '
 		</table>
-	</div>
+	</div>';
+}
+
+function template_boardindex_outer_above()
+{
+	global $context, $settings, $txt;
+
+	// Show some statistics if stat info is off.
+	if (!$settings['show_stats_index'])
+		echo '
+	<div id="index_common_stats">
+		', $txt['members'], ': ', $context['common_stats']['total_members'], ' &nbsp;&#8226;&nbsp; ', $txt['posts_made'], ': ', $context['common_stats']['total_posts'], ' &nbsp;&#8226;&nbsp; ', $txt['topics_made'], ': ', $context['common_stats']['total_topics'], '<br />
+		', $settings['show_latest_member'] ? ' ' . sprintf($txt['welcome_newest_member'], ' <strong>' . $context['common_stats']['latest_member']['link'] . '</strong>') : '' , '
+	</div>';
+
+	// Show the news fader?  (assuming there are things to show...)
+	if ($settings['show_newsfader'] && !empty($context['news_lines']))
+		template_news_fader();
+}
+
+function template_boardindex_outer_below()
+{
+	global $context, $settings, $txt;
+	echo '
 		<ul id="posting_icons">';
 
 	if ($context['user']['is_logged'])

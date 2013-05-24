@@ -147,7 +147,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	loadLanguage('Login');
 
 	// Apparently we're not in a position to handle this now. Let's go to a safer location for now.
-	if (empty($context['template_layers']))
+	if (!Template_Layers::getInstance()->hasLayers())
 	{
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
 		redirectexit('action=login');

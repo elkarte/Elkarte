@@ -488,7 +488,7 @@ function action_modifyprofile()
 	// Set the template for this area... if you still can :P
 	// and add the profile layer.
 	$context['sub_template'] = $profile_include_data['function'];
-	$context['template_layers'][] = 'profile';
+	Template_Layers::getInstance()->add('profile');
 
 	// All the subactions that require a user password in order to validate.
 	$check_password = $context['user']['is_owner'] && in_array($profile_include_data['current_area'], $context['password_areas']);

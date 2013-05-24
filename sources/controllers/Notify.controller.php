@@ -98,7 +98,7 @@ class Notify_Controller
 
 		loadTemplate('Xml');
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
@@ -190,7 +190,7 @@ class Notify_Controller
 
 		loadTemplate('Xml');
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(
@@ -252,7 +252,7 @@ class Notify_Controller
 
 		loadTemplate('Xml');
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
 		$context['xml_data'] = array(

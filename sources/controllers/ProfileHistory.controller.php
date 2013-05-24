@@ -279,6 +279,7 @@ function action_trackactivity($memID)
 			$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		$db->free_result($request);
 	}
+	loadTemplate('ProfileHistory');
 	$context['sub_template'] = 'trackActivity';
 }
 
@@ -443,12 +444,13 @@ function action_trackip($memID = 0)
 	// Can the user do this?
 	isAllowedTo('moderate_forum');
 
+	loadTemplate('Profile');
+	loadTemplate('ProfileHistory');
+	loadLanguage('Profile');
+
 	if ($memID == 0)
 	{
 		$context['ip'] = $user_info['ip'];
-		loadTemplate('Profile');
-		loadLanguage('Profile');
-		$context['sub_template'] = 'trackIP';
 		$context['page_title'] = $txt['profile'];
 		$context['base_url'] = $scripturl . '?action=trackip';
 	}

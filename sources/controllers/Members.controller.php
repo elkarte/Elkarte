@@ -115,7 +115,7 @@ class Members_Controller
 
 		// Load members template
 		loadTemplate('Members');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'find_members';
 
 		if (isset($_REQUEST['search']))

@@ -273,6 +273,8 @@ class Display_Controller
 
 		// Did we report a post to a moderator just now?
 		$context['report_sent'] = isset($_GET['reportsent']);
+		if ($context['report_sent'])
+			Template_Layers::getInstance()->add('report_sent');
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
@@ -424,12 +426,16 @@ class Display_Controller
 			}
 
 			if (!empty($context['linked_calendar_events']))
+			{
 				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
+				Template_Layers::getInstance()->add('display_calendar');
+			}
 		}
 
 		// Create the poll info if it exists.
 		if ($context['is_poll'])
 		{
+			Template_Layers::getInstance()->add('display_poll');
 			// Get information on the poll
 			require_once(SUBSDIR . '/Poll.subs.php');
 			$pollinfo = pollInfo($topicinfo['id_poll']);
@@ -691,14 +697,14 @@ class Display_Controller
 				loadMemberData($posters);
 			$messages_request = $db->query('', '
 				SELECT
-					id_msg, icon, subject, poster_time, poster_ip, id_member, modified_time, modified_name, body,
-					smileys_enabled, poster_name, poster_email, approved,
-					id_msg_modified < {int:new_from} AS is_read
+					m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,
+					m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
+					m.id_msg_modified < {int:new_from} AS is_read
 					' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
-				FROM {db_prefix}messages
+				FROM {db_prefix}messages as m
 					' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
-				WHERE id_msg IN ({array_int:message_list})
-				ORDER BY id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
+				WHERE m.id_msg IN ({array_int:message_list})
+				ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
 				$msg_parameters
 			);
 
@@ -872,6 +878,10 @@ class Display_Controller
 		// Restore topic. eh?  No monkey business.
 		if ($context['can_restore_topic'])
 			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
+
+		if ($context['can_reply'] && !empty($options['display_quick_reply']))
+			Template_Layers::getInstance()->add('quickreply');
+		Template_Layers::getInstance()->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');
