@@ -852,7 +852,7 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 		$group_ids = array($group_id);
 
 	$groups = array();
-	$group_ids = array_map('intval', $group_ids);
+	$group_ids = array_map('intval', $group_id);
 
 	$request = $db->query('', '
 		SELECT id_group, group_name, group_type' . (!$detailed ? '' : ',
@@ -1034,6 +1034,8 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  */
 function getGroups($groupList)
 {
+	global $txt;
+
 	$db = database();
 
 	$groups = array();
