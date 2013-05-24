@@ -4598,7 +4598,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	}
 }
 /* 7" Tablets like Google Nexus (landscape) or other mobile devices */
-@media screen and (max-width: 610px) and (orientation: portrait) {
+@media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
 	 	 display: none !important;
 	 }
@@ -4645,6 +4645,14 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		float: none;
 		width: 95%;
 	}
+	.poster {
+		float: none;
+		border: 0 !important;
+		box-shadow: none !important;
+	}
+	.postarea, .moderatorbar {
+		margin: 0;
+	}
 	#basicinfo, #detailedinfo {
 		float: none;
 		width: 95%;
@@ -4652,12 +4660,20 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	.login {
 		width: 95%;
 	}
-	.pagelinks, .buttonlist {
-		width: 80%;
-		float: none !important;
+	.pagesection .buttonlist {
+		width: 100%;
 	}
 	input {
 		max-width: 230px;
+	}
+	.post_seperator {
+		border: 3px solid #222;
+		display: visible;
+	}
+	.post_wrapper {
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 6px;
 	}
 }
 
@@ -4682,8 +4698,6 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		display: none;
 	}
 	.pagelinks, .buttonlist {
-		float: none !important;
-		width: 95%;
 	}
 	#main_menu ul li {
 	margin-bottom: 5px;
