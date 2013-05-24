@@ -206,16 +206,16 @@ class Groups_Controller
 
 		$db = database();
 
-		$_REQUEST['group'] = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
+		$current_group = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
 		// No browsing of guests, membergroup 0 or moderators.
-		if (in_array($_REQUEST['group'], array(-1, 0, 3)))
+		if (in_array($current_group, array(-1, 0, 3)))
 			fatal_lang_error('membergroup_does_not_exist', false);
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Load up the group details.
-		$context['group'] = membergroupsById($_REQUEST['group'], 1, true, true, allowedTo('admin_forum'));
+		$context['group'] = membergroupsById($current_group, 1, true, true, allowedTo('admin_forum'));
 
 		// Doesn't exist?
 		if (empty($context['group']))
@@ -239,27 +239,19 @@ class Groups_Controller
 		// @todo: use createList
 
 		// Load all the group moderators, for fun.
-		$request = $db->query('', '
-			SELECT mem.id_member, mem.real_name
-			FROM {db_prefix}group_moderators AS mods
-				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
-			WHERE mods.id_group = {int:id_group}',
-			array(
-				'id_group' => $_REQUEST['group'],
-			)
-		);
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['group']['moderators'] = array();
-		while ($row = $db->fetch_assoc($request))
+		$moderators = getGroupModerators($current_group);
+		foreach ($moderators as $id_memebr => $name)
 		{
 			$context['group']['moderators'][] = array(
-				'id' => $row['id_member'],
-				'name' => $row['real_name']
+				'id' => $id_memebr,
+				'name' => $name
 			);
 
-			if ($user_info['id'] == $row['id_member'] && $context['group']['group_type'] != 1)
+			if ($user_info['id'] == $id_memebr && $context['group']['group_type'] != 1)
 				$context['group']['can_moderate'] = true;
 		}
-		$db->free_result($request);
 
 		// If this group is hidden then it can only "exists" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
@@ -282,7 +274,7 @@ class Groups_Controller
 			foreach ($_REQUEST['rem'] as $key => $group)
 				$_REQUEST['rem'][$key] = (int) $group;
 
-			removeMembersFromGroups($_REQUEST['rem'], $_REQUEST['group'], true);
+			removeMembersFromGroups($_REQUEST['rem'], $current_group, true);
 		}
 		// Must be adding new members to the group...
 		elseif (isset($_REQUEST['add']) && (!empty($_REQUEST['toAdd']) || !empty($_REQUEST['member_add'])) && $context['group']['assignable'])
@@ -336,7 +328,7 @@ class Groups_Controller
 						AND id_group != {int:id_group}
 						AND FIND_IN_SET({int:id_group}, additional_groups) = 0',
 					array_merge($member_parameters, array(
-						'id_group' => $_REQUEST['group'],
+						'id_group' => $current_group,
 					))
 				);
 				while ($row = $db->fetch_assoc($request))
@@ -350,7 +342,7 @@ class Groups_Controller
 			if (!empty($members))
 			{
 				require_once(SUBSDIR . '/Membergroups.subs.php');
-				addMembersToGroup($members, $_REQUEST['group'], isset($_POST['additional']) || $context['group']['hidden'] ? 'only_additional' : 'auto', true);
+				addMembersToGroup($members, $current_group, isset($_POST['additional']) || $context['group']['hidden'] ? 'only_additional' : 'auto', true);
 			}
 		}
 
@@ -390,7 +382,7 @@ class Groups_Controller
 			FROM {db_prefix}members
 			WHERE ' . $where,
 			array(
-				'group' => $_REQUEST['group'],
+				'group' => $current_group,
 			)
 		);
 		list ($context['total_members']) = $db->fetch_row($request);
@@ -398,7 +390,7 @@ class Groups_Controller
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $_REQUEST['group'] . ';sort=' . $context['sort_by'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $context['total_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $context['total_members'], $modSettings['defaultMaxMembers']);
 		$context['start'] = $_REQUEST['start'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
@@ -411,7 +403,7 @@ class Groups_Controller
 			ORDER BY ' . $querySort . ' ' . ($context['sort_direction'] == 'down' ? 'DESC' : 'ASC') . '
 			LIMIT ' . $context['start'] . ', ' . $modSettings['defaultMaxMembers'],
 			array(
-				'group' => $_REQUEST['group'],
+				'group' => $current_group,
 			)
 		);
 		$context['members'] = array();
