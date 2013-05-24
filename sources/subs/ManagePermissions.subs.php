@@ -453,6 +453,7 @@ function loadAllPermissions($loadType = 'classic')
 			'who_view' => array(false, 'general', 'view_basic_info'),
 			'search_posts' => array(false, 'general', 'view_basic_info'),
 			'karma_edit' => array(false, 'general', 'moderate_general'),
+			'like_posts' => array(false, 'general', 'moderate_general'),
 			'disable_censor' => array(false, 'general', 'disable_censor'),
 			'pm_read' => array(false, 'pm', 'use_pm_system'),
 			'pm_send' => array(false, 'pm', 'use_pm_system'),
@@ -519,6 +520,7 @@ function loadAllPermissions($loadType = 'classic')
 			'post_unapproved_attachments' => array(false, 'attachment', 'make_unapproved_posts'),
 			'post_attachment' => array(false, 'attachment', 'attach'),
 			'postby_email' => array(false, 'topic', 'make_posts'),
+			'like_posts' => array(false, 'topic', 'participate'),
 		),
 	);
 
@@ -552,6 +554,8 @@ function loadAllPermissions($loadType = 'classic')
 		$hiddenPermissions[] = 'issue_warning';
 	if (!in_array('k', $context['admin_features']))
 		$hiddenPermissions[] = 'karma_edit';
+	if (!in_array('l', $context['admin_features']))
+		$hiddenPermissions[] = 'like_posts';
 	if (!in_array('pe', $context['admin_features']))
 	{
 		$hiddenPermissions[] = 'approve_emails';

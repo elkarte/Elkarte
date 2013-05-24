@@ -193,17 +193,6 @@ class MessageIndex_Controller
 
 		// And now, what we're here for: topics!
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
-		// Default sort methods.
-		$sort_methods = array(
-			'subject' => 'mf.subject',
-			'starter' => 'IFNULL(memf.real_name, mf.poster_name)',
-			'last_poster' => 'IFNULL(meml.real_name, ml.poster_name)',
-			'replies' => 't.num_replies',
-			'views' => 't.num_views',
-			'likes' => 't.num_likes',
-			'first_post' => 't.id_topic',
-			'last_post' => 't.id_last_msg'
-		);
 
 		// Known sort methods.
 		$sort_methods = messageIndexSort();
@@ -402,8 +391,8 @@ class MessageIndex_Controller
 				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
 				'is_poll' => $modSettings['pollMode'] == '1' && $row['id_poll'] > 0,
-				'is_hot' => $row['num_replies'] >= $modSettings['hotTopicPosts'],
-				'is_very_hot' => $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
+				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
+				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,
 				'icon' => $row['first_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',

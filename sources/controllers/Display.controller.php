@@ -359,14 +359,9 @@ class Display_Controller
 
 		$context['is_poll'] = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
 
+		// Did this user start the topic or not?
 		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];
 		$context['topic_starter_id'] = $topicinfo['id_member_started'];
-	// Information about the current topic...
-	$context['is_locked'] = $topicinfo['locked'];
-	$context['is_sticky'] = $topicinfo['is_sticky'];
-	$context['is_hot'] = !empty($modSettings['useLikesNotViews']) ? $topicinfo['num_likes'] >= $modSettings['hotTopicPosts'] : $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
-	$context['is_very_hot'] = !empty($modSettings['useLikesNotViews']) ? $topicinfo['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
-	$context['is_approved'] = $topicinfo['approved'];
 
 		// Set the topic's information for the template.
 		$context['subject'] = $topicinfo['subject'];
@@ -700,7 +695,6 @@ class Display_Controller
 			// What?  It's not like it *couldn't* be only guests in this topic...
 			if (!empty($posters))
 				loadMemberData($posters);
-			$messages_request = $db->query('', '
 
 			// Load in the likes for this group of messages
 			if (!empty($modSettings['likes_enabled']))
@@ -708,8 +702,8 @@ class Display_Controller
 				require_once(SUBSDIR . '/Likes.subs.php');
 				$context['likes'] = loadLikes($messages, true);
 			}
-
-			$messages_request = $smcFunc['db_query']('', '
+			
+			$messages_request = $db->query('', '
 				SELECT
 					m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,
 					m.smileys_enabled, m.poster_name, m.poster_email, m.approved,

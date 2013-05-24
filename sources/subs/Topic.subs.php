@@ -301,6 +301,32 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 	}
 
+	// Reuse the message array if available
+	if (empty($messages))
+	{
+		$messages = array();
+		$request = $smcFunc['db_query']('', '
+			SELECT id_msg
+			FROM {db_prefix}messages
+			WHERE id_topic IN ({array_int:topics})',
+			array(
+				'topics' => $topics,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_row']($request))
+			$messages[] = $row[0];
+		$smcFunc['db_free_result']($request);
+	}
+
+	// Remove all likes now that the topic is gone
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}message_likes
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+		)
+	);
+
 	// Delete messages in each topic.
 	$db->query('', '
 		DELETE FROM {db_prefix}messages
