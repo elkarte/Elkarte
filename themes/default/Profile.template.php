@@ -171,7 +171,7 @@ function template_action_summary()
 					<dt>', $modSettings['karmaLabel'], ' </dt>
 					<dd>+', $context['member']['karma']['good'], '/-', $context['member']['karma']['bad'], '</dd>';
 
-	// If likes enabled show the members karma.
+	// If likes enabled show the members like totals.
 	if (!empty($modSettings['likes_enabled']))
 		echo '
 					<dt>', $txt['likes'], ' </dt>
