@@ -317,7 +317,7 @@ class Post_Controller
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
 				require_once(SUBSDIR . '/Topic.subs.php');
-				$context['new_replies'] = messagesSince($topic, (int) $_REQUEST['last_msg'], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+				$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 				if (!empty($context['new_replies']))
 				{

@@ -1235,8 +1235,15 @@ function topicsStartedBy($memberID)
  * Retrieve the messages of the given topic, that are at or after
  * a message.
  * Used by split topics actions.
+ *
+ * @param int $id_topic
+ * @param int $id_msg
+ * @param bool $include_current = false
+ * @param bool $only_approved = false
+ *
+ * @return array message ids
  */
-function messagesAfter($topic, $message)
+function messagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
 {
 	$db = database();
 
@@ -1245,10 +1252,12 @@ function messagesAfter($topic, $message)
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}
-			AND id_msg >= {int:split_at}',
+			AND id_msg ' . ($include_current ? '>=' : '>') . ' {int:last_msg}' . ($only_approved ? '
+			AND approved = {int:approved}' : ''),
 		array(
-			'current_topic' => $topic,
-			'split_at' => $message,
+			'current_topic' => $id_topic,
+			'last_msg' => $id_msg,
+			'approved' => 1,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -1256,6 +1265,44 @@ function messagesAfter($topic, $message)
 	$db->free_result($request);
 
 	return $messages;
+}
+
+/**
+ * This function returns the number of messages in a topic,
+ * posted after $last_msg.
+ *
+ * @param int $id_topic
+ * @param int $last_msg
+ * @param bool $include_current = false
+ * @param bool $only_approved = false
+ *
+ * @return int
+ */
+function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
+{
+	$db = database();
+
+	// Give us something to work with
+	if (empty($id_topic) || empty($id_msg))
+		return false;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND id_msg ' . ($include_current ? '>=' : '>') . ' {int:last_msg}' . ($only_approved ? '
+			AND approved = {int:approved}' : '') . '
+		LIMIT 1',
+		array(
+			'current_topic' => $id_topic,
+			'last_msg' => $id_msg,
+			'approved' => 1,
+		)
+	);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $count;
 }
 
 /**
@@ -1356,43 +1403,6 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 	$db->free_result($request);
 
 	return $messages;
-}
-
-/**
- * This function returns the number of messages in a topic,
- * posted after $last_msg.
- *
- * @param int $id_topic
- * @param int $last_msg
- * @param bool $only_approved
- *
- * @return int
- */
-function messagesSince($id_topic, $last_msg, $only_approved)
-{
-	$db = database();
-
-	// Give us something to work with
-	if (empty($id_topic) || empty($last_msg))
-		return false;
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}messages
-		WHERE id_topic = {int:current_topic}
-			AND id_msg > {int:last_msg}' . ($only_approved ? '
-			AND approved = {int:approved}' : '') . '
-		LIMIT 1',
-		array(
-			'current_topic' => $id_topic,
-			'last_msg' => $last_msg,
-			'approved' => 1,
-		)
-	);
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $count;
 }
 
 /**
