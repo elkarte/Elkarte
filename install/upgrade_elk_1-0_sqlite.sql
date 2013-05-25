@@ -643,7 +643,7 @@ CREATE TABLE {$db_prefix}log_likes (
   id_target int NOT NULL default '0',
   id_member int NOT NULL default '0',
   log_time int NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member),
+  PRIMARY KEY (id_target, id_member)
 );
 ---#
 
@@ -655,7 +655,7 @@ CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
 CREATE TABLE {$db_prefix}message_likes (
   id_member int NOT NULL default '0',
   id_msg int NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member),
+  PRIMARY KEY (id_msg, id_member)
 );
 ---#
 
@@ -667,5 +667,5 @@ ADD COLUMN num_likes int NOT NULL default '0';
 ---# Adding new columns to members...
 ALTER TABLE {$db_prefix}members
 ADD COLUMN likes_given int NOT NULL default '0',
-ADD COLUMN likes_received int NOT NULL default '0',
+ADD COLUMN likes_received int NOT NULL default '0';
 ---#
