@@ -1747,21 +1747,10 @@ function action_plushsearch2()
 		// If we want to know who participated in what then load this now.
 		if (!empty($modSettings['enableParticipation']) && !$user_info['is_guest'])
 		{
-			$result = $db->query('', '
-				SELECT id_topic
-				FROM {db_prefix}messages
-				WHERE id_topic IN ({array_int:topic_list})
-					AND id_member = {int:current_member}
-				GROUP BY id_topic
-				LIMIT ' . count($participants),
-				array(
-					'current_member' => $user_info['id'],
-					'topic_list' => array_keys($participants),
-				)
-			);
-			while ($row = $db->fetch_assoc($result))
-				$participants[$row['id_topic']] = true;
-			$db->free_result($result);
+			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			$topics_participated_in = topicsParticipation($user_info['id'], array_keys($participants));
+			foreach ($topics_participated_in as $topic)
+				$participants[$topic['id_topic']] = true;
 		}
 	}
 
