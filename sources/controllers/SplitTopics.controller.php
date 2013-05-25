@@ -178,7 +178,7 @@ class SplitTopics_Controller
 
 		// Fetch the message IDs of the topic that are at or after the message.
 		if ($_POST['step2'] == 'afterthis')
-			$messagesToBeSplit = messagesAfter($topic, $splitAt);
+			$messagesToBeSplit = messagesSince($topic, $splitAt, true);
 		// Only the selected message has to be split. That should be easy.
 		elseif ($_POST['step2'] == 'onlythis')
 			$messagesToBeSplit[] = $splitAt;
