@@ -817,7 +817,7 @@ function messageAt($start, $id_topic)
  */
 function loadMessageBasics($id_msg)
 {
-	global $smcFunc;
+	$db = database();
 
 	$msg = false;
 
@@ -825,7 +825,7 @@ function loadMessageBasics($id_msg)
 	if (empty($id_msg))
 		return $msg;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_msg, m.id_topic, m.id_board, m.poster_time, m.id_member, m.subject,
 			m.poster_name, m.poster_email, m.smileys_enabled, m.body, m.approved, t.id_first_msg
 		FROM {db_prefix}messages AS m
@@ -836,9 +836,9 @@ function loadMessageBasics($id_msg)
 			'id_msg' => (int) $id_msg,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) !== 0)
-		$msg = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	if ($db->num_rows($request) !== 0)
+		$msg = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	return $msg;
 }
