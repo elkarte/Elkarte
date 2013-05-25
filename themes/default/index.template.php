@@ -497,7 +497,7 @@ function template_menu()
 
 	echo '
 				<div id="main_menu">
-					<ul class="dropmenu" id="menu_nav">';
+					<ul class="dropmenu topmenu" id="menu_nav">';
 
 	// Note: Menu markup has been cleaned up to remove unnecessary spans and classes.
 	foreach ($context['menu_buttons'] as $act => $button)
