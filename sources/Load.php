@@ -1685,9 +1685,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 
 	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 	if (!empty($context['theme_variant']))
-		$default_sheets = array('index.css', $context['theme_variant'] . '.css');
+		$default_sheets = array('core.css', 'index.css', $context['theme_variant'] . '.css');
 	else
-		$default_sheets = array('index.css');
+		$default_sheets = array('core.css', 'index.css');
 
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
