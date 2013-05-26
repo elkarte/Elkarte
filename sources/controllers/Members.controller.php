@@ -144,7 +144,7 @@ class Members_Controller
 
 			$context['results'] = findMembers(array($_REQUEST['search']), true, $context['buddy_search']);
 			$total_results = count($context['results']);
-
+			$_REQUEST['start'] = (int) $_REQUEST['start'];
 			$context['page_index'] = constructPageIndex($scripturl . '?action=findmember;search=' . $context['last_search'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';input=' . $context['input_box_name'] . ($context['quote_results'] ? ';quote=1' : '') . ($context['buddy_search'] ? ';buddies' : ''), $_REQUEST['start'], $total_results, 7);
 
 			// Determine the navigation context (especially useful for the wireless template).
