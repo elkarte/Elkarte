@@ -29,7 +29,7 @@ class Members_Controller
 	 * Subactions: sa=add and sa=remove. (@todo refactor subactions)
 	 * Redirects to ?action=profile;u=x.
 	 */
-	function action_buddy()
+	public function action_buddy()
 	{
 		global $user_info;
 
@@ -61,9 +61,9 @@ class Members_Controller
 	 * This function is used by javascript to find members matching the request.
 	 * Accessed by action=requestmembers.
 	 */
-	function action_requestmembers()
+	public function action_requestmembers()
 	{
-		global $user_info, $txt;
+		global $user_info;
 
 		$db = database();
 
@@ -107,7 +107,7 @@ class Members_Controller
 	 * This function result is used as a popup for searching members.
 	 * @uses sub template find_members of the Members template.
 	 */
-	function action_findmember()
+	public function action_findmember()
 	{
 		global $context, $scripturl, $user_info;
 
