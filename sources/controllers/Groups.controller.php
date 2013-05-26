@@ -242,14 +242,14 @@ class Groups_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['group']['moderators'] = array();
 		$moderators = getGroupModerators($current_group);
-		foreach ($moderators as $id_memebr => $name)
+		foreach ($moderators as $id_member => $name)
 		{
 			$context['group']['moderators'][] = array(
-				'id' => $id_memebr,
+				'id' => $id_member,
 				'name' => $name
 			);
 
-			if ($user_info['id'] == $id_memebr && $context['group']['group_type'] != 1)
+			if ($user_info['id'] == $id_member && $context['group']['group_type'] != 1)
 				$context['group']['can_moderate'] = true;
 		}
 
