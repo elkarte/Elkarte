@@ -152,7 +152,7 @@ function template_main()
 
 function template_load_drafts_below()
 {
-	global $context, $settings, $txt, $options;
+	global $context, $settings, $txt, $modSettings, $options;
 
 	// If the admin enabled the drafts feature, show a draft selection box
 	if (!empty($options['drafts_show_saved_enabled']))
