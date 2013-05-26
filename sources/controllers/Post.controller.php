@@ -289,6 +289,8 @@ class Post_Controller
 					fatal_lang_error('invalid_year', false);
 
 				// Get a list of boards they can post in.
+				require_once(SUBSDIR . '/Boards.subs.php');
+
 				$boards = boardsAllowedTo('post_new');
 				if (empty($boards))
 					fatal_lang_error('cannot_post_new', 'user');

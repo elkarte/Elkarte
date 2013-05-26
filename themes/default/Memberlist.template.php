@@ -179,7 +179,7 @@ function template_search()
 							<label><strong>', $txt['search_for'], ':</strong></label>
 						</dt>
 						<dd>
-							<input type="text" name="search" value="', $context['old_search'], '" size="40" class="input_text" />
+							<input type="text" name="search" value="', $context['old_search'], '" size="40" class="input_text" placeholder="', $txt['search'], '" autofocus="autofocus" required="required" />
 						</dd>
 						<dt>
 							<label><strong>', $txt['mlist_search_filter'], ':</strong></label>
