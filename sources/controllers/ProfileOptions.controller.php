@@ -1147,17 +1147,14 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 	// Sanity check!!
 	if ($group_id == 1)
 		isAllowedTo('admin_forum');
-	// Protected groups too!
-	else
-	{
-		$is_protected = membergroupsById($group_id);
-
-		if ($is_protected['group_type'] == 1)
-			isAllowedTo('admin_forum');
-	}
 
 	// What ever we are doing, we need to determine if changing primary is possible!
 	$groups_details = membergroupsById(array($group_id, $old_profile['id_group']), 0, true);
+
+	// Protected groups require proper permissions!
+	if ($group_id != 1 && $groups_details[$group_id]['group_type'] == 1)
+		isAllowedTo('admin_forum');
+
 	foreach ($groups_details as $key => $row)
 	{
 		// Is this the new group?

@@ -532,7 +532,7 @@ class ManagePermissions_Controller
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 
-			$group = membergroupsById($context['group']['id'], 1, true);
+			$group = membergroupById($context['group']['id'], true);
 			$context['group']['name'] = $group['group_name'];
 			$parent = $group['id_parent'];
 
@@ -630,7 +630,7 @@ class ManagePermissions_Controller
 
 		loadIllegalPermissions();
 
-		$_GET['group'] = (int) $_GET['group'];
+		$current_group_id = (int) $_GET['group'];
 		$_GET['pid'] = (int) $_GET['pid'];
 
 		// Cannot modify predefined profiles.
@@ -638,12 +638,12 @@ class ManagePermissions_Controller
 			fatal_lang_error('no_access', false);
 
 		// Verify this isn't inherited.
-		if ($_GET['group'] == -1 || $_GET['group'] == 0)
+		if ($current_group_id == -1 || $current_group_id == 0)
 			$parent = -2;
 		else
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$group = membergroupsById($_GET['group'], 1, true);
+			$group = membergroupById($current_group_id, true);
 			$parent = $group['id_parent'];
 		}
 
@@ -653,7 +653,7 @@ class ManagePermissions_Controller
 		$givePerms = array('membergroup' => array(), 'board' => array());
 
 		// Guest group, we need illegal, guest permissions.
-		if ($_GET['group'] == -1)
+		if ($current_group_id == -1)
 		{
 			loadIllegalGuestPermissions();
 			$context['illegal_permissions'] = array_merge($context['illegal_permissions'], $context['non_guest_permissions']);
@@ -673,16 +673,16 @@ class ManagePermissions_Controller
 							if (!empty($context['illegal_permissions']) && in_array($permission, $context['illegal_permissions']))
 								continue;
 
-							$givePerms[$perm_type][] = array($permission, $_GET['group'], $value == 'deny' ? 0 : 1);
+							$givePerms[$perm_type][] = array($permission, $current_group_id, $value == 'deny' ? 0 : 1);
 						}
 				}
 			}
 		}
 
 		// Insert the general permissions.
-		if ($_GET['group'] != 3 && empty($_GET['pid']))
+		if ($current_group_id != 3 && empty($_GET['pid']))
 		{
-			deleteInvalidPermissions($_GET['group'], $context['illegal_permissions']);
+			deleteInvalidPermissions($current_group_id, $context['illegal_permissions']);
 
 			if (!empty($givePerms['membergroup']))
 				replacePermission($givePerms['membergroup']);
@@ -690,7 +690,7 @@ class ManagePermissions_Controller
 
 		// Insert the boardpermissions.
 		$profileid = max(1, $_GET['pid']);
-		deleteAllBoardPermissions($_GET['group'], $profileid);
+		deleteAllBoardPermissions($current_group_id, $profileid);
 
 		if (!empty($givePerms['board']))
 		{
@@ -700,7 +700,7 @@ class ManagePermissions_Controller
 		}
 
 		// Update any inherited permissions as required.
-		updateChildPermissions($_GET['group'], $_GET['pid']);
+		updateChildPermissions($current_group_id, $_GET['pid']);
 
 		// Clear cached privs.
 		updateSettings(array('settings_updated' => time()));
