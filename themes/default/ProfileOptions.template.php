@@ -414,7 +414,7 @@ function template_edit_options()
 							<span class="smalltext">', $txt['required_security_reasons'], '</span>
 						</dt>
 						<dd>
-							<input type="password" name="oldpasswrd" id="oldpasswrd" size="20" style="margin-right: 4ex;" class="input_password" />
+							<input type="password" name="oldpasswrd" id="oldpasswrd" size="20" style="margin-right: 4ex;" class="input_password" required />
 						</dd>
 					</dl>';
 
@@ -1551,7 +1551,7 @@ function template_authentication_method()
 							<span class="smalltext">', $txt['required_security_reasons'], '</span>
 						</dt>
 						<dd>
-							<input type="password" name="oldpasswrd" tabindex="', $context['tabindex']++, '" size="20" style="margin-right: 4ex;" class="input_password" placeholder="', $txt['current_password'], '"/>
+							<input type="password" name="oldpasswrd" tabindex="', $context['tabindex']++, '" size="20" style="margin-right: 4ex;" class="input_password" placeholder="', $txt['current_password'], '"  required />
 						</dd>
 					</dl>';
 
