@@ -63,9 +63,7 @@ class Members_Controller
 	 */
 	public function action_requestmembers()
 	{
-		global $user_info;
-
-		$db = database();
+		require_once(SUBSDIR . '/Members.subs.php');
 
 		checkSession('get');
 
@@ -76,19 +74,9 @@ class Members_Controller
 		if (function_exists('iconv'))
 			header('Content-Type: text/plain; charset=UTF-8');
 
-		$request = $db->query('', '
-			SELECT real_name
-			FROM {db_prefix}members
-			WHERE real_name LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '
-				AND id_member IN ({array_int:buddy_list})' : '') . '
-				AND is_activated IN (1, 11)
-			LIMIT ' . (Util::strlen($_REQUEST['search']) <= 2 ? '100' : '800'),
-			array(
-				'buddy_list' => $user_info['buddies'],
-				'search' => $_REQUEST['search'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		$members = findMembers($_REQUEST['search'], $_REQUEST['buddies']);
+
+		foreach ($members as $row)
 		{
 			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
@@ -97,7 +85,7 @@ class Members_Controller
 
 			echo $row['real_name'], "\n";
 		}
-		$db->free_result($request);
+	
 
 		obExit(false);
 	}
