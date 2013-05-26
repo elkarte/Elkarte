@@ -1428,7 +1428,7 @@ function boardsModerated($id_member)
 		FROM {db_prefix}moderators
 		WHERE id_member = {int:current_member}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => $id_member,
 		)
 	);
 
