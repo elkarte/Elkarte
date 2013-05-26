@@ -215,7 +215,8 @@ class ManageErrors_Controller
 		isAllowedTo('admin_forum');
 
 		// Decode the file and get the line
-		$file = realpath(base64_decode($_REQUEST['file']));
+		$filename = base64_decode($_REQUEST['file']);
+		$file = realpath($filename);
 		$line = isset($_REQUEST['line']) ? (int) $_REQUEST['line'] : 0;
 
 		// Make sure things are normalized
@@ -228,7 +229,7 @@ class ManageErrors_Controller
 		$basename = strtolower(basename($file));
 		$ext = strrchr($basename, '.');
 		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
-			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($file)));
+			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename)));
 
 		// get the min and max lines
 		$min = $line - 20 <= 0 ? 1 : $line - 20;
