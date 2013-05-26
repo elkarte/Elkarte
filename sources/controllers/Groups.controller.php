@@ -215,12 +215,13 @@ class Groups_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Load up the group details.
-		$context['group'] = membergroupsById($current_group, 1, true, true, allowedTo('admin_forum'));
+		$group_details = membergroupsById($current_group, 1, true, true);
 
 		// Doesn't exist?
-		if (empty($context['group']))
+		if (!allowedTo('admin_forum') && $group_details[$current_group]['group_type'] == 1)
 			fatal_lang_error('membergroup_does_not_exist', false);
 
+		$context['group'] = $group_details[$current_group];
 		// @todo should we change id => id_group and name => name_group?
 		$context['group']['id'] = $context['group']['id_group'];
 		$context['group']['name'] = $context['group']['group_name'];

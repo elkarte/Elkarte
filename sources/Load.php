@@ -911,13 +911,14 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	// Are we loading any moderators?  If so, fix their group data...
 	if (!empty($loaded_ids) && !empty($board_info['moderators']) && $set === 'normal' && count($temp_mods = array_intersect($loaded_ids, array_keys($board_info['moderators']))) !== 0)
 	{
-		if (($row = cache_get_data('moderator_group_info', 480)) == null)
+		if (($groups_info = cache_get_data('moderator_group_info', 480)) == null)
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$row = membergroupsById(3, 1, true);
+			$groups_info = membergroupsById(3, 1, true);
 
-			cache_put_data('moderator_group_info', $row, 480);
+			cache_put_data('moderator_group_info', $groups_info, 480);
 		}
+		$row = $groups_info[3];
 
 		foreach ($temp_mods as $id)
 		{

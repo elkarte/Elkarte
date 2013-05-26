@@ -286,14 +286,9 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	}
 	elseif (!is_array($groups))
 		$groups = array((int) $groups);
+	// Make sure all groups are integer.
 	else
-	{
-		$groups = array_unique($groups);
-
-		// Make sure all groups are integer.
-		foreach ($groups as $key => $value)
-			$groups[$key] = (int) $value;
-	}
+		$groups = array_unique(array_map('intval', $groups));
 
 	// Fetch a list of groups members cannot be assigned to explicitely, and the group names of the ones we want.
 	$implicitGroups = array(-1, 0, 3);
@@ -448,24 +443,20 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 
 	if (!is_array($members))
 		$members = array((int) $members);
+	// Make sure all members are integer.
 	else
-	{
-		$members = array_unique($members);
+		$members = array_unique(array_map('intval', $members));
 
-		// Make sure all members are integer.
-		foreach ($members as $key => $value)
-			$members[$key] = (int) $value;
-	}
 	$group = (int) $group;
 
 	// Some groups just don't like explicitly having members.
 	$implicitGroups = array(-1, 0, 3);
 	$group_names = array();
 	$group_details = membergroupsById($group, 1, true);
-	if ($group_details['min_posts'] != -1)
-		$implicitGroups[] = $group_details['id_group'];
+	if ($group_details[$group]['min_posts'] != -1)
+		$implicitGroups[] = $group_details[$group]['id_group'];
 	else
-		$group_names[$group_details['id_group']] = $group_details['group_name'];
+		$group_names[$group_details[$group]['id_group']] = $group_details[$group]['group_name'];
 
 	// Sorry, you can't join an implicit group.
 	if (in_array($group, $implicitGroups) || empty($members))
@@ -475,14 +466,8 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	if (!allowedTo('admin_forum') && $group == 1)
 		return false;
 	// ... and assign protected groups!
-	elseif (!allowedTo('admin_forum'))
-	{
-		$is_protected = membergroupsById($group, 1, false, false, true);
-
-		// Is it protected?
-		if ($is_protected['group_type'] == 1)
+	elseif (!allowedTo('admin_forum') && $group_details[$group]['group_type'] == 1)
 			return false;
-	}
 
 	// Do the actual updates.
 	if ($type == 'only_additional')
@@ -537,7 +522,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	else
 		trigger_error('addMembersToGroup(): Unknown type \'' . $type . '\'', E_USER_WARNING);
 
-	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
+	call_integration_hook('integrate_add_members_to_group', array($members, $group_details[$group], &$group_names));
 
 	// Update their postgroup statistics.
 	updateStats('postgroups', $members);
@@ -831,7 +816,7 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
 /**
  * Returns details of membergroups based on the id
  *
- * @param array/int $group_id the IDs of the groups. (Note: yes, this is $group_id and NOT $group_ids)
+ * @param array/int $group_ids the IDs of the groups.
  * @param integer $limit = 1 the number of results returned (default 1, if null/false/0 returns all).
  * @param bool $detailed = false if true then it returns more fields (default false).
  *  false returns: id_group, group_name, group_type.
@@ -841,14 +826,14 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *
  * @return array|false
  */
-function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable = false, $protected = false)
+function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false)
 {
 	$db = database();
 
 	if (empty($group_id))
 		return false;
 
-	$group_ids = !is_array($group_id) ? array($group_id) : $group_id;
+	$group_ids = !is_array($group_ids) ? array($group_ids) : $group_ids;
 
 	$groups = array();
 	$group_ids = array_map('intval', $group_ids);
@@ -859,28 +844,20 @@ function membergroupsById($group_id, $limit = 1, $detailed = false, $assignable 
 			CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable,
 			CASE WHEN min_posts != {int:min_posts} THEN 1 ELSE 0 END AS is_post_group') . '
 		FROM {db_prefix}membergroups
-		WHERE id_group IN ({array_int:group_ids})' . ($protected ? '' : '
-			AND group_type != {int:is_protected}') . (empty($limit) ? '' : '
+		WHERE id_group IN ({array_int:group_ids})' . (empty($limit) ? '' : '
 		LIMIT {int:limit}'),
 		array(
 			'min_posts' => -1,
 			'group_ids' => $group_ids,
 			'limit' => $limit,
-			'is_protected' => 1,
 		)
 	);
-
-	if ($db->num_rows($request) == 0)
-		return $groups;
 
 	while ($row = $db->fetch_assoc($request))
 		$groups[$row['id_group']] = $row;
 	$db->free_result($request);
 
-	if (is_array($group_id))
-		return $groups;
-	else
-		return $groups[$group_id];
+	return $groups;
 }
 
 /**
@@ -1213,10 +1190,10 @@ function updateCopiedGroup($id_group, $copy_from)
 			icons = {string:icons}
 			WHERE id_group = {int:current_group}',
 			array(
-				'max_messages' => $group_info['max_messages'],
+				'max_messages' => $group_info[$copy_from]['max_messages'],
 				'current_group' => $id_group,
-				'online_color' => $group_info['online_color'],
-				'icons' => $group_info['icons'],
+				'online_color' => $group_info[$copy_from]['online_color'],
+				'icons' => $group_info[$copy_from]['icons'],
 			)
 	);
 }
