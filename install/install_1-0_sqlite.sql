@@ -1969,6 +1969,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('knownThemes', '1,2,3
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('who_enabled', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('time_offset', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cookieTime', '60');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('jquery_source', 'local');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('lastActive', '15');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_known', 'default,aaron,akyhne,fugue');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_names', '{$default_smileyset_name}
