@@ -627,7 +627,7 @@ class ManageMembergroups_Controller
 
 			// Finally, moderators!
 			$moderator_string = isset($_POST['group_moderators']) ? trim($_POST['group_moderators']) : '';
-			detachGroupModerators($groups[$current_group]'id_group']);
+			detachGroupModerators($groups[$current_group]['id_group']);
 
 			if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $_POST['min_posts'] == -1 && $groups[$current_groups]['id_group'] != 3)
 			{

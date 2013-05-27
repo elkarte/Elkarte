@@ -533,7 +533,7 @@ class ManagePermissions_Controller
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 
 			$group = membergroupsById($context['group']['id'], 1, true);
-			$context['group']['name'] = $group[$context['group'['id']]['group_name'];
+			$context['group']['name'] = $group[$context['group']['id']]['group_name'];
 			$parent = $group[$context['group']['id']]['id_parent'];
 
 			// Cannot edit an inherited group!
