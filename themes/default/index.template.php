@@ -227,7 +227,7 @@ function template_body_above()
 	if ($context['allow_search'])
 	{
 		echo '
-			<form id="search_form" class="floatright" action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
+			<form id="search_form" action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
 				<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />&nbsp;';
 
 		// Using the quick search dropdown?
