@@ -564,7 +564,7 @@ function rebuildModCache()
 	$boards_mod = array();
 	if (!$user_info['is_guest'])
 	{
-		require_once(SUBSDIR . 'Boards.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_mod = boardsModerated($user_info['id']);
 	}
 
