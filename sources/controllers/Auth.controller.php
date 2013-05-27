@@ -485,7 +485,7 @@ class Auth_Controller
 	 */
 	public function action_check()
 	{
-		global $user_info;
+		global $user_info, $modSettings;
 
 		// Only our members, please.
 		if (!$user_info['is_guest'])
