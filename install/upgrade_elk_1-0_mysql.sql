@@ -28,7 +28,7 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 ---}
 ---#
 
----# Adding new settings ...
+---# Adding new settings to the settings table...
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
@@ -36,7 +36,8 @@ VALUES
 	('gravatar_rating', 'g'),
 	('xmlnews_limit', 5),
 	('visual_verification_num_chars', '6'),
-	('enable_disregard', 0);
+	('enable_disregard', 0),
+	('jquery_source', 'local');
 ---#
 
 /******************************************************************************/
