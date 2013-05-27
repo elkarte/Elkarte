@@ -1113,7 +1113,7 @@ class Recent_Controller
 			require_once(SUBSDIR . '/MessageIndex.subs.php');
 			$topics_participated_in = topicsParticipation($user_info['id'], $topic_ids);
 
-			foreach (topics_participated_in as $topic)
+			foreach ($topics_participated_in as $topic)
 			{
 				if (empty($context['topics'][$topic['id_topic']]['is_posted_in']))
 				{
