@@ -1667,7 +1667,7 @@ class Post_Controller
 		if (!empty($_POST['notify']) && allowedTo('mark_any_notify'))
 			setTopicNotification($user_info['id'], $topic, true);
 		elseif (!$newTopic)
-			setTopicNotification($user_info, $topic, false);
+			setTopicNotification($user_info['id'], $topic, false);
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
