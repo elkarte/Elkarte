@@ -690,10 +690,6 @@ function deleteOnline($session)
  */
 function isFirstLogin($id_member)
 {
-	$db = database();
-
-	$isFirstLogin = false;
-
 	// First login?
 	require_once(SUBSDIR . '/Members.subs.php');
 	$member = getBasicMemberData($id_member, array('moderation' => true));
@@ -701,7 +697,7 @@ function isFirstLogin($id_member)
 	return !empty($member) && $member['last_login'] == 0;
 }
 
-function findUser($where, $whereparams)
+function findUser($where, $where_params)
 {
 	$db = database();
 
