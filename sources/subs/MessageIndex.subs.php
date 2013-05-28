@@ -53,12 +53,11 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 
 	// And now, all you ever wanted on message index...
 	// and some you wish you didn't! :P
-
 	if (!$ids_query || !empty($topic_ids))
 	{
 		$request = $db->query('substring', '
 			SELECT
-				t.id_topic, t.num_replies, t.locked, t.num_views, t.is_sticky, t.id_poll, t.id_previous_board,
+				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
 				' . ($id_member == 0 ? '0' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from,
 				t.id_last_msg, t.approved, t.unapproved_posts, ml.poster_time AS last_poster_time,
 				ml.id_msg_modified, ml.subject AS last_subject, ml.icon AS last_icon,
@@ -114,6 +113,7 @@ function messageIndexSort()
 		'last_poster' => 'IFNULL(meml.real_name, ml.poster_name)',
 		'replies' => 't.num_replies',
 		'views' => 't.num_views',
+		'likes' => 't.num_likes',
 		'first_post' => 't.id_topic',
 		'last_post' => 't.id_last_msg'
 	);
