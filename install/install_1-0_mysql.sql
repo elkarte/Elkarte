@@ -2183,7 +2183,6 @@ CREATE TABLE {$db_prefix}postby_emails_filters (
 	filter_name varchar(255) NOT NULL default '',
 	PRIMARY KEY (id_filter)
 ) ENGINE=MyISAM;
-) ENGINE=MyISAM;
 
 #
 # Table structure for table `log_likes`
@@ -2205,5 +2204,5 @@ CREATE TABLE {$db_prefix}log_likes (
 CREATE TABLE {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member),
+  PRIMARY KEY (id_msg, id_member)
 ) ENGINE=MyISAM;

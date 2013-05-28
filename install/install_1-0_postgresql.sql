@@ -2751,8 +2751,8 @@ CREATE TABLE {$db_prefix}postby_emails_filter
 	filter_to varchar(255) NOT NULL default '',
 	filter_from varchar(255) NOT NULL default '',
 	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter),
-);CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);
+	PRIMARY KEY (id_filter)
+);
 
 #
 # Table structure for table `log_likes`
@@ -2779,5 +2779,5 @@ CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
 CREATE TABLE {$db_prefix}message_likes (
   id_member int NOT NULL default '0',
   id_msg int NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member),
+  PRIMARY KEY (id_msg, id_member)
 );
