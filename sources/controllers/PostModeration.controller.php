@@ -512,7 +512,7 @@ class PostModeration_Controller
 
 		isAllowedTo('approve_posts');
 
-		$message_info = messageInfo($topic, $current_msg);
+		$message_info = messageTopicDetails($topic, $current_msg);
 
 		// If it's the first in a topic then the whole topic gets approved!
 		if ($message_info['id_first_msg'] == $current_msg)

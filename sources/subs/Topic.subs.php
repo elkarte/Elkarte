@@ -1307,14 +1307,14 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 
 /**
  * Retrieve a few data on a particular message.
- * Slightly different from getMessageInfo, this one inner joins {db_prefix}topics
+ * Slightly different from basicMessageInfo, this one inner joins {db_prefix}topics
  * and doesn't use {query_see_board}
  *
  * @param int $topic topic ID
  * @param int $message message ID
  * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
  */
-function messageInfo($topic, $message, $topic_approved = false)
+function messageTopicDetails($topic, $message, $topic_approved = false)
 {
 	global $modSettings;
 

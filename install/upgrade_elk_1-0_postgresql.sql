@@ -644,4 +644,3 @@ ADD COLUMN message_id int  NOT NULL DEFAULT '0';
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
 ---#
-
