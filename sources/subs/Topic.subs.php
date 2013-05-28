@@ -1314,7 +1314,7 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
  * @param int $message message ID
  * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
  */
-function messageInfo($topic, $message, $topic_approved = false)
+function messageTopicDetails($topic, $message, $topic_approved = false)
 {
 	global $modSettings;
 
