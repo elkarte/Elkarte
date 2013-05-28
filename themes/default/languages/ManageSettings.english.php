@@ -117,6 +117,13 @@ $txt['karmaLabel'] = 'Karma label';
 $txt['karmaApplaudLabel'] = 'Karma applaud label';
 $txt['karmaSmiteLabel'] = 'Karma smite label';
 
+$txt['likes_enabled'] = 'Enable Likes';
+$txt['likeMinPosts'] = 'Set the minimum number of posts a member needs in order to like a post';
+$txt['likeWaitTime'] = 'Set wait time period in minutes';
+$txt['likeWaitCount'] = 'Set the maximum number of likes/unlikes the member can do in the above time period';
+$txt['likeRestrictAdmins'] = 'Restrict administrators to limits';
+$txt['likeDisplayLimit'] = 'Set the maximum number of "liked by" names to display in the topic view, 0 for no limit, -1 to disable';
+
 $txt['caching_information'] = 'ElkArte supports caching through the use of accelerators. The currently supported accelerators include:
 <ul class="normallist">
 	<li>APC</li>
@@ -359,6 +366,10 @@ $txt['core_settings_item_ih'] = 'Integration Hooks Management';
 $txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disable any integration hooks added by modifications. Changing hooks can prevent your forum from working properly, so use this feature only if you know what you are doing.';
 $txt['core_settings_item_k'] = 'Karma';
 $txt['core_settings_item_k_desc'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can \'applaud\' or \'smite\' other members, which is how their popularity is calculated.';
+$txt['core_settings_item_pe'] = 'Post by Email Management';
+$txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailist feel.  Use of this functionality will require additional setup steps on your hosting provider.';
+$txt['core_settings_item_l'] = 'Likes';
+$txt['core_settings_item_l_desc'] = 'Likes is a feature that allows members to like a post to show thier approval and popularity of the message content.';
 $txt['core_settings_item_pe'] = 'Post by Email Management';
 $txt['core_settings_item_pe_desc'] = 'This will allow users of your forum to reply to emailed notifications and personal messages and have them post directly as a reply to the appropriate thread or PM.  This provides a familiar mailist feel.  Use of this functionality will require additional setup steps on your hosting provider.';
 $txt['core_settings_item_ml'] = 'Moderation, Administration and User Logs';

@@ -509,3 +509,37 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
 ---#
 
+
+/******************************************************************************/
+--- Adding likes support.
+/******************************************************************************/
+
+---# Creating likes log  table...
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target mediumint(8) unsigned NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  log_time int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member),
+  KEY log_time (log_time)
+) ENGINE=MyISAM;
+---#
+
+---# Creating likes message  table...
+CREATE TABLE {$db_prefix}message_likes (
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  id_msg mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member) 
+) ENGINE=MyISAM;
+---#
+
+---# Adding new columns to topics...
+ALTER TABLE {$db_prefix}topics
+ADD COLUMN num_likes int(10) unsigned NOT NULL default '0';
+---#
+
+---# Adding new columns to members...
+ALTER TABLE {$db_prefix}members
+ADD COLUMN likes_given mediumint(5) unsigned  NOT NULL default '0',
+ADD COLUMN likes_received mediumint(5) unsigned  NOT NULL default '0';
+---#

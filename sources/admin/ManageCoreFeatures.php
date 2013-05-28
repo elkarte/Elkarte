@@ -230,6 +230,13 @@ class ManageCoreFeatures_Controller
 					'karmaMode' => 2,
 				),
 			),
+			// l = likes.
+			'l' => array(
+				'url' => 'action=admin;area=featuresettings;sa=likes',
+				'settings' => array(
+					'likes_enabled' => 1,
+				),
+			),
 			// ml = moderation log.
 			'ml' => array(
 				'url' => 'action=admin;area=logs;sa=modlog',

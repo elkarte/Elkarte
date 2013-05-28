@@ -58,7 +58,7 @@ function template_main()
 			echo '
 					<th scope="col" class="first_th" style="width:4%">&nbsp;</th>
 					<th scope="col" class="lefttext subject">', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], '</th>
-					<th scope="col" class="stats" style="width:14%">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], '</th>';
+					<th scope="col" class="stats" style="width:14em">', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], ' / ', $context['topics_headers']['likes'], '</th>';
 
 			// Show a "select all" box for quick moderation?
 			if (empty($context['can_quick_mod']))
@@ -151,7 +151,8 @@ function template_main()
 					<td class="', $color_class, ' stats">
 						', $topic['replies'], ' ', $txt['replies'], '
 						<br />
-						', $topic['views'], ' ', $txt['views'], '
+						', $topic['views'], ' ', $txt['views'], ' / ',
+						$topic['likes'], ' ', $txt['likes'], '
 					</td>
 					<td class="', $alternate_class, ' lastpost">
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
