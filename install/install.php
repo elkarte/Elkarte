@@ -2330,12 +2330,7 @@ function template_database_settings()
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_info'], '
 					<span id="db_name_info_warning">', $txt['db_settings_database_info_note'], '</span></div>
 				</td>
-			</tr><tr id="db_filename_contain" style="display: none;">
-				<td style="vertical-align:top" class="textbox"><label for="db_filename_input">', $txt['db_settings_database_file'], ':</label></td>
-				<td>
-					<input type="text" name="db_filename" id="db_filename_input" value="', empty($incontext['db']['name']) ? dirname(__FILE__) . '/elkarte_' . substr(md5(microtime()), 0, 10) : stripslashes($incontext['db']['name']), '" size="30" class="input_text" /><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_file_info'], '</div>
-				</td>
+			</tr>
 			</tr><tr>
 				<td style="vertical-align:top" class="textbox"><label for="db_prefix_input">', $txt['db_settings_prefix'], ':</label></td>
 				<td>
@@ -2348,30 +2343,16 @@ function template_database_settings()
 	// Allow the toggling of input boxes for SQLite etc.
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
-		function toggleDBInput()
-		{
-			// What state is it?';
-
-	if (count($incontext['supported_databases']) < 2)
-		echo '
-			var showAll = false;';
-	// If we have more than one DB, what should we be doing?
-	else
-		echo '
-			var showAll = true;';
+		function validatePgsql()
+		{';
 
 	echo '
-			document.getElementById(\'db_passwd_contain\').style.display = showAll ? \'\' : \'none\';
-			document.getElementById(\'db_server_contain\').style.display = showAll ? \'\' : \'none\';
-			document.getElementById(\'db_user_contain\').style.display = showAll ? \'\' : \'none\';
-			document.getElementById(\'db_name_contain\').style.display = showAll ? \'\' : \'none\';
-			document.getElementById(\'db_filename_contain\').style.display = !showAll ? \'\' : \'none\';
 			if (document.getElementById(\'db_type_input\').value == \'postgresql\')
 				document.getElementById(\'db_name_info_warning\').style.display = \'none\';
 			else
 				document.getElementById(\'db_name_info_warning\').style.display = \'\';
 		}
-		toggleDBInput();
+		validatePgsql();
 	// ]]></script>';
 }
 
