@@ -49,6 +49,10 @@ INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
 	('enable_disregard', 0);
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('jquery_source', 'local');
 ---#
 
 /******************************************************************************/

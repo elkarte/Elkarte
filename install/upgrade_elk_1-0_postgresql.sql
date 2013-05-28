@@ -51,6 +51,10 @@ INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
 	('enable_disregard', 0);
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
+	('jquery_source', 'local');
 ---#
 
 /******************************************************************************/
@@ -639,6 +643,8 @@ ADD COLUMN message_id int  NOT NULL DEFAULT '0';
 ---# Updating board profiles...
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
+---#
+
 ---#
 /******************************************************************************/
 --- Adding likes support.

@@ -60,7 +60,7 @@ function template_find_members()
 				</div>
 				<div class="padding">
 					<strong>', $txt['find_username'], ':</strong><br />
-					<input type="text" name="search" id="search" value="', isset($context['last_search']) ? $context['last_search'] : '', '" style="margin-top: 4px; width: 96%;" class="input_text" /><br />
+					<input type="text" name="search" id="search" value="', isset($context['last_search']) ? $context['last_search'] : '', '" style="margin-top: 4px; width: 96%;" class="input_text" autofocus="autofocus" placeholder="', $txt['find_members'], '" required="required" /><br />
 					<span class="smalltext"><em>', $txt['find_wildcards'], '</em></span><br />';
 
 	// Only offer to search for buddies if we have some!

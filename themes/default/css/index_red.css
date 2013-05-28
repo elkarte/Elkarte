@@ -110,12 +110,12 @@ html, body {
 	border: none;
 	background: none;
 }
-#main_menu .dropmenu li {
+.topmenu li {
 	border-right: 1px solid #343434;
 	padding-right: 10px;
 }
 
-#main_menu .dropmenu li a {
+.topmenu li a {
 	background: none;
 	padding: 0 0.3em;
 	margin: 0;
@@ -124,7 +124,7 @@ html, body {
 	color: #fff;
 	border-radius: 2px;
 }
-#main_menu .dropmenu li a:hover, .dropmenu li:hover a, .dropmenu li a:focus {
+.topmenu li a:hover, .topmenu li:hover a, .topmenu li a:focus {
 /* 	background: #597b9f; */
 	border: none;
 	color: #ccc;
@@ -133,7 +133,7 @@ html, body {
 	box-shadow: none;
 }
 /* Level 1 active button. */
-#main_menu .dropmenu li a.active:hover, .dropmenu li:hover a.active {
+.topmenu li a.active:hover, .topmenu li:hover a.active {
 /* 	background: orange; */
 	border: none;
 	color: #ccc;
@@ -141,7 +141,7 @@ html, body {
 	text-shadow: none;
 }
 
-#main_menu .dropmenu li a.active {
+.topmenu li a.active {
 	border: none;
 	box-shadow: none;
 	color: #ccc;

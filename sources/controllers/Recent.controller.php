@@ -1111,28 +1111,17 @@ class Recent_Controller
 
 		if ($is_topics && !empty($modSettings['enableParticipation']) && !empty($topic_ids))
 		{
-			$result = $db->query('', '
-				SELECT id_topic
-				FROM {db_prefix}messages
-				WHERE id_topic IN ({array_int:topic_list})
-					AND id_member = {int:current_member}
-				GROUP BY id_topic
-				LIMIT {int:limit}',
-				array(
-					'current_member' => $user_info['id'],
-					'topic_list' => $topic_ids,
-					'limit' => count($topic_ids),
-				)
-			);
-			while ($row = $db->fetch_assoc($result))
+			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			$topics_participated_in = topicsParticipation($user_info['id'], $topic_ids);
+
+			foreach ($topics_participated_in as $topic)
 			{
-				if (empty($context['topics'][$row['id_topic']]['is_posted_in']))
+				if (empty($context['topics'][$topic['id_topic']]['is_posted_in']))
 				{
-					$context['topics'][$row['id_topic']]['is_posted_in'] = true;
-					$context['topics'][$row['id_topic']]['class'] = 'my_' . $context['topics'][$row['id_topic']]['class'];
+					$context['topics'][$topic['id_topic']]['is_posted_in'] = true;
+					$context['topics'][$topic['id_topic']]['class'] = 'my_' . $context['topics'][$topic['id_topic']]['class'];
 				}
 			}
-			$db->free_result($result);
 		}
 
 		$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $_REQUEST['start']);
