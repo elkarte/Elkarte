@@ -529,7 +529,7 @@ CREATE TABLE {$db_prefix}log_likes (
 CREATE TABLE {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member),
+  PRIMARY KEY (id_msg, id_member) 
 ) ENGINE=MyISAM;
 ---#
 
@@ -541,5 +541,5 @@ ADD COLUMN num_likes int(10) unsigned NOT NULL default '0';
 ---# Adding new columns to members...
 ALTER TABLE {$db_prefix}members
 ADD COLUMN likes_given mediumint(5) unsigned  NOT NULL default '0',
-ADD COLUMN likes_received mediumint(5) unsigned  NOT NULL default '0',
+ADD COLUMN likes_received mediumint(5) unsigned  NOT NULL default '0';
 ---#
