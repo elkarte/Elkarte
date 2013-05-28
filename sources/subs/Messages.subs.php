@@ -89,7 +89,7 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
  *
  * @param int $id_msg
  */
-function getMessageInfo($id_msg, $override_permissions = false)
+function basicMessageInfo($id_msg, $override_permissions = false)
 {
 	$db = database();
 
@@ -707,7 +707,7 @@ function canAccessMessage($id_msg, $check_approval = true)
 {
 	global $user_info;
 
-	$message_info = getMessageInfo($id_msg);
+	$message_info = basicMessageInfo($id_msg);
 
 	// Do we even have a message to speak of?
 	if (empty($message_info))

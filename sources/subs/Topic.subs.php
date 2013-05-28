@@ -1307,7 +1307,7 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 
 /**
  * Retrieve a few data on a particular message.
- * Slightly different from getMessageInfo, this one inner joins {db_prefix}topics
+ * Slightly different from basicMessageInfo, this one inner joins {db_prefix}topics
  * and doesn't use {query_see_board}
  *
  * @param int $topic topic ID

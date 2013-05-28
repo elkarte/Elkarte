@@ -1146,7 +1146,7 @@ class Post_Controller
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
 			require_once(SUBSDIR . '/Messages.subs.php');
-			$msgInfo = getMessageInfo($_REQUEST['msg'], true);
+			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
 
 			if (empty($msgInfo))
 				fatal_lang_error('cant_find_messages', false);
