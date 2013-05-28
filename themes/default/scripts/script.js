@@ -1690,7 +1690,7 @@ function toggleButtonAJAX(btn, text_confirm)
 {
 	ajax_indicator(true);
 
-	var oXMLDoc = getXMLDocument(btn.href + ';api');
+	var oXMLDoc = getXMLDocument(btn.href + ';xml;api');
 
 	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
 	{
@@ -1717,7 +1717,7 @@ function toggleHeaderAJAX(btn, container_id)
 {
 	ajax_indicator(true);
 
-	var oXMLDoc = getXMLDocument(btn.href + ';api');
+	var oXMLDoc = getXMLDocument(btn.href + ';xml;api');
 	var text_template = '<div class="cat_bar"><h3 class="catbg centertext">{text}</h3></div>';
 
 	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
