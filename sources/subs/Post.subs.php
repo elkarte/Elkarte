@@ -1356,7 +1356,6 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$message = basicMessageInfo($msgOptions['id'], true);
 			$msgOptions['old_body'] = $message['body'];
-			$db->free_result($request);
 		}
 	}
 	if (!empty($msgOptions['modify_time']))
