@@ -2344,9 +2344,7 @@ function template_database_settings()
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		function validatePgsql()
-		{';
-
-	echo '
+		{
 			if (document.getElementById(\'db_type_input\').value == \'postgresql\')
 				document.getElementById(\'db_name_info_warning\').style.display = \'none\';
 			else
