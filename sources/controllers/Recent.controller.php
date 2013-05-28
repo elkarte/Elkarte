@@ -321,6 +321,7 @@ class Recent_Controller
 
 			// The easiest thing is to just get all the boards they can see,
 			// but since we've specified the top of tree we ignore some of them
+			require_once(SUBSDIR . '/Boards.subs.php');
 			addChildBoards($boards);
 
 			if (empty($boards))
