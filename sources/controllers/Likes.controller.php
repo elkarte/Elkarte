@@ -47,7 +47,7 @@ class Likes_Controller
 		// Have to be able to access it to like it
 		if ($this->prepare_like() && canAccessMessage($id_liked))
 		{
-			$liked_message = loadMessageBasics($id_liked);
+			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
 				like_post($user_info['id'], $liked_message, '+');
 		}
@@ -74,7 +74,7 @@ class Likes_Controller
 		// Have to be able to access it to unlike it now
 		if ($this->prepare_like() && canAccessMessage($id_liked))
 		{
-			$liked_message = loadMessageBasics($id_liked);
+			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
 				like_post($user_info['id'], $liked_message, '-');
 		}

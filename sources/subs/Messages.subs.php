@@ -86,10 +86,15 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 
 /**
  * Get some basic info of a certain message
+ * Will use query_see_board unless $override_permissions is set to true
+ * Will return additional topic information if $topic_basics is set to true
+ * Returns an associative array of the results or false on error
  *
  * @param int $id_msg
+ * @param boolean $override_permissions
+ * @param boolean $topic_basics
  */
-function basicMessageInfo($id_msg, $override_permissions = false)
+function basicMessageInfo($id_msg, $override_permissions = false, $topic_basics = false)
 {
 	$db = database();
 
@@ -98,14 +103,15 @@ function basicMessageInfo($id_msg, $override_permissions = false)
 
 	$request = $db->query('', '
 		SELECT
-			m.id_member, m.id_topic, m.id_board,
+			m.id_member, m.id_topic, m.id_board, m.id_msg,
 			m.body, m.subject,
 			m.poster_name, m.poster_email, m.poster_time,
-			m.approved
+			m.approved' .  ($topic_basics === false ? '' : ', t.id_first_msg') . '
 		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($topic_basics === false ? '' : '
+			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)') . '
 		WHERE id_msg = {int:message}
-		LIMIt 1',
+		LIMIT 1',
 		array(
 			'message' => $id_msg,
 		)
@@ -804,41 +810,6 @@ function messageAt($start, $id_topic)
 	);
 	list ($msg) = $db->fetch_row($result);
 	$db->free_result($result);
-
-	return $msg;
-}
-
-/**
- * For a given message, return only the basic message details.
- * Does not check premissions, does not deal with attachments
- *
- * @param int $id_msg
- * @return array of message values on success, false on failure
- */
-function loadMessageBasics($id_msg)
-{
-	$db = database();
-
-	$msg = false;
-
-	// Nothing to do here
-	if (empty($id_msg))
-		return $msg;
-
-	$request = $db->query('', '
-		SELECT m.id_msg, m.id_topic, m.id_board, m.poster_time, m.id_member, m.subject,
-			m.poster_name, m.poster_email, m.smileys_enabled, m.body, m.approved, t.id_first_msg
-		FROM {db_prefix}messages AS m
-			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-		WHERE m.id_msg = {int:id_msg}
-		LIMIT 1',
-		array(
-			'id_msg' => (int) $id_msg,
-		)
-	);
-	if ($db->num_rows($request) !== 0)
-		$msg = $db->fetch_assoc($request);
-	$db->free_result($request);
 
 	return $msg;
 }
