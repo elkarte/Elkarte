@@ -326,7 +326,7 @@ function action_showPosts()
 
 		// We need msg info for logging.
 		require_once(SUBSDIR . '/Messages.subs.php');
-		$info = getExistingMessage((int) $_GET['delete'], true);
+		$info = getMessageInfo((int) $_GET['delete'], true);
 
 		// Trying to remove a message that doesn't exist.
 		if (empty($info))

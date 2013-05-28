@@ -326,7 +326,7 @@ function action_issuewarning()
 	if (isset($_REQUEST['msg']) && 0 < (int) $_REQUEST['msg'])
 	{
 		require_once(SUBSDIR . '/Messages.subs.php');
-		$message = getExistingMessage((int) $_REQUEST['msg']);
+		$message = getMessageInfo((int) $_REQUEST['msg']);
 		if (!empty($message))
 		{
 			$context['warning_for_message'] = (int) $_REQUEST['msg'];

@@ -1354,7 +1354,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (!empty($modSettings['search_custom_index_config']))
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
-			$message = getExistingMessage($msgOptions['id'], true);
+			$message = getMessageInfo($msgOptions['id'], true);
 			$msgOptions['old_body'] = $message['body'];
 			$db->free_result($request);
 		}
