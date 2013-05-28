@@ -33,7 +33,7 @@ if (!defined('ELKARTE'))
  * @param int $id_topic = 0
  * @param int $attachment_type = 0
  */
-function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
+function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 {
 	global $modSettings;
 

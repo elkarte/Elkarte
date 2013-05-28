@@ -491,7 +491,7 @@ class Post_Controller
 			{
 				require_once(SUBSDIR . '/Messages.subs.php');
 				// Get the existing message.
-				$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
+				$message = messageDetails((int) $_REQUEST['msg'], $topic);
 				// The message they were trying to edit was most likely deleted.
 				// @todo Change this error message?
 				if ($message === false)
