@@ -909,7 +909,7 @@ function getBoardTree()
  */
 function getBoardList($boardListOptions = array(), $simple = false)
 {
-	global $user_info;
+	global $modSettings;
 
 	$db = database();
 
