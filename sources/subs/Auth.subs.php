@@ -697,7 +697,7 @@ function isFirstLogin($id_member)
 	return !empty($member) && $member['last_login'] == 0;
 }
 
-function findUser($where, $whereparams)
+function findUser($where, $where_params)
 {
 	$db = database();
 
