@@ -1354,9 +1354,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		if (!empty($modSettings['search_custom_index_config']))
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
-			$message = getExistingMessage($msgOptions['id'], true);
+			$message = basicMessageInfo($msgOptions['id'], true);
 			$msgOptions['old_body'] = $message['body'];
-			$db->free_result($request);
 		}
 	}
 	if (!empty($msgOptions['modify_time']))
@@ -2374,7 +2373,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 	{
 		require_once(SUBSDIR . '/Messages.subs.php');
 		// Get the existing message.
-		$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
+		$message = messageDetails((int) $_REQUEST['msg'], $topic);
 		// The message they were trying to edit was most likely deleted.
 		if ($message === false)
 			fatal_lang_error('no_message', false);

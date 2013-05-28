@@ -38,8 +38,8 @@ VALUES
 
 CREATE TABLE {$db_prefix}antispam_questions (
   id_question tinyint(4) unsigned NOT NULL auto_increment,
-  question text NOT NULL default '',
-  answer text NOT NULL default '',
+  question text NOT NULL,
+  answer text NOT NULL,
   language varchar(50) NOT NULL default '',
   PRIMARY KEY (id_question),
   KEY language (language(30))
@@ -2167,7 +2167,7 @@ CREATE TABLE {$db_prefix}postby_emails_error (
 	id_board smallint(5) NOT NULL default '0',
 	email_from varchar(50) NOT NULL default '',
 	message_type char(10) NOT NULL default '',
-	message mediumtext NOT NULL default '',
+	message mediumtext NOT NULL,
 	PRIMARY KEY (id_email)
 ) ENGINE=MyISAM;
 

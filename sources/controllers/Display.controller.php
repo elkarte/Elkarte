@@ -150,7 +150,7 @@ class Display_Controller
 
 		require_once(SUBSDIR . '/Messages.subs.php');
 		// When was the last time this topic was replied to?  Should we warn them about it?
-		$mgsOptions = getMessageInfo($topicinfo['id_last_msg'], true);
+		$mgsOptions = basicMessageInfo($topicinfo['id_last_msg'], true);
 
 		$context['oldTopicError'] = !empty($modSettings['oldTopicDays']) && $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 
@@ -923,7 +923,7 @@ class Display_Controller
 			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		if (isset($_REQUEST['split_selection']))
 		{
-			$mgsOptions = getMessageInfo(min($messages), true);
+			$mgsOptions = basicMessageInfo(min($messages), true);
 
 			$_SESSION['split_selection'][$topic] = $messages;
 			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' .urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
