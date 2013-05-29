@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function getLastPosts($latestPostOptions)
 {
-	global $scripturl, $txt, $user_info, $modSettings, $context;
+	global $scripturl, $modSettings;
 
 	$db = database();
 
@@ -144,7 +144,7 @@ function getRecentPosts($messages, $start)
 			'message_list' => $messages,
 		)
 	);
-	$counter = $_REQUEST['start'] + 1;
+	$counter = $start + 1;
 	$posts = array();
 	$board_ids = array('own' => array(), 'any' => array());
 	while ($row = $db->fetch_assoc($request))
