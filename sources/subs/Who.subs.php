@@ -127,6 +127,8 @@ function formatViewers($id, $type)
  */
 function addonsCredits()
 {
+	global $txt;
+
 	$db = database();
 
 	if (($credits = cache_get_data('addons_credits', 86400)) === null)
