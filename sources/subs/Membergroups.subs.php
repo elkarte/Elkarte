@@ -435,8 +435,6 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	global $modSettings;
-
 	$db = database();
 
 	// Show your licence, but only if it hasn't been done yet.
@@ -878,6 +876,7 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 		$groups[$row['id_group']] = $row;
 	$db->free_result($request);
 
+	//@todo: $group_id isn't initialized, the code below is probably broken
 	if (is_array($group_id))
 		return $groups;
 	else
