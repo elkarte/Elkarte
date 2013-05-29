@@ -119,7 +119,7 @@ function cache_getLastPosts($latestPostOptions)
 
 function getRecentPosts($messages, $start)
 {
-	global $user_info, $scripturl;
+	global $user_info, $scripturl, $modSettings;
 
 	$db = database();
 
