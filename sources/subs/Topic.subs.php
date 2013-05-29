@@ -424,7 +424,7 @@ function moveTopics($topics, $toBoard)
 	// Only a single topic.
 	if (is_numeric($topics))
 		$topics = array($topics);
-	$num_topics = count($topics);
+	
 	$fromBoards = array();
 
 	// Destination board empty or equal to 0?
