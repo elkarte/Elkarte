@@ -1162,8 +1162,6 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  */
 function removeOldTopics()
 {
-	global $modSettings;
-
 	$db = database();
 
 	isAllowedTo('admin_forum');
