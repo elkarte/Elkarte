@@ -1546,6 +1546,12 @@ function updateSplitTopics($options, $id_board)
 	);
 }
 
+/**
+ * Find out who started a topic
+ *
+ * @param int $topic
+ * @return int
+ */
 function topicStarter($topic)
 {
 	$db = database();
