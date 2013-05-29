@@ -424,7 +424,7 @@ function moveTopics($topics, $toBoard)
 	// Only a single topic.
 	if (is_numeric($topics))
 		$topics = array($topics);
-	$num_topics = count($topics);
+	
 	$fromBoards = array();
 
 	// Destination board empty or equal to 0?
@@ -1162,8 +1162,6 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  */
 function removeOldTopics()
 {
-	global $modSettings;
-
 	$db = database();
 
 	isAllowedTo('admin_forum');
@@ -1548,6 +1546,12 @@ function updateSplitTopics($options, $id_board)
 	);
 }
 
+/**
+ * Find out who started a topic
+ *
+ * @param int $topic
+ * @return int
+ */
 function topicStarter($topic)
 {
 	$db = database();

@@ -11,6 +11,11 @@
  *
  */
 
+/**
+ * Remove old karma from the log 
+ *
+ * @param int $karmaWaitTime
+ */
 function clearKarma($karmaWaitTime)
 {
 	$db = database();
@@ -20,7 +25,7 @@ function clearKarma($karmaWaitTime)
 		DELETE FROM {db_prefix}log_karma
 		WHERE {int:current_time} - log_time > {int:wait_time}',
 		array(
-			'wait_time' => (int) ($karmaWaitTime * 3600),
+			'wait_time' => $karmaWaitTime * 3600,
 			'current_time' => time(),
 		)
 	);

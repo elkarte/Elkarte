@@ -30,7 +30,7 @@ if (!defined('ELKARTE'))
  */
 function getMembersOnlineStats($membersOnlineOptions)
 {
-	global $context, $scripturl, $user_info, $modSettings, $txt;
+	global $scripturl, $user_info, $modSettings, $txt;
 
 	$db = database();
 

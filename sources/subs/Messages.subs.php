@@ -207,7 +207,7 @@ function prepareMessageContext($message)
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $modSettings, $user_info, $context;
+	global $board, $modSettings, $user_info;
 
 	$db = database();
 
@@ -587,7 +587,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if (!$recycle)
 	{
 		// Remove the likes!
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}message_likes
 			WHERE id_msg = {int:id_msg}',
 			array(

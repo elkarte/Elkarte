@@ -225,7 +225,7 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// Delete any likes...
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}message_likes
 		WHERE id_member IN ({array_int:users})',
 		array(
@@ -444,8 +444,7 @@ function deleteMembers($users, $check_not_admin = false)
  */
 function registerMember(&$regOptions, $return_errors = false)
 {
-	global $scripturl, $txt, $modSettings, $context;
-	global $user_info, $options, $settings;
+	global $scripturl, $txt, $modSettings, $user_info;
 
 	$db = database();
 
@@ -873,7 +872,7 @@ function registerMember(&$regOptions, $return_errors = false)
  */
 function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal = true)
 {
-	global $user_info, $modSettings, $context;
+	global $modSettings;
 
 	$db = database();
 
@@ -979,7 +978,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
  */
 function groupsAllowedTo($permission, $board_id = null)
 {
-	global $modSettings, $board_info;
+	global $board_info;
 
 	$db = database();
 

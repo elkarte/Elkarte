@@ -157,7 +157,7 @@ function url_parts($local, $global)
  */
 function adminLogin($type = 'admin')
 {
-	global $context, $scripturl, $txt, $user_info, $user_settings;
+	global $context, $txt, $user_info;
 
 	loadLanguage('Admin');
 	loadTemplate('Login');
@@ -218,8 +218,6 @@ function adminLogin($type = 'admin')
  */
 function adminLogin_outputPostVars($k, $v)
 {
-	$db = database();
-
 	if (!is_array($v))
 		return '
 <input type="hidden" name="' . htmlspecialchars($k) . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '" />';
@@ -286,7 +284,7 @@ function construct_query_string($get)
  */
 function findMembers($names, $use_wildcards = false, $buddies_only = false, $max = 500)
 {
-	global $scripturl, $user_info, $modSettings;
+	global $scripturl, $user_info;
 
 	$db = database();
 
