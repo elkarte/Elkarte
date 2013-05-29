@@ -48,7 +48,7 @@ function list_getNumLanguages()
  */
 function list_getLanguages()
 {
-	global $settings, $language, $context, $txt;
+	global $settings, $language, $txt;
 
 	$db = database();
 
