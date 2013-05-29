@@ -876,7 +876,6 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 		$groups[$row['id_group']] = $row;
 	$db->free_result($request);
 
-	//@todo: $group_id isn't initialized, the code below is probably broken
 	if (is_array($group_id))
 		return $groups;
 	else
