@@ -56,7 +56,6 @@ function automanage_attachments_check_directory()
 	// get our date and random numbers for the directory choices
 	$year = date('Y');
 	$month = date('m');
-	$day = date('d');
 
 	$rand = md5(mt_rand());
 	$rand1 = $rand[1];
