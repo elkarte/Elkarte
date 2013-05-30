@@ -1336,29 +1336,107 @@ function getOtherGroups($curBoard)
 /**
  * Get a list of moderators from a specific board
  * @param int $idboard
+ * @param bool $only_id return only the id of the moderators instead of id and name (default false)
  * @return array
  */
-function getBoardModerators($idboard)
+function getBoardModerators($idboard, $only_id = false)
 {
 	$db = database();
 
 	$moderators = array();
 
+	if ($only_id)
+	{
+		$request = $db->query('', '
+			SELECT id_member
+			FROM {db_prefix}moderators
+			WHERE id_board = {int:current_board}',
+			array(
+				'current_board' => $board,
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$moderators[] = $row['id_member'];
+	}
+	else
+	{
+		$request = $db->query('', '
+			SELECT mem.id_member, mem.real_name
+			FROM {db_prefix}moderators AS mods
+				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
+			WHERE mods.id_board = {int:current_board}',
+			array(
+				'current_board' => $idboard,
+			)
+		);
+
+		while ($row = $db->fetch_assoc($request))
+			$moderators[$row['id_member']] = $row['real_name'];
+	}
+	$db->free_result($request);
+
+	return $moderators;
+}
+
+/**
+ * Get a list of all the board moderators (every board)
+ * @param bool $only_id return only the id of the moderators instead of id and name (default false)
+ * @return array
+ */
+function allBoardModerators($only_id = false)
+{
+	$db = database();
+
+	$moderators = array();
+
+	if ($only_id)
+		$request = $db->query('', '
+			SELECT id_board, id_member
+			FROM {db_prefix}moderators',
+			array(
+			)
+		);
+	else
+		$request = $db->query('', '
+			SELECT mods.id_board, mods.id_member, mem.real_name
+			FROM {db_prefix}moderators AS mods
+				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)',
+			array(
+			)
+		);
+
+	while ($row = $db->fetch_assoc($request))
+		$moderators[$row['id_member']] = $row;
+	$db->free_result($request);
+
+	return $moderators;
+}
+
+/**
+ * Get a list of all the board moderated by a certain user
+ * @param int $id_member the id of a member
+ * @return array
+ */
+function boardsModerated($id_member)
+{
+	$db = database();
+
+	$boards = array();
+
 	$request = $db->query('', '
-		SELECT mem.id_member, mem.real_name
-		FROM {db_prefix}moderators AS mods
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = mods.id_member)
-		WHERE mods.id_board = {int:current_board}',
+		SELECT id_board
+		FROM {db_prefix}moderators
+		WHERE id_member = {int:current_member}',
 		array(
-			'current_board' => $idboard,
+			'current_member' => $id_member,
 		)
 	);
 
 	while ($row = $db->fetch_assoc($request))
-		$moderators[$row['id_member']] = $row['real_name'];
+		$boards[] = $row['id_board'];
 	$db->free_result($request);
 
-	return $moderators;
+	return $boards;
 }
 
 /**

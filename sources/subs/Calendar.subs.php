@@ -979,9 +979,10 @@ function removeEvent($event_id)
  * Gets all the events properties
  *
  * @param int $event_id
+ * @param bool $calendar_only
  * @return array
  */
-function getEventProperties($event_id)
+function getEventProperties($event_id, $calendar_only = false)
 {
 	$db = database();
 
@@ -989,13 +990,13 @@ function getEventProperties($event_id)
 		SELECT
 			c.id_event, c.id_board, c.id_topic, MONTH(c.start_date) AS month,
 			DAYOFMONTH(c.start_date) AS day, YEAR(c.start_date) AS year,
-			(TO_DAYS(c.end_date) - TO_DAYS(c.start_date)) AS span, c.id_member, c.title,
+			(TO_DAYS(c.end_date) - TO_DAYS(c.start_date)) AS span, c.id_member, c.title' . ($simple ? '' : ',
 			t.id_first_msg, t.id_member_started,
-			mb.real_name, m.modified_time
-		FROM {db_prefix}calendar AS c
+			mb.real_name, m.modified_time') . '
+		FROM {db_prefix}calendar AS c' . ($simple ? '' : '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = c.id_topic)
 			LEFT JOIN {db_prefix}members AS mb ON (mb.id_member = t.id_member_started)
-			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg  = t.id_first_msg)
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg  = t.id_first_msg)') . '
 		WHERE c.id_event = {int:id_event}
 		LIMIT 1',
 		array(
@@ -1010,27 +1011,32 @@ function getEventProperties($event_id)
 	$row = $db->fetch_assoc($request);
 	$db->free_result($request);
 
-	$return_value = array(
-		'boards' => array(),
-		'board' => $row['id_board'],
-		'new' => 0,
-		'eventid' => $event_id,
-		'year' => $row['year'],
-		'month' => $row['month'],
-		'day' => $row['day'],
-		'title' => $row['title'],
-		'span' => 1 + $row['span'],
-		'member' => $row['id_member'],
-		'realname' => $row['real_name'],
-		'sequence' => $row['modified_time'],
-		'topic' => array(
-			'id' => $row['id_topic'],
-			'member_started' => $row['id_member_started'],
-			'first_msg' => $row['id_first_msg'],
-		),
-	);
+	if ($calendar_only)
+		$return_value = $row;
+	else
+	{
+		$return_value = array(
+			'boards' => array(),
+			'board' => $row['id_board'],
+			'new' => 0,
+			'eventid' => $event_id,
+			'year' => $row['year'],
+			'month' => $row['month'],
+			'day' => $row['day'],
+			'title' => $row['title'],
+			'span' => 1 + $row['span'],
+			'member' => $row['id_member'],
+			'realname' => $row['real_name'],
+			'sequence' => $row['modified_time'],
+			'topic' => array(
+				'id' => $row['id_topic'],
+				'member_started' => $row['id_member_started'],
+				'first_msg' => $row['id_first_msg'],
+			),
+		);
 
-	$return_value['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $return_value['month'] == 12 ? 1 : $return_value['month'] + 1, 0, $return_value['month'] == 12 ? $return_value['year'] + 1 : $return_value['year']));
+		$return_value['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $return_value['month'] == 12 ? 1 : $return_value['month'] + 1, 0, $return_value['month'] == 12 ? $return_value['year'] + 1 : $return_value['year']));
+	}
 
 	return $return_value;
 }
