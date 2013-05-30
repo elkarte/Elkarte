@@ -1475,7 +1475,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 				$layers[$layer] = $key * 100;
 		else
 			$layers = array('html' => 0, 'body' => 100);
-		Template_Layers::getInstance()->add($layers);
+		foreach ($layers as $layer => $priority)
+			Template_Layers::getInstance()->add($layer, $priority);
 	}
 
 	// Initialize the theme.

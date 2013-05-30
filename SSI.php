@@ -197,7 +197,8 @@ if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $use
 if (isset($ssi_layers))
 {
 	Template_Layers::getInstance()->removeAll();
-	Template_Layers::getInstance()->add($ssi_layers);
+	foreach ($ssi_layers as $layer)
+		Template_Layers::getInstance()->add($layer);
 	template_header();
 }
 else

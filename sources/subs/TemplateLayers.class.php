@@ -22,12 +22,42 @@ class Template_Layers
 	/**
 	 * An array containing all the layers added
 	 */
-	private $_all_layers = array();
+	private $_all_general = array();
 
 	/**
-	 * The highest priority assigned at a certain moment
+	 * An array containing all the layers that should go *after* another one
 	 */
-	private $_highest_priority = 100;
+	private $_all_after = array();
+
+	/**
+	 * An array containing all the layers that should go *before* another one
+	 */
+	private $_all_before = array();
+
+	/**
+	 * An array containing all the layers that should go at the end of the list
+	 */
+	private $_all_end = array();
+
+	/**
+	 * An array containing all the layers that should go at the beginning
+	 */
+	private $_all_begin = array();
+
+	/**
+	 * The highest priority assigned at a certain moment for $_all_general
+	 */
+	private $_general_highest_priority = 100;
+
+	/**
+	 * The highest priority assigned at a certain moment for $_all_end
+	 */
+	private $_end_highest_priority = 100;
+
+	/**
+	 * The highest priority assigned at a certain moment for $_all_begin
+	 */
+	private $_begin_highest_priority = 100;
 
 	/**
 	 * Used in prepareContext to store the layers in the order
@@ -45,20 +75,13 @@ class Template_Layers
 	/**
 	 * Add a new layer to the pile
 	 *
-	 * @param mixed $layers can be a single layer or an array of layers
-	 *              if an array is passed it must be in the form:
-	 *                array('layer_name' => PRIORITY)
-	 *              where PRIORITY is an integer
+	 * @param string $layer name of a layer
 	 * @param int $priority an integer defining the priority of the layer.
-	 *            If $layers is an array $priority is ignored
 	 */
-	public function add($layers = array(), $priority = null)
+	public function add($layer, $priority = null)
 	{
-		if (!is_array($layers))
-			$layers = array($layers => $priority === null ? $this->_highest_priority : (int) $priority);
-
-		$this->_all_layers = array_merge($this->_all_layers, $layers);
-		$this->_highest_priority = max($this->_all_layers) + 100;
+		$this->_all_general[$layer] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+		$this->_general_highest_priority = max($this->_all_general) + 100;
 	}
 
 	/**
@@ -66,14 +89,10 @@ class Template_Layers
 	 *
 	 * @param string $layer the name of a layer
 	 * @param string $following the name of the layer before which $layer must be added
-	 * @param bool $force if true $layer is added even if $following doesn't exist (default false)
 	 */
-	public function addBefore($layer, $following, $force = false)
+	public function addBefore($layer, $following)
 	{
-		if (isset($this->_all_layers[$following]))
-			$this->add(array($layer => $this->_all_layers[$following] - 1));
-		elseif ($force)
-			$this->add($layer);
+		$this->_all_before[$layer] = $following;
 	}
 
 	/**
@@ -81,14 +100,34 @@ class Template_Layers
 	 *
 	 * @param string $layer the name of a layer
 	 * @param string $following the name of the layer after which $layer must be added
-	 * @param bool $force if true $layer is added even if $following doesn't exist (default false)
 	 */
-	public function addAfter($layer, $previous, $force = false)
+	public function addAfter($layer, $previous)
 	{
-		if (isset($this->_all_layers[$previous]))
-			$this->add(array($layer => $this->_all_layers[$previous] + 1));
-		elseif ($force)
-			$this->add($layer);
+		$this->_all_after[$layer] = $previous;
+	}
+
+	/**
+	 * Add a layer at the end of the pile
+	 *
+	 * @param string $layer name of a layer
+	 * @param int $priority an integer defining the priority of the layer.
+	 */
+	public function addEnd($layer, $priority = null)
+	{
+		$this->_all_end[$layer] = $priority === null ? $this->_end_highest_priority : (int) $priority;
+		$this->_end_highest_priority = max($this->_all_end) + 100;
+	}
+
+	/**
+	 * Add a layer at the beginning of the pile
+	 *
+	 * @param string $layer name of a layer
+	 * @param int $priority an integer defining the priority of the layer.
+	 */
+	public function addBegin($layer, $priority = null)
+	{
+		$this->_all_begin[$layer] = $priority === null ? $this->_begin_highest_priority : (int) $priority;
+		$this->_begin_highest_priority = max($this->_all_begin) + 100;
 	}
 
 	/**
@@ -98,8 +137,16 @@ class Template_Layers
 	 */
 	public function remove($layer)
 	{
-		if (isset($this->_all_layers[$layer]))
-			unset($this->_all_layers[$layer]);
+		if (isset($this->_all_general[$layer]))
+			unset($this->_all_general[$layer]);
+		elseif (isset($this->_all_after[$layer]))
+			unset($this->_all_after[$layer]);
+		elseif (isset($this->_all_before[$layer]))
+			unset($this->_all_before[$layer]);
+		elseif (isset($this->_all_end[$layer]))
+			unset($this->_all_end[$layer]);
+		elseif (isset($this->_all_begin[$layer]))
+			unset($this->_all_begin[$layer]);
 	}
 
 	/**
@@ -107,7 +154,12 @@ class Template_Layers
 	 */
 	public function removeAll()
 	{
-		$this->_all_layers = array();
+		$this->_all_general = array();
+		$this->_all_after = array();
+		$this->_all_before = array();
+		$this->_all_end = array();
+		$this->_all_begin = array();
+		$this->_general_highest_priority = 100;
 	}
 
 	/**
@@ -121,8 +173,71 @@ class Template_Layers
 	{
 		$this->_sorted_layers = array();
 
-		asort($this->_all_layers);
-		$this->_sorted_layers = array_keys($this->_all_layers);
+		// Let's gain some space between the layers to be sure to be able to fit all the before/after
+		$spacing = (count($this->_all_after) + count($this->_all_before)) * 2;
+		array_map(create_function('$priority', 'return $priority * ' . $spacing . ';'), $this->_all_begin);
+		array_map(create_function('$priority', 'return $priority * ' . $spacing . ';'), $this->_all_general);
+		array_map(create_function('$priority', 'return $priority * ' . $spacing . ';'), $this->_all_end);
+
+		// Sorting
+		asort($this->_all_begin);
+		asort($this->_all_general);
+		asort($this->_all_end);
+
+		// The easy ones: just merge
+		$all_layers = array_merge(
+			$this->_all_begin,
+			$this->_all_general,
+			$this->_all_end
+		);
+
+		// Now the funny part, let's start with some cleanup: collecting all the layers we know and pruning those that cannot be placed somewhere
+		$all_known = array_merge(array_keys($all_layers), array_keys($this->_all_after), array_keys($this->_all_before));
+
+		$all['before'] = array();
+		foreach ($this->_all_before as $key => $value)
+			if (in_array($key, $all_known))
+				$all['before'][$key] = $value;
+
+		$all['after'] = array();
+		foreach ($this->_all_after as $key => $value)
+			if (in_array($key, $all_known))
+				$all['after'][$key] = $value;
+
+		// This is terribly optimized, though it shouldn't loop over too many things (hopefully)
+		// It "iteratively" adds all the after/before layers shifting priority
+		// of all the other layers to ensure each one has a different value
+		while (!empty($all['after']) || !empty($all['before']))
+		{
+			foreach (array('after' => 1, 'before' => -1) as $where => $inc)
+			{
+				if (empty($all[$where]))
+					continue;
+
+				foreach ($all[$where] as $layer => $reference)
+					if (isset($all_layers[$reference]))
+					{
+						$priority_threshold = $all_layers[$reference];
+						foreach ($all_layers as $key => $val)
+							switch ($where)
+							{
+								case 'after':
+									if ($val <= $priority_threshold)
+										$all_layers[$key] -= $inc;
+									break;
+								case 'before':
+									if ($val >= $priority_threshold)
+										$all_layers[$key] -= $inc;
+									break;
+							}
+						unset($all[$where][$layer]);
+						$all_layers[$layer] = $priority_threshold;
+					}
+			}
+		}
+
+		asort($all_layers);
+		$this->_sorted_layers = array_keys($all_layers);
 
 		return $this->_sorted_layers;
 	}
@@ -144,10 +259,11 @@ class Template_Layers
 	 * Check if at least one layer has been added
 	 *
 	 * @return bool true if at least one layer has been added
+	 * @todo at that moment _all_after and _all_before are not considered because they may not be "forced"
 	 */
 	public function hasLayers()
 	{
-		return !empty($this->_all_layers);
+		return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
 	}
 
 	/**
