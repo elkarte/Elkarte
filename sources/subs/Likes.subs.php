@@ -210,7 +210,7 @@ function addLike($id_liker, $liked_message, $direction)
 
 		// If we are liking the first message in a topic, we are de facto liking the topic
 		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
-			increaseTopicLikes($topic, $direction);
+			increaseTopicLikes($liked_message['id_topic'], $direction);
 
 		// And update the stats
 		updateMemberData($id_liker, array('likes_given' => '+'));
@@ -231,7 +231,7 @@ function addLike($id_liker, $liked_message, $direction)
 
 		// If we are unliking the first message in a topic, we are de facto unliking the topic
 		if ($liked_message['id_msg'] === $liked_message['id_first_msg'])
-			increaseTopicLikes($topic, $direction);
+			increaseTopicLikes($liked_message['id_topic'], $direction);
 
 		// And update the stats
 		updateMemberData($id_liker, array('likes_given' => '-'));
