@@ -1,4 +1,4 @@
-<?php
+fi<?php
 
 /**
  * @name      ElkArte Forum
@@ -1768,36 +1768,4 @@ function countMembersInGroup($id_group = 0)
 	$db->free_result($request);
 
 	return $num_members;
-}
-
-/**
- * helper function to find members via ajax request
- *
- * @param string $search
- * @param array $buddies
- * @return array
- */
-function findMembers($search, $buddies = null)
-{
-	global $user_info;
-
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT real_name
-		FROM {db_prefix}members
-		WHERE real_name LIKE {string:search}' . (isset($buddies) ? '
-			AND id_member IN ({array_int:buddy_list})' : '') . '
-			AND is_activated IN (1, 11)
-		LIMIT ' . (Util::strlen($search) <= 2 ? '100' : '800'),
-		array(
-			'buddy_list' => $user_info['buddies'],
-			'search' => $search,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-		$members = $row;
-	$db->free_result($request);
-
-	return $members;
 }

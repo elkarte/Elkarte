@@ -182,7 +182,6 @@ class Site_Dispatcher
 			'removepoll' => array('Poll.controller.php', 'Poll_Controller', 'action_removepoll'),
 			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),
-			'requestmembers' => array('Members.controller.php', 'Members_Controller', 'action_requestmembers'),
 			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
 			'search' => array('Search.controller.php', 'action_plushsearch1'),
 			'search2' => array('Search.controller.php', 'action_plushsearch2'),

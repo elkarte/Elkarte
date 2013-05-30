@@ -57,40 +57,6 @@ class Members_Controller
 	}
 
 	/**
-	 * Outputs each member name on its own line.
-	 * This function is used by javascript to find members matching the request.
-	 * Accessed by action=requestmembers.
-	 */
-	public function action_requestmembers()
-	{
-		require_once(SUBSDIR . '/Members.subs.php');
-
-		checkSession('get');
-
-		$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search']) . '*';
-		$_REQUEST['search'] = trim(Util::strtolower($_REQUEST['search']));
-		$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
-
-		if (function_exists('iconv'))
-			header('Content-Type: text/plain; charset=UTF-8');
-
-		$members = findMembers($_REQUEST['search'], $_REQUEST['buddies']);
-
-		foreach ($members as $row)
-		{
-			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
-
-			if (preg_match('~&#\d+;~', $row['real_name']) != 0)
-				$row['real_name'] = preg_replace_callback('~&#(\d+);~', 'fixchar__callback', $row['real_name']);
-
-			echo $row['real_name'], "\n";
-		}
-	
-
-		obExit(false);
-	}
-
-	/**
 	 * Called by index.php?action=findmember.
 	 * This function result is used as a popup for searching members.
 	 * @uses sub template find_members of the Members template.
