@@ -126,7 +126,7 @@ body.action_admin .navigate_section ul li a {
 #core_features, #generate_reports_type,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper{
-	background: #f0f4f7;
+	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	border: 1px solid #ccc;
@@ -692,6 +692,21 @@ ul.package_servers li {
 	background-color: #eee;
 }
 
+/* Styles for anti-spam questions.
+------------------------------------------------------- */
+dl.settings dt.questions {
+	width: 65%;
+}
+dl.settings dd.questions {
+	width: 35%;
+}
+dl.settings dt.questions input{
+	width: 80%;
+}
+dl.settings dd.questions input {
+	width: 90%;
+}
+
 /* Styles for the BBC permissions
 ------------------------------------------------- */
 .list_bbc {
@@ -701,7 +716,7 @@ ul.package_servers li {
 /* Styles for the manage boards section.
 ------------------------------------------------- */
 #manage_boards {
-	background: #f0f4f7;
+	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	border: 1px solid #ccc;

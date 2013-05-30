@@ -20,27 +20,23 @@ if (!defined('ELKARTE'))
  *
  * @param array $filter
  */
-function deleteBadBehavior($filter)
+function deleteBadBehavior($type ,$filter)
 {
-	global $smcFunc;
-
-	// Make sure the session exists and the token is correct
-	checkSession();
-	validateToken('admin-bbl');
+	$db = database();
 
 	// Delete all or just some?
-	if (isset($_POST['delall']) && empty($filter))
+	if ($type === 'delall' && empty($filter))
 	{
-		$smcFunc['db_query']('truncate_table', '
+		$db->query('truncate_table', '
 			TRUNCATE {db_prefix}log_badbehavior',
 			array(
 			)
 		);
 	}
 	// Deleting all with a filter?
-	elseif (isset($_POST['delall']) && !empty($filter))
+	elseif ($type === 'delall'  && !empty($filter))
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_badbehavior
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 			array(
@@ -49,9 +45,9 @@ function deleteBadBehavior($filter)
 		);
 	}
 	// Just specific entries?
-	elseif (!empty($_POST['delete']))
+	elseif ($type == 'delete')
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_badbehavior
 			WHERE id IN ({array_int:log_list})',
 			array(
@@ -59,14 +55,10 @@ function deleteBadBehavior($filter)
 			)
 		);
 
-		$start = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
-
-		// Go back to where we were.
-		redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $start . (!empty($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));
+		return 'delete';
 	}
 
-	// Back to the badbehavior log
-	redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
+	return 'delall';
 }
 
 /**
@@ -77,9 +69,9 @@ function deleteBadBehavior($filter)
  */
 function getBadBehaviorLogEntryCount($filter)
 {
-	global $smcFunc;
+	$db = database();
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
@@ -87,8 +79,8 @@ function getBadBehaviorLogEntryCount($filter)
 			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
 	);
-	list ($entry_count) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($entry_count) = $db->fetch_row($result);
+	$db->free_result($result);
 
 	return $entry_count;
 }
@@ -100,15 +92,19 @@ function getBadBehaviorLogEntryCount($filter)
  * @param int $items_per_page
  * @param string $sort
  * @param array $filter
- * @param array $members
  */
-function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $filter = '')
+function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 {
-	global $context, $scripturl, $smcFunc;
+	global $scripturl;
+
+	$db = database();
 
 	require_once(EXTDIR . '/bad-behavior/bad-behavior/responses.inc.php');
 
-	$request = $smcFunc['db_query']('', '
+	$bb_entries = array();
+
+	$db = database();
+	$request = $db->query('', '
 		SELECT id, ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
@@ -118,21 +114,29 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $fi
 			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
 	);
-	$context['bb_entries'] = array();
-	$members = array();
-	for ($i = 0; $row = $smcFunc['db_fetch_assoc']($request); $i++)
+
+	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
 	{
 		// Turn the key in to something nice to show
 		$key_response = bb2_get_response($row['valid']);
 
-		$context['bb_entries'][$row['id']] = array(
+		//Prevent undefined errors and log ..
+		if($key_response[0] == '00000000')
+		{
+			$key_response['response'] = '';
+			$key_response['explanation'] = '';
+			$key_response['log'] = '';
+			trigger_error('bb2_get_response(): returned invalid response key \'' . $key_response[0] . '\'', E_USER_WARNING);
+		}
+
+		$bb_entries[$row['id']] = array(
 			'alternate' => $i %2 == 0,
 			'ip' => $row['ip'],
 			'request_method' => $row['request_method'],
 			'server_protocol' => $row['server_protocol'],
 			'user_agent' => array(
 				'html' => $row['user_agent'],
-				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['user_agent']))
+				'href' => base64_encode($db->escape_wildcard_string($row['user_agent']))
 			),
 			'request_entity' => $row['request_entity'],
 			'valid' => array(
@@ -146,11 +150,11 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $fi
 				'ip' => $row['ip'],
 				'session' => $row['session']
 			),
-			'date' => timeformat($row['date']),
+			'date' => standardTime($row['date']),
 			'timestamp' => $row['date'],
 			'request_uri' => array(
 				'html' => htmlspecialchars((substr($row['request_uri'], 0, 1) === '?' ? $scripturl : '') . $row['request_uri']),
-				'href' => base64_encode($smcFunc['db_escape_wildcard_string']($row['request_uri']))
+				'href' => base64_encode($db->escape_wildcard_string($row['request_uri']))
 			),
 			'http_headers' => array(
 				'html' => str_replace("\n", '<br />', $row['http_headers']),
@@ -158,9 +162,8 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, &$members, $fi
 			),
 			'id' => $row['id'],
 		);
-
-		// Make a list of members to load later.
-		$members[$row['id_member']] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
+
+	return $bb_entries;
 }

@@ -20,9 +20,9 @@ if (!defined('ELKARTE'))
  */
 function followupTopics($messages, $include_approved = false)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT fu.derived_from, fu.follow_up, m.subject
 		FROM {db_prefix}follow_ups as fu
 			LEFT JOIN {db_prefix}topics as t ON (t.id_topic = fu.follow_up)
@@ -37,7 +37,7 @@ function followupTopics($messages, $include_approved = false)
 	);
 
 	$returns = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$returns[$row['derived_from']][] = $row;
 
 	return $returns;
@@ -48,9 +48,9 @@ function followupTopics($messages, $include_approved = false)
  */
 function topicStartedHere($topic, $include_approved = false)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT fu.derived_from, m.subject
 		FROM {db_prefix}follow_ups as fu
 			LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)
@@ -65,7 +65,7 @@ function topicStartedHere($topic, $include_approved = false)
 	);
 
 	$returns = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$returns = $row;
 
 	return $returns;
@@ -76,9 +76,9 @@ function topicStartedHere($topic, $include_approved = false)
  */
 function linkMessages($msg, $topic)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_insert']('ignore',
+	$db->insert('ignore',
 		'{db_prefix}follow_ups',
 		array('follow_up' => 'int', 'derived_from' => 'int'),
 		array($topic, $msg),
@@ -93,9 +93,9 @@ function linkMessages($msg, $topic)
  */
 function unlinkMessages($msg, $topic)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE derived_from = {int:id_msg}
 			AND follow_up = {int:id_topic}
@@ -112,9 +112,9 @@ function unlinkMessages($msg, $topic)
  */
 function removeFollowUpsByTopic($topics)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE follow_up IN ({array_int:id_topics})',
 		array(
@@ -128,9 +128,9 @@ function removeFollowUpsByTopic($topics)
  */
 function removeFollowUpsByMessage($msgs)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}follow_ups
 		WHERE derived_from IN ({array_int:id_msgs})',
 		array(

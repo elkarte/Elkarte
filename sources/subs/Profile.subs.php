@@ -19,13 +19,56 @@ if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
+ * Find the ID of the "current" member
+ *
+ * @param $fatal if the function ends in a fatal error in case of problems (default true)
+ * @param $reload_id if true the already set value is ignored (default false)
+ *
+ * @return mixed and integer if no error, false in case of problems if $fatal is false
+ */
+function currentMemberID($fatal = true, $reload_id = false)
+{
+	global $user_info;
+	static $memID;
+
+	// If we already
+	if (isset($memID) && !$reload_id)
+		return $memID;
+
+	// Did we get the user by name...
+	if (isset($_REQUEST['user']))
+		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
+	// ... or by id_member?
+	elseif (!empty($_REQUEST['u']))
+		$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
+	// If it was just ?action=profile, edit your own profile.
+	else
+		$memberResult = loadMemberData($user_info['id'], false, 'profile');
+
+	// Check if loadMemberData() has returned a valid result.
+	if (!is_array($memberResult))
+	{
+		if ($fatal)
+			fatal_lang_error('not_a_user', false);
+		else
+			return false;
+	}
+
+	// If all went well, we have a valid member ID!
+	list ($memID) = $memberResult;
+	return $memID;
+}
+
+/**
  * Setup the context for a page load!
  *
  * @param array $fields
  */
 function setupProfileContext($fields)
 {
-	global $profile_fields, $context, $cur_profile, $smcFunc, $txt;
+	global $profile_fields, $context, $cur_profile, $txt;
+
+	$db = database();
 
 	// Make sure we have this!
 	loadProfileFields(true);
@@ -114,7 +157,9 @@ function setupProfileContext($fields)
  */
 function loadCustomFields($memID, $area = 'summary')
 {
-	global $context, $txt, $user_profile, $smcFunc, $user_info, $settings, $scripturl;
+	global $context, $txt, $user_profile, $user_info, $settings, $scripturl;
+
+	$db = database();
 
 	// Get the right restrictions in place...
 	$where = 'active = 1';
@@ -133,7 +178,7 @@ function loadCustomFields($memID, $area = 'summary')
 		$where .= ' AND show_profile = {string:area}';
 
 	// Load all the relevant fields - and data.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
 			default_value, bbc, enclose, placement
@@ -145,7 +190,7 @@ function loadCustomFields($memID, $area = 'summary')
 	);
 	$context['custom_fields'] = array();
 	$context['custom_fields_required'] = false;
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Shortcut.
 		$exists = $memID && isset($user_profile[$memID], $user_profile[$memID]['options'][$row['col_name']]);
@@ -154,7 +199,7 @@ function loadCustomFields($memID, $area = 'summary')
 		// If this was submitted already then make the value the posted version.
 		if (isset($_POST['customfield']) && isset($_POST['customfield'][$row['col_name']]))
 		{
-			$value = $smcFunc['htmlspecialchars']($_POST['customfield'][$row['col_name']]);
+			$value = Util::htmlspecialchars($_POST['customfield'][$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
 					$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}
@@ -233,7 +278,7 @@ function loadCustomFields($memID, $area = 'summary')
 		);
 		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	call_integration_hook('integrate_load_custom_profile_fields', array($memID, $area));
 }
@@ -245,7 +290,9 @@ function loadCustomFields($memID, $area = 'summary')
  */
 function loadProfileFields($force_reload = false)
 {
-	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $smcFunc, $cur_profile, $language;
+	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $cur_profile, $language;
+
+	$db = database();
 
 	// Don't load this twice!
 	if (!empty($profile_fields) && !$force_reload)
@@ -397,7 +444,7 @@ function loadProfileFields($force_reload = false)
 				// Do they need to revalidate? If so schedule the function!
 				if ($isValid === true && !empty($modSettings[\'send_validation_onChange\']) && !allowedTo(\'moderate_forum\'))
 				{
-					require_once(SUBSDIR . \'/Members.subs.php\');
+					require_once(SUBSDIR . \'/Auth.subs.php\');
 					$profile_vars[\'validation_code\'] = generateValidationCode();
 					$profile_vars[\'is_activated\'] = 2;
 					$context[\'profile_execute_on_save\'][] = \'profileSendActivation\';
@@ -440,9 +487,11 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_extra',
 			'enabled' => $modSettings['theme_allow'] || allowedTo('admin_forum'),
 			'preload' => create_function('', '
-				global $smcFunc, $context, $cur_profile, $txt;
+				global $context, $cur_profile, $txt;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$db = database();
+
+				$request = $db->query(\'\', \'
 					SELECT value
 					FROM {db_prefix}themes
 					WHERE id_theme = {int:id_theme}
@@ -452,8 +501,8 @@ function loadProfileFields($force_reload = false)
 						\'variable\' => \'name\',
 					)
 				);
-				list ($name) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+				list ($name) = $db->fetch_row($request);
+				$db->free_result($request);
 
 				$context[\'member\'][\'theme\'] = array(
 					\'id\' => $cur_profile[\'id_theme\'],
@@ -570,7 +619,9 @@ function loadProfileFields($force_reload = false)
 			'save_key' => 'passwd',
 			// Note this will only work if passwrd2 also exists!
 			'input_validate' => create_function('&$value', '
-				global $user_info, $smcFunc, $cur_profile;
+				global $user_info, $cur_profile;
+
+				$db = database();
 
 				// If we didn\'t try it then ignore it!
 				if ($value == \'\')
@@ -610,9 +661,7 @@ function loadProfileFields($force_reload = false)
 			'size' => 50,
 			'permission' => 'profile_extra',
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
-
-				if ($smcFunc[\'strlen\']($value) > 50)
+				if (Util::strlen($value) > 50)
 					return \'personal_text_too_long\';
 
 				return true;
@@ -667,13 +716,13 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
 			'input_validate' => create_function('&$value', '
-				global $context, $smcFunc, $cur_profile;
+				global $context, $cur_profile;
 
 				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
 				if (trim($value) == \'\')
 					return \'no_name\';
-				elseif ($smcFunc[\'strlen\']($value) > 60)
+				elseif (Util::strlen($value) > 60)
 					return \'name_too_long\';
 				elseif ($cur_profile[\'real_name\'] != $value)
 				{
@@ -786,7 +835,7 @@ function loadProfileFields($force_reload = false)
 				);
 
 				$context[\'member\'][\'time_format\'] = $cur_profile[\'time_format\'];
-				$context[\'current_forum_time\'] = timeformat(time() - $user_info[\'time_offset\'] * 3600, false);
+				$context[\'current_forum_time\'] = standardTime(time() - $user_info[\'time_offset\'] * 3600, false);
 				$context[\'current_forum_time_js\'] = strftime(\'%Y,\' . ((int) strftime(\'%m\', time() + $modSettings[\'time_offset\'] * 3600) - 1) . \',%d,%H,%M,%S\', time() + $modSettings[\'time_offset\'] * 3600);
 				$context[\'current_forum_time_hour\'] = (int) strftime(\'%H\', forum_time(false));
 				return true;
@@ -820,9 +869,7 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_title',
 			'enabled' => !empty($modSettings['titlesEnable']),
 			'input_validate' => create_function('&$value', '
-				global $smcFunc;
-
-				if ($smcFunc[\'strlen\'] > 50)
+				if (Util::strlen($value) > 50)
 					return \'user_title_too_long\';
 
 				return true;
@@ -881,7 +928,9 @@ function loadProfileFields($force_reload = false)
 function saveProfileFields()
 {
 	global $profile_fields, $profile_vars, $context, $old_profile;
-	global $post_errors, $modSettings, $cur_profile, $smcFunc;
+	global $post_errors, $modSettings, $cur_profile;
+
+	$db = database();
 
 	// Load them up.
 	loadProfileFields();
@@ -1021,7 +1070,9 @@ function saveProfileFields()
  */
 function profileValidateEmail($email, $memID = 0)
 {
-	global $smcFunc, $context;
+	global $context;
+
+	$db = database();
 
 	$email = strtr($email, array('&#039;' => '\''));
 
@@ -1032,7 +1083,7 @@ function profileValidateEmail($email, $memID = 0)
 		return 'bad_email';
 
 	// Email addresses should be and stay unique.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . ($memID != 0 ? 'id_member != {int:selected_member} AND ' : '') . '
@@ -1044,9 +1095,9 @@ function profileValidateEmail($email, $memID = 0)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) > 0)
+	if ($db->num_rows($request) > 0)
 		return 'email_taken';
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return true;
 }
@@ -1062,7 +1113,9 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
 {
 	global $user_info, $txt, $modSettings, $user_profile;
 	global $context, $settings;
-	global $smcFunc;
+
+
+	$db = database();
 
 	// These make life easier....
 	$old_profile = &$user_profile[$memID];
@@ -1148,7 +1201,9 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
  */
 function makeThemeChanges($memID, $id_theme)
 {
-	global $modSettings, $smcFunc, $context, $user_info;
+	global $modSettings, $context, $user_info;
+
+	$db = database();
 
 	$reservedVars = array(
 		'actual_theme_url',
@@ -1174,7 +1229,7 @@ function makeThemeChanges($memID, $id_theme)
 		fatal_lang_error('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:is_active}',
@@ -1183,9 +1238,9 @@ function makeThemeChanges($memID, $id_theme)
 		)
 	);
 	$custom_fields = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$custom_fields[] = $row['col_name'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// These are the theme changes...
 	$themeSetArray = array();
@@ -1230,7 +1285,7 @@ function makeThemeChanges($memID, $id_theme)
 	{
 		if (!empty($themeSetArray))
 		{
-			$smcFunc['db_insert']('replace',
+			$db->insert('replace',
 				'{db_prefix}themes',
 				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 				$themeSetArray,
@@ -1240,7 +1295,7 @@ function makeThemeChanges($memID, $id_theme)
 
 		if (!empty($erase_options))
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}themes
 				WHERE id_theme != {int:id_theme}
 					AND variable IN ({array_string:erase_variables})
@@ -1266,27 +1321,61 @@ function makeThemeChanges($memID, $id_theme)
  */
 function makeNotificationChanges($memID)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Update the boards they are being notified on.
-	if (isset($_POST['edit_notify_boards']) && !empty($_POST['notify_boards']))
+	if (isset($_POST['edit_notify_boards']))
 	{
-		// Make sure only integers are deleted.
+		if (!isset($_POST['notify_boards']))
+			$_POST['notify_boards'] = array();
+
+		// Make sure only integers are added/deleted.
 		foreach ($_POST['notify_boards'] as $index => $id)
 			$_POST['notify_boards'][$index] = (int) $id;
 
-		// id_board = 0 is reserved for topic notifications.
-		$_POST['notify_boards'] = array_diff($_POST['notify_boards'], array(0));
+		// id_board = 0 is reserved for topic notifications only
+		$notification_wanted = array();
+		$notification_wanted = array_diff($_POST['notify_boards'], array(0));
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}log_notify
-			WHERE id_board IN ({array_int:board_list})
-				AND id_member = {int:selected_member}',
+		// Gather up any any existing board notifications.
+		$request = $db->query('', '
+			SELECT id_board
+			FROM {db_prefix}log_notify
+			WHERE id_member = {int:selected_member}',
 			array(
-				'board_list' => $_POST['notify_boards'],
 				'selected_member' => $memID,
 			)
 		);
+		$notification_current = array();
+		while ($row = $db->fetch_assoc($request))
+			$notification_current[] = $row['id_board'];
+		$db->free_result($request);
+
+		// And remove what they no longer want
+		$notification_deletes = array_diff($notification_current, $notification_wanted);
+		if (!empty($notification_deletes))
+			$db->query('', '
+				DELETE FROM {db_prefix}log_notify
+				WHERE id_board IN ({array_int:board_list})
+					AND id_member = {int:selected_member}',
+				array(
+					'board_list' =>$notification_deletes,
+					'selected_member' => $memID,
+				)
+			);
+
+		// Now add in what they do want
+		$notification_inserts = array();
+		foreach ($notification_wanted as $id)
+			$notification_inserts[] = array($memID, $id);
+
+		if (!empty($notification_inserts));
+			$db->insert('ignore',
+				'{db_prefix}log_notify',
+				array('id_member' => 'int', 'id_board' => 'int'),
+				$notification_inserts,
+				array('id_member', 'id_board')
+			);
 	}
 
 	// We are editing topic notifications......
@@ -1298,7 +1387,7 @@ function makeNotificationChanges($memID)
 		// Make sure there are no zeros left.
 		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member = {int:selected_member}',
@@ -1319,7 +1408,9 @@ function makeNotificationChanges($memID)
  */
 function makeCustomFieldChanges($memID, $area, $sanitize = true)
 {
-	global $context, $smcFunc, $user_profile, $user_info, $modSettings;
+	global $context, $user_profile, $user_info, $modSettings;
+
+	$db = database();
 
 	if ($sanitize && isset($_POST['customfield']))
 		$_POST['customfield'] = htmlspecialchars__recursive($_POST['customfield']);
@@ -1327,7 +1418,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	$where = $area == 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
 
 	// Load the fields we are saving too - make sure we save valid data (etc).
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, field_desc, field_type, field_length, field_options, default_value, show_reg, mask, private
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
@@ -1339,7 +1430,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	);
 	$changes = array();
 	$log_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		/* This means don't save if:
 			- The user is NOT an admin.
@@ -1365,7 +1456,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		{
 			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : '';
 			if ($row['field_length'])
-				$value = $smcFunc['substr']($value, 0, $row['field_length']);
+				$value = Util::substr($value, 0, $row['field_length']);
 
 			// Any masks?
 			if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
@@ -1399,24 +1490,21 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			$user_profile[$memID]['options'][$row['col_name']] = $value;
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	call_integration_hook('integrate_save_custom_profile_fields', array(&$changes, &$log_changes, $memID, $area, $sanitize));
 
 	// Make those changes!
 	if (!empty($changes) && empty($context['password_auth_failed']))
 	{
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}themes',
 			array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
 			$changes,
 			array('id_theme', 'variable', 'id_member')
 		);
 		if (!empty($log_changes) && !empty($modSettings['modlog_enabled']))
-		{
-			require_once(SOURCEDIR . '/Logging.php');
 			logActions($log_changes);
-		}
 	}
 }
 
@@ -1425,7 +1513,9 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
  */
 function profileSendActivation()
 {
-	global $profile_vars, $txt, $context, $scripturl, $smcFunc, $cookiename, $cur_profile, $language, $modSettings;
+	global $profile_vars, $txt, $context, $scripturl, $cookiename, $cur_profile, $language, $modSettings;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -1476,7 +1566,9 @@ function profileSendActivation()
  */
 function profileLoadSignatureData()
 {
-	global $modSettings, $context, $txt, $cur_profile, $smcFunc, $memberContext;
+	global $modSettings, $context, $txt, $cur_profile, $memberContext;
+
+	$db = database();
 
 	// Signature limits.
 	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
@@ -1608,7 +1700,9 @@ function profileLoadAvatarData()
  */
 function profileLoadGroups()
 {
-	global $cur_profile, $txt, $context, $smcFunc, $user_settings;
+	global $cur_profile, $txt, $context, $user_settings;
+
+	$db = database();
 
 	$context['member_groups'] = array(
 		0 => array(
@@ -1622,7 +1716,7 @@ function profileLoadGroups()
 	$curGroups = explode(',', $cur_profile['additional_groups']);
 
 	// Load membergroups, but only those groups the user can assign.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT group_name, id_group, hidden
 		FROM {db_prefix}membergroups
 		WHERE id_group != {int:moderator_group}
@@ -1636,7 +1730,7 @@ function profileLoadGroups()
 			'newbie_group' => 4,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// We should skip the administrator group if they don't have the admin_forum permission!
 		if ($row['id_group'] == 1 && !allowedTo('admin_forum'))
@@ -1651,7 +1745,7 @@ function profileLoadGroups()
 			'can_be_primary' => $row['hidden'] != 2,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$context['member']['group_id'] = $user_settings['id_group'];
 
@@ -1664,7 +1758,9 @@ function profileLoadGroups()
  */
 function profileLoadLanguages()
 {
-	global $context, $modSettings, $settings, $cur_profile, $language, $smcFunc;
+	global $context, $modSettings, $settings, $cur_profile, $language;
+
+	$db = database();
 
 	$context['profile_languages'] = array();
 
@@ -1686,7 +1782,9 @@ function profileLoadLanguages()
  */
 function profileReloadUser()
 {
-	global $modSettings, $context, $cur_profile, $smcFunc, $profile_vars;
+	global $modSettings, $context, $cur_profile, $profile_vars;
+
+	$db = database();
 
 	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
@@ -1707,7 +1805,7 @@ function profileReloadUser()
  */
 function profileValidateSignature(&$value)
 {
-	global $modSettings, $smcFunc, $txt;
+	global $modSettings, $txt;
 
 	require_once(SUBSDIR . '/Post.subs.php');
 
@@ -1872,7 +1970,7 @@ function profileValidateSignature(&$value)
 	preparsecode($value);
 
 	// Too long?
-	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && $smcFunc['strlen'](str_replace('<br />', "\n", $value)) > $sig_limits[1])
+	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
 	{
 		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
@@ -1891,7 +1989,9 @@ function profileValidateSignature(&$value)
  */
 function profileSaveAvatarData(&$value)
 {
-	global $modSettings, $smcFunc, $profile_vars, $cur_profile, $context;
+	global $modSettings, $profile_vars, $cur_profile, $context;
+
+	$db = database();
 
 	$memID = $context['id_member'];
 	if (empty($memID) && !empty($context['password_auth_failed']))
@@ -2078,7 +2178,7 @@ function profileSaveAvatarData(&$value)
 				// Remove previous attachments this member might have had.
 				removeAttachments(array('id_member' => $memID));
 
-				$smcFunc['db_insert']('',
+				$db->insert('',
 					'{db_prefix}attachments',
 					array(
 						'id_member' => 'int', 'attachment_type' => 'int', 'filename' => 'string', 'file_hash' => 'string', 'fileext' => 'string', 'size' => 'int',
@@ -2091,7 +2191,7 @@ function profileSaveAvatarData(&$value)
 					array('id_attach')
 				);
 
-				$cur_profile['id_attach'] = $smcFunc['db_insert_id']('{db_prefix}attachments', 'id_attach');
+				$cur_profile['id_attach'] = $db->insert_id('{db_prefix}attachments', 'id_attach');
 				$cur_profile['filename'] = $destName;
 				$cur_profile['attachment_type'] = empty($modSettings['custom_avatar_enabled']) ? 0 : 1;
 
@@ -2133,12 +2233,14 @@ function profileSaveAvatarData(&$value)
  */
 function profileSaveGroups(&$value)
 {
-	global $profile_vars, $old_profile, $context, $smcFunc, $cur_profile;
+	global $profile_vars, $old_profile, $context, $cur_profile;
+
+	$db = database();
 
 	// Do we need to protect some groups?
 	if (!allowedTo('admin_forum'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_group
 			FROM {db_prefix}membergroups
 			WHERE group_type = {int:is_protected}',
@@ -2147,9 +2249,9 @@ function profileSaveGroups(&$value)
 			)
 		);
 		$protected_groups = array(1);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$protected_groups[] = $row['id_group'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$protected_groups = array_unique($protected_groups);
 	}
@@ -2195,7 +2297,7 @@ function profileSaveGroups(&$value)
 		// If they would no longer be an admin, look for any other...
 		if (!$stillAdmin)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE (id_group = {int:admin_group} OR FIND_IN_SET({int:admin_group}, additional_groups) != 0)
@@ -2206,8 +2308,8 @@ function profileSaveGroups(&$value)
 					'selected_member' => $context['id_member'],
 				)
 			);
-			list ($another) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			list ($another) = $db->fetch_row($request);
+			$db->free_result($request);
 
 			if (empty($another))
 				fatal_lang_error('at_least_one_admin', 'critical');
@@ -2237,9 +2339,11 @@ function profileSaveGroups(&$value)
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $scripturl;
+	global $scripturl;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
 			lc.log_time, lc.body, lc.counter, lc.id_notice
 		FROM {db_prefix}log_comments AS lc
@@ -2254,20 +2358,20 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$previous_warnings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$previous_warnings[] = array(
 			'issuer' => array(
 				'id' => $row['id_member'],
 				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
 			),
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'reason' => $row['body'],
 			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 			'id_notice' => $row['id_notice'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $previous_warnings;
 }
@@ -2280,9 +2384,9 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
  */
 function list_getUserWarningCount($memID)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE id_recipient = {int:selected_member}
@@ -2292,8 +2396,8 @@ function list_getUserWarningCount($memID)
 			'warning' => 'warning',
 		)
 	);
-	list ($total_warnings) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_warnings) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $total_warnings;
 }

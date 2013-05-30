@@ -1,0 +1,23 @@
+/* This is css file for the blue color variant */
+
+body {
+	background-color: #e9eef2;
+}
+#wrapper {
+	background-color: #fff;
+}
+#top_section {
+	background: #e2e9f3 url(../images/_blue/lower_section.png) 0 0 repeat-x;
+}
+
+.navigate_section  ul{
+	background-color: #eef;
+}
+.cat_bar {
+	background-color: #3e5a78;
+	color: white;
+}
+
+.catbg, .catbg a {
+	color: white;
+}

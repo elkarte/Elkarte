@@ -171,10 +171,11 @@ class ManageCoreFeatures_Controller
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
 				'save_callback' => create_function('$value', '
-					global $smcFunc;
+					$db = database();
+
 					if (!$value)
 					{
-						$smcFunc[\'db_query\'](\'\', \'
+						$db->query(\'\', \'
 							UPDATE {db_prefix}custom_fields
 							SET active = 0\');
 					}
@@ -201,10 +202,10 @@ class ManageCoreFeatures_Controller
 					'drafts_show_saved_enabled' => 2,
 				),
 				'setting_callback' => create_function('$value', '
-					global $smcFunc;
+					$db = database();
 
 					// Set the correct disabled value for the scheduled task.
-					$smcFunc[\'db_query\'](\'\', \'
+					$db->query(\'\', \'
 						UPDATE {db_prefix}scheduled_tasks
 						SET disabled = {int:disabled}
 						WHERE task = {string:task}\',
@@ -229,11 +230,27 @@ class ManageCoreFeatures_Controller
 					'karmaMode' => 2,
 				),
 			),
+			// l = likes.
+			'l' => array(
+				'url' => 'action=admin;area=featuresettings;sa=likes',
+				'settings' => array(
+					'likes_enabled' => 1,
+				),
+			),
 			// ml = moderation log.
 			'ml' => array(
 				'url' => 'action=admin;area=logs;sa=modlog',
 				'settings' => array(
 					'modlog_enabled' => 1,
+				),
+			),
+			// pe = post email
+			'pe' => array(
+				'url' => 'action=admin;area=maillist',
+				'settings' => array(
+					'maillist_enabled' => 1,
+					'pbe_post_enabled' => 2,
+					'pbe_pm_enabled' => 2,
 				),
 			),
 			// pm = post moderation.
@@ -260,10 +277,10 @@ class ManageCoreFeatures_Controller
 					'paid_enabled' => 1,
 				),
 				'setting_callback' => create_function('$value', '
-					global $smcFunc;
+					$db = database();
 
 					// Set the correct disabled value for scheduled task.
-					$smcFunc[\'db_query\'](\'\', \'
+					$db->query(\'\', \'
 						UPDATE {db_prefix}scheduled_tasks
 						SET disabled = {int:disabled}
 						WHERE task = {string:task}\',

@@ -21,231 +21,264 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-/**
- * Who's online, and what are they doing?
- * This function prepares the who's online data for the Who template.
- * It requires the who_view permission.
- * It is enabled with the who_enabled setting.
- * It is accessed via ?action=who.
- *
- * @uses Who template, main sub-template
- * @uses Who language file.
- */
-function action_who()
+class Who_Controller
 {
-	global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext, $smcFunc;
-
-	// Permissions, permissions, permissions.
-	isAllowedTo('who_view');
-
-	// You can't do anything if this is off.
-	if (empty($modSettings['who_enabled']))
-		fatal_lang_error('who_off', false);
-
-	// Load the 'Who' template.
-	loadTemplate('Who');
-	loadLanguage('Who');
-
-	// Sort out... the column sorting.
-	$sort_methods = array(
-		'user' => 'mem.real_name',
-		'time' => 'lo.log_time'
-	);
-
-	$show_methods = array(
-		'members' => '(lo.id_member != 0)',
-		'guests' => '(lo.id_member = 0)',
-		'all' => '1=1',
-	);
-
-	// Store the sort methods and the show types for use in the template.
-	$context['sort_methods'] = array(
-		'user' => $txt['who_user'],
-		'time' => $txt['who_time'],
-	);
-	$context['show_methods'] = array(
-		'all' => $txt['who_show_all'],
-		'members' => $txt['who_show_members_only'],
-		'guests' => $txt['who_show_guests_only'],
-	);
-
-	// Can they see spiders too?
-	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
+	/**
+	 * Default action of this class.
+	 * ?action=who
+	 */
+	function action_index()
 	{
-		$show_methods['spiders'] = '(lo.id_member = 0 AND lo.id_spider > 0)';
-		$show_methods['guests'] = '(lo.id_member = 0 AND lo.id_spider = 0)';
-		$context['show_methods']['spiders'] = $txt['who_show_spiders_only'];
-	}
-	elseif (empty($modSettings['show_spider_online']) && isset($_SESSION['who_online_filter']) && $_SESSION['who_online_filter'] == 'spiders')
-		unset($_SESSION['who_online_filter']);
-
-	// Does the user prefer a different sort direction?
-	if (isset($_REQUEST['sort']) && isset($sort_methods[$_REQUEST['sort']]))
-	{
-		$context['sort_by'] = $_SESSION['who_online_sort_by'] = $_REQUEST['sort'];
-		$sort_method = $sort_methods[$_REQUEST['sort']];
-	}
-	// Did we set a preferred sort order earlier in the session?
-	elseif (isset($_SESSION['who_online_sort_by']))
-	{
-		$context['sort_by'] = $_SESSION['who_online_sort_by'];
-		$sort_method = $sort_methods[$_SESSION['who_online_sort_by']];
-	}
-	// Default to last time online.
-	else
-	{
-		$context['sort_by'] = $_SESSION['who_online_sort_by'] = 'time';
-		$sort_method = 'lo.log_time';
+		// we know how to... peek at who's online
+		$this->action_who();
 	}
 
-	$context['sort_direction'] = isset($_REQUEST['asc']) || (isset($_REQUEST['sort_dir']) && $_REQUEST['sort_dir'] == 'asc') ? 'up' : 'down';
-
-	$conditions = array();
-	if (!allowedTo('moderate_forum'))
-		$conditions[] = '(IFNULL(mem.show_online, 1) = 1)';
-
-	// Fallback to top filter?
-	if (isset($_REQUEST['submit_top']) && isset($_REQUEST['show_top']))
-		$_REQUEST['show'] = $_REQUEST['show_top'];
-	// Does the user wish to apply a filter?
-	if (isset($_REQUEST['show']) && isset($show_methods[$_REQUEST['show']]))
+	/**
+	 * Who's online, and what are they doing?
+	 * This function prepares the who's online data for the Who template.
+	 * It requires the who_view permission.
+	 * It is enabled with the who_enabled setting.
+	 * It is accessed via ?action=who.
+	 *
+	 * @uses Who template, main sub-template
+	 * @uses Who language file.
+	 */
+	function action_who()
 	{
-		$context['show_by'] = $_SESSION['who_online_filter'] = $_REQUEST['show'];
-		$conditions[] = $show_methods[$_REQUEST['show']];
-	}
-	// Perhaps we saved a filter earlier in the session?
-	elseif (isset($_SESSION['who_online_filter']))
-	{
-		$context['show_by'] = $_SESSION['who_online_filter'];
-		$conditions[] = $show_methods[$_SESSION['who_online_filter']];
-	}
-	else
-		$context['show_by'] = $_SESSION['who_online_filter'] = 'all';
+		global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext;
 
-	// Get the total amount of members online.
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}log_online AS lo
-			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
-		WHERE ' . implode(' AND ', $conditions) : ''),
-		array(
-		)
-	);
-	list ($totalMembers) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+		$db = database();
 
-	// Prepare some page index variables.
-	$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $_REQUEST['start'], $totalMembers, $modSettings['defaultMaxMembers']);
-	$context['start'] = $_REQUEST['start'];
+		// Permissions, permissions, permissions.
+		isAllowedTo('who_view');
 
-	// Look for people online, provided they don't mind if you see they are.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
-			lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
-			lo.id_spider
-		FROM {db_prefix}log_online AS lo
-			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)
-			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_member} THEN mem.id_post_group ELSE mem.id_group END)' . (!empty($conditions) ? '
-		WHERE ' . implode(' AND ', $conditions) : '') . '
-		ORDER BY {raw:sort_method} {raw:sort_direction}
-		LIMIT {int:offset}, {int:limit}',
-		array(
-			'regular_member' => 0,
-			'sort_method' => $sort_method,
-			'sort_direction' => $context['sort_direction'] == 'up' ? 'ASC' : 'DESC',
-			'offset' => $context['start'],
-			'limit' => $modSettings['defaultMaxMembers'],
-		)
-	);
-	$context['members'] = array();
-	$member_ids = array();
-	$url_data = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$actions = @unserialize($row['url']);
-		if ($actions === false)
-			continue;
+		// You can't do anything if this is off.
+		if (empty($modSettings['who_enabled']))
+			fatal_lang_error('who_off', false);
 
-		// Send the information to the template.
-		$context['members'][$row['session']] = array(
-			'id' => $row['id_member'],
-			'ip' => allowedTo('moderate_forum') ? $row['ip'] : '',
-			// It is *going* to be today or yesterday, so why keep that information in there?
-			'time' => strtr(timeformat($row['log_time']), array($txt['today'] => '', $txt['yesterday'] => '')),
-			'timestamp' => forum_time(true, $row['log_time']),
-			'query' => $actions,
-			'is_hidden' => $row['show_online'] == 0,
-			'id_spider' => $row['id_spider'],
-			'color' => empty($row['online_color']) ? '' : $row['online_color']
+		// Load the 'Who' template.
+		loadTemplate('Who');
+		loadLanguage('Who');
+
+		// Sort out... the column sorting.
+		$sort_methods = array(
+			'user' => 'mem.real_name',
+			'time' => 'lo.log_time'
 		);
 
-		$url_data[$row['session']] = array($row['url'], $row['id_member']);
-		$member_ids[] = $row['id_member'];
-	}
-	$smcFunc['db_free_result']($request);
+		$show_methods = array(
+			'members' => '(lo.id_member != 0)',
+			'guests' => '(lo.id_member = 0)',
+			'all' => '1=1',
+		);
 
-	// Load the user data for these members.
-	loadMemberData($member_ids);
+		// Store the sort methods and the show types for use in the template.
+		$context['sort_methods'] = array(
+			'user' => $txt['who_user'],
+			'time' => $txt['who_time'],
+		);
+		$context['show_methods'] = array(
+			'all' => $txt['who_show_all'],
+			'members' => $txt['who_show_members_only'],
+			'guests' => $txt['who_show_guests_only'],
+		);
 
-	// Load up the guest user.
-	$memberContext[0] = array(
-		'id' => 0,
-		'name' => $txt['guest_title'],
-		'group' => $txt['guest_title'],
-		'href' => '',
-		'link' => $txt['guest_title'],
-		'email' => $txt['guest_title'],
-		'is_guest' => true
-	);
+		// Can they see spiders too?
+		if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
+		{
+			$show_methods['spiders'] = '(lo.id_member = 0 AND lo.id_spider > 0)';
+			$show_methods['guests'] = '(lo.id_member = 0 AND lo.id_spider = 0)';
+			$context['show_methods']['spiders'] = $txt['who_show_spiders_only'];
+		}
+		elseif (empty($modSettings['show_spider_online']) && isset($_SESSION['who_online_filter']) && $_SESSION['who_online_filter'] == 'spiders')
+			unset($_SESSION['who_online_filter']);
 
-	// Are we showing spiders?
-	$spiderContext = array();
-	if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
-	{
-		foreach (unserialize($modSettings['spider_name_cache']) as $id => $name)
-			$spiderContext[$id] = array(
-				'id' => 0,
-				'name' => $name,
-				'group' => $txt['spiders'],
-				'href' => '',
-				'link' => $name,
-				'email' => $name,
-				'is_guest' => true
-			);
-	}
-
-	$url_data = determineActions($url_data);
-
-	// Setup the linktree and page title (do it down here because the language files are now loaded..)
-	$context['page_title'] = $txt['who_title'];
-	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=who',
-		'name' => $txt['who_title']
-	);
-
-	// Put it in the context variables.
-	foreach ($context['members'] as $i => $member)
-	{
-		if ($member['id'] != 0)
-			$member['id'] = loadMemberContext($member['id']) ? $member['id'] : 0;
-
-		// Keep the IP that came from the database.
-		$memberContext[$member['id']]['ip'] = $member['ip'];
-		$context['members'][$i]['action'] = isset($url_data[$i]) ? $url_data[$i] : $txt['who_hidden'];
-		if ($member['id'] == 0 && isset($spiderContext[$member['id_spider']]))
-			$context['members'][$i] += $spiderContext[$member['id_spider']];
+		// Does the user prefer a different sort direction?
+		if (isset($_REQUEST['sort']) && isset($sort_methods[$_REQUEST['sort']]))
+		{
+			$context['sort_by'] = $_SESSION['who_online_sort_by'] = $_REQUEST['sort'];
+			$sort_method = $sort_methods[$_REQUEST['sort']];
+		}
+		// Did we set a preferred sort order earlier in the session?
+		elseif (isset($_SESSION['who_online_sort_by']))
+		{
+			$context['sort_by'] = $_SESSION['who_online_sort_by'];
+			$sort_method = $sort_methods[$_SESSION['who_online_sort_by']];
+		}
+		// Default to last time online.
 		else
-			$context['members'][$i] += $memberContext[$member['id']];
+		{
+			$context['sort_by'] = $_SESSION['who_online_sort_by'] = 'time';
+			$sort_method = 'lo.log_time';
+		}
+
+		$context['sort_direction'] = isset($_REQUEST['asc']) || (isset($_REQUEST['sort_dir']) && $_REQUEST['sort_dir'] == 'asc') ? 'up' : 'down';
+
+		$conditions = array();
+		if (!allowedTo('moderate_forum'))
+			$conditions[] = '(IFNULL(mem.show_online, 1) = 1)';
+
+		// Fallback to top filter?
+		if (isset($_REQUEST['submit_top']) && isset($_REQUEST['show_top']))
+			$_REQUEST['show'] = $_REQUEST['show_top'];
+		// Does the user wish to apply a filter?
+		if (isset($_REQUEST['show']) && isset($show_methods[$_REQUEST['show']]))
+		{
+			$context['show_by'] = $_SESSION['who_online_filter'] = $_REQUEST['show'];
+			$conditions[] = $show_methods[$_REQUEST['show']];
+		}
+		// Perhaps we saved a filter earlier in the session?
+		elseif (isset($_SESSION['who_online_filter']))
+		{
+			$context['show_by'] = $_SESSION['who_online_filter'];
+			$conditions[] = $show_methods[$_SESSION['who_online_filter']];
+		}
+		else
+			$context['show_by'] = $_SESSION['who_online_filter'] = 'all';
+
+		// Get the total amount of members online.
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}log_online AS lo
+				LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
+			WHERE ' . implode(' AND ', $conditions) : ''),
+			array(
+			)
+		);
+		list ($totalMembers) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		// Prepare some page index variables.
+		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $_REQUEST['start'], $totalMembers, $modSettings['defaultMaxMembers']);
+		$context['start'] = $_REQUEST['start'];
+
+		// Look for people online, provided they don't mind if you see they are.
+		$request = $db->query('', '
+			SELECT
+				lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
+				lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
+				lo.id_spider
+			FROM {db_prefix}log_online AS lo
+				LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)
+				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_member} THEN mem.id_post_group ELSE mem.id_group END)' . (!empty($conditions) ? '
+			WHERE ' . implode(' AND ', $conditions) : '') . '
+			ORDER BY {raw:sort_method} {raw:sort_direction}
+			LIMIT {int:offset}, {int:limit}',
+			array(
+				'regular_member' => 0,
+				'sort_method' => $sort_method,
+				'sort_direction' => $context['sort_direction'] == 'up' ? 'ASC' : 'DESC',
+				'offset' => $context['start'],
+				'limit' => $modSettings['defaultMaxMembers'],
+			)
+		);
+		$context['members'] = array();
+		$member_ids = array();
+		$url_data = array();
+		while ($row = $db->fetch_assoc($request))
+		{
+			$actions = @unserialize($row['url']);
+			if ($actions === false)
+				continue;
+
+			// Send the information to the template.
+			$context['members'][$row['session']] = array(
+				'id' => $row['id_member'],
+				'ip' => allowedTo('moderate_forum') ? $row['ip'] : '',
+				// It is *going* to be today or yesterday, so why keep that information in there?
+				'time' => strtr(relativeTime($row['log_time']), array($txt['today'] => '', $txt['yesterday'] => '')),
+				'timestamp' => forum_time(true, $row['log_time']),
+				'query' => $actions,
+				'is_hidden' => $row['show_online'] == 0,
+				'id_spider' => $row['id_spider'],
+				'color' => empty($row['online_color']) ? '' : $row['online_color']
+			);
+
+			$url_data[$row['session']] = array($row['url'], $row['id_member']);
+			$member_ids[] = $row['id_member'];
+		}
+		$db->free_result($request);
+
+		// Load the user data for these members.
+		loadMemberData($member_ids);
+
+		// Load up the guest user.
+		$memberContext[0] = array(
+			'id' => 0,
+			'name' => $txt['guest_title'],
+			'group' => $txt['guest_title'],
+			'href' => '',
+			'link' => $txt['guest_title'],
+			'email' => $txt['guest_title'],
+			'is_guest' => true
+		);
+
+		// Are we showing spiders?
+		$spiderContext = array();
+		if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
+		{
+			foreach (unserialize($modSettings['spider_name_cache']) as $id => $name)
+				$spiderContext[$id] = array(
+					'id' => 0,
+					'name' => $name,
+					'group' => $txt['spiders'],
+					'href' => '',
+					'link' => $name,
+					'email' => $name,
+					'is_guest' => true
+				);
+		}
+
+		$url_data = determineActions($url_data);
+
+		// Setup the linktree and page title (do it down here because the language files are now loaded..)
+		$context['page_title'] = $txt['who_title'];
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=who',
+			'name' => $txt['who_title']
+		);
+
+		// Put it in the context variables.
+		foreach ($context['members'] as $i => $member)
+		{
+			if ($member['id'] != 0)
+				$member['id'] = loadMemberContext($member['id']) ? $member['id'] : 0;
+
+			// Keep the IP that came from the database.
+			$memberContext[$member['id']]['ip'] = $member['ip'];
+			$context['members'][$i]['action'] = isset($url_data[$i]) ? $url_data[$i] : $txt['who_hidden'];
+			if ($member['id'] == 0 && isset($spiderContext[$member['id_spider']]))
+				$context['members'][$i] += $spiderContext[$member['id_spider']];
+			else
+				$context['members'][$i] += $memberContext[$member['id']];
+		}
+
+		// Some people can't send personal messages...
+		$context['can_send_pm'] = allowedTo('pm_send');
+		$context['can_send_email'] = allowedTo('send_email_to_members');
+
+		// any profile fields disabled?
+		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 	}
 
-	// Some people can't send personal messages...
-	$context['can_send_pm'] = allowedTo('pm_send');
-	$context['can_send_email'] = allowedTo('send_email_to_members');
+	/**
+	 * It prepares credit and copyright information for the credits page or the admin page.
+	 * Accessed by ?action=who;sa=credits
+	 *
+	 */
+	function action_credits()
+	{
+		global $context, $txt;
 
-	// any profile fields disabled?
-	$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+		loadLanguage('Who');
 
+		prepareCreditsData();
+
+		loadTemplate('Who');
+		$context['sub_template'] = 'credits';
+		$context['robot_no_index'] = true;
+		$context['page_title'] = $txt['credits'];
+	}
 }
 
 /**
@@ -269,7 +302,9 @@ function action_who()
  */
 function determineActions($urls, $preferred_prefix = false)
 {
-	global $txt, $user_info, $modSettings, $smcFunc, $context;
+	global $txt, $user_info, $modSettings, $context;
+
+	$db = database();
 
 	if (!allowedTo('who_view'))
 		return array();
@@ -383,7 +418,7 @@ function determineActions($urls, $preferred_prefix = false)
 				// Find out what message they are accessing.
 				$msgid = (int) (isset($actions['msg']) ? $actions['msg'] : (isset($actions['quote']) ? $actions['quote'] : 0));
 
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT m.id_topic, m.subject
 					FROM {db_prefix}messages AS m
 						INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -397,9 +432,9 @@ function determineActions($urls, $preferred_prefix = false)
 						'id_msg' => $msgid,
 					)
 				);
-				list ($id_topic, $subject) = $smcFunc['db_fetch_row']($result);
+				list ($id_topic, $subject) = $db->fetch_row($result);
 				$data[$k] = sprintf($txt['whopost_' . $actions['action']], $id_topic, $subject);
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				if (empty($id_topic))
 					$data[$k] = $txt['who_hidden'];
@@ -442,34 +477,21 @@ function determineActions($urls, $preferred_prefix = false)
 	// Load topic names.
 	if (!empty($topic_ids))
 	{
-		$result = $smcFunc['db_query']('', '
-			SELECT t.id_topic, m.subject
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			WHERE {query_see_board}
-				AND t.id_topic IN ({array_int:topic_list})' . ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : '') . '
-			LIMIT {int:limit}',
-			array(
-				'topic_list' => array_keys($topic_ids),
-				'is_approved' => 1,
-				'limit' => count($topic_ids),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$topics_data = topicsList(array_keys($topic_ids));
+
+		foreach ($topics_data as $topic)
 		{
-			// Show the topic's subject for each of the actions.
-			foreach ($topic_ids[$row['id_topic']] as $k => $session_text)
-				$data[$k] = sprintf($session_text, $row['id_topic'], censorText($row['subject']));
+			// Show the topic's subject for each of the members looking at this...
+			foreach ($topic_ids[$topic['id_topic']] as $k => $session_text)
+				$data[$k] = sprintf($session_text, $topic['id_topic'], $topic['subject']);
 		}
-		$smcFunc['db_free_result']($result);
 	}
 
 	// Load board names.
 	if (!empty($board_ids))
 	{
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards_list = getBoardList(array('use_permissions' => true, 'included_boards' => array_keys($board_ids)), true);
 		foreach ($boards_list as $board)
 		{
@@ -503,28 +525,14 @@ function determineActions($urls, $preferred_prefix = false)
 }
 
 /**
- * It prepares credit and copyright information for the credits page or the admin page.
- * @todo two functions: split the data from loading templates and stuff, and remove the parameter.
- *  - a function for action=who;sa=credits, and another for the data needed for this and admin.
- *
- * @param bool $in_admin = false, if parameter is true the it will not load the sub-template nor the template file
+ * Prepare credits for display.
+ * This is a helper function, used by admin panel for credits and support page, and by the credits page.
  */
-function action_credits($in_admin = false)
+function prepareCreditsData()
 {
-	global $context, $smcFunc, $modSettings, $forum_copyright, $forum_version, $boardurl, $txt, $user_info;
+	global $context, $modSettings, $forum_copyright, $forum_version, $txt;
 
 	// Don't blink. Don't even blink. Blink and you're dead.
-	loadLanguage('Who');
-
-	if ($in_admin)
-	{
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['support_credits_title'],
-			'help' => '',
-			'description' => '',
-		);
-	}
-
 	$context['credits'] = array(
 		array(
 			'pretext' => $txt['credits_intro'],
@@ -546,6 +554,14 @@ function action_credits($in_admin = false)
 			'<a href="http://p.yusukekamiyamane.com/">Fugue Icons</a> | &copy; 2012 Yusuke Kamiyamane | These icons are licensed under a Creative Commons Attribution 3.0 License',
 			'<a href="http://www.oxygen-icons.org/">Oxygen Icons</a> | These icons are licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>',
 		),
+		'fonts' => array(
+			'<a href="http://openfontlibrary.org/en/font/dotrice">Dotrice</a> | &copy; 2010 <a href="http://hisdeedsaredust.com/">Paul Flo Williams</a> | This font is licensed under the SIL Open Font License, Version 1.1',
+			'<a href="http://openfontlibrary.org/en/font/klaudia-and-berenika">Berenika</a> | &copy; 2011 wmk69 | This font is licensed under the SIL Open Font License, Version 1.1',
+			'<a href="http://openfontlibrary.org/en/font/vshexagonica-v1-0-1">vSHexagonica</a> | &copy; 2012 T.B. von Strong | This font is licensed under the SIL Open Font License, Version 1.1',
+			'<a href="http://openfontlibrary.org/en/font/press-start-2p">Press Start 2P</a> | &copy; 2012 Cody "CodeMan38" Boisclair | This font is licensed under the SIL Open Font License, Version 1.1',
+			'<a href="http://openfontlibrary.org/en/font/architect-s-daughter">Architect\'s Daughter</a> | &copy; 2010 <a href="http://kimberlygeswein.com/">Kimberly Geswein</a> | This font is licensed under the SIL Open Font License, Version 1.1',
+			'<a href="http://openfontlibrary.org/en/font/vds">VDS</a> | &copy; 2012 <a href="http://www.wix.com/artmake1/artmaker">artmaker</a> | This font is licensed under the SIL Open Font License, Version 1.1',
+		),
 		'software' => array(
 			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="http://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
 			'<a href="http://jquery.org/">JQuery</a> | &copy; John Resig | Licensed under <a href="http://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt">The MIT License (MIT)</a>',
@@ -556,63 +572,15 @@ function action_credits($in_admin = false)
 		),
 	);
 
-	// Support for mods that use the <credits> tag via the package manager
-	$context['credits_modifications'] = array();
-	if (($mods = cache_get_data('mods_credits', 86400)) === null)
-	{
-		$mods = array();
-		$request = $smcFunc['db_query']('substring', '
-			SELECT version, name, credits
-			FROM {db_prefix}log_packages
-			WHERE install_state = {int:installed_mods}
-				AND credits != {string:empty}
-				AND SUBSTRING(filename, 1, 9) != {string:old_patch_name}
-				AND SUBSTRING(filename, 1, 9) != {string:patch_name}',
-			array(
-				'installed_mods' => 1,
-				'old_patch_name' => 'smf_patch',
-				'patch_name' => 'elk_patch',
-				'empty' => '',
-			)
-		);
+	require_once(SUBSDIR . '/Who.subs.php');
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$credit_info = unserialize($row['credits']);
+	// Add-ons authors: to add credits, the simpler and better way is to add in your package.xml the <credits> <license> tags.
+	// Support for addons that use the <credits> tag via the package manager
+	$context['credits_addons'] = addonsCredits();
 
-			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . $smcFunc['htmlspecialchars']($credit_info['copyright']);
-			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . $smcFunc['htmlspecialchars']($credit_info['license']);
-			$version = $txt['credits_version'] . ' ' . $row['version'];
-			$title = (empty($credit_info['title']) ? $row['name'] : $smcFunc['htmlspecialchars']($credit_info['title'])) . ': ' . $version;
-
-			// build this one out and stash it away
-			$mod_name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
-			$mods[] = $mod_name . (!empty($license) ? ' | ' . $license  : '') . (!empty($copyright) ? ' | ' . $copyright  : '');
-		}
-		cache_put_data('mods_credits', $mods, 86400);
-	}
-	$context['credits_modifications'] = $mods;
-
-	$context['copyrights'] = array(
-		'elkarte' => sprintf($forum_copyright, ucfirst(strtolower($forum_version))),
-		/* Modification Authors:  You may add a copyright statement to this array for your mods.
-			Copyright statements should be in the form of a value only without a array key.  I.E.:
-				'Some Mod by Thantos &copy; 2010',
-				$txt['some_mod_copyright'],
-			But its better and simpler to just your package.xml and add in the <credits> <license> tags
-		*/
-		'mods' => array(
-		),
-	);
-
-	// Support for those that want to use a hook as well
+	// An alternative for add-ons credits is to use a hook.
 	call_integration_hook('integrate_credits');
 
-	if (!$in_admin)
-	{
-		loadTemplate('Who');
-		$context['sub_template'] = 'credits';
-		$context['robot_no_index'] = true;
-		$context['page_title'] = $txt['credits'];
-	}
+	// Copyright information
+	$context['copyrights']['elkarte'] = '&copy; 2013 ElkArte contributors';
 }

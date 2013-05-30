@@ -421,12 +421,11 @@ class ManageBoards_Controller
 
 		loadTemplate('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/ManageBoards.subs.php');
 		getBoardTree();
 
 		// For editing the profile we'll need this.
 		loadLanguage('ManagePermissions');
-		require_once(ADMINDIR . '/ManagePermissions.php');
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		loadPermissionProfiles();
 
 		// id_board must be a number....
@@ -592,7 +591,6 @@ class ManageBoards_Controller
 		validateToken('admin-be-' . $_REQUEST['boardid']);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/ManageBoards.subs.php');
 
 		// Mode: modify aka. don't delete.
 		if (isset($_POST['edit']) || isset($_POST['add']))
@@ -659,7 +657,7 @@ class ManageBoards_Controller
 			if (!empty($_POST['boardid']))
 			{
 				$properties = getBoardProperties($_POST['boardid']);
-				
+
 				// If we're turning redirection on check the board doesn't have posts in it - if it does don't make it a redirection board.
 				if ($boardOptions['redirect'] && empty($properties['oldRedirect']) && $properties['numPosts'])
 					unset($boardOptions['redirect']);
@@ -774,7 +772,7 @@ class ManageBoards_Controller
 		$this->_boardSettings = new Settings_Form();
 
 		// Load the boards list - for the recycle bin!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
 		foreach ($boards as $board)
@@ -803,7 +801,7 @@ class ManageBoards_Controller
 	public function settings()
 	{
 		// Load the boards list - for the recycle bin!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
 		foreach ($boards as $board)

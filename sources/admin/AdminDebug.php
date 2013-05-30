@@ -33,7 +33,7 @@ class AdminDebug_Controller
 	 */
 	public function action_viewquery()
 	{
-		global $scripturl, $settings, $context, $db_connection, $smcFunc, $txt, $db_show_debug;
+		global $scripturl, $settings, $context, $db_connection, $txt, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
 		if (!isset($db_show_debug) || $db_show_debug !== true || !isset($_SESSION['debug']))
@@ -76,6 +76,9 @@ class AdminDebug_Controller
 	</head>
 	<body id="help_popup">
 		<div class="tborder windowbg description">';
+
+		// db work...
+		$db = database();
 
 		foreach ($_SESSION['debug'] as $q => $query_data)
 		{
@@ -141,7 +144,7 @@ class AdminDebug_Controller
 			// Explain the query.
 			if ($query_id == $q && $is_select_query)
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					EXPLAIN ' . $select,
 					array(
 					)
@@ -150,7 +153,7 @@ class AdminDebug_Controller
 				{
 					echo '
 		<table border="1" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
-			<tr><td>', $smcFunc['db_error']($db_connection), '</td></tr>
+			<tr><td>', $db->last_error($db_connection), '</td></tr>
 		</table>';
 					continue;
 				}
@@ -158,7 +161,7 @@ class AdminDebug_Controller
 				echo '
 		<table border="1" rules="all" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">';
 
-				$row = $smcFunc['db_fetch_assoc']($result);
+				$row = $db->fetch_assoc($result);
 
 				echo '
 			<tr>
@@ -166,8 +169,8 @@ class AdminDebug_Controller
 				<th>', array_keys($row)) . '</th>
 			</tr>';
 
-				$smcFunc['db_data_seek']($result, 0);
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				$db->data_seek($result, 0);
+				while ($row = $db->fetch_assoc($result))
 				{
 					echo '
 			<tr>
@@ -175,7 +178,7 @@ class AdminDebug_Controller
 				<td>', $row) . '</td>
 			</tr>';
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				echo '
 		</table>';
@@ -217,7 +220,8 @@ if (!(\'smfForum_sessionvar\' in window))
 	window.smfForum_sessionvar = \'sesc\';
 ' . strtr($file['file_data'], array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
 
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
+
 		// Lets make sure we aren't going to output anything nasty.
 		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))

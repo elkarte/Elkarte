@@ -116,12 +116,12 @@ function openID_revalidate()
  */
 function openID_getAssociation($server, $handle = null, $no_delete = false)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!$no_delete)
 	{
 		// Delete the already expired associations.
-		$smcFunc['db_query']('openid_delete_assoc_old', '
+		$db->query('openid_delete_assoc_old', '
 			DELETE FROM {db_prefix}openid_assoc
 			WHERE expires <= {int:current_time}',
 			array(
@@ -131,7 +131,7 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
 	}
 
 	// Get the association that has the longest lifetime from now.
-	$request = $smcFunc['db_query']('openid_select_assoc', '
+	$request = $db->query('openid_select_assoc', '
 		SELECT server_url, handle, secret, issued, expires, assoc_type
 		FROM {db_prefix}openid_assoc
 		WHERE server_url = {string:server_url}' . ($handle === null ? '' : '
@@ -143,11 +143,11 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return null;
 
-	$return = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$return = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	return $return;
 }
@@ -160,7 +160,9 @@ function openID_getAssociation($server, $handle = null, $no_delete = false)
  */
 function openID_makeAssociation($server)
 {
-	global $smcFunc, $modSettings, $p;
+	global $modSettings, $p;
+
+	$db = database();
 
 	$parameters = array(
 		'openid.mode=associate',
@@ -214,7 +216,7 @@ function openID_makeAssociation($server)
 		$secret = $assoc_data['mac_key'];
 
 	// Store the data
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}openid_assoc',
 		array('server_url' => 'string', 'handle' => 'string', 'secret' => 'string', 'issued' => 'int', 'expires' => 'int', 'assoc_type' => 'string'),
 		array($server, $handle, $secret, $issued, $expires, $assoc_type),
@@ -238,9 +240,9 @@ function openID_makeAssociation($server)
  */
 function openID_removeAssociation($handle)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('openid_remove_association', '
+	$db->query('openid_remove_association', '
 		DELETE FROM {db_prefix}openid_assoc
 		WHERE handle = {string:handle}',
 		array(
@@ -254,7 +256,9 @@ function openID_removeAssociation($handle)
  */
 function action_openidreturn()
 {
-	global $smcFunc, $user_info, $user_profile, $modSettings, $context, $sc, $user_settings;
+	global $user_info, $user_profile, $modSettings, $context, $sc, $user_settings;
+
+	$db = database();
 
 	// Is OpenID even enabled?
 	if (empty($modSettings['enableOpenID']))
@@ -312,7 +316,7 @@ function action_openidreturn()
 	$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
 
 	// Is there a user with this OpenID_uri?
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 			openid_uri
 		FROM {db_prefix}members
@@ -322,7 +326,7 @@ function action_openidreturn()
 		)
 	);
 
-	$member_found = $smcFunc['db_num_rows']($result);
+	$member_found = $db->num_rows($result);
 
 	if (!$member_found && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $openid_uri)
 	{
@@ -358,7 +362,8 @@ function action_openidreturn()
 		if (isset($_GET['sa']) && $_GET['sa'] == 'register2')
 		{
 			require_once(CONTROLLERDIR . '/Register.controller.php');
-			return action_register2(true);
+			$controller = new Register_Controller();
+			return $controller->action_register2(true);
 		}
 		else
 			redirectexit('action=register');
@@ -376,8 +381,8 @@ function action_openidreturn()
 	}
 	else
 	{
-		$user_settings = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
+		$user_settings = $db->fetch_assoc($result);
+		$db->free_result($result);
 
 		$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $secret);
 		$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
@@ -390,12 +395,12 @@ function action_openidreturn()
 			'openid_uri' => $openid_uri,
 		);
 
-		require_once(CONTROLLERDIR . '/LogInOut.controller.php');
+		require_once(CONTROLLERDIR . '/Auth.controller.php');
 
 		if (!checkActivation())
 			return;
 
-		DoLogin();
+		doLogin();
 	}
 }
 
@@ -425,9 +430,9 @@ function openID_canonize($uri)
  */
 function openid_member_exists($url)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('openid_member_exists', '
+	$request = $db->query('openid_member_exists', '
 		SELECT mem.id_member, mem.member_name
 		FROM {db_prefix}members AS mem
 		WHERE mem.openid_uri = {string:openid_uri}',
@@ -435,8 +440,8 @@ function openid_member_exists($url)
 			'openid_uri' => $url,
 		)
 	);
-	$member = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$member = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	return $member;
 }

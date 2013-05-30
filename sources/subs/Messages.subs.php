@@ -33,14 +33,16 @@ if (!defined('ELKARTE'))
  * @param int $id_topic = 0
  * @param int $attachment_type = 0
  */
-function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
+function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	if (empty($id_msg))
 		return false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_member, m.modified_time, m.modified_name, m.smileys_enabled, m.body,
 			m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
@@ -61,14 +63,14 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 		)
 	);
 	// The message they were trying to edit was most likely deleted.
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
-	$row = $smcFunc['db_fetch_assoc']($request);
+	$row = $db->fetch_assoc($request);
 
 	$attachment_stuff = array($row);
-	while ($row2 = $smcFunc['db_fetch_assoc']($request))
+	while ($row2 = $db->fetch_assoc($request))
 		$attachment_stuff[] = $row2;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$temp = array();
 	foreach ($attachment_stuff as $attachment)
@@ -80,6 +82,45 @@ function getExistingMessage($id_msg, $id_topic = 0, $attachment_type = 0)
 	ksort($temp);
 
 	return array('message' => $row, 'attachment_stuff' => $temp);
+}
+
+/**
+ * Get some basic info of a certain message
+ * Will use query_see_board unless $override_permissions is set to true
+ * Will return additional topic information if $topic_basics is set to true
+ * Returns an associative array of the results or false on error
+ *
+ * @param int $id_msg
+ * @param boolean $override_permissions
+ * @param boolean $topic_basics
+ */
+function basicMessageInfo($id_msg, $override_permissions = false, $topic_basics = false)
+{
+	$db = database();
+
+	if (empty($id_msg))
+		return false;
+
+	$request = $db->query('', '
+		SELECT
+			m.id_member, m.id_topic, m.id_board, m.id_msg,
+			m.body, m.subject,
+			m.poster_name, m.poster_email, m.poster_time,
+			m.approved' .  ($topic_basics === false ? '' : ', t.id_first_msg') . '
+		FROM {db_prefix}messages AS m' . ($override_permissions === true ? '' : '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . ($topic_basics === false ? '' : '
+			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)') . '
+		WHERE id_msg = {int:message}
+		LIMIT 1',
+		array(
+			'message' => $id_msg,
+		)
+	);
+
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return empty($row) ? false : $row;
 }
 
 /**
@@ -144,7 +185,7 @@ function prepareMessageContext($message)
 	// When was it last modified?
 	if (!empty($message['message']['modified_time']))
 	{
-		$context['last_modified'] = timeformat($message['message']['modified_time']);
+		$context['last_modified'] = relativeTime($message['message']['modified_time']);
 		$context['last_modified_text'] = sprintf($txt['last_edit_by'], $context['last_modified'], $message['message']['modified_name']);
 	}
 
@@ -166,12 +207,14 @@ function prepareMessageContext($message)
  */
 function removeMessage($message, $decreasePostCount = true)
 {
-	global $board, $modSettings, $user_info, $smcFunc, $context;
+	global $board, $modSettings, $user_info;
+
+	$db = database();
 
 	if (empty($message) || !is_numeric($message))
 		return false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_member, m.icon, m.poster_time, m.subject,' . (empty($modSettings['search_custom_index_config']) ? '' : ' m.body,') . '
 			m.approved, t.id_topic, t.id_first_msg, t.id_last_msg, t.num_replies, t.id_board,
@@ -186,10 +229,10 @@ function removeMessage($message, $decreasePostCount = true)
 			'id_msg' => $message,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return false;
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	if (empty($board) || $row['id_board'] != $board)
 	{
@@ -259,7 +302,7 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 
 	// Close any moderation reports for this message.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET closed = {int:is_closed}
 		WHERE id_msg = {int:id_msg}',
@@ -268,7 +311,7 @@ function removeMessage($message, $decreasePostCount = true)
 			'id_msg' => $message,
 		)
 	);
-	if ($smcFunc['db_affected_rows']() != 0)
+	if ($db->affected_rows() != 0)
 	{
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		updateSettings(array('last_mod_report_action' => time()));
@@ -321,7 +364,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if ($row['id_last_msg'] == $message)
 	{
 		// Find the last message, set it, and decrease the post count.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg, id_member
 			FROM {db_prefix}messages
 			WHERE id_topic = {int:id_topic}
@@ -333,10 +376,10 @@ function removeMessage($message, $decreasePostCount = true)
 				'id_msg' => $message,
 			)
 		);
-		$row2 = $smcFunc['db_fetch_assoc']($request);
-		$smcFunc['db_free_result']($request);
+		$row2 = $db->fetch_assoc($request);
+		$db->free_result($request);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				id_last_msg = {int:id_last_msg},
@@ -355,7 +398,7 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 	// Only decrease post counts.
 	else
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET ' . ($row['approved'] ? '
 				num_replies = CASE WHEN num_replies = {int:no_replies} THEN 0 ELSE num_replies - 1 END' : '
@@ -376,7 +419,7 @@ function removeMessage($message, $decreasePostCount = true)
 	if (!empty($modSettings['recycle_enable']) && $row['id_board'] != $modSettings['recycle_board'] && $row['icon'] != 'recycled')
 	{
 		// Check if the recycle board exists and if so get the read status.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT (IFNULL(lb.id_msg, 0) >= b.id_msg_updated) AS is_seen, id_last_msg
 			FROM {db_prefix}boards AS b
 				LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
@@ -386,13 +429,13 @@ function removeMessage($message, $decreasePostCount = true)
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 0)
+		if ($db->num_rows($request) == 0)
 			fatal_lang_error('recycle_no_valid_board');
-		list ($isRead, $last_board_msg) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($isRead, $last_board_msg) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// Is there an existing topic in the recycle board to group this post with?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, id_first_msg, id_last_msg
 			FROM {db_prefix}topics
 			WHERE id_previous_topic = {int:id_previous_topic}
@@ -402,12 +445,12 @@ function removeMessage($message, $decreasePostCount = true)
 				'recycle_board' => $modSettings['recycle_board'],
 			)
 		);
-		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($id_recycle_topic, $first_topic_msg, $last_topic_msg) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// Insert a new topic in the recycle board if $id_recycle_topic is empty.
 		if (empty($id_recycle_topic))
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}topics',
 				array(
 					'id_board' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int', 'id_first_msg' => 'int',
@@ -421,12 +464,12 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 
 		// Capture the ID of the new topic...
-		$topicID = empty($id_recycle_topic) ? $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
+		$topicID = empty($id_recycle_topic) ? $db->insert_id('{db_prefix}topics', 'id_topic') : $id_recycle_topic;
 
 		// If the topic creation went successful, move the message.
 		if ($topicID > 0)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}messages
 				SET
 					id_topic = {int:id_topic},
@@ -444,7 +487,7 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 
 			// Take any reported posts with us...
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_reported
 				SET
 					id_topic = {int:id_topic},
@@ -466,7 +509,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Mark recycle board as seen, if it was marked as seen before.
 			if (!empty($isRead) && !$user_info['is_guest'])
-				$smcFunc['db_insert']('replace',
+				$db->insert('replace',
 					'{db_prefix}log_boards',
 					array('id_board' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
 					array($modSettings['recycle_board'], $user_info['id'], $modSettings['maxMsgID']),
@@ -474,7 +517,7 @@ function removeMessage($message, $decreasePostCount = true)
 				);
 
 			// Add one topic and post to the recycle bin board.
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET
 					num_topics = num_topics + {int:num_topics_inc},
@@ -490,7 +533,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Lets increase the num_replies, and the first/last message ID as appropriate.
 			if (!empty($id_recycle_topic))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}topics
 					SET num_replies = num_replies + 1' .
 						($message > $last_topic_msg ? ', id_last_msg = {int:id_merged_msg}' : '') .
@@ -511,7 +554,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 		// If it wasn't approved don't keep it in the queue.
 		if (!$row['approved'])
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}approval_queue
 				WHERE id_msg = {int:id_msg}
 					AND id_attach = {int:id_attach}',
@@ -522,7 +565,7 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET ' . ($row['approved'] ? '
 			num_posts = CASE WHEN num_posts = {int:no_posts} THEN 0 ELSE num_posts - 1 END' : '
@@ -543,8 +586,17 @@ function removeMessage($message, $decreasePostCount = true)
 	// Only remove posts if they're not recycled.
 	if (!$recycle)
 	{
+		// Remove the likes!
+		$db->query('', '
+			DELETE FROM {db_prefix}message_likes
+			WHERE id_msg = {int:id_msg}',
+			array(
+				'id_msg' => $message,
+			)
+		);
+
 		// Remove the message!
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}messages
 			WHERE id_msg = {int:id_msg}',
 			array(
@@ -557,7 +609,7 @@ function removeMessage($message, $decreasePostCount = true)
 			$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
 			$words = text2words($row['body'], $customIndexSettings['bytes_per_word'], true);
 			if (!empty($words))
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					DELETE FROM {db_prefix}log_search_words
 					WHERE id_word IN ({array_int:word_list})
 						AND id_msg = {int:id_msg}',
@@ -581,7 +633,7 @@ function removeMessage($message, $decreasePostCount = true)
 		// If it is an entire topic
 		if ($row['id_first_msg'] == $message)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}follow_ups
 				WHERE follow_ups IN ({array_int:topics})',
 				array(
@@ -589,7 +641,7 @@ function removeMessage($message, $decreasePostCount = true)
 				)
 			);
 		}
-		
+
 
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
@@ -613,33 +665,54 @@ function removeMessage($message, $decreasePostCount = true)
 }
 
 /**
- * Retrieve the topic associated with a message.
+ * This function deals with the topic associated to a message.
+ * It allows to retrieve or update the topic to which the message belongs.
  *
+ * If $topicID is not passed, the current topic ID of the message is returned.
+ * If $topicID is passed, the message is updated to point to the new topic.
+ *
+ * @param int $msg_id message ID
+ * @param int $topicID = null topic ID, if null is passed the ID of the topic is retrieved and returned
  * @return mixed, int topic ID if any, or false
  */
-function associatedTopic($msg_id)
+function associatedTopic($msg_id, $topicID = null)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_topic
-		FROM {db_prefix}messages
-		WHERE id_msg = {int:msg}',
-		array(
-			'msg' => $msg_id,
-	));
-	if ($smcFunc['db_num_rows']($request) != 1)
-		$topic = false;
+	if ($topicID === null)
+	{
+		$request = $db->query('', '
+			SELECT id_topic
+			FROM {db_prefix}messages
+			WHERE id_msg = {int:msg}',
+			array(
+				'msg' => $msg_id,
+		));
+		if ($db->num_rows($request) != 1)
+			$topic = false;
+		else
+			list ($topic) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		return $topic;
+	}
 	else
-		list ($topic) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $topic;
+	{
+		$db->query('', '
+			UPDATE {db_prefix}messages
+			SET id_topic = {int:topic}
+			WHERE id_msg = {int:msg}',
+			array(
+				'msg' => $msg_id,
+				'topic' => $topicID,
+			)
+		);
+	}
 }
 
 /**
- * Small function that simply query the database to verify
- * if the current user can access a specific message
+ * Small function that simply verifies if the current
+ * user can access a specific message
  *
  * @param int $id_msg a message id
  * @param bool $check_approval if true messages are checked for approval (default true)
@@ -647,32 +720,96 @@ function associatedTopic($msg_id)
  */
 function canAccessMessage($id_msg, $check_approval = true)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_msg, id_member, approved
-		FROM {db_prefix}messages AS m
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE m.id_msg = {int:id_msg}
-		LIMIT 1',
-		array(
-			'id_msg' => $id_msg,
-		)
-	);
-	$exists = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$message_info = basicMessageInfo($id_msg);
 
-	// It doesn't exists or is not accessible
-	if (empty($exists))
+	// Do we even have a message to speak of?
+	if (empty($message_info))
 		return false;
-	// We have to check for approval...
-	elseif ($check_approval)
+
+	// Check for approval status?
+	if ($check_approval)
 	{
-		// Message approved or user is owner
-		if (!empty($exists['approved']) || $exists['id_member'] == $user_info['id'])
-			return true;
+		// The user can access this message if it's approved or they're owner
+		return (!empty($message_info['approved']) || $message_info['id_member'] == $user_info['id']);
 	}
 
-	// Any other case should be false.
+	// Otherwise, nope.
 	return false;
+}
+
+/**
+ * Advance message pointer in a topic.
+ * (in either direction)
+ * This function is used by previousMessage() and nextMessage().
+ * The boolean parameter $next determines the direction.
+ *
+ * @param int $id_msg origin message id
+ * @param int $id_topic topic
+ * @param bool $next = true if true, it increases the pointer, otherwise it decreases it
+ */
+function messagePointer($id_msg, $id_topic, $next = true)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT ' . ($next ? 'MIN(id_msg)' : 'MAX($id_msg)') . '
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND id_msg {raw:strictly} {int:topic_msg_id}',
+		array(
+			'current_topic' => $id_topic,
+			'topic_msg_id' => $id_msg,
+			'strictly' => $next ? '>' : '<'
+		)
+	);
+
+	list ($msg) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $msg;
+}
+
+/**
+ * Get previous message from where we were in the topic.
+ *
+ * @param int $id_msg
+ * @param int $id_topic
+ */
+function previousMessage($id_msg, $id_topic)
+{
+	return messagePointer($id_msg, $id_topic, false);
+}
+
+/**
+ * Get next message from where we were in the topic.
+ *
+ * @param int $id_msg
+ * @param int $id_topic
+ */
+function nextMessage($id_msg, $id_topic)
+{
+	return messagePointer($id_msg, $id_topic);
+}
+
+function messageAt($start, $id_topic)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT id_msg
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+		ORDER BY id_msg
+		LIMIT {int:start}, 1',
+		array(
+			'current_topic' => $id_topic,
+			'start' => $start,
+		)
+	);
+	list ($msg) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $msg;
 }

@@ -119,7 +119,9 @@ class ManageMaintenance_Controller
 	 */
 	public function action_database()
 	{
-		global $context, $db_type, $modSettings, $smcFunc, $maintenance;
+		global $context, $db_type, $modSettings, $maintenance;
+
+		$db = database();
 
 		// We need this, really..
 		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
@@ -129,9 +131,9 @@ class ManageMaintenance_Controller
 
 		if ($db_type == 'mysql')
 		{
-			db_extend('packages');
+			$table = db_table();
 
-			$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+			$colData = $table->db_list_columns('{db_prefix}messages', true);
 			foreach ($colData as $column)
 				if ($column['name'] == 'body')
 					$body_type = $column['type'];
@@ -211,7 +213,7 @@ class ManageMaintenance_Controller
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Get all membergroups - for deleting members and the like.
-		$context['membergroups'] = getBasicMembergroupData('all');
+		$context['membergroups'] = getBasicMembergroupData(array('all'));
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recountposts')
 			$context['maintenance_finished'] = $txt['maintain_recountposts'];
@@ -227,7 +229,7 @@ class ManageMaintenance_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
@@ -445,10 +447,6 @@ class ManageMaintenance_Controller
 		{
 			// Optimize the table!  We use backticks here because it might be a custom table.
 			$data_freed = optimizeTable($table['table_name']);
-
-			// Optimizing one sqlite table optimizes them all.
-			if ($db_type == 'sqlite')
-				break;
 
 			if ($data_freed > 0)
 				$context['optimized_tables'][] = array(
@@ -779,11 +777,18 @@ class ManageMaintenance_Controller
 
 	/**
 	 * Handling function for the backup stuff.
+	 * It requires an administrator and the session hash by post.
 	 * This method simply forwards to DumpDatabase2().
 	 */
 	public function action_backup_display()
 	{
 		validateToken('admin-maint');
+
+		// Administrators only!
+		if (!allowedTo('admin_forum'))
+			fatal_lang_error('no_dump_database', 'critical');
+
+		checkSession('post');
 
 		require_once(SOURCEDIR . '/DumpDatabase.php');
 		DumpDatabase2();
@@ -893,7 +898,7 @@ class ManageMaintenance_Controller
 			{
 				// Lets get the topics.
 				$topics = getTopicsToMove($id_board_from);
-	
+
 				// Just return if we don't have any topics left to move.
 				if (empty($topics))
 				{
@@ -991,7 +996,7 @@ class ManageMaintenance_Controller
 				apache_reset_timeout();
 			return;
 		}
-		// No countable posts? set posts counter to 0 
+		// No countable posts? set posts counter to 0
 		 updateZeroPostMembers();
 
 		// all done

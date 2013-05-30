@@ -25,15 +25,18 @@ if (!defined('ELKARTE'))
 /**
  * Show all the users buddies, as well as a add/delete interface.
  *
- * @param int $memID id_member
  */
-function action_editBuddyIgnoreLists($memID)
+function action_editBuddyIgnoreLists()
 {
 	global $context, $txt, $scripturl, $modSettings, $user_profile;
+
+	$memID = currentMemberID();
 
 	// Do a quick check to ensure people aren't getting here illegally!
 	if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
 		fatal_lang_error('no_access', false);
+
+	loadTemplate('ProfileOptions');
 
 	// Can we email the user direct?
 	$context['can_moderate_forum'] = allowedTo('moderate_forum');
@@ -69,7 +72,11 @@ function action_editBuddyIgnoreLists($memID)
 function action_editBuddies($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext;
+
+	$db = database();
+
+	loadTemplate('ProfileOptions');
 
 	// We want to view what we're doing :P
 	$context['sub_template'] = 'editBuddies';
@@ -104,7 +111,7 @@ function action_editBuddies($memID)
 		checkSession();
 
 		// Prepare the string for extraction...
-		$_POST['new_buddy'] = strtr($smcFunc['htmlspecialchars']($_POST['new_buddy'], ENT_QUOTES), array('&quot;' => '"'));
+		$_POST['new_buddy'] = strtr(Util::htmlspecialchars($_POST['new_buddy'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_POST['new_buddy'], $matches);
 		$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_buddy']))));
 
@@ -121,7 +128,7 @@ function action_editBuddies($memID)
 		if (!empty($new_buddies))
 		{
 			// Now find out the id_member of the buddy.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE member_name IN ({array_string:new_buddies}) OR real_name IN ({array_string:new_buddies})
@@ -133,9 +140,9 @@ function action_editBuddies($memID)
 			);
 
 			// Add the new member to the buddies array.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$buddiesArray[] = (int) $row['id_member'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Now update the current users buddy list.
 			$user_profile[$memID]['buddy_list'] = implode(',', $buddiesArray);
@@ -182,7 +189,11 @@ function action_editBuddies($memID)
 function action_editIgnoreList($memID)
 {
 	global $txt, $scripturl, $modSettings;
-	global $context, $user_profile, $memberContext, $smcFunc;
+	global $context, $user_profile, $memberContext;
+
+	$db = database();
+
+	loadTemplate('ProfileOptions');
 
 	// We want to view what we're doing :P
 	$context['sub_template'] = 'editIgnoreList';
@@ -214,7 +225,7 @@ function action_editIgnoreList($memID)
 	{
 		checkSession();
 		// Prepare the string for extraction...
-		$_POST['new_ignore'] = strtr($smcFunc['htmlspecialchars']($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
+		$_POST['new_ignore'] = strtr(Util::htmlspecialchars($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_POST['new_ignore'], $matches);
 		$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_ignore']))));
 
@@ -229,7 +240,7 @@ function action_editIgnoreList($memID)
 		if (!empty($new_entries))
 		{
 			// Now find out the id_member for the members in question.
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_member
 				FROM {db_prefix}members
 				WHERE member_name IN ({array_string:new_entries}) OR real_name IN ({array_string:new_entries})
@@ -241,9 +252,9 @@ function action_editIgnoreList($memID)
 			);
 
 			// Add the new member to the buddies array.
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$ignoreArray[] = (int) $row['id_member'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Now update the current users buddy list.
 			$user_profile[$memID]['pm_ignore_list'] = implode(',', $ignoreArray);
@@ -282,14 +293,14 @@ function action_editIgnoreList($memID)
 /**
  * Allows the user to see or change their account info.
  *
- * @param int $memID id_member
  */
-function action_account($memID)
+function action_account()
 {
 	global $context, $txt;
 
-	// be sure we have this
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
+
+	loadTemplate('ProfileOptions');
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
@@ -312,14 +323,14 @@ function action_account($memID)
 /**
  * Allow the user to change the forum options in their profile.
  *
- * @param int $memID id_member
  */
-function action_forumProfile($memID)
+function action_forumProfile()
 {
 	global $context, $user_profile, $user_info, $txt, $modSettings;
 
-	// make sure we have this
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
+
+	loadTemplate('ProfileOptions');
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
@@ -343,16 +354,17 @@ function action_forumProfile($memID)
 /**
  * Allow the edit of *someone elses* personal message settings.
  *
- * @param int $memID id_member
  */
-function action_pmprefs($memID)
+function action_pmprefs()
 {
 	global $context, $txt, $scripturl;
 
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
+
+	loadTemplate('ProfileOptions');
 
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['pm_settings_desc'];
@@ -367,17 +379,18 @@ function action_pmprefs($memID)
 /**
  * Allow the user to pick a theme.
  *
- * @param int $memID id_member
  */
-function action_themepick($memID)
+function action_themepick()
 {
-	global $txt, $context, $user_profile, $modSettings, $settings, $user_info, $smcFunc;
+	global $txt, $context, $user_profile, $modSettings, $settings, $user_info;
 
-	require_once(SUBSDIR . '/Profile.subs.php');
+	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		loadCustomFields($memID, 'theme');
+
+	loadTemplate('ProfileOptions');
 
 	$context['sub_template'] = 'edit_options';
 	$context['page_desc'] = $txt['theme_info'];
@@ -403,6 +416,8 @@ function action_authentication($memID, $saving = false)
 	global $context, $cur_profile, $txt, $post_errors, $modSettings;
 
 	loadLanguage('Login');
+
+	loadTemplate('ProfileOptions');
 
 	// We are saving?
 	if ($saving)
@@ -480,11 +495,16 @@ function action_authentication($memID, $saving = false)
 /**
  * Display the notifications and settings for changes.
  *
- * @param int $memID id_member
  */
-function action_notification($memID)
+function action_notification()
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc, $settings;
+	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $settings;
+
+	$db = database();
+
+	loadTemplate('ProfileOptions');
+
+	$memID = currentMemberID();
 
 	// Gonna want this for the list.
 	require_once(SUBSDIR . '/List.subs.php');
@@ -534,12 +554,13 @@ function action_notification($memID)
 				),
 				'data' => array(
 					'sprintf' => array(
-						'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" class="input_check" />',
+						'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" class="input_check" %2$s />',
 						'params' => array(
 							'id' => false,
+							'checked' => false,
 						),
-					),
 					'class' => 'centertext',
+					),
 				),
 			),
 		),
@@ -557,8 +578,12 @@ function action_notification($memID)
 		'additional_rows' => array(
 			array(
 				'position' => 'bottom_of_list',
-				'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_update'] . '" class="button_submit" />',
-				'align' => 'right',
+				'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="button_submit" />',
+			),
+			array(
+				'position' => 'after_title',
+				'value' => getBoardNotificationsCount($memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
+				'class' => 'windowbg2',
 			),
 		),
 	);
@@ -696,16 +721,19 @@ function action_notification($memID)
 }
 
 /**
- * @todo needs a description
+ * Callback for createList() in action_notification()
+ * Retrieve topic notifications count.
  *
  * @param int $memID id_member
  * @return string
  */
 function list_getTopicNotificationCount($memID)
 {
-	global $smcFunc, $user_info, $context, $modSettings;
+	global $user_info, $context, $modSettings;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && $user_info['query_see_board'] === '1=1' ? '' : '
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . ($user_info['query_see_board'] === '1=1' ? '' : '
@@ -718,15 +746,15 @@ function list_getTopicNotificationCount($memID)
 			'is_approved' => 1,
 		)
 	);
-	list ($totalNotifications) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalNotifications) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// @todo make this an integer before it gets returned
 	return $totalNotifications;
 }
 
 /**
- * @todo Needs a description
+ * Callback for createList() in action_notification()
  *
  * @param int $start
  * @param int $items_per_page
@@ -736,10 +764,12 @@ function list_getTopicNotificationCount($memID)
  */
 function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $user_info, $context, $modSettings;
+	global $txt, $scripturl, $user_info, $context, $modSettings;
+
+	$db = database();
 
 	// All the topics with notification on...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from, b.id_board, b.name,
 			t.id_topic, ms.subject, ms.id_member, IFNULL(mem.real_name, ms.poster_name) AS real_name_col,
@@ -767,7 +797,7 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 		)
 	);
 	$notification_topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['subject']);
 
@@ -780,19 +810,44 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
 			'new' => $row['new_from'] <= $row['id_msg_modified'],
 			'new_from' => $row['new_from'],
-			'updated' => timeformat($row['poster_time']),
+			'updated' => relativeTime($row['poster_time']),
 			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
 			'new_link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new">' . $row['subject'] . '</a>',
 			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $notification_topics;
 }
 
+function getBoardNotificationsCount($memID)
+{
+	global $user_info;
+
+	$db = database();
+
+	// All the boards that you have notification enabled
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE ln.id_member = {int:selected_member}
+			AND {query_see_board}',
+		array(
+			'current_member' => $user_info['id'],
+			'selected_member' => $memID,
+		)
+	);
+	list ($totalNotifications) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $totalNotifications;
+}
+
 /**
- * @todo needs a description
+ * Callback for createList() in action_notification()
  *
  * @param int $start
  * @param int $items_per_page
@@ -802,9 +857,12 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
  */
 function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $user_info;
+	global $txt, $scripturl, $user_info, $modSettings;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	// All the boards that you have notification enabled
+	$request = $db->query('', '
 		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
@@ -817,16 +875,45 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 			'selected_member' => $memID,
 		)
 	);
+
 	$notification_boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
+		$notification_boards[] = array(
+			'id' => $row['id_board'],
+			'name' =>  $row['name'],
+			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' .'<strong>' . $row['name'] . '</strong></a>',
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => 'checked="checked"',
+		);
+	$db->free_result($request);
+
+	// and all the boards that you can see but don't have notify turned on for
+	$request = $db->query('', '
+		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		FROM {db_prefix}boards AS b
+			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE {query_see_board}
+			AND ln.id_board is null ' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+		ORDER BY ' . $sort,
+		array(
+			'selected_member' => $memID,
+			'current_member' => $user_info['id'],
+			'recycle_board' => $modSettings['recycle_board'],
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
 		$notification_boards[] = array(
 			'id' => $row['id_board'],
 			'name' => $row['name'],
 			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-			'new' => $row['board_read'] < $row['id_msg_updated']
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => '',
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $notification_boards;
 }
@@ -838,7 +925,9 @@ function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
  */
 function loadThemeOptions($memID)
 {
-	global $context, $options, $cur_profile, $smcFunc;
+	global $context, $options, $cur_profile;
+
+	$db = database();
 
 	if (isset($_POST['default_options']))
 		$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
@@ -852,7 +941,7 @@ function loadThemeOptions($memID)
 	}
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, variable, value
 			FROM {db_prefix}themes
 			WHERE id_theme IN (1, {int:member_theme})
@@ -863,7 +952,7 @@ function loadThemeOptions($memID)
 			)
 		);
 		$temp = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['id_member'] == -1)
 			{
@@ -875,7 +964,7 @@ function loadThemeOptions($memID)
 				$row['value'] = $_POST['options'][$row['variable']];
 			$context['member']['options'][$row['variable']] = $row['value'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Load up the default theme options for any missing.
 		foreach ($temp as $k => $v)
@@ -890,18 +979,21 @@ function loadThemeOptions($memID)
  * Allows the user to see the list of their ignored boards.
  * (and un-ignore them)
  *
- * @param int $memID id_member
  */
-function action_ignoreboards($memID)
+function action_ignoreboards()
 {
 	global $context, $modSettings, $cur_profile;
+
+	$memID = currentMemberID();
 
 	// Have the admins enabled this option?
 	if (empty($modSettings['allow_ignore_boards']))
 		fatal_lang_error('ignoreboards_disallowed', 'user');
 
+	loadTemplate('ProfileOptions');
+
 	$context['sub_template'] = 'ignoreboards';
-	require_once(SUBSDIR . '/MessageIndex.subs.php');
+	require_once(SUBSDIR . '/Boards.subs.php');
 	$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'ignore' => !empty($cur_profile['ignore_boards']) ? explode(',', $cur_profile['ignore_boards']) : array()));
 
 	// Include a list of boards per category for easy toggling.
@@ -914,11 +1006,16 @@ function action_ignoreboards($memID)
 /**
  * Function to allow the user to choose group membership etc...
  *
- * @param int $memID id_member
  */
-function action_groupMembership($memID)
+function action_groupMembership()
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $smcFunc;
+	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings;
+
+	$db = database();
+
+	$memID = currentMemberID();
+
+	loadTemplate('ProfileOptions');
 
 	$curMember = $user_profile[$memID];
 	$context['primary_group'] = $curMember['id_group'];
@@ -941,7 +1038,7 @@ function action_groupMembership($memID)
 		$groups[$k] = (int) $v;
 
 	// Get all the membergroups they can join.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, mg.description, mg.group_type, mg.online_color, mg.hidden,
 			IFNULL(lgr.id_member, 0) AS pending
 		FROM {db_prefix}membergroups AS mg
@@ -964,7 +1061,7 @@ function action_groupMembership($memID)
 		'member' => array(),
 		'available' => array()
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Can they edit their primary group?
 		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1) || ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $groups)))
@@ -987,7 +1084,7 @@ function action_groupMembership($memID)
 			'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Add registered members on the end.
 	$context['groups']['member'][0] = array(
@@ -1019,7 +1116,9 @@ function action_groupMembership($memID)
  */
 function action_groupMembership2($profile_vars, $post_errors, $memID)
 {
-	global $user_info, $context, $user_profile, $modSettings, $txt, $smcFunc, $scripturl, $language;
+	global $user_info, $context, $user_profile, $modSettings, $txt, $scripturl, $language;
+
+	$db = database();
 
 	// Let's be extra cautious...
 	if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
@@ -1101,7 +1200,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 	// Final security check, don't allow users to promote themselves to admin.
 	if ($context['can_manage_membergroups'] && !allowedTo('admin_forum'))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT COUNT(permission)
 			FROM {db_prefix}permissions
 			WHERE id_group = {int:selected_group}
@@ -1113,8 +1212,8 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 				'admin_forum' => 'admin_forum',
 			)
 		);
-		list ($disallow) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($disallow) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		if ($disallow)
 			isAllowedTo('admin_forum');
@@ -1123,7 +1222,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 	// If we're requesting, add the note then return.
 	if ($changeType == 'request')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}log_group_requests
 			WHERE id_member = {int:selected_member}
@@ -1133,12 +1232,12 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 				'selected_group' => $group_id,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) != 0)
+		if ($db->num_rows($request) != 0)
 			fatal_lang_error('profile_error_already_requested_group');
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Log the request.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}log_group_requests',
 			array(
 				'id_member' => 'int', 'id_group' => 'int', 'time_applied' => 'int', 'reason' => 'string-65534',
@@ -1153,7 +1252,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// Do we have any group moderators?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}group_moderators
 			WHERE id_group = {int:selected_group}',
@@ -1162,9 +1261,9 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 			)
 		);
 		$moderators = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$moderators[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Otherwise this is the backup!
 		if (empty($moderators))

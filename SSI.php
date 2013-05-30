@@ -45,9 +45,19 @@ require_once(dirname(__FILE__) . '/Settings.php');
 if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
 	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
 
-// Make absolutely sure the new directories are defined.
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
@@ -59,7 +69,7 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
-unset($boarddir, $cachedir, $sourcedir);
+unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 $ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
@@ -83,6 +93,9 @@ require_once(SOURCEDIR . '/Load.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SOURCEDIR . '/BrowserDetect.class.php');
+require_once(SOURCEDIR . '/Errors.class.php');
+require_once(SUBSDIR . '/Util.class.php');
+require_once(SUBSDIR . '/TemplateLayers.class.php');
 
 // Create a variable to store some specific functions in.
 $smcFunc = array();
@@ -90,8 +103,11 @@ $smcFunc = array();
 // Initate the database connection and define some database functions to use.
 loadDatabase();
 
-// Load installed 'Mods' settings.
+// Load settings from the database.
 reloadSettings();
+
+// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
+Util::compat_init();
 
 // Clean the request variables.
 cleanRequest();
@@ -171,15 +187,17 @@ if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))
 // Do we allow guests in here?
 if (empty($ssi_guest_access) && empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && basename($_SERVER['PHP_SELF']) != 'SSI.php')
 {
-	require_once(SUBSDIR . '/Auth.subs.php');
-	KickGuest();
+	require_once(CONTROLLERDIR . '/Auth.controller.php');
+	$controller = new Auth_Controller();
+	$controller->action_kickguest();
 	obExit(null, true);
 }
 
 // Load the stuff like the menu bar, etc.
 if (isset($ssi_layers))
 {
-	$context['template_layers'] = $ssi_layers;
+	Template_Layers::getInstance()->removeAll();
+	Template_Layers::getInstance()->add($ssi_layers);
 	template_header();
 }
 else
@@ -299,7 +317,7 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo', $limit_body = true)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings, $smcFunc;
+	global $modSettings;
 
 	// Excluding certain boards...
 	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
@@ -386,10 +404,12 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
 function ssi_queryPosts($query_where = '', $query_where_params = array(), $query_limit = 10, $query_order = 'm.id_msg DESC', $output_method = 'echo', $limit_body = false, $override_permissions = false)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	// Find all the posts. Newer ones will have higher IDs.
-	$request = $smcFunc['db_query']('substring', '
+	$request = $db->query('substring', '
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg, m.id_board, b.name AS board_name,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
@@ -412,7 +432,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		))
 	);
 	$posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -440,9 +460,9 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			),
 			'subject' => $row['subject'],
 			'short_subject' => shorten_subject($row['subject'], 25),
-			'preview' => $smcFunc['strlen']($preview) > 128 ? $smcFunc['substr']($preview, 0, 128) . '...' : $preview,
+			'preview' => Util::strlen($preview) > 128 ? Util::substr($preview, 0, 128) . '...' : $preview,
 			'body' => $row['body'],
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#new',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
@@ -451,7 +471,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			'new_from' => $row['new_from'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Just return it.
 	if ($output_method != 'echo' || empty($posts))
@@ -490,7 +510,9 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo')
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
 		$exclude_boards = array($modSettings['recycle_board']);
@@ -514,7 +536,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$icon_sources[$icon] = 'images_url';
 
 	// Find all the posts in distinct topics.  Newer ones will have higher IDs.
-	$request = $smcFunc['db_query']('substring', '
+	$request = $db->query('substring', '
 		SELECT
 			m.poster_time, ms.subject, m.id_topic, m.id_member, m.id_msg, b.id_board, b.name AS board_name, t.num_replies, t.num_views,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
@@ -546,11 +568,11 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		)
 	);
 	$posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br />' => '&#10;')));
-		if ($smcFunc['strlen']($row['body']) > 128)
-			$row['body'] = $smcFunc['substr']($row['body'], 0, 128) . '...';
+		if (Util::strlen($row['body']) > 128)
+			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 		// Censor the subject.
 		censorText($row['subject']);
@@ -579,7 +601,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'views' => $row['num_views'],
 			'short_subject' => shorten_subject($row['subject'], 25),
 			'preview' => $row['body'],
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#new',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#new" rel="nofollow">' . $row['subject'] . '</a>',
@@ -590,7 +612,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" style="vertical-align: middle;" alt="' . $row['icon'] . '" />',
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Just return it.
 	if ($output_method != 'echo' || empty($posts))
@@ -625,10 +647,12 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
  */
 function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 {
-	global $db_prefix, $scripturl, $smcFunc;
+	global $db_prefix, $scripturl;
+
+	$db = database();
 
 	// Find the latest poster.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name, posts
 		FROM {db_prefix}members
 		ORDER BY posts DESC
@@ -637,7 +661,7 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 		)
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$return[] = array(
 			'id' => $row['id_member'],
 			'name' => $row['real_name'],
@@ -645,7 +669,7 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 			'posts' => $row['posts']
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Just return all the top posters.
 	if ($output_method != 'echo')
@@ -667,10 +691,12 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
  */
 function ssi_topBoards($num_top = 10, $output_method = 'echo')
 {
-	global $context, $settings, $db_prefix, $txt, $scripturl, $user_info, $modSettings, $smcFunc;
+	global $context, $settings, $db_prefix, $txt, $scripturl, $user_info, $modSettings;
+
+	$db = database();
 
 	// Find boards with lots of posts.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			b.name, b.num_topics, b.num_posts, b.id_board,' . (!$user_info['is_guest'] ? ' 1 AS is_read' : '
 			(IFNULL(lb.id_msg, 0) >= b.id_last_msg) AS is_read') . '
@@ -686,7 +712,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 		)
 	);
 	$boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$boards[] = array(
 			'id' => $row['id_board'],
 			'num_posts' => $row['num_posts'],
@@ -696,7 +722,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>'
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If we shouldn't output or have nothing to output, just jump out.
 	if ($output_method != 'echo' || empty($boards))
@@ -729,12 +755,14 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
  */
 function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'echo')
 {
-	global $db_prefix, $txt, $scripturl, $user_info, $modSettings, $smcFunc, $context;
+	global $db_prefix, $txt, $scripturl, $user_info, $modSettings, $context;
+
+	$db = database();
 
 	if ($modSettings['totalMessages'] > 100000)
 	{
 		// @todo Why don't we use {query(_wanna)_see_board}?
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic
 			FROM {db_prefix}topics
 			WHERE num_' . ($type != 'replies' ? 'views' : 'replies') . ' != 0' . ($modSettings['postmod_active'] ? '
@@ -747,14 +775,14 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 			)
 		);
 		$topic_ids = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$topic_ids[] = $row['id_topic'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 	else
 		$topic_ids = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.subject, m.id_topic, t.num_views, t.num_replies
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -773,7 +801,7 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 		)
 	);
 	$topics = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['subject']);
 
@@ -786,7 +814,7 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if ($output_method != 'echo' || empty($topics))
 		return $topics;
@@ -964,13 +992,15 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
 function ssi_queryMembers($query_where = null, $query_where_params = array(), $query_limit = '', $query_order = 'id_member DESC', $output_method = 'echo')
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings, $smcFunc, $memberContext;
+	global $modSettings, $memberContext;
 
 	if ($query_where === null)
 		return;
 
+	$db = database();
+
 	// Fetch the members in question.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . $query_where . '
@@ -980,9 +1010,9 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 		))
 	);
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$members[] = $row['id_member'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($members))
 		return array();
@@ -1033,10 +1063,12 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
  */
 function ssi_boardStats($output_method = 'echo')
 {
-	global $db_prefix, $txt, $scripturl, $modSettings, $smcFunc;
+	global $db_prefix, $txt, $scripturl, $modSettings;
 
 	if (!allowedTo('view_stats'))
 		return;
+
+	$db = database();
 
 	$totals = array(
 		'members' => $modSettings['totalMembers'],
@@ -1044,23 +1076,23 @@ function ssi_boardStats($output_method = 'echo')
 		'topics' => $modSettings['totalTopics']
 	);
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}boards',
 		array(
 		)
 	);
-	list ($totals['boards']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($totals['boards']) = $db->fetch_row($result);
+	$db->free_result($result);
 
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}categories',
 		array(
 		)
 	);
-	list ($totals['categories']) = $smcFunc['db_fetch_row']($result);
-	$smcFunc['db_free_result']($result);
+	list ($totals['categories']) = $db->fetch_row($result);
+	$db->free_result($result);
 
 	if ($output_method != 'echo')
 		return $totals;
@@ -1202,14 +1234,16 @@ function ssi_topPoll($output_method = 'echo')
  */
 function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 {
-	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $smcFunc, $modSettings;
+	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $modSettings;
 
 	$boardsAllowed = array_intersect(boardsAllowedTo('poll_view'), boardsAllowedTo('poll_vote'));
 
 	if (empty($boardsAllowed))
 		return array();
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT p.id_poll, p.question, t.id_topic, p.max_votes, p.guest_vote, p.hide_results, p.expire_time
 		FROM {db_prefix}polls AS p
 			INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
@@ -1236,8 +1270,8 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			'recycle_enable' => $modSettings['recycle_board'],
 		)
 	);
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	// This user has voted on all the polls.
 	if ($row === false)
@@ -1247,7 +1281,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	if ($user_info['is_guest'] && (!$row['guest_vote'] || (isset($_COOKIE['guest_poll_vote']) && in_array($row['id_poll'], explode(',', $_COOKIE['guest_poll_vote'])))))
 		return ssi_showPoll($row['id_topic'], $output_method);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(DISTINCT id_member)
 		FROM {db_prefix}log_polls
 		WHERE id_poll = {int:current_poll}',
@@ -1255,10 +1289,10 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			'current_poll' => $row['id_poll'],
 		)
 	);
-	list ($total) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total) = $db->fetch_row($request);
+	$db->free_result($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_choice, label, votes
 		FROM {db_prefix}poll_choices
 		WHERE id_poll = {int:current_poll}',
@@ -1267,13 +1301,13 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		)
 	);
 	$options = array();
-	while ($rowChoice = $smcFunc['db_fetch_assoc']($request))
+	while ($rowChoice = $db->fetch_assoc($request))
 	{
 		censorText($rowChoice['label']);
 
 		$options[$rowChoice['id_choice']] = array($rowChoice['label'], $rowChoice['votes']);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Can they view it?
 	$is_expired = !empty($row['expire_time']) && $row['expire_time'] < time();
@@ -1340,19 +1374,21 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
  */
 function ssi_showPoll($topic = null, $output_method = 'echo')
 {
-	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $smcFunc, $modSettings;
+	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $modSettings;
 
 	$boardsAllowed = boardsAllowedTo('poll_view');
 
 	if (empty($boardsAllowed))
 		return array();
 
+	$db = database();
+
 	if ($topic === null && isset($_REQUEST['ssi_topic']))
 		$topic = (int) $_REQUEST['ssi_topic'];
 	else
 		$topic = (int) $topic;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			p.id_poll, p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.guest_vote, b.id_board
 		FROM {db_prefix}topics AS t
@@ -1371,11 +1407,11 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 	);
 
 	// Either this topic has no poll, or the user cannot view it.
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		return array();
 
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	// Check if they can vote.
 	if (!empty($row['expire_time']) && $row['expire_time'] < time())
@@ -1388,7 +1424,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 		$allow_vote = false;
 	else
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}log_polls
 			WHERE id_poll = {int:current_poll}
@@ -1399,15 +1435,15 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 				'current_poll' => $row['id_poll'],
 			)
 		);
-		$allow_vote = $smcFunc['db_num_rows']($request) == 0;
-		$smcFunc['db_free_result']($request);
+		$allow_vote = $db->num_rows($request) == 0;
+		$db->free_result($request);
 	}
 
 	// Can they view?
 	$is_expired = !empty($row['expire_time']) && $row['expire_time'] < time();
 	$allow_view_results = allowedTo('moderate_board') || $row['hide_results'] == 0 || ($row['hide_results'] == 1 && !$allow_vote) || $is_expired;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(DISTINCT id_member)
 		FROM {db_prefix}log_polls
 		WHERE id_poll = {int:current_poll}',
@@ -1415,10 +1451,10 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 			'current_poll' => $row['id_poll'],
 		)
 	);
-	list ($total) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total) = $db->fetch_row($request);
+	$db->free_result($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_choice, label, votes
 		FROM {db_prefix}poll_choices
 		WHERE id_poll = {int:current_poll}',
@@ -1428,14 +1464,14 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 	);
 	$options = array();
 	$total_votes = 0;
-	while ($rowChoice = $smcFunc['db_fetch_assoc']($request))
+	while ($rowChoice = $db->fetch_assoc($request))
 	{
 		censorText($rowChoice['label']);
 
 		$options[$rowChoice['id_choice']] = array($rowChoice['label'], $rowChoice['votes']);
 		$total_votes += $rowChoice['votes'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$return = array(
 		'id' => $row['id_poll'],
@@ -1518,7 +1554,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
  */
 function ssi_pollVote()
 {
-	global $context, $db_prefix, $user_info, $sc, $smcFunc, $modSettings;
+	global $context, $db_prefix, $user_info, $sc, $modSettings;
 
 	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
 	{
@@ -1539,8 +1575,10 @@ function ssi_pollVote()
 
 	$_POST['poll'] = (int) $_POST['poll'];
 
+	$db = database();
+
 	// Check if they have already voted, or voting is locked.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			p.id_poll, p.voting_locked, p.expire_time, p.max_votes, p.guest_vote,
 			t.id_topic,
@@ -1559,10 +1597,10 @@ function ssi_pollVote()
 			'is_approved' => 1,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		die;
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
 
 	if (!empty($row['voting_locked']) || ($row['selected'] != -1 && !$user_info['is_guest']) || (!empty($row['expire_time']) && time() > $row['expire_time']))
 		redirectexit('topic=' . $row['id_topic'] . '.0');
@@ -1593,13 +1631,13 @@ function ssi_pollVote()
 	}
 
 	// Add their vote in to the tally.
-	$smcFunc['db_insert']('insert',
+	$db->insert('insert',
 		$db_prefix . 'log_polls',
 		array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
 		$inserts,
 		array('id_poll', 'id_member', 'id_choice')
 	);
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}poll_choices
 		SET votes = votes + 1
 		WHERE id_poll = {int:current_poll}
@@ -1804,9 +1842,10 @@ function ssi_todaysCalendar($output_method = 'echo')
 function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $output_method = 'echo')
 {
 	global $scripturl, $db_prefix, $txt, $settings, $modSettings, $context;
-	global $smcFunc;
 
 	loadLanguage('Stats');
+
+	$db = database();
 
 	// Must be integers....
 	if ($limit === null)
@@ -1833,7 +1872,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	$start = max(0, $start);
 
 	// Make sure guests can see this board.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_board
 		FROM {db_prefix}boards
 		WHERE ' . ($board === null ? '' : 'id_board = {int:current_board}
@@ -1843,15 +1882,15 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'current_board' => $board,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 	{
 		if ($output_method == 'echo')
 			die($txt['ssi_no_guests']);
 		else
 			return array();
 	}
-	list ($board) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($board) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// Load the message icons - the usual suspects.
 	$stable_icons = array('xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'poll', 'moved', 'recycled', 'wireless', 'clip');
@@ -1860,7 +1899,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$icon_sources[$icon] = 'images_url';
 
 	// Find the post ids.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT t.id_first_msg
 		FROM {db_prefix}topics as t
 		LEFT JOIN {db_prefix}boards as b ON (b.id_board = t.id_board)
@@ -1875,15 +1914,15 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		)
 	);
 	$posts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$posts[] = $row['id_first_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($posts))
 		return array();
 
 	// Find the posts.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
 			t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, t.id_last_msg
@@ -1898,12 +1937,12 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		)
 	);
 	$return = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// If we want to limit the length of the post.
-		if (!empty($length) && $smcFunc['strlen']($row['body']) > $length)
+		if (!empty($length) && Util::strlen($row['body']) > $length)
 		{
-			$row['body'] = $smcFunc['substr']($row['body'], 0, $length);
+			$row['body'] = Util::substr($row['body'], 0, $length);
 			$cutoff = false;
 
 			$last_space = strrpos($row['body'], ' ');
@@ -1915,7 +1954,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 				$cutoff = $last_space;
 
 			if ($cutoff !== false)
-				$row['body'] = $smcFunc['substr']($row['body'], 0, $cutoff);
+				$row['body'] = Util::substr($row['body'], 0, $cutoff);
 			$row['body'] .= '...';
 		}
 
@@ -1933,7 +1972,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'message_id' => $row['id_msg'],
 			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" alt="' . $row['icon'] . '" />',
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'body' => $row['body'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
@@ -1952,7 +1991,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'is_last' => false
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($return))
 		return $return;
@@ -1989,13 +2028,15 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
  */
 function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 {
-	global $db_prefix, $user_info, $scripturl, $modSettings, $txt, $context, $smcFunc;
+	global $db_prefix, $user_info, $scripturl, $modSettings, $txt, $context;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 		return;
 
+	$db = database();
+
 	// Find all events which are happening in the near future that the member can see.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, cal.id_topic,
 			cal.id_board, t.id_first_msg, t.approved
@@ -2014,7 +2055,7 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 	);
 	$return = array();
 	$duplicates = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Check if we've already come by an event linked to this same topic with the same title... and don't display it if we have.
 		if (!empty($duplicates[$row['title'] . $row['id_topic']]))
@@ -2047,7 +2088,7 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 		// Let's not show this one again, huh?
 		$duplicates[$row['title'] . $row['id_topic']] = true;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	foreach ($return as $mday => $array)
 		$return[$mday][count($array) - 1]['is_last'] = true;
@@ -2080,13 +2121,15 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
  */
 function ssi_checkPassword($id = null, $password = null, $is_username = false)
 {
-	global $db_prefix, $smcFunc;
+	global $db_prefix;
 
 	// If $id is null, this was most likely called from a query string and should do nothing.
 	if ($id === null)
 		return;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT passwd, member_name, is_activated
 		FROM {db_prefix}members
 		WHERE ' . ($is_username ? 'member_name' : 'id_member') . ' = {string:id}
@@ -2095,8 +2138,8 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
 			'id' => $id,
 		)
 	);
-	list ($pass, $user, $active) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($pass, $user, $active) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return sha1(strtolower($user) . $password) == $pass && $active == 1;
 }
@@ -2110,7 +2153,7 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
  */
 function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(), $output_method = 'echo')
 {
-	global $smcFunc, $context, $modSettings, $scripturl, $txt, $settings;
+	global $context, $modSettings, $scripturl, $txt, $settings;
 
 	// We want to make sure that we only get attachments for boards that we can see *if* any.
 	$attachments_boards = boardsAllowedTo('view_attachments');
@@ -2119,12 +2162,14 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 	if (empty($attachments_boards))
 		return array();
 
+	$db = database();
+
 	// Is it an array?
 	if (!is_array($attachment_ext))
 		$attachment_ext = array($attachment_ext);
 
 	// Lets build the query.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			att.id_attach, att.id_msg, att.filename, IFNULL(att.size, 0) AS filesize, att.downloads, mem.id_member,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.id_topic, m.subject, t.id_board, m.poster_time,
@@ -2153,7 +2198,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 
 	// We have something.
 	$attachments = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$filename = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($row['filename']));
 
@@ -2177,7 +2222,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 				'subject' => $row['subject'],
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-				'time' => timeformat($row['poster_time']),
+				'time' => standardTime($row['poster_time']),
 			),
 		);
 
@@ -2196,7 +2241,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 			);
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// So you just want an array?  Here you can have it.
 	if ($output_method == 'array' || empty($attachments))

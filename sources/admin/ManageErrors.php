@@ -36,9 +36,11 @@ class ManageErrors_Controller
 	 */
 	public function action_log()
 	{
-		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter, $smcFunc;
+		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
 
-		require_once(SUBSDIR . '/ManageErrors.subs.php');
+		$db = database();
+
+		require_once(SUBSDIR . '/Error.subs.php');
 
 		// Viewing contents of a file?
 		if (isset($_GET['file']))
@@ -68,7 +70,7 @@ class ManageErrors_Controller
 			$filter = array(
 				'variable' => $_GET['filter'],
 				'value' => array(
-					'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $smcFunc['db_escape_wildcard_string']($_GET['value']),
+					'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->db_escape_wildcard_string($_GET['value']),
 				),
 				'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 				'entity' => $filters[$_GET['filter']]
@@ -91,7 +93,7 @@ class ManageErrors_Controller
 			// // Go back to where we were.
 			if ($type == 'delete')
 				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : '') . ';start=' . $_GET['start'] . (isset($filter) ? ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'] : ''));// Go back to where we were.
-		
+
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 
 		}
@@ -119,7 +121,7 @@ class ManageErrors_Controller
 			$context['errors'] = $logdata['errors'];
 			$members = $logdata['members'];
 		}
-		
+
 		// Load the member data.
 		if (!empty($members))
 		{
@@ -166,38 +168,19 @@ class ManageErrors_Controller
 
 		$context['error_types'] = array();
 
+		$sort = ($context['sort_direction'] == 'down') ? ';desc' : '';
+		// What type of errors do we have and how many do we have?
+		$context['error_types'] = fetchErrorsByType($filter, $sort);
+		$sum = 0;
+		foreach ($context['error_types'] as $key => $value)
+			$sum += $key;
+
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
 			'description' => isset($txt['errortype_all_desc']) ? $txt['errortype_all_desc'] : '',
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : ''),
 			'is_selected' => empty($filter),
 		);
-
-		$sum = 0;
-		// What type of errors do we have and how many do we have?
-		$request = $smcFunc['db_query']('', '
-			SELECT error_type, COUNT(*) AS num_errors
-			FROM {db_prefix}log_errors
-			GROUP BY error_type
-			ORDER BY error_type = {string:critical_type} DESC, error_type ASC',
-			array(
-				'critical_type' => 'critical',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			// Total errors so far?
-			$sum += $row['num_errors'];
-
-			$context['error_types'][$sum] = array(
-				'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
-				'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
-				'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
-				'is_selected' => isset($filter) && $filter['value']['sql'] == $smcFunc['db_escape_wildcard_string']($row['error_type']),
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
 		// Update the all errors tab with the total number of errors
 		$context['error_types']['all']['label'] .= ' (' . $sum . ')';
 
@@ -232,7 +215,8 @@ class ManageErrors_Controller
 		isAllowedTo('admin_forum');
 
 		// Decode the file and get the line
-		$file = realpath(base64_decode($_REQUEST['file']));
+		$filename = base64_decode($_REQUEST['file']);
+		$file = realpath($filename);
 		$line = isset($_REQUEST['line']) ? (int) $_REQUEST['line'] : 0;
 
 		// Make sure things are normalized
@@ -245,7 +229,7 @@ class ManageErrors_Controller
 		$basename = strtolower(basename($file));
 		$ext = strrchr($basename, '.');
 		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
-			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($file)));
+			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename)));
 
 		// get the min and max lines
 		$min = $line - 20 <= 0 ? 1 : $line - 20;
@@ -269,7 +253,7 @@ class ManageErrors_Controller
 		);
 
 		loadTemplate('Errors');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'show_file';
 	}
 }

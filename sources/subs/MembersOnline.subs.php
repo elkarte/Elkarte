@@ -30,7 +30,9 @@ if (!defined('ELKARTE'))
  */
 function getMembersOnlineStats($membersOnlineOptions)
 {
-	global $smcFunc, $context, $scripturl, $user_info, $modSettings, $txt;
+	global $scripturl, $user_info, $modSettings, $txt;
+
+	$db = database();
 
 	// The list can be sorted in several ways.
 	$allowed_sort_options = array(
@@ -53,7 +55,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		trigger_error('Sort method for getMembersOnlineStats() function is not allowed', E_USER_NOTICE);
 
 	// Get it from the cache and send it back.
-	if (($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
+	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] > 1 && ($temp = cache_get_data('membersOnlineStats-' . $membersOnlineOptions['sort'], 240)) !== null)
 		return $temp;
 
 	// Initialize the array that'll be returned later on.
@@ -75,7 +77,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 		$spiders = unserialize($modSettings['spider_name_cache']);
 
 	// Load the users online right now.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			lo.id_member, lo.log_time, lo.id_spider, mem.real_name, mem.member_name, mem.show_online,
 			mg.online_color, mg.id_group, mg.group_name
@@ -86,7 +88,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 			'reg_mem_group' => 0,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (empty($row['real_name']))
 		{
@@ -147,7 +149,7 @@ function getMembersOnlineStats($membersOnlineOptions)
 				'color' => $row['online_color']
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If there are spiders only and we're showing the detail, add them to the online list - at the bottom.
 	if (!empty($spider_finds) && $modSettings['show_spider_online'] > 1)
@@ -203,7 +205,9 @@ function getMembersOnlineStats($membersOnlineOptions)
  */
 function trackStatsUsersOnline($total_users_online)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	$settingsToUpdate = array();
 
@@ -219,7 +223,7 @@ function trackStatsUsersOnline($total_users_online)
 	// No entry exists for today yet?
 	if (!isset($modSettings['mostOnlineUpdated']) || $modSettings['mostOnlineUpdated'] != $date)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT most_on
 			FROM {db_prefix}log_activity
 			WHERE date = {date:date}
@@ -230,9 +234,9 @@ function trackStatsUsersOnline($total_users_online)
 		);
 
 		// The log_activity hasn't got an entry for today?
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($db->num_rows($request) === 0)
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_activity',
 				array('date' => 'date', 'most_on' => 'int'),
 				array($date, $total_users_online),
@@ -242,14 +246,14 @@ function trackStatsUsersOnline($total_users_online)
 		// There's an entry in log_activity on today...
 		else
 		{
-			list ($modSettings['mostOnlineToday']) = $smcFunc['db_fetch_row']($request);
+			list ($modSettings['mostOnlineToday']) = $db->fetch_row($request);
 
 			if ($total_users_online > $modSettings['mostOnlineToday'])
 				trackStats(array('most_on' => $total_users_online));
 
 			$total_users_online = max($total_users_online, $modSettings['mostOnlineToday']);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		$settingsToUpdate['mostOnlineUpdated'] = $date;
 		$settingsToUpdate['mostOnlineToday'] = $total_users_online;

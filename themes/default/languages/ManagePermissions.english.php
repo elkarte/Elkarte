@@ -86,6 +86,8 @@ $txt['permissionname_search_posts'] = 'Search for posts and topics';
 $txt['permissionhelp_search_posts'] = 'The Search permission allows the user to search all boards he or she is allowed to access. When the search permission is enabled, a \'Search\' button will be added to the forum button bar.';
 $txt['permissionname_karma_edit'] = 'Change other people\'s karma';
 $txt['permissionhelp_karma_edit'] = 'Karma is a feature that shows the popularity of a member. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a membergroup to cast a vote. This permission has no effect on guests.';
+$txt['permissionname_like_posts'] = 'Like other users posts';
+$txt['permissionhelp_like_posts'] = 'Likes is a feature that shows the popularity of a post. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a membergroup to like a post or unlike one they previosly liked.  This permission has no effect on guests.';
 $txt['permissionname_disable_censor'] = 'Disable word censor';
 $txt['permissionhelp_disable_censor'] = 'Allows members the option to disable the word censor.';
 
@@ -200,6 +202,11 @@ $txt['permissionname_delete_replies'] = 'Delete replies to own topics';
 $txt['permissionhelp_delete_replies'] = 'This permission allows a user that started a topic to remove all replies to their topic.';
 $txt['permissionname_announce_topic'] = 'Announce topic';
 $txt['permissionhelp_announce_topic'] = 'This allows a user to send an announcement e-mail about a topic to all members or to a few membergroups.';
+
+$txt['permissionname_approve_emails'] = 'Moderate Post by Email Failures';
+$txt['permissionhelp_approve_emails'] = 'Allow Moderators to access the Post by Email failure log to perform actions including approve, delete, view and bounce.  Note, since the system may not allways know what board a post goes to, this permission should be only be given to members with full board access';
+$txt['permissionname_postby_email'] = 'Post by Email';
+$txt['permissionhelp_postby_email'] = 'This permission allows users to start new topics as well as reply to topic and PM notifications by email.';
 
 $txt['permissiongroup_post'] = 'Posts';
 $txt['permissionname_delete'] = 'Delete posts';

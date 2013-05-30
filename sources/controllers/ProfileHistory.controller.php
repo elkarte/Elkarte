@@ -22,11 +22,12 @@ if (!defined('ELKARTE'))
  * Profile history main function.
  * Re-directs to sub-actions (@todo it should only set the context)
  *
- * @param int $memID id_member
  */
-function action_history($memID)
+function action_history()
 {
 	global $context, $txt, $scripturl, $modSettings, $user_profile;
+
+	$memID = currentMemberID();
 
 	$subActions = array(
 		'activity' => array('action_trackactivity', $txt['trackActivity']),
@@ -72,7 +73,9 @@ function action_history($memID)
 function action_trackactivity($memID)
 {
 	global $scripturl, $txt, $modSettings;
-	global $user_profile, $context, $smcFunc;
+	global $user_profile, $context;
+
+	$db = database();
 
 	// Verify if the user has sufficient permissions.
 	isAllowedTo('moderate_forum');
@@ -167,7 +170,7 @@ function action_trackactivity($memID)
 	// If this is a big forum, or a large posting user, let's limit the search.
 	if ($modSettings['totalMessages'] > 50000 && $user_profile[$memID]['posts'] > 500)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT MAX(id_msg)
 			FROM {db_prefix}messages AS m
 			WHERE m.id_member = {int:current_member}',
@@ -175,8 +178,8 @@ function action_trackactivity($memID)
 				'current_member' => $memID,
 			)
 		);
-		list ($max_msg_member) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($max_msg_member) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// There's no point worrying ourselves with messages made yonks ago, just get recent ones!
 		$min_msg_member = max(0, $max_msg_member - $user_profile[$memID]['posts'] * 3);
@@ -190,7 +193,7 @@ function action_trackactivity($memID)
 
 	// @todo cache this
 	// Get all IP addresses this user has used for his messages.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT poster_ip
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member}
@@ -204,15 +207,15 @@ function action_trackactivity($memID)
 		)
 	);
 	$context['ips'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['poster_ip'] . ';u=' . $memID . '">' . $row['poster_ip'] . '</a>';
 		$ips[] = $row['poster_ip'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Now also get the IP addresses from the error messages.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS error_count, ip
 		FROM {db_prefix}log_errors
 		WHERE id_member = {int:current_member}
@@ -222,12 +225,12 @@ function action_trackactivity($memID)
 		)
 	);
 	$context['error_ips'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['ip'] . ';u=' . $memID . '">' . $row['ip'] . '</a>';
 		$ips[] = $row['ip'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Find other users that might use the same IP.
 	$ips = array_unique($ips);
@@ -235,7 +238,7 @@ function action_trackactivity($memID)
 	if (!empty($ips))
 	{
 		// Get member ID's which are in messages...
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT mem.id_member
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -248,9 +251,9 @@ function action_trackactivity($memID)
 			)
 		);
 		$message_members = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$message_members[] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Fetch their names, cause of the GROUP BY doesn't like giving us that normally.
 		if (!empty($message_members))
@@ -262,7 +265,7 @@ function action_trackactivity($memID)
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		}
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, real_name
 			FROM {db_prefix}members
 			WHERE id_member != {int:current_member}
@@ -272,10 +275,11 @@ function action_trackactivity($memID)
 				'ip_list' => $ips,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
+	loadTemplate('ProfileHistory');
 	$context['sub_template'] = 'trackActivity';
 }
 
@@ -289,18 +293,17 @@ function action_trackactivity($memID)
  */
 function list_getUserErrorCount($where, $where_vars = array())
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS error_count
 		FROM {db_prefix}log_errors
 		WHERE ' . $where,
 		$where_vars
 	);
-	list ($count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
 
-	// @todo cast this to an integer
 	return $count;
 }
 
@@ -316,10 +319,12 @@ function list_getUserErrorCount($where, $where_vars = array())
  */
 function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $smcFunc, $txt, $scripturl;
+	global $txt, $scripturl;
+
+	$db = database();
 
 	// Get a list of error messages from this ip (range).
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			le.log_time, le.ip, le.url, le.message, IFNULL(mem.id_member, 0) AS id_member,
 			IFNULL(mem.real_name, {string:guest_title}) AS display_name, mem.member_name
@@ -333,16 +338,16 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
 		))
 	);
 	$error_messages = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$error_messages[] = array(
 			'ip' => $row['ip'],
 			'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
 			'message' => strtr($row['message'], array('&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '')),
 			'url' => $row['url'],
-			'time' => timeformat($row['log_time']),
+			'time' => relativeTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $error_messages;
 }
@@ -356,19 +361,18 @@ function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars 
  */
 function list_getIPMessageCount($where, $where_vars = array())
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_see_board} AND ' . $where,
 		$where_vars
 	);
-	list ($count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
 
-	// @todo cast to integer
 	return $count;
 }
 
@@ -384,11 +388,13 @@ function list_getIPMessageCount($where, $where_vars = array())
  */
 function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $smcFunc, $txt, $scripturl;
+	global $txt, $scripturl;
+
+	$db = database();
 
 	// Get all the messages fitting this where clause.
 	// @todo SLOW This query is using a filesort.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			m.id_msg, m.poster_ip, IFNULL(mem.real_name, m.poster_name) AS display_name, mem.id_member,
 			m.subject, m.poster_time, m.id_topic, m.id_board
@@ -402,7 +408,7 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 		))
 	);
 	$messages = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$messages[] = array(
 			'ip' => $row['poster_ip'],
 			'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>',
@@ -413,10 +419,10 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 			'topic' => $row['id_topic'],
 			'id' => $row['id_msg'],
 			'subject' => $row['subject'],
-			'time' => timeformat($row['poster_time']),
+			'time' => relativeTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time'])
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $messages;
 }
@@ -431,17 +437,20 @@ function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars 
 function action_trackip($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context, $smcFunc;
+	global $context;
+
+	$db = database();
 
 	// Can the user do this?
 	isAllowedTo('moderate_forum');
 
+	loadTemplate('Profile');
+	loadTemplate('ProfileHistory');
+	loadLanguage('Profile');
+
 	if ($memID == 0)
 	{
 		$context['ip'] = $user_info['ip'];
-		loadTemplate('Profile');
-		loadLanguage('Profile');
-		$context['sub_template'] = 'trackIP';
 		$context['page_title'] = $txt['profile'];
 		$context['base_url'] = $scripturl . '?action=trackip';
 	}
@@ -464,7 +473,7 @@ function action_trackip($memID = 0)
 	if (empty($context['history_area']))
 		$context['page_title'] = $txt['trackIP'] . ' - ' . $context['ip'];
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name AS display_name, member_ip
 		FROM {db_prefix}members
 		WHERE member_ip ' . $ip_string,
@@ -473,9 +482,9 @@ function action_trackip($memID = 0)
 		)
 	);
 	$context['ips'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$context['ips'][$row['member_ip']][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>';
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	ksort($context['ips']);
 
@@ -717,7 +726,9 @@ function action_trackip($memID = 0)
 function action_tracklogin($memID = 0)
 {
 	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context, $smcFunc;
+	global $context;
+
+	$db = database();
 
 	// Gonna want this for the list.
 	require_once(SUBSDIR . '/List.subs.php');
@@ -798,9 +809,9 @@ function action_tracklogin($memID = 0)
  */
 function list_getLoginCount($where, $where_vars = array())
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
 		FROM {db_prefix}member_logins
 		WHERE id_member = {int:id_member}',
@@ -808,10 +819,9 @@ function list_getLoginCount($where, $where_vars = array())
 			'id_member' => $where_vars['current_member'],
 		)
 	);
-	list ($count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
 
-	// @todo cast to integer
 	return $count;
 }
 
@@ -827,9 +837,11 @@ function list_getLoginCount($where, $where_vars = array())
  */
 function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $smcFunc, $txt, $scripturl;
+	global $txt, $scripturl;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT time, ip, ip2
 		FROM {db_prefix}member_logins
 		WHERE {int:id_member}
@@ -839,13 +851,13 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
 		)
 	);
 	$logins = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$logins[] = array(
-			'time' => timeformat($row['time']),
+			'time' => relativeTime($row['time']),
 			'ip' => $row['ip'],
 			'ip2' => $row['ip2'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $logins;
 }
@@ -857,24 +869,26 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
  */
 function action_trackedits($memID)
 {
-	global $scripturl, $txt, $modSettings, $context, $smcFunc;
+	global $scripturl, $txt, $modSettings, $context;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/List.subs.php');
 
 	// Get the names of any custom fields.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT col_name, field_name, bbc
 		FROM {db_prefix}custom_fields',
 		array(
 		)
 	);
 	$context['custom_field_titles'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$context['custom_field_titles']['customfield_' . $row['col_name']] = array(
 			'title' => $row['field_name'],
 			'parse_bbc' => $row['bbc'],
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Set the options for the error lists.
 	$listOptions = array(
@@ -959,9 +973,9 @@ function action_trackedits($memID)
  */
 function list_getProfileEditCount($memID)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*) AS edit_count
 		FROM {db_prefix}log_actions
 		WHERE id_log = {int:log_type}
@@ -971,10 +985,9 @@ function list_getProfileEditCount($memID)
 			'owner' => $memID,
 		)
 	);
-	list ($edit_count) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($edit_count) = $db->fetch_row($request);
+	$db->free_result($request);
 
-	// @todo cast to integer
 	return $edit_count;
 }
 
@@ -989,10 +1002,12 @@ function list_getProfileEditCount($memID)
  */
 function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 {
-	global $smcFunc, $txt, $scripturl, $context;
+	global $txt, $scripturl, $context;
+
+	$db = database();
 
 	// Get a list of error messages from this ip (range).
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT
 			id_action, id_member, ip, log_time, action, extra
 		FROM {db_prefix}log_actions
@@ -1007,7 +1022,7 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	);
 	$edits = array();
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$extra = @unserialize($row['extra']);
 		if (!empty($extra['applicator']))
@@ -1036,10 +1051,10 @@ function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 			'action_text' => $action_text,
 			'before' => !empty($extra['previous']) ? ($parse_bbc ? parse_bbc($extra['previous']) : $extra['previous']) : '',
 			'after' => !empty($extra['new']) ? ($parse_bbc ? parse_bbc($extra['new']) : $extra['new']) : '',
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Get any member names.
 	if (!empty($members))

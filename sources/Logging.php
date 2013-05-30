@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
  */
 function writeLog($force = false)
 {
-	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board, $smcFunc;
+	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board;
+
+	$db = database();
 
 	// If we are showing who is viewing a topic, let's see if we are, and force an update if so - to make it accurate.
 	if (!empty($settings['display_who_viewing']) && ($topic || $board))
@@ -79,7 +81,7 @@ function writeLog($force = false)
 	{
 		if ($do_delete)
 		{
-			$smcFunc['db_query']('delete_log_online_interval', '
+			$db->query('delete_log_online_interval', '
 				DELETE FROM {db_prefix}log_online
 				WHERE log_time < {int:log_time}
 					AND session != {string:session}',
@@ -93,7 +95,7 @@ function writeLog($force = false)
 			cache_put_data('log_online-update', time(), 30);
 		}
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_online
 			SET log_time = {int:log_time}, ip = IFNULL(INET_ATON({string:ip}), 0), url = {string:url}
 			WHERE session = {string:session}',
@@ -106,7 +108,7 @@ function writeLog($force = false)
 		);
 
 		// Guess it got deleted.
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($db->affected_rows() == 0)
 			$_SESSION['log_time'] = 0;
 	}
 	else
@@ -116,7 +118,7 @@ function writeLog($force = false)
 	if (empty($_SESSION['log_time']))
 	{
 		if ($do_delete || !empty($user_info['id']))
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}log_online
 				WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty($user_info['id']) ? ' OR ' : '') . (empty($user_info['id']) ? '' : 'id_member = {int:current_member}'),
 				array(
@@ -125,7 +127,7 @@ function writeLog($force = false)
 				)
 			);
 
-		$smcFunc['db_insert']($do_delete ? 'ignore' : 'replace',
+		$db->insert($do_delete ? 'ignore' : 'replace',
 			'{db_prefix}log_online',
 			array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
 			array($session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), 'IFNULL(INET_ATON(\'' . $user_info['ip'] . '\'), 0)', $serialized),
@@ -207,7 +209,7 @@ function displayDebug()
 	global $db_cache, $db_count, $db_show_debug, $cache_count, $cache_hits, $txt;
 
 	// Add to Settings.php if you want to show the debugging information.
-	if (!isset($db_show_debug) || $db_show_debug !== true || (isset($_GET['action']) && $_GET['action'] == 'viewquery'))
+	if (!isset($db_show_debug) || $db_show_debug !== true || (isset($_GET['action']) && $_GET['action'] == 'viewquery') || isset($_GET['api']))
 		return;
 
 	if (empty($_SESSION['view_queries']))
@@ -335,7 +337,9 @@ function displayDebug()
  */
 function trackStats($stats = array())
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 	static $cache_stats = array();
 
 	if (empty($modSettings['trackStats']))
@@ -363,15 +367,15 @@ function trackStats($stats = array())
 		$insert_keys[$field] = 'int';
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_activity
 		SET' . substr($setStringUpdate, 0, -1) . '
 		WHERE date = {date:current_date}',
 		$update_parameters
 	);
-	if ($smcFunc['db_affected_rows']() == 0)
+	if ($db->affected_rows() == 0)
 	{
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_activity',
 			array_merge($insert_keys, array('date' => 'date')),
 			array_merge($cache_stats, array($date)),
@@ -414,7 +418,9 @@ function logAction($action, $extra = array(), $log_type = 'moderate')
  */
 function logActions($logs)
 {
-	global $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info;
+
+	$db = database();
 
 	$inserts = array();
 	$log_types = array(
@@ -462,7 +468,7 @@ function logActions($logs)
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_report
 				FROM {db_prefix}log_reported
 				WHERE {raw:column_name} = {int:reported}
@@ -473,13 +479,13 @@ function logActions($logs)
 			));
 
 			// Alright, if we get any result back, update open reports.
-			if ($smcFunc['db_num_rows']($request) > 0)
+			if ($db->num_rows($request) > 0)
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 
 		if (isset($log['extra']['member']) && !is_numeric($log['extra']['member']))
@@ -517,7 +523,7 @@ function logActions($logs)
 		);
 	}
 
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_actions',
 		array(
 			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
@@ -527,7 +533,7 @@ function logActions($logs)
 		array('id_action')
 	);
 
-	return $smcFunc['db_insert_id']('{db_prefix}log_actions', 'id_action');
+	return $db->insert_id('{db_prefix}log_actions', 'id_action');
 }
 
 /**
@@ -540,9 +546,9 @@ function logActions($logs)
  */
 function logLoginHistory($id_member, $ip, $ip2)
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_insert']('insert',
+	$db->insert('insert',
 		'{db_prefix}member_logins',
 		array(
 			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',

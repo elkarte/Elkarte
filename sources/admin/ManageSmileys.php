@@ -33,11 +33,16 @@ class ManageSmileys_Controller
 	protected $_smileySettings;
 
 	/**
+	 * Contextual information about smiley sets.
+	 */
+	private $_smiley_context = array();
+
+	/**
 	 * This is the dispatcher of smileys administration.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $modSettings;
 
 		isAllowedTo('manage_smileys');
 
@@ -74,6 +79,9 @@ class ManageSmileys_Controller
 			unset($subActions['editicon']);
 			unset($subActions['editicons']);
 		}
+
+		// Set the smiley context.
+		$this->_initSmileyContext();
 
 		// Default the sub-action to 'edit smiley settings'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'editsets';
@@ -130,9 +138,9 @@ class ManageSmileys_Controller
 	/**
 	 * Displays and allows to modify smileys settings.
 	 */
-	function action_smileySettings_display()
+	public function action_smileySettings_display()
 	{
-		global $modSettings, $context, $settings, $txt, $scripturl;
+		global $context, $scripturl;
 
 		// initialize the form
 		$this->_initSmileySettingsForm();
@@ -143,6 +151,7 @@ class ManageSmileys_Controller
 
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		$context['sub_template'] = 'show_settings';
 
 		// Finish up the form...
@@ -154,8 +163,7 @@ class ManageSmileys_Controller
 		{
 			checkSession();
 
-			// Validate the smiley set name.
-			$_POST['smiley_sets_default'] = empty($smiley_context[$_POST['smiley_sets_default']]) ? 'default' : $_POST['smiley_sets_default'];
+			$_POST['smiley_sets_default'] = empty($this->_smiley_context[$_POST['smiley_sets_default']]) ? 'default' : $_POST['smiley_sets_default'];
 
 			// Make sure that the smileys are in the right order after enabling them.
 			if (isset($_POST['smiley_enable']))
@@ -180,7 +188,7 @@ class ManageSmileys_Controller
 	/**
 	 * Retrieve and initialize the form with smileys administration settings.
 	 */
-	function _initSmileySettingsForm()
+	private function _initSmileySettingsForm()
 	{
 		global $txt, $modSettings;
 
@@ -194,21 +202,13 @@ class ManageSmileys_Controller
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 
-		// Get the names of the smiley sets.
-		$smiley_sets = explode(',', $modSettings['smiley_sets_known']);
-		$set_names = explode("\n", $modSettings['smiley_sets_names']);
-
-		$smiley_context = array();
-		foreach ($smiley_sets as $i => $set)
-			$smiley_context[$set] = $set_names[$i];
-
 		// All the settings for the page...
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
 				array('permissions', 'manage_smileys'),
 			'',
-				array('select', 'smiley_sets_default', $smiley_context),
+				array('select', 'smiley_sets_default', $this->_smiley_context),
 				array('check', 'smiley_sets_enable'),
 				array('check', 'smiley_enable', 'subtext' => $txt['smileys_enable_note']),
 				array('text', 'smileys_url', 40),
@@ -224,7 +224,7 @@ class ManageSmileys_Controller
 	/**
 	 * Retrieve and return smileys administration settings.
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt, $modSettings;
 
@@ -232,21 +232,13 @@ class ManageSmileys_Controller
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
 
-		// Get the names of the smiley sets.
-		$smiley_sets = explode(',', $modSettings['smiley_sets_known']);
-		$set_names = explode("\n", $modSettings['smiley_sets_names']);
-
-		$smiley_context = array();
-		foreach ($smiley_sets as $i => $set)
-			$smiley_context[$set] = $set_names[$i];
-
 		// All the settings for the page...
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
 				array('permissions', 'manage_smileys'),
 			'',
-				array('select', 'smiley_sets_default', $smiley_context),
+				array('select', 'smiley_sets_default', $this->_smiley_context),
 				array('check', 'smiley_sets_enable'),
 				array('check', 'smiley_enable', 'subtext' => $txt['smileys_enable_note']),
 				array('text', 'smileys_url', 40),
@@ -262,11 +254,11 @@ class ManageSmileys_Controller
 	/**
 	 * List, add, remove, modify smileys sets.
 	 */
-	function action_edit()
+	public function action_edit()
 	{
-		global $modSettings, $context, $settings, $txt;
-		global $smcFunc, $scripturl;
+		global $modSettings, $context, $txt, $scripturl;
 
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		// Set the right tab to be selected.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
 		$context['sub_template'] = $context['sub_action'];
@@ -337,7 +329,7 @@ class ManageSmileys_Controller
 
 				// The user might have checked to also import smileys.
 				if (!empty($_POST['smiley_sets_import']))
-					ImportSmileys($_POST['smiley_sets_path']);
+					importSmileys($_POST['smiley_sets_path']);
 			}
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
@@ -364,7 +356,7 @@ class ManageSmileys_Controller
 
 			// Sanity check - then import.
 			if (isset($context['smiley_sets'][$_GET['set']]))
-				ImportSmileys(un_htmlspecialchars($context['smiley_sets'][$_GET['set']]['path']));
+				importSmileys(un_htmlspecialchars($context['smiley_sets'][$_GET['set']]['path']));
 
 			// Force the process to continue.
 			$context['sub_action'] = 'modifyset';
@@ -403,18 +395,12 @@ class ManageSmileys_Controller
 						fatal_lang_error('smiley_set_dir_not_found', false, array($context['current_set']['name']));
 
 					// Exclude the smileys that are already in the database.
-					$request = $smcFunc['db_query']('', '
-						SELECT filename
-						FROM {db_prefix}smileys
-						WHERE filename IN ({array_string:smiley_list})',
-						array(
-							'smiley_list' => $smileys,
-						)
-					);
-					while ($row = $smcFunc['db_fetch_assoc']($request))
-						if (isset($smileys[strtolower($row['filename'])]))
-							unset($smileys[strtolower($row['filename'])]);
-					$smcFunc['db_free_result']($request);
+					$found = smileyExists($smileys);
+					foreach ($found as $smiley)
+					{
+						if (isset($smileys[$smiley]))
+							unset($smileys[$smiley]);
+					}
 
 					$context['current_set']['can_import'] = count($smileys);
 					// Setup this string to look nice.
@@ -549,10 +535,11 @@ class ManageSmileys_Controller
 	/**
 	 * Add a smiley, that's right.
 	 */
-	function action_addsmiley()
+	public function action_addsmiley()
 	{
-		global $modSettings, $context, $settings, $txt, $smcFunc;
+		global $modSettings, $context, $txt;
 
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		// Get a list of all known smiley sets.
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
@@ -586,18 +573,8 @@ class ManageSmileys_Controller
 				fatal_lang_error('smiley_has_no_code');
 
 			// Check whether the new code has duplicates. It should be unique.
-			$request = $smcFunc['db_query']('', '
-				SELECT id_smiley
-				FROM {db_prefix}smileys
-				WHERE code = {raw:mysql_binary_statement} {string:smiley_code}',
-				array(
-					'mysql_binary_statement' => $smcFunc['db_title'] == 'MySQL' ? 'BINARY' : '',
-					'smiley_code' => $_POST['smiley_code'],
-				)
-			);
-			if ($smcFunc['db_num_rows']($request) > 0)
+			if (validateDuplicateSmiley($_POST['smiley_code']))
 				fatal_lang_error('smiley_not_unique');
-			$smcFunc['db_free_result']($request);
 
 			// If we are uploading - check all the smiley sets are writable!
 			if ($_POST['method'] != 'existing')
@@ -667,7 +644,7 @@ class ManageSmileys_Controller
 			elseif ($_POST['method'] != 'existing')
 			{
 				$newName = '';
-				foreach ($_FILES as $name => $data)
+				foreach ($_FILES as $name => $dummy)
 				{
 					if ($_FILES[$name]['name'] == '')
 						fatal_lang_error('smileys_upload_error_blank');
@@ -726,32 +703,20 @@ class ManageSmileys_Controller
 			$smiley_order = '0';
 			if ($_POST['smiley_location'] != 1)
 			{
-				$request = $smcFunc['db_query']('', '
-					SELECT MAX(smiley_order) + 1
-					FROM {db_prefix}smileys
-					WHERE hidden = {int:smiley_location}
-						AND smiley_row = {int:first_row}',
-					array(
-						'smiley_location' => $_POST['smiley_location'],
-						'first_row' => 0,
-					)
-				);
-				list ($smiley_order) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				$_POST['smiley_location'] = (int) $_POST['smiley_location'];
+				$smiley_order = nextSmileyLocation($_POST['smiley_location']);
 
 				if (empty($smiley_order))
 					$smiley_order = '0';
 			}
-			$smcFunc['db_insert']('',
-				'{db_prefix}smileys',
-				array(
-					'code' => 'string-30', 'filename' => 'string-48', 'description' => 'string-80', 'hidden' => 'int', 'smiley_order' => 'int',
-				),
-				array(
-					$_POST['smiley_code'], $_POST['smiley_filename'], $_POST['smiley_description'], $_POST['smiley_location'], $smiley_order,
-				),
-				array('id_smiley')
+			$param = array(
+				$_POST['smiley_code'],
+				$_POST['smiley_filename'],
+				$_POST['smiley_description'],
+				(int) $_POST['smiley_location'],
+				$smiley_order,
 			);
+			addSmiley($param);
 
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
@@ -800,10 +765,11 @@ class ManageSmileys_Controller
 	/**
 	 * Add, remove, edit smileys.
 	 */
-	function action_editsmiley()
+	public function action_editsmiley()
 	{
-		global $modSettings, $context, $settings, $txt;
-		global $smcFunc, $scripturl;
+		global $modSettings, $context, $txt, $scripturl, $modSettings;
+
+		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		// Force the correct tab to be displayed.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'editsmileys';
@@ -821,13 +787,8 @@ class ManageSmileys_Controller
 					$_POST['checked_smileys'][$id] = (int) $smiley_id;
 
 				if ($_POST['smiley_action'] == 'delete')
-					$smcFunc['db_query']('', '
-						DELETE FROM {db_prefix}smileys
-						WHERE id_smiley IN ({array_int:checked_smileys})',
-						array(
-							'checked_smileys' => $_POST['checked_smileys'],
-						)
-					);
+					deleteSmileys($_POST['checked_smileys']);
+
 				// Changing the status of the smiley?
 				else
 				{
@@ -838,35 +799,21 @@ class ManageSmileys_Controller
 						'popup' => 2
 					);
 					if (isset($displayTypes[$_POST['smiley_action']]))
-						$smcFunc['db_query']('', '
-							UPDATE {db_prefix}smileys
-							SET hidden = {int:display_type}
-							WHERE id_smiley IN ({array_int:checked_smileys})',
-							array(
-								'checked_smileys' => $_POST['checked_smileys'],
-								'display_type' => $displayTypes[$_POST['smiley_action']],
-							)
-						);
+						updateSmileyDisplayType($_POST['checked_smileys'], $displayTypes[$_POST['smiley_action']]);
+
 				}
 			}
 			// Create/modify a smiley.
 			elseif (isset($_POST['smiley']))
 			{
+				$_POST['smiley'] = (int) $_POST['smiley'];
+
 				// Is it a delete?
 				if (!empty($_POST['deletesmiley']))
-				{
-					$smcFunc['db_query']('', '
-						DELETE FROM {db_prefix}smileys
-						WHERE id_smiley = {int:current_smiley}',
-						array(
-							'current_smiley' => $_POST['smiley'],
-						)
-					);
-				}
+					deleteSmileys(array($_POST['smiley']));
 				// Otherwise an edit.
 				else
 				{
-					$_POST['smiley'] = (int) $_POST['smiley'];
 					$_POST['smiley_code'] = htmltrim__recursive($_POST['smiley_code']);
 					$_POST['smiley_filename'] = htmltrim__recursive($_POST['smiley_filename']);
 					$_POST['smiley_location'] = empty($_POST['smiley_location']) || $_POST['smiley_location'] > 2 || $_POST['smiley_location'] < 0 ? 0 : (int) $_POST['smiley_location'];
@@ -880,37 +827,17 @@ class ManageSmileys_Controller
 						fatal_lang_error('smiley_has_no_filename');
 
 					// Check whether the new code has duplicates. It should be unique.
-					$request = $smcFunc['db_query']('', '
-						SELECT id_smiley
-						FROM {db_prefix}smileys
-						WHERE code = {raw:mysql_binary_type} {string:smiley_code}' . (empty($_POST['smiley']) ? '' : '
-							AND id_smiley != {int:current_smiley}'),
-						array(
-							'current_smiley' => $_POST['smiley'],
-							'mysql_binary_type' => $smcFunc['db_title'] == 'MySQL' ? 'BINARY' : '',
-							'smiley_code' => $_POST['smiley_code'],
-						)
-					);
-					if ($smcFunc['db_num_rows']($request) > 0)
+					if (validateDuplicateSmiley($_POST['smiley_code'], $_POST['smiley']))
 						fatal_lang_error('smiley_not_unique');
-					$smcFunc['db_free_result']($request);
 
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}smileys
-						SET
-							code = {string:smiley_code},
-							filename = {string:smiley_filename},
-							description = {string:smiley_description},
-							hidden = {int:smiley_location}
-						WHERE id_smiley = {int:current_smiley}',
-						array(
+					$param = array(
 							'smiley_location' => $_POST['smiley_location'],
-							'current_smiley' => $_POST['smiley'],
+							'smiley' => $_POST['smiley'],
 							'smiley_code' => $_POST['smiley_code'],
 							'smiley_filename' => $_POST['smiley_filename'],
 							'smiley_description' => $_POST['smiley_description'],
-						)
-					);
+						);
+					updateSmiley($param);
 				}
 
 				// Sort all smiley codes for more accurate parsing (longest code first).
@@ -1192,19 +1119,8 @@ class ManageSmileys_Controller
 				ksort($context['filenames']);
 			}
 
-			$request = $smcFunc['db_query']('', '
-				SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new
-				FROM {db_prefix}smileys
-				WHERE id_smiley = {int:current_smiley}',
-				array(
-					'current_smiley' => (int) $_REQUEST['smiley'],
-				)
-			);
-			if ($smcFunc['db_num_rows']($request) != 1)
-				fatal_lang_error('smiley_not_found');
-			$context['current_smiley'] = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
-
+			$_REQUEST['smiley'] = (int) $_REQUEST['smiley'];
+			$context['current_smiley'] = getSmiley($_REQUEST['smiley']);
 			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code']);
 			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename']);
 			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description']);
@@ -1217,39 +1133,13 @@ class ManageSmileys_Controller
 	/**
 	 * Allows to edit the message icons.
 	 */
-	function action_editicon()
+	public function action_editicon()
 	{
-		global $user_info, $modSettings, $context, $settings, $txt;
-		global $smcFunc, $scripturl;
+		global $context, $settings, $txt, $scripturl;
 
+		require_once(SUBSDIR . '/MessageIcons.subs.php');
 		// Get a list of icons.
-		$context['icons'] = array();
-		$request = $smcFunc['db_query']('', '
-			SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
-			FROM {db_prefix}message_icons AS m
-				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			WHERE ({query_see_board} OR b.id_board IS NULL)',
-			array(
-			)
-		);
-		$last_icon = 0;
-		$trueOrder = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['icons'][$row['id_icon']] = array(
-				'id' => $row['id_icon'],
-				'title' => $row['title'],
-				'filename' => $row['filename'],
-				'image_url' => $settings[file_exists($settings['theme_dir'] . '/images/post/' . $row['filename'] . '.png') ? 'actual_images_url' : 'default_images_url'] . '/post/' . $row['filename'] . '.png',
-				'board_id' => $row['id_board'],
-				'board' => empty($row['board_name']) ? $txt['icons_edit_icons_all_boards'] : $row['board_name'],
-				'order' => $row['icon_order'],
-				'true_order' => $trueOrder++,
-				'after' => $last_icon,
-			);
-			$last_icon = $row['id_icon'];
-		}
-		$smcFunc['db_free_result']($request);
+		$context['icons'] = getMessageIcons();
 
 		// Submitting a form?
 		if (isset($_POST['icons_save']))
@@ -1264,13 +1154,7 @@ class ManageSmileys_Controller
 					$deleteIcons[] = (int) $icon;
 
 				// Do the actual delete!
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}message_icons
-					WHERE id_icon IN ({array_int:icon_list})',
-					array(
-						'icon_list' => $deleteIcons,
-					)
-				);
+				deleteMessageIcons($deleteIcons);
 			}
 			// Editing/Adding an icon?
 			elseif ($context['sub_action'] == 'editicon' && isset($_GET['icon']))
@@ -1331,32 +1215,15 @@ class ManageSmileys_Controller
 					}
 				}
 
-				$smcFunc['db_insert']('replace',
-					'{db_prefix}message_icons',
-					array('id_icon' => 'int', 'id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
-					$iconInsert,
-					array('id_icon')
-				);
+				updateMessageIcon($iconInsert);
 
 				if (!empty($iconInsert_new))
-				{
-					$smcFunc['db_insert']('replace',
-						'{db_prefix}message_icons',
-						array('id_board' => 'int', 'title' => 'string-80', 'filename' => 'string-80', 'icon_order' => 'int'),
-						$iconInsert_new,
-						array('id_icon')
-					);
-				}
+					addMessageIcon($iconInsert_new);
+
 			}
 
 			// Sort by order, so it is quicker :)
-			$smcFunc['db_query']('alter_table_icons', '
-				ALTER TABLE {db_prefix}message_icons
-				ORDER BY icon_order',
-				array(
-					'db_error_skip' => true,
-				)
-			);
+			sortMessageIconTable();
 
 			// Unless we're adding a new thing, we'll escape
 			if (!isset($_POST['add']))
@@ -1480,7 +1347,7 @@ class ManageSmileys_Controller
 				'use_permissions' => true,
 				'selected_board' => isset($context['icon']['board_id']) ? $context['icon']['board_id'] : 0,
 			);
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList($boardListOptions);
 		}
 	}
@@ -1488,10 +1355,11 @@ class ManageSmileys_Controller
 	/**
 	 * Allows to edit smileys order.
 	 */
-	function action_setorder()
+	public function action_setorder()
 	{
-		global $modSettings, $context, $settings, $txt, $smcFunc;
+		global $context, $txt;
 
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		$context['sub_template'] = 'setorder';
 
 		// Move smileys to another position.
@@ -1505,96 +1373,30 @@ class ManageSmileys_Controller
 			if (empty($_GET['source']))
 				fatal_lang_error('smiley_not_found');
 
+			$smiley = array();
+
 			if (!empty($_GET['after']))
 			{
 				$_GET['after'] = (int) $_GET['after'];
 
-				$request = $smcFunc['db_query']('', '
-					SELECT smiley_row, smiley_order, hidden
-					FROM {db_prefix}smileys
-					WHERE hidden = {int:location}
-						AND id_smiley = {int:after_smiley}',
-					array(
-						'location' => $_GET['location'],
-						'after_smiley' => $_GET['after'],
-					)
-				);
-				if ($smcFunc['db_num_rows']($request) != 1)
+				$smiley = getSmileyPosition($_GET['location'], $_GET['after']);
+				if (empty($smiley))
 					fatal_lang_error('smiley_not_found');
-				list ($smiley_row, $smiley_order, $smileyLocation) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
 			}
 			else
 			{
-				$smiley_row = (int) $_GET['row'];
-				$smiley_order = -1;
-				$smileyLocation = (int) $_GET['location'];
+				$smiley['row'] = (int) $_GET['row'];
+				$smiley['order'] = -1;
+				$smiley['location'] = (int) $_GET['location'];
 			}
 
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}smileys
-				SET smiley_order = smiley_order + 1
-				WHERE hidden = {int:new_location}
-					AND smiley_row = {int:smiley_row}
-					AND smiley_order > {int:smiley_order}',
-				array(
-					'new_location' => $_GET['location'],
-					'smiley_row' => $smiley_row,
-					'smiley_order' => $smiley_order,
-				)
-			);
-
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}smileys
-				SET
-					smiley_order = {int:smiley_order} + 1,
-					smiley_row = {int:smiley_row},
-					hidden = {int:new_location}
-				WHERE id_smiley = {int:current_smiley}',
-				array(
-					'smiley_order' => $smiley_order,
-					'smiley_row' => $smiley_row,
-					'new_location' => $smileyLocation,
-					'current_smiley' => $_GET['source'],
-				)
-			);
+			moveSmileyPosition($smiley, $_GET['source']);
 
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
 		}
 
-		$request = $smcFunc['db_query']('', '
-			SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
-			FROM {db_prefix}smileys
-			WHERE hidden != {int:popup}
-			ORDER BY smiley_order, smiley_row',
-			array(
-				'popup' => 1,
-			)
-		);
-		$context['smileys'] = array(
-			'postform' => array(
-				'rows' => array(),
-			),
-			'popup' => array(
-				'rows' => array(),
-			),
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$location = empty($row['hidden']) ? 'postform' : 'popup';
-			$context['smileys'][$location]['rows'][$row['smiley_row']][] = array(
-				'id' => $row['id_smiley'],
-				'code' => htmlspecialchars($row['code']),
-				'filename' => htmlspecialchars($row['filename']),
-				'description' => htmlspecialchars($row['description']),
-				'row' => $row['smiley_row'],
-				'order' => $row['smiley_order'],
-				'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
+		$context['smileys'] = getSmileys();
 		$context['move_smiley'] = empty($_REQUEST['move']) ? 0 : (int) $_REQUEST['move'];
 
 		// Make sure all rows are sequential.
@@ -1615,32 +1417,14 @@ class ManageSmileys_Controller
 				// Fix empty rows if any.
 				if ($id != $smiley_row[0]['row'])
 				{
-					$smcFunc['db_query']('', '
-						UPDATE {db_prefix}smileys
-						SET smiley_row = {int:new_row}
-						WHERE smiley_row = {int:current_row}
-							AND hidden = {int:location}',
-						array(
-							'new_row' => $id,
-							'current_row' => $smiley_row[0]['row'],
-							'location' => $location == 'postform' ? '0' : '2',
-						)
-					);
+					updateSmileyRow($id, $smiley_row[0]['row'], $location);
 					// Only change the first row value of the first smiley (we don't need the others :P).
 					$context['smileys'][$location]['rows'][$id][0]['row'] = $id;
 				}
 				// Make sure the smiley order is always sequential.
 				foreach ($smiley_row as $order_id => $smiley)
 					if ($order_id != $smiley['order'])
-						$smcFunc['db_query']('', '
-							UPDATE {db_prefix}smileys
-							SET smiley_order = {int:new_order}
-							WHERE id_smiley = {int:current_smiley}',
-							array(
-								'new_order' => $order_id,
-								'current_smiley' => $smiley['id'],
-							)
-						);
+						updateSmileyOrder($smiley['id'], $order_id);
 			}
 		}
 
@@ -1653,7 +1437,7 @@ class ManageSmileys_Controller
 	 */
 	function action_install()
 	{
-		global $modSettings, $smcFunc, $scripturl, $context, $txt, $user_info;
+		global $modSettings, $scripturl, $context, $txt, $user_info;
 
 		isAllowedTo('manage_smileys');
 		checkSession('request');
@@ -1661,6 +1445,7 @@ class ManageSmileys_Controller
 		loadLanguage('Errors');
 		loadLanguage('Packages');
 
+		require_once(SUBSDIR . '/Smileys.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Installing unless proven otherwise
@@ -1669,7 +1454,7 @@ class ManageSmileys_Controller
 		if (isset($_REQUEST['set_gz']))
 		{
 			$base_name = strtr(basename($_REQUEST['set_gz']), ':/', '-_');
-			$name = $smcFunc['htmlspecialchars'](strtok(basename($_REQUEST['set_gz']), '.'));
+			$name = Util::htmlspecialchars(strtok(basename($_REQUEST['set_gz']), '.'));
 			$name_pr = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $name);
 			$context['filename'] = $base_name;
 
@@ -1689,7 +1474,7 @@ class ManageSmileys_Controller
 		elseif (isset($_REQUEST['package']))
 		{
 			$base_name = basename($_REQUEST['package']);
-			$name = $smcFunc['htmlspecialchars'](strtok(basename($_REQUEST['package']), '.'));
+			$name = Util::htmlspecialchars(strtok(basename($_REQUEST['package']), '.'));
 			$name_pr = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $name);
 			$context['filename'] = $base_name;
 
@@ -1719,7 +1504,7 @@ class ManageSmileys_Controller
 		}
 
 		$extracted = read_tgz_file($destination, BOARDDIR . '/packages/temp');
-		if (!$extracted)
+		if (!$extracted) //Norv needs to change the URL in the next line ;)
 			fatal_lang_error('packageget_unable', false, array('http://custom.simplemachines.org/mods/index.php?action=search;type=12;basic_search=' . $name));
 		if ($extracted && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			foreach ($extracted as $file)
@@ -1740,20 +1525,7 @@ class ManageSmileys_Controller
 			fatal_lang_error($smileyInfo);
 
 		// See if it is installed?
-		$request = $smcFunc['db_query']('', '
-			SELECT version, themes_installed, db_changes
-			FROM {db_prefix}log_packages
-			WHERE package_id = {string:current_package}
-				AND install_state != {int:not_installed}
-			ORDER BY time_installed DESC
-			LIMIT 1',
-			array(
-				'not_installed'	=> 0,
-				'current_package' => $smileyInfo['id'],
-			)
-		);
-
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if(isSmileySetInstalled($smileyInfo['id']))
 			fata_lang_error('package_installed_warning1');
 
 		// Everything is fine, now it's time to do something
@@ -1792,7 +1564,7 @@ class ManageSmileys_Controller
 				// Do this one...
 				$thisAction = array(
 					'type' => $txt['package_extract'] . ' ' . ($action['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
-					'action' => $smcFunc['htmlspecialchars'](strtr($action['destination'], array(BOARDDIR => '.')))
+					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 
 				$file =  BOARDDIR . '/packages/temp/' . $base_path . $action['filename'];
@@ -1839,7 +1611,7 @@ class ManageSmileys_Controller
 			{
 				updateSettings(array(
 					'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . basename($action['action']),
-					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' .  (!empty($action['description']) ? $smcFunc['htmlspecialchars']($action['description']) : basename($action['action'])) : ''),
+					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' .  (!empty($action['description']) ? Util::htmlspecialchars($action['description']) : basename($action['action'])) : ''),
 				));
 			}
 
@@ -1849,24 +1621,18 @@ class ManageSmileys_Controller
 			package_put_contents(BOARDDIR . '/packages/installed.list', time());
 			// Credits tag?
 			$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
-			$smcFunc['db_insert']('',
-				'{db_prefix}log_packages',
-				array(
-					'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
-					'id_member_installed' => 'int', 'member_installed' => 'string','time_installed' => 'int',
-					'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
-					'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
-				),
-				array(
-					$smileyInfo['filename'], $smileyInfo['name'], $smileyInfo['id'], $smileyInfo['version'],
-					$user_info['id'], $user_info['name'], time(),
-					1, '', '',
-					0, '', $credits_tag,
-				),
-				array('id_install')
+			$installed = array(
+				'filename' => $smileyInfo['filename'],
+				'name' => $smileyInfo['name'],
+				'package_id' => $smileyInfo['id'],
+				'version' => $smileyInfo['filename'],
+				'id_member' => $user_info['id'],
+				'member_name' => $user_info['name'],
+				'credits_tag' => $credits_tag,
 			);
+			logPackageInstall($installed);
 
-			logAction('install_package', array('package' => $smcFunc['htmlspecialchars']($smileyInfo['name']), 'version' => $smcFunc['htmlspecialchars']($smileyInfo['version'])), 'admin');
+			logAction('install_package', array('package' => Util::htmlspecialchars($smileyInfo['name']), 'version' => Util::htmlspecialchars($smileyInfo['version'])), 'admin');
 
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
@@ -1880,241 +1646,69 @@ class ManageSmileys_Controller
 	}
 
 	/**
-	 * A function to import new smileys from an existing directory into the database.
-	 *
-	 * @param string $smileyPath
+	 * Sets our internal smiley context.
 	 */
-	function ImportSmileys($smileyPath)
+	private function _initSmileyContext()
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
-		if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
-			fatal_lang_error('smiley_set_unable_to_import');
+		// Validate the smiley set name.
+		$smiley_sets = explode(',', $modSettings['smiley_sets_known']);
+		$set_names = explode("\n", $modSettings['smiley_sets_names']);
+		$smiley_context = array();
 
-		$smileys = array();
-		$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
-		while ($entry = $dir->read())
-		{
-			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
-				$smileys[strtolower($entry)] = $entry;
-		}
-		$dir->close();
+		foreach ($smiley_sets as $i => $set)
+			$smiley_context[$set] = $set_names[$i];
 
-		// Exclude the smileys that are already in the database.
-		$request = $smcFunc['db_query']('', '
-			SELECT filename
-			FROM {db_prefix}smileys
-			WHERE filename IN ({array_string:smiley_list})',
-			array(
-				'smiley_list' => $smileys,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			if (isset($smileys[strtolower($row['filename'])]))
-				unset($smileys[strtolower($row['filename'])]);
-		$smcFunc['db_free_result']($request);
-
-		$request = $smcFunc['db_query']('', '
-			SELECT MAX(smiley_order)
-			FROM {db_prefix}smileys
-			WHERE hidden = {int:postform}
-				AND smiley_row = {int:first_row}',
-			array(
-				'postform' => 0,
-				'first_row' => 0,
-			)
-		);
-		list ($smiley_order) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
-		$new_smileys = array();
-		foreach ($smileys as $smiley)
-			if (strlen($smiley) <= 48)
-				$new_smileys[] = array(':' . strtok($smiley, '.') . ':', $smiley, strtok($smiley, '.'), 0, ++$smiley_order);
-
-		if (!empty($new_smileys))
-		{
-			$smcFunc['db_insert']('',
-				'{db_prefix}smileys',
-				array(
-					'code' => 'string-30', 'filename' => 'string-48', 'description' => 'string-80', 'smiley_row' => 'int', 'smiley_order' => 'int',
-				),
-				$new_smileys,
-				array('id_smiley')
-			);
-
-			// Make sure the smiley codes are still in the right order.
-			sortSmileyTable();
-
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
-		}
+		$this->_smiley_context = $smiley_context;
 	}
 }
 
 /**
- * Callback function for createList().
+ * A function to import new smileys from an existing directory into the database.
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
+ * @param string $smileyPath
  */
-function list_getMessageIcons($start, $items_per_page, $sort)
-{
-	global $smcFunc, $user_info;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT m.id_icon, m.title, m.filename, m.icon_order, m.id_board, b.name AS board_name
-		FROM {db_prefix}message_icons AS m
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE ({query_see_board} OR b.id_board IS NULL)',
-		array(
-		)
-	);
-
-	$message_icons = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$message_icons[] = $row;
-	$smcFunc['db_free_result']($request);
-
-	return $message_icons;
-}
-
-/**
- * This function sorts the smiley table by code length,
- * it is needed as MySQL withdrew support for functions in order by.
- * @todo is this ordering itself needed?
- */
-function sortSmileyTable()
-{
-	global $smcFunc;
-
-	db_extend('packages');
-
-	// Add a sorting column.
-	$smcFunc['db_add_column']('{db_prefix}smileys', array('name' => 'temp_order', 'size' => 8, 'type' => 'mediumint', 'null' => false));
-
-	// Set the contents of this column.
-	$smcFunc['db_query']('set_smiley_order', '
-		UPDATE {db_prefix}smileys
-		SET temp_order = LENGTH(code)',
-		array(
-		)
-	);
-
-	// Order the table by this column.
-	$smcFunc['db_query']('alter_table_smileys', '
-		ALTER TABLE {db_prefix}smileys
-		ORDER BY temp_order DESC',
-		array(
-			'db_error_skip' => true,
-		)
-	);
-
-	// Remove the sorting column.
-	$smcFunc['db_remove_column']('{db_prefix}smileys', 'temp_order');
-}
-
-
-/**
- * Callback function for createList().
- * @todo to be moved to Smileys.subs?
- *
- * @param $start
- * @param $items_per_page
- * @param $sort
- */
-function list_getSmileySets($start, $items_per_page, $sort)
+function importSmileys($smileyPath)
 {
 	global $modSettings;
 
-	$known_sets = explode(',', $modSettings['smiley_sets_known']);
-	$set_names = explode("\n", $modSettings['smiley_sets_names']);
-	$cols = array(
-		'id' => array(),
-		'selected' => array(),
-		'path' => array(),
-		'name' => array(),
-	);
-	foreach ($known_sets as $i => $set)
-	{
-		$cols['id'][] = $i;
-		$cols['selected'][] = $i;
-		$cols['path'][] = $set;
-		$cols['name'][] = $set_names[$i];
-	}
-	$sort_flag = strpos($sort, 'DESC') === false ? SORT_ASC : SORT_DESC;
-	if (substr($sort, 0, 4) === 'name')
-		array_multisort($cols['name'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['selected'], $cols['id']);
-	elseif (substr($sort, 0, 4) === 'path')
-		array_multisort($cols['path'], $sort_flag, SORT_REGULAR, $cols['name'], $cols['selected'], $cols['id']);
-	else
-		array_multisort($cols['selected'], $sort_flag, SORT_REGULAR, $cols['path'], $cols['name'], $cols['id']);
+	require_once(SUBSDIR . '/Smileys.subs.php');
 
-	$smiley_sets = array();
-	foreach ($cols['id'] as $i => $id)
-		$smiley_sets[] = array(
-			'id' => $id,
-			'path' => $cols['path'][$i],
-			'name' => $cols['name'][$i],
-			'selected' => $cols['path'][$i] == $modSettings['smiley_sets_default']
-		);
+	if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
+		fatal_lang_error('smiley_set_unable_to_import');
 
-	return $smiley_sets;
-}
-
-/**
- * Callback function for createList().
- * @todo to be moved to Smileys.subs?
- */
-function list_getNumSmileySets()
-{
-	global $modSettings;
-
-	return count(explode(',', $modSettings['smiley_sets_known']));
-}
-
-/**
- * Callback function for createList().
- *
- * @param unknown_type $start
- * @param unknown_type $items_per_page
- * @param unknown_type $sort
- */
-function list_getSmileys($start, $items_per_page, $sort)
-{
-	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden
-		FROM {db_prefix}smileys
-		ORDER BY ' . $sort,
-		array(
-		)
-	);
 	$smileys = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smileys[] = $row;
-	$smcFunc['db_free_result']($request);
+	$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
+	while ($entry = $dir->read())
+	{
+		if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+			$smileys[strtolower($entry)] = $entry;
+	}
+	$dir->close();
 
-	return $smileys;
-}
+	// Exclude the smileys that are already in the database.
+	$duplicates = smileyExists($smileys);
 
-/**
- * Callback function for createList().
- */
-function list_getNumSmileys()
-{
-	global $smcFunc;
+	foreach ($duplicates as $duplicate)
+		if (isset($smileys[strtolower($duplicate)]))
+			unset($smileys[strtolower($duplicate)]);
 
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}smileys',
-		array(
-		)
-	);
-	list($numSmileys) = $smcFunc['db_fetch_row'];
-	$smcFunc['db_free_result']($request);
+	$smiley_order = getMaxSmileyOrder();
 
-	return $numSmileys;
+	$new_smileys = array();
+	foreach ($smileys as $smiley)
+		if (strlen($smiley) <= 48)
+			$new_smileys[] = array(':' . strtok($smiley, '.') . ':', $smiley, strtok($smiley, '.'), 0, ++$smiley_order);
+
+	if (!empty($new_smileys))
+	{
+		addSmiley($new_smileys);
+
+		// Make sure the smiley codes are still in the right order.
+		sortSmileyTable();
+
+		cache_put_data('parsing_smileys', null, 480);
+		cache_put_data('posting_smileys', null, 480);
+	}
 }

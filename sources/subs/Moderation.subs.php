@@ -30,9 +30,11 @@ if (!defined('ELKARTE'))
  */
 function recountOpenReports($flush = true)
 {
-	global $user_info, $context, $smcFunc;
+	global $user_info, $context;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported
 		WHERE ' . $user_info['mod_cache']['bq'] . '
@@ -43,8 +45,8 @@ function recountOpenReports($flush = true)
 			'not_ignored' => 0,
 		)
 	);
-	list ($open_reports) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($open_reports) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	$_SESSION['rc'] = array(
 		'id' => $user_info['id'],
@@ -69,13 +71,15 @@ function recountOpenReports($flush = true)
  */
 function recountUnapprovedPosts($approve_query = null)
 {
-	global $context, $smcFunc;
+	global $context;
+
+	$db = database();
 
 	if ($approve_query === null)
 		return array('posts' => 0, 'topics' => 0);
 
 	// Any unapproved posts?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic AND t.id_first_msg != m.id_msg)
@@ -87,11 +91,11 @@ function recountUnapprovedPosts($approve_query = null)
 			'not_approved' => 0,
 		)
 	);
-	list ($unapproved_posts) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($unapproved_posts) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	// What about topics?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(m.id_topic)
 		FROM {db_prefix}topics AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -102,12 +106,43 @@ function recountUnapprovedPosts($approve_query = null)
 			'not_approved' => 0,
 		)
 	);
-	list ($unapproved_topics) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($unapproved_topics) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	$context['total_unapproved_topics'] = $unapproved_topics;
 	$context['total_unapproved_posts'] = $unapproved_posts;
 	return array('posts' => $unapproved_posts, 'topics' => $unapproved_topics);
+}
+
+/**
+ * How many falied emails (that they can see) do we have?
+ * 
+ * @param string $approve_query
+ */
+function recountFailedEmails($approve_query = null)
+{
+	global $context;
+
+	$db = database();
+	
+	if ($approve_query === null)
+		return 0;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}postby_emails_error as m
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE {query_see_board}
+			' . $approve_query . '
+			OR m.id_board = -1',
+		array(
+		)
+	);
+	list ($failed_emails) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	$context['failed_emails'] = $failed_emails;
+	return $failed_emails;
 }
 
 /**
@@ -117,6 +152,7 @@ function recountUnapprovedPosts($approve_query = null)
  *  - Unapproved posts
  *  - Unapproved topics
  *  - Unapproved attachments
+ *  - Failed emails
  *  - Reported posts
  *
  * @param int $brd
@@ -155,6 +191,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Starting out with nothing is a good start
 		$menu_errors[$cache_key]['attachments'] = 0;
 		$menu_errors[$cache_key]['reports'] = 0;
+		$menu_errors[$cache_key]['emailmod'] = 0;
 		$menu_errors[$cache_key]['postmod'] = 0;
 		$menu_errors[$cache_key]['topics'] = 0;
 		$menu_errors[$cache_key]['posts'] = 0;
@@ -172,7 +209,7 @@ function loadModeratorMenuCounts($brd = null)
 		// Attachments
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
-			require_once(CONTROLLERDIR . '/PostModeration.controller.php');
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$menu_errors[$cache_key]['attachments'] = list_getNumUnapprovedAttachments($approve_query);
 		}
 
@@ -180,8 +217,12 @@ function loadModeratorMenuCounts($brd = null)
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
 			$menu_errors[$cache_key]['reports'] = recountOpenReports(false);
 
+		// Email failures that require attention
+		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
+			$menu_errors[$cache_key]['emailmod'] = recountFailedEmails($approve_query);
+
 		// Grand Totals for the top most menu
-		$menu_errors[$cache_key]['total'] = $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
+		$menu_errors[$cache_key]['total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
 
 		// Add this key in to the array, technically this resets the cache time for all keys
 		// done this way as the entire thing needs to go null once *any* moderation action is taken
@@ -204,20 +245,20 @@ function loadModeratorMenuCounts($brd = null)
  */
 function logWarningNotice($subject, $body)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Log warning notice.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_member_notices',
 		array(
 			'subject' => 'string-255', 'body' => 'string-65534',
 		),
 		array(
-			$smcFunc['htmlspecialchars']($subject), $smcFunc['htmlspecialchars']($body),
+			Util::htmlspecialchars($subject), Util::htmlspecialchars($body),
 		),
 		array('id_notice')
 	);
-	$id_notice = $smcFunc['db_insert_id']('{db_prefix}log_member_notices', 'id_notice');
+	$id_notice = $db->insert_id('{db_prefix}log_member_notices', 'id_notice');
 
 	return $id_notice;
 }
@@ -233,9 +274,11 @@ function logWarningNotice($subject, $body)
  */
 function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reason)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 
-	$smcFunc['db_insert']('',
+	$db = database();
+
+	$db->insert('',
 		'{db_prefix}log_comments',
 		array(
 			'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int', 'recipient_name' => 'string-255',
@@ -256,10 +299,12 @@ function logWarning($memberID, $real_name, $id_notice, $level_change, $warn_reas
  */
 function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 {
-	global $smcFunc, $user_info;
+	global $user_info;
+
+	$db = database();
 
 	// Log the actions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT recipient_name
 		FROM {db_prefix}log_comments
 		WHERE id_comment IN ({array_int:delete_ids})
@@ -272,12 +317,12 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		logAction('delete_warn_template', array('template' => $row['recipient_name']));
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Do the deletes.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_comments
 		WHERE id_comment IN ({array_int:delete_ids})
 			AND comment_type = {string:tpltype}
@@ -301,9 +346,11 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  */
 function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
-	global $smcFunc, $scripturl, $user_info;
+	global $scripturl, $user_info;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT lc.id_comment, IFNULL(mem.id_member, 0) AS id_member,
 			IFNULL(mem.real_name, lc.member_name) AS creator_name, recipient_name AS template_title,
 			lc.log_time, lc.body
@@ -320,17 +367,17 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 		)
 	);
 	$templates = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$templates[] = array(
 			'id_comment' => $row['id_comment'],
 			'creator' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['creator_name'] . '</a>') : $row['creator_name'],
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'title' => $row['template_title'],
-			'body' => $smcFunc['htmlspecialchars']($row['body']),
+			'body' => Util::htmlspecialchars($row['body']),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $templates;
 }
@@ -344,9 +391,11 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
  */
 function list_getWarningTemplateCount($template_type = 'warntpl')
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
@@ -357,8 +406,8 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalWarns) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $totalWarns;
 }
@@ -372,9 +421,11 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
  */
 function list_getWarnings($start, $items_per_page, $sort)
 {
-	global $smcFunc, $scripturl;
+	global $scripturl;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name_col,
 			IFNULL(mem2.id_member, 0) AS id_recipient, IFNULL(mem2.real_name, lc.recipient_name) AS recipient_name,
 			lc.log_time, lc.body, lc.id_notice, lc.counter
@@ -389,18 +440,18 @@ function list_getWarnings($start, $items_per_page, $sort)
 		)
 	);
 	$warnings = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$warnings[] = array(
 			'issuer_link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name_col'] . '</a>') : $row['member_name_col'],
 			'recipient_link' => $row['id_recipient'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_recipient'] . '">' . $row['recipient_name'] . '</a>') : $row['recipient_name'],
-			'time' => timeformat($row['log_time']),
+			'time' => standardTime($row['log_time']),
 			'reason' => $row['body'],
 			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 			'id_notice' => $row['id_notice'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $warnings;
 }
@@ -410,9 +461,9 @@ function list_getWarnings($start, $items_per_page, $sort)
  */
 function list_getWarningCount()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:warning}',
@@ -420,8 +471,8 @@ function list_getWarningCount()
 			'warning' => 'warning',
 		)
 	);
-	list ($totalWarns) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($totalWarns) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $totalWarns;
 }
@@ -433,9 +484,11 @@ function list_getWarningCount()
  */
 function modLoadTemplate($id_template, $template_type = 'warntpl')
 {
-	global $smcFunc, $user_info, $context;
+	global $user_info, $context;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT id_member, id_recipient, recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE id_comment = {int:id}
@@ -448,16 +501,16 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
 			'current_member' => $user_info['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$context['template_data'] = array(
 			'title' => $row['template_title'],
-			'body' => $smcFunc['htmlspecialchars']($row['body']),
+			'body' => Util::htmlspecialchars($row['body']),
 			'personal' => $row['id_recipient'],
 			'can_edit_personal' => $row['id_member'] == $user_info['id'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -471,12 +524,14 @@ function modLoadTemplate($id_template, $template_type = 'warntpl')
  */
 function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $id_template, $edit = true, $type = 'warntpl')
 {
-	global $smcFunc, $user_info;
+	global $user_info;
+
+	$db = database();
 
 	if ($edit)
 	{
 		// Simple update...
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_comments
 			SET id_recipient = {int:personal}, recipient_name = {string:title}, body = {string:body}
 			WHERE id_comment = {int:id}
@@ -497,7 +552,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 	// Or inserting a new row
 	else
 	{
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}log_comments',
 			array(
 				'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'id_recipient' => 'int',
@@ -518,9 +573,11 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  */
 function modReportDetails($id_report)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
 			lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
 			IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
@@ -535,12 +592,12 @@ function modReportDetails($id_report)
 	);
 
 	// So did we find anything?
-	if (!$smcFunc['db_num_rows']($request))
+	if (!$db->num_rows($request))
 		$row = false;
 	else
-		$row = $smcFunc['db_fetch_assoc']($request);
+		$row = $db->fetch_assoc($request);
 
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $row;
 }

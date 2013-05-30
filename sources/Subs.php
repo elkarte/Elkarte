@@ -47,7 +47,9 @@ if (!defined('ELKARTE'))
  */
 function updateStats($type, $parameter1 = null, $parameter2 = null)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	switch ($type)
 	{
@@ -69,7 +71,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		else
 		{
 			// Update the latest activated member (highest id_member) and count.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT COUNT(*), MAX(id_member)
 				FROM {db_prefix}members
 				WHERE is_activated = {int:is_activated}',
@@ -77,8 +79,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'is_activated' => 1,
 				)
 			);
-			list ($changes['totalMembers'], $changes['latestMember']) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			list ($changes['totalMembers'], $changes['latestMember']) = $db->fetch_row($result);
+			$db->free_result($result);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			// Get the latest activated member's display name.
@@ -89,7 +91,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 			if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
 			{
 				// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}members
 					WHERE is_activated IN ({array_int:activation_status})',
@@ -97,8 +99,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 						'activation_status' => array(3, 4),
 					)
 				);
-				list ($changes['unapprovedMembers']) = $smcFunc['db_fetch_row']($result);
-				$smcFunc['db_free_result']($result);
+				list ($changes['unapprovedMembers']) = $db->fetch_row($result);
+				$db->free_result($result);
 			}
 		}
 
@@ -111,7 +113,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		else
 		{
 			// SUM and MAX on a smaller table is better for InnoDB tables.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
 				FROM {db_prefix}boards
 				WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -121,8 +123,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'blank_redirect' => '',
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
+			$row = $db->fetch_assoc($result);
+			$db->free_result($result);
 
 			updateSettings(array(
 				'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
@@ -133,7 +135,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 
 	case 'subject':
 		// Remove the previous subject (if any).
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}log_search_subjects
 			WHERE id_topic = {int:id_topic}',
 			array(
@@ -152,7 +154,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				$inserts[] = array($word, $parameter1);
 
 			if (!empty($inserts))
-				$smcFunc['db_insert']('ignore',
+				$db->insert('ignore',
 					'{db_prefix}log_search_subjects',
 					array('word' => 'string', 'id_topic' => 'int'),
 					$inserts,
@@ -168,7 +170,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		{
 			// Get the number of topics - a SUM is better for InnoDB tables.
 			// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT SUM(num_topics + unapproved_topics) AS total_topics
 				FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				WHERE id_board != {int:recycle_board}' : ''),
@@ -176,8 +178,8 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 					'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
 				)
 			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
+			$row = $db->fetch_assoc($result);
+			$db->free_result($result);
 
 			updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
 		}
@@ -192,7 +194,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		if ($postgroups === null || $parameter1 === null)
 		{
 			// Fetch the postgroups!
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_group, min_posts
 				FROM {db_prefix}membergroups
 				WHERE min_posts != {int:min_posts}',
@@ -201,9 +203,9 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 				)
 			);
 			$postgroups = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$postgroups[$row['id_group']] = $row['min_posts'];
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Sort them this way because if it's done with MySQL it causes a filesort :(.
 			arsort($postgroups);
@@ -226,7 +228,7 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
 		}
 
 		// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET id_post_group = CASE ' . $conditions . '
 					ELSE 0
@@ -264,7 +266,9 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  */
 function updateMemberData($members, $data)
 {
-	global $modSettings, $user_info, $smcFunc;
+	global $modSettings, $user_info;
+
+	$db = database();
 
 	$parameters = array();
 	if (is_array($members))
@@ -285,7 +289,7 @@ function updateMemberData($members, $data)
 		'date_registered', 'posts', 'id_group', 'last_login', 'instant_messages', 'unread_messages',
 		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'pm_receive_from', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
-		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
+		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning', 'likes_given', 'likes_received',
 	);
 	$knownFloats = array(
 		'time_offset',
@@ -321,15 +325,15 @@ function updateMemberData($members, $data)
 			else
 			{
 				$member_names = array();
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT member_name
 					FROM {db_prefix}members
 					WHERE ' . $condition,
 					$parameters
 				);
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $db->fetch_assoc($request))
 					$member_names[] = $row['member_name'];
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 			}
 
 			if (!empty($member_names))
@@ -371,7 +375,7 @@ function updateMemberData($members, $data)
 		$parameters['p_' . $var] = $val;
 	}
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}members
 		SET' . substr($setString, 0, -1) . '
 		WHERE ' . $condition,
@@ -416,7 +420,9 @@ function updateMemberData($members, $data)
  */
 function updateSettings($changeArray, $update = false, $debug = false)
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -426,7 +432,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	{
 		foreach ($changeArray as $variable => $value)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}settings
 				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
 				WHERE variable = {string:variable}',
@@ -462,7 +468,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	if (empty($replaceArray))
 		return;
 
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-65534'),
 		$replaceArray,
@@ -498,7 +504,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show_prevnext = true)
 {
-	global $modSettings, $context, $txt;
+	global $modSettings, $context, $txt, $settings;
 
 	// Save whether $start was less than 0 or not.
 	$start = (int) $start;
@@ -516,23 +522,23 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 	$context['current_page'] = $start / $num_per_page;
 
-	$base_link = '<a class="navPages" href="' . ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d') . '">%2$s</a> ';
+	$base_link = str_replace('{base_link}', ($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'), $settings['page_index_template']['base_link']);
 
 	// Compact pages is off or on?
 	if (empty($modSettings['compactTopicPagesEnable']))
 	{
 		// Show the left arrow.
-		$pageindex = $start == 0 ? ' ' : sprintf($base_link, $start - $num_per_page, '<span class="previous_page">' . $txt['prev'] . '</span>');
+		$pageindex = $start == 0 ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 
 		// Show all the pages.
 		$display_page = 1;
 		for ($counter = 0; $counter < $max_value; $counter += $num_per_page)
-			$pageindex .= $start == $counter && !$start_invalid ? '<span class="current_page"><strong>' . $display_page++ . '</strong></span> ' : sprintf($base_link, $counter, $display_page++);
+			$pageindex .= $start == $counter && !$start_invalid ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
 
 		// Show the right arrow.
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
 		if ($start != $counter - $max_value && !$start_invalid)
-			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, '<span class="next_page">' . $txt['next'] . '</span>');
+			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 	else
 	{
@@ -541,7 +547,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the "prev page" link. (>prev page< 1 ... 6 7 [8] 9 10 ... 15 next page)
 		if (!empty($start) && $show_prevnext)
-			$pageindex = sprintf($base_link, $start - $num_per_page, '<span class="previous_page">' . $txt['prev'] . '</span>');
+			$pageindex = sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 		else
 			$pageindex = '';
 
@@ -551,7 +557,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the ... after the first page.  (prev page 1 >...< 6 7 [8] 9 10 ... 15 next page)
 		if ($start > $num_per_page * ($PageContiguous + 1))
-			$pageindex .= '<span class="expand_pages" onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . $num_per_page . ', ' . ($start - $num_per_page * $PageContiguous) . ', ' . $num_per_page . ');') . '" onmouseover="this.style.cursor = \'pointer\';"><strong> ... </strong></span>';
+			$pageindex .= str_replace('{onclick_handler}', htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . $num_per_page . ', ' . ($start - $num_per_page * $PageContiguous) . ', ' . $num_per_page . ');'), $settings['page_index_template']['expand_pages']);
 
 		// Show the pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
 		for ($nCont = $PageContiguous; $nCont >= 1; $nCont--)
@@ -563,7 +569,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
 		if (!$start_invalid)
-			$pageindex .= '<span class="current_page"><strong>' . ($start / $num_per_page + 1) . '</strong></span>';
+			$pageindex .= sprintf($settings['page_index_template']['current_page'], ($start / $num_per_page + 1));
 		else
 			$pageindex .= sprintf($base_link, $start, $start / $num_per_page + 1);
 
@@ -578,7 +584,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
 		if ($start + $num_per_page * ($PageContiguous + 1) < $tmpMaxPages)
-			$pageindex .= '<span class="expand_pages" onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . ($start + $num_per_page * ($PageContiguous + 1)) . ', ' . $tmpMaxPages . ', ' . $num_per_page . ');') . '" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>';
+			$pageindex .= str_replace('{onclick_handler}', htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . ($start + $num_per_page * ($PageContiguous + 1)) . ', ' . $tmpMaxPages . ', ' . $num_per_page . ');'), $settings['page_index_template']['expand_pages']);
 
 		// Show the last number in the list. (prev page 1 ... 6 7 [8] 9 10 ... >15<  next page)
 		if ($start + $num_per_page * $PageContiguous < $tmpMaxPages)
@@ -586,7 +592,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
 		if ($start != $tmpMaxPages && $show_prevnext)
-			$pageindex .= sprintf($base_link, $start + $num_per_page, '<span class="next_page">' . $txt['next'] . '</span>');
+			$pageindex .= sprintf($base_link, $start + $num_per_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
 	}
 
 	return $pageindex;
@@ -636,9 +642,9 @@ function comma_format($number, $override_decimal_count = false)
  * @param bool $show_today = true
  * @param string $offset_type = false
  */
-function timeformat($log_time, $show_today = true, $offset_type = false)
+function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $context, $user_info, $txt, $modSettings, $smcFunc;
+	global $context, $user_info, $txt, $modSettings;
 	static $non_twelve_hour;
 
 	// Offset the time.
@@ -675,11 +681,11 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 		// Same day of the year, same year.... Today!
 		if ($then['yday'] == $now['yday'] && $then['year'] == $now['year'])
-			return $txt['today'] . timeformat($log_time, $today_fmt, $offset_type);
+			return $txt['today'] . standardTime($log_time, $today_fmt, $offset_type);
 
 		// Day-of-year is one less and same year, or it's the first of the year and that's the last of the year...
 		if ($modSettings['todayMod'] == '2' && (($then['yday'] == $now['yday'] - 1 && $then['year'] == $now['year']) || ($now['yday'] == 0 && $then['year'] == $now['year'] - 1) && $then['mon'] == 12 && $then['mday'] == 31))
-			return $txt['yesterday'] . timeformat($log_time, $today_fmt, $offset_type);
+			return $txt['yesterday'] . standardTime($log_time, $today_fmt, $offset_type);
 	}
 
 	$str = !is_bool($show_today) ? $show_today : $user_info['time_format'];
@@ -693,7 +699,7 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 		foreach (array('%a', '%A', '%b', '%B') as $token)
 			if (strpos($str, $token) !== false)
-				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? $smcFunc['ucwords'](strftime($token, $time)) : strftime($token, $time), $str);
+				$str = str_replace($token, !empty($txt['lang_capitalize_dates']) ? Util::ucwords(strftime($token, $time)) : strftime($token, $time), $str);
 	}
 	else
 	{
@@ -712,6 +718,71 @@ function timeformat($log_time, $show_today = true, $offset_type = false)
 
 	// Format any other characters..
 	return strftime($str, $time);
+}
+
+/**
+ * Calculates the relative time between now and a given timestamp.
+ * If relative time is disabled we can just bypass to standardTime();
+ * This function is based on ideas from user "Eye" at
+ * http://stackoverflow.com/questions/2690504/php-producing-relative-date-time-from-timestamps
+ *
+ * @param int $date
+ * @param bool $show_today = true
+ * @param string $offset_type = false
+ * @return string
+ */
+function relativeTime($timestamp, $show_today = true, $offset_type = false)
+{
+	global $modSettings, $txt;
+
+	// We don't want relative times? Bypass to standardTime();
+	if ($modSettings['todayMod'] < 3)
+	{
+		$past_time = standardTime($timestamp, $show_today, $offset_type);
+		return $past_time;
+	}
+
+    $past_time = time() - $timestamp;
+
+	// Within the first 60 seconds it is just now.
+    if ($past_time < 60)
+        return $txt['rt_now'];
+
+	// Within the first hour?
+    $past_time = floor($past_time/60);
+
+    if ($past_time < 60)
+        return sprintf($past_time > 1 ? $txt['rt_minutes'] : $txt['rt_minute'], $past_time);
+
+	// Some hours but less than a day?
+    $past_time = floor($past_time/60);
+
+    if ($past_time < 24)
+        return sprintf($past_time > 1 ? $txt['rt_hours'] : $txt['rt_hour'], $past_time);
+
+	// Some days ago but less than a week?
+    $past_time = floor($past_time/24);
+
+    if ($past_time < 7)
+        return sprintf($past_time > 1 ? $txt['rt_days'] : $txt['rt_day'], $past_time);
+
+	// Weeks ago but less than a month?
+    if ($past_time < 30)
+    {
+        $past_time = floor($past_time / 7);
+        return sprintf($past_time > 1 ? $txt['rt_weeks'] : $txt['rt_week'], $past_time);
+    }
+
+	// Months ago but less than a year?
+    $past_time = floor($past_time/30);
+
+    if ($past_time < 12)
+       return sprintf($past_time > 1 ? $txt['rt_months'] : $txt['rt_month'], $past_time);
+
+	// Oha, we've passed at least a year?
+    $past_time = date('Y', time()) - date('Y', $timestamp);
+
+    return sprintf($past_time > 1 ? $txt['rt_years'] : $txt['rt_year'], $past_time);
 }
 
 /**
@@ -746,14 +817,45 @@ function un_htmlspecialchars($string)
  */
 function shorten_subject($subject, $len)
 {
-	global $smcFunc;
-
 	// It was already short enough!
-	if ($smcFunc['strlen']($subject) <= $len)
+	if (Util::strlen($subject) <= $len)
 		return $subject;
 
 	// Shorten it by the length it was too long, and strip off junk from the end.
-	return $smcFunc['substr']($subject, 0, $len) . '...';
+	return Util::substr($subject, 0, $len) . '...';
+}
+
+/**
+ * Shorten a string of text
+ *
+ * - shortens a text string so that it is approximately a certain length or under
+ * - attempts to break the string on the first word boundary after the allowed length
+ * - if resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
+ * - respects internationalization characters and entities as one character.
+ * - returns the shortened string.
+ *
+ * @param string $text
+ * @param int $len
+ * @param int $buffer maximum length overflow to allow cutting on a word boundary
+ */
+function shorten_text($text, $len = 384, $buffer = 12)
+{
+	$current = Util::strlen($text);
+
+	// Its to long so lets cut it down to size
+	if ($current > $len)
+	{
+		// Look for len characters and cut on first word boundary after
+		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
+
+		// Always one clown in the audience who likes long words or not using the spacebar
+		if (Util::strlen($matches[1]) > $len + $buffer)
+			$matches[1] = substr($matches[1], 0, $len);
+
+		return rtrim($matches[1]) . '...';
+	}
+	else
+		return $text;
 }
 
 /**
@@ -828,7 +930,9 @@ function permute($array)
  */
 function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
 {
-	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
+	global $txt, $scripturl, $context, $modSettings, $user_info;
+
+	$db = database();
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
 	static $disabled;
 
@@ -1362,7 +1466,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '([^<>]{1,192}?)'),
 					'link' => array('match' => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|action=profile;u=\d+)'),
-					'date' => array('match' => '(\d+)', 'validate' => 'timeformat'),
+					'date' => array('match' => '(\d+)', 'validate' => 'relativeTime'),
 				),
 				'before' => '<div class="quoteheader"><div class="topslice_quote"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . $txt['search_on'] . ' {date}</a></div></div><blockquote>',
 				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
@@ -1479,7 +1583,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '$1',
 				'validate' => create_function('&$tag, &$data, $disabled', '
 					if (is_numeric($data))
-						$data = timeformat($data);
+						$data = standardTime($data);
 					else
 						$tag[\'content\'] = \'[time]$1[/time]\';'),
 			),
@@ -2010,7 +2114,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
 		if ($smileys !== false && $tag === null && isset($itemcodes[$message[$pos + 1]]) && $message[$pos + 2] == ']' && !isset($disabled['list']) && !isset($disabled['li']))
 		{
-			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", '>')))
+			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", "\n", '>')))
 				continue;
 
 			$tag = $itemcodes[$message[$pos + 1]];
@@ -2367,7 +2471,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info, $context, $smcFunc;
+	global $modSettings, $txt, $user_info, $context;
+
+	$db = database();
 	static $smileyPregSearch = null, $smileyPregReplacements = array();
 
 	// No smiley set at all?!
@@ -2389,7 +2495,7 @@ function parsesmileys(&$message)
 			// Load the smileys in reverse order by length so they don't get parsed wrong.
 			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
 			{
-				$result = $smcFunc['db_query']('', '
+				$result = $db->query('', '
 					SELECT code, filename, description
 					FROM {db_prefix}smileys',
 					array(
@@ -2398,13 +2504,13 @@ function parsesmileys(&$message)
 				$smileysfrom = array();
 				$smileysto = array();
 				$smileysdescs = array();
-				while ($row = $smcFunc['db_fetch_assoc']($result))
+				while ($row = $db->fetch_assoc($result))
 				{
 					$smileysfrom[] = $row['code'];
 					$smileysto[] = htmlspecialchars($row['filename']);
 					$smileysdescs[] = $row['description'];
 				}
-				$smcFunc['db_free_result']($result);
+				$db->free_result($result);
 
 				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
 			}
@@ -2526,7 +2632,8 @@ function redirectexit($setLocation = '', $refresh = false)
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
-	global $context, $settings, $modSettings, $txt, $smcFunc;
+	global $context, $settings, $modSettings, $txt;
+
 	static $header_done = false, $footer_done = false, $level = 0, $has_fatal_error = false;
 
 	// Attempt to prevent a recursive loop.
@@ -2553,7 +2660,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	{
 		// Was the page title set last minute? Also update the HTML safe one.
 		if (!empty($context['page_title']) && empty($context['page_title_html_safe']))
-			$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+			$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Start up the session URL fixer.
 		ob_start('ob_sessrewrite');
@@ -2664,7 +2771,8 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
-	global $user_settings, $smcFunc;
+	global $user_settings;
+
 	static $loaded = false;
 
 	// Under SSI this function can be called more then once.  That can cause some problems.
@@ -2675,7 +2783,7 @@ function setupThemeContext($forceload = false)
 	$loaded = true;
 
 	$context['in_maintenance'] = !empty($maintenance);
-	$context['current_time'] = timeformat(time(), false);
+	$context['current_time'] = standardTime(time(), false);
 	$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
 	$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
 
@@ -2822,8 +2930,8 @@ function setupThemeContext($forceload = false)
 		$context['page_title'] = '';
 
 	// Set some specific vars.
-	$context['page_title_html_safe'] = $smcFunc['htmlspecialchars'](un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
-	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? $smcFunc['htmlspecialchars']($modSettings['meta_keywords']) : '';
+	$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
+	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? Util::htmlspecialchars($modSettings['meta_keywords']) : '';
 }
 
 /**
@@ -2914,19 +3022,25 @@ function template_header()
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 
 		// Are we debugging the template/html content?
-		if (!isset($_REQUEST['xml']) && isset($_GET['debug']) && !isBrowser('ie'))
+		if ((!isset($_REQUEST['xml']) || !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
 			header('Content-Type: application/xhtml+xml');
-		elseif (!isset($_REQUEST['xml']))
+		elseif (!isset($_REQUEST['xml']) || !isset($_REQUEST['api']))
 			header('Content-Type: text/html; charset=UTF-8');
 	}
 
-	header('Content-Type: text/' . (isset($_REQUEST['xml']) ? 'xml' : 'html') . '; charset=UTF-8');
+	// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
+	if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+		header('Content-Type: application/json; charset=UTF-8');
+	elseif (isset($_REQUEST['xml']) || isset($_REQUEST['api']))
+		header('Content-Type: text/xml; charset=UTF-8');
+	else
+		header('Content-Type: text/html; charset=UTF-8');
 
 	$checked_securityFiles = false;
 	$showed_banned = false;
-	foreach ($context['template_layers'] as $layer)
+	foreach (Template_Layers::getInstance()->prepareContext() as $layer)
 	{
-		loadSubTemplate($layer . '_above', true);
+		loadSubTemplate($layer . '_above', 'ignore');
 
 		// May seem contrived, but this is done in case the body and main layer aren't there...
 		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && !$checked_securityFiles)
@@ -2995,7 +3109,7 @@ function template_header()
 
 			if (!empty($_SESSION['ban']['expire_time']))
 				echo '
-					<div>', sprintf($txt['your_ban_expires'], timeformat($_SESSION['ban']['expire_time'], false)), '</div>';
+					<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
 			else
 				echo '
 					<div>', $txt['your_ban_expires_never'], '</div>';
@@ -3051,8 +3165,8 @@ function template_footer()
 		$settings['theme_dir'] = $settings['actual_theme_dir'];
 	}
 
-	foreach (array_reverse($context['template_layers']) as $layer)
-		loadSubTemplate($layer . '_below', true);
+	foreach (Template_Layers::getInstance()->reverseLayers() as $layer)
+		loadSubTemplate($layer . '_below', 'ignore');
 
 }
 
@@ -3213,7 +3327,9 @@ function template_css()
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	// Just make up a nice hash...
 	if ($new)
@@ -3223,7 +3339,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	// @todo: Locate all places that don't call a hash and fix that.
 	if ($file_hash === '')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT file_hash
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
@@ -3231,11 +3347,11 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 				'id_attach' => $attachment_id,
 		));
 
-		if ($smcFunc['db_num_rows']($request) === 0)
+		if ($db->num_rows($request) === 0)
 			return false;
 
-		list ($file_hash) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($file_hash) = $db->fetch_row($request);
+		$db->free_result($request);
 	}
 
 	// In case of files from the old system, do a legacy call.
@@ -3420,13 +3536,13 @@ function host_from_ip($ip)
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
-	global $smcFunc, $context;
+	global $context;
 
 	// Step 1: Remove entities/things we don't consider words:
 	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
 	// Step 2: Entities we left to letters, where applicable, lowercase.
-	$words = un_htmlspecialchars($smcFunc['strtolower']($words));
+	$words = un_htmlspecialchars(Util::strtolower($words));
 
 	// Step 3: Ready to split apart and index!
 	$words = explode(' ', $words);
@@ -3495,7 +3611,7 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
  */
 function setupMenuContext()
 {
-	global $context, $modSettings, $user_info, $txt, $scripturl;
+	global $context, $modSettings, $user_info, $txt, $scripturl, $settings;
 
 	// Set up the menu privileges.
 	$context['allow_search'] = !empty($modSettings['allow_guestAccess']) ? allowedTo('search_posts') : (!$user_info['is_guest'] && allowedTo('search_posts'));
@@ -3576,6 +3692,11 @@ function setupMenuContext()
 						'title' => $txt['mc_unapproved_poststopics'],
 						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'postbyemail' => array(
+						'title' => $txt['mc_emailerror'],
+						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 					),
 					'attachments' => array(
 						'title' => $txt['mc_unapproved_attachments'],
@@ -3769,11 +3890,16 @@ function setupMenuContext()
 	if (isset($context['menu_buttons'][$current_action]))
 		$context['menu_buttons'][$current_action]['active_button'] = true;
 
+	// No need for accurate text if we are in xml mode
+	if (isset($_REQUEST['xml']))
+		return;
+
 	// Update the PM menu item if they have unread messages
 	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
 	{
 		$context['menu_buttons']['pm']['alttitle'] = $context['menu_buttons']['pm']['title'] . ' [' . $context['user']['unread_messages'] . ']';
-		$context['menu_buttons']['pm']['title'] .= ' [<strong>' . $context['user']['unread_messages'] . '</strong>]';
+		if (!empty($settings['menu_numeric_notice']))
+			$context['menu_buttons']['pm']['title'] .= sprintf($settings['menu_numeric_notice'], $context['user']['unread_messages']);
 	}
 
 	// Update the Moderation menu items with action item totals
@@ -3786,24 +3912,30 @@ function setupMenuContext()
 		if (!empty($mod_count['total']))
 		{
 			$context['menu_buttons']['moderate']['alttitle'] = $context['menu_buttons']['moderate']['title'] . ' [' . $mod_count['total'] . ']';
-			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? ' [<strong>' . $mod_count['total'] . '</strong>]' : '';
+			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? sprintf($settings['menu_numeric_notice'], $mod_count['total']) : '';
 
 			if (!empty($mod_count['postmod']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] . ' [' . $mod_count['postmod'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= ' [<strong>' . $mod_count['postmod'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['postmod']);
+			}
+
+			if (!empty($mod_count['emailmod']))
+			{
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] . ' [' . $mod_count['emailmod'] . ']';
+				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['emailmod']);
 			}
 
 			if (!empty($mod_count['attachments']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] . ' [' . $mod_count['attachments'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= ' [<strong>' . $mod_count['attachments'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['attachments']);
 			}
 
 			if (!empty($mod_count['reports']))
 			{
 				$context['menu_buttons']['moderate']['sub_buttons']['reports']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] . ' [' . $mod_count['reports'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= ' [<strong>' . $mod_count['reports'] . '</strong>]';
+				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['reports']);
 			}
 		}
 	}
@@ -3902,14 +4034,16 @@ function call_integration_hook($hook, $parameters = array())
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	$integration_call = (!empty($file) && $file !== true) ? $function . ':' . $file : $function;
 
 	// Is it going to be permanent?
 	if ($permanent)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT value
 			FROM {db_prefix}settings
 			WHERE variable = {string:variable}',
@@ -3917,8 +4051,8 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 				'variable' => $hook,
 			)
 		);
-		list($current_functions) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list($current_functions) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		if (!empty($current_functions))
 		{
@@ -3956,12 +4090,14 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
+
+	$db = database();
 
 	$integration_call = (!empty($file)) ? $function . ':' . $file : $function;
 
 	// Get the permanent functions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}settings
 		WHERE variable = {string:variable}',
@@ -3969,8 +4105,8 @@ function remove_integration_function($hook, $function, $file = '')
 			'variable' => $hook,
 		)
 	);
-	list($current_functions) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($current_functions) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	if (!empty($current_functions))
 	{

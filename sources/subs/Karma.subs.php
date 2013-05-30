@@ -11,16 +11,21 @@
  *
  */
 
+/**
+ * Remove old karma from the log 
+ *
+ * @param int $karmaWaitTime
+ */
 function clearKarma($karmaWaitTime)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Delete any older items from the log. (karmaWaitTime is by hour.)
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_karma
 		WHERE {int:current_time} - log_time > {int:wait_time}',
 		array(
-			'wait_time' => (int) ($karmaWaitTime * 3600),
+			'wait_time' => $karmaWaitTime * 3600,
 			'current_time' => time(),
 		)
 	);
@@ -34,10 +39,10 @@ function clearKarma($karmaWaitTime)
  */
 function lastActionOn($id_executor, $id_target)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Find out if this user has done this recently...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT action
 		FROM {db_prefix}log_karma
 		WHERE id_target = {int:id_target}
@@ -48,9 +53,9 @@ function lastActionOn($id_executor, $id_target)
 			'id_target' => $id_target,
 		)
 	);
-	if ($smcFunc['db_num_rows']($request) > 0)
-		list ($action) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	if ($db->num_rows($request) > 0)
+		list ($action) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return isset($action) ? $action : null;
 }
@@ -64,10 +69,10 @@ function lastActionOn($id_executor, $id_target)
  */
 function addKarma($id_executor, $id_target, $direction)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Put it in the log.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}log_karma',
 		array('action' => 'int', 'id_target' => 'int', 'id_executor' => 'int', 'log_time' => 'int'),
 		array($direction, $id_target, $id_executor, time()),
@@ -87,10 +92,10 @@ function addKarma($id_executor, $id_target, $direction)
  */
 function updateKarma($id_executor, $id_target, $direction)
 {
-	global $smcFunc;
+	$db = database();
 
 	// You decided to go back on your previous choice?
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_karma
 		SET action = {int:action}, log_time = {int:current_time}
 		WHERE id_target = {int:id_target}

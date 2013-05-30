@@ -37,6 +37,25 @@ COMMIT;
 # --------------------------------------------------------
 
 #
+# Table structure for table `antispam_questions`
+#
+
+CREATE TABLE {$db_prefix}antispam_questions (
+  id_question integer primary key,
+  question text NOT NULL,
+  answer text NOT NULL,
+  language varchar(50) NOT NULL
+);
+
+#
+# Indexes for table `admin_info_files`
+#
+
+CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
+
+# --------------------------------------------------------
+
+#
 # Table structure for table `approval_queue`
 #
 
@@ -159,6 +178,7 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'poll_vote');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'post_attachment');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'post_new');
+INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'post_draft');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'post_autosave_draft');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'post_reply_any');
@@ -251,6 +271,7 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'poll_vote');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'post_attachment');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'post_new');
+INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'post_draft');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'post_autosave_draft');
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'post_reply_any');
@@ -827,6 +848,8 @@ CREATE TABLE {$db_prefix}log_activity (
   posts smallint NOT NULL default '0',
   registers smallint NOT NULL default '0',
   most_on smallint NOT NULL default '0',
+  pm smallint NOT NULL default '0',
+  email smallint NOT NULL default '0',
   PRIMARY KEY (date)
 );
 
@@ -1283,7 +1306,8 @@ CREATE TABLE {$db_prefix}mail_queue (
   headers text NOT NULL,
   send_html smallint NOT NULL default '0',
   priority smallint NOT NULL default '1',
-  private smallint NOT NULL default '0'
+  private smallint NOT NULL default '0',
+  message_id int NOT NULL default '0'
 );
 
 #
@@ -1372,6 +1396,8 @@ CREATE TABLE {$db_prefix}members (
   pm_email_notify smallint NOT NULL default '0',
   karma_bad smallint NOT NULL default '0',
   karma_good smallint NOT NULL default '0',
+  likes_given int NOT NULL default '0',
+  likes_received int NOT NULL default '0',
   usertitle varchar(255) NOT NULL,
   notify_announcements smallint NOT NULL default '1',
   notify_regularity smallint NOT NULL default '1',
@@ -1793,8 +1819,9 @@ INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_r
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (10, 0, 120, 1, 'd', 1, 'paid_subscriptions');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (11, 0, 120, 1, 'd', 1, 'remove_temp_attachments');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (12, 0, 180, 1, 'd', 1, 'remove_topic_redirect');
-INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (13, 0, 240, 1, 'd', 1, 'remove_old_drafts');
+INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (13, 0, 240, 1, 'd', 0, 'remove_old_drafts');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (14, 0, 0, 6, 'h', 0, 'remove_old_followups');
+INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (15, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
 COMMIT;
 
 # --------------------------------------------------------
@@ -1944,6 +1971,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('knownThemes', '1,2,3
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('who_enabled', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('time_offset', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cookieTime', '60');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('jquery_source', 'local');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('lastActive', '15');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_known', 'default,aaron,akyhne,fugue');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_names', '{$default_smileyset_name}
@@ -1984,6 +2012,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('pruningOptions', '30
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cache_enable', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('reg_verification', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('visual_verification_type', '3');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('visual_verification_num_chars', '6');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enable_buddylist', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('birthday_email', 'happy_birthday');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('dont_repeat_theme_core', '1');
@@ -2198,6 +2227,7 @@ CREATE TABLE {$db_prefix}topics (
   id_previous_topic int NOT NULL default '0',
   num_replies int NOT NULL default '0',
   num_views int NOT NULL default '0',
+  num_likes int NOT NULL default '0',
   locked smallint NOT NULL default '0',
   redirect_expires int NOT NULL default '0',
   id_redirect_topic int NOT NULL default '0',
@@ -2282,3 +2312,70 @@ CREATE TABLE {$db_prefix}log_badbehavior (
 
 CREATE INDEX {$db_prefix}ip ON {$db_prefix}log_badbehavior (ip);
 CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);
+
+#
+# Table structure for table `postby_emails`
+#
+
+CREATE TABLE {$db_prefix}postby_emails (
+	id_email varchar(50) primary key,
+	time_sent int NOT NULL,
+	email_to varchar(50) NOT NULL,
+);
+
+#
+# Table structure for table `postby_emails_error`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_error
+	id_email integer primary key,
+	error varchar(255) NOT NULL default '',
+	data_id varchar(255) NOT NULL default '0',
+	subject varchar(255) NOT NULL default '',
+	id_message int NOT NULL default '0',
+	id_board smallint(5) NOT NULL default '0',
+	email_from varchar(50) NOT NULL default '',
+	message_type char(10) NOT NULL default '',
+	message text NOT NULL default '',
+);
+
+#
+# Table structure for table `postby_emails_filter`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_filter
+	id_filter integer primary key,
+	filter_style char(5) NOT NULL default '',
+	filter_type varchar(255) NOT NULL default '',
+	filter_to varchar(255) NOT NULL default '',
+	filter_from varchar(255) NOT NULL default '',
+	filter_name varchar(255) NOT NULL default '',
+);
+
+#
+# Table structure for table `log_likes`
+#
+
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target int NOT NULL default '0',
+  id_member int NOT NULL default '0',
+  log_time int NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member)
+);
+
+#
+# Indexes for table `log_likes`
+#
+
+CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
+
+#
+# Table structure for table `message_likes`
+#
+
+CREATE TABLE {$db_prefix}message_likes (
+  id_member int NOT NULL default '0',
+  id_msg int NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member)
+);

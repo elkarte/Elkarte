@@ -32,11 +32,14 @@ if (!defined('ELKARTE'))
  * @param string $error_type = 'general'
  * @param string $file = null
  * @param int $line = null
+ *
  * @return string, the error message
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
-	global $txt, $modSettings, $sc, $user_info, $smcFunc, $scripturl, $last_error;
+	global $txt, $modSettings, $sc, $user_info, $scripturl, $last_error;
+
+	$db = database();
 	static $tried_hook = false;
 
 	// Check if error logging is actually on.
@@ -103,7 +106,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
 	if (empty($last_error) || $last_error != $error_info)
 	{
 		// Insert the error into the database.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}log_errors',
 			array('id_member' => 'int', 'log_time' => 'int', 'ip' => 'string-16', 'url' => 'string-65534', 'message' => 'string-65534', 'session' => 'string', 'error_type' => 'string', 'file' => 'string-255', 'line' => 'int'),
 			$error_info,
@@ -145,8 +148,8 @@ function fatal_error($error, $log = 'general')
  *  - the information is logged if log is specified.
  *
  * @param $error
- * @param $log
- * @param $sprintf
+ * @param $log = 'general'
+ * @param $sprintf = array()
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {
@@ -361,7 +364,9 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $db_connection, $webmaster_email, $db_last_error, $db_error_send, $smcFunc;
+	global $db_connection, $webmaster_email, $db_last_error, $db_error_send;
+
+	$db = database();
 
 	// Just check we're not in any buffers, just in case.
 	while (@ob_get_level() > 0)
@@ -383,8 +388,9 @@ function display_db_error()
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.
-		$db_error = @$smcFunc['db_error']($db_connection);
-		@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $smcFunc['db_title'] . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
+		$db_error = $db->last_error($db_connection);
+		$db = database();
+		@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 	}
 
 	// What to do?  Language files haven't and can't be loaded yet...

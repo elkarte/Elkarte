@@ -5,9 +5,8 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
+ * This file contains code also covered by:
  *
- * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
@@ -32,10 +31,11 @@ if (!defined('ELKARTE'))
  * - sets up $board, $topic, and $scripturl and $_REQUEST['start'].
  * - determines, or rather tries to determine, the client's IP.
  */
-
 function cleanRequest()
 {
-	global $board, $topic, $boardurl, $scripturl, $modSettings, $smcFunc;
+	global $board, $topic, $boardurl, $scripturl;
+
+	$db = database();
 
 	// Makes it easier to refer to things this way.
 	$scripturl = $boardurl . '/index.php';
@@ -89,12 +89,12 @@ function cleanRequest()
 		parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
 		// Magic quotes still applies with parse_str - so clean it up.
-		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0 && empty($modSettings['integrate_magic_quotes']))
+		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
 			$_GET = $removeMagicQuoteFunction($_GET);
 	}
 	elseif (strpos(ini_get('arg_separator.input'), ';') !== false)
 	{
-		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0 && empty($modSettings['integrate_magic_quotes']))
+		if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
 			$_GET = $removeMagicQuoteFunction($_GET);
 
 		// Search engines will send action=profile%3Bu=1, which confuses PHP.
@@ -136,7 +136,7 @@ function cleanRequest()
 		if (strpos($request, basename($scripturl) . '/') !== false)
 		{
 			parse_str(substr(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr(preg_replace('~/([^,/]+),~', '/$1=', substr($request, strpos($request, basename($scripturl)) + strlen(basename($scripturl)))), '/', '&')), 1), $temp);
-			if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0 && empty($modSettings['integrate_magic_quotes']))
+			if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() != 0)
 				$temp = $removeMagicQuoteFunction($temp);
 			$_GET += $temp;
 		}
@@ -289,7 +289,7 @@ function cleanRequest()
 		$_SERVER['REQUEST_URL'] = $_SERVER['REQUEST_URI'];
 
 	// And make sure HTTP_USER_AGENT is set.
-	$_SERVER['HTTP_USER_AGENT'] = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($smcFunc['db_unescape_string']($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES) : '';
+	$_SERVER['HTTP_USER_AGENT'] = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($db->unescape_string($_SERVER['HTTP_USER_AGENT']), ENT_QUOTES) : '';
 
 	// Some final checking.
 	if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $_SERVER['BAN_CHECK_IP']) === 0 || !isValidIPv6($_SERVER['BAN_CHECK_IP']))
@@ -403,17 +403,17 @@ function expandIPv6($addr, $strict_check = true)
  */
 function escapestring__recursive($var)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($var))
-		return $smcFunc['db_escape_string']($var);
+		return $db->escape_string($var);
 
 	// Reindex the array with slashes.
 	$new_var = array();
 
 	// Add slashes to every element, even the indexes!
 	foreach ($var as $k => $v)
-		$new_var[$smcFunc['db_escape_string']($k)] = escapestring__recursive($v);
+		$new_var[$db->escape_string($k)] = escapestring__recursive($v);
 
 	return $new_var;
 }
@@ -431,10 +431,8 @@ function escapestring__recursive($var)
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
-	global $smcFunc;
-
 	if (!is_array($var))
-		return isset($smcFunc['htmlspecialchars']) ? $smcFunc['htmlspecialchars']($var, ENT_QUOTES) : htmlspecialchars($var, ENT_QUOTES);
+		return Util::htmlspecialchars($var, ENT_QUOTES);
 
 	// Add the htmlspecialchars to every element.
 	foreach ($var as $k => $v)
@@ -480,17 +478,17 @@ function urldecode__recursive($var, $level = 0)
  */
 function unescapestring__recursive($var)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($var))
-		return $smcFunc['db_unescape_string']($var);
+		return $db->unescape_string($var);
 
 	// Reindex the array without slashes, this time.
 	$new_var = array();
 
 	// Strip the slashes from every element.
 	foreach ($var as $k => $v)
-		$new_var[$smcFunc['db_unescape_string']($k)] = unescapestring__recursive($v);
+		$new_var[$db->unescape_string($k)] = unescapestring__recursive($v);
 
 	return $new_var;
 }
@@ -534,11 +532,9 @@ function stripslashes__recursive($var, $level = 0)
  */
 function htmltrim__recursive($var, $level = 0)
 {
-	global $smcFunc;
-
 	// Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
 	if (!is_array($var))
-		return isset($smcFunc) ? $smcFunc['htmltrim']($var) : trim($var, ' ' . "\t\n\r\x0B" . '\0' . "\xA0");
+		return Util::htmltrim($var);
 
 	// Go through all the elements and remove the whitespace.
 	foreach ($var as $k => $v)
@@ -558,8 +554,6 @@ function htmltrim__recursive($var, $level = 0)
  */
 function cleanXml($string)
 {
-	global $context;
-
 	// http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char
 	return preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x19\x{FFFE}\x{FFFF}]~u', '', $string);
 }
@@ -596,8 +590,6 @@ function JavaScriptEscape($string)
  * - handles rewriting URLs for the queryless URLs option.
  * - can be turned off entirely by setting $scripturl to an empty
  *   string, ''. (it wouldn't work well like that anyway.)
- * - because of bugs in certain builds of PHP, does not function in
- *   versions lower than 4.3.0 - please upgrade if this hurts you.
  *
  * @param string $buffer
  * @return string

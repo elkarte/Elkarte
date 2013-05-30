@@ -32,7 +32,7 @@ if (!defined('ELKARTE'))
  */
 function preparsecode(&$message, $previewing = false)
 {
-	global $user_info, $modSettings, $smcFunc, $context;
+	global $user_info;
 
 	// This line makes all languages *theoretically* work even with the wrong charset ;).
 	$message = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $message);
@@ -243,6 +243,8 @@ function preparsecode(&$message, $previewing = false)
 			$parts[$i] = preg_replace('~\[quote\]\s*\[/quote\]~', '', $parts[$i]);
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
 		}
+
+		call_integration_hook('integrate_preparse_code', array(&$parts[$i]));
 	}
 
 	// Put it back together!
@@ -262,8 +264,6 @@ function preparsecode(&$message, $previewing = false)
  */
 function un_preparsecode($message)
 {
-	global $smcFunc;
-
 	$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 	// We're going to unparse only the stuff outside [code]...
@@ -276,14 +276,14 @@ function un_preparsecode($message)
 			// $parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ie', '\'[html]\' . strtr(htmlspecialchars(\'$1\', ENT_QUOTES), array(\'\\&quot;\' => \'&quot;\', \'&amp;#13;\' => \'<br />\', \'&amp;#32;\' => \' \', \'&amp;#38;\' => \'&#38;\', \'&amp;#91;\' => \'[\', \'&amp;#93;\' => \']\')) . \'[/html]\'', $parts[$i]);
 
 			// Attempt to un-parse the time to something less awful.
-			$parts[$i] = preg_replace('~\[time\](\d{0,10})\[/time\]~ie', '\'[time]\' . timeformat(\'$1\', false) . \'[/time]\'', $parts[$i]);
+			$parts[$i] = preg_replace('~\[time\](\d{0,10})\[/time\]~ie', '\'[time]\' . standardTime(\'$1\', false) . \'[/time]\'', $parts[$i]);
 		}
-	}
 
+		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
+	}
 
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
-
 }
 
 /**
@@ -360,6 +360,7 @@ function fixTags(&$message)
 		),
 	);
 
+	call_integration_hook('integrate_fixtags', array(&$fixArray, &$message));
 	// Fix each type of tag.
 	foreach ($fixArray as $param)
 		fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
@@ -369,67 +370,7 @@ function fixTags(&$message)
 
 	// Limit the size of images posted?
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
-	{
-		// We'll need this for image processing
-		require_once(SUBSDIR . '/Attachments.subs.php');
-
-		// Find all the img tags - with or without width and height.
-		preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);
-
-		$replaces = array();
-		foreach ($matches[0] as $match => $dummy)
-		{
-			// If the width was after the height, handle it.
-			$matches[1][$match] = !empty($matches[3][$match]) ? $matches[3][$match] : $matches[1][$match];
-
-			// Now figure out if they had a desired height or width...
-			$desired_width = !empty($matches[1][$match]) ? (int) substr(trim($matches[1][$match]), 6) : 0;
-			$desired_height = !empty($matches[2][$match]) ? (int) substr(trim($matches[2][$match]), 7) : 0;
-
-			// One was omitted, or both.  We'll have to find its real size...
-			if (empty($desired_width) || empty($desired_height))
-			{
-				list ($width, $height) = url_image_size(un_htmlspecialchars($matches[4][$match]));
-
-				// They don't have any desired width or height!
-				if (empty($desired_width) && empty($desired_height))
-				{
-					$desired_width = $width;
-					$desired_height = $height;
-				}
-				// Scale it to the width...
-				elseif (empty($desired_width) && !empty($height))
-					$desired_width = (int) (($desired_height * $width) / $height);
-				// Scale if to the height.
-				elseif (!empty($width))
-					$desired_height = (int) (($desired_width * $height) / $width);
-			}
-
-			// If the width and height are fine, just continue along...
-			if ($desired_width <= $modSettings['max_image_width'] && $desired_height <= $modSettings['max_image_height'])
-				continue;
-
-			// Too bad, it's too wide.  Make it as wide as the maximum.
-			if ($desired_width > $modSettings['max_image_width'] && !empty($modSettings['max_image_width']))
-			{
-				$desired_height = (int) (($modSettings['max_image_width'] * $desired_height) / $desired_width);
-				$desired_width = $modSettings['max_image_width'];
-			}
-
-			// Now check the height, as well.  Might have to scale twice, even...
-			if ($desired_height > $modSettings['max_image_height'] && !empty($modSettings['max_image_height']))
-			{
-				$desired_width = (int) (($modSettings['max_image_height'] * $desired_width) / $desired_height);
-				$desired_height = $modSettings['max_image_height'];
-			}
-
-			$replaces[$matches[0][$match]] = '[img' . (!empty($desired_width) ? ' width=' . $desired_width : '') . (!empty($desired_height) ? ' height=' . $desired_height : '') . ']' . $matches[4][$match] . '[/img]';
-		}
-
-		// If any img tags were actually changed...
-		if (!empty($replaces))
-			$message = strtr($message, $replaces);
-	}
+		resizeBBCImages($message);
 }
 
 /**
@@ -514,6 +455,71 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
 		$message = strtr($message, $replaces);
 }
 
+function resizeBBCImages(&$message)
+{
+	global $modSettings;
+
+	// We'll need this for image processing
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
+	// Find all the img tags - with or without width and height.
+	preg_match_all('~\[img(\s+width=\d+)?(\s+height=\d+)?(\s+width=\d+)?\](.+?)\[/img\]~is', $message, $matches, PREG_PATTERN_ORDER);
+
+	$replaces = array();
+	foreach ($matches[0] as $match => $dummy)
+	{
+		// If the width was after the height, handle it.
+		$matches[1][$match] = !empty($matches[3][$match]) ? $matches[3][$match] : $matches[1][$match];
+
+		// Now figure out if they had a desired height or width...
+		$desired_width = !empty($matches[1][$match]) ? (int) substr(trim($matches[1][$match]), 6) : 0;
+		$desired_height = !empty($matches[2][$match]) ? (int) substr(trim($matches[2][$match]), 7) : 0;
+
+		// One was omitted, or both.  We'll have to find its real size...
+		if (empty($desired_width) || empty($desired_height))
+		{
+			list ($width, $height) = url_image_size(un_htmlspecialchars($matches[4][$match]));
+
+			// They don't have any desired width or height!
+			if (empty($desired_width) && empty($desired_height))
+			{
+				$desired_width = $width;
+				$desired_height = $height;
+			}
+			// Scale it to the width...
+			elseif (empty($desired_width) && !empty($height))
+				$desired_width = (int) (($desired_height * $width) / $height);
+			// Scale if to the height.
+			elseif (!empty($width))
+				$desired_height = (int) (($desired_width * $height) / $width);
+		}
+
+		// If the width and height are fine, just continue along...
+		if ($desired_width <= $modSettings['max_image_width'] && $desired_height <= $modSettings['max_image_height'])
+			continue;
+
+		// Too bad, it's too wide.  Make it as wide as the maximum.
+		if ($desired_width > $modSettings['max_image_width'] && !empty($modSettings['max_image_width']))
+		{
+			$desired_height = (int) (($modSettings['max_image_width'] * $desired_height) / $desired_width);
+			$desired_width = $modSettings['max_image_width'];
+		}
+
+		// Now check the height, as well.  Might have to scale twice, even...
+		if ($desired_height > $modSettings['max_image_height'] && !empty($modSettings['max_image_height']))
+		{
+			$desired_width = (int) (($modSettings['max_image_height'] * $desired_width) / $desired_height);
+			$desired_height = $modSettings['max_image_height'];
+		}
+
+		$replaces[$matches[0][$match]] = '[img' . (!empty($desired_width) ? ' width=' . $desired_width : '') . (!empty($desired_height) ? ' height=' . $desired_height : '') . ']' . $matches[4][$match] . '[/img]';
+	}
+
+	// If any img tags were actually changed...
+	if (!empty($replaces))
+		$message = strtr($message, $replaces);
+}
+
 /**
  * Sends a notification to members who have elected to receive emails
  * when things happen to a topic, such as replies are posted.
@@ -529,10 +535,22 @@ function fixTag(&$message, $myTag, $protocols, $embeddedUrl = false, $hasEqualSi
  * @param array $members_only = array() - are the only ones that will be sent the notification if they have it on.
  * @uses Post language file
  */
-function sendNotifications($topics, $type, $exclude = array(), $members_only = array())
+function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
 {
-	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $smcFunc;
+	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname;
+	global $modSettings;
+
+	$db = database();
+
+	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
+	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : $user_info['id'];
+	$user_language = (!empty($pbe['user_info']['language']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['language'] : $user_info['language'];
+
+	// Load in our dependencies
+	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
+	if ($maillist)
+		require_once(SUBSDIR . '/Emailpost.subs.php');
+	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Can't do it if there's no topics.
 	if (empty($topics))
@@ -542,12 +560,13 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	if (!is_array($topics))
 		$topics = array($topics);
 
-	// Email functions will be helpful here
-	require_once(SUBSDIR . '/Mail.subs.php');
+	// I hope we are not sending one of silly moderation notices
+	if ($type !== 'reply' && !empty($maillist) && !empty($modSettings['pbe_no_mod_notices']))
+		return;
 
-	// Get the subject and body...
-	$result = $smcFunc['db_query']('', '
-		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic,
+	// Get the subject, body and basic poster details
+	$result = $db->query('', '
+		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
 			IFNULL(mem.real_name, ml.poster_name) AS poster_name
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -560,24 +579,57 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		)
 	);
 	$topicData = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	$boards_index = array();
+	while ($row = $db->fetch_assoc($result))
 	{
-		// Clean it up.
-		censorText($row['subject']);
-		censorText($row['body']);
-		$row['subject'] = un_htmlspecialchars($row['subject']);
-		$row['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($row['body'], false, $row['id_last_msg']), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+		// Any attachments, we just want the number of them for display
+		$num_attachments = 0;
+		$request = $db->query('', '
+			SELECT COUNT(id_attach)
+			FROM {db_prefix}attachments
+			WHERE attachment_type = {int:attachment_type}
+				AND id_msg = {int:id_msg}
+			LIMIT 1',
+			array(
+				'attachment_type' => 0,
+				'id_msg' => $row['id_last_msg'],
+			)
+		);
+		list($num_attachments) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		// Using the maillist function or the standard style
+		if ($maillist)
+		{
+			// Convert to markdown markup e.g. text ;)
+			pbe_prepare_text($row['body'], $row['subject'], $row['signature']);
+		}
+		else
+		{
+			// Clean it up.
+			censorText($row['subject']);
+			censorText($row['body']);
+			censorText($row['signature']);
+			$row['subject'] = un_htmlspecialchars($row['subject']);
+			$row['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($row['body'], false, $row['id_last_msg']), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+		}
+
+		// all the boards for these topics, used to find all the members to be notified
+		$boards_index[] = $row['id_board'];
 
 		$topicData[$row['id_topic']] = array(
 			'subject' => $row['subject'],
 			'body' => $row['body'],
 			'last_id' => $row['id_last_msg'],
 			'topic' => $row['id_topic'],
-			'name' => $user_info['name'],
+			'board' => $row['id_board'],
+			'name' => $row['poster_name'],
 			'exclude' => '',
+			'signature' => $row['signature'],
+			'attachments' => $num_attachments,
 		);
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Work out any exclusions...
 	foreach ($topics as $key => $id)
@@ -589,6 +641,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		trigger_error('sendNotifications(): topics not found', E_USER_NOTICE);
 
 	$topics = array_keys($topicData);
+
 	// Just in case they've gone walkies.
 	if (empty($topics))
 		return;
@@ -597,7 +650,8 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	$digest_insert = array();
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['last_id'], $type, (int) $data['exclude']);
-	$smcFunc['db_insert']('',
+
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -606,11 +660,127 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		array()
 	);
 
+	// Are we doing anything here?
+	$sent = 0;
+
+	// Using the posting email function in either group or list mode
+	if ($maillist)
+	{
+		// Find the members with *board* notifications on.
+		$members = $db->query('', '
+			SELECT
+				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, mem.warning,
+				ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, b.name, b.id_profile,
+				ln.id_board
+			FROM {db_prefix}log_notify AS ln
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
+			WHERE ln.id_board IN ({array_int:board_list})
+				AND mem.notify_types != {int:notify_types}
+				AND mem.notify_regularity < {int:notify_regularity}
+				AND mem.is_activated = {int:is_activated}
+				AND ln.id_member != {int:current_member}' .
+				(empty($members_only) ? '' : ' AND ln.id_member IN ({array_int:members_only})') . '
+			ORDER BY mem.lngfile',
+			array(
+				'current_member' => $user_id,
+				'board_list' => $boards_index,
+				'notify_types' => $type === 'reply' ? 4 : 3,
+				'notify_regularity' => 2,
+				'is_activated' => 1,
+				'members_only' => is_array($members_only) ? $members_only : array($members_only),
+			)
+		);
+		$boards = array();
+		while ($row = $db->fetch_assoc($members))
+		{
+			// for this member/board, loop through the topics and see if we should send it
+			foreach ($topicData as $id => $data)
+			{
+				// Don't send it if its not from the right board
+				if ($data['board'] !== $row['id_board'])
+					continue;
+				else
+					$data['board_name'] = $row['name'];
+
+				// Don't do the excluded...
+				if ($data['exclude'] === $row['id_member'])
+					continue;
+
+				// If they are not the poster do they want to know?
+				// @todo maybe if they posted via email?
+				if ($type !== 'reply' && $row['notify_types'] == 2)
+					continue;
+
+				$email_perm = true;
+				if (validateAccess($row, $maillist, $email_perm) === false)
+					continue;
+
+				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
+				if (empty($current_language) || $current_language != $needed_language)
+					$current_language = loadLanguage('Post', $needed_language, false);
+
+				$message_type = 'notification_' . $type;
+				$replacements = array(
+					'TOPICSUBJECT' => $data['subject'],
+					'POSTERNAME' => un_htmlspecialchars($data['name']),
+					'TOPICLINKNEW' => $scripturl . '?topic=' . $id . '.new;topicseen#new',
+					'TOPICLINK' => $scripturl . '?topic=' . $id . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
+					'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $data['board'] . '.0',
+					'SIGNATURE' => $data['signature'],
+					'BOARDNAME' => $data['board_name'],
+				);
+
+				if ($type === 'remove')
+					unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK']);
+
+				// Do they want the body of the message sent too?
+				if (!empty($row['notify_send_body']) && $type === 'reply')
+				{
+					$message_type .= '_body';
+					$replacements['MESSAGE'] = $data['body'];
+
+					// Any attachments? if so lets make a big deal about them!
+					if ($data['attachments'] != 0)
+						$replacements['MESSAGE'] .=  "\n\n" . sprintf($txt['message_attachments'], $data['attachments'], $replacements['TOPICLINK']);
+				}
+
+				if (!empty($row['notify_regularity']) && $type === 'reply')
+					$message_type .= '_once';
+
+				// Send only if once is off or it's on and it hasn't been sent.
+				if ($type !== 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
+				{
+					$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply') ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
+
+					if ($maillist && $email_perm && $type === 'reply')
+					{
+						// In group mode like google group or yahoo group, the mail is from the poster
+						// Otherwise in maillist mode, it is from the site
+						$emailfrom = !empty($modSettings['maillist_group_mode']) ? un_htmlspecialchars($data['name']) : (!empty($modSettings['maillist_sitename']) ? un_htmlspecialchars($modSettings['maillist_sitename']) : $mbname);
+
+						// The email address of the sender, irrespective of the envelope name above
+						$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
+						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $emailfrom, 'm' . $data['last_id'], false, 3, null, false, $from_wrapper, $id);
+					}
+					else
+						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $data['last_id']);
+
+					$sent++;
+
+					// make a note that this member was sent this topic
+					$boards[$row['id_member']][$id] = 1;
+				}
+			}
+		}
+		$db->free_result($members);
+	}
+
 	// Find the members with notification on for this topic.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
+			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started, b.name,
 			ln.id_topic
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
@@ -624,36 +794,33 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			(empty($members_only) ? '' : ' AND ln.id_member IN ({array_int:members_only})') . '
 		ORDER BY mem.lngfile',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => $user_id,
 			'topic_list' => $topics,
-			'notify_types' => $type == 'reply' ? '4' : '3',
+			'notify_types' => $type == 'reply' ? 4 : 3,
 			'notify_regularity' => 2,
 			'is_activated' => 1,
 			'members_only' => is_array($members_only) ? $members_only : array($members_only),
 		)
 	);
-	$sent = 0;
-	$current_language = '';
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+
+	while ($row = $db->fetch_assoc($members))
 	{
 		// Don't do the excluded...
 		if ($topicData[$row['id_topic']]['exclude'] == $row['id_member'])
 			continue;
 
+		// Don't do the ones that were sent via board notification, you only get one notice
+		if (isset($boards[$row['id_member']][$row['id_topic']]))
+			continue;
+
 		// Easier to check this here... if they aren't the topic poster do they really want to know?
+		// @todo prehaps just if they posted by email?
 		if ($type != 'reply' && $row['notify_types'] == 2 && $row['id_member'] != $row['id_member_started'])
 			continue;
 
-		if ($row['id_group'] != 1)
-		{
-			$allowed = explode(',', $row['member_groups']);
-			$row['additional_groups'] = explode(',', $row['additional_groups']);
-			$row['additional_groups'][] = $row['id_group'];
-			$row['additional_groups'][] = $row['id_post_group'];
-
-			if (count(array_intersect($allowed, $row['additional_groups'])) == 0)
-				continue;
-		}
+		$email_perm = true;
+		if (validateAccess($row, $maillist, $email_perm) === false)
+			continue;
 
 		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 		if (empty($current_language) || $current_language != $needed_language)
@@ -663,14 +830,18 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		$replacements = array(
 			'TOPICSUBJECT' => $topicData[$row['id_topic']]['subject'],
 			'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
-			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+			'TOPICLINKNEW' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
 			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
+			'SIGNATURE' => $topicData[$row['id_topic']]['signature'],
+			'BOARDNAME' => $row['name'],
 		);
 
 		if ($type == 'remove')
 			unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK']);
+
 		// Do they want the body of the message sent too?
-		if (!empty($row['notify_send_body']) && $type == 'reply' && empty($modSettings['disallow_sendBody']))
+		if (!empty($row['notify_send_body']) && $type == 'reply')
 		{
 			$message_type .= '_body';
 			$replacements['MESSAGE'] = $topicData[$row['id_topic']]['body'];
@@ -681,25 +852,36 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		// Send only if once is off or it's on and it hasn't been sent.
 		if ($type != 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
 		{
-			$emaildata = loadEmailTemplate($message_type, $replacements, $needed_language);
-			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicData[$row['id_topic']]['last_id']);
+			$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply') ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
+
+			// Using the maillist functions?
+			if ($maillist && $email_perm && $type === 'reply')
+			{
+				// Set the from name base on group or maillist mode
+				$emailfrom = !empty($modSettings['maillist_group_mode']) ? un_htmlspecialchars($topicData[$row['id_topic']]['name']) : un_htmlspecialchars($modSettings['maillist_sitename']);
+				$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
+				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $emailfrom, 'm' . $data['last_id'], false, 3, null, false, $from_wrapper, $row['id_topic']);
+			}
+			else
+				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicData[$row['id_topic']]['last_id']);
+
 			$sent++;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
-	if (isset($current_language) && $current_language != $user_info['language'])
+	if (isset($current_language) && $current_language != $user_language)
 		loadLanguage('Post');
 
 	// Sent!
 	if ($type == 'reply' && !empty($sent))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member != {int:current_member}',
 			array(
-				'current_member' => $user_info['id'],
+				'current_member' => $user_id,
 				'topic_list' => $topics,
 				'is_sent' => 1,
 			)
@@ -709,8 +891,10 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	if (!empty($sent) && !empty($exclude))
 	{
 		foreach ($topicData as $id => $data)
+		{
 			if ($data['exclude'])
-				$smcFunc['db_query']('', '
+			{
+				$db->query('', '
 					UPDATE {db_prefix}log_notify
 					SET sent = {int:not_sent}
 					WHERE id_topic = {int:id_topic}
@@ -721,6 +905,75 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 						'id_member' => $data['exclude'],
 					)
 				);
+			}
+		}
+	}
+}
+
+/**
+ * Checks if a user has the correct access to get notifications
+ * - validates they have proper group access to a board
+ * - if using the maillist, checks if they should get a reply-able message
+ * 		- not muted
+ * 		- has postby_email permission on the board
+ *
+ * Returns false if they do not have the proper group access to a board
+ * Sets email_perm to false if they should not get a reply-able message
+ *
+ * @param array $row
+ * @param boolean $maillist
+ * @param boolean $email_perm
+ */
+function validateAccess($row, $maillist, &$email_perm = true)
+{
+	global $modSettings;
+
+	$db = database();
+	static $board_profile = array();
+
+	// No need to check for you ;)
+	if ($row['id_group'] == 1)
+		return;
+
+	$allowed = explode(',', $row['member_groups']);
+	$row['additional_groups'] = !empty( $row['additional_groups']) ? explode(',', $row['additional_groups']) : array();
+	$row['additional_groups'][] = $row['id_group'];
+	$row['additional_groups'][] = $row['id_post_group'];
+
+	// They do have access to this board?
+	if (count(array_intersect($allowed, $row['additional_groups'])) === 0)
+		return false;
+
+	// If using maillist, see if they should get a reply-able message
+	if ($maillist)
+	{
+		// Perhaps they don't require a security key in the message
+		if (!empty($modSettings['postmod_active']) && !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $row['warning'])
+			$email_perm = false;
+		else
+		{
+			// In a group that has email posting permissions on this board
+			if (!isset($board_profile[$row['id_profile']]))
+			{
+				$request = $db->query('', '
+					SELECT permission, add_deny, id_group
+					FROM {db_prefix}board_permissions
+					WHERE id_profile = {int:id_profile}
+						AND permission = {string:permission}',
+					array(
+						'id_profile' => $row['id_profile'],
+						'permission' => 'postby_email',
+					)
+				);
+				while ($row_perm = $db->fetch_assoc($request))
+					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
+				$db->free_result($request);
+			}
+
+			// Get the email permission for this board / posting group
+			if (count(array_intersect($board_profile[$row['id_profile']], $row['additional_groups'])) === 0)
+				$email_perm = false;
+		}
 	}
 }
 
@@ -737,7 +990,9 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
  */
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, $smcFunc;
+	global $user_info, $txt, $modSettings;
+
+	$db = database();
 
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
@@ -758,7 +1013,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		$topicOptions['is_approved'] = true;
 	elseif (!empty($topicOptions['id']) && !isset($topicOptions['is_approved']))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT approved
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:id_topic}
@@ -767,8 +1022,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_topic' => $topicOptions['id'],
 			)
 		);
-		list ($topicOptions['is_approved']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($topicOptions['is_approved']) = $db->fetch_row($request);
+		$db->free_result($request);
 	}
 
 	// If nothing was filled in as name/e-mail address, try the member table.
@@ -826,13 +1081,13 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	call_integration_hook('integrate_create_post', array(&$msgOptions, &$topicOptions, &$posterOptions, &$message_columns, &$message_parameters));
 
 	// Insert the post.
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}messages',
 		$message_columns,
 		$message_parameters,
 		array('id_msg')
 	);
-	$msgOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}messages', 'id_msg');
+	$msgOptions['id'] = $db->insert_id('{db_prefix}messages', 'id_msg');
 
 	// Something went wrong creating the message...
 	if (empty($msgOptions['id']))
@@ -840,7 +1095,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Fix the attachments.
 	if (!empty($msgOptions['attachments']))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}attachments
 			SET id_msg = {int:id_msg}
 			WHERE id_attach IN ({array_int:attachment_list})',
@@ -868,19 +1123,19 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 		call_integration_hook('integrate_before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));
 
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}topics',
 			$topic_columns,
 			$topic_parameters,
 			array('id_topic')
 		);
-		$topicOptions['id'] = $smcFunc['db_insert_id']('{db_prefix}topics', 'id_topic');
+		$topicOptions['id'] = $db->insert_id('{db_prefix}topics', 'id_topic');
 
 		// The topic couldn't be created for some reason.
 		if (empty($topicOptions['id']))
 		{
 			// We should delete the post that did work, though...
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				DELETE FROM {db_prefix}messages
 				WHERE id_msg = {int:id_msg}',
 				array(
@@ -892,7 +1147,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		}
 
 		// Fix the message with the topic.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET id_topic = {int:id_topic}
 			WHERE id_msg = {int:id_msg}',
@@ -945,7 +1200,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		call_integration_hook('integrate_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
 		// Update the number of replies and the lock/sticky status.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				' . implode(', ', $topics_columns) . '
@@ -959,7 +1214,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Creating is modifying...in a way.
 	// @todo Why not set id_msg_modified on the insert?
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET id_msg_modified = {int:id_msg}
 		WHERE id_msg = {int:id_msg}',
@@ -970,7 +1225,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 
 	// Increase the number of posts and topics on the board.
 	if ($msgOptions['approved'])
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET num_posts = num_posts + 1' . ($new_topic ? ', num_topics = num_topics + 1' : '') . '
 			WHERE id_board = {int:id_board}',
@@ -980,7 +1235,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 	else
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET unapproved_posts = unapproved_posts + 1' . ($new_topic ? ', unapproved_topics = unapproved_topics + 1' : '') . '
 			WHERE id_board = {int:id_board}',
@@ -990,7 +1245,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		);
 
 		// Add to the approval queue too.
-		$smcFunc['db_insert']('',
+		$db->insert('',
 			'{db_prefix}approval_queue',
 			array(
 				'id_msg' => 'int',
@@ -1008,7 +1263,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// Since it's likely they *read* it before replying, let's try an UPDATE first.
 		if (!$new_topic)
 		{
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_topics
 				SET id_msg = {int:id_msg}
 				WHERE id_member = {int:current_member}
@@ -1020,7 +1275,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				)
 			);
 
-			$flag = $smcFunc['db_affected_rows']() != 0;
+			$flag = $db->affected_rows() != 0;
 		}
 
 		if (empty($flag))
@@ -1075,7 +1330,9 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $modSettings, $smcFunc;
+	global $user_info, $modSettings;
+
+	$db = database();
 
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
 	$topicOptions['lock_mode'] = isset($topicOptions['lock_mode']) ? $topicOptions['lock_mode'] : null;
@@ -1098,16 +1355,9 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		// using a custom search index, then lets get the old message so we can update our index as needed
 		if (!empty($modSettings['search_custom_index_config']))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT body
-				FROM {db_prefix}messages
-				WHERE id_msg = {int:id_msg}',
-				array(
-					'id_msg' => $msgOptions['id'],
-				)
-			);
-			list ($msgOptions['old_body']) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			require_once(SUBSDIR . '/Messages.subs.php');
+			$message = basicMessageInfo($msgOptions['id'], true);
+			$msgOptions['old_body'] = $message['body'];
 		}
 	}
 	if (!empty($msgOptions['modify_time']))
@@ -1138,7 +1388,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		return true;
 
 	// Change the post.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET ' . implode(', ', $messages_columns) . '
 		WHERE id_msg = {int:id_msg}',
@@ -1148,7 +1398,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Lock and or sticky the post.
 	if ($topicOptions['sticky_mode'] !== null || $topicOptions['lock_mode'] !== null || $topicOptions['poll'] !== null)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET
 				is_sticky = {raw:is_sticky},
@@ -1168,7 +1418,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (!empty($topicOptions['mark_as_read']) && !$user_info['is_guest'])
 	{
 		// Since it's likely they *read* it before editing, let's try an UPDATE first.
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_topics
 			SET id_msg = {int:id_msg}
 			WHERE id_member = {int:current_member}
@@ -1180,7 +1430,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			)
 		);
 
-		$flag = $smcFunc['db_affected_rows']() != 0;
+		$flag = $db->affected_rows() != 0;
 
 		if (empty($flag))
 		{
@@ -1198,7 +1448,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (isset($msgOptions['subject']))
 	{
 		// Only update the subject if this was the first message in the topic.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic
 			FROM {db_prefix}topics
 			WHERE id_first_msg = {int:id_first_msg}
@@ -1207,9 +1457,9 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
 				'id_first_msg' => $msgOptions['id'],
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) == 1)
+		if ($db->num_rows($request) == 1)
 			updateStats('subject', $topicOptions['id'], $msgOptions['subject']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Finally, if we are setting the approved state we need to do much more work :(
@@ -1227,7 +1477,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($msgs))
 		$msgs = array($msgs);
@@ -1236,7 +1486,7 @@ function approvePosts($msgs, $approve = true)
 		return false;
 
 	// May as well start at the beginning, working out *what* we need to change.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
 			m.body, m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.id_member,
 			t.approved AS topic_approved, b.count_posts
@@ -1258,7 +1508,7 @@ function approvePosts($msgs, $approve = true)
 	$notification_topics = array();
 	$notification_posts = array();
 	$member_post_changes = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Easy...
 		$msgs[] = $row['id_msg'];
@@ -1330,13 +1580,13 @@ function approvePosts($msgs, $approve = true)
 		if ($row['id_member'] && empty($row['count_posts']))
 			$member_post_changes[$row['id_member']] = isset($member_post_changes[$row['id_member']]) ? $member_post_changes[$row['id_member']] + 1 : 1;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($msgs))
 		return;
 
 	// Now we have the differences make the changes, first the easy one.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}messages
 		SET approved = {int:approved_state}
 		WHERE id_msg IN ({array_int:message_list})',
@@ -1349,7 +1599,7 @@ function approvePosts($msgs, $approve = true)
 	// If we were unapproving find the last msg in the topics...
 	if (!$approve)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_topic, MAX(id_msg) AS id_last_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topic_list})
@@ -1360,14 +1610,14 @@ function approvePosts($msgs, $approve = true)
 				'approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$topic_changes[$row['id_topic']]['id_last_msg'] = $row['id_last_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// ... next the topics...
 	foreach ($topic_changes as $id => $changes)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET approved = {int:approved}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
 				num_replies = num_replies + {int:num_replies}, id_last_msg = {int:id_last_msg}
@@ -1383,7 +1633,7 @@ function approvePosts($msgs, $approve = true)
 
 	// ... finally the boards...
 	foreach ($board_changes as $id => $changes)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET num_posts = num_posts + {int:num_posts}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
 				num_topics = num_topics + {int:num_topics}, unapproved_topics = unapproved_topics + {int:unapproved_topics}
@@ -1405,7 +1655,7 @@ function approvePosts($msgs, $approve = true)
 		if (!empty($notification_posts))
 			sendApprovalNotifications($notification_posts);
 
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			DELETE FROM {db_prefix}approval_queue
 			WHERE id_msg IN ({array_int:message_list})
 				AND id_attach = {int:id_attach}',
@@ -1422,7 +1672,7 @@ function approvePosts($msgs, $approve = true)
 		foreach ($msgs as $msg)
 			$msgInserts[] = array($msg);
 
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}approval_queue',
 			array('id_msg' => 'int'),
 			$msgInserts,
@@ -1450,7 +1700,7 @@ function approvePosts($msgs, $approve = true)
  */
 function approveTopics($topics, $approve = true)
 {
-	global $smcFunc;
+	$db = database();
 
 	if (!is_array($topics))
 		$topics = array($topics);
@@ -1461,7 +1711,7 @@ function approveTopics($topics, $approve = true)
 	$approve_type = $approve ? 0 : 1;
 
 	// Just get the messages to be approved and pass through...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE id_topic IN ({array_int:topic_list})
@@ -1472,9 +1722,9 @@ function approveTopics($topics, $approve = true)
 		)
 	);
 	$msgs = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$msgs[] = $row['id_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return approvePosts($msgs, $approve);
 }
@@ -1486,8 +1736,9 @@ function approveTopics($topics, $approve = true)
  */
 function sendApprovalNotifications(&$topicData)
 {
-	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $smcFunc;
+	global $scripturl, $language, $user_info, $modSettings;
+
+	$db = database();
 
 	// Clean up the data...
 	if (!is_array($topicData) || empty($topicData))
@@ -1496,22 +1747,37 @@ function sendApprovalNotifications(&$topicData)
 	// Email ahoy
 	require_once(SUBSDIR . '/Mail.subs.php');
 
+	// Maillist format?
+	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
+	if ($maillist)
+		require_once(SUBSDIR . '/Emailpost.subs.php');
+
 	$topics = array();
 	$digest_insert = array();
 	foreach ($topicData as $topic => $msgs)
+	{
 		foreach ($msgs as $msgKey => $msg)
 		{
-			censorText($topicData[$topic][$msgKey]['subject']);
-			censorText($topicData[$topic][$msgKey]['body']);
-			$topicData[$topic][$msgKey]['subject'] = un_htmlspecialchars($topicData[$topic][$msgKey]['subject']);
-			$topicData[$topic][$msgKey]['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topicData[$topic][$msgKey]['body'], false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+			if ($maillist)
+			{
+				// Convert it to markdown for sending
+				pbe_prepare_text($topicData[$topic][$msgKey]['body'], $topicData[$topic][$msgKey]['subject'], '');
+			}
+			else
+			{
+				censorText($topicData[$topic][$msgKey]['subject']);
+				censorText($topicData[$topic][$msgKey]['body']);
+				$topicData[$topic][$msgKey]['subject'] = un_htmlspecialchars($topicData[$topic][$msgKey]['subject']);
+				$topicData[$topic][$msgKey]['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topicData[$topic][$msgKey]['body'], false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+			}
 
 			$topics[] = $msg['id'];
 			$digest_insert[] = array($msg['topic'], $msg['id'], 'reply', $user_info['id']);
 		}
+	}
 
 	// These need to go into the digest too...
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -1521,7 +1787,7 @@ function sendApprovalNotifications(&$topicData)
 	);
 
 	// Find everyone who needs to know about this.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
 			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
@@ -1546,7 +1812,7 @@ function sendApprovalNotifications(&$topicData)
 	$sent = 0;
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($members))
+	while ($row = $db->fetch_assoc($members))
 	{
 		if ($row['id_group'] != 1)
 		{
@@ -1595,14 +1861,14 @@ function sendApprovalNotifications(&$topicData)
 			$sent_this_time = true;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Post');
 
 	// Sent!
 	if (!empty($sent))
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_notify
 			SET sent = {int:is_sent}
 			WHERE id_topic IN ({array_int:topic_list})
@@ -1628,7 +1894,9 @@ function sendApprovalNotifications(&$topicData)
  */
 function updateLastMessages($setboards, $id_msg = 0)
 {
-	global $board_info, $board, $modSettings, $smcFunc;
+	global $board_info, $board;
+
+	$db = database();
 
 	// Please - let's be sane.
 	if (empty($setboards))
@@ -1641,7 +1909,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	if (!$id_msg)
 	{
 		// Find the latest message on this board (highest id_msg.)
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_board, MAX(id_last_msg) AS id_msg
 			FROM {db_prefix}topics
 			WHERE id_board IN ({array_int:board_list})
@@ -1653,9 +1921,9 @@ function updateLastMessages($setboards, $id_msg = 0)
 			)
 		);
 		$lastMsg = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$lastMsg[$row['id_board']] = $row['id_msg'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 	else
 	{
@@ -1726,7 +1994,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	// Now commit the changes!
 	foreach ($parent_updates as $id_msg => $boards)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_msg_updated = {int:id_msg_updated}
 			WHERE id_board IN ({array_int:board_list})
@@ -1739,7 +2007,7 @@ function updateLastMessages($setboards, $id_msg = 0)
 	}
 	foreach ($board_updates as $board_data)
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
 			WHERE id_board IN ({array_int:board_list})',
@@ -1766,7 +2034,9 @@ function updateLastMessages($setboards, $id_msg = 0)
  */
 function adminNotify($type, $memberID, $member_name = null)
 {
-	global $txt, $modSettings, $language, $scripturl, $user_info, $smcFunc;
+	global $modSettings, $language, $scripturl, $user_info;
+
+	$db = database();
 
 	// If the setting isn't enabled then just exit.
 	if (empty($modSettings['notify_new_registration']))
@@ -1787,7 +2057,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	$groups = array();
 
 	// All membergroups who can approve members.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:moderate_forum}
@@ -1799,16 +2069,16 @@ function adminNotify($type, $memberID, $member_name = null)
 			'moderate_forum' => 'moderate_forum',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$groups[] = $row['id_group'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Add administrators too...
 	$groups[] = 1;
 	$groups = array_unique($groups);
 
 	// Get a list of all members who have ability to approve accounts - these are the people who we inform.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -1822,7 +2092,7 @@ function adminNotify($type, $memberID, $member_name = null)
 	);
 
 	$current_language = $user_info['language'];
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$replacements = array(
 			'USERNAME' => $member_name,
@@ -1842,7 +2112,7 @@ function adminNotify($type, $memberID, $member_name = null)
 		// And do the actual sending...
 		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
@@ -1858,14 +2128,20 @@ function adminNotify($type, $memberID, $member_name = null)
  */
 function notifyMembersBoard(&$topicData)
 {
-	global $txt, $scripturl, $language, $user_info;
-	global $modSettings, $board, $smcFunc, $context;
+	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
+
+	$db = database();
 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Do we have one or lots of topics?
 	if (isset($topicData['body']))
 		$topicData = array($topicData);
+
+	// Using the post to email functions?
+	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
+	if ($maillist)
+		require_once(SUBSDIR . '/Emailpost.subs.php');
 
 	// Find out what boards we have... and clear out any rubbish!
 	$boards = array();
@@ -1879,25 +2155,47 @@ function notifyMembersBoard(&$topicData)
 			continue;
 		}
 
-		// Censor the subject and body...
-		censorText($topicData[$key]['subject']);
-		censorText($topicData[$key]['body']);
+		// Using maillist functionality?
+		if ($maillist)
+		{
+			// Convert to markdown markup e.g. styled plain text
+			pbe_prepare_text($topicData[$key]['body'], $topicData[$key]['subject'], $topicData[$key]['signature']);
+		}
+		else
+		{
+			// Censor the subject and body...
+			censorText($topicData[$key]['subject']);
+			censorText($topicData[$key]['body']);
 
-		$topicData[$key]['subject'] = un_htmlspecialchars($topicData[$key]['subject']);
-		$topicData[$key]['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topicData[$key]['body'], false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+			$topicData[$key]['subject'] = un_htmlspecialchars($topicData[$key]['subject']);
+			$topicData[$key]['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topicData[$key]['body'], false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+		}
 	}
 
 	// Just the board numbers.
 	$board_index = array_unique(array_keys($boards));
-
 	if (empty($board_index))
 		return;
+
+	// Load the actual board names
+	$board_names = array();
+	$request = $db->query('', '
+		SELECT id_board, name
+		FROM {db_prefix}boards
+		WHERE id_board IN ({array_int:board_list})',
+		array(
+			'board_list' => $board_index,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$board_names[$row['id_board']] = $row['name'];
+	$db->free_result($request);
 
 	// Yea, we need to add this to the digest queue.
 	$digest_insert = array();
 	foreach ($topicData as $id => $data)
 		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', $user_info['id']);
-	$smcFunc['db_insert']('',
+	$db->insert('',
 		'{db_prefix}log_digest',
 		array(
 			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
@@ -1907,10 +2205,10 @@ function notifyMembersBoard(&$topicData)
 	);
 
 	// Find the members with notification on for these boards.
-	$members = $smcFunc['db_query']('', '
+	$members = $db->query('', '
 		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile,
-			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups,
+			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
+			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups, b.id_profile,
 			mem.id_post_group
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
@@ -1929,18 +2227,12 @@ function notifyMembersBoard(&$topicData)
 			'notify_regularity' => 2,
 		)
 	);
-	while ($rowmember = $smcFunc['db_fetch_assoc']($members))
+	// While we have members with board notifications
+	while ($rowmember = $db->fetch_assoc($members))
 	{
-		if ($rowmember['id_group'] != 1)
-		{
-			$allowed = explode(',', $rowmember['member_groups']);
-			$rowmember['additional_groups'] = explode(',', $rowmember['additional_groups']);
-			$rowmember['additional_groups'][] = $rowmember['id_group'];
-			$rowmember['additional_groups'][] = $rowmember['id_post_group'];
-
-			if (count(array_intersect($allowed, $rowmember['additional_groups'])) == 0)
-				continue;
-		}
+		$email_perm = true;
+		if (validateAccess($rowmember, $maillist, $email_perm) === false)
+			continue;
 
 		$langloaded = loadLanguage('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
 
@@ -1949,6 +2241,8 @@ function notifyMembersBoard(&$topicData)
 			continue;
 
 		$sentOnceAlready = 0;
+
+		// For each message we need to send (from this board to this member)
 		foreach ($boards[$rowmember['id_board']] as $key)
 		{
 			// Don't notify the guy who started the topic!
@@ -1957,19 +2251,20 @@ function notifyMembersBoard(&$topicData)
 				continue;
 
 			// Setup the string for adding the body to the message, if a user wants it.
-			$send_body = empty($modSettings['disallow_sendBody']) && !empty($rowmember['notify_send_body']);
+			$send_body = $maillist || (empty($modSettings['disallow_sendBody']) && !empty($rowmember['notify_send_body']));
 
 			$replacements = array(
 				'TOPICSUBJECT' => $topicData[$key]['subject'],
+				'POSTERNAME' => un_htmlspecialchars($topicData[$key]['name']),
 				'TOPICLINK' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
-				'MESSAGE' => $topicData[$key]['body'],
+				'TOPICLINKNEW' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
+				'MESSAGE' => $send_body ? $topicData[$key]['body'] : '',
 				'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $topicData[$key]['board'] . '.0',
+				'SIGNATURE' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
+				'BOARDNAME' => $board_names[$topicData[$key]['board']],
 			);
 
-			if (!$send_body)
-				unset($replacements['MESSAGE']);
-
-			// Figure out which email to send off
+			// Figure out which email to send
 			$emailtype = '';
 
 			// Send only if once is off or it's on and it hasn't been sent.
@@ -1981,19 +2276,29 @@ function notifyMembersBoard(&$topicData)
 			if (!empty($emailtype))
 			{
 				$emailtype .= $send_body ? '_body' : '';
-				$emaildata = loadEmailTemplate($emailtype, $replacements, $langloaded);
-				sendmail($rowmember['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 3);
+				$emaildata = loadEmailTemplate((($maillist && $email_perm) ? 'pbe_' : '') . $emailtype, $replacements, $langloaded);
+				$emailname = (!empty($topicData[$key]['name'])) ? un_htmlspecialchars($topicData[$key]['name']) : null;
+
+				// Maillist style?
+				if ($maillist && $email_perm)
+				{
+					// Add in the from wrapper and trigger sendmail to add in a security key
+					$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
+					sendmail($rowmember['email_address'], $emaildata['subject'], $emaildata['body'], $emailname, 't' . $topicData[$key]['topic'], false, 3, null, false, $from_wrapper, $topicData[$key]['topic']);
+				}
+				else
+					sendmail($rowmember['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 3);
 			}
 
 			$sentOnceAlready = 1;
 		}
 	}
-	$smcFunc['db_free_result']($members);
+	$db->free_result($members);
 
 	loadLanguage('index', $user_info['language']);
 
 	// Sent!
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_notify
 		SET sent = {int:is_sent}
 		WHERE id_board IN ({array_int:board_list})
@@ -2004,4 +2309,160 @@ function notifyMembersBoard(&$topicData)
 			'is_sent' => 1,
 		)
 	);
+}
+
+/**
+ * Get the latest post made on the system
+ * - respects approved, recycled, and board permissions
+ *
+ * @return array
+ */
+function lastPost()
+{
+	global $user_info, $scripturl, $modSettings;
+
+	$db = database();
+
+	// Find it by the board - better to order by board than sort the entire messages table.
+	$request = $db->query('substring', '
+		SELECT ml.poster_time, ml.subject, ml.id_topic, ml.poster_name, SUBSTRING(ml.body, 1, 385) AS body,
+			ml.smileys_enabled
+		FROM {db_prefix}boards AS b
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = b.id_last_msg)
+		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+			AND ml.approved = {int:is_approved}
+		ORDER BY b.id_msg_updated DESC
+		LIMIT 1',
+		array(
+			'recycle_board' => $modSettings['recycle_board'],
+			'is_approved' => 1,
+		)
+	);
+	if ($db->num_rows($request) == 0)
+		return array();
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	// Censor the subject and post...
+	censorText($row['subject']);
+	censorText($row['body']);
+
+	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
+	if (Util::strlen($row['body']) > 128)
+		$row['body'] = Util::substr($row['body'], 0, 128) . '...';
+
+	// Send the data.
+	return array(
+		'topic' => $row['id_topic'],
+		'subject' => $row['subject'],
+		'short_subject' => shorten_subject($row['subject'], 24),
+		'preview' => $row['body'],
+		'time' => standardTime($row['poster_time']),
+		'timestamp' => forum_time(true, $row['poster_time']),
+		'href' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+		'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new">' . $row['subject'] . '</a>'
+	);
+}
+
+function getFormMsgSubject($editing, $topic, $first_subject = '')
+{
+	global $modSettings, $context;
+
+	$db = database();
+
+	if ($editing)
+	{
+		require_once(SUBSDIR . '/Messages.subs.php');
+		// Get the existing message.
+		$message = messageDetails((int) $_REQUEST['msg'], $topic);
+		// The message they were trying to edit was most likely deleted.
+		if ($message === false)
+			fatal_lang_error('no_message', false);
+
+		$errors = checkMessagePermissions($message['message']);
+
+		prepareMessageContext($message);
+
+		if (!empty($errors))
+			$message['errors'] = $errors;
+
+		return $message;
+	}
+	else
+	{
+		// Posting a quoted reply?
+		if ((!empty($topic) && !empty($_REQUEST['quote'])) || !empty($_REQUEST['followup']))
+		{
+			// Make sure they _can_ quote this post, and if so get it.
+			$request = $db->query('', '
+				SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
+				FROM {db_prefix}messages AS m
+					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+				WHERE m.id_msg = {int:id_msg}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+					AND m.approved = {int:is_approved}') . '
+				LIMIT 1',
+				array(
+					'id_msg' => !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'],
+					'is_approved' => 1,
+				)
+			);
+			if ($db->num_rows($request) == 0)
+				fatal_lang_error('quoted_post_deleted', false);
+			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
+			$db->free_result($request);
+
+			// Add 'Re: ' to the front of the quoted subject.
+			if (trim($context['response_prefix']) != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
+				$form_subject = $context['response_prefix'] . $form_subject;
+
+			// Censor the message and subject.
+			censorText($form_message);
+			censorText($form_subject);
+
+			// But if it's in HTML world, turn them into htmlspecialchar's so they can be edited!
+			if (strpos($form_message, '[html]') !== false)
+			{
+				$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $form_message, -1, PREG_SPLIT_DELIM_CAPTURE);
+				for ($i = 0, $n = count($parts); $i < $n; $i++)
+				{
+					// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
+					if ($i % 4 == 0)
+						$parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ise', '\'[html]\' . preg_replace(\'~<br\s?/?' . '>~i\', \'&lt;br /&gt;<br />\', \'$1\') . \'[/html]\'', $parts[$i]);
+				}
+				$form_message = implode('', $parts);
+			}
+
+			$form_message = preg_replace('~<br ?/?' . '>~i', "\n", $form_message);
+
+			// Remove any nested quotes, if necessary.
+			if (!empty($modSettings['removeNestedQuotes']))
+				$form_message = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $form_message);
+
+			// Add a quote string on the front and end.
+			$form_message = '[quote author=' . $mname . ' link=topic=' . $topic . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';
+		}
+		// Posting a reply without a quote?
+		elseif (!empty($topic) && empty($_REQUEST['quote']))
+		{
+			// Get the first message's subject.
+			$form_subject = $first_subject;
+
+			// Add 'Re: ' to the front of the subject.
+			if (trim($context['response_prefix']) != '' && $form_subject != '' && Util::strpos($form_subject, trim($context['response_prefix'])) !== 0)
+				$form_subject = $context['response_prefix'] . $form_subject;
+
+			// Censor the subject.
+			censorText($form_subject);
+
+			$form_message = '';
+		}
+		else
+		{
+			$form_subject = isset($_GET['subject']) ? $_GET['subject'] : '';
+			$form_message = '';
+		}
+		return array($form_subject, $form_message);
+	}
 }

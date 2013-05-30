@@ -26,15 +26,15 @@ if (!defined('ELKARTE'))
  */
 function countMessages()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}messages',
 		array()
 	);
-	list($messages) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list($messages) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $messages;
 }
@@ -45,49 +45,49 @@ function countMessages()
  */
 function flushLogTables()
 {
-	global $smcFunc;
+	$db = database();
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_online');
 
 	// Dump the banning logs.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_banned');
 
 	// Start id_error back at 0 and dump the error log.
-	$smcFunc['db_query']('truncate_table', '
+	$db->query('truncate_table', '
 		TRUNCATE {db_prefix}log_errors');
 
 	// Clear out the spam log.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_floodcontrol');
 
 	// Clear out the karma actions.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}log_karma');
 
 	// Last but not least, the search logs!
-	$smcFunc['db_query']('truncate_table', '
+	$db->query('truncate_table', '
 		TRUNCATE {db_prefix}log_search_topics');
 
-	$smcFunc['db_query']('truncate_table', '
+	$db->query('truncate_table', '
 		TRUNCATE {db_prefix}log_search_messages');
 
-	$smcFunc['db_query']('truncate_table', '
+	$db->query('truncate_table', '
 		TRUNCATE {db_prefix}log_search_results');
 }
 
 /**
  * Gets the table columns from the messages table, just a wrapper function
  *
- * @return array 
+ * @return array
  */
 function getMessageTableColumns()
 {
-	global $smcFunc;
+	$db = database();
 
-	db_extend('packages');
-	$colData = $smcFunc['db_list_columns']('{db_prefix}messages', true);
+	$table = db_table();
+	$colData = $table->db_list_columns('{db_prefix}messages', true);
 
 	return $colData;
 }
@@ -95,14 +95,14 @@ function getMessageTableColumns()
 /**
  * Resizes the body column from the messages table
  *
- * @param string $type 
+ * @param string $type
  */
 function resizeMessageTableBody($type)
 {
-	global $smcFunc;
+	$db = database();
 
-	db_extend('packages');
-	$smcFunc['db_change_column']('{db_prefix}messages', 'body', array('type' => $type));
+	$table = db_table();
+	$table->db_change_column('{db_prefix}messages', 'body', array('type' => $type));
 }
 
 /**
@@ -110,15 +110,15 @@ function resizeMessageTableBody($type)
  *
  * @param type $start
  * @param type $increment
- * @return type 
+ * @return type
  */
 function detectExceedingMessages($start, $increment)
 {
-	global $smcFunc;
+	$db = database();
 
 	$id_msg_exceeding = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ id_msg
 		FROM {db_prefix}messages
 		WHERE id_msg BETWEEN {int:start} AND {int:start} + {int:increment}
@@ -128,9 +128,9 @@ function detectExceedingMessages($start, $increment)
 			'increment' => $increment - 1,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$id_msg_exceeding[] = $row['id_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $id_msg_exceeding;
 }
@@ -143,11 +143,13 @@ function detectExceedingMessages($start, $increment)
  */
 function getExceedingMessages($msg)
 {
-	global $smcFunc, $scripturl;
+	global $scripturl;
+
+	$db = database();
 
 	$exceeding_messages = array();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_msg, id_topic, subject
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:messages})',
@@ -155,9 +157,9 @@ function getExceedingMessages($msg)
 			'messages' => $msg,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$exceeding_messages[] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $exceeding_messages;
 }
@@ -166,21 +168,23 @@ function getExceedingMessages($msg)
  * Lists all the tables from our ElkArte installation.
  * Additional tables from modifications are also included.
  *
- * @return array 
+ * @return array
  */
 function getElkTables()
 {
-	global $smcFunc, $db_prefix;
+	global $db_prefix;
+
+	$db = database();
 
 	$tables = array();
 
-	db_extend();
-	
+	$db = database();
+
 	// Only optimize the tables related to this installation, not all the tables in the db
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
 	// Get a list of tables, as well as how many there are.
-	$temp_tables = $smcFunc['db_list_tables'](false, $real_prefix . '%');
+	$temp_tables = $db->db_list_tables(false, $real_prefix . '%');
 	foreach ($temp_tables as $table)
 			$tables[] = array('table_name' => $table);
 
@@ -190,33 +194,33 @@ function getElkTables()
 /**
  * Wrapper function for db_optimize_table
  *
- * @param string $tablename 
+ * @param string $tablename
  */
 function optimizeTable($tablename)
 {
-	global $smcFunc;
-	
-	db_extend();
-	$smcFunc['db_optimize_table']($tablename);
+	$db = database();
+
+	$db = database();
+	$db->db_optimize_table($tablename);
 }
 
 /**
  * gets the last topics id.
- * 
- * @return int 
+ *
+ * @return int
  */
 function getMaxTopicID()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT MAX(id_topic)
 		FROM {db_prefix}topics',
 		array(
 		)
 	);
-	list ($id_topic) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($id_topic) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $id_topic;
 }
@@ -229,10 +233,10 @@ function getMaxTopicID()
  */
 function recountApprovedMessages($start, $increment)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Recount approved messages
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.num_replies) AS num_replies,
 			CASE WHEN COUNT(ma.id_msg) >= 1 THEN COUNT(ma.id_msg) - 1 ELSE 0 END AS real_num_replies
 		FROM {db_prefix}topics AS t
@@ -247,8 +251,8 @@ function recountApprovedMessages($start, $increment)
 			'max_id' => $start + $increment,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
+	while ($row = $db->fetch_assoc($request))
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET num_replies = {int:num_replies}
 			WHERE id_topic = {int:id_topic}',
@@ -257,7 +261,7 @@ function recountApprovedMessages($start, $increment)
 				'id_topic' => $row['id_topic'],
 			)
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -268,10 +272,10 @@ function recountApprovedMessages($start, $increment)
  */
 function recountUnapprovedMessages($start, $increment)
 {
-	global $smcFunc;
+	$db = database();
 
 	// Recount unapproved messages
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.unapproved_posts) AS unapproved_posts,
 			COUNT(mu.id_msg) AS real_unapproved_posts
 		FROM {db_prefix}topics AS t
@@ -286,8 +290,8 @@ function recountUnapprovedMessages($start, $increment)
 			'max_id' => $start + $increment,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$smcFunc['db_query']('', '
+	while ($row = $db->fetch_assoc($request))
+		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET unapproved_posts = {int:unapproved_posts}
 			WHERE id_topic = {int:id_topic}',
@@ -296,7 +300,7 @@ function recountUnapprovedMessages($start, $increment)
 				'id_topic' => $row['id_topic'],
 			)
 		);
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -308,14 +312,14 @@ function recountUnapprovedMessages($start, $increment)
  */
 function resetBoardsCounter($column)
 {
-	global $smcFunc;
+	$db = database();
 
 	$allowed_columns = array('num_posts', 'num_topics', 'unapproved_posts', 'unapproved_topics');
-	
+
 	if (!in_array($column, $allowed_columns))
 			return false;
 
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET ' . $column . ' = {int:counter}
 		WHERE redirect = {string:redirect}',
@@ -331,16 +335,16 @@ function resetBoardsCounter($column)
  *
  * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
  * @param int $start
- * @param int $increment 
+ * @param int $increment
  */
 function updateBoardsCounter($type, $start, $increment)
 {
-	global $smcFunc;
+	$db = database();
 
 	switch ($type)
 	{
 	case 'posts':
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
 			FROM {db_prefix}messages AS m
 			WHERE m.id_topic > {int:id_topic_min}
@@ -353,8 +357,8 @@ function updateBoardsCounter($type, $start, $increment)
 				'is_approved' => 1,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$smcFunc['db_query']('', '
+		while ($row = $db->fetch_assoc($request))
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET num_posts = num_posts + {int:real_num_posts}
 				WHERE id_board = {int:id_board}',
@@ -363,11 +367,11 @@ function updateBoardsCounter($type, $start, $increment)
 					'real_num_posts' => $row['real_num_posts'],
 				)
 			);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		break;
 
 	case 'topics':
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
 			FROM {db_prefix}topics AS t
 			WHERE t.approved = {int:is_approved}
@@ -380,8 +384,8 @@ function updateBoardsCounter($type, $start, $increment)
 				'id_topic_max' => $start + $increment,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$smcFunc['db_query']('', '
+		while ($row = $db->fetch_assoc($request))
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET num_topics = num_topics + {int:real_num_topics}
 				WHERE id_board = {int:id_board}',
@@ -390,11 +394,11 @@ function updateBoardsCounter($type, $start, $increment)
 					'real_num_topics' => $row['real_num_topics'],
 				)
 			);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		break;
 
 	case 'unapproved_posts':
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
 			FROM {db_prefix}messages AS m
 			WHERE m.id_topic > {int:id_topic_min}
@@ -407,8 +411,8 @@ function updateBoardsCounter($type, $start, $increment)
 				'is_approved' => 0,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$smcFunc['db_query']('', '
+		while ($row = $db->fetch_assoc($request))
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
 				WHERE id_board = {int:id_board}',
@@ -417,11 +421,11 @@ function updateBoardsCounter($type, $start, $increment)
 					'unapproved_posts' => $row['real_unapproved_posts'],
 				)
 			);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		break;
 
 	case 'unapproved_topics':
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
 			FROM {db_prefix}topics AS t
 			WHERE t.approved = {int:is_approved}
@@ -434,8 +438,8 @@ function updateBoardsCounter($type, $start, $increment)
 				'id_topic_max' => $start + $increment,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$smcFunc['db_query']('', '
+		while ($row = $db->fetch_assoc($request))
+			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
 				WHERE id_board = {int:id_board}',
@@ -444,7 +448,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'real_unapproved_topics' => $row['real_unapproved_topics'],
 				)
 			);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		break;
 
 	default:
@@ -457,9 +461,9 @@ function updateBoardsCounter($type, $start, $increment)
  */
 function updatePersonalMessagesCounter()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.instant_messages) AS instant_messages
 		FROM {db_prefix}members AS mem
@@ -470,12 +474,12 @@ function updatePersonalMessagesCounter()
 			'is_not_deleted' => 0,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		updateMemberData($row['id_member'], array('instant_messages' => $row['real_num']));
-			
-	$smcFunc['db_free_result']($request);
 
-	$request = $smcFunc['db_query']('', '
+	$db->free_result($request);
+
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.unread_messages) AS unread_messages
 		FROM {db_prefix}members AS mem
@@ -487,9 +491,9 @@ function updatePersonalMessagesCounter()
 			'is_not_read' => 0,
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		updateMemberData($row['id_member'], array('unread_messages' => $row['real_num']));
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 }
 
 /**
@@ -500,9 +504,9 @@ function updatePersonalMessagesCounter()
  */
 function updateMessagesBoardID($start, $increment)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_board, m.id_msg
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic AND t.id_board != m.id_board)
@@ -514,12 +518,12 @@ function updateMessagesBoardID($start, $increment)
 		)
 	);
 	$boards = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$boards[$row['id_board']][] = $row['id_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	foreach ($boards as $board_id => $messages)
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET id_board = {int:id_board}
 			WHERE id_msg IN ({array_int:id_msg_array})',
@@ -535,10 +539,10 @@ function updateMessagesBoardID($start, $increment)
  */
 function updateBoardsLastMessage()
 {
-	global $smcFunc;
+	$db = database();
 
 	// Update the latest message of each board.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT m.id_board, MAX(m.id_msg) AS local_last_msg
 		FROM {db_prefix}messages AS m
 		WHERE m.approved = {int:is_approved}
@@ -548,23 +552,23 @@ function updateBoardsLastMessage()
 		)
 	);
 	$realBoardCounts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$realBoardCounts[$row['id_board']] = $row['local_last_msg'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ id_board, id_parent, id_last_msg, child_level, id_msg_updated
 		FROM {db_prefix}boards',
 		array(
 		)
 	);
 	$resort_me = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$row['local_last_msg'] = isset($realBoardCounts[$row['id_board']]) ? $realBoardCounts[$row['id_board']] : 0;
 		$resort_me[$row['child_level']][] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	krsort($resort_me);
 
@@ -579,7 +583,7 @@ function updateBoardsLastMessage()
 				$curLastModifiedMsg = $row['local_last_msg'];
 				// If what is and what should be the latest message differ, an update is necessary.
 			if ($row['local_last_msg'] != $row['id_last_msg'] || $curLastModifiedMsg != $row['id_msg_updated'])
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}boards
 					SET id_last_msg = {int:id_last_msg}, id_msg_updated = {int:id_msg_updated}
 					WHERE id_board = {int:id_board}',
@@ -602,13 +606,13 @@ function updateBoardsLastMessage()
  * Counts topics from a given board.
  *
  * @param int $id_board
- * @return int 
+ * @return int
  */
 function countTopicsFromBoard($id_board)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}topics
 		WHERE id_board = {int:id_board}',
@@ -616,8 +620,8 @@ function countTopicsFromBoard($id_board)
 			'id_board' => $id_board,
 		)
 	);
-	list ($total_topics) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_topics) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $total_topics;
 }
@@ -626,16 +630,16 @@ function countTopicsFromBoard($id_board)
  * Gets a list of topics which should be moved to a different board.
  *
  * @param type $id_board
- * @return type 
+ * @return type
  */
 function getTopicsToMove($id_board)
 {
-	global $smcFunc;
+	$db = database();
 
 	$topics = array();
-	
+
 	// Lets get the topics.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_topic
 		FROM {db_prefix}topics
 		WHERE id_board = {int:id_board}
@@ -646,9 +650,9 @@ function getTopicsToMove($id_board)
 	);
 
 	// Get the ids.
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$topics[] = $row['id_topic'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $topics;
 }
@@ -660,9 +664,9 @@ function getTopicsToMove($id_board)
  */
 function countContributors()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT COUNT(DISTINCT m.id_member)
 		FROM ({db_prefix}messages AS m, {db_prefix}boards AS b)
 		WHERE m.id_member != 0
@@ -673,8 +677,8 @@ function countContributors()
 	);
 
 	// save it so we don't do this again for this task
-	list ($total_members) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+	list ($total_members) = $db->fetch_row($request);
+	$db->free_result($request);
 
 	return $total_members;
 }
@@ -688,9 +692,11 @@ function countContributors()
  */
 function updateMembersPostCount($start, $increment)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
 
-	$request = $smcFunc['db_query']('', '
+	$db = database();
+
+	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ m.id_member, COUNT(m.id_member) AS posts
 		FROM ({db_prefix}messages AS m, {db_prefix}boards AS b)
 		WHERE m.id_member != {int:zero}
@@ -706,12 +712,12 @@ function updateMembersPostCount($start, $increment)
 			'zero' => 0,
 		)
 	);
-	$total_rows = $smcFunc['db_num_rows']($request);
+	$total_rows = $db->num_rows($request);
 
 	// Update the post count for this group
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET posts = {int:posts}
 			WHERE id_member = {int:row}',
@@ -721,7 +727,7 @@ function updateMembersPostCount($start, $increment)
 			)
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $total_rows;
 }
@@ -733,9 +739,11 @@ function updateMembersPostCount($start, $increment)
  */
 function updateZeroPostMembers()
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
 
-	$createTemporary = $smcFunc['db_query']('', '
+	$db = database();
+
+	$createTemporary = $db->query('', '
 			CREATE TEMPORARY TABLE {db_prefix}tmp_maint_recountposts (
 				id_member mediumint(8) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_member)
@@ -757,7 +765,7 @@ function updateZeroPostMembers()
 		if ($createTemporary)
 		{
 			// outer join the members table on the temporary table finding the members that have a post count but no posts in the message table
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT mem.id_member, mem.posts
 				FROM {db_prefix}members AS mem
 				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res
@@ -770,9 +778,9 @@ function updateZeroPostMembers()
 			);
 
 			// set the post count to zero for any delinquents we may have found
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}members
 					SET posts = {int:zero}
 					WHERE id_member = {int:row}',
@@ -782,7 +790,7 @@ function updateZeroPostMembers()
 					)
 				);
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 		}
 }
 
@@ -796,7 +804,7 @@ function updateZeroPostMembers()
  */
 function purgeMembers($type, $groups, $time_limit)
 {
-	global $smcFunc;
+	$db = database();
 
 	$where_vars = array(
 		'time_limit' => $time_limit,
@@ -810,13 +818,13 @@ function purgeMembers($type, $groups, $time_limit)
 		$where = 'mem.last_login < {int:time_limit} AND (mem.last_login != 0 OR mem.date_registered < {int:time_limit})';
 
 	// Need to get *all* groups then work out which (if any) we avoid.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_group, group_name, min_posts
 		FROM {db_prefix}membergroups',
 		array(
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Avoid this one?
 		if (!in_array($row['id_group'], $groups))
@@ -834,7 +842,7 @@ function purgeMembers($type, $groups, $time_limit)
 			}
 		}
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// If we have ungrouped unselected we need to avoid those guys.
 	if (!in_array(0, $groups))
@@ -844,7 +852,7 @@ function purgeMembers($type, $groups, $time_limit)
 	}
 
 	// Select all the members we're about to murder/remove...
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT mem.id_member, IFNULL(m.id_member, 0) AS is_mod
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}moderators AS m ON (m.id_member = mem.id_member)
@@ -852,12 +860,12 @@ function purgeMembers($type, $groups, $time_limit)
 		$where_vars
 	);
 	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!$row['is_mod'] || !in_array(3, $groups))
 			$members[] = $row['id_member'];
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $members;
 }

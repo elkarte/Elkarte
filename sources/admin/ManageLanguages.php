@@ -90,7 +90,7 @@ class ManageLanguages_Controller
 		{
 			// Need fetch_web_data.
 			require_once(SUBSDIR . '/Package.subs.php');
-			require_once(SUBSDIR . '/ManageLanguages.subs.php');
+			require_once(SUBSDIR . '/Language.subs.php');
 
 			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']));
 
@@ -159,7 +159,7 @@ class ManageLanguages_Controller
 	{
 		global $txt, $context, $scripturl, $language;
 
-		require_once(SUBSDIR . '/ManageLanguages.subs.php');
+		require_once(SUBSDIR . '/Language.subs.php');
 
 		// Setting a new default?
 		if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
@@ -623,9 +623,9 @@ class ManageLanguages_Controller
 	 */
 	public function action_editlang()
 	{
-		global $settings, $context, $smcFunc, $txt, $modSettings, $language;
+		global $settings, $context, $txt, $modSettings, $language;
 
-		require_once(SUBSDIR . '/ManageLanguages.subs.php');
+		require_once(SUBSDIR . '/Language.subs.php');
 		loadLanguage('ManageSettings');
 
 		// Select the languages tab.
@@ -778,7 +778,7 @@ class ManageLanguages_Controller
 		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php');
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
-			'name' => $smcFunc['ucwords'](strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
+			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
 			'character_set' => 'UTF-8',
 			'locale' => $txt['lang_locale'],
 			'dictionary' => $txt['lang_dictionary'],
@@ -1046,8 +1046,7 @@ class ManageLanguages_Controller
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-
+		
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
@@ -1062,5 +1061,27 @@ class ManageLanguages_Controller
 
 		// initialize the little form
 		return $this->_languageSettings->settings($config_vars);
+	}
+
+	public function settings()
+	{
+		global $txt;
+		
+		// Warn the user if the backup of Settings.php failed.
+		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+		
+		$config_vars = array(
+			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
+			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
+		);
+
+		call_integration_hook('integrate_language_settings', array(&$config_vars));
+
+		// Get all languages we speak.
+		$languages = getLanguages(false);
+		foreach ($languages as $lang)
+			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
+
+		return $config_vars;
 	}
 }

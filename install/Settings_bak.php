@@ -121,7 +121,7 @@ $db_error_send = 0;
 ########## Cache Info ##########
 /**
  * Select a cache system. You want to leave this up to the cache area of the admin panel for
- * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, smf, or xcache
+ * proper detection of apc, eaccelerator, memcache, mmcache, output_cache, xcache or filesystem-based
  * (you can add more with a mod).
  * @var string
  */
@@ -156,12 +156,12 @@ $boarddir = dirname(__FILE__);
  */
 $sourcedir = dirname(__FILE__) . '/sources';
 /**
- * Path to the library directory.
+ * Path to the external resources directory.
  * @var string
  */
-$extdir = dirname(__FILE__) . '/sources/lib';
+$extdir = dirname(__FILE__) . '/sources/ext';
 /**
- * Path to the controllers directory.
+ * Path to the languages directory.
  * @var string
  */
 $languagedir = dirname(__FILE__) . '/themes/default/languages';
@@ -182,13 +182,3 @@ if (file_exists(dirname(__FILE__) . '/install.php'))
 {
 	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install.php'); exit;
 }
-
-# Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-	$boarddir = dirname(__FILE__);
-if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
-	$sourcedir = $boarddir . '/sources';
-if (!file_exists($cachedir) && file_exists($boarddir . '/cache'))
-	$cachedir = $boarddir . '/cache';
-if (!file_exists($extdir) && file_exists($sourcedir . '/ext'))
-	$extdir = $sourcedir . '/ext';

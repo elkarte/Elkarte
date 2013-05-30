@@ -125,6 +125,10 @@ $txt['who_profile'] = 'Editing the profile of <a href="' . $scripturl . '?action
 $txt['who_post'] = 'Posting a new topic in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
 $txt['who_poll'] = 'Posting a new poll in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
 
+$txt['whotopic_topicbyemail'] = 'Email starting a new topic in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
+$txt['whotopic_postbyemail'] = 'Email posting in <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
+$txt['who_pm_byemail'] = 'Sending a personal message by email.';
+
 // Credits text
 $txt['credits'] = 'Credits';
 $txt['credits_intro'] = 'ElkArte wants to thank everyone who helped make it possible it is today.  It wouldn\'t have been possible without you. Thanks for installing and using our software as well as providing valuable feedback, bug reports, and opinions.';
@@ -132,10 +136,11 @@ $txt['credits_team'] = 'The Team';
 $txt['credits_and'] = 'and';
 $txt['credits_copyright'] = 'Copyrights';
 $txt['credits_forum'] = 'Forum';
-$txt['credits_modifications'] = 'Modifications';
+$txt['credits_addons'] = 'Add-ons';
 $txt['credits_software_graphics'] = 'Software/Graphics';
 $txt['credits_software'] = 'Software';
 $txt['credits_graphics'] = 'Graphics';
+$txt['credits_fonts'] = 'Fonts';
 $txt['credits_groups_dev'] = 'Developers';
 $txt['credits_license'] = 'License';
 $txt['credits_copyright'] = 'Copyright';
@@ -148,7 +153,6 @@ $txt['credits_groups_consultants'] = 'Consulting Developers';
 $txt['credits_groups_beta'] = 'Beta Testers';
 $txt['credits_beta_message'] = 'The invaluable few who tirelessly find bugs, provide feedback, and drive the developers crazier.';
 $txt['credits_groups_founder'] = 'Founding Father of SMF';
-$txt['credits_groups_orignal_pm'] = 'Original Project Managers';
 
 // List of people who have made more than a token contribution to this translation. (blank for English)
 $txt['translation_credits'] = array();

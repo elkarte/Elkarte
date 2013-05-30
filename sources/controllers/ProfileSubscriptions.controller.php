@@ -23,18 +23,21 @@ if (!defined('ELKARTE'))
 /**
  * Function for doing all the paid subscription stuff - kinda.
  *
- * @param int $memID
  */
-function action_subscriptions($memID)
+function action_subscriptions()
 {
-	global $context, $txt, $modSettings, $smcFunc, $scripturl;
+	global $context, $txt, $modSettings, $scripturl;
+
+	$db = database();
 
 	// Load the paid template anyway.
 	loadTemplate('ManagePaid');
 	loadLanguage('ManagePaid');
 
+	$memID = currentMemberID();
+
 	// Load all of the subscriptions.
-	require_once(ADMINDIR . '/ManagePaid.php');
+	require_once(SUBSDIR . '/ManagePaid.subs.php');
 	loadSubscriptions();
 	$context['member']['id'] = $memID;
 
@@ -82,7 +85,7 @@ function action_subscriptions($memID)
 		fatal_error($txt['paid_admin_not_setup_gateway']);
 
 	// Get the current subscriptions.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_sublog, id_subscribe, start_time, end_time, status, payments_pending, pending_details
 		FROM {db_prefix}log_subscribed
 		WHERE id_member = {int:selected_member}',
@@ -91,7 +94,7 @@ function action_subscriptions($memID)
 		)
 	);
 	$context['current'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// The subscription must exist!
 		if (!isset($context['subscriptions'][$row['id_subscribe']]))
@@ -102,8 +105,8 @@ function action_subscriptions($memID)
 			'sub_id' => $row['id_subscribe'],
 			'hide' => $row['status'] == 0 && $row['end_time'] == 0 && $row['payments_pending'] == 0,
 			'name' => $context['subscriptions'][$row['id_subscribe']]['name'],
-			'start' => timeformat($row['start_time'], false),
-			'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : timeformat($row['end_time'], false),
+			'start' => standardTime($row['start_time'], false),
+			'end' => $row['end_time'] == 0 ? $txt['not_applicable'] : standardTime($row['end_time'], false),
 			'pending_details' => $row['pending_details'],
 			'status' => $row['status'],
 			'status_text' => $row['status'] == 0 ? ($row['payments_pending'] ? $txt['paid_pending'] : $txt['paid_finished']) : $txt['paid_active'],
@@ -112,7 +115,7 @@ function action_subscriptions($memID)
 		if ($row['status'] == 1)
 			$context['subscriptions'][$row['id_subscribe']]['subscribed'] = true;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Simple "done"?
 	if (isset($_GET['done']))
@@ -140,7 +143,7 @@ function action_subscriptions($memID)
 				// Save the details back.
 				$pending_details = serialize($current_pending);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = payments_pending + 1, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_id}
@@ -236,7 +239,7 @@ function action_subscriptions($memID)
 				$current_pending[] = $new_data;
 				$pending_details = serialize($current_pending);
 
-				$smcFunc['db_query']('', '
+				$db->query('', '
 					UPDATE {db_prefix}log_subscribed
 					SET payments_pending = {int:pending_count}, pending_details = {string:pending_details}
 					WHERE id_sublog = {int:current_subscription_item}
@@ -255,7 +258,7 @@ function action_subscriptions($memID)
 		else
 		{
 			$pending_details = serialize(array($new_data));
-			$smcFunc['db_insert']('',
+			$db->insert('',
 				'{db_prefix}log_subscribed',
 				array(
 					'id_subscribe' => 'int', 'id_member' => 'int', 'status' => 'int', 'payments_pending' => 'int', 'pending_details' => 'string-65534',
@@ -283,13 +286,14 @@ function action_subscriptions($memID)
  * Activate an account.
  * This function is called from the profile account actions area.
  *
- * @param int $memID the member ID
  */
-function action_activateaccount($memID)
+function action_activateaccount()
 {
 	global $context, $user_profile, $modSettings, $user_info;
 
 	isAllowedTo('moderate_forum');
+
+	$memID = currentMemberID();
 
 	if (isset($_REQUEST['save']) && isset($user_profile[$memID]['is_activated']) && $user_profile[$memID]['is_activated'] != 1)
 	{
@@ -308,7 +312,6 @@ function action_activateaccount($memID)
 		updateMemberData($context['id_member'], array('is_activated' => $user_profile[$memID]['is_activated'] >= 10 ? 11 : 1, 'validation_code' => ''));
 
 		// Log what we did?
-		require_once(SOURCEDIR . '/Logging.php');
 		logAction('approve_member', array('member' => $memID), 'admin');
 
 		// If we are doing approval, update the stats for the member just in case.

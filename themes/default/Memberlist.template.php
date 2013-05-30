@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Displays a sortable listing of all members registered on the forum.
+/**
+ * Displays a sortable listing of all members registered on the forum.
+ */
 function template_main()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -151,7 +153,9 @@ function template_main()
 
 }
 
-// A page allowing people to search the member list.
+/**
+ * A page allowing people to search the member list.
+ */
 function template_search()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -175,7 +179,7 @@ function template_search()
 							<label><strong>', $txt['search_for'], ':</strong></label>
 						</dt>
 						<dd>
-							<input type="text" name="search" value="', $context['old_search'], '" size="40" class="input_text" />
+							<input type="text" name="search" value="', $context['old_search'], '" size="40" class="input_text" placeholder="', $txt['search'], '" autofocus="autofocus" required="required" />
 						</dd>
 						<dt>
 							<label><strong>', $txt['mlist_search_filter'], ':</strong></label>

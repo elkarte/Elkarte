@@ -22,6 +22,7 @@ $txt['theme_install_go'] = 'Install';
 $txt['theme_install_new'] = 'Create a copy of Default named';
 $txt['theme_install_new_confirm'] = 'Are you sure you want to install this new theme?';
 $txt['theme_install_writable'] = 'Warning - you cannot create or install a new theme as your themes directory is not currently writable.';
+$txt['theme_install_general'] = 'The theme doesn\'t seem to be where it should, please double check the information you provided.';
 $txt['theme_installed'] = 'Installed Successfully';
 $txt['theme_installed_message'] = 'was installed successfully.';
 
@@ -145,3 +146,9 @@ $txt['themeadmin_edit_on_line'] = 'Beginning on line';
 $txt['themeadmin_edit_preview'] = 'Preview';
 $txt['themeadmin_selectable'] = 'Themes that the user is able to select';
 $txt['themeadmin_themelist_link'] = 'Show the list of themes';
+
+// Strings for the variants
+$txt['variant_red'] = 'Minimalist White';
+$txt['variant_red'] = 'Red Sector';
+$txt['variant_green'] = 'Green Style';
+$txt['variant_blue'] = 'Blue Sky';

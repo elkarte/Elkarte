@@ -40,9 +40,19 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 // Ready to load the site settings.
 require_once(dirname(__FILE__) . '/Settings.php');
 
-// Double-check that directories which didn't exist in past releases are initialized.
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
 
 // Time to forget about variables and go with constants!
 DEFINE('BOARDDIR', $boarddir);
@@ -54,7 +64,7 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
-unset($boarddir, $cachedir, $sourcedir);
+unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 // Files we cannot live without.
 require_once(SOURCEDIR . '/QueryString.php');
@@ -67,6 +77,8 @@ require_once(SUBSDIR . '/Cache.subs.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SOURCEDIR . '/BrowserDetect.class.php');
 require_once(SOURCEDIR . '/Errors.class.php');
+require_once(SUBSDIR . '/Util.class.php');
+require_once(SUBSDIR . '/TemplateLayers.class.php');
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
@@ -81,10 +93,13 @@ loadDatabase();
 // It's time for settings loaded from the database.
 reloadSettings();
 
+// Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
+Util::compat_init();
+
 // Clean the request!
 cleanRequest();
 
-// Our good ole' contextual array, which will hold everything 
+// Our good ole' contextual array, which will hold everything
 $context = array();
 
 // Seed the random generator.
@@ -144,6 +159,9 @@ function elk_main()
 		header('Content-Type: image/gif');
 		die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 	}
+
+	// We should set our security headers now.
+	frameOptionsHeader();
 
 	// Load the user's cookie (or set as guest) and load their settings.
 	loadUserSettings();

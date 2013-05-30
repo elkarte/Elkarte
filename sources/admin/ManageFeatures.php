@@ -39,6 +39,12 @@ class ManageFeatures_Controller
 	protected $_karmaSettings;
 
 	/**
+	 * Likes settings form
+	 * @var Settings_Form
+	 */
+	protected $_likesSettings;
+
+	/**
 	 * Layout settings form
 	 * @var Settings_Form
 	 */
@@ -73,6 +79,9 @@ class ManageFeatures_Controller
 			'karma' => array(
 				'controller' => $this,
 				'function' => 'action_karmaSettings_display'),
+			'likes' => array(
+				'controller' => $this,
+				'function' => 'action_likesSettings_display'),
 			'sig' => array(
 				'controller' => $this,
 				'function' => 'action_signatureSettings_display'),
@@ -93,6 +102,10 @@ class ManageFeatures_Controller
 		// Same for Karma
 		if (!in_array('k', $context['admin_features']))
 			unset($subActions['karma']);
+
+		// And likes
+		if (!in_array('l', $context['admin_features']))
+			unset($subActions['likes']);
 
 		// By default do the basic settings.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
@@ -119,6 +132,8 @@ class ManageFeatures_Controller
 				'layout' => array(
 				),
 				'karma' => array(
+				),
+				'likes' => array(
 				),
 				'sig' => array(
 					'description' => $txt['signature_settings_desc'],
@@ -296,7 +311,7 @@ class ManageFeatures_Controller
 				array('int', 'defaultMaxMembers'),
 			'',
 				// Stuff that just is everywhere - today, search, online, etc.
-				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'])),
+				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
 				array('check', 'topbottomEnable'),
 				array('check', 'onlineEnable'),
 				array('check', 'enableVBStyleLogin'),
@@ -380,12 +395,75 @@ class ManageFeatures_Controller
 	}
 
 	/**
+	 * Display configuration settings page for likes settings.
+	 * Accessed  from ?action=admin;area=featuresettings;sa=likes;
+	 *
+	 */
+	public function action_likesSettings_display()
+	{
+		global $txt, $scripturl, $context;
+
+		// initialize the form
+		$this->_initLikesSettingsForm();
+
+		// retrieve the current config settings
+		$config_vars = $this->_likesSettings->settings();
+
+		// Saving?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+
+			call_integration_hook('integrate_save_likes_settings');
+
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=featuresettings;sa=likes');
+		}
+
+		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=likes';
+		$context['settings_title'] = $txt['likes'];
+
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initializes the likes settings admin page.
+	 */
+	private function _initLikesSettingsForm()
+	{
+		global $txt;
+
+		// We're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_likesSettings = new Settings_Form();
+
+		$config_vars = array(
+				// Likes - On or off?
+				array('check', 'likes_enabled'),
+			'',
+				// Who can do it.... and who is restricted by count limits?
+				array('int', 'likeMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
+				array('int', 'likeWaitCount', 6),
+				array('check', 'likeRestrictAdmins'),
+			'',
+				array('int', 'likeDisplayLimit', 6)
+		);
+
+		call_integration_hook('integrate_likes_settings', array(&$config_vars));
+
+		return $this->_likesSettings->settings($config_vars);
+	}
+
+	/**
 	 * Display configuration settings for signatures on forum.
 	 *
 	 */
 	public function action_signatureSettings_display()
 	{
-		global $context, $txt, $modSettings, $sig_start, $smcFunc, $scripturl;
+		global $context, $txt, $modSettings, $sig_start, $scripturl;
 
 		// initialize the form
 		$this->_initSignatureSettingsForm();
@@ -412,13 +490,14 @@ class ManageFeatures_Controller
 			checkSession('get');
 
 			require_once(SUBSDIR . '/ManageFeatures.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
 			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
 			$applied_sigs = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 			$done = false;
 
-			$context['max_member'] = getMaxMember();
+			$context['max_member'] = maxMemberID();
 
 			while (!$done)
 			{
@@ -435,7 +514,7 @@ class ManageFeatures_Controller
 
 					// Max characters...
 					if (!empty($sig_limits[1]))
-						$sig = $smcFunc['substr']($sig, 0, $sig_limits[1]);
+						$sig = Util::substr($sig, 0, $sig_limits[1]);
 					// Max lines...
 					if (!empty($sig_limits[2]))
 					{
@@ -681,7 +760,7 @@ class ManageFeatures_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=sig';
 		$context['settings_title'] = $txt['signature_settings'];
 
-		$context['settings_message'] = !empty($settings_applied) ? '<div class="infobox">' . $txt['signature_settings_applied'] . '</div>' : '<p class="centertext">' . sprintf($txt['signature_settings_warning'], $context['session_id'], $context['session_var']) . '</p>';
+		$context['settings_message'] = '<p class="centertext">' . (!empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $context['session_id'], $context['session_var'])) . '</p>';
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -961,7 +1040,7 @@ class ManageFeatures_Controller
 	 */
 	public function action_profileedit()
 	{
-		global $txt, $scripturl, $context, $smcFunc;
+		global $txt, $scripturl, $context;
 
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		loadTemplate('ManageFeatures');
@@ -1020,8 +1099,8 @@ class ManageFeatures_Controller
 			if (!empty($_POST['regex']) && @preg_match($_POST['regex'], 'dummy') === false)
 				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=regex_error');
 
-			$_POST['field_name'] = $smcFunc['htmlspecialchars']($_POST['field_name']);
-			$_POST['field_desc'] = $smcFunc['htmlspecialchars']($_POST['field_desc']);
+			$_POST['field_name'] = Util::htmlspecialchars($_POST['field_name']);
+			$_POST['field_desc'] = Util::htmlspecialchars($_POST['field_desc']);
 
 			// Checkboxes...
 			$show_reg = isset($_POST['reg']) ? (int) $_POST['reg'] : 0;
@@ -1051,7 +1130,7 @@ class ManageFeatures_Controller
 				foreach ($_POST['select_option'] as $k => $v)
 				{
 					// Clean, clean, clean...
-					$v = $smcFunc['htmlspecialchars']($v);
+					$v = Util::htmlspecialchars($v);
 					$v = strtr($v, array(',' => ''));
 
 					// Nada, zip, etc...
@@ -1078,7 +1157,7 @@ class ManageFeatures_Controller
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = $smcFunc['substr'](strtr($_POST['field_name'], array(' ' => '')), 0, 6);
+				$colname = Util::substr(strtr($_POST['field_name'], array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
@@ -1215,6 +1294,166 @@ class ManageFeatures_Controller
 		}
 
 		createToken('admin-ecp');
+	}
+
+	/**
+	 * Return basic feature settings.
+	 * Used in admin center search.
+	 */
+	public function basicSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Big Options... polls, sticky, bbc....
+				array('select', 'pollMode', array($txt['disable_polls'], $txt['enable_polls'], $txt['polls_as_topics'])),
+			'',
+				// Basic stuff, titles, flash, permissions...
+				array('check', 'allow_guestAccess'),
+				array('check', 'enable_buddylist'),
+				array('check', 'enable_disregard'),
+				array('check', 'allow_editDisplayName'),
+				array('check', 'allow_hideOnline'),
+				array('check', 'titlesEnable'),
+				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note']),
+			'',
+				// Javascript and CSS options
+				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
+				array('check', 'minify_css_js'),
+			'',
+				// SEO stuff
+				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong>'),
+				array('text', 'meta_keywords', 'subtext' => $txt['meta_keywords_note'], 'size' => 50),
+			'',
+				// Number formatting, timezones.
+				array('text', 'time_format'),
+				array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
+				'default_timezone' => array('select', 'default_timezone', array()),
+			'',
+				// Who's online?
+				array('check', 'who_enabled'),
+				array('int', 'lastActive', 6, 'postinput' => $txt['minutes']),
+			'',
+				// Statistics.
+				array('check', 'trackStats'),
+				array('check', 'hitStats'),
+			'',
+				// Option-ish things... miscellaneous sorta.
+				array('check', 'allow_disableAnnounce'),
+				array('check', 'disallow_sendBody'),
+				array('select', 'enable_contactform', array('disabled' => $txt['contact_form_disabled'], 'registration' => $txt['contact_form_registration'], 'menu' => $txt['contact_form_menu'])),
+		);
+
+		// Get all the time zones.
+		if (function_exists('timezone_identifiers_list') && function_exists('date_default_timezone_set'))
+		{
+			$all_zones = timezone_identifiers_list();
+			// Make sure we set the value to the same as the printed value.
+			foreach ($all_zones as $zone)
+				$config_vars['default_timezone'][2][$zone] = $zone;
+		}
+		else
+		{
+			// we don't know this, huh?
+			unset($config_vars['default_timezone']);
+		}
+
+		call_integration_hook('integrate_modify_basic_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return layout settings.
+	 * Used in admin center search.
+	 */
+	public function layoutSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Pagination stuff.
+				array('check', 'compactTopicPagesEnable'),
+				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
+				array('int', 'defaultMaxMembers'),
+			'',
+				// Stuff that just is everywhere - today, search, online, etc.
+				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
+				array('check', 'topbottomEnable'),
+				array('check', 'onlineEnable'),
+				array('check', 'enableVBStyleLogin'),
+			'',
+				// Automagic image resizing.
+				array('int', 'max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+				// This is like debugging sorta.
+				array('check', 'timeLoadPageEnable'),
+		);
+
+		call_integration_hook('integrate_layout_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return karma settings.
+	 * Used in admin center search.
+	 */
+	public function karmaSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Karma - On or off?
+				array('select', 'karmaMode', explode('|', $txt['karma_options'])),
+			'',
+				// Who can do it.... and who is restricted by time limits?
+				array('int', 'karmaMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
+				array('check', 'karmaTimeRestrictAdmins'),
+			'',
+				// What does it look like?  [smite]?
+				array('text', 'karmaLabel'),
+				array('text', 'karmaApplaudLabel'),
+				array('text', 'karmaSmiteLabel'),
+		);
+
+		call_integration_hook('integrate_karma_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return signature settings.
+	 * Used in admin center search.
+	 */
+	public function signatureSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Are signatures even enabled?
+				array('check', 'signature_enable'),
+			'',
+				// Tweaking settings!
+				array('int', 'signature_max_length', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'signature_max_lines', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
+				array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
+				array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+				// Image settings.
+				array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),
+				array('int', 'signature_max_image_width', 'subtext' => $txt['zero_for_no_limit']),
+				array('int', 'signature_max_image_height', 'subtext' => $txt['zero_for_no_limit']),
+			'',
+				array('bbc', 'signature_bbc'),
+		);
+
+		call_integration_hook('integrate_signature_settings', array(&$config_vars));
+
+		return $config_vars;
 	}
 }
 

@@ -5,15 +5,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered also by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
  *
- * This file contains functions that are specifically done by administrators.
+ * This file contains utility functions related to charsets.
  *
  */
 
@@ -561,9 +559,9 @@ function utf8_strtoupper($string)
  */
 function fix_serialized_columns()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_action, extra
 		FROM {db_prefix}log_actions
 		WHERE action IN ({string:remove}, {string:delete})',
@@ -572,10 +570,10 @@ function fix_serialized_columns()
 			'delete' => 'delete',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (@unserialize($row['extra']) === false && preg_match('~^(a:3:{s:5:"topic";i:\d+;s:7:"subject";s:)(\d+):"(.+)"(;s:6:"member";s:5:"\d+";})$~', $row['extra'], $matches) === 1)
-			$smcFunc['db_query']('', '
+			$db->query('', '
 				UPDATE {db_prefix}log_actions
 				SET extra = {string:extra}
 				WHERE id_action = {int:current_action}',
@@ -585,7 +583,7 @@ function fix_serialized_columns()
 				)
 			);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	// Refresh some cached data.
 	updateSettings(array(

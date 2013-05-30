@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// This is the main sidebar for the personal messages section.
+/**
+ * This is the main sidebar for the personal messages section.
+ */
 function template_pm_above()
 {
 	global $context, $txt;
@@ -43,13 +45,18 @@ function template_pm_above()
 						</div>';
 }
 
-// Just the end of the index bar, nothing special.
+/**
+ * The end of the index bar, for personal messages page.
+ */
 function template_pm_below()
 {
 	echo '
 					</div>';
 }
 
+/**
+ * Messages folder.
+ */
 function template_folder()
 {
 	global $context, $scripturl, $options, $txt;
@@ -560,7 +567,9 @@ function template_build_pmposter_div($message)
 	return $poster_div;
 }
 
-// Just list all the personal message subjects - to make templates easier.
+/**
+ * Just list all the personal message subjects - to make templates easier.
+ */
 function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -679,6 +688,9 @@ function template_subject_list()
 						</div>';
 }
 
+/**
+ * Page to search in PMs.
+ */
 function template_search()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -705,7 +717,7 @@ function template_search()
 			<div class="roundframe">
 				<div id="search_term_input">
 					<strong>', $txt['pm_search_text'], ':</strong>
-					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" />
+					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 					<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit floatnone" />
 				</div>
 				<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="smf_setThemeOption(\'minmax_preferences\', \'1\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
@@ -724,7 +736,7 @@ function template_search()
 						<strong>', $txt['pm_search_text'], ':</strong>
 					</dt>
 					<dd>
-						<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text floatnone" />
+						<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text floatnone" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 						<select name="searchtype">
 							<option value="1"', empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_all'], '</option>
 							<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
@@ -858,6 +870,9 @@ function template_search()
 	</form>';
 }
 
+/**
+ * Template for the results of search in PMs.
+ */
 function template_search_results()
 {
 	global $context, $scripturl, $txt;
@@ -1080,7 +1095,7 @@ function template_send()
 						<span', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</span>
 					</dt>
 					<dd id="pm_subject">
-						<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"',isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
+						<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"',isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
 					</dd>
 				</dl><hr class="clear" />';
 
@@ -1263,7 +1278,9 @@ function template_send()
 		// ]]></script>';
 }
 
-// This template asks the user whether they wish to empty out their folder/messages.
+/**
+ * This template asks the user whether they wish to empty out their folder/messages.
+ */
 function template_ask_delete()
 {
 	global $context, $scripturl, $txt;
@@ -1280,7 +1297,9 @@ function template_ask_delete()
 		</div>';
 }
 
-// This template asks the user what messages they want to prune.
+/**
+ * This template asks the user what messages they want to prune.
+ */
 function template_prune()
 {
 	global $context, $scripturl, $txt;
@@ -1300,7 +1319,9 @@ function template_prune()
 	</form>';
 }
 
-// Here we allow the user to setup labels, remove labels and change rules for labels (i.e, do quite a bit)
+/**
+ * Here we allow the user to setup labels, remove labels and change rules for labels (i.e, do quite a bit)
+ */
 function template_labels()
 {
 	global $context, $scripturl, $txt;
@@ -1396,7 +1417,9 @@ function template_labels()
 	</form>';
 }
 
-// Template for reporting a personal message.
+/**
+ * Template for reporting a personal message.
+ */
 function template_report_message()
 {
 	global $context, $txt, $scripturl;
@@ -1450,7 +1473,9 @@ function template_report_message()
 	</form>';
 }
 
-// Little template just to say "Yep, it's been submitted"
+/**
+ * Little template just to say "Yep, it's been submitted".
+ */
 function template_report_message_complete()
 {
 	global $context, $txt, $scripturl;
@@ -1542,7 +1567,9 @@ function template_rules()
 
 }
 
-// Template for adding/editing a rule.
+/**
+ * Template for adding/editing a rule.
+ */
 function template_add_rule()
 {
 	global $context, $txt, $scripturl;
@@ -1755,7 +1782,9 @@ function template_add_rule()
 		// ]]></script>';
 }
 
-// Template for showing all the PM drafts of the user.
+/**
+ * Template for showing all the PM drafts of the user.
+ */
 function template_showPMDrafts()
 {
 	global $context, $settings, $scripturl, $txt;

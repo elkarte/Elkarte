@@ -350,7 +350,7 @@ class ManageMembergroups_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		require_once(SUBSDIR . '/ManageMembergroups.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// A form was submitted, we can start adding.
 		if (isset($_POST['group_name']) && trim($_POST['group_name']) != '')
@@ -371,7 +371,7 @@ class ManageMembergroups_Controller
 			$minposts = !empty($_POST['min_posts']) ? (int) $_POST['min_posts'] : '-1';
 
 			addMembergroup($id_group, $_POST['group_name'], $minposts, $_POST['group_type']);
-			
+
 
 			call_integration_hook('integrate_add_membergroup', array($id_group, $postCountBasedGroup));
 
@@ -387,7 +387,7 @@ class ManageMembergroups_Controller
 			{
 				// Set default permission level.
 				require_once(ADMINDIR . '/ManagePermissions.php');
-				setPermissionLevel($_POST['level'], $id_group, 'null');
+				setPermissionLevel($_POST['level'], $id_group, null);
 			}
 			// Copy or inherit the permissions!
 			elseif ($_POST['perm_type'] == 'copy' || $_POST['perm_type'] == 'inherit')
@@ -433,7 +433,7 @@ class ManageMembergroups_Controller
 			{
 				// Only do this if they have special access requirements.
 				if (!empty($changed_boards[$board_action]))
-					assignGroupToBoards($changed_boards, $id_group, $board_action);
+					assignGroupToBoards($id_group, $changed_boards, $board_action);
 			}
 
 			// If this is joinable then set it to show group membership in people's profiles.
@@ -463,9 +463,9 @@ class ManageMembergroups_Controller
 			loadLanguage('ManagePermissions');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		$context['groups'] = getBasicMembergroupData();
+		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList(array('use_permissions' => true));
 
 		// Include a list of boards per category for easy toggling.
@@ -514,7 +514,6 @@ class ManageMembergroups_Controller
 			loadLanguage('ManagePermissions');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/ManageMembergroups.subs.php');
 		// Make sure this group is editable.
 		if (!empty($_REQUEST['group']))
 			$groups = membergroupsById($_REQUEST['group'], 1, false, false, allowedTo('admin_forum'));
@@ -587,7 +586,7 @@ class ManageMembergroups_Controller
 				{
 					// Find all board this group is in, but shouldn't be in.
 					detachGroupFromBoards($groups['id_group'], $changed_boards, $board_action);
-				
+
 					// Add the membergroup to all boards that hadn't been set yet.
 					if (!empty($changed_boards[$board_action]))
 						assignGroupToBoards($groups['id_group'], $changed_boards, $board_action);
@@ -597,7 +596,7 @@ class ManageMembergroups_Controller
 			// Remove everyone from this group!
 			if ($_POST['min_posts'] != -1)
 				detachDeletedGroupFromMembers($groups['id_group']);
-			
+
 			elseif ($groups['id_group'] != 3)
 			{
 				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
@@ -636,7 +635,7 @@ class ManageMembergroups_Controller
 							unset($moderators[$k]);
 					}
 
-					// Find all the id_member's for the member_name's in the list.	
+					// Find all the id_member's for the member_name's in the list.
 					if (!empty($moderators))
 						$group_moderators = getIDMemberFromGroupModerators($moderators);
 				}
@@ -676,7 +675,7 @@ class ManageMembergroups_Controller
 
 		// Fetch the current group information.
 		$row = membergroupsById($groups['id_group'], 1, true, false, allowedTo('admin_forum'));
-		
+
 		if (empty($row))
 			fatal_lang_error('membergroup_does_not_exist', false);
 
@@ -712,7 +711,7 @@ class ManageMembergroups_Controller
 		$context['boards'] = array();
 		if ($groups['id_group'] == 2 || $groups['id_group'] > 3)
 		{
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('access' => $groups['id_group'], 'not_redirection' => true));
 
 			// Include a list of boards per category for easy toggling.

@@ -23,7 +23,7 @@ class ManageTopics_Controller
 	 */
 	protected $_topicSettings;
 
-	function action_index()
+	public function action_index()
 	{
 		// Only admins are allowed around here.
 		isAllowedTo('admin_forum');
@@ -52,9 +52,9 @@ class ManageTopics_Controller
 
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
-	function action_topicSettings_display()
+	public function action_topicSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl;
+		global $context, $txt, $scripturl;
 
 		// initialize the form
 		$this->_initTopicSettingsForm();
@@ -95,7 +95,7 @@ class ManageTopics_Controller
 	/**
 	 * Initialize topicSettings form with the configuration settings for topics.
 	 */
-	function _initTopicSettingsForm()
+	private function _initTopicSettingsForm()
 	{
 		global $txt;
 
@@ -120,6 +120,7 @@ class ManageTopics_Controller
 				// Hot topics (etc)...
 				array('int', 'hotTopicPosts', 'postinput' => $txt['manageposts_posts']),
 				array('int', 'hotTopicVeryPosts', 'postinput' => $txt['manageposts_posts']),
+				array('check', 'useLikesNotViews'),
 			'',
 				// All, next/prev...
 				array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
@@ -134,7 +135,7 @@ class ManageTopics_Controller
 	/**
 	 * Return configuration settings for topics.
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 

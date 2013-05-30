@@ -26,16 +26,15 @@ if (!defined('ELKARTE'))
  * It uses gzip compression if compress is set in the URL/post data.
  * It may possibly time out, and mess up badly if you were relying on it. :P
  * The data dumped depends on whether "struct" and "data" are passed.
- * It requires an administrator and the session hash by post.
  * It is called from ManageMaintenance.php.
  */
 function DumpDatabase2()
 {
-	global $db_name, $scripturl, $context, $modSettings, $crlf, $smcFunc, $db_prefix, $db_show_debug;
+	global $db_name, $scripturl, $modSettings;
+	global $db_prefix, $db_show_debug;
 
-	// Administrators only!
-	if (!allowedTo('admin_forum'))
-		fatal_lang_error('no_dump_database', 'critical');
+	// We'll need a db to dump :P
+	$database = database();
 
 	// We don't need debug when dumping the database
 	$modSettings['disableQueryCheck'] = true;
@@ -44,11 +43,6 @@ function DumpDatabase2()
 	// You can't dump nothing!
 	if (!isset($_REQUEST['struct']) && !isset($_REQUEST['data']))
 		$_REQUEST['data'] = true;
-
-	checkSession('post');
-
-	// We will need this, badly!
-	db_extend();
 
 	// Attempt to stop from dying...
 	@set_time_limit(600);
@@ -102,9 +96,9 @@ function DumpDatabase2()
 	$scripturl = '';
 
 	// If this database is flat file and has a handler function pass it to that.
-	if (!empty($smcFunc['db_get_backup']))
+	if (method_exists($database, 'db_get_backup'))
 	{
-		$smcFunc['db_get_backup']();
+		$database->db_get_backup();
 		exit;
 	}
 
@@ -121,25 +115,19 @@ function DumpDatabase2()
 		'-- ==========================================================' . $crlf .
 		'--' . $crlf .
 		'-- Database dump of tables in `' . $db_name . '`' . $crlf .
-		'-- ' . timeformat(time(), false) . $crlf .
+		'-- ' . standardTime(time(), false) . $crlf .
 		'--' . $crlf .
 		'-- ==========================================================' . $crlf .
 		$crlf;
 
 	// Get all tables in the database....
 	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) != 0)
-	{
-		$db = strtr($match[1], array('`' => ''));
 		$dbp = str_replace('_', '\_', $match[2]);
-	}
 	else
-	{
-		$db = false;
 		$dbp = $db_prefix;
-	}
 
 	// Dump each table.
-	$tables = $smcFunc['db_list_tables'](false, $db_prefix . '%');
+	$tables = $database->db_list_tables(false, $db_prefix . '%');
 	foreach ($tables as $tableName)
 	{
 		// Are we dumping the structures?
@@ -151,11 +139,11 @@ function DumpDatabase2()
 				'-- Table structure for table `' . $tableName . '`' . $crlf .
 				'--' . $crlf .
 				$crlf .
-				$smcFunc['db_table_sql']($tableName) . ';' . $crlf;
+				$database->db_table_sql($tableName) . ';' . $crlf;
 		}
 		else
 			// This is needed to speedup things later
-			$smcFunc['db_table_sql']($tableName);
+			$database->db_table_sql($tableName);
 
 		// How about the data?
 		if (!isset($_REQUEST['data']) || substr($tableName, -10) == 'log_errors')
@@ -165,7 +153,7 @@ function DumpDatabase2()
 		$close_table = false;
 
 		// Are there any rows in this table?
-		while ($get_rows = $smcFunc['db_insert_sql']($tableName, $first_round))
+		while ($get_rows = $database->insert_sql($tableName, $first_round))
 		{
 			if (empty($get_rows))
 				break;
@@ -192,7 +180,7 @@ function DumpDatabase2()
 			}
 			$db_chunks .=
 				$get_rows;
-			$current_used_memory += $smcFunc['strlen']($db_chunks);
+			$current_used_memory += Util::strlen($db_chunks);
 
 			$db_backup .= $db_chunks;
 			unset($db_chunks);

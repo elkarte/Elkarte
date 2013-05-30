@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The only template in the file.
+/**
+ * Who's online page.
+ */
 function template_main()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -131,6 +133,9 @@ function template_main()
 	</div>';
 }
 
+/**
+ * Display the credits page.
+ */
 function template_credits()
 {
 	global $context, $txt;
@@ -207,18 +212,11 @@ function template_credits()
 		<div class="windowbg">
 			<div class="content">';
 
-		if (!empty($context['credits_software_graphics']['graphics']))
+		foreach ($context['credits_software_graphics'] as $section => $credits)
 			echo '
 				<dl>
-					<dt><strong>', $txt['credits_graphics'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_software_graphics']['graphics']), '</dd>
-				</dl>';
-
-		if (!empty($context['credits_software_graphics']['software']))
-			echo '
-				<dl>
-					<dt><strong>', $txt['credits_software'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_software_graphics']['software']), '</dd>
+					<dt><strong>', $txt['credits_' . $section], '</strong></dt>
+					<dd>', implode('</dd><dd>', $credits), '</dd>
 				</dl>';
 
 		echo '
@@ -226,20 +224,20 @@ function template_credits()
 		</div>';
 	}
 
-	// How about Modifications, we all love em
-	if (!empty($context['credits_modifications']))
+	// Addons credits, copyright, license
+	if (!empty($context['credits_addons']))
 	{
 		echo '
 		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_modifications'], '</h3>
+			<h3 class="catbg">', $txt['credits_addons'], '</h3>
 		</div>
 		<div class="windowbg">
 			<div class="content">';
 
 		echo '
 				<dl>
-					<dt><strong>', $txt['credits_modifications'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_modifications']), '</dd>
+					<dt><strong>', $txt['credits_addons'], '</strong></dt>
+					<dd>', implode('</dd><dd>', $context['credits_addons']), '</dd>
 				</dl>';
 
 		echo '
@@ -247,7 +245,7 @@ function template_credits()
 		</div>';
 	}
 
-	// Elkarte !
+	// ElkArte !
 	echo '
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['credits_copyright'], '</h3>
@@ -262,12 +260,12 @@ function template_credits()
 					</dd>
 				</dl>';
 
-	if (!empty($context['copyrights']['mods']))
+	if (!empty($context['copyrights']['addons']))
 	{
 		echo '
 				<dl>
-					<dt><strong>', $txt['credits_modifications'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['copyrights']['mods']), '</dd>
+					<dt><strong>', $txt['credits_addons'], '</strong></dt>
+					<dd>', implode('</dd><dd>', $context['copyrights']['addons']), '</dd>
 				</dl>';
 	}
 

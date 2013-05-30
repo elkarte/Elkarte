@@ -36,7 +36,7 @@ class ManageNews_Controller
 	 * It does the permission checks, and calls the appropriate function
 	 * based on the requested sub-action.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context, $txt;
 
@@ -112,10 +112,9 @@ class ManageNews_Controller
 	 * Can be accessed with ?action=admin;sa=editnews.
 	 *
 	 */
-	function action_editnews()
+	public function action_editnews()
 	{
 		global $txt, $modSettings, $context, $scripturl;
-		global $smcFunc;
 
 		require_once(SUBSDIR . '/Post.subs.php');
 
@@ -148,7 +147,7 @@ class ManageNews_Controller
 					unset($_POST['news'][$i]);
 				else
 				{
-					$_POST['news'][$i] = $smcFunc['htmlspecialchars']($_POST['news'][$i], ENT_QUOTES);
+					$_POST['news'][$i] = Util::htmlspecialchars($_POST['news'][$i], ENT_QUOTES);
 					preparsecode($_POST['news'][$i]);
 				}
 			}
@@ -162,6 +161,7 @@ class ManageNews_Controller
 
 		// We're going to want this for making our list.
 		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/ManageNews.subs.php');
 
 		$context['page_title'] = $txt['admin_edit_news'];
 
@@ -302,57 +302,27 @@ class ManageNews_Controller
 	 *
 	 * @uses the ManageNews template and email_members sub template.
 	 */
-	function action_mailingmembers()
+	public function action_mailingmembers()
 	{
-		global $txt, $context, $modSettings, $smcFunc;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(SUBSDIR . '/ManageNews.subs.php');
 
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
 		$context['groups'] = array();
-		$postGroups = array();
-		$normalGroups = array();
+		
+		$allgroups = getBasicMembergroupData(array('all'), array(), null, true);
+		$context['groups'] = $allgroups['groups'];
 
-		// If we have post groups disabled then we need to give a "ungrouped members" option.
-		if (empty($modSettings['permission_enable_postgroups']))
-		{
-			$context['groups'][0] = array(
-				'id' => 0,
-				'name' => $txt['membergroups_members'],
-				'member_count' => 0,
-			);
-			$normalGroups[0] = 0;
-		}
+		foreach ($allgroups['postgroups'] as $postgroup)
+			$pg[] = $postgroup['id'];
+		foreach ($allgroups['membergroups'] as $membergroup)
+			$mg[] = $membergroup['id'];
 
-		// Get all the extra groups as well as Administrator and Global Moderator.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_group, group_name, min_posts
-			FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
-			WHERE min_posts = {int:min_posts}' : '') . '
-			GROUP BY id_group, min_posts, group_name
-			ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-			array(
-				'min_posts' => -1,
-				'newbie_group' => 4,
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['groups'][$row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => $row['group_name'],
-				'member_count' => 0,
-			);
+		$groups = membersInGroups($pg, $mg, true, true);
 
-			if ($row['min_posts'] == -1)
-				$normalGroups[$row['id_group']] = $row['id_group'];
-			else
-				$postGroups[$row['id_group']] = $row['id_group'];
-		}
-		$smcFunc['db_free_result']($request);
-
-		$groups = membersInGroups($postGroups, $normalGroups, true, true);
 		foreach ($groups as $id_group => $member_count)
 		{
 			if (isset($context['groups'][$id_group]['member_count']))
@@ -372,9 +342,9 @@ class ManageNews_Controller
 	 *
 	 * @uses ManageNews template, email_members_compose sub-template.
 	 */
-	function action_mailingcompose()
+	public function action_mailingcompose()
 	{
-		global $txt, $context, $smcFunc;
+		global $txt, $context;
 
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];
@@ -441,7 +411,7 @@ class ManageNews_Controller
 				foreach ($_POST[$type] as $index => $member)
 				{
 					if (strlen(trim($member)) > 0)
-						$_POST[$type][$index] = $smcFunc['htmlspecialchars']($smcFunc['strtolower'](trim($member)));
+						$_POST[$type][$index] = Util::htmlspecialchars(Util::strtolower(trim($member)));
 					else
 						unset($_POST[$type][$index]);
 				}
@@ -470,100 +440,33 @@ class ManageNews_Controller
 		}
 
 		// Clean the other vars.
-		action_mailingsend(true);
+		$this->action_mailingsend(true);
 
 		// We need a couple strings from the email template file
 		loadLanguage('EmailTemplates');
-
+		require_once(SUBSDIR . '/ManageNews.subs.php');
 		// Get a list of all full banned users.  Use their Username and email to find them.
 		// Only get the ones that can't login to turn off notification.
-		$request = $smcFunc['db_query']('', '
-			SELECT DISTINCT mem.id_member
-			FROM {db_prefix}ban_groups AS bg
-				INNER JOIN {db_prefix}ban_items AS bi ON (bg.id_ban_group = bi.id_ban_group)
-				INNER JOIN {db_prefix}members AS mem ON (bi.id_member = mem.id_member)
-			WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
-				AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time})',
-			array(
-				'cannot_access' => 1,
-				'cannot_login' => 1,
-				'current_time' => time(),
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$context['recipients']['exclude_members'][] = $row['id_member'];
-		$smcFunc['db_free_result']($request);
-
-		$request = $smcFunc['db_query']('', '
-			SELECT DISTINCT bi.email_address
-			FROM {db_prefix}ban_items AS bi
-				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
-			WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
-				AND (COALESCE(bg.expire_time, 1=1) OR bg.expire_time > {int:current_time})
-				AND bi.email_address != {string:blank_string}',
-			array(
-				'cannot_access' => 1,
-				'cannot_login' => 1,
-				'current_time' => time(),
-				'blank_string' => '',
-			)
-		);
-		$condition_array = array();
-		$condition_array_params = array();
-		$count = 0;
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$condition_array[] = '{string:email_' . $count . '}';
-			$condition_array_params['email_' . $count++] = $row['email_address'];
-		}
-		$smcFunc['db_free_result']($request);
-
-		if (!empty($condition_array))
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE email_address IN(' . implode(', ', $condition_array) .')',
-				$condition_array_params
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
-				$context['recipients']['exclude_members'][] = $row['id_member'];
-			$smcFunc['db_free_result']($request);
-		}
+		$context['recipients']['exclude_members'] = excludeBannedMembers();
 
 		// Did they select moderators - if so add them as specific members...
 		if ((!empty($context['recipients']['groups']) && in_array(3, $context['recipients']['groups'])) || (!empty($context['recipients']['exclude_groups']) && in_array(3, $context['recipients']['exclude_groups'])))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT DISTINCT mem.id_member AS identifier
-				FROM {db_prefix}members AS mem
-					INNER JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member)
-				WHERE mem.is_activated = {int:is_activated}',
-				array(
-					'is_activated' => 1,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			$mods = getModerators();
+			
+			foreach($mods as $row)
 			{
 				if (in_array(3, $context['recipients']))
 					$context['recipients']['exclude_members'][] = $row['identifier'];
 				else
 					$context['recipients']['members'][] = $row['identifier'];
 			}
-			$smcFunc['db_free_result']($request);
 		}
 
+		require_once(SUBSDIR . '/Members.subs.php');
 		// For progress bar!
 		$context['total_emails'] = count($context['recipients']['emails']);
-		$request = $smcFunc['db_query']('', '
-			SELECT MAX(id_member)
-			FROM {db_prefix}members',
-			array(
-			)
-		);
-		list ($context['max_id_member']) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
+		$context['max_id_member'] = maxMemberID();
 		// Clean up the arrays.
 		$context['recipients']['members'] = array_unique($context['recipients']['members']);
 		$context['recipients']['exclude_members'] = array_unique($context['recipients']['exclude_members']);
@@ -579,10 +482,9 @@ class ManageNews_Controller
 	 * @param bool $clean_only = false; if set, it will only clean the variables, put them in context, then return.
 	 * @uses the ManageNews template and email_members_send sub template.
 	 */
-	function action_mailingsend($clean_only = false)
+	public function action_mailingsend($clean_only = false)
 	{
-		global $txt, $context, $smcFunc;
-		global $scripturl, $modSettings, $user_info;
+		global $txt, $context, $scripturl, $modSettings, $user_info;
 
 		if (isset($_POST['preview']))
 		{
@@ -601,13 +503,13 @@ class ManageNews_Controller
 		checkSession();
 
 		// Where are we actually to?
-		$context['start'] = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
+		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 		$context['email_force'] = !empty($_POST['email_force']) ? 1 : 0;
 		$context['send_pm'] = !empty($_POST['send_pm']) ? 1 : 0;
 		$context['total_emails'] = !empty($_POST['total_emails']) ? (int) $_POST['total_emails'] : 0;
 		$context['max_id_member'] = !empty($_POST['max_id_member']) ? (int) $_POST['max_id_member'] : 0;
-		$context['send_html'] = !empty($_POST['send_html']) ? '1' : '0';
-		$context['parse_html'] = !empty($_POST['parse_html']) ? '1' : '0';
+		$context['send_html'] = !empty($_POST['send_html']) ? 1 : 0;
+		$context['parse_html'] = !empty($_POST['parse_html']) ? 1 : 0;
 
 		// Create our main context.
 		$context['recipients'] = array(
@@ -742,7 +644,7 @@ class ManageNews_Controller
 		$_POST['message'] = str_replace($variables,
 			array(
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '">' . $scripturl . '</a>' : $scripturl,
-				timeformat(forum_time(), false),
+				standardTime(forum_time(), false),
 				!empty($_POST['send_html']) ? '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $cleanLatestMember . '</a>' : ($context['send_pm'] ? '[url=' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . ']' . $cleanLatestMember . '[/url]' : $cleanLatestMember),
 				$modSettings['latestMember'],
 				$cleanLatestMember
@@ -751,7 +653,7 @@ class ManageNews_Controller
 		$_POST['subject'] = str_replace($variables,
 			array(
 				$scripturl,
-				timeformat(forum_time(), false),
+				standardTime(forum_time(), false),
 				$modSettings['latestRealName'],
 				$modSettings['latestMember'],
 				$modSettings['latestRealName']
@@ -845,26 +747,10 @@ class ManageNews_Controller
 				$sendQuery .= ' AND mem.notify_announcements = {int:notify_announcements}';
 
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
-			$result = $smcFunc['db_query']('', '
-				SELECT mem.id_member, mem.email_address, mem.real_name, mem.id_group, mem.additional_groups, mem.id_post_group
-				FROM {db_prefix}members AS mem
-				WHERE mem.id_member > {int:min_id_member}
-					AND mem.id_member < {int:max_id_member}
-					AND ' . $sendQuery . '
-					AND mem.is_activated = {int:is_activated}
-				ORDER BY mem.id_member ASC
-				LIMIT {int:atonce}',
-				array_merge($sendParams, array(
-					'min_id_member' => $context['start'],
-					'max_id_member' => $context['start'] + $num_at_once - $i,
-					'atonce' => $num_at_once - $i,
-					'regular_group' => 0,
-					'notify_announcements' => 1,
-					'is_activated' => 1,
-				))
-			);
+			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
+	
 
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			foreach ($recipients as $row)
 			{
 				$last_id_member = $row['id_member'];
 
@@ -907,7 +793,6 @@ class ManageNews_Controller
 				else
 					sendpm(array('to' => array($row['id_member']), 'bcc' => array()), $subject, $message);
 			}
-			$smcFunc['db_free_result']($result);
 		}
 
 		// If used our batch assume we still have a member.
@@ -942,7 +827,7 @@ class ManageNews_Controller
 	 *
 	 * @uses ManageNews template, news_settings sub-template.
 	 */
-	function action_newsSettings_display()
+	public function action_newsSettings_display()
 	{
 		global $context, $txt, $scripturl;
 
@@ -987,7 +872,7 @@ class ManageNews_Controller
 	 *
 	 * @return array
 	 */
-	function _initNewsSettingsForm()
+	private function _initNewsSettingsForm()
 	{
 		global $txt;
 
@@ -1017,7 +902,7 @@ class ManageNews_Controller
 	 *
 	 * @return array
 	 */
-	function settings()
+	public function settings()
 	{
 		global $txt;
 
@@ -1036,32 +921,3 @@ class ManageNews_Controller
 		return $config_vars;
 	}
 }
-/**
- * Prepares an array of the forum news items for display in the template
- *
- * @return array
- */
-function list_getNews()
-{
-	global $modSettings;
-
-	$admin_current_news = array();
-
-	// Ready the current news.
-	foreach (explode("\n", $modSettings['news']) as $id => $line)
-		$admin_current_news[$id] = array(
-			'id' => $id,
-			'unparsed' => un_preparsecode($line),
-			'parsed' => preg_replace('~<([/]?)form[^>]*?[>]*>~i', '<em class="smalltext">&lt;$1form&gt;</em>', parse_bbc($line)),
-		);
-
-	$admin_current_news['last'] = array(
-		'id' => 'last',
-		'unparsed' => '<div id="moreNewsItems"></div>
-		<noscript><textarea rows="3" cols="65" name="news[]" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 85%; min-width: 85%' : 'width: 85%') . ';"></textarea></noscript>',
-		'parsed' => '<div id="moreNewsItems_preview"></div>',
-	);
-
-	return $admin_current_news;
-}
-

@@ -392,6 +392,22 @@ $txt['template_parse_error_details'] = 'There was a problem loading the <tt><str
 
 $txt['today'] = 'Today at ';
 $txt['yesterday'] = 'Yesterday at ';
+
+//Relative times
+$txt['rt_now'] = 'just now';
+$txt['rt_minute'] = 'A minute ago';
+$txt['rt_minutes'] = '%s minutes ago';
+$txt['rt_hour'] = 'An hour ago';
+$txt['rt_hours'] = '%s hours ago';
+$txt['rt_day'] = 'A day ago';
+$txt['rt_days'] = '%s days ago';
+$txt['rt_week'] = 'A week ago';
+$txt['rt_weeks'] = '%s weeks ago';
+$txt['rt_month'] = 'A month ago';
+$txt['rt_months'] = '%s months ago';
+$txt['rt_year'] = 'A year ago';
+$txt['rt_years'] = '%s years ago';
+
 $txt['new_poll'] = 'New poll';
 $txt['poll_question'] = 'Question';
 $txt['poll_vote'] = 'Submit Vote';
@@ -616,6 +632,13 @@ $txt['notification_disable_topic'] = 'Are you sure you wish to disable notificat
 $txt['report_to_mod'] = 'Report Post';
 $txt['issue_warning_post'] = 'Issue a warning because of this message';
 
+$txt['like_post'] = 'Like Post';
+$txt['unlike_post'] = 'Unlike Post';
+$txt['likes'] = 'Likes';
+$txt['liked_by'] = 'Liked by:';
+$txt['liked_you'] = 'You';
+$txt['liked_more'] = 'more';
+
 $txt['unread_topics_visit'] = 'Recent Unread Topics';
 $txt['unread_topics_visit_none'] = 'No unread topics found since your last visit.  <a href="' . $scripturl . '?action=unread;all">Click here to try all unread topics</a>.';
 $txt['unread_topics_all'] = 'All Unread Topics';
@@ -770,6 +793,7 @@ $txt['package'] = 'Package Manager';
 $txt['errlog'] = 'Error Log';
 $txt['edit_permissions'] = 'Permissions';
 $txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
+$txt['mc_emailerror'] = 'Unapproved Emails';
 $txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
 $txt['mc_reported_posts'] = 'Reported Posts';
 $txt['modlog_view'] = 'Moderation Log';

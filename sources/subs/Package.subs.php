@@ -386,13 +386,13 @@ function url_exists($url)
  */
 function loadInstalledPackages()
 {
-	global $smcFunc;
+	$db = database();
 
 	// First, check that the database is valid, installed.list is still king.
 	$install_file = implode('', file(BOARDDIR . '/packages/installed.list'));
 	if (trim($install_file) == '')
 	{
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_packages
 			SET install_state = {int:not_installed}',
 			array(
@@ -405,7 +405,7 @@ function loadInstalledPackages()
 	}
 
 	// Load the packages from the database - note this is ordered by install time to ensure latest package uninstalled first.
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_install, package_id, filename, name, version
 		FROM {db_prefix}log_packages
 		WHERE install_state != {int:not_installed}
@@ -416,7 +416,7 @@ function loadInstalledPackages()
 	);
 	$installed = array();
 	$found = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// Already found this? If so don't add it twice!
 		if (in_array($row['package_id'], $found))
@@ -432,7 +432,7 @@ function loadInstalledPackages()
 			'version' => $row['version'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $installed;
 }
@@ -449,8 +449,6 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
-	global $smcFunc;
-
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (strpos($gzfilename, 'http://') !== false)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
@@ -491,7 +489,7 @@ function getPackageInfo($gzfilename)
 	$package = $packageInfo->to_array();
 	$package['xml'] = $packageInfo;
 	$package['filename'] = $gzfilename;
-	$package['name'] = $smcFunc['htmlspecialchars']($package['name']);
+	$package['name'] = Util::htmlspecialchars($package['name']);
 
 	if (!isset($package['type']))
 		$package['type'] = 'modification';
@@ -2898,7 +2896,7 @@ function package_crypt($pass)
  */
 function package_create_backup($id = 'backup')
 {
-	global $smcFunc;
+	$db = database();
 
 	$files = array();
 
@@ -2916,7 +2914,7 @@ function package_create_backup($id = 'backup')
 		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'Sources/' : strtr(SOURCEDIR . '/', '\\', '/')
 	);
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -2926,9 +2924,9 @@ function package_create_backup($id = 'backup')
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	while (!empty($dirs))
 	{
@@ -3217,7 +3215,9 @@ if (!function_exists('crc32_compat'))
  */
 function isPackageInstalled($id)
 {
-	global $smcFunc, $context;
+	global $context;
+
+	$db = database();
 
 	$result = array(
 		'package_id' => '',
@@ -3231,7 +3231,7 @@ function isPackageInstalled($id)
 		return $result;
 
 	// See if it is installed?
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT version, themes_installed, db_changes, package_id, install_state
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
@@ -3245,7 +3245,7 @@ function isPackageInstalled($id)
 			'install_id' => $context['install_id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$result = array(
 			'old_themes' => explode(',', $row['themes_installed']),
@@ -3255,7 +3255,7 @@ function isPackageInstalled($id)
 			'install_state' => $row['install_state'],
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $result;
 }
@@ -3267,9 +3267,11 @@ function isPackageInstalled($id)
  */
 function setPackageState($id)
 {
-	global $smcFunc, $context, $user_info;
+	global $context, $user_info;
 
-	$smcFunc['db_query']('', '
+	$db = database();
+
+	$db->query('', '
 		UPDATE {db_prefix}log_packages
 		SET install_state = {int:not_installed}, member_removed = {string:member_name}, id_member_removed = {int:current_member},
 			time_removed = {int:current_time}
@@ -3289,15 +3291,14 @@ function setPackageState($id)
 /**
  * Checks if a package is installed, and if so returns its version level
  *
- * @global type $smcFunc
  */
 function checkPackageDependency()
 {
-	global $smcFunc;
+	$db = database();
 
 	$version = false;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT version
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
@@ -3309,9 +3310,9 @@ function checkPackageDependency()
 			'current_package' => $action['id'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_row']($request));
+	while ($row = $db->fetch_row($request));
 		list($version) = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	return $version;
 }
@@ -3328,9 +3329,11 @@ function checkPackageDependency()
  */
 function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db_changes, $is_upgrade, $credits_tag)
 {
-	global $smcFunc, $user_info;
+	global $user_info;
 
-	$smcFunc['db_insert']('', '{db_prefix}log_packages',
+	$db = database();
+
+	$db->insert('', '{db_prefix}log_packages',
 		array(
 			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
 			'id_member_installed' => 'int', 'member_installed' => 'string', 'time_installed' => 'int',
@@ -3352,10 +3355,10 @@ function addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $db
  */
 function setPackagesAsUninstalled()
 {
-	global $smcFunc;
+	$db = database();
 
 	// Set everything as uninstalled, just like that
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_packages
 		SET install_state = {int:not_installed}',
 		array(

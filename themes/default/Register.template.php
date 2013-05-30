@@ -72,7 +72,9 @@ function template_registration_agreement()
 
 }
 
-// Before registering - get their information.
+/**
+ * Before registering - get their information.
+ */
 function template_registration_form()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -125,7 +127,7 @@ function template_registration_form()
 					<dl class="register_form">
 						<dt><strong><label for="smf_autov_username">', $txt['username'], ':</label></strong></dt>
 						<dd>
-							<input type="text" name="user" id="smf_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" />
+							<input type="text" name="user" id="smf_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
 							<span id="smf_autov_username_div" style="display: none;">
 								<a id="smf_autov_username_link" href="#">
 									<img id="smf_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
@@ -134,7 +136,7 @@ function template_registration_form()
 						</dd>
 						<dt><strong><label for="smf_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
 						<dd>
-							<input type="text" name="email" id="smf_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" />
+							<input type="email" name="email" id="smf_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
 						</dd>
 						<dt><strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong></dt>
 						<dd>
@@ -168,7 +170,7 @@ function template_registration_form()
 					<dl class="register_form" id="password1_group">
 						<dt><strong><label for="smf_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd1" id="smf_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" />
+							<input type="password" name="passwrd1" id="smf_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['choose_pass']), '" required="required" />
 							<span id="smf_autov_pwmain_div" style="display: none;">
 								<img id="smf_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 							</span>
@@ -177,7 +179,7 @@ function template_registration_form()
 					<dl class="register_form" id="password2_group">
 						<dt><strong><label for="smf_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd2" id="smf_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" />
+							<input type="password" name="passwrd2" id="smf_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['verify_pass']), '" required="required" />
 							<span id="smf_autov_pwverify_div" style="display: none;">
 								<img id="smf_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 							</span>
@@ -395,7 +397,9 @@ function template_registration_form()
 		// ]]></script>';
 }
 
-// After registration... all done ;).
+/**
+ * After registration... all done ;).
+ */
 function template_after()
 {
 	global $context;
@@ -412,7 +416,9 @@ function template_after()
 		</div>';
 }
 
-// Template for giving instructions about COPPA activation.
+/**
+ * Template for giving instructions about COPPA activation.
+ */
 function template_coppa()
 {
 	global $context, $txt, $scripturl;
@@ -461,7 +467,9 @@ function template_coppa()
 			</div>';
 }
 
-// An easily printable form for giving permission to access the forum for a minor.
+/**
+ * An easily printable form for giving permission to access the forum for a minor.
+ */
 function template_coppa_form()
 {
 	global $context, $txt;
@@ -495,7 +503,9 @@ function template_coppa_form()
 		<br />';
 }
 
-// Show a window containing the spoken verification code.
+/**
+ * Show a window containing the spoken verification code.
+ */
 function template_verification_sound()
 {
 	global $context, $settings, $txt;
@@ -538,6 +548,9 @@ function template_verification_sound()
 </html>';
 }
 
+/**
+ * Show a page for admins to register new members.
+ */
 function template_admin_register()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -629,7 +642,9 @@ function template_admin_register()
 	<br class="clear" />';
 }
 
-// Form for editing the agreement shown for people registering to the forum.
+/**
+ * Form for editing the agreement shown for people registering to the forum.
+ */
 function template_edit_agreement()
 {
 	global $context, $scripturl, $txt;
@@ -697,6 +712,9 @@ function template_edit_agreement()
 		</form>';
 }
 
+/**
+ * Interface to edit reserved words in admin panel.
+ */
 function template_edit_reserved_words()
 {
 	global $context, $scripturl, $txt;
@@ -747,6 +765,9 @@ function template_edit_reserved_words()
 		</form>';
 }
 
+/**
+ * Interface for contact form.
+ */
 function template_contact_form()
 {
 	global $context, $scripturl, $txt;
@@ -799,6 +820,9 @@ function template_contact_form()
 		</form>';
 }
 
+/**
+ * Show a success page when contact form is submitted.
+ */
 function template_contact_form_done()
 {
 	global $txt;

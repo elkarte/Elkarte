@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Template for the database maintenance tasks.
+/**
+ * Template for the database maintenance tasks.
+ */
 function template_maintain_database()
 {
 	global $context, $settings, $txt, $scripturl, $db_type;
@@ -53,22 +55,17 @@ function template_maintain_database()
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">
 					<p>', $txt['maintain_backup_info'], '</p>';
 
-	if ($db_type == 'sqlite')
+	if ($context['safe_mode_enable'])
 		echo '
-					<input type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" class="button_submit" />';
+				<div class="errorbox">', $txt['safe_mode_enabled'], '</div>';
 	else
-	{
-		if ($context['safe_mode_enable'])
-			echo '
-					<div class="errorbox">', $txt['safe_mode_enabled'], '</div>';
-		else
-			echo '
+		echo '
 					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'noticebox', '">
-						', $txt[$context['suggested_method']],
-						$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
+					', $txt[$context['suggested_method']],
+					$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
 					'</div>';
 
-		echo '
+	echo '
 					<p>
 						<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" class="input_check" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
 						<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" class="input_check" /> ', $txt['maintain_backup_data'], '</label><br />
@@ -76,7 +73,6 @@ function template_maintain_database()
 					</p>
 
 					<input ', $context['use_maintenance'] == 2 ? 'disabled="disabled" ' : '', 'type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" onclick="return document.getElementById(\'struct\').checked || document.getElementById(\'data\').checked;" class="button_submit" />';
-	}
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -109,7 +105,9 @@ function template_maintain_database()
 	</div>';
 }
 
-// Template for the routine maintenance tasks.
+/**
+ * Template for the routine maintenance tasks.
+ */
 function template_maintain_routine()
 {
 	global $context, $txt, $scripturl;
@@ -198,7 +196,9 @@ function template_maintain_routine()
 	</div>';
 }
 
-// Template for the member maintenance tasks.
+/**
+ * Template for the member maintenance tasks.
+ */
 function template_maintain_members()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -365,7 +365,9 @@ function template_maintain_members()
 	// ]]></script>';
 }
 
-// Template for the topic maintenance tasks.
+/**
+ * Template for the topic maintenance tasks.
+ */
 function template_maintain_topics()
 {
 	global $scripturl, $txt, $context, $settings, $modSettings;
@@ -508,7 +510,9 @@ function template_maintain_topics()
 	</div>';
 }
 
-// Simple template for showing results of our optimization...
+/**
+ * Simple template for showing results of our optimization...
+ */
 function template_optimize()
 {
 	global $context, $txt, $scripturl;
@@ -541,6 +545,9 @@ function template_optimize()
 	</div>';
 }
 
+/**
+ * Template for maintenance conversion of messages body to several conditions
+ */
 function template_convert_msgbody()
 {
 	global $context, $txt, $scripturl;

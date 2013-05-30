@@ -27,11 +27,13 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $smcFunc, $txt, $db_character_set, $context;
+	global $modSettings, $txt, $db_character_set, $context, $ent_check;
+
+	$db = database();
 
 	// Most database systems have not set UTF-8 as their default input charset.
 	if (!empty($db_character_set))
-		$smcFunc['db_query']('set_character_set', '
+		$db->query('set_character_set', '
 			SET NAMES ' . $db_character_set,
 			array(
 			)
@@ -40,7 +42,7 @@ function reloadSettings()
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = cache_get_data('modSettings', 90)) == null)
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings',
 			array(
@@ -49,9 +51,9 @@ function reloadSettings()
 		$modSettings = array();
 		if (!$request)
 			display_db_error();
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $db->fetch_row($request))
 			$modSettings[$row[0]] = $row[1];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		// Do a few things to protect against missing settings or settings with invalid values...
 		if (empty($modSettings['defaultMaxTopics']) || $modSettings['defaultMaxTopics'] <= 0 || $modSettings['defaultMaxTopics'] > 999)
@@ -66,82 +68,6 @@ function reloadSettings()
 		if (!empty($modSettings['cache_enable']))
 			cache_put_data('modSettings', $modSettings, 90);
 	}
-
-	// Set a list of common functions.
-	$ent_list = empty($modSettings['disableEntityCheck']) ? '&(#\d{1,7}|quot|amp|lt|gt|nbsp);' : '&(#021|quot|amp|lt|gt|nbsp);';
-	$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
-
-	// Preg_replace space characters
-	$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
-
-	// global array of anonymous helper functions, used mosly to properly handle multi byte strings
-	$smcFunc += array(
-		'entity_fix' => create_function('$string', '
-			$num = $string[0] === \'x\' ? hexdec(substr($string, 1)) : (int) $string;
-			return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? \'\' : \'&#\' . $num . \';\';'),
-		'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'UTF-8\'', '
-			global $smcFunc;
-			return ' . strtr($ent_check[0], array('&' => '&amp;')) . 'htmlspecialchars($string, $quote_style, \'UTF-8\')' . $ent_check[1] . ';'),
-		'htmltrim' => create_function('$string', '
-			global $smcFunc;
-			return preg_replace(\'~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+$~u\', \'\', ' . implode('$string', $ent_check) . ');'),
-		'strlen' => create_function('$string', '
-			global $smcFunc;
-			return strlen(preg_replace(\'~' . $ent_list . '|.~u' . '\', \'_\', ' . implode('$string', $ent_check) . '));'),
-		'strpos' => create_function('$haystack, $needle, $offset = 0', '
-			global $smcFunc;
-			$haystack_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$haystack', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			$haystack_size = count($haystack_arr);
-			if (strlen($needle) === 1)
-			{
-				$result = array_search($needle, array_slice($haystack_arr, $offset));
-				return is_int($result) ? $result + $offset : false;
-			}
-			else
-			{
-				$needle_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$needle', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-				$needle_size = count($needle_arr);
-
-				$result = array_search($needle_arr[0], array_slice($haystack_arr, $offset));
-				while ((int) $result === $result)
-				{
-					$offset += $result;
-					if (array_slice($haystack_arr, $offset, $needle_size) === $needle_arr)
-						return $offset;
-					$result = array_search($needle_arr[0], array_slice($haystack_arr, ++$offset));
-				}
-				return false;
-			}'),
-		'substr' => create_function('$string, $start, $length = null', '
-			global $smcFunc;
-			$ent_arr = preg_split(\'~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u\', ' . implode('$string', $ent_check) . ', -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-			return $length === null ? implode(\'\', array_slice($ent_arr, $start)) : implode(\'\', array_slice($ent_arr, $start, $length));'),
-		'strtolower' => function_exists('mb_strtolower') ? create_function('$string', '
-			return mb_strtolower($string, \'UTF-8\');') : create_function('$string', '
-			require_once(SUBSDIR . \'/Charset.subs.php\');
-			return utf8_strtolower($string);'),
-		'strtoupper' => function_exists('mb_strtoupper') ? create_function('$string', '
-			return mb_strtoupper($string, \'UTF-8\');') : create_function('$string', '
-			require_once(SUBSDIR . \'/Charset.subs.php\');
-			return utf8_strtoupper($string);'),
-		'truncate' => create_function('$string, $length', (empty($modSettings['disableEntityCheck']) ? '
-			global $smcFunc;
-			$string = ' . implode('$string', $ent_check) . ';' : '') . '
-			preg_match(\'~^(' . $ent_list . '|.){\' . $smcFunc[\'strlen\'](substr($string, 0, $length)) . \'}~u\', $string, $matches);
-			$string = $matches[0];
-			while (strlen($string) > $length)
-				$string = preg_replace(\'~(?:' . $ent_list . '|.)$~u\', \'\', $string);
-			return $string;'),
-		'ucfirst' => create_function('$string', '
-			global $smcFunc;
-			return $smcFunc[\'strtoupper\']($smcFunc[\'substr\']($string, 0, 1)) . $smcFunc[\'substr\']($string, 1);'),
-		'ucwords' => create_function('$string', '
-			global $smcFunc;
-			$words = preg_split(\'~([\s\r\n\t]+)~\', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
-			for ($i = 0, $n = count($words); $i < $n; $i += 2)
-				$words[$i] = $smcFunc[\'ucfirst\']($words[$i]);
-			return implode(\'\', $words);'),
-	);
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
 	if (isset($modSettings['default_timezone']) && function_exists('date_default_timezone_set'))
@@ -222,7 +148,9 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings, $smcFunc;
+	global $modSettings, $user_settings;
+
+	$db = database();
 	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
@@ -267,7 +195,7 @@ function loadUserSettings()
 		// Is the member data cached?
 		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = cache_get_data('user_settings-' . $id_member, 60)) == null)
 		{
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
@@ -277,8 +205,8 @@ function loadUserSettings()
 					'id_member' => $id_member,
 				)
 			);
-			$user_settings = $smcFunc['db_fetch_assoc']($request);
-			$smcFunc['db_free_result']($request);
+			$user_settings = $db->fetch_assoc($request);
+			$db->free_result($request);
 
 			if (!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
 				$user_settings['avatar'] = 'default_avatar.png';
@@ -300,7 +228,7 @@ function loadUserSettings()
 				$check = false;
 
 			// Wrong password or not activated - either way, you're going nowhere.
-			$id_member = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? $user_settings['id_member'] : 0;
+			$id_member = $check && ($user_settings['is_activated'] == 1 || $user_settings['is_activated'] == 11) ? (int) $user_settings['id_member'] : 0;
 		}
 		else
 			$id_member = 0;
@@ -322,22 +250,13 @@ function loadUserSettings()
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
-			$result = $smcFunc['db_query']('', '
-				SELECT poster_time
-				FROM {db_prefix}messages
-				WHERE id_msg = {int:id_msg}
-				LIMIT 1',
-				array(
-					'id_msg' => $user_settings['id_msg_last_visit'],
-				)
-			);
-			list ($visitTime) = $smcFunc['db_fetch_row']($result);
-			$smcFunc['db_free_result']($result);
+			require_once(SUBSDIR . '/Messages.subs.php');
+			$visitOpt = basicMessageInfo($user_settings['id_msg_last_visit'], true);
 
 			$_SESSION['id_msg_last_visit'] = $user_settings['id_msg_last_visit'];
 
 			// If it was *at least* five hours ago...
-			if ($visitTime < time() - 5 * 3600)
+			if ($visitOpt['poster_time'] < time() - 5 * 3600)
 			{
 				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $_SERVER['REMOTE_ADDR'], 'member_ip2' => $_SERVER['BAN_CHECK_IP']));
 				$user_settings['last_login'] = time();
@@ -491,7 +410,9 @@ function loadUserSettings()
 function loadBoard()
 {
 	global $txt, $scripturl, $context, $modSettings;
-	global $board_info, $board, $topic, $user_info, $smcFunc;
+	global $board_info, $board, $topic, $user_info;
+
+	$db = database();
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
@@ -509,21 +430,14 @@ function loadBoard()
 		// Looking through the message table can be slow, so try using the cache first.
 		if (($topic = cache_get_data('msg_topic-' . $_REQUEST['msg'], 120)) === NULL)
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_topic
-				FROM {db_prefix}messages
-				WHERE id_msg = {int:id_msg}
-				LIMIT 1',
-				array(
-					'id_msg' => $_REQUEST['msg'],
-				)
-			);
+			require_once(SUBSDIR . '/Messages.subs.php');
+			$topic = associatedTopic($_REQUEST['msg']);
 
 			// So did it find anything?
-			if ($smcFunc['db_num_rows']($request))
+			if ($topic !== false)
 			{
-				list ($topic) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
+				$topic = $topic;
+
 				// Save save save.
 				cache_put_data('msg_topic-' . $_REQUEST['msg'], $topic, 120);
 			}
@@ -564,7 +478,7 @@ function loadBoard()
 
 	if (empty($temp))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT
 				c.id_cat, b.name AS bname, b.description, b.num_topics, b.member_groups, b.deny_member_groups,
 				b.id_parent, c.name AS cname, IFNULL(mem.id_member, 0) AS id_moderator,
@@ -579,13 +493,13 @@ function loadBoard()
 			WHERE b.id_board = {raw:board_link}',
 			array(
 				'current_topic' => $topic,
-				'board_link' => empty($topic) ? $smcFunc['db_quote']('{int:current_board}', array('current_board' => $board)) : 't.id_board',
+				'board_link' => empty($topic) ? $db->quote('{int:current_board}', array('current_board' => $board)) : 't.id_board',
 			)
 		);
 		// If there aren't any, skip.
-		if ($smcFunc['db_num_rows']($request) > 0)
+		if ($db->num_rows($request) > 0)
 		{
-			$row = $smcFunc['db_fetch_assoc']($request);
+			$row = $db->fetch_assoc($request);
 
 			// Set the current board.
 			if (!empty($row['id_board']))
@@ -631,18 +545,18 @@ function loadBoard()
 						'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_moderator'] . '">' . $row['real_name'] . '</a>'
 					);
 			}
-			while ($row = $smcFunc['db_fetch_assoc']($request));
+			while ($row = $db->fetch_assoc($request));
 
 			// If the board only contains unapproved posts and the user isn't an approver then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
 			if ($board_info['num_topics'] == 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
 			{
 				// Free the previous result
-				$smcFunc['db_free_result']($request);
+				$db->free_result($request);
 
 				// @todo why is this using id_topic?
 				// @todo Can this get cached?
-				$request = $smcFunc['db_query']('', '
+				$request = $db->query('', '
 					SELECT COUNT(id_topic)
 					FROM {db_prefix}topics
 					WHERE id_member_started={int:id_member}
@@ -655,7 +569,7 @@ function loadBoard()
 					)
 				);
 
-				list ($board_info['unapproved_user_topics']) = $smcFunc['db_fetch_row']($request);
+				list ($board_info['unapproved_user_topics']) = $db->fetch_row($request);
 			}
 
 			if (!empty($modSettings['cache_enable']) && (empty($topic) || $modSettings['cache_enable'] >= 3))
@@ -676,7 +590,7 @@ function loadBoard()
 			$topic = null;
 			$board = 0;
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($topic))
@@ -756,7 +670,9 @@ function loadBoard()
  */
 function loadPermissions()
 {
-	global $user_info, $board, $board_info, $modSettings, $smcFunc;
+	global $user_info, $board, $board_info, $modSettings;
+
+	$db = database();
 
 	if ($user_info['is_admin'])
 	{
@@ -790,7 +706,7 @@ function loadPermissions()
 	if (empty($user_info['permissions']))
 	{
 		// Get the general permissions.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}permissions
 			WHERE id_group IN ({array_int:member_groups})
@@ -801,14 +717,14 @@ function loadPermissions()
 			)
 		);
 		$removals = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
 				$user_info['permissions'][] = $row['permission'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (isset($cache_groups))
 			cache_put_data('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
@@ -821,7 +737,7 @@ function loadPermissions()
 		if (!isset($board_info['profile']))
 			fatal_lang_error('no_board');
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT permission, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE (id_group IN ({array_int:member_groups})
@@ -833,14 +749,14 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) ? $modSettings['spider_group'] : 0,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['add_deny']))
 				$removals[] = $row['permission'];
 			else
 				$user_info['permissions'][] = $row['permission'];
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Remove all the permissions they shouldn't have ;).
@@ -876,7 +792,9 @@ function loadPermissions()
  */
 function loadMemberData($users, $is_name = false, $set = 'normal')
 {
-	global $user_profile, $modSettings, $board_info, $smcFunc, $context;
+	global $user_profile, $modSettings, $board_info, $context;
+
+	$db = database();
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -909,11 +827,11 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
-			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login,
+			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login, mem.likes_given, mem.likes_received,
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
 			mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
 			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group,
-			mem.is_activated, mem.warning' . (!empty($modSettings['titlesEnable']) ? ', mem.usertitle, ' : '') . '
+			mem.is_activated, mem.warning, ' . (!empty($modSettings['titlesEnable']) ? 'mem.usertitle, ' : '') . '
 			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
 	$select_tables = '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
@@ -949,7 +867,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($users))
 	{
 		// Load the member's data.
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT' . $select_columns . '
 			FROM {db_prefix}members AS mem' . $select_tables . '
 			WHERE mem.' . ($is_name ? 'member_name' : 'id_member') . (count($users) == 1 ? ' = {' . ($is_name ? 'string' : 'int') . ':users}' : ' IN ({' . ($is_name ? 'array_string' : 'array_int') . ':users})'),
@@ -959,19 +877,19 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			)
 		);
 		$new_loaded_ids = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			$new_loaded_ids[] = $row['id_member'];
 			$loaded_ids[] = $row['id_member'];
 			$row['options'] = array();
 			$user_profile[$row['id_member']] = $row;
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($new_loaded_ids) && $set !== 'minimal')
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT *
 			FROM {db_prefix}themes
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
@@ -979,9 +897,9 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$user_profile[$row['id_member']]['options'][$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	if (!empty($new_loaded_ids) && !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
@@ -1029,7 +947,6 @@ function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
 	global $context, $modSettings, $board_info, $settings;
-	global $smcFunc;
 	static $dataLoaded = array();
 
 	// If this person's data is already loaded, skip it.
@@ -1086,7 +1003,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		'link' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '">' . $profile['real_name'] . '</a>',
 		'email' => $profile['email_address'],
 		'show_email' => showEmailAddress(!empty($profile['hide_email']), $profile['id_member']),
-		'registered' => empty($profile['date_registered']) ? $txt['not_applicable'] : timeformat($profile['date_registered']),
+		'registered' => empty($profile['date_registered']) ? $txt['not_applicable'] : standardTime($profile['date_registered']),
 		'registered_timestamp' => empty($profile['date_registered']) ? 0 : forum_time(true, $profile['date_registered']),
 	);
 
@@ -1115,7 +1032,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'real_posts' => $profile['posts'],
 			'posts' => comma_format($profile['posts']),
 			'avatar' => determineAvatar($profile, $avatar_width, $avatar_height),
-			'last_login' => empty($profile['last_login']) ? $txt['never'] : timeformat($profile['last_login']),
+			'last_login' => empty($profile['last_login']) ? $txt['never'] : standardTime($profile['last_login']),
 			'last_login_timestamp' => empty($profile['last_login']) ? 0 : forum_time(0, $profile['last_login']),
 			'karma' => array(
 				'good' => $profile['karma_good'],
@@ -1123,18 +1040,22 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'allow' => !$user_info['is_guest'] && !empty($modSettings['karmaMode']) && $user_info['id'] != $user && allowedTo('karma_edit') &&
 				($user_info['posts'] >= $modSettings['karmaMinPosts'] || $user_info['is_admin']),
 			),
+			'likes' => array(
+				'given' => $profile['likes_given'],
+				'received' => $profile['likes_received']
+			),
 			'ip' => htmlspecialchars($profile['member_ip']),
 			'ip2' => htmlspecialchars($profile['member_ip2']),
 			'online' => array(
 				'is_online' => $profile['is_online'],
-				'text' => $smcFunc['htmlspecialchars']($txt[$profile['is_online'] ? 'online' : 'offline']),
-				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], $smcFunc['htmlspecialchars']($profile['real_name'])),
+				'text' => Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),
+				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], Util::htmlspecialchars($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
 				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
-			'language' => $smcFunc['ucwords'](strtr($profile['lngfile'], array('_' => ' '))),
+			'language' => Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
 			'is_activated' => isset($profile['is_activated']) ? $profile['is_activated'] : 1,
 			'is_banned' => isset($profile['is_activated']) ? $profile['is_activated'] >= 10 : 0,
 			'options' => $profile['options'],
@@ -1147,7 +1068,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/group_icons/' . $profile['icons'][1] : '') . '" alt="*" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
 			'warning' => $profile['warning'],
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
-			'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
+			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 		);
 
 	// Are we also loading the members custom fields into context?
@@ -1232,7 +1153,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 {
 	global $user_info, $user_settings, $board_info;
 	global $txt, $boardurl, $scripturl, $mbname, $modSettings;
-	global $context, $settings, $options, $ssi_theme, $smcFunc;
+	global $context, $settings, $options, $ssi_theme;
+
+	$db = database();
 
 	// The theme was specified by parameter.
 	if (!empty($id_theme))
@@ -1289,7 +1212,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (empty($flag))
 	{
 		// Load variables from the current or default theme, global or this user's.
-		$result = $smcFunc['db_query']('', '
+		$result = $db->query('', '
 			SELECT variable, value, id_member, id_theme
 			FROM {db_prefix}themes
 			WHERE id_member' . (empty($themeData[0]) ? ' IN (-1, 0, {int:id_member})' : ' = {int:id_member}') . '
@@ -1300,7 +1223,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			)
 		);
 		// Pick between $settings and $options depending on whose data it is.
-		while ($row = $smcFunc['db_fetch_assoc']($result))
+		while ($row = $db->fetch_assoc($result))
 		{
 			// There are just things we shouldn't be able to change as members.
 			if ($row['id_member'] != 0 && in_array($row['variable'], array('actual_theme_url', 'actual_images_url', 'base_theme_dir', 'base_theme_url', 'default_images_url', 'default_theme_dir', 'default_theme_url', 'default_template', 'images_url', 'number_recent_posts', 'smiley_sets_default', 'theme_dir', 'theme_id', 'theme_layers', 'theme_templates', 'theme_url')))
@@ -1314,7 +1237,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			if (!isset($themeData[$row['id_member']][$row['variable']]) || $row['id_theme'] != '1')
 				$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) == 'show_' ? $row['value'] == '1' : $row['value'];
 		}
-		$smcFunc['db_free_result']($result);
+		$db->free_result($result);
 
 		// Set the defaults if the user has not chosen on their own
 		if (!empty($themeData[-1]))
@@ -1484,8 +1407,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['session_var'] = $_SESSION['session_var'];
 	$context['session_id'] = $_SESSION['session_value'];
 	$context['forum_name'] = $mbname;
-	$context['forum_name_html_safe'] = $smcFunc['htmlspecialchars']($context['forum_name']);
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : $smcFunc['htmlspecialchars']($settings['header_logo_url']);
+	$context['forum_name_html_safe'] = Util::htmlspecialchars($context['forum_name']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : Util::htmlspecialchars($settings['header_logo_url']);
 	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
@@ -1496,19 +1419,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['show_login_bar'] = $user_info['is_guest'] && !empty($modSettings['enableVBStyleLogin']);
 
 	// This determines the server... not used in many places, except for login fixing.
-	$context['server'] = array(
-		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
-		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
-		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
-		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
-		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
-		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
-		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
-		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
-	);
-
-	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
+	detectServer();
 
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	detectBrowser();
@@ -1538,13 +1449,13 @@ function loadTheme($id_theme = 0, $initialize = true)
 	{
 		loadLanguage('index+Modifications');
 		loadTemplate('Xml');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 	}
 	// These actions don't require the index template at all.
 	elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 	{
 		loadLanguage('index+Modifications');
-		$context['template_layers'] = array();
+		Template_Layers::getInstance()->removeAll();
 	}
 	else
 	{
@@ -1564,9 +1475,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 		// Custom template layers?
 		if (isset($settings['theme_layers']))
-			$context['template_layers'] = explode(',', $settings['theme_layers']);
+			foreach(explode(',', $settings['theme_layers']) as $key => $layer)
+				$layers[$layer] = $key * 100;
 		else
-			$context['template_layers'] = array('html', 'body');
+			$layers = array('html' => 0, 'body' => 100);
+		Template_Layers::getInstance()->add($layers);
 	}
 
 	// Initialize the theme.
@@ -1602,10 +1515,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$context['theme_variant_url'] = $context['theme_variant'] . '/';
 	}
 
-	// Let's be compatible with old themes!
-	if (!function_exists('template_html_above') && in_array('html', $context['template_layers']))
-		$context['template_layers'] = array('main');
-
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
 		$user_info['time_format'] = $txt['time_format'];
@@ -1637,6 +1546,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'smf_theme_url' => '"' . $settings['theme_url'] . '"',
 		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'smf_images_url' => '"' . $settings['images_url'] . '"',
+		'smf_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
 		'smf_scripturl' => '"' . $scripturl . '"',
 		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'smf_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
@@ -1708,10 +1618,12 @@ function loadTheme($id_theme = 0, $initialize = true)
  */
 function loadEssentialThemeData()
 {
-	global $settings, $modSettings, $smcFunc, $mbname, $context;
+	global $settings, $modSettings, $mbname, $context;
+
+	$db = database();
 
 	// Get all the default theme variables.
-	$result = $smcFunc['db_query']('', '
+	$result = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -1721,7 +1633,7 @@ function loadEssentialThemeData()
 			'theme_guests' => $modSettings['theme_guests'],
 		)
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($result))
+	while ($row = $db->fetch_assoc($result))
 	{
 		$settings[$row['variable']] = $row['value'];
 
@@ -1729,7 +1641,7 @@ function loadEssentialThemeData()
 		if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
 			$settings['default_' . $row['variable']] = $row['value'];
 	}
-	$smcFunc['db_free_result']($result);
+	$db->free_result($result);
 
 	// Check we have some directories setup.
 	if (empty($settings['template_dirs']))
@@ -1886,13 +1798,13 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * Add a CSS file for output later
  *
  * @param string $filename
- * @param array $params
+ * @param array $params = array()
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
  * 	- ['fallback'] (true/false): if false  will attempt to load the file from the default theme if not found in the current theme
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
- * @param string $id
+ * @param string $id = ''
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
 {
@@ -1967,7 +1879,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * need specific parameters on a per file basis, call it multiple times
  *
  * @param array $filenames
- * @param array $params
+ * @param array $params = array()
  * Keys are the following:
  * 	- ['local'] (true/false): define if the file is local
  * 	- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
@@ -1975,7 +1887,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  *	- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
- * @param string $id
+ * @param string $id = ''
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
@@ -2080,7 +1992,7 @@ function addInlineJavascript($javascript, $defer = false)
  * Load a language file.  Tries the current and default themes as well as the user and global languages.
  *
  * @param string $template_name
- * @param string $lang
+ * @param string $lang = ''
  * @param bool $fatal = true
  * @param bool $force_reload = false
  * @return string The language actually loaded.
@@ -2204,7 +2116,9 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
  */
 function getBoardParents($id_parent)
 {
-	global $scripturl, $smcFunc;
+	global $scripturl;
+
+	$db = database();
 
 	// First check if we have this cached already.
 	if (($boards = cache_get_data('board_parents-' . $id_parent, 480)) === null)
@@ -2215,7 +2129,7 @@ function getBoardParents($id_parent)
 		// Loop while the parent is non-zero.
 		while ($id_parent != 0)
 		{
-			$result = $smcFunc['db_query']('', '
+			$result = $db->query('', '
 				SELECT
 					b.id_parent, b.name, {int:board_parent} AS id_board, IFNULL(mem.id_member, 0) AS id_moderator,
 					mem.real_name, b.child_level
@@ -2228,9 +2142,9 @@ function getBoardParents($id_parent)
 				)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
-			if ($smcFunc['db_num_rows']($result) == 0)
+			if ($db->num_rows($result) == 0)
 				fatal_lang_error('parent_not_found', 'critical');
-			while ($row = $smcFunc['db_fetch_assoc']($result))
+			while ($row = $db->fetch_assoc($result))
 			{
 				if (!isset($boards[$row['id_board']]))
 				{
@@ -2254,7 +2168,7 @@ function getBoardParents($id_parent)
 						);
 					}
 			}
-			$smcFunc['db_free_result']($result);
+			$db->free_result($result);
 		}
 
 		cache_put_data('board_parents-' . $original_parent, $boards, 480);
@@ -2267,12 +2181,11 @@ function getBoardParents($id_parent)
  * Attempt to reload our known languages.
  *
  * @param bool $use_cache = true
- * @param bool $favor_utf8 = true
  * @return array
  */
 function getLanguages($use_cache = true)
 {
-	global $smcFunc, $settings, $modSettings;
+	global $settings, $modSettings;
 
 	// Either we don't use the cache, or its expired.
 	if (!$use_cache || ($languages = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
@@ -2308,7 +2221,7 @@ function getLanguages($use_cache = true)
 					continue;
 
 				$languages[$matches[1]] = array(
-					'name' => $smcFunc['ucwords'](strtr($matches[1], array('_' => ' '))),
+					'name' => Util::ucwords(strtr($matches[1], array('_' => ' '))),
 					'selected' => false,
 					'filename' => $matches[1],
 					'location' => $language_dir . '/index.' . $matches[1] . '.php',
@@ -2581,28 +2494,29 @@ function loadDatabase()
 	global $db_persist, $db_connection, $db_server, $db_user, $db_passwd;
 	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
+	// Database stuffs
+	require_once(SOURCEDIR . '/database/Database.subs.php');
+
 	// Figure out what type of database we are using.
 	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
 		$db_type = 'mysql';
 
-	// Load the file for the database.
-	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
-
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
 	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-		$db_connection = smf_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true));
+		$db_connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true), $db_type);
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($db_connection))
-		$db_connection = smf_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'));
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'), $db_type);
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$db_connection)
 		display_db_error();
 
 	// If in SSI mode fix up the prefix.
+	$db = database();
 	if (ELKARTE == 'SSI')
-		db_fix_prefix($db_prefix, $db_name);
+		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 }
 
 /**
@@ -2686,4 +2600,26 @@ function determineAvatar($profile, $max_avatar_width, $max_avatar_height)
 	$avatar['gravatar_preview'] = 'http://www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
+}
+
+/**
+ * Get information about the server
+ */
+function detectServer()
+{
+	global $context;
+
+	$context['server'] = array(
+		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
+		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
+		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
+		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
+		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
+		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
+		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
+		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
+	);
+
+	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
+	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
 }

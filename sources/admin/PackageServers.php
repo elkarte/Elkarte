@@ -29,9 +29,9 @@ class PackageServers_Controller
 	/**
 	 * Browse the list of package servers, add servers...
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $txt, $scripturl, $context, $modSettings;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -100,32 +100,18 @@ class PackageServers_Controller
 	/**
 	 * Load a list of package servers.
 	 */
-	function action_list()
+	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings, $smcFunc;
+		global $txt, $context, $modSettings;
+
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// Ensure we use the correct template, and page title.
 		$context['sub_template'] = 'servers';
 		$context['page_title'] .= ' - ' . $txt['download_packages'];
 
 		// Load the list of servers.
-		$request = $smcFunc['db_query']('', '
-			SELECT id_server, name, url
-			FROM {db_prefix}package_servers',
-			array(
-			)
-		);
-		$context['servers'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['servers'][] = array(
-				'name' => $row['name'],
-				'url' => $row['url'],
-				'id' => $row['id_server'],
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
+		$context['servers'] = fetchPackageServers();
 		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
 
 		if ($context['package_download_broken'])
@@ -195,9 +181,11 @@ class PackageServers_Controller
 	/**
 	 * Browse a server's list of packages.
 	 */
-	function action_browse()
+	public function action_browse()
 	{
-		global $txt, $boardurl, $context, $scripturl, $forum_version, $context, $smcFunc;
+		global $txt, $context, $scripturl, $forum_version, $context;
+
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		if (isset($_GET['server']))
 		{
@@ -207,18 +195,10 @@ class PackageServers_Controller
 			$server = (int) $_GET['server'];
 
 			// Query the server list to find the current server.
-			$request = $smcFunc['db_query']('', '
-				SELECT name, url
-				FROM {db_prefix}package_servers
-				WHERE id_server = {int:current_server}
-				LIMIT 1',
-				array(
-					'current_server' => $server,
-				)
-			);
-			list ($name, $url) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
-
+			$packageserver = fetchPackageServers($server);
+			$url = $packageserver[0]['url'];
+			$name = $packageserver[0]['name'];
+			
 			// If the server does not exist, dump out.
 			if (empty($url))
 				fatal_lang_error('couldnt_connect', false);
@@ -304,17 +284,17 @@ class PackageServers_Controller
 		// Get default author and email if they exist.
 		if ($listing->exists('default-author'))
 		{
-			$default_author = $smcFunc['htmlspecialchars']($listing->fetch('default-author'));
+			$default_author = Util::htmlspecialchars($listing->fetch('default-author'));
 			if ($listing->exists('default-author/@email'))
-				$default_email = $smcFunc['htmlspecialchars']($listing->fetch('default-author/@email'));
+				$default_email = Util::htmlspecialchars($listing->fetch('default-author/@email'));
 		}
 
 		// Get default web site if it exists.
 		if ($listing->exists('default-website'))
 		{
-			$default_website = $smcFunc['htmlspecialchars']($listing->fetch('default-website'));
+			$default_website = Util::htmlspecialchars($listing->fetch('default-website'));
 			if ($listing->exists('default-website/@title'))
-				$default_title = $smcFunc['htmlspecialchars']($listing->fetch('default-website/@title'));
+				$default_title = Util::htmlspecialchars($listing->fetch('default-website/@title'));
 		}
 
 		$the_version = strtr($forum_version, array('ELKARTE ' => ''));
@@ -341,10 +321,10 @@ class PackageServers_Controller
 				);
 
 				if (in_array($package['type'], array('title', 'text')))
-					$context['package_list'][$packageSection][$package['type']] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+					$context['package_list'][$packageSection][$package['type']] = Util::htmlspecialchars($thisPackage->fetch('.'));
 				// It's a Title, Heading, Rule or Text.
 				elseif (in_array($package['type'], array('heading', 'rule')))
-					$package['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+					$package['name'] = Util::htmlspecialchars($thisPackage->fetch('.'));
 				// It's a Remote link.
 				elseif ($package['type'] == 'remote')
 				{
@@ -371,7 +351,7 @@ class PackageServers_Controller
 						$package['href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;absolute=' . $current_url;
 					}
 
-					$package['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('.'));
+					$package['name'] = Util::htmlspecialchars($thisPackage->fetch('.'));
 					$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
 				}
 				// It's a package...
@@ -395,7 +375,7 @@ class PackageServers_Controller
 					if ($package['description'] == '')
 						$package['description'] = $txt['package_no_description'];
 					else
-						$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', $smcFunc['htmlspecialchars']($package['description'])));
+						$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', Util::htmlspecialchars($package['description'])));
 
 					$package['is_installed'] = isset($installed_mods[$package['id']]);
 					$package['is_current'] = $package['is_installed'] && ($installed_mods[$package['id']] == $package['version']);
@@ -415,7 +395,7 @@ class PackageServers_Controller
 					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
 
 					$package['href'] = $url . '/' . $package['filename'];
-					$package['name'] = $smcFunc['htmlspecialchars']($package['name']);
+					$package['name'] = Util::htmlspecialchars($package['name']);
 					$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
 					$package['download']['href'] = $scripturl . '?action=admin;area=packages;get;sa=download' . $server_att . ';package=' . $current_url . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
@@ -428,7 +408,7 @@ class PackageServers_Controller
 							$package['author']['email'] = $default_email;
 
 						if ($thisPackage->exists('author') && $thisPackage->fetch('author') != '')
-							$package['author']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('author'));
+							$package['author']['name'] = Util::htmlspecialchars($thisPackage->fetch('author'));
 						else
 							$package['author']['name'] = $default_author;
 
@@ -443,11 +423,11 @@ class PackageServers_Controller
 					if ($thisPackage->exists('website') || isset($default_website))
 					{
 						if ($thisPackage->exists('website') && $thisPackage->exists('website/@title'))
-							$package['author']['website']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('website/@title'));
+							$package['author']['website']['name'] = Util::htmlspecialchars($thisPackage->fetch('website/@title'));
 						elseif (isset($default_title))
 							$package['author']['website']['name'] = $default_title;
 						elseif ($thisPackage->exists('website'))
-							$package['author']['website']['name'] = $smcFunc['htmlspecialchars']($thisPackage->fetch('website'));
+							$package['author']['website']['name'] = Util::htmlspecialchars($thisPackage->fetch('website'));
 						else
 							$package['author']['website']['name'] = $default_website;
 
@@ -527,9 +507,11 @@ class PackageServers_Controller
 	/**
 	 * Download a package.
 	 */
-	function action_download()
+	public function action_download()
 	{
-		global $txt, $scripturl, $context, $smcFunc;
+		global $txt, $scripturl, $context;
+
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// Use the downloaded sub template.
 		$context['sub_template'] = 'downloaded';
@@ -546,17 +528,8 @@ class PackageServers_Controller
 			$server = (int) $_GET['server'];
 
 			// Query the server table to find the requested server.
-			$request = $smcFunc['db_query']('', '
-				SELECT name, url
-				FROM {db_prefix}package_servers
-				WHERE id_server = {int:current_server}
-				LIMIT 1',
-				array(
-					'current_server' => $server,
-				)
-			);
-			list ($name, $url) = $smcFunc['db_fetch_row']($request);
-			$smcFunc['db_free_result']($request);
+			$packageserver = fetchPackageServers($server);
+			$url = $packageserver[0]['url'];
 
 			// If server does not exist then dump out.
 			if (empty($url))
@@ -636,7 +609,7 @@ class PackageServers_Controller
 	/**
 	 * Upload a new package to the directory.
 	 */
-	function action_update()
+	public function action_update()
 	{
 		global $txt, $scripturl, $context;
 
@@ -723,10 +696,9 @@ class PackageServers_Controller
 	/**
 	 * Add a package server to the list.
 	 */
-	function action_add()
+	public function action_add()
 	{
-		global $smcFunc;
-
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 		// Validate the user.
 		checkSession();
 
@@ -735,23 +707,14 @@ class PackageServers_Controller
 			$_POST['serverurl'] = substr($_POST['serverurl'], 0, -1);
 
 		// Are they both nice and clean?
-		$servername = trim($smcFunc['htmlspecialchars']($_POST['servername']));
-		$serverurl = trim($smcFunc['htmlspecialchars']($_POST['serverurl']));
+		$servername = trim(Util::htmlspecialchars($_POST['servername']));
+		$serverurl = trim(Util::htmlspecialchars($_POST['serverurl']));
 
 		// Make sure the URL has the correct prefix.
 		if (strpos($serverurl, 'http://') !== 0 && strpos($serverurl, 'https://') !== 0)
 			$serverurl = 'http://' . $serverurl;
 
-		$smcFunc['db_insert']('',
-			'{db_prefix}package_servers',
-			array(
-				'name' => 'string-255', 'url' => 'string-255',
-			),
-			array(
-				$servername, $serverurl,
-			),
-			array('id_server')
-		);
+		addPackageServer($servername, $serverurl);
 
 		redirectexit('action=admin;area=packages;get');
 	}
@@ -759,19 +722,14 @@ class PackageServers_Controller
 	/**
 	 * Remove a server from the list.
 	 */
-	function action_remove()
+	public function action_remove()
 	{
-		global $smcFunc;
-
 		checkSession('get');
 
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}package_servers
-			WHERE id_server = {int:current_server}',
-			array(
-				'current_server' => (int) $_GET['server'],
-			)
-		);
+		require_once(SUBSDIR . '/PackageServer.subs.php');
+
+		$_GET['server'] = (int) $_GET['server'];
+		deletePackageServer($_GET['server']);
 
 		redirectexit('action=admin;area=packages;get');
 	}

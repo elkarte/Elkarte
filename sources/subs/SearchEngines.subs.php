@@ -27,7 +27,9 @@ if (!defined('ELKARTE'))
  */
 function spiderCheck()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings;
+
+	$db = database();
 
 	if (isset($_SESSION['id_robot']))
 		unset($_SESSION['id_robot']);
@@ -36,16 +38,16 @@ function spiderCheck()
 	// We cache the spider data for five minutes if we can.
 	if (($spider_data = cache_get_data('spider_search', 300)) === null)
 	{
-		$request = $smcFunc['db_query']('spider_check', '
+		$request = $db->query('spider_check', '
 			SELECT id_spider, user_agent, ip_info
 			FROM {db_prefix}spiders',
 			array(
 			)
 		);
 		$spider_data = array();
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			$spider_data[] = $row;
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		cache_put_data('spider_search', $spider_data, 300);
 	}
@@ -103,7 +105,9 @@ function spiderCheck()
  */
 function logSpider()
 {
-	global $smcFunc, $modSettings, $context;
+	global $modSettings, $context;
+
+	$db = database();
 
 	if (empty($modSettings['spider_mode']) || empty($_SESSION['id_robot']))
 		return;
@@ -112,7 +116,7 @@ function logSpider()
 	if ($modSettings['spider_mode'] == 1)
 	{
 		$date = strftime('%Y-%m-%d', forum_time(false));
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_spider_stats
 			SET last_seen = {int:current_time}, page_hits = page_hits + 1
 			WHERE id_spider = {int:current_spider}
@@ -125,9 +129,9 @@ function logSpider()
 		);
 
 		// Nothing updated?
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($db->affected_rows() == 0)
 		{
-			$smcFunc['db_insert']('ignore',
+			$db->insert('ignore',
 				'{db_prefix}log_spider_stats',
 				array(
 					'id_spider' => 'int', 'last_seen' => 'int', 'stat_date' => 'date', 'page_hits' => 'int',
@@ -151,7 +155,7 @@ function logSpider()
 		else
 			$url = '';
 
-		$smcFunc['db_insert']('insert',
+		$db->insert('insert',
 			'{db_prefix}log_spider_hits',
 			array('id_spider' => 'int', 'log_time' => 'int', 'url' => 'string'),
 			array($_SESSION['id_robot'], time(), $url),
@@ -166,9 +170,9 @@ function logSpider()
  */
 function consolidateSpiderStats()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('consolidate_spider_stats', '
+	$request = $db->query('consolidate_spider_stats', '
 		SELECT id_spider, MAX(log_time) AS last_seen, COUNT(*) AS num_hits
 		FROM {db_prefix}log_spider_hits
 		WHERE processed = {int:not_processed}
@@ -178,9 +182,9 @@ function consolidateSpiderStats()
 		)
 	);
 	$spider_hits = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$spider_hits[] = $row;
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (empty($spider_hits))
 		return;
@@ -191,7 +195,7 @@ function consolidateSpiderStats()
 	{
 		// We assume the max date is within the right day.
 		$date = strftime('%Y-%m-%d', $stat['last_seen']);
-		$smcFunc['db_query']('', '
+		$db->query('', '
 			UPDATE {db_prefix}log_spider_stats
 			SET page_hits = page_hits + ' . $stat['num_hits'] . ',
 				last_seen = CASE WHEN last_seen > {int:last_seen} THEN last_seen ELSE {int:last_seen} END
@@ -203,13 +207,13 @@ function consolidateSpiderStats()
 				'current_spider' => $stat['id_spider'],
 			)
 		);
-		if ($smcFunc['db_affected_rows']() == 0)
+		if ($db->affected_rows() == 0)
 			$stat_inserts[] = array($date, $stat['id_spider'], $stat['num_hits'], $stat['last_seen']);
 	}
 
 	// New stats?
 	if (!empty($stat_inserts))
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}log_spider_stats',
 			array('stat_date' => 'date', 'id_spider' => 'int', 'page_hits' => 'int', 'last_seen' => 'int'),
 			$stat_inserts,
@@ -217,7 +221,7 @@ function consolidateSpiderStats()
 		);
 
 	// All processed.
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		UPDATE {db_prefix}log_spider_hits
 		SET processed = {int:is_processed}
 		WHERE processed = {int:not_processed}',
@@ -233,18 +237,18 @@ function consolidateSpiderStats()
  */
 function recacheSpiderNames()
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_spider, spider_name
 		FROM {db_prefix}spiders',
 		array(
 		)
 	);
 	$spiders = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 		$spiders[$row['id_spider']] = $row['spider_name'];
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	updateSettings(array('spider_name_cache' => serialize($spiders)));
 }
@@ -254,15 +258,15 @@ function recacheSpiderNames()
  */
 function sortSpiderTable()
 {
-	global $smcFunc;
+	$db = database();
 
-	db_extend('packages');
+	$table = db_table();
 
 	// Add a sorting column.
-	$smcFunc['db_add_column']('{db_prefix}spiders', array('name' => 'temp_order', 'size' => 8, 'type' => 'mediumint', 'null' => false));
+	$table->db_add_column('{db_prefix}spiders', array('name' => 'temp_order', 'size' => 8, 'type' => 'mediumint', 'null' => false));
 
 	// Set the contents of this column.
-	$smcFunc['db_query']('set_spider_order', '
+	$db->query('set_spider_order', '
 		UPDATE {db_prefix}spiders
 		SET temp_order = LENGTH(user_agent)',
 		array(
@@ -270,7 +274,7 @@ function sortSpiderTable()
 	);
 
 	// Order the table by this column.
-	$smcFunc['db_query']('alter_table_spiders', '
+	$db->query('alter_table_spiders', '
 		ALTER TABLE {db_prefix}spiders
 		ORDER BY temp_order DESC',
 		array(
@@ -279,5 +283,5 @@ function sortSpiderTable()
 	);
 
 	// Remove the sorting column.
-	$smcFunc['db_remove_column']('{db_prefix}spiders', 'temp_order');
+	$table->db_remove_column('{db_prefix}spiders', 'temp_order');
 }

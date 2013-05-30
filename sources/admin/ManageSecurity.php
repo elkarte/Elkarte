@@ -51,9 +51,9 @@ class ManageSecurity_Controller
 	/**
 	 * This function passes control through to the relevant security tab.
 	 */
-	function action_index()
+	public function action_index()
 	{
-		global $context, $txt, $scripturl, $modSettings, $settings;
+		global $context, $txt;
 
 		$context['page_title'] = $txt['admin_security_moderation'];
 
@@ -120,9 +120,9 @@ class ManageSecurity_Controller
 	 * Uses a settings form for security options.
 	 *
 	 */
-	function action_securitySettings_display()
+	public function action_securitySettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context;
 
 		// initialize the form
 		$this->_initSecuritySettingsForm();
@@ -152,7 +152,7 @@ class ManageSecurity_Controller
 	/**
 	 * Initializes security settings admin screen data.
 	 */
-	function _initSecuritySettingsForm()
+	private function _initSecuritySettingsForm()
 	{
 		global $txt;
 
@@ -186,6 +186,8 @@ class ManageSecurity_Controller
 			'',
 				// Reporting of personal messages?
 				array('check', 'enableReportPM'),
+			'',
+				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
 		);
 
 		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
@@ -198,9 +200,9 @@ class ManageSecurity_Controller
 	 * Uses the moderation settings form.
 	 *
 	 */
-	function action_moderationSettings_display()
+	public function action_moderationSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// initialize the form
 		$this->_initModerationSettingsForm();
@@ -240,7 +242,7 @@ class ManageSecurity_Controller
 			$save_vars[] = array('text', 'warning_settings');
 			unset($save_vars['rem1'], $save_vars['rem2']);
 
-			call_integration_hook('integrate_save_karma_settings', array(&$save_vars));
+			call_integration_hook('integrate_save_moderation_settings', array(&$save_vars));
 
 			Settings_Form::save_db($save_vars);
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
@@ -260,7 +262,7 @@ class ManageSecurity_Controller
 	 *
 	 * @return array
 	 */
-	function _initModerationSettingsForm()
+	private function _initModerationSettingsForm()
 	{
 		global $txt;
 
@@ -289,13 +291,9 @@ class ManageSecurity_Controller
 	 * Handles admin security spam settings.
 	 * Displays a page with settings and eventually allows the admin to change them.
 	 */
-	function action_spamSettings_display()
+	public function action_spamSettings_display()
 	{
-		global $txt, $scripturl, $context, $settings, $sc, $modSettings, $smcFunc;
-
-		// Generate a sample registration image.
-		$context['use_graphic_library'] = in_array('gd', get_loaded_extensions());
-		$context['verification_image_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
+		global $txt, $scripturl, $context, $modSettings;
 
 		// Let's try keep the spam to a minimum ah Thantos?
 		// initialize the form
@@ -303,26 +301,6 @@ class ManageSecurity_Controller
 
 		// retrieve the current config settings
 		$config_vars = $this->_spamSettings->settings();
-
-		// Load any question and answers!
-		$context['question_answers'] = array();
-		$request = $smcFunc['db_query']('', '
-			SELECT id_comment, body AS question, recipient_name AS answer
-			FROM {db_prefix}log_comments
-			WHERE comment_type = {string:ver_test}',
-			array(
-				'ver_test' => 'ver_test',
-			)
-		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$context['question_answers'][$row['id_comment']] = array(
-				'id' => $row['id_comment'],
-				'question' => $row['question'],
-				'answer' => $row['answer'],
-			);
-		}
-		$smcFunc['db_free_result']($request);
 
 		// Saving?
 		if (isset($_GET['save']))
@@ -341,75 +319,6 @@ class ManageSecurity_Controller
 
 			$save_vars[] = array('text', 'pm_spam_settings');
 
-			// Handle verification questions.
-			$questionInserts = array();
-			$count_questions = 0;
-			foreach ($_POST['question'] as $id => $question)
-			{
-				$question = trim($smcFunc['htmlspecialchars']($question, ENT_COMPAT));
-				$answer = trim($smcFunc['strtolower']($smcFunc['htmlspecialchars']($_POST['answer'][$id], ENT_COMPAT)));
-
-				// Already existed?
-				if (isset($context['question_answers'][$id]))
-				{
-					$count_questions++;
-					// Changed?
-					if ($context['question_answers'][$id]['question'] != $question || $context['question_answers'][$id]['answer'] != $answer)
-					{
-						if ($question == '' || $answer == '')
-						{
-							$smcFunc['db_query']('', '
-								DELETE FROM {db_prefix}log_comments
-								WHERE comment_type = {string:ver_test}
-									AND id_comment = {int:id}',
-								array(
-									'id' => $id,
-									'ver_test' => 'ver_test',
-								)
-							);
-							$count_questions--;
-						}
-						else
-							$request = $smcFunc['db_query']('', '
-								UPDATE {db_prefix}log_comments
-								SET body = {string:question}, recipient_name = {string:answer}
-								WHERE comment_type = {string:ver_test}
-									AND id_comment = {int:id}',
-								array(
-									'id' => $id,
-									'ver_test' => 'ver_test',
-									'question' => $question,
-									'answer' => $answer,
-								)
-							);
-					}
-				}
-				// It's so shiney and new!
-				elseif ($question != '' && $answer != '')
-				{
-					$questionInserts[] = array(
-						'comment_type' => 'ver_test',
-						'body' => $question,
-						'recipient_name' => $answer,
-					);
-				}
-			}
-
-			// Any questions to insert?
-			if (!empty($questionInserts))
-			{
-				$smcFunc['db_insert']('',
-					'{db_prefix}log_comments',
-					array('comment_type' => 'string', 'body' => 'string-65535', 'recipient_name' => 'string-80'),
-					$questionInserts,
-					array('id_comment')
-				);
-				$count_questions++;
-			}
-
-			if (empty($count_questions) || $_POST['qa_verification_number'] > $count_questions)
-				$_POST['qa_verification_number'] = $count_questions;
-
 			call_integration_hook('integrate_save_spam_settings', array(&$save_vars));
 
 			// Now save.
@@ -417,27 +326,6 @@ class ManageSecurity_Controller
 			cache_put_data('verificationQuestionIds', null, 300);
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
-
-		$character_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
-		$_SESSION['visual_verification_code'] = '';
-		for ($i = 0; $i < 6; $i++)
-			$_SESSION['visual_verification_code'] .= $character_range[array_rand($character_range)];
-
-		// Some javascript for CAPTCHA.
-		$context['settings_post_javascript'] = '';
-		if ($context['use_graphic_library'])
-			$context['settings_post_javascript'] .= '
-			function refreshImages()
-			{
-				var imageType = document.getElementById(\'visual_verification_type\').value;
-				document.getElementById(\'verification_image\').src = \'' . $context['verification_image_href'] . ';type=\' + imageType;
-			}';
-
-		// Show the image itself, or text saying we can't.
-		if ($context['use_graphic_library'])
-			$config_vars['vv']['postinput'] = '<br /><img src="' . $context['verification_image_href'] . ';type=' . (empty($modSettings['visual_verification_type']) ? 0 : $modSettings['visual_verification_type']) . '" alt="' . $txt['setting_image_verification_sample'] . '" id="verification_image" /><br />';
-		else
-			$config_vars['vv']['postinput'] = '<br /><span class="smalltext">' . $txt['setting_image_verification_nogd'] . '</span>';
 
 		// Hack for PM spam settings.
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
@@ -448,8 +336,7 @@ class ManageSecurity_Controller
 
 		// Some minor javascript for the guest post setting.
 		if ($modSettings['posts_require_captcha'])
-			$context['settings_post_javascript'] .= '
-			document.getElementById(\'guests_require_captcha\').disabled = true;';
+			addInlineJavascript('document.getElementById(\'guests_require_captcha\').disabled = true;', true);
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 		$context['settings_title'] = $txt['antispam_Settings'];
@@ -459,12 +346,13 @@ class ManageSecurity_Controller
 	/**
 	 * Initializes spam settings with the current configuration saved.
 	 */
-	function _initSpamSettingsForm()
+	private function _initSpamSettingsForm()
 	{
-		global $txt, $context;
+		global $txt;
 
 		// we're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/Editor.subs.php');
 
 		// instantiate the form
 		$this->_spamSettings = new Settings_Form();
@@ -483,17 +371,28 @@ class ManageSecurity_Controller
 				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
 				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
-			// Visual verification.
-			array('title', 'configure_verification_means'),
-				array('desc', 'configure_verification_means_desc'),
-				'vv' => array('select', 'visual_verification_type', array($txt['setting_image_verification_off'], $txt['setting_image_verification_vsimple'], $txt['setting_image_verification_simple'], $txt['setting_image_verification_medium'], $txt['setting_image_verification_high'], $txt['setting_image_verification_extreme']), 'subtext'=> $txt['setting_visual_verification_type_desc'], 'onchange' => $context['use_graphic_library'] ? 'refreshImages();' : ''),
-			// Clever Thomas, who is looking sheepy now? Not I, the mighty sword swinger did say.
-			array('title', 'setup_verification_questions'),
-				array('desc', 'setup_verification_questions_desc'),
-				array('int', 'qa_verification_number', 'postinput' => $txt['setting_qa_verification_number_desc']),
-				array('callback', 'question_answer_list'),
 		);
 
+		// @todo: maybe move the list to $modSettings instead of hooking it?
+		// Used in create_control_verification too
+		$known_verifications = array(
+			'captcha',
+			'questions',
+		);
+		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+
+		foreach ($known_verifications as $verification)
+		{
+			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$current_instance = new $class_name();
+
+			$new_settings = $current_instance->settings();
+			if (!empty($new_settings) && is_array($new_settings))
+				foreach ($new_settings as $new_setting)
+				$config_vars[] = $new_setting;
+		}
+
+		// @todo: it may be removed, it may stay, the two hooks may have different functions
 		call_integration_hook('integrate_spam_settings', array(&$config_vars));
 
 		return $this->_spamSettings->settings($config_vars);
@@ -503,7 +402,7 @@ class ManageSecurity_Controller
 	 * Change the way bad behavior ... well behaves
 	 *
 	 */
-	function action_bbSettings_display()
+	public function action_bbSettings_display()
 	{
 		global $txt, $scripturl, $context, $modSettings, $boardurl;
 
@@ -512,9 +411,6 @@ class ManageSecurity_Controller
 
 		// Our callback templates are here
 		loadTemplate('BadBehavior');
-
-		// See if they supplied a valid looking http:BL API Key
-		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 		// Any errors to display?
 		if ($context['invalid_badbehavior_httpbl_key'])
@@ -594,15 +490,18 @@ class ManageSecurity_Controller
 	 * Retrieves and returns the configuration settings for Bad Behavior.
 	 * Initializes bbSettings form.
 	 */
-	function _initBBSettingsForm()
+	private function _initBBSettingsForm()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// instantiate the form
 		$this->_bbSettings = new Settings_Form();
+		
+		// See if they supplied a valid looking http:BL API Key
+		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
 		// Build up our options array
 		$config_vars = array(
@@ -642,9 +541,9 @@ class ManageSecurity_Controller
 	 * @param array $subActions = array() An array containing all possible subactions.
 	 * @param string $defaultAction = '' the default action to be called if no valid subaction was found.
 	 */
-	function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
+	public function loadGeneralSettingParameters($subActions = array(), $defaultAction = '')
 	{
-		global $context, $txt;
+		global $context;
 
 		// You need to be an admin to edit settings!
 		isAllowedTo('admin_forum');
@@ -660,5 +559,161 @@ class ManageSecurity_Controller
 		// By default do the basic settings.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
 		$context['sub_action'] = $_REQUEST['sa'];
+	}
+
+	/**
+	 * Moderation settings.
+	 * Used in admin panel search.
+	 */
+	public function moderationSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+			// Warning system?
+			array('int', 'warning_watch', 'subtext' => $txt['setting_warning_watch_note'], 'help' => 'warning_enable'),
+			'moderate' => array('int', 'warning_moderate', 'subtext' => $txt['setting_warning_moderate_note']),
+			array('int', 'warning_mute', 'subtext' => $txt['setting_warning_mute_note']),
+			'rem1' => array('int', 'user_limit', 'subtext' => $txt['setting_user_limit_note']),
+			'rem2' => array('int', 'warning_decrement', 'subtext' => $txt['setting_warning_decrement_note']),
+			array('select', 'warning_show', 'subtext' => $txt['setting_warning_show_note'], array($txt['setting_warning_show_mods'], $txt['setting_warning_show_user'], $txt['setting_warning_show_all'])),
+		);
+
+		call_integration_hook('integrate_moderation_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Security settings.
+	 * Used in admin panel search.
+	 */
+	public function securitySettings()
+	{
+		global $txt;
+
+		// initialize it with our settings
+		$config_vars = array(
+				array('check', 'guest_hideContacts'),
+				array('check', 'make_email_viewable'),
+			'',
+				array('int', 'failed_login_threshold'),
+				array('int', 'loginHistoryDays'),
+			'',
+				array('check', 'enableErrorLogging'),
+				array('check', 'enableErrorQueryLogging'),
+			'',
+				array('check', 'securityDisable'),
+				array('check', 'securityDisable_moderate'),
+			'',
+				// Reactive on email, and approve on delete
+				array('check', 'send_validation_onChange'),
+				array('check', 'approveAccountDeletion'),
+			'',
+				// Password strength.
+				array('select', 'password_strength', array($txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high'])),
+				array('check', 'enable_password_conversion'),
+			'',
+				// Reporting of personal messages?
+				array('check', 'enableReportPM'),
+			'',
+				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
+		);
+
+		call_integration_hook('integrate_general_security_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Spam settings.
+	 * Used in admin panel search.
+	 */
+	public function spamSettings()
+	{
+		global $txt;
+
+		require_once(SUBSDIR . '/Editor.subs.php');
+
+		// Build up our options array
+		$config_vars = array(
+			array('title', 'antispam_Settings'),
+				array('check', 'reg_verification'),
+				array('check', 'search_enable_captcha'),
+				// This, my friend, is a cheat :p
+				'guest_verify' => array('check', 'guests_require_captcha', 'postinput' => $txt['setting_guests_require_captcha_desc']),
+				array('int', 'posts_require_captcha', 'postinput' => $txt['posts_require_captcha_desc'], 'onchange' => 'if (this.value > 0){ document.getElementById(\'guests_require_captcha\').checked = true; document.getElementById(\'guests_require_captcha\').disabled = true;} else {document.getElementById(\'guests_require_captcha\').disabled = false;}'),
+				array('check', 'guests_report_require_captcha'),
+			// PM Settings
+			array('title', 'antispam_PM'),
+				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
+				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
+				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
+		);
+
+		// @todo: maybe move the list to $modSettings instead of hooking it?
+		// Used in create_control_verification too
+		$known_verifications = array(
+			'captcha',
+			'questions',
+		);
+		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+
+		foreach ($known_verifications as $verification)
+		{
+			$class_name = 'Control_Verification_' . ucfirst($verification);
+			$current_instance = new $class_name();
+
+			$new_settings = $current_instance->settings();
+			if (!empty($new_settings) && is_array($new_settings))
+				foreach ($new_settings as $new_setting)
+				$config_vars[] = $new_setting;
+		}
+
+		// @todo: it may be removed, it may stay, the two hooks may have different functions
+		call_integration_hook('integrate_spam_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Bad Behavior settings.
+	 * Used in admin panel search.
+	 */
+	public function bbSettings()
+	{
+		global $txt, $context, $modSettings;
+		
+		// See if they supplied a valid looking http:BL API Key
+		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
+
+		// Build up our options array
+		$config_vars = array(
+			array('title', 'badbehavior_title'),
+				array('desc', 'badbehavior_desc'),
+				array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
+				array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
+				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_strict', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_offsite_forms', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_eucookie', 'postinput' => $txt['badbehavior_default_off']),
+				array('check', 'badbehavior_display_stats', 'postinput' => $txt['badbehavior_default_off']),
+				'',
+				array('check', 'badbehavior_reverse_proxy', 'postinput' => $txt['badbehavior_default_off']),
+				array('text', 'badbehavior_reverse_proxy_header', 30, 'postinput' => $txt['badbehavior_reverse_proxy_header_desc']),
+				array('text', 'badbehavior_reverse_proxy_addresses', 30),
+				'',
+				array('text', 'badbehavior_httpbl_key', 12, 'invalid' => $context['invalid_badbehavior_httpbl_key']),
+				array('int', 'badbehavior_httpbl_threat', 'postinput' => $txt['badbehavior_httpbl_threat_desc']),
+				array('int', 'badbehavior_httpbl_maxage', 'postinput' => $txt['badbehavior_httpbl_maxage_desc']),
+			array('title', 'badbehavior_whitelist_title'),
+				array('desc', 'badbehavior_wl_desc'),
+				array('int', 'badbehavior_postcount_wl', 'postinput' => $txt['badbehavior_postcount_wl_desc']),
+				array('callback', 'badbehavior_add_ip'),
+				array('callback', 'badbehavior_add_url'),
+				array('callback', 'badbehavior_add_useragent'),
+		);
+
+		return $config_vars;
 	}
 }
