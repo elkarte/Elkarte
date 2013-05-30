@@ -398,10 +398,10 @@ class ManageMembergroups_Controller
 				if (!allowedTo('admin_forum'))
 				{
 					require_once(SUBSDIR . '/Membergroups.subs.php');
-					$copy_type = membergroupsById($copy_id);
+					$copy_type = membergroupById($copy_id);
 
 					// Protected groups are... well, protected!
-					if ($copy_type[$copy_id]['group_type'] == 1)
+					if ($copy_type['group_type'] == 1)
 						fatal_lang_error('membergroup_does_not_exist');
 				}
 
@@ -508,18 +508,18 @@ class ManageMembergroups_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		$current_group = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
+		$current_group_id = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
 		if (!empty($modSettings['deny_boards_access']))
 			loadLanguage('ManagePermissions');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Make sure this group is editable.
-		if (!empty($current_group))
-			$groups = membergroupsById($current_group, 1);
+		if (!empty($current_group_id))
+			$current_group = membergroupById($current_group_id);
 
 		// Now, do we have a valid id?
-		if (!allowedTo('admin_forum') && !empty($groups) && $groups[$current_group]['group_type'] == 1)
+		if (!allowedTo('admin_forum') && !empty($groups) && $current_group['group_type'] == 1)
 			fatal_lang_error('membergroup_does_not_exist', false);
 
 		// The delete this membergroup button was pressed.
@@ -532,7 +532,7 @@ class ManageMembergroups_Controller
 				fatal_lang_error('membergroup_does_not_exist', false);
 
 			// Let's delete the group
-			deleteMembergroups($groups[$current_group]['id_group']);
+			deleteMembergroups($current_group['id_group']);
 
 			redirectexit('action=admin;area=membergroups;');
 		}
@@ -549,19 +549,19 @@ class ManageMembergroups_Controller
 			// Can they really inherit from this group?
 			if (isset($_POST['group_inherit']) && $_POST['group_inherit'] != -2 && !allowedTo('admin_forum'))
 			{
-				$inherit_group = (int) $_POST['group_inherit'];
-				$inherit_type = membergroupsById($inherit_group);
+				$group_inherit = (int) $_POST['group_inherit'];
+				$inherit_type = membergroupById($group_inherit);
 			}
 
 			// Set variables to their proper value.
 			// @todo probably avoid all this...
 			$_POST['max_messages'] = isset($_POST['max_messages']) ? (int) $_POST['max_messages'] : 0;
-			$_POST['min_posts'] = isset($_POST['min_posts']) && isset($_POST['group_type']) && $_POST['group_type'] == -1 && $groups[$current_group]['id_group'] > 3 ? abs($_POST['min_posts']) : ($groups[$current_group]['id_group'] == 4 ? 0 : -1);
+			$_POST['min_posts'] = isset($_POST['min_posts']) && isset($_POST['group_type']) && $_POST['group_type'] == -1 && $current_group['id_group'] > 3 ? abs($_POST['min_posts']) : ($current_group['id_group'] == 4 ? 0 : -1);
 			$_POST['icons'] = (empty($_POST['icon_count']) || $_POST['icon_count'] < 0) ? '' : min((int) $_POST['icon_count'], 99) . '#' . $_POST['icon_image'];
-			$_POST['group_desc'] = isset($_POST['group_desc']) && ($groups[$current_group]['id_group'] == 1 || (isset($_POST['group_type']) && $_POST['group_type'] != -1)) ? trim($_POST['group_desc']) : '';
+			$_POST['group_desc'] = isset($_POST['group_desc']) && ($current_group['id_group'] == 1 || (isset($_POST['group_type']) && $_POST['group_type'] != -1)) ? trim($_POST['group_desc']) : '';
 			$_POST['group_type'] = !isset($_POST['group_type']) || $_POST['group_type'] < 0 || $_POST['group_type'] > 3 || ($_POST['group_type'] == 1 && !allowedTo('admin_forum')) ? 0 : (int) $_POST['group_type'];
-			$_POST['group_hidden'] = empty($_POST['group_hidden']) || $_POST['min_posts'] != -1 || $groups[$current_group]['id_group'] == 3 ? 0 : (int) $_POST['group_hidden'];
-			$_POST['group_inherit'] = $groups[$current_group]['id_group'] > 1 && $groups[$current_group]['id_group'] != 3 && (empty($inherit_type[$inherit_group]['group_type']) || $inherit_type[$inherit_group]['group_type'] != 1) ? (int) $_POST['group_inherit'] : -2;
+			$_POST['group_hidden'] = empty($_POST['group_hidden']) || $_POST['min_posts'] != -1 || $current_group['id_group'] == 3 ? 0 : (int) $_POST['group_hidden'];
+			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? $group_inherit : -2;
 
 			//@todo Don't set online_color for the Moderators group?
 
@@ -571,8 +571,8 @@ class ManageMembergroups_Controller
 					'min_posts' => $_POST['min_posts'],
 					'group_type' => $_POST['group_type'],
 					'group_hidden' => $_POST['group_hidden'],
-					'group_inherit' => $_POST['group_inherit'],
-					'current_group' => $groups[$current_group]['id_group'],
+					'group_inherit' => $group_inherit,
+					'current_group' => $current_group['id_group'],
 					'group_name' => $_POST['group_name'],
 					'online_color' => $_POST['online_color'],
 					'icons' => $_POST['icons'],
@@ -580,10 +580,10 @@ class ManageMembergroups_Controller
 				);
 			updateMembergroupProperties($properties);
 
-			call_integration_hook('integrate_save_membergroup', array($groups[$current_group]['id_group']));
+			call_integration_hook('integrate_save_membergroup', array($current_group['id_group']));
 
 			// Time to update the boards this membergroup has access to.
-			if ($groups[$current_group]['id_group'] == 2 || $groups[$current_group]['id_group'] > 3)
+			if ($current_group['id_group'] == 2 || $current_group['id_group'] > 3)
 			{
 				$accesses = empty($_POST['boardaccess']) || !is_array($_POST['boardaccess']) ? array() : $_POST['boardaccess'];
 				$changed_boards['allow'] = array();
@@ -595,23 +595,23 @@ class ManageMembergroups_Controller
 				foreach (array('allow', 'deny') as $board_action)
 				{
 					// Find all board this group is in, but shouldn't be in.
-					detachGroupFromBoards($groups[$current_group]['id_group'], $changed_boards, $board_action);
+					detachGroupFromBoards($current_group['id_group'], $changed_boards, $board_action);
 
 					// Add the membergroup to all boards that hadn't been set yet.
 					if (!empty($changed_boards[$board_action]))
-						assignGroupToBoards($groups[$current_group]['id_group'], $changed_boards, $board_action);
+						assignGroupToBoards($current_group['id_group'], $changed_boards, $board_action);
 				}
 			}
 
 			// Remove everyone from this group!
 			if ($_POST['min_posts'] != -1)
-				detachDeletedGroupFromMembers($groups[$current_group]['id_group']);
+				detachDeletedGroupFromMembers($current_group['id_group']);
 
-			elseif ($groups[$current_group]['id_group'] != 3)
+			elseif ($current_group['id_group'] != 3)
 			{
 				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
 				if ($_POST['group_hidden'] == 2)
-					setGroupToHidden($groups[$current_group]['id_group']);
+					setGroupToHidden($current_group['id_group']);
 
 
 				// Either way, let's check our "show group membership" setting is correct.
@@ -619,15 +619,15 @@ class ManageMembergroups_Controller
 			}
 
 			// Do we need to set inherited permissions?
-			if ($_POST['group_inherit'] != -2 && $_POST['group_inherit'] != $_POST['old_inherit'])
+			if ($group_inherit != -2 && $group_inherit != $_POST['old_inherit'])
 			{
 				require_once(ADMINDIR . '/ManagePermissions.php');
-				updateChildPermissions($_POST['group_inherit']);
+				updateChildPermissions($group_inherit);
 			}
 
 			// Finally, moderators!
 			$moderator_string = isset($_POST['group_moderators']) ? trim($_POST['group_moderators']) : '';
-			detachGroupModerators($groups[$current_group]['id_group']);
+			detachGroupModerators($current_group['id_group']);
 
 			if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $_POST['min_posts'] == -1 && $groups[$current_groups]['id_group'] != 3)
 			{
@@ -667,7 +667,7 @@ class ManageMembergroups_Controller
 
 				// Found some?
 				if (!empty($group_moderators))
-					assignGroupModerators($groups[$current_group]['id_group'], $group_moderators);
+					assignGroupModerators($current_group['id_group'], $group_moderators);
 			}
 
 			// There might have been some post group changes.
@@ -684,8 +684,7 @@ class ManageMembergroups_Controller
 		}
 
 		// Fetch the current group information.
-		$rows = membergroupsById($groups[$current_group]['id_group'], 1, true);
-		$row = $rows[$current_group];
+		$row = membergroupById($current_group['id_group'], true);
 
 		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] == 1))
 			fatal_lang_error('membergroup_does_not_exist', false);
@@ -693,7 +692,7 @@ class ManageMembergroups_Controller
 		$row['icons'] = explode('#', $row['icons']);
 
 		$context['group'] = array(
-			'id' => $groups[$current_group]['id_group'],
+			'id' => $row['id_group'],
 			'name' => $row['group_name'],
 			'description' => htmlspecialchars($row['description']),
 			'editable_name' => $row['group_name'],
@@ -706,13 +705,13 @@ class ManageMembergroups_Controller
 			'type' => $row['min_posts'] != -1 ? 0 : $row['group_type'],
 			'hidden' => $row['min_posts'] == -1 ? $row['hidden'] : 0,
 			'inherited_from' => $row['id_parent'],
-			'allow_post_group' => $groups[$current_group]['id_group'] == 2 || $groups[$current_group]['id_group'] > 4,
-			'allow_delete' => $groups[$current_group]['id_group'] == 2 || $groups[$current_group]['id_group'] > 4,
+			'allow_post_group' => $row['id_group'] == 2 || $row['id_group'] > 4,
+			'allow_delete' => $row['id_group'] == 2 || $row['id_group'] > 4,
 			'allow_protected' => allowedTo('admin_forum'),
 		);
 
 		// Get any moderators for this group
-		$context['group']['moderators'] = getGroupModerators($groups[$current_group]['id_group']);
+		$context['group']['moderators'] = getGroupModerators($row['id_group']);
 		$context['group']['moderator_list'] = empty($context['group']['moderators']) ? '' : '&quot;' . implode('&quot;, &quot;', $context['group']['moderators']) . '&quot;';
 
 		if (!empty($context['group']['moderators']))
@@ -720,10 +719,10 @@ class ManageMembergroups_Controller
 
 		// Get a list of boards this membergroup is allowed to see.
 		$context['boards'] = array();
-		if ($groups[$current_group]['id_group'] == 2 || $groups[$current_group]['id_group'] > 3)
+		if ($row['id_group'] == 2 || $row['id_group'] > 3)
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('access' => $groups[$current_group]['id_group'], 'not_redirection' => true));
+			$context += getBoardList(array('access' => $row['id_group'], 'not_redirection' => true));
 
 			// Include a list of boards per category for easy toggling.
 			foreach ($context['categories'] as $category)
@@ -731,7 +730,7 @@ class ManageMembergroups_Controller
 		}
 
 		// Finally, get all the groups this could be inherited off.
-		$context['inheritable_groups'] = getInheritableGroups($groups[$current_group]['id_group']);
+		$context['inheritable_groups'] = getInheritableGroups($row['id_group']);
 
 		call_integration_hook('integrate_view_membergroup');
 

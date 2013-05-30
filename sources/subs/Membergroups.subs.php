@@ -450,11 +450,11 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	// Some groups just don't like explicitly having members.
 	$implicitGroups = array(-1, 0, 3);
 	$group_names = array();
-	$group_details = membergroupsById($group, 1, true);
-	if ($group_details[$group]['min_posts'] != -1)
-		$implicitGroups[] = $group_details[$group]['id_group'];
+	$group_details = membergroupById($group, true);
+	if ($group_details['min_posts'] != -1)
+		$implicitGroups[] = $group_details['id_group'];
 	else
-		$group_names[$group_details[$group]['id_group']] = $group_details[$group]['group_name'];
+		$group_names[$group_details['id_group']] = $group_details['group_name'];
 
 	// Sorry, you can't join an implicit group.
 	if (in_array($group, $implicitGroups) || empty($members))
@@ -464,7 +464,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	if (!allowedTo('admin_forum') && $group == 1)
 		return false;
 	// ... and assign protected groups!
-	elseif (!allowedTo('admin_forum') && $group_details[$group]['group_type'] == 1)
+	elseif (!allowedTo('admin_forum') && $group_details['group_type'] == 1)
 			return false;
 
 	// Do the actual updates.
@@ -520,7 +520,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	else
 		trigger_error('addMembersToGroup(): Unknown type \'' . $type . '\'', E_USER_WARNING);
 
-	call_integration_hook('integrate_add_members_to_group', array($members, $group_details[$group], &$group_names));
+	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
 
 	// Update their postgroup statistics.
 	updateStats('postgroups', $members);
@@ -859,6 +859,19 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 }
 
 /**
+ * Uses membergroupsById to return the group informations of only 1 group
+ */
+function membergroupById($group_id, $detailed = false, $assignable = false)
+{
+	$groups = membergroupsById(array($group_id), 1, $detailed, $assignable);
+
+	if (isset($groups[$group_id]))
+		return $groups[$group_id];
+	else
+		return false;
+}
+
+/**
  * Gets basic membergroup data
  *
  * the $includes and $excludes array is used for granular filtering the output. We need to exclude
@@ -1177,7 +1190,7 @@ function updateCopiedGroup($id_group, $copy_from)
 	$db = database();
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
-	$group_info = membergroupsById($copy_from, 1, true);
+	$group_info = membergroupById($copy_from, true);
 
 	// update the new membergroup
 	$db->query('', '
@@ -1188,10 +1201,10 @@ function updateCopiedGroup($id_group, $copy_from)
 			icons = {string:icons}
 			WHERE id_group = {int:current_group}',
 			array(
-				'max_messages' => $group_info[$copy_from]['max_messages'],
+				'max_messages' => $group_info['max_messages'],
 				'current_group' => $id_group,
-				'online_color' => $group_info[$copy_from]['online_color'],
-				'icons' => $group_info[$copy_from]['icons'],
+				'online_color' => $group_info['online_color'],
+				'icons' => $group_info['icons'],
 			)
 	);
 }
