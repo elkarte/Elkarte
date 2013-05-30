@@ -79,7 +79,7 @@ class MessageIndex_Controller
 		}
 
 		// We only know these.
-		if (isset($_REQUEST['sort']) && !in_array($_REQUEST['sort'], array('subject', 'starter', 'last_poster', 'replies', 'views', 'first_post', 'last_post')))
+		if (isset($_REQUEST['sort']) && !in_array($_REQUEST['sort'], array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
 			$_REQUEST['sort'] = 'last_post';
 
 		// Make sure the starting place makes sense and construct the page index.
@@ -250,6 +250,9 @@ class MessageIndex_Controller
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
+		// Prepare for links to guests (for search engines)
+		$context['pageindex_multiplier'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
+
 		// Begin 'printing' the message index for current board.
 		foreach ($topics_info as $row)
 		{
@@ -391,8 +394,8 @@ class MessageIndex_Controller
 				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
 				'is_poll' => $modSettings['pollMode'] == '1' && $row['id_poll'] > 0,
-				'is_hot' => $row['num_replies'] >= $modSettings['hotTopicPosts'],
-				'is_very_hot' => $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
+				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
+				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,
 				'icon' => $row['first_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
@@ -404,6 +407,7 @@ class MessageIndex_Controller
 				'pages' => $pages,
 				'replies' => comma_format($row['num_replies']),
 				'views' => comma_format($row['num_views']),
+				'likes' => comma_format($row['num_likes']),
 				'approved' => $row['approved'],
 				'unapproved_posts' => $row['unapproved_posts'],
 			);

@@ -88,7 +88,7 @@ class SplitTopics_Controller
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
 		// Retrieve message info for the message at the split point.
-		$messageInfo = messageInfo($topic, $splitAt, true);
+		$messageInfo = messageTopicDetails($topic, $splitAt, true);
 		if (empty($messageInfo))
 			fatal_lang_error('cant_find_messages');
 
@@ -178,7 +178,7 @@ class SplitTopics_Controller
 
 		// Fetch the message IDs of the topic that are at or after the message.
 		if ($_POST['step2'] == 'afterthis')
-			$messagesToBeSplit = messagesAfter($topic, $splitAt);
+			$messagesToBeSplit = messagesSince($topic, $splitAt, true);
 		// Only the selected message has to be split. That should be easy.
 		elseif ($_POST['step2'] == 'onlythis')
 			$messagesToBeSplit[] = $splitAt;

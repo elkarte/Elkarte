@@ -289,6 +289,8 @@ class Post_Controller
 					fatal_lang_error('invalid_year', false);
 
 				// Get a list of boards they can post in.
+				require_once(SUBSDIR . '/Boards.subs.php');
+
 				$boards = boardsAllowedTo('post_new');
 				if (empty($boards))
 					fatal_lang_error('cannot_post_new', 'user');
@@ -317,7 +319,7 @@ class Post_Controller
 			if (empty($options['no_new_reply_warning']) && isset($_REQUEST['last_msg']) && $context['topic_last_message'] > $_REQUEST['last_msg'])
 			{
 				require_once(SUBSDIR . '/Topic.subs.php');
-				$context['new_replies'] = messagesSince($topic, (int) $_REQUEST['last_msg'], $modSettings['postmod_active'] && !allowedTo('approve_posts'));
+				$context['new_replies'] = countMessagesSince($topic, (int) $_REQUEST['last_msg'], false, $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 				if (!empty($context['new_replies']))
 				{
@@ -489,7 +491,7 @@ class Post_Controller
 			{
 				require_once(SUBSDIR . '/Messages.subs.php');
 				// Get the existing message.
-				$message = getExistingMessage((int) $_REQUEST['msg'], $topic);
+				$message = messageDetails((int) $_REQUEST['msg'], $topic);
 				// The message they were trying to edit was most likely deleted.
 				// @todo Change this error message?
 				if ($message === false)
@@ -1144,7 +1146,7 @@ class Post_Controller
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
 			require_once(SUBSDIR . '/Messages.subs.php');
-			$msgInfo = getMessageInfo($_REQUEST['msg'], true);
+			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
 
 			if (empty($msgInfo))
 				fatal_lang_error('cant_find_messages', false);
@@ -1881,7 +1883,7 @@ class Post_Controller
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// Assume the first message if no message ID was given.
-		// @todo: candidate for messageInfo
+		// @todo: candidate for messageTopicDetails
 		$request = $db->query('', '
 			SELECT
 				t.locked, t.num_replies, t.id_member_started, t.id_first_msg,

@@ -321,6 +321,7 @@ class Recent_Controller
 
 			// The easiest thing is to just get all the boards they can see,
 			// but since we've specified the top of tree we ignore some of them
+			require_once(SUBSDIR . '/Boards.subs.php');
 			addChildBoards($boards);
 
 			if (empty($boards))
@@ -471,7 +472,7 @@ class Recent_Controller
 		// This part is the same for each query.
 		$select_clause = '
 					ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
-					t.num_replies, t.num_views, ms.id_member AS id_first_member, ml.id_member AS id_last_member,
+					t.num_replies, t.num_views, t.num_likes, ms.id_member AS id_first_member, ml.id_member AS id_last_member,
 					ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_poster_name,
 					IFNULL(meml.real_name, ml.poster_name) AS last_poster_name, ml.subject AS last_subject,
 					ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
@@ -1086,8 +1087,8 @@ class Recent_Controller
 				'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
 				'is_locked' => !empty($row['locked']),
 				'is_poll' => $modSettings['pollMode'] == '1' && $row['id_poll'] > 0,
-				'is_hot' => $row['num_replies'] >= $modSettings['hotTopicPosts'],
-				'is_very_hot' => $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
+				'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],
+				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,
 				'icon' => $row['first_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
@@ -1095,6 +1096,7 @@ class Recent_Controller
 				'pages' => $pages,
 				'replies' => comma_format($row['num_replies']),
 				'views' => comma_format($row['num_views']),
+				'likes' => comma_format($row['num_likes']),
 				'board' => array(
 					'id' => $row['id_board'],
 					'name' => $row['bname'],
@@ -1110,28 +1112,17 @@ class Recent_Controller
 
 		if ($is_topics && !empty($modSettings['enableParticipation']) && !empty($topic_ids))
 		{
-			$result = $db->query('', '
-				SELECT id_topic
-				FROM {db_prefix}messages
-				WHERE id_topic IN ({array_int:topic_list})
-					AND id_member = {int:current_member}
-				GROUP BY id_topic
-				LIMIT {int:limit}',
-				array(
-					'current_member' => $user_info['id'],
-					'topic_list' => $topic_ids,
-					'limit' => count($topic_ids),
-				)
-			);
-			while ($row = $db->fetch_assoc($result))
+			require_once(SUBSDIR . '/MessageIndex.subs.php');
+			$topics_participated_in = topicsParticipation($user_info['id'], $topic_ids);
+
+			foreach ($topics_participated_in as $topic)
 			{
-				if (empty($context['topics'][$row['id_topic']]['is_posted_in']))
+				if (empty($context['topics'][$topic['id_topic']]['is_posted_in']))
 				{
-					$context['topics'][$row['id_topic']]['is_posted_in'] = true;
-					$context['topics'][$row['id_topic']]['class'] = 'my_' . $context['topics'][$row['id_topic']]['class'];
+					$context['topics'][$topic['id_topic']]['is_posted_in'] = true;
+					$context['topics'][$topic['id_topic']]['class'] = 'my_' . $context['topics'][$topic['id_topic']]['class'];
 				}
 			}
-			$db->free_result($result);
 		}
 
 		$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $_REQUEST['start']);

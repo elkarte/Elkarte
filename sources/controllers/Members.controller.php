@@ -29,7 +29,7 @@ class Members_Controller
 	 * Subactions: sa=add and sa=remove. (@todo refactor subactions)
 	 * Redirects to ?action=profile;u=x.
 	 */
-	function action_buddy()
+	public function action_buddy()
 	{
 		global $user_info;
 
@@ -57,57 +57,11 @@ class Members_Controller
 	}
 
 	/**
-	 * Outputs each member name on its own line.
-	 * This function is used by javascript to find members matching the request.
-	 * Accessed by action=requestmembers.
-	 */
-	function action_requestmembers()
-	{
-		global $user_info, $txt;
-
-		$db = database();
-
-		checkSession('get');
-
-		$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search']) . '*';
-		$_REQUEST['search'] = trim(Util::strtolower($_REQUEST['search']));
-		$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
-
-		if (function_exists('iconv'))
-			header('Content-Type: text/plain; charset=UTF-8');
-
-		$request = $db->query('', '
-			SELECT real_name
-			FROM {db_prefix}members
-			WHERE real_name LIKE {string:search}' . (isset($_REQUEST['buddies']) ? '
-				AND id_member IN ({array_int:buddy_list})' : '') . '
-				AND is_activated IN (1, 11)
-			LIMIT ' . (Util::strlen($_REQUEST['search']) <= 2 ? '100' : '800'),
-			array(
-				'buddy_list' => $user_info['buddies'],
-				'search' => $_REQUEST['search'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
-
-			if (preg_match('~&#\d+;~', $row['real_name']) != 0)
-				$row['real_name'] = preg_replace_callback('~&#(\d+);~', 'fixchar__callback', $row['real_name']);
-
-			echo $row['real_name'], "\n";
-		}
-		$db->free_result($request);
-
-		obExit(false);
-	}
-
-	/**
 	 * Called by index.php?action=findmember.
 	 * This function result is used as a popup for searching members.
 	 * @uses sub template find_members of the Members template.
 	 */
-	function action_findmember()
+	public function action_findmember()
 	{
 		global $context, $scripturl, $user_info;
 
@@ -144,7 +98,7 @@ class Members_Controller
 
 			$context['results'] = findMembers(array($_REQUEST['search']), true, $context['buddy_search']);
 			$total_results = count($context['results']);
-
+			$_REQUEST['start'] = (int) $_REQUEST['start'];
 			$context['page_index'] = constructPageIndex($scripturl . '?action=findmember;search=' . $context['last_search'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';input=' . $context['input_box_name'] . ($context['quote_results'] ? ';quote=1' : '') . ($context['buddy_search'] ? ';buddies' : ''), $_REQUEST['start'], $total_results, 7);
 
 			// Determine the navigation context (especially useful for the wireless template).

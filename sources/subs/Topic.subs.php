@@ -301,6 +301,32 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 	}
 
+	// Reuse the message array if available
+	if (empty($messages))
+	{
+		$messages = array();
+		$request = $smcFunc['db_query']('', '
+			SELECT id_msg
+			FROM {db_prefix}messages
+			WHERE id_topic IN ({array_int:topics})',
+			array(
+				'topics' => $topics,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_row']($request))
+			$messages[] = $row[0];
+		$smcFunc['db_free_result']($request);
+	}
+
+	// Remove all likes now that the topic is gone
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}message_likes
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+		)
+	);
+
 	// Delete messages in each topic.
 	$db->query('', '
 		DELETE FROM {db_prefix}messages
@@ -398,7 +424,7 @@ function moveTopics($topics, $toBoard)
 	// Only a single topic.
 	if (is_numeric($topics))
 		$topics = array($topics);
-	$num_topics = count($topics);
+	
 	$fromBoards = array();
 
 	// Destination board empty or equal to 0?
@@ -1102,7 +1128,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 		SELECT
 			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
 			t.id_member_started, t.id_member_updated, t.id_poll,
-			t.num_replies, t.num_views, t.locked, t.redirect_expires,
+			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
 			fu.derived_from' : '') .
@@ -1136,8 +1162,6 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  */
 function removeOldTopics()
 {
-	global $modSettings;
-
 	$db = database();
 
 	isAllowedTo('admin_forum');
@@ -1235,8 +1259,15 @@ function topicsStartedBy($memberID)
  * Retrieve the messages of the given topic, that are at or after
  * a message.
  * Used by split topics actions.
+ *
+ * @param int $id_topic
+ * @param int $id_msg
+ * @param bool $include_current = false
+ * @param bool $only_approved = false
+ *
+ * @return array message ids
  */
-function messagesAfter($topic, $message)
+function messagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
 {
 	$db = database();
 
@@ -1245,10 +1276,12 @@ function messagesAfter($topic, $message)
 		SELECT id_msg
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}
-			AND id_msg >= {int:split_at}',
+			AND id_msg ' . ($include_current ? '>=' : '>') . ' {int:last_msg}' . ($only_approved ? '
+			AND approved = {int:approved}' : ''),
 		array(
-			'current_topic' => $topic,
-			'split_at' => $message,
+			'current_topic' => $id_topic,
+			'last_msg' => $id_msg,
+			'approved' => 1,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -1259,15 +1292,53 @@ function messagesAfter($topic, $message)
 }
 
 /**
+ * This function returns the number of messages in a topic,
+ * posted after $last_msg.
+ *
+ * @param int $id_topic
+ * @param int $last_msg
+ * @param bool $include_current = false
+ * @param bool $only_approved = false
+ *
+ * @return int
+ */
+function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_approved = false)
+{
+	$db = database();
+
+	// Give us something to work with
+	if (empty($id_topic) || empty($id_msg))
+		return false;
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND id_msg ' . ($include_current ? '>=' : '>') . ' {int:last_msg}' . ($only_approved ? '
+			AND approved = {int:approved}' : '') . '
+		LIMIT 1',
+		array(
+			'current_topic' => $id_topic,
+			'last_msg' => $id_msg,
+			'approved' => 1,
+		)
+	);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $count;
+}
+
+/**
  * Retrieve a few data on a particular message.
- * Slightly different from getMessageInfo, this one inner joins {db_prefix}topics
+ * Slightly different from basicMessageInfo, this one inner joins {db_prefix}topics
  * and doesn't use {query_see_board}
  *
  * @param int $topic topic ID
  * @param int $message message ID
  * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
  */
-function messageInfo($topic, $message, $topic_approved = false)
+function messageTopicDetails($topic, $message, $topic_approved = false)
 {
 	global $modSettings;
 
@@ -1356,43 +1427,6 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 	$db->free_result($request);
 
 	return $messages;
-}
-
-/**
- * This function returns the number of messages in a topic,
- * posted after $last_msg.
- *
- * @param int $id_topic
- * @param int $last_msg
- * @param bool $only_approved
- *
- * @return int
- */
-function messagesSince($id_topic, $last_msg, $only_approved)
-{
-	$db = database();
-
-	// Give us something to work with
-	if (empty($id_topic) || empty($last_msg))
-		return false;
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}messages
-		WHERE id_topic = {int:current_topic}
-			AND id_msg > {int:last_msg}' . ($only_approved ? '
-			AND approved = {int:approved}' : '') . '
-		LIMIT 1',
-		array(
-			'current_topic' => $id_topic,
-			'last_msg' => $last_msg,
-			'approved' => 1,
-		)
-	);
-	list ($count) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $count;
 }
 
 /**
@@ -1512,6 +1546,12 @@ function updateSplitTopics($options, $id_board)
 	);
 }
 
+/**
+ * Find out who started a topic
+ *
+ * @param int $topic
+ * @return int
+ */
 function topicStarter($topic)
 {
 	$db = database();
