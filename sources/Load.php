@@ -1471,7 +1471,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 		// Custom template layers?
 		if (isset($settings['theme_layers']))
-			$layers = explode(',', $settings['theme_layers'])
+			$layers = explode(',', $settings['theme_layers']);
 		else
 			$layers = array('html', 'body');
 		$template_layers = Template_Layers::getInstance();
