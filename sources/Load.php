@@ -911,25 +911,25 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	// Are we loading any moderators?  If so, fix their group data...
 	if (!empty($loaded_ids) && !empty($board_info['moderators']) && $set === 'normal' && count($temp_mods = array_intersect($loaded_ids, array_keys($board_info['moderators']))) !== 0)
 	{
-		if (($row = cache_get_data('moderator_group_info', 480)) == null)
+		if (($group_info = cache_get_data('moderator_group_info', 480)) == null)
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$row = membergroupsById(3, 1, true);
+			$group_info = membergroupById(3, true);
 
-			cache_put_data('moderator_group_info', $row, 480);
+			cache_put_data('moderator_group_info', $group_info, 480);
 		}
 
 		foreach ($temp_mods as $id)
 		{
 			// By popular demand, don't show admins or global moderators as moderators.
 			if ($user_profile[$id]['id_group'] != 1 && $user_profile[$id]['id_group'] != 2)
-				$user_profile[$id]['member_group'] = $row['group_name'];
+				$user_profile[$id]['member_group'] = $group_info['group_name'];
 
 			// If the Moderator group has no color or icons, but their group does... don't overwrite.
-			if (!empty($row['icons']))
-				$user_profile[$id]['icons'] = $row['icons'];
-			if (!empty($row['online_color']))
-				$user_profile[$id]['member_group_color'] = $row['online_color'];
+			if (!empty($group_info['icons']))
+				$user_profile[$id]['icons'] = $group_info['icons'];
+			if (!empty($group_info['online_color']))
+				$user_profile[$id]['member_group_color'] = $group_info['online_color'];
 		}
 	}
 

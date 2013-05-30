@@ -241,19 +241,12 @@ function scheduled_approval_notification()
 	$members = array();
 	if (in_array(2, $addGroups))
 	{
-		$request = $db->query('', '
-			SELECT id_member, id_board
-			FROM {db_prefix}moderators',
-			array(
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$all_mods = allBoardModerators(true);
+		// Make sure they get included in the big loop.
+		$members = array_keys($all_mods);
+		foreach ($all_mods as $row)
 			$mods[$row['id_member']][$row['id_board']] = true;
-			// Make sure they get included in the big loop.
-			$members[] = $row['id_member'];
-		}
-		$db->free_result($request);
 	}
 
 	// Come along one and all... until we reject you ;)

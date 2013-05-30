@@ -286,14 +286,9 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	}
 	elseif (!is_array($groups))
 		$groups = array((int) $groups);
+	// Make sure all groups are integer.
 	else
-	{
-		$groups = array_unique($groups);
-
-		// Make sure all groups are integer.
-		foreach ($groups as $key => $value)
-			$groups[$key] = (int) $value;
-	}
+		$groups = array_unique(array_map('intval', $groups));
 
 	// Fetch a list of groups members cannot be assigned to explicitely, and the group names of the ones we want.
 	$implicitGroups = array(-1, 0, 3);
@@ -446,20 +441,16 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 
 	if (!is_array($members))
 		$members = array((int) $members);
+	// Make sure all members are integer.
 	else
-	{
-		$members = array_unique($members);
+		$members = array_unique(array_map('intval', $members));
 
-		// Make sure all members are integer.
-		foreach ($members as $key => $value)
-			$members[$key] = (int) $value;
-	}
 	$group = (int) $group;
 
 	// Some groups just don't like explicitly having members.
 	$implicitGroups = array(-1, 0, 3);
 	$group_names = array();
-	$group_details = membergroupsById($group, 1, true);
+	$group_details = membergroupById($group, true);
 	if ($group_details['min_posts'] != -1)
 		$implicitGroups[] = $group_details['id_group'];
 	else
@@ -473,14 +464,8 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	if (!allowedTo('admin_forum') && $group == 1)
 		return false;
 	// ... and assign protected groups!
-	elseif (!allowedTo('admin_forum'))
-	{
-		$is_protected = membergroupsById($group, 1, false, false, true);
-
-		// Is it protected?
-		if ($is_protected['group_type'] == 1)
+	elseif (!allowedTo('admin_forum') && $group_details['group_type'] == 1)
 			return false;
-	}
 
 	// Do the actual updates.
 	if ($type == 'only_additional')
@@ -839,15 +824,14 @@ function membersInGroups($postGroups, $normalGroups = array(), $include_hidden =
  *
  * @return array|false
  */
-function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false, $protected = false)
+function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable = false)
 {
 	$db = database();
 
 	if (empty($group_ids))
 		return false;
 
-	if (!is_array($group_ids))
-		$group_ids = array($group_ids);
+	$group_ids = !is_array($group_ids) ? array($group_ids) : $group_ids;
 
 	$groups = array();
 	$group_ids = array_map('intval', $group_ids);
@@ -858,28 +842,33 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 			CASE WHEN min_posts = {int:min_posts} THEN 1 ELSE 0 END AS assignable,
 			CASE WHEN min_posts != {int:min_posts} THEN 1 ELSE 0 END AS is_post_group') . '
 		FROM {db_prefix}membergroups
-		WHERE id_group IN ({array_int:group_ids})' . ($protected ? '' : '
-			AND group_type != {int:is_protected}') . (empty($limit) ? '' : '
+		WHERE id_group IN ({array_int:group_ids})' . (empty($limit) ? '' : '
 		LIMIT {int:limit}'),
 		array(
 			'min_posts' => -1,
 			'group_ids' => $group_ids,
 			'limit' => $limit,
-			'is_protected' => 1,
 		)
 	);
-
-	if ($db->num_rows($request) == 0)
-		return $groups;
 
 	while ($row = $db->fetch_assoc($request))
 		$groups[$row['id_group']] = $row;
 	$db->free_result($request);
 
-	if (is_array($group_id))
-		return $groups;
-	else
+	return $groups;
+}
+
+/**
+ * Uses membergroupsById to return the group informations of only 1 group
+ */
+function membergroupById($group_id, $detailed = false, $assignable = false)
+{
+	$groups = membergroupsById(array($group_id), 1, $detailed, $assignable);
+
+	if (isset($groups[$group_id]))
 		return $groups[$group_id];
+	else
+		return false;
 }
 
 /**
@@ -948,7 +937,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			$where = '';
 
 	$request = $db->query('', '
-		SELECT id_group, group_name, min_posts
+		SELECT id_group, group_name, min_posts, online_color
 		FROM {db_prefix}membergroups
 		WHERE 1 = 1
 			' . $where . '
@@ -971,7 +960,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			'name' => $txt['membergroups_members']
 		);
 
-	if (isset($split))
+	if (!empty($split))
 	{
 		if (empty($modSettings['permission_enable_postgroups']))
 		{
@@ -1009,15 +998,16 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 				);
 		}
 	}
-
 	else
 		while ($row = $db->fetch_assoc($request))
 		{
 			$groups[] = array(
 				'id' => $row['id_group'],
-				'name' => $row['group_name']
+				'name' => $row['group_name'],
+				'online_color' => $row['online_color'],
 			);
 		}
+
 	$db->free_result($request);
 
 	return $groups;
@@ -1032,10 +1022,12 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
  */
 function getGroups($groupList)
 {
+	global $txt;
+
 	$db = database();
 
 	$groups = array();
-	if (in_array(0, $groups))
+	if (in_array(0, $groupList))
 	{
 		$groups[0] = array(
 			'id' => 0,
@@ -1046,20 +1038,20 @@ function getGroups($groupList)
 
 	// Get all membergroups that have access to the board the announcement was made on.
 	$request = $db->query('', '
-		SELECT mg.id_group, COUNT(mem.id_member) AS num_members
+		SELECT mg.id_group, mg.group_name, COUNT(mem.id_member) AS num_members
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_group = mg.id_group OR FIND_IN_SET(mg.id_group, mem.additional_groups) != 0 OR mg.id_group = mem.id_post_group)
 		WHERE mg.id_group IN ({array_int:group_list})
 		GROUP BY mg.id_group',
 		array(
-			'group_list' => $groups,
+			'group_list' => $groupList,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$groups[$row['id_group']] = array(
 			'id' => $row['id_group'],
-			'name' => '',
+			'name' => $row['group_name'],
 			'member_count' => $row['num_members'],
 		);
 	}
@@ -1198,7 +1190,7 @@ function updateCopiedGroup($id_group, $copy_from)
 	$db = database();
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
-	$group_info = membergroupsById($copy_from, 1, true);
+	$group_info = membergroupById($copy_from, true);
 
 	// update the new membergroup
 	$db->query('', '

@@ -562,17 +562,8 @@ function rebuildModCache()
 	$boards_mod = array();
 	if (!$user_info['is_guest'])
 	{
-		$request = $db->query('', '
-			SELECT id_board
-			FROM {db_prefix}moderators
-			WHERE id_member = {int:current_member}',
-			array(
-				'current_member' => $user_info['id'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-			$boards_mod[] = $row['id_board'];
-		$db->free_result($request);
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$boards_mod = boardsModerated($user_info['id']);
 	}
 
 	$mod_query = empty($boards_mod) ? '0=1' : 'b.id_board IN (' . implode(',', $boards_mod) . ')';
