@@ -39,6 +39,8 @@ class DbTable_PostgreSQL extends DbTable
 
 	private function __construct()
 	{
+		global $db_prefix;
+
 		// We won't do any remove on these
 		$this->_reservedTables = array('admin_info_files', 'approval_queue', 'attachments', 'ban_groups', 'ban_items',
 			'board_permissions', 'boards', 'calendar', 'calendar_holidays', 'categories', 'collapsed_categories',
