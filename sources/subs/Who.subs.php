@@ -14,15 +14,21 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Checks, who is viewing a topic or board
+ *
+ * @param int $id
+ * @param string $session
+ * @param string $type
+ * @return array
+ */
 function viewers($id, $session, $type = 'topic')
 {
 	$db = database();
 
+	// Make sure we have a default value
 	if (!in_array($type, array('topic', 'board')))
-	{
-		// Dunno what you want!
 		$type = 'topic';
-	}
 
 	$viewers = array();
 	$request = $db->query('', '
@@ -121,6 +127,8 @@ function formatViewers($id, $type)
  */
 function addonsCredits()
 {
+	global $txt;
+
 	$db = database();
 
 	if (($credits = cache_get_data('addons_credits', 86400)) === null)

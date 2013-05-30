@@ -435,8 +435,6 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  */
 function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDone = false)
 {
-	global $modSettings;
-
 	$db = database();
 
 	// Show your licence, but only if it hasn't been done yet.

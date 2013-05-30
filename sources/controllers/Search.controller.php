@@ -1718,7 +1718,7 @@ function action_plushsearch2()
 				first_mem.id_member AS first_member_id, IFNULL(first_mem.real_name, first_m.poster_name) AS first_member_name,
 				last_m.id_msg AS last_msg, last_m.poster_time AS last_poster_time, last_mem.id_member AS last_member_id,
 				IFNULL(last_mem.real_name, last_m.poster_name) AS last_member_name, last_m.icon AS last_icon, last_m.subject AS last_subject,
-				t.id_topic, t.is_sticky, t.locked, t.id_poll, t.num_replies, t.num_views,
+				t.id_topic, t.is_sticky, t.locked, t.id_poll, t.num_replies, t.num_views, t.num_likes,
 				b.id_board, b.name AS board_name, c.id_cat, c.name AS cat_name
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -2518,8 +2518,8 @@ function prepareSearchContext($reset = false)
 		'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($message['is_sticky']),
 		'is_locked' => !empty($message['locked']),
 		'is_poll' => $modSettings['pollMode'] == '1' && $message['id_poll'] > 0,
-		'is_hot' => $message['num_replies'] >= $modSettings['hotTopicPosts'],
-		'is_very_hot' => $message['num_replies'] >= $modSettings['hotTopicVeryPosts'],
+		'is_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicPosts'] : $message['num_replies'] >= $modSettings['hotTopicPosts'],
+		'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $message['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 		'posted_in' => !empty($participants[$message['id_topic']]),
 		'views' => $message['num_views'],
 		'replies' => $message['num_replies'],

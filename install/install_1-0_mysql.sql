@@ -38,8 +38,8 @@ VALUES
 
 CREATE TABLE {$db_prefix}antispam_questions (
   id_question tinyint(4) unsigned NOT NULL auto_increment,
-  question text NOT NULL default '',
-  answer text NOT NULL default '',
+  question text NOT NULL,
+  answer text NOT NULL,
   language varchar(50) NOT NULL default '',
   PRIMARY KEY (id_question),
   KEY language (language(30))
@@ -1288,6 +1288,8 @@ CREATE TABLE {$db_prefix}members (
   pm_email_notify tinyint(4) NOT NULL default '0',
   karma_bad smallint(5) unsigned NOT NULL default '0',
   karma_good smallint(5) unsigned NOT NULL default '0',
+  likes_given mediumint(5) unsigned NOT NULL default '0',
+  likes_received mediumint(5) unsigned NOT NULL default '0',
   usertitle varchar(255) NOT NULL default '',
   notify_announcements tinyint(4) NOT NULL default '1',
   notify_regularity tinyint(4) NOT NULL default '1',
@@ -2070,6 +2072,7 @@ CREATE TABLE {$db_prefix}topics (
   id_previous_topic mediumint(8) NOT NULL default '0',
   num_replies int(10) unsigned NOT NULL default '0',
   num_views int(10) unsigned NOT NULL default '0',
+  num_likes int(10) unsigned NOT NULL default '0',
   locked tinyint(4) NOT NULL default '0',
   redirect_expires int(10) unsigned NOT NULL default '0',
   id_redirect_topic mediumint(8) unsigned NOT NULL default '0',
@@ -2164,7 +2167,7 @@ CREATE TABLE {$db_prefix}postby_emails_error (
 	id_board smallint(5) NOT NULL default '0',
 	email_from varchar(50) NOT NULL default '',
 	message_type char(10) NOT NULL default '',
-	message mediumtext NOT NULL default '',
+	message mediumtext NOT NULL,
 	PRIMARY KEY (id_email)
 ) ENGINE=MyISAM;
 
@@ -2179,4 +2182,27 @@ CREATE TABLE {$db_prefix}postby_emails_filters (
 	filter_from varchar(255) NOT NULL default '',
 	filter_name varchar(255) NOT NULL default '',
 	PRIMARY KEY (id_filter)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `log_likes`
+#
+
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target mediumint(8) unsigned NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  log_time int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member),
+  KEY log_time (log_time)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `message_likes`
+#
+
+CREATE TABLE {$db_prefix}message_likes (
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  id_msg mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member)
 ) ENGINE=MyISAM;

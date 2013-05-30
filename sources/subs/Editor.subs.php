@@ -26,7 +26,7 @@ if (!defined('ELKARTE'))
  */
 function action_loadlocale()
 {
-	global $context, $txt, $editortxt, $modSettings;
+	global $txt, $editortxt, $modSettings;
 
 	loadLanguage('Editor');
 
@@ -701,10 +701,8 @@ function create_control_richedit($editorOptions)
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
-	global $txt, $modSettings, $options, $language;
+	global $context;
 
-	$db = database();
-	global $context, $settings, $user_info, $scripturl;
 	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
 	static $all_instances;
 
@@ -893,7 +891,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
 		if (!$this->_show_captcha)
 			return;
@@ -936,7 +934,7 @@ class Control_Verification_Captcha implements Control_Verifications
 
 	public function settings()
 	{
-		global $txt, $context, $scripturl, $modSettings;
+		global $txt, $scripturl, $modSettings;
 
 		// Generate a sample registration image.
 		$verification_image = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
@@ -1045,8 +1043,6 @@ class Control_Verification_Questions implements Control_Verifications
 
 	public function createTest($refresh = true)
 	{
-		global $modSettings;
-
 		if (empty($this->_number_questions))
 			return;
 
@@ -1296,7 +1292,7 @@ class Control_Verification_Questions implements Control_Verifications
 	{
 		$db = database();
 
-		$request = $db->query('', '
+		$db->query('', '
 			UPDATE {db_prefix}antispam_questions
 			SET
 				question = {string:question},

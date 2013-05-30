@@ -1689,6 +1689,8 @@ CREATE TABLE {$db_prefix}members (
   pm_email_notify smallint NOT NULL default '0',
   karma_bad smallint NOT NULL default '0',
   karma_good smallint NOT NULL default '0',
+  likes_given int NOT NULL default '0',
+  likes_received int NOT NULL default '0',
   usertitle varchar(255) NOT NULL,
   notify_announcements smallint NOT NULL default '1',
   notify_regularity smallint NOT NULL default '1',
@@ -2590,6 +2592,7 @@ CREATE TABLE {$db_prefix}topics (
   id_previous_topic int NOT NULL default '0',
   num_replies int NOT NULL default '0',
   num_views int NOT NULL default '0',
+  num_likes int NOT NULL default '0',
   locked smallint NOT NULL default '0',
   redirect_expires int NOT NULL default '0',
   id_redirect_topic int NOT NULL default '0',
@@ -2748,5 +2751,33 @@ CREATE TABLE {$db_prefix}postby_emails_filter
 	filter_to varchar(255) NOT NULL default '',
 	filter_from varchar(255) NOT NULL default '',
 	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter),
+	PRIMARY KEY (id_filter)
+);
+
+#
+# Table structure for table `log_likes`
+#
+
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target int NOT NULL default '0',
+  id_member int NOT NULL default '0',
+  log_time int NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member)
+);
+
+#
+# Indexes for table `log_likes`
+#
+
+CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
+
+#
+# Table structure for table `message_likes`
+#
+
+CREATE TABLE {$db_prefix}message_likes (
+  id_member int NOT NULL default '0',
+  id_msg int NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member)
 );

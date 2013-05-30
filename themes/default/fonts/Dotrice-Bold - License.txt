@@ -1,6 +1,5 @@
-Copyright (c) 2012, T.B. von Strong (tstrong2@gmail.com),
-with Reserved Font Name vSHexagonica.
-
+Copyright (c) 2010, Paul Flo Williams (paul@frixxon.co.uk),
+with Reserved Font Name Dotrice.
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

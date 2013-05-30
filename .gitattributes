@@ -1,0 +1,11 @@
+* text eol=lf
+
+# Always convert to LF
+*.php text
+
+# Safe is safe...
+*.png binary
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.ttf binary

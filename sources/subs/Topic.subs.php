@@ -301,6 +301,32 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 			);
 	}
 
+	// Reuse the message array if available
+	if (empty($messages))
+	{
+		$messages = array();
+		$request = $smcFunc['db_query']('', '
+			SELECT id_msg
+			FROM {db_prefix}messages
+			WHERE id_topic IN ({array_int:topics})',
+			array(
+				'topics' => $topics,
+			)
+		);
+		while ($row = $smcFunc['db_fetch_row']($request))
+			$messages[] = $row[0];
+		$smcFunc['db_free_result']($request);
+	}
+
+	// Remove all likes now that the topic is gone
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}message_likes
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+		)
+	);
+
 	// Delete messages in each topic.
 	$db->query('', '
 		DELETE FROM {db_prefix}messages
@@ -398,7 +424,7 @@ function moveTopics($topics, $toBoard)
 	// Only a single topic.
 	if (is_numeric($topics))
 		$topics = array($topics);
-	$num_topics = count($topics);
+	
 	$fromBoards = array();
 
 	// Destination board empty or equal to 0?
@@ -1102,7 +1128,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 		SELECT
 			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
 			t.id_member_started, t.id_member_updated, t.id_poll,
-			t.num_replies, t.num_views, t.locked, t.redirect_expires,
+			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($follow_ups_table ? ',
 			fu.derived_from' : '') .
@@ -1136,8 +1162,6 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  */
 function removeOldTopics()
 {
-	global $modSettings;
-
 	$db = database();
 
 	isAllowedTo('admin_forum');
@@ -1307,14 +1331,14 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 
 /**
  * Retrieve a few data on a particular message.
- * Slightly different from getMessageInfo, this one inner joins {db_prefix}topics
+ * Slightly different from basicMessageInfo, this one inner joins {db_prefix}topics
  * and doesn't use {query_see_board}
  *
  * @param int $topic topic ID
  * @param int $message message ID
  * @param bool $topic_approved if true it will return the topic approval status, otherwise the message one (default false)
  */
-function messageInfo($topic, $message, $topic_approved = false)
+function messageTopicDetails($topic, $message, $topic_approved = false)
 {
 	global $modSettings;
 
@@ -1522,6 +1546,12 @@ function updateSplitTopics($options, $id_board)
 	);
 }
 
+/**
+ * Find out who started a topic
+ *
+ * @param int $topic
+ * @return int
+ */
 function topicStarter($topic)
 {
 	$db = database();
