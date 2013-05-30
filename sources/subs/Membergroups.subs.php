@@ -828,7 +828,7 @@ function membergroupsById($group_ids, $limit = 1, $detailed = false, $assignable
 {
 	$db = database();
 
-	if (empty($group_id))
+	if (empty($group_ids))
 		return false;
 
 	$group_ids = !is_array($group_ids) ? array($group_ids) : $group_ids;
