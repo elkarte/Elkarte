@@ -1,4 +1,4 @@
-fi<?php
+<?php
 
 /**
  * @name      ElkArte Forum
