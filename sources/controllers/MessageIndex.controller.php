@@ -48,6 +48,7 @@ class MessageIndex_Controller
 
 		$context['name'] = $board_info['name'];
 		$context['description'] = $board_info['description'];
+		$template_layers = Template_Layers::getInstance();
 
 		// How many topics do we have in total?
 		$board_info['total_topics'] = allowedTo('approve_posts') ? $board_info['num_topics'] + $board_info['unapproved_topics'] : $board_info['num_topics'] + $board_info['unapproved_user_topics'];
@@ -487,11 +488,11 @@ class MessageIndex_Controller
 		}
 
 		if (!empty($context['boards']) && (!empty($options['show_children']) || $context['start'] == 0))
-			Template_Layers::getInstance()->add('display_child_boards');
+			$template_layers->add('display_child_boards');
 
 		// If there are children, but no topics and no ability to post topics...
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
-		Template_Layers::getInstance()->add('pages_and_buttons');
+		$template_layers->add('pages_and_buttons');
 
 		addJavascriptVar('notification_board_notice', $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board'], true);
 

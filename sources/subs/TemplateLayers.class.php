@@ -47,17 +47,18 @@ class Template_Layers
 	/**
 	 * The highest priority assigned at a certain moment for $_all_general
 	 */
-	private $_general_highest_priority = 100;
+	private $_general_highest_priority = 0;
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_end
 	 */
-	private $_end_highest_priority = 100;
+	private $_end_highest_priority = 10000;
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_begin
+	 * Highest priority at "begin" is sort of tricky, because the value is negative
 	 */
-	private $_begin_highest_priority = 100;
+	private $_begin_highest_priority = -10000;
 
 	/**
 	 * Used in prepareContext to store the layers in the order
@@ -126,7 +127,7 @@ class Template_Layers
 	 */
 	public function addBegin($layer, $priority = null)
 	{
-		$this->_all_begin[$layer] = $priority === null ? $this->_begin_highest_priority : (int) $priority;
+		$this->_all_begin[$layer] = $priority === null ? $this->_begin_highest_priority : (int) -$priority;
 		$this->_begin_highest_priority = max($this->_all_begin) + 100;
 	}
 
@@ -159,7 +160,9 @@ class Template_Layers
 		$this->_all_before = array();
 		$this->_all_end = array();
 		$this->_all_begin = array();
-		$this->_general_highest_priority = 100;
+		$this->_general_highest_priority = 0;
+		$this->_end_highest_priority = 10000;
+		$this->_begin_highest_priority = -10000;
 	}
 
 	/**
@@ -172,12 +175,6 @@ class Template_Layers
 	public function prepareContext()
 	{
 		$this->_sorted_layers = array();
-
-		// Let's gain some space between the layers to be sure to be able to fit all the before/after
-		$spacing = (count($this->_all_after) + count($this->_all_before)) * 2;
-		array_map(create_function('$priority', 'return $priority * ' . $spacing . ';'), $this->_all_begin);
-		array_map(create_function('$priority', 'return $priority * ' . $spacing . ';'), $this->_all_general);
-		array_map(create_function('$priority', 'return $priority * ' . $spacing . ';'), $this->_all_end);
 
 		// Sorting
 		asort($this->_all_begin);
