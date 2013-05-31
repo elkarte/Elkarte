@@ -304,7 +304,7 @@ function template_topic_replies_below()
 
 function template_postarea_above()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Start the javascript...
 	echo '
