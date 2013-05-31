@@ -616,19 +616,22 @@ class Packages_Controller
 			if (empty($thisAction))
 				continue;
 
-			if ($context['uninstalling'])
-				$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
-			else
-				$file = BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
-
-			if (isset($action['filename']) && !file_exists($file))
+			if (isset($action['filename']))
 			{
-				$context['has_failure'] = true;
+				if ($context['uninstalling'])
+					$file = in_array($action['type'], array('remove-dir', 'remove-file')) ? $action['filename'] : BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
+				else
+					$file = BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename'];
 
-				$thisAction += array(
-					'description' => $txt['package_action_error'],
-					'failed' => true,
-				);
+				if (!file_exists($file))
+				{
+					$context['has_failure'] = true;
+
+					$thisAction += array(
+						'description' => $txt['package_action_error'],
+						'failed' => true,
+					);
+				}
 			}
 
 			// @todo None given?
@@ -748,6 +751,7 @@ class Packages_Controller
 		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
 
 		require_once(SUBSDIR . '/Package.subs.php');
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// @todo Perhaps do it in steps, if necessary?
 		$context['uninstalling'] = $_REQUEST['sa'] == 'uninstall2';

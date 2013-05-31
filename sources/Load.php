@@ -1475,11 +1475,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 		// Custom template layers?
 		if (isset($settings['theme_layers']))
-			foreach(explode(',', $settings['theme_layers']) as $key => $layer)
-				$layers[$layer] = $key * 100;
+			$layers = explode(',', $settings['theme_layers']);
 		else
-			$layers = array('html' => 0, 'body' => 100);
-		Template_Layers::getInstance()->add($layers);
+			$layers = array('html', 'body');
+		$template_layers = Template_Layers::getInstance();
+		foreach ($layers as $layer)
+			$template_layers->addBegin($layer);
 	}
 
 	// Initialize the theme.
