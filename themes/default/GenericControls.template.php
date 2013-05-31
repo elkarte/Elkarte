@@ -36,8 +36,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					emoticonsCompat: true,', !empty($editor_context['locale']) ? '
 					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
-					plugins: "bbcode, draft",
-					enablePasteFiltering: true,', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? '
+					enablePasteFiltering: true,
+					plugins: "bbcode', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
 					draftOptions: {
 						sLastNote: \'draft_lastautosave\',
 						sSceditorID: \'' . $context['post_box_name'] . '\',
@@ -45,7 +45,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
 						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
 						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
-					},' : ''), '
+					},' : '",'), '
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 					}';
