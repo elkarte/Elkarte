@@ -1756,6 +1756,7 @@ class PersonalMessage_Controller
 
 		// Load up the fields.
 		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+		require_once(SUBSDIR . '/Profile.subs.php');
 		action_pmprefs($user_info['id']);
 	}
 

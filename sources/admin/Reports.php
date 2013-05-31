@@ -110,7 +110,11 @@ class Reports_Controller
 
 			// Are we disabling the other layers - print friendly for example?
 			if ($reportTemplates[$_REQUEST['st']]['layers'] !== null)
-				Template_Layers::getInstance()->add($reportTemplates[$_REQUEST['st']]['layers']);
+			{
+				$template_layers = Template_Layers::getInstance();
+				foreach ($reportTemplates[$_REQUEST['st']]['layers'] as $layer)
+					$template_layers->add($layer);
+			}
 		}
 
 		// Make the page title more descriptive.
