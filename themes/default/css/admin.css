@@ -1256,6 +1256,10 @@ ul.moderation_notes li {
 .admin_img_themes {
 	background: url(../images/admin/admin_sprite.png) no-repeat -480px 0;
 }
+.pagelink, .current_page, .expand_pages {
+	border: 0;
+	background-color: transparent;
+}
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
 /*@media screen and (max-width: 85em) {
