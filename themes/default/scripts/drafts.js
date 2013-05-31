@@ -147,7 +147,6 @@ elk_DraftAutoSave.prototype.onDraftDone = function (XMLDoc)
 // If another auto save came in with one still pending
 elk_DraftAutoSave.prototype.draftCancel = function ()
 {
-	// can we do anything at all ... do we want to (e.g. sequence our async events?)
 	this.bInDraftMode = false;
 	document.getElementById('throbber').style.display = 'none';
 };
