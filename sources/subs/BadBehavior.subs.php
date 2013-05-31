@@ -121,7 +121,7 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 		$key_response = bb2_get_response($row['valid']);
 
 		//Prevent undefined errors and log ..
-		if($key_response[0] == '00000000')
+		if(isset($key_response[0]) && $key_response[0]  == '00000000')
 		{
 			$key_response['response'] = '';
 			$key_response['explanation'] = '';

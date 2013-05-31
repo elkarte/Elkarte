@@ -2384,7 +2384,7 @@ select.qaction, input.qaction {
 /* The quick buttons */
 .quickbuttons_wrap {
 	padding: 2px 0;
-	margin: 0 0 0 95px;
+	margin: 0 0 0 180px;
 }
 ul.quickbuttons {
 	margin: 11px 0 0 0;
@@ -4677,6 +4677,9 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		border: 1px solid #ddd;
 		border-radius: 8px;
 		padding: 6px;
+	}
+	.quickbuttons li.modified {
+		display: none;
 	}
 }
 
