@@ -125,8 +125,6 @@ class MarkRead_Controller
 	{
 		global $user_info, $modSettings;
 
-		$db = database();
-
 		// Make sure all the topics are integers!
 		$topics = array_map('intval', explode('-', $_REQUEST['topics']));
 
@@ -152,8 +150,6 @@ class MarkRead_Controller
 	public function action_marktopic()
 	{
 		global $board, $topic, $user_info;
-
-		$db = database();
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
