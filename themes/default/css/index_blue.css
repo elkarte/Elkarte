@@ -30,6 +30,10 @@ html, body {
 .catbg, .catbg a {
 	color: white;
 }
+h3.catbg a:hover {
+    color: #ccc !important;
+}
+
 h1.forumtitle {
 	padding: 12px 10px 6px 12px;
 	text-shadow: -1px 0 white, 0 1px white,
