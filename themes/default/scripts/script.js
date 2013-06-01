@@ -132,7 +132,7 @@ String.prototype.php_to8bit = function ()
 		{
 			n = this.charCodeAt(i);
 			if (n < 128)
-				sReturn += String.fromCharCode(n)
+				sReturn += String.fromCharCode(n);
 			else if (n < 2048)
 				sReturn += String.fromCharCode(192 | n >> 6) + String.fromCharCode(128 | n & 63);
 			else if (n < 65536)
@@ -242,7 +242,7 @@ String.prototype.php_to8bit = function ()
 		sReturn += iOffsetFrom > -1 ? this.oCharsetConversion.to.charAt(iOffsetFrom) : (this.charCodeAt(i) > 127 ? '&#' + this.charCodeAt(i) + ';' : this.charAt(i));
 	}
 
-	return sReturn
+	return sReturn;
 }
 
 // Character-level replacement function.
@@ -816,7 +816,7 @@ smc_Toggle.prototype.init = function ()
 		this.oCookie = new smc_Cookie({});
 
 		// Check if the cookie is set.
-		var cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName)
+		var cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName);
 		if (cookieValue != null)
 			this.opt.bCurrentlyCollapsed = cookieValue == '1';
 	}
