@@ -19,7 +19,7 @@
  */
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings, $counter;
+	global $context, $settings, $options, $txt, $modSettings;
 
 	// Show the actual posting area...
 	echo '
@@ -152,7 +152,7 @@ function template_main()
 
 function template_load_drafts_below()
 {
-	global $context, $settings, $txt, $modSettings, $options;
+	global $context, $settings, $txt, $options;
 
 	// If the admin enabled the drafts feature, show a draft selection box
 	if (!empty($options['drafts_show_saved_enabled']))
@@ -304,7 +304,7 @@ function template_topic_replies_below()
 
 function template_postarea_above()
 {
-	global $context, $scripturl, $txt;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Start the javascript...
 	echo '

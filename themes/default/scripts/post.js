@@ -328,9 +328,9 @@ function addPollOption()
 				pollTabIndex = document.forms[form_name].elements[i].tabIndex;
 			}
 	}
-	pollOptionNum++
-	pollOptionId++
-	pollTabIndex++
+	pollOptionNum++;
+	pollOptionId++;
+	pollTabIndex++;
 	setOuterHTML(document.getElementById('pollMoreOptions'), '<li><label for="options-' + pollOptionId + '">' + txt_option + ' ' + pollOptionNum + '</label>: <input type="text" name="options[' + pollOptionId + ']" id="options-' + pollOptionId + '" value="" size="80" maxlength="255" tabindex="' + pollTabIndex + '" class="input_text" /></li><li id="pollMoreOptions"></li>');
 }
 
