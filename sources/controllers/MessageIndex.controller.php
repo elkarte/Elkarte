@@ -30,10 +30,8 @@ class MessageIndex_Controller
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
 		global $options, $settings, $board_info, $user_info;
-
-		$db = database();
-
 		// Fairly often, we'll work with boards. Current board, child boards.
+
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// If this is a redirection board head off.
