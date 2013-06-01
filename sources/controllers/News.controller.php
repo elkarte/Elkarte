@@ -42,8 +42,6 @@ class News_Controller
 		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
 		global $query_this_board, $forum_version, $cdata_override, $settings;
 
-		$db = database();
-
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
 			obExit(false);
@@ -387,8 +385,8 @@ class News_Controller
 	 */
 	function action_xmlnews($xml_format)
 	{
-		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $settings, $context;
+		global $scripturl, $modSettings, $board;
+		global $query_this_board, $context;
 
 		$db = database();
 
@@ -535,8 +533,8 @@ class News_Controller
 	 */
 	function action_xmlrecent($xml_format)
 	{
-		global $user_info, $scripturl, $modSettings, $board;
-		global $query_this_board, $settings, $context;
+		global $scripturl, $modSettings, $board;
+		global $query_this_board, $context;
 
 		$db = database();
 
@@ -933,8 +931,6 @@ function cdata_parse($data, $ns = '')
  */
 function dumpTags($data, $i, $tag = null, $xml_format = '')
 {
-	global $modSettings, $context, $scripturl;
-
 	// For every array in the data...
 	foreach ($data as $key => $val)
 	{
