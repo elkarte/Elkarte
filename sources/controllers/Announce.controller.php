@@ -102,7 +102,7 @@ class Announce_Controller
 		global $topic, $board, $board_info, $context, $modSettings;
 		global $language, $scripturl;
 
-        checkSession();
+		checkSession();
 
 		$context['start'] = empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'];
 		$groups = array_merge($board_info['groups'], array(1));
