@@ -36,7 +36,7 @@ class Poll_Controller
 	 */
 	function action_vote()
 	{
-		global $topic, $txt, $user_info, $modSettings;
+		global $topic, $user_info, $modSettings;
 
 		$db = database();
 
@@ -588,8 +588,7 @@ class Poll_Controller
 	 */
 	function action_editpoll2()
 	{
-		global $txt, $topic, $board, $context;
-		global $modSettings, $user_info;
+		global $topic, $board, $user_info;
 
 		$db = database();
 
