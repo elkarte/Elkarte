@@ -511,7 +511,7 @@ class Display_Controller
 					'id' => $pollinfo['id_member'],
 					'name' => $pollinfo['poster_name'],
 					'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-					'link' => $pollinfo['id_member'] == 0 ? $polinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $pollinfo['poster_name'] . '</a>'
+					'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $pollinfo['poster_name'] . '</a>'
 				)
 			);
 
@@ -1010,7 +1010,7 @@ function prepareDisplayContext($reset = false)
 	global $settings, $txt, $modSettings, $scripturl, $options, $user_info;
 
 	$db = database();
-	global $memberContext, $context, $messages_request, $topic, $attachments, $topicinfo;
+	global $memberContext, $context, $messages_request, $topic;
 
 	static $counter = null;
 
