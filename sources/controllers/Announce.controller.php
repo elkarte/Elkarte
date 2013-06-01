@@ -64,9 +64,7 @@ class Announce_Controller
 	 */
 	function action_selectgroup()
 	{
-		global $txt, $context, $topic, $board, $board_info;
-
-		$db = database();
+		global $context, $topic, $board_info;
 
 		$groups = array_merge($board_info['groups'], array(1));
 		foreach ($groups as $id => $group)
@@ -102,11 +100,9 @@ class Announce_Controller
 	function action_send()
 	{
 		global $topic, $board, $board_info, $context, $modSettings;
-		global $language, $scripturl, $txt, $user_info;
+		global $language, $scripturl;
 
-		$db = database();
-
-		checkSession();
+        checkSession();
 
 		$context['start'] = empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'];
 		$groups = array_merge($board_info['groups'], array(1));
