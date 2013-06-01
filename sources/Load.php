@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  */
 function reloadSettings()
 {
-	global $modSettings, $txt, $db_character_set, $context, $ent_check;
+	global $modSettings, $db_character_set;
 
 	$db = database();
 
@@ -946,7 +946,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 function loadMemberContext($user, $display_custom_fields = false)
 {
 	global $memberContext, $user_profile, $txt, $scripturl, $user_info;
-	global $context, $modSettings, $board_info, $settings;
+	global $context, $modSettings, $settings;
 	static $dataLoaded = array();
 
 	// If this person's data is already loaded, skip it.
@@ -1773,7 +1773,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	global $context, $settings, $options, $txt, $db_show_debug;
+	global $context, $txt, $db_show_debug;
 
 	if ($db_show_debug === true)
 		$context['debug']['sub_templates'][] = $sub_template_name;
@@ -2084,7 +2084,8 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			}
 			$txt['emails'] = array();
 		}
-		if (!empty($birthdayEmails))
+        // @todo: sending birthday mails currently broken, $birthdayEmails not initialized !
+        if (!empty($birthdayEmails))
 		{
 			foreach ($birthdayEmails as $key => $value)
 			{
@@ -2253,7 +2254,7 @@ function getLanguages($use_cache = true)
  */
 function censorText(&$text, $force = false)
 {
-	global $modSettings, $options, $settings, $txt;
+	global $modSettings, $options, $settings;
 	static $censor_vulgar = null, $censor_proper;
 
 	if ((!empty($options['show_no_censored']) && $settings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
@@ -2301,8 +2302,7 @@ function censorText(&$text, $force = false)
  */
 function template_include($filename, $once = false)
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
-	global $user_info, $boardurl;
+	global $context, $settings, $txt, $scripturl, $modSettings, $boardurl;
 	global $maintenance, $mtitle, $mmessage;
 	static $templates = array();
 
