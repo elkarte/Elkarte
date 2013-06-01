@@ -3232,7 +3232,7 @@ function template_javascript($do_defered = false)
 				// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
 				if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
 					// @todo: $loadjquery isn't used anywhere, probably a bug..
-                    $loadjquery = true;
+					$loadjquery = true;
 			}
 		}
 	}
