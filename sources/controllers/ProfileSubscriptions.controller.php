@@ -289,7 +289,7 @@ function action_subscriptions()
  */
 function action_activateaccount()
 {
-	global $context, $user_profile, $modSettings, $user_info;
+	global $context, $user_profile, $modSettings;
 
 	isAllowedTo('moderate_forum');
 
