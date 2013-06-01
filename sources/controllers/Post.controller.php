@@ -431,15 +431,9 @@ class Post_Controller
 			// Are you... a guest?
 			if ($user_info['is_guest'])
 			{
-				$_REQUEST['guestname'] = !isset($_REQUEST['guestname']) ? '' : trim($_REQUEST['guestname']);
-				$_REQUEST['email'] = !isset($_REQUEST['email']) ? '' : trim($_REQUEST['email']);
-
-				$_REQUEST['guestname'] = htmlspecialchars($_REQUEST['guestname']);
-				$context['name'] = $_REQUEST['guestname'];
-				$_REQUEST['email'] = htmlspecialchars($_REQUEST['email']);
-				$context['email'] = $_REQUEST['email'];
-
-				$user_info['name'] = $_REQUEST['guestname'];
+				$context['name'] = !isset($_REQUEST['guestname']) ? '' : Util::htmlspecialchars(trim($_REQUEST['guestname']));
+				$context['email'] = !isset($_REQUEST['email']) ? '' : Util::htmlspecialchars(trim($_REQUEST['email']));
+				$user_info['name'] = $context['name'];
 			}
 
 			// Only show the preview stuff if they hit Preview.
