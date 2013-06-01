@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
 function action_issuewarning()
 {
 	global $txt, $scripturl, $modSettings, $user_info, $mbname;
-	global $context, $cur_profile, $memberContext;
+	global $context, $cur_profile;
 
 	$db = database();
 
@@ -386,9 +386,7 @@ function action_issuewarning()
  */
 function action_deleteaccount()
 {
-	global $txt, $context, $user_info, $modSettings, $cur_profile;
-
-	$db = database();
+	global $txt, $context, $modSettings, $cur_profile;
 
 	if (!$context['user']['is_owner'])
 		isAllowedTo('profile_remove_any');
