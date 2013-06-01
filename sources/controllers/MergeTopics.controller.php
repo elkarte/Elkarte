@@ -59,9 +59,9 @@ class MergeTopics_Controller
 	function action_mergeIndex()
 	{
 		global $txt, $board, $context;
+		global $scripturl, $user_info, $modSettings;
 
 		$db = database();
-		global $scripturl, $topic, $user_info, $modSettings;
 
 		if (!isset($_GET['from']))
 			fatal_lang_error('no_access', false);
