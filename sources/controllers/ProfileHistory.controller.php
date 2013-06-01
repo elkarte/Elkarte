@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function action_history()
 {
-	global $context, $txt, $scripturl, $modSettings, $user_profile;
+	global $context, $txt, $modSettings, $user_profile;
 
 	$memID = currentMemberID();
 
@@ -388,7 +388,7 @@ function list_getIPMessageCount($where, $where_vars = array())
  */
 function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $txt, $scripturl;
+	global $scripturl;
 
 	$db = database();
 
@@ -725,10 +725,7 @@ function action_trackip($memID = 0)
  */
 function action_tracklogin($memID = 0)
 {
-	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context;
-
-	$db = database();
+	global $scripturl, $txt, $context;
 
 	// Gonna want this for the list.
 	require_once(SUBSDIR . '/List.subs.php');
@@ -806,6 +803,8 @@ function action_tracklogin($memID = 0)
  * @param string $where
  * @param array $where_vars
  * @return string count of messages matching the IP
+ * @todo: this function is probably, broken: $where isn't used, $where_vars is
+ *	array but used like a var..
  */
 function list_getLoginCount($where, $where_vars = array())
 {
@@ -837,8 +836,6 @@ function list_getLoginCount($where, $where_vars = array())
  */
 function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $txt, $scripturl;
-
 	$db = database();
 
 	$request = $db->query('', '
