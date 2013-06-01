@@ -39,8 +39,7 @@ class Post_Controller
 	function action_post()
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board;
-		global $user_info, $context, $settings;
-		global $options, $language;
+		global $user_info, $context, $options, $language;
 
 		$db = database();
 
@@ -918,10 +917,8 @@ class Post_Controller
 	 */
 	function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context;
+		global $board, $topic, $txt, $modSettings, $context, $user_settings;
 		global $user_info, $board_info, $options, $scripturl, $settings;
-
-		$db = database();
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -1671,6 +1668,7 @@ class Post_Controller
 			setTopicNotification($user_info['id'], $topic, false);
 
 		// Log an act of moderation - modifying.
+        // @todo: bug, $row['id_member'] is not initialized
 		if (!empty($moderationAction))
 			logAction('modify', array('topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $row['id_member'], 'board' => $board));
 
@@ -1765,7 +1763,7 @@ class Post_Controller
 	 */
 	function action_quotefast()
 	{
-		global $modSettings, $user_info, $txt, $settings, $context;
+		global $modSettings, $user_info, $context;
 
 		$db = database();
 
@@ -2132,8 +2130,6 @@ class Post_Controller
 	function action_spellcheck()
 	{
 		global $txt, $context;
-
-		$db = database();
 
 		// A list of "words" we know about but pspell doesn't.
 		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');
