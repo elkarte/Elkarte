@@ -2412,9 +2412,6 @@ function messageIndexBar($area)
 
 	require_once(SUBSDIR . '/Menu.subs.php');
 
-	// What page is this, again?
-	$current_page = $scripturl . '?action=pm' . (!empty($_REQUEST['sa']) ? ';sa=' . $_REQUEST['sa'] : '') . (!empty($context['folder']) ? ';f=' . $context['folder'] : '') . (!empty($context['current_label_id']) ? ';l=' . $context['current_label_id'] : '');
-
 	// Set a few options for the menu.
 	$menuOptions = array(
 		'current_area' => $area,
