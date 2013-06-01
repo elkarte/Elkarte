@@ -417,6 +417,7 @@ function updateMemberData($members, $data)
  * @param array $changeArray
  * @param bool $update = false
  * @param bool $debug = false
+ * @todo: add debugging features, $debug isn't used 
  */
 function updateSettings($changeArray, $update = false, $debug = false)
 {
@@ -932,7 +933,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 {
 	global $txt, $scripturl, $context, $modSettings, $user_info;
 
-	$db = database();
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
 	static $disabled;
 
@@ -2471,7 +2471,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info, $context;
+	global $modSettings, $txt, $user_info;
 
 	$db = database();
 	static $smileyPregSearch = null, $smileyPregReplacements = array();
@@ -2946,7 +2946,6 @@ function setupThemeContext($forceload = false)
 function setMemoryLimit($needed, $in_use = false)
 {
 	// everything in bytes
-	$memory_used = 0;
 	$memory_current = memoryReturnBytes(ini_get('memory_limit'));
 	$memory_needed = memoryReturnBytes($needed);
 
@@ -3132,7 +3131,7 @@ function template_header()
  */
 function theme_copyright()
 {
-	global $forum_copyright, $context, $boardurl, $forum_version, $txt, $modSettings;
+	global $forum_copyright, $forum_version;
 
 	// Don't display copyright for things like SSI.
 	if (!isset($forum_version))
@@ -3232,7 +3231,8 @@ function template_javascript($do_defered = false)
 
 				// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
 				if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
-					$loadjquery = true;
+					// @todo: $loadjquery isn't used anywhere, probably a bug..
+                    $loadjquery = true;
 			}
 		}
 	}
@@ -3381,7 +3381,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
  */
 function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
 {
-	global $modSettings, $db_character_set;
+	global $modSettings;
 
 	$clean_name = $filename;
 
@@ -3536,8 +3536,6 @@ function host_from_ip($ip)
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
-	global $context;
-
 	// Step 1: Remove entities/things we don't consider words:
 	$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
 
@@ -3589,7 +3587,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  */
 function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
 {
-	global $settings, $txt, $context;
+	global $settings, $txt;
 
 	// Does the current loaded theme have this and we are not forcing the usage of this function?
 	if (function_exists('template_create_button') && !$force_use)
@@ -3830,6 +3828,7 @@ function setupMenuContext()
 				// Make sure the last button truely is the last button.
 				if (!empty($button['is_last']))
 				{
+                    // @todo: $last_button not initialized, probably a bug..
 					if (isset($last_button))
 						unset($menu_buttons[$last_button]['is_last']);
 					$last_button = $act;
@@ -4138,8 +4137,6 @@ function remove_integration_function($hook, $function, $file = '')
 */
 function sanitizeMSCutPaste($string)
 {
-	global $context;
-
 	if (empty($string))
 		return $string;
 
