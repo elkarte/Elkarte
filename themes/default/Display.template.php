@@ -27,8 +27,8 @@ function template_report_sent_above()
 
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
-		// Yeah, I know, though at the moment is the only way...
+	global $context, $settings, $options, $txt, $scripturl;
+	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
 
 	// Show the topic information - icon, subject, etc.

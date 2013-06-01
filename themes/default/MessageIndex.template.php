@@ -19,7 +19,7 @@
  */
 function template_main()
 {
-	global $context, $settings, $options, $scripturl, $modSettings, $txt;
+	global $context, $settings, $options, $scripturl, $txt;
 
 	if (!$context['no_topic_listing'])
 	{

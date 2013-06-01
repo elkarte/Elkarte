@@ -266,7 +266,7 @@ function addCriteriaOption()
 			if (document.forms.addrule.elements[i].id.substr(0, 8) == "ruletype")
 				criteriaNum++;
 	}
-	criteriaNum++
+	criteriaNum++;
 	
 	// group selections
 	var group_option = '';
@@ -284,7 +284,7 @@ function addActionOption()
 			if (document.forms.addrule.elements[i].id.substr(0, 7) == "acttype")
 				actionNum++;
 	}
-	actionNum++
+	actionNum++;
 	
 	// Label selections
 	var label_option = '';
