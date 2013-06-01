@@ -45,7 +45,7 @@ class Who_Controller
 	 */
 	function action_who()
 	{
-		global $context, $scripturl, $user_info, $txt, $modSettings, $memberContext;
+		global $context, $scripturl, $txt, $modSettings, $memberContext;
 
 		$db = database();
 
@@ -302,7 +302,7 @@ class Who_Controller
  */
 function determineActions($urls, $preferred_prefix = false)
 {
-	global $txt, $user_info, $modSettings, $context;
+	global $txt, $user_info, $modSettings;
 
 	$db = database();
 
@@ -530,7 +530,7 @@ function determineActions($urls, $preferred_prefix = false)
  */
 function prepareCreditsData()
 {
-	global $context, $modSettings, $forum_copyright, $forum_version, $txt;
+	global $context, $txt;
 
 	// Don't blink. Don't even blink. Blink and you're dead.
 	$context['credits'] = array(
