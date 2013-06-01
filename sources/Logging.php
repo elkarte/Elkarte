@@ -440,6 +440,7 @@ function logActions($logs)
 		if (!isset($log_types[$log['log_type']]))
 			return false;
 
+        // @todo : $action is not initialized, probably a bug..
 		if (!is_array($log['extra']))
 			trigger_error('logActions(): data is not an array with action \'' . $action . '\'', E_USER_NOTICE);
 
