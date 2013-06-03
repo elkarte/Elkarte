@@ -1422,7 +1422,7 @@ function scheduled_fetchFiles()
  */
 function scheduled_birthdayemails()
 {
-	global $modSettings, $mbname, $txt, $txtBirthdayEmails;
+	global $modSettings, $txt, $txtBirthdayEmails;
 
 	$db = database();
 
