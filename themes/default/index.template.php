@@ -695,5 +695,5 @@ function template_select_boards($name, $label = '', $extra = '')
 	}
 
 	echo '
-					</select>';
+	</select>';
 }

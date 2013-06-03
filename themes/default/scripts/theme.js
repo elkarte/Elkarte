@@ -101,6 +101,7 @@ function errorbox_handler(oOptions)
 	this.init();
 }
 
+// @todo this code works well almost only with the editor I think.
 errorbox_handler.prototype.init = function ()
 {
 	if (this.opt.check_id !== undefined)
