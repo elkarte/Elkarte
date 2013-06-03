@@ -1138,7 +1138,7 @@ table.table_padding td {
 }
 /* Necessary to allow highlighting of 1st level while hovering over submenu. */
 .dropmenu li:hover li a, .dropmenu li.sfhover li a {
-	padding: 1px 9px;
+	padding: 1px 10px;
 	background: none;
 	color: #666;
 	border: none;
