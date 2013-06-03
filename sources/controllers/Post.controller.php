@@ -486,8 +486,6 @@ class Post_Controller
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['msg']) ? ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '') . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = isset($_REQUEST['msg']) ? $txt['save'] : $txt['post'];
 
-			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
-
 			// Previewing an edit?
 			if (isset($_REQUEST['msg']) && !empty($topic))
 			{
