@@ -52,6 +52,7 @@ class Post_Controller
 
 		$post_errors = error_context::context('post', 1);
 		$attach_errors = error_context::context('attachment', 1);
+		$first_subject = '';
 
 		// Posting an event?
 		$context['make_event'] = isset($_REQUEST['calendar']);
