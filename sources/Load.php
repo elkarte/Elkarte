@@ -2084,8 +2084,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 			}
 			$txt['emails'] = array();
 		}
-        // @todo: sending birthday mails currently broken, $birthdayEmails not initialized !
-        if (!empty($birthdayEmails))
+		if (!empty($birthdayEmails))
 		{
 			foreach ($birthdayEmails as $key => $value)
 			{
