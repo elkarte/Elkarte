@@ -982,7 +982,7 @@ class PersonalMessage_Controller
 		if (!isset($_REQUEST['xml']) && checkSession('post', '', false) != '')
 			$post_errors->addError('session_timeout');
 
-		$_REQUEST['subject'] = isset($_REQUEST['subject']) ? trim($_REQUEST['subject']) : '';
+		$_REQUEST['subject'] = isset($_REQUEST['subject']) ? strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')) : '';
 		$_REQUEST['to'] = empty($_POST['to']) ? (empty($_GET['to']) ? '' : $_GET['to']) : $_POST['to'];
 		$_REQUEST['bcc'] = empty($_POST['bcc']) ? (empty($_GET['bcc']) ? '' : $_GET['bcc']) : $_POST['bcc'];
 
