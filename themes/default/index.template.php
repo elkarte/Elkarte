@@ -70,7 +70,7 @@ function template_init()
 	$settings['require_theme_strings'] = false;
 
 	// This is used for the color variants
-	$settings['theme_variants'] = array('white', 'blue', 'red');
+	$settings['theme_variants'] = array('white', 'blue', 'red', 'green');
 
 	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
 	$settings['avatars_on_indexes'] = false;
@@ -82,7 +82,7 @@ function template_init()
 	$settings['page_index_template'] = array(
 		'base_link' => '<span class="pagelink"><a class="navPages" href="{base_link}">%2$s</a> </span>',
 		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-		'current_page' => '<span class="pagelink"><span class="current_page"><strong>%1$s</strong></span></span>',
+		'current_page' => '<span class="pagelink current_pagelink"><span class="current_page"><strong>%1$s</strong></span></span>',
 		'next_page' => '<span class="next_page">{next_txt}</span>',
 		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 	);
