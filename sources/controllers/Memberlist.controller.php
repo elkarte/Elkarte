@@ -29,7 +29,7 @@ class Memberlist_Controller
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
 	 *
-	 * @uses Memberlist template, main sub template.
+	 * @uses Memberlist template, main sub-template.
 	 */
 	function action_index()
 	{
@@ -315,8 +315,8 @@ class Memberlist_Controller
 
 	/**
 	 * Search for members, or display search results.
-	 * - If variable 'search' is empty displays search dialog box, using the search sub template.
-	 * - Calls printMemberListRows to retrieve the results of the query.
+	 * If variable $_REQUEST['search'] is empty displays search dialog box, using the search sub-template.
+	 * Calls printMemberListRows to retrieve the results of the query.
 	 */
 	function action_mlsearch()
 	{
