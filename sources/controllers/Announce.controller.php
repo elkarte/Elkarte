@@ -38,9 +38,9 @@ class Announce_Controller
 	 *
 	 * checks the topic announcement permissions and loads the announcement template.
 	 * requires the announce_topic permission.
-	 * uses the ManageMembers template and Post language file.
+	 * uses the Announce template and Post language file.
 	 */
-	function pre_announce()
+	function pre_dispatch()
 	{
 		global $context, $txt, $topic;
 
