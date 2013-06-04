@@ -26,7 +26,8 @@ $_SERVER['SERVER_NAME'] = '';
 
 // Our mail controller
 require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-action_pbe_post();
+$controller = new Emailpost_Controller();
+$controller->action_pbe_post();
 
 // Always exit as successful
 exit(0);

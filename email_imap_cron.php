@@ -68,6 +68,9 @@ function postbyemail_imap()
 		// Make sure we work from the oldest to the newest message
 		sort($emails);
 
+		// Initialize Emailpost controller
+		$controller = new Emailpost_Controller();
+
 		// For every email...
 		foreach ($emails as $email_number)
 		{
@@ -81,7 +84,7 @@ function postbyemail_imap()
 			if (!empty($headers) && !empty($message))
 			{
 				$email = $headers . "\n" . $message;
-				action_pbe_post($email);
+				$controller->action_pbe_post($email);
 
 				// Mark it for deletion?
 				if (!empty($modSettings['maillist_imap_delete']))
