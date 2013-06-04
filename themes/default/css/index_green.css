@@ -65,7 +65,7 @@ h1.forumtitle a {
 }
 .unread_links {
 	position: fixed;
-	top: 0;
+	top: 3px;
 	left: 40%;
 	z-index: 99;
 }
