@@ -347,3 +347,27 @@ font-weight: bold;
 border-radius: 3px;
 border: 1px solid #ccc;
 }
+#button_xhtml {
+	display: none;
+}
+#button_rss {
+	background: url(../images/_green/rss.png) no-repeat;
+	position: fixed;
+	top: 10px;
+	right: 8px;
+	z-index: 99;
+}
+#button_rss a {
+	width: 10px;
+	display: block;
+	line-height: 10px;
+}
+#button_rss span {
+	color: transparent;
+	font-size: 0.7em;
+	cursor: pointer;
+	text-decoration: none;
+}
+#footer_section a:hover {
+	text-decoration: none;
+}
