@@ -1,8 +1,10 @@
 /* This is css file for the blue color variant */
 
+@import url(http://fonts.googleapis.com/css?family=Piedra);
+
 body {
 	background-color: #e9e9e9;
-	font-family: Verdana, Arial, Helvetica;
+	margin-top: 32px;
 }
 #wrapper {
 	background-color: #fff;
@@ -22,11 +24,8 @@ div.cat_bar {
 	border-bottom: 1px solid #ccc;
 	border-radius: 0;
 }
-.catbg, .catbg a {
-
-}
 h1.forumtitle {
-	padding: 12px 10px 6px 12px;
+	padding: 16px 10px 6px 12px;
 	text-shadow: -1px 0 white, 0 1px white,
       1px 0 white, 0 -1px white, #c0c0c0 2px 2px 9px;
 }
@@ -37,20 +36,38 @@ h1.forumtitle a:hover {
 h1.forumtitle a {
 	color: #70963E;
 	font-weight: bold;
-	font-size: 1.2em;
+	font-size: 1.4em;
+	font-family: 'Piedra', sans-serif;
+	background: radial-gradient(ellipse at center, #aaa 0%,#e9e9e9 69%);
 }
 
 #footer_section {
-	background-color: transparent;
+	background-color: white;
 	color: #222;
+	border-top: 1px solid #ccc;
 }
-#footer_section a:link {
+#footer_section a:link, #footer_section a:visited, #footer_section a:active {
 	color: #444;
 }
+#footer_section ul li {
+	text-align:center;
+}
+
 #top_section {
 	font-weight: normal;
 	color: #222;
 	background-color: #fff;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 98;
+}
+.unread_links {
+	position: fixed;
+	top: 0;
+	left: 40%;
+	z-index: 99;
 }
 
 #header .frame {
@@ -140,6 +157,15 @@ h1.forumtitle a {
 	box-shadow: none;
 	color: #444;
 }
+.dropmenu li li:hover, .adm_section .dropmenu li li:hover {
+	border: 1px solid transparent;
+}
+.dropmenu li li:hover>a, .dropmenu li li.sfhover a:focus, .dropmenu li li a:hover, .dropmenu li li a:focus {
+	color: #fff;
+	text-decoration: none;
+	border: 1px solid #70963E;
+	background-color: #70963E;
+}
 #inner_wrap hr {
 	display: none;
 }
@@ -180,6 +206,8 @@ li.greeting, .news p {
 .navigate_section ul {
 	border: none;
 	border-radius: 0;
+	box-shadow: none;
+	border: 1px solid #ccc;
 }
 .generic_list_wrapper, .action_profile #permissions, #postmodify .roundframe, .add_buddy,
 #creator .windowbg2, #notify_options .windowbg2, .windowbg
