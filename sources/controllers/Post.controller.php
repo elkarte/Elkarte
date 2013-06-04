@@ -52,6 +52,7 @@ class Post_Controller
 
 		$post_errors = error_context::context('post', 1);
 		$attach_errors = error_context::context('attachment', 1);
+		$first_subject = '';
 
 		// Posting an event?
 		$context['make_event'] = isset($_REQUEST['calendar']);
@@ -484,8 +485,6 @@ class Post_Controller
 			// Set the destination action for submission.
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['msg']) ? ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '') . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = isset($_REQUEST['msg']) ? $txt['save'] : $txt['post'];
-
-			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 
 			// Previewing an edit?
 			if (isset($_REQUEST['msg']) && !empty($topic))
