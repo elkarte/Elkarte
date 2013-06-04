@@ -371,3 +371,7 @@ border: 1px solid #ccc;
 #footer_section a:hover {
 	text-decoration: none;
 }
+
+.titlebg, .titlebg2, tr.titlebg th, tr.titlebg td, tr.titlebg2 td {
+	background: transparent;
+}
