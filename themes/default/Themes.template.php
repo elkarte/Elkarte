@@ -1098,7 +1098,7 @@ function template_edit_template()
 			echo '
 	<div class="errorbox">
 		', $txt['themeadmin_edit_error'], '
-			<div><tt>', $error, '</tt></div>
+			<div><span class="tt">', $error, '</span></div>
 	</div>';
 
 	// Just show a big box.... gray out the Save button if it's not saveable... (ie. not 777.)

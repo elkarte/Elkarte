@@ -122,6 +122,11 @@ input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
 	box-shadow: 0 2px 5px rgba(0,0,0,0.1) inset;
 }
 
+/* HTML5 additions for deprecated tags */
+.tt {
+	font-family: monospace;
+}
+
 /* Buttons should be styled a bit differently, in order to make them look more button'ish. */
 #frmLogin input.button_submit, #guest_form input.button_submit, #calendar_navigation input.button_submit {
 	float: none;

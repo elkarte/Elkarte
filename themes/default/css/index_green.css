@@ -376,3 +376,10 @@ border: 1px solid #ccc;
 .titlebg, .titlebg2, tr.titlebg th, tr.titlebg td, tr.titlebg2 td {
 	background: transparent;
 }
+
+input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
+	outline:none !important;
+	border: 1px solid #70963E;
+	box-shadow: 0;
+	background-color: #faffff;
+}
