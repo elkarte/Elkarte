@@ -279,7 +279,7 @@ function template_body_above()
 	</div>';
 
 	echo '
-	<div id="header">
+	<header id="header">
 		<div class="frame">
 			<h1 class="forumtitle">
 				<a id="top" href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
@@ -290,7 +290,7 @@ function template_body_above()
 
 	echo'
 		</div>
-	</div>
+	</header>
 	<div id="wrapper">
 		<div id="upper_section">
 			<div id="inner_section">
@@ -392,7 +392,7 @@ function template_body_below()
 	// Show the XHTML and RSS links, as well as the copyright.
 	// Footer is now full-width by default. Frame inside it will match theme wrapper width automatically.
 	echo '
-	<div id="footer_section">
+	<footer id="footer_section">
 		<div class="frame">';
 
 	// There is now a global "Go to top" link at the right.
@@ -413,7 +413,7 @@ function template_body_below()
 
 	echo '
 		</div>
-	</div>';
+	</footer>';
 }
 
 /**
@@ -496,7 +496,7 @@ function template_menu()
 	global $context, $settings, $txt;
 
 	echo '
-				<div id="main_menu">
+				<nav id="main_menu">
 					<ul class="dropmenu topmenu" id="menu_nav">';
 
 	// Note: Menu markup has been cleaned up to remove unnecessary spans and classes.
@@ -558,7 +558,7 @@ function template_menu()
 
 	echo '
 					</ul>
-				</div>';
+				</nav>';
 
 	// Define the upper_section toggle in JavaScript.
 	// Note that this definition had to be shifted for the js to work with the new markup.
