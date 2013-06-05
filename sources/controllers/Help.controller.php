@@ -20,13 +20,15 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Class to handle the help page and boxes
+ */
 class Help_Controller
 {
 	/**
-	 * Redirect to the user help ;).
-	 * It loads information needed for the help section.
+	 * Prepares the help page.
+	 * Uses Help template and Manual language file.
 	 * It is accessed by ?action=help.
-	 * @uses Help template and Manual language file.
 	 */
 	function action_help()
 	{
@@ -38,7 +40,7 @@ class Help_Controller
 		// We need to know where our wiki is.
 		$context['wiki_url'] = 'https://github.com/elkarte/Elkarte/wiki';
 
-		// Sections were are going to link...
+		// Sections we are going to link...
 		$context['manual_sections'] = array(
 			'registering' => 'Registering',
 			'logging_in' => 'Logging_In',
@@ -58,19 +60,19 @@ class Help_Controller
 			'name' => $txt['help'],
 		);
 
-		// Lastly, some minor template stuff.
+		// Lastly, set up some template stuff.
 		$context['page_title'] = $txt['manual_elkarte_user_help'];
 		$context['sub_template'] = 'manual';
 	}
 
 	/**
-	 * Show some of the more detailed help to give the admin an idea...
-	 * It shows a popup for administrative or user help.
-	 * It uses the help parameter to decide what string to display and where to get
-	 * the string from. ($helptxt or $txt?)
+	 * Show boxes with more detailed help on items, when the user clicks on their help icon.
+	 * It handles both administrative or user help.
+	 * Data: $_GET['help'] parameter, it holds what string to display
+	 * and where to get the string from. ($helptxt or $txt)
 	 * It is accessed via ?action=quickhelp;help=?.
 	 * @uses ManagePermissions language file, if the help starts with permissionhelp.
-	 * @uses Help template, popup sub template, no layers.
+	 * @uses Help template, 'popup' sub-template.
 	 */
 	function action_quickhelp()
 	{
@@ -82,13 +84,16 @@ class Help_Controller
 		if (!isset($helptxt))
 			$helptxt = array();
 
+		$help = $_GET['help'];
+
 		// Load the admin help language file and template.
 		loadLanguage('Help');
 
-		// Permission specific help?
-		if (isset($_GET['help']) && substr($_GET['help'], 0, 14) == 'permissionhelp')
+		// Load permission specific help
+		if (substr($help, 0, 14) == 'permissionhelp')
 			loadLanguage('ManagePermissions');
 
+		// Load our template
 		loadTemplate('Help');
 
 		// Allow mods to load their own language file here
@@ -97,19 +102,20 @@ class Help_Controller
 		// Set the page title to something relevant.
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['help'];
 
-		// Don't show any template layers, just the popup sub template.
+		// Only show the 'popup' sub-template, no layers.
 		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'popup';
 
-		// What help string should be used?
-		if (isset($helptxt[$_GET['help']]))
-			$context['help_text'] = $helptxt[$_GET['help']];
-		elseif (isset($txt[$_GET['help']]))
-			$context['help_text'] = $txt[$_GET['help']];
+		// Find what to display: the string will be in $helptxt['help'] or in $txt['help]
+		if (isset($helptxt[$help]))
+			$context['help_text'] = $helptxt[$help];
+		elseif (isset($txt[$help]))
+			$context['help_text'] = $txt[$help];
 		else
-			$context['help_text'] = $_GET['help'];
+			// nothing :(
+			$context['help_text'] = $help;
 
-		// Does this text contain a link that we should fill in?
+		// Link to the forum URL, and include session id.
 		if (preg_match('~%([0-9]+\$)?s\?~', $context['help_text'], $match))
 			$context['help_text'] = sprintf($context['help_text'], $scripturl, $context['session_id'], $context['session_var']);
 	}
