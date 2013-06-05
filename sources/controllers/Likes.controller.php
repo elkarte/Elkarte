@@ -7,13 +7,14 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains one likable use, which allows members to like a post
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * This class contains one likable use, which allows members to like a post
+ */
 class Likes_Controller
 {
 	/**

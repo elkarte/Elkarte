@@ -38,22 +38,25 @@ class Members_Controller
 		isAllowedTo('profile_identity_own');
 		is_not_guest();
 
+		// You have to give a user
 		if (empty($_REQUEST['u']))
 			fatal_lang_error('no_access', false);
-		$_REQUEST['u'] = (int) $_REQUEST['u'];
 
-		// Remove if it's already there...
-		if (in_array($_REQUEST['u'], $user_info['buddies']))
-			$user_info['buddies'] = array_diff($user_info['buddies'], array($_REQUEST['u']));
-		// ...or add if it's not and if it's not you.
-		elseif ($user_info['id'] != $_REQUEST['u'])
-			$user_info['buddies'][] = (int) $_REQUEST['u'];
+		// Always an int
+		$user = (int) $_REQUEST['u'];
+
+		// Remove this user if it's already in your buddies...
+		if (in_array($user, $user_info['buddies']))
+			$user_info['buddies'] = array_diff($user_info['buddies'], array($user));
+		// ...or add if it's not there (and not you).
+		elseif ($user_info['id'] != $user)
+			$user_info['buddies'][] = $user;
 
 		// Update the settings.
 		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
 
 		// Redirect back to the profile
-		redirectexit('action=profile;u=' . $_REQUEST['u']);
+		redirectexit('action=profile;u=' . $user);
 	}
 
 	/**
