@@ -311,6 +311,9 @@ class Site_Dispatcher
 			if (method_exists($controller, 'pre_dispatch'))
 				$controller->pre_dispatch();
 
+			$hook = substr($this->_function_name, -1) == 2 ? substr($this->_function_name, 0, -1) : $this->_function_name;
+			call_integration_hook('integrate_' . $hook . '_before');
+
 			// 3, 2, ... and go
 			if (method_exists($controller, $this->_function_name))
 				$controller->{$this->_function_name}();
@@ -326,9 +329,12 @@ class Site_Dispatcher
 				// things went pretty bad, huh?
 				// board index :P
 				require_once(CONTROLLERDIR . '/BoardIndex.controller.php');
+				call_integration_hook('integrate_action_boardindex_before');
 				$controller = new BoardIndex_Controller();
-				return $this->action_boardindex();
+				$this->action_boardindex();
+				call_integration_hook('integrate_action_boardindex_after');
 			}
+			call_integration_hook('integrate_' . $hook . '_after');
 		}
 		else
 		{
