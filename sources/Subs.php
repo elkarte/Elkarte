@@ -786,6 +786,21 @@ function relativeTime($timestamp, $show_today = true, $offset_type = false)
 }
 
 /**
+ * Used to render a timestamp to html5 <time> tag format.
+ *
+ * @param int $timestamp
+ * @return string
+ */
+function htmlTime($timestamp)
+{
+	global $modSettings, $user_info;
+
+	$time = date('Y-m-d H:i', $timestamp + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600);
+
+	return $time;
+}
+
+/**
  * Removes special entities from strings.  Compatibility...
  * Faster than html_entity_decode
  *
