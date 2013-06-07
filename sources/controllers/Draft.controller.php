@@ -194,6 +194,7 @@ class Draft_Controller
 	{
 		global $txt, $user_info, $scripturl, $modSettings, $context;
 
+		require_once(SUBSDIR . '/Profile.subs.php');
 		$memID = currentMemberID(false);
 		// @todo: is necessary? Added because the default was -1
 		if (empty($memID))
