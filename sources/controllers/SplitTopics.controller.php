@@ -248,8 +248,6 @@ class SplitTopics_Controller
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
 
-		$db = database();
-
 		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
 
