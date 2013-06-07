@@ -241,7 +241,7 @@ class Display_Controller
 		// Create a previous next string if the selected theme has it as a selected option.
 		$context['previous_next'] = $modSettings['enablePreviousNext'] ? '<a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new">' . $txt['previous_next_back'] . '</a> - <a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=next#new">' . $txt['previous_next_forward'] . '</a>' : '';
 		if (!empty($context['topic_derived_from']))
-			$context['previous_next'] .= ' - <a href="' . $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_subject($context['topic_derived_from']['subject'], 25)) . '</em></a>';
+			$context['previous_next'] .= ' - <a href="' . $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_text($context['topic_derived_from']['subject'], 25)) . '</em></a>';
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -703,7 +703,7 @@ class Display_Controller
 				require_once(SUBSDIR . '/Likes.subs.php');
 				$context['likes'] = loadLikes($messages, true);
 			}
-			
+
 			$messages_request = $db->query('', '
 				SELECT
 					m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,

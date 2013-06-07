@@ -606,7 +606,7 @@ function scheduled_daily_digest()
 
 	require_once(SUBSDIR . '/Boards.subs.php');
 	// Just get the board names.
-	
+
 	$boards = fetchBoardsInfo(array('boards' => $boards));
 
 	if (empty($boards))
@@ -719,7 +719,7 @@ function scheduled_daily_digest()
 				// Replace the body array with the appropriate preview message
 				$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
 				pbe_prepare_text($body);
-				$body = shorten_text($body);
+				$body = shorten_text($body, 375, true);
 				$body = preg_replace("~\n~s","\n  ", $body);
 				$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
 

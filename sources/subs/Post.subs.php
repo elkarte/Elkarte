@@ -2356,7 +2356,7 @@ function lastPost()
 	return array(
 		'topic' => $row['id_topic'],
 		'subject' => $row['subject'],
-		'short_subject' => shorten_subject($row['subject'], 24),
+		'short_subject' => shorten_text($row['subject'], 24),
 		'preview' => $row['body'],
 		'time' => standardTime($row['poster_time']),
 		'timestamp' => forum_time(true, $row['poster_time']),
