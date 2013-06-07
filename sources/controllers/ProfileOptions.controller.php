@@ -1274,33 +1274,31 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		if (!empty($moderators))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			// @todo: $board isn't initialized, probably a bug
-			$moderators = membersAllowedTo('moderate_board', $board);
-			$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
+			$members = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
 
-			foreach ($result as $row)
+			foreach ($members as $member)
 			{
-				if ($row['notify_types'] != 4)
+				if ($member['notify_types'] != 4)
 					continue;
 
 				// Check whether they are interested.
-				if (!empty($row['mod_prefs']))
+				if (!empty($member['mod_prefs']))
 				{
-					list(,, $pref_binary) = explode('|', $row['mod_prefs']);
+					list(,, $pref_binary) = explode('|', $member['mod_prefs']);
 					if (!($pref_binary & 4))
 						continue;
 				}
 
 				$replacements = array(
-					'RECPNAME' => $row['member_name'],
+					'RECPNAME' => $member['member_name'],
 					'APPYNAME' => $old_profile['member_name'],
 					'GROUPNAME' => $group_name,
 					'REASON' => $_POST['reason'],
 					'MODLINK' => $scripturl . '?action=moderate;area=groups;sa=requests',
 				);
 
-				$emaildata = loadEmailTemplate('request_membership', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
+				$emaildata = loadEmailTemplate('request_membership', $replacements, empty($member['lngfile']) || empty($modSettings['userLanguage']) ? $language : $member['lngfile']);
+				sendmail($member['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
 			}
 		}
 
