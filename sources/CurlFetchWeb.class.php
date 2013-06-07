@@ -285,7 +285,6 @@ class Curl_Fetch_Webdata
 	 *  - lowercases everything to make it consistent
 	 *
 	 * @param type $cr
-     * @todo : $cr not used in code, bug?
 	 * @param string $header
 	 * @return string
 	 */

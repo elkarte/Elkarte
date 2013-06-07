@@ -803,8 +803,6 @@ function action_tracklogin($memID = 0)
  * @param string $where
  * @param array $where_vars
  * @return string count of messages matching the IP
- * @todo: this function is probably, broken: $where isn't used, $where_vars is
- *	array but used like a var..
  */
 function list_getLoginCount($where, $where_vars = array())
 {
@@ -813,7 +811,7 @@ function list_getLoginCount($where, $where_vars = array())
 	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
 		FROM {db_prefix}member_logins
-		WHERE id_member = {int:id_member}',
+		WHERE ' . $where,
 		array(
 			'id_member' => $where_vars['current_member'],
 		)
@@ -841,7 +839,7 @@ function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = ar
 	$request = $db->query('', '
 		SELECT time, ip, ip2
 		FROM {db_prefix}member_logins
-		WHERE {int:id_member}
+		WHERE ' . $where .'
 		ORDER BY time DESC',
 		array(
 			'id_member' => $where_vars['current_member'],

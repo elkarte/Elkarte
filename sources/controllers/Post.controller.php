@@ -1668,9 +1668,8 @@ class Post_Controller
 			setTopicNotification($user_info['id'], $topic, false);
 
 		// Log an act of moderation - modifying.
-        // @todo: bug, $row['id_member'] is not initialized
 		if (!empty($moderationAction))
-			logAction('modify', array('topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $row['id_member'], 'board' => $board));
+			logAction('modify', array('topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $msgInfo['id_member'], 'board' => $board));
 
 		if (isset($_POST['lock']) && $_POST['lock'] != 2)
 			logAction(empty($_POST['lock']) ? 'unlock' : 'lock', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
