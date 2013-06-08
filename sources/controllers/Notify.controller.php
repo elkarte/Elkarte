@@ -21,6 +21,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Notify Controller
+ */
 class Notify_Controller
 {
 	/**
