@@ -23,6 +23,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Memberlist Controller
+ */
 class Memberlist_Controller
 {
 	/**
@@ -246,7 +249,6 @@ class Memberlist_Controller
 		// Send the data to the template.
 		$context['start'] = $_REQUEST['start'] + 1;
 		$context['end'] = min($_REQUEST['start'] + $modSettings['defaultMaxMembers'], $context['num_members']);
-
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['page_title'] = sprintf($txt['viewing_members'], $context['start'], $context['end']);
 		$context['linktree'][] = array(
@@ -274,7 +276,6 @@ class Memberlist_Controller
 			$query_parameters['real_name_high'] = $memberlist_cache['index'][$second_offset];
 			$limit -= $first_offset;
 		}
-
 		// Reverse sorting is a bit more complicated...
 		elseif ($use_cache && $_REQUEST['sort'] === 'real_name')
 		{
