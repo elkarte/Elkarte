@@ -286,11 +286,13 @@ class Emailuser_Controller
 
 		// No errors, yet.
 		$report_errors = error_context::context('report', 1);
+
 		// ...or maybe some.
 		$context['report_error'] = array(
 			'errors' => $report_errors->prepareErrors(),
 			'type' => $report_errors->getErrorType() == 0 ? 'minor' : 'serious',
 		);
+
 		// If they're posting, it should be processed by action_reporttm2.
 		if ((isset($_POST[$context['session_var']]) || isset($_POST['save'])) && !$report_errors->hasErrors())
 			$this->action_reporttm2();
@@ -414,8 +416,10 @@ class Emailuser_Controller
 			$context['require_verification'] = create_control_verification($verificationOptions, true);
 
 			if (is_array($context['require_verification']))
+			{
 				foreach ($context['require_verification'] as $error)
 					$report_errors->addError($error, 0);
+			}
 		}
 
 		// Any errors?
@@ -452,8 +456,10 @@ class Emailuser_Controller
 		$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
 		$mod_to_notify = array();
 		foreach ($result as $row)
+		{
 			if ($row['notify_types'] != 4)
 				$mod_to_notify[] = $row;
+		}
 
 		// Check that moderators do exist!
 		if (empty($mod_to_notify))
