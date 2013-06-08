@@ -57,8 +57,6 @@ class Emailuser_Controller
 	{
 		global $topic, $txt, $context, $scripturl, $modSettings;
 
-		$db = database();
-
 		// Check permissions...
 		isAllowedTo('send_topic');
 
@@ -280,8 +278,6 @@ class Emailuser_Controller
 	function action_reporttm()
 	{
 		global $txt, $topic, $modSettings, $user_info, $context;
-
-		$db = database();
 
 		$context['robot_no_index'] = true;
 

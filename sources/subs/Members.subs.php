@@ -964,7 +964,6 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	return false;
 }
 
-// Get a list of groups that have a given permission (on a given board).
 /**
  * Retrieves a list of membergroups that are allowed to do the given
  * permission. (on the given board)
@@ -1688,7 +1687,7 @@ function retrieveMemberData($conditions)
 
 	if (isset($conditions['group_list']))
 		$conditions['additional_group_list'] = implode(', additional_groups) != 0 OR FIND_IN_SET(', $conditions['group_list']);
-	
+
 	$data = array();
 
 	if (!isset($conditions['order_by']))

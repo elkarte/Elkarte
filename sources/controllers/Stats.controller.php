@@ -32,7 +32,7 @@ class Stats_Controller
 	 */
 	function action_stats()
 	{
-		global $txt, $scripturl, $modSettings, $user_info, $context;
+		global $txt, $scripturl, $modSettings, $context;
 
 		$db = database();
 

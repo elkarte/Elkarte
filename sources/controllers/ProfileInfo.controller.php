@@ -600,10 +600,7 @@ function action_showPosts()
  */
 function action_showAttachments()
 {
-	global $txt, $user_info, $scripturl, $modSettings, $board;
-	global $context, $user_profile;
-
-	$db = database();
+	global $txt, $scripturl, $modSettings;
 
 	// OBEY permissions!
 	$boardsAllowed = boardsAllowedTo('view_attachments');
@@ -823,9 +820,7 @@ function list_getNumAttachments($boardsAllowed, $memID)
  */
 function action_showDisregarded()
 {
-	global $txt, $user_info, $scripturl, $modSettings, $board, $context;
-
-	$db = database();
+	global $txt, $user_info, $scripturl, $modSettings, $context;
 
 	$memID = currentMemberID();
 
@@ -1010,8 +1005,6 @@ function list_getDisregarded($start, $items_per_page, $sort, $memID)
  */
 function list_getNumDisregarded($memID)
 {
-	global $user_info;
-
 	$db = database();
 
 	// Get the total number of attachments they have posted.
@@ -1242,8 +1235,7 @@ function action_statPanel()
  */
 function action_showPermissions()
 {
-	global $scripturl, $txt, $board, $modSettings;
-	global $user_profile, $context, $user_info;
+	global $txt, $board, $user_profile, $context;
 
 	$db = database();
 

@@ -779,8 +779,6 @@ function createToken($action, $type = 'post')
  */
 function validateToken($action, $type = 'post', $reset = true)
 {
-	global $modSettings;
-
 	$type = $type == 'get' || $type == 'request' ? $type : 'post';
 
 	// Logins are special: the token is used to has the password with javascript before POST it
@@ -912,7 +910,7 @@ function checkSubmitOnce($action, $is_fatal = true)
  */
 function allowedTo($permission, $boards = null)
 {
-	global $user_info, $modSettings;
+	global $user_info;
 
 	$db = database();
 
@@ -1049,7 +1047,7 @@ function isAllowedTo($permission, $boards = null)
  */
 function boardsAllowedTo($permissions, $check_access = true, $simple = true)
 {
-	global $user_info, $modSettings;
+	global $user_info;
 
 	$db = database();
 
@@ -1188,7 +1186,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  */
 function spamProtection($error_type)
 {
-	global $modSettings, $txt, $user_info;
+	global $modSettings, $user_info;
 
 	$db = database();
 
@@ -1361,7 +1359,7 @@ function constructBanQueryIP($fullip)
  */
 function loadBadBehavior()
 {
-	global $modSettings, $user_info, $context, $bb2_results;
+	global $modSettings, $user_info, $bb2_results;
 
 	$bb_run = false;
 
@@ -1402,8 +1400,6 @@ function loadBadBehavior()
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)
 {
 	global $cookiename;
-
-	$db = database();
 
 	// As this is only brute protection, we allow 5 attempts every 10 seconds.
 

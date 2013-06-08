@@ -1043,7 +1043,6 @@ table.table_padding td {
 .dropmenu li a.active {
 /* 	background: orange; */
 	color: #666;
-	font-weight: bold;
 	border: 1px solid #aaa;
 	box-shadow: 0 5px 5px rgba(255,255,255,0.2) inset;
 /* 	text-shadow: 0 0 1px rgba(0,0,0,0.4); */

@@ -39,8 +39,7 @@ class Post_Controller
 	function action_post()
 	{
 		global $txt, $scripturl, $topic, $modSettings, $board;
-		global $user_info, $context, $settings;
-		global $options, $language;
+		global $user_info, $context, $options, $language;
 
 		$db = database();
 
@@ -911,10 +910,8 @@ class Post_Controller
 	 */
 	function action_post2()
 	{
-		global $board, $topic, $txt, $modSettings, $context;
+		global $board, $topic, $txt, $modSettings, $context, $user_settings;
 		global $user_info, $board_info, $options, $scripturl, $settings;
-
-		$db = database();
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -1665,7 +1662,7 @@ class Post_Controller
 
 		// Log an act of moderation - modifying.
 		if (!empty($moderationAction))
-			logAction('modify', array('topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $row['id_member'], 'board' => $board));
+			logAction('modify', array('topic' => $topic, 'message' => (int) $_REQUEST['msg'], 'member' => $msgInfo['id_member'], 'board' => $board));
 
 		if (isset($_POST['lock']) && $_POST['lock'] != 2)
 			logAction(empty($_POST['lock']) ? 'unlock' : 'lock', array('topic' => $topicOptions['id'], 'board' => $topicOptions['board']));
@@ -1758,7 +1755,7 @@ class Post_Controller
 	 */
 	function action_quotefast()
 	{
-		global $modSettings, $user_info, $txt, $settings, $context;
+		global $modSettings, $user_info, $context;
 
 		$db = database();
 
@@ -2125,8 +2122,6 @@ class Post_Controller
 	function action_spellcheck()
 	{
 		global $txt, $context;
-
-		$db = database();
 
 		// A list of "words" we know about but pspell doesn't.
 		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http', 'grandia', 'terranigma', 'rpgs');

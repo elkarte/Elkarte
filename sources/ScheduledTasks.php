@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function AutoTask()
 {
-	global $time_start, $modSettings;
+	global $time_start;
 
 	$db = database();
 
@@ -154,7 +154,7 @@ function AutoTask()
  */
 function scheduled_approval_notification()
 {
-	global $scripturl, $modSettings, $mbname, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 
@@ -494,7 +494,7 @@ function scheduled_daily_maintenance()
  */
 function scheduled_auto_optimize()
 {
-	global $modSettings, $db_prefix, $db_type;
+	global $modSettings, $db_prefix;
 
 	$db = database();
 
@@ -1282,8 +1282,8 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
  * Simply returns a time stamp of the next instance of these time parameters.
  *
  * @param int $regularity
- * @param type $unit
- * @param type $offset
+ * @param string $unit
+ * @param int $offset
  * @return int
  */
 function next_time($regularity, $unit, $offset)
@@ -1292,7 +1292,6 @@ function next_time($regularity, $unit, $offset)
 	if ($regularity == 0)
 		$regularity = 2;
 
-	$curHour = date('H', time());
 	$curMin = date('i', time());
 	$next_time = 9999999999;
 
@@ -1353,7 +1352,7 @@ function next_time($regularity, $unit, $offset)
  */
 function scheduled_fetchFiles()
 {
-	global $txt, $language, $settings, $forum_version, $modSettings;
+	global $txt, $language, $forum_version, $modSettings;
 
 	$db = database();
 
@@ -1423,7 +1422,7 @@ function scheduled_fetchFiles()
  */
 function scheduled_birthdayemails()
 {
-	global $modSettings, $mbname, $txt, $birthdayEmails;
+	global $modSettings, $txt, $txtBirthdayEmails;
 
 	$db = database();
 
@@ -1714,7 +1713,7 @@ function scheduled_weekly_maintenance()
  */
 function scheduled_paid_subscriptions()
 {
-	global $txt, $scripturl, $modSettings, $language;
+	global $scripturl, $modSettings, $language;
 
 	$db = database();
 
@@ -1801,8 +1800,6 @@ function scheduled_paid_subscriptions()
  */
 function scheduled_remove_temp_attachments()
 {
-	global $modSettings;
-
 	// We need to know where this thing is going.
 	require_once(SUBSDIR . '/Attachments.subs.php');
 	$attach_dirs = attachmentPaths();
@@ -1878,7 +1875,7 @@ function scheduled_remove_old_drafts()
 		return true;
 
 	// init
-	$drafts= array();
+	$drafts = array();
 
 	// We need this for language items
 	loadEssentialThemeData();

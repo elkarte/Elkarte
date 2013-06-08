@@ -33,7 +33,7 @@ class Emailpost_Controller
 	 */
 	function action_pbe_post($data = null, $force = false, $key = null)
 	{
-		global $txt, $modSettings, $language, $user_info;
+		global $txt, $modSettings, $language, $user_info, $maintenance;
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
@@ -330,6 +330,8 @@ class Emailpost_Controller
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
+    global $modSettings, $txt;
+
 	// Validate they have permission to reply
 	$becomesApproved = true;
 	if (!in_array('postby_email', $pbe['user_info']['permissions']))
@@ -422,6 +424,8 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 */
 function pbe_create_pm($pbe, $email_message)
 {
+    global $modSettings, $txt;
+
 	// Can they send?
 	if (!$pbe['user_info']['is_admin'] && !in_array('pm_send', $pbe['user_info']['permissions']))
 		return pbe_emailError('error_pm_not_allowed', $email_message);

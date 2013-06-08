@@ -36,7 +36,7 @@ function action_xmlhttp()
 	);
 
 	// Easy adding of xml sub actions
- 	call_integration_hook('integrate_xmlhttp', array(&$sub_actions));
+ 	call_integration_hook('integrate_xmlhttp', array(&$subActions));
 
 	// Valid action?
 	if (!isset($_REQUEST['sa'], $subActions[$_REQUEST['sa']]))
@@ -308,8 +308,6 @@ function action_newsletterpreview()
 function action_sig_preview()
 {
 	global $context, $txt, $user_info;
-
-	$db = database();
 
 	require_once(SUBSDIR . '/Profile.subs.php');
 	loadLanguage('Profile');
