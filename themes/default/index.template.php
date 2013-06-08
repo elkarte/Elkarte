@@ -119,10 +119,6 @@ function template_html_above()
 		}
 	</style>';
 
-	// Quick and dirty testing of RTL horrors. Remove before production build.
-	//echo '
-	//<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
-
 	// RTL languages require an additional stylesheet.
 	if ($context['right_to_left'])
 		echo '
