@@ -76,9 +76,9 @@ class Groups_Controller
 		global $txt, $context, $scripturl, $user_info;
 
 		$context['page_title'] = $txt['viewing_groups'];
-			$context[$context['moderation_menu_name']]['tab_data'] = array(
-				'title' => $txt['mc_group_requests'],
-			);
+		$context[$context['moderation_menu_name']]['tab_data'] = array(
+			'title' => $txt['mc_group_requests'],
+		);
 
 		// Making a list is not hard with this beauty.
 		require_once(SUBSDIR . '/List.subs.php');
@@ -241,6 +241,7 @@ class Groups_Controller
 		// Load all the group moderators, for fun.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['group']['moderators'] = array();
+
 		$moderators = getGroupModerators($current_group);
 		foreach ($moderators as $id_member => $name)
 		{
@@ -301,9 +302,13 @@ class Groups_Controller
 			// Any passed by ID?
 			$member_ids = array();
 			if (!empty($_REQUEST['member_add']))
+			{
 				foreach ($_REQUEST['member_add'] as $id)
+				{
 					if ($id > 0)
 						$member_ids[] = (int) $id;
+				}
+			}
 
 			// Construct the query pelements.
 			if (!empty($member_ids))
@@ -311,6 +316,7 @@ class Groups_Controller
 				$member_query[] = 'id_member IN ({array_int:member_ids})';
 				$member_parameters['member_ids'] = $member_ids;
 			}
+
 			if (!empty($member_names))
 			{
 				$member_query[] = 'LOWER(member_name) IN ({array_string:member_names})';
@@ -474,6 +480,7 @@ class Groups_Controller
 			{
 				// Different sub template...
 				$context['sub_template'] = 'group_request_reason';
+
 				// And a limitation. We don't care that the page number bit makes no sense, as we don't need it!
 				$where .= ' AND lgr.id_request IN ({array_int:request_ids})';
 				$where_parameters['request_ids'] = $_POST['groupr'];
@@ -752,8 +759,8 @@ class Groups_Controller
 /**
  * Callback function for createList().
  *
- * @param $where
- * @param $where_parameters
+ * @param string $where
+ * @param string $where_parameters
  * @return int, the count of group requests
  */
 function list_getGroupRequestCount($where, $where_parameters)
