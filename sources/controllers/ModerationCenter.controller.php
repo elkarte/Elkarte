@@ -20,6 +20,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Moderation Center Controller
+ */
 class ModerationCenter_Controller
 {
 	/**
@@ -79,8 +82,10 @@ class ModerationCenter_Controller
 
 		// Clean any moderator tokens as well.
 		foreach ($_SESSION['token'] as $key => $token)
+		{
 			if (strpos($key, '-mod') !== false)
 				unset($_SESSION['token'][$key]);
+		}
 
 		redirectexit('action=moderate');
 	}
@@ -318,8 +323,10 @@ class ModerationCenter_Controller
 			'n' => $txt['mc_prefs_latest_news'],
 			'p' => $txt['mc_notes'],
 		);
+
 		if ($context['can_moderate_groups'])
 			$context['homepage_blocks']['g'] = $txt['mc_group_requests'];
+
 		if ($context['can_moderate_boards'])
 		{
 			$context['homepage_blocks']['r'] = $txt['mc_reported_posts'];
@@ -334,9 +341,7 @@ class ModerationCenter_Controller
 			$show_reports = 1;
 		}
 		else
-		{
 			list ($show_reports, $mod_blocks, $pref_binary) = explode('|', $user_settings['mod_prefs']);
-		}
 
 		// Are we saving?
 		if (isset($_POST['save']))
@@ -1412,6 +1417,7 @@ function ModBlockReportedPosts()
 	// Got the info already?
 	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
 	$context['reported_posts'] = array();
+
 	if ($user_info['mod_cache']['bq'] == '0=1')
 		return 'reported_posts_block';
 
@@ -1477,6 +1483,7 @@ function ModBlockGroupRequests()
 	$db = database();
 
 	$context['group_requests'] = array();
+
 	// Make sure they can even moderate someone!
 	if ($user_info['mod_cache']['gq'] == '0=1')
 		return 'group_requests_block';
@@ -1519,7 +1526,7 @@ function ModBlockGroupRequests()
 
 /**
  * Callback for createList().
- * @param $approve_query
+ * @param string $approve_query
  */
 function list_getWatchedUserCount($approve_query)
 {
@@ -1544,11 +1551,11 @@ function list_getWatchedUserCount($approve_query)
 /**
  * Callback for createList().
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
- * @param $approve_query
- * @param $dummy
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $approve_query
+ * @param string $dummy
  */
 function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 {
@@ -1648,7 +1655,7 @@ function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $d
 /**
  * Callback for createList().
  *
- * @param $approve_query
+ * @param string $approve_query
  */
 function list_getWatchedUserPostsCount($approve_query)
 {
@@ -1677,11 +1684,11 @@ function list_getWatchedUserPostsCount($approve_query)
 /**
  * Callback for createList().
  *
- * @param $start
- * @param $items_per_page
- * @param $sort
- * @param $approve_query
- * @param $delete_boards
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $approve_query
+ * @param array $delete_boards
  */
 function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 {
@@ -1733,9 +1740,7 @@ function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query
  */
 function action_modcenter($dont_call = false)
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $user_info, $settings, $options;
-
-	$db = database();
+	global $txt, $context, $scripturl, $modSettings, $user_info, $options;
 
 	// Don't run this twice... and don't conflict with the admin bar.
 	if (isset($context['admin_area']))

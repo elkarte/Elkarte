@@ -582,8 +582,6 @@ function doLogin()
 	global $user_info, $user_settings;
 	global $cookiename, $maintenance, $modSettings, $context;
 
-	$db = database();
-
 	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -674,7 +672,6 @@ function phpBB3_password_check($passwd, $passwd_hash)
 	// Tests
 	$strpos = strpos($range, $passwd_hash[3]);
 	$count = 1 << $strpos;
-	$count2 = $count;
 	$salt = substr($passwd_hash, 4, 8);
 
 	$hash = md5($salt . $passwd, true);

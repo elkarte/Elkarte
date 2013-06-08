@@ -35,10 +35,10 @@ class Display_Controller
 	function action_index()
 	{
 		global $scripturl, $txt, $modSettings, $context, $settings;
-
-		$db = database();
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request, $topicinfo, $language, $all_posters;
+
+		$db = database();
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
@@ -149,10 +149,9 @@ class Display_Controller
 		else
 			$context['total_visible_posts'] = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
 
-		require_once(SUBSDIR . '/Messages.subs.php');
 		// When was the last time this topic was replied to?  Should we warn them about it?
+		// require_once(SUBSDIR . '/Messages.subs.php');
 		$mgsOptions = basicMessageInfo($topicinfo['id_last_msg'], true);
-
 		$context['oldTopicError'] = !empty($modSettings['oldTopicDays']) && $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 
 		// The start isn't a number; it's information about what to do, where to go.
@@ -203,7 +202,6 @@ class Display_Controller
 					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
 				}
 			}
-
 			// Link to a message...
 			elseif (substr($_REQUEST['start'], 0, 3) == 'msg')
 			{
@@ -337,6 +335,7 @@ class Display_Controller
 		// Build a list of this board's moderators.
 		$context['moderators'] = &$board_info['moderators'];
 		$context['link_moderators'] = array();
+
 		if (!empty($board_info['moderators']))
 		{
 			// Add a link for each moderator...
@@ -437,6 +436,7 @@ class Display_Controller
 		if ($context['is_poll'])
 		{
 			$template_layers->add('display_poll');
+
 			// Get information on the poll
 			require_once(SUBSDIR . '/Poll.subs.php');
 			$pollinfo = pollInfo($topicinfo['id_poll']);
@@ -460,6 +460,7 @@ class Display_Controller
 				{
 					// ;id,timestamp,[vote,vote...]; etc
 					$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);
+
 					// Find the poll we're after.
 					foreach ($guestinfo as $i => $guestvoted)
 					{
@@ -467,6 +468,7 @@ class Display_Controller
 						if ($guestvoted[0] == $topicinfo['id_poll'])
 							break;
 					}
+
 					// Has the poll been reset since guest voted?
 					if ($pollinfo['reset_poll'] > $guestvoted[1])
 					{
@@ -922,6 +924,7 @@ class Display_Controller
 		// We are restoring messages. We handle this in another place.
 		if (isset($_REQUEST['restore_selected']))
 			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
+
 		if (isset($_REQUEST['split_selection']))
 		{
 			$mgsOptions = basicMessageInfo(min($messages), true);
@@ -938,9 +941,7 @@ class Display_Controller
 			$allowed_all = true;
 		// Allowed to delete replies to their messages?
 		elseif (allowedTo('delete_replies'))
-		{
 			$allowed_all = $topic_info['id_member_started'] == $user_info['id'];
-		}
 		else
 			$allowed_all = false;
 
@@ -1008,10 +1009,7 @@ class Display_Controller
 function prepareDisplayContext($reset = false)
 {
 	global $settings, $txt, $modSettings, $scripturl, $options, $user_info;
-
-	$db = database();
 	global $memberContext, $context, $messages_request, $topic;
-
 	static $counter = null;
 
 	// If the query returned false, bail.
@@ -1212,10 +1210,12 @@ function loadAttachmentContext($id_msg)
 			}
 
 			if (!empty($attachment['id_thumb']))
+			{
 				$attachmentData[$i]['thumbnail'] = array(
 					'id' => $attachment['id_thumb'],
 					'href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_thumb'] . ';image',
 				);
+			}
 			$attachmentData[$i]['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
 
 			// If thumbnails are disabled, check the maximum size of the image.
