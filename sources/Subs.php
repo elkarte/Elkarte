@@ -851,7 +851,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 			$text = rtrim($matches[1]) . ' ...';
 		}
 		else
-			$text = Util::substr($subject, 0, $len) . '...';
+			$text = Util::substr($text, 0, $len) . '...';
 	}
 
 	return $text;
