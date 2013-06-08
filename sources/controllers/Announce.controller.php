@@ -28,6 +28,7 @@ class Announce_Controller
 	function action_index()
 	{
 		loadLanguage('Post');
+
 		// default for action=announce: action_selectgroup() function.
 		$this->action_selectgroup();
 	}
@@ -142,6 +143,7 @@ class Announce_Controller
 			// @todo Might need an interface?
 			'limit' => empty($modSettings['mail_queue']) ? 50 : 500,
 		);
+
 		if (!empty($modSettings['allow_disableAnnounce']))
 			$conditions['notify_announcements'] = 1;
 
@@ -160,6 +162,7 @@ class Announce_Controller
 		}
 
 		$announcements = array();
+		
 		// Loop through all members that'll receive an announcement in this batch.
 		foreach ($data as $row)
 		{
