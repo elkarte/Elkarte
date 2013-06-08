@@ -252,10 +252,7 @@ function template_reported_posts()
 						</div>';
 
 	if (!empty($context['reports']))
-		echo '
-						<div class="pagesection floatleft">
-							', $context['page_index'], '
-						</div>';
+		template_pagesection(false, false, 'go_down');
 
 	foreach ($context['reports'] as $report)
 	{
@@ -308,15 +305,7 @@ function template_reported_posts()
 							</div>
 						</div>';
 	else
-		echo '
-						<div class="pagesection">
-							<div class="floatleft">
-								<div class="pagelinks">', $context['page_index'], '</div>
-							</div>
-							<div class="floatright">
-								', !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="button_submit" />' : '', '
-							</div>
-						</div>';
+		template_pagesection(false, false, 'go_up', array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="button_submit" />' : ''));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -351,10 +340,7 @@ function template_unapproved_posts()
 							</div>
 						</div>';
 	else
-		echo '
-						<div class="pagesection floatleft">
-							', $context['page_index'], '
-						</div>';
+		template_pagesection(false, false, 'go_down');
 
 	foreach ($context['unapproved_items'] as $item)
 	{
@@ -375,7 +361,6 @@ function template_unapproved_posts()
 
 			if ($item['can_delete'])
 				echo '
-									', $context['menu_separator'], '
 										<a href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $remove_button, '</a>';
 
 			if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -389,29 +374,21 @@ function template_unapproved_posts()
 						</div>';
 	}
 
-	echo '
-						<div class="pagesection">';
-
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
-		echo '
+		$quick_mod = '
 							<div class="floatright">
-								<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'', $txt['mc_unapproved_sure'], '\')) submit();">
-									<option value="0">', $txt['with_selected'], ':</option>
+								<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
+									<option value="0">' . $txt['with_selected'] . ':</option>
 									<option value="0">-------------------</option>
-									<option value="approve">&nbsp;--&nbsp;', $txt['approve'], '</option>
-									<option value="delete">&nbsp;--&nbsp;', $txt['delete'], '</option>
+									<option value="approve">&nbsp;--&nbsp;' . $txt['approve'] . '</option>
+									<option value="delete">&nbsp;--&nbsp;' . $txt['delete'] . '</option>
 								</select>
-								<noscript><input type="submit" name="mc_go" value="', $txt['go'], '" class="button_submit" /></noscript>
+								<noscript><input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit" /></noscript>
 							</div>';
 
-	if (!empty($context['unapproved_items']))
-		echo '
-							<div class="floatleft">
-								<div class="pagelinks">', $context['page_index'], '</div>
-							</div>';
+	template_pagesection(false, false, 'go_up', array('extra' => $quick_mod));
 
 	echo '
-						</div>
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</form>
 					</div>';

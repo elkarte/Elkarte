@@ -22,12 +22,7 @@ function template_badbehavior_log()
 				<h3 class="titlebg">
 					<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
 				</h3>
-			</div>
-			<div class="pagesection">
-				<div class="floatleft">
-					', $context['page_index'], '
-				</div>
-			</div>
+			</div>', template_pagesection(false, false, 'go_down'), '
 			<table class="table_grid" id="error_log">';
 
 	if ($context['has_filter'])
@@ -108,10 +103,9 @@ function template_badbehavior_log()
 						<input type="checkbox" id="check_all_2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all_1.checked = this.checked;" class="input_check" />
 					</td>
 				</tr>
-			</table>
-			<div class="pagesection floatleft">
-				&nbsp;&nbsp;', $context['page_index'], '
-			</div>';
+			</table>';
+
+	template_pagesection();
 
 	echo '
 			<div>

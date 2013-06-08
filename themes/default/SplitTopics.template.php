@@ -125,10 +125,7 @@ function template_select()
 				</div>
 				<div class="information">
 					', $txt['please_select_split'], '
-				</div>
-				<div class="pagesection">
-					<span id="pageindex_not_selected">', $context['not_selected']['page_index'], '</span>
-				</div>
+				</div>', template_pagesection(false, false, '', array('top_button' => false, 'page_index_markup' => $context['not_selected']['page_index'])), '
 				<ul id="messages_not_selected" class="split_messages smalltext reset">';
 
 	foreach ($context['not_selected']['messages'] as $message)
@@ -156,10 +153,7 @@ function template_select()
 				</div>
 				<div class="information">
 					', $txt['split_selected_posts_desc'], '
-				</div>
-				<div class="pagesection">
-					<span id="pageindex_selected">', $context['selected']['page_index'], '</span>
-				</div>
+				</div>', template_pagesection(false, false, '', array('top_button' => false, 'page_index_markup' => $context['selected']['page_index'])), '
 				<ul id="messages_selected" class="split_messages smalltext reset">';
 
 	if (!empty($context['selected']['messages']))

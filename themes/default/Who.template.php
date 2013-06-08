@@ -27,23 +27,25 @@ function template_main()
 		<form action="', $scripturl, '?action=who" method="post" id="whoFilter" accept-charset="UTF-8">
 			<div class="title_bar">
 				<h4 class="titlebg margin_lower">', $txt['who_title'], '</h4>
-			</div>
-			<div class="pagesection">
-				<div class="pagelinks floatleft">', $context['page_index'], '</div>';
-		echo '
-				<div class="selectbox floatright">', $txt['who_show1'], '
+			</div>';
+
+	$extra = '
+				<div class="selectbox floatright">' . $txt['who_show1'] . '
 					<select name="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
 
-		foreach ($context['show_methods'] as $value => $label)
-			echo '
-						<option value="', $value, '" ', $value == $context['show_by'] ? ' selected="selected"' : '', '>', $label, '</option>';
-		echo '
+	foreach ($context['show_methods'] as $value => $label)
+		$extra .= '
+						<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+	$extra .= '
 					</select>
 					<noscript>
-						<input type="submit" name="submit_top" value="', $txt['go'], '" class="button_submit" />
+						<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit" />
 					</noscript>
-				</div>
-			</div>
+				</div>';
+
+	template_pagesection(false, false, 'go_down', array('extra' => $extra));
+
+	echo '
 			<div class="topic_table" id="mlist">
 				<table class="table_grid" >
 					<thead>
@@ -111,24 +113,10 @@ function template_main()
 	echo '
 					</tbody>
 				</table>
-			</div>
-			<div class="pagesection">
-				<div class="pagelinks floatleft">', $context['page_index'], '</div>';
+			</div>';
+	template_pagesection(false, false, 'go_down', array('extra' => $extra));
 
 	echo '
-				<div class="selectbox floatright">', $txt['who_show1'], '
-					<select name="show" onchange="document.forms.whoFilter.submit();">';
-
-	foreach ($context['show_methods'] as $value => $label)
-		echo '
-						<option value="', $value, '" ', $value == $context['show_by'] ? ' selected="selected"' : '', '>', $label, '</option>';
-	echo '
-					</select>
-					<noscript>
-						<input type="submit" value="', $txt['go'], '" class="button_submit" />
-					</noscript>
-				</div>
-			</div>
 		</form>
 	</div>';
 }
