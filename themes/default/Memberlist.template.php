@@ -23,10 +23,7 @@ function template_main()
 
 	echo '
 	<div class="main_section" id="memberlist">
-		<div class="pagesection">
-			', template_button_strip($context['memberlist_buttons'], 'right'), '
-			<div class="pagelinks floatleft">', $context['page_index'], '</div>
-		</div>
+		', template_pagesection('memberlist_buttons', 'right', 'go_down'), '
 		<div class="cat_bar">
 			<h4 class="catbg">
 				<span class="floatleft">', $txt['members_list'], '</span>';
@@ -138,17 +135,17 @@ function template_main()
 			</table>
 		</div>';
 
-	// Show the page numbers again. (makes 'em easier to find!)
-	echo '
-		<div class="pagesection">
-			<div class="pagelinks floatleft">', $context['page_index'], '</div>';
-
 	// If it is displaying the result of a search show a "search again" link to edit their criteria.
 	if (isset($context['old_search']))
-		echo '
-			<a class="button_link" href="', $scripturl, '?action=memberlist;sa=search;search=', $context['old_search_value'], '">', $txt['mlist_search_again'], '</a>';
+		$extra = '
+			<a class="button_link" href="' . $scripturl . '?action=memberlist;sa=search;search=' . $context['old_search_value'] . '">' . $txt['mlist_search_again'] . '</a>';
+	else
+		$extra = '';
+
+	// Show the page numbers again. (makes 'em easier to find!)
+	template_pagesection(false, false, 'go_up', array('extra' => $extra));
+
 	echo '
-		</div>
 	</div>';
 
 }
@@ -163,10 +160,7 @@ function template_search()
 	// Start the submission form for the search!
 	echo '
 	<form action="', $scripturl, '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
-		<div id="memberlist">
-			<div class="pagesection">
-				', template_button_strip($context['memberlist_buttons'], 'right'), '
-			</div>
+		<div id="memberlist">', template_pagesection('memberlist_buttons', 'right', '', array('top_button' => false)), '
 			<div class="cat_bar">
 				<h3 class="catbg mlist">
 					', !empty($settings['use_buttons']) ? '<img src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="" class="icon" />' : '', $txt['mlist_search'], '

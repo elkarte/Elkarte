@@ -96,16 +96,9 @@ function template_folder()
 
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		if ($context['display_mode'] == 2)
-		{
-			// Show the conversation buttons.
-			echo '
-						<div class="pagesection">';
-
-			template_button_strip($context['conversation_buttons'], 'right');
-
-			echo '
-						</div>';
-		}
+			template_pagesection('conversation_buttons', 'right', 'go_down');
+		else
+			template_pagesection(false, false, 'go_down');
 
 		while ($message = $context['get_pmessage']('message'))
 		{
@@ -292,24 +285,10 @@ function template_folder()
 		}
 
 		if (empty($context['display_mode']))
-		{
-			echo '
-						<div class="pagesection">
-							<div class="floatleft">', $context['page_index'], '</div>
-							<input type="submit" name="del_selected" value="', $txt['quickmod_delete_selected'], '" style="font-weight: normal;" onclick="if (!confirm(\'', $txt['delete_selected_confirm'], '\')) return false;" class="button_submit" />
-						</div>';
-		}
+			template_pagesection(false, false, 'go_up', array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="button_submit" />'));
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
-		{
-			echo '
-						<div class="pagesection">';
-
-			template_button_strip($context['conversation_buttons'], 'right');
-
-			echo '
-						</div>';
-		}
+			template_pagesection('conversation_buttons', 'right');
 
 		echo '
 						<br />';
@@ -639,53 +618,52 @@ function template_subject_list()
 
 	echo '
 						</tbody>
-						</table>
-						<div class="pagesection">
-							<div class="floatleft">', $context['page_index'], '</div>
-							<div class="floatright">&nbsp;';
+						</table>';
 
+	$extra = '
+							<div class="floatright">';
 	if ($context['show_delete'])
 	{
 		if (!empty($context['currently_using_labels']) && $context['folder'] != 'sent')
 		{
-			echo '
+			$extra .= '
 								<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
-									<option value="">', $txt['pm_sel_label_title'], ':</option>
+									<option value="">' . $txt['pm_sel_label_title'] . ':</option>
 									<option value="" disabled="disabled">---------------</option>';
 
-			echo '
-									<option value="" disabled="disabled">', $txt['pm_msg_label_apply'], ':</option>';
+			$extra .= '
+									<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != $context['current_label_id'])
-					echo '
-									<option value="add_', $label['id'], '">&nbsp;', $label['name'], '</option>';
+					$extra .= '
+									<option value="add_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
 			}
 
-			echo '
-									<option value="" disabled="disabled">', $txt['pm_msg_label_remove'], ':</option>';
+			$extra .= '
+									<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
-				echo '
-									<option value="rem_', $label['id'], '">&nbsp;', $label['name'], '</option>';
+				$extra .= '
+									<option value="rem_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
 			}
 
-			echo '
+			$extra .= '
 								</select>
 								<noscript>
-									<input type="submit" value="', $txt['pm_apply'], '" class="button_submit" style="float: none" />
+									<input type="submit" value="' . $txt['pm_apply'] . '" class="button_submit" style="float: none" />
 								</noscript>';
 		}
 
-		echo '
-								<input type="submit" name="del_selected" value="', $txt['quickmod_delete_selected'], '" onclick="if (!confirm(\'', $txt['delete_selected_confirm'], '\')) return false;" class="button_submit" style="float: none" />';
+		$extra .= '
+								<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="button_submit" style="float: none" />';
 	}
+	$extra .= '
+							</div>';
 
-	echo '
-							</div>
-						</div>';
+	template_pagesection(false, false, '', array('top_button' => false, 'extra' => $extra));
 }
 
 /**
@@ -880,10 +858,8 @@ function template_search_results()
 	echo '
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_search_results'], '</h3>
-		</div>
-		<div class="pagesection">
-			', $context['page_index'], '
 		</div>';
+	template_pagesection(false, false, 'go_down');
 
 	// complete results ?
 	if (empty($context['search_params']['show_complete']) && !empty($context['personal_messages']))
@@ -939,12 +915,12 @@ function template_search_results()
 					// You can only reply if they are not a guest...
 					if (!$message['member']['is_guest'])
 						echo '
-								<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $quote_button , '</a>', $context['menu_separator'], '
-								<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $reply_button , '</a> ', $context['menu_separator'];
+								<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $quote_button , '</a>
+								<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $reply_button , '</a> ';
 					// This is for "forwarding" - even if the member is gone.
 					else
 						echo '
-								<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $quote_button , '</a>', $context['menu_separator'];
+								<a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $quote_button , '</a>';
 				}
 
 				echo '
@@ -982,11 +958,7 @@ function template_search_results()
 			</div>
 		</div>';
 
-	echo '
-		<div class="pagesection">
-			', $context['page_index'], '
-		</div>';
-
+	template_pagesection();
 }
 
 function template_send()
@@ -1795,10 +1767,8 @@ function template_showPMDrafts()
 				<img src="', $settings['images_url'], '/message_sm.png" alt="" class="icon" />
 					', $txt['drafts_show'], '
 			</h3>
-		</div>
-		<div class="pagesection">
-			<div>', $context['page_index'], '</div>
 		</div>';
+	template_pagesection(false, false, 'go_down');
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
@@ -1844,8 +1814,5 @@ function template_showPMDrafts()
 	}
 
 	// Show page numbers.
-	echo '
-		<div class="pagesection" style="margin-bottom: 0;">
-			<div class="pagelinks">', $context['page_index'], '</div>
-		</div>';
+	template_pagesection();
 }

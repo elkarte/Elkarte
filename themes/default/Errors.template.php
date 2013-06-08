@@ -56,12 +56,7 @@ function template_error_log()
 				<h3 class="titlebg">
 					<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
 				</h3>
-			</div>
-			<div class="pagesection">
-				<div class="floatleft">
-					', $context['page_index'], '
-				</div>
-			</div>
+			</div>', template_pagesection(false, false, 'go_down'), '
 			<table class="table_grid" id="error_log">
 				<tr>
 					<td colspan="3" class="windowbg">
@@ -159,10 +154,9 @@ function template_error_log()
 						<input type="checkbox" id="check_all2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all1.checked = this.checked;" class="input_check" />
 					</td>
 				</tr>
-			</table>
-			<div class="pagesection floatleft">
-				&nbsp;&nbsp;', $context['page_index'], '
-			</div>';
+			</table>';
+
+	template_pagesection(false, false, 'go_down');
 
 	echo '
 			<div class="floatright" style="margin-top: 1ex">

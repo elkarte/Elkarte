@@ -569,7 +569,7 @@ function template_group_members()
 				<h4 class="titlebg">', $txt['membergroups_members_group_members'], '</h4>
 			</div>
 			<br />
-			<div class="pagesection">', $context['page_index'], '</div>
+			', template_pagesection(false, false, 'go_down'), '
 			<table class="table_grid">
 				<thead>
 					<tr class="catbg">
@@ -652,10 +652,8 @@ function template_group_members()
 				<input type="submit" name="remove" value="', $txt['membergroups_members_remove'], '" class="button_submit " />
 			</div>';
 
+	template_pagesection();
 	echo '
-			<div class="pagesection flow_hidden">
-				<div class="floatleft">', $context['page_index'], '</div>
-			</div>
 			<br />';
 
 	if (!empty($context['group']['assignable']))

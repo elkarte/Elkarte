@@ -111,10 +111,7 @@ function template_merge()
 			</div><br />
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['target_topic'], '</h3>
-			</div>
-			<div class="pagesection">
-				', $context['page_index'], '
-			</div>
+			</div>', template_pagesection(false, false, 'go_down'), '
 			<div class="windowbg2">
 				<div class="content">
 					<ul class="reset merge_topics">';
@@ -131,10 +128,7 @@ function template_merge()
 		echo '
 					</ul>
 				</div>
-			</div>
-			<div class="pagesection">
-				', $context['page_index'], '
-			</div>
+			</div>', template_pagesection(false, false), '
 		</div>';
 }
 

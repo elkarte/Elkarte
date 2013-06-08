@@ -363,12 +363,7 @@ function template_pages_and_buttons_above()
 	if ($context['no_topic_listing'])
 		return;
 
-	echo '
-	<div class="pagesection">
-		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagetop" href="#bot" class="topbottom floatleft">' . $txt['go_down'] . '</a>' : '', '
-		<div class="pagelinks floatleft">', $context['page_index'], '</div>
-		', template_button_strip($context['normal_buttons'], 'right'), '
-	</div>';
+	template_pagesection('normal_buttons', 'right', 'go_down');
 
 	if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
 	{
@@ -396,14 +391,9 @@ function template_pages_and_buttons_below()
 	global $modSettings, $context, $txt, $options, $settings;
 
 	if ($context['no_topic_listing'])
-	{
-		echo '
-	<div class="pagesection">
-		', !empty($modSettings['topbottomEnable']) ? $context['menu_separator'] . '<a id="pagebot" href="#top" class="topbottom floatleft">' . $txt['go_up'] . '</a>' : '', '
-			<div class="pagelinks floatleft">', $context['page_index'], '</div>
-		', template_button_strip($context['normal_buttons'], 'right'), '	
-	</div>';
-	}
+		return;
+
+	template_pagesection('normal_buttons', 'right');
 
 	// Show breadcrumbs at the bottom too.
 	theme_linktree();

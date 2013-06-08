@@ -50,10 +50,7 @@ function template_showDrafts()
 {
 	global $context, $settings, $scripturl, $txt;
 
-	echo '
-		<div class="pagesection" style="margin-bottom: 0;">
-			<div class="pagelinks">', $context['page_index'], '</div>
-		</div>';
+	template_pagesection(false, false, 'go_down');
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
@@ -102,10 +99,7 @@ function template_showDrafts()
 	}
 
 	// Show page numbers.
-	echo '
-		<div class="pagesection" style="margin-bottom: 0;">
-			<div class="pagelinks">', $context['page_index'], '</div>
-		</div>';
+	template_pagesection();
 }
 
 /**
