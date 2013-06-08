@@ -69,6 +69,7 @@ class Attachment_Controller
 
 			$attachment = getAttachmentFromTopic($id_attach, $topic);
 		}
+
 		if (empty($attachment))
 			fatal_lang_error('no_access', false);
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
@@ -159,13 +160,10 @@ class Attachment_Controller
 		// Different browsers like different standards...
 		if (isBrowser('firefox'))
 			header('Content-Disposition: ' . $disposition . '; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
-
 		elseif (isBrowser('opera'))
 			header('Content-Disposition: ' . $disposition . '; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
-
 		elseif (isBrowser('ie'))
 			header('Content-Disposition: ' . $disposition . '; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
-
 		else
 			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
 
@@ -205,6 +203,7 @@ class Attachment_Controller
 					echo $callback(fread($fp, 8192));
 				else
 					echo fread($fp, 8192);
+
 				flush();
 			}
 			fclose($fp);
