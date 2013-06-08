@@ -82,7 +82,7 @@ function template_init()
 	$settings['page_index_template'] = array(
 		'base_link' => '<span class="pagelink"><a class="navPages" href="{base_link}">%2$s</a> </span>',
 		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-		'current_page' => '<span class="pagelink current_pagelink"><span class="current_page"><strong>%1$s</strong></span></span>',
+		'current_page' => '<span class="pagelink current_pagelink">%1$s</span>',
 		'next_page' => '<span class="next_page">{next_txt}</span>',
 		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 	);
@@ -118,10 +118,6 @@ function template_html_above()
 			width: ', $settings['forum_width'], ';
 		}
 	</style>';
-
-	// Quick and dirty testing of RTL horrors. Remove before production build.
-	//echo '
-	//<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
 
 	// RTL languages require an additional stylesheet.
 	if ($context['right_to_left'])
@@ -279,7 +275,7 @@ function template_body_above()
 	</div>';
 
 	echo '
-	<div id="header">
+	<header id="header">
 		<div class="frame">
 			<h1 class="forumtitle">
 				<a id="top" href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
@@ -290,7 +286,7 @@ function template_body_above()
 
 	echo'
 		</div>
-	</div>
+	</header>
 	<div id="wrapper">
 		<div id="upper_section">
 			<div id="inner_section">
@@ -392,7 +388,7 @@ function template_body_below()
 	// Show the XHTML and RSS links, as well as the copyright.
 	// Footer is now full-width by default. Frame inside it will match theme wrapper width automatically.
 	echo '
-	<div id="footer_section">
+	<footer id="footer_section">
 		<div class="frame">';
 
 	// There is now a global "Go to top" link at the right.
@@ -413,7 +409,7 @@ function template_body_below()
 
 	echo '
 		</div>
-	</div>';
+	</footer>';
 }
 
 /**
@@ -496,7 +492,7 @@ function template_menu()
 	global $context, $settings, $txt;
 
 	echo '
-				<div id="main_menu">
+				<nav id="main_menu">
 					<ul class="dropmenu topmenu" id="menu_nav">';
 
 	// Note: Menu markup has been cleaned up to remove unnecessary spans and classes.
@@ -559,7 +555,7 @@ function template_menu()
 
 	echo '
 					</ul>
-				</div>';
+				</nav>';
 
 	// Define the upper_section toggle in JavaScript.
 	// Note that this definition had to be shifted for the js to work with the new markup.

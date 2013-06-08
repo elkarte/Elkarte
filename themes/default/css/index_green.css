@@ -9,7 +9,6 @@ body {
 #wrapper {
 	background-color: #fff;
 }
-
 #logo {
 	float: right;
 	text-align: right;
@@ -170,7 +169,7 @@ h1.forumtitle a {
 #inner_wrap hr {
 	display: none;
 }
-div#main_menu {
+#main_menu {
 	padding: 0;
 }
 #helpmain {
@@ -281,11 +280,9 @@ li.greeting, .news p {
 	display: inline-block;
 	border-radius: 2px;
 }
-.current_page strong {
-	color: #fff;
-}
 .current_pagelink {
 	background-color: #7CB229;
+	color: white;
 }
 
 .table_list .icon, .table_list .info, .table_list .stats, .table_list .lastpost {
@@ -375,4 +372,11 @@ border: 1px solid #ccc;
 
 .titlebg, .titlebg2, tr.titlebg th, tr.titlebg td, tr.titlebg2 td {
 	background: transparent;
+}
+
+input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
+	outline:none !important;
+	border: 1px solid #70963E;
+	box-shadow: 0;
+	background-color: #faffff;
 }
