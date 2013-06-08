@@ -673,7 +673,7 @@ function scheduled_daily_digest()
 			{
 				// Convert to markdown markup e.g. text ;)
 				pbe_prepare_text($row['body']);
-				$row['body'] = shorten_text($row['body']);
+				$row['body'] = shorten_text($row['body'], 375, true);
 				$row['body'] = preg_replace("~\n~s","\n  ", $row['body']);
 			}
 
