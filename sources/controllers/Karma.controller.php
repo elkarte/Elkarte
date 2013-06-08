@@ -106,8 +106,8 @@ function prepare_karma($id_target)
 
 	clearKarma($modSettings['karmaWaitTime']);
 
-	$action = 0;
 	// Not an administrator... or one who is restricted as well.
+	$action = 0;
 	if (!empty($modSettings['karmaTimeRestrictAdmins']) || !allowedTo('moderate_forum'))
 	{
 		// Find out if this user has done this recently...

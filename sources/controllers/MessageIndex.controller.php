@@ -21,6 +21,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Message Index Controller
+ */
 class MessageIndex_Controller
 {
 	/**
@@ -30,8 +33,8 @@ class MessageIndex_Controller
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
 		global $options, $settings, $board_info, $user_info;
-		// Fairly often, we'll work with boards. Current board, child boards.
 
+		// Fairly often, we'll work with boards. Current board, child boards.
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// If this is a redirection board head off.
@@ -66,6 +69,7 @@ class MessageIndex_Controller
 					$context['robot_no_index'] = true;
 			}
 		}
+
 		if (!empty($_REQUEST['start']) && (!is_numeric($_REQUEST['start']) || $_REQUEST['start'] % $context['messages_per_page'] != 0))
 			$context['robot_no_index'] = true;
 
@@ -86,6 +90,7 @@ class MessageIndex_Controller
 			$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
 		else
 			$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d', $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+
 		$context['start'] = &$_REQUEST['start'];
 
 		// Set a canonical URL for this page.
@@ -320,6 +325,7 @@ class MessageIndex_Controller
 			{
 				if (!isset($context['icon_sources'][$row['first_icon']]))
 					$context['icon_sources'][$row['first_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['first_icon'] . '.png') ? 'images_url' : 'default_images_url';
+
 				if (!isset($context['icon_sources'][$row['last_icon']]))
 					$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
 			}
@@ -327,6 +333,7 @@ class MessageIndex_Controller
 			{
 				if (!isset($context['icon_sources'][$row['first_icon']]))
 					$context['icon_sources'][$row['first_icon']] = 'images_url';
+
 				if (!isset($context['icon_sources'][$row['last_icon']]))
 					$context['icon_sources'][$row['last_icon']] = 'images_url';
 			}
@@ -408,6 +415,7 @@ class MessageIndex_Controller
 				'approved' => $row['approved'],
 				'unapproved_posts' => $row['unapproved_posts'],
 			);
+
 			if (!empty($settings['avatars_on_indexes']))
 				$context['topics'][$row['id_topic']]['last_post']['member']['avatar'] = array(
 					'name' => $row['avatar'],
@@ -530,6 +538,7 @@ class MessageIndex_Controller
 
 		// This is going to be needed to send off the notifications and for updateLastMessages().
 		require_once(SUBSDIR . '/Post.subs.php');
+
 		// Process process process data.
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -1003,11 +1012,13 @@ class MessageIndex_Controller
 			logAction('move', array('topic' => $topic[0], 'board_from' => $topic[1], 'board_to' => $topic[2]));
 			sendNotifications($topic[0], 'move');
 		}
+
 		foreach ($lockCache as $topic)
 		{
 			logAction($lockStatus[$topic] ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $lockCacheBoards[$topic]));
 			sendNotifications($topic, $lockStatus[$topic] ? 'lock' : 'unlock');
 		}
+		
 		foreach ($stickyCache as $topic)
 		{
 			logAction($stickyCacheStatus[$topic] ? 'unsticky' : 'sticky', array('topic' => $topic, 'board' => $stickyCacheBoards[$topic]));

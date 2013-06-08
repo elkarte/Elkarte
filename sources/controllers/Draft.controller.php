@@ -18,7 +18,9 @@ if (!defined('ELKARTE'))
 loadLanguage('Drafts');
 require_once(SUBSDIR . '/Drafts.subs.php');
 
-
+/**
+ * Draft controller.
+ */
 class Draft_Controller
 {
 	/**
@@ -188,7 +190,6 @@ class Draft_Controller
 	 * Show all PM drafts of the current user
 	 * Uses the showpmdraft template
 	 * Allows for the deleting and loading/editing of PM drafts
-	 *
 	 */
 	function action_showPMDrafts()
 	{
@@ -196,6 +197,7 @@ class Draft_Controller
 
 		require_once(SUBSDIR . '/Profile.subs.php');
 		$memID = currentMemberID(false);
+
 		// @todo: is necessary? Added because the default was -1
 		if (empty($memID))
 			$memID = -1;

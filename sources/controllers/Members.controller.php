@@ -20,6 +20,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Members Controller
+ */
 class Members_Controller
 {
 	/**
