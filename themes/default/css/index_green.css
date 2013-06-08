@@ -169,7 +169,7 @@ h1.forumtitle a {
 #inner_wrap hr {
 	display: none;
 }
-nav#main_menu {
+#main_menu {
 	padding: 0;
 }
 #helpmain {
