@@ -207,12 +207,14 @@ class MarkRead_Controller
 			foreach ($_REQUEST['c'] as $c)
 				$categories[] = (int) $c;
 		}
+
 		if (isset($_REQUEST['boards']))
 		{
 			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
 			foreach ($_REQUEST['boards'] as $b)
 				$boards[] = (int) $b;
 		}
+
 		if (!empty($board))
 			$boards[] = (int) $board;
 
@@ -253,6 +255,7 @@ class MarkRead_Controller
 					array('id_member', 'id_board')
 				);
 			}
+
 			if (empty($board))
 				return '';
 			else
