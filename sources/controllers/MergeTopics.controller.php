@@ -99,6 +99,7 @@ class MergeTopics_Controller
 		// Get the topic's subject.
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($_GET['from'], 'message');
+
 		// @todo review: double check the logic
 		if (empty($topic_info) || ($topic_info['id_board'] != $board) || ($onlyApproved && empty($topic_info['approved'])))
 			fatal_lang_error('no_board');
@@ -126,11 +127,13 @@ class MergeTopics_Controller
 		$boards_list = getBoardList($boardListOptions, true);
 		$context['boards'] = array();
 		foreach ($boards_list as $board)
+		{
 			$context['boards'][] = array(
 				'id' => $board['id_board'],
 				'name' => $board['board_name'],
 				'category' => $board['cat_name']
 			);
+		}
 
 		// Get some topics to merge it with.
 		$request = $db->query('', '
@@ -253,12 +256,14 @@ class MergeTopics_Controller
 		{
 			// Make a note for the board counts...
 			if (!isset($boardTotals[$row['id_board']]))
+			{
 				$boardTotals[$row['id_board']] = array(
 					'posts' => 0,
 					'topics' => 0,
 					'unapproved_posts' => 0,
 					'unapproved_topics' => 0
 				);
+			}
 
 			// We can't see unapproved topics here?
 			if ($modSettings['postmod_active'] && !$row['approved'] && $can_approve_boards != array(0) && in_array($row['id_board'], $can_approve_boards))
@@ -296,6 +301,7 @@ class MergeTopics_Controller
 			// If there's no poll, id_poll == 0...
 			if ($row['id_poll'] > 0)
 				$polls[] = $row['id_poll'];
+
 			// Store the id_topic with the lowest id_first_msg.
 			if (empty($firstTopic))
 				$firstTopic = $row['id_topic'];
@@ -323,6 +329,7 @@ class MergeTopics_Controller
 			fatal_lang_error('cannot_merge_any', 'user');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
+
 		// Make sure they can see all boards....
 		$query_boards = array('boards' => $boards);
 
@@ -379,6 +386,7 @@ class MergeTopics_Controller
 
 			$context['page_title'] = $txt['merge'];
 			$context['sub_template'] = 'merge_extra_options';
+
 			return;
 		}
 
@@ -397,6 +405,7 @@ class MergeTopics_Controller
 		if (empty($_POST['subject']) && isset($_POST['custom_subject']) && $_POST['custom_subject'] != '')
 		{
 			$target_subject = strtr(Util::htmltrim(Util::htmlspecialchars($_POST['custom_subject'])), array("\r" => '', "\n" => '', "\t" => ''));
+
 			// Keep checking the length.
 			if (Util::strlen($target_subject) > 100)
 				$target_subject = Util::substr($target_subject, 0, 100);
@@ -492,8 +501,9 @@ class MergeTopics_Controller
 		);
 		list ($member_started) = $db->fetch_row($request);
 		list ($member_updated) = $db->fetch_row($request);
+
 		// First and last message are the same, so only row was returned.
-		if ($member_updated === NULL)
+		if ($member_updated === null)
 			$member_updated = $member_started;
 
 		$db->free_result($request);
@@ -523,6 +533,7 @@ class MergeTopics_Controller
 				'deleted_topics' => $deleted_topics,
 			)
 		);
+
 		$db->query('', '
 			DELETE FROM {db_prefix}log_search_subjects
 			WHERE id_topic IN ({array_int:deleted_topics})',
@@ -712,6 +723,7 @@ class MergeTopics_Controller
 					'deleted_polls' => $deleted_polls,
 				)
 			);
+
 			$db->query('', '
 				DELETE FROM {db_prefix}poll_choices
 				WHERE id_poll IN ({array_int:deleted_polls})',
@@ -719,6 +731,7 @@ class MergeTopics_Controller
 					'deleted_polls' => $deleted_polls,
 				)
 			);
+
 			$db->query('', '
 				DELETE FROM {db_prefix}log_polls
 				WHERE id_poll IN ({array_int:deleted_polls})',
@@ -771,6 +784,7 @@ class MergeTopics_Controller
 		$searchAPI = findSearchAPI();
 		if (is_callable(array($searchAPI, 'topicMerge')))
 			$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($_POST['enforce_subject']) ? null : array($context['response_prefix'], $target_subject));
+
 		// Send them to the all done page.
 		redirectexit('action=mergetopics;sa=done;to=' . $id_topic . ';targetboard=' . $target_board);
 	}
