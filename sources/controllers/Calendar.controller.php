@@ -79,8 +79,10 @@ class Calendar_Controller
 		// Make sure the year and month are in valid ranges.
 		if ($curPage['month'] < 1 || $curPage['month'] > 12)
 			fatal_lang_error('invalid_month', false);
+
 		if ($curPage['year'] < $modSettings['cal_minyear'] || $curPage['year'] > $modSettings['cal_maxyear'])
 			fatal_lang_error('invalid_year', false);
+
 		// If we have a day clean that too.
 		if ($context['view_week'])
 		{
@@ -116,9 +118,11 @@ class Calendar_Controller
 		$calendarOptions['show_week_links'] = false;
 		$calendarOptions['size'] = 'small';
 		$context['calendar_grid_current'] = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
+
 		// Only show previous month if it isn't pre-January of the min-year
 		if ($context['calendar_grid_current']['previous_calendar']['year'] > $modSettings['cal_minyear'] || $curPage['month'] != 1)
 			$context['calendar_grid_prev'] = getCalendarGrid($context['calendar_grid_current']['previous_calendar']['month'], $context['calendar_grid_current']['previous_calendar']['year'], $calendarOptions);
+
 		// Only show next month if it isn't post-December of the max-year
 		if ($context['calendar_grid_current']['next_calendar']['year'] < $modSettings['cal_maxyear'] || $curPage['month'] != 12)
 			$context['calendar_grid_next'] = getCalendarGrid($context['calendar_grid_current']['next_calendar']['month'], $context['calendar_grid_current']['next_calendar']['year'], $calendarOptions);
@@ -138,11 +142,13 @@ class Calendar_Controller
 			'url' => $scripturl . '?action=calendar',
 			'name' => $txt['calendar']
 		);
+
 		// Add the current month to the linktree.
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=calendar;year=' . $context['current_year'] . ';month=' . $context['current_month'],
 			'name' => $txt['months'][$context['current_month']] . ' ' . $context['current_year']
 		);
+
 		// If applicable, add the current week to the linktree.
 		if ($context['view_week'])
 			$context['linktree'][] = array(
@@ -218,11 +224,9 @@ class Calendar_Controller
 				);
 				insertEvent($eventOptions);
 			}
-
 			// Deleting...
 			elseif (isset($_REQUEST['deleteevent']))
 				removeEvent($_REQUEST['eventid']);
-
 			// ... or just update it?
 			else
 			{
