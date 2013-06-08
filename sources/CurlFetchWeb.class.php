@@ -58,8 +58,8 @@ class Curl_Fetch_Webdata
 	 * Start the curl object
 	 * - allow for user override values
 	 *
-	 * @param type $options cURL options as an array
-	 * @param type $max_redirect use to override the default of 3
+	 * @param array $options cURL options as an array
+	 * @param int $max_redirect use to override the default of 3
 	 */
 	public function __construct($options = array(), $max_redirect = 3)
 	{
@@ -75,8 +75,8 @@ class Curl_Fetch_Webdata
 	 *  - passed arrays will be converted to a post string joined with &'s
 	 *  - calls _setOptions to set the curl opts array values based on the defaults and user input
 	 *
-	 * @param type $url the site we are going to fetch
-	 * @param type $post_data any post data as form name => value
+	 * @param string $url the site we are going to fetch
+	 * @param array $post_data any post data as form name => value
 	 */
 	public function get_url_data($url, $post_data = array())
 	{
@@ -98,8 +98,8 @@ class Curl_Fetch_Webdata
 	 *  - stores responses (url, code, error, headers, body) in the response array
 	 *  - detects 301, 302, 307 codes and will redirect to the given response header location
 	 *
-	 * @param type $url site to fetch
-	 * @param type $redirect flag to indicate if this was a redirect request or not
+	 * @param string $url site to fetch
+	 * @param bool $redirect flag to indicate if this was a redirect request or not
 	 * @return boolean
 	*/
 	private function _curlRequest($url, $redirect = false)
@@ -154,8 +154,8 @@ class Curl_Fetch_Webdata
 	/**
 	 * Used if being redirected to ensure we have a fully qualified address
 	 *
-	 * @param type $last_url where we went to
-	 * @param type $new_url where we were redirected to
+	 * @param string $last_url where we went to
+	 * @param string $new_url where we were redirected to
 	 * @return new url location
 	 */
 	private function _getRedirectURL($last_url = '', $new_url = '')
@@ -179,8 +179,8 @@ class Curl_Fetch_Webdata
 	 *  - called as ->result() will return the full final array
 	 *  - called as ->result('body') to just return the page source of the result
 	 *
-	 * @param type $area used to return an area such as body, header, error
-	 * @return type
+	 * @param string $area used to return an area such as body, header, error
+	 * @return string
 	 */
 	public function result($area = '')
 	{
@@ -198,8 +198,8 @@ class Curl_Fetch_Webdata
 	 *  - Can be called as ->result_raw(x) where x is a specific loop results.
 	 *  - Call as ->result_raw() for everything.
 	 *
-	 * @param type $response_number
-	 * @return type
+	 * @param int $response_number
+	 * @return int
 	 */
 	public function result_raw($response_number = '')
 	{
@@ -217,8 +217,8 @@ class Curl_Fetch_Webdata
 	 *  - forms the date (for post) in to a string var=xyz&var2=abc&var3=123
 	 *  - drops vars with @ since we don't support sending files (uploading)
 	 *
-	 * @param type $post_data
-	 * @return type
+	 * @param array $post_data
+	 * @return string
 	*/
 	private function _buildPostData($post_data)
 	{
@@ -269,8 +269,8 @@ class Curl_Fetch_Webdata
 	 * Called to initiate a redirect from a 301, 302 or 307 header
 	 *  - resets the cURL options for the loop, sets the referrer flag
 	 *
-	 * @param type $target_url
-	 * @param type $referer_url
+	 * @param string $target_url
+	 * @param string $referer_url
 	 */
 	private function _redirect($target_url, $referer_url)
 	{
@@ -285,8 +285,8 @@ class Curl_Fetch_Webdata
 	 *  - lowercases everything to make it consistent
 	 *
 	 * @param type $cr
-	 * @param type $header
-	 * @return type
+	 * @param string $header
+	 * @return string
 	 */
 	private function _headerCallback($cr, $header)
 	{

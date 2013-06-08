@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  */
 function action_history()
 {
-	global $context, $txt, $scripturl, $modSettings, $user_profile;
+	global $context, $txt, $modSettings, $user_profile;
 
 	$memID = currentMemberID();
 
@@ -388,7 +388,7 @@ function list_getIPMessageCount($where, $where_vars = array())
  */
 function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $txt, $scripturl;
+	global $scripturl;
 
 	$db = database();
 
@@ -725,10 +725,7 @@ function action_trackip($memID = 0)
  */
 function action_tracklogin($memID = 0)
 {
-	global $user_profile, $scripturl, $txt, $user_info, $modSettings;
-	global $context;
-
-	$db = database();
+	global $scripturl, $txt, $context;
 
 	// Gonna want this for the list.
 	require_once(SUBSDIR . '/List.subs.php');
@@ -814,7 +811,7 @@ function list_getLoginCount($where, $where_vars = array())
 	$request = $db->query('', '
 		SELECT COUNT(*) AS message_count
 		FROM {db_prefix}member_logins
-		WHERE id_member = {int:id_member}',
+		WHERE ' . $where,
 		array(
 			'id_member' => $where_vars['current_member'],
 		)
@@ -837,14 +834,12 @@ function list_getLoginCount($where, $where_vars = array())
  */
 function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 {
-	global $txt, $scripturl;
-
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT time, ip, ip2
 		FROM {db_prefix}member_logins
-		WHERE {int:id_member}
+		WHERE ' . $where .'
 		ORDER BY time DESC',
 		array(
 			'id_member' => $where_vars['current_member'],

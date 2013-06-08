@@ -28,7 +28,7 @@ if (!defined('ELKARTE'))
  */
 function action_editBuddyIgnoreLists()
 {
-	global $context, $txt, $scripturl, $modSettings, $user_profile;
+	global $context, $txt, $modSettings;
 
 	$memID = currentMemberID();
 
@@ -71,7 +71,6 @@ function action_editBuddyIgnoreLists()
  */
 function action_editBuddies($memID)
 {
-	global $txt, $scripturl, $modSettings;
 	global $context, $user_profile, $memberContext;
 
 	$db = database();
@@ -188,7 +187,6 @@ function action_editBuddies($memID)
  */
 function action_editIgnoreList($memID)
 {
-	global $txt, $scripturl, $modSettings;
 	global $context, $user_profile, $memberContext;
 
 	$db = database();
@@ -326,7 +324,7 @@ function action_account()
  */
 function action_forumProfile()
 {
-	global $context, $user_profile, $user_info, $txt, $modSettings;
+	global $context, $txt;
 
 	$memID = currentMemberID();
 
@@ -357,7 +355,7 @@ function action_forumProfile()
  */
 function action_pmprefs()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	$memID = currentMemberID();
 
@@ -382,7 +380,7 @@ function action_pmprefs()
  */
 function action_themepick()
 {
-	global $txt, $context, $user_profile, $modSettings, $settings, $user_info;
+	global $txt, $context;
 
 	$memID = currentMemberID();
 
@@ -413,7 +411,7 @@ function action_themepick()
  */
 function action_authentication($memID, $saving = false)
 {
-	global $context, $cur_profile, $txt, $post_errors, $modSettings;
+	global $context, $cur_profile, $post_errors, $modSettings;
 
 	loadLanguage('Login');
 
@@ -498,9 +496,7 @@ function action_authentication($memID, $saving = false)
  */
 function action_notification()
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings, $settings;
-
-	$db = database();
+	global $txt, $scripturl, $user_profile, $context, $modSettings;
 
 	loadTemplate('ProfileOptions');
 
@@ -729,7 +725,7 @@ function action_notification()
  */
 function list_getTopicNotificationCount($memID)
 {
-	global $user_info, $context, $modSettings;
+	global $user_info, $modSettings;
 
 	$db = database();
 
@@ -764,7 +760,7 @@ function list_getTopicNotificationCount($memID)
  */
 function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $txt, $scripturl, $user_info, $context, $modSettings;
+	global $scripturl, $user_info, $modSettings;
 
 	$db = database();
 
@@ -821,6 +817,12 @@ function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	return $notification_topics;
 }
 
+/**
+ * counts the board notification for a given member
+ *
+ * @param int $memID
+ * @return int
+ */
 function getBoardNotificationsCount($memID)
 {
 	global $user_info;
@@ -857,7 +859,7 @@ function getBoardNotificationsCount($memID)
  */
 function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 {
-	global $txt, $scripturl, $user_info, $modSettings;
+	global $scripturl, $user_info, $modSettings;
 
 	$db = database();
 
@@ -1009,7 +1011,7 @@ function action_ignoreboards()
  */
 function action_groupMembership()
 {
-	global $txt, $scripturl, $user_profile, $user_info, $context, $modSettings;
+	global $txt, $user_profile, $context;
 
 	$db = database();
 
@@ -1116,7 +1118,7 @@ function action_groupMembership()
  */
 function action_groupMembership2($profile_vars, $post_errors, $memID)
 {
-	global $user_info, $context, $user_profile, $modSettings, $txt, $scripturl, $language;
+	global $context, $user_profile, $modSettings, $scripturl, $language;
 
 	$db = database();
 
@@ -1272,32 +1274,31 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 		if (!empty($moderators))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$moderators = membersAllowedTo('moderate_board', $board);
-			$result = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
+			$members = getBasicMemberData($moderators, array('preferences' => true, 'sort' => 'lngfile'));
 
-			foreach ($result as $row)
+			foreach ($members as $member)
 			{
-				if ($row['notify_types'] != 4)
+				if ($member['notify_types'] != 4)
 					continue;
 
 				// Check whether they are interested.
-				if (!empty($row['mod_prefs']))
+				if (!empty($member['mod_prefs']))
 				{
-					list(,, $pref_binary) = explode('|', $row['mod_prefs']);
+					list(,, $pref_binary) = explode('|', $member['mod_prefs']);
 					if (!($pref_binary & 4))
 						continue;
 				}
 
 				$replacements = array(
-					'RECPNAME' => $row['member_name'],
+					'RECPNAME' => $member['member_name'],
 					'APPYNAME' => $old_profile['member_name'],
 					'GROUPNAME' => $group_name,
 					'REASON' => $_POST['reason'],
 					'MODLINK' => $scripturl . '?action=moderate;area=groups;sa=requests',
 				);
 
-				$emaildata = loadEmailTemplate('request_membership', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
+				$emaildata = loadEmailTemplate('request_membership', $replacements, empty($member['lngfile']) || empty($modSettings['userLanguage']) ? $language : $member['lngfile']);
+				sendmail($member['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 2);
 			}
 		}
 

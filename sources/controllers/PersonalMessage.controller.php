@@ -196,7 +196,7 @@ class PersonalMessage_Controller
 	function action_messagefolder()
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
-		global $messages_request, $user_info, $recipients, $options, $memberContext, $user_settings;
+		global $messages_request, $user_info, $recipients, $options, $user_settings;
 
 		$db = database();
 
@@ -942,8 +942,7 @@ class PersonalMessage_Controller
 	 */
 	function action_sendmessage2()
 	{
-		global $txt, $context;
-		global $user_info, $modSettings, $scripturl;
+		global $txt, $context, $user_info, $modSettings;
 
 		$db = database();
 
@@ -1225,7 +1224,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messageactions()
 	{
-		global $txt, $context, $user_info, $options;
+		global $context, $user_info, $options;
 
 		$db = database();
 
@@ -1709,9 +1708,7 @@ class PersonalMessage_Controller
 	 */
 	function action_messagesettings()
 	{
-		global $txt, $user_settings, $user_info, $context;
-
-		$db = database();
+		global $txt, $user_info, $context;
 		global $scripturl, $profile_vars, $cur_profile, $user_profile;
 
 		// We want them to submit back to here.
@@ -2298,7 +2295,7 @@ function loadRules($reload = false)
  */
 function messageIndexBar($area)
 {
-	global $txt, $context, $scripturl, $sc, $modSettings, $settings, $user_info, $options;
+	global $txt, $context, $scripturl, $modSettings, $user_info;
 
 	$pm_areas = array(
 		'folders' => array(
@@ -2414,9 +2411,6 @@ function messageIndexBar($area)
 	}
 
 	require_once(SUBSDIR . '/Menu.subs.php');
-
-	// What page is this, again?
-	$current_page = $scripturl . '?action=pm' . (!empty($_REQUEST['sa']) ? ';sa=' . $_REQUEST['sa'] : '') . (!empty($context['folder']) ? ';f=' . $context['folder'] : '') . (!empty($context['current_label_id']) ? ';l=' . $context['current_label_id'] : '');
 
 	// Set a few options for the menu.
 	$menuOptions = array(

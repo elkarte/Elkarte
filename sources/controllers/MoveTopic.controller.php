@@ -33,10 +33,7 @@ class MoveTopic_Controller
 	 */
 	function action_movetopic()
 	{
-		global $txt, $board, $topic, $user_info, $context, $language, $scripturl, $settings, $modSettings;
-
-		$db = database();
-		global $cat_tree, $boards, $boardList;
+		global $txt, $topic, $user_info, $context, $language, $scripturl, $modSettings;
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);

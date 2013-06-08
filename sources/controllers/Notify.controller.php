@@ -121,10 +121,8 @@ class Notify_Controller
 	public function action_notifyboard()
 	{
 		global $scripturl, $txt, $board, $user_info, $context;
-
-		$db = database();
-
 		// Permissions are an important part of anything ;).
+
 		is_not_guest();
 		isAllowedTo('mark_notify');
 
@@ -172,8 +170,6 @@ class Notify_Controller
 	public function action_notifyboard_api()
 	{
 		global $scripturl, $txt, $board, $user_info, $context;
-
-		$db = database();
 
 		// Permissions are an important part of anything ;).
 		is_not_guest('', false);

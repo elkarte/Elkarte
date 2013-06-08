@@ -74,8 +74,6 @@ class SplitTopics_Controller
 	{
 		global $txt, $topic, $context, $modSettings;
 
-		$db = database();
-
 		// Validate "at".
 		if (empty($_GET['at']))
 			fatal_lang_error('numbers_one_to_nine', false);
@@ -131,8 +129,8 @@ class SplitTopics_Controller
 	 */
 	function action_splitExecute()
 	{
-		global $txt, $context, $user_info, $modSettings;
-		global $board, $topic, $language, $scripturl;
+		global $txt, $context, $topic;
+
 
 		// Check the session to make sure they meant to do this.
 		checkSession();
@@ -201,7 +199,7 @@ class SplitTopics_Controller
 	 */
 	function action_splitSelection()
 	{
-		global $txt, $board, $topic, $context, $user_info;
+		global $txt, $topic, $context;
 
 		// Make sure the session id was passed with post.
 		checkSession();
@@ -247,6 +245,8 @@ class SplitTopics_Controller
 	function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
+
+		$db = database();
 
 		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
@@ -504,7 +504,7 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
  */
 function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 {
-	global $user_info, $topic, $board, $modSettings, $txt, $context;
+	global $txt;
 
 	$db = database();
 
