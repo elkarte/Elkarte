@@ -428,7 +428,7 @@ class PostModeration_Controller
 					),
 					'data' => array(
 						'function' => create_function('$data', '
-							return \'<a href="\' . $data[\'message\'][\'href\'] . \'">\' . shorten_text($data[\'message\'][\'subject\'], 20) . \'</a>\';'
+							return \'<a href="\' . $data[\'message\'][\'href\'] . \'">\' . shorten_text($data[\'message\'][\'subject\'], !empty($modSettings[\'subject_length\']) ? $modSettings[\'subject_length\'] : 24) . \'</a>\';'
 						),
 						'class' => 'smalltext',
 						'style' => 'width:15em;',
