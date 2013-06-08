@@ -461,8 +461,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>'
 			),
 			'subject' => $row['subject'],
-			'short_subject' => shorten_text($row['subject'], 25),
-			'preview' => Util::strlen($preview) > 128 ? Util::substr($preview, 0, 128) . '...' : $preview,
+			'short_subject' => shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24),
+			'preview' => shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128),
 			'body' => $row['body'],
 			'time' => standardTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
