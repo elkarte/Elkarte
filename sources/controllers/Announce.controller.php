@@ -162,7 +162,7 @@ class Announce_Controller
 		}
 
 		$announcements = array();
-		
+
 		// Loop through all members that'll receive an announcement in this batch.
 		foreach ($data as $row)
 		{
