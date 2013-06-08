@@ -82,6 +82,7 @@ class SplitTopics_Controller
 		// We deal with topics here.
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
+
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true));
 
@@ -131,7 +132,6 @@ class SplitTopics_Controller
 	{
 		global $txt, $context, $topic;
 
-
 		// Check the session to make sure they meant to do this.
 		checkSession();
 
@@ -150,6 +150,7 @@ class SplitTopics_Controller
 			$context['move_to_board'] = (int) $_SESSION['move_to_board'];
 			$context['reason'] = trim(Util::htmlspecialchars($_SESSION['reason']));
 		}
+
 		$_SESSION['move_to_board'] = $context['move_to_board'];
 		$_SESSION['reason'] = $context['reason'];
 
@@ -399,6 +400,7 @@ class SplitTopics_Controller
 
 		// Build a page list of the not-selected topics...
 		$context['not_selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
+
 		// ...and one of the selected topics.
 		$context['selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
 
@@ -476,15 +478,18 @@ function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 		'icon' => 'moved',
 		'smileys_enabled' => 1,
 	);
+
 	$topicOptions = array(
 		'id' => $topic,
 		'board' => $board,
 		'mark_as_read' => true,
 	);
+
 	$posterOptions = array(
 		'id' => $user_info['id'],
 		'update_post_count' => empty($board_info['count_posts']),
 	);
+
 	createPost($msgOptions, $topicOptions, $posterOptions);
 }
 
@@ -553,6 +558,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		// Get the right first and last message dependant on approved state...
 		if (empty($split1_first_msg) || $row['myid_first_msg'] < $split1_first_msg)
 			$split1_first_msg = $row['myid_first_msg'];
+
 		if (empty($split1_last_msg) || $row['approved'])
 			$split1_last_msg = $row['myid_last_msg'];
 
@@ -596,6 +602,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 		// As before get the right first and last message dependant on approved state...
 		if (empty($split2_first_msg) || $row['myid_first_msg'] < $split2_first_msg)
 			$split2_first_msg = $row['myid_first_msg'];
+
 		if (empty($split2_last_msg) || $row['approved'])
 			$split2_last_msg = $row['myid_last_msg'];
 
@@ -659,6 +666,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Move the messages over to the other topic.
 	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
+
 	// Check the subject length.
 	if (Util::strlen($new_subject) > 100)
 		$new_subject = Util::substr($new_subject, 0, 100);
@@ -811,6 +819,7 @@ function splitAttemptMove($boards, $totopic)
 						updateMemberData($id_member, array('posts' => 'posts + ' . $posts));
 				}
 			}
+
 			// And finally move it!
 			moveTopics($totopic, $boards['destination']['id']);
 		}

@@ -20,6 +20,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Post Moderation Controller
+ */
 class PostModeration_Controller
 {
 	/**
@@ -140,11 +143,10 @@ class PostModeration_Controller
 					continue;
 
 				$can_add = false;
+
 				// If we're approving this is simple.
 				if ($curAction == 'approve' && ($any_array == array(0) || in_array($row['id_board'], $any_array)))
-				{
 					$can_add = true;
-				}
 				// Delete requires more permission checks...
 				elseif ($curAction == 'delete')
 				{
@@ -176,13 +178,10 @@ class PostModeration_Controller
 			if (!empty($toAction))
 			{
 				if ($curAction == 'approve')
-				{
 					approveMessages ($toAction, $details, $context['current_view']);
-				}
 				else
-				{
 					removeMessages ($toAction, $details, $context['current_view']);
-				}
+
 				cache_put_data('num_menu_errors', null, 900);
 			}
 		}
@@ -191,9 +190,9 @@ class PostModeration_Controller
 		$brd = isset($_REQUEST['brd']) ? (int) $_REQUEST['brd'] : null;
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		$mod_count = loadModeratorMenuCounts($brd);
+
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($_REQUEST['brd']) ? ';brd=' . (int) $_REQUEST['brd'] : ''), $_GET['start'], $context['current_view'] == 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
 		$context['start'] = $_GET['start'];
 
@@ -314,8 +313,10 @@ class PostModeration_Controller
 		elseif (isset($_GET['delete']))
 			$attachments[] = (int) $_GET['delete'];
 		elseif (isset($_POST['item']))
+		{
 			foreach ($_POST['item'] as $item)
 				$attachments[] = (int) $item;
+		}
 
 		// Are we approving or deleting?
 		if (isset($_GET['approve']) || (isset($_POST['do']) && $_POST['do'] == 'approve'))
@@ -487,7 +488,6 @@ class PostModeration_Controller
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'mc_unapproved_attach';
-
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['mc_unapproved_attachments'],
 			'help' => '',
@@ -501,8 +501,6 @@ class PostModeration_Controller
 	function action_approve()
 	{
 		global $user_info, $topic, $board;
-
-		$db = database();
 
 		checkSession('get');
 
@@ -550,20 +548,18 @@ function approveMessages($messages, $messageDetails, $current_view = 'replies')
 	if ($current_view == 'topics')
 	{
 		approveTopics($messages);
+
 		// and tell the world about it
 		foreach ($messages as $topic)
-		{
 			logAction('approve_topic', array('topic' => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
-		}
 	}
 	else
 	{
 		approvePosts($messages);
+
 		// and tell the world about it again
 		foreach ($messages as $post)
-		{
 			logAction('approve', array('topic' => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
-		}
 	}
 }
 
@@ -634,11 +630,14 @@ function removeMessages($messages, $messageDetails, $current_view = 'replies')
 	{
 		require_once(SUBSDIR . '/Topic.subs.php');
 		removeTopics($messages);
+
 		// and tell the world about it
 		foreach ($messages as $topic)
+		{
 			// Note, only log topic ID in native form if it's not gone forever.
 			logAction('remove', array(
 				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$topic]['board'] ? 'topic' : 'old_topic_id') => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
+		}
 	}
 	else
 	{

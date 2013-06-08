@@ -21,6 +21,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Remove Topic Controller
+ */
 class RemoveTopic_Controller
 {
 	/**
@@ -30,7 +33,7 @@ class RemoveTopic_Controller
 	 */
 	function action_removetopic2()
 	{
-		global $user_info, $topic, $board, $context, $modSettings;
+		global $user_info, $topic, $board, $modSettings;
 
 		// Make sure they aren't being lead around by someone. (:@)
 		checkSession('get');
@@ -65,12 +68,14 @@ class RemoveTopic_Controller
 
 		// Note, only log topic ID in native form if it's not gone forever.
 		if (allowedTo('remove_any') || (allowedTo('remove_own') && $topic_info['id_member_started'] == $user_info['id']))
+		{
 			logAction('remove', array(
 				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $board ? 'topic' : 'old_topic_id') => $topic,
 				'subject' => $topic_info['subject'],
 				'member' => $topic_info['id_member_started'],
 				'board' => $board)
 			);
+		}
 
 		redirectexit('board=' . $board . '.0');
 	}
@@ -125,12 +130,14 @@ class RemoveTopic_Controller
 		$full_topic = removeMessage($_REQUEST['msg']);
 
 		if (allowedTo('delete_any') && (!allowedTo('delete_own') || $topic_info['id_member'] != $user_info['id']))
+		{
 			logAction('delete', array(
 				'topic' => $topic,
 				'subject' => $topic_info['subject'],
 				'member' => $topic_info['id_member'],
 				'board' => $board)
 			);
+		}
 
 		// We want to redirect back to recent action.
 		if (isset($_REQUEST['recent']))
@@ -150,7 +157,7 @@ class RemoveTopic_Controller
 	 */
 	function action_restoretopic()
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
 		$db = database();
 
@@ -201,6 +208,7 @@ class RemoveTopic_Controller
 					$topics_to_restore[] = $row['id_topic'];
 					continue;
 				}
+
 				// Don't know where it's going?
 				if (empty($row['id_previous_topic']))
 				{
@@ -229,8 +237,10 @@ class RemoveTopic_Controller
 
 			// Check for topics we are going to fully restore.
 			foreach ($actioned_messages as $topic => $data)
+			{
 				if (in_array($topic, $topics_to_restore))
 					unset($actioned_messages[$topic]);
+			}
 
 			// Load any previous topics to check they exist.
 			if (!empty($previous_topics))
@@ -281,6 +291,7 @@ class RemoveTopic_Controller
 
 			// Put the icons back.
 			if (!empty($messages))
+			{
 				$db->query('', '
 					UPDATE {db_prefix}messages
 					SET icon = {string:icon}
@@ -290,6 +301,7 @@ class RemoveTopic_Controller
 						'messages' => $messages,
 					)
 				);
+			}
 		}
 
 		// Now any topics?
@@ -385,7 +397,7 @@ class RemoveTopic_Controller
  */
 function mergePosts($msgs = array(), $from_topic, $target_topic)
 {
-	global $context, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -482,6 +494,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 		if ($row['id_first_msg'] < $target_topic_data['id_first_msg'])
 			$target_topic_data['id_first_msg'] = $row['id_first_msg'];
 		$target_topic_data['id_last_msg'] = $row['id_last_msg'];
+
 		if (!$row['approved'])
 			$target_topic_data['unapproved_posts'] = $row['message_count'];
 		else
@@ -617,6 +630,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
 	$cache_updates = array();
 	if ($target_first_msg != $target_topic_data['id_first_msg'])
 		$cache_updates[] = $target_topic_data['id_first_msg'];
+
 	if (!empty($source_topic_data['id_first_msg']) && $from_first_msg != $source_topic_data['id_first_msg'])
 		$cache_updates[] = $source_topic_data['id_first_msg'];
 
@@ -643,7 +657,7 @@ function mergePosts($msgs = array(), $from_topic, $target_topic)
  */
 function removeDeleteConcurrence()
 {
-	global $modSettings, $board, $topic, $scripturl, $context;
+	global $modSettings, $board, $scripturl, $context;
 
 	// No recycle no need to go further
 	if (empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']))

@@ -21,6 +21,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Who Controller
+ */
 class Who_Controller
 {
 	/**
@@ -121,6 +124,7 @@ class Who_Controller
 		// Fallback to top filter?
 		if (isset($_REQUEST['submit_top']) && isset($_REQUEST['show_top']))
 			$_REQUEST['show'] = $_REQUEST['show_top'];
+
 		// Does the user wish to apply a filter?
 		if (isset($_REQUEST['show']) && isset($show_methods[$_REQUEST['show']]))
 		{
@@ -247,6 +251,7 @@ class Who_Controller
 			// Keep the IP that came from the database.
 			$memberContext[$member['id']]['ip'] = $member['ip'];
 			$context['members'][$i]['action'] = isset($url_data[$i]) ? $url_data[$i] : $txt['who_hidden'];
+
 			if ($member['id'] == 0 && isset($spiderContext[$member['id_spider']]))
 				$context['members'][$i] += $spiderContext[$member['id_spider']];
 			else
@@ -264,7 +269,6 @@ class Who_Controller
 	/**
 	 * It prepares credit and copyright information for the credits page or the admin page.
 	 * Accessed by ?action=who;sa=credits
-	 *
 	 */
 	function action_credits()
 	{
@@ -308,6 +312,7 @@ function determineActions($urls, $preferred_prefix = false)
 
 	if (!allowedTo('who_view'))
 		return array();
+
 	loadLanguage('Who');
 
 	// Actions that require a specific permission level.
@@ -492,6 +497,7 @@ function determineActions($urls, $preferred_prefix = false)
 	if (!empty($board_ids))
 	{
 		require_once(SUBSDIR . '/Boards.subs.php');
+
 		$boards_list = getBoardList(array('use_permissions' => true, 'included_boards' => array_keys($board_ids)), true);
 		foreach ($boards_list as $board)
 		{

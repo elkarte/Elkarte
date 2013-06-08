@@ -28,9 +28,7 @@ if (!defined('ELKARTE'))
 function action_modifyprofile()
 {
 	global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
-	global $modSettings, $memberContext, $profile_vars, $post_errors, $options, $user_settings;
-
-	$db = database();
+	global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
 
 	// Don't reload this as we may have processed error strings.
 	if (empty($post_errors))
@@ -425,7 +423,6 @@ function action_modifyprofile()
 				{
 					$security_checks[isset($_REQUEST['save']) ? 'validateToken' : 'needsToken'] = $area['token'];
 					$token_name = $area['token'] !== true ? str_replace('%u', $context['id_member'], $area['token']) : 'profile-u' . $context['id_member'];
-
 					$token_type = isset($area['token_type']) && in_array($area['token_type'], array('request', 'post', 'get')) ? $area['token_type'] : 'post';
 				}
 
@@ -453,10 +450,13 @@ function action_modifyprofile()
 	// Now the context is setup have we got any security checks to carry out additional to that above?
 	if (isset($security_checks['validateToken']))
 		validateToken($token_name, $token_type);
+
 	if (isset($security_checks['session']))
 		checkSession($security_checks['session']);
+
 	if (isset($security_checks['validate']))
 		validateSession();
+
 	if (isset($security_checks['permission']))
 		isAllowedTo($security_checks['permission']);
 
@@ -474,16 +474,20 @@ function action_modifyprofile()
 	);
 
 	if (!empty($profile_include_data['label']))
+	{
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=profile' . ($memID != $user_info['id'] ? ';u=' . $memID : '') . ';area=' . $profile_include_data['current_area'],
 			'name' => $profile_include_data['label'],
 		);
+	}
 
 	if (!empty($profile_include_data['current_subsection']) && $profile_include_data['subsections'][$profile_include_data['current_subsection']][0] != $profile_include_data['label'])
+	{
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=profile' . ($memID != $user_info['id'] ? ';u=' . $memID : '') . ';area=' . $profile_include_data['current_area'] . ';sa=' . $profile_include_data['current_subsection'],
 			'name' => $profile_include_data['subsections'][$profile_include_data['current_subsection']][0],
 		);
+	}
 
 	// Set the template for this area... if you still can :P
 	// and add the profile layer.

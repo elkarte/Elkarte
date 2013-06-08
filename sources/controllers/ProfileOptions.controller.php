@@ -199,8 +199,10 @@ function action_editIgnoreList($memID)
 	// For making changes!
 	$ignoreArray = explode(',', $user_profile[$memID]['pm_ignore_list']);
 	foreach ($ignoreArray as $k => $dummy)
+	{
 		if ($dummy == '')
 			unset($ignoreArray[$k]);
+	}
 
 	// Removing a member from the ignore list?
 	if (isset($_GET['remove']))
@@ -222,6 +224,7 @@ function action_editIgnoreList($memID)
 	elseif (isset($_POST['new_ignore']))
 	{
 		checkSession();
+
 		// Prepare the string for extraction...
 		$_POST['new_ignore'] = strtr(Util::htmlspecialchars($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_POST['new_ignore'], $matches);
@@ -299,8 +302,8 @@ function action_account()
 	$memID = currentMemberID();
 
 	loadTemplate('ProfileOptions');
-
 	loadThemeOptions($memID);
+
 	if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
 		loadCustomFields($memID, 'account');
 
@@ -329,8 +332,8 @@ function action_forumProfile()
 	$memID = currentMemberID();
 
 	loadTemplate('ProfileOptions');
-
 	loadThemeOptions($memID);
+
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		loadCustomFields($memID, 'forumprofile');
 
@@ -361,7 +364,6 @@ function action_pmprefs()
 
 	loadThemeOptions($memID);
 	loadCustomFields($memID, 'pmprefs');
-
 	loadTemplate('ProfileOptions');
 
 	$context['sub_template'] = 'edit_options';
@@ -385,6 +387,7 @@ function action_themepick()
 	$memID = currentMemberID();
 
 	loadThemeOptions($memID);
+
 	if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
 		loadCustomFields($memID, 'theme');
 
@@ -1035,6 +1038,7 @@ function action_groupMembership()
 	// Ensure the query doesn't croak!
 	if (empty($groups))
 		$groups = array(0);
+
 	// Just to be sure...
 	foreach ($groups as $k => $v)
 		$groups[$k] = (int) $v;
@@ -1125,6 +1129,7 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 	// Let's be extra cautious...
 	if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
 		isAllowedTo('manage_membergroups');
+
 	if (!isset($_REQUEST['gid']) && !isset($_POST['primary']))
 		fatal_lang_error('no_access', false);
 
@@ -1342,8 +1347,10 @@ function action_groupMembership2($profile_vars, $post_errors, $memID)
 
 	// Finally, we can make the changes!
 	foreach ($addGroups as $id => $dummy)
+	{
 		if (empty($id))
 			unset($addGroups[$id]);
+	}
 	$addGroups = implode(',', array_flip($addGroups));
 
 	// Ensure that we don't cache permissions if the group is changing.

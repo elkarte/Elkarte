@@ -20,6 +20,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Recent Post Controller
+ */
 class Recent_Controller
 {
 	/**
@@ -285,10 +288,10 @@ class Recent_Controller
 		require_once(SUBSDIR . '/Recent.subs.php');
 
 		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $settings['show_mark_read'];
-
 		$context['showing_all_topics'] = isset($_GET['all']);
 		$context['start'] = (int) $_REQUEST['start'];
 		$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
+
 		if ($_REQUEST['action'] == 'unread')
 			$context['page_title'] = $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'];
 		else
@@ -382,6 +385,7 @@ class Recent_Controller
 		else
 		{
 			$see_board = isset($_REQUEST['action']) && $_REQUEST['action'] == 'unreadreplies' ? 'query_see_board' : 'query_wanna_see_board';
+
 			// Don't bother to show deleted posts!
 			$request = $db->query('', '
 				SELECT b.id_board
@@ -619,6 +623,7 @@ class Recent_Controller
 			{
 				// Mark the boards as read if there are no unread topics!
 				require_once(SUBSDIR . '/Boards.subs.php');
+
 				// @todo look at this... there are no more unread topics already.
 				// If clearing of log_topics is still needed, perhaps do it separately.
 				markBoardsRead(empty($boards) ? $board : $boards, false, true);
@@ -628,6 +633,7 @@ class Recent_Controller
 					$context['querystring_board_limits'] = '';
 				else
 					$context['querystring_board_limits'] = sprintf($context['querystring_board_limits'], $_REQUEST['start']);
+
 				return;
 			}
 			else
@@ -707,6 +713,7 @@ class Recent_Controller
 				{
 					// Since there are no unread topics, mark the boards as read!
 					require_once(SUBSDIR . '/Boards.subs.php');
+
 					// @todo look at this... there are no more unread topics already.
 					// If clearing of log_topics is still needed, perhaps do it separately.
 					markBoardsRead(empty($boards) ? $board : $boards, false, true);
@@ -1017,6 +1024,7 @@ class Recent_Controller
 					$tmppages[] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . $tmpb . ';topicseen">' . $tmpa . '</a>';
 					$tmpa++;
 				}
+
 				// Show links to all the pages?
 				if (count($tmppages) <= 5)
 					$pages = '&#171; ' . implode(' ', $tmppages);
@@ -1037,6 +1045,7 @@ class Recent_Controller
 				// First icon first... as you'd expect.
 				if (!isset($context['icon_sources'][$row['first_icon']]))
 					$context['icon_sources'][$row['first_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['first_icon'] . '.png') ? 'images_url' : 'default_images_url';
+
 				// Last icon... last... duh.
 				if (!isset($context['icon_sources'][$row['last_icon']]))
 					$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';

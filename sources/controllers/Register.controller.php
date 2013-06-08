@@ -22,6 +22,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Register Controller
+ */
 class Register_Controller
 {
 	/**
@@ -32,10 +35,8 @@ class Register_Controller
  	*/
 	function action_register($reg_errors = array())
 	{
-		global $txt, $context, $settings, $modSettings, $user_info;
+		global $txt, $context, $modSettings, $user_info;
 		global $language, $scripturl, $cur_profile;
-
-		$db = database();
 
 		// Is this an incoming AJAX check?
 		if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
@@ -168,8 +169,10 @@ class Register_Controller
 
 			// We might have had some submissions on this front - go check.
 			foreach ($reg_fields as $field)
+			{
 				if (isset($_POST[$field]))
 					$cur_profile[$field] = Util::htmlspecialchars($_POST[$field]);
+			}
 
 			// Load all the fields in question.
 			setupProfileContext($reg_fields);
@@ -226,8 +229,7 @@ class Register_Controller
 	 */
 	function action_register2($verifiedOpenID = false)
 	{
-		global $scripturl, $txt, $modSettings, $context;
-		global $user_info, $options, $settings;
+		global $txt, $modSettings, $context;
 
 		$db = database();
 
@@ -262,6 +264,7 @@ class Register_Controller
 			// If we don't require an agreement, we need a extra check for coppa.
 			if (empty($modSettings['requireAgreement']) && !empty($modSettings['coppaAge']))
 				$_SESSION['skip_coppa'] = !empty($_POST['accept_agreement']);
+
 			// Are they under age, and under age users are banned?
 			if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 			{
@@ -381,12 +384,15 @@ class Register_Controller
 		foreach ($possible_strings as $var)
 			if (isset($_POST[$var]))
 				$regOptions['extra_register_vars'][$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
+
 		foreach ($possible_ints as $var)
 			if (isset($_POST[$var]))
 				$regOptions['extra_register_vars'][$var] = (int) $_POST[$var];
+
 		foreach ($possible_floats as $var)
 			if (isset($_POST[$var]))
 				$regOptions['extra_register_vars'][$var] = (float) $_POST[$var];
+
 		foreach ($possible_bools as $var)
 			if (isset($_POST[$var]))
 				$regOptions['extra_register_vars'][$var] = empty($_POST[$var]) ? 0 : 1;
@@ -462,6 +468,7 @@ class Register_Controller
 			$_REQUEST['step'] = 2;
 			return $this->action_register($reg_errors);
 		}
+
 		// If they're wanting to use OpenID we need to validate them first.
 		if (empty($_SESSION['openid']['verified']) && !empty($_POST['authenticate']) && $_POST['authenticate'] == 'openid')
 		{
@@ -709,6 +716,7 @@ class Register_Controller
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
 		$member = getBasicMemberData((int) $_GET['member'], array('authentication' => true));
+
 		// If doesn't exist or pending coppa
 		if (empty($member) || $member['is_activated'] == 5)
 			fatal_lang_error('no_access', false);
@@ -772,7 +780,7 @@ class Register_Controller
 	 */
 	function action_verificationcode()
 	{
-		global $modSettings, $context, $scripturl;
+		global $context, $scripturl;
 
 		$verification_id = isset($_GET['vid']) ? $_GET['vid'] : '';
 		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');
@@ -822,7 +830,6 @@ class Register_Controller
 				die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 			}
 		}
-
 		elseif ($_REQUEST['format'] === '.wav')
 		{
 			require_once(SUBSDIR . '/Sound.subs.php');
@@ -879,12 +886,14 @@ class Register_Controller
 			$email = !empty($_POST['emailaddres']) ? trim($_POST['emailaddres']) : '';
 			if (empty($email))
 				$context['errors'][] = $txt['error_no_email'];
+
 			if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $email) == 0)
 				$context['errors'][] = $txt['error_bad_email'];
 
 			$message = !empty($_POST['contactmessage']) ? trim(Util::htmlspecialchars($_POST['contactmessage'])) : '';
 			if (empty($message))
 				$context['errors'][] = $txt['error_no_message'];
+
 			if (empty($context['errors']))
 			{
 				$admins = admins();

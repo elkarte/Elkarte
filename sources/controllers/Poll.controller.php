@@ -22,6 +22,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Poll Controller
+ */
 class Poll_Controller
 {
 	/**
@@ -76,6 +79,7 @@ class Poll_Controller
 			{
 				// ;id,timestamp,[vote,vote...]; etc
 				$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);
+
 				// Find the poll we're after.
 				foreach ($guestinfo as $i => $guestvoted)
 				{
@@ -83,6 +87,7 @@ class Poll_Controller
 					if ($guestvoted[0] == $row['id_poll'])
 						break;
 				}
+
 				// Has the poll been reset since guest voted?
 				if ($row['reset_poll'] > $guestvoted[1])
 				{
@@ -205,6 +210,7 @@ class Poll_Controller
 		{
 			// Time is stored in case the poll is reset later, plus what they voted for.
 			$_COOKIE['guest_poll_vote'] = empty($_COOKIE['guest_poll_vote']) ? '' : $_COOKIE['guest_poll_vote'];
+
 			// ;id,timestamp,[vote,vote...]; etc
 			$_COOKIE['guest_poll_vote'] .= ';' . $row['id_poll'] . ',' . time() . ',' . (count($pollOptions) > 1 ? explode(',' . $pollOptions) : $pollOptions[0]);
 
@@ -321,12 +327,12 @@ class Poll_Controller
 		loadLanguage('Post');
 		loadTemplate('Poll');
 		loadJavascriptFile('post.js', array(), 'post_scripts');
-		$context['sub_template'] = 'poll_edit';
 
+		$context['sub_template'] = 'poll_edit';
 		$context['start'] = (int) $_REQUEST['start'];
 		$context['is_edit'] = isset($_REQUEST['add']) ? 0 : 1;
-		$poll_errors = error_context::context('poll');
 
+		$poll_errors = error_context::context('poll');
 		$pollinfo = pollInfoForTopic($topic);
 
 		// Assume it all exists, right?
@@ -345,6 +351,7 @@ class Poll_Controller
 			isAllowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
 		elseif (!$context['is_edit'] && !allowedTo('poll_add_any'))
 			isAllowedTo('poll_add_' . ($user_info['id'] == $pollinfo['id_member_started'] ? 'own' : 'any'));
+
 		$context['can_moderate_poll'] = isset($_REQUEST['add']) ? true : allowedTo('poll_edit_' . ($user_info['id'] == $pollinfo['id_member_started'] || ($pollinfo['poll_starter'] != 0 && $user_info['id'] == $pollinfo['poll_starter']) ? 'own' : 'any'));
 
 		// Do we enable guest voting?
@@ -410,10 +417,13 @@ class Poll_Controller
 			// Work out how many options we have, so we get the 'is_last' field right...
 			$totalPostOptions = 0;
 			foreach ($_POST['options'] as $id => $label)
+			{
 				if ($label != '')
 					$totalPostOptions++;
+			}
 
 			$count = 1;
+
 			// If an option exists, update it.  If it is new, add it - but don't reuse ids!
 			foreach ($_POST['options'] as $id => $label)
 			{
@@ -437,6 +447,7 @@ class Poll_Controller
 			{
 				// Need two?
 				if ($totalPostOptions == 0)
+				{
 					$context['choices'][] = array(
 						'id' => $last_id++,
 						'number' => $number++,
@@ -444,6 +455,7 @@ class Poll_Controller
 						'votes' => -1,
 						'is_last' => false
 					);
+				}
 				$poll_errors->addError('poll_few');
 			}
 
@@ -645,6 +657,7 @@ class Poll_Controller
 
 		$optionCount = 0;
 		$idCount = 0;
+
 		// Ensure the user is leaving a valid amount of options - there must be at least two.
 		foreach ($_POST['options'] as $k => $option)
 		{
@@ -654,6 +667,7 @@ class Poll_Controller
 				$idCount = max($idCount, $k);
 			}
 		}
+
 		if ($optionCount < 2)
 			$poll_errors->addError('poll_few');
 		elseif ($optionCount > 256 || $idCount > 255)
@@ -796,6 +810,7 @@ class Poll_Controller
 
 			// If it's already there, update it.  If it's not... add it.
 			if (in_array($k, $choices))
+			{
 				$db->query('', '
 					UPDATE {db_prefix}poll_choices
 					SET label = {string:option_name}
@@ -807,7 +822,9 @@ class Poll_Controller
 						'option_name' => $option,
 					)
 				);
+			}
 			else
+			{
 				$db->insert('',
 					'{db_prefix}poll_choices',
 					array(
@@ -818,6 +835,7 @@ class Poll_Controller
 					),
 					array()
 				);
+			}
 		}
 
 		// I'm sorry, but... well, no one was choosing you. Poor options, I'll put you out of your misery.
@@ -832,6 +850,7 @@ class Poll_Controller
 					'id_poll' => $bcinfo['id_poll'],
 				)
 			);
+
 			$db->query('', '
 				DELETE FROM {db_prefix}poll_choices
 				WHERE id_poll = {int:id_poll}
