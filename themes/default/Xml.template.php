@@ -101,11 +101,11 @@ function template_post()
 		<subject><![CDATA[', $context['preview_subject'], ']]></subject>
 		<body><![CDATA[', $context['preview_message'], ']]></body>
 	</preview>
-	<errors serious="', empty($context['error_type']) || $context['error_type'] != 'serious' ? '0' : '1', '" topic_locked="', $context['locked'] ? '1' : '0', '">';
-	if (!empty($context['post_error']))
-		foreach ($context['post_error'] as $message)
+	<errors serious="', empty($context['errors']['type']) || $context['errors']['type'] != 'serious' ? '0' : '1', '" topic_locked="', $context['locked'] ? '1' : '0', '">';
+	if (!empty($context['post_error']['errors']))
+		foreach ($context['post_error']['errors'] as $key => $message)
 			echo '
-		<error><![CDATA[', cleanXml($message), ']]></error>';
+		<error code="', cleanXml($key), '"><![CDATA[', cleanXml($message), ']]></error>';
 	echo '
 		<caption name="guestname" class="', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? 'error' : '', '" />
 		<caption name="email" class="', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? 'error' : '', '" />
@@ -125,7 +125,7 @@ function template_post()
 		<post id="', $post['id'], '">
 			<time><![CDATA[', $post['time'], ']]></time>
 			<poster><![CDATA[', cleanXml($post['poster']), ']]></poster>
-			<message><![CDATA[', cleanXml($post['message']), ']]></message>
+			<message><![CDATA[', cleanXml($post['body']), ']]></message>
 			<is_ignored>', $post['is_ignored'] ? '1' : '0', '</is_ignored>
 		</post>';
 		echo '

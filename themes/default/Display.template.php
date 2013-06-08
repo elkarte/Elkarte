@@ -27,8 +27,8 @@ function template_report_sent_above()
 
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
-		// Yeah, I know, though at the moment is the only way...
+	global $context, $settings, $options, $txt, $scripturl;
+	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
 
 	// Show the topic information - icon, subject, etc.
@@ -429,8 +429,6 @@ function template_quickreply_below()
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',
-					sSceditorID: ' . (!empty($context['post_box_name']) ? "'" . $context['post_box_name'] . "'" : "null") . ',
-					sType: \'', (!empty($options['use_editor_quick_reply']) ? 'qpost' : 'quick'), '\',
 					iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
 				});

@@ -683,7 +683,7 @@ function testFTP()
 		2: "ftp_username",
 		3: "ftp_password",
 		4: "ftp_path"
-	}
+	};
 
 	var sPostData = "";
 	for (i = 0; i < 5; i++)

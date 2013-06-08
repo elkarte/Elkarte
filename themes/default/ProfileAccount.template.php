@@ -318,11 +318,11 @@ function template_issueWarning()
 				data: {item: "warning_preview", title: $("#warn_sub").val(), body: $("#warn_body").val(), issuing: true},
 				context: document.body,
 				success: function(request){
-					$("#box_preview").css({display:""});
+					$("#box_preview").show();
 					$("#body_preview").html($(request).find(\'body\').text());
 					if ($(request).find("error").text() != \'\')
 					{
-						$("#profile_error").css({display:""});
+						$("#profile_error").show();
 						var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors" class="reset">\';
 						var errors = $(request).find(\'error\').each(function() {
 							errors_html += \'<li>\' + $(this).text() + \'</li>\';
@@ -333,7 +333,7 @@ function template_issueWarning()
 					}
 					else
 					{
-						$("#profile_error").css({display:"none"});
+						$("#profile_error").hide();
 						$("#error_list").html(\'\');
 					}
 				return false;

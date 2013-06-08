@@ -551,7 +551,7 @@ class Email_Parse
 				continue;
 
 			// Parse this section just like its was a separate email
-			$this->_boundary_section[$this->_boundary_section_count] = new Email_Parse;
+			$this->_boundary_section[$this->_boundary_section_count] = new Email_Parse();
 			$this->_boundary_section[$this->_boundary_section_count]->read_email($html, $part);
 
 			$this->_boundary_section_count++;

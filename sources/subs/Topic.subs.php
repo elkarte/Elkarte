@@ -1136,7 +1136,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') .
-			(!empty($selects) ? implode(',', $selects) : '') . '
+			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
 			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') .

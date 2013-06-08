@@ -189,7 +189,7 @@ function create_control_richedit($editorOptions)
 
 		// Drafts?
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			loadJavascriptFile('drafts.js');
+			loadJavascriptFile('drafts.plugin.js');
 
 		// Our not so concise shortcut line
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];

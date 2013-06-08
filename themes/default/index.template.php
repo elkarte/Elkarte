@@ -70,7 +70,7 @@ function template_init()
 	$settings['require_theme_strings'] = false;
 
 	// This is used for the color variants
-	$settings['theme_variants'] = array('white', 'blue', 'red');
+	$settings['theme_variants'] = array('white', 'blue', 'red', 'green');
 
 	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
 	$settings['avatars_on_indexes'] = false;
@@ -82,7 +82,7 @@ function template_init()
 	$settings['page_index_template'] = array(
 		'base_link' => '<span class="pagelink"><a class="navPages" href="{base_link}">%2$s</a> </span>',
 		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-		'current_page' => '<span class="pagelink"><span class="current_page"><strong>%1$s</strong></span></span>',
+		'current_page' => '<span class="pagelink current_pagelink"><span class="current_page"><strong>%1$s</strong></span></span>',
 		'next_page' => '<span class="next_page">{next_txt}</span>',
 		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 	);
@@ -286,7 +286,7 @@ function template_body_above()
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/'. $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="Elkarte Community" title="Elkarte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/'. $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="ElkArte Community" title="ElkArte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	echo'
 		</div>
@@ -506,6 +506,7 @@ function template_menu()
 						<li id="button_', $act, '" ', !empty($button['sub_buttons']) ? 'class="subsections"' : '', '>
 							<a class="', $button['sub_buttons'] ? 'submenu' : '', !empty($button['active_button']) ? ' active' : '', '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', $button['title'], '</a>';
 
+		// does it have child buttons? (2nd level menus)
 		if (!empty($button['sub_buttons']))
 		{
 			echo '
@@ -634,6 +635,9 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 						</div>';
 }
 
+/**
+ * Show a box with an error message.
+ */
 function template_show_error($error_id)
 {
 	global $context;
@@ -671,6 +675,9 @@ function template_show_error($error_id)
 					</div>';
 }
 
+/**
+ * Allows to select a board
+ */
 function template_select_boards($name, $label = '', $extra = '')
 {
 	global $context;
@@ -695,5 +702,5 @@ function template_select_boards($name, $label = '', $extra = '')
 	}
 
 	echo '
-					</select>';
+	</select>';
 }

@@ -5,9 +5,15 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains javascript associated with the drafts auto function.
+ * This file contains javascript associated with the drafts auto function as it
+ * relates to a plain text box (no sceditor invocation)
  */
 
+/**
+ * The constructor for the plain text box auto-saver
+ *
+ * @param {object} oOptions
+ */
 function elk_DraftAutoSave(oOptions)
 {
 	this.opt = oOptions;
@@ -15,81 +21,82 @@ function elk_DraftAutoSave(oOptions)
 	this.sCurDraftId = '';
 	this.oCurDraftDiv = null;
 	this.interval_id = null;
-	this.oDraftHandle = window;
+	this.oDraftHandle = document.forms.postmodify["message"];
 	this.sLastSaved = '';
-	this.bPM = this.opt.bPM ? true : false;
-	this.sCheckDraft = '';
+	this.bCheckDraft = false;
 
-	// slight delay on autosave init to allow sceditor to create the iframe
-	setTimeout('addLoadEvent(' + this.opt.sSelf + '.init())', 3000);
+	addLoadEvent(this.opt.sSelf + '.init();');
 }
 
-// Start our self calling routine
+/**
+ * Start our self calling routine
+ * @returns {undefined}
+ */
 elk_DraftAutoSave.prototype.init = function ()
 {
 	if (this.opt.iFreq > 0)
 	{
-		// start the autosave timer
-		this.interval_id = this.oDraftHandle.setInterval(this.opt.sSelf + '.draft' + (this.bPM ? 'PM' : '') + 'Save();', this.opt.iFreq);
+		// Start the autosaver timer
+		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
 
-		var current_draft_save = this.opt.sSelf;
-		$(document).ready(function () {
-			var current_draft = eval(current_draft_save);
-			if (current_draft.opt.sType === 'quick')
-			{
-				$current_editor = $(document.forms.postmodify["message"]);
-				$current_editor.on('blur', save_onBlur);
-				$current_editor.on('focus', enable_onFocus);
-			}
-			else
-			{
-				$current_editor = $(document.getElementById(current_draft.opt.sSceditorID));
-				$current_editor.data("sceditor").addEvent(current_draft.opt.sSceditorID, 'blur', save_onBlur);
-				$current_editor.data("sceditor").addEvent(current_draft.opt.sSceditorID, 'focus', enable_onFocus);
-			}
-			
-			function enable_onFocus ()
-			{
-				// Since your back we resume the autosave timer
-				var current_draft = eval(current_draft_save);
-
-				if (current_draft.opt.sType === 'quick' && current_draft.interval_id === "")
-					current_draft.interval_id = window.setInterval(current_draft.opt.sSelf + '.draft' + (current_draft.bPM ? 'PM' : '') + 'Save();', current_draft.opt.iFreq);
-
-					return;
-			}
-			function save_onBlur ()
-			{
-				// Moved away from the page, where did you go? ... till you return we pause autosaving
-				if (current_draft.bPM)
-					current_draft.draftPMSave();
-				else
-					current_draft.draftSave();
-
-				if (current_draft.interval_id !== "")
-					window.clearInterval(current_draft.interval_id);
-
-				current_draft.interval_id = "";
-			}
-		});
+		// Set up the text area events
+		this.oDraftHandle.instanceRef = this;
+		this.oDraftHandle.onblur = function (oEvent) {return this.instanceRef.draftBlur();};
+		this.oDraftHandle.onfocus = function (oEvent) {return this.instanceRef.draftFocus();};
+		this.oDraftHandle.onkeypress = function (oEvent) {return this.instanceRef.draftKeypress();};
 	}
-}
+};
 
-// Make the call to save this draft in the background
+/**
+ * Moved away from the page, where did you go? ... till you return we pause autosaving
+ *  - Handles the Blur event
+ */
+elk_DraftAutoSave.prototype.draftBlur = function()
+{
+	this.draftSave();
+
+	if (this.interval_id !== "")
+		window.clearInterval(this.interval_id);
+
+	this.interval_id = "";
+};
+
+/**
+ * Since your back we resume the autosave timer
+ *  - Handles the focus event
+ */
+elk_DraftAutoSave.prototype.draftFocus = function()
+{
+	if (this.interval_id === "")
+		this.interval_id = setInterval(this.opt.sSelf + '.draftSave();', this.opt.iFreq);
+};
+
+/**
+ * Since your back we resume the autosave timer
+ *  - Handles the keypress event
+ */
+elk_DraftAutoSave.prototype.draftKeypress = function()
+{
+	this.bCheckDraft = true;
+};
+
+/**
+ * Makes the ajax call to save this draft in the background
+ */
 elk_DraftAutoSave.prototype.draftSave = function ()
 {
-	if (this.opt.sType !== 'quick')
-		var sPostdata = $('#' + this.opt.sSceditorID).data("sceditor").getText();
-	else
-		var sPostdata = document.forms.postmodify["message"].value;
-
-	// nothing to save or already posting or nothing changed?
-	if (isEmptyText(sPostdata) || smf_formSubmitted || this.sCheckDraft === sPostdata)
+	// Form submitted or nothing changed since the last save
+	if (smf_formSubmitted || !this.bCheckDraft)
 		return false;
 
 	// Still saving the last one or other?
 	if (this.bInDraftMode)
 		this.draftCancel();
+
+	// Nothing to save?
+	var sPostdata = document.forms.postmodify["message"].value;
+	if (isEmptyText(sPostdata))
+		return false;
 
 	// Flag that we are saving a draft
 	document.getElementById('throbber').style.display = '';
@@ -106,77 +113,17 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 		smf_session_var + '=' + smf_session_id,
 	];
 
-	// Get the locked an/or sticky values if they have been selected or set that is
-	if (this.opt.sType === 'post')
-	{
-		var oLock = document.getElementById('check_lock');
-		var oSticky = document.getElementById('check_sticky');
-		if (oLock && oLock.checked)
-			aSections[aSections.length] = 'lock=1';
-		if (oSticky && oSticky.checked)
-			aSections[aSections.length] = 'sticky=1';
-	}
-
-	// keep track of source or wysiwyg when using the full editor
-	if (this.opt.sType === 'post' || this.opt.sType === 'qpost')
-		aSections[aSections.length] = 'message_mode=' + $('#' + this.opt.sSceditorID).data("sceditor").inSourceMode();
-
 	// Send in document for saving and hope for the best
 	sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=post2;board=" + this.opt.iBoard + ";xml", aSections.join("&"), this.onDraftDone);
 
 	// Save the latest for compare
-	this.sCheckDraft = sPostdata;
-}
+	this.bCheckDraft = false;
+};
 
-// Make the call to save this PM draft in the background
-elk_DraftAutoSave.prototype.draftPMSave = function ()
-{
-	var sPostdata = $('#' + this.opt.sSceditorID).data("sceditor").getText();
-
-	// nothing to save or already posting or nothing changed?
-	if (isEmptyText(sPostdata) || smf_formSubmitted || this.sCheckDraft === sPostdata)
-		return false;
-
-	// Still saving the last one or some other?
-	if (this.bInDraftMode)
-		this.draftCancel();
-
-	// Flag that we are saving
-	document.getElementById('throbber').style.display = '';
-	this.bInDraftMode = true;
-
-	// Get the to and bcc values
-	var aTo = this.draftGetRecipient('recipient_to[]');
-	var aBcc = this.draftGetRecipient('recipient_bcc[]');
-
-	// Get the rest of the form elements that we want to save, and load them up
-	var aSections = [
-		'replied_to=' + parseInt(document.forms.postmodify.elements['replied_to'].value),
-		'id_pm_draft=' + parseInt(document.forms.postmodify.elements['id_pm_draft'].value),
-		'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-		'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-		'recipient_to=' + aTo,
-		'recipient_bcc=' + aBcc,
-		'save_draft=true',
-		smf_session_var + '=' + smf_session_id,
-	];
-
-	// Saving a copy in the outbox?
-	if (document.getElementById('outbox'))
-		aSections[aSections.length] = 'outbox=' + parseInt(document.getElementById('outbox').value);
-
-	// account for wysiwyg
-	if (this.opt.sType === 'post')
-		aSections[aSections.length] = 'message_mode=' + parseInt(document.forms.postmodify.elements['message_mode'].value);
-
-	// Send in (post) the document for saving
-	sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=pm;sa=send2;xml", aSections.join("&"), this.onDraftDone);
-
-	// Save the latest for compare
-	this.sCheckDraft = sPostdata;
-}
-
-// Callback function of the XMLhttp request for saving the draft message
+/**
+ * Callback function of the XMLhttp request for saving the draft message
+ * @param {object} XMLDoc
+ */
 elk_DraftAutoSave.prototype.onDraftDone = function (XMLDoc)
 {
 	// If it is not valid then clean up
@@ -192,41 +139,14 @@ elk_DraftAutoSave.prototype.onDraftDone = function (XMLDoc)
 	oCurDraftDiv = document.getElementById(this.opt.sLastNote);
 	setInnerHTML(oCurDraftDiv, this.sLastSaved);
 
-	// hide the saved draft infobox in the event they pressed the save draft button at some point
-	if (this.opt.sType === 'post')
-		document.getElementById('draft_section').style.display = 'none';
-
 	// thank you sir, may I have another
 	this.bInDraftMode = false;
 	document.getElementById('throbber').style.display = 'none';
-}
-
-// function to retrieve the to and bcc values from the pseudo arrays
-elk_DraftAutoSave.prototype.draftGetRecipient = function (sField)
-{
-	var oRecipient = document.forms.postmodify.elements[sField];
-	var aRecipient = []
-
-	if (typeof(oRecipient) !== 'undefined')
-	{
-		// just one recipient
-		if ('value' in oRecipient)
-			aRecipient.push(parseInt(oRecipient.value));
-		else
-		{
-			// or many !
-			for (var i = 0, n = oRecipient.length; i < n; i++)
-				aRecipient.push(parseInt(oRecipient[i].value));
-		}
-	}
-	return aRecipient;
-}
+};
 
 // If another auto save came in with one still pending
 elk_DraftAutoSave.prototype.draftCancel = function ()
 {
-	// can we do anything at all ... do we want to (e.g. sequence our async events?)
-	// @todo if not remove this function
 	this.bInDraftMode = false;
 	document.getElementById('throbber').style.display = 'none';
-}
+};
