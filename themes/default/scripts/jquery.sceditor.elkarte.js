@@ -273,7 +273,7 @@ $.sceditor.command.set(
 $.sceditor.command.set(
 	'tt', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('<tt>', '</tt>');
+			this.wysiwygEditorInsertHtml('<span class="tt">', '</span>');
 		},
 		txtExec: ["[tt]", "[/tt]"],
 		tooltip: 'Teletype'
@@ -434,7 +434,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 			tt: null
 		},
 		format: "[tt]{0}[/tt]",
-		html: '<tt>{0}</tt>'
+		html: '<span class="tt">{0}</span>'
 	}
 );
 

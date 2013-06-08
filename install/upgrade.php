@@ -2622,7 +2622,7 @@ function upgrade_query($string, $unbuffered = false)
 
 			<div style="margin: 2ex;">
 				This query:
-				<blockquote><tt>' . nl2br(htmlspecialchars(trim($string))) . ';</tt></blockquote>
+				<blockquote><span style="font-family: monospace;">' . nl2br(htmlspecialchars(trim($string))) . ';</span></blockquote>
 
 				Caused the error:
 				<blockquote>' . nl2br(htmlspecialchars($db_error_message)) . '</blockquote>
@@ -3346,7 +3346,7 @@ function template_chmod()
 	$txt['ftp_path'] = 'Install Path';
 	$txt['ftp_path_info'] = 'This is the <em>relative</em> path you use in your FTP client <a href="' . $_SERVER['PHP_SELF'] . '?ftphelp" onclick="window.open(this.href, \'\', \'width=450,height=250\');return false;" target="_blank">(more help)</a>.';
 	$txt['ftp_path_found_info'] = 'The path in the box above was automatically detected.';
-	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<tt>www</tt>&quot;, &quot;<tt>public_html</tt>&quot;, or &quot;<tt>httpdocs</tt>&quot; - but it should include the directory ELKARTE is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
+	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<span style="font-family: monospace;">www</span>&quot;, &quot;<span style="font-family: monospace;">public_html</span>&quot;, or &quot;<span style="font-family: monospace;">httpdocs</span>&quot; - but it should include the directory ELKARTE is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
 	$txt['ftp_path_help_close'] = 'Close';
 	$txt['ftp_connect'] = 'Connect';
 

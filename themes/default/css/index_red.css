@@ -149,7 +149,7 @@ html, body {
 #inner_wrap hr {
 	display: none;
 }
-div#main_menu {
+main_menu {
 	padding: 0;
 }
 
