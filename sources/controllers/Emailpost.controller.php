@@ -28,8 +28,8 @@ class Emailpost_Controller
 	 * - Keys are used once and then discarded
 	 *
 	 * @param string $data used to supply a full body+headers email
-	 * @param type $force used to override common failure errors
-	 * @param type $key used to supply a lost key
+	 * @param boolean $force used to override common failure errors
+	 * @param string $key used to supply a lost key
 	 */
 	function action_pbe_post($data = null, $force = false, $key = null)
 	{
