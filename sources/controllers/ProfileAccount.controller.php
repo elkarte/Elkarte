@@ -22,7 +22,6 @@ if (!defined('ELKARTE'))
 
 /**
  * Issue/manage an user's warning status.
- *
  */
 function action_issuewarning()
 {
@@ -108,6 +107,7 @@ function action_issuewarning()
 		$_POST['warn_reason'] = isset($_POST['warn_reason']) ? trim($_POST['warn_reason']) : '';
 		if ($_POST['warn_reason'] == '' && !$context['user']['is_owner'])
 			$issueErrors[] = 'warning_no_reason';
+
 		$_POST['warn_reason'] = Util::htmlspecialchars($_POST['warn_reason']);
 
 		// If the value hasn't changed it's either no JS or a real no change (Which this will pass)
@@ -116,6 +116,7 @@ function action_issuewarning()
 
 		$_POST['warning_level'] = (int) $_POST['warning_level'];
 		$_POST['warning_level'] = max(0, min(100, $_POST['warning_level']));
+
 		if ($_POST['warning_level'] < $context['min_allowed'])
 			$_POST['warning_level'] = $context['min_allowed'];
 		elseif ($_POST['warning_level'] > $context['max_allowed'])
@@ -129,6 +130,7 @@ function action_issuewarning()
 		{
 			$_POST['warn_sub'] = trim($_POST['warn_sub']);
 			$_POST['warn_body'] = trim($_POST['warn_body']);
+
 			if (empty($_POST['warn_sub']) || empty($_POST['warn_body']))
 				$issueErrors[] = 'warning_notify_blank';
 			// Send the PM?
@@ -185,6 +187,7 @@ function action_issuewarning()
 	{
 		$warning_body = !empty($_POST['warn_body']) ? trim(censorText($_POST['warn_body'])) : '';
 		$context['preview_subject'] = !empty($_POST['warn_sub']) ? trim(Util::htmlspecialchars($_POST['warn_sub'])) : '';
+
 		if (empty($_POST['warn_sub']) || empty($_POST['warn_body']))
 			$issueErrors[] = 'warning_notify_blank';
 
@@ -228,9 +231,12 @@ function action_issuewarning()
 		$modSettings['warning_mute'] => $txt['profile_warning_effect_mute'],
 	);
 	$context['current_level'] = 0;
+
 	foreach ($context['level_effects'] as $limit => $dummy)
+	{
 		if ($context['member']['warning'] >= $limit)
 			$context['current_level'] = $limit;
+	}
 
 	$listOptions = array(
 		'id' => 'issued_warnings',
@@ -327,6 +333,7 @@ function action_issuewarning()
 	{
 		require_once(SUBSDIR . '/Messages.subs.php');
 		$message = basicMessageInfo((int) $_REQUEST['msg']);
+
 		if (!empty($message))
 		{
 			$context['warning_for_message'] = (int) $_REQUEST['msg'];
@@ -370,10 +377,12 @@ function action_issuewarning()
 
 	// Setup the "default" templates.
 	foreach (array('spamming', 'offence', 'insulting') as $type)
+	{
 		$context['notification_templates'][] = array(
 			'title' => $txt['profile_warning_notify_title_' . $type],
 			'body' => sprintf($txt['profile_warning_notify_template_outline' . (!empty($context['warning_for_message']) ? '_post' : '')], $txt['profile_warning_notify_for_' . $type]),
 		);
+	}
 
 	// Replace all the common variables in the templates.
 	foreach ($context['notification_templates'] as $k => $name)
@@ -382,7 +391,6 @@ function action_issuewarning()
 
 /**
  * Present a screen to make sure the user wants to be deleted.
- *
  */
 function action_deleteaccount()
 {
@@ -407,7 +415,6 @@ function action_deleteaccount()
 
 /**
  * Actually delete an account.
- *
  */
 function action_deleteaccount2()
 {
@@ -419,7 +426,6 @@ function action_deleteaccount2()
 	@set_time_limit(600);
 
 	// @todo Add a way to delete pms as well?
-
 	if (!$context['user']['is_owner'])
 		isAllowedTo('profile_remove_any');
 	elseif (!allowedTo('profile_remove_any'))
