@@ -543,7 +543,7 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 	border-bottom-left-radius: 4px;
 	border-left: 1px solid #ccc;
 }
-.pagelinks  .pagelink:last-child {
+.pagelinks .pagelink:last-child {
 	border-top-right-radius: 4px;
 	border-bottom-right-radius: 4px;
 }
@@ -555,8 +555,6 @@ div.pagesection div.floatright input, div.pagesection div.floatright select {
 	background: #efefef;
 	display: inline-block;
 }
-.navPages {
-}
 small .pagelink {
 	border: none !important;
 	padding: 1px;
@@ -564,8 +562,9 @@ small .pagelink {
 .next_page, .previous_page {
 	text-transform: capitalize;
 }
-.current_page  {
-	color: #ccc;
+.current_pagelink  {
+	color: #aaa;
+	font-weight: bold;
 }
 .next_page, .previous_page {
 	text-transform: capitalize;

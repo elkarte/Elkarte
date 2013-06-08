@@ -82,7 +82,7 @@ function template_init()
 	$settings['page_index_template'] = array(
 		'base_link' => '<span class="pagelink"><a class="navPages" href="{base_link}">%2$s</a> </span>',
 		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-		'current_page' => '<span class="pagelink current_pagelink"><span class="current_page"><strong>%1$s</strong></span></span>',
+		'current_page' => '<span class="pagelink current_pagelink">%1$s</span>',
 		'next_page' => '<span class="next_page">{next_txt}</span>',
 		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 	);

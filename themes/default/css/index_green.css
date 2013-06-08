@@ -9,7 +9,6 @@ body {
 #wrapper {
 	background-color: #fff;
 }
-
 #logo {
 	float: right;
 	text-align: right;
@@ -281,11 +280,9 @@ li.greeting, .news p {
 	display: inline-block;
 	border-radius: 2px;
 }
-.current_page strong {
-	color: #fff;
-}
 .current_pagelink {
 	background-color: #7CB229;
+	color: white;
 }
 
 .table_list .icon, .table_list .info, .table_list .stats, .table_list .lastpost {
