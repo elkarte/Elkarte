@@ -202,7 +202,6 @@ function template_show_month_grid($grid_name)
 		return false;
 
 	$calendar_data = &$context['calendar_grid_' . $grid_name];
-	$colspan = !empty($calendar_data['show_week_links']) ? 8 : 7;
 
 	if (empty($calendar_data['disable_title']))
 	{

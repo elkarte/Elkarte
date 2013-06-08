@@ -1137,7 +1137,7 @@ table.table_padding td {
 }
 /* Necessary to allow highlighting of 1st level while hovering over submenu. */
 .dropmenu li:hover li a, .dropmenu li.sfhover li a {
-	padding: 1px 9px;
+	padding: 1px 10px;
 	background: none;
 	color: #666;
 	border: none;
@@ -4477,7 +4477,7 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	background: #f2e3d9;
 }
 .table_grid tr td.lockedbg {
-	background: #f0f4f7 /*e7eaef*/
+	background: #f0f4f7; /*e7eaef*/
 }
 .table_grid tr td.lockedbg2 {
 	background: #f0f4f7;

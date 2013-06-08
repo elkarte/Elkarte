@@ -19,7 +19,7 @@
  */
 function template_maintain_database()
 {
-	global $context, $settings, $txt, $scripturl, $db_type;
+	global $context, $settings, $txt, $scripturl;
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))

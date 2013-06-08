@@ -51,6 +51,7 @@ class Post_Controller
 
 		$post_errors = error_context::context('post', 1);
 		$attach_errors = error_context::context('attachment', 1);
+		$first_subject = '';
 
 		// Posting an event?
 		$context['make_event'] = isset($_REQUEST['calendar']);
@@ -430,15 +431,9 @@ class Post_Controller
 			// Are you... a guest?
 			if ($user_info['is_guest'])
 			{
-				$_REQUEST['guestname'] = !isset($_REQUEST['guestname']) ? '' : trim($_REQUEST['guestname']);
-				$_REQUEST['email'] = !isset($_REQUEST['email']) ? '' : trim($_REQUEST['email']);
-
-				$_REQUEST['guestname'] = htmlspecialchars($_REQUEST['guestname']);
-				$context['name'] = $_REQUEST['guestname'];
-				$_REQUEST['email'] = htmlspecialchars($_REQUEST['email']);
-				$context['email'] = $_REQUEST['email'];
-
-				$user_info['name'] = $_REQUEST['guestname'];
+				$context['name'] = !isset($_REQUEST['guestname']) ? '' : Util::htmlspecialchars(trim($_REQUEST['guestname']));
+				$context['email'] = !isset($_REQUEST['email']) ? '' : Util::htmlspecialchars(trim($_REQUEST['email']));
+				$user_info['name'] = $context['name'];
 			}
 
 			// Only show the preview stuff if they hit Preview.
@@ -483,8 +478,6 @@ class Post_Controller
 			// Set the destination action for submission.
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['msg']) ? ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '') . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = isset($_REQUEST['msg']) ? $txt['save'] : $txt['post'];
-
-			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 
 			// Previewing an edit?
 			if (isset($_REQUEST['msg']) && !empty($topic))
@@ -1235,8 +1228,8 @@ class Post_Controller
 		// If the poster is a guest evaluate the legality of name and email.
 		if ($posterIsGuest)
 		{
-			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : trim($_POST['guestname']);
-			$_POST['email'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
+			$_POST['guestname'] = !isset($_POST['guestname']) ? '' : Util::htmlspecialchars(trim($_POST['guestname']));
+			$_POST['email'] = !isset($_POST['email']) ? '' : Util::htmlspecialchars(trim($_POST['email']));
 
 			if ($_POST['guestname'] == '' || $_POST['guestname'] == '_')
 				$post_errors->addError('no_name');

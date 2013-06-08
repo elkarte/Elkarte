@@ -7,16 +7,13 @@
  *
  * @version 1.0 Alpha
  *
- * This file is mainly concerned with minor tasks relating to boards, such as
- * marking them read, collapsing categories, or quick moderation.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * This class handles a part of the actions to mak boards, topics, or replies, as read/unread.
+ * This class handles a part of the actions to mark boards, topics, or replies, as read/unread.
  */
 class MarkRead_Controller
 {
