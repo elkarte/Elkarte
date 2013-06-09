@@ -118,6 +118,7 @@ function action_summary()
 	if ($context['member']['is_activated'] % 10 != 1 && allowedTo('moderate_forum'))
 	{
 		$context['activate_type'] = $context['member']['is_activated'];
+
 		// What should the link text be?
 		$context['activate_link_text'] = in_array($context['member']['is_activated'], array(3, 4, 5, 13, 14, 15)) ? $txt['account_approve'] : $txt['account_activate'];
 
@@ -268,7 +269,6 @@ function action_summary()
 /**
  * Show all posts by the current user
  * @todo This function needs to be split up properly.
- *
  */
 function action_showPosts()
 {
@@ -596,7 +596,6 @@ function action_showPosts()
 
 /**
  * Show all the attachments of a user.
- *
  */
 function action_showAttachments()
 {
@@ -1204,6 +1203,7 @@ function action_statPanel()
 	$db->free_result($result);
 
 	if ($maxPosts > 0)
+	{
 		for ($hour = 0; $hour < 24; $hour++)
 		{
 			if (!isset($context['posts_by_time'][$hour]))
@@ -1221,6 +1221,7 @@ function action_statPanel()
 				$context['posts_by_time'][$hour]['relative_percent'] = round(($context['posts_by_time'][$hour]['posts'] * 100) / $maxPosts);
 			}
 		}
+	}
 
 	// Put it in the right order.
 	ksort($context['posts_by_time']);
@@ -1231,7 +1232,6 @@ function action_statPanel()
 
 /**
  * Show permissions for a user.
- *
  */
 function action_showPermissions()
 {
@@ -1343,6 +1343,7 @@ function action_showPermissions()
 
 		// Add this permission if it doesn't exist yet.
 		if (!isset($context['member']['permissions']['general'][$row['permission']]))
+		{
 			$context['member']['permissions']['general'][$row['permission']] = array(
 				'id' => $row['permission'],
 				'groups' => array(
@@ -1353,6 +1354,7 @@ function action_showPermissions()
 				'is_denied' => false,
 				'is_global' => true,
 			);
+		}
 
 		// Add the membergroup to either the denied or the allowed groups.
 		$context['member']['permissions']['general'][$row['permission']]['groups'][empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['id_group'] == 0 ? $txt['membergroups_members'] : $row['group_name'];
@@ -1408,7 +1410,6 @@ function action_showPermissions()
 			);
 
 		$context['member']['permissions']['board'][$row['permission']]['groups'][empty($row['add_deny']) ? 'denied' : 'allowed'][$row['id_group']] = $row['id_group'] == 0 ? $txt['membergroups_members'] : $row['group_name'];
-
 		$context['member']['permissions']['board'][$row['permission']]['is_denied'] |= empty($row['add_deny']);
 	}
 	$db->free_result($request);
@@ -1416,7 +1417,6 @@ function action_showPermissions()
 
 /**
  * View a members warnings?
- *
  */
 function action_viewWarning()
 {
@@ -1427,6 +1427,7 @@ function action_viewWarning()
 		fatal_lang_error('no_access', false);
 
 	loadTemplate('ProfileInfo');
+
 	// We need this because of template_load_warning_variables
 	loadTemplate('Profile');
 
@@ -1518,6 +1519,8 @@ function action_viewWarning()
 	$context['current_level'] = 0;
 	$context['sub_template'] = 'viewWarning';
 	foreach ($context['level_effects'] as $limit => $dummy)
+	{
 		if ($context['member']['warning'] >= $limit)
 			$context['current_level'] = $limit;
+	}
 }
