@@ -13,14 +13,14 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains those functions specific to the editing box and is
- * generally used for WYSIWYG type functionality.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Suggest Controler
+ */
 class Suggest_Controller
 {
 	/**
@@ -131,6 +131,7 @@ class Suggest_Controller
 		);
 
 		foreach ($versions as $id => $version)
+		{
 			if (strpos($version, strtoupper($_REQUEST['search'])) !== false)
 				$xml_data['items']['children'][] = array(
 					'attributes' => array(
@@ -138,6 +139,7 @@ class Suggest_Controller
 					),
 					'value' => $version,
 				);
+		}
 
 		return $xml_data;
 	}
