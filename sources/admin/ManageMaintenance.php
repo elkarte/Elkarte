@@ -108,7 +108,12 @@ class ManageMaintenance_Controller
 
 		// Any special activity?
 		if (isset($activity))
-			$this->{$subActions[$subAction]['activities'][$activity]}();
+		{
+			if (method_exists($this, $subActions[$subAction]['activities'][$activity]))
+				$this->{$subActions[$subAction]['activities'][$activity]}();
+			else
+				$subActions[$subAction]['activities'][$activity]();
+		}
 
 		// Create a maintenance token.  Kinda hard to do it any other way.
 		createToken('admin-maint');
