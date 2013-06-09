@@ -2000,7 +2000,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	global $user_info, $language, $settings, $context, $modSettings, $txtBirthdayEmails;
+	global $user_info, $language, $settings, $context, $modSettings;
 	global $db_show_debug, $txt;
 	static $already_loaded = array();
 
@@ -2072,27 +2072,6 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 		{
 			log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
 			break;
-		}
-
-		// For the sake of backward compatibility
-		if (!empty($txt['emails']))
-		{
-			foreach ($txt['emails'] as $key => $value)
-			{
-				$txt[$key . '_subject'] = $value['subject'];
-				$txt[$key . '_body'] = $value['body'];
-			}
-			$txt['emails'] = array();
-		}
-		if (!empty($txtBirthdayEmails))
-		{
-			foreach ($txtBirthdayEmails as $key => $value)
-			{
-				$txtBirthdayEmails[$key . '_subject'] = $value['subject'];
-				$txtBirthdayEmails[$key . '_body'] = $value['body'];
-				$txtBirthdayEmails[$key . '_author'] = $value['author'];
-			}
-			$txtBirthdayEmails = array();
 		}
 	}
 
