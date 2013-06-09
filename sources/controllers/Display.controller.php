@@ -150,7 +150,7 @@ class Display_Controller
 			$context['total_visible_posts'] = $context['num_replies'] + $topicinfo['unapproved_posts'] + ($topicinfo['approved'] ? 1 : 0);
 
 		// When was the last time this topic was replied to?  Should we warn them about it?
-		// require_once(SUBSDIR . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 		$mgsOptions = basicMessageInfo($topicinfo['id_last_msg'], true);
 		$context['oldTopicError'] = !empty($modSettings['oldTopicDays']) && $mgsOptions['poster_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($topicinfo['is_sticky']);
 
