@@ -21,6 +21,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Topics Controller
+ */
 class Topic_Controller
 {
 	/**
@@ -52,6 +55,7 @@ class Topic_Controller
 
 		// Can you lock topics here, mister?
 		$user_lock = !allowedTo('lock_any');
+
 		if ($user_lock && $starter == $user_info['id'])
 			isAllowedTo('lock_own');
 		else
@@ -76,6 +80,7 @@ class Topic_Controller
 		// If they are allowed a "moderator" permission, log it in the moderator log.
 		if (!$user_lock)
 			logAction($locked ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $board));
+
 		// Notify people that this topic has been locked?
 		sendNotifications($topic, empty($locked) ? 'unlock' : 'lock');
 
@@ -134,6 +139,7 @@ class Topic_Controller
 
 		// Log this sticky action - always a moderator thing.
 		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', array('topic' => $topic, 'board' => $board));
+
 		// Notify people that this topic has been stickied?
 		if (empty($is_sticky))
 			sendNotifications($topic, 'sticky');
@@ -193,6 +199,7 @@ class Topic_Controller
 		if (!empty($row['id_poll']))
 		{
 			loadLanguage('Post');
+
 			// Get the question and if it's locked.
 			$request = $db->query('', '
 				SELECT
@@ -256,6 +263,7 @@ class Topic_Controller
 				{
 					// ;id,timestamp,[vote,vote...]; etc
 					$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);
+
 					// Find the poll we're after.
 					foreach ($guestinfo as $i => $guestvoted)
 					{
@@ -263,6 +271,7 @@ class Topic_Controller
 						if ($guestvoted[0] == $row['id_poll'])
 							break;
 					}
+
 					// Has the poll been reset since guest voted?
 					if ($pollinfo['reset_poll'] > $guestvoted[1])
 					{
@@ -289,6 +298,7 @@ class Topic_Controller
 			}
 
 			$context['user']['started'] = $user_info['id'] == $row['id_member'] && !$user_info['is_guest'];
+			
 			// Set up the basic poll information.
 			$context['poll'] = array(
 				'id' => $row['id_poll'],
