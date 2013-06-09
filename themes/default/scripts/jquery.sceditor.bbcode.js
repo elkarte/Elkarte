@@ -440,11 +440,12 @@
 						bbcode = base.bbcodes[token.name];
 
 						// If this tag is not self closing and it has a closing tag then it is open and has children so
-						// add it to the list of open tags. If it is a valid BBCode, e.g. in the BBCode list but is missing
-						// an end tag then just assume it's misisng and include everything as it's children.
-						if((!bbcode || !bbcode.isSelfClosing) && (bbcode || hasTag(token.name, tokenType.close, toks)))
+						// add it to the list of open tags. If has the closedBy property then it is closed by other tags
+						// so include everything as it's children until one of those tags is reached.
+						if((!bbcode || !bbcode.isSelfClosing) && (bbcode.closedBy || hasTag(token.name, tokenType.close, toks)))
 							openTags.push(token);
-
+						else if(!bbcode || !bbcode.isSelfClosing)
+							token.type = tokenType.content;
 						break;
 
 					case tokenType.close:
@@ -452,8 +453,8 @@
 						if(currentOpenTag() && token.name !== currentOpenTag().name && closesCurrentTag('/' + token.name))
 							openTags.pop();
 
-						// If this is closing the currently open tag just pop thfcloe
-						// tage off the open tags array
+						// If this is closing the currently open tag just pop the close
+						// tag off the open tags array
 						if(currentOpenTag() && token.name === currentOpenTag().name)
 						{
 							currentOpenTag().closing = token;
@@ -828,7 +829,7 @@
 				removeEmpty(token.children);
 
 				if(allWhiteSpace(token.children) && bbcode && !bbcode.isSelfClosing && !bbcode.allowsEmpty)
-					tokens.splice(i, 1);
+					tokens.splice.apply(tokens, $.merge([i, 1], token.children));
 			}
 		};
 
@@ -1271,6 +1272,10 @@
 			// build the BBCode cache
 			buildBbcodeCache();
 			mergeSourceModeCommands(this);
+
+			// Add BBCode helper methods
+			this.toBBCode   = base.signalToSource;
+			this.fromBBCode = base.signalToWysiwyg;
 		};
 
 		mergeSourceModeCommands = function(editor) {
@@ -1539,16 +1544,35 @@
 		/**
 		 * Converts HTML to BBCode
 		 * @param string	html	Html string, this function ignores this, it works off domBody
-		 * @param HtmlElement	domBody	Editors dom body object to convert
+		 * @param HtmlElement	$body	Editors dom body object to convert
 		 * @return string BBCode which has been converted from HTML
 		 * @memberOf jQuery.plugins.bbcode.prototype
 		 */
-		base.signalToSource = function(html, domBody) {
-			var parser = new $.sceditor.BBCodeParser(base.opts.parserOptions);
+		base.signalToSource = function(html, $body) {
+			var	$tmpContainer, bbcode,
+				parser = new $.sceditor.BBCodeParser(base.opts.parserOptions);
 
-			$.sceditor.dom.removeWhiteSpace(domBody[0]);
+			if(!$body)
+			{
+				if(typeof html === "string")
+				{
+					$tmpContainer = $('<div />').css('visibility', 'hidden').appendTo(document.body).html(html);
+					$body = $tmpContainer;
+				}
+				else
+					$body = $(html);
+			}
 
-			return $.trim(parser.toBBCode(base.elementToBbcode(domBody), true));
+			if(!$body || !$body.jquery)
+				return '';
+
+			$.sceditor.dom.removeWhiteSpace($body[0]);
+			bbcode = base.elementToBbcode($body);
+
+			if($tmpContainer)
+				$tmpContainer.remove();
+
+			return $.trim(parser.toBBCode(bbcode, true));
 		};
 
 		/**
@@ -1643,7 +1667,7 @@
 		 */
 		base.signalToWysiwyg = function(text, asFragment) {
 			var	parser = new $.sceditor.BBCodeParser(base.opts.parserOptions),
-				html   = parser.toHTML(text);
+				html   = parser.toHTML($.trim(text));
 
 			return asFragment ? removeFirstLastDiv(html) : html;
 		};
@@ -1662,6 +1686,10 @@
 				output  = $output[0];
 
 			removeDiv = function(node, isFirst) {
+				// Don't remove divs that have styleing
+				if(node.className || $(node).attr('style') || !$.isEmptyObject($(node).data()))
+					return;
+
 				while((next = node.firstChild))
 					output.insertBefore(next, node);
 
@@ -2046,21 +2074,26 @@
 				}
 			},
 			quoteType: $.sceditor.BBCodeParser.QuoteType.never,
-			format: function(element, content) {
-				var	attribs = '',
-					style = function(name) {
+			format: function($element, content) {
+				var	w, h,
+					attribs   = '',
+					element   = $element[0],
+					style     = function(name) {
 						return element.style ? element.style[name] : null;
 					};
 
 				// check if this is an emoticon image
-				if(typeof element.attr('data-sceditor-emoticon') !== "undefined")
+				if(typeof $element.attr('data-sceditor-emoticon') !== "undefined")
 					return content;
 
-				// only add width and height if one is specified
-				if(element.attr('width') || element.attr('height') || style('width') || style('height'))
-					attribs = "=" + $(element).width() + "x" + $(element).height();
+				w = $element.attr('width') || style('width');
+				h = $element.attr('height') || style('height');
 
-				return '[img' + attribs + ']' + element.attr('src') + '[/img]';
+				// only add width and height if one is specified
+				if((element.complete && (w || h)) || (w && h))
+					attribs = "=" + $element.width() + "x" + $element.height();
+
+				return '[img' + attribs + ']' + $element.attr('src') + '[/img]';
 			},
 			html: function(token, attrs, content) {
 				var	parts,
@@ -2073,7 +2106,7 @@
 					attribs += ' height="' + attrs.height + '"';
 
 				// handle [img=340x240]url[/img]
-				if(typeof attrs.defaultattr !== "undefined") {
+				if(attrs.defaultattr) {
 					parts = attrs.defaultattr.split(/x/i);
 
 					attribs = ' width="' + parts[0] + '"' +
