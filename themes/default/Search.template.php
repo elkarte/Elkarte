@@ -351,10 +351,7 @@ function template_results()
 
 		// was anything even found?
 		if (!empty($context['topics']))
-			echo'
-					<div class="pagesection">
-						<span>', $context['page_index'], '</span>
-					</div>';
+			template_pagesection(false, false, 'go_down');
 		else
 			echo '
 					<div class="roundframe">', $txt['find_no_results'], '</div>';
@@ -440,10 +437,7 @@ function template_results()
 		}
 
 		if (!empty($context['topics']))
-			echo '
-					<div class="pagesection">
-						<span>', $context['page_index'], '</span>
-					</div>';
+			template_pagesection();
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
 		{
@@ -485,10 +479,8 @@ function template_results()
 					<h3 class="catbg">
 						<img class="centericon" src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
 					</h3>
-				</div>
-				<div class="pagesection">
-					<span>', $context['page_index'], '</span>
 				</div>';
+		template_pagesection(false, false, 'go_down');
 
 		if (empty($context['topics']))
 			echo '
@@ -541,10 +533,7 @@ function template_results()
 			}
 		}
 
-		echo '
-				<div class="pagesection">
-					<span>', $context['page_index'], '</span>
-				</div>';
+		template_pagesection();
 	}
 
 	// Show a jump to box for easy navigation.

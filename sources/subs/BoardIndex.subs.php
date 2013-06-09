@@ -256,10 +256,10 @@ function getBoardIndex($boardIndexOptions)
 
 		// Prepare the subject, and make sure it's not too long.
 		censorText($row_board['subject']);
-		$row_board['short_subject'] = shorten_subject($row_board['subject'], 24);
+		$row_board['short_subject'] = shorten_text($row_board['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24);
 		$this_last_post = array(
 			'id' => $row_board['id_msg'],
-			'time' => $row_board['poster_time'] > 0 ? relativeTime($row_board['poster_time']) : $txt['not_applicable'],
+			'time' => $row_board['poster_time'] > 0 ? ('<time datetime="' . htmlTime($row_board['poster_time']) . '">' . relativeTime($row_board['poster_time']) . '</time>') : $txt['not_applicable'],
 			'timestamp' => forum_time(true, $row_board['poster_time']),
 			'subject' => $row_board['short_subject'],
 			'member' => array(

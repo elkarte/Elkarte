@@ -787,6 +787,21 @@ function relativeTime($timestamp, $show_today = true, $offset_type = false)
 }
 
 /**
+ * Used to render a timestamp to html5 <time> tag format.
+ *
+ * @param int $timestamp
+ * @return string
+ */
+function htmlTime($timestamp)
+{
+	global $modSettings, $user_info;
+
+	$time = date('Y-m-d H:i', $timestamp + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600);
+
+	return $time;
+}
+
+/**
  * Removes special entities from strings.  Compatibility...
  * Faster than html_entity_decode
  *
@@ -806,57 +821,40 @@ function un_htmlspecialchars($string)
 }
 
 /**
- * Shorten a subject + internationalization concerns.
- *
- * - shortens a subject so that it is either shorter than length, or that length plus an ellipsis.
- * - respects internationalization characters and entities as one character.
- * - avoids trailing entities.
- * - returns the shortened string.
- *
- * @param string $subject
- * @param int $len
- */
-function shorten_subject($subject, $len)
-{
-	// It was already short enough!
-	if (Util::strlen($subject) <= $len)
-		return $subject;
-
-	// Shorten it by the length it was too long, and strip off junk from the end.
-	return Util::substr($subject, 0, $len) . '...';
-}
-
-/**
  * Shorten a string of text
  *
- * - shortens a text string so that it is approximately a certain length or under
- * - attempts to break the string on the first word boundary after the allowed length
- * - if resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
+ * - shortens a text string so that it is either shorter than length, or that length plus an ellipsis.
+ * - optionally attempts to break the string on a word boundary approximately at the allowed length
+ * - if using cutword and the resulting length is > len plus buffer then it is truncated to length plus an ellipsis.
  * - respects internationalization characters and entities as one character.
  * - returns the shortened string.
  *
  * @param string $text
  * @param int $len
- * @param int $buffer maximum length overflow to allow cutting on a word boundary
+ * @param bool $cutword try to cut at a word boundary
+ * @param int $buffer maximum length overflow to allow when cutting on a word boundary
  */
-function shorten_text($text, $len = 384, $buffer = 12)
+function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 {
-	$current = Util::strlen($text);
-
-	// Its to long so lets cut it down to size
-	if ($current > $len)
+	// If its to long, cut it down to size
+	if (Util::strlen($text) > $len)
 	{
-		// Look for len characters and cut on first word boundary after
-		preg_match('~(.{' . $len . '}.*?)\b~s', $text, $matches);
+		if ($cutword)
+		{
+			// Look for len - buffer characters and cut on first word boundary after
+			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~s', $text, $matches);
 
-		// Always one clown in the audience who likes long words or not using the spacebar
-		if (Util::strlen($matches[1]) > $len + $buffer)
-			$matches[1] = substr($matches[1], 0, $len);
+			// Always one clown in the audience who likes long words or not using the spacebar
+			if (Util::strlen($matches[1]) > $len + $buffer)
+				$matches[1] = Util::substr($matches[1], 0, $len);
 
-		return rtrim($matches[1]) . '...';
+			$text = rtrim($matches[1]) . ' ...';
+		}
+		else
+			$text = Util::substr($subject, 0, $len) . '...';
 	}
-	else
-		return $text;
+
+	return $text;
 }
 
 /**
@@ -1083,8 +1081,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'acronym',
 				'type' => 'unparsed_equals',
-				'before' => '<acronym title="$1">',
-				'after' => '</acronym>',
+				'before' => '<abbr title="$1">',
+				'after' => '</abbr>',
 				'quoted' => 'optional',
 				'disabled_after' => ' ($1)',
 			),

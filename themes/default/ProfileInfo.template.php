@@ -308,10 +308,8 @@ function template_action_showPosts()
 			<h3 class="catbg">
 				', (!isset($context['attachments']) && empty($context['is_topics']) ? $txt['showMessages'] : (!empty($context['is_topics']) ? $txt['showTopics'] : $txt['showAttachments'])), ' - ', $context['member']['name'], '
 			</h3>
-		</div>', !empty($context['page_index']) ? '
-		<div class="pagesection">
-			<div class="pagelinks">' . $context['page_index'] . '</div>
-		</div>' : '';
+		</div>';
+		template_pagesection(false, false, 'go_down');
 
 	// Are we displaying posts or attachments?
 	if (!isset($context['attachments']))
@@ -387,11 +385,7 @@ function template_action_showPosts()
 				</div>';
 
 	// Show more page numbers.
-	if (!empty($context['page_index']))
-		echo '
-		<div class="pagesection" style="margin-bottom: 0;">
-			<div class="pagelinks">', $context['page_index'], '</div>
-		</div>';
+	template_pagesection();
 }
 
 function template_action_showPermissions()
