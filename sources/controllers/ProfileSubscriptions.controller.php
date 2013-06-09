@@ -57,9 +57,7 @@ function action_subscriptions()
 			}
 		}
 		else
-		{
 			$cost_array['fixed'] = $costs['fixed'];
-		}
 
 		if (empty($cost_array))
 			unset($context['subscriptions'][$id]);
@@ -76,6 +74,7 @@ function action_subscriptions()
 	foreach ($gateways as $id => $gateway)
 	{
 		$gateways[$id] = new $gateway['display_class']();
+
 		if (!$gateways[$id]->gatewayEnabled())
 			unset($gateways[$id]);
 	}
@@ -160,6 +159,7 @@ function action_subscriptions()
 		$context['sub_template'] = 'paid_done';
 		return;
 	}
+
 	// If this is confirmation then it's simpler...
 	if (isset($_GET['confirm']) && isset($_POST['sub_id']) && is_array($_POST['sub_id']))
 	{
@@ -225,14 +225,18 @@ function action_subscriptions()
 			$current_pending = array();
 			if ($context['current'][$context['sub']['id']]['pending_details'] != '')
 				$current_pending = @unserialize($context['current'][$context['sub']['id']]['pending_details']);
+
 			// Don't get silly.
 			if (count($current_pending) > 9)
 				$current_pending = array();
 			$pending_count = 0;
+
 			// Only record real pending payments as will otherwise confuse the admin!
 			foreach ($current_pending as $pending)
+			{
 				if ($pending[3] == 'payback')
 					$pending_count++;
+			}
 
 			if (!in_array($new_data, $current_pending))
 			{
@@ -285,7 +289,6 @@ function action_subscriptions()
 /**
  * Activate an account.
  * This function is called from the profile account actions area.
- *
  */
 function action_activateaccount()
 {
