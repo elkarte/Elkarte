@@ -21,6 +21,9 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * Reminder Controller
+ */
 class Reminder_Controller
 {
 	/**
@@ -55,8 +58,6 @@ class Reminder_Controller
 	function action_picktype()
 	{
 		global $context, $txt, $scripturl, $user_info, $webmaster_email, $language, $modSettings;
-
-		$db = database();
 
 		checkSession();
 		validateToken('remind');
@@ -136,9 +137,7 @@ class Reminder_Controller
 		}
 		// Otherwise are ready to answer the question?
 		elseif (isset($_POST['reminder_type']) && $_POST['reminder_type'] == 'secret')
-		{
 			return secretAnswerInput();
-		}
 
 		// No we're here setup the context for template number 2!
 		$context['sub_template'] = 'reminder_pick';
@@ -180,9 +179,7 @@ class Reminder_Controller
 	 */
 	function action_setpassword2()
 	{
-		global $context, $txt, $modSettings;
-
-		$db = database();
+		global $context, $txt;
 
 		checkSession();
 		validateToken('remind-sp');
@@ -251,9 +248,7 @@ class Reminder_Controller
 	 */
 	function action_secret2()
 	{
-		global $txt, $context, $modSettings;
-
-		$db = database();
+		global $txt, $context;
 
 		checkSession();
 		validateToken('remind-sai');
@@ -326,9 +321,7 @@ class Reminder_Controller
  */
 function secretAnswerInput()
 {
-	global $txt, $context;
-
-	$db = database();
+	global $context;
 
 	checkSession();
 
