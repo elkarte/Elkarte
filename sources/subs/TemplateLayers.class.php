@@ -193,12 +193,12 @@ class Template_Layers
 
 		$all['before'] = array();
 		foreach ($this->_all_before as $key => $value)
-			if (in_array($key, $all_known))
+			if (in_array($value, $all_known))
 				$all['before'][$key] = $value;
 
 		$all['after'] = array();
 		foreach ($this->_all_after as $key => $value)
-			if (in_array($key, $all_known))
+			if (in_array($value, $all_known))
 				$all['after'][$key] = $value;
 
 		// This is terribly optimized, though it shouldn't loop over too many things (hopefully)
