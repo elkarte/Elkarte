@@ -1425,6 +1425,32 @@ class ManageFeatures_Controller
 	}
 
 	/**
+	 * Return likes settings.
+	 * Used in admin center search.
+	 */
+	public function likesSettings()
+	{
+		global $txt;
+
+		$config_vars = array(
+				// Likes - On or off?
+				array('check', 'likes_enabled'),
+			'',
+				// Who can do it.... and who is restricted by count limits?
+				array('int', 'likeMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
+				array('int', 'likeWaitCount', 6),
+				array('check', 'likeRestrictAdmins'),
+			'',
+				array('int', 'likeDisplayLimit', 6)
+		);
+
+		call_integration_hook('integrate_likes_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
 	 * Return signature settings.
 	 * Used in admin center search.
 	 */
