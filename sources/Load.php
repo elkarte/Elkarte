@@ -1514,6 +1514,10 @@ function loadTheme($id_theme = 0, $initialize = true)
 		// Do this to keep things easier in the templates.
 		$context['theme_variant'] = '_' . $context['theme_variant'];
 		$context['theme_variant_url'] = $context['theme_variant'] . '/';
+
+		// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
+		if (!empty($context['theme_variant']))
+			loadCSSFile('index' . $context['theme_variant'] . '.css');
 	}
 
 	// Allow overriding the board wide time/number formats.
@@ -1534,6 +1538,10 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['character_set'] = 'UTF-8';
 	$context['right_to_left'] = !empty($txt['lang_rtl']);
 	$context['tabindex'] = 1;
+
+	// RTL languages require an additional stylesheet.
+	if ($context['right_to_left'])
+		loadCSSFile('rtl.css');
 
 	// Compatibility.
 	if (!isset($settings['theme_version']))
@@ -1688,21 +1696,19 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 	if (!is_array($style_sheets))
 		$style_sheets = array($style_sheets);
 
-	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
-	if (!empty($context['theme_variant']))
-		$default_sheets = array('index.css', $context['theme_variant'] . '.css');
-	else
-		$default_sheets = array('index.css');
+	if (empty($default_loaded))
+	{
+		loadCSSFile(array('index.css'));
+		$default_loaded = true;
+	}
 
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
-		loadCSSFile(
-			array(implode('.css,', $style_sheets) . '.css')
-		);
-	elseif (empty($default_loaded))
 	{
-		loadCSSFile($default_sheets);
-		$default_loaded = true;
+		foreach ($style_sheets as &$sheet)
+			$sheet = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
+
+		loadCSSFile($style_sheets);
 	}
 
 	// No template to load?
