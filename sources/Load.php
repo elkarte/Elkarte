@@ -1967,7 +1967,7 @@ function addJavascriptVar($key, $value, $escape = false)
 {
 	global $context;
 
-	if (!empty($key) && !empty($value))
+	if (!empty($key) && isset($value))
 		$context['javascript_vars'][$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
 }
 
