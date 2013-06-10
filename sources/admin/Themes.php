@@ -165,7 +165,7 @@ class Themes_Controller
 
 			// Commit the new settings.
 			updateSettings(array(
-				'theme_allow' => $_POST['options']['theme_allow'],
+				'theme_allow' => !empty($_POST['options']['theme_allow']),
 				'theme_guests' => $_POST['options']['theme_guests'],
 				'knownThemes' => implode(',', $_POST['options']['known_themes']),
 			));
