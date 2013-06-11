@@ -119,15 +119,6 @@ function template_html_above()
 		}
 	</style>';
 
-	// RTL languages require an additional stylesheet.
-	if ($context['right_to_left'])
-		echo '
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/rtl.css?alp21" />';
-
-	if (!empty($context['theme_variant']))
-		echo '
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />';
-
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
