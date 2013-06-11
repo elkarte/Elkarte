@@ -108,7 +108,12 @@ class ManageMaintenance_Controller
 
 		// Any special activity?
 		if (isset($activity))
-			$this->{$subActions[$subAction]['activities'][$activity]}();
+		{
+			if (method_exists($this, $subActions[$subAction]['activities'][$activity]))
+				$this->{$subActions[$subAction]['activities'][$activity]}();
+			else
+				$subActions[$subAction]['activities'][$activity]();
+		}
 
 		// Create a maintenance token.  Kinda hard to do it any other way.
 		createToken('admin-maint');
@@ -194,13 +199,66 @@ class ManageMaintenance_Controller
 	 */
 	public function action_routine()
 	{
-		global $context, $txt;
+		global $context, $txt, $scripturl;
 
 		if (isset($_GET['done']) && $_GET['done'] == 'recount')
 			$context['maintenance_finished'] = $txt['maintain_recount'];
 
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_routine';
+		$context['routine_actions'] = array(
+			'version' => array(
+				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=version',
+				'title' => $txt['maintain_version'],
+				'description' => $txt['maintain_version_info'],
+				'submit' => $txt['maintain_run_now'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+				)
+			),
+			'repair' => array(
+				'url' => $scripturl . '?action=admin;area=repairboards',
+				'title' => $txt['maintain_errors'],
+				'description' => $txt['maintain_errors_info'],
+				'submit' => $txt['maintain_run_now'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+					'admin-maint_token_var' => 'admin-maint_token',
+				)
+			),
+			'recount' => array(
+				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=recount',
+				'title' => $txt['maintain_recount'],
+				'description' => $txt['maintain_recount_info'],
+				'submit' => $txt['maintain_run_now'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+					'admin-maint_token_var' => 'admin-maint_token',
+				)
+			),
+			'logs' => array(
+				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=logs',
+				'title' => $txt['maintain_logs'],
+				'description' => $txt['maintain_logs_info'],
+				'submit' => $txt['maintain_run_now'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+					'admin-maint_token_var' => 'admin-maint_token',
+				)
+			),
+			'cleancache' => array(
+				'url' => $scripturl . '?action=admin;area=maintain;sa=routine;activity=cleancache',
+				'title' => $txt['maintain_cache'],
+				'description' => $txt['maintain_cache_info'],
+				'submit' => $txt['maintain_run_now'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+					'admin-maint_token_var' => 'admin-maint_token',
+				)
+			),
+		);
+
+		call_integration_hook('integrate_routine_maintenance');
 	}
 
 	/**
