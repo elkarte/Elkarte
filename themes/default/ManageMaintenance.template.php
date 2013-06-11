@@ -110,7 +110,7 @@ function template_maintain_database()
  */
 function template_maintain_routine()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	// Starts off with general maintenance procedures.
 	echo '
@@ -123,76 +123,29 @@ function template_maintain_routine()
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
+	foreach ($context['routine_actions'] as $action)
+	{
+		echo '
+		<div class="cat_bar">
+			<h3 class="catbg">', $action['title'], '</h3>
+		</div>
+		<div class="windowbg">
+			<div class="content">
+				<form action="', $action['url'], '" method="post" accept-charset="UTF-8">
+					<p>', $action['description'], '
+						<input type="submit" value="', $action['submit'], '" class="button_submit" />';
+		if (!empty($action['hidden']))
+			foreach ($action['hidden'] as $name => $val)
+				echo '
+						<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
+		echo '
+					</p>
+				</form>
+			</div>
+		</div>';
+	}
+
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_version'], '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=version" method="post" accept-charset="UTF-8">
-					<p>', $txt['maintain_version_info'], '
-						<input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					</p>
-				</form>
-			</div>
-		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_errors'], '</h3>
-		</div>
-		<div class="windowbg2">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=repairboards" method="post" accept-charset="UTF-8">
-					<p>', $txt['maintain_errors_info'], '
-						<input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					</p>
-				</form>
-			</div>
-		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_recount'], '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" method="post" accept-charset="UTF-8">
-					<p>', $txt['maintain_recount_info'], '
-						<input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					</p>
-				</form>
-			</div>
-		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_logs'], '</h3>
-		</div>
-		<div class="windowbg2">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=logs" method="post" accept-charset="UTF-8">
-					<p>', $txt['maintain_logs_info'], '
-						<input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					</p>
-				</form>
-			</div>
-		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_cache'], '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
-					<p>', $txt['maintain_cache_info'], '
-						<input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					</p>
-				</form>
-			</div>
-		</div>
 	</div>';
 }
 
