@@ -30,7 +30,7 @@ class Help_Controller
 	 * Uses Help template and Manual language file.
 	 * It is accessed by ?action=help.
 	 */
-	function action_help()
+	public function action_help()
 	{
 		global $scripturl, $context, $txt;
 
@@ -74,7 +74,7 @@ class Help_Controller
 	 * @uses ManagePermissions language file, if the help starts with permissionhelp.
 	 * @uses Help template, 'popup' sub-template.
 	 */
-	function action_quickhelp()
+	public function action_quickhelp()
 	{
 		global $txt, $helptxt, $context, $scripturl;
 
