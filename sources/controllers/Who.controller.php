@@ -250,7 +250,7 @@ class Who_Controller
 		require_once(SUBSDIR . '/Who.subs.php');
 		loadLanguage('Who');
 
-		prepareCreditsData();
+		$context += prepareCreditsData();
 
 		loadTemplate('Who');
 		$context['sub_template'] = 'credits';

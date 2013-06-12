@@ -422,7 +422,7 @@ function prepareCreditsData()
 	global $context, $txt;
 
 	// Don't blink. Don't even blink. Blink and you're dead.
-	$context['credits'] = array(
+	$credits['credits'] = array(
 		array(
 			'pretext' => $txt['credits_intro'],
 			'title' => $txt['credits_team'],
@@ -438,7 +438,7 @@ function prepareCreditsData()
 	);
 
 	// Give credit to any graphic library's, software library's, plugins etc
-	$context['credits_software_graphics'] = array(
+	$credits['credits_software_graphics'] = array(
 		'graphics' => array(
 			'<a href="http://p.yusukekamiyamane.com/">Fugue Icons</a> | &copy; 2012 Yusuke Kamiyamane | These icons are licensed under a Creative Commons Attribution 3.0 License',
 			'<a href="http://www.oxygen-icons.org/">Oxygen Icons</a> | These icons are licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>',
@@ -463,11 +463,12 @@ function prepareCreditsData()
 
 	// Add-ons authors: to add credits, the simpler and better way is to add in your package.xml the <credits> <license> tags.
 	// Support for addons that use the <credits> tag via the package manager
-	$context['credits_addons'] = addonsCredits();
+	$credits['credits_addons'] = addonsCredits();
 
 	// An alternative for add-ons credits is to use a hook.
 	call_integration_hook('integrate_credits');
 
 	// Copyright information
-	$context['copyrights']['elkarte'] = '&copy; 2013 ElkArte contributors';
+	$credits['copyrights']['elkarte'] = '&copy; 2013 ElkArte contributors';
+	return $credits;
 }

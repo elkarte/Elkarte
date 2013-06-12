@@ -748,7 +748,7 @@ class Admin_Controller
 			'description' => '',
 		);
 		loadLanguage('Who');
-		prepareCreditsData();
+		$context += prepareCreditsData();
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
