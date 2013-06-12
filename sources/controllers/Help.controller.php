@@ -84,7 +84,7 @@ class Help_Controller
 		if (!isset($helptxt))
 			$helptxt = array();
 
-		$help = $_GET['help'];
+		$help = Util::htmlspecialchars($_GET['help']);
 
 		// Load the admin help language file and template.
 		loadLanguage('Help');
