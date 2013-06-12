@@ -35,7 +35,7 @@ class Draft_Controller
 	 * @param int $draft_type
 	 * @return boolean
 	 */
-	function action_showDrafts($member_id, $topic = false, $draft_type = 0)
+	public function action_showDrafts($member_id, $topic = false, $draft_type = 0)
 	{
 		global $scripturl, $context, $txt, $modSettings;
 
@@ -81,7 +81,7 @@ class Draft_Controller
 	 *
 	 * @param int $draft_type = 0
 	 */
-	function action_showProfileDrafts($draft_type = 0)
+	public function action_showProfileDrafts($draft_type = 0)
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
@@ -191,7 +191,7 @@ class Draft_Controller
 	 * Uses the showpmdraft template
 	 * Allows for the deleting and loading/editing of PM drafts
 	 */
-	function action_showPMDrafts()
+	public function action_showPMDrafts()
 	{
 		global $txt, $user_info, $scripturl, $modSettings, $context;
 
