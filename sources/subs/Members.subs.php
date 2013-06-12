@@ -1858,6 +1858,15 @@ function countMembersOnline($conditions)
 	return $totalMembers;
 }
 
+/**
+ * Look for people online, provided they don't mind if you see they are.
+ *
+ * @param array $conditions
+ * @param string $sort_method
+ * @param string $sort_direction
+ * @param int $start
+ * @return array
+ */
 function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 {
 	global $modSettings;
@@ -1865,7 +1874,6 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 	$db = database();
 	$members = array();
 
-	// Look for people online, provided they don't mind if you see they are.
 	$request = $db->query('', '
 		SELECT
 			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
