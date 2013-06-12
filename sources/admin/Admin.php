@@ -729,7 +729,7 @@ class Admin_Controller
 
 		// we need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(CONTROLLERDIR . '/Who.controller.php');
+		require_once(SUBSDIR . '/Who.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
