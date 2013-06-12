@@ -30,7 +30,7 @@ class Who_Controller
 	 * Default action of this class.
 	 * ?action=who
 	 */
-	function action_index()
+	public function action_index()
 	{
 		// we know how to... peek at who's online
 		$this->action_who();
@@ -46,7 +46,7 @@ class Who_Controller
 	 * @uses Who template, main sub-template
 	 * @uses Who language file.
 	 */
-	function action_who()
+	public function action_who()
 	{
 		global $context, $scripturl, $txt, $modSettings, $memberContext;
 
@@ -270,7 +270,7 @@ class Who_Controller
 	 * It prepares credit and copyright information for the credits page or the admin page.
 	 * Accessed by ?action=who;sa=credits
 	 */
-	function action_credits()
+	public function action_credits()
 	{
 		global $context, $txt;
 
