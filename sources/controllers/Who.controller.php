@@ -146,7 +146,7 @@ class Who_Controller
 		$context['start'] = $_REQUEST['start'];
 
 		// Look for people online, provided they don't mind if you see they are.
-		$members = onlineMembers($conditions, $sort_methods, $context['sort_direction'], $context['start']);
+		$members = onlineMembers($conditions, $sort_method, $context['sort_direction'], $context['start']);
 
 		$context['members'] = array();
 		$member_ids = array();
@@ -247,6 +247,7 @@ class Who_Controller
 	{
 		global $context, $txt;
 
+		require_once(SUBSDIR . '/Who.subs.php');
 		loadLanguage('Who');
 
 		prepareCreditsData();
