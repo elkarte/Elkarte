@@ -419,7 +419,7 @@ function determineActions($urls, $preferred_prefix = false)
  */
 function prepareCreditsData()
 {
-	global $context, $txt;
+	global $txt;
 
 	// Don't blink. Don't even blink. Blink and you're dead.
 	$credits['credits'] = array(
