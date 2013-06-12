@@ -50,8 +50,6 @@ class Who_Controller
 	{
 		global $context, $scripturl, $txt, $modSettings, $memberContext;
 
-		$db = database();
-
 		// Permissions, permissions, permissions.
 		isAllowedTo('who_view');
 
@@ -140,46 +138,21 @@ class Who_Controller
 		else
 			$context['show_by'] = $_SESSION['who_online_filter'] = 'all';
 
-		// Get the total amount of members online.
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}log_online AS lo
-				LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
-			WHERE ' . implode(' AND ', $conditions) : ''),
-			array(
-			)
-		);
-		list ($totalMembers) = $db->fetch_row($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/Members.subs.php');
+		$totalMembers = countMembersOnline($conditions);
 
 		// Prepare some page index variables.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] == 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $_REQUEST['start'], $totalMembers, $modSettings['defaultMaxMembers']);
 		$context['start'] = $_REQUEST['start'];
 
 		// Look for people online, provided they don't mind if you see they are.
-		$request = $db->query('', '
-			SELECT
-				lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
-				lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
-				lo.id_spider
-			FROM {db_prefix}log_online AS lo
-				LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_member} THEN mem.id_post_group ELSE mem.id_group END)' . (!empty($conditions) ? '
-			WHERE ' . implode(' AND ', $conditions) : '') . '
-			ORDER BY {raw:sort_method} {raw:sort_direction}
-			LIMIT {int:offset}, {int:limit}',
-			array(
-				'regular_member' => 0,
-				'sort_method' => $sort_method,
-				'sort_direction' => $context['sort_direction'] == 'up' ? 'ASC' : 'DESC',
-				'offset' => $context['start'],
-				'limit' => $modSettings['defaultMaxMembers'],
-			)
-		);
+		$members = onlineMembers($conditions, $sort_methods, $context['sort_direction'], $context['start']);
+
 		$context['members'] = array();
 		$member_ids = array();
 		$url_data = array();
-		while ($row = $db->fetch_assoc($request))
+
+		foreach ($members as $row)
 		{
 			$actions = @unserialize($row['url']);
 			if ($actions === false)
@@ -201,7 +174,6 @@ class Who_Controller
 			$url_data[$row['session']] = array($row['url'], $row['id_member']);
 			$member_ids[] = $row['id_member'];
 		}
-		$db->free_result($request);
 
 		// Load the user data for these members.
 		loadMemberData($member_ids);
