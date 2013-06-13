@@ -1833,3 +1833,71 @@ function countMembersInGroup($id_group = 0)
 
 	return $num_members;
 }
+
+/**
+ * Get the total amount of members online.
+ *
+ * @param array $conditions
+ * @return int
+ */
+function countMembersOnline($conditions)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_online AS lo
+			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)' . (!empty($conditions) ? '
+		WHERE ' . implode(' AND ', $conditions) : ''),
+		array(
+		)
+	);
+	list ($totalMembers) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $totalMembers;
+}
+
+/**
+ * Look for people online, provided they don't mind if you see they are.
+ *
+ * @param array $conditions
+ * @param string $sort_method
+ * @param string $sort_direction
+ * @param int $start
+ * @return array
+ */
+function onlineMembers($conditions, $sort_method, $sort_direction, $start)
+{
+	global $modSettings;
+
+	$db = database();
+	$members = array();
+
+	$request = $db->query('', '
+		SELECT
+			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
+			lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
+			lo.id_spider
+		FROM {db_prefix}log_online AS lo
+			LEFT JOIN {db_prefix}members AS mem ON (lo.id_member = mem.id_member)
+			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_member} THEN mem.id_post_group ELSE mem.id_group END)' . (!empty($conditions) ? '
+		WHERE ' . implode(' AND ', $conditions) : '') . '
+		ORDER BY {raw:sort_method} {raw:sort_direction}
+		LIMIT {int:offset}, {int:limit}',
+		array(
+			'regular_member' => 0,
+			'sort_method' => $sort_method,
+			'sort_direction' => $sort_direction == 'up' ? 'ASC' : 'DESC',
+			'offset' => $start,
+			'limit' => $modSettings['defaultMaxMembers'],
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+		$members[] = $row;
+
+	$db->free_result($request);
+
+	return $members;
+}

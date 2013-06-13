@@ -25,7 +25,7 @@ class Announce_Controller
 	/**
 	 * Default (sub)action for ?action=announce
 	 */
-	function action_index()
+	public function action_index()
 	{
 		loadLanguage('Post');
 
@@ -41,7 +41,7 @@ class Announce_Controller
 	 * requires the announce_topic permission.
 	 * uses the Announce template and Post language file.
 	 */
-	function pre_dispatch()
+	public function pre_dispatch()
 	{
 		global $context, $txt, $topic;
 
@@ -63,7 +63,7 @@ class Announce_Controller
 	 * Lets the user select the membergroups that will receive the topic announcement.
 	 * Accessed by action=announce;sa=selectgroup
 	 */
-	function action_selectgroup()
+	public function action_selectgroup()
 	{
 		global $context, $topic, $board_info;
 
@@ -98,7 +98,7 @@ class Announce_Controller
 	 * calculates a rough estimate of the percentage items sent.
 	 * Accessed by action=announce;sa=send
 	 */
-	function action_send()
+	public function action_send()
 	{
 		global $topic, $board, $board_info, $context, $modSettings;
 		global $language, $scripturl;

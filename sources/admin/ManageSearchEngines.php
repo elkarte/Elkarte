@@ -595,7 +595,7 @@ class ManageSearchEngines_Controller
 			}
 
 			// Now stick in the new URLs.
-			require_once(CONTROLLERDIR . '/Who.controller.php');
+			require_once(SUBSDIR . '/Who.subs.php');
 			$urls = determineActions($urls, 'whospider_');
 			foreach ($urls as $k => $new_url)
 			{
