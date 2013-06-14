@@ -18,7 +18,7 @@ if (!defined('ELKARTE'))
  * Initiate
  *		$validation = new Data_Validator();
  *
-  * Set validation rules
+ * Set validation rules
  * validation_rules()
  * 		$validation->validation_rules(array(
  * 			'username' => 'required|alpha_numeric|max_length[10]|min_length[6]',
@@ -86,6 +86,16 @@ class Data_Validator
 	 * if true drops data for which no sanitation rule was set
 	 */
 	protected $strict = false;
+
+	/**
+	 * Allow reading otherwise inaccessible data values
+	 *
+	 * @param type $property key name of array value to return
+	 */
+	public function __get($property)
+	{
+		return array_key_exists($property, $this->_data) ? $this->_data[$property] : null;
+	}
 
 	/**
 	 * Set the validation rules that will be run against the data
@@ -175,9 +185,12 @@ class Data_Validator
 	 *
 	 * @return array
 	 */
-	public function validation_data()
+	public function validation_data($key = null)
 	{
-		return $this->_data;
+		if ($key === null)
+			return $this->_data;
+
+		return isset($this->_data[$key]) ? $this->_data[$key] : null;
 	}
 
 	/**
