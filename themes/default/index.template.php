@@ -85,6 +85,7 @@ function template_init()
 		'current_page' => '<span class="pagelink current_pagelink">%1$s</span>',
 		'next_page' => '<span class="next_page">{next_txt}</span>',
 		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
+		'all' => '<span class="all_pages">{all_txt}</span>',
 	);
 }
 

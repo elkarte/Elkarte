@@ -291,7 +291,7 @@ class Display_Controller
 			$_REQUEST['start'] = -1;
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $_REQUEST['start'], $context['total_visible_posts'], $context['messages_per_page'], true);
+		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $_REQUEST['start'], $context['total_visible_posts'], $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($_REQUEST['all'])));
 		$context['start'] = $_REQUEST['start'];
 
 		// This is information about which page is current, and which page we're on - in case you don't like the constructed page index. (again, wireles..)
@@ -310,20 +310,13 @@ class Display_Controller
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
-		if ($can_show_all)
+		if ($can_show_all && isset($_REQUEST['all']))
 		{
-			if (isset($_REQUEST['all']))
-			{
-				// No limit! (actually, there is a limit, but...)
-				$context['messages_per_page'] = -1;
-				$context['page_index'] .= empty($modSettings['compactTopicPagesEnable']) ? '<strong>' . $txt['all'] . '</strong> ' : '[<strong>' . $txt['all'] . '</strong>] ';
+			// No limit! (actually, there is a limit, but...)
+			$context['messages_per_page'] = -1;
 
-				// Set start back to 0...
-				$_REQUEST['start'] = 0;
-			}
-			// They aren't using it, but the *option* is there, at least.
-			else
-				$context['page_index'] .= '&nbsp;<a href="' . $scripturl . '?topic=' . $topic . '.0;all">' . $txt['all'] . '</a> ';
+			// Set start back to 0...
+			$_REQUEST['start'] = 0;
 		}
 
 		// Build the link tree.
