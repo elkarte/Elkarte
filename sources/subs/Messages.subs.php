@@ -754,7 +754,7 @@ function messagePointer($id_msg, $id_topic, $next = true)
 	$db = database();
 
 	$result = $db->query('', '
-		SELECT ' . ($next ? 'MIN(id_msg)' : 'MAX($id_msg)') . '
+		SELECT ' . ($next ? 'MIN(id_msg)' : 'MAX(id_msg)') . '
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}
 			AND id_msg {raw:strictly} {int:topic_msg_id}',
