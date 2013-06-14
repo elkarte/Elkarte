@@ -93,25 +93,33 @@ class Emailuser_Controller
 		// This is needed for sendmail().
 		require_once(SUBSDIR . '/Mail.subs.php');
 
-		// Trim the names..
-		$_POST['y_name'] = trim($_POST['y_name']);
-		$_POST['r_name'] = trim($_POST['r_name']);
+		// Time to check and clean what was placed in the form
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+		$validator->sanitation_rules(array(
+			'y_name' => 'trim',
+			'r_name' => 'trim'
+		));
+		$validator->validation_rules(array(
+			'y_name' => 'required|notequal[_]',
+			'y_email' => 'required|valid_email',
+			'r_name' => 'required|notequal[_]',
+			'r_email' => 'required|valid_email'
+		));
+		$validator->text_replacements(array(
+			'y_name' => $txt['sendtopic_sender_name'],
+			'y_email' => $txt['sendtopic_sender_email'],
+			'r_name' => $txt['sendtopic_receiver_name'],
+			'r_email' => $txt['sendtopic_receiver_email']
+		));
+		$validator->validate($_POST);
 
-		// Make sure they aren't playing "let's use a fake email".
-		if ($_POST['y_name'] == '_' || !isset($_POST['y_name']) || $_POST['y_name'] == '')
-			fatal_lang_error('no_name', false);
-		if (!isset($_POST['y_email']) || $_POST['y_email'] == '')
-			fatal_lang_error('no_email', false);
-		if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['y_email']) == 0)
-			fatal_lang_error('email_invalid_character', false);
-
-		// The receiver should be valid to.
-		if ($_POST['r_name'] == '_' || !isset($_POST['r_name']) || $_POST['r_name'] == '')
-			fatal_lang_error('no_name', false);
-		if (!isset($_POST['r_email']) || $_POST['r_email'] == '')
-			fatal_lang_error('no_email', false);
-		if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['r_email']) == 0)
-			fatal_lang_error('email_invalid_character', false);
+		// Any errors or are we good to go?
+		$errors = $validator->validation_errors();
+		if (!empty($errors))
+			fatal_error(implode('<br />', $errors), false);
+		else
+			$_POST = array_replace($_POST, $validator->validation_data());
 
 		// Emails don't like entities...
 		$row['subject'] = un_htmlspecialchars($row['subject']);
