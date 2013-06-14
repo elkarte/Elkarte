@@ -693,7 +693,13 @@ class Database_SQLite implements Database
 		foreach (debug_backtrace() as $step)
 		{
 			// Found it?
-			if (strpos($step['function'], 'query') === false && !in_array(substr($step['function'], 0, 7), array('smf_db_', 'preg_re', 'db_erro', 'call_us')) && strpos($step['function'], '__') !== 0)
+			if (!method_exists($this, $step['function']))
+			{
+				$log_message .= '<br />Function: ' . $step['function'];
+				break;
+			}
+			// dunno if this is needed...if not feel free to remove it
+			elseif (strpos($step['function'], 'query') === false && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')) && strpos($step['function'], '__') !== 0)
 			{
 				$log_message .= '<br />Function: ' . $step['function'];
 				break;
