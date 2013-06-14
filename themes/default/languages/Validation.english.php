@@ -19,4 +19,6 @@ $txt['_validate_valid_ip'] = 'The %1$s field needs to contain a valid IP address
 $txt['_validate_valid_ipv6'] = 'The %1$s field needs to contain a valid IPV6 address';
 $txt['_validate_contains'] = 'The %1$s field needs contain one of these values: %2$s';
 $txt['_validate_invalid_function'] = 'The specified validation function %1$s does not exist';
+$txt['_validate_without'] = 'The %1$s field may not contain the %2$s character';
+$txt['_validate_notequal'] = 'The %1$s field does not contain a valid value';
 $txt['php_syntax_error'] = 'PHP syntax error: %1$s';
