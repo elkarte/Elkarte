@@ -332,7 +332,7 @@ function attachments_init_dir (&$tree, &$count)
  */
 function processAttachments($id_msg = null)
 {
-	global $context, $modSettings, $txt, $user_info;
+	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -401,7 +401,6 @@ function processAttachments($id_msg = null)
 		$_SESSION['temp_attachments'] = array();
 
 	// Remember where we are at. If it's anywhere at all.
-	//@todo: $topc & $board aren't initialized, probably a bug
 	if (!$ignore_temp)
 		$_SESSION['temp_attachments']['post'] = array(
 			'msg' => !empty($id_msg) ? $id_msg : 0,
@@ -505,7 +504,7 @@ function processAttachments($id_msg = null)
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context;
+	global $modSettings, $context, $attachmentOptions;
 
 	$db = database();
 
@@ -560,7 +559,6 @@ function attachmentChecks($attachID)
 			// Success! However, successes usually come for a price:
 			// we might get a new format for our image...
 			$old_format = $size[2];
-			// @todo: $attachmentOptions not initialized, bug?
 			$size = @getimagesize($attachmentOptions['tmp_name']);
 			if (!(empty($size)) && ($size[2] != $old_format))
 			{
