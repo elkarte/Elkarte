@@ -839,12 +839,6 @@ class Database_PostgreSQL implements Database
 				$log_message .= '<br />Function: ' . $step['function'];
 				break;
 			}
-			// dunno if this is needed...if not feel free to remove it
-			elseif (strpos($step['function'], 'query') === false && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')) && strpos($step['function'], '__') !== 0)
-			{
-				$log_message .= '<br />Function: ' . $step['function'];
-				break;
-			}
 
 			if (isset($step['line']))
 			{
