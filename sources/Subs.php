@@ -503,13 +503,19 @@ function updateSettings($changeArray, $update = false, $debug = false)
  * @param bool $flexible_start = false
  * @param bool $show_prevnext = true
  */
-function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show_prevnext = true)
+function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
 	global $modSettings, $context, $txt, $settings;
 
 	// Save whether $start was less than 0 or not.
 	$start = (int) $start;
 	$start_invalid = $start < 0;
+	$show_defaults = array(
+		'prev_next' => true,
+		'all' => false,
+	);
+
+	$show = array_merge($show_defaults, $show);
 
 	// Make sure $start is a proper variable - not less than 0.
 	if ($start_invalid)
@@ -540,6 +546,15 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
 		if ($start != $counter - $max_value && !$start_invalid)
 			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
+
+		// The "all" button
+		if ($show['all'])
+		{
+			if ($show['all_selected'])
+				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
+			else
+				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
+		}
 	}
 	else
 	{
@@ -547,7 +562,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		$PageContiguous = (int) ($modSettings['compactTopicPagesContiguous'] - ($modSettings['compactTopicPagesContiguous'] % 2)) / 2;
 
 		// Show the "prev page" link. (>prev page< 1 ... 6 7 [8] 9 10 ... 15 next page)
-		if (!empty($start) && $show_prevnext)
+		if (!empty($start) && $show['prev_next'])
 			$pageindex = sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 		else
 			$pageindex = '';
@@ -592,8 +607,17 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 			$pageindex .= sprintf($base_link, $tmpMaxPages, $tmpMaxPages / $num_per_page + 1);
 
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
-		if ($start != $tmpMaxPages && $show_prevnext)
+		if ($start != $tmpMaxPages && $show['prev_next'])
 			$pageindex .= sprintf($base_link, $start + $num_per_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
+
+		// The "all" button
+		if ($show['all'])
+		{
+			if ($show['all_selected'])
+				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
+			else
+				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
+		}
 	}
 
 	return $pageindex;

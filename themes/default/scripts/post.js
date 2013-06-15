@@ -284,7 +284,7 @@ function onDocSent(XMLDoc)
 				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 == 0 ? '2' : '') + ' core_posts"><div class="content" id="msg' + newPosts[i].getAttribute("id") + '"><div class="floatleft"><h5>' + txt_posted_by + ': ' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '</h5><span class="smalltext">&#171;&nbsp;<strong>' + txt_on + ':</strong> ' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + '&nbsp;&#187;</span> <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></div>';
 
 				if (can_quote)
-					newPostsHTML += '<ul class="reset smalltext quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="quote_button"><span>' + txt_bbc_quote + '</span></a></li></ul>';
+					newPostsHTML += '<ul class="smalltext quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="quote_button"><span>' + txt_bbc_quote + '</span></a></li></ul>';
 
 				newPostsHTML += '<br class="clear" />';
 

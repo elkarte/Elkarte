@@ -261,7 +261,7 @@ function template_folder()
 						$shown = true;
 						echo '
 									<div class="custom_fields_above_signature">
-										<ul class="reset nolist">';
+										<ul class="nolist">';
 					}
 					echo '
 											<li>', $custom['value'], '</li>';
@@ -784,7 +784,7 @@ function template_search()
 					</h4>
 				</div>
 				<div id="advanced_panel_div"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
-				<ul id="searchLabelsExpand" class="reset" >';
+				<ul id="searchLabelsExpand">';
 
 			foreach ($context['search_labels'] as $label)
 				echo '

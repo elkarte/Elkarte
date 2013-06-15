@@ -32,7 +32,7 @@ class Calendar_Controller
 	 * It goes to the month and year passed in 'month' and 'year' by get or post.
 	 * It is accessed through ?action=calendar.
 	 */
-	function action_calendar()
+	public function action_calendar()
 	{
 		global $txt, $context, $modSettings, $scripturl, $options;
 
@@ -175,7 +175,7 @@ class Calendar_Controller
 	 * It uses the event_post sub template in the Calendar template.
 	 * It is accessed with ?action=calendar;sa=post.
 	 */
-	function action_event_post()
+	public function action_event_post()
 	{
 		global $context, $txt, $user_info, $scripturl;
 		global $modSettings, $topic;
@@ -334,7 +334,7 @@ class Calendar_Controller
 	 *
 	 * @todo .... allow for week or month export files as well?
 	 */
-	function action_ical()
+	public function action_ical()
 	{
 		global $forum_version, $modSettings, $webmaster_email, $mbname;
 

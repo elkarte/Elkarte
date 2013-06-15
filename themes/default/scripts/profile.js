@@ -113,7 +113,7 @@ function ajax_getSignaturePreview (showPreview)
 				if (!$("#profile_error").is(":visible"))
 					$("#profile_error").css({display: "", position: "fixed", top: 0, left: 0, width: "100%"});
 				var errors = $(request).find('[type="error"]');
-				var errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul class="reset">';
+				var errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
 
 				for (var i = 0; i < errors.length; i++)
 					errors_html += '<li>' + $(errors).text() + '</li>';

@@ -107,7 +107,7 @@ function action_summary()
 
 	if (!empty($modSettings['who_enabled']))
 	{
-		include_once(CONTROLLERDIR . '/Who.controller.php');
+		include_once(SUBSDIR . '/Who.subs.php');
 		$action = determineActions($user_profile[$memID]['url']);
 
 		if ($action !== false)

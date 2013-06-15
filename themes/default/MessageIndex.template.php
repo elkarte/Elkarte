@@ -29,25 +29,7 @@ function template_main()
 	<form action="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], '" method="post" accept-charset="UTF-8" class="clear" name="quickModForm" id="quickModForm">';
 
 		echo '
-		<div class="tborder topic_table" id="messageindex">';
-
-		if (!empty($settings['display_who_viewing']))
-		{
-			echo '
-			<p class="whoisviewing">';
-
-			if ($settings['display_who_viewing'] == 1)
-				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
-			else
-				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
-
-			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
-
-			echo '
-			</p>';
-		}
-
-		echo '
+	<div class="tborder topic_table" id="messageindex">
 		<table class="table_grid">
 			<thead>
 				<tr class="catbg">';
@@ -244,7 +226,7 @@ function template_display_child_boards_above()
 	global $context, $txt, $scripturl, $settings;
 
 	echo '
-	<div id="board_', $context['current_board'], '_childboards" class="boardindex_table">
+	<div id="board_', $context['current_board'], '_childboards" class="childboard_table">
 		<table class="table_list">
 			<tbody class="header">
 				<tr>
@@ -358,7 +340,7 @@ function template_display_child_boards_above()
 
 function template_pages_and_buttons_above()
 {
-	global $modSettings, $context, $txt, $options;
+	global $modSettings, $context, $settings, $txt, $options;
 
 	if ($context['no_topic_listing'])
 		return;
@@ -368,7 +350,7 @@ function template_pages_and_buttons_above()
 	if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
 	{
 		echo '
-		<div id="description_board" class="generic_list_wrapper">
+		<div id="description_board">
 			<h3 class="floatleft">', $context['name'], '&nbsp;-&nbsp;</h3>
 			<p>';
 
@@ -381,7 +363,26 @@ function template_pages_and_buttons_above()
 			', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.';
 
 		echo '
-			</p>
+			</p>';
+
+		// @todo - Thought the who is suff was better here. Presentation still WIP.
+		if (!empty($settings['display_who_viewing']))
+		{
+			echo '
+			<p class="whoisviewing">';
+
+			if ($settings['display_who_viewing'] == 1)
+				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
+			else
+				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
+
+			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
+
+			echo '
+			</p>';
+		}
+
+		echo'
 		</div>';
 	}
 }

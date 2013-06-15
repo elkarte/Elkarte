@@ -23,7 +23,7 @@ class Attachment_Controller
 	 * The default action is to download an attachment.
 	 * This allows ?action=attachment to be forwarded to action_dlattach()
 	 */
-	function action_attachment()
+	public function action_attachment()
 	{
 		// default action to execute
 		$this->action_dlattach();
@@ -36,7 +36,7 @@ class Attachment_Controller
 	 * It is accessed via the query string ?action=dlattach.
 	 * Views to attachments and avatars do not increase hits and are not logged in the "Who's Online" log.
 	 */
-	function action_dlattach()
+	public function action_dlattach()
 	{
 		global $txt, $modSettings, $user_info, $context, $topic;
 
