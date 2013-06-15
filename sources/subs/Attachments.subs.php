@@ -504,7 +504,7 @@ function processAttachments($id_msg = null)
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context;
+	global $modSettings, $context, $attachmentOptions;
 
 	$db = database();
 
@@ -559,7 +559,6 @@ function attachmentChecks($attachID)
 			// Success! However, successes usually come for a price:
 			// we might get a new format for our image...
 			$old_format = $size[2];
-			// @todo: $attachmentOptions not initialized, bug?
 			$size = @getimagesize($attachmentOptions['tmp_name']);
 			if (!(empty($size)) && ($size[2] != $old_format))
 			{
