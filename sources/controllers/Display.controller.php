@@ -32,7 +32,7 @@ class Display_Controller
 	 * It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
 	 * It is accessed by ?topic=id_topic.START.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $scripturl, $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
@@ -896,7 +896,7 @@ class Display_Controller
 	 * In-topic quick moderation.
 	 * Accessed by ?action=quickmod2
 	 */
-	function action_quickmod2()
+	public function action_quickmod2()
 	{
 		global $topic, $board, $user_info, $modSettings, $context;
 
