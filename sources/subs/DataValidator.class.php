@@ -257,7 +257,7 @@ class Data_Validator
 		// For each field, run our set of rules against the data
 		foreach ($ruleset as $field => $rules)
 		{
-			// data for which we don't have rules
+			// Data for which we don't have rules
 			if (!array_key_exists($field, $input))
 			{
 				if ($this->strict)
@@ -276,7 +276,10 @@ class Data_Validator
 				// Defined method to use?
 				if (is_callable(array($this, $sanitation_method)))
 					$input[$field] = $this->$sanitation_method($input[$field]);
-				// Maybe its a built in php function?
+				// One of our static methods
+				elseif (strpos($rule, '::') !== false && is_callable($rule))
+					$input[$field] = call_user_func($rule, $input[$field]);
+				// Maybe even a built in php function?
 				elseif (function_exists($rule))
 					$input[$field] = $rule($input[$field]);
 				else
