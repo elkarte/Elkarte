@@ -900,3 +900,34 @@ function recordReport($message, $poster_comment)
 
 	return $id_report;
 }
+
+/**
+ * Count the new posts for a specific topic
+ * @param int $topic
+ * @param int $topicinfo
+ * @param int $timestamp
+ * @return int
+ */
+function countNewPosts($topic, $topicinfo, $timestamp)
+{
+	global $user_info, $modSettings;
+
+	$db = database();
+	// Find the number of messages posted before said time...
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE poster_time < {int:timestamp}
+			AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts') ? '
+			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
+		array(
+			'current_topic' => $topic,
+			'current_member' => $user_info['id'],
+			'is_approved' => 1,
+			'timestamp' => $timestamp,
+		)
+	);
+	list ($start) = $db->fetch_row($request);
+	$db->free_result($request);
+	return $start;
+}
