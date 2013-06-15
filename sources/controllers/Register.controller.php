@@ -907,12 +907,12 @@ class Register_Controller
 			if (empty($context['errors']))
 			{
 				$admins = admins();
-
 				if (!empty($admins))
 				{
 					require_once(SUBSDIR . '/PersonalMessage.subs.php');
-					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_POST['contactmessage'], false, array('id' => 0, 'name' => $validator->emailaddress, 'username' => $validator->emailaddress));
+					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $validator->emailaddress, 'username' => $validator->emailaddress));
 				}
+
 				// Send the PM
 				redirectexit('action=contact;sa=done');
 			}
