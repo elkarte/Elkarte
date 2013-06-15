@@ -2372,7 +2372,8 @@ function MessageSearch2()
  * Callback to return messages - saves memory.
  * @todo Fix this, update it, whatever... from Display.controller.php mainly.
  * Note that the call to loadAttachmentContext() doesn't work:
- * this function doesn't fulfill the pre-condition to fill $attachments global...
+ * this function doesn't fulf
+ * ill the pre-condition to fill $attachments global...
  * So all it does is to fallback and return.
  *
  * What it does:
@@ -2612,6 +2613,7 @@ function prepareSearchContext($reset = false)
 		$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 	}
 
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	$output['matches'][] = array(
 		'id' => $message['id_msg'],
 		'attachment' => loadAttachmentContext($message['id_msg']),
