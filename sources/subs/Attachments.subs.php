@@ -332,7 +332,7 @@ function attachments_init_dir (&$tree, &$count)
  */
 function processAttachments($id_msg = null)
 {
-	global $context, $modSettings, $txt, $user_info;
+	global $context, $modSettings, $txt, $user_info, $ignore_temp;
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
