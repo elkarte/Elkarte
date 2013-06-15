@@ -651,18 +651,7 @@ class Display_Controller
 				$context['likes'] = loadLikes($messages, true);
 			}
 
-			$messages_request = $db->query('', '
-				SELECT
-					m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,
-					m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
-					m.id_msg_modified < {int:new_from} AS is_read
-					' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
-				FROM {db_prefix}messages as m
-					' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
-				WHERE m.id_msg IN ({array_int:message_list})
-				ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
-				$msg_parameters
-			);
+			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
 
 			require_once(SUBSDIR . '/FollowUps.subs.php');
 			$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
