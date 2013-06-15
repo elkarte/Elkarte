@@ -245,7 +245,7 @@ function template_show_month_grid($grid_name)
 		foreach ($calendar_data['week_days'] as $day)
 		{
 			echo '
-						<th class="days">', !empty($calendar_data['short_day_titles']) ? (Util::substr($txt['days'][$day], 0, 1)) : $txt['days'][$day], '</th>';
+						<th class="days" scope="col">', !empty($calendar_data['short_day_titles']) ? (Util::substr($txt['days'][$day], 0, 1)) : $txt['days'][$day], '</th>';
 		}
 		echo '
 					</tr>';
