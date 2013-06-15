@@ -2610,6 +2610,7 @@ function prepareSearchContext($reset = false)
 		$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 	}
 
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	$output['matches'][] = array(
 		'id' => $message['id_msg'],
 		'attachment' => loadAttachmentContext($message['id_msg']),

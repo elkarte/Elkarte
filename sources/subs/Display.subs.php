@@ -110,6 +110,7 @@ function prepareDisplayContext($reset = false)
 	$message['body'] = parse_bbc($message['body'], $message['smileys_enabled'], $message['id_msg']);
 
 	// Compose the memory eat- I mean message array.
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	$output = array(
 		'attachment' => loadAttachmentContext($message['id_msg']),
 		'alternate' => $counter % 2,
