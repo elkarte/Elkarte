@@ -197,13 +197,12 @@ function action_summary()
 
 	// Load up the most recent attachments for this user for use in profile views etc.
 	$context['thumbs'] = array();
-	if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+	if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments') && !empty($settings['attachments_on_summary']))
 	{
-		$limit = 8;
 		$boardsAllowed = boardsAllowedTo('view_attachments');
 		if (empty($boardsAllowed))
 			$boardsAllowed = array(-1);
-		$attachments = list_getAttachments(0, $limit, 'm.poster_time DESC', $boardsAllowed , $context['member']['id']);
+		$attachments = list_getAttachments(0, $settings['attachments_on_summary'], 'm.poster_time DESC', $boardsAllowed , $context['member']['id']);
 
 		// load them in to $context for use in the template
 		$i = 0;

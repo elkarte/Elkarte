@@ -20,6 +20,10 @@ function template_ProfileInfo_init()
 
 	// This piece is used to style attachments awaiting approval in the list
 	$settings['attachments_awaiting_approval'] = '{attachment_link}&nbsp;(<em>{txt_awaiting}</em>)';
+
+	// This setting is used to load a certain number of attachments
+	// in the user's profile summary, change it to a number if you need any
+	$settings['attachments_on_summary'] = 0;
 }
 
 /**
