@@ -567,33 +567,18 @@ class Display_Controller
 			$firstIndex = $limit - 1;
 		}
 
-		// Get each post and poster in this topic.
-		$request = $db->query('display_get_post_poster', '
-			SELECT id_msg, id_member, approved
-			FROM {db_prefix}messages
-			WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : (!empty($modSettings['db_mysql_group_by_fix']) ? '' : '
-			GROUP BY id_msg') . '
-			HAVING (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
-			ORDER BY id_msg ' . ($ascending ? '' : 'DESC') . ($context['messages_per_page'] == -1 ? '' : '
-			LIMIT ' . $start . ', ' . $limit),
-			array(
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-				'is_approved' => 1,
-				'blank_id_member' => 0,
-			)
-		);
+		// Taking care of member specific settings 
+		$limit_settings = array(
+			'messages_per_page' => $context['messages_per_page'],
+			'start' => $start,
+			'offset' => $limit,
+ 		);
 
-		$messages = array();
-		$all_posters = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!empty($row['id_member']))
-				$all_posters[$row['id_msg']] = $row['id_member'];
-			$messages[] = $row['id_msg'];
-		}
-		$db->free_result($request);
-		$posters = array_unique($all_posters);
+		// Get each post and poster in this topic.
+		$topic_details = getTopicsPostsAndPoster($topic, $limit_settings, $ascending);
+		$messages = $topic_details['messages'];
+		$posters = array_unique($topic_details['all_posters']);
+		unset($topic_details);
 
 		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
 
