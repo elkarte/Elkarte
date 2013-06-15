@@ -67,7 +67,6 @@ class Emailuser_Controller extends Action_Controller
 			fatal_lang_error('not_a_topic', false);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
-
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
 			fatal_lang_error('not_a_topic', false);
@@ -215,22 +214,18 @@ class Emailuser_Controller extends Action_Controller
 			'r_name' => $txt['sendtopic_receiver_name'],
 			'r_email' => $txt['sendtopic_receiver_email']
 		));
-		$validator->validate($_POST);
 
 		// Any errors or are we good to go?
-		$errors = $validator->validation_errors();
-		if (!empty($errors))
-			fatal_error(implode('<br />', $errors), false);
-		else
-			$_POST = array_replace($_POST, $validator->validation_data());
+		if (!$validator->validate($_POST))
+			fatal_error(implode('<br />', $validator->validation_errors()), false);
 
 		// Emails don't like entities...
 		$row['subject'] = un_htmlspecialchars($row['subject']);
 
 		$replacements = array(
 			'TOPICSUBJECT' => $row['subject'],
-			'SENDERNAME' => $_POST['y_name'],
-			'RECPNAME' => $_POST['r_name'],
+			'SENDERNAME' => $validator->y_name,
+			'RECPNAME' => $validator->r_name,
 			'TOPICLINK' => $scripturl . '?topic=' . $topic . '.0',
 		);
 
@@ -243,8 +238,9 @@ class Emailuser_Controller extends Action_Controller
 		}
 
 		$emaildata = loadEmailTemplate($emailtemplate, $replacements);
+
 		// And off we go!
-		sendmail($_POST['r_email'], $emaildata['subject'], $emaildata['body'], $_POST['y_email']);
+		sendmail($validator->r_email, $emaildata['subject'], $emaildata['body'], $validator->y_email);
 
 		return true;
 	}
