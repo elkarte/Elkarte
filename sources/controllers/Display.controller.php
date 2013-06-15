@@ -196,25 +196,7 @@ class Display_Controller
 				elseif (!$topicinfo['unapproved_posts'] && $virtual_msg <= $topicinfo['id_first_msg'])
 					$context['start_from'] = 0;
 				else
-				{
-					// Find the start value for that message......
-					$request = $db->query('', '
-						SELECT COUNT(*)
-						FROM {db_prefix}messages
-						WHERE id_msg < {int:virtual_msg}
-							AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts') ? '
-							AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
-						array(
-							'current_member' => $user_info['id'],
-							'current_topic' => $topic,
-							'virtual_msg' => $virtual_msg,
-							'is_approved' => 1,
-							'no_member' => 0,
-						)
-					);
-					list ($context['start_from']) = $db->fetch_row($request);
-					$db->free_result($request);
-				}
+					$context['start_from'] = determineStartMessage($topic, $topicinfo['unapproved_posts'], $virtual_msg);
 
 				// We need to reverse the start as well in this case.
 				$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
