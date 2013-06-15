@@ -89,8 +89,8 @@ function template_main()
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
 			echo '
-							<div class="poster">', template_build_poster_div($message, $ignoring), '</div>
-							<div class="postarea">';
+						<div class="poster">', template_build_poster_div($message, $ignoring), '</div>
+						<div class="postarea">';
 
 		echo '
 							<div class="keyinfo">
@@ -280,7 +280,7 @@ function template_main()
 					$shown = true;
 					echo '
 							<div class="custom_fields_above_signature">
-								<ul class="reset nolist">';
+								<ul class="nolist">';
 				}
 
 				echo '
@@ -865,7 +865,7 @@ function template_display_poll_above()
 							<p class="smallpadding">', $context['poll']['allowed_warning'], '</p>';
 
 		echo '
-							<ul class="reset options">';
+							<ul class="options">';
 
 		// Show each option with its button - a radio likely.
 		foreach ($context['poll']['options'] as $option)
@@ -911,7 +911,7 @@ function template_display_calendar_above()
 				</div>
 				<div class="windowbg">
 					<div class="content">
-						<ul class="reset">';
+						<ul>';
 
 	foreach ($context['linked_calendar_events'] as $event)
 		echo '

@@ -30,7 +30,7 @@ function template_merge_done()
 				<div class="content">
 					<p>', $txt['merge_successful'], '</p>
 					<br />
-					<ul class="reset">
+					<ul>
 						<li>
 							<a href="', $scripturl, '?board=', $context['target_board'], '.0">', $txt['message_index'], '</a>
 						</li>
@@ -114,7 +114,7 @@ function template_merge()
 			</div>', template_pagesection(false, false, 'go_down'), '
 			<div class="windowbg2">
 				<div class="content">
-					<ul class="reset merge_topics">';
+					<ul class="merge_topics">';
 
 		$merge_button = create_button('merge.png', 'merge', '');
 
@@ -208,7 +208,7 @@ function template_merge_extra_options()
 		echo '
 					<fieldset id="merge_board" class="merge_options">
 						<legend>', $txt['merge_select_target_board'], '</legend>
-						<ul class="reset">';
+						<ul>';
 		foreach ($context['boards'] as $board)
 			echo '
 							<li>
@@ -224,7 +224,7 @@ function template_merge_extra_options()
 		echo '
 					<fieldset id="merge_poll" class="merge_options">
 						<legend>' . $txt['merge_select_poll'] . '</legend>
-						<ul class="reset">';
+						<ul>';
 		foreach ($context['polls'] as $poll)
 			echo '
 							<li>

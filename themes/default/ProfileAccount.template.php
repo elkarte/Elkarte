@@ -323,7 +323,7 @@ function template_issueWarning()
 					if ($(request).find("error").text() != \'\')
 					{
 						$("#profile_error").show();
-						var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors" class="reset">\';
+						var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors">\';
 						var errors = $(request).find(\'error\').each(function() {
 							errors_html += \'<li>\' + $(this).text() + \'</li>\';
 						});

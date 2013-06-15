@@ -19,7 +19,7 @@ body {
 	background-color: #E9E9E9;
 	color: white;
 }
-div.cat_bar {
+.cat_bar {
 	border-bottom: 1px solid #ccc;
 	border-radius: 0;
 }

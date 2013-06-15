@@ -142,7 +142,7 @@ function template_main()
 				echo '
 					<tr id="board_', $board['id'], '_children" class="windowbg2">
 						<td colspan="3" class="windowbg children">
-							<p><strong>', $txt['parent_boards'], '</strong>: ', implode(', ', $children), '</p>
+							<p><strong>', $txt['parent_boards'], '</strong>: ', implode(' - ', $children), '</p>
 						</td>
 					</tr>';
 				}
@@ -384,7 +384,7 @@ function template_info_center()
 					', $context['allow_pm'] ? '<a href="' . $scripturl . '?action=pm">' : '', '<img class="icon" src="', $settings['images_url'], '/message_sm.png" alt="" />', $txt['personal_message'], '', $context['allow_pm'] ? '</a>' : '', '
 				</h4>
 			</div>
-			<p class="pminfo">
+			<p class="inline">
 					', empty($context['user']['messages']) ? $txt['you_have_no_msg'] : ($context['user']['messages'] == 1 ? sprintf($txt['you_have_one_msg'], $scripturl . '?action=pm') : sprintf($txt['you_have_many_msgs'], $scripturl . '?action=pm', $context['user']['messages'])), '
 			</p>';
 	}
@@ -448,7 +448,7 @@ function template_news_fader()
 				', $txt['news'], '
 			</h3>
 		</div>
-		<ul class="reset" id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
+		<ul id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
 			<li>
 				', implode('</li><li>', $context['news_lines']), '
 			</li>
