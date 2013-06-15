@@ -266,7 +266,7 @@ function template_body_above()
 	</div>';
 
 	echo '
-	<header id="header">
+	<header id="header"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;"', '>
 		<div class="frame">
 			<h1 class="forumtitle">
 				<a id="top" href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
@@ -278,39 +278,42 @@ function template_body_above()
 	echo'
 		</div>
 	</header>
-	<div id="wrapper">
+	<div id="wrapper">';
+	// Show the menu here, according to the menu sub template. Moved this. Like it here. :)
+	// Upper section and main content markup simplified. Less divs = happier parrots!
+	template_menu();
+	echo '
 		<div id="upper_section">
-			<div id="inner_section">
-				<div id="inner_wrap"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;"', '>
-					<div class="user floatright">';
+			<div id="inner_wrap"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;"', '>
+				<div class="user floatright">';
 
 	// Otherwise they're a guest - this time ask them to either register or login - lazy bums...
 	if (!empty($context['show_login_bar']))
 	{
 		echo '
-						<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
-						<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
-							<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
-							<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
-							<select name="cookielength">
-								<option value="60">', $txt['one_hour'], '</option>
-								<option value="1440">', $txt['one_day'], '</option>
-								<option value="10080">', $txt['one_week'], '</option>
-								<option value="43200">', $txt['one_month'], '</option>
-								<option value="-1" selected="selected">', $txt['forever'], '</option>
-							</select>
-							<input type="submit" value="', $txt['login'], '" class="button_submit" />
-							<div>', $txt['quick_login_dec'], '</div>';
+					<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
+					<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
+						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
+						<select name="cookielength">
+							<option value="60">', $txt['one_hour'], '</option>
+							<option value="1440">', $txt['one_day'], '</option>
+							<option value="10080">', $txt['one_week'], '</option>
+							<option value="43200">', $txt['one_month'], '</option>
+							<option value="-1" selected="selected">', $txt['forever'], '</option>
+						</select>
+						<input type="submit" value="', $txt['login'], '" class="button_submit" />
+						<div>', $txt['quick_login_dec'], '</div>';
 
 		if (!empty($modSettings['enableOpenID']))
 			echo '
-							<br /><input type="text" name="openid_identifier" size="25" class="input_text openid_login" />';
+						<br /><input type="text" name="openid_identifier" size="25" class="input_text openid_login" />';
 
 		echo '
-							<input type="hidden" name="hash_passwrd" value="" />
-							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-							<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-						</form>';
+						<input type="hidden" name="hash_passwrd" value="" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+					</form>';
 	}
 
 	// If the user is logged in, display stuff like their name, new messages, etc.
@@ -318,50 +321,46 @@ function template_body_above()
 	{
 		if (!empty($context['user']['avatar']))
 			echo '
-						<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
+					<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
 		echo '
-						<ul>
-							<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
+					<ul>
+						<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
 
 		// Are there any members waiting for approval?
 		if (!empty($context['unapproved_members']))
 			echo '
-							<li>', $context['unapproved_members_text'], '</li>';
+						<li>', $context['unapproved_members_text'], '</li>';
 
 		if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
 			echo '
-							<li><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></li>';
+						<li><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></li>';
 
 		echo '
-						</ul>';
+					</ul>';
 	}
 
 	echo'
-					</div>';
+				</div>';
 	// Show a random news item? (or you could pick one from news_lines...)
 	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
 		echo '
-					<div class="news">
-						<h2>', $txt['news'], ': </h2>
-						<p>', $context['random_news_line'], '</p>
-					</div>';
-
-	echo '
-					<hr class="clear" />
+				<div class="news">
+					<h2>', $txt['news'], ': </h2>
+					<p>', $context['random_news_line'], '</p>
 				</div>';
 
-	// Show the menu here, according to the menu sub template, followed by the navigation tree.
-	template_menu();
+	echo '
+			</div>';
+
+	// Show the navigation tree.
 	theme_linktree();
 
 	echo '
-			</div>
 		</div>';
 
 	// The main content should go here.
 	echo '
-		<div id="content_section">
-			<div id="main_content_section">';
+		<div id="main_content_section">';
 }
 
 /**
@@ -372,7 +371,6 @@ function template_body_below()
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
 	echo '
-			</div>
 		</div>
 	</div>';
 
@@ -382,10 +380,10 @@ function template_body_below()
 	<footer id="footer_section">
 		<div class="frame">';
 
-	// There is now a global "Go to top" link at the right.
+	// There is now a global "Go to top" link at the right. @todo - this needs fixing.
 	echo '
 			<a href="#top" id="bot"><img src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['go_up'], '" /></a>
-			<ul class="reset">
+			<ul>
 				<li class="copyright">', theme_copyright(), '
 				</li>
 				<li><a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_xhtml'], '"><span>', $txt['xhtml'], '</span></a></li>
@@ -408,7 +406,7 @@ function template_body_below()
  */
 function template_html_below()
 {
-	// load in any javascipt that could be defered to the end of the page
+	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
 
 	echo '
@@ -427,7 +425,7 @@ function theme_linktree($force_show = false)
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
 		return;
-
+	// @todo - Div here is pointless. Prefer to deprecate in favour of plain ul (easy CSS changes).
 	echo '
 				<div class="navigate_section">
 					<ul>';
@@ -440,18 +438,13 @@ function theme_linktree($force_show = false)
 						</li>';
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
+	// Added a linktree class to make targeting dividers easy.
 	foreach ($context['linktree'] as $link_num => $tree)
 	{
 		echo '
-						<li', ($link_num == count($context['linktree']) - 1) ? ' class="last"' : '', '>';
+						<li class="', ($link_num == count($context['linktree']) - 1) ? 'last' : 'linktree', '">';
 
-		// Don't show a separator for the first one.
-		// Better here. Always points to the next level when the linktree breaks to a second line.
-		// Picked a better looking HTML entity, and added support for RTL plus a span for styling.
-		if ($link_num != 0)
-			echo '
-							<span class="dividers">', $context['right_to_left'] ? ' &#9668; ' : ' &#9658; ', '</span>';
-
+		// Dividers moved to pseudo-elements in CSS. @todo- rtl.css
 		// Show something before the link?
 		if (isset($tree['extra_before']))
 			echo $tree['extra_before'];
@@ -484,9 +477,9 @@ function template_menu()
 
 	echo '
 				<nav id="main_menu">
-					<ul class="dropmenu topmenu" id="menu_nav">';
+					<ul class="dropmenu" id="menu_nav">';
 
-	// Note: Menu markup has been cleaned up to remove unnecessary spans and classes.
+	// @todo - WAI-ARIA a11y tweaks should be applied here (and elsewhere, for that matter).
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
@@ -541,7 +534,7 @@ function template_menu()
 	// If anyone is terrified of losing 40px out of the menu bar, set your theme to 92% instead of 90%. :P
 	echo '
 						<li id="collapse_button">
-							<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="padding: 4px 9px 3px 9px; display: none;" />
+							<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />
 						</li>';
 
 	echo '
@@ -556,7 +549,7 @@ function template_menu()
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',
 						aSwappableContainers: [
-							\'inner_wrap\'
+							\'inner_wrap\',\'header\'
 						],
 						aSwapImages: [
 							{
@@ -613,7 +606,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 	// No buttons? No button strip either.
 	if (empty($buttons))
 		return;
-
+	// @todo - Div here is pointless. Prefer to deprecate in favour of plain ul (easy CSS changes, but check for js bugz).
 	echo '
 						<div class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
 							<ul>',
