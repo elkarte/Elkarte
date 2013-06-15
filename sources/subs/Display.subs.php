@@ -17,6 +17,7 @@ if (!defined('ELKARTE'))
  * It actually gets and prepares the message context.
  * This function will start over from the beginning if reset is set to true, which is
  * useful for showing an index before or after the posts.
+ * @todo move $context back to controller
  *
  * @param bool $reset default false.
  */

@@ -937,7 +937,6 @@ class Display_Controller
  * This loads an attachment's contextual data including, most importantly, its size if it is an image.
  * Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
  * (@todo change this pre-condition, too fragile and error-prone.)
- * @todo move $context back to controller
  * It requires the view_attachments permission to calculate image size.
  * It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by
  * the max_image_width and max_image_height settings.
