@@ -182,22 +182,7 @@ class Display_Controller
 				else
 				{
 					// Find the number of messages posted before said time...
-					$request = $db->query('', '
-						SELECT COUNT(*)
-						FROM {db_prefix}messages
-						WHERE poster_time < {int:timestamp}
-							AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts') ? '
-							AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
-						array(
-							'current_topic' => $topic,
-							'current_member' => $user_info['id'],
-							'is_approved' => 1,
-							'timestamp' => $timestamp,
-						)
-					);
-					list ($context['start_from']) = $db->fetch_row($request);
-					$db->free_result($request);
-
+					$context['start_from'] = countNewPosts($topic, $topicinfo, $timestamp);
 					// Handle view_newest_first options, and get the correct start value.
 					$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
 				}
