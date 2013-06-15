@@ -866,51 +866,60 @@ class Register_Controller
 
 			// No errors, yet.
 			$context['errors'] = array();
+			loadLanguage('Errors');
 
 			// Could they get the right send topic verification code?
 			require_once(SUBSDIR . '/Editor.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
+			// form validation
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			$validator = new Data_Validator();
+			$validator->sanitation_rules(array(
+				'emailaddress' => 'trim',
+				'contactmessage' => 'trim|Util::htmlspecialchars'
+			));
+			$validator->validation_rules(array(
+				'emailaddress' => 'required|valid_email',
+				'contactmessage' => 'required'
+			));
+			$validator->text_replacements(array(
+				'emailaddress' => $txt['error_email'],
+				'contactmessage' => $txt['error_message']
+			));
+
+			// Any form errors
+			if (!$validator->validate($_POST))
+				$context['errors'] = $validator->validation_errors();
+
+			// How about any verification errors
 			$verificationOptions = array(
 				'id' => 'contactform',
 			);
 			$context['require_verification'] = create_control_verification($verificationOptions, true);
 			if (is_array($context['require_verification']))
 			{
-				loadLanguage('Errors');
 				foreach ($context['require_verification'] as $error)
 					$context['errors'][] = $txt['error_' . $error];
 			}
 
-			// Check the email for validity.
-			$email = !empty($_POST['emailaddres']) ? trim($_POST['emailaddres']) : '';
-			if (empty($email))
-				$context['errors'][] = $txt['error_no_email'];
-
-			if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $email) == 0)
-				$context['errors'][] = $txt['error_bad_email'];
-
-			$message = !empty($_POST['contactmessage']) ? trim(Util::htmlspecialchars($_POST['contactmessage'])) : '';
-			if (empty($message))
-				$context['errors'][] = $txt['error_no_message'];
-
+			// No errors, then send the PM to the admins
 			if (empty($context['errors']))
 			{
 				$admins = admins();
 
 				if (!empty($admins))
 				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $email, 'username' => $email));
-
+					require_once(SUBSDIR . '/PersonalMessage.subs.php');
+					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_POST['contactmessage'], false, array('id' => 0, 'name' => $validator->emailaddress, 'username' => $validator->emailaddress));
 				}
 				// Send the PM
 				redirectexit('action=contact;sa=done');
 			}
 			else
 			{
-				$context['emailaddres'] = $email;
-				$context['contactmessage'] = $message;
+				$context['emailaddress'] = $validator->emailaddress;
+				$context['contactmessage'] = $validator->contactmessage;
 			}
 		}
 
