@@ -993,3 +993,46 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 
 	return $request;
 }
+
+/**
+ * Checks, which messages can be removed from a certain member.
+ *
+ * @global type $user_info
+ * @global type $modSettings
+ * @param int $topic
+ * @param array $messages
+ * @param bol $allowed_all
+ * @return array
+ */
+function determineRemovableMessages($topic, $messages, $allowed_all)
+{
+	global $user_info, $modSettings;
+
+	$db = database();
+
+	// Allowed to remove which messages?
+	$request = $db->query('', '
+		SELECT id_msg, subject, id_member, poster_time
+		FROM {db_prefix}messages
+		WHERE id_msg IN ({array_int:message_list})
+			AND id_topic = {int:current_topic}' . (!$allowed_all ? '
+			AND id_member = {int:current_member}' : '') . '
+		LIMIT ' . count($messages),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'message_list' => $messages,
+		)
+	);
+	$messages_list = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
+			continue;
+		$messages_list[$row['id_msg']] = array($row['subject'], $row['id_member']);
+	}
+
+	$db->free_result($request);
+
+	return $messages_list;
+}

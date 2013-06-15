@@ -838,9 +838,7 @@ class Display_Controller
 	 */
 	public function action_quickmod2()
 	{
-		global $topic, $board, $user_info, $modSettings, $context;
-
-		$db = database();
+		global $topic, $board, $user_info, $context;
 
 		// Check the session = get or post.
 		checkSession('request');
@@ -883,28 +881,7 @@ class Display_Controller
 			isAllowedTo('delete_own');
 
 		// Allowed to remove which messages?
-		$request = $db->query('', '
-			SELECT id_msg, subject, id_member, poster_time
-			FROM {db_prefix}messages
-			WHERE id_msg IN ({array_int:message_list})
-				AND id_topic = {int:current_topic}' . (!$allowed_all ? '
-				AND id_member = {int:current_member}' : '') . '
-			LIMIT ' . count($messages),
-			array(
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-				'message_list' => $messages,
-			)
-		);
-		$messages = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-				continue;
-
-			$messages[$row['id_msg']] = array($row['subject'], $row['id_member']);
-		}
-		$db->free_result($request);
+		$messages = determineRemovableMessages($topic, $messages, $allowed_all);
 
 		// Get the first message in the topic - because you can't delete that!
 		$first_message = $topic_info['id_first_msg'];
