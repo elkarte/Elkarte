@@ -41,7 +41,7 @@ function template_button_strip($button_strip, $direction = 'top', $strip_options
 
 	echo '
 		<div class="buttonlist', $direction != 'top' ? '_bottom' : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
-			<ul class="reset clearfix">
+			<ul>
 				', implode('', $buttons), '
 			</ul>
 		</div>';

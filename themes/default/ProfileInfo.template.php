@@ -29,7 +29,7 @@ function template_action_summary()
 			<div class="content flow_auto">
 				<div class="username"><h4>', $context['member']['name'], ' <span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4></div>
 				', $context['member']['avatar']['image'], '
-				<ul class="reset">';
+				<ul>';
 	// @TODO fix the <ul> when no fields are visible
 	// What about if we allow email only via the forum??
 	if ($context['member']['show_email'] === 'yes' || $context['member']['show_email'] === 'no_through_forum' || $context['member']['show_email'] === 'yes_permission_override' && $context['can_send_email'])
@@ -269,7 +269,7 @@ function template_action_summary()
 				$shown = true;
 				echo '
 				<div class="custom_fields_above_signature">
-					<ul class="reset nolist">';
+					<ul class="nolist">';
 			}
 			echo '
 						<li>', $field['output_html'], '</li>';
@@ -340,7 +340,7 @@ function template_action_showPosts()
 			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 				echo '
 				<div class="floatright">
-					<ul class="reset smalltext quickbuttons">';
+					<ul class="smalltext quickbuttons">';
 
 			// If they *can* reply?
 			if ($post['can_reply'])

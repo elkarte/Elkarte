@@ -45,7 +45,7 @@ function template_main()
 		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 			echo '
 					<div class="quickbuttons_wrap">
-						<ul class="reset smalltext quickbuttons">';
+						<ul class="smalltext quickbuttons">';
 
 		// If they *can* reply?
 		if ($post['can_reply'])

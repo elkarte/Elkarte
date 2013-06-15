@@ -385,7 +385,7 @@ function template_body_below()
 	// There is now a global "Go to top" link at the right.
 	echo '
 			<a href="#top" id="bot"><img src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['go_up'], '" /></a>
-			<ul class="reset">
+			<ul>
 				<li class="copyright">', theme_copyright(), '
 				</li>
 				<li><a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_xhtml'], '"><span>', $txt['xhtml'], '</span></a></li>
@@ -408,7 +408,7 @@ function template_body_below()
  */
 function template_html_below()
 {
-	// load in any javascipt that could be defered to the end of the page
+	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
 
 	echo '

@@ -377,7 +377,7 @@ function template_modify_user_subscription()
 		foreach ($context['pending_payments'] as $id => $payment)
 		{
 			echo '
-					<li class="reset">
+					<li>
 						', $payment['desc'], '
 						<span class="floatleft">
 							<a href="', $scripturl, '?action=admin;area=paidsubscribe;sa=modifyuser;lid=', $context['log_id'], ';pending=', $id, ';accept">', $txt['pending_payments_accept'], '</a>

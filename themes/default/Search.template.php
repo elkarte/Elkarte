@@ -504,7 +504,7 @@ function template_results()
 				if ($topic['can_reply'] || $topic['can_mark_notify'])
 					echo '
 							<div class="quickbuttons_wrap">
-								<ul class="reset smalltext quickbuttons">';
+								<ul class="smalltext quickbuttons">';
 
 				// If they *can* reply?
 				if ($topic['can_reply'])
