@@ -50,7 +50,7 @@ function smc_NewsFader(oOptions)
 			aFaderItems.push($(this).html());
 		});
 
-	$(sControlId).html('<li>' + sItemTemplate.replace('%1$s', aFaderItems[0]) + '</li>').show();
+	$(sControlId).html('<li>' + sItemTemplate.replace('%1$s', aFaderItems[0]) + '</li>');
 
 	fadeOut();
 }
