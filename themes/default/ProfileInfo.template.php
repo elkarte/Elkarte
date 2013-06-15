@@ -14,6 +14,14 @@
  * @version 1.0 Alpha
  */
 
+function template_ProfileInfo_init()
+{
+	global $settings;
+
+	// This piece is used to style attachments awaiting approval in the list
+	$settings['attachments_awaiting_approval'] = '{attachment_link}&nbsp;(<em>{txt_awaiting}</em>)';
+}
+
 /**
  * This template displays users details without any option to edit them.
  */

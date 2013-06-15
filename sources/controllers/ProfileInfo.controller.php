@@ -715,7 +715,7 @@ function action_showAttachments()
  */
 function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 {
-	global $board, $modSettings, $context;
+	global $board, $modSettings, $context, $settings, $scripturl, $txt;
 
 	$db = database();
 
@@ -750,6 +750,12 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 	);
 	$attachments = array();
 	while ($row = $db->fetch_assoc($request))
+	{
+		if (!$row['approved'])
+			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+		else
+			$row['filename'] = '<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>';
+
 		$attachments[] = array(
 			'id' => $row['id_attach'],
 			'filename' => $row['filename'],
@@ -759,7 +765,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 			'downloads' => $row['downloads'],
 			'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
 			'id_thumb' => $row['id_thumb'],
-			'subject' => censorText($row['subject']),
+			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censorText($row['subject']) . '</a>',
 			'posted' => $row['poster_time'],
 			'msg' => $row['id_msg'],
 			'topic' => $row['id_topic'],
@@ -767,6 +773,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 			'board_name' => $row['name'],
 			'approved' => $row['approved'],
 		);
+	}
 
 	$db->free_result($request);
 
