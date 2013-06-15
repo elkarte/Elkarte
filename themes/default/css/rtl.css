@@ -81,10 +81,10 @@ h4.titlebg img.icon {
 	margin: 5px 0 0 8px;
 }
 
-table.table_list a.unreadlink, table.table_list a.collapse {
+.table_list a.unreadlink, .table_list a.collapse {
 	float: left;
 }
-table.table_list a.collapse {
+.table_list a.collapse {
 	margin: 10px 1em 0 5px;
 }
 
