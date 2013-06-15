@@ -2046,12 +2046,11 @@ function list_getAttachDirs()
 				}
 		}
 
-		// @todo: $save_errors not initialized, bug?
 		$attachdirs[] = array(
 			'id' => $id,
 			'current' => $id == $modSettings['currentAttachmentUploadDir'],
 			'disable_current' => isset($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] > 1,
-			'disable_base_dir' =>  $is_base_dir && $sub_dirs > 0 && !empty($files) && empty($error) && empty($save_errors),
+			'disable_base_dir' =>  $is_base_dir && $sub_dirs > 0 && !empty($files) && empty($error),
 			'path' => $dir,
 			'current_size' => !empty($expected_size[$id]) ? comma_format($expected_size[$id] / 1024, 0) : 0,
 			'num_files' => comma_format($expected_files[$id] - $sub_dirs, 0) . ($sub_dirs > 0 ? ' (' . $sub_dirs . ')' : ''),
