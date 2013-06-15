@@ -965,3 +965,31 @@ function determineStartMessage($topic, $unapproved_posts, $virtual_msg)
 
 	return $start;
 }
+
+/**
+ * Loads the details from a message
+ * @param array $msg_selects
+ * @param array $msg_tables
+ * @param array $msg_parameters
+ * @param string $options
+ * @return array
+ */
+function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,
+			m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
+			m.id_msg_modified < {int:new_from} AS is_read
+			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
+		FROM {db_prefix}messages as m
+			' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
+		WHERE m.id_msg IN ({array_int:message_list})
+		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
+		$msg_parameters
+	);
+
+	return $request;
+}
