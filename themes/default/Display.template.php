@@ -89,8 +89,8 @@ function template_main()
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
 			echo '
-							<div class="poster">', template_build_poster_div($message, $ignoring), '</div>
-							<div class="postarea">';
+						<div class="poster">', template_build_poster_div($message, $ignoring), '</div>
+						<div class="postarea">';
 
 		echo '
 							<div class="keyinfo">
