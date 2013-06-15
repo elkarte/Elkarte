@@ -2372,8 +2372,7 @@ function MessageSearch2()
  * Callback to return messages - saves memory.
  * @todo Fix this, update it, whatever... from Display.controller.php mainly.
  * Note that the call to loadAttachmentContext() doesn't work:
- * this function doesn't fulf
- * ill the pre-condition to fill $attachments global...
+ * this function doesn't fulfill the pre-condition to fill $attachments global...
  * So all it does is to fallback and return.
  *
  * What it does:
