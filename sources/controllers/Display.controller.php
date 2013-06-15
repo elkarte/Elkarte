@@ -36,9 +36,7 @@ class Display_Controller
 	{
 		global $scripturl, $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
-		global $attachments, $messages_request, $topicinfo, $language, $all_posters;
-
-		$db = database();
+		global $attachments, $messages_request, $topicinfo, $language;
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
