@@ -173,11 +173,17 @@ class Data_Validator
 	/**
 	 * Return errors
 	 *
+	 * @param mixed $raw - true returns the faw error array,
+	 *					 - array returns just error messages of those fields
+	 *					 - otherwise all error message(s)
 	 * @return array
 	 */
-	public function validation_errors()
+	public function validation_errors($raw = false)
 	{
-		return $this->_get_error_messages();
+		if ($raw === true)
+			return $this->_validation_errors;
+		else
+			return $this->_get_error_messages($raw);
 	}
 
 	/**
@@ -299,7 +305,7 @@ class Data_Validator
 	 * @return array
 	 * @return string
 	 */
-	private function _get_error_messages()
+	private function _get_error_messages($keys)
 	{
 		global $txt;
 
@@ -309,10 +315,18 @@ class Data_Validator
 		loadLanguage('Validation');
 		$result = array();
 
+		// Just want specific errors then it must be an array
+		if (!empty($keys) && !is_array($keys))
+			$keys = array($keys);
+
 		foreach ($this->_validation_errors as $error)
 		{
 			// Field name substitution supplied?
 			$field = isset($this->_replacements[$error['field']]) ? $this->_replacements[$error['field']] : $error['field'];
+
+			// Just want specific field errors returned?
+			if (!empty($keys) && !in_array($error['field'], $keys))
+				continue;
 
 			// Set the error message for this validation failure
 			if (isset($error['error']))
