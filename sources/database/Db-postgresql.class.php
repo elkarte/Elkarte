@@ -834,7 +834,7 @@ class Database_PostgreSQL implements Database
 		foreach (debug_backtrace() as $step)
 		{
 			// Found it?
-			if (!method_exists($this, $step['function']))
+			if (!method_exists($this, $step['function'])) && !in_array(substr($step['function'], 0, 7), array('elk_db_', 'preg_re', 'db_erro', 'call_us')))
 			{
 				$log_message .= '<br />Function: ' . $step['function'];
 				break;
