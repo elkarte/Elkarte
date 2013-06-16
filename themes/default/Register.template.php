@@ -784,10 +784,10 @@ function template_contact_form()
 			echo '
 				<dl class="settings">
 					<dt>
-						<label for="emailaddres">', $txt['admin_register_email'], '</label>
+						<label for="emailaddress">', $txt['admin_register_email'], '</label>
 					</dt>
 					<dd>
-						<input type="text" name="emailaddres" id="emailaddres" value="', !empty($context['emailaddres']) ? $context['emailaddres'] : '', '" tabindex="', $context['tabindex']++, '" />
+						<input type="text" name="emailaddress" id="emailaddress" value="', !empty($context['emailaddress']) ? $context['emailaddress'] : '', '" tabindex="', $context['tabindex']++, '" />
 					</dd>
 					<dt>
 						<label for="contactmessage">', $txt['contact_your_message'], '</label>
