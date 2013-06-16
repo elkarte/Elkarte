@@ -305,7 +305,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	if (empty($messages))
 	{
 		$messages = array();
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_msg
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})',
@@ -313,13 +313,13 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				'topics' => $topics,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_row']($request))
+		while ($row = $db->fetch_row($request))
 			$messages[] = $row[0];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 	}
 
 	// Remove all likes now that the topic is gone
-	$smcFunc['db_query']('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}message_likes
 		WHERE id_msg IN ({array_int:messages})',
 		array(
