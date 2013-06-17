@@ -135,7 +135,7 @@ class News_Controller
 		}
 
 		// If format isn't set, rss2 is default
-		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('smf', 'rss', 'rss2', 'atom', 'rdf', 'webslice')) ? $_GET['type'] : 'rss2';
+		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('rss', 'rss2', 'atom', 'rdf', 'webslice')) ? $_GET['type'] : 'rss2';
 
 		// @todo Birthdays?
 
@@ -194,7 +194,7 @@ class News_Controller
 		else
 			ob_start();
 
-		if ($xml_format == 'smf' || isset($_REQUEST['debug']))
+		if (isset($_REQUEST['debug']))
 			header('Content-Type: text/xml; charset=UTF-8');
 		elseif ($xml_format == 'rss' || $xml_format == 'rss2' || $xml_format == 'webslice')
 			header('Content-Type: application/rss+xml; charset=UTF-8');
@@ -287,8 +287,8 @@ class News_Controller
 			echo '
 	</feed>';
 		}
-		//@todo to not change much, rdf by default, maybe better use rss?
-		else //if ($xml_format == 'rdf')
+		// rdf by default
+		else
 		{
 			echo '
 	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">
