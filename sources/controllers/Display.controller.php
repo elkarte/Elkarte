@@ -565,7 +565,7 @@ class Display_Controller
 			$firstIndex = $limit - 1;
 		}
 
-		// Taking care of member specific settings 
+		// Taking care of member specific settings
 		$limit_settings = array(
 			'messages_per_page' => $context['messages_per_page'],
 			'start' => $start,
@@ -919,7 +919,7 @@ class Display_Controller
 		global $settings, $txt, $modSettings, $scripturl, $options, $user_info;
 		global $memberContext, $context, $messages_request, $topic;
 		static $counter = null;
-	
+
 		// If the query returned false, bail.
 		if ($messages_request == false)
 			return false;
@@ -928,19 +928,16 @@ class Display_Controller
 		if ($counter === null || $reset)
 			$counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
 
-		// We need a little help from our friend :P
-		require_once(SUBSDIR . '/Display.subs.php');
-
 		// Start from the beginning...
 		// @todo this isn't ever called? does it even work, since it returns the query result?
 		if ($reset)
-			return currentMessage($messages_request, $reset);
-	
+			return currentContext($messages_request, $reset);
+
 		// Attempt to get the next message.
-		$message = currentMessage($messages_request);
+		$message = currentContext($messages_request);
 		if (!$message)
 			return false;
-	
+
 		// $context['icon_sources'] says where each icon should come from - here we set up the ones which will always exist!
 		if (empty($context['icon_sources']))
 		{
@@ -949,7 +946,7 @@ class Display_Controller
 			foreach ($stable_icons as $icon)
 				$context['icon_sources'][$icon] = 'images_url';
 		}
-	
+
 		// Message Icon Management... check the images exist.
 		if (empty($modSettings['messageIconChecks_disable']))
 		{
@@ -959,18 +956,18 @@ class Display_Controller
 		}
 		elseif (!isset($context['icon_sources'][$message['icon']]))
 			$context['icon_sources'][$message['icon']] = 'images_url';
-	
+
 		// If you're a lazy bum, you probably didn't give a subject...
 		$message['subject'] = $message['subject'] != '' ? $message['subject'] : $txt['no_subject'];
-	
+
 		// Are you allowed to remove at least a single reply?
 		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
-	
+
 		// Have you liked this post, can you
 		$message['likes'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
 		$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] !== $user_info['id'];
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
-	
+
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
 		if (!loadMemberContext($message['id_member'], true))
 		{
@@ -989,17 +986,17 @@ class Display_Controller
 			$memberContext[$message['id_member']]['is_topic_starter'] = $message['id_member'] == $context['topic_starter_id'];
 			$memberContext[$message['id_member']]['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $memberContext[$message['id_member']]['warning_status'] && ($context['user']['can_mod'] || (!$user_info['is_guest'] && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $message['id_member'] == $user_info['id'])));
 		}
-	
+
 		$memberContext[$message['id_member']]['ip'] = $message['poster_ip'];
 		$memberContext[$message['id_member']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$message['id_member']]['can_view_profile']) || (!empty($memberContext[$message['id_member']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$message['id_member']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
-	
+
 		// Do the censor thang.
 		censorText($message['body']);
 		censorText($message['subject']);
-	
+
 		// Run BBC interpreter on the message.
 		$message['body'] = parse_bbc($message['body'], $message['smileys_enabled'], $message['id_msg']);
-	
+
 		// Compose the memory eat- I mean message array.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$output = array(
@@ -1034,19 +1031,19 @@ class Display_Controller
 			'can_unlike' => $message['use_likes'] && $message['likes'],
 			'like_counter' =>$message['like_count'],
 		);
-	
+
 		// Is this user the message author?
 		$output['is_message_author'] = $message['id_member'] == $user_info['id'];
 		if (!empty($output['modified']['name']))
 			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name']);
-	
+
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
-	
+
 		if (empty($options['view_newest_first']))
 			$counter++;
 		else
 			$counter--;
-	
+
 		return $output;
 	}
 }
