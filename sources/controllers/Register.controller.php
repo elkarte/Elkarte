@@ -400,6 +400,7 @@ class Register_Controller
 		// Registration options are always default options...
 		if (isset($_POST['default_options']))
 			$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
+
 		$regOptions['theme_vars'] = isset($_POST['options']) && is_array($_POST['options']) ? $_POST['options'] : array();
 
 		// Make sure they are clean, dammit!
@@ -704,8 +705,6 @@ class Register_Controller
 	{
 		global $context, $modSettings, $txt;
 
-		$db = database();
-
 		loadLanguage('Login');
 		loadTemplate('Register');
 
@@ -791,7 +790,6 @@ class Register_Controller
 			header('Content-Type: image/gif');
 			die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 		}
-
 		// Show a window that will play the verification code.
 		elseif (isset($_REQUEST['sound']))
 		{
@@ -804,7 +802,6 @@ class Register_Controller
 
 			obExit();
 		}
-
 		// If we have GD, try the nice code.
 		elseif (empty($_REQUEST['format']))
 		{
@@ -812,7 +809,6 @@ class Register_Controller
 
 			if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
 				header('HTTP/1.1 400 Bad Request');
-
 			// Otherwise just show a pre-defined letter.
 			elseif (isset($_REQUEST['letter']))
 			{
@@ -875,6 +871,7 @@ class Register_Controller
 				'id' => 'contactform',
 			);
 			$context['require_verification'] = create_control_verification($verificationOptions, true);
+
 			if (is_array($context['require_verification']))
 			{
 				loadLanguage('Errors');
@@ -902,8 +899,8 @@ class Register_Controller
 				{
 					require_once(SUBSDIR . '/Post.subs.php');
 					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $email, 'username' => $email));
-
 				}
+
 				// Send the PM
 				redirectexit('action=contact;sa=done');
 			}
