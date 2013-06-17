@@ -14,7 +14,6 @@ if (!defined('ELK'))
 /**
  * Class used to validate and transform data
  *
- *
  * Initiate
  *		$validation = new Data_Validator();
  *
@@ -44,8 +43,9 @@ if (!defined('ELK'))
  * $data must be an array with keys matching the validation rule e.g. $data['username'], $data['email']
  *
  * Get the results
- * 		$validation->validation_errors()
+ * 		$validation->validation_errors(optional array of fields to return errors)
  * 		$validation->validation_data()
+ *		$validation->username
  *
  * Current validation can be one or a combination of:
  * 		max_length[x], min_length[x], length[x],
@@ -67,7 +67,7 @@ class Data_Validator
 	protected $_sanitation_rules = array();
 
 	/**
-	 * Text Substitutions for field names in the error messages
+	 * Text substitutions for field names in the error messages
 	 */
 	protected $_replacements = array();
 
