@@ -101,9 +101,6 @@ function prepare_karma($id_target)
 	if (empty($id_target) || $id_target == $user_info['id'])
 		fatal_lang_error('cant_change_own_karma', false);
 
-	// Applauding or smiting?
-	$dir = $_REQUEST['sa'] != 'applaud' ? -1 : 1;
-
 	clearKarma($modSettings['karmaWaitTime']);
 
 	// Not an administrator... or one who is restricted as well.
