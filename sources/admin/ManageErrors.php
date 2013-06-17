@@ -70,7 +70,7 @@ class ManageErrors_Controller
 			$filter = array(
 				'variable' => $_GET['filter'],
 				'value' => array(
-					'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->db_escape_wildcard_string($_GET['value']),
+					'sql' => in_array($_GET['filter'], array('message', 'url', 'file')) ? base64_decode(strtr($_GET['value'], array(' ' => '+'))) : $db->escape_wildcard_string($_GET['value']),
 				),
 				'href' => ';filter=' . $_GET['filter'] . ';value=' . $_GET['value'],
 				'entity' => $filters[$_GET['filter']]
