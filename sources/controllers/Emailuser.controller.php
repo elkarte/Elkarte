@@ -185,9 +185,6 @@ class Emailuser_Controller
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 		}
 
-		if (empty($request) || $db->num_rows($request) == 0)
-			fatal_lang_error('cant_find_user_email');
-
 		// Are you sure you got the address?
 		if (empty($row['email_address']))
 			fatal_lang_error('cant_find_user_email');
