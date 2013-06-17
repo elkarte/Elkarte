@@ -197,13 +197,12 @@ function action_summary()
 
 	// Load up the most recent attachments for this user for use in profile views etc.
 	$context['thumbs'] = array();
-	if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+	if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments') && !empty($settings['attachments_on_summary']))
 	{
-		$limit = 8;
 		$boardsAllowed = boardsAllowedTo('view_attachments');
 		if (empty($boardsAllowed))
 			$boardsAllowed = array(-1);
-		$attachments = list_getAttachments(0, $limit, 'm.poster_time DESC', $boardsAllowed , $context['member']['id']);
+		$attachments = list_getAttachments(0, $settings['attachments_on_summary'], 'm.poster_time DESC', $boardsAllowed , $context['member']['id']);
 
 		// load them in to $context for use in the template
 		$i = 0;
@@ -715,7 +714,7 @@ function action_showAttachments()
  */
 function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 {
-	global $board, $modSettings, $context;
+	global $board, $modSettings, $context, $settings, $scripturl, $txt;
 
 	$db = database();
 
@@ -750,6 +749,12 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 	);
 	$attachments = array();
 	while ($row = $db->fetch_assoc($request))
+	{
+		if (!$row['approved'])
+			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+		else
+			$row['filename'] = '<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>';
+
 		$attachments[] = array(
 			'id' => $row['id_attach'],
 			'filename' => $row['filename'],
@@ -759,7 +764,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 			'downloads' => $row['downloads'],
 			'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
 			'id_thumb' => $row['id_thumb'],
-			'subject' => censorText($row['subject']),
+			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censorText($row['subject']) . '</a>',
 			'posted' => $row['poster_time'],
 			'msg' => $row['id_msg'],
 			'topic' => $row['id_topic'],
@@ -767,6 +772,7 @@ function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $me
 			'board_name' => $row['name'],
 			'approved' => $row['approved'],
 		);
+	}
 
 	$db->free_result($request);
 
