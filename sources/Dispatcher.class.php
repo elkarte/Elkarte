@@ -94,7 +94,8 @@ class Site_Dispatcher
 			// home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// @todo Unless we have a custom home page registered...
+				// Reminder: hooks need to account for multiple mods setting this hook.
+				call_integration_hook('integrate_frontpage', array(&$default_action));
 
 				// was it, wasn't it....
 				if (empty($this->_function_name))

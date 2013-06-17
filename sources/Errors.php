@@ -134,6 +134,8 @@ function fatal_error($error, $log = 'general')
 	if (empty($txt))
 		die($error);
 
+	if (class_exists('Template_Layers'))
+		Template_Layers::getInstance()->preventReverse();
 	setup_fatal_error_context($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2) ? log_error($error, $log) : $error, $error);
 }
 

@@ -2103,7 +2103,7 @@ function template_install_below()
 		</div>
 		<div id="footer_section">
 			<div class="frame">
-				<ul class="reset">
+				<ul>
 					<li class="copyright"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">Elkarte &copy; 2012, Elkarte Community</a></li>
 				</ul>
 			</div>
