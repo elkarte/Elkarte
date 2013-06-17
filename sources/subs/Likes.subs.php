@@ -162,7 +162,7 @@ function lastLikeOn($id_liker)
 	$request = $db->query('', '
 		SELECT action
 		FROM {db_prefix}log_likes
-		WHERE id_executor = {int:current_member}',
+		WHERE id_member = {int:current_member}',
 		array(
 			'current_member' => $id_liker,
 		)
