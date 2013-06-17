@@ -1792,8 +1792,6 @@ function MessageSearch()
 {
 	global $context, $txt, $scripturl, $modSettings;
 
-	$db = database();
-
 	if (isset($_REQUEST['params']))
 	{
 		$temp_params = explode('|"|', base64_decode(strtr($_REQUEST['params'], array(' ' => '+'))));

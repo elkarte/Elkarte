@@ -292,8 +292,6 @@ class PostModeration_Controller
 	{
 		global $txt, $scripturl, $context, $user_info, $modSettings;
 
-		$db = database();
-
 		$context['page_title'] = $txt['mc_unapproved_attachments'];
 
 		// Once again, permissions are king!
