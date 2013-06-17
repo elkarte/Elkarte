@@ -186,7 +186,7 @@ class Site_Dispatcher
 			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
 			'search' => array('Search.controller.php', 'action_plushsearch1'),
 			'search2' => array('Search.controller.php', 'action_plushsearch2'),
-			'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
+			// 'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'Suggest_Controller', 'action_suggest'),
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
