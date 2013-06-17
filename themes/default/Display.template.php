@@ -66,7 +66,8 @@ function template_main()
 	$removableMessageIDs = array();
 
 	// Get all the messages...
-	while ($message = $context['get_message']())
+	$controller = $context['get_message'][0];
+	while ($message = $controller->{$context['get_message'][1]}())
 	{
 		if ($message['can_remove'])
 			$removableMessageIDs[] = $message['id'];
