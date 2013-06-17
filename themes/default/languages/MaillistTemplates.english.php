@@ -279,3 +279,30 @@ The message they sent you is:
     {REPLYLINK}
 
 {EMAILREGARDS}';
+
+/**
+	@additional_params: new_pm_body_tolist
+		SUBJECT: The personal message subject.
+		SENDER:  The user name for the member sending the personal message.
+		MESSAGE:  The text of the personal message.
+		REPLYLINK:  The link to directly access the reply page.
+		TOLIST:  The list of users that will receive the personal message.
+	@description: A notification email sent to the receivers of a personal message
+*/
+$txt['pbe_new_pm_body_tolist_subject'] = 'New Personal Message: {SUBJECT}';
+$txt['pbe_new_pm_body_tolist_body'] = '{TOLIST} have just been sent a personal message by {SENDER} on {FORUMNAME}
+
+The message they sent is:
+
+{MESSAGE}
+
+------------------------------------
+{FORUMNAMESHORT} Links:
+
+<*> To visit {FORUMNAMESHORT} on the web, go to:
+    {FORUMURL}
+
+<*> Reply to this Personal Message here::
+    {REPLYLINK}
+
+{EMAILREGARDS}';
