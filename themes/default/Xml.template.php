@@ -391,6 +391,9 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
 	echo "\n", str_repeat("\t", $level), '</', $parent_ident, '>';
 }
 
+/**
+ * Output before webslices content
+ */
 function template_webslice_header_above()
 {
 	global $settings;
@@ -399,21 +402,28 @@ function template_webslice_header_above()
 	<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/wireless.css" />';
 }
 
+/**
+ * Output after webslices content
+ */
 function template_webslice_header_below()
 {
 }
 
-// This shows a webslice of the recent posts.
+/**
+ * This shows a webslice of the recent posts.
+ */
 function template_webslice_recent_posts()
 {
 	global $context, $scripturl, $txt;
 
+	// @todo test if this works
 	echo '
 	<div style="width: 100%; height: 100%; border: 1px solid black; padding: 0; margin: 0 0 0 0; font: 100.01%/100% Verdana, Helvetica, sans-serif;">
 		<div style="background: #080436; color: #ffffff; padding: 4px;">
 			', cleanXml($txt['recent_posts']), '
 		</div>';
 
+	// Recent posts bit
 	$alternate = 0;
 	foreach ($context['recent_posts_data'] as $item)
 	{
@@ -429,6 +439,7 @@ function template_webslice_recent_posts()
 	<div style="width: 100%; height: 100%; border: 0; padding: 0; margin: 0 0 0 0; font: 100.01%/100% Verdana, Helvetica, sans-serif;">
 		<div style="font-size: xx-small;" class="righttext">';
 
+	// Send alerts for the logged in user if they have new PMs
 	if ($context['user']['is_guest'])
 		echo '
 			<a href="', $scripturl, '?action=login">', $txt['login'], '</a>';

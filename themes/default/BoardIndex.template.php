@@ -220,6 +220,8 @@ function template_info_center()
 	// This is the "Recent Posts" bar.
 	if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
 	{
+		// Show the Recent Posts title, and attach webslices feed to this section
+		// The format requires: hslice, entry-title and entry-content classes
 		echo '
 			<div class="title_barIC">
 				<h4 class="titlebg">

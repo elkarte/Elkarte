@@ -134,8 +134,8 @@ class News_Controller
 			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $_GET['limit'] * 5);
 		}
 
-		// Show in rss or proprietary format?
-		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('smf', 'rss', 'rss2', 'atom', 'rdf', 'webslice')) ? $_GET['type'] : 'smf';
+		// If format isn't set, rss2 is default
+		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('smf', 'rss', 'rss2', 'atom', 'rdf', 'webslice')) ? $_GET['type'] : 'rss2';
 
 		// @todo Birthdays?
 
@@ -153,7 +153,7 @@ class News_Controller
 		if (empty($_GET['sa']) || !isset($subActions[$_GET['sa']]))
 			$_GET['sa'] = 'recent';
 
-		// @todo Temp - webslices doesn't do everything yet.
+		// @todo Temp - webslices doesn't do everything yet. (only recent posts)
 		if ($xml_format == 'webslice' && $_GET['sa'] != 'recent')
 			$xml_format = 'rss2';
 		// If this is webslices we kinda cheat - we allow a template that we call direct for the HTML, and we override the CDATA.
@@ -234,6 +234,11 @@ class News_Controller
 		}
 		elseif ($xml_format == 'webslice')
 		{
+			// Format specification http://msdn.microsoft.com/en-us/library/cc304073%28VS.85%29.aspx
+			// Known browsers to support webslices: IE8, IE9, Firefox with Webchunks addon.
+			// It uses RSS 2.
+
+			// We send a feed with recent posts, and alerts for PMs for logged in users
 			$context['recent_posts_data'] = $xml;
 			$context['can_pm_read'] = allowedTo('pm_read');
 
