@@ -49,7 +49,7 @@ class Themes_Controller
 	 */
 	function action_thememain()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
 
 		// Load the important language files...
 		loadLanguage('Themes');
@@ -1695,9 +1695,7 @@ class Themes_Controller
 	 */
 	function action_edit()
 	{
-		global $context, $settings, $scripturl;
-
-		$db = database();
+		global $context;
 
 		isAllowedTo('admin_forum');
 		loadTemplate('Themes');
@@ -1848,7 +1846,7 @@ class Themes_Controller
 	 */
 	function action_edit_submit()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 		if (empty($selectedTheme))
