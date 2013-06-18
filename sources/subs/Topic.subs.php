@@ -1082,7 +1082,7 @@ function setTopicRegard($id_member, $topic, $on = false)
 	$db->insert(empty($was_set) ? 'ignore' : 'replace',
 		'{db_prefix}log_topics',
 		array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int'),
-		array($id_member, $topic, $was_set ? $was_set : 0, $on ? 1 : 0),
+		array($id_member, $topic, !empty($was_set['id_msg']) ? $was_set['id_msg'] : 0, $on ? 1 : 0),
 		array('id_member', 'id_topic')
 	);
 }
@@ -1646,7 +1646,7 @@ function getLoggedTopics($member, $topics)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_topic, disregarded
+		SELECT id_topic, disregarded, id_msg
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})
 			AND id_member = {int:current_user}',
