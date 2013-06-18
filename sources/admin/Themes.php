@@ -47,7 +47,7 @@ class Themes_Controller
 	 * Requires the user not be a guest. (@todo what?)
 	 * Accessed via ?action=admin;area=theme.
 	 */
-	function action_thememain()
+	public function action_thememain()
 	{
 		global $txt, $context;
 
@@ -115,11 +115,9 @@ class Themes_Controller
 	 *  @uses Themes template
 	 *  @uses Admin language file
 	 */
-	function action_admin()
+	public function action_admin()
 	{
 		global $context, $modSettings;
-
-		$db = database();
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
@@ -180,7 +178,7 @@ class Themes_Controller
 	 * This function lists the available themes and provides an interface
 	 * to reset the paths of all the installed themes.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $context, $boardurl;
 
@@ -306,7 +304,7 @@ class Themes_Controller
 	/**
 	 * Administrative global settings.
 	 */
-	function action_options()
+	public function action_options()
 	{
 		global $txt, $context, $settings, $modSettings;
 
@@ -691,7 +689,7 @@ class Themes_Controller
 	 * - requires admin_forum permission.
 	 * - accessed with ?action=admin;area=theme;sa=list&th=xx.
 	 */
-	function action_setthemesettings()
+	public function action_setthemesettings()
 	{
 		global $txt, $context, $settings, $modSettings;
 
@@ -870,7 +868,7 @@ class Themes_Controller
 	 * - requires an administrator.
 	 * - accessed with ?action=admin;area=theme;sa=remove.
 	 */
-	function action_remove()
+	public function action_remove()
 	{
 		global $modSettings, $context;
 
@@ -943,7 +941,7 @@ class Themes_Controller
 	 * @todo thought so... Might be better to split this file in ManageThemes and Themes,
 	 * with centralized admin permissions on ManageThemes.
 	 */
-	function action_pick()
+	public function action_pick()
 	{
 		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
 
@@ -1278,7 +1276,7 @@ class Themes_Controller
 	 * Requires admin_forum.
 	 * Accessed with ?action=admin;area=theme;sa=install.
 	 */
-	function action_install()
+	public function action_install()
 	{
 		global $boardurl, $txt, $context, $settings, $modSettings;
 
@@ -1591,7 +1589,7 @@ class Themes_Controller
 	 * - optionally contains &th=theme id
 	 * - does not log access to the Who's Online log. (in index.php..)
 	 */
-	function action_jsoption()
+	public function action_jsoption()
 	{
 		global $settings, $user_info, $options;
 
@@ -1693,7 +1691,7 @@ class Themes_Controller
 	 * uses the Themes template
 	 * accessed via ?action=admin;area=theme;sa=edit
 	 */
-	function action_edit()
+	public function action_edit()
 	{
 		global $context;
 
@@ -1769,7 +1767,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	function action_edit_style($theme_dir)
+	public function action_edit_style($theme_dir)
 	{
 		global $context;
 
@@ -1786,7 +1784,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	function action_edit_template($theme_dir)
+	public function action_edit_template($theme_dir)
 	{
 		global $context;
 
@@ -1827,7 +1825,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	function action_edit_file($theme_dir)
+	public function action_edit_file($theme_dir)
 	{
 		global $context;
 
@@ -1844,7 +1842,7 @@ class Themes_Controller
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
 	 */
-	function action_edit_submit()
+	public function action_edit_submit()
 	{
 		global $context;
 
@@ -1983,7 +1981,7 @@ class Themes_Controller
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
 	 */
-	function action_edit_browse()
+	public function action_edit_browse()
 	{
 		global $context, $scripturl;
 
@@ -2040,7 +2038,7 @@ class Themes_Controller
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
 	 */
-	function action_edit_list()
+	public function action_edit_list()
 	{
 		global $context;
 
@@ -2086,7 +2084,7 @@ class Themes_Controller
 	 * Makes a copy of a template file in a new location
 	 * @uses Themes template, copy_template sub-template.
 	 */
-	function action_copy()
+	public function action_copy()
 	{
 		global $context, $settings;
 
