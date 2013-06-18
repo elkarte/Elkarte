@@ -63,21 +63,31 @@ class MarkRead_Controller
 	{
 		global $context, $txt;
 
-		// Guests can't mark things.
-		is_not_guest('', false);
+		loadTemplate('Xml');
 
-		checkSession('get');
+		Template_Layers::getInstance()->removeAll();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		// Guests can't mark things.
+		if ($user_info['is_guest'])
+		{
+			loadLanguage('Errors');
+			$context['xml_data']['error']['text'] = $txt['not_guests'];
+			return;
+		}
+
+		if (checkSession('get', '', false))
+		{
+			loadLanguage('Errors');
+			$context['xml_data']['error']['url'] = $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+			return;
+		}
 
 		$this->_dispatch();
 
 		// For the time being this is a special case
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
 		{
-			loadTemplate('Xml');
-
-			Template_Layers::getInstance()->removeAll();
-			$context['sub_template'] = 'generic_xml_buttons';
-
 			$context['xml_data'] = array(
 				'text' => $txt['unread_topics_visit_none'],
 			);

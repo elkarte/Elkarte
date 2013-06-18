@@ -5,6 +5,7 @@ global $scripturl, $modSettings;
 
 $txt['no_access'] = 'Sorry, we can\'t let you access this section. We can\'t even tell you if it exists. You\'re welcome to visit the main page and choose your way from there.';
 $txt['wireless_error_notyet'] = 'Sorry, this section isn\'t available for wireless users at this time.';
+$txt['not_guests'] = 'Sorry, this action is not available to guests.';
 
 $txt['mods_only'] = 'Only Moderators can use the direct remove function, please remove this message through the modify feature.';
 $txt['no_name'] = 'You didn\'t fill the name field out. We can\'t let you without a name, sorry.';

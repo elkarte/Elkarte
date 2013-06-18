@@ -333,21 +333,18 @@ function template_generic_xml_buttons()
 {
 	global $context;
 
+	$tag = empty($context['xml_data']['error']) ? 'button' : 'error';
+
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
 <elk>
-	<buttons>';
-	foreach ($context['xml_data'] as $button)
+	<', $tag, '>';
+	foreach ($context['xml_data'] as $key => $val)
 	{
 		echo '
-		<button>';
-		foreach ($button as $key => $val)
-			echo '
 			<', $key, '><![CDATA[', cleanXml($val), ']]></', $key, '>';
-		echo '
-		</button>';
 	}
 	echo '
-	</buttons>
+	</', $tag, '>
 </elk>';
 }
 
