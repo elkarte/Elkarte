@@ -94,7 +94,8 @@ class Site_Dispatcher
 			// home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// @todo Unless we have a custom home page registered...
+				// Reminder: hooks need to account for multiple mods setting this hook.
+				call_integration_hook('integrate_frontpage', array(&$default_action));
 
 				// was it, wasn't it....
 				if (empty($this->_function_name))
@@ -183,9 +184,9 @@ class Site_Dispatcher
 			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),
 			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
-			'search' => array('Search.controller.php', 'Search_Controller', 'action_plushsearch1'),
-			'search2' => array('Search.controller.php', 'Search_Controller', 'action_plushsearch2'),
-			'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
+			'search' => array('Search.controller.php', 'action_plushsearch1'),
+			'search2' => array('Search.controller.php', 'action_plushsearch2'),
+			// 'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'Suggest_Controller', 'action_suggest'),
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),

@@ -3430,111 +3430,103 @@ tr.windowbg2 .stats_day {
 
 /* Styles for the calendar section.
 ------------------------------------------------- */
-/* @todo - Needs sorting - remove inline css in template. */
+/* Removed css and redundant tags/classes from template. */
+/* Parrots are stoked. Fred happy too. */
 #calendar {
 	overflow: hidden;
-}
-
-/* Used to indicate the current day in the grid. */
-.calendar_today {
-	background: #fff;
-	border: 1px solid #bbb;
-	box-shadow: 0 2px 5px #eee inset;
 }
 #month_grid {
 	padding: 0 15px 0 0;
 	width: 215px;
-	text-align: center;
 	float: left;
-}
-#month_grid .cat_bar {
-	border-radius: 5px 5px 0 0;
-	margin: 0 1px 0 0;
-	padding: 0 0 0 0;
-}
-#month_grid h3 a {
-	padding: 0 6px 0 6px;
-}
-#month_grid table {
-	width: 100%;
-	margin-bottom: 12px;
 }
 #main_grid {
 	position: relative;
 	overflow: hidden;
 }
-#main_grid table {
-	width: 100%;
-	margin-bottom: 2px;
-	padding-bottom: 4px;
+#month_grid .catbg {
+	font-size: 1.1em;
+	text-align: center;
 }
-#main_grid .cat_bar {
-	border-radius: 5px 5px 0 0;
-	margin: 0 1px;
+#main_grid .catbg {
+	font-size: 1.5em;
+	text-align: center;
 }
-#main_grid h3.catbg {
-	padding: 8px 6px 4px 6px;
-}
-#main_grid h3.catbg span {
+#main_grid .catbg .floatleft, #main_grid .catbg .floatright {
 	display: block;
 	font-size: 1.5em;
-	margin: -3px 4px 0 4px;
+	margin: -3px 0 0 0;
 }
-#main_grid table th.days {
-	width: 14%;
-	padding: 4px 0;
-}
-#main_grid table td.weeks {
+.calendar_table {
+	width: 100%;
+	font-size: 0.9em;
 	text-align: center;
+	background: #e4e4e4;
+}
+.calendar_table th, .calendar_table td {
+	padding: 2px 0;
+	background: #fff;
+}
+#month_grid .calendar_table {
+	margin-bottom: 12px;
+	border-top: 1px solid #ddd;
+	border-spacing: 1px;
+	background: #ddd;
+}
+#main_grid .titlebg2, #month_grid .titlebg2 {
+	background: none;
+	font-size: 0.889em;
+}
+#main_grid .titlebg2 {
+	font-size: 1.1em;
+}
+#main_grid .days {
+	width: 14%;
+	padding: 4px;
+}
+#main_grid .windowbg.days {
+	height: 100px;
+}
+/* Used to indicate the current day. */
+#main_grid .calendar_today, #month_grid .calendar_today {
+	border: 1px solid #aaa;
+	background: #ebffd8;
+}
+#main_grid .weeks {
 	font-weight: bold;
 	font-size: 1.8em;
 }
-#main_grid table td.weeks a:hover {
+#main_grid .weeks a:hover {
 	text-decoration: none;
 }
-#main_grid table td.days {
+#main_grid .days {
 	vertical-align: top;
-	text-align: center;
 }
 #main_grid .weekly {
-	text-align: center;
 	font-size: 1.4em;
 }
-/* @todo - Buggy CSS with divider between months. Sort when doing other stuff. */
-#main_grid ul.weeklist, #main_grid ul.weeklist li {
-	margin: 0 0 8px 0;
-	padding: 0;
-	float: left;
-	width: 100%;
+.weeklist {
+	border-bottom: 2px solid #e4e4e4;
+}
+.weeklist>li {
 	overflow: hidden;
+	border: 2px solid #e4e4e4;
+	border-bottom: none;
 }
-#main_grid ul.weeklist li {
-	margin: 0 1px 0 1px;
-	border-top: 2px solid #fff;
-}
-#main_grid .weeklist h4 {
-	text-align: center;
+.weeklist h4 {
 	float: left;
-	width: 10em;
+	width: 140px;
 	font-size: 1.2em;
-	padding: 15px 0;
+	padding: 10px;
+	border-right: 2px solid #e4e4e4;
 }
-#main_grid .weeklist h4 a:hover {
+.weeklist h4 a:hover {
 	text-decoration: none;
-	border-bottom: 1px solid #555;
 }
 /* Use the old one true layout trick here. */
-#main_grid .weeklist .windowbg2 {
-	margin: 0 0 -95px 12em;
+.weeklist .windowbg2, .weeklist .calendar_today {
+	margin: 0 0 -95px 160px;
 	padding: 8px 8px 100px 8px;
-	border-radius: 0;
-	border-left: 2px solid #fff;
-}
-#main_grid .weeklist .calendar_today {
-	margin: 0 0 -95px 12em;
-	padding: 8px 8px 100px 8px;
-	border-left: none;
-	background: #fff;
 }
 .modify_event {
 	color: red;
@@ -3544,30 +3536,15 @@ tr.windowbg2 .stats_day {
 }
 /* Add a background that fits with the calendar. */
 #calendar_navigation {
-	margin: -6px 1px 0 1px;
 	padding: 12px 0;
 	text-align: center;
-	float: left;
-	width: 100%;
-	background: #e7eaef;
+	border: 2px solid #e4e4e4;
+	border-top: none;
 }
 /* Cheat and match this to the submit button. */
-#main_grid .buttonlist {
-	position: absolute;
-	bottom: 12px;
-	right: 12px;
-}
-#main_grid .buttonlist a {
-	background: #cde7ff;
-	border: 1px solid #aaa;
-	border-radius: 3px;
-}
-#main_grid .buttonlist a:hover {
-	background: #dceeff;
-	color: #555;
-}
-.calendar_table {
-	border-spacing: 1px;
+#calendar_navigation .buttonlist {
+	margin: -5px 0;
+	padding: 0 6px;
 }
 
 /* Styles for the memberlist section.

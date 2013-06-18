@@ -29,11 +29,11 @@ function template_main()
 			<div id="main_grid">
 				', $context['view_week'] ? template_show_week_grid('main') : template_show_month_grid('main');
 
-	template_button_strip($context['calendar_buttons'], 'right');
-
 	// Show some controls to allow easy calendar navigation.
 	echo '
-				<form id="calendar_navigation" action="', $scripturl, '?action=calendar" method="post" accept-charset="UTF-8">
+				<form id="calendar_navigation" action="', $scripturl, '?action=calendar" method="post" accept-charset="UTF-8">';
+					template_button_strip($context['calendar_buttons'], 'right');
+	echo '
 					<select name="month">';
 
 	// Show a select box with all the months.
@@ -207,15 +207,15 @@ function template_show_month_grid($grid_name)
 	{
 		echo '
 			<div class="cat_bar">
-				<h3 class="catbg centertext" style="font-size: ', $calendar_data['size'] == 'large' ? 'large' : 'small', ';">';
+				<h3 class="catbg">';
 
 		if (empty($calendar_data['previous_calendar']['disabled']) && $calendar_data['show_next_prev'])
 			echo '
-					<span class="floatleft"><a href="', $calendar_data['previous_calendar']['href'], '">&#171;</a></span>';
+					<a href="', $calendar_data['previous_calendar']['href'], '" class="floatleft">&#171;</a>';
 
 		if (empty($calendar_data['next_calendar']['disabled']) && $calendar_data['show_next_prev'])
 			echo '
-					<span class="floatright"><a href="', $calendar_data['next_calendar']['href'], '">&#187;</a></span>';
+					<a href="', $calendar_data['next_calendar']['href'], '" class="floatright">&#187;</a>';
 
 		if ($calendar_data['show_next_prev'])
 			echo '
@@ -245,7 +245,7 @@ function template_show_month_grid($grid_name)
 		foreach ($calendar_data['week_days'] as $day)
 		{
 			echo '
-						<th class="days" scope="col" ', $calendar_data['size'] == 'small' ? 'style="font-size: x-small;"' : '', '>', !empty($calendar_data['short_day_titles']) ? (Util::substr($txt['days'][$day], 0, 1)) : $txt['days'][$day], '</th>';
+						<th class="days" scope="col">', !empty($calendar_data['short_day_titles']) ? (Util::substr($txt['days'][$day], 0, 1)) : $txt['days'][$day], '</th>';
 		}
 		echo '
 					</tr>';
@@ -271,7 +271,7 @@ function template_show_month_grid($grid_name)
 		{
 			// If this is today, make it a different color and show a border.
 			echo '
-						<td style="height: ', $calendar_data['size'] == 'small' ? '20' : '100', 'px; padding: 2px;', $calendar_data['size'] == 'small' ? 'font-size: x-small;' : '', '" class="', $day['is_today'] ? 'calendar_today' : 'windowbg', ' days">';
+						<td class="', $day['is_today'] ? 'calendar_today' : 'windowbg', ' days">';
 
 			// Skip it if it should be blank - it's not a day if it has no number.
 			if (!empty($day['day']))
@@ -286,18 +286,18 @@ function template_show_month_grid($grid_name)
 
 				// Is this the first day of the week? (and are we showing week numbers?)
 				if ($day['is_first_day'] && $calendar_data['size'] != 'small')
-					echo '<span class="smalltext"> - <a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $day['day'], '">', $txt['calendar_week'], ' ', $week['number'], '</a></span>';
+					echo ' - <a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $day['day'], '">', $txt['calendar_week'], ' ', $week['number'], '</a>';
 
 				// Are there any holidays?
 				if (!empty($day['holidays']))
 					echo '
-							<div class="smalltext holiday">', $txt['calendar_prompt'], ' ', implode(', ', $day['holidays']), '</div>';
+							<div class="holiday">', $txt['calendar_prompt'], ' ', implode(', ', $day['holidays']), '</div>';
 
 				// Show any birthdays...
 				if (!empty($day['birthdays']))
 				{
 					echo '
-							<div class="smalltext">
+							<div>
 								<span class="birthday">', $txt['birthdays'], '</span>';
 
 					/* Each of the birthdays has:
@@ -327,7 +327,7 @@ function template_show_month_grid($grid_name)
 				if (!empty($day['events']))
 				{
 					echo '
-							<div class="smalltext lefttext">
+							<div class="lefttext">
 								<span class="event">', $txt['events'], '</span><br />';
 
 					/* The events are made up of:

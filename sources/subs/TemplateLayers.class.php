@@ -68,6 +68,11 @@ class Template_Layers
 	private $_sorted_layers = null;
 
 	/**
+	 * In case of fatal errors prevents the output of the "below" layers
+	 */
+	private $_prevent_reversing = false;
+
+	/**
 	 * Instance of the class
 	 */
 	private static $_instance = null;
@@ -246,6 +251,9 @@ class Template_Layers
 	 */
 	public function reverseLayers()
 	{
+		if ($this->_prevent_reversing)
+			return array();
+
 		if ($this->_sorted_layers === null)
 			$this->prepareContext();
 
@@ -261,6 +269,11 @@ class Template_Layers
 	public function hasLayers()
 	{
 		return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
+	}
+
+	public function preventReverse()
+	{
+		$this->_prevent_reversing = true;
 	}
 
 	/**
