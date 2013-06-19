@@ -1191,3 +1191,25 @@ function loadRules($reload = false)
 	}
 	$db->free_result($request);
 }
+
+/**
+ * Update PM recipient when they receive or read a new PM
+ *
+ * @param int $id_member
+ * @param $new = false
+ */
+function toggleNewPM($id_member, $new = false)
+{
+	$db = database();
+	
+	$db->query('', '
+		UPDATE {db_prefix}pm_recipients
+		SET is_new = ' . ($new ? '{int:new}' : '{int:not_new}') . '
+		WHERE id_member = {int:current_member}',
+		array(
+			'current_member' => $user_info['id'],
+			'new' => 1,
+			'not_new' => 0
+		)
+	);
+}

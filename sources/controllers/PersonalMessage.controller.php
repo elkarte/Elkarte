@@ -29,16 +29,86 @@ class PersonalMessage_Controller
 {
 	/**
 	 * This is the main function of personal messages, called before the action handler.
-	 * It should set the context, load templates and language file(s), as necessary
-	 * for the function that will be called.
-	 *
-	 * @todo this should be a (pre)dispatcher.
+	 * PersonalMessages is a menu-based controller.
+	 * It sets up the menu. @todo and call from the menu the appropriate method/function
+	 * for the current area.
 	 */
 	function action_index()
 	{
 		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
 
-		$db = database();
+		// Finally all the things we know how to do
+		$subActions = array(
+			'manlabels' => 'action_manlabels',
+			'manrules' => 'action_manrules',
+			'pmactions' => 'action_pmactions',
+			'prune' => 'action_prune',
+			'removeall' => 'action_removeall',
+			'removeall2' => 'action_removeall2',
+			'report' => 'action_report',
+			'search' => 'action_search',
+			'search2' => 'action_search2',
+			'send' => 'action_send',
+			'send2' => 'action_send',
+			'settings' => 'action_settings',
+			'showpmdrafts' => 'action_showpmdrafts',
+		);
+
+		// Known action, go to it, otherwise the inbox for you
+		if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
+			$this->action_folder();
+		else
+		{
+			if (!isset($_REQUEST['xml']))
+				messageIndexBar($_REQUEST['sa']);
+
+			// So it was set - let's go to that action.
+			$this->{$subActions[$_REQUEST['sa']]}();
+		}
+	}
+
+	/**
+	 * This method is executed before any other in this file
+	 * (when the class is loaded by the dispatcher).
+	 * It sets the context, load templates and language file(s), as necessary
+	 * for the function that will be called.
+	 */
+	function pre_dispatch()
+	{
+		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
+
+		// No guests!
+		is_not_guest();
+
+		// You're not supposed to be here at all, if you can't even read PMs.
+		isAllowedTo('pm_read');
+
+		// This file contains the our PM functions such as mark, send, delete
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
+
+		loadLanguage('PersonalMessage+Drafts');
+
+		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
+
+		if (!isset($_REQUEST['xml']))
+			loadTemplate('PersonalMessage');
+
+		// Load up the members maximum message capacity.
+		loadMessageLimit();
+
+		// Prepare the context for the capacity bar.
+		if (!empty($context['message_limit']))
+		{
+			$bar = ($user_info['messages'] * 100) / $context['message_limit'];
+
+			$context['limit_bar'] = array(
+				'messages' => $user_info['messages'],
+				'allowed' => $context['message_limit'],
+				'percent' => $bar,
+				'bar' => min(100, (int) $bar),
+				'text' => sprintf($txt['pm_currently_using'], $user_info['messages'], round($bar, 1)),
+			);
+		}
 
 		// a previous message was sent successfully? show a small indication.
 		if (isset($_GET['done']) && ($_GET['done'] == 'sent'))
@@ -67,15 +137,7 @@ class PersonalMessage_Controller
 
 			applyRules();
 			updateMemberData($user_info['id'], array('new_pm' => 0));
-			$db->query('', '
-				UPDATE {db_prefix}pm_recipients
-				SET is_new = {int:not_new}
-				WHERE id_member = {int:current_member}',
-				array(
-					'current_member' => $user_info['id'],
-					'not_new' => 0,
-				)
-			);
+			toggleNewPM($user_info['id']);
 		}
 
 		// Load the label data.
@@ -126,92 +188,12 @@ class PersonalMessage_Controller
 
 		// Preferences...
 		$context['display_mode'] = $user_settings['pm_prefs'] & 3;
-
-		// Finally all the things we know how to do
-		$subActions = array(
-			'manlabels' => 'action_manlabels',
-			'manrules' => 'action_manrules',
-			'pmactions' => 'action_pmactions',
-			'prune' => 'action_prune',
-			'removeall' => 'action_removeall',
-			'removeall2' => 'action_removeall2',
-			'report' => 'action_report',
-			'search' => 'action_search',
-			'search2' => 'action_search2',
-			'send' => 'action_send',
-			'send2' => 'action_send',
-			'settings' => 'action_settings',
-			'showpmdrafts' => 'action_showpmdrafts',
-		);
-
-		// Known action, go to it, otherwise the inbox for you
-		if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-			$this->action_messagefolder();
-		else
-		{
-			if (!isset($_REQUEST['xml']))
-				messageIndexBar($_REQUEST['sa']);
-
-			// So it was set - let's go to that action.
-			if (is_array($subActions[$_REQUEST['sa']]))
-			{
-				require_once(CONTROLLERDIR . '/' . $subActions[$_REQUEST['sa']][0]);
-				$controller = new $subActions[$_REQUEST['sa']][1]();
-				$controller->{$subActions[$_REQUEST['sa']][2]}();
-			}
-			else
-				$this->{$subActions[$_REQUEST['sa']]}();
-		}
-	}
-
-	/**
-	 * This method is executed before any other in this file
-	 * (when the class is loaded by the dispatcher).
-	 * It sets the context, load templates and language file(s), as necessary
-	 * for the function that will be called.
-	 */
-	function pre_dispatch()
-	{
-		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
-
-		// No guests!
-		is_not_guest();
-
-		// You're not supposed to be here at all, if you can't even read PMs.
-		isAllowedTo('pm_read');
-
-		// This file contains the our PM functions such as mark, send, delete
-		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-
-		loadLanguage('PersonalMessage+Drafts');
-
-		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
-
-		if (!isset($_REQUEST['xml']))
-			loadTemplate('PersonalMessage');
-
-		// Load up the members maximum message capacity.
-		loadMessageLimit();
-
-		// Prepare the context for the capacity bar.
-		if (!empty($context['message_limit']))
-		{
-			$bar = ($user_info['messages'] * 100) / $context['message_limit'];
-
-			$context['limit_bar'] = array(
-				'messages' => $user_info['messages'],
-				'allowed' => $context['message_limit'],
-				'percent' => $bar,
-				'bar' => min(100, (int) $bar),
-				'text' => sprintf($txt['pm_currently_using'], $user_info['messages'], round($bar, 1)),
-			);
-		}
 	}
 
 	/**
 	 * A folder, ie. inbox/sent etc.
 	 */
-	function action_messagefolder()
+	function action_folder()
 	{
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
 		global $messages_request, $user_info, $recipients, $options, $user_settings;
