@@ -1027,7 +1027,7 @@ class Control_Verification_Questions implements Control_Verifications
 			}
 
 			// Do we have enough questions?
-			if (!empty($this->_number_questions) && $this->_number_questions >= count($modSettings['question_id_cache'][$this->_questions_language]))
+			if (!empty($this->_number_questions) && $this->_number_questions <= count($modSettings['question_id_cache'][$this->_questions_language]))
 			{
 				$this->_possible_questions = $modSettings['question_id_cache'][$this->_questions_language];
 				$this->_number_questions = count($this->_possible_questions);
