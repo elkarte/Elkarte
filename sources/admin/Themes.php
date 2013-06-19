@@ -1707,7 +1707,7 @@ class Themes_Controller
 		{
 			// you didn't choose a theme:
 			// we show you all installed themes
-			$this->action_edit_list();
+			$this->_action_edit_list();
 
 			// ugly, but safer :P
 			return;
@@ -1715,7 +1715,7 @@ class Themes_Controller
 		elseif (!isset($_REQUEST['filename']))
 		{
 			// you're browsing around, aren't you
-			$this->action_edit_browse();
+			$this->action_browse();
 			return;
 		}
 
@@ -1733,7 +1733,7 @@ class Themes_Controller
 		// Saving?
 		if (isset($_POST['save']))
 		{
-			$this->action_edit_submit();
+			$this->_action_edit_submit();
 
 			// now lets get out of here!
 			return;
@@ -1744,15 +1744,15 @@ class Themes_Controller
 		// controller functions, which isn't cool. To be refactored.
 		if (substr($_REQUEST['filename'], -4) == '.css')
 		{
-			$this->action_edit_style($theme_dir);
+			$this->_action_edit_style($theme_dir);
 		}
 		elseif (substr($_REQUEST['filename'], -13) == '.template.php')
 		{
-			$this->action_edit_template($theme_dir);
+			$this->_action_edit_template($theme_dir);
 		}
 		else
 		{
-			$this->action_edit_file($theme_dir);
+			$this->_action_edit_file($theme_dir);
 		}
 
 		// Create a special token to allow editing of multiple files.
@@ -1767,7 +1767,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	public function action_edit_style($theme_dir)
+	private function _action_edit_style($theme_dir)
 	{
 		global $context;
 
@@ -1784,7 +1784,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	public function action_edit_template($theme_dir)
+	private function _action_edit_template($theme_dir)
 	{
 		global $context;
 
@@ -1825,7 +1825,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	public function action_edit_file($theme_dir)
+	private function _action_edit_file($theme_dir)
 	{
 		global $context;
 
@@ -1842,7 +1842,7 @@ class Themes_Controller
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
 	 */
-	public function action_edit_submit()
+	private function _action_edit_submit()
 	{
 		global $context;
 
@@ -1981,7 +1981,7 @@ class Themes_Controller
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
 	 */
-	public function action_edit_browse()
+	public function action_browse()
 	{
 		global $context, $scripturl;
 
@@ -2040,7 +2040,7 @@ class Themes_Controller
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
 	 */
-	public function action_edit_list()
+	private function _action_edit_list()
 	{
 		global $context;
 
