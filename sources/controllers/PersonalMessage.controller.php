@@ -890,10 +890,8 @@ class PersonalMessage_Controller
 		// Generate a list of drafts that they can load in to the editor
 		if (!empty($context['drafts_pm_save']))
 		{
-			require_once(CONTROLLERDIR . '/Draft.controller.php');
 			$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
-			$controller = new Draft_Controller();
-			$controller->action_showDrafts($user_info['id'], $pm_seed, 1);
+			prepareDraftsContext($user_info['id'], $pm_seed);
 		}
 
 		// Needed for the WYSIWYG editor.
@@ -957,7 +955,7 @@ class PersonalMessage_Controller
 
 		// PM Drafts enabled and needed?
 		if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
-			require_once(CONTROLLERDIR . '/Draft.controller.php');
+			require_once(SUBSDIR . '/Drafts.subs.php');
 
 		loadLanguage('PersonalMessage', '', false);
 
@@ -3179,4 +3177,48 @@ function messagePostError($named_recipients, $recipient_ids = array())
 
 	// Acquire a new form sequence number.
 	checkSubmitOnce('register');
+}
+
+/**
+ * Loads in a group of PM drafts for the user.
+ * Loads a specific draft for current use in pm editing box if selected.
+ * Used in the posting screens to allow draft selection
+ * Will load a draft if selected is supplied via post
+ *
+ * @param int $member_id
+ * @param int $id_pm = false if set, it will try to load drafts for this id
+ * @return boolean
+ */
+function prepareDraftsContext($member_id, $id_pm = false)
+{
+	global $scripturl, $context, $txt, $modSettings;
+
+	$context['drafts'] = array();
+
+	// Permissions
+	if (empty($member_id))
+		return false;
+
+	// We haz drafts
+	loadLanguage('Drafts');
+	require_once(SUBSDIR . '/Drafts.subs.php');
+
+	// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
+	if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
+		loadDraft((int) $_REQUEST['id_draft'], 1, true, true);
+
+	// load all the drafts for this user that meet the criteria
+	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
+	$order = 'poster_time DESC';
+	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $drafts_keep_days, $order);
+
+	// add them to the context draft array for template display
+	foreach ($user_drafts as $draft)
+	{
+		$context['drafts'][] = array(
+			'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24)),
+			'poster_time' => relativeTime($draft['poster_time']),
+				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
+			);
+	}
 }
