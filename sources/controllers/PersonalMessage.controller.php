@@ -169,8 +169,8 @@ class PersonalMessage_Controller
 			'removeall' => 'action_removemessage',
 			'removeall2' => 'action_removemessage2',
 			'report' => 'action_reportmessage',
-			'search' => array('Search.controller.php','MessageSearch'),
-			'search2' => array('Search.controller.php','MessageSearch2'),
+			'search' => array('Search.controller.php','Search_Controller', 'action_messagesearch'),
+			'search2' => array('Search.controller.php','Search_Controller', 'action_messagesearch2'),
 			'send' => 'action_sendmessage',
 			'send2' => 'action_sendmessage2',
 			'settings' => 'action_messagesettings',
@@ -189,7 +189,8 @@ class PersonalMessage_Controller
 			if (is_array($subActions[$_REQUEST['sa']]))
 			{
 				require_once(CONTROLLERDIR . '/' . $subActions[$_REQUEST['sa']][0]);
-				$subActions[$_REQUEST['sa']][1]();
+				$controller = new $subActions[$_REQUEST['sa']][1]();
+				$controller->{$subActions[$_REQUEST['sa']][2]}();
 			}
 			else
 				$this->{$subActions[$_REQUEST['sa']]}();

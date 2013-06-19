@@ -332,7 +332,7 @@ function attachments_init_dir (&$tree, &$count)
  */
 function processAttachments($id_msg = null)
 {
-	global $context, $modSettings, $txt, $user_info;
+	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -401,7 +401,6 @@ function processAttachments($id_msg = null)
 		$_SESSION['temp_attachments'] = array();
 
 	// Remember where we are at. If it's anywhere at all.
-	//@todo: $topc & $board aren't initialized, probably a bug
 	if (!$ignore_temp)
 		$_SESSION['temp_attachments']['post'] = array(
 			'msg' => !empty($id_msg) ? $id_msg : 0,
@@ -505,7 +504,7 @@ function processAttachments($id_msg = null)
  */
 function attachmentChecks($attachID)
 {
-	global $modSettings, $context;
+	global $modSettings, $context, $attachmentOptions;
 
 	$db = database();
 
@@ -560,7 +559,6 @@ function attachmentChecks($attachID)
 			// Success! However, successes usually come for a price:
 			// we might get a new format for our image...
 			$old_format = $size[2];
-			// @todo: $attachmentOptions not initialized, bug?
 			$size = @getimagesize($attachmentOptions['tmp_name']);
 			if (!(empty($size)) && ($size[2] != $old_format))
 			{
@@ -2048,12 +2046,11 @@ function list_getAttachDirs()
 				}
 		}
 
-		// @todo: $save_errors not initialized, bug?
 		$attachdirs[] = array(
 			'id' => $id,
 			'current' => $id == $modSettings['currentAttachmentUploadDir'],
 			'disable_current' => isset($modSettings['automanage_attachments']) && $modSettings['automanage_attachments'] > 1,
-			'disable_base_dir' =>  $is_base_dir && $sub_dirs > 0 && !empty($files) && empty($error) && empty($save_errors),
+			'disable_base_dir' =>  $is_base_dir && $sub_dirs > 0 && !empty($files) && empty($error),
 			'path' => $dir,
 			'current_size' => !empty($expected_size[$id]) ? comma_format($expected_size[$id] / 1024, 0) : 0,
 			'num_files' => comma_format($expected_files[$id] - $sub_dirs, 0) . ($sub_dirs > 0 ? ' (' . $sub_dirs . ')' : ''),
@@ -2508,4 +2505,146 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 	$db->free_result($request);
 
 	return $size;
+}
+
+/**
+ * This loads an attachment's contextual data including, most importantly, its size if it is an image.
+ * Pre-condition: $attachments array to have been filled with the proper attachment data, as Display() does.
+ * (@todo change this pre-condition, too fragile and error-prone.)
+ * It requires the view_attachments permission to calculate image size.
+ * It attempts to keep the "aspect ratio" of the posted image in line, even if it has to be resized by
+ * the max_image_width and max_image_height settings.
+ *
+ * @param type $id_msg message number to load attachments for
+ * @return array of attachments
+ */
+function loadAttachmentContext($id_msg)
+{
+	global $attachments, $modSettings, $txt, $scripturl, $topic;
+
+	// Set up the attachment info - based on code by Meriadoc.
+	$attachmentData = array();
+	$have_unapproved = false;
+	if (isset($attachments[$id_msg]) && !empty($modSettings['attachmentEnable']))
+	{
+		foreach ($attachments[$id_msg] as $i => $attachment)
+		{
+			$attachmentData[$i] = array(
+				'id' => $attachment['id_attach'],
+				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'])),
+				'downloads' => $attachment['downloads'],
+				'size' => ($attachment['filesize'] < 1024000) ? round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'] : round($attachment['filesize'] / 1024 / 1024, 2) . ' ' . $txt['megabyte'],
+				'byte_size' => $attachment['filesize'],
+				'href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'],
+				'link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename']) . '</a>',
+				'is_image' => !empty($attachment['width']) && !empty($attachment['height']) && !empty($modSettings['attachmentShowImages']),
+				'is_approved' => $attachment['approved'],
+			);
+
+			// If something is unapproved we'll note it so we can sort them.
+			if (!$attachment['approved'])
+				$have_unapproved = true;
+
+			if (!$attachmentData[$i]['is_image'])
+				continue;
+
+			$attachmentData[$i]['real_width'] = $attachment['width'];
+			$attachmentData[$i]['width'] = $attachment['width'];
+			$attachmentData[$i]['real_height'] = $attachment['height'];
+			$attachmentData[$i]['height'] = $attachment['height'];
+
+			// Let's see, do we want thumbs?
+			if (!empty($modSettings['attachmentThumbnails']) && !empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']) && ($attachment['width'] > $modSettings['attachmentThumbWidth'] || $attachment['height'] > $modSettings['attachmentThumbHeight']) && strlen($attachment['filename']) < 249)
+			{
+				// A proper thumb doesn't exist yet? Create one! Or, it needs update.
+				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
+				{
+					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
+
+					require_once(SUBSDIR . '/Attachments.subs.php');
+					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
+				}
+
+				// Only adjust dimensions on successful thumbnail creation.
+				if (!empty($attachment['thumb_width']) && !empty($attachment['thumb_height']))
+				{
+					$attachmentData[$i]['width'] = $attachment['thumb_width'];
+					$attachmentData[$i]['height'] = $attachment['thumb_height'];
+				}
+			}
+
+			if (!empty($attachment['id_thumb']))
+			{
+				$attachmentData[$i]['thumbnail'] = array(
+					'id' => $attachment['id_thumb'],
+					'href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_thumb'] . ';image',
+				);
+			}
+			$attachmentData[$i]['thumbnail']['has_thumb'] = !empty($attachment['id_thumb']);
+
+			// If thumbnails are disabled, check the maximum size of the image.
+			if (!$attachmentData[$i]['thumbnail']['has_thumb'] && ((!empty($modSettings['max_image_width']) && $attachment['width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachment['height'] > $modSettings['max_image_height'])))
+			{
+				if (!empty($modSettings['max_image_width']) && (empty($modSettings['max_image_height']) || $attachment['height'] * $modSettings['max_image_width'] / $attachment['width'] <= $modSettings['max_image_height']))
+				{
+					$attachmentData[$i]['width'] = $modSettings['max_image_width'];
+					$attachmentData[$i]['height'] = floor($attachment['height'] * $modSettings['max_image_width'] / $attachment['width']);
+				}
+				elseif (!empty($modSettings['max_image_width']))
+				{
+					$attachmentData[$i]['width'] = floor($attachment['width'] * $modSettings['max_image_height'] / $attachment['height']);
+					$attachmentData[$i]['height'] = $modSettings['max_image_height'];
+				}
+			}
+			elseif ($attachmentData[$i]['thumbnail']['has_thumb'])
+			{
+				// If the image is too large to show inline, make it a popup.
+				if (((!empty($modSettings['max_image_width']) && $attachmentData[$i]['real_width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachmentData[$i]['real_height'] > $modSettings['max_image_height'])))
+					$attachmentData[$i]['thumbnail']['javascript'] = 'return reqWin(\'' . $attachmentData[$i]['href'] . ';image\', ' . ($attachment['width'] + 20) . ', ' . ($attachment['height'] + 20) . ', true);';
+				else
+					$attachmentData[$i]['thumbnail']['javascript'] = 'return expandThumb(' . $attachment['id_attach'] . ');';
+			}
+
+			if (!$attachmentData[$i]['thumbnail']['has_thumb'])
+				$attachmentData[$i]['downloads']++;
+		}
+	}
+
+	// Do we need to instigate a sort?
+	if ($have_unapproved)
+		usort($attachmentData, 'approved_attach_sort');
+
+	return $attachmentData;
+}
+
+/**
+ * A sort function for putting unapproved attachments first.
+ * @param $a
+ * @param $b
+ * @return int, -1, 0, 1
+ */
+function approved_attach_sort($a, $b)
+{
+	if ($a['is_approved'] == $b['is_approved'])
+		return 0;
+
+	return $a['is_approved'] > $b['is_approved'] ? -1 : 1;
+}
+
+/**
+ * Callback filter for the retrieval of attachments.
+ * This function returns false when:
+ *  - the attachment is unapproved, and
+ *  - the viewer is not the poster of the message where the attachment is
+ *
+ * @param array $attachment_info
+ */
+function filter_accessible_attachment($attachment_info)
+{
+	global $all_posters, $user_info;
+
+	if (!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']))
+		return false;
+
+	return true;
 }

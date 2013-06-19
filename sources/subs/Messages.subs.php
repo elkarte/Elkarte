@@ -900,3 +900,139 @@ function recordReport($message, $poster_comment)
 
 	return $id_report;
 }
+
+/**
+ * Count the new posts for a specific topic
+ * @param int $topic
+ * @param int $topicinfo
+ * @param int $timestamp
+ * @return int
+ */
+function countNewPosts($topic, $topicinfo, $timestamp)
+{
+	global $user_info, $modSettings;
+
+	$db = database();
+	// Find the number of messages posted before said time...
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE poster_time < {int:timestamp}
+			AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts') ? '
+			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
+		array(
+			'current_topic' => $topic,
+			'current_member' => $user_info['id'],
+			'is_approved' => 1,
+			'timestamp' => $timestamp,
+		)
+	);
+	list ($start) = $db->fetch_row($request);
+	$db->free_result($request);
+	return $start;
+}
+
+/**
+ * Find the start value for a specific message.
+ *
+ * @param int $topic
+ * @param int $unapproved_posts
+ * @param int $virtual_msg
+ * @return int
+ */
+function determineStartMessage($topic, $unapproved_posts, $virtual_msg)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE id_msg < {int:virtual_msg}
+			AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $unapproved_posts && !allowedTo('approve_posts') ? '
+			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'virtual_msg' => $virtual_msg,
+			'is_approved' => 1,
+			'no_member' => 0,
+		)
+	);
+	list ($start) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $start;
+}
+
+/**
+ * Loads the details from a message
+ * @param array $msg_selects
+ * @param array $msg_tables
+ * @param array $msg_parameters
+ * @param string $options
+ * @return array
+ */
+function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			m.id_msg, m.icon, m.subject, m.poster_time, m.poster_ip, m.id_member, m.modified_time, m.modified_name, m.body,
+			m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
+			m.id_msg_modified < {int:new_from} AS is_read
+			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
+		FROM {db_prefix}messages as m
+			' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
+		WHERE m.id_msg IN ({array_int:message_list})
+		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
+		$msg_parameters
+	);
+
+	return $request;
+}
+
+/**
+ * Checks, which messages can be removed from a certain member.
+ *
+ * @global type $user_info
+ * @global type $modSettings
+ * @param int $topic
+ * @param array $messages
+ * @param bol $allowed_all
+ * @return array
+ */
+function determineRemovableMessages($topic, $messages, $allowed_all)
+{
+	global $user_info, $modSettings;
+
+	$db = database();
+
+	// Allowed to remove which messages?
+	$request = $db->query('', '
+		SELECT id_msg, subject, id_member, poster_time
+		FROM {db_prefix}messages
+		WHERE id_msg IN ({array_int:message_list})
+			AND id_topic = {int:current_topic}' . (!$allowed_all ? '
+			AND id_member = {int:current_member}' : '') . '
+		LIMIT ' . count($messages),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'message_list' => $messages,
+		)
+	);
+	$messages_list = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
+			continue;
+		$messages_list[$row['id_msg']] = array($row['subject'], $row['id_member']);
+	}
+
+	$db->free_result($request);
+
+	return $messages_list;
+}
