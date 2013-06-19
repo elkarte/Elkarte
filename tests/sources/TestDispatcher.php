@@ -4,26 +4,15 @@ require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(SOURCEDIR . '/Dispatcher.class.php');
 
 /**
- * TestCase class for dispatching
+ * TestCase class for dispatching.
+ * The few tests here test that for the actions known to us,
+ * things can be found, and all expected methods exist.
+ * Potentially useful during refactoring, as it will fail on us and
+ * force to check that all expected subactions are still routed, and
+ * update it.
  */
 class TestDispatcher extends UnitTestCase
 {
-	/**
-	 * prepare some test data, to use in these tests
-	 */
-	function setUp()
-	{
-		// set up some data for testing
-	}
-
-	/**
-	 * cleanup data we no longer need at the end of the tests in this class.
-	 */
-	function tearDown()
-	{
-		// remove useless data
-	}
-
 	/**
 	 * Tests automagical routing to an action
 	 */
@@ -36,6 +25,9 @@ class TestDispatcher extends UnitTestCase
 			'calendar' => array('calendar', 'ical', 'post'),
 			'emailuser' => array('sendtopic', 'email'),
 			'groups' => array('index', 'members', 'requests'),
+			'help' => array('index', 'help'),
+			'topic' => array('lock', 'printpage', 'sticky'),
+			
 		);
 
 		foreach (array_keys($auto_actions) as $action)
@@ -56,6 +48,7 @@ class TestDispatcher extends UnitTestCase
 	function testSaDispatch()
 	{
 		// controller hardcoded, sa action
+		// these are ?action=name routed to SomeController->action_name()
 		$actions = array(
 			'activate' => 'Register',
 			'attachapprove' => 'ModerateAttachments',
@@ -67,6 +60,14 @@ class TestDispatcher extends UnitTestCase
 			'dlattach' => 'Attachment',
 			'findmember' => 'Members',
 			'disregardtopic' => 'Notify',
+			'quickhelp' => 'Help',
+			'login' => 'Auth',
+			'login2' => 'Auth',
+			'logout' => 'Auth',
+			'quotefast' => 'Post',
+			'quickmod' => 'MessageIndex',
+			'quickmod2' => 'Display',
+			
 			
 		);
 
@@ -92,17 +93,10 @@ class TestDispatcher extends UnitTestCase
 		$leftovers = array(
 			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
 			'editpoll2' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll2'),
-			// 'findmember' => array('Members.controller.php', 'Members_Controller', 'action_findmember'),
-			'help' => array('Help.controller.php', 'Help_Controller', 'action_help'),
-			'quickhelp' => array('Help.controller.php', 'Help_Controller', 'action_quickhelp'),
 			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
-			'lock' => array('Topic.controller.php', 'Topic_Controller', 'action_lock'), // done
 			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
-			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
-			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),
-			'logout' => array('Auth.controller.php', 'Auth_Controller', 'action_logout'),
 			'markasread' => array('Markasread.controller.php', 'MarkRead_Controller', 'action_index'),
 			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
 			'memberlist' => array('Memberlist.controller.php', 'Memberlist_Controller', 'action_index'),
@@ -116,11 +110,7 @@ class TestDispatcher extends UnitTestCase
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
-			'printpage' => array('Topic.controller.php', 'Topic_Controller', 'action_printpage'), // done
 			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
-			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
-			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
-			'quickmod2' => array('Display.controller.php', 'Display_Controller', 'action_quickmod2'),
 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
 			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
 			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),
@@ -136,7 +126,6 @@ class TestDispatcher extends UnitTestCase
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'Stats_Controller', 'action_stats'),
-			'sticky' => array('Topic.controller.php', 'Topic_Controller', 'action_sticky'), // done
 			'theme' => array('Themes.php', 'Themes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory.controller.php', 'action_trackip'),
 			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
@@ -152,5 +141,21 @@ class TestDispatcher extends UnitTestCase
 
 		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
 
+	}
+
+	/**
+	 * prepare some test data, to use in these tests
+	 */
+	function setUp()
+	{
+		// set up some data for testing
+	}
+
+	/**
+	 * cleanup data we no longer need at the end of the tests in this class.
+	 */
+	function tearDown()
+	{
+		// remove useless data
 	}
 }
