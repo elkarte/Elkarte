@@ -1789,3 +1789,106 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 
 	return $topic_details;
 }
+
+/**
+ * Remove a batch of messages (or topics)
+ *
+ * @param array $messages
+ * @param array $messageDetails
+ * @param string $type = replies
+ */
+function removeMessages($messages, $messageDetails, $type = 'replies')
+{
+	global $modSettings;
+
+	// @todo something's not right, removeMessage() does check permissions,
+	// removeTopics() doesn't
+	if ($type == 'topics')
+	{
+		removeTopics($messages);
+
+		// and tell the world about it
+		foreach ($messages as $topic)
+		{
+			// Note, only log topic ID in native form if it's not gone forever.
+			logAction('remove', array(
+				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$topic]['board'] ? 'topic' : 'old_topic_id') => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
+		}
+	}
+	else
+	{
+		require_once(SUBSDIR . '/Messages.subs.php');
+		foreach ($messages as $post)
+		{
+			removeMessage($post);
+			logAction('delete', array(
+				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$post]['board'] ? 'topic' : 'old_topic_id') => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
+		}
+	}
+}
+
+/**
+ * Approve a batch of posts (or topics in their own right)
+ *
+ * @param array $messages
+ * @param array $messageDetails
+ * @param (string) $type = replies
+ */
+function approveMessages($messages, $messageDetails, $type = 'replies')
+{
+	if ($type == 'topics')
+	{
+		approveTopics($messages);
+
+		// and tell the world about it
+		foreach ($messages as $topic)
+			logAction('approve_topic', array('topic' => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
+	}
+	else
+	{
+		require_once(SUBSDIR . '/Post.subs.php');
+		approvePosts($messages);
+
+		// and tell the world about it again
+		foreach ($messages as $post)
+			logAction('approve', array('topic' => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
+	}
+}
+
+/**
+ * Approve topics, all we got.
+ *
+ * @param array $topics array of topics ids
+ * @param bool $approve = true
+ */
+function approveTopics($topics, $approve = true)
+{
+	$db = database();
+
+	if (!is_array($topics))
+		$topics = array($topics);
+
+	if (empty($topics))
+		return false;
+
+	$approve_type = $approve ? 0 : 1;
+
+	// Just get the messages to be approved and pass through...
+	$request = $db->query('', '
+		SELECT id_msg
+		FROM {db_prefix}messages
+		WHERE id_topic IN ({array_int:topic_list})
+			AND approved = {int:approve_type}',
+		array(
+			'topic_list' => $topics,
+			'approve_type' => $approve_type,
+		)
+	);
+	$msgs = array();
+	while ($row = $db->fetch_assoc($request))
+		$msgs[] = $row['id_msg'];
+	$db->free_result($request);
+
+	require_once(SUBSDIR . '/Post.subs.php');
+	return approvePosts($msgs, $approve);
+}
