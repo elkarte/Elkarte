@@ -84,188 +84,176 @@ function template_main()
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '
 				<div class="', $message['approved'] ? ($message['alternate'] == 0 ? 'windowbg' : 'windowbg2') : 'approvebg', '">', $message['id'] != $context['first_message'] ? '
-					<a id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a name="new" id="new"></a>' : '') : '', '
-					<div class="post_wrapper">';
+					<a id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a name="new" id="new"></a>' : '') : '';
 
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
 			echo '
-						<div class="poster">', template_build_poster_div($message, $ignoring), '</div>
-						<div class="postarea">';
+					<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>';
 
-		echo '
-							<div class="keyinfo">
-							', (!empty($options['hide_poster_area']) ? '<div class="poster poster2" style="">' .  template_build_poster_div($message, $ignoring) . '</div>' : '');
+			echo '
+					<div class="postarea"', (empty($options['hide_poster_area']) ? '' : ' style="margin:0"'), '>
+						<div class="keyinfo">
+						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' .  template_build_poster_div($message, $ignoring) . '</ul>' : '');
 
 		if (!empty($context['follow_ups'][$message['id']]))
 		{
 			echo '
-								<ul class="follow_ups quickbuttons">
-									<li>', $txt['follow_ups'], '
-										<ul>';
+							<ul class="quickbuttons follow_ups">
+								<li class="listlevel1" aria-haspopup="true">', $txt['follow_ups'], '
+									<ul class="menulevel2">';
 
 				foreach($context['follow_ups'][$message['id']] as $follow_up)
 				{
 					echo '
-											<li><a href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
+										<li class="listlevel2"><a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
 				}
+
 				echo '
-										</ul>
-									</li>
-								</ul>';
+									</ul>
+								</li>
+							</ul>';
 		}
 
 		echo '
-								<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
-								<span id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
-									<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
-								</span>
-								<h5 id="info_', $message['id'], '">
-									<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['time'], '
-								</h5>
-								<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
-							</div>';
+							<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
+							<span id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
+								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
+							</span>
+							<h5 id="info_', $message['id'], '">
+								<a href="', $message['href'], '" rel="nofollow" title="', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['time'], '
+							</h5>
+							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
+						</div>';
 
 		// Ignoring this user? Hide the post.
 		if ($ignoring)
 			echo '
-							<div id="msg_', $message['id'], '_ignored_prompt">
-								', $txt['ignoring_user'], '
-								<a href="#" id="msg_', $message['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
-							</div>';
+						<div id="msg_', $message['id'], '_ignored_prompt">
+							', $txt['ignoring_user'], '
+							<a href="#" id="msg_', $message['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+						</div>';
 
 		// Show the post itself, finally!
-		echo '
-							<div class="post">';
-
 		if (!$message['approved'] && $message['member']['id'] != 0 && $message['member']['id'] == $context['user']['id'])
 			echo '
-								<div class="approve_post">
-									', $txt['post_awaiting_approval'], '
-								</div>';
+						<div class="approve_post">
+							', $txt['post_awaiting_approval'], '
+						</div>';
 
 		echo '
-								<div class="inner" id="msg_', $message['id'], '"', $ignoring ? ' style="display:none;"' : '', '>', $message['body'], '</div>
-							</div>';
+						<div class="inner" id="msg_', $message['id'], '"', $ignoring ? ' style="display:none;"' : '', '>', $message['body'], '</div>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
 			template_display_attachments($message, $ignoring);
-		if (empty($options['hide_poster_area']))
-			echo '
-						</div>';
 
 		// Show the quickbuttons, for various operations on posts.
 		echo '
-						<div class="quickbuttons_wrap"', (empty($options['hide_poster_area']) ? '' : ' style="margin:0"'), '>
-							<ul class="quickbuttons">';
+						<ul class="quickbuttons">';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'] && !empty($message['modified']['name']))
 			echo '
-								<li class="modified" id="modified_', $message['id'], '">
-									', $message['modified']['last_edit_text'], '
-								</li>';
+							<li class="listlevel1 modified" id="modified_', $message['id'], '">
+								', $message['modified']['last_edit_text'], '
+							</li>';
 
 		// Show a checkbox for quick moderation?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
 			echo '
-								<li class="inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
+							<li class="listlevel1 inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
-								<li class="post_options"><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '">', $txt['post_options'], '</a>';
+							<li class="listlevel1 post_options" aria-haspopup="true"><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '" class="linklevel1">', $txt['post_options'], '</a>';
 
 		if ($message['can_modify'] || $message['can_remove'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{
 			// Show them the other options they may have in a nice pulldown
 			echo '
-									<ul>';
+								<ul class="menulevel2">';
 
 			// Can the user modify the contents of this post?
 			if ($message['can_modify'])
 				echo '
-										<li><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '" class="modify_button">', $txt['modify'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '" class="linklevel2 modify_button">', $txt['modify'], '</a></li>';
 
 			// How about... even... remove it entirely?!
 			if ($message['can_remove'])
 				echo '
-										<li><a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="remove_button">', $txt['remove'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=deletemsg;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel2 remove_button">', $txt['remove'], '</a></li>';
 
 			// What about splitting it off the rest of the topic?
 			if ($context['can_split'] && !empty($context['real_num_replies']))
 				echo '
-										<li><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="split_button">', $txt['split'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="linklevel2 split_button">', $txt['split'], '</a></li>';
 
 			// Can we restore topics?
 			if ($context['can_restore_msg'])
 				echo '
-										<li><a href="', $scripturl, '?action=restoretopic;msgs=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="restore_button">', $txt['restore_message'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=restoretopic;msgs=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 restore_button">', $txt['restore_message'], '</a></li>';
 
 			// Maybe we can approve it, maybe we should?
 			if ($message['can_approve'])
 				echo '
-										<li><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="approve_button">', $txt['approve'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 approve_button">', $txt['approve'], '</a></li>';
 
 			// Maybe we can unapprove it?
 			if ($message['can_unapprove'])
 						echo '
-										<li><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="unapprove_button">', $txt['unapprove'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 unapprove_button">', $txt['unapprove'], '</a></li>';
 
 			// Maybe they want to report this post to the moderator(s)?
 			if ($context['can_report_moderator'])
 						echo '
-										<li><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="warn_button">' . $txt['report_to_mod'] . '</a></li>';
+									<li class="listlevel2"><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a></li>';
 
 			// Can they like this post
 			if ($message['can_like'])
 						echo '
-										<li><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="like_button">', $txt['like_post'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 like_button">', $txt['like_post'], '</a></li>';
 			// Or remove the like they made
 			elseif ($message['can_unlike'])
 						echo '
-										<li><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="unlike_button">', $txt['unlike_post'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 unlike_button">', $txt['unlike_post'], '</a></li>';
 
 			echo '
-									</ul>';
+								</ul>';
 		}
 
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
-								</li>
-								<li class="quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
+							</li>
+							<li class="listlevel1 quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
 
 
 		// Can they reply? Have they turned on quick reply?
 		if ($context['can_quote'] && !empty($options['display_quick_reply']))
 			echo '
-								<li class="quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="quote_button">', $txt['quote'], '</a>';
+							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a>';
 		// So... quick reply is off, but they *can* reply?
 		elseif ($context['can_quote'])
 			echo '
-								<li class="quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="quote_button">', $txt['quote'], '</a>';
+							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>';
 
-		// Can they quote to a new topic?
+		// Can they quote to a new topic? @todo - This needs rethinking for gui layout.
 		if ($context['can_follow_up'])
 			echo '
-									<ul>
-										<li><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="quotetonew_button">', $txt['quote_new'], '</a></li>
-									</ul>
-								</li>';
+								<ul class="menulevel2">
+									<li class="listlevel2"><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel2 quotetonew_button">', $txt['quote_new'], '</a></li>
+								</ul>
+							</li>';
 
 		// Has anyone liked this post?
 		if (!empty($message['like_counter']))
 			echo '
-										<li class="quick_edit"><img src="', $settings['images_url'], '/icons/heart.png" alt="', $txt['likes'], '" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="likes">', $message['like_counter'], ' ', $txt['likes'], '</li>';
+							<li class="listlevel1 quick_edit"><img src="', $settings['images_url'], '/icons/heart.png" alt="', $txt['likes'], '" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="likes">', $message['like_counter'], ' ', $txt['likes'], '</li>';
 
 		echo '
-							</ul>
-						</div>';
-
-		echo '
-						<div class="moderatorbar"', (empty($options['hide_poster_area']) ? '' : ' style="margin:0"'), '>';
+						</ul>';
 
 		// Are there any custom profile fields for above the signature?
 		if (!empty($message['member']['custom_fields']))
@@ -280,27 +268,26 @@ function template_main()
 				{
 					$shown = true;
 					echo '
-							<div class="custom_fields_above_signature">
-								<ul class="nolist">';
+						<div class="custom_fields_above_signature">
+							<ul class="nolist">';
 				}
 
 				echo '
-									<li>', $custom['value'], '</li>';
+								<li>', $custom['value'], '</li>';
 			}
 
 			if ($shown)
 				echo '
-								</ul>
-							</div>';
+							</ul>
+						</div>';
 		}
 
 		// Show the member's signature?
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 			echo '
-							<div class="signature" id="msg_', $message['id'], '_signature"', $ignoring ? ' style="display:none;"' : '', '>', $message['member']['signature'], '</div>';
+						<div class="signature" id="msg_', $message['id'], '_signature"', $ignoring ? ' style="display:none;"' : '', '>', $message['member']['signature'], '</div>';
 
 		echo '
-						</div>
 					</div>
 				</div>
 				<hr class="post_separator" />';
@@ -581,18 +568,17 @@ function template_build_poster_div($message, $ignoring)
 
 	// Show information about the poster of this message.
 	$poster_div .= '
-						<ul class="dropmenu">
-							<li>';
+							<li class="listlevel1" aria-haspopup="true">';
 
 	// Show a link to the member's profile.
 	$poster_div .= '
-								<a href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
-									<span class="name">' . $message['member']['name'] . '</span>
+								<a class="linklevel1 name" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
+									' . $message['member']['name'] . '
 								</a>';
 
 	// The new member info dropdown starts here. Note that conditionals have not been fully checked yet.
 	$poster_div .= '
-								<ul class="smalltext" id="msg_' . $message['id'] . '_extra_info"' . ($ignoring ? ' style="display:none;"' : '') . '>';
+								<ul class="menulevel2" id="msg_' . $message['id'] . '_extra_info"' . ($ignoring ? ' style="display:none;"' : ' aria-haspopup="true"') . '>';
 
 	// Don't show these things for guests.
 	if (!$message['member']['is_guest'])
@@ -600,38 +586,38 @@ function template_build_poster_div($message, $ignoring)
 		// Show the post group if and only if they have no other group or the option is on, and they are in a post group.
 		if ((empty($settings['hide_post_group']) || $message['member']['group'] == '') && $message['member']['post_group'] != '')
 			$poster_div .= '
-									<li class="postgroup">' . $message['member']['post_group'] . '</li>';
+									<li class="listlevel2 postgroup">' . $message['member']['post_group'] . '</li>';
 
 		// Show how many posts they have made.
 		if (!isset($context['disabled_fields']['posts']))
 			$poster_div .= '
-									<li class="postcount">' . $txt['member_postcount'] . ': ' . $message['member']['posts'] . '</li>';
+									<li class="listlevel2 postcount">' . $txt['member_postcount'] . ': ' . $message['member']['posts'] . '</li>';
 
 		// Is karma display enabled?  Total or +/-?
 		if ($modSettings['karmaMode'] == '1')
 			$poster_div .= '
-									<li class="karma">' . $modSettings['karmaLabel'] . ' ' . $message['member']['karma']['good'] - $message['member']['karma']['bad'] . '</li>';
+									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' ' . $message['member']['karma']['good'] - $message['member']['karma']['bad'] . '</li>';
 		elseif ($modSettings['karmaMode'] == '2')
 			$poster_div .= '
-									<li class="karma">' . $modSettings['karmaLabel'] . ' +' . $message['member']['karma']['good'] . '/-' . $message['member']['karma']['bad'] . '</li>';
+									<li class="listlevel2 karma">' . $modSettings['karmaLabel'] . ' +' . $message['member']['karma']['good'] . '/-' . $message['member']['karma']['bad'] . '</li>';
 
 		// Is this user allowed to modify this member's karma?
 		if ($message['member']['karma']['allow'])
 			$poster_div .= '
-									<li class="karma_allow">
-										<a href="' . $scripturl . '?action=karma;sa=applaud;uid=' . $message['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>
-										<a href="' . $scripturl . '?action=karma;sa=smite;uid=' . $message['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>
+									<li class="listlevel2 karma_allow">
+										<a class="linklevel2" href="' . $scripturl . '?action=karma;sa=applaud;uid=' . $message['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>
+										<a class="linklevel2" href="' . $scripturl . '?action=karma;sa=smite;uid=' . $message['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>
 									</li>';
 
 		// Show the member's gender icon?
 		if (!empty($settings['show_gender']) && $message['member']['gender']['image'] != '' && !isset($context['disabled_fields']['gender']))
 			$poster_div .= '
-									<li class="gender">' . $txt['gender'] . ': ' . $message['member']['gender']['image'] . '</li>';
+									<li class="listlevel2 gender">' . $txt['gender'] . ': ' . $message['member']['gender']['image'] . '</li>';
 
 		// Show their personal text?
 		if (!empty($settings['show_blurb']) && $message['member']['blurb'] != '')
 			$poster_div .= '
-									<li class="blurb">' . $message['member']['blurb'] . '</li>';
+									<li class="listlevel2 blurb">' . $message['member']['blurb'] . '</li>';
 
 		// Any custom fields to show as icons?
 		if (!empty($message['member']['custom_fields']))
@@ -646,7 +632,7 @@ function template_build_poster_div($message, $ignoring)
 				{
 					$shown = true;
 					$poster_div .= '
-									<li class="cf_icons">
+									<li class="listlevel2 cf_icons">
 										<ol>';
 				}
 
@@ -664,7 +650,7 @@ function template_build_poster_div($message, $ignoring)
 		if ($message['member']['show_profile_buttons'])
 		{
 			$poster_div .= '
-									<li class="profile">
+									<li class="listlevel2 profile">
 										<ol>';
 
 			// Don't show an icon if they haven't specified a website.
@@ -694,30 +680,30 @@ function template_build_poster_div($message, $ignoring)
 			{
 				if (empty($custom['placement']) || empty($custom['value']))
 					$poster_div .= '
-									<li class="custom">' . $custom['title'] . ': ' . $custom['value'] . '</li>';
+									<li class="listlevel2 custom">' . $custom['title'] . ': ' . $custom['value'] . '</li>';
 			}
 		}
 	}
 	// Otherwise, show the guest's email.
 	elseif (!empty($message['member']['email']) && in_array($message['member']['show_email'], array('yes' . 'yes_permission_override' . 'no_through_forum')) && $context['can_send_email'])
 		$poster_div .= '
-									<li class="email"><a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
+									<li class="listlevel2 email"><a class="linklevel2" href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
 
 	// Stuff for the staff to wallop them with.
 	$poster_div .= '
-									<li class="report_seperator"></li>';
+									<li class="listlevel2 report_seperator"></li>';
 
 	// Can we issue a warning because of this post?  Remember, we can't give guests warnings.
 	if ($context['can_issue_warning'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 	{
 		$poster_div .= '
-									<li class="warning">
-										<a href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . ';msg=' . $message['id'] . '"><img src="' . $settings['images_url'] . '/profile/warn.png" alt="' . $txt['issue_warning_post'] . '" title="' . $txt['issue_warning_post'] . '" />' . $txt['warning_issue'] . '</a>';
+									<li class="listlevel2 warning">
+										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . ';msg=' . $message['id'] . '"><img src="' . $settings['images_url'] . '/profile/warn.png" alt="' . $txt['issue_warning_post'] . '" title="' . $txt['issue_warning_post'] . '" />' . $txt['warning_issue'] . '</a>';
 
 		// Do they have a warning in place?
 		if ($message['member']['can_see_warning'] && !empty($options['hide_poster_area']))
 			$poster_div .= '
-										<a href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '"><img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" /><span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></a>';
+										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '"><img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" /><span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></a>';
 
 		$poster_div .= '
 									</li>';
@@ -726,19 +712,19 @@ function template_build_poster_div($message, $ignoring)
 	// Show the IP to this user for this post - because you can moderate?
 	if (!empty($context['can_moderate_forum']) && !empty($message['member']['ip']))
 		$poster_div .= '
-									<li class="poster_ip"><a href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '" class="help"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a><a href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></li>';
+									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a><a href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></li>';
 	// Or, should we show it because this is you?
 	elseif ($message['can_see_ip'])
 		$poster_div .= '
-									<li class="poster_ip"><a href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a></li>';
+									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a></li>';
 	// Okay, are you at least logged in?  Then we can show something about why IPs are logged...
 	elseif (!$context['user']['is_guest'])
 		$poster_div .= '
-									<li class="poster_ip"><a href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);" class="help">' . $txt['logged'] . '</a></li>';
+									<li class="listlevel2 poster_ip"><a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);">' . $txt['logged'] . '</a></li>';
 	// Otherwise, you see NOTHING!
 	else
 		$poster_div .= '
-									<li class="poster_ip">' . $txt['logged'] . '</li>';
+									<li class="listlevel2 poster_ip">' . $txt['logged'] . '</li>';
 
 	// Done with the detail information about the poster.
 	$poster_div .= '
@@ -750,8 +736,8 @@ function template_build_poster_div($message, $ignoring)
 	{
 		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && empty($options['hide_poster_area']) && !empty($message['member']['avatar']['image']))
 		$poster_div .= '
-							<li class="avatar">
-								<a href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
+							<li class="listlevel1 avatar">
+								<a class="linklevel1" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
 									' . $message['member']['avatar']['image'] . '
 								</a>
 							</li>';
@@ -760,17 +746,17 @@ function template_build_poster_div($message, $ignoring)
 		// Show the post group icons, but not for guests.
 		if (!$message['member']['is_guest'])
 			$poster_div .= '
-								<li class="icons">' . $message['member']['group_icons'] . '</li>';
+							<li class="listlevel1 icons">' . $message['member']['group_icons'] . '</li>';
 
 		// Show the member's primary group (like 'Administrator') if they have one.
 		if (!empty($message['member']['group']))
 			$poster_div .= '
-								<li class="membergroup">' . $message['member']['group'] . '</li>';
+							<li class="listlevel1 membergroup">' . $message['member']['group'] . '</li>';
 
 		// Show the member's custom title, if they have one.
 		if (!empty($message['member']['title']))
 			$poster_div .= '
-								<li class="title">' . $message['member']['title'] . '</li>';
+							<li class="listlevel1 title">' . $message['member']['title'] . '</li>';
 
 		// Show online and offline buttons? PHP could do with a little bit of cleaning up here for brevity, but it works.
 		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
@@ -779,29 +765,26 @@ function template_build_poster_div($message, $ignoring)
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
 			$poster_div .= '
-								<li class="poster_online"><a href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '[<strong>'. $context['user']['unread_messages'] . '</strong>]' : '')  . '</a></li>';
+							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '[<strong>'. $context['user']['unread_messages'] . '</strong>]' : '')  . '</a></li>';
 		}
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{
 			if (!empty($modSettings['onlineEnable']))
 				$poster_div .= '
-								<li class="poster_online"><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
+							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
 			else
 				$poster_div .= '
-								<li class="poster_online"><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a></li>';
+							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a></li>';
 		}
 		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']))
 			$poster_div .= '
-								<li class="poster_online">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></li>';
+							<li class="listlevel1 poster_online">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></li>';
 
 		// Are we showing the warning status?
 		if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
 			$poster_div .= '
-								<li class="warning">' . ($context['can_issue_warning'] ? '<a href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" />' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
+							<li class="listlevel1 warning">' . ($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" />' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
 	}
-
-	$poster_div .= '
-					</ul>';
 
 	return $poster_div;
 }
