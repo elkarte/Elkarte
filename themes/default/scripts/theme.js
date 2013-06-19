@@ -17,9 +17,9 @@
 $(document).ready(function() {
 	// menu drop downs
 	if (use_click_menu)
-		$('.dropmenu, ul.quickbuttons').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}});
+		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}});
  	else
-		$('.dropmenu, ul.quickbuttons').superfish({delay : 300, speed: 175});
+		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons').superfish({delay : 300, speed: 175});
 
 	// Smooth scroll navigation
 	$('.topbottom').bind('click', function(event) {
