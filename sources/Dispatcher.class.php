@@ -83,7 +83,7 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
+		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'quickhelp', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
 			$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
 			$this->_controller_name = 'Auth_Controller';
