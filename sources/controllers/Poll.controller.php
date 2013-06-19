@@ -13,17 +13,16 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains the functions for voting, locking, removing and
- * editing polls. Note that that posting polls is done in
- * Post.controller.php.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Poll Controller
+ * Poll Controller.
+ * This receives requests for voting, locking, removing and
+ * editing polls. Note that that posting polls is done in
+ * Post.controller.php.
  */
 class Poll_Controller
 {

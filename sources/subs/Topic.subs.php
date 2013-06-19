@@ -1349,7 +1349,7 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}messages
-		WHERE id_msg < {int:id_msg}
+		WHERE id_msg ' . ($include_current ? '<=' : '<') . ' {int:id_msg}
 			AND id_topic = {int:current_topic}' . ($only_approved ? '
 			AND (approved = {int:is_approved}' . ($include_own ? '
 			OR id_member = {int:current_member}' : '') . ')' : ''),

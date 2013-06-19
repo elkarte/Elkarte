@@ -13,15 +13,13 @@
  *
  * @version 1.0 Alpha
  *
- * This file's job is to handle things related to post moderation.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Post Moderation Controller
+ * PostModeration Controller handles post moderation actions. (approvals, unapprovals)
  */
 class PostModeration_Controller
 {
