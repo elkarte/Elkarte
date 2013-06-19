@@ -81,6 +81,9 @@ class Emailuser_Controller extends Action_Controller
 		// Sending yet, or just getting prepped?
 		if (empty($_POST['send']))
 		{
+			// No errors, yet.
+			$sendtopic_errors = error_context::context('sendtopic', 1);
+
 			$context['page_title'] = sprintf($txt['sendtopic_title'], $row['subject']);
 			$context['start'] = $_REQUEST['start'];
 
