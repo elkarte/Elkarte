@@ -83,7 +83,7 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'mailq', 'verificationcode', 'openidreturn'))))
+		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'quickhelp', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
 			$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
 			$this->_controller_name = 'Auth_Controller';
@@ -184,8 +184,8 @@ class Site_Dispatcher
 			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),
 			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
-			'search' => array('Search.controller.php', 'action_plushsearch1'),
-			'search2' => array('Search.controller.php', 'action_plushsearch2'),
+			'search' => array('Search.controller.php', 'Search_Controller', 'action_plushsearch1'),
+			'search2' => array('Search.controller.php', 'Search_Controller', 'action_plushsearch2'),
 			// 'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'Suggest_Controller', 'action_suggest'),
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),

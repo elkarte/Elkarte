@@ -357,7 +357,8 @@ function template_results()
 					<div class="roundframe">', $txt['find_no_results'], '</div>';
 
 		// while we have results to show ...
-		while ($topic = $context['get_topics']())
+		$controller = $context['get_topics'][0];
+		while ($topic = $controller->{$context['get_topics'][1]}())
 		{
 			$color_class = '';
 			// Locked and Sticky
@@ -486,7 +487,9 @@ function template_results()
 			echo '
 				<div class="information">(', $txt['search_no_results'], ')</div>';
 
-		while ($topic = $context['get_topics']())
+		// while we have some results...
+		$controller = $context['get_topics'][0];
+		while ($topic = $controller->{$context['get_topics'][1]}())
 		{
 			foreach ($topic['matches'] as $message)
 			{
