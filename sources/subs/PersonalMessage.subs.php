@@ -1038,3 +1038,156 @@ function pmCount($id_member, $time)
 
 	return $pmCount;
 }
+
+/**
+ * This will apply rules to all unread messages.
+ * If all_messages is set will, clearly, do it to all!
+ *
+ * @param bool $all_messages = false
+ */
+function applyRules($all_messages = false)
+{
+	global $user_info, $context, $options;
+
+	$db = database();
+
+	// Want this - duh!
+	loadRules();
+
+	// No rules?
+	if (empty($context['rules']))
+		return;
+
+	// Just unread ones?
+	$ruleQuery = $all_messages ? '' : ' AND pmr.is_new = 1';
+
+	// @todo Apply all should have timeout protection!
+	// Get all the messages that match this.
+	$request = $db->query('', '
+		SELECT
+			pmr.id_pm, pm.id_member_from, pm.subject, pm.body, mem.id_group, pmr.labels
+		FROM {db_prefix}pm_recipients AS pmr
+			INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = pm.id_member_from)
+		WHERE pmr.id_member = {int:current_member}
+			AND pmr.deleted = {int:not_deleted}
+			' . $ruleQuery,
+		array(
+			'current_member' => $user_info['id'],
+			'not_deleted' => 0,
+		)
+	);
+	$actions = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		foreach ($context['rules'] as $rule)
+		{
+			$match = false;
+
+			// Loop through all the criteria hoping to make a match.
+			foreach ($rule['criteria'] as $criterium)
+			{
+				if (($criterium['t'] == 'mid' && $criterium['v'] == $row['id_member_from']) || ($criterium['t'] == 'gid' && $criterium['v'] == $row['id_group']) || ($criterium['t'] == 'sub' && strpos($row['subject'], $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($row['body'], $criterium['v']) !== false))
+					$match = true;
+				// If we're adding and one criteria don't match then we stop!
+				elseif ($rule['logic'] == 'and')
+				{
+					$match = false;
+					break;
+				}
+			}
+
+			// If we have a match the rule must be true - act!
+			if ($match)
+			{
+				if ($rule['delete'])
+					$actions['deletes'][] = $row['id_pm'];
+				else
+				{
+					foreach ($rule['actions'] as $ruleAction)
+					{
+						if ($ruleAction['t'] == 'lab')
+						{
+							// Get a basic pot started!
+							if (!isset($actions['labels'][$row['id_pm']]))
+								$actions['labels'][$row['id_pm']] = empty($row['labels']) ? array() : explode(',', $row['labels']);
+							$actions['labels'][$row['id_pm']][] = $ruleAction['v'];
+						}
+					}
+				}
+			}
+		}
+	}
+	$db->free_result($request);
+
+	// Deletes are easy!
+	if (!empty($actions['deletes']))
+		deleteMessages($actions['deletes']);
+
+	// Relabel?
+	if (!empty($actions['labels']))
+	{
+		foreach ($actions['labels'] as $pm => $labels)
+		{
+			// Quickly check each label is valid!
+			$realLabels = array();
+			foreach ($context['labels'] as $label)
+				if (in_array($label['id'], $labels) && ($label['id'] != -1 || empty($options['pm_remove_inbox_label'])))
+					$realLabels[] = $label['id'];
+
+			$db->query('', '
+				UPDATE {db_prefix}pm_recipients
+				SET labels = {string:new_labels}
+				WHERE id_pm = {int:id_pm}
+					AND id_member = {int:current_member}',
+				array(
+					'current_member' => $user_info['id'],
+					'id_pm' => $pm,
+					'new_labels' => empty($realLabels) ? '' : implode(',', $realLabels),
+				)
+			);
+		}
+	}
+}
+
+/**
+ * Load up all the rules for the current user.
+ *
+ * @param bool $reload = false
+ */
+function loadRules($reload = false)
+{
+	global $user_info, $context;
+
+	$db = database();
+
+	if (isset($context['rules']) && !$reload)
+		return;
+
+	$request = $db->query('', '
+		SELECT
+			id_rule, rule_name, criteria, actions, delete_pm, is_or
+		FROM {db_prefix}pm_rules
+		WHERE id_member = {int:current_member}',
+		array(
+			'current_member' => $user_info['id'],
+		)
+	);
+	$context['rules'] = array();
+	// Simply fill in the data!
+	while ($row = $db->fetch_assoc($request))
+	{
+		$context['rules'][$row['id_rule']] = array(
+			'id' => $row['id_rule'],
+			'name' => $row['rule_name'],
+			'criteria' => unserialize($row['criteria']),
+			'actions' => unserialize($row['actions']),
+			'delete' => $row['delete_pm'],
+			'logic' => $row['is_or'] ? 'or' : 'and',
+		);
+
+		if ($row['delete_pm'])
+			$context['rules'][$row['id_rule']]['actions'][] = array('t' => 'del', 'v' => 1);
+	}
+	$db->free_result($request);
+}

@@ -933,7 +933,7 @@ class Post_Controller
 	function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context, $user_settings;
-		global $user_info, $board_info, $options, $scripturl, $settings;
+		global $user_info, $board_info, $options, $scripturl, $settings, $ignore_temp;
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))

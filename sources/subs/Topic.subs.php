@@ -1330,6 +1330,43 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 }
 
 /**
+ * Returns how many messages are in a topic before the specified message id.
+ * Used in display to compute the start value for a specific message.
+ *
+ * @param int $id_topic
+ * @param int $id_msg
+ * @param bool $include_current = false
+ * @param bool $only_approved = false
+ * @param bool $include_own = false
+ * @return int
+ */
+function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only_approved = false, $include_own = false)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE id_msg < {int:id_msg}
+			AND id_topic = {int:current_topic}' . ($only_approved ? '
+			AND (approved = {int:is_approved}' . ($include_own ? '
+			OR id_member = {int:current_member}' : '') . ')' : ''),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $id_topic,
+			'id_msg' => $id_msg,
+			'is_approved' => 1,
+		)
+	);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $count;
+}
+
+/**
  * Retrieve a few data on a particular message.
  * Slightly different from basicMessageInfo, this one inner joins {db_prefix}topics
  * and doesn't use {query_see_board}
@@ -1705,4 +1742,50 @@ function topicsList($topic_ids)
 	$db->free_result($result);
 
 	return $topics;
+}
+
+/**
+ * Get each post and poster in this topic and take care of user settings such as
+ * limit or sort direction.
+ *
+ * @param int $topic
+ * @param array $limit
+ * @param string $sort
+ * @return array
+ */
+function getTopicsPostsAndPoster($topic, $limit, $sort)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$topic_details = array(
+		'messages' => array(),
+		'all_posters' => array(),
+	);
+
+	$request = $db->query('display_get_post_poster', '
+		SELECT id_msg, id_member, approved
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : (!empty($modSettings['db_mysql_group_by_fix']) ? '' : '
+		GROUP BY id_msg') . '
+		HAVING (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
+		ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
+		LIMIT ' . $limit['start'] . ', ' . $limit['offset']),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'is_approved' => 1,
+			'blank_id_member' => 0,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!empty($row['id_member']))
+			$topic_details['all_posters'][$row['id_msg']] = $row['id_member'];
+			$topic_details['messages'][] = $row['id_msg'];
+	}
+	$db->free_result($request);
+
+	return $topic_details;
 }
