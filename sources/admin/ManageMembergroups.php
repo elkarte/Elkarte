@@ -62,7 +62,7 @@ class ManageMembergroups_Controller
 				'permission' => 'manage_membergroups'),
 			'members' => array(
 				'controller' => 'Groups_Controller',
-				'function' => 'action_groupmembers',
+				'function' => 'action_members',
 				'permission' => 'manage_membergroups',
 				'file' => 'Groups.controller.php',
 				'dir' => CONTROLLERDIR),
