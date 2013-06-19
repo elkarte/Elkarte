@@ -28,7 +28,7 @@ class TestDispatcher extends UnitTestCase
 			'help' => array('index', 'help'),
 			'topic' => array('lock', 'printpage', 'sticky'),
 			'profile' => array('index'),
-			
+			'reminder' => array('picktype', 'secret2', 'setpassword', 'setpassword2'),
 		);
 
 		foreach (array_keys($auto_actions) as $action)
@@ -68,7 +68,7 @@ class TestDispatcher extends UnitTestCase
 			'quotefast' => 'Post',
 			'quickmod' => 'MessageIndex',
 			'quickmod2' => 'Display',
-			
+			'openidreturn' => 'OpenID',
 			
 		);
 
@@ -107,14 +107,12 @@ class TestDispatcher extends UnitTestCase
 			'movetopic2' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic2'),
 			'notify' => array('Notify.controller.php', 'Notify_Controller', 'action_notify'),
 			'notifyboard' => array('Notify.controller.php', 'Notify_Controller', 'action_notifyboard'),
-			'openidreturn' => array('OpenID.subs.php', 'action_openidreturn'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
 			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
 			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),
-			// 'reminder' => array('Reminder.controller.php', ''),
 			'removepoll' => array('Poll.controller.php', 'Poll_Controller', 'action_removepoll'),
 			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),

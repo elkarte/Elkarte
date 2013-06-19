@@ -167,7 +167,7 @@ class Site_Dispatcher
 			'movetopic2' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic2'),
 			'notify' => array('Notify.controller.php', 'Notify_Controller', 'action_notify'),
 			'notifyboard' => array('Notify.controller.php', 'Notify_Controller', 'action_notifyboard'),
-			'openidreturn' => array('OpenID.subs.php', 'action_openidreturn'),
+			'openidreturn' => array('OpenID.controller.php', 'OpenID_Controller', 'action_openidreturn'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
