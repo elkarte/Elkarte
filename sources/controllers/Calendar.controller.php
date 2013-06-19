@@ -23,6 +23,15 @@ if (!defined('ELKARTE'))
 class Calendar_Controller
 {
 	/**
+	 * Default action handler for requests on the calendar
+	 */
+	public function action_index()
+	{
+		// when you don't know what you're doing... we know! :P
+		$this->action_calendar();
+	}
+	
+	/**
 	 * Show the calendar.
 	 * It loads the specified month's events, holidays, and birthdays.
 	 * It requires the calendar_view permission.
@@ -38,15 +47,6 @@ class Calendar_Controller
 
 		// Permissions, permissions, permissions.
 		isAllowedTo('calendar_view');
-
-		// Doing something other than calendar viewing?
-		$subActions = array(
-			'ical' => 'action_ical',
-			'post' => 'action_event_post',
-		);
-
-		if (isset($_GET['sa']) && isset($subActions[$_GET['sa']]))
-			return $this->{$subActions[$_GET['sa']]}();
 
 		// This is gonna be needed...
 		loadTemplate('Calendar');
@@ -175,12 +175,15 @@ class Calendar_Controller
 	 * It uses the event_post sub template in the Calendar template.
 	 * It is accessed with ?action=calendar;sa=post.
 	 */
-	public function action_event_post()
+	public function action_post()
 	{
 		global $context, $txt, $user_info, $scripturl;
 		global $modSettings, $topic;
 
-		// Well - can they?
+		// You need to view what you're doing :P
+		isAllowedTo('calendar_view');
+
+		// Well - can they post?
 		isAllowedTo('calendar_post');
 
 		// We need this for all kinds of useful functions.
@@ -337,6 +340,9 @@ class Calendar_Controller
 	public function action_ical()
 	{
 		global $forum_version, $modSettings, $webmaster_email, $mbname;
+
+		// What do you think you export?
+		isAllowedTo('calendar_view');
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))

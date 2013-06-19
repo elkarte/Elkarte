@@ -133,10 +133,10 @@ class Site_Dispatcher
 		$actionArray = array(
 			'activate' => array('Register.controller.php', 'Register_Controller', 'action_activate'),
 			'admin' => array('Admin.php', 'AdminMain'),
-			'announce' => array('Announce.controller.php', 'Announce_Controller', 'action_index'),
+			// 'announce' => array('Announce.controller.php', 'Announce_Controller', 'action_index'),
 			'attachapprove' => array('ModerateAttachments.controller.php', 'ModerateAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members.controller.php', 'Members_Controller', 'action_buddy'),
-			'calendar' => array('Calendar.controller.php', 'Calendar_Controller', 'action_calendar'),
+			// 'calendar' => array('Calendar.controller.php', 'Calendar_Controller', 'action_calendar'),
 			'collapse' => array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_collapse'),
 			'contact' => array('Register.controller.php', 'Register_Controller', 'action_contact'),
 			'coppa' => array('Register.controller.php', 'Register_Controller', 'action_coppa'),
@@ -145,7 +145,7 @@ class Site_Dispatcher
 			'disregardtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_disregardtopic'),
 			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
 			'editpoll2' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll2'),
-			'emailuser' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_emailuser'),
+			// 'emailuser' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_emailuser'),
 			'findmember' => array('Members.controller.php', 'Members_Controller', 'action_findmember'),
 			'groups' => array('Groups.controller.php', 'Groups_Controller', 'action_groups'),
 			'help' => array('Help.controller.php', 'Help_Controller', 'action_help'),
@@ -153,7 +153,7 @@ class Site_Dispatcher
 			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
-			'lock' => array('Topic.controller.php', 'Topic_Controller', 'action_lock'), // done
+			// 'lock' => array('Topic.controller.php', 'Topic_Controller', 'action_lock'), // done
 			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
 			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
 			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),

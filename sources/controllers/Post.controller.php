@@ -253,7 +253,7 @@ class Post_Controller
 				{
 					require_once(CONTROLLERDIR . '/Calendar.controller.php');
 					$controller = new Calendar_Controller();
-					return $controller->action_event_post();
+					return $controller->action_post();
 				}
 
 				// Get the current event information.
