@@ -49,14 +49,18 @@ class PersonalMessage_Controller
 			'search' => 'action_search',
 			'search2' => 'action_search2',
 			'send' => 'action_send',
-			'send2' => 'action_send',
+			'send2' => 'action_send2',
 			'settings' => 'action_settings',
 			'showpmdrafts' => 'action_showpmdrafts',
 		);
 
 		// Known action, go to it, otherwise the inbox for you
 		if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
+		{
+			// Set the index bar
+			messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
 			$this->action_folder();
+		}
 		else
 		{
 			if (!isset($_REQUEST['xml']))
@@ -224,9 +228,6 @@ class PersonalMessage_Controller
 
 		$labelQuery = $context['folder'] != 'sent' ? '
 				AND FIND_IN_SET(' . $context['current_label_id'] . ', pmr.labels) != 0' : '';
-
-		// Set the index bar correct!
-		messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
 
 		// They didn't pick a sort, use the forum default.
 		if (!isset($_GET['sort']))
@@ -935,23 +936,14 @@ class PersonalMessage_Controller
 	 */
 	function action_showpmdrafts()
 	{
-		global $user_info;
-
-		// validate with loadMemberData()
-		$memberResult = loadMemberData($user_info['id'], false);
-
-		if (!is_array($memberResult))
-			fatal_lang_error('not_a_user', false);
-		list ($memID) = $memberResult;
-
-		// drafts is where the functions reside
+		// @todo the file/method to pass control to should be listed in the menu
 		require_once(CONTROLLERDIR . '/Draft.controller.php');
 		$controller = new Draft_Controller();
-		$controller->action_showPMDrafts($memID);
+		$controller->action_showPMDrafts();
 	}
 
 	/**
-	 * Actually send a personal message.
+	 * Send a personal message.
 	 */
 	function action_send2()
 	{
