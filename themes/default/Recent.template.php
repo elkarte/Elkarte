@@ -30,6 +30,7 @@ function template_main()
 			</div>';
 	template_pagesection(false, false, 'go_down');
 
+	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
 	{
 		echo '
@@ -44,33 +45,31 @@ function template_main()
 
 		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 			echo '
-					<div class="quickbuttons_wrap">
-						<ul class="smalltext quickbuttons">';
+					<ul class="quickbuttons">';
 
 		// If they *can* reply?
 		if ($post['can_reply'])
 			echo '
-							<li><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="reply_button"><span>', $txt['reply'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 reply_button"><span>', $txt['reply'], '</span></a></li>';
 
 		// If they *can* quote?
 		if ($post['can_quote'])
 			echo '
-							<li><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="quote_button"><span>', $txt['quote'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button"><span>', $txt['quote'], '</span></a></li>';
 
 		// Can we request notification of topics?
 		if ($post['can_mark_notify'])
 			echo '
-							<li><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="notify_button"><span>', $txt['notify'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 notify_button"><span>', $txt['notify'], '</span></a></li>';
 
 		// How about... even... remove it entirely?!
 		if ($post['can_delete'])
 			echo '
-							<li><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';recent;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="remove_button"><span>', $txt['remove'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';recent;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button"><span>', $txt['remove'], '</span></a></li>';
 
 		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 			echo '
-						</ul>
-					</div>';
+					</ul>';
 
 		echo '
 				</div>
@@ -301,7 +300,7 @@ function template_replies()
 			if (strpos($topic['class'], 'sticky') !== false)
 				$color_class = 'stickybg';
 			if (strpos($topic['class'], 'locked') !== false)
-				$color_class .= 'lockedbg';
+				$color_class = !empty($color_class) ? 'stickybg locked_sticky' : 'lockedbg';
 
 			$color_class2 = !empty($color_class) ? $color_class . '2' : '';
 
