@@ -27,6 +27,7 @@ class TestDispatcher extends UnitTestCase
 			'groups' => array('index', 'members', 'requests'),
 			'help' => array('index', 'help'),
 			'topic' => array('lock', 'printpage', 'sticky'),
+			'profile' => array('index'),
 			
 		);
 
@@ -110,7 +111,6 @@ class TestDispatcher extends UnitTestCase
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
-			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
 			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
 			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),

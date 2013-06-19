@@ -172,7 +172,7 @@ class Site_Dispatcher
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
 			// 'printpage' => array('Topic.controller.php', 'Topic_Controller', 'action_printpage'), // done
-			'profile' => array('Profile.controller.php', 'action_modifyprofile'),
+			'profile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
 			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
 			'quickmod2' => array('Display.controller.php', 'Display_Controller', 'action_quickmod2'),
@@ -197,7 +197,7 @@ class Site_Dispatcher
 			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
 			'unreadreplies' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
 			'verificationcode' => array('Register.controller.php', 'Register_Controller', 'action_verificationcode'),
-			'viewprofile' => array('Profile.controller.php', 'action_modifyprofile'),
+			'viewprofile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
 			'vote' => array('Poll.controller.php', 'Poll_Controller', 'action_vote'),
 			'viewquery' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewquery'),
 			'viewadminfile' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewadminfile'),
