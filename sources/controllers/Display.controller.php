@@ -194,7 +194,10 @@ class Display_Controller
 				elseif (!$topicinfo['unapproved_posts'] && $virtual_msg <= $topicinfo['id_first_msg'])
 					$context['start_from'] = 0;
 				else
-					$context['start_from'] = determineStartMessage($topic, $topicinfo['unapproved_posts'], $virtual_msg);
+				{
+					$only_approved = $modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts');
+					$context['start_from'] = countMessagesBefore($topic, $virtual_msg, false, $only_approved, !$user_info['is_guest']);
+				}
 
 				// We need to reverse the start as well in this case.
 				$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;

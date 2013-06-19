@@ -933,40 +933,6 @@ function countNewPosts($topic, $topicinfo, $timestamp)
 }
 
 /**
- * Find the start value for a specific message.
- *
- * @param int $topic
- * @param int $unapproved_posts
- * @param int $virtual_msg
- * @return int
- */
-function determineStartMessage($topic, $unapproved_posts, $virtual_msg)
-{
-	global $modSettings, $user_info;
-
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}messages
-		WHERE id_msg < {int:virtual_msg}
-			AND id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && $unapproved_posts && !allowedTo('approve_posts') ? '
-			AND (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')' : ''),
-		array(
-			'current_member' => $user_info['id'],
-			'current_topic' => $topic,
-			'virtual_msg' => $virtual_msg,
-			'is_approved' => 1,
-			'no_member' => 0,
-		)
-	);
-	list ($start) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $start;
-}
-
-/**
  * Loads the details from a message
  * @param array $msg_selects
  * @param array $msg_tables
