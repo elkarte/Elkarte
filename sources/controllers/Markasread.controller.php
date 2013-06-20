@@ -61,7 +61,7 @@ class MarkRead_Controller
 	 */
 	public function action_index_api()
 	{
-		global $context, $txt;
+		global $context, $txt, $user_info;
 
 		loadTemplate('Xml');
 
