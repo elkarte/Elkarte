@@ -5,14 +5,29 @@ define('TESTDIR', dirname(__FILE__) . '/');
 require_once('simpletest/autorun.php');
 
 // SSI mode should work for most tests. (core and subs)
-// For web tester tests, it should not be necessary.
+// For web tester tests, it should not be used.
 // For install/upgrade, if we even can test those, SSI is a no-no.
+// Note: SSI mode is our way to work-around limitations in defining a 'unit' of behavior,
+// since the code is very tightly coupled. If possible, and where possible, tests should
+// not use SSI either.
+
 // Might wanna make two or three different suites.
 require_once('../SSI.php');
+global $test_enabled;
+
+echo "WARNING! Tests may work directly with the local database. DON'T run them on ANY other than test installs!\n";
+echo "To run the tests, set test_enabled = 1 in Settings.php file.\n";
+
+if (empty($test_enabled))
+	die('Testing disabled.');
 
 /**
- * All tests suite. This suite adds all files/classes/folders currently
- * being tested.
+ * All tests suite. This suite adds all files/classes/folders currently being tested.
+ * Many of the tests are integration tests, strictly speaking, since they use both SSI
+ * and database work.
+ *
+ * @todo set up a testing database, i.e. on sqlite maybe, or mysql, like populate script, at the
+ * beginning of the suite, and remove or clean it up completely at the end of it.
  * 
  * To run all tests, execute php all_tests.php in tests directory
  * Or, scripturl/tests/all_tests.php

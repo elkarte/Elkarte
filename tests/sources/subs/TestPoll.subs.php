@@ -4,12 +4,15 @@ require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(SUBSDIR . '/Poll.subs.php');
 
 /**
- * TestCase class for poll subs
+ * TestCase class for poll subs.
+ * WARNING. These tests work directly with the local database. Don't run
+ * them if you need to keep your data untouched!
  */
 class TestPoll extends UnitTestCase
 {
 	/**
-	 * @todo prepare some test data, to use in these tests
+	 * Prepare some test data, to use in these tests.
+	 * setUp() is run automatically by the testing framework before each test method.
 	 */
 	function setUp()
 	{
@@ -48,7 +51,8 @@ class TestPoll extends UnitTestCase
 	}
 
 	/**
-	 * cleanup data we no longer need at the end of the tests in this class.
+	 * Cleanup data we no longer need at the end of the tests in this class.
+	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
 	function tearDown()
 	{
