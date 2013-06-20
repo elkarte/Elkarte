@@ -39,5 +39,6 @@ class AllTests extends TestSuite
 
 		// subs APIs
 		$this->addFile('sources/subs/TestBoards.subs.php');
+		$this->addFile('sources/subs/TestPoll.subs.php');
 	}
 }
