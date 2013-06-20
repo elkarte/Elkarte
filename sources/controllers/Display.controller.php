@@ -13,14 +13,15 @@
  *
  * @version 1.0 Alpha
  *
- * This is perhaps the most important and probably most accessed file in all
- * of ELKARTE.  This file controls topic, message, and attachment display.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
+/**
+ * This controller is the most important and probably most accessed of all.
+ * It controls topic display, with all related.
+ */
 class Display_Controller
 {
 	/**

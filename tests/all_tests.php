@@ -35,6 +35,7 @@ class AllTests extends TestSuite
 
 		// core sources
 		$this->addFile('sources/TestLogging.php');
+		$this->addFile('sources/TestDispatcher.php');
 
 		// subs APIs
 		$this->addFile('sources/subs/TestBoards.subs.php');

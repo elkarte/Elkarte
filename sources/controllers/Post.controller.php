@@ -253,7 +253,7 @@ class Post_Controller
 				{
 					require_once(CONTROLLERDIR . '/Calendar.controller.php');
 					$controller = new Calendar_Controller();
-					return $controller->action_event_post();
+					return $controller->action_post();
 				}
 
 				// Get the current event information.
@@ -812,9 +812,7 @@ class Post_Controller
 		// Build a list of drafts that they can load in to the editor
 		if (!empty($context['drafts_save']))
 		{
-			require_once(CONTROLLERDIR . '/Draft.controller.php');
-			$controller = new Draft_Controller();
-			$controller->action_showDrafts($user_info['id'], $topic);
+			$this->_prepareDraftsContext($user_info['id'], $topic);
 
 			if (!empty($context['drafts']))
 				$template_layers->add('load_drafts');
@@ -984,7 +982,7 @@ class Post_Controller
 
 		// Drafts enabled and needed?
 		if (!empty($modSettings['drafts_enabled']) && (isset($_POST['save_draft']) || isset($_POST['id_draft'])))
-			require_once(CONTROLLERDIR . '/Draft.controller.php');
+			require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// First check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))
@@ -2240,5 +2238,49 @@ class Post_Controller
 		// And instruct the template system to just show the spellcheck sub template.
 		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'spellcheck';
+	}
+
+	/**
+	 * Loads in a group of post drafts for the user.
+	 * Loads a specific draft for current use in the postbox if selected.
+	 * Used in the posting screens to allow draft selection
+	 * Will load a draft if selected is supplied via post
+	 *
+	 * @param int $member_id
+	 * @param int $id_topic if set, load drafts for the specified topic
+	 * @return boolean
+	 */
+	private function _prepareDraftsContext($member_id, $id_topic = false)
+	{
+		global $scripturl, $context, $txt, $modSettings;
+
+		$context['drafts'] = array();
+
+		// Need a member
+		if (empty($member_id))
+			return false;
+
+		// We haz drafts
+		loadLanguage('Drafts');
+		require_once(SUBSDIR . '/Drafts.subs.php');
+
+		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
+		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
+			loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
+
+		// load all the drafts for this user that meet the criteria
+		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
+		$order = 'poster_time DESC';
+		$user_drafts = load_user_drafts($member_id, 0, $id_topic, $drafts_keep_days, $order);
+
+		// add them to the context draft array for template display
+		foreach ($user_drafts as $draft)
+		{
+			$context['drafts'][] = array(
+				'subject' => empty($draft['subject']) ? $txt['drafts_none'] : censorText(shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24)),
+				'poster_time' => relativeTime($draft['poster_time']),
+					'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
+				);
+		}
 	}
 }

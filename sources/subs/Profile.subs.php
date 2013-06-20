@@ -31,7 +31,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 	global $user_info;
 	static $memID;
 
-	// If we already
+	// If we already know who we're dealing with
 	if (isset($memID) && !$reload_id)
 		return $memID;
 
