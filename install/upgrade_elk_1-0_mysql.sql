@@ -495,7 +495,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
 
 ---# Adding new columns to log_activity...
 ALTER TABLE {$db_prefix}log_activity
-ADD COLUMN pm smallint(5) unsigned NOT NULL DEFAULT '0';
+ADD COLUMN pm smallint(5) unsigned NOT NULL DEFAULT '0',
 ADD COLUMN email smallint(5) unsigned NOT NULL DEFAULT '0';
 ---#
 
