@@ -223,7 +223,7 @@ class ManageMembergroups_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// The second list shows the post count based groups.

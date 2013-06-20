@@ -345,7 +345,7 @@ class PostModeration_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		$listOptions = array(

@@ -609,7 +609,7 @@ function action_showAttachments()
 
 	$memID = currentMemberID();
 
-	require_once(SUBSDIR . '/List.subs.php');
+	require_once(SUBSDIR . '/List.class.php');
 
 	// This is all the information required to list attachments.
 	$listOptions = array(
@@ -833,7 +833,7 @@ function action_showDisregarded()
 	if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
 		return;
 
-	require_once(SUBSDIR . '/List.subs.php');
+	require_once(SUBSDIR . '/List.class.php');
 
 	// And here they are: the topics you don't like
 	$listOptions = array(
@@ -1444,7 +1444,7 @@ function action_viewWarning()
 
 	// Let's use a generic list to get all the current warnings
 	// and use the issue warnings grab-a-granny thing.
-	require_once(SUBSDIR . '/List.subs.php');
+	require_once(SUBSDIR . '/List.class.php');
 
 	$memID = currentMemberID();
 

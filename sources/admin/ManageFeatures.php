@@ -855,7 +855,7 @@ class ManageFeatures_Controller
 
 		createToken('admin-scp');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		$listOptions = array(
