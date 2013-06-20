@@ -865,7 +865,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		}
 
 		//Some javascript ma'am? (But load it only once)
-		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visuali_verification_type']) && !isset($this->_options['override_visual'])) && emtpy($context['captcha_js_loaded']))
+		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
 			loadJavascriptFile('captcha.js');
 			$context['captcha_js_loaded'] = true;
