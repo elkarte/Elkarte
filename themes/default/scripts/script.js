@@ -1686,7 +1686,7 @@ function doAutoSubmit()
 	setTimeout("doAutoSubmit();", 1000);
 }
 
-function toggleButtonAJAX(btn, text_confirm)
+function toggleButtonAJAX(btn, confirmation_msg_variable)
 {
 	ajax_indicator(true);
 
@@ -1708,8 +1708,10 @@ function toggleButtonAJAX(btn, text_confirm)
 					// @todo: the span should be moved somewhere in themes.js?
 					$(this).html('<span>' + text + '</span>');
 					$(this).attr('href', url);
+
+					// Replaces the confirmations message with the new one
 					if (typeof(confirm_text) != 'undefined')
-						eval(text_confirm + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
+						eval(confirmation_msg_variable + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
 				});
 			}
 			else
