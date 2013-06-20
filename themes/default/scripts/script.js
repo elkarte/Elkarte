@@ -1690,43 +1690,41 @@ function toggleButtonAJAX(btn, text_confirm)
 {
 	ajax_indicator(true);
 
-	var oXMLDoc = getXMLDocument(btn.href + ';xml;api');
+	$.ajax({
+		type: 'GET',
+		url: btn.href + ';xml;api',
+		context: document.body,
+		success: function(request) {
+			var oElement = $(request).find('elk')[0];
+			if (oElement.getElementsByTagName('error').length == 0)
+			{
+				var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+				var url = oElement.getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities();
+				var confirm_elem = oElement.getElementsByTagName('confirm');
+				if (confirm_elem.length == 1)
+					var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
 
-	if (oXMLDoc.responseXML)
-	{
-		var oElement = oXMLDoc.responseXML.getElementsByTagName('elk')[0];
-		if (oElement.getElementsByTagName('error').length == 0)
-		{
-			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
-			var url = oElement.getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities();
-			var confirm_elem = oElement.getElementsByTagName('confirm');
-			if (confirm_elem.length == 1)
-				var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
+				$('.' + btn.className).each(function() {
+					// @todo: the span should be moved somewhere in themes.js?
+					$(this).html('<span>' + text + '</span>');
+					$(this).attr('href', url);
+					if (typeof(confirm_text) != 'undefined')
+						eval(text_confirm + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
+				});
+			}
+			else
+			{
+				if (oElement.getElementsByTagName('text').length != 0)
+					alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities());
 
-			$('.' + btn.className).each(function() {
-				// @todo: the span should be moved somewhere in themes.js?
-				$(this).html('<span>' + text + '</span>');
-				$(this).attr('href', url);
-				if (typeof(confirm_text) != 'undefined')
-					eval(text_confirm + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
-			});
-			var result = false;
-		}
-		else
-		{
-			if (oElement.getElementsByTagName('text').length != 0)
-				alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities());
+				if (oElement.getElementsByTagName('url').length != 0)
+					window.location.href = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
+			}
+			ajax_indicator(false);
+		},
+	});
 
-			if (oElement.getElementsByTagName('url').length != 0)
-				window.location.href(oElement.getElementsByTagName('url')[0].firstChild.nodeValue);
-
-			// Shouldn't be necessary
-			var result = true;
-		}
-	}
-
-	ajax_indicator(false);
-	return result;
+	return false;
 }
 
 function toggleHeaderAJAX(btn, container_id)

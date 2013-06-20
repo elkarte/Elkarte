@@ -72,15 +72,27 @@ class MarkRead_Controller
 		if ($user_info['is_guest'])
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['text'] = $txt['not_guests'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_guests']
+			);
 			return;
 		}
 
 		if (checkSession('get', '', false))
 		{
-			loadLanguage('Errors');
-			$context['xml_data']['error']['url'] = $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
-			return;
+			// Again, this is a special case, someone will deal with the others later :P
+			if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
+			{
+				loadLanguage('Errors');
+				$context['xml_data'] = array(
+					'error' => 1,
+					'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id'],
+				);
+				return;
+			}
+			else
+				obExit(false);
 		}
 
 		$this->_dispatch();

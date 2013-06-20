@@ -95,21 +95,30 @@ class Notify_Controller
 		if ($user_info['is_guest'])
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['text'] = $txt['not_guests'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_guests']
+			);
 			return;
 		}
 
 		if (!allowedTo('mark_any_notify') || empty($topic) || empty($_GET['sa']))
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['text'] = $txt['cannot_mark_any_notify'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['cannot_mark_any_notify']
+			);
 			return;
 		}
 
 		if (checkSession('get', '', false))
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['url'] = $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'url' => $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			);
 			return;
 		}
 
@@ -198,21 +207,30 @@ class Notify_Controller
 		if ($user_info['is_guest'])
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['text'] = $txt['not_guests'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_guests']
+			);
 			return;
 		}
 
 		if (!allowedTo('mark_notify') || empty($board) || empty($_GET['sa']))
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['text'] = $txt['cannot_mark_notify'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['cannot_mark_notify'],
+			);
 			return;
 		}
 
 		if (checkSession('get', '', false))
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['url'] = $scripturl . '?action=notifyboard;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';board=' . $board . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'url' => $scripturl . '?action=notifyboard;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';board=' . $board . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			);
 			return;
 		}
 
@@ -274,7 +292,10 @@ class Notify_Controller
 		if ($user_info['is_guest'])
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['text'] = $txt['not_guests'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_guests']
+			);
 			return;
 		}
 
@@ -282,14 +303,20 @@ class Notify_Controller
 		if (empty($modSettings['enable_disregard']))
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['text'] = $txt['feature_disabled'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['feature_disabled'],
+			);
 			return;
 		}
 
 		if (checkSession('get', '', false))
 		{
 			loadLanguage('Errors');
-			$context['xml_data']['error']['url'] = $scripturl . '?action=notify;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+			$context['xml_data'] = array(
+				'error' => 1,
+				'url' => $scripturl . '?action=disregardtopic;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			);
 			return;
 		}
 
