@@ -221,6 +221,7 @@ function pollInfoForTopic($topicID)
  * Return poll options, customized for a given member.
  * The function adds to poll options the information if the user
  * has voted in this poll.
+ * It censors the label in the result array.
  *
  * @param int $id_poll
  * @param int $id_member
@@ -242,6 +243,37 @@ function pollOptionsForMember($id_poll, $id_member)
 		)
 	);
 	$pollOptions = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['label']);
+		$pollOptions[$row['id_choice']] = $row;
+	}
+	$db->free_result($request);
+
+	return $pollOptions;
+}
+
+/**
+ * Returns poll options.
+ * It censors the label in the result array.
+ *
+ * @param $id_poll
+ */
+function pollOptions($id_poll)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT label, votes, id_choice
+		FROM {db_prefix}poll_choices
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $id_poll,
+		)
+	);
+
+	$pollOptions = array();
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['label']);
@@ -315,4 +347,32 @@ function addPollOptions($id_poll, array $options)
 		$pollOptions,
 		array('id_poll', 'id_choice')
 	);
+}
+
+/**
+ * Retrieves the topic and, if different, poll starter
+ * for the poll associated with the $id_topic.
+ *
+ * @param $id_topic
+ */
+function pollStarters($id_topic)
+{
+	$db = database();
+
+	$pollStarters = array();
+	$request = $db->query('', '
+		SELECT t.id_member_started, p.id_member AS poll_starter
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $id_topic,
+		)
+	);
+	if ($db->num_rows($request) != 0)
+		$pollStarters = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $pollStarters;
 }
