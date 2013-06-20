@@ -601,3 +601,54 @@ function modReportDetails($id_report)
 
 	return $row;
 }
+
+/**
+ * This is a helper function: approve everything unapproved.
+ * Used from moderation panel.
+ */
+function approveAllUnapproved()
+{
+	$db = database();
+
+	// Start with messages and topics.
+	$request = $db->query('', '
+		SELECT id_msg
+		FROM {db_prefix}messages
+		WHERE approved = {int:not_approved}',
+		array(
+			'not_approved' => 0,
+		)
+	);
+	$msgs = array();
+	while ($row = $db->fetch_row($request))
+		$msgs[] = $row[0];
+	$db->free_result($request);
+
+	if (!empty($msgs))
+	{
+		require_once(SUBSDIR . '/Post.subs.php');
+		approvePosts($msgs);
+		cache_put_data('num_menu_errors', null, 900);
+	}
+
+	// Now do attachments
+	$request = $db->query('', '
+		SELECT id_attach
+		FROM {db_prefix}attachments
+		WHERE approved = {int:not_approved}',
+		array(
+			'not_approved' => 0,
+		)
+	);
+	$attaches = array();
+	while ($row = $db->fetch_row($request))
+		$attaches[] = $row[0];
+	$db->free_result($request);
+
+	if (!empty($attaches))
+	{
+		require_once(SUBSDIR . '/Attachments.subs.php');
+		approveAttachments($attaches);
+		cache_put_data('num_menu_errors', null, 900);
+	}
+}
