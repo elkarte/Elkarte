@@ -500,7 +500,7 @@ class ManageBoards_Controller
 			)
 		);
 
-		$context['groups'] = getOtherGroups($curBoard);
+		$context['groups'] += getOtherGroups($curBoard);
 
 		// Category doesn't exist, man... sorry.
 		if (!isset($boardList[$curBoard['category']]))

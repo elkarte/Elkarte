@@ -340,8 +340,9 @@ class MergeTopics_Controller
 		$boards_info = fetchBoardsInfo($query_boards);
 
 		// This happens when a member is moderator of a board he cannot see
-		if (count($boards_info) != count($boards))
-			fatal_lang_error('no_board');
+		foreach ($boards as $board)
+			if (!isset($boards_info[$board]))
+				fatal_lang_error('no_board');
 
 		if (empty($_REQUEST['sa']) || $_REQUEST['sa'] == 'options')
 		{
