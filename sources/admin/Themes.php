@@ -191,7 +191,6 @@ class Themes_Controller
 		global $context, $boardurl;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
-		$db = database();
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
