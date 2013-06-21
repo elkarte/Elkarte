@@ -12,7 +12,7 @@ require_once('simpletest/autorun.php');
 // not use SSI either.
 
 // Might wanna make two or three different suites.
-require_once('../Settings.php');
+require_once(TESTDIR . '../Settings.php');
 global $test_enabled;
 
 echo "WARNING! Tests may work directly with the local database. DON'T run them on ANY other than test installs!\n";
@@ -28,7 +28,7 @@ if (empty($test_enabled))
  *
  * @todo set up a testing database, i.e. on sqlite maybe, or mysql, like populate script, at the
  * beginning of the suite, and remove or clean it up completely at the end of it.
- * 
+ *
  * To run all tests, execute php all_tests.php in tests directory
  * Or, scripturl/tests/all_tests.php
  */
@@ -39,22 +39,22 @@ class AllTests extends TestSuite
 		$this->TestSuite('All tests');
 
 		// controllers (web tests)
-		$this->addFile('sources/controllers/TestAuth.php');
+		$this->addFile(TESTDIR . 'sources/controllers/TestAuth.php');
 
 		// admin controllers (web tests)
-		$this->addFile('sources/admin/TestManageBoardsSettings.php');
-		$this->addFile('sources/admin/TestManagePostsSettings.php');
+		$this->addFile(TESTDIR . 'sources/admin/TestManageBoardsSettings.php');
+		$this->addFile(TESTDIR . 'sources/admin/TestManagePostsSettings.php');
 
 		// install
-		$this->addFile('install/TestInstall.php');
+		$this->addFile(TESTDIR . 'install/TestInstall.php');
 
 		// core sources
-		$this->addFile('sources/TestLogging.php');
-		$this->addFile('sources/TestDispatcher.php');
-		$this->addFile('sources/TestRequest.php');
+		$this->addFile(TESTDIR . 'sources/TestLogging.php');
+		$this->addFile(TESTDIR . 'sources/TestDispatcher.php');
+		$this->addFile(TESTDIR . 'sources/TestRequest.php');
 
 		// subs APIs
-		$this->addFile('sources/subs/TestBoards.subs.php');
-		$this->addFile('sources/subs/TestPoll.subs.php');
+		$this->addFile(TESTDIR . 'sources/subs/TestBoards.subs.php');
+		$this->addFile(TESTDIR . 'sources/subs/TestPoll.subs.php');
 	}
 }
