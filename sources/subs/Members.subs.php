@@ -463,7 +463,7 @@ function registerMember(&$regOptions, $return_errors = false)
 		is_not_guest();
 		isAllowedTo('moderate_forum');
 	}
-	// If you're an admin, you're special ;).
+	// You're new around, aren't you? or else!
 	elseif ($regOptions['interface'] == 'guest')
 	{
 		// You cannot register twice...
@@ -614,8 +614,8 @@ function registerMember(&$regOptions, $return_errors = false)
 		'password_salt' => substr(md5(mt_rand()), 0, 4) ,
 		'posts' => 0,
 		'date_registered' => time(),
-		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $user_info['ip'],
-		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $_SERVER['BAN_CHECK_IP'],
+		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
+		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
 		'validation_code' => $validation_code,
 		'real_name' => $regOptions['username'],
 		'personal_text' => $modSettings['default_personal_text'],

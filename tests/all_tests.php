@@ -12,7 +12,7 @@ require_once('simpletest/autorun.php');
 // not use SSI either.
 
 // Might wanna make two or three different suites.
-require_once('../SSI.php');
+require_once('../Settings.php');
 global $test_enabled;
 
 echo "WARNING! Tests may work directly with the local database. DON'T run them on ANY other than test installs!\n";
@@ -51,6 +51,7 @@ class AllTests extends TestSuite
 		// core sources
 		$this->addFile('sources/TestLogging.php');
 		$this->addFile('sources/TestDispatcher.php');
+		$this->addFile('sources/TestRequest.php');
 
 		// subs APIs
 		$this->addFile('sources/subs/TestBoards.subs.php');

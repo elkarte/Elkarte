@@ -84,6 +84,9 @@ require_once(SUBSDIR . '/TemplateLayers.class.php');
 if (!empty($maintenance) && $maintenance == 2)
 	display_maintenance_message();
 
+// Clean the request.
+cleanRequest();
+
 // Create a variable to store some specific functions in.
 $smcFunc = array();
 
@@ -95,9 +98,6 @@ reloadSettings();
 
 // Temporarily, compatibility for access to utility functions through $smcFunc is enabled by default.
 Util::compat_init();
-
-// Clean the request!
-cleanRequest();
 
 // Our good ole' contextual array, which will hold everything
 $context = array();
