@@ -4,12 +4,15 @@ require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(SUBSDIR . '/Boards.subs.php');
 
 /**
- * TestCase class for boards subs
+ * TestCase class for boards subs: working with boards.
+ * WARNING. These tests work directly with the local database. Don't run
+ * them if you need to keep your data untouched!
  */
 class TestBoards extends UnitTestCase
 {
 	/**
-	 * @todo prepare some test data, to use in these tests
+	 * @todo prepare some test data, to use in these tests.
+	 * setUp() is run automatically by the testing framework before each test method.
 	 */
 	function setUp()
 	{
@@ -19,10 +22,12 @@ class TestBoards extends UnitTestCase
 
 	/**
 	 * cleanup data we no longer need at the end of the tests in this class.
+	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
 	function tearDown()
 	{
-		// remove useless data
+		// remove useless data.
+		// leave database in initial state!
 	}
 
 	/**
