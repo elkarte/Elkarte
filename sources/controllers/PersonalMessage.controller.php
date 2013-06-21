@@ -25,13 +25,16 @@ if (!defined('ELKARTE'))
 /**
  * Personal Message Controller
  */
-class PersonalMessage_Controller
+class PersonalMessage_Controller extends Action_Controller
 {
 	/**
 	 * This is the main function of personal messages, called before the action handler.
 	 * PersonalMessages is a menu-based controller.
-	 * It sets up the menu. @todo and call from the menu the appropriate method/function
+	 * It sets up the menu.
+	 * @todo and call from the menu the appropriate method/function
 	 * for the current area.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{

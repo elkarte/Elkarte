@@ -32,8 +32,8 @@ class News_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// do... something, of your favorite, like xmlnews.
-		$this->action_xmlnews();
+		// do... something, of your favorite.
+		// $this->action_xmlnews();
 	}
 
 	/**

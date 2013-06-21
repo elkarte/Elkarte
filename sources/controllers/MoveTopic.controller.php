@@ -31,7 +31,7 @@ class MoveTopic_Controller extends Action_Controller
 	public function action_index()
 	{
 		// move a topic, what else?!
-		$this->action_movetopic();
+		// $this->action_movetopic();
 	}
 
 	/**

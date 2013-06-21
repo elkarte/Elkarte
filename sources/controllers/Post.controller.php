@@ -25,8 +25,19 @@ if (!defined('ELKARTE'))
 /**
  * Post Controller
  */
-class Post_Controller
+class Post_Controller extends Action_Controller
 {
+	/**
+	 * Dispatch to the right action method for the request.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// figure out the right action to do.
+		// hint: I'm post controller. :P
+	}
+
 	/**
 	 * Handles showing the post screen, loading the post to be modified, and loading any post quoted.
 	 *
