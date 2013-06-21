@@ -1344,11 +1344,11 @@ class ManageMaillist_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailtemplates;' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'title',
 			'get_items' => array(
-				'function' => 'list_getWarningTemplates',
+				'function' => array($this, 'list_getWarningTemplates'),
 				'params' => array('bnctpl'),
 			),
 			'get_count' => array(
-				'function' => 'list_getWarningTemplateCount',
+				'function' => array($this, 'list_getWarningTemplateCount'),
 				'params' => array('bnctpl'),
 			),
 			'columns' => array(
@@ -1536,5 +1536,28 @@ class ManageMaillist_Controller extends Action_Controller
 		}
 
 		createToken('mod-mlt');
+	}
+
+	/**
+	 * Callback for createList() to get all the templates of a type from the system
+	 *
+	 * @param $start
+	 * @param $items_per_page
+	 * @param $sort
+	 * @param $template_type type of template to load
+	 */
+	function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
+	{
+		return warningTemplates($start, $items_per_page, $sort, $template_type);
+	}
+
+	/**
+	 * Callback for createList() to get the number of templates of a type in the system
+	 *
+	 * @param string $template_type
+	 */
+	function list_getWarningTemplateCount($template_type = 'warntpl')
+	{
+		return warningTemplateCount($template_type);
 	}
 }
