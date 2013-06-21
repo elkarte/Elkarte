@@ -19,7 +19,7 @@
  * If $pollID is passed, the topic is updated to point to the new poll.
  *
  * @param int $topicID the ID of the topic
- * @param int $pollID = null the ID of the poll, if any. If null is passed, it retrives the current ID.
+ * @param int $pollID = null the ID of the poll, if any. If null is passed, it retrieves the current ID.
  *
  */
 function associatedPoll($topicID, $pollID = null)
@@ -298,7 +298,7 @@ function pollOptions($id_poll)
  * @param array $options = array() The poll options
  * @return int the id of the created poll
  */
-function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
+function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0, array $options = array())
 {
 	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
 
