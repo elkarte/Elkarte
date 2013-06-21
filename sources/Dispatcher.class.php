@@ -118,7 +118,7 @@ class Site_Dispatcher
 			{
 				$this->_file_name = CONTROLLERDIR . '/Display.controller.php';
 				$this->_controller_name = 'Display_Controller';
-				$this->_function_name = 'action_index';
+				$this->_function_name = 'action_display';
 			}
 		}
 
