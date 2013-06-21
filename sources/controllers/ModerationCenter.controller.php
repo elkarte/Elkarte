@@ -1804,7 +1804,7 @@ function action_modcenter($dont_call = false)
 					'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
 					'file' => 'admin/Modlog.php',
 					'controller' => 'Modlog_Controller',
-					'function' => 'action_modlog',
+					'function' => 'action_log',
 				),
 				'warnings' => array(
 					'label' => $txt['mc_warnings'],

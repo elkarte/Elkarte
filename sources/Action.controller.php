@@ -21,8 +21,9 @@ abstract class Action_Controller
 {
 	/**
 	 * Default action handler. This will be called
-	 * if no other subaction matches the ?sa= parameter
-	 * in the request.
+	 * by the dispatcher in many cases. It may set up a menu,
+	 * sub-dispatch at its turn to the method matching ?sa= parameter
+	 * or simply forward the request to a known default method.
 	 */
 	abstract public function action_index();
 

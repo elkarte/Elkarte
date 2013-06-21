@@ -20,11 +20,14 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class ManageMaintenance_Controller
+class ManageMaintenance_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher, the maintenance access point.
-	 * This, as usual, checks permissions, loads language files, and forwards to the actual workers.
+	 * This, as usual, checks permissions, loads language files,
+	 * and forwards to the actual workers.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

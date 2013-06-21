@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
  * ManageSecurity controller handles the Security and Moderation
  * pages in admin panel.
  */
-class ManageSecurity_Controller
+class ManageSecurity_Controller extends Action_Controller
 {
 	/**
 	 * Bad Behavior settings form.
@@ -50,6 +50,8 @@ class ManageSecurity_Controller
 
 	/**
 	 * This function passes control through to the relevant security tab.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -499,7 +501,7 @@ class ManageSecurity_Controller
 
 		// instantiate the form
 		$this->_bbSettings = new Settings_Form();
-		
+
 		// See if they supplied a valid looking http:BL API Key
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
@@ -683,7 +685,7 @@ class ManageSecurity_Controller
 	public function bbSettings()
 	{
 		global $txt, $context, $modSettings;
-		
+
 		// See if they supplied a valid looking http:BL API Key
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 

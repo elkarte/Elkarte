@@ -72,7 +72,7 @@ require_once(SUBSDIR . '/Settings.class.php');
  * It sends the data for display, and it allows the admin to change it.
  *
  */
-class ManageServer_Controller
+class ManageServer_Controller extends Action_Controller
 {
 	/**
 	 * Database settings form
@@ -112,6 +112,8 @@ class ManageServer_Controller
 	 * Redirects to the appropriate function based on the sub-action.
 	 *
 	 * @uses edit_settings adminIndex.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

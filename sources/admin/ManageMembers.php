@@ -24,7 +24,7 @@ if (!defined('ELKARTE'))
  * ManageMembers controller deals with members administration, approval,
  * admin-visible list and search in it.
  */
-class ManageMembers_Controller
+class ManageMembers_Controller extends Action_Controller
 {
 	/**
 	 * The main entrance point for the Manage Members screen.
@@ -34,6 +34,8 @@ class ManageMembers_Controller
 	 *
 	 * @uses ManageMembers template
 	 * @uses ManageMembers language file.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

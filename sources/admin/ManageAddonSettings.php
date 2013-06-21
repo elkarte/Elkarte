@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
  * to admin search and otherwise benefit from admin areas security,
  * checks and display.
  */
-class ManageAddonSettings_Controller
+class ManageAddonSettings_Controller extends Action_Controller
 {
 	/**
 	 * General addon settings form.
@@ -30,7 +30,9 @@ class ManageAddonSettings_Controller
 	protected $_addonSettings;
 
 	/**
-	 * This my friend, is for all the mod authors out there.
+	 * This, my friend, is for all the authors of add-ons out there.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  * to register a new member, to see and edit the  registration agreement,
  * to set up reserved words for forum names.
  */
-class ManageRegistration_Controller
+class ManageRegistration_Controller extends Action_Controller
 {
 	/**
 	 * Registration settings form
@@ -43,6 +43,8 @@ class ManageRegistration_Controller
 	 *
 	 * @uses Login language file
 	 * @uses Register template.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -174,7 +176,7 @@ class ManageRegistration_Controller
 			foreach ($membergroups as $membergroup)
 				$groups[$membergroup['id']] = $membergroup['name'];
 
-			$context['member_groups'] = $groups; 
+			$context['member_groups'] = $groups;
 		}
 		else
 			$context['member_groups'] = array();

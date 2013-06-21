@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
  *  - handles the adding / editing / removing of both filters and parsers
  *
  */
-class ManageMaillist_Controller
+class ManageMaillist_Controller extends Action_Controller
 {
 	/**
 	 * Basic feature settings form
@@ -31,7 +31,9 @@ class ManageMaillist_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control to the sub action.
+	 * This function checks permissions and passes control
+	 *  to the sub action.
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

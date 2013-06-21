@@ -20,8 +20,14 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class AdminDebug_Controller
+class AdminDebug_Controller extends Action_Controller
 {
+	public function action_index()
+	{
+		// what to do first... viewquery! What, it'll work or it won't.
+		$this->action_viewquery();
+	}
+
 	/**
 	 * Show the database queries for debugging
 	 * What this does:

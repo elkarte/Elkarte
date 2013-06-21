@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  * This class handles all search engines pages in admin panel,
  *  forwards to display and allows to change options.
  */
-class ManageSearchEngines_Controller
+class ManageSearchEngines_Controller extends Action_Controller
 {
 	/**
 	 * Search engines settings form
@@ -35,6 +35,8 @@ class ManageSearchEngines_Controller
 
 	/**
  	* Entry point for this section.
+ 	*
+ 	* @see Action_Controller::action_index()
  	*/
 	function action_index()
 	{
