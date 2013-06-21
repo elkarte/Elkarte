@@ -263,6 +263,9 @@ $smcFunc['db_alter_table']('{db_prefix}log_topics', array(
 		),
 	)
 ));
+
+UPDATE {$db_prefix}log_topics
+SET disregarded = 0;
 ---}
 ---#
 
