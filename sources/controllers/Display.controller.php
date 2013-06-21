@@ -25,6 +25,15 @@ if (!defined('ELKARTE'))
 class Display_Controller
 {
 	/**
+	 * Default action handler for this controller
+	 */
+	public function action_index()
+	{
+		// what to do... display things!
+		$this->action_display();
+	}
+
+	/**
 	 * The central part of the board - topic display.
 	 * This function loads the posts in a topic up so they can be displayed.
 	 * It uses the main sub template of the Display template.
@@ -33,7 +42,7 @@ class Display_Controller
 	 * It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
 	 * It is accessed by ?topic=id_topic.START.
 	 */
-	public function action_index()
+	public function action_display()
 	{
 		global $scripturl, $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
