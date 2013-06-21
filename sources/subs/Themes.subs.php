@@ -354,6 +354,10 @@ function get_file_listing($path, $relative)
 	return array_merge($listing1, $listing2);
 }
 
+/**
+ * Updates the pathes for a theme. Used to fix invalid pathes.
+ * @param array $setValues
+ */
 function updateThemePath($setValues)
 {
 	$db = database;
@@ -365,4 +369,71 @@ function updateThemePath($setValues)
 		array('id_theme', 'variable', 'id_member')
 	);
 	
+}
+
+/**
+ * Counts the theme options configured for guests
+ * @return array
+ */
+function countConfiguredGuestOptions()
+{
+	$db = database();
+
+	$themes = array();
+
+	$request = $db->query('', '
+		SELECT id_theme, COUNT(*) AS value
+		FROM {db_prefix}themes
+		WHERE id_member = {int:guest_member}
+		GROUP BY id_theme',
+		array(
+			'guest_member' => -1,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$themes[] = $row;
+	$db->free_result($request);
+
+	return($themes);
+}
+
+/**
+ * Counts the theme options configured for members
+ * @return array
+ */
+function countConfiguredMemberOptions()
+{
+	$db = database();
+
+	$themes = array();
+
+	// Need to make sure we don't do custom fields.
+	$request = $db->query('', '
+		SELECT col_name
+		FROM {db_prefix}custom_fields',
+		array(
+		)
+	);
+	$customFields = array();
+	while ($row = $db->fetch_assoc($request))
+		$customFields[] = $row['col_name'];
+	$db->free_result($request);
+	$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
+
+	$request = $db->query('themes_count', '
+		SELECT COUNT(DISTINCT id_member) AS value, id_theme
+		FROM {db_prefix}themes
+		WHERE id_member > {int:no_member}
+			' . $customFieldsQuery . '
+		GROUP BY id_theme',
+		array(
+			'no_member' => 0,
+			'custom_fields' => empty($customFields) ? array() : $customFields,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$themes[] = $row;
+	$db->free_result($request);
+
+	return $themes;
 }

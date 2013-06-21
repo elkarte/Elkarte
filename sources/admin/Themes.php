@@ -280,46 +280,14 @@ class Themes_Controller
 		{
 			$context['themes'] = installedThemes();
 
-			$request = $db->query('', '
-				SELECT id_theme, COUNT(*) AS value
-				FROM {db_prefix}themes
-				WHERE id_member = {int:guest_member}
-				GROUP BY id_theme',
-				array(
-					'guest_member' => -1,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$context['themes'][$row['id_theme']]['num_default_options'] = $row['value'];
-			$db->free_result($request);
+			//How many options do we have setup for guests?
+			$guestOptions = countConfiguredGuestOptions();
+			foreach ($guestOptions as $guest_option)
+				$context['themes'][$guest_option['id_theme']]['num_default_options'] = $guest_option['value'];
 
-			// Need to make sure we don't do custom fields.
-			$request = $db->query('', '
-				SELECT col_name
-				FROM {db_prefix}custom_fields',
-				array(
-				)
-			);
-			$customFields = array();
-			while ($row = $db->fetch_assoc($request))
-				$customFields[] = $row['col_name'];
-			$db->free_result($request);
-			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
-
-			$request = $db->query('themes_count', '
-				SELECT COUNT(DISTINCT id_member) AS value, id_theme
-				FROM {db_prefix}themes
-				WHERE id_member > {int:no_member}
-					' . $customFieldsQuery . '
-				GROUP BY id_theme',
-				array(
-					'no_member' => 0,
-					'custom_fields' => empty($customFields) ? array() : $customFields,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$context['themes'][$row['id_theme']]['num_members'] = $row['value'];
-			$db->free_result($request);
+			$memberOptions = countConfiguredMemberOptions();
+			foreach ($memberOptions as $member_option)
+				$context['themes'][$member_option['id_theme']]['num_members'] = $member_option['value'];
 
 			// There has to be a Settings template!
 			foreach ($context['themes'] as $k => $v)
