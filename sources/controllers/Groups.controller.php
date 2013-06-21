@@ -20,11 +20,13 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Groups_Controller
+class Groups_Controller extends Action_Controller
 {
 	/**
 	 * Entry point to groups.
 	 * It allows moderators and users to access the group showing functions.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{
@@ -40,7 +42,7 @@ class Groups_Controller
 	public function pre_dispatch()
 	{
 		global $context, $txt, $scripturl, $user_info;
-		
+
 		// Get the template stuff up and running.
 		loadLanguage('ManageMembers');
 		loadLanguage('ModerationCenter');

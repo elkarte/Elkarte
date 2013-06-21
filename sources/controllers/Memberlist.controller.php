@@ -26,13 +26,15 @@ if (!defined('ELKARTE'))
 /**
  * Memberlist Controller
  */
-class Memberlist_Controller
+class Memberlist_Controller extends Action_Controller
 {
 	/**
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
 	 *
 	 * @uses Memberlist template, main sub-template.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{

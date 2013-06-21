@@ -23,8 +23,19 @@ if (!defined('ELKARTE'))
 /**
  * News Controller
  */
-class News_Controller
+class News_Controller extends Action_Controller
 {
+	/**
+	 * Dispatcher. Forwards to the action to execute.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// do... something, of your favorite, like xmlnews.
+		$this->action_xmlnews();
+	}
+
 	/**
 	 * Outputs xml data representing recent information or a profile.
 	 * Can be passed 4 subactions which decide what is output:
@@ -922,7 +933,7 @@ function cdata_parse($data, $ns = '')
 
 			if ($pos2 === false)
 				$pos2 = $n;
-			
+
 			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
 
 			if (Util::substr($data, $pos + 1, 1) == '#')

@@ -21,7 +21,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Emailuser_Controller
+class Emailuser_Controller extends Action_Controller
 {
 	/**
 	 * This function initializes or sets up the necessary, for the other actions
@@ -38,11 +38,12 @@ class Emailuser_Controller
 	}
 
 	/**
-	 * Default action handler (when no ;sa is specified)
+	 * Default action handler
+	 * @see Action_Controller::action_index()
 	 */
-	function action_emailuser()
+	function action_index()
 	{
-		// default action: action_sendtopic()
+		// just accept we haz a default action: action_sendtopic()
 		$this->action_sendtopic();
 	}
 

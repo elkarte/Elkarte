@@ -21,7 +21,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class MergeTopics_Controller
+class MergeTopics_Controller extends Action_Controller
 {
 	/**
 	 * Merges two or more topics into one topic.
@@ -29,6 +29,8 @@ class MergeTopics_Controller
 	 * loads the MergeTopics template.
 	 * requires the merge_any permission.
 	 * is accessed with ?action=mergetopics.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{

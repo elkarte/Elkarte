@@ -20,8 +20,19 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class BoardIndex_Controller
+class BoardIndex_Controller extends Action_Controller
 {
+	/**
+	 * Forwards to the action to execute here by default.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// what to do... boardindex, 'course!
+		$this->action_boardindex();
+	}
+
 	/**
 	 * This function shows the board index.
 	 * It uses the BoardIndex template, and main sub template.
@@ -29,7 +40,7 @@ class BoardIndex_Controller
 	 * It updates the most online statistics.
 	 * It is accessed by ?action=boardindex.
 	 */
-	function action_boardindex()
+	public function action_boardindex()
 	{
 		global $txt, $user_info, $modSettings, $context, $settings, $scripturl;
 
@@ -124,7 +135,7 @@ class BoardIndex_Controller
 	 * Collapse or expand a category
 	 * ?action=collapse
 	 */
-	function action_collapse()
+	public function action_collapse()
 	{
 		global $user_info, $context;
 

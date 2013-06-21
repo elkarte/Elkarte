@@ -24,8 +24,19 @@ if (!defined('ELKARTE'))
 /**
  * Message Index Controller
  */
-class MessageIndex_Controller
+class MessageIndex_Controller extends Action_Controller
 {
+	/**
+	 * Dispatches forward to message index handler.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// forward to message index, it's not like we know much more :P
+		$this->action_messageindex();
+	}
+
 	/**
 	 * Show the list of topics in this board, along with any child boards.
 	 */
@@ -1018,7 +1029,7 @@ class MessageIndex_Controller
 			logAction($lockStatus[$topic] ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $lockCacheBoards[$topic]));
 			sendNotifications($topic, $lockStatus[$topic] ? 'lock' : 'unlock');
 		}
-		
+
 		foreach ($stickyCache as $topic)
 		{
 			logAction($stickyCacheStatus[$topic] ? 'unsticky' : 'sticky', array('topic' => $topic, 'board' => $stickyCacheBoards[$topic]));

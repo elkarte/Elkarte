@@ -16,8 +16,19 @@ if (!defined('ELKARTE'))
 /**
  * Post-by-email controller.
  */
-class Emailpost_Controller
+class Emailpost_Controller extends Action_Controller
 {
+	/**
+	 * Default entry point, it forwards to a worker method,
+	 * if we ever get here.
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// default, default, by default... preview
+		$this->action_pbe_preview();
+	}
+
 	/**
 	 * Main email posting controller, reads, parses, checks and posts an email message or PM
 	 * Allows a user to reply to a topic on the board by emailing a reply to a
@@ -26,6 +37,7 @@ class Emailpost_Controller
 	 * - It must be from the email of a registered user
 	 * - The key must have been sent to that user
 	 * - Keys are used once and then discarded
+	 * Accessed by email imap cron script, and ManageMaillist.php.
 	 *
 	 * @param string $data used to supply a full body+headers email
 	 * @param boolean $force used to override common failure errors
@@ -175,6 +187,7 @@ class Emailpost_Controller
 	 * - New topics do not have security keys in them so they are subject to spoofing
 	 * - It must be from the email of a registered user
 	 * - It must have been sent to an email ID that has been set to post new topics
+	 * Accessed through emailtopic.
 	 *
 	 * @param string $data used to supply a full body+headers email
 	 * @param type $force used to override common failure errors

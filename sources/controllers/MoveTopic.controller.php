@@ -21,8 +21,19 @@ if (!defined('ELKARTE'))
 /**
  * Move Topic Controller
  */
-class MoveTopic_Controller
+class MoveTopic_Controller extends Action_Controller
 {
+	/**
+	 * Forwards to the action method to handle the action.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// move a topic, what else?!
+		$this->action_movetopic();
+	}
+
 	/**
 	 * This function allows to move a topic, making sure to ask the moderator
 	 * to give reason for topic move.
@@ -271,7 +282,7 @@ class MoveTopic_Controller
 				'redirect_expires' => $redirect_expires,
 				'redirect_topic' => $redirect_topic,
 			);
-			
+
 			$posterOptions = array(
 				'id' => $user_info['id'],
 				'update_post_count' => empty($board_info['count_posts']),

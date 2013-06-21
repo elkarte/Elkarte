@@ -20,17 +20,19 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Calendar_Controller
+class Calendar_Controller extends Action_Controller
 {
 	/**
 	 * Default action handler for requests on the calendar
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		// when you don't know what you're doing... we know! :P
 		$this->action_calendar();
 	}
-	
+
 	/**
 	 * Show the calendar.
 	 * It loads the specified month's events, holidays, and birthdays.

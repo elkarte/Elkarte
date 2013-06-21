@@ -23,17 +23,19 @@ if (!defined('ELKARTE'))
 /**
  * Class to handle the help page and boxes
  */
-class Help_Controller
+class Help_Controller extends Action_Controller
 {
 	/**
 	 * Default action handler: just help.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		// I need help!
 		$this->action_help();
 	}
-	
+
 	/**
 	 * Prepares the help page.
 	 * Uses Help template and Manual language file.

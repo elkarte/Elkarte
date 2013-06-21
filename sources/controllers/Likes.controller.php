@@ -15,8 +15,20 @@ if (!defined('ELKARTE'))
 /**
  * This class contains one likable use, which allows members to like a post
  */
-class Likes_Controller
+class Likes_Controller extends Action_Controller
 {
+	/**
+	 * Default action method, if a specific methods wasn't
+	 * directly called already. Simply forwards to likepost.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// We like you.
+		$this->action_likepost();
+	}
+
 	/**
 	 * Entry point function for likes, permission checks, just makes sure its on
 	 */
