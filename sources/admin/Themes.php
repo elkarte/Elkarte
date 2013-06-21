@@ -269,6 +269,7 @@ class Themes_Controller
 	{
 		global $txt, $context, $settings, $modSettings;
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		$db = database();
 
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
@@ -277,29 +278,7 @@ class Themes_Controller
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 		{
-			$request = $db->query('', '
-				SELECT id_theme, variable, value
-				FROM {db_prefix}themes
-				WHERE variable IN ({string:name}, {string:theme_dir})
-					AND id_member = {int:no_member}',
-				array(
-					'no_member' => 0,
-					'name' => 'name',
-					'theme_dir' => 'theme_dir',
-				)
-			);
-			$context['themes'] = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				if (!isset($context['themes'][$row['id_theme']]))
-					$context['themes'][$row['id_theme']] = array(
-						'id' => $row['id_theme'],
-						'num_default_options' => 0,
-						'num_members' => 0,
-					);
-				$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
-			}
-			$db->free_result($request);
+			$context['themes'] = installedThemes();
 
 			$request = $db->query('', '
 				SELECT id_theme, COUNT(*) AS value
