@@ -324,7 +324,7 @@ function get_file_listing($path, $relative)
 				'is_template' => false,
 				'is_image' => false,
 				'is_editable' => false,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $relative . $entry,
+				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $relative . $entry,
 				'size' => '',
 			);
 		else

@@ -47,7 +47,7 @@ class Themes_Controller
 	 * Requires the user not be a guest. (@todo what?)
 	 * Accessed via ?action=admin;area=theme.
 	 */
-	public function action_thememain()
+	public function action_index()
 	{
 		global $txt, $context;
 
@@ -72,6 +72,8 @@ class Themes_Controller
 			'pick' => 'action_pick',
 			'edit' => 'action_edit',
 			'copy' => 'action_copy',
+			'themelist' => 'action_themelist',
+			'browse' => 'action_browse',
 		);
 
 		// @todo Layout Settings?
@@ -92,6 +94,12 @@ class Themes_Controller
 						'description' => $txt['themeadmin_reset_desc'],
 					),
 					'edit' => array(
+						'description' => $txt['themeadmin_edit_desc'],
+					),
+					'themelist' => array(
+						'description' => $txt['themeadmin_edit_desc'],
+					),
+					'browse' => array(
 						'description' => $txt['themeadmin_edit_desc'],
 					),
 				),
@@ -1682,8 +1690,6 @@ class Themes_Controller
 	 * Allows choosing, browsing, and editing a theme files.
 	 *
 	 * Its subactions handle several features:
-	 *  - edit_list: show a list of installed themes
-	 *  - edit_browse: display the list of files in the current theme, and allow browsing
 	 *  - edit_template: display and edit a PHP template file
 	 *  - edit_style: display and edit a CSS file
 	 *  - edit_file: display and edit other files in the theme
@@ -1703,21 +1709,13 @@ class Themes_Controller
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
+		//Unfortunately we cannot edit an unkwown theme.. redirect.
 		if (empty($selectedTheme))
-		{
-			// you didn't choose a theme:
-			// we show you all installed themes
-			$this->_action_edit_list();
+			redirectexit('action=admin;area=theme;sa=themelist');
 
-			// ugly, but safer :P
-			return;
-		}
+		// you're browsing around, aren't you
 		elseif (!isset($_REQUEST['filename']))
-		{
-			// you're browsing around, aren't you
-			$this->action_browse();
-			return;
-		}
+			redirectexit('action=admin;area=theme;sa=browse;th=' . $selectedTheme);
 
 		// We don't have errors. Yet.
 		$context['session_error'] = false;
@@ -1907,7 +1905,7 @@ class Themes_Controller
 				fclose($fp);
 
 				// we're done here.
-				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
+				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . dirname($_REQUEST['filename']));
 			}
 			else
 			{
@@ -1978,14 +1976,22 @@ class Themes_Controller
 	 * The display will allow to choose a file for editing,
 	 * if it is writable.
 	 *
-	 * This function is forwarded to, from
-	 * ?action=admin;area=theme;sa=edit
+	 * ?action=admin;area=theme;sa=browse
 	 */
 	public function action_browse()
 	{
 		global $context, $scripturl;
 
+		isAllowedTo('admin_forum');
+		loadTemplate('Themes');
+
+		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
+
+		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
+
+		if (empty($selectedTheme))
+			redirectexit('action=admin;area=theme;sa=themelist');
 
 		// Get first the directory of the theme we are editing.
 		$context['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
@@ -2022,7 +2028,7 @@ class Themes_Controller
 				'is_template' => false,
 				'is_image' => false,
 				'is_editable' => false,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $temp,
+				'href' => $scripturl . '?action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $temp,
 				'size' => '',
 			));
 		}
@@ -2030,19 +2036,22 @@ class Themes_Controller
 			$context['theme_files'] = get_file_listing($theme_dir, '');
 
 		// finally, load the sub-template
-		$context['sub_template'] = 'edit_browse';
+		$context['sub_template'] = 'browse';
 	}
 
 	/**
 	 * List installed themes.
 	 * The listing will allow editing if the files are writable.
-	 *
-	 * This function is forwarded to, from
-	 * ?action=admin;area=theme;sa=edit
 	 */
-	private function _action_edit_list()
+	public function action_themelist()
 	{
 		global $context;
+
+		isAllowedTo('admin_forum');
+		loadTemplate('Themes');
+
+		// We'll work hard with them themes!
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		$context['themes'] = installedThemes();
 
@@ -2079,7 +2088,7 @@ class Themes_Controller
 			}
 		}
 
-		$context['sub_template'] = 'edit_list';
+		$context['sub_template'] = 'themelist';
 	}
 
 	/**

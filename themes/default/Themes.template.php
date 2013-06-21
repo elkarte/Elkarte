@@ -467,7 +467,7 @@ function template_set_settings()
 							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;filename=index.template.php">', $txt['theme_edit_index'], '</a>
 						</li>
 						<li>
-							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;directory=css">', $txt['theme_edit_style'], '</a>
+							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse;directory=css">', $txt['theme_edit_style'], '</a>
 						</li>
 					</ul>
 				</div>
@@ -786,7 +786,7 @@ function template_installed()
 /**
  * Interface to edit a list.
  */
-function template_edit_list()
+function template_themelist()
 {
 	global $context, $scripturl, $txt;
 
@@ -806,15 +806,15 @@ function template_edit_list()
 		echo '
 		<div class="title_bar">
 			<h3 class="titlebg">
-				<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit">', $theme['name'], '</a>', !empty($theme['version']) ? '
+				<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $theme['name'], '</a>', !empty($theme['version']) ? '
 				<em>(' . $theme['version'] . ')</em>' : '', '
 			</h3>
 		</div>
 		<div class="windowbg', $alternate ? '' : '2','">
 			<div class="content">
 				<ul>
-					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit">', $txt['themeadmin_edit_browse'], '</a></li>', $theme['can_edit_style'] ? '
-					<li><a href="' . $scripturl . '?action=admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=css">' . $txt['themeadmin_edit_style'] . '</a></li>' : '', '
+					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $txt['themeadmin_edit_browse'], '</a></li>', $theme['can_edit_style'] ? '
+					<li><a href="' . $scripturl . '?action=admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=css">' . $txt['themeadmin_edit_style'] . '</a></li>' : '', '
 					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy">', $txt['themeadmin_edit_copy_template'], '</a></li>
 				</ul>
 			</div>
@@ -874,7 +874,7 @@ function template_copy_template()
 /**
  * Interface to browse the files of a theme in admin panel.
  */
-function template_edit_browse()
+function template_browse()
 {
 	global $context, $txt;
 
