@@ -53,7 +53,8 @@ class Groups_Controller extends Action_Controller
 		{
 			require_once(CONTROLLERDIR . '/ModerationCenter.controller.php');
 			$_GET['area'] = (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'requests') ? 'groups' : 'viewgroups';
-			action_modcenter(true);
+			$controller = new ModerationCenter_Controller();
+			$controller->prepareModcenter();
 		}
 		// Otherwise add something to the link tree, for normal people.
 		else

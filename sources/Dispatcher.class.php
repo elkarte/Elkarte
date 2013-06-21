@@ -158,7 +158,7 @@ class Site_Dispatcher
 			'markasread' => array('Markasread.controller.php', 'MarkRead_Controller', 'action_index'),
 			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
 			'memberlist' => array('Memberlist.controller.php', 'Memberlist_Controller', 'action_index'),
-			'moderate' => array('ModerationCenter.controller.php', 'ModerationCenter_Controller', 'action_modcenter'),
+			'moderate' => array('ModerationCenter.controller.php', 'ModerationCenter_Controller', 'action_index'),
 			'karma' => array('Karma.controller.php', 'Karma_Controller', ''),
 			'movetopic' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic'),
 			'movetopic2' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic2'),

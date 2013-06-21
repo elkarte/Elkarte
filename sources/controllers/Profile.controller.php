@@ -22,13 +22,15 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Profile_Controller
+class Profile_Controller extends Action_Controller
 {
 	/**
 	 * Allow the change or view of profiles.
 	 * Loads the profile menu.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
 		global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
