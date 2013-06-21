@@ -227,43 +227,14 @@ class Themes_Controller
 			}
 
 			if (!empty($setValues))
-			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$setValues,
-					array('id_theme', 'variable', 'id_member')
-				);
-			}
+				updateThemePath($setValues);
 
 			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		loadTemplate('Themes');
 
-		$request = $db->query('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_url}, {string:images_url})
-				AND id_member = {int:no_member}',
-			array(
-				'no_member' => 0,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-				'theme_url' => 'theme_url',
-				'images_url' => 'images_url',
-			)
-		);
-		$context['themes'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!isset($context['themes'][$row['id_theme']]))
-				$context['themes'][$row['id_theme']] = array(
-					'id' => $row['id_theme'],
-				);
-			$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
-		}
-		$db->free_result($request);
+		$context['themes'] = installedThemes();
 
 		foreach ($context['themes'] as $i => $theme)
 		{

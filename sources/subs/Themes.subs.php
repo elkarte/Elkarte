@@ -26,11 +26,13 @@ function installedThemes()
 	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
-		WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_templates}, {string:theme_layers})
+		WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_url}, {string:images_url}, {string:theme_templates}, {string:theme_layers})
 			AND id_member = {int:no_member}',
 		array(
 			'name' => 'name',
 			'theme_dir' => 'theme_dir',
+			'theme_url' => 'theme_url',
+			'images_url' => 'images_url',
 			'theme_templates' => 'theme_templates',
 			'theme_layers' => 'theme_layers',
 			'no_member' => 0,
@@ -350,4 +352,17 @@ function get_file_listing($path, $relative)
 	}
 
 	return array_merge($listing1, $listing2);
+}
+
+function updateThemePath($setValues)
+{
+	$db = database;
+
+	$db->insert('replace',
+		'{db_prefix}themes',
+		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		$setValues,
+		array('id_theme', 'variable', 'id_member')
+	);
+	
 }
