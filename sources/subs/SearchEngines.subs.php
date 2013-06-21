@@ -55,8 +55,8 @@ function spiderCheck()
 	if (empty($spider_data))
 		return false;
 
-	// Only do these bits once.
-	$ci_user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
+	// We need user agent
+	$req = request();
 
 	// Always attempt IPv6 first.
 	if (strpos($_SERVER['REMOTE_ADDR'], ':') !== false)
@@ -67,7 +67,7 @@ function spiderCheck()
 	foreach ($spider_data as $spider)
 	{
 		// User agent is easy.
-		if (!empty($spider['user_agent']) && strpos($ci_user_agent, strtolower($spider['user_agent'])) !== false)
+		if (!empty($spider['user_agent']) && strpos(strtolower($req->user_agent()), strtolower($spider['user_agent'])) !== false)
 			$_SESSION['id_robot'] = $spider['id_spider'];
 		// IP stuff is harder.
 		elseif (!empty($ip_parts))
@@ -148,7 +148,8 @@ function logSpider()
 	{
 		if ($modSettings['spider_mode'] > 2)
 		{
-			$url = $_GET + array('USER_AGENT' => $_SERVER['HTTP_USER_AGENT']);
+			$req = request();
+			$url = $_GET + array('USER_AGENT' => $req->user_agent());
 			unset($url['sesc'], $url[$context['session_var']]);
 			$url = serialize($url);
 		}

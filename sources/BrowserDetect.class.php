@@ -54,6 +54,12 @@ class Browser_Detector
 	private $_is_tablet = null;
 
 	/**
+	 * User agent
+	 * @var string
+	 */
+	private $_ua = null;
+
+	/**
 	 * The main method of this class, you know the one that does the job: detect the thing.
 	 *  - determines the user agent (browser) as best it can.
 	 * The method fills the instance variables _is_mobile and _is_tablet,
@@ -72,6 +78,10 @@ class Browser_Detector
 
 		// Initialize some values we'll set differently if necessary...
 		$this->_browsers['needs_size_fix'] = false;
+
+		// Saves us many many calls
+		$req = request();
+		$this->_ua = $req->user_agent();
 
 		// One at a time, one at a time, and in this order too
 		if ($this->isOpera())
@@ -121,7 +131,7 @@ class Browser_Detector
 	function isOpera()
 	{
 		if (!isset($this->_browsers['is_opera']))
-			$this->_browsers['is_opera'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Opera') !== false;
+			$this->_browsers['is_opera'] = strpos($this->_ua, 'Opera') !== false;
 		return $this->_browsers['is_opera'];
 	}
 
@@ -134,7 +144,7 @@ class Browser_Detector
 	{
 		// I'm IE, Yes I'm the real IE; All you other IEs are just imitating.
 		if (!isset($this->_browsers['is_ie']))
-			$this->_browsers['is_ie'] = !$this->isOpera() && !$this->isGecko() && !$this->isWebTv() && preg_match('~MSIE \d+~', $_SERVER['HTTP_USER_AGENT']) === 1;
+			$this->_browsers['is_ie'] = !$this->isOpera() && !$this->isGecko() && !$this->isWebTv() && preg_match('~MSIE \d+~', $this->_ua) === 1;
 		return $this->_browsers['is_ie'];
 	}
 
@@ -146,7 +156,7 @@ class Browser_Detector
 	function isWebkit()
 	{
 		if (!isset($this->_browsers['is_webkit']))
-			$this->_browsers['is_webkit'] = strpos($_SERVER['HTTP_USER_AGENT'], 'AppleWebKit') !== false;
+			$this->_browsers['is_webkit'] = strpos($this->_ua, 'AppleWebKit') !== false;
 		return $this->_browsers['is_webkit'];
 	}
 
@@ -158,7 +168,7 @@ class Browser_Detector
 	function isFirefox()
 	{
 		if (!isset($this->_browsers['is_firefox']))
-			$this->_browsers['is_firefox'] = preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)/~', $_SERVER['HTTP_USER_AGENT']) === 1 && $this->isGecko();
+			$this->_browsers['is_firefox'] = preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)/~', $this->_ua) === 1 && $this->isGecko();
 		return $this->_browsers['is_firefox'];
 	}
 
@@ -170,7 +180,7 @@ class Browser_Detector
 	function isWebTv()
 	{
 		if (!isset($this->_browsers['is_web_tv']))
-			$this->_browsers['is_web_tv'] = strpos($_SERVER['HTTP_USER_AGENT'], 'WebTV') !== false;
+			$this->_browsers['is_web_tv'] = strpos($this->_ua, 'WebTV') !== false;
 		return $this->_browsers['is_web_tv'];
 	}
 
@@ -182,7 +192,7 @@ class Browser_Detector
 	function isKonqueror()
 	{
 		if (!isset($this->_browsers['is_konqueror']))
-			$this->_browsers['is_konqueror'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Konqueror') !== false;
+			$this->_browsers['is_konqueror'] = strpos($this->_ua, 'Konqueror') !== false;
 		return $this->_browsers['is_konqueror'];
 	}
 
@@ -194,7 +204,7 @@ class Browser_Detector
 	function isGecko()
 	{
 		if (!isset($this->_browsers['is_gecko']))
-			$this->_browsers['is_gecko'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Gecko') !== false && !$this->isWebkit() && !$this->isKonqueror();
+			$this->_browsers['is_gecko'] = strpos($this->_ua, 'Gecko') !== false && !$this->isWebkit() && !$this->isKonqueror();
 		return $this->_browsers['is_gecko'];
 	}
 
@@ -206,7 +216,7 @@ class Browser_Detector
 	function isOperaMini()
 	{
 		if (!isset($this->_browsers['is_opera_mini']))
-			$this->_browsers['is_opera_mini'] = (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) || stripos($_SERVER['HTTP_USER_AGENT'], 'opera mini') !== false);
+			$this->_browsers['is_opera_mini'] = (isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA']) || stripos($this->_ua, 'opera mini') !== false);
 		if ($this->_browsers['is_opera_mini'])
 			$this->_is_mobile = true;
 		return $this->_browsers['is_opera_mini'];
@@ -220,7 +230,7 @@ class Browser_Detector
 	function isOperaMobi()
 	{
 		if (!isset($this->_browsers['is_opera_mobi']))
-			$this->_browsers['is_opera_mobi'] = stripos($_SERVER['HTTP_USER_AGENT'], 'opera mobi') !== false;
+			$this->_browsers['is_opera_mobi'] = stripos($this->_ua, 'opera mobi') !== false;
 		if ($this->_browsers['is_opera_mobi'])
 			$this->_is_mobile = true;
 		return $this->_browsers['is_opera_mini'];
@@ -234,12 +244,12 @@ class Browser_Detector
 	private function _setupWebkit()
 	{
 		$this->_browsers += array(
-			'is_chrome' => strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false,
-			'is_iphone' => (strpos($_SERVER['HTTP_USER_AGENT'], 'iPhone') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'iPod') !== false) && strpos($_SERVER['HTTP_USER_AGENT'], 'iPad') === false,
-			'is_blackberry' => stripos($_SERVER['HTTP_USER_AGENT'], 'BlackBerry') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'PlayBook') !== false,
-			'is_android' => strpos($_SERVER['HTTP_USER_AGENT'], 'Android') !== false,
-			'is_nokia' => strpos($_SERVER['HTTP_USER_AGENT'], 'SymbianOS') !== false,
-			'is_ipad' => strpos($_SERVER['HTTP_USER_AGENT'], 'iPad') !== false,
+			'is_chrome' => strpos($this->_ua, 'Chrome') !== false,
+			'is_iphone' => (strpos($this->_ua, 'iPhone') !== false || strpos($this->_ua, 'iPod') !== false) && strpos($this->_ua, 'iPad') === false,
+			'is_blackberry' => stripos($this->_ua, 'BlackBerry') !== false || strpos($this->_ua, 'PlayBook') !== false,
+			'is_android' => strpos($this->_ua, 'Android') !== false,
+			'is_nokia' => strpos($this->_ua, 'SymbianOS') !== false,
+			'is_ipad' => strpos($this->_ua, 'iPad') !== false,
 		);
 
 		// blackberry, playbook, iphone, nokia, android and ipods set a mobile flag
@@ -247,23 +257,23 @@ class Browser_Detector
 			$this->_is_mobile = true;
 
 		// iPad and droid tablets get a tablet flag
-		$this->_browsers['is_android_tablet'] = $this->_browsers['is_android'] && strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile') === false;
+		$this->_browsers['is_android_tablet'] = $this->_browsers['is_android'] && strpos($this->_ua, 'Mobile') === false;
 		if ($this->_browsers['is_ipad'] || $this->_browsers['is_android_tablet'])
 			$this->_is_tablet = true;
 
-		$this->_browsers['is_safari'] = strpos($_SERVER['HTTP_USER_AGENT'], 'Safari') !== false && !$this->_browsers['is_chrome'] && !$this->_browsers['is_iphone'];
+		$this->_browsers['is_safari'] = strpos($this->_ua, 'Safari') !== false && !$this->_browsers['is_chrome'] && !$this->_browsers['is_iphone'];
 
 		// if Chrome, get the major version
 		if ($this->_browsers['is_chrome'])
 		{
-			if (preg_match('~chrome[/]([0-9][0-9]?[.])~i', $_SERVER['HTTP_USER_AGENT'], $match) === 1)
+			if (preg_match('~chrome[/]([0-9][0-9]?[.])~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_chrome' . (int) $match[1]] = true;
 		}
 
 		// or if Safari get its major version
 		if ($this->_browsers['is_safari'])
 		{
-			if (preg_match('~version/?(.*)safari.*~i', $_SERVER['HTTP_USER_AGENT'], $match) === 1)
+			if (preg_match('~version/?(.*)safari.*~i', $this->_ua, $match) === 1)
 				$this->_browsers['is_safari' . (int) trim($match[1])] = true;
 		}
 	}
@@ -280,7 +290,7 @@ class Browser_Detector
 		$this->_browsers['is_ie_compat_view'] = false;
 
 		// get the version of the browser from the msie tag
-		if (preg_match('~MSIE\s?([0-9][0-9]?.[0-9])~i', $_SERVER['HTTP_USER_AGENT'], $msie_match) === 1)
+		if (preg_match('~MSIE\s?([0-9][0-9]?.[0-9])~i', $this->_ua, $msie_match) === 1)
 		{
 			$msie_match[1] = trim($msie_match[1]);
 			$msie_match[1] = (($msie_match[1] - (int) $msie_match[1]) == 0) ? (int) $msie_match[1] : $msie_match[1];
@@ -288,7 +298,7 @@ class Browser_Detector
 		}
 
 		// "modern" ie uses trident 4=ie8, 5=ie9, 6=ie10, even in compatability view
-		if (preg_match('~Trident/([0-9.])~i', $_SERVER['HTTP_USER_AGENT'], $trident_match) === 1)
+		if (preg_match('~Trident/([0-9.])~i', $this->_ua, $trident_match) === 1)
 		{
 			$this->_browsers['is_ie' . ((int) $trident_match[1] + 4)] = true;
 
@@ -302,14 +312,14 @@ class Browser_Detector
 		$this->_browsers['is_ie6'] = !empty($this->_browsers['is_ie6']) && ($this->_browsers['is_ie_compat_view'] === false);
 
 		// IE mobile 7 or 9, ... shucks why not
-		if ((!empty($this->_browsers['is_ie7']) && strpos($_SERVER['HTTP_USER_AGENT'], 'IEMobile/7') !== false) || (!empty($this->_browsers['is_ie9']) && strpos($_SERVER['HTTP_USER_AGENT'], 'IEMobile/9') !== false))
+		if ((!empty($this->_browsers['is_ie7']) && strpos($this->_ua, 'IEMobile/7') !== false) || (!empty($this->_browsers['is_ie9']) && strpos($this->_ua, 'IEMobile/9') !== false))
 		{
 			$this->_browsers['is_ie_mobi'] = true;
 			$this->_is_mobile = true;
 		}
 
 		// Tablets as well, someone may win one
-		if (strpos($_SERVER['HTTP_USER_AGENT'], 'Tablet PC') !== false)
+		if (strpos($this->_ua, 'Tablet PC') !== false)
 		{
 			$this->_browsers['is_tablet_pc'] = true;
 			$this->_is_tablet = true;
@@ -318,7 +328,7 @@ class Browser_Detector
 		// And some throwbacks to a bygone era, deposited here like cholesterol in your arteries
 		$this->_browsers += array(
 			'is_ie4' => !empty($this->_browsers['is_ie4']) && !$this->_browsers['is_web_tv'],
-			'is_mac_ie' => strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE 5.') !== false && strpos($_SERVER['HTTP_USER_AGENT'], 'Mac') !== false
+			'is_mac_ie' => strpos($this->_ua, 'MSIE 5.') !== false && strpos($this->_ua, 'Mac') !== false
 		);
 
 		// Before IE8 we need to fix IE... lots!
@@ -335,7 +345,7 @@ class Browser_Detector
 	 */
 	private function _setupFirefox()
 	{
-		if (preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)[\/ \(]([^ ;\)]+)~', $_SERVER['HTTP_USER_AGENT'], $match) === 1)
+		if (preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)[\/ \(]([^ ;\)]+)~', $this->_ua, $match) === 1)
 			$this->_browsers['is_firefox' . (int) $match[1]] = true;
 	}
 
@@ -347,10 +357,10 @@ class Browser_Detector
 	private function _setupOpera()
 	{
 		// Opera 10+ uses the version tag at the end of the string
-		if (preg_match('~\sVersion/([0-9]+)\.[0-9]+(?:\s*|$)~', $_SERVER['HTTP_USER_AGENT'], $match))
+		if (preg_match('~\sVersion/([0-9]+)\.[0-9]+(?:\s*|$)~', $this->_ua, $match))
 			$this->_browsers['is_opera' . (int) $match[1]] = true;
 		// Opera pre 10 is supposed to uses the Opera tag alone, as do some spoofers
-		elseif (preg_match('~Opera[ /]([0-9]+)(?!\\.[89])~', $_SERVER['HTTP_USER_AGENT'], $match))
+		elseif (preg_match('~Opera[ /]([0-9]+)(?!\\.[89])~', $this->_ua, $match))
 			$this->_browsers['is_opera' . (int) $match[1]] = true;
 
 		// Needs size fix?

@@ -85,7 +85,10 @@ function getServerVersions($checkFor)
 		$versions['php'] = array('title' => 'PHP', 'version' => PHP_VERSION, 'more' => '?action=admin;area=serversettings;sa=phpinfo');
 
 	if (in_array('server', $checkFor))
-		$versions['server'] = array('title' => $txt['support_versions_server'], 'version' => $_SERVER['SERVER_SOFTWARE']);
+	{
+		$req = request();
+		$versions['server'] = array('title' => $txt['support_versions_server'], 'version' => $req->server_software());
+	}
 
 	return $versions;
 }
