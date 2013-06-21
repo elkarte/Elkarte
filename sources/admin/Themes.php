@@ -190,6 +190,7 @@ class Themes_Controller
 	{
 		global $context, $boardurl;
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		$db = database();
 
 		loadLanguage('Admin');
@@ -203,25 +204,7 @@ class Themes_Controller
 			checkSession();
 			validateToken('admin-tl');
 
-			$request = $db->query('', '
-				SELECT id_theme, variable, value
-				FROM {db_prefix}themes
-				WHERE variable IN ({string:theme_dir}, {string:theme_url}, {string:images_url}, {string:base_theme_dir}, {string:base_theme_url}, {string:base_images_url})
-					AND id_member = {int:no_member}',
-				array(
-					'no_member' => 0,
-					'theme_dir' => 'theme_dir',
-					'theme_url' => 'theme_url',
-					'images_url' => 'images_url',
-					'base_theme_dir' => 'base_theme_dir',
-					'base_theme_url' => 'base_theme_url',
-					'base_images_url' => 'base_images_url',
-				)
-			);
-			$themes = array();
-			while ($row = $db->fetch_assoc($request))
-				$themes[$row['id_theme']][$row['variable']] = $row['value'];
-			$db->free_result($request);
+			$themes = installedThemes();
 
 			$setValues = array();
 			foreach ($themes as $id => $theme)
