@@ -58,7 +58,8 @@ function createMenu($menuData, $menuOptions = array())
 				string 0:		Text label for this subsection.
 				array 1:		Array of permissions to check for this subsection.
 				bool 2:			Is this the default subaction - if not set for any will default to first...
-				bool enabled:		Bool to say whether this should be enabled or not.
+				bool enabled:	Bool to say whether this should be enabled or not.
+				array active:	Set the button active for other subsections.
 	*/
 
 	// Every menu gets a unique ID, these are shown in first in, first out order.
@@ -159,10 +160,14 @@ function createMenu($menuData, $menuOptions = array())
 										// Save which is the first...
 										if (empty($first_sa))
 											$first_sa = $sa;
-
+										
 										// Is this the current subsection?
 										if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == $sa)
 											$menu_context['current_subsection'] = $sa;
+	
+										elseif (isset($sub['active']) && isset($_REQUEST['sa']) && in_array($_REQUEST['sa'], $sub['active']))
+											$menu_context['current_subsection'] = $sa;
+
 										// Otherwise is it the default?
 										elseif (!isset($menu_context['current_subsection']) && !empty($sub[2]))
 											$menu_context['current_subsection'] = $sa;
