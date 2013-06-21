@@ -1322,6 +1322,8 @@ class ManageMaillist_Controller extends Action_Controller
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
+		// We'll need this, because bounce templates are stored
+		// with warning templates.
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Submitting a new one or editing an existing one then pass this request off
@@ -1344,11 +1346,10 @@ class ManageMaillist_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailtemplates;' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'title',
 			'get_items' => array(
-				'function' => array($this, 'list_getWarningTemplates'),
-				'params' => array('bnctpl'),
+				'function' => array($this, 'list_getBounceTemplates'),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getWarningTemplateCount'),
+				'function' => array($this, 'list_getBounceTemplateCount'),
 				'params' => array('bnctpl'),
 			),
 			'columns' => array(
@@ -1539,25 +1540,25 @@ class ManageMaillist_Controller extends Action_Controller
 	}
 
 	/**
-	 * Callback for createList() to get all the templates of a type from the system
+	 * Callback for createList() to get all the bounce templates from the system
 	 *
 	 * @param $start
 	 * @param $items_per_page
 	 * @param $sort
 	 * @param $template_type type of template to load
 	 */
-	function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
+	protected function list_getBounceTemplates($start, $items_per_page, $sort)
 	{
-		return warningTemplates($start, $items_per_page, $sort, $template_type);
+		return warningTemplates($start, $items_per_page, $sort, 'bnctpl');
 	}
 
 	/**
-	 * Callback for createList() to get the number of templates of a type in the system
+	 * Callback for createList() to get the number of bounce templates in the system
 	 *
 	 * @param string $template_type
 	 */
-	function list_getWarningTemplateCount($template_type = 'warntpl')
+	protected function list_getBounceTemplateCount()
 	{
-		return warningTemplateCount($template_type);
+		return warningTemplateCount('bnctpl');
 	}
 }

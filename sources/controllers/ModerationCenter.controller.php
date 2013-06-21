@@ -260,7 +260,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * This handler presents the home page of the moderation center.
 	 */
-	function action_moderationHome()
+	public function action_moderationHome()
 	{
 		global $txt, $context, $user_settings;
 
@@ -307,7 +307,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * This ends a moderator session, requiring authentication to access the MCP again.
 	 */
-	function action_modEndSession()
+	public function action_modEndSession()
 	{
 		// This is so easy!
 		unset($_SESSION['moderate_time']);
@@ -325,7 +325,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Show a notice sent to a user.
 	 */
-	function action_showNotice()
+	public function action_showNotice()
 	{
 		global $txt, $context;
 
@@ -359,7 +359,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Browse all the reported posts...
 	 * @todo this needs to be given its own file?
 	 */
-	function action_reportedPosts()
+	public function action_reportedPosts()
 	{
 		global $txt, $context, $scripturl, $user_info;
 
@@ -536,7 +536,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Change moderation preferences.
 	 */
-	function action_moderationSettings()
+	public function action_moderationSettings()
 	{
 		global $context, $txt, $user_settings, $user_info;
 
@@ -636,7 +636,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Edit a warning template.
 	 */
-	function action_modifyWarningTemplate()
+	public function action_modifyWarningTemplate()
 	{
 		global $context, $txt, $user_info;
 
@@ -737,7 +737,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Get details about the moderation report...
 	 * specified in $_REQUEST['report'].
 	 */
-	function action_modReport()
+	public function action_modReport()
 	{
 		global $user_info, $context, $scripturl, $txt;
 
@@ -983,7 +983,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * View watched users.
 	 */
-	function action_viewWatchedUsers()
+	public function action_viewWatchedUsers()
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
@@ -1196,7 +1196,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Simply put, look at the warning log!
 	 */
-	function action_viewWarningLog()
+	public function action_viewWarningLog()
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
@@ -1301,7 +1301,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 *  - Shows all the templates in the system
 	 *  - Provides for actions to add or delete them
 	 */
-	function action_viewWarningTemplates()
+	public function action_viewWarningTemplates()
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
@@ -1423,7 +1423,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Entry point for viewing warning related stuff.
 	 */
-	function action_viewWarnings()
+	public function action_viewWarnings()
 	{
 		global $context, $txt;
 
@@ -1454,7 +1454,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 *
 	 * @param string $approve_query
 	 */
-	function list_getWatchedUserCount($approve_query)
+	protected function list_getWatchedUserCount($approve_query)
 	{
 		global $modSettings;
 
@@ -1470,7 +1470,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param string $approve_query
 	 * @param string $dummy
 	 */
-	function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
+	protected function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 	{
 		// find all our watched users
 		return watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy);
@@ -1481,7 +1481,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 *
 	 * @param string $approve_query
 	 */
-	function list_getWatchedUserPostsCount($approve_query)
+	protected function list_getWatchedUserPostsCount($approve_query)
 	{
 		global $modSettings;
 
@@ -1497,7 +1497,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param string $approve_query
 	 * @param array $delete_boards
 	 */
-	function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
+	protected function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 	{
 		// watched users posts
 		return watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards);
@@ -1511,7 +1511,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param $sort
 	 * @param $template_type type of template to load
 	 */
-	function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
+	protected function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 	{
 		return warningTemplates($start, $items_per_page, $sort, $template_type);
 	}
@@ -1521,7 +1521,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 *
 	 * @param string $template_type
 	 */
-	function list_getWarningTemplateCount($template_type = 'warntpl')
+	protected function list_getWarningTemplateCount($template_type = 'warntpl')
 	{
 		return warningTemplateCount($template_type);
 	}
@@ -1533,7 +1533,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param $items_per_page
 	 * @param $sort
 	 */
-	function list_getWarnings($start, $items_per_page, $sort)
+	protected function list_getWarnings($start, $items_per_page, $sort)
 	{
 		return warnings($start, $items_per_page, $sort);
 	}
@@ -1541,7 +1541,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Callback for createList(), get the total count of all current warnings
 	 */
-	function list_getWarningCount()
+	protected function list_getWarningCount()
 	{
 		return warningCount();
 	}
