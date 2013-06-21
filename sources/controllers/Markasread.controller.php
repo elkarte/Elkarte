@@ -61,23 +61,45 @@ class MarkRead_Controller
 	 */
 	public function action_index_api()
 	{
-		global $context, $txt;
+		global $context, $txt, $user_info;
+
+		loadTemplate('Xml');
+
+		Template_Layers::getInstance()->removeAll();
+		$context['sub_template'] = 'generic_xml_buttons';
 
 		// Guests can't mark things.
-		is_not_guest('', false);
+		if ($user_info['is_guest'])
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_guests']
+			);
+			return;
+		}
 
-		checkSession('get');
+		if (checkSession('get', '', false))
+		{
+			// Again, this is a special case, someone will deal with the others later :P
+			if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
+			{
+				loadLanguage('Errors');
+				$context['xml_data'] = array(
+					'error' => 1,
+					'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id'],
+				);
+				return;
+			}
+			else
+				obExit(false);
+		}
 
 		$this->_dispatch();
 
 		// For the time being this is a special case
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
 		{
-			loadTemplate('Xml');
-
-			Template_Layers::getInstance()->removeAll();
-			$context['sub_template'] = 'generic_xml_buttons';
-
 			$context['xml_data'] = array(
 				'text' => $txt['unread_topics_visit_none'],
 			);

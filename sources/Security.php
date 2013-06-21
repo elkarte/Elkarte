@@ -123,7 +123,7 @@ function is_not_guest($message = '', $is_fatal = true)
 
 	// Luckily, this person isn't a guest.
 	if (isset($user_info['is_guest']) && !$user_info['is_guest'])
-		return;
+		return true;
 
 	// People always worry when they see people doing things they aren't actually doing...
 	$_GET['action'] = '';
@@ -152,6 +152,8 @@ function is_not_guest($message = '', $is_fatal = true)
 		$_SESSION['login_url'] = $scripturl . '?' . $_SERVER['QUERY_STRING'];
 		redirectexit('action=login');
 	}
+	elseif (isset($_GET['api']))
+		return false;
 	else
 	{
 		loadTemplate('Login');
