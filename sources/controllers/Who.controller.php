@@ -24,7 +24,7 @@ if (!defined('ELKARTE'))
 /**
  * Who Controller
  */
-class Who_Controller
+class Who_Controller extends Action_Controller
 {
 	/**
 	 * Default action of this class.

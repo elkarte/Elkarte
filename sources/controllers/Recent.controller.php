@@ -23,8 +23,18 @@ if (!defined('ELKARTE'))
 /**
  * Recent Post Controller
  */
-class Recent_Controller
+class Recent_Controller extends Action_Controller
 {
+	/**
+	 * Intended entry point for recent controller class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// figure out what action to do
+	}
+
 	/**
 	 * Find the ten most recent posts.
 	 * Accessed by action=recent.

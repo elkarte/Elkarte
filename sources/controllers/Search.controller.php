@@ -27,8 +27,18 @@ $GLOBALS['search_versions'] = array(
 	'search_version' => strtr('ELKARTE 1+0=Alpha', array('+' => '.', '=' => ' ')),
 );
 
-class Search_Controller
+class Search_Controller extends Action_Controller
 {
+	/**
+	 * Intended entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Call the right method.
+	}
+
 	/**
 	 * Ask the user what they want to search for.
 	 * What it does:

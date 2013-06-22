@@ -21,8 +21,18 @@ if (!defined('ELKARTE'))
 /**
  * Suggest Controler
  */
-class Suggest_Controller
+class Suggest_Controller extends Action_Controller
 {
+	/**
+	 * Intended entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Call the right method for this user request.
+	}
+
 	/**
 	 * This keeps track of all registered handling functions for auto suggest
 	 *  functionality and passes execution to them.
@@ -30,9 +40,11 @@ class Suggest_Controller
 	 *
 	 * @param bool $checkRegistered = null
 	 */
-	function action_suggest($checkRegistered = null)
+	public function action_suggest($checkRegistered = null)
 	{
 		global $context;
+
+		// @todo this method shouldn't have a $checkRegistered parameter...
 
 		// These are all registered types.
 		$searchTypes = array(
@@ -65,7 +77,7 @@ class Suggest_Controller
 	 *
 	 * @return string
 	 */
-	function action_suggest_member()
+	public function action_suggest_member()
 	{
 		global $user_info, $context;
 
@@ -85,7 +97,7 @@ class Suggest_Controller
 	 *
 	 * @return string
 	 */
-	function action_suggest_versions()
+	public function action_suggest_versions()
 	{
 		$xml_data = array(
 			'items' => array(

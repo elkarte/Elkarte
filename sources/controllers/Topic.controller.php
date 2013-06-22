@@ -24,8 +24,22 @@ if (!defined('ELKARTE'))
 /**
  * Topics Controller
  */
-class Topic_Controller
+class Topic_Controller extends Action_Controller
 {
+	/**
+	 * Entry point for this class (by default).
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Call the right method, if it ain't done yet.
+		// this is done by the dispatcher, so lets leave it alone...
+		// we don't want to assume what it means if the user doesn't
+		// send us a ?sa=, do we? (lock topics out of nowhere?)
+		// Unless... we can printpage()
+	}
+
 	/**
 	 * Locks a topic... either by way of a moderator or the topic starter.
 	 * What this does:
@@ -298,7 +312,7 @@ class Topic_Controller
 			}
 
 			$context['user']['started'] = $user_info['id'] == $row['id_member'] && !$user_info['is_guest'];
-			
+
 			// Set up the basic poll information.
 			$context['poll'] = array(
 				'id' => $row['id_poll'],

@@ -21,8 +21,19 @@ if (!defined('ELKARTE'))
 /**
  * ProfileAccount controller handles actions made on a user's profile.
  */
-class ProfileAccount_Controller
+class ProfileAccount_Controller extends Action_Controller
 {
+	/**
+	 * Entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// figure out what action to do... if we're called directly
+		// actions in this class are called from the Profile menu, though.
+	}
+
 	/**
 	 * Issue/manage an user's warning status.
 	 */
