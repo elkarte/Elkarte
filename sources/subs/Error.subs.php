@@ -54,7 +54,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
  *
  * @return int
  */
-function numErrors()
+function numErrors($filter = array())
 {
 	$db = database();
 

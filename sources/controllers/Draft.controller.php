@@ -46,6 +46,8 @@ class Draft_Controller
 			// empty($modSettings['enable_drafts']) || empty($modSettings['enable_post_drafts'])
 			fatal_lang_error('no_access', false);
 
+		require_once(SUBSDIR . '/Drafts.subs.php');
+
 		// Some initial context.
 		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 		$context['current_member'] = $memID;
@@ -155,6 +157,7 @@ class Draft_Controller
 		global $txt, $user_info, $scripturl, $modSettings, $context;
 
 		require_once(SUBSDIR . '/Profile.subs.php');
+		require_once(SUBSDIR . '/Drafts.subs.php');
 		$memID = currentMemberID();
 
 		// Quick check how we got here.
