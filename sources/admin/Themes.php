@@ -331,24 +331,9 @@ class Themes_Controller
 			{
 				// Are there options in non-default themes set that should be cleared?
 				if (!empty($old_settings))
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme != {int:default_theme}
-							AND id_member = {int:guest_member}
-							AND variable IN ({array_string:old_settings})',
-						array(
-							'default_theme' => 1,
-							'guest_member' => -1,
-							'old_settings' => $old_settings,
-						)
-					);
+					removeThemeOptions($old_settings);
 
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$setValues,
-					array('id_theme', 'variable', 'id_member')
-				);
+				updateThemeOptions($setValues);
 			}
 
 			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
