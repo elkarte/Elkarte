@@ -438,18 +438,27 @@ function countConfiguredMemberOptions()
 	return $themes;
 }
 
-function removeThemeOptions($old_settings)
+function removeThemeOptions($default_theme, $membergroups, $old_settings)
 {
 	$db = database();
+	
+	// Which theme's option should we clean? 
+	$default = ($default_theme = true ? '=' : '!='); 
 
+	// Guest or regular membergroups?
+	if ($membergroups === false )
+		$mem_param = array('operator' => '=', 'id' => -1);
+	else
+		$mem_param = array('operator' => '>', 'id' => 0);
+	
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
-		WHERE id_theme != {int:default_theme}
-			AND id_member = {int:guest_member}
+		WHERE id_theme '. $default . ' {int:default_theme}
+			AND id_member ' . $mem_param['operator'] . ' {int:guest_member}
 			AND variable IN ({array_string:old_settings})',
 		array(
 			'default_theme' => 1,
-			'guest_member' => -1,
+			'guest_member' => $mem_param['id'],
 			'old_settings' => $old_settings,
 		)
 	);

@@ -331,7 +331,7 @@ class Themes_Controller
 			{
 				// Are there options in non-default themes set that should be cleared?
 				if (!empty($old_settings))
-					removeThemeOptions($old_settings);
+					removeThemeOptions(false, false, $old_settings);
 
 				updateThemeOptions($setValues);
 			}
@@ -399,17 +399,7 @@ class Themes_Controller
 
 			// Delete options from other themes.
 			if (!empty($old_settings))
-				$db->query('', '
-					DELETE FROM {db_prefix}themes
-					WHERE id_theme != {int:default_theme}
-						AND id_member > {int:no_member}
-						AND variable IN ({array_string:old_settings})',
-					array(
-						'default_theme' => 1,
-						'no_member' => 0,
-						'old_settings' => $old_settings,
-					)
-				);
+				removeThemeOptions(false, true, $old_settings);
 
 			foreach ($_POST['options'] as $opt => $val)
 			{
