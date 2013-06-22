@@ -250,10 +250,13 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			case 'date':
 				$sort_by_query = 'pm.id_pm';
+				break;
 			case 'name':
 				$sort_by_query = 'IFNULL(mem.real_name, \'\')';
+				break;
 			case 'subject':
 				$sort_by_query = 'pm.subject';
+				break;
 			default:
 				$sort_by_query = 'pm.id_pm';
 		}
