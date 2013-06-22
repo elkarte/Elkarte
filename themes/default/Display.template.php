@@ -938,7 +938,7 @@ function template_pages_and_buttons_below()
 
 	// Show the jumpto box, or actually...let Javascript do it.
 	echo '
-			<div class="plainbox" id="display_jump_to">&nbsp;</div>';
+			<div id="display_jump_to">&nbsp;</div>';
 }
 /**
  * Used to display attachments

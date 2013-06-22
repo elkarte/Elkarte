@@ -70,7 +70,7 @@ function template_init()
 	$settings['require_theme_strings'] = false;
 
 	// This is used for the color variants
-	$settings['theme_variants'] = array('white', 'blue', 'red', 'green');
+	$settings['theme_variants'] = array('light', 'dark', 'basic', 'blue', 'red', 'green');
 
 	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
 	$settings['avatars_on_indexes'] = false;
@@ -194,7 +194,7 @@ function template_body_above()
 
 	// Wrapper div now echoes permanently for better layout options. h1 a is now target for "Go up" links.
 	echo '
-	<div id="top_section">
+	<div id="top_section"><a id="top"></a>
 		<div class="frame">
 			<span id="top_section_notice">';
 	// For above, see me grumblez in Issue #552. ;)
@@ -274,7 +274,7 @@ function template_body_above()
 	<header id="header"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
 		<div class="frame">
 			<h1 class="forumtitle">
-				<a id="top" href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
+				<a href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
 			</h1>';
 
 	echo '
@@ -283,11 +283,14 @@ function template_body_above()
 	echo'
 		</div>
 	</header>
-	<div id="wrapper">';
+	<div id="wrapper">
+		<a href="#top" id="gotop" title="', $txt['go_up'], '">&#8593;</a>
+		<a href="#bot" id="gobottom" title="', $txt['go_down'], '">&#8595;</a>';
 
-	// Show the menu here, according to the menu sub template. Moved this. Like it here. :)
+	// Added top of page and bottom of page links there ^^ for use anywhere on any page.
+	// Show the menu here, according to the menu sub template. Moved this. Like it here.
 	// Upper section and main content markup simplified. Less divs = happier parrots!
-	template_menu();
+		template_menu();
 
 	echo '
 		<div id="upper_section">
@@ -386,7 +389,7 @@ function template_body_below()
 	// Footer is now full-width by default. Frame inside it will match theme wrapper width automatically.
 	// Have removed "Go to top" link from footer, as I have a better idea. ;)
 	echo '
-	<footer id="footer_section">
+	<footer id="footer_section"><a id="bot"></a>
 		<div class="frame">
 			<ul>
 				<li class="copyright">', theme_copyright(), '
@@ -454,9 +457,9 @@ function theme_linktree($force_show = false)
 		if (isset($tree['extra_before']))
 			echo $tree['extra_before'];
 
-		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '
-						<a href="' . $tree['url'] . '"><span>' . $tree['name'] . '</span></a>' : '<span>' . $tree['name'] . '</span>';
+		// Show the link, including a URL if it should have one. Why were spans here? Why do people fall in love with spans?
+		// Spans have no semantic meaning, and offer no markup or CSS benefits here. Just use a plain anchor. [/grumble] :P
+		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . $tree['name'] . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))
@@ -611,7 +614,6 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 	if (empty($buttons))
 		return;
 
-	// @todo - Div here is pointless. Prefer to deprecate in favour of plain ul (easy CSS changes, but check for js bugz).
 	echo '
 							<ul class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
 								', implode('', $buttons), '
@@ -692,9 +694,9 @@ function template_select_boards($name, $label = '', $extra = '')
  * Another used and abused piece of template that can be found everywhere
  * @param string $button_strip index of $context to create the button strip
  * @param string $strip_direction direction of the button strip (see template_button_strip for details)
- * @param string $go index of $txt used to label the go up/down button (possible values go_up/go_down, other values can be used as well, though it may result in non working buttons)
+ * @param string $go index of $txt used to label the go up/down button < Deprecated (possible values go_up/go_down, other values can be used as well, though it may result in non working buttons)
  * @param array $options array of optional values, possible values:
- *                - 'top_button' (boolean) show/hide the go up/down button (@todo rename)
+ *                - 'top_button' (boolean) show/hide the go up/down button (@todo rename) < Deprecated
  *                - 'page_index' (string) index of $context where is located the pages index generated by constructPageIndex
  *                - 'page_index_markup' (string) markup for the page index, overrides 'page_index' and can be used if the page index code is not in the first level of $context
  *                - 'extra' (string) used to add html markup at the end of the template
@@ -703,8 +705,8 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
 {
 	global $context, $modSettings, $txt;
 
-	if (!isset($options['top_button']))
-		$options['top_button'] = !empty($modSettings['topbottomEnable']);
+	//if (!isset($options['top_button']))
+	//	$options['top_button'] = !empty($modSettings['topbottomEnable']);
 
 	if (!empty($options['page_index_markup']))
 	// Hmmm. I'm a tad wary of having floatleft here but anyway............
@@ -719,12 +721,16 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
 	if (!isset($options['extra']))
 		$options['extra'] = '';
 
-	// Also, would love to deprecate the old/top bottom buttons for something better (which I already know how to do).
+	// Also, would love to deprecate the old/top bottom buttons for something better (which I already know how to do). < Done. :)
+	// @todo - Just leaving stuff commented for the moment, in preparation for the inevitable bleating and circular motion. :D
 		echo '
-	<div class="pagesection">
-		', $options['top_button'] ? '<a id="page' . ($go != 'go_up' ? 'top' : 'bot') . '" href="#' . ($go == 'go_up' ? 'top' : 'bot') . '" class="topbottom floatleft">' . $txt[$go] . '</a>' : '', $pages, '
-		', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
-		$options['extra'], '
-	</div>';
+			<div class="pagesection">
+				', $pages;
+		/*	<div class="pagesection">
+				', $options['top_button'] ? '<a id="page' . ($go != 'go_up' ? 'top' : 'bot') . '" href="#' . ($go == 'go_up' ? 'top' : 'bot') . '" class="topbottom floatleft">' . $txt[$go] . '</a>' : '', $pages, '*/
+		echo '
+				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
+				$options['extra'], '
+			</div>';
 
 }

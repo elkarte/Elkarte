@@ -551,7 +551,7 @@ function template_modify_board()
 					</div>';
 
 	if (!empty($context['board']['is_recycle']))
-		echo '<div class="simplebox">', $txt['mboards_recycle_disabled_delete'], '</div>';
+		echo '<div class="information">', $txt['mboards_recycle_disabled_delete'], '</div>';
 
 	echo '
 					<input type="hidden" name="rid" value="', $context['redirect_location'], '" />

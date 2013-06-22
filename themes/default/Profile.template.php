@@ -83,16 +83,14 @@ function template_showDrafts()
 					<div class="list_posts">
 						', $draft['body'], '
 					</div>
-					<div class="floatright">
-						<ul class="quickbuttons">
-							<li>
-								<a href="', $scripturl, '?action=post;', (empty($draft['topic']['id']) ? 'board=' . $draft['board']['id'] : 'topic=' . $draft['topic']['id']), '.0;id_draft=', $draft['id_draft'], '" class="reply_button"><span>', $txt['draft_edit'], '</span></a>
-							</li>
-							<li>
-								<a href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=showdrafts;delete=', $draft['id_draft'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="remove_button"><span>', $txt['draft_delete'], '</span></a>
-							</li>
-						</ul>
-					</div>
+					<ul class="quickbuttons">
+						<li class="listlevel1">
+							<a href="', $scripturl, '?action=post;', (empty($draft['topic']['id']) ? 'board=' . $draft['board']['id'] : 'topic=' . $draft['topic']['id']), '.0;id_draft=', $draft['id_draft'], '" class="linklevel1 reply_button"><span>', $txt['draft_edit'], '</span></a>
+						</li>
+						<li class="listlevel1">
+							<a href="', $scripturl, '?action=profile;u=', $context['member']['id'], ';area=showdrafts;delete=', $draft['id_draft'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="linklevel1 remove_button"><span>', $txt['draft_delete'], '</span></a>
+						</li>
+					</ul>
 				</div>
 			</div>';
 		}

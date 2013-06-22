@@ -509,7 +509,7 @@ function template_modify_group()
 
 	if (!empty($modSettings['permission_enable_deny']) && $context['group']['id'] != -1)
 		echo '
-			<div class="simplebox">
+			<div class="information">
 				', $txt['permissions_option_desc'], '
 			</div>';
 
@@ -1063,7 +1063,7 @@ function template_inline_permissions()
 			<ul class="permission_groups">';
 	else
 		echo '
-			<div class="simplebox">', $txt['permissions_option_desc'], '</div>
+			<div class="information">', $txt['permissions_option_desc'], '</div>
 			<dl class="settings">
 				<dt>
 					<span class="perms"><strong>', $txt['permissions_option_on'], '</strong></span>
