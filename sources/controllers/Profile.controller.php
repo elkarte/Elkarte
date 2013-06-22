@@ -317,6 +317,7 @@ class Profile_Controller extends Action_Controller
 					'subscriptions' => array(
 						'label' => $txt['subscriptions'],
 						'file' => '/controllers/ProfileSubscriptions.controller.php',
+						'controller' => 'ProfileSubscriptions_Controller',
 						'function' => 'action_subscriptions',
 						'enabled' => !empty($modSettings['paid_enabled']),
 						'permission' => array(
