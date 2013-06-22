@@ -437,3 +437,32 @@ function countConfiguredMemberOptions()
 
 	return $themes;
 }
+
+function removeThemeOptions($old_settings)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE id_theme != {int:default_theme}
+			AND id_member = {int:guest_member}
+			AND variable IN ({array_string:old_settings})',
+		array(
+			'default_theme' => 1,
+			'guest_member' => -1,
+			'old_settings' => $old_settings,
+		)
+	);
+}
+
+function updateThemeOptions($setValues)
+{
+	$db = database();
+
+	$db->insert('replace',
+		'{db_prefix}themes',
+		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		$setValues,
+		array('id_theme', 'variable', 'id_member')
+	);
+}
