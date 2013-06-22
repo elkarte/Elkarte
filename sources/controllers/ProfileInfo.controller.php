@@ -18,8 +18,17 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class ProfileInfo_Controller
+class ProfileInfo_Controller extends Action_Controller
 {
+	/**
+	 * Intended as entry point which delegates to methods in this class...
+	 */
+	public function action_index()
+	{
+		// what do we do, do you even know what you do?
+		// $this->action_showPosts();
+	}
+
 	/**
 	 * View a summary.
 	 */
