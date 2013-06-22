@@ -1725,3 +1725,78 @@ function incrementBoard($board, $stat)
 		)
 	);
 }
+
+/**
+ * Retrieve all the boards the user can see,
+ * and their notification status: if they're subscribed
+ * to notifications for new topics in each of them or they're not.
+ * (used by createList() callbacks)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID id_member
+ * @return array
+ */
+function boardNotifications($start, $items_per_page, $sort, $memID)
+{
+	global $scripturl, $user_info, $modSettings;
+
+	$db = database();
+
+	// All the boards that you have notification enabled
+	$request = $db->query('', '
+		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE ln.id_member = {int:selected_member}
+			AND {query_see_board}
+		ORDER BY ' . $sort,
+		array(
+			'current_member' => $user_info['id'],
+			'selected_member' => $memID,
+		)
+	);
+
+	$notification_boards = array();
+	while ($row = $db->fetch_assoc($request))
+		$notification_boards[] = array(
+			'id' => $row['id_board'],
+			'name' =>  $row['name'],
+			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' .'<strong>' . $row['name'] . '</strong></a>',
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => 'checked="checked"',
+		);
+	$db->free_result($request);
+
+	// and all the boards that you can see but don't have notify turned on for
+	$request = $db->query('', '
+		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		FROM {db_prefix}boards AS b
+			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE {query_see_board}
+			AND ln.id_board is null ' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+		ORDER BY ' . $sort,
+		array(
+			'selected_member' => $memID,
+			'current_member' => $user_info['id'],
+			'recycle_board' => $modSettings['recycle_board'],
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$notification_boards[] = array(
+			'id' => $row['id_board'],
+			'name' => $row['name'],
+			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+			'new' => $row['board_read'] < $row['id_msg_updated'],
+			'checked' => '',
+		);
+	$db->free_result($request);
+
+	return $notification_boards;
+}

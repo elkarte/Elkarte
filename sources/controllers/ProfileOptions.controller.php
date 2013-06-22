@@ -523,6 +523,7 @@ class ProfileOptions_Controller extends Action_Controller
 		// Gonna want this for the list.
 		require_once(SUBSDIR . '/List.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Fine, start with the board list.
 		$listOptions = array(
@@ -533,7 +534,7 @@ class ProfileOptions_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=profile;u=' . $memID . ';area=notification',
 			'default_sort_col' => 'board_name',
 			'get_items' => array(
-				'function' => 'list_getBoardNotifications',
+				'function' => array($this, 'list_getBoardNotifications'),
 				'params' => array(
 					$memID,
 				),
@@ -616,13 +617,13 @@ class ProfileOptions_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=profile;u=' . $memID . ';area=notification',
 			'default_sort_col' => 'last_post',
 			'get_items' => array(
-				'function' => 'list_getTopicNotifications',
+				'function' => array($this, 'list_getTopicNotifications'),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getTopicNotificationCount',
+				'function' => array($this, 'list_getTopicNotificationCount'),
 				'params' => array(
 					$memID,
 				),
@@ -744,28 +745,8 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	function list_getTopicNotificationCount($memID)
 	{
-		global $user_info, $modSettings;
-
-		$db = database();
-
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && $user_info['query_see_board'] === '1=1' ? '' : '
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . ($user_info['query_see_board'] === '1=1' ? '' : '
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)') . '
-			WHERE ln.id_member = {int:selected_member}' . ($user_info['query_see_board'] === '1=1' ? '' : '
-				AND {query_see_board}') . ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : ''),
-			array(
-				'selected_member' => $memID,
-				'is_approved' => 1,
-			)
-		);
-		list ($totalNotifications) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		// @todo make this an integer before it gets returned
-		return $totalNotifications;
+		// topic notifications count, for the list
+		return topicNotificationCount($memID);
 	}
 
 	/**
@@ -775,65 +756,12 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID id_member
-	 * @return array $notification_topics
+	 * @return array
 	 */
 	function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	{
-		global $scripturl, $user_info, $modSettings;
-
-		$db = database();
-
-		// All the topics with notification on...
-		$request = $db->query('', '
-			SELECT
-				IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from, b.id_board, b.name,
-				t.id_topic, ms.subject, ms.id_member, IFNULL(mem.real_name, ms.poster_name) AS real_name_col,
-				ml.id_msg_modified, ml.poster_time, ml.id_member AS id_member_updated,
-				IFNULL(mem2.real_name, ml.poster_name) AS last_real_name
-			FROM {db_prefix}log_notify AS ln
-				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})
-				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ms.id_member)
-				LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = ml.id_member)
-				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
-			WHERE ln.id_member = {int:selected_member}
-			ORDER BY {raw:sort}
-			LIMIT {int:offset}, {int:items_per_page}',
-			array(
-				'current_member' => $user_info['id'],
-				'is_approved' => 1,
-				'selected_member' => $memID,
-				'sort' => $sort,
-				'offset' => $start,
-				'items_per_page' => $items_per_page,
-			)
-		);
-		$notification_topics = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			censorText($row['subject']);
-
-			$notification_topics[] = array(
-				'id' => $row['id_topic'],
-				'poster_link' => empty($row['id_member']) ? $row['real_name_col'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name_col'] . '</a>',
-				'poster_updated_link' => empty($row['id_member_updated']) ? $row['last_real_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['last_real_name'] . '</a>',
-				'subject' => $row['subject'],
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
-				'new' => $row['new_from'] <= $row['id_msg_modified'],
-				'new_from' => $row['new_from'],
-				'updated' => relativeTime($row['poster_time']),
-				'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
-				'new_link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new">' . $row['subject'] . '</a>',
-				'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-			);
-		}
-		$db->free_result($request);
-
-		return $notification_topics;
+		// topic notifications, for the list
+		return topicNotifications($start, $items_per_page, $sort, $memID);
 	}
 
 	/**
@@ -847,65 +775,8 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	{
-		global $scripturl, $user_info, $modSettings;
-
-		$db = database();
-
-		// All the boards that you have notification enabled
-		$request = $db->query('', '
-			SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
-			FROM {db_prefix}log_notify AS ln
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
-				LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-			WHERE ln.id_member = {int:selected_member}
-				AND {query_see_board}
-			ORDER BY ' . $sort,
-			array(
-				'current_member' => $user_info['id'],
-				'selected_member' => $memID,
-			)
-		);
-
-		$notification_boards = array();
-		while ($row = $db->fetch_assoc($request))
-			$notification_boards[] = array(
-				'id' => $row['id_board'],
-				'name' =>  $row['name'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' .'<strong>' . $row['name'] . '</strong></a>',
-				'new' => $row['board_read'] < $row['id_msg_updated'],
-				'checked' => 'checked="checked"',
-			);
-		$db->free_result($request);
-
-		// and all the boards that you can see but don't have notify turned on for
-		$request = $db->query('', '
-			SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
-			FROM {db_prefix}boards AS b
-				LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
-				LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-			WHERE {query_see_board}
-				AND ln.id_board is null ' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board}' : '') . '
-			ORDER BY ' . $sort,
-			array(
-				'selected_member' => $memID,
-				'current_member' => $user_info['id'],
-				'recycle_board' => $modSettings['recycle_board'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-			$notification_boards[] = array(
-				'id' => $row['id_board'],
-				'name' => $row['name'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-				'new' => $row['board_read'] < $row['id_msg_updated'],
-				'checked' => '',
-			);
-		$db->free_result($request);
-
-		return $notification_boards;
+		// return boards you see and their notification status for the list
+		return boardNotifications($start, $items_per_page, $sort, $memID);
 	}
 
 	/**
@@ -1291,61 +1162,61 @@ class ProfileOptions_Controller extends Action_Controller
 
 		return $changeType;
 	}
+}
 
-	/**
-	 * Load the options for an user.
-	 *
-	 * @param int $memID id_member
-	 */
-	function loadThemeOptions($memID)
+/**
+ * Load the options for an user.
+ *
+ * @param int $memID id_member
+ */
+function loadThemeOptions($memID)
+{
+	global $context, $options, $cur_profile;
+
+	$db = database();
+
+	if (isset($_POST['default_options']))
+		$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
+
+	if ($context['user']['is_owner'])
 	{
-		global $context, $options, $cur_profile;
-
-		$db = database();
-
-		if (isset($_POST['default_options']))
-			$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
-
-		if ($context['user']['is_owner'])
+		$context['member']['options'] = $options;
+		if (isset($_POST['options']) && is_array($_POST['options']))
+			foreach ($_POST['options'] as $k => $v)
+				$context['member']['options'][$k] = $v;
+	}
+	else
+	{
+		$request = $db->query('', '
+			SELECT id_member, variable, value
+			FROM {db_prefix}themes
+			WHERE id_theme IN (1, {int:member_theme})
+				AND id_member IN (-1, {int:selected_member})',
+			array(
+				'member_theme' => (int) $cur_profile['id_theme'],
+				'selected_member' => $memID,
+			)
+		);
+		$temp = array();
+		while ($row = $db->fetch_assoc($request))
 		{
-			$context['member']['options'] = $options;
-			if (isset($_POST['options']) && is_array($_POST['options']))
-				foreach ($_POST['options'] as $k => $v)
-					$context['member']['options'][$k] = $v;
+			if ($row['id_member'] == -1)
+			{
+				$temp[$row['variable']] = $row['value'];
+				continue;
+			}
+
+			if (isset($_POST['options'][$row['variable']]))
+				$row['value'] = $_POST['options'][$row['variable']];
+			$context['member']['options'][$row['variable']] = $row['value'];
 		}
-		else
+		$db->free_result($request);
+
+		// Load up the default theme options for any missing.
+		foreach ($temp as $k => $v)
 		{
-			$request = $db->query('', '
-				SELECT id_member, variable, value
-				FROM {db_prefix}themes
-				WHERE id_theme IN (1, {int:member_theme})
-					AND id_member IN (-1, {int:selected_member})',
-				array(
-					'member_theme' => (int) $cur_profile['id_theme'],
-					'selected_member' => $memID,
-				)
-			);
-			$temp = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				if ($row['id_member'] == -1)
-				{
-					$temp[$row['variable']] = $row['value'];
-					continue;
-				}
-
-				if (isset($_POST['options'][$row['variable']]))
-					$row['value'] = $_POST['options'][$row['variable']];
-				$context['member']['options'][$row['variable']] = $row['value'];
-			}
-			$db->free_result($request);
-
-			// Load up the default theme options for any missing.
-			foreach ($temp as $k => $v)
-			{
-				if (!isset($context['member']['options'][$k]))
-					$context['member']['options'][$k] = $v;
-			}
+			if (!isset($context['member']['options'][$k]))
+				$context['member']['options'][$k] = $v;
 		}
 	}
 }

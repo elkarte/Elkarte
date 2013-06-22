@@ -424,7 +424,7 @@ function moveTopics($topics, $toBoard)
 	// Only a single topic.
 	if (is_numeric($topics))
 		$topics = array($topics);
-	
+
 	$fromBoards = array();
 
 	// Destination board empty or equal to 0?
@@ -2307,4 +2307,105 @@ function splitDestinationBoard()
 		$destination_board['id'] = $toboard;
 
 	return array('current' => $current_board, 'destination' => $destination_board);
+}
+
+/**
+ * Retrieve topic notifications count.
+ * (used by createList() callbacks, amongst others.)
+ *
+ * @param int $memID id_member
+ * @return string
+ */
+function topicNotificationCount($memID)
+{
+	global $user_info, $modSettings;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && $user_info['query_see_board'] === '1=1' ? '' : '
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . ($user_info['query_see_board'] === '1=1' ? '' : '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)') . '
+		WHERE ln.id_member = {int:selected_member}' . ($user_info['query_see_board'] === '1=1' ? '' : '
+			AND {query_see_board}') . ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved}' : ''),
+		array(
+			'selected_member' => $memID,
+			'is_approved' => 1,
+		)
+	);
+	list ($totalNotifications) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return (int)$totalNotifications;
+}
+
+/**
+ * Retrieve all topic notifications for the given user.
+ * (used by createList() callbacks)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID id_member
+ * @return array
+ */
+function topicNotifications($start, $items_per_page, $sort, $memID)
+{
+	global $scripturl, $user_info, $modSettings;
+
+	$db = database();
+
+	// All the topics with notification on...
+	$request = $db->query('', '
+		SELECT
+			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from, b.id_board, b.name,
+			t.id_topic, ms.subject, ms.id_member, IFNULL(mem.real_name, ms.poster_name) AS real_name_col,
+			ml.id_msg_modified, ml.poster_time, ml.id_member AS id_member_updated,
+			IFNULL(mem2.real_name, ml.poster_name) AS last_real_name
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ms.id_member)
+			LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = ml.id_member)
+			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
+		WHERE ln.id_member = {int:selected_member}
+		ORDER BY {raw:sort}
+		LIMIT {int:offset}, {int:items_per_page}',
+		array(
+			'current_member' => $user_info['id'],
+			'is_approved' => 1,
+			'selected_member' => $memID,
+			'sort' => $sort,
+			'offset' => $start,
+			'items_per_page' => $items_per_page,
+		)
+	);
+	$notification_topics = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['subject']);
+
+		$notification_topics[] = array(
+			'id' => $row['id_topic'],
+			'poster_link' => empty($row['id_member']) ? $row['real_name_col'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name_col'] . '</a>',
+			'poster_updated_link' => empty($row['id_member_updated']) ? $row['last_real_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['last_real_name'] . '</a>',
+			'subject' => $row['subject'],
+			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
+			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
+			'new' => $row['new_from'] <= $row['id_msg_modified'],
+			'new_from' => $row['new_from'],
+			'updated' => relativeTime($row['poster_time']),
+			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
+			'new_link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new">' . $row['subject'] . '</a>',
+			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+		);
+	}
+	$db->free_result($request);
+
+	return $notification_topics;
 }
