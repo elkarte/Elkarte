@@ -1,0 +1,168 @@
+/* Ok, gotta start somewhere. CSS will be added as work progresses. */
+
+/* This variant is a very basic, boilerplate version of the default theme. */
+/* It is intended primarily as a "clean slate" for custom theming. */
+
+/* This variant uses named colours instead of hex codes, to make things easier for beginners. */
+/* A complete list of CSS colour names can be found at http://www.w3schools.com/cssref/css_colornames.asp */
+
+/* ----------------------------------------------------------- */
+/* This is eye candy only. All the layout code is in index.css. */
+/* NOTE: The layout code in index.css should NOT be altered
+/* unless you are really sure of what you are doing.
+/* ALL variants depend on the basic layout code for stability. */
+/* ----------------------------------------------------------- */
+
+
+/* Styles for the standard dropdown menus.
+----------------------------------------------------------- */
+
+/* Visible menu bar: wrapper/background. */
+#main_menu {
+	background: forestgreen;
+}
+
+/* Needed for new PM notifications. */
+.listlevel1 strong {
+	color: white;
+}
+
+/* Level 1 Menu bar: link or button. */
+/* If there will be a border on hover, have a border here. */
+/* A default transparent border stops links jumping on hover. */
+#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	border: 1px solid transparent;
+	color: white;
+}
+
+/* Override link colour for admin/profile/etc menus. */
+.admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	color: black;
+}
+
+/* Level 1 button hover and focus effects. */
+#main_menu .active, /* Level 1 active button shares same styling. */
+#main_menu .linklevel1:hover, #main_menu .listlevel:hover .linklevel1, #main_menu .linklevel1:focus,
+
+/* For primary admin/profile/etc drop menus. */
+.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
+
+/* For secondary admin/profile/etc menus. */
+#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
+	background: gainsboro /* This is a pale grey. */;
+	color: black;
+	border: 1px solid darkgray;
+	text-decoration: none;
+}
+
+/* Main menu Level 1 active button and hover need a different border. */
+#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel:hover .linklevel1, #main_menu .linklevel1:focus {
+	border: 1px solid black;
+}
+
+/* Level 1 active buttons for primary admin/profile/etc drop menus... */
+.admin_menu .active,
+/* ......and for secondary admin/profile/etc menu strip. */
+#adm_submenus .active {
+	background: forestgreen;
+	color: white;
+	border: 1px solid black;
+}
+
+/* Hover effects for those buttons. */
+.admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
+	background: darkgreen;
+	color: white;
+	border: 1px solid black;
+}
+
+/* Level 1 active buttons get a bit more weight. */
+.active {
+	font-weight: bold;
+}
+
+/* Top level subsection indicators. */
+/* Comment these out if you don't want them. */
+#main_menu .subsections .linklevel1, .admin_menu .subsections .linklevel1 {
+	padding: 0 0.8em 0 0.5em;
+}
+#main_menu .subsections .linklevel1:after,.admin_menu .subsections .linklevel1:after {
+	content:" \2193";
+	position: absolute;
+	top: 0.5em;
+	right: 0.3em;
+	font-size: 1.3em;
+}
+
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	background: white;
+	border: 1px solid darkgray;
+}
+
+/* Levels 2 and 3 drop menus: link or button. */
+.linklevel2, .linklevel3 {
+	color: black;
+	/* Applying a default transparent border stops links jumping on hover. */
+	border: 1px solid transparent;
+}
+
+/* Admin menu icons. */
+.linklevel2>img {
+	vertical-align: middle;
+	margin: 0 0 0 -4px;
+}
+
+/* Levels 2 and 3: hover effects. */
+.listlevel2:hover .linklevel2, /* < highlighted with cursor over level 3. */
+.linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
+.linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
+	background: gainsboro;
+	color: black;
+	border: 1px solid darkgray;
+	text-decoration: none;
+}
+
+/* Level 2: subsection indicators. */
+.listlevel2.subsections .linklevel2:after {
+	content: "\2192";
+	position: absolute;
+	right: 6px;
+	font-size: 1.3em;
+	color: black;
+}
+
+/* Levels 2 and 3: highlighting of current section */
+.linklevel2.chosen, .linklevel3.chosen {
+	font-weight: bold;
+}
+
+/* Styles for sidebar menus.
+------------------------------------------------------- */
+
+/* Same styling for Level 1 and Level 2. */
+#menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
+	color: black;
+	border: 1px solid transparent;
+}
+
+#menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus, #menu_current_area .linklevel1,
+#menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
+	background: gainsboro;
+	color: black;
+	border: 1px solid darkgray;
+	text-decoration: none;
+}
+
+#menu_current_area .linklevel1 {
+	font-weight: bold;
+}
+
+/* Level 1: subsection indicators. */
+#menu_sidebar .listlevel1.subsections .linklevel1:after {
+	content: "\2192";
+	position: absolute;
+	right: 6px;
+}
+
+/*End sidebar flyout coding. */
