@@ -20,17 +20,18 @@
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
-
+		template_pagesection(false, false, 'go_down');
 	echo '
-		<div id="recentposts" class="main_section">
+		<div id="recentposts" class="main_section">';// @todo - Why is this main_section when unread has main_content in the same place?
+		//template_pagesection(false, false, 'go_down');
+		echo '
 			<div class="cat_bar">
 				<h3 class="catbg">
 					<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />',$txt['recent_posts'],'
 				</h3>
 			</div>';
-	template_pagesection(false, false, 'go_down');
-
-	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
+	//template_pagesection(false, false, 'go_down');
+	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too. 
 	foreach ($context['posts'] as $post)
 	{
 		echo '
@@ -76,10 +77,11 @@ function template_main()
 			</div>';
 	}
 
-	template_pagesection();
+	//template_pagesection();
 
 	echo '
 		</div>';
+	template_pagesection();
 }
 
 /**
@@ -90,7 +92,7 @@ function template_unread()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-				<div id="recentposts" class="main_content">';
+				<div id="recentposts" class="main_content">';// @todo - Why is this main_content when recent posts has main_section in the same place?
 
 	if (!empty($context['topics']))
 	{
@@ -220,21 +222,15 @@ function template_unread()
 					</div>';
 
 	echo '
-					<div class="tborder" id="topic_icons">
-						<div class="description ', empty($context['topics']) ? 'none' : '', '">
-							<p class="smalltext floatleft">
-								', !empty($modSettings['enableParticipation']) ? '
-								<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] . '<br />' : '', '
-								<img src="', $settings['images_url'], '/topic/normal_post.png" alt="" class="centericon" /> ', $txt['normal_topic'], '<br />
-								<img src="', $settings['images_url'], '/topic/hot_post.png" alt="" class="centericon" /> ', sprintf($txt['hot_topics'], $modSettings['hotTopicPosts']), '<br />
-								<img src="', $settings['images_url'], '/topic/veryhot_post.png" alt="" class="centericon" /> ', sprintf($txt['very_hot_topics'], $modSettings['hotTopicVeryPosts']), '
-							</p>
-							<p class="smalltext para2">
-								<img src="', $settings['images_url'], '/icons/quick_lock.png" alt="" class="centericon" /> ', $txt['locked_topic'], '<br />', ($modSettings['enableStickyTopics'] == '1' ? '
-								<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : ''), ($modSettings['pollMode'] == '1' ? '
-								<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : ''), '
-							</p>
-						</div>
+					<div id="topic_icons" class="description">
+						<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
+							<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
+							'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
+						</p>
+						<p>
+							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
+							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
+						</p>
 					</div>
 				</div>';
 }
@@ -247,7 +243,7 @@ function template_replies()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-				<div id="recentposts" class="main_content">';
+				<div id="recentposts" class="main_content">';// @todo - Why is this main_content when recent posts has main_section in the same place?
 
 	if (!empty($context['topics']))
 	{
@@ -297,12 +293,19 @@ function template_replies()
 		{
 			// Calculate the color class of the topic.
 			$color_class = '';
-			if (strpos($topic['class'], 'sticky') !== false)
+			if ($topic['is_sticky'] && $topic['is_locked'])
+				$color_class = 'stickybg locked_sticky';
+			// Sticky topics should get a different color, too.
+			elseif ($topic['is_sticky'])
 				$color_class = 'stickybg';
-			if (strpos($topic['class'], 'locked') !== false)
-				$color_class = !empty($color_class) ? 'stickybg locked_sticky' : 'lockedbg';
+			// Locked topics get special treatment as well.
+			elseif ($topic['is_locked'])
+				$color_class = 'lockedbg';
+			// Last, but not least: regular topics.
+			else
+				$color_class = 'windowbg';
 
-			$color_class2 = !empty($color_class) ? $color_class . '2' : '';
+			$color_class2 = $color_class . '2';
 
 			// [WIP] There is trial code here to hide the topic icon column. Hardly anyone will miss it.
 			// [WIP] Markup can be cleaned up later. CSS can go in the CSS files later.
@@ -369,21 +372,15 @@ function template_replies()
 					</div>';
 
 	echo '
-					<div class="tborder" id="topic_icons">
-						<div class="description ', empty($context['topics']) ? 'none' : '', '">
-							<p class="smalltext floatleft">
-								', !empty($modSettings['enableParticipation']) ? '
-								<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] . '<br />' : '', '
-								<img src="', $settings['images_url'], '/topic/normal_post.png" alt="" class="centericon" /> ', $txt['normal_topic'], '<br />
-								<img src="', $settings['images_url'], '/topic/hot_post.png" alt="" class="centericon" /> ', sprintf($txt['hot_topics'], $modSettings['hotTopicPosts']), '<br />
-								<img src="', $settings['images_url'], '/topic/veryhot_post.png" alt="" class="centericon" /> ', sprintf($txt['very_hot_topics'], $modSettings['hotTopicVeryPosts']), '
-							</p>
-							<p class="smalltext para2">
-								<img src="', $settings['images_url'], '/icons/quick_lock.png" alt="" class="centericon" /> ', $txt['locked_topic'], '<br />', ($modSettings['enableStickyTopics'] == '1' ? '
-								<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . ($modSettings['pollMode'] == '1' ? '
-								<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
-							</p>
-						</div>
+					<div id="topic_icons" class="description">
+						<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
+							<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
+							'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
+						</p>
+						<p>
+							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
+							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
+						</p>
 					</div>
 				</div>';
 }
