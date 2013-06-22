@@ -97,7 +97,7 @@ class ManageErrors_Controller
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($_REQUEST['desc']) ? ';desc' : ''));
 
 		}
-		$num_errors = numErrors();
+		$num_errors = numErrors($filter);
 
 		// If this filter is empty...
 		if ($num_errors == 0 && isset($filter))
