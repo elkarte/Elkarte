@@ -133,7 +133,8 @@ class Profile_Controller extends Action_Controller
 					'history' => array(
 						'label' => $txt['history'],
 						'file' => '/controllers/ProfileHistory.controller.php',
-						'function' => 'action_history',
+						'controller' => 'ProfileHistory_Controller',
+						'function' => 'action_index',
 						'subsections' => array(
 							'activity' => array($txt['trackActivity'], 'moderate_forum'),
 							'ip' => array($txt['trackIP'], 'moderate_forum'),
