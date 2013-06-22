@@ -160,11 +160,11 @@ function createMenu($menuData, $menuOptions = array())
 										// Save which is the first...
 										if (empty($first_sa))
 											$first_sa = $sa;
-										
+
 										// Is this the current subsection?
 										if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == $sa)
 											$menu_context['current_subsection'] = $sa;
-	
+
 										elseif (isset($sub['active']) && isset($_REQUEST['sa']) && in_array($_REQUEST['sa'], $sub['active']))
 											$menu_context['current_subsection'] = $sa;
 
