@@ -202,8 +202,6 @@ class PersonalMessage_Controller
 		global $txt, $scripturl, $modSettings, $context, $subjects_request;
 		global $messages_request, $user_info, $recipients, $options, $user_settings;
 
-		$db = database();
-
 		// Changing view?
 		if (isset($_GET['view']))
 		{
