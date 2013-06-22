@@ -26,11 +26,13 @@ function installedThemes()
 	$request = $db->query('', '
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
-		WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_templates}, {string:theme_layers})
+		WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_url}, {string:images_url}, {string:theme_templates}, {string:theme_layers})
 			AND id_member = {int:no_member}',
 		array(
 			'name' => 'name',
 			'theme_dir' => 'theme_dir',
+			'theme_url' => 'theme_url',
+			'images_url' => 'images_url',
 			'theme_templates' => 'theme_templates',
 			'theme_layers' => 'theme_layers',
 			'no_member' => 0,
@@ -282,4 +284,252 @@ function loadThemes($knownThemes)
 	$db->free_result($request);
 
 	return $themes;
+}
+
+/**
+ * Generates a file listing for a given directory
+ *
+ * @param type $path
+ * @param type $relative
+ * @return type
+ */
+function get_file_listing($path, $relative)
+{
+	global $scripturl, $txt, $context;
+
+	// Is it even a directory?
+	if (!is_dir($path))
+		fatal_lang_error('error_invalid_dir', 'critical');
+
+	$dir = dir($path);
+	$entries = array();
+	while ($entry = $dir->read())
+		$entries[] = $entry;
+	$dir->close();
+
+	natcasesort($entries);
+
+	$listing1 = array();
+	$listing2 = array();
+
+	foreach ($entries as $entry)
+	{
+		// Skip all dot files, including .htaccess.
+		if (substr($entry, 0, 1) == '.' || $entry == 'CVS')
+			continue;
+
+		if (is_dir($path . '/' . $entry))
+			$listing1[] = array(
+				'filename' => $entry,
+				'is_writable' => is_writable($path . '/' . $entry),
+				'is_directory' => true,
+				'is_template' => false,
+				'is_image' => false,
+				'is_editable' => false,
+				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $relative . $entry,
+				'size' => '',
+			);
+		else
+		{
+			$size = filesize($path . '/' . $entry);
+			if ($size > 2048 || $size == 1024)
+				$size = comma_format($size / 1024) . ' ' . $txt['themeadmin_edit_kilobytes'];
+			else
+				$size = comma_format($size) . ' ' . $txt['themeadmin_edit_bytes'];
+
+			$listing2[] = array(
+				'filename' => $entry,
+				'is_writable' => is_writable($path . '/' . $entry),
+				'is_directory' => false,
+				'is_template' => preg_match('~\.template\.php$~', $entry) != 0,
+				'is_image' => preg_match('~\.(jpg|jpeg|gif|bmp|png)$~', $entry) != 0,
+				'is_editable' => is_writable($path . '/' . $entry) && preg_match('~\.(php|pl|css|js|vbs|xml|xslt|txt|xsl|html|htm|shtm|shtml|asp|aspx|cgi|py)$~', $entry) != 0,
+				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;filename=' . $relative . $entry,
+				'size' => $size,
+				'last_modified' => standardTime(filemtime($path . '/' . $entry)),
+			);
+		}
+	}
+
+	return array_merge($listing1, $listing2);
+}
+
+/**
+ * Updates the pathes for a theme. Used to fix invalid pathes.
+ * @param array $setValues
+ */
+function updateThemePath($setValues)
+{
+	$db = database;
+
+	$db->insert('replace',
+		'{db_prefix}themes',
+		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		$setValues,
+		array('id_theme', 'variable', 'id_member')
+	);
+	
+}
+
+/**
+ * Counts the theme options configured for guests
+ * @return array
+ */
+function countConfiguredGuestOptions()
+{
+	$db = database();
+
+	$themes = array();
+
+	$request = $db->query('', '
+		SELECT id_theme, COUNT(*) AS value
+		FROM {db_prefix}themes
+		WHERE id_member = {int:guest_member}
+		GROUP BY id_theme',
+		array(
+			'guest_member' => -1,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$themes[] = $row;
+	$db->free_result($request);
+
+	return($themes);
+}
+
+/**
+ * Counts the theme options configured for members
+ * @return array
+ */
+function countConfiguredMemberOptions()
+{
+	$db = database();
+
+	$themes = array();
+
+	// Need to make sure we don't do custom fields.
+	$request = $db->query('', '
+		SELECT col_name
+		FROM {db_prefix}custom_fields',
+		array(
+		)
+	);
+	$customFields = array();
+	while ($row = $db->fetch_assoc($request))
+		$customFields[] = $row['col_name'];
+	$db->free_result($request);
+	$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
+
+	$request = $db->query('themes_count', '
+		SELECT COUNT(DISTINCT id_member) AS value, id_theme
+		FROM {db_prefix}themes
+		WHERE id_member > {int:no_member}
+			' . $customFieldsQuery . '
+		GROUP BY id_theme',
+		array(
+			'no_member' => 0,
+			'custom_fields' => empty($customFields) ? array() : $customFields,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$themes[] = $row;
+	$db->free_result($request);
+
+	return $themes;
+}
+
+/**
+ * Deletes all outdated options from the themes table
+ *
+ * @param bol $default_theme -> true is default, false for all custom themes
+ * @param bol $membergroups -> true is for members, false for guests
+ * @param array $old_settings
+ */
+function removeThemeOptions($default_theme, $membergroups, $old_settings)
+{
+	$db = database();
+	
+	// Which theme's option should we clean? 
+	$default = ($default_theme = true ? '=' : '!='); 
+
+	// Guest or regular membergroups?
+	if ($membergroups === false )
+		$mem_param = array('operator' => '=', 'id' => -1);
+	else
+		$mem_param = array('operator' => '>', 'id' => 0);
+	
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE id_theme '. $default . ' {int:default_theme}
+			AND id_member ' . $mem_param['operator'] . ' {int:guest_member}
+			AND variable IN ({array_string:old_settings})',
+		array(
+			'default_theme' => 1,
+			'guest_member' => $mem_param['id'],
+			'old_settings' => $old_settings,
+		)
+	);
+}
+
+/**
+ * Remove a specific option from the themes table
+ *
+ * @param int $theme
+ * @param string $options
+ */
+function removeThemeOption($theme, $options)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE variable = {string:option}
+			AND id_member > {int:no_member}
+			AND id_theme = {int:current_theme}',
+		array(
+			'no_member' => 0,
+			'current_theme' => $theme,
+			'option' => $options,
+		)
+	);
+}
+
+/**
+ * Update the default options for our users.
+ * @param  array $setValues
+ */
+function updateThemeOptions($setValues)
+{
+	$db = database();
+
+	$db->insert('replace',
+		'{db_prefix}themes',
+		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		$setValues,
+		array('id_theme', 'variable', 'id_member')
+	);
+}
+
+/**
+ * Add predefined options to the themes table.
+ *
+ * @param int $id_theme
+ * @param string $options
+ * @param mixed $value
+ */
+function addThemeOptions($id_theme, $options, $value)
+{
+	$db = database();
+
+	$db->query('substring', '
+		INSERT INTO {db_prefix}themes
+			(id_member, id_theme, variable, value)
+		SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
+		FROM {db_prefix}members',
+		array(
+			'current_theme' => $id_theme,
+			'option' => $options,
+			'value' => (is_array($value) ? implode(',', $value) : $value),
+		)
+	);
 }
