@@ -1451,6 +1451,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (isset($_REQUEST['xml']))
 	{
 		loadLanguage('index+Modifications');
+		// @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
+		loadTemplate('index');
 		loadTemplate('Xml');
 		Template_Layers::getInstance()->removeAll();
 	}
