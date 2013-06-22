@@ -195,7 +195,7 @@ class MarkRead_Controller
 			$earlyMsg = 0;
 		else
 		{
-			$earlyMsg = messageAt((int) $_REQUEST['start'], $topic);
+			list($earlyMsg) = messageAt((int) $_REQUEST['start'], $topic);
 			$earlyMsg--;
 		}
 

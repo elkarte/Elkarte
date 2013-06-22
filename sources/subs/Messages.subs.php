@@ -793,22 +793,54 @@ function nextMessage($id_msg, $id_topic)
 	return messagePointer($id_msg, $id_topic);
 }
 
-function messageAt($start, $id_topic)
+/**
+ * Retrieve the message id/s at a certain position in a topic
+ *
+ * @param int $start the offset of the message/s
+ * @param int $id_topic the id of the topic
+ * @param array (optional) $params an array of params, includes:
+ *      - 'not_in' => array - of messages to exclude
+ *      - 'include' => array - of messages to explicitely include
+ *      - 'exclude_unapproved' => true/false - include or exclude the unapproved messages
+ *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
+ * @todo very similar to selectMessages in Topics.subs.php
+ */
+function messageAt($start, $id_topic, $params = array())
 {
 	$db = database();
+
+	$params = array_merge(
+		// defaults
+		array(
+			'not_in' => false,
+			'include' => false,
+			'include_unapproved' => true,
+			'limit' => 1,
+		),
+		// passed arguments
+		$params,
+		// others
+		array(
+			'current_topic' => $id_topic,
+			'start' => $start,
+			'is_approved' => 1,
+		)
+	);
 
 	$result = $db->query('', '
 		SELECT id_msg
 		FROM {db_prefix}messages
-		WHERE id_topic = {int:current_topic}
-		ORDER BY id_msg
-		LIMIT {int:start}, 1',
-		array(
-			'current_topic' => $id_topic,
-			'start' => $start,
-		)
+		WHERE id_topic = {int:current_topic}' . (!$params['include'] ? '' : '
+			AND id_msg IN ({array_int:include})') . (!$params['not_in'] ? '' : '
+			AND id_msg NOT IN ({array_int:not_in})') . (!$params['include_unapproved'] ? '' : '
+			AND approved = {int:is_approved}') . '
+		ORDER BY id_msg DESC' . ($params['limit'] === false ? '' : '
+		LIMIT {int:start}, {int:limit}'),
+		$params
 	);
-	list ($msg) = $db->fetch_row($result);
+	$msg = array();
+	while ($row = $db->fetch_assoc($result))
+		$msg[] = $row['id_msg'];
 	$db->free_result($result);
 
 	return $msg;
@@ -1001,4 +1033,28 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 	$db->free_result($request);
 
 	return $messages_list;
+}
+
+function countSplitMessages($topic, $include_unapproved)
+{
+	$db = database();
+
+	$return = array('not_selected' => array(), 'selected' => array());
+	$request = $db->query('', '
+		SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
+		FROM {db_prefix}messages AS m
+		WHERE m.id_topic = {int:current_topic}' . ($include_unapproved ? '' : '
+			AND approved = {int:is_approved}') . (empty($_SESSION['split_selection'][$topic]) ? '' : '
+		GROUP BY is_selected'),
+		array(
+			'current_topic' => $topic,
+			'split_msgs' => !empty($_SESSION['split_selection'][$topic]) ? $_SESSION['split_selection'][$topic] : array(),
+			'is_approved' => 1,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+		$return[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected'] = $row['num_messages'];
+	$db->free_result($request);
+
+	return $return;
 }

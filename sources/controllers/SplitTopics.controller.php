@@ -245,9 +245,7 @@ class SplitTopics_Controller
 	 */
 	function action_splitSelectTopics()
 	{
-		global $txt, $scripturl, $topic, $context, $modSettings, $original_msgs, $options;
-
-		$db = database();
+		global $txt, $scripturl, $topic, $context, $modSettings, $options;
 
 		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
@@ -263,6 +261,7 @@ class SplitTopics_Controller
 		$context['reason'] = !empty($_SESSION['reason']) ? trim(Util::htmlspecialchars($_SESSION['reason'])) : '';
 
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
 
 		$context['not_selected'] = array(
 			'num_messages' => 0,
@@ -294,52 +293,25 @@ class SplitTopics_Controller
 		if (isset($_REQUEST['xml']))
 		{
 			$original_msgs = array(
-				'not_selected' => array(),
+				'not_selected' => messageAt($context['not_selected']['start'], $topic, array(
+					'not_in' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
+					'include_unapproved' => $modSettings['postmod_active'] && allowedTo('approve_posts'),
+					'limit' => $context['messages_per_page'],
+				)),
 				'selected' => array(),
 			);
-			$request = $db->query('', '
-				SELECT id_msg
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}' . (empty($_SESSION['split_selection'][$topic]) ? '' : '
-					AND id_msg NOT IN ({array_int:no_split_msgs})') . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-					AND approved = {int:is_approved}') . '
-				ORDER BY id_msg DESC
-				LIMIT {int:start}, {int:messages_per_page}',
-				array(
-					'current_topic' => $topic,
-					'no_split_msgs' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
-					'is_approved' => 1,
-					'start' => $context['not_selected']['start'],
-					'messages_per_page' => $context['messages_per_page'],
-				)
-			);
+
 			// You can't split the last message off.
-			if (empty($context['not_selected']['start']) && $db->num_rows($request) <= 1 && $_REQUEST['move'] == 'down')
+			if (empty($context['not_selected']['start']) && count($original_msgs['not_selected']) <= 1 && $_REQUEST['move'] == 'down')
 				$_REQUEST['move'] = '';
-			while ($row = $db->fetch_assoc($request))
-				$original_msgs['not_selected'][] = $row['id_msg'];
-			$db->free_result($request);
+
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
-				$request = $db->query('', '
-					SELECT id_msg
-					FROM {db_prefix}messages
-					WHERE id_topic = {int:current_topic}
-						AND id_msg IN ({array_int:split_msgs})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-						AND approved = {int:is_approved}') . '
-					ORDER BY id_msg DESC
-					LIMIT {int:start}, {int:messages_per_page}',
-					array(
-						'current_topic' => $topic,
-						'split_msgs' => $_SESSION['split_selection'][$topic],
-						'is_approved' => 1,
-						'start' => $context['selected']['start'],
-						'messages_per_page' => $context['messages_per_page'],
-					)
-				);
-				while ($row = $db->fetch_assoc($request))
-					$original_msgs['selected'][] = $row['id_msg'];
-				$db->free_result($request);
+				$original_msgs['selected'] = messageAt($context['not_selected']['start'], $topic, array(
+					'include' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
+					'include_unapproved' => $modSettings['postmod_active'] && allowedTo('approve_posts'),
+					'limit' => $context['messages_per_page'],
+				));
 			}
 		}
 
@@ -359,50 +331,28 @@ class SplitTopics_Controller
 		// Make sure the selection is still accurate.
 		if (!empty($_SESSION['split_selection'][$topic]))
 		{
-			$request = $db->query('', '
-				SELECT id_msg
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}
-					AND id_msg IN ({array_int:split_msgs})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-					AND approved = {int:is_approved}'),
-				array(
-					'current_topic' => $topic,
-					'split_msgs' => $_SESSION['split_selection'][$topic],
-					'is_approved' => 1,
-				)
-			);
-			$_SESSION['split_selection'][$topic] = array();
-			while ($row = $db->fetch_assoc($request))
-				$_SESSION['split_selection'][$topic][] = $row['id_msg'];
-			$db->free_result($request);
+			$_SESSION['split_selection'][$topic] = messageAt(0, $topic, array(
+				'include' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
+				'include_unapproved' => $modSettings['postmod_active'] && allowedTo('approve_posts'),
+				'limit' => false,
+			));
 		}
 
 		// Get the number of messages (not) selected to be split.
-		$request = $db->query('', '
-			SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
-			FROM {db_prefix}messages AS m
-			WHERE m.id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
-				AND approved = {int:is_approved}') . (empty($_SESSION['split_selection'][$topic]) ? '' : '
-			GROUP BY is_selected'),
-			array(
-				'current_topic' => $topic,
-				'split_msgs' => !empty($_SESSION['split_selection'][$topic]) ? $_SESSION['split_selection'][$topic] : array(),
-				'is_approved' => 1,
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-			$context[empty($row['is_selected']) || $row['is_selected'] == 'f' ? 'not_selected' : 'selected']['num_messages'] = $row['num_messages'];
-		$db->free_result($request);
+		$split_counts = countSplitMessages($topic, !$modSettings['postmod_active'] || allowedTo('approve_posts'));
+		foreach ($split_counts as $key => $num_messages)
+			$context[$key]['num_messages'] = $num_messages;
 
 		// Fix an oversized starting page (to make sure both pageindexes are properly set).
 		if ($context['selected']['start'] >= $context['selected']['num_messages'])
 			$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
 
+		$page_index_url = $scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic;
 		// Build a page list of the not-selected topics...
-		$context['not_selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
+		$context['not_selected']['page_index'] = constructPageIndex($page_index_url . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
 
 		// ...and one of the selected topics.
-		$context['selected']['page_index'] = constructPageIndex($scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
+		$context['selected']['page_index'] = constructPageIndex($page_index_url . '.' . $context['not_selected']['start'] . ';start2=%1$d', $context['selected']['start'], $context['selected']['num_messages'], $context['messages_per_page'], true);
 
 		// Retrieve the unselected messages.
 		$context['not_selected']['messages'] = selectMessages($topic, $context['not_selected']['start'], $context['messages_per_page'], empty($_SESSION['split_selection'][$topic]) ? array() : array('excluded' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
