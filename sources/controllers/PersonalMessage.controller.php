@@ -1886,22 +1886,13 @@ class PersonalMessage_Controller
 				// Members need to be found.
 				if ($type == 'mid')
 				{
+					require_once(SUBSDIR . '/Members.subs.php');
 					$name = trim($_POST['ruledef'][$ind]);
-					$request = $db->query('', '
-						SELECT id_member
-						FROM {db_prefix}members
-						WHERE real_name = {string:member_name}
-							OR member_name = {string:member_name}',
-						array(
-							'member_name' => $name,
-						)
-					);
-					if ($db->num_rows($request) == 0)
+					$member = getMemberByName($name, true);
+					if (empty($member))
 						continue;
-					list ($memID) = $db->fetch_row($request);
-					$db->free_result($request);
 
-					$criteria[] = array('t' => 'mid', 'v' => $memID);
+					$criteria[] = array('t' => 'mid', 'v' => $member['id_member']);
 				}
 				elseif ($type == 'bud')
 					$criteria[] = array('t' => 'bud', 'v' => 1);

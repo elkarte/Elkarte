@@ -1544,13 +1544,15 @@ function countInactiveMembers()
 
 	return $inactive_members;
 }
+
 /**
  * Get the member's id and group
  *
  * @param string $name
+ * @param bool $flexible if true searches for both real_name and member_name (default false)
  * @return array
  */
-function getMemberByName($name)
+function getMemberByName($name, $flexible = false)
 {
 	$db = database();
 
@@ -1559,16 +1561,17 @@ function getMemberByName($name)
 	$request = $db->query('', '
 		SELECT id_member, id_group
 		FROM {db_prefix}members
-		WHERE real_name = {string:name}
+		WHERE real_name = {string:name}' . ($flexible ? '
+			OR member_name = {string:member_name}' : '') . '
 		LIMIT 1',
 		array(
 			'name' => $name,
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('error_member_not_found');
+		return false;
 
-	list ($member['id_member'], $member['id_group']) = $db->fetch_row($request);
+	$member = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $member;
