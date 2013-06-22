@@ -1571,7 +1571,7 @@ class Themes_Controller
 		$context['theme_id'] = $selectedTheme;
 		$theme_dir = themeDirectory($context['theme_id']);
 
-		prepareThemeEditContext($theme_dir);
+		$this->prepareThemeEditContext($theme_dir);
 
 		// Saving?
 		if (isset($_POST['save']))
@@ -2088,6 +2088,42 @@ class Themes_Controller
 
 		$context['sub_template'] = 'copy_template';
 	}
+
+	/**
+	* This function makes necessary pre-checks and fills
+	* the contextual data as needed by theme edition functions.
+	*
+	* @param string $theme_dir absolute path of the selected theme directory
+	*/
+	private function prepareThemeEditContext($theme_dir)
+	{
+		global $context;
+
+		// Eh? not trying to sneak a peek outside the theme directory are we
+		if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
+			fatal_lang_error('theme_edit_missing', false);
+
+		// You're editing a file: we have extra-checks coming up first.
+		if (substr($_REQUEST['filename'], 0, 1) == '.')
+			$_REQUEST['filename'] = '';
+		else
+		{
+			$_REQUEST['filename'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_REQUEST['filename']);
+
+			$temp = realpath($theme_dir . '/' . $_REQUEST['filename']);
+			if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) !== realpath($theme_dir))
+				$_REQUEST['filename'] = '';
+		}
+
+		// we shouldn't end up with no file
+		if (empty($_REQUEST['filename']))
+			fatal_lang_error('theme_edit_missing', false);
+
+		// initialize context
+		$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
+		$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
+		$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
+	}
 }
 
 /**
@@ -2131,39 +2167,3 @@ function WrapAction()
 		$context['sub_template'] = $settings['catch_action']['sub_template'];
 }
 
-/**
- * This function makes necessary pre-checks and fills
- * the contextual data as needed by theme edition functions.
- *
- * @param string $theme_dir absolute path of the selected theme directory
- */
-function prepareThemeEditContext($theme_dir)
-{
-	global $context;
-
-	// Eh? not trying to sneak a peek outside the theme directory are we
-	if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
-		fatal_lang_error('theme_edit_missing', false);
-
-	// You're editing a file: we have extra-checks coming up first.
-	if (substr($_REQUEST['filename'], 0, 1) == '.')
-		$_REQUEST['filename'] = '';
-	else
-	{
-		$_REQUEST['filename'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_REQUEST['filename']);
-
-		$temp = realpath($theme_dir . '/' . $_REQUEST['filename']);
-		if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) !== realpath($theme_dir))
-			$_REQUEST['filename'] = '';
-	}
-
-	// we shouldn't end up with no file
-	if (empty($_REQUEST['filename']))
-		fatal_lang_error('theme_edit_missing', false);
-
-	// initialize context
-	$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
-	$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
-	$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
-
-}
