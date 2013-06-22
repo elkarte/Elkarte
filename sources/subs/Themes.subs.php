@@ -438,6 +438,13 @@ function countConfiguredMemberOptions()
 	return $themes;
 }
 
+/**
+ * Deletes all outdated options from the themes table
+ *
+ * @param bol $default_theme -> true is default, false for all custom themes
+ * @param bol $membergroups -> true is for members, false for guests
+ * @param array $old_settings
+ */
 function removeThemeOptions($default_theme, $membergroups, $old_settings)
 {
 	$db = database();
@@ -464,6 +471,33 @@ function removeThemeOptions($default_theme, $membergroups, $old_settings)
 	);
 }
 
+/**
+ * Remove a specific option from the themes table
+ *
+ * @param int $theme
+ * @param string $options
+ */
+function removeThemeOption($theme, $options)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE variable = {string:option}
+			AND id_member > {int:no_member}
+			AND id_theme = {int:current_theme}',
+		array(
+			'no_member' => 0,
+			'current_theme' => $theme,
+			'option' => $options,
+		)
+	);
+}
+
+/**
+ * Update the default options for our users.
+ * @param  array $setValues
+ */
 function updateThemeOptions($setValues)
 {
 	$db = database();
@@ -473,5 +507,29 @@ function updateThemeOptions($setValues)
 		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 		$setValues,
 		array('id_theme', 'variable', 'id_member')
+	);
+}
+
+/**
+ * Add predefined options to the themes table.
+ *
+ * @param int $id_theme
+ * @param string $options
+ * @param mixed $value
+ */
+function addThemeOptions($id_theme, $options, $value)
+{
+	$db = database();
+
+	$db->query('substring', '
+		INSERT INTO {db_prefix}themes
+			(id_member, id_theme, variable, value)
+		SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
+		FROM {db_prefix}members',
+		array(
+			'current_theme' => $id_theme,
+			'option' => $options,
+			'value' => (is_array($value) ? implode(',', $value) : $value),
+		)
 	);
 }

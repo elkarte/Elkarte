@@ -370,16 +370,7 @@ class Themes_Controller
 							'option' => $opt,
 						)
 					);
-					$db->query('substring', '
-						INSERT INTO {db_prefix}themes
-							(id_member, id_theme, variable, value)
-						SELECT id_member, 1, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
-						FROM {db_prefix}members',
-						array(
-							'option' => $opt,
-							'value' => (is_array($val) ? implode(',', $val) : $val),
-						)
-					);
+					addThemeOptions(1, $opt, $val);
 
 					$old_settings[] = $opt;
 				}
@@ -419,32 +410,11 @@ class Themes_Controller
 							'option' => $opt,
 						)
 					);
-					$db->query('substring', '
-						INSERT INTO {db_prefix}themes
-							(id_member, id_theme, variable, value)
-						SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
-						FROM {db_prefix}members',
-						array(
-							'current_theme' => $_GET['th'],
-							'option' => $opt,
-							'value' => (is_array($val) ? implode(',', $val) : $val),
-						)
-					);
+					addThemeOptions($_GET['th'], $opt, $val);
 				}
 				elseif ($_POST['options_master'][$opt] == 2)
-				{
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE variable = {string:option}
-							AND id_member > {int:no_member}
-							AND id_theme = {int:current_theme}',
-						array(
-							'no_member' => 0,
-							'current_theme' => $_GET['th'],
-							'option' => $opt,
-						)
-					);
-				}
+					removeThemeOption($_GET['th'], $opt);
+
 			}
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
