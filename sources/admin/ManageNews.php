@@ -257,7 +257,7 @@ class ManageNews_Controller extends Action_Controller
 							$("#preview_" + preview_id).text(\'' . $txt['preview'] . '\').click(function () {
 								$.ajax({
 									type: "POST",
-									url: "' . $scripturl . '?action=xmlhttp;sa=previews;xml",
+									url: "' . $scripturl . '?action=xmlpreview;xml",
 									data: {item: "newspreview", news: $("#data_" + preview_id).val()},
 									context: document.body,
 									success: function(request){

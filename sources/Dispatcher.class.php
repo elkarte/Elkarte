@@ -192,7 +192,8 @@ class Site_Dispatcher
 			'viewquery' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewquery'),
 			'viewadminfile' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewadminfile'),
 			'.xml' => array('News.controller.php', 'News_Controller', 'action_showfeed'),
-			'xmlhttp' => array('Xml.controller.php', 'action_xmlhttp'),
+			'xmlhttp' => array('Xml.controller.php', 'Xml_Controller', 'action_index'),
+			'xmlpreview' => array('Xmlpreview.controller.php', 'XmlPreview_Controller', 'action_index'),
 		);
 
 		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');

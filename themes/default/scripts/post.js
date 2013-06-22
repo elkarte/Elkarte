@@ -130,7 +130,7 @@ function previewNews()
 	x[x.length] = 'item=newsletterpreview';
 
 	// Send in document for previewing
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=previews;xml', x.join('&'), onDocSent);
+	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
