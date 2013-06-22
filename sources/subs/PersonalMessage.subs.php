@@ -866,8 +866,6 @@ function markPMsRead($memberID)
  */
 function loadPMs($pm_options, $id_member)
 {
-	global $context, $modSettings;
-
 	$db = database();
 
 	// First work out what messages we need to see - if grouped is a little trickier...
@@ -875,27 +873,27 @@ function loadPMs($pm_options, $id_member)
 	if ($pm_options['display_mode'] === 2)
 	{
 		// On a non-default sort due to PostgreSQL we have to do a harder sort.
-		if ($pm_options['is_postgres'] && $pm_options['sort_by_query'] != 'pm.id_pm')
+		if ($db->db_title() == 'PostgreSQL' && $pm_options['sort_by_query'] != 'pm.id_pm')
 		{
 			$sub_request = $db->query('', '
 				SELECT MAX({raw:sort}) AS sort_param, pm.id_pm_head
-				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
+				FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
 						AND pmr.deleted = {int:not_deleted}
 						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
-				WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
+				WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
 					AND pm.deleted_by_sender = {int:not_deleted}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
 					AND pm.id_pm = {int:id_pm}') . '
 				GROUP BY pm.id_pm_head
 				ORDER BY sort_param' . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 				array(
 					'current_member' => $id_member,
 					'not_deleted' => 0,
-					'id_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+					'id_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
 					'id_pm' => isset($pm_options['pmsg']) ? $pm_options['pmsg'] : '0',
 					'sort' => $pm_options['sort_by_query'],
 				)
@@ -908,7 +906,7 @@ function loadPMs($pm_options, $id_member)
 
 			$request = $db->query('', '
 				SELECT pm.id_pm AS id_pm, pm.id_pm_head
-				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
+				FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
@@ -916,14 +914,14 @@ function loadPMs($pm_options, $id_member)
 						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
 				WHERE ' . (empty($sub_pms) ? '0=1' : 'pm.id_pm IN ({array_int:pm_list})') . '
-				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $context['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
+				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 				array(
 					'current_member' => $id_member,
 					'pm_list' => array_keys($sub_pms),
 					'not_deleted' => 0,
 					'sort' => $pm_options['sort_by_query'],
-					'id_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+					'id_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
 				)
 			);
 		}
@@ -931,24 +929,24 @@ function loadPMs($pm_options, $id_member)
 		{
 			$request = $db->query('pm_conversation_list', '
 				SELECT MAX(pm.id_pm) AS id_pm, pm.id_pm_head
-				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
+				FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
 						AND pmr.deleted = {int:deleted_by}
 						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:pm_member})') : '') . '
-				WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
+				WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
 					AND pm.deleted_by_sender = {int:deleted_by}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
 					AND pm.id_pm = {int:pmsg}') . '
 				GROUP BY pm.id_pm_head
-				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $context['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
+				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 				array(
 					'current_member' => $id_member,
 					'deleted_by' => 0,
 					'sort' => $pm_options['sort_by_query'],
-					'pm_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+					'pm_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
 					'pmsg' => isset($pm_options['pmsg']) ? (int) $pm_options['pmsg'] : 0,
 				)
 			);
@@ -971,7 +969,7 @@ function loadPMs($pm_options, $id_member)
 				AND pm.deleted_by_sender = {int:is_deleted}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
 				AND pm.id_pm = {int:pmsg}') . '
 			ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $context['folder'] != 'sent' ? 'pmr.id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
-			LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+			LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 			array(
 				'current_member' => $id_member,
 				'is_deleted' => 0,
@@ -984,7 +982,7 @@ function loadPMs($pm_options, $id_member)
 	// Load the id_pms and initialize recipients.
 	$pms = array();
 	$lastData = array();
-	$posters = $context['folder'] == 'sent' ? array($id_member) : array();
+	$posters = $pm_options['folder'] == 'sent' ? array($id_member) : array();
 	$recipients = array();
 
 	while ($row = $db->fetch_assoc($request))
