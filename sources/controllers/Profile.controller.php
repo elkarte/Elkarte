@@ -80,6 +80,7 @@ class Profile_Controller extends Action_Controller
 					'summary' => array(
 						'label' => $txt['summary'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_summary',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -89,6 +90,7 @@ class Profile_Controller extends Action_Controller
 					'statistics' => array(
 						'label' => $txt['statPanel'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_statPanel',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -98,6 +100,7 @@ class Profile_Controller extends Action_Controller
 					'showposts' => array(
 						'label' => $txt['showPosts'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_showPosts',
 						'subsections' => array(
 							'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
@@ -124,6 +127,7 @@ class Profile_Controller extends Action_Controller
 					'permissions' => array(
 						'label' => $txt['showPermissions'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_showPermissions',
 						'permission' => array(
 							'own' => 'manage_permissions',
@@ -150,6 +154,7 @@ class Profile_Controller extends Action_Controller
 						'label' => $txt['profile_view_warnings'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_viewWarning',
 						'permission' => array(
 							'own' => 'profile_view_own',
