@@ -801,6 +801,8 @@ class ManagePaid_Controller extends Action_Controller
 				// Find the user...
 				require_once(SUBSDIR . '/Members.subs.php');
 				$member = getMemberByName($_POST['name']);
+				if (empty($member))
+					fatal_lang_error('error_member_not_found');
 
 				if(alreadySubscribed($context['sub_id'], $member['id_member']))
 					fatal_lang_error('member_already_subscribed');
