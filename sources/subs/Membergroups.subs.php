@@ -1657,3 +1657,37 @@ function prepareMembergroupPermissions()
 
 	return $profile_groups;
 }
+
+function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
+		FROM {db_prefix}membergroups AS mg
+			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
+		WHERE mg.min_posts = {int:min_posts}
+			AND mg.id_group != {int:moderator_group}' . ($show_hidden ? '' : '
+			AND mg.hidden = {int:not_hidden}') . '
+		ORDER BY mg.group_name',
+		array(
+			'current_member' => $id_member,
+			'min_posts' => $min_posts,
+			'moderator_group' => 3,
+			'not_hidden' => 0,
+		)
+	);
+	$groups = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Hide hidden groups!
+		if ($show_hidden && $row['hidden'] && !$row['can_moderate'])
+			continue;
+
+		$groups[$row['id_group']] = $row['group_name'];
+	}
+
+	$db->free_result($request);
+
+	return $groups;
+}

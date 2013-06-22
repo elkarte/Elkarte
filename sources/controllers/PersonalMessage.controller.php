@@ -1811,32 +1811,9 @@ class PersonalMessage_Controller
 		// Load them... load them!!
 		loadRules();
 
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Likely to need all the groups!
-		$request = $db->query('', '
-			SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
-			FROM {db_prefix}membergroups AS mg
-				LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
-			WHERE mg.min_posts = {int:min_posts}
-				AND mg.id_group != {int:moderator_group}
-				AND mg.hidden = {int:not_hidden}
-			ORDER BY mg.group_name',
-			array(
-				'current_member' => $user_info['id'],
-				'min_posts' => -1,
-				'moderator_group' => 3,
-				'not_hidden' => 0,
-			)
-		);
-		$context['groups'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Hide hidden groups!
-			if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
-				continue;
-
-			$context['groups'][$row['id_group']] = $row['group_name'];
-		}
-		$db->free_result($request);
+		$context['groups'] = loadGroups($user_info['id'], allowedTo('manage_membergroups'));
 
 		// Applying all rules?
 		if (isset($_GET['apply']))
