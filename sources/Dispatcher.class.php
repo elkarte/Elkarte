@@ -56,9 +56,6 @@ class Site_Dispatcher
 	{
 		global $board, $topic, $modSettings, $settings, $user_info, $maintenance;
 
-		// ready to load 'em
-		require_once(SOURCEDIR . '/Action.controller.php');
-
 		// default action of the forum: board index
 		// everytime we don't know what to do, we'll do this :P
 		$default_action = array(
