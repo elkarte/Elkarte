@@ -9,7 +9,7 @@ CREATE SEQUENCE {$db_prefix}member_logins_seq;
 ---#
 
 ---# Creating login history table.
-CREATE TABLE {$db_prefix}member_logins (
+CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
 	id_login int NOT NULL default nextval('{$db_prefix}member_logins_seq'),
 	id_member mediumint NOT NULL,
 	time int NOT NULL,
@@ -310,7 +310,7 @@ upgrade_query("
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating drafts table.
-CREATE TABLE {$db_prefix}user_drafts (
+CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 	id_draft int unsigned NOT NULL auto_increment,
 	id_topic int unsigned NOT NULL default '0',
 	id_board smallint unsigned NOT NULL default '0',
@@ -486,7 +486,7 @@ WHERE url = 'http://custom.simplemachines.org/packages/mods';
 /******************************************************************************/
 
 ---# Creating follow-up table...
-CREATE TABLE {$db_prefix}follow_ups (
+CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
   follow_up int NOT NULL default '0',
   derived_from int NOT NULL default '0',
   PRIMARY KEY (follow_up, derived_from)
@@ -498,7 +498,7 @@ CREATE TABLE {$db_prefix}follow_ups (
 /******************************************************************************/
 
 ---# Creating antispam questions table...
-CREATE TABLE {$db_prefix}antispam_questions (
+CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
   id_question tinyint(4) unsigned NOT NULL auto_increment,
   question text NOT NULL default '',
   answer text NOT NULL default '',
@@ -654,7 +654,7 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 /******************************************************************************/
 
 ---# Creating likes log  table...
-CREATE TABLE {$db_prefix}log_likes (
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
   action char(1) NOT NULL default '0',
   id_target int NOT NULL default '0',
   id_member int NOT NULL default '0',
@@ -668,7 +668,7 @@ CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
 ---#
 
 ---# Creating likes message  table...
-CREATE TABLE {$db_prefix}message_likes (
+CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
   id_member int NOT NULL default '0',
   id_msg int NOT NULL default '0',
   PRIMARY KEY (id_msg, id_member)

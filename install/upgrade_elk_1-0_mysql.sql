@@ -518,7 +518,7 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 /******************************************************************************/
 
 ---# Creating likes log  table...
-CREATE TABLE {$db_prefix}log_likes (
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
   action char(1) NOT NULL default '0',
   id_target mediumint(8) unsigned NOT NULL default '0',
   id_member mediumint(8) unsigned NOT NULL default '0',
@@ -529,7 +529,7 @@ CREATE TABLE {$db_prefix}log_likes (
 ---#
 
 ---# Creating likes message  table...
-CREATE TABLE {$db_prefix}message_likes (
+CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY (id_msg, id_member) 
