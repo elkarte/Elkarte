@@ -15,7 +15,7 @@ if (!defined('ELKARTE'))
  * Xml controller receives XMLhttp requests of various types.
  * (jump to, message and group icons, core features)
  */
-class Xml_Controller
+class Xml_Controller extends Action_Controller
 {
 	/**
 	 * Main function for action=xmlhttp.

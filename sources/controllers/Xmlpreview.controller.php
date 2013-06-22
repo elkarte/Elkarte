@@ -8,13 +8,13 @@
  * @version 1.0 Alpha
  */
 
-class XmlPreview_Controller
+class XmlPreview_Controller extends Action_Controller
 {
 	/**
 	 * Returns a preview of an item for use in an ajax enabled template
 	 *  - Calls the correct function for the action
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $context;
 
@@ -33,14 +33,14 @@ class XmlPreview_Controller
 			return false;
 
 		// A preview it is then
-		$subActions[$_REQUEST['item']][0]();
+		$this->{$subActions[$_REQUEST['item']][0]}();
 	}
 
 	/**
 	 * Get a preview of the important forum news for review before use
 	 *  - Calls parse bbc to render bbc tags for the preview
 	 */
-	function action_newspreview()
+	public function action_newspreview()
 	{
 		global $context;
 
@@ -75,7 +75,7 @@ class XmlPreview_Controller
 	 * Get a preview of a news letter before its sent on to the masses
 	 *  - Uses prepareMailingForPreview to create the actual preview
 	 */
-	function action_newsletterpreview()
+	public function action_newsletterpreview()
 	{
 		global $context, $txt;
 
@@ -101,7 +101,7 @@ class XmlPreview_Controller
 	/**
 	 * Let them see what their signature looks like before they use it like spam
 	 */
-	function action_sig_preview()
+	public function action_sig_preview()
 	{
 		global $context, $txt, $user_info;
 
@@ -183,7 +183,7 @@ class XmlPreview_Controller
 	/**
 	 * Used to preview custom warning templates before they are saved to submitted to the user
 	 */
-	function action_warning_preview()
+	public function action_warning_preview()
 	{
 		global $context, $txt, $user_info, $scripturl, $mbname;
 
@@ -250,7 +250,7 @@ class XmlPreview_Controller
 	/**
 	 * Used to preview custom email bounce templates before they are saved for use
 	 */
-	function action_bounce_preview()
+	public function action_bounce_preview()
 	{
 		global $context, $txt, $scripturl, $mbname, $modSettings;
 
