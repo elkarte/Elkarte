@@ -13,16 +13,13 @@
  *
  * @version 1.0 Alpha
  *
- * Handle sending out reminders, and checking the secret answer and question.
- * It uses just a few functions to do this.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Reminder Controller
+ * Reminder Controller handles sending out reminders, and checking the secret answer and question.
  */
 class Reminder_Controller
 {

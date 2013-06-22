@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; Themes
 
-$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum.  These settings affect the selection of themes, and which themes guests and other members use.';
+$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. These settings affect the selection of themes, and which themes guests and other members use.';
 
 $txt['theme_allow'] = 'Allow members to select their own themes.';
 $txt['theme_guests'] = 'Overall forum default';
@@ -10,16 +10,16 @@ $txt['theme_reset'] = 'Reset everyone to';
 $txt['theme_nochange'] = 'No change';
 $txt['theme_forum_default'] = 'Forum Default';
 
-$txt['theme_remove'] = 'remove';
-$txt['theme_remove_confirm'] = 'Are you sure you want to permanently remove this theme?';
+$txt['theme_remove'] = 'Uninstall';
+$txt['theme_remove_confirm'] = 'Are you sure you want to uninstall this theme?';
 
 $txt['theme_install'] = 'Install a New Theme';
 $txt['theme_install_file'] = 'From a file';
 $txt['theme_install_dir'] = 'From a directory on the server';
 $txt['theme_install_error'] = 'That theme directory doesn\'t exist, or doesn\'t contain a theme.';
-$txt['theme_install_write_error'] = 'The Themes directory must be writable to continue.';
+$txt['theme_install_write_error'] = 'The themes directory must be writable to continue.';
 $txt['theme_install_go'] = 'Install';
-$txt['theme_install_new'] = 'Create a copy of Default named';
+$txt['theme_install_new'] = 'Create a copy of default theme named';
 $txt['theme_install_new_confirm'] = 'Are you sure you want to install this new theme?';
 $txt['theme_install_writable'] = 'Warning - you cannot create or install a new theme as your themes directory is not currently writable.';
 $txt['theme_install_general'] = 'The theme doesn\'t seem to be where it should, please double check the information you provided.';

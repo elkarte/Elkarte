@@ -865,7 +865,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		}
 
 		//Some javascript ma'am? (But load it only once)
-		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visuali_verification_type']) && !isset($this->_options['override_visual'])) && emtpy($context['captcha_js_loaded']))
+		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
 			loadJavascriptFile('captcha.js');
 			$context['captcha_js_loaded'] = true;
@@ -1027,7 +1027,7 @@ class Control_Verification_Questions implements Control_Verifications
 			}
 
 			// Do we have enough questions?
-			if (!empty($this->_number_questions) && $this->_number_questions >= count($modSettings['question_id_cache'][$this->_questions_language]))
+			if (!empty($this->_number_questions) && $this->_number_questions <= count($modSettings['question_id_cache'][$this->_questions_language]))
 			{
 				$this->_possible_questions = $modSettings['question_id_cache'][$this->_questions_language];
 				$this->_number_questions = count($this->_possible_questions);

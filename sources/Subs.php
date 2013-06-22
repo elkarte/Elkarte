@@ -417,7 +417,7 @@ function updateMemberData($members, $data)
  * @param array $changeArray
  * @param bool $update = false
  * @param bool $debug = false
- * @todo: add debugging features, $debug isn't used 
+ * @todo: add debugging features, $debug isn't used
  */
 function updateSettings($changeArray, $update = false, $debug = false)
 {
@@ -2646,7 +2646,10 @@ function redirectexit($setLocation = '', $refresh = false)
 }
 
 /**
- * Ends execution.  Takes care of template loading and remembering the previous URL.
+ * Ends execution.
+ * Takes care of template loading and remembering the previous URL.
+ * Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
+ *
  * @param bool $header = null
  * @param bool $do_footer = null
  * @param bool $from_index = false
@@ -2733,12 +2736,15 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		}
 	}
 
+	// Need user agent
+	$req = request();
+
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
 	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...
-	$_SESSION['USER_AGENT'] = empty($_SERVER['HTTP_USER_AGENT']) ? '' : $_SERVER['HTTP_USER_AGENT'];
+	$_SESSION['USER_AGENT'] = $req->user_agent();
 
 	if (!empty($settings['strict_doctype']))
 	{
@@ -4312,4 +4318,35 @@ function prepareSearchEngines()
 	}
 
 	return $engines;
+}
+
+/**
+ * This function receives a request handle and attempts to retrieve
+ * the next result.
+ * It is used by the controller callbacks from the template, such as
+ * posts in topic display page, posts search results page, or personal
+ * messages.
+ */
+function currentContext($messages_request, $reset = false)
+{
+	// Can't work with a database without a database :P
+	$db = database();
+
+	// Start from the beginning...
+	if ($reset)
+		return $db->data_seek($messages_request, 0);
+
+	// If the query has already returned false, get out of here
+	if ($messages_request == false)
+		return false;
+
+	// Attempt to get the next message.
+	$message = $db->fetch_assoc($messages_request);
+	if (!$message)
+	{
+		$db->free_result($messages_request);
+		return false;
+	}
+
+	return $message;
 }

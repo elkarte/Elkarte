@@ -179,9 +179,10 @@ class Attachment_Controller
 		// Recode line endings for text files, if enabled.
 		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($_REQUEST['image']) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
 		{
-			if (strpos($_SERVER['HTTP_USER_AGENT'], 'Windows') !== false)
+			$req = request();
+			if (strpos($req->user_agent(), 'Windows') !== false)
 				$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\r\n", $buffer);');
-			elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'Mac') !== false)
+			elseif (strpos($req->user_agent(), 'Mac') !== false)
 				$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\r", $buffer);');
 			else
 				$callback = create_function('$buffer', 'return preg_replace(\'~[\r]?\n~\', "\n", $buffer);');

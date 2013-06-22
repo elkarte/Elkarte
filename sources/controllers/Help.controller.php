@@ -26,6 +26,15 @@ if (!defined('ELKARTE'))
 class Help_Controller
 {
 	/**
+	 * Default action handler: just help.
+	 */
+	public function action_index()
+	{
+		// I need help!
+		$this->action_help();
+	}
+	
+	/**
 	 * Prepares the help page.
 	 * Uses Help template and Manual language file.
 	 * It is accessed by ?action=help.

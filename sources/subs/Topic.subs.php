@@ -1082,7 +1082,7 @@ function setTopicRegard($id_member, $topic, $on = false)
 	$db->insert(empty($was_set) ? 'ignore' : 'replace',
 		'{db_prefix}log_topics',
 		array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int'),
-		array($id_member, $topic, $was_set ? $was_set : 0, $on ? 1 : 0),
+		array($id_member, $topic, !empty($was_set['id_msg']) ? $was_set['id_msg'] : 0, $on ? 1 : 0),
 		array('id_member', 'id_topic')
 	);
 }
@@ -1321,6 +1321,43 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
 			'current_topic' => $id_topic,
 			'last_msg' => $id_msg,
 			'approved' => 1,
+		)
+	);
+	list ($count) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $count;
+}
+
+/**
+ * Returns how many messages are in a topic before the specified message id.
+ * Used in display to compute the start value for a specific message.
+ *
+ * @param int $id_topic
+ * @param int $id_msg
+ * @param bool $include_current = false
+ * @param bool $only_approved = false
+ * @param bool $include_own = false
+ * @return int
+ */
+function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only_approved = false, $include_own = false)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}messages
+		WHERE id_msg ' . ($include_current ? '<=' : '<') . ' {int:id_msg}
+			AND id_topic = {int:current_topic}' . ($only_approved ? '
+			AND (approved = {int:is_approved}' . ($include_own ? '
+			OR id_member = {int:current_member}' : '') . ')' : ''),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $id_topic,
+			'id_msg' => $id_msg,
+			'is_approved' => 1,
 		)
 	);
 	list ($count) = $db->fetch_row($request);
@@ -1646,7 +1683,7 @@ function getLoggedTopics($member, $topics)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_topic, disregarded
+		SELECT id_topic, disregarded, id_msg
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})
 			AND id_member = {int:current_user}',
@@ -1705,4 +1742,153 @@ function topicsList($topic_ids)
 	$db->free_result($result);
 
 	return $topics;
+}
+
+/**
+ * Get each post and poster in this topic and take care of user settings such as
+ * limit or sort direction.
+ *
+ * @param int $topic
+ * @param array $limit
+ * @param string $sort
+ * @return array
+ */
+function getTopicsPostsAndPoster($topic, $limit, $sort)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+
+	$topic_details = array(
+		'messages' => array(),
+		'all_posters' => array(),
+	);
+
+	$request = $db->query('display_get_post_poster', '
+		SELECT id_msg, id_member, approved
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : (!empty($modSettings['db_mysql_group_by_fix']) ? '' : '
+		GROUP BY id_msg') . '
+		HAVING (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
+		ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
+		LIMIT ' . $limit['start'] . ', ' . $limit['offset']),
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'is_approved' => 1,
+			'blank_id_member' => 0,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!empty($row['id_member']))
+			$topic_details['all_posters'][$row['id_msg']] = $row['id_member'];
+			$topic_details['messages'][] = $row['id_msg'];
+	}
+	$db->free_result($request);
+
+	return $topic_details;
+}
+
+/**
+ * Remove a batch of messages (or topics)
+ *
+ * @param array $messages
+ * @param array $messageDetails
+ * @param string $type = replies
+ */
+function removeMessages($messages, $messageDetails, $type = 'replies')
+{
+	global $modSettings;
+
+	// @todo something's not right, removeMessage() does check permissions,
+	// removeTopics() doesn't
+	if ($type == 'topics')
+	{
+		removeTopics($messages);
+
+		// and tell the world about it
+		foreach ($messages as $topic)
+		{
+			// Note, only log topic ID in native form if it's not gone forever.
+			logAction('remove', array(
+				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$topic]['board'] ? 'topic' : 'old_topic_id') => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
+		}
+	}
+	else
+	{
+		require_once(SUBSDIR . '/Messages.subs.php');
+		foreach ($messages as $post)
+		{
+			removeMessage($post);
+			logAction('delete', array(
+				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$post]['board'] ? 'topic' : 'old_topic_id') => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
+		}
+	}
+}
+
+/**
+ * Approve a batch of posts (or topics in their own right)
+ *
+ * @param array $messages
+ * @param array $messageDetails
+ * @param (string) $type = replies
+ */
+function approveMessages($messages, $messageDetails, $type = 'replies')
+{
+	if ($type == 'topics')
+	{
+		approveTopics($messages);
+
+		// and tell the world about it
+		foreach ($messages as $topic)
+			logAction('approve_topic', array('topic' => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
+	}
+	else
+	{
+		require_once(SUBSDIR . '/Post.subs.php');
+		approvePosts($messages);
+
+		// and tell the world about it again
+		foreach ($messages as $post)
+			logAction('approve', array('topic' => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
+	}
+}
+
+/**
+ * Approve topics, all we got.
+ *
+ * @param array $topics array of topics ids
+ * @param bool $approve = true
+ */
+function approveTopics($topics, $approve = true)
+{
+	$db = database();
+
+	if (!is_array($topics))
+		$topics = array($topics);
+
+	if (empty($topics))
+		return false;
+
+	$approve_type = $approve ? 0 : 1;
+
+	// Just get the messages to be approved and pass through...
+	$request = $db->query('', '
+		SELECT id_msg
+		FROM {db_prefix}messages
+		WHERE id_topic IN ({array_int:topic_list})
+			AND approved = {int:approve_type}',
+		array(
+			'topic_list' => $topics,
+			'approve_type' => $approve_type,
+		)
+	);
+	$msgs = array();
+	while ($row = $db->fetch_assoc($request))
+		$msgs[] = $row['id_msg'];
+	$db->free_result($request);
+
+	require_once(SUBSDIR . '/Post.subs.php');
+	return approvePosts($msgs, $approve);
 }

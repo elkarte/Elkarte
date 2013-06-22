@@ -261,8 +261,8 @@ class ManageCoreFeatures_Controller
 					// Cant use warning post moderation if disabled!
 					if (!$value)
 					{
-						require_once(CONTROLLERDIR . \'/PostModeration.controller.php\');
-						approveAllData();
+						require_once(SUBSDIR . \'/Moderation.subs.php\');
+						approveAllUnapproved();
 
 						return array(\'warning_moderate\' => 0);
 					}

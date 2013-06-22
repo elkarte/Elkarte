@@ -23,24 +23,24 @@ if (!defined('ELKARTE'))
 class Groups_Controller
 {
 	/**
-	 * Entry point function, permission checks, admin bars, etc.
+	 * Entry point to groups.
 	 * It allows moderators and users to access the group showing functions.
+	 */
+	function action_index()
+	{
+		// Default to listing the groups
+		$this->action_list();
+	}
+
+	/**
+	 * Set up templates and pre-requisites for any request processed by this class.
+	 * Called automagically before any action_() call.
 	 * It handles permission checks, and puts the moderation bar on as required.
 	 */
-	function action_groups()
+	public function pre_dispatch()
 	{
 		global $context, $txt, $scripturl, $user_info;
-
-		// The sub-actions that we can do. Format "Function Name, Mod Bar Index if appropriate".
-		$subActions = array(
-			'index' => array('action_grouplist', 'view_groups'),
-			'members' => array('action_groupmembers', 'view_groups'),
-			'requests' => array('action_grouprequests', 'group_requests'),
-		);
-
-		// Default to sub action 'index' or 'settings' depending on permissions.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'index';
-
+		
 		// Get the template stuff up and running.
 		loadLanguage('ManageMembers');
 		loadLanguage('ModerationCenter');
@@ -50,7 +50,7 @@ class Groups_Controller
 		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 		{
 			require_once(CONTROLLERDIR . '/ModerationCenter.controller.php');
-			$_GET['area'] = $_REQUEST['sa'] == 'requests' ? 'groups' : 'viewgroups';
+			$_GET['area'] = (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'requests') ? 'groups' : 'viewgroups';
 			action_modcenter(true);
 		}
 		// Otherwise add something to the link tree, for normal people.
@@ -63,15 +63,12 @@ class Groups_Controller
 				'name' => $txt['groups'],
 			);
 		}
-
-		// Call the actual function.
-		$this->{$subActions[$_REQUEST['sa']][0]}();
 	}
 
 	/**
 	 * This very simply lists the groups, nothing snazy.
 	 */
-	function action_grouplist()
+	function action_list()
 	{
 		global $txt, $context, $scripturl, $user_info;
 
@@ -200,7 +197,7 @@ class Groups_Controller
 	 * It redirects to itself.
 	 * @uses ManageMembergroups template, group_members sub template.
 	 */
-	function action_groupmembers()
+	function action_members()
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
@@ -444,7 +441,7 @@ class Groups_Controller
 	/**
 	 * Show and manage all group requests.
 	 */
-	function action_grouprequests()
+	function action_requests()
 	{
 		global $txt, $context, $scripturl, $user_info, $modSettings, $language;
 
@@ -849,8 +846,8 @@ function ModerateGroups()
 
 	// Setup the subactions...
 	$subactions = array(
-		'requests' => 'action_grouprequests',
-		'view' => 'action_groupmembers',
+		'requests' => 'action_requests',
+		'view' => 'action_members',
 	);
 
 	if (!isset($_GET['sa']) || !isset($subactions[$_GET['sa']]))

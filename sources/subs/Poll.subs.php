@@ -19,7 +19,7 @@
  * If $pollID is passed, the topic is updated to point to the new poll.
  *
  * @param int $topicID the ID of the topic
- * @param int $pollID = null the ID of the poll, if any. If null is passed, it retrives the current ID.
+ * @param int $pollID = null the ID of the poll, if any. If null is passed, it retrieves the current ID.
  *
  */
 function associatedPoll($topicID, $pollID = null)
@@ -221,6 +221,7 @@ function pollInfoForTopic($topicID)
  * Return poll options, customized for a given member.
  * The function adds to poll options the information if the user
  * has voted in this poll.
+ * It censors the label in the result array.
  *
  * @param int $id_poll
  * @param int $id_member
@@ -253,6 +254,37 @@ function pollOptionsForMember($id_poll, $id_member)
 }
 
 /**
+ * Returns poll options.
+ * It censors the label in the result array.
+ *
+ * @param $id_poll
+ */
+function pollOptions($id_poll)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT label, votes, id_choice
+		FROM {db_prefix}poll_choices
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $id_poll,
+		)
+	);
+
+	$pollOptions = array();
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['label']);
+		$pollOptions[$row['id_choice']] = $row;
+	}
+	$db->free_result($request);
+
+	return $pollOptions;
+}
+
+/**
  * Create a poll
  *
  * @param string $question The title/question of the poll
@@ -266,7 +298,7 @@ function pollOptionsForMember($id_poll, $id_member)
  * @param array $options = array() The poll options
  * @return int the id of the created poll
  */
-function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = true, $expire = 0, $can_change_vote = false, $can_guest_vote = false, array $options = array())
+function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0, array $options = array())
 {
 	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
 
@@ -315,4 +347,32 @@ function addPollOptions($id_poll, array $options)
 		$pollOptions,
 		array('id_poll', 'id_choice')
 	);
+}
+
+/**
+ * Retrieves the topic and, if different, poll starter
+ * for the poll associated with the $id_topic.
+ *
+ * @param $id_topic
+ */
+function pollStarters($id_topic)
+{
+	$db = database();
+
+	$pollStarters = array();
+	$request = $db->query('', '
+		SELECT t.id_member_started, p.id_member AS poll_starter
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $id_topic,
+		)
+	);
+	if ($db->num_rows($request) != 0)
+		$pollStarters = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $pollStarters;
 }

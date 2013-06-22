@@ -13,15 +13,13 @@
  *
  * @version 1.0 Alpha
  *
- * This file's job is to handle things related to post moderation.
- *
  */
 
 if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
- * Post Moderation Controller
+ * PostModeration Controller handles post moderation actions. (approvals, unapprovals)
  */
 class PostModeration_Controller
 {
@@ -116,6 +114,8 @@ class PostModeration_Controller
 		if (!empty($toAction) && isset($curAction))
 		{
 			checkSession('request');
+
+			require_once(SUBSDIR . '/Topic.subs.php');
 
 			// Handy shortcut.
 			$any_array = $curAction == 'approve' ? $approve_boards : $delete_any_boards;
@@ -530,121 +530,5 @@ class PostModeration_Controller
 		cache_put_data('num_menu_errors', null, 900);
 
 		redirectexit('topic=' . $topic . '.msg' . $current_msg. '#msg' . $current_msg);
-	}
-}
-
-/**
- * Approve a batch of posts (or topics in their own right)
- *
- * @param array $messages
- * @param array $messageDetails
- * @param (string) $current_view = replies
- */
-function approveMessages($messages, $messageDetails, $current_view = 'replies')
-{
-	require_once(SUBSDIR . '/Post.subs.php');
-	if ($current_view == 'topics')
-	{
-		approveTopics($messages);
-
-		// and tell the world about it
-		foreach ($messages as $topic)
-			logAction('approve_topic', array('topic' => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
-	}
-	else
-	{
-		approvePosts($messages);
-
-		// and tell the world about it again
-		foreach ($messages as $post)
-			logAction('approve', array('topic' => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
-	}
-}
-
-/**
- * This is a helper function - basically approve everything!
- */
-function approveAllData()
-{
-	$db = database();
-
-	// Start with messages and topics.
-	$request = $db->query('', '
-		SELECT id_msg
-		FROM {db_prefix}messages
-		WHERE approved = {int:not_approved}',
-		array(
-			'not_approved' => 0,
-		)
-	);
-	$msgs = array();
-	while ($row = $db->fetch_row($request))
-		$msgs[] = $row[0];
-	$db->free_result($request);
-
-	if (!empty($msgs))
-	{
-		require_once(SUBSDIR . '/Post.subs.php');
-		approvePosts($msgs);
-		cache_put_data('num_menu_errors', null, 900);
-	}
-
-	// Now do attachments
-	$request = $db->query('', '
-		SELECT id_attach
-		FROM {db_prefix}attachments
-		WHERE approved = {int:not_approved}',
-		array(
-			'not_approved' => 0,
-		)
-	);
-	$attaches = array();
-	while ($row = $db->fetch_row($request))
-		$attaches[] = $row[0];
-	$db->free_result($request);
-
-	if (!empty($attaches))
-	{
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		approveAttachments($attaches);
-		cache_put_data('num_menu_errors', null, 900);
-	}
-}
-
-/**
- * Remove a batch of messages (or topics)
- *
- * @param array $messages
- * @param array $messageDetails
- * @param string $current_view = replies
- */
-function removeMessages($messages, $messageDetails, $current_view = 'replies')
-{
-	global $modSettings;
-
-	// @todo something's not right, removeMessage() does check permissions,
-	// removeTopics() doesn't
-	if ($current_view == 'topics')
-	{
-		require_once(SUBSDIR . '/Topic.subs.php');
-		removeTopics($messages);
-
-		// and tell the world about it
-		foreach ($messages as $topic)
-		{
-			// Note, only log topic ID in native form if it's not gone forever.
-			logAction('remove', array(
-				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$topic]['board'] ? 'topic' : 'old_topic_id') => $topic, 'subject' => $messageDetails[$topic]['subject'], 'member' => $messageDetails[$topic]['member'], 'board' => $messageDetails[$topic]['board']));
-		}
-	}
-	else
-	{
-		require_once(SUBSDIR . '/Messages.subs.php');
-		foreach ($messages as $post)
-		{
-			removeMessage($post);
-			logAction('delete', array(
-				(empty($modSettings['recycle_enable']) || $modSettings['recycle_board'] != $messageDetails[$post]['board'] ? 'topic' : 'old_topic_id') => $messageDetails[$post]['topic'], 'subject' => $messageDetails[$post]['subject'], 'member' => $messageDetails[$post]['member'], 'board' => $messageDetails[$post]['board']));
-		}
 	}
 }

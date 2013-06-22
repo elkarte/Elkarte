@@ -2911,7 +2911,7 @@ function package_create_backup($id = 'backup')
 	}
 
 	$dirs = array(
-		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'Sources/' : strtr(SOURCEDIR . '/', '\\', '/')
+		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
 	);
 
 	$request = $db->query('', '

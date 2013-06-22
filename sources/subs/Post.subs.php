@@ -1692,44 +1692,6 @@ function approvePosts($msgs, $approve = true)
 }
 
 /**
- * Approve topics?
- * @todo shouldn't this be in topic
- *
- * @param array $topics array of topics ids
- * @param bool $approve = true
- */
-function approveTopics($topics, $approve = true)
-{
-	$db = database();
-
-	if (!is_array($topics))
-		$topics = array($topics);
-
-	if (empty($topics))
-		return false;
-
-	$approve_type = $approve ? 0 : 1;
-
-	// Just get the messages to be approved and pass through...
-	$request = $db->query('', '
-		SELECT id_msg
-		FROM {db_prefix}messages
-		WHERE id_topic IN ({array_int:topic_list})
-			AND approved = {int:approve_type}',
-		array(
-			'topic_list' => $topics,
-			'approve_type' => $approve_type,
-		)
-	);
-	$msgs = array();
-	while ($row = $db->fetch_assoc($request))
-		$msgs[] = $row['id_msg'];
-	$db->free_result($request);
-
-	return approvePosts($msgs, $approve);
-}
-
-/**
  * A special function for handling the hell which is sending approval notifications.
  *
  * @param $topicData

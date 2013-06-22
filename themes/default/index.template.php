@@ -79,10 +79,13 @@ function template_init()
 	$settings['menu_numeric_notice'] = ' [<strong>%1$s</strong>]';
 
 	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
+	// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
+	// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
+	// How do we get anchors only, where they will work? Spans and strong only where necessary?
 	$settings['page_index_template'] = array(
-		'base_link' => '<span class="pagelink"><a class="navPages" href="{base_link}">%2$s</a> </span>',
+		'base_link' => '<a class="navPages" href="{base_link}">%2$s</a>',
 		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-		'current_page' => '<span class="pagelink current_pagelink">%1$s</span>',
+		'current_page' => '<strong class="current_page">%1$s</strong>',
 		'next_page' => '<span class="next_page">{next_txt}</span>',
 		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 		'all' => '<span class="all_pages">{all_txt}</span>',
@@ -151,12 +154,12 @@ function template_html_above()
 	// If we're viewing a topic, these should be the previous and next topics, respectively.
 	if (!empty($context['links']['next']))
 		echo '<link rel="next" href="', $context['links']['next'], '" />';
-	else if (!empty($context['current_topic']))
+	elseif (!empty($context['current_topic']))
 		echo '<link rel="next" href="', $scripturl, '?topic=', $context['current_topic'], '.0;prev_next=next" />';
 
 	if (!empty($context['links']['prev']))
 		echo '<link rel="prev" href="', $context['links']['prev'], '" />';
-	else if (!empty($context['current_topic']))
+	elseif (!empty($context['current_topic']))
 		echo '<link rel="prev" href="', $scripturl, '?topic=', $context['current_topic'], '.0;prev_next=prev" />';
 
 	// If we're in a board, or a topic for that matter, the index will be the board's index.
@@ -193,7 +196,8 @@ function template_body_above()
 	echo '
 	<div id="top_section">
 		<div class="frame">
-			<span id="top_section_notice" class="floatleft">';
+			<span id="top_section_notice">';
+	// For above, see me grumblez in Issue #552. ;)
 
 	// If the user is logged in, display the time, or a maintenance warning for admins.
 	if ($context['user']['is_logged'])
@@ -267,7 +271,7 @@ function template_body_above()
 	</div>';
 
 	echo '
-	<header id="header"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;"', '>
+	<header id="header"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
 		<div class="frame">
 			<h1 class="forumtitle">
 				<a id="top" href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
@@ -280,13 +284,16 @@ function template_body_above()
 		</div>
 	</header>
 	<div id="wrapper">';
+
 	// Show the menu here, according to the menu sub template. Moved this. Like it here. :)
 	// Upper section and main content markup simplified. Less divs = happier parrots!
 	template_menu();
+
 	echo '
 		<div id="upper_section">
-			<div id="inner_wrap"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;"', '>
-				<div class="user floatright">';
+			<div id="inner_wrap"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
+				<div class="user">';
+	// For above, see me grumblez in Issue #552. ;)
 
 	// Otherwise they're a guest - this time ask them to either register or login - lazy bums...
 	if (!empty($context['show_login_bar']))
@@ -377,13 +384,10 @@ function template_body_below()
 
 	// Show the XHTML and RSS links, as well as the copyright.
 	// Footer is now full-width by default. Frame inside it will match theme wrapper width automatically.
+	// Have removed "Go to top" link from footer, as I have a better idea. ;)
 	echo '
 	<footer id="footer_section">
-		<div class="frame">';
-
-	// There is now a global "Go to top" link at the right. @todo - this needs fixing.
-	echo '
-			<a href="#top" id="bot"><img src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['go_up'], '" /></a>
+		<div class="frame">
 			<ul>
 				<li class="copyright">', theme_copyright(), '
 				</li>
@@ -426,24 +430,24 @@ function theme_linktree($force_show = false)
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
 		return;
-	// @todo - Div here is pointless. Prefer to deprecate in favour of plain ul (easy CSS changes).
+
+	// Div here has been deprecated in favour of plain ul.
 	echo '
-				<div class="navigate_section">
-					<ul>';
+				<ul class="navigate_section">';
 
 	if ($context['user']['is_logged'])
 		echo '
-						<li class="unread_links">
-							<a href="', $scripturl, '?action=unread" title="', $txt['unread_since_visit'], '">', $txt['view_unread_category'], '</a>
-							<a href="', $scripturl, '?action=unreadreplies" title="', $txt['show_unread_replies'], '">', $txt['unread_replies'], '</a>
-						</li>';
+					<li class="unread_links">
+						<a href="', $scripturl, '?action=unread" title="', $txt['unread_since_visit'], '">', $txt['view_unread_category'], '</a>
+						<a href="', $scripturl, '?action=unreadreplies" title="', $txt['show_unread_replies'], '">', $txt['unread_replies'], '</a>
+					</li>';
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
 	// Added a linktree class to make targeting dividers easy.
 	foreach ($context['linktree'] as $link_num => $tree)
 	{
 		echo '
-						<li class="', ($link_num == count($context['linktree']) - 1) ? 'last' : 'linktree', '">';
+					<li class="', ($link_num == count($context['linktree']) - 1) ? 'last' : 'linktree', '">';
 
 		// Dividers moved to pseudo-elements in CSS. @todo- rtl.css
 		// Show something before the link?
@@ -452,19 +456,18 @@ function theme_linktree($force_show = false)
 
 		// Show the link, including a URL if it should have one.
 		echo $settings['linktree_link'] && isset($tree['url']) ? '
-							<a href="' . $tree['url'] . '"><span>' . $tree['name'] . '</span></a>' : '<span>' . $tree['name'] . '</span>';
+						<a href="' . $tree['url'] . '"><span>' . $tree['name'] . '</span></a>' : '<span>' . $tree['name'] . '</span>';
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))
 			echo $tree['extra_after'];
 
 		echo '
-						</li>';
+					</li>';
 	}
 
 	echo '
-					</ul>
-				</div>';
+				</ul>';
 
 	$shown_linktree = true;
 }
@@ -476,42 +479,42 @@ function template_menu()
 {
 	global $context, $settings, $txt;
 
+	// WAI-ARIA a11y tweaks have been applied here.
+	// ID's for nav and ul have been swapped so semantics makes sense.
 	echo '
-				<nav id="main_menu">
-					<ul class="dropmenu" id="menu_nav">';
+				<nav id="menu_nav" role="navigation">
+					<ul id="main_menu">';
 
-	// @todo - WAI-ARIA a11y tweaks should be applied here (and elsewhere, for that matter).
+	// Also, elements have had classes changed for greater ease of customisation.
+	// See http://www.elkarte.net/index.php?topic=439.msg3100#msg3100 and previous posts for details.
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
-						<li id="button_', $act, '" ', !empty($button['sub_buttons']) ? 'class="subsections"' : '', '>
-							<a class="', $button['sub_buttons'] ? 'submenu' : '', !empty($button['active_button']) ? ' active' : '', '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', $button['title'], '</a>';
+						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', $button['title'], '</a>';
 
 		// does it have child buttons? (2nd level menus)
 		if (!empty($button['sub_buttons']))
 		{
 			echo '
-							<ul>';
+							<ul class="menulevel2">';
 
 			foreach ($button['sub_buttons'] as $childbutton)
 			{
 				echo '
-								<li ', !empty($childbutton['sub_buttons']) ? 'class="subsections"' : '', '>
-									<a href="', $childbutton['href'], '" ' , isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>
-								', $childbutton['title'], '</a>';
+								<li class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
+									<a class="linklevel2" href="', $childbutton['href'], '" ' , isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
 
 				// 3rd level menus :)
 				if (!empty($childbutton['sub_buttons']))
 				{
 					echo '
-									<ul>';
+									<ul class="menulevel3">';
 
 					foreach ($childbutton['sub_buttons'] as $grandchildbutton)
 						echo '
-										<li>
-											<a href="', $grandchildbutton['href'], '" ' , isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>
-										', $grandchildbutton['title'], '
-											</a>
+										<li class="listlevel3">
+											<a class="linklevel3" href="', $grandchildbutton['href'], '" ' , isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
 										</li>';
 
 					echo '
@@ -593,7 +596,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 	if ($context['right_to_left'])
 		$button_strip = array_reverse($button_strip, true);
 
-	// Create the buttons...
+	// Create the buttons... now with cleaner markup (yay!).
 	$buttons = array();
 	foreach ($button_strip as $key => $value)
 	{
@@ -601,19 +604,18 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		// Kept for backward compatibility
 		if (!isset($value['test']) || !empty($context[$value['test']]))
 			$buttons[] = '
-								<li><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '><span>' . $txt[$value['text']] . '</span></a></li>';
+								<li><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
 	}
 
 	// No buttons? No button strip either.
 	if (empty($buttons))
 		return;
+
 	// @todo - Div here is pointless. Prefer to deprecate in favour of plain ul (easy CSS changes, but check for js bugz).
 	echo '
-						<div class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
-							<ul>',
-								implode('', $buttons), '
-							</ul>
-						</div>';
+							<ul class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
+								', implode('', $buttons), '
+							</ul>';
 }
 
 /**
@@ -703,7 +705,9 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
 
 	if (!isset($options['top_button']))
 		$options['top_button'] = !empty($modSettings['topbottomEnable']);
+
 	if (!empty($options['page_index_markup']))
+	// Hmmm. I'm a tad wary of having floatleft here but anyway............
 		$pages = '<div class="pagelinks floatleft">' . $options['page_index_markup'] . '</div>';
 	else
 	{
@@ -711,9 +715,11 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
 			$options['page_index'] = 'page_index';
 		$pages = empty($context[$options['page_index']]) ? '' : '<div class="pagelinks floatleft">' . $context[$options['page_index']] . '</div>';
 	}
+
 	if (!isset($options['extra']))
 		$options['extra'] = '';
 
+	// Also, would love to deprecate the old/top bottom buttons for something better (which I already know how to do).
 		echo '
 	<div class="pagesection">
 		', $options['top_button'] ? '<a id="page' . ($go != 'go_up' ? 'top' : 'bot') . '" href="#' . ($go == 'go_up' ? 'top' : 'bot') . '" class="topbottom floatleft">' . $txt[$go] . '</a>' : '', $pages, '

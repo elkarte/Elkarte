@@ -530,11 +530,9 @@ div.windowbg, div.windowbg2 {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
-/* the page navigation area */
-/* @todo - Sort font size another way for compat with buttonlist. */
-/* @todo - Take a good look at markup, then CSS. */
+/* The page navigation area - now cleaned up for happier parrots. */
+/* Could still be a bit more stylish. */
 .pagesection {
-	font-size: 0.9em;
 	padding: 2px 4px;
 	overflow: hidden;
 	margin: 0;
@@ -543,67 +541,46 @@ div.windowbg, div.windowbg2 {
 #main_content_section .pagesection {
 	margin: 4px 0 0 0;
 }
-div.pagesection div.floatright input, div.pagesection div.floatright select {
+.pagesection .floatright input, .pagesection .floatright select {
 	margin-top: 3px;
 }
 .selectbox, .pagelinks {
 	margin: 8px 0 0 0;
+	font-size: 0.9em;
 }
-.pagelinks {
-	padding: 0 1px;
-	margin: 8px 0 0 0;
+.pagelinks  :first-child {
+	border-radius: 4px 0 0 4px;
 }
-.pagelinks  .pagelink:first-child {
-	border-top-left-radius: 4px;
-	border-bottom-left-radius: 4px;
-	border-left: 1px solid #ccc;
+.pagelinks :last-child {
+	border-radius: 0 4px 4px 0;
 }
-.pagelinks .pagelink:last-child {
-	border-top-right-radius: 4px;
-	border-bottom-right-radius: 4px;
-}
-.pagelink, .expand_pages {
-	border-top: 1px solid #ccc;
-	border-right: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
+.navPages, .expand_pages, .current_page {
+	border: 1px solid #ccc;
+	border-left: none;
 	padding: 1px 5px;
 	background: #efefef;
 	display: inline-block;
 }
-small .pagelink {
+/* @todo - Ugh. Search by tag name, and a cruddy one at that. Fix later. */
+small .navPages {
 	border: none !important;
 	padding: 1px;
 }
 .next_page, .previous_page {
 	text-transform: capitalize;
-}
-.current_pagelink  {
-	color: #aaa;
-	font-weight: bold;
-}
-.next_page, .previous_page {
-	text-transform: capitalize;
 	padding: 0 2px;
 }
-.current_page strong {
+.current_page  {
 	color: #555;
 	font-family: verdana, sans-serif;
 }
-/* Next and previous topic links for Display.template.php. */
-/* Give them a bit of extra height for an easier target. */
-.nextlinks {
-	text-transform: capitalize;
-	display: block;
-	margin: -2px 0;
-}
-.nextlinks a {
-	padding: 3px 0;
-}
+/* @todo - Ugh. Search by tag name, and a cruddy one at that. Fix later. */
 small span.pagelink, small span.expand_pages {
 	border: none;
 	background: none;
 }
 /* Go up and go down links. */
+/* @todo - These need to be deprecated. Really. Haz good plan. */
 .topbottom {
 	display: block;
 	/* @todo - Change background image for simple sprite combined with bars. */
@@ -626,26 +603,6 @@ small span.pagelink, small span.expand_pages {
 	border-left: 1px solid #bbb;
 	border-top: 1px solid #aaa;
 	box-shadow: -1px -1px 2px rgba(0,0,0,0.07), -1px -2px 4px rgba(255,255,255,0.33) inset;
-}
-
-/* Posts and personal messages displayed throughout the forum. */
-.post, .personalmessage {
-	overflow: auto;
-	line-height: 1.4em;
-	padding: 1px 0;
-}
-
-/* All the signatures used in the forum. If your forum users use Mozilla, Opera, or Safari, you might add max-height here ;). */
-.signature, .attachments, .custom_fields_above_signature {
-	width: 100%;
-	overflow: auto;
-	clear: right;
-	padding: 12px 0 3px 0;
-	border-top: 1px solid #bfbfbf;
-	box-shadow: 0 1px 0 #fff inset;
-	line-height: 1.4em;
-	font-size: 0.9em;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 /* Sometimes there will be an error when you post */
@@ -925,30 +882,19 @@ dl.settings textarea {
 }
 
 /* Styles for the standard dropdown menus.
-------------------------------------------------------- */
+----------------------------------------------------------- */
 /* @todo - Lots of interdependent revision here to minimise code. */
-/* @todo - If making any changes, please check very carefully. */
-#main_menu {
+/* @todo - If making any changes, please check very carefully.
+----------------------------------------------------------- */
+/* Wrapper for main menu - no visible styling. */
+#menu_nav {
 	margin: 6px;
 	padding: 0;
 }
-.dropmenu {
-	float: left;
-	width: 100%;
-	position: relative;
-}
-#menu_nav {
+/* Menu bar: wrapper/background. */
+#main_menu {
 	padding: 0 8px;
 	border-radius: 6px 6px 0 0;
-}
-#menu_nav, #admin_menu>ul>li a.active, #adm_submenus li a.active {
-	/* @todo - Change background for simple sprite combined with buttons. */
-	background: -moz-linear-gradient(top,  #5BA048 0%, #3d6e32 100%); /* FF3.6+ */
-	background: -webkit-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #5BA048 0%,#3d6e32 100%); /* W3C */
-	color: #fff;
 }
 /* @todo - Collect all pseudo clearfixes in one declaration. */
 #main_menu:after {
@@ -956,8 +902,13 @@ dl.settings textarea {
 	display: block;
 	clear: both;
 }
+#main_menu, .admin_menu .linklevel1.active, #adm_submenus .linklevel1.active {
+	background: #4b863c;
+	background-image: linear-gradient(to bottom, #5BA048 0%, #3d6e32 100%); /* W3C */
+	color: #fff;
+}
 /* Level 1 button background. */
-.dropmenu li {
+.listlevel1 {
 	margin: 5px 0;
 	padding: 1px;
 	float: left;
@@ -965,7 +916,7 @@ dl.settings textarea {
 	position: relative;
 }
 /* Needed for new PM notifications. */
-.dropmenu li strong {
+.listlevel1 strong {
 	color: #555;
 }
 /* For the upshrink button in the main menu bar. */
@@ -977,7 +928,7 @@ dl.settings textarea {
 #upshrink {
 	padding: 4px 9px 3px 9px;
 }
-#menu_nav>li>a, #admin_menu>ul>li>a, #adm_submenus li a {
+#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
 	padding: 0 0.5em;
 	margin: 0;
 	display: block;
@@ -985,29 +936,31 @@ dl.settings textarea {
 	border-radius: 4px;
 	color: #fff;
 }
-#admin_menu>ul>li>a, #adm_submenus li a {
+.admin_menu .linklevel1, #adm_submenus .linklevel1 {
 	color: #444;
 }
 /* Level 1 hover effects. */
-#menu_nav .active, #menu_nav li a:hover, #menu_nav>li:hover>a, #menu_nav li a:focus, #menu_nav>li:hover>a, #menu_nav>li>a:focus,
-#admin_menu li>a:hover, #admin_menu>.dropmenu>li>ul>li:hover>a, #admin_menu li a:focus,
-#adm_submenus li a:hover, #adm_submenus li a:focus {
+#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel:hover .linklevel1, #main_menu .linklevel1:focus,
+.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus, .admin_menu .listlevel2:hover .linklevel2,
+#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
 	background: #efefef url(../images/theme/lower_section.png) 0 8px repeat-x;
 	color: #444;
 	border: 1px solid #bbb;
 	text-decoration: none;
 }
 /* Level 1 active button. */
-.dropmenu .active, #admin_menu .active, #adm_submenus .active, #admin_menu .active:hover, #adm_submenus .active:hover {
+.admin_menu .active, .admin_menu .active:hover,
+#adm_submenus .active, #adm_submenus .active:hover {
 	font-weight: 600;
 	border: 1px solid #38642d;
 }
 /* Top level subsection indicators, just in case anyone wants them. */
-.dropmenu>.subsections>a:after {
+#main_menu .subsections .linklevel1:after,
+.admin_menu .subsections .linklevel1:after {
 	content:" \2193";
 }
 /* Levels 2 and 3 submenu wrapper. */
-.dropmenu li ul {
+.menulevel2, .menulevel3 {
 	z-index: 90;
 	position: absolute;
 	top: 100%;
@@ -1019,14 +972,14 @@ dl.settings textarea {
 	border-radius: 3px;
 	box-shadow: 3px 3px 4px rgba(0,0,0,0.3);
 }
-.dropmenu li li {
+.listlevel2 {
 	margin: 0;
 	padding: 0;
 	width: 17em;
 	position: relative;
 	float: none;
 }
-.dropmenu li li a, .dropmenu li li li a {
+.linklevel2, .linklevel3 {
 	position: relative;
 	line-height: 2.2em;
 	padding: 0 7px;
@@ -1035,12 +988,12 @@ dl.settings textarea {
 	border: 1px solid transparent;
 	border-radius: 3px;
 }
-.dropmenu li li a>img {
+.linklevel2>img {
 	vertical-align: middle;
 	margin: 0 0 0 -4px;
 }
-/* Note: The next declarations are for keyboard access with js disabled. */
-.dropmenu ul a:focus, .dropmenu ul ul a:focus {
+/* @todo - Note: The next declarations are for keyboard access with js disabled. */
+/*.dropmenu ul a:focus, .dropmenu ul ul a:focus {
 	margin-left: 9990px;
 	border: none;
 	width: 17em;
@@ -1048,46 +1001,46 @@ dl.settings textarea {
 .dropmenu ul ul a:focus {
 	margin-left: 19950px;
 }
-/* Cancel those for hover and/or js access. */
-.dropmenu ul li:hover a:focus, .dropmenu ul li.sfhover a:focus {
+/* @todo - Cancel those for hover and/or js access. */
+/*.dropmenu ul li:hover a:focus, .dropmenu ul li.sfhover a:focus {
 	margin-left: 0;
 	width: auto;
 }
 /* Level 3 submenu wrapper positioning. */
-.dropmenu li ul ul, .dropmenu li.sfhover ul ul {
+.menulevel3 {
 	margin: -2em 0 0 15.3em;
 }
 /* Levels 2 and 3 hover effects. */
-.dropmenu li li:hover>a, .dropmenu li li.sfhover a:focus, .dropmenu li li a:hover, .dropmenu li li a:focus {
+.listlevel2:hover .linklevel2, .linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus {
 	color: #555;
 	border: 1px solid #ccc;
 }
 /* Reposition Level 2 submenu as visible on hover. */
-.dropmenu li:hover ul, .dropmenu li.sfhover ul {
+.listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: 1px;
 }
 /* Hiding Level 3 submenu off hover. */
-.dropmenu li:hover ul ul, .dropmenu li.sfhover ul ul, .dropmenu li:hover ul ul ul, .dropmenu li.sfhover ul ul ul {
+.listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
 	left: -9999px;
 }
 /* Reposition as visible on hover. */
-.dropmenu li li:hover ul, .dropmenu li li.sfhover ul {
+.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
 	left: -14px;
 }
 /* Nice and light subsection indicators. */
-.dropmenu>li>ul>.subsections>a:after, .left_admmenu>.subsections>a:after, .subsections>strong>a:after {
+.listlevel2.subsections .linklevel2:after {
 	content: "\2192";
 	position: absolute;
 	right: 6px;
 }
 /* Highlighting of current section */
-.dropmenu li li .chosen {
+.linklevel2.chosen, .linklevel3.chosen {
 	font-weight: bold;
 }
 /* The extra menu rows for admin sections, etc. */
 #adm_submenus {
-	padding: 10px 15px 0 15px;
-	overflow: hidden;
+	padding: 10px 15px;
+	overflow: auto;
 }
 
 /* Styles for sidebar menus.
@@ -1107,71 +1060,300 @@ dl.settings textarea {
 	right: 0;
 	overflow: auto;
 }
-#left_admsection {
+#menu_sidebar {
 	width: 185px;
 	float: left;
 	padding: 0 10px 1em 0;
 }
-.adm_section .catbg {
+#menu_sidebar .catbg {
 	padding: 5px 8px;
 	font-size: 1em;
 }
-.adm_section .dropmenu {
+#menu_sidebar .sidebar_menu {
 	padding: 4px 0 9px 0;
 	float: none;
 }
-.adm_section li {
+#menu_sidebar .listlevel1 {
 	margin: 0 0 1px 0;
 	line-height: 1.7em;
 	border: 1px solid transparent;
 	border-radius: 2px;
 	float: none;
 }
-.adm_section li:hover, .adm_section li.sfhover, #menu_current_area {
+#menu_sidebar .listlevel1:hover, #menu_sidebar .listlevel2:hover, #menu_current_area {
 	background: #ebebeb;
 	border: 1px solid #ccc;
 }
-.adm_section a {
+#menu_sidebar .linklevel1 {
 	display: block;
 	text-decoration: none;
 	padding: 2px 7px;
 	color: #555;
 }
-.adm_section li ul {
-	top: -1px;
+#menu_sidebar .listlevel1.subsections .linklevel1:after {
+	content: "\2192";
+	position: absolute;
+	right: 6px;
 }
-.adm_section li:hover ul, .adm_section li.sfhover ul {
+#menu_sidebar  .listlevel1:hover .menulevel2, #menu_sidebar  .listlevel1.sfhover .menulevel2 {
+	top: -1px;
 	left: 160px;
 }
-.adm_section .dropmenu li li a {
+#menu_sidebar .linklevel2 {
 	padding: 0 7px;
 	border: none;
 }
+/* @todo - Check these again. */
 /* Note: The next declarations are for keyboard access with js disabled. */
-.adm_section .dropmenu ul a:focus {
+#menu_sidebar .linklevel2:focus {
 	margin-left: 10150px;
 	width: 17em;
 }
+/* @todo - Check these again. */
 /* Cancel those for hover and/or js access. */
-.adm_section .dropmenu ul li:hover a:focus, .adm_section .dropmenu ul li.sfhover a:focus {
+#menu_sidebar .listlevel2:hover .linklevel2:focus, #menu_sidebar .listlevel2.sfhover .linklevel2:focus {
 	margin-left: 0;
 	width: auto;
 }
 /*End sidebar flyout coding. */
 
+/* The quick buttons - let's keep all this drop menu stuff in one place. */
+/* Superfluous div deprecated in favour of plain ul. */
+.quickbuttons {
+	margin: 11px 11px 4px 0;
+	text-align: right;
+}
+/* @todo - Collect all pseudo clearfixes in one declaration. */
+.quickbuttons:after {
+	content:"";
+	display: block;
+	clear: both;
+}
+/* @todo - What is this stuff? Must look it up later. */
+.windowbg .post_wrapper:hover ul.nojs_visible, .windowbg2 .post_wrapper:hover ul.nojs_visible {
+	visibility: visible;
+}
+.quickbuttons .listlevel1 {
+	float: right;
+	margin: 3px 0;
+	padding: 0 1px;
+	font-size: 0.9em;
+	/* @todo - Change background image for simple sprite combined with bars. */
+	background: #ebebeb url(../images/theme/lower_section.png) 0 6px repeat-x;
+	border: 1px solid #ccc;
+	color: #555;
+	overflow: visible;
+	/* @todo */ width: auto;
+}
+.quickbuttons .listlevel1:last-child {
+	border-radius: 4px 0 0 4px;
+}
+.quickbuttons .listlevel1:hover {
+	/* @todo - Change background image for simple sprite combined with bars. */
+	background: #fff url(../images/theme/upper_section.png) 0 -30px repeat-x;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
+	border: 1px solid #ccc;
+	border-left: 1px solid #bbb;
+	border-top: 1px solid #aaa;
+}
+.quickbuttons .linklevel1, .quickbuttons .linklevel1:hover {
+	margin: 0;
+	padding: 0 4px 0 20px;
+	line-height: 2.0em;
+	float: left;
+	text-decoration: none;
+	color: #555;
+}
+/* @todo - Check with js disabled after sorting most of the other crud. */
+/* Note: The next declarations are for keyboard access with js disabled. */
+.quickbuttons .linklevel1:focus {
+	margin: 0 -9910px 0 9910px;
+	/* @todo - Change background image for simple sprite combined with bars. */
+	background: #e3e9ef url(../images/theme/lower_section.png) 0 0 repeat-x;
+}
+/* Cancel for hover and/or js access. */
+.quickbuttons .listlevel1:hover .linklevel1:focus, .quickbuttons .listlevel1.sfhover .linklevel1:focus {
+	margin: 0;
+}
+.quickbuttons .listlevel1.modified, .quickbuttons .listlevel1.modified:hover {
+	float: left;
+	color: #777;
+	background: none;
+	box-shadow: none;
+	border: none;
+	padding: 0.65em 0 0 6px;
+}
+.quickbuttons .linklevel1, .quickbuttons .linklevel1:hover,
+.quickbuttons .linklevel2, .quickbuttons .linklevel2:hover {
+/* A rare example of where longhand background declarations work well. */
+	background-image: url(../images/theme/quickbuttons.png);
+	background-repeat: no-repeat;
+}
+/* The long list of sprite coordinates is much less verbose this way. */
+.quickbuttons .quote_button {
+	background-position: 0 0;
+}
+.quickbuttons .remove_button {
+	background-position: 0 -24px;
+}
+.quickbuttons .modify_button {
+	background-position: 0 -48px;
+}
+.quickbuttons .approve_button {
+	background-position: 0 -72px;
+}
+.quickbuttons .restore_button {
+	background-position: 0 -96px;
+}
+.quickbuttons .split_button {
+	background-position: 0 -120px;
+}
+.quickbuttons .reply_button {
+	background-position: 0 -144px;
+}
+.quickbuttons .reply_all_button {
+	background-position: 0 -144px;
+}
+.quickbuttons .notify_button {
+	background-position: 0 -168px;
+}
+.quickbuttons .unapprove_button {
+	background-position: 0 -192px;
+}
+.quickbuttons .close_button {
+	background-position: 0 -216px;
+}
+.quickbuttons .im_reply_button {
+	background-position: 0 -240px;
+}
+.quickbuttons .details_button {
+	background-position: 0 -264px;
+}
+.quickbuttons .ignore_button {
+	background-position: 0 -288px;
+}
+.quickbuttons .report_button {
+	background-position: 0 -312px;
+}
+.quickbuttons .warn_button {
+	background-position: 0 -336px;
+}
+.quickbuttons .quotetonew_button {
+	background-position: 0 -360px;
+}
+.quickbuttons .like_button {
+	background-position: 0 -384px;
+}
+.quickbuttons .unlike_button {
+	background-position: 0 -408px;
+}
+.quickbuttons .inline_mod_check {
+	padding: 1px 1px 1px 1px;
+}
+.quickbuttons .quick_edit, .quickbuttons .post_options {
+	padding: 0 6px 0 22px;
+	line-height: 2.0em;
+	position: relative;
+	color: #555;
+}
+.quickbuttons .quick_edit img {
+	padding: 4px 5em 4px 4px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	cursor: pointer;
+	margin: 0;
+}
+.quickbuttons .inline_mod_check {
+	padding: 3px 0 0 3px;
+	background: none;
+	border: none;
+	box-shadow: none;
+}
+.quickbuttons .post_options {
+	padding: 0 0 0 0;
+	border-radius: 0 4px 4px 0;
+}
+.quickbuttons .post_options .linklevel1, .quickbuttons .post_options .linklevel1:hover {
+	padding: 0 4px 0 4px;
+	background-image: none;
+}
+/* @todo */
+.quickbuttons .menulevel2, .follow_ups  .menulevel2 {
+	z-index: 90;
+	position: absolute;
+	top: 100%;
+	left: -9999px;
+	width: auto;
+	padding: 0.5em;
+	background: #fff;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	box-shadow: 3px 3px 4px rgba(0,0,0,0.3);
+	padding: 0.5em;
+	text-align: left;
+	white-space: nowrap;
+}
+.quickbuttons .listlevel1:hover .menulevel2, .quickbuttons .listlevel1.sfhover .menulevel2,
+.follow_ups .listlevel1:hover .menulevel2, .follow_ups .listlevel1.sfhover .menulevel2 {
+	left: auto;
+	right: -1px;
+}
+.quickbuttons .listlevel2 {
+	clear: right;
+}
+.quickbuttons .listlevel1.sfhover .listlevel2, .quickbuttons .listlevel1:hover .listlevel2 {
+	background: none;
+	box-shadow: none;
+	width: 12.5em;
+	border: 1px solid transparent;
+	border-radius: 3px;
+}
+.quickbuttons .listlevel2:hover {
+	border: 1px solid #cfcfcf;
+	/* @todo - Change background image for simple sprite combined with bars. */
+	background: #ebebeb url(../images/theme/lower_section.png) 0 10px repeat-x;
+}
+.quickbuttons .linklevel2, .quickbuttons .linklevel2:hover, .quickbuttons .linklevel2:focus {
+	padding: 0 6px 0 26px;
+	display: block;
+	line-height: 2.0em;
+}
+.follow_ups {
+	float: right;
+	margin: -8px 0 0 0;
+}
+.follow_ups:after {
+	display: none;
+}
+.follow_ups .listlevel1 {
+	padding: 0 4px;
+	line-height: 1.9em;
+	cursor: pointer;
+}
+.follow_ups .listlevel1:first-child {
+	border-radius: 4px;
+	margin-right: 0.75em;
+}
+.follow_ups .listlevel1.sfhover .listlevel2, .follow_ups .listlevel1:hover .listlevel2 {
+	width: 20em;
+	background-image: none;
+}
+
+/* End quickbuttons and follow ups code. */
+
 /* Styles for the standard button lists.
 ------------------------------------------------------- */
-.buttonlist ul {
-	z-index: 100;
+.buttonlist {
 	padding: 5px;
-	margin: 0 0 5px 0;
+	margin: 0;
 }
-.buttonlist ul li {
+.buttonlist li {
 	margin: 0 0 0 6px;
 	padding: 0;
 	float: left;
 }
-.buttonlist ul li a {
+.buttonlist li a {
 	display: block;
 	background: #ebebeb url(../images/theme/lower_section.png) 0 -10px repeat-x;
 	border: 1px solid #bbb;
@@ -1181,6 +1363,8 @@ dl.settings textarea {
 	color: #555;
 	font-size: 0.8em;
 	text-transform: uppercase;
+	line-height: 2.2em;
+	padding: 0 8px;
 }
 /* @todo - What on earth is buttonlist_c? */
 .pagesection ul.buttonlist_c {
@@ -1189,38 +1373,27 @@ dl.settings textarea {
 	text-align: right;
 	white-space: nowrap;
 }
-.pagesection ul.buttonlist_c>li>ul, div.buttonlist ul>li>ul {
+.pagesection ul.buttonlist_c>li>ul, .buttonlist>li>ul {
 	display: none;
 }
 #pagetop, #pagebot {
 	margin-top: 7px;
 }
-div.buttonlist ul>li>ul li {
+/* @todo - Will these be used? */
+.buttonlist>li>ul li {
 	float: none;
 }
-div.buttonlist ul>li>ul {
+.buttonlist>li>ul {
 	background-color: #fff;
 }
-
-/* Keep a consistent size when wrapped in pagesection. */
-/* @todo - Why does it need this? Sounds like bad declaration on pagesection. */
-.pagesection .buttonlist ul li a {
-	font-size: 0.889em;
-}
-.buttonlist ul li a:hover {
+.buttonlist li a:hover {
 	border: 1px solid #ccc;
 	border-bottom: 1px solid #bbb;
 	background: #efefef url(../images/theme/lower_section.png) 0 0 repeat-x;
 	text-decoration: none;
 }
-.buttonlist ul li a span {
-	display: block;
-	height: 2.2em;
-	line-height: 2.2em;
-	padding: 0 8px;
-}
 /* the active one */
-.buttonlist ul li a.active {
+.buttonlist li a.active {
 	background: -moz-linear-gradient(top,  #5BA048 0%, #3d6e32 100%); /* FF3.6+ */
 	background: -webkit-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* Chrome10+,Safari5.1+ */
 	background: -o-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* Opera 11.10+ */
@@ -1230,10 +1403,11 @@ div.buttonlist ul>li>ul {
 	font-weight: bold;
 	border: 1px solid #46823c;
 }
-.buttonlist ul li a.active:hover {
+.buttonlist li a.active:hover {
 	color: #ccc;
 }
-.align_top ul li a, .align_bottom ul li a {
+/* @tdo - What are these classes? */
+.align_top li a, .align_bottom li a {
 	margin: 0 12px 0 0;
 }
 
@@ -1280,6 +1454,8 @@ div.buttonlist ul>li>ul {
 	margin: 0;
 	padding: 9px 9px 7px 9px;
 	line-height: 1.3em;
+	/* See me grumblez in Issue #552. ;) */
+	float: left;
 }
 #search_form {
 	padding: 4px 0 0 0;
@@ -1384,13 +1560,9 @@ div.buttonlist ul>li>ul {
 	padding: 2px 12px 16px 12px;
 }
 
-/* @todo - Look at deprecating parent div in favour of plain ul. */
+/* Deprecated parent div in favour of plain ul. */
 /* The navigation list (i.e. linktree) */
 .navigate_section {
-	float: left;
-	width: 100%;
-}
-.navigate_section ul {
 	margin: 0 3px 6px 3px;
 	padding: 2px 0 0 10px;
 	font-size: 0.9em;
@@ -1400,7 +1572,7 @@ div.buttonlist ul>li>ul {
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.08);
 	background: #eee;
 }
-#main_content_section .navigate_section ul {
+#main_content_section .navigate_section {
 	margin: 6px 0 0 0;
 }
 .navigate_section li {
@@ -1847,31 +2019,26 @@ select.qaction, input.qaction {
 	border: 1px solid #ddd;
 }
 /* @todo - Collect all pseudo clearfixes in one declaration. */
-/* @todo - Also, look at simplifying markup in posts. */
-.post_wrapper:after {
-	content:"";
-	display: block;
-	clear: both;
-}
-/* poster details and list of items */
+/* @todo - Also, look at simplifying markup in posts < ETA: Mostly done, but poster area still needs some work. */
+/* Poster details and list of items */
 .poster {
 	float: left;
 	/* Don't set this in em - will eat too much space if people need large text. */
 	/* Just break the few words here, and leave more space for topic content. */
-	width: 160px;
+	margin: -8px -10px 0 0;
+	width: 170px;
 	word-break: hyphenate;
 	word-wrap: break-word;
 }
-/* @todo - Implementation of this in Display.template.php could be improved. */
-/* @todo - Play around with it after sorting the worst of the rest. */
 .poster2 {
+	margin: 0;
 	width: auto;
 	max-width: 25em;
 	font-size: 1em;
 }
 /* #todo - Why a span? Just use li class="name" and an anchor. */
-/* @todo - Then CSS becomes .name>a {..stuff..} - easy. */ 
-.poster span.name {
+/* @todo - Then CSS becomes .name>a {..stuff..} - easy. */
+.poster .name {
 	display: block;
 	padding: 6px;
 	line-height: 1.5em;
@@ -1881,41 +2048,35 @@ select.qaction, input.qaction {
 	font-weight: 600;
 	overflow: hidden;
 }
+.poster2 .name {
+	padding: 0 8px;
+	font-size: 1em;
+}
 /* Nifty new flyout menu for the poster info. */
 /* Revised for less code. Partly dependent on previous .dropmenu declarations. */
 /* @todo Can probably clean up the CSS a bit more here. */
 /* Check inheritance with font size in the dropdown. */
-.poster .dropmenu {
-	padding: 0 0 0 0;
-	margin: -8px 0 0 0;
+.poster .listlevel1, .poster .listlevel1.sfhover {
+	padding: 0;
+	margin: 0;
 	float: none;
-}
-.poster .dropmenu>li, .poster .dropmenu>li.sfhover
-.poster .dropmenu>li h4, .poster .dropmenu>li:hover h4,
-.poster .dropmenu>li h4 a,.poster .dropmenu>li:hover h4 a {
-	padding: 0 0 0 0;
-	margin: 0 0 0 0;
-	float: none;
-	border: none;
-	background: none;
 	line-height: 1.5em;
 	text-align: center;
 }
-.poster .dropmenu>li .karma_allow a {
-	float: left;
-}
-.poster .dropmenu li:hover a, .poster .dropmenu li.sfhover a, .poster .dropmenu li a:hover, .poster .dropmenu li a {
+.poster .listlevel1:hover .linklevel1, .poster  .listlevel1.sfhover .linklevel1,
+.poster .linklevel1:hover, .poster .linklevel1 {
 	background: none;
 	border: none;
 }
-.poster .dropmenu>li.sfhover>ul, .poster .dropmenu>li:hover>ul {
+.poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
 	top: 100%;
 	float: none;
 	left: 0;
 	padding: 6px 0.5em 4px 0.5em;
 	width: 15.2em;
+	font-size: 0.9em;
 }
-.poster .dropmenu>li>ul>li, .poster .dropmenu>li>ul>li:hover {
+.poster .listlevel2, .poster .listlevel2:hover {
 	float: none;
 	text-align: left;
 	clear: both;
@@ -1923,64 +2084,63 @@ select.qaction, input.qaction {
 	border: none;
 	width: 14em;
 }
-.poster .dropmenu ul ol {
+.poster .karma_allow .linklevel2 {
+	float: left;
+}
+.poster .listlevel2 ol {
 	padding: 0 0 0 0;
 	margin: 6px 0 0 0;
 	float: left;
 	width: 100%;
 }
-.poster .dropmenu li ul li, .poster .dropmenu li ul li:hover {
-	background: none;
-	border: none;
-}
-.poster .dropmenu li ul .cf_icons, .poster .dropmenu ul ol li {
+.poster .menulevel2 .cf_icons, .poster .menulevel2 ol li {
 	padding: 3px;
 }
-.poster .dropmenu ul ol li {
+.poster .menulevel2 ol li {
 	display: table-cell;
 }
-.poster .dropmenu .postgroup, .poster .dropmenu .postcount, .poster .dropmenu .karma,
-.poster .dropmenu .karma_allow, .poster .dropmenu .gender, .poster .dropmenu .blurb {
+.poster .postgroup, .poster .postcount, .poster .karma,
+.poster .karma_allow, .poster .gender, .poster .blurb {
 	padding: 0 10px;
 }
-.poster .dropmenu li ul .report_link, .poster .dropmenu li ul .warning, .poster .dropmenu li ul .poster_ip {
+.poster .menulevel2 .report_link, .poster .menulevel2 .warning, .poster .menulevel2 .poster_ip {
 	margin: 0;
 	padding: 0;
 	float: left;
 	width: 100%;
 	font-size: 1.1em;
 }
-.poster .dropmenu li ul .report_seperator {
+.poster .menulevel2 .report_seperator {
 	height: 2px;
 	background: #ccc;
 	box-shadow: 0 -1px 0 #fff inset;
 }
-.poster .dropmenu li ul .warning a, .poster .dropmenu li ul .warning img {
+.poster .menulevel2 .warning a, .poster .menulevel2 .warning img {
 	width: auto;
 	display: table-cell;
 	vertical-align: middle;
 	padding: 0 4px;
 	line-height: 1.4em;
 }
-.poster .dropmenu li ul li hr {
+.poster .listlevel2 hr {
 	margin: 4px 3px;
 }
-.poster .dropmenu li ul li.poster_ip a {
+.poster .listlevel2.poster_ip a {
 	display: table-cell;
 }
 
 /* The visible stuff below the avatar. */
-.poster>ul>li.icons, .poster li.membergroup, .poster li.title, li.poster_online, .poster li.warning {
+.poster .icons, .poster .membergroup, .poster .title, .poster_online, .poster  .warning {
 	font-size: 0.9em;
 	line-height: 1.4em;
 	padding: 0;
 	margin: 3px 0 0 0;
 }
-.poster li.membergroup {
+.poster  .membergroup {
 	font-weight: bold;
 }
 /* @todo - Re-code this a bit to give background on anchor. */
-.poster li.poster_online a {
+.poster  .poster_online a {
 	/* @todo - Change background image for simple sprite combined with bars. */
 	background: #ebebeb url(../images/theme/lower_section.png) 0 0 repeat-x;
 	border: 1px solid #ccc;
@@ -1992,7 +2152,7 @@ select.qaction, input.qaction {
 	line-height: 1.8em;
 	display: block;
 }
-.poster li.poster_online a:hover {
+.poster  .poster_online a:hover {
 	/* @todo - Change background image for simple sprite combined with bars. */
 	background: #fff url(../images/theme/upper_section.png) 0 -30px repeat-x;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
@@ -2001,7 +2161,7 @@ select.qaction, input.qaction {
 	border-top: 1px solid #aaa;
 	text-decoration: none;
 }
-.poster li.warning a img {
+.poster  .warning a img {
 	vertical-align: bottom;
 	padding: 0 2px;
 }
@@ -2010,11 +2170,9 @@ select.qaction, input.qaction {
 }
 /* End nifty new flyout. */
 
-.postarea, .moderatorbar {
-	margin: 0 0 0 175px;
-}
 .postarea {
-	padding: 0 5px 5px 5px;
+	margin: 0 0 0 160px;
+	padding: 0 10px;
 }
 .post_subject {
 	color: #555;
@@ -2026,9 +2184,6 @@ select.qaction, input.qaction {
 	text-overflow: ellipsis;
 	white-space: pre;
 	padding-right: 1em;
-}
-.moderatorbar {
-	clear: right;
 }
 .messageicon {
 	float: left;
@@ -2054,7 +2209,7 @@ select.qaction, input.qaction {
 }
 .inner {
 	padding: 7px 8px 2px 2px;
-	margin: 0 8px 0 0;
+	margin: 0;
 	border-top: 1px solid #bfbfbf;
 	box-shadow: 0 1px 0 #fff inset;
 	min-height: 85px;
@@ -2064,8 +2219,15 @@ select.qaction, input.qaction {
 .smiley {
 	vertical-align: bottom;
 }
-.attachments {
-	padding: 12px 0 0 0;
+/* All the signatures used in the forum. If your forum users use Mozilla, Opera, or Safari, you might add max-height here ;). */
+.signature, .attachments, .custom_fields_above_signature {
+	overflow: auto;
+	padding: 12px 0 3px 0;
+	border-top: 1px solid #bfbfbf;
+	box-shadow: 0 1px 0 #fff inset;
+	line-height: 1.4em;
+	font-size: 0.9em;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .attachments .floatleft {
 	padding: 0 6px 8px 6px;
@@ -2078,232 +2240,6 @@ select.qaction, input.qaction {
 	clear: both;
 }
 
-/* The quick buttons */
-/* @todo - Superfluous div. Consider removing in favour of plain ul. */
-.quickbuttons_wrap {
-	padding: 2px 0;
-	margin: 0 0 0 180px;
-}
-.quickbuttons {
-	margin: 11px 11px 4px 0;
-	padding: 0;
-	clear: right;
-	float: right;
-	text-align: right;
-	width: 100%;
-}
-.windowbg .post_wrapper:hover ul.nojs_visible, .windowbg2 .post_wrapper:hover ul.nojs_visible {
-	visibility: visible;
-}
-.quickbuttons li {
-	float: right;
-	margin: 3px 0;
-	padding: 0 1px;
-	font-size: 0.9em;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 6px repeat-x;
-	border: 1px solid #ccc;
-	border-right: 1px solid #bbb;
-	border-bottom: 1px solid #aaa;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-	color: #555;
-	overflow: visible;
-}
-.quickbuttons>li:last-child {
-	border-radius: 4px 0 0 4px;
-}
-.quickbuttons li:hover {
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #fff url(../images/theme/upper_section.png) 0 -30px repeat-x;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
-	border: 1px solid #ccc;
-	border-left: 1px solid #bbb;
-	border-top: 1px solid #aaa;
-}
-.quickbuttons li a, .quickbuttons li a:hover {
-	margin: 0;
-	padding: 0 4px 0 20px;
-	display: block;
-	line-height: 2.0em;
-	float: left;
-	text-decoration: none;
-	color: #555;
-/* A rare example of where longhand background declarations work well. */
-	background-image: url(../images/theme/quickbuttons.png);
-	background-repeat: no-repeat;
-}
-/* The long list of sprite coordinates is much less verbose this way. */
-.quickbuttons .quote_button {
-	background-position: 0 0;
-}
-.quickbuttons .remove_button {
-	background-position: 0 -24px;
-}
-.quickbuttons .modify_button {
-	background-position: 0 -48px;
-}
-.quickbuttons .approve_button {
-	background-position: 0 -72px;
-}
-.quickbuttons .restore_button {
-	background-position: 0 -96px;
-}
-.quickbuttons .split_button {
-	background-position: 0 -120px;
-}
-.quickbuttons .reply_button {
-	background-position: 0 -144px;
-}
-.quickbuttons .reply_all_button {
-	background-position: 0 -144px;
-}
-.quickbuttons .notify_button {
-	background-position: 0 -168px;
-}
-.quickbuttons .unapprove_button {
-	background-position: 0 -192px;
-}
-.quickbuttons .close_button {
-	background-position: 0 -216px;
-}
-.quickbuttons .im_reply_button {
-	background-position: 0 -240px;
-}
-.quickbuttons .details_button {
-	background-position: 0 -264px;
-}
-.quickbuttons .ignore_button {
-	background-position: 0 -288px;
-}
-.quickbuttons .report_button {
-	background-position: 0 -312px;
-}
-.quickbuttons .warn_button {
-	background-position: 0 -336px;
-}
-.quickbuttons .quotetonew_button {
-	background-position: 0 -360px;
-}
-.quickbuttons .like_button {
-	background-position: 0 -384px;
-}
-.quickbuttons .unlike_button {
-	background-position: 0 -408px;
-}
-.quickbuttons .inline_mod_check {
-	padding: 1px 1px 1px 1px;
-}
-.quickbuttons .quick_edit, .quickbuttons .post_options {
-	padding: 0 6px 0 22px;
-	line-height: 2.0em;
-	position: relative;
-	color: #555;
-}
-.quickbuttons .quick_edit img {
-	padding: 4px 5em 4px 4px;
-	position: absolute;
-	left: 0;
-	top: 0;
-	cursor: pointer;
-	margin: 0;
-}
-.quickbuttons .inline_mod_check {
-	padding: 3px 0 0 3px;
-	background: none;
-	border: none;
-	box-shadow: none;
-}
-.quickbuttons .post_options {
-	padding: 0 0 0 0;
-	border-radius: 0 4px 4px 0;
-}
-.quickbuttons .post_options>a, .quickbuttons .post_options>a:hover {
-	padding: 0 4px 0 4px;
-	background-image: none; 
-}
-/* @todo - Styling here could probably be simplified. Should mostly inherit from basic .dropmenu. */
-.quickbuttons li ul {
-	position: absolute;
-	top: 2em;
-	left: -9999px;
-	z-index: 90;
-	padding: 0.5em;
-	text-align: left;
-	background: #fff;
-	border: solid 1px #aaa;
-	border-radius: 3px;
-	box-shadow: 2px 3px 3px rgba(0, 0 ,0, 0.2);
-	white-space: nowrap;
-}
-.quickbuttons li:hover ul, .quickbuttons li.sfhover ul {
-	left: auto;
-	right: -1px;
-}
-.quickbuttons li ul li {
-	clear: right;
-}
-.quickbuttons li.sfhover ul li, .quickbuttons li:hover ul li{
-	background: none;
-	box-shadow: none;
-	width: 12.5em;
-	border: 1px solid transparent;
-	border-radius: 3px;
-}
-.quickbuttons li ul li:hover {
-	border: 1px solid #cfcfcf;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 10px repeat-x;
-}
-.quickbuttons ul li a, .quickbuttons ul li a:hover, .quickbuttons ul li a:focus {
-	padding: 0 6px 0 26px;
-	display: block;
-	line-height: 2.0em;
-	width: 12.5em;
-}
-.keyinfo .quickbuttons li.sfhover ul li, .keyinfo .quickbuttons li:hover ul li,
-.keyinfo .quickbuttons ul li a {
-	width: 20em;
-	background-image: none;
-}
-ul.follow_ups {
-	float: none;
-	margin: 0;
-}
-ul.follow_ups>li {
-	margin-top: -5px;
-}
-.quote, .follow_ups li {
-	position: relative;
-	padding: 0 4px;
-	line-height: 2.0em;
-}
-.follow_ups>li:first-child {
-	border-radius: 4px;
-	margin-right: 0.75em;
-}
-ul.follow_ups li a, ul.follow_ups li a:hover {
-	padding: 0;
-	white-space: normal;
-}
-/* @todo - Check with js disabled after sorting most of the other crud. */
-/* Note: The next declarations are for keyboard access with js disabled. */
-.quickbuttons ul li a:focus {
-	margin: 0 -9910px 0 9910px;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #e3e9ef url(../images/theme/lower_section.png) 0 0 repeat-x;
-}
-/* Cancel for hover and/or js access. */
-.quickbuttons ul li:hover a:focus, .quickbuttons ul li.sfhover a:focus {
-	margin: 0;
-}
-.quickbuttons li.modified, .quickbuttons li.modified:hover {
-	float: left;
-	color: #777;
-	background: none;
-	box-shadow: none;
-	border: none;
-	padding: 0.65em 0 0 6px;
-}
 /* Separator of posts. More useful in the print stylesheet. */
 #forumposts .post_separator {
 	display: none;
@@ -3829,7 +3765,7 @@ tr.windowbg2 .stats_day {
 /* This lot will be simplified once I get all the styling hooks in place. */
 .generic_list_wrapper, .action_profile  #permissions, #postmodify .roundframe, .add_buddy, #creator .windowbg2,
 #notify_options .windowbg2, #info_center, #profileview, #messageindex, #unread, #mlist,
-#main_grid table, .core_posts, #recent .core_posts, #recent .topic_table, #searchform .roundframe {
+.core_posts, #recent .core_posts, #recent .topic_table, #searchform .roundframe {
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 	border: 1px solid #ccc;
@@ -4164,7 +4100,6 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 @media screen and (min-width: 1824px) {}
 /* 10" Tablets (landscape) */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {}
-
 /* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
 	.table_list td.stats .table_grid td.stats, .table_grid th.stats {
@@ -4260,7 +4195,6 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		display: none;
 	}
 }
-
 /* mobile devices with low screen resolutions */
 @media screen and (max-width: 400px) and (orientation: portrait) {
 	#top_section_notice, #logo, #topic_icons div p, .optional {
