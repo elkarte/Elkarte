@@ -583,7 +583,7 @@ function template_browse()
 
 	if (!$mods_available)
 		echo '
-		<div class="descbox">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_mods_installed'], '</div>';
+		<div class="information">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_mods_installed'], '</div>';
 
 	// the advanced (emulation) box, collapsed by default
 	echo '
@@ -1267,8 +1267,8 @@ function template_view_operations()
 {
 	global $context, $txt, $settings;
 
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+	echo '<!DOCTYPE html>
+<html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<title>', $txt['operation_title'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -1601,7 +1601,7 @@ function template_file_permissions()
 					', $txt['package_file_perms_ftp_details'], ':
 				</p>
 				', template_control_chmod(), '
-				<div class="descbox">', $txt['package_file_perms_ftp_retain'], '</div>';
+				<div class="information">', $txt['package_file_perms_ftp_retain'], '</div>';
 
 	echo '
 				<span id="test_ftp_placeholder_full"></span>

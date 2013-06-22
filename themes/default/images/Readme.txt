@@ -1,0 +1,1 @@
+NOTE: The _white folder is redundant now and has been removed.
