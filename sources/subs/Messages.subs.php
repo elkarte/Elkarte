@@ -801,7 +801,7 @@ function nextMessage($id_msg, $id_topic)
  * @param array (optional) $params an array of params, includes:
  *      - 'not_in' => array - of messages to exclude
  *      - 'include' => array - of messages to explicitely include
- *      - 'exclude_unapproved' => true/false - include or exclude the unapproved messages
+ *      - 'only_approved' => true/false - include or exclude the unapproved messages
  *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
  * @todo very similar to selectMessages in Topics.subs.php
  */
@@ -814,7 +814,7 @@ function messageAt($start, $id_topic, $params = array())
 		array(
 			'not_in' => false,
 			'include' => false,
-			'include_unapproved' => true,
+			'only_approved' => false,
 			'limit' => 1,
 		),
 		// passed arguments
@@ -832,7 +832,7 @@ function messageAt($start, $id_topic, $params = array())
 		FROM {db_prefix}messages
 		WHERE id_topic = {int:current_topic}' . (!$params['include'] ? '' : '
 			AND id_msg IN ({array_int:include})') . (!$params['not_in'] ? '' : '
-			AND id_msg NOT IN ({array_int:not_in})') . (!$params['include_unapproved'] ? '' : '
+			AND id_msg NOT IN ({array_int:not_in})') . (!$params['only_approved'] ? '' : '
 			AND approved = {int:is_approved}') . '
 		ORDER BY id_msg DESC' . ($params['limit'] === false ? '' : '
 		LIMIT {int:start}, {int:limit}'),

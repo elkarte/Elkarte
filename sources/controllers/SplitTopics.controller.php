@@ -297,7 +297,7 @@ class SplitTopics_Controller
 			$original_msgs = array(
 				'not_selected' => messageAt($context['not_selected']['start'], $topic, array(
 					'not_in' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
-					'include_unapproved' => $modSettings['postmod_active'] && allowedTo('approve_posts'),
+					'only_approved' => !$modSettings['postmod_active'] || allowedTo('approve_posts'),
 					'limit' => $context['messages_per_page'],
 				)),
 				'selected' => array(),
@@ -311,7 +311,7 @@ class SplitTopics_Controller
 			{
 				$original_msgs['selected'] = messageAt($context['not_selected']['start'], $topic, array(
 					'include' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
-					'include_unapproved' => $modSettings['postmod_active'] && allowedTo('approve_posts'),
+					'only_approved' => !$modSettings['postmod_active'] || allowedTo('approve_posts'),
 					'limit' => $context['messages_per_page'],
 				));
 			}
@@ -335,7 +335,7 @@ class SplitTopics_Controller
 		{
 			$_SESSION['split_selection'][$topic] = messageAt(0, $topic, array(
 				'include' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
-				'include_unapproved' => $modSettings['postmod_active'] && allowedTo('approve_posts'),
+				'only_approved' => !$modSettings['postmod_active'] || allowedTo('approve_posts'),
 				'limit' => false,
 			));
 		}
