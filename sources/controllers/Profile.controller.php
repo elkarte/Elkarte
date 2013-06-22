@@ -339,6 +339,7 @@ class Profile_Controller extends Action_Controller
 					),
 					'activateaccount' => array(
 						'file' => '/controllers/ProfileAccount.controller.php',
+						'controller' => 'ProfileAccount_Controller',
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
 						'token' => 'profile-aa%u',
@@ -560,7 +561,11 @@ class Profile_Controller extends Action_Controller
 			if ($current_area == 'activateaccount')
 			{
 				if (empty($post_errors))
-					action_activateaccount();
+				{
+					require_once(CONTROLLERDIR . '/ProfileAccount.controller.php');
+					$controller = new ProfileAccount_Controller();
+					$controller->action_activateaccount();
+				}
 			}
 			elseif ($current_area == 'deleteaccount')
 			{
