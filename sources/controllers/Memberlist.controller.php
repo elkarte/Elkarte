@@ -36,7 +36,7 @@ class Memberlist_Controller extends Action_Controller
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
@@ -179,7 +179,7 @@ class Memberlist_Controller extends Action_Controller
 	 * Can be passed a sort parameter, to order the display of members.
 	 * Calls printMemberListRows to retrieve the results of the query.
 	 */
-	function action_mlall()
+	public function action_mlall()
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
@@ -321,7 +321,7 @@ class Memberlist_Controller extends Action_Controller
 	 * If variable $_REQUEST['search'] is empty displays search dialog box, using the search sub-template.
 	 * Calls printMemberListRows to retrieve the results of the query.
 	 */
-	function action_mlsearch()
+	public function action_mlsearch()
 	{
 		global $txt, $scripturl, $context, $modSettings;
 

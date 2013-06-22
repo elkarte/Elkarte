@@ -39,7 +39,7 @@ class Karma_Controller extends Action_Controller
  	 * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
  	 * It is accessed via ?action=karma, sa=smite or sa=applaud.
  	*/
-	function action_applaud()
+	public function action_applaud()
 	{
 		global $user_info;
 
@@ -56,7 +56,7 @@ class Karma_Controller extends Action_Controller
 	/**
 	 * Smite a user.
 	 */
-	function action_smite()
+	public function action_smite()
 	{
 		global $user_info;
 

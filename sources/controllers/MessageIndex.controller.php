@@ -40,7 +40,7 @@ class MessageIndex_Controller extends Action_Controller
 	/**
 	 * Show the list of topics in this board, along with any child boards.
 	 */
-	function action_messageindex()
+	public function action_messageindex()
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
 		global $options, $settings, $board_info, $user_info;
@@ -531,7 +531,7 @@ class MessageIndex_Controller extends Action_Controller
 	 * Allows for moderation from the message index.
 	 * @todo refactor this...
 	 */
-	function action_quickmod()
+	public function action_quickmod()
 	{
 		global $board, $user_info, $modSettings, $context;
 

@@ -32,7 +32,7 @@ class MergeTopics_Controller extends Action_Controller
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		// Load the template....
 		loadTemplate('MergeTopics');
@@ -58,7 +58,7 @@ class MergeTopics_Controller extends Action_Controller
 	 * uses 'merge' sub template of the MergeTopics template.
 	 * allows to set a different target board.
 	 */
-	function action_mergeIndex()
+	public function action_mergeIndex()
 	{
 		global $txt, $board, $context;
 		global $scripturl, $user_info, $modSettings;
@@ -198,7 +198,7 @@ class MergeTopics_Controller extends Action_Controller
 	 * * redirects to ?action=mergetopics;sa=done.
 	 * @param array $topics = array()
 	 */
-	function action_mergeExecute($topics = array())
+	public function action_mergeExecute($topics = array())
 	{
 		global $user_info, $txt, $context, $scripturl;
 		global $language, $modSettings;
@@ -797,7 +797,7 @@ class MergeTopics_Controller extends Action_Controller
 	 * is accessed with ?action=mergetopics;sa=done.
 	 * uses 'merge_done' sub template of the MergeTopics template.
 	 */
-	function action_mergeDone()
+	public function action_mergeDone()
 	{
 		global $txt, $context;
 

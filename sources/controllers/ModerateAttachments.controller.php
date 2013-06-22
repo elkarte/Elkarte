@@ -40,7 +40,7 @@ class ModerateAttachments_Controller extends Action_Controller
 	 * works out what we want to do with attachments and actions it.
 	 * Accessed by ?action=attachapprove
 	 */
-	function action_attachapprove()
+	public function action_attachapprove()
 	{
 		global $user_info;
 

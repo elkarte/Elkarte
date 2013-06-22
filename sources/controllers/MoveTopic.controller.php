@@ -45,7 +45,7 @@ class MoveTopic_Controller extends Action_Controller
 	 *
 	 * @uses the MoveTopic template, main sub-template.
 	 */
-	function action_movetopic()
+	public function action_movetopic()
 	{
 		global $txt, $topic, $user_info, $context, $language, $scripturl, $modSettings;
 
@@ -121,7 +121,7 @@ class MoveTopic_Controller extends Action_Controller
 	 *
 	 * @uses subs/Post.subs.php.
 	 */
-	function action_movetopic2()
+	public function action_movetopic2()
 	{
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
 		global $board, $language, $user_info;

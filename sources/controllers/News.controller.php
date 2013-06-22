@@ -51,7 +51,7 @@ class News_Controller extends Action_Controller
 	 *
 	 * @uses Stats language file.
 	 */
-	function action_showfeed()
+	public function action_showfeed()
 	{
 		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
 		global $query_this_board, $forum_version, $cdata_override, $settings;
@@ -337,7 +337,7 @@ class News_Controller extends Action_Controller
 	 * @param string $xml_format
 	 * @return array
 	 */
-	function action_xmlmembers($xml_format)
+	public function action_xmlmembers($xml_format)
 	{
 		global $scripturl;
 
@@ -404,7 +404,7 @@ class News_Controller extends Action_Controller
 	 * @param $xml_format
 	 * @return array, array of topics
 	 */
-	function action_xmlnews($xml_format)
+	public function action_xmlnews($xml_format)
 	{
 		global $scripturl, $modSettings, $board;
 		global $query_this_board, $context;
@@ -552,7 +552,7 @@ class News_Controller extends Action_Controller
 	 * @param $xml_format
 	 * @return array, of recent posts
 	 */
-	function action_xmlrecent($xml_format)
+	public function action_xmlrecent($xml_format)
 	{
 		global $scripturl, $modSettings, $board, $query_this_board, $context;
 
@@ -726,7 +726,7 @@ class News_Controller extends Action_Controller
 	 * @param $xml_format
 	 * @return array, of profile data.
 	 */
-	function action_xmlprofile($xml_format)
+	public function action_xmlprofile($xml_format)
 	{
 		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
 

@@ -71,7 +71,7 @@ class Groups_Controller extends Action_Controller
 	/**
 	 * This very simply lists the groups, nothing snazy.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $txt, $context, $scripturl, $user_info;
 
@@ -200,7 +200,7 @@ class Groups_Controller extends Action_Controller
 	 * It redirects to itself.
 	 * @uses ManageMembergroups template, group_members sub template.
 	 */
-	function action_members()
+	public function action_members()
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
@@ -444,7 +444,7 @@ class Groups_Controller extends Action_Controller
 	/**
 	 * Show and manage all group requests.
 	 */
-	function action_requests()
+	public function action_requests()
 	{
 		global $txt, $context, $scripturl, $user_info, $modSettings, $language;
 
