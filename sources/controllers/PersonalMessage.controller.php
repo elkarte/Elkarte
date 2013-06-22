@@ -1728,6 +1728,8 @@ class PersonalMessage_Controller extends Action_Controller
 		loadLanguage('Profile');
 		loadTemplate('Profile');
 
+		require_once(SUBSDIR . '/Profile.subs.php');
+
 		$context['page_title'] = $txt['pm_settings'];
 		$context['user']['is_owner'] = true;
 		$context['id_member'] = $user_info['id'];
@@ -1752,7 +1754,6 @@ class PersonalMessage_Controller extends Action_Controller
 			$_POST = htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
-			require_once(SUBSDIR . '/Profile.subs.php');
 			saveProfileFields();
 
 			if (!empty($profile_vars))
@@ -1761,8 +1762,8 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Load up the fields.
 		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
-		require_once(SUBSDIR . '/Profile.subs.php');
-		action_pmprefs($user_info['id']);
+		$controller = new ProfileOptions_Controller();
+		$controller->action_pmprefs($user_info['id']);
 	}
 
 	/**

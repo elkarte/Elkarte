@@ -1198,6 +1198,37 @@ function resetSentBoardNotification($id_member, $id_board, $check = true)
 }
 
 /**
+ * Counts the board notification for a given member.
+ *
+ * @param int $memID
+ * @return int
+ */
+function getBoardNotificationsCount($memID)
+{
+	global $user_info;
+
+	$db = database();
+
+	// All the boards that you have notification enabled
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
+		WHERE ln.id_member = {int:selected_member}
+			AND {query_see_board}',
+		array(
+			'current_member' => $user_info['id'],
+			'selected_member' => $memID,
+		)
+	);
+	list ($totalNotifications) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $totalNotifications;
+}
+
+/**
  * Returns all the boards accessible to the current user.
  * If $id_parents is given, return only the child boards of those boards.
  *
