@@ -59,7 +59,7 @@ function template_show_list($list_id = null)
 		echo '
 			<div class="flow_auto">';
 
-		// Show the page index (if this list doesn't intend to show all items).
+		// Show the page index (if this list doesn't intend to show all items). @todo - Needs old top/bottom stuff cleaned up.
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 			echo '
 				<div class="floatleft">',
