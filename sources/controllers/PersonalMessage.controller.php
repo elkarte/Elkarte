@@ -1362,7 +1362,7 @@ class PersonalMessage_Controller extends Action_Controller
 						$searchArray[] = $i;
 				}
 
-				$updateErrors = updateLabelsToPM($searchArray, $user_info['id']);
+				$updateErrors = updateLabelsToPM($searchArray, $new_labels, $user_info['id']);
 
 				// Now do the same the rules - check through each rule.
 				foreach ($context['rules'] as $k => $rule)

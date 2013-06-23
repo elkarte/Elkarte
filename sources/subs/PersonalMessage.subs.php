@@ -1205,7 +1205,7 @@ function toggleNewPM($id_member, $new = false)
 		SET is_new = ' . ($new ? '{int:new}' : '{int:not_new}') . '
 		WHERE id_member = {int:current_member}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => $id_member,
 			'new' => 1,
 			'not_new' => 0
 		)
@@ -1289,6 +1289,8 @@ function getPmsFromDiscussion($pm_heads)
 
 function changePMLabels($to_label, $label_type, $user_id)
 {
+	global $options;
+
 	$db = database();
 	$labels = array();
 	$to_update = array();
@@ -1332,8 +1334,9 @@ function changePMLabels($to_label, $label_type, $user_id)
 		return updatePMLabels($to_update);
 }
 
-function updateLabelsToPM($searchArray, $user_id)
+function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
+	$db = database();
 
 	// Now find the messages to change.
 	$request = $db->query('', '
