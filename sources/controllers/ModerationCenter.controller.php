@@ -1454,7 +1454,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 *
 	 * @param string $approve_query
 	 */
-	protected function list_getWatchedUserCount($approve_query)
+	public function list_getWatchedUserCount($approve_query)
 	{
 		global $modSettings;
 
@@ -1470,7 +1470,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param string $approve_query
 	 * @param string $dummy
 	 */
-	protected function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
+	public function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
 	{
 		// find all our watched users
 		return watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy);
@@ -1481,7 +1481,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 *
 	 * @param string $approve_query
 	 */
-	protected function list_getWatchedUserPostsCount($approve_query)
+	public function list_getWatchedUserPostsCount($approve_query)
 	{
 		global $modSettings;
 
@@ -1497,7 +1497,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param string $approve_query
 	 * @param array $delete_boards
 	 */
-	protected function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
+	public function list_getWatchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
 	{
 		// watched users posts
 		return watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards);
@@ -1511,7 +1511,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param $sort
 	 * @param $template_type type of template to load
 	 */
-	protected function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
+	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 	{
 		return warningTemplates($start, $items_per_page, $sort, $template_type);
 	}
@@ -1521,7 +1521,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 *
 	 * @param string $template_type
 	 */
-	protected function list_getWarningTemplateCount($template_type = 'warntpl')
+	public function list_getWarningTemplateCount($template_type = 'warntpl')
 	{
 		return warningTemplateCount($template_type);
 	}
@@ -1533,7 +1533,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param $items_per_page
 	 * @param $sort
 	 */
-	protected function list_getWarnings($start, $items_per_page, $sort)
+	public function list_getWarnings($start, $items_per_page, $sort)
 	{
 		return warnings($start, $items_per_page, $sort);
 	}
@@ -1541,7 +1541,7 @@ class ModerationCenter_Controller extends Action_Controller
 	/**
 	 * Callback for createList(), get the total count of all current warnings
 	 */
-	protected function list_getWarningCount()
+	public function list_getWarningCount()
 	{
 		return warningCount();
 	}

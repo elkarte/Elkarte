@@ -1547,7 +1547,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 * @param $sort
 	 * @param $template_type type of template to load
 	 */
-	protected function list_getBounceTemplates($start, $items_per_page, $sort)
+	public function list_getBounceTemplates($start, $items_per_page, $sort)
 	{
 		return warningTemplates($start, $items_per_page, $sort, 'bnctpl');
 	}
@@ -1557,7 +1557,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 *
 	 * @param string $template_type
 	 */
-	protected function list_getBounceTemplateCount()
+	public function list_getBounceTemplateCount()
 	{
 		return warningTemplateCount('bnctpl');
 	}
