@@ -1225,8 +1225,6 @@ class PersonalMessage_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
-		$db = database();
-
 		// Actually delete the messages.
 		if (isset($_REQUEST['age']))
 		{
@@ -1235,43 +1233,8 @@ class PersonalMessage_Controller
 			// Calculate the time to delete before.
 			$deleteTime = max(0, time() - (86400 * (int) $_REQUEST['age']));
 
-			// Array to store the IDs in.
-			$toDelete = array();
-
-			// Select all the messages they have sent older than $deleteTime.
-			$request = $db->query('', '
-				SELECT id_pm
-				FROM {db_prefix}personal_messages
-				WHERE deleted_by_sender = {int:not_deleted}
-					AND id_member_from = {int:current_member}
-					AND msgtime < {int:msgtime}',
-				array(
-					'current_member' => $user_info['id'],
-					'not_deleted' => 0,
-					'msgtime' => $deleteTime,
-				)
-			);
-			while ($row = $db->fetch_row($request))
-				$toDelete[] = $row[0];
-			$db->free_result($request);
-
-			// Select all messages in their inbox older than $deleteTime.
-			$request = $db->query('', '
-				SELECT pmr.id_pm
-				FROM {db_prefix}pm_recipients AS pmr
-					INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
-				WHERE pmr.deleted = {int:not_deleted}
-					AND pmr.id_member = {int:current_member}
-					AND pm.msgtime < {int:msgtime}',
-				array(
-					'current_member' => $user_info['id'],
-					'not_deleted' => 0,
-					'msgtime' => $deleteTime,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$toDelete[] = $row['id_pm'];
-			$db->free_result($request);
+			// Select all the messages older than $deleteTime.
+			$toDelete = getPMsOlderThan($user_info['id'], $deleteTime);
 
 			// Delete the actual messages.
 			deleteMessages($toDelete);
