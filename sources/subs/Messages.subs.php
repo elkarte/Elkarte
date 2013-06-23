@@ -1039,7 +1039,7 @@ function countSplitMessages($topic, $include_unapproved)
 {
 	$db = database();
 
-	$return = array('not_selected' => array(), 'selected' => array());
+	$return = array('not_selected' => 0, 'selected' => 0);
 	$request = $db->query('', '
 		SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
 		FROM {db_prefix}messages AS m
