@@ -8,26 +8,54 @@ html, body {
 }
 #wrapper {
 	background-color: #fff;
+	border: 1px solid #ccc;
+	border-top: 1px solid white;
+	box-shadow: none;
+	margin-top: 0;
 }
 
 #header .frame, #top_section .frame {
 	margin: 0;
 	width: 100%;
 }
+#top_section {
+	padding: 0;
+	box-shadow: none;
+}
 #logo {
 	float: right;
 	text-align: right;
 	margin-top: 0;
 }
-
 .cat_bar {
 	background: #3f4c6b;
 	color: white;
-	-webkit-box-shadow: none;
-	-moz-box-shadow: none;
-	box-shadow: none;
+	box-shadow: 0 16px 20px rgba(255,255,255,0.15) inset;
 }
-.catbg, .catbg a {
+h3.catbg, h3.catbg a {
+	color: white;
+	text-shadow: none;
+}
+
+.table_list .lastpost p a, #ic_recentposts .recentpost>strong>a {
+	color:  #3f4c6b;
+}
+a.new_posts, span.new_posts {
+	background: orange;
+}
+
+.buttonlist li a.active, .buttonlist li a.active:hover {
+	background: #3f4c6b;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.3) inset;
+	border: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+}
+
+h3.catbg a:link, h3.catbg a:visited, 
+h4.catbg a:link, h4.catbg a:visited, h3.catbg2 a,
+h3.catbg2, .table_list .header td,
+.table_list .header td a {
 	color: white;
 }
 h3.catbg a:hover {
@@ -52,19 +80,17 @@ h1.forumtitle a {
 #footer_section {
 	background-color: #3f4c6b;
 	border-radius: 0 0 7px 7px;
+	border-top: 0;
 }
 #top_section {
 	padding-top: 10px;
-	background-color: #fff;
+	background: #fff;
 	border-bottom: none;
 	font-weight: normal;
 	border-radius: 10px 10px 0 0;
-	border-left: 1px solid #b8b8b8;
-	border-right: 1px solid #b8b8b8;
-	border-top: 1px solid #b8b8b8;
-}
-#header {
-	background-color: #fff;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	border-top: 1px solid #ccc;
 }
 
 #upper_section , #content_section, #inner_section, #wrapper {
@@ -89,9 +115,13 @@ h1.forumtitle a {
 	background-color: #383F50;
 }
 #header {
-	padding: 0 2px 12px 2px;
-	border-left: 1px solid #b8b8b8;
-	border-right: 1px solid #b8b8b8;
+	padding: 0;
+	padding-bottom: 12px;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	background-color: white;
+	box-shadow: none;
+	border-bottom: 0;
 }
 #header, #top_section, #footer_section {
 	margin: 0 auto;
@@ -99,10 +129,7 @@ h1.forumtitle a {
 	max-width: 100em;
 }
 #upper_section {
-	background-color: #fff;
-	border-left: 1px solid #b8b8b8;
-	border-right: 1px solid #b8b8b8;
-	padding: 1px;
+	padding: 5px 12px;
 }
 .table_list .info .subject{
 	color: #3f4c6b;
@@ -110,67 +137,9 @@ h1.forumtitle a {
 	font-weight: bold;
 }
 
-#upper_section {
-	padding: 0;
-}
-
-#upper_section {
-	border-top: none;
-	color: #333333;
-}
-
-#main_menu {
-	background-color: #142346;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	box-shadow: 0 16px 20px rgba(255,255,255,0.15) inset;
-}
 #upshrink {
 	border: none;
 	background: none;
-}
-.topmenu li {
-	border-right: 1px solid #343434;
-	padding-right: 10px;
-}
-.topmenu li ul {
-	border-radius: 4px;
-}
-
-.topmenu li a {
-	background: none;
-	padding: 0 0.3em;
-	margin: 0;
-	display: block;
-	border: none;
-	color: #fff;
-	border-radius: 5px;
-}
-.topmenu li a:hover, .topmenu li:hover a, .topmenu li a:focus {
-/* 	background: #597b9f; */
-	border: none;
-	color: #ccc;
-	cursor: pointer;
-	text-decoration: none;
-	box-shadow: none;
-}
-/* Level 1 active button. */
-.topmenu li a.active:hover, .topmenu li:hover a.active {
-	border: none;
-	color: #ccc;
-	box-shadow: none;
-	text-shadow: none;
-}
-.topmenu li a.active {
-	border: none;
-	box-shadow: none;
-	color: #ccc;
-}
-#inner_wrap hr {
-	display: none;
-}
-nav#main_menu {
-	padding: 0;
 }
 
 #info_center .cat_bar, .table_grid tr.catbg th, #show_attachments th, #searchform .roundframe .title_bar {
@@ -238,6 +207,143 @@ li.greeting, .news p {
 	border: 1px solid #D6D5CC;
 	border-radius: 8px;
 }
+
+/* Styles for the standard dropdown menus.
+----------------------------------------------------------- */
+/* Visible menu bar: wrapper/background. */
+#main_menu {
+	background: #3f4c6b;
+	box-shadow: 0 16px 20px rgba(255,255,255,0.15) inset;
+}
+/* Needed for new PM notifications. */
+.listlevel1 strong {
+	color: #fff;
+}
+/* Level 1 Menu bar: link or button. General sizing. */
+#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	/* If there will be a border on hover, ensure there is a default border. */
+	/* Applying a default transparent border stops links jumping on hover. */
+	border: 1px solid transparent;
+	color: #fff;
+}
+/* Override link colour for admin/profile/etc menus. */
+.admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	color: #444;
+}
+/* Level 1 button hover and focus effects. */
+#main_menu .active, /* Level 1 active button shares same styling. */
+#main_menu .linklevel1:hover, #main_menu .listlevel:hover .linklevel1, #main_menu .linklevel1:focus,
+/* For primary admin/profile/etc drop menus. */
+.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
+/* For secondary admin/profile/etc menus. */
+#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
+	border: 1px solid transparent;
+	border-top: 1px solid transparent;
+	text-decoration: none;
+}
+/* Main menu Level 1 active button and hover need a different border. */
+#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel:hover .linklevel1, #main_menu .linklevel1:focus {
+	border: 1px solid transparent;
+}
+/* Level 1 active buttons for primary admin/profile/etc drop menus... */
+.admin_menu .active,
+/* ......and for secondary admin/profile/etc menu strip. */
+#adm_submenus .active {
+	background: #4b863c;
+	color: #fff;
+	border: 1px solid transparent;
+}
+/* Hover effects for those buttons. */
+.admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
+	background: #437837;
+	color: #fff;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.3) inset;
+	border: 1px solid #5aa049;
+	border-left: 1px solid #2d5024;
+	border-top: 1px solid #2d5024;
+}
+/* Level 1 active buttons get a bit more weight. */
+.active {
+	font-weight: 600;
+}
+/* Top level subsection indicators. */
+/* Comment these out if you don't want them. */
+#main_menu .subsections .linklevel1, .admin_menu .subsections .linklevel1 {
+	padding: 0 0.8em 0 0.5em;
+}
+#main_menu .subsections .linklevel1:after,.admin_menu .subsections .linklevel1:after {
+	position: absolute;
+	top: 0.25em;
+	right: 0.2em;
+	font-size: 1.3em;
+}
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	background: #fff;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+}
+/* Levels 2 and 3 drop menus: link or button. */
+.linklevel2, .linklevel3 {
+	color: #555;
+	/* Applying a default transparent border stops links jumping on hover. */
+	border: 1px solid transparent;
+	border-radius: 3px;
+}
+/* Admin menu icons. */
+.linklevel2>img {
+	vertical-align: middle;
+	margin: 0 0 0 -4px;
+}
+/* Levels 2 and 3: hover effects. */
+.listlevel2:hover .linklevel2, /* linklevel2 highlighted with cursor over level 3. */
+.linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
+.linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
+	background: #fcfcfc;
+	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%); /* W3C */
+	color: #555;
+	border: 1px solid transparent;
+	border-top: 1px solid #bbb;
+	text-decoration: none;
+}
+/* Level 2: subsection indicators. */
+.listlevel2.subsections .linklevel2:after {
+	position: absolute;
+	right: 6px;
+	font-size: 1.3em;
+	color: #777;
+}
+/* Levels 2 and 3: highlighting of current section */
+/* @todo - This should probably be applied to main menu as well, just for consistency. */
+.linklevel2.chosen, .linklevel3.chosen {
+	font-weight: 600;
+}
+
+/* Styles for sidebar menus.
+------------------------------------------------------- */
+/* Same styling for Level 1 and Level 2. */
+#menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
+	color: #555;
+	border: 1px solid transparent;
+}
+#menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus, #menu_current_area .linklevel1,
+#menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
+	color: #555;
+	border: 1px solid transparent;
+	border-top: 1px solid transparent;
+	border-radius: 3px;
+	text-decoration: none;
+}
+#menu_current_area .linklevel1 {
+	font-weight: 600;
+}
+/* Level 1: subsection indicators. */
+#menu_sidebar .listlevel1.subsections .linklevel1:after {
+	position: absolute;
+	right: 6px;
+}
+/*End sidebar flyout coding. */
 
 @media screen and (max-width: 480px) and (min-width: 320px)
 {
