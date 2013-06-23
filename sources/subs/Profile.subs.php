@@ -68,8 +68,6 @@ function setupProfileContext($fields)
 {
 	global $profile_fields, $context, $cur_profile, $txt;
 
-	$db = database();
-
 	// Make sure we have this!
 	loadProfileFields(true);
 
