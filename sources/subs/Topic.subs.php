@@ -1126,7 +1126,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 	// Create the query, taking full and integration in to account
 	$request = $db->query('', '
 		SELECT
-			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
+			t.id_topic, t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
 			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',

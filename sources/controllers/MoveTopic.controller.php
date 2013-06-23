@@ -203,7 +203,8 @@ class MoveTopic_Controller extends Action_Controller
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject != '')
 			{
-				if (isset($_POST['enforce_subject']))
+				$all_messages = isset($_POST['enforce_subject']);
+				if ($all_messages)
 				{
 					// Get a response prefix, but in the forum's default language.
 					if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
@@ -219,26 +220,10 @@ class MoveTopic_Controller extends Action_Controller
 						cache_put_data('response_prefix', $context['response_prefix'], 600);
 					}
 
-					$db->query('', '
-						UPDATE {db_prefix}messages
-						SET subject = {string:subject}
-						WHERE id_topic = {int:current_topic}',
-						array(
-							'current_topic' => $topic,
-							'subject' => $context['response_prefix'] . $custom_subject,
-						)
-					);
+					topicSubject($topic_info, $custom_subject, $context['response_prefix'], $all_messages);
 				}
-
-				$db->query('', '
-					UPDATE {db_prefix}messages
-					SET subject = {string:custom_subject}
-					WHERE id_msg = {int:id_first_msg}',
-					array(
-						'id_first_msg' => $topic_info['id_first_msg'],
-						'custom_subject' => $custom_subject,
-					)
-				);
+				else
+					topicSubject($topic_info, $custom_subject);
 
 				// Fix the subject cache.
 				updateStats('subject', $topic, $custom_subject);

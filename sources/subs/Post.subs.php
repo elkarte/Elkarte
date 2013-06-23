@@ -2427,3 +2427,39 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 		return array($form_subject, $form_message);
 	}
 }
+
+/**
+ * Update topic subject.
+ * If $all is true, for all messages in the topic, otherwise only the first message.
+ *
+ * @param array $topic_info topic information as returned by getTopicInfo()
+ * @param string $custom_subject
+ * @param string $response_prefix = ''
+ * @param bool $all = false
+ */
+function topicSubject($topic_info, $custom_subject, $response_prefix = '', $all = false)
+{
+	$db = database();
+
+	if ($all)
+	{
+		$db->query('', '
+			UPDATE {db_prefix}messages
+			SET subject = {string:subject}
+			WHERE id_topic = {int:current_topic}',
+			array(
+				'current_topic' => $topic_info['id_topic'],
+				'subject' => $response_prefix . $custom_subject,
+			)
+		);
+	}
+	$db->query('', '
+		UPDATE {db_prefix}messages
+		SET subject = {string:custom_subject}
+		WHERE id_msg = {int:id_first_msg}',
+		array(
+			'id_first_msg' => $topic_info['id_first_msg'],
+			'custom_subject' => $custom_subject,
+		)
+	);
+}
