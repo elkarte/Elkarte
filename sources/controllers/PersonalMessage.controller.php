@@ -1105,9 +1105,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 */
 	function action_pmactions()
 	{
-		global $context, $user_info, $options;
-
-		//$db = database();
+		global $context, $user_info;
 
 		checkSession('request');
 
@@ -1174,7 +1172,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Are we labeling anything?
 		if (!empty($to_label) && $context['folder'] == 'inbox')
 		{
-			$updateErrors = updatePMLabels(array_keys($to_label), $user_info['id']);
+			$updateErrors = changePMLabels($to_label, $label_type, $user_info['id']);
 
 			// Any errors?
 			// @todo Separate the sprintf?
@@ -1401,53 +1399,7 @@ class PersonalMessage_Controller extends Action_Controller
 						$searchArray[] = $i;
 				}
 
-				// Now find the messages to change.
-				$request = $db->query('', '
-					SELECT id_pm, labels
-					FROM {db_prefix}pm_recipients
-					WHERE FIND_IN_SET({raw:find_label_implode}, labels) != 0
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'find_label_implode' => '\'' . implode('\', labels) != 0 OR FIND_IN_SET(\'', $searchArray) . '\'',
-					)
-				);
-				while ($row = $db->fetch_assoc($request))
-				{
-					// Do the long task of updating them...
-					$toChange = explode(',', $row['labels']);
-
-					foreach ($toChange as $key => $value)
-						if (in_array($value, $searchArray))
-						{
-							if (isset($new_labels[$value]))
-								$toChange[$key] = $new_labels[$value];
-							else
-								unset($toChange[$key]);
-						}
-
-					if (empty($toChange))
-						$toChange[] = '-1';
-
-		// Check that this string isn't going to be too large for the database.
-		if ($set > 60)
-			$updateErrors++;
-		else
-		{
-					$db->query('', '
-						UPDATE {db_prefix}pm_recipients
-						SET labels = {string:new_labels}
-						WHERE id_pm = {int:id_pm}
-							AND id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-							'id_pm' => $row['id_pm'],
-							'new_labels' => implode(',', array_unique($toChange)),
-						)
-					);
-					}
-				}
-				$db->free_result($request);
+				$updateErrors = updateLabelsToPM($searchArray, $user_info['id']);
 
 				// Now do the same the rules - check through each rule.
 				foreach ($context['rules'] as $k => $rule)
