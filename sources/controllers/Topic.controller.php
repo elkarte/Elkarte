@@ -50,7 +50,7 @@ class Topic_Controller extends Action_Controller
 	 *  - returns to the topic after it is done.
 	 *  - it is accessed via ?action=topic;sa=lock.
 	*/
-	function action_lock()
+	public function action_lock()
 	{
 		global $topic, $user_info, $board;
 
@@ -64,8 +64,8 @@ class Topic_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		// Find out who started the topic
-		list ($starter, $locked) = topicStarter($topic);
+		// Find out who started the topic and its lock status
+		list ($starter, $locked) = topicStatus($topic);
 
 		// Can you lock topics here, mister?
 		$user_lock = !allowedTo('lock_any');
@@ -88,7 +88,7 @@ class Topic_Controller extends Action_Controller
 		else
 			fatal_lang_error('locked_by_admin', 'user');
 
-		// Actually lock the topic
+		// Lock the topic!
 		setTopicAttribute($topic, array('locked' => $locked));
 
 		// If they are allowed a "moderator" permission, log it in the moderator log.
@@ -112,11 +112,9 @@ class Topic_Controller extends Action_Controller
 	 *  - when done, sends the user back to the topic.
 	 *  - accessed via ?action=topic;sa=sticky.
 	 */
-	function action_sticky()
+	public function action_sticky()
 	{
 		global $modSettings, $topic, $board;
-
-		$db = database();
 
 		// Make sure the user can sticky it, and they are stickying *something*.
 		isAllowedTo('make_sticky');
@@ -133,23 +131,14 @@ class Topic_Controller extends Action_Controller
 
 		// We need subs/Post.subs.php for the sendNotifications() function.
 		require_once(SUBSDIR . '/Post.subs.php');
+		// And Topic subs for topic attributes.
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Is this topic already stickied, or no?
-		$request = $db->query('', '
-			SELECT is_sticky
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		list ($is_sticky) = $db->fetch_row($request);
-		$db->free_result($request);
+		$is_sticky = topicAttribute($topic, 'sticky');
 
 		// Toggle the sticky value.
-		setTopicAttribute($topic, array('sticky' => $is_sticky));
+		setTopicAttribute($topic, array('sticky' => (empty($is_sticky) ? 1 : 0)));
 
 		// Log this sticky action - always a moderator thing.
 		logAction(empty($is_sticky) ? 'sticky' : 'unsticky', array('topic' => $topic, 'board' => $board));
@@ -170,7 +159,7 @@ class Topic_Controller extends Action_Controller
 	 * @uses Printpage template, main sub-template.
 	 * @uses print_above/print_below later without the main layer.
 	 */
-	function action_printpage()
+	public function action_printpage()
 	{
 		global $topic, $txt, $scripturl, $context, $user_info;
 		global $board_info, $modSettings, $settings;

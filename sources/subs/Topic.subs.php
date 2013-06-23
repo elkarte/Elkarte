@@ -1584,16 +1584,16 @@ function updateSplitTopics($options, $id_board)
 }
 
 /**
- * Find out who started a topic
+ * Find out who started a topic, and the lock status
  *
  * @param int $topic
- * @return int
+ * @return array with id_member_started and locked
  */
-function topicStarter($topic)
+function topicStatus($topic)
 {
 	$db = database();
 
-	// Find out who started the topic - in case User Topic Locking is enabled.
+	// Find out who started the topic, and the lock status.
 	$request = $db->query('', '
 		SELECT id_member_started, locked
 		FROM {db_prefix}topics
@@ -1614,6 +1614,7 @@ function topicStarter($topic)
  * Parameter $attributes is an array with:
  *  - 'locked' => lock_value,
  *  - 'sticky' => sticky_value
+ * It sets the new value for the attribute as passed to it.
  *
  * @param int $topic
  * @param array $attributes
@@ -1634,16 +1635,62 @@ function setTopicAttribute($topic, $attributes)
 			)
 		);
 	if (isset($attributes['sticky']))
-		// Toggle the sticky value... pretty simple ;).
+		// Set the new sticky value.
 		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET is_sticky = {int:is_sticky}
 			WHERE id_topic = {int:current_topic}',
 			array(
 				'current_topic' => $topic,
-				'is_sticky' => empty($attributes['sticky']) ? 1 : 0,
+				'is_sticky' => empty($attributes['sticky']) ? 0 : 1,
 			)
 		);
+}
+
+/**
+ * Retrieve the locked or sticky status of a topic.
+ *
+ * @param string $attribute 'locked' or 'sticky'
+ */
+function topicAttribute($id_topic, $attribute)
+{
+	$db = database();
+
+	if ($attribute == 'locked')
+	{
+		// check the lock status
+		$request = $db->query('', '
+			SELECT locked
+			FROM {db_prefix}topics
+			WHERE id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+		list ($locked) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		return $locked;
+	}
+
+	if  ($attribute == 'sticky')
+	{
+		// Is this topic already stickied, or no?
+		$request = $db->query('', '
+			SELECT is_sticky
+			FROM {db_prefix}topics
+			WHERE id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+		list ($sticky) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		return $sticky;
+	}
 }
 
 /**
