@@ -2456,3 +2456,35 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 
 	return $notification_topics;
 }
+
+/**
+ * Get a list of posters in this topic, and their posts counts in the topic.
+ * Used to update users posts counts when topics are moved or are deleted.
+ */
+function postersCount($id_topic)
+{
+	$db = database();
+
+	// we only care about approved topics, the rest don't count.
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND approved = {int:is_approved}',
+		array(
+			'current_topic' => $id_topic,
+			'is_approved' => 1,
+		)
+	);
+	$posters = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!isset($posters[$row['id_member']]))
+			$posters[$row['id_member']] = 0;
+
+		$posters[$row['id_member']]++;
+	}
+	$db->free_result($request);
+
+	return $posters;
+}

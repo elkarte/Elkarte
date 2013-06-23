@@ -126,8 +126,6 @@ class MoveTopic_Controller extends Action_Controller
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
 		global $board, $language, $user_info;
 
-		$db = database();
-
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
 
@@ -279,25 +277,7 @@ class MoveTopic_Controller extends Action_Controller
 
 		if ($board_from['count_posts'] != $board_info['count_posts'])
 		{
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}
-					AND approved = {int:is_approved}',
-				array(
-					'current_topic' => $topic,
-					'is_approved' => 1,
-				)
-			);
-			$posters = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				if (!isset($posters[$row['id_member']]))
-					$posters[$row['id_member']] = 0;
-
-				$posters[$row['id_member']]++;
-			}
-			$db->free_result($request);
+			$posters = postersCount($topic);
 
 			foreach ($posters as $id_member => $posts)
 			{
