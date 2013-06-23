@@ -1259,11 +1259,11 @@ function getPmsFromDiscussion($pm_heads)
 	return $pms;
 }
 
-function updatePMLabels($labels, $user_id)
+function changePMLabels($to_label, $label_type, $user_id)
 {
 	$db = database();
-	$updateErrors = 0;
-	$existing_labels = array();
+	$labels = array();
+	$to_update = array();
 
 	// Get information about each message...
 	$request = $db->query('', '
@@ -1271,49 +1271,107 @@ function updatePMLabels($labels, $user_id)
 		FROM {db_prefix}pm_recipients
 		WHERE id_member = {int:current_member}
 			AND id_pm IN ({array_int:to_label})
-		LIMIT ' . count($labels),
+		LIMIT ' . count($to_label),
 		array(
 			'current_member' => $user_id,
-			'to_label' => array_keys($labels),
+			'to_label' => array_keys($to_label),
 		)
 	);
 
 	while ($row = $db->fetch_assoc($request))
 	{
-		$existing_labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
+		$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
 
 		// Already exists?  Then... unset it!
-		$ID_LABEL = array_search($to_label[$row['id_pm']], $existing_labels);
+		$ID_LABEL = array_search($to_label[$row['id_pm']], $labels);
 		if ($ID_LABEL !== false && $label_type[$row['id_pm']] !== 'add')
-			unset($existing_labels[$ID_LABEL]);
+			unset($labels[$ID_LABEL]);
 		elseif ($label_type[$row['id_pm']] !== 'rem')
-			$existing_labels[] = $to_label[$row['id_pm']];
+			$labels[] = $to_label[$row['id_pm']];
 
-		if (!empty($options['pm_remove_inbox_label']) && $to_label[$row['id_pm']] != '-1' && ($key = array_search('-1', $existing_labels)) !== false)
-			unset($existing_labels[$key]);
+		if (!empty($options['pm_remove_inbox_label']) && $to_label[$row['id_pm']] != '-1' && ($key = array_search('-1', $labels)) !== false)
+			unset($labels[$key]);
 
-		if (empty($set))
-			$set[] = '-1';
+		$set = implode(',', array_unique($labels));
+		if ($set == '')
+			$set = '-1';
 
-		// Check that this string isn't going to be too large for the database.
-		if ($set > 60)
-			$updateErrors++;
-		else
-		{
-			$db->query('', '
-				UPDATE {db_prefix}pm_recipients
-				SET labels = {string:labels}
-				WHERE id_pm = {int:id_pm}
-					AND id_member = {int:current_member}',
-				array(
-					'current_member' => $user_id,
-					'id_pm' => $row['id_pm'],
-					'labels' => implode(',', array_unique($set)),
-				)
-			);
-		}
+		$to_update[$row['id_pm']] = $set;
 	}
 	$db->free_result($request);
+
+	if (!empty($to_update))
+		return updatePMLabels($to_update);
+}
+
+function updateLabelsToPM($searchArray, $user_id)
+{
+
+	// Now find the messages to change.
+	$request = $db->query('', '
+		SELECT id_pm, labels
+		FROM {db_prefix}pm_recipients
+		WHERE FIND_IN_SET({raw:find_label_implode}, labels) != 0
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $user_id,
+			'find_label_implode' => '\'' . implode('\', labels) != 0 OR FIND_IN_SET(\'', $searchArray) . '\'',
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Do the long task of updating them...
+		$toChange = explode(',', $row['labels']);
+
+		foreach ($toChange as $key => $value)
+			if (in_array($value, $searchArray))
+			{
+				if (isset($new_labels[$value]))
+					$toChange[$key] = $new_labels[$value];
+				else
+					unset($toChange[$key]);
+			}
+
+		if (empty($toChange))
+			$toChange[] = '-1';
+
+		$to_update[$row['id_pm']] = implode(',', array_unique($toChange));
+	}
+	$db->free_result($request);
+
+	if (!empty($to_update))
+		return updatePMLabels($to_update, $user_id);
+}
+
+function updatePMLabels($to_update, $user_id)
+{
+	$db = database();
+
+	$updateErrors = 0;
+
+	foreach ($to_update as $id_pm => $set)
+	{
+		// Check that this string isn't going to be too large for the database.
+		if (strlen($set) > 60)
+		{
+			$updateErrors++;
+			// Make the string as long as possible and update anyway
+			$set = substr($set, 0, 60);
+			$set = substr($set, 0, strrpos($set, ','));
+		}
+
+		$db->query('', '
+			UPDATE {db_prefix}pm_recipients
+			SET labels = {string:labels}
+			WHERE id_pm = {int:id_pm}
+				AND id_member = {int:current_member}',
+			array(
+				'current_member' => $user_id,
+				'id_pm' => $id_pm,
+				'labels' => $set,
+			)
+		);
+	}
 
 	return $updateErrors;
 }
