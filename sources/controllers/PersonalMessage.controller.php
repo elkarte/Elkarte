@@ -944,7 +944,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Make sure that we remove the members who did get it from the screen.
 		if (!$is_recipient_change)
 		{
-			foreach ($recipientList as $recipientType => $dummy)
+			foreach (array_keys($recipientList) as $recipientType)
 			{
 				if (!empty($namesNotFound[$recipientType]))
 				{
@@ -1174,57 +1174,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Are we labeling anything?
 		if (!empty($to_label) && $context['folder'] == 'inbox')
 		{
-			$updateErrors = 0;
-
-			// Get information about each message...
-			$request = $db->query('', '
-				SELECT id_pm, labels
-				FROM {db_prefix}pm_recipients
-				WHERE id_member = {int:current_member}
-					AND id_pm IN ({array_int:to_label})
-				LIMIT ' . count($to_label),
-				array(
-					'current_member' => $user_info['id'],
-					'to_label' => array_keys($to_label),
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
-
-				// Already exists?  Then... unset it!
-				$ID_LABEL = array_search($to_label[$row['id_pm']], $labels);
-				if ($ID_LABEL !== false && $label_type[$row['id_pm']] !== 'add')
-					unset($labels[$ID_LABEL]);
-				elseif ($label_type[$row['id_pm']] !== 'rem')
-					$labels[] = $to_label[$row['id_pm']];
-
-				if (!empty($options['pm_remove_inbox_label']) && $to_label[$row['id_pm']] != '-1' && ($key = array_search('-1', $labels)) !== false)
-					unset($labels[$key]);
-
-				$set = implode(',', array_unique($labels));
-				if ($set == '')
-					$set = '-1';
-
-				// Check that this string isn't going to be too large for the database.
-				if ($set > 60)
-					$updateErrors++;
-				else
-				{
-					$db->query('', '
-						UPDATE {db_prefix}pm_recipients
-						SET labels = {string:labels}
-						WHERE id_pm = {int:id_pm}
-							AND id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-							'id_pm' => $row['id_pm'],
-							'labels' => $set,
-						)
-					);
-				}
-			}
-			$db->free_result($request);
+			$updateErrors = updatePMLabels(array_keys($to_label), $user_info['id']);
 
 			// Any errors?
 			// @todo Separate the sprintf?
@@ -1479,7 +1429,11 @@ class PersonalMessage_Controller extends Action_Controller
 					if (empty($toChange))
 						$toChange[] = '-1';
 
-					// Update the message.
+		// Check that this string isn't going to be too large for the database.
+		if ($set > 60)
+			$updateErrors++;
+		else
+		{
 					$db->query('', '
 						UPDATE {db_prefix}pm_recipients
 						SET labels = {string:new_labels}
@@ -1491,6 +1445,7 @@ class PersonalMessage_Controller extends Action_Controller
 							'new_labels' => implode(',', array_unique($toChange)),
 						)
 					);
+					}
 				}
 				$db->free_result($request);
 

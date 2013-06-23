@@ -1245,7 +1245,7 @@ function loadPMLimits($id_group = false)
  */
 function getDiscussions($id_pms)
 {
-	$db => database();
+	$db = database();
 
 	$request = $db->query('', '
 		SELECT id_pm_head, id_pm
@@ -1285,4 +1285,63 @@ function getPmsFromDiscussion($pm_heads)
 	$db->free_result($request);
 
 	return $pms;
+}
+
+function updatePMLabels($labels, $user_id)
+{
+	$db = database();
+	$updateErrors = 0;
+	$existing_labels = array();
+
+	// Get information about each message...
+	$request = $db->query('', '
+		SELECT id_pm, labels
+		FROM {db_prefix}pm_recipients
+		WHERE id_member = {int:current_member}
+			AND id_pm IN ({array_int:to_label})
+		LIMIT ' . count($labels),
+		array(
+			'current_member' => $user_id,
+			'to_label' => array_keys($labels),
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		$existing_labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
+
+		// Already exists?  Then... unset it!
+		$ID_LABEL = array_search($to_label[$row['id_pm']], $existing_labels);
+		if ($ID_LABEL !== false && $label_type[$row['id_pm']] !== 'add')
+			unset($existing_labels[$ID_LABEL]);
+		elseif ($label_type[$row['id_pm']] !== 'rem')
+			$existing_labels[] = $to_label[$row['id_pm']];
+
+		if (!empty($options['pm_remove_inbox_label']) && $to_label[$row['id_pm']] != '-1' && ($key = array_search('-1', $existing_labels)) !== false)
+			unset($existing_labels[$key]);
+
+		if (empty($set))
+			$set[] = '-1';
+
+		// Check that this string isn't going to be too large for the database.
+		if ($set > 60)
+			$updateErrors++;
+		else
+		{
+			$db->query('', '
+				UPDATE {db_prefix}pm_recipients
+				SET labels = {string:labels}
+				WHERE id_pm = {int:id_pm}
+					AND id_member = {int:current_member}',
+				array(
+					'current_member' => $user_id,
+					'id_pm' => $row['id_pm'],
+					'labels' => implode(',', array_unique($set)),
+				)
+			);
+		}
+	}
+	$db->free_result($request);
+
+	return $updateErrors;
 }
