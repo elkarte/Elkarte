@@ -1342,7 +1342,7 @@ function countMessagesSince($id_topic, $id_msg, $include_current = false, $only_
  */
 function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only_approved = false, $include_own = false)
 {
-	global $modSettings, $user_info;
+	global $user_info;
 
 	$db = database();
 
