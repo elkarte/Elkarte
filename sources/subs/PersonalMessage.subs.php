@@ -1240,3 +1240,49 @@ function loadPMLimits($id_group = false)
 	return $groups;
 }
 
+/**
+ * Retrieve the discussion one or more PMs belong to
+ */
+function getDiscussions($id_pms)
+{
+	$db => database();
+
+	$request = $db->query('', '
+		SELECT id_pm_head, id_pm
+		FROM {db_prefix}personal_messages
+		WHERE id_pm IN ({array_int:id_pms})',
+		array(
+			'id_pms' => $id_pms,
+		)
+	);
+	$pm_heads = array();
+	while ($row = $db->fetch_assoc($request))
+		$pm_heads[$row['id_pm_head']] = $row['id_pm'];
+	$db->free_result($request);
+
+	return $pm_heads;
+}
+
+/**
+ * Return all the PMs belonging to one or more discussions
+ */
+function getPmsFromDiscussion($pm_heads)
+{
+	$db = database();
+
+	$pms = array();
+	$request = $db->query('', '
+		SELECT id_pm, id_pm_head
+		FROM {db_prefix}personal_messages
+		WHERE id_pm_head IN ({array_int:pm_heads})',
+		array(
+			'pm_heads' => array_keys($pm_heads),
+		)
+	);
+	// Copy the action from the single to PM to the others.
+	while ($row = $db->fetch_assoc($request))
+		$pms[$row['id_pm']] = $row['id_pm_head'];
+	$db->free_result($request);
+
+	return $pms;
+}
