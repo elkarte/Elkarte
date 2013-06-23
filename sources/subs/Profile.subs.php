@@ -290,9 +290,7 @@ function loadCustomFields($memID, $area = 'summary')
  */
 function loadProfileFields($force_reload = false)
 {
-	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $cur_profile, $language;
-
-	$db = database();
+	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $cur_profile, $language;
 
 	// Don't load this twice!
 	if (!empty($profile_fields) && !$force_reload)
@@ -927,10 +925,7 @@ function loadProfileFields($force_reload = false)
  */
 function saveProfileFields()
 {
-	global $profile_fields, $profile_vars, $context, $old_profile;
-	global $post_errors, $modSettings, $cur_profile;
-
-	$db = database();
+	global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
 
 	// Load them up.
 	loadProfileFields();
@@ -1070,8 +1065,6 @@ function saveProfileFields()
  */
 function profileValidateEmail($email, $memID = 0)
 {
-	global $context;
-
 	$db = database();
 
 	$email = strtr($email, array('&#039;' => '\''));
@@ -1111,11 +1104,7 @@ function profileValidateEmail($email, $memID = 0)
  */
 function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
 {
-	global $user_info, $txt, $modSettings, $user_profile;
-	global $context, $settings;
-
-
-	$db = database();
+	global $context, $user_profile;
 
 	// These make life easier....
 	$old_profile = &$user_profile[$memID];
@@ -1515,8 +1504,6 @@ function profileSendActivation()
 {
 	global $profile_vars, $txt, $context, $scripturl, $cookiename, $cur_profile, $language, $modSettings;
 
-	$db = database();
-
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Shouldn't happen but just in case.
@@ -1567,8 +1554,6 @@ function profileSendActivation()
 function profileLoadSignatureData()
 {
 	global $modSettings, $context, $txt, $cur_profile, $memberContext;
-
-	$db = database();
 
 	// Signature limits.
 	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
@@ -1758,9 +1743,7 @@ function profileLoadGroups()
  */
 function profileLoadLanguages()
 {
-	global $context, $modSettings, $settings, $cur_profile, $language;
-
-	$db = database();
+	global $context;
 
 	$context['profile_languages'] = array();
 
@@ -1782,9 +1765,7 @@ function profileLoadLanguages()
  */
 function profileReloadUser()
 {
-	global $modSettings, $context, $cur_profile, $profile_vars;
-
-	$db = database();
+	global $modSettings, $context, $cur_profile;
 
 	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
