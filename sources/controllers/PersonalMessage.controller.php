@@ -35,7 +35,7 @@ class PersonalMessage_Controller
 	 */
 	function action_index()
 	{
-		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
+		global $context;
 
 		// Finally all the things we know how to do
 		$subActions = array(
@@ -1104,7 +1104,7 @@ class PersonalMessage_Controller
 	{
 		global $context, $user_info, $options;
 
-		$db = database();
+		//$db = database();
 
 		checkSession('request');
 
@@ -1123,38 +1123,17 @@ class PersonalMessage_Controller
 		// If we are in conversation, we may need to apply this to every message in the conversation.
 		if ($context['display_mode'] == 2 && isset($_REQUEST['conversation']))
 		{
-			$id_pms = array();
-			foreach ($_REQUEST['pm_actions'] as $pm => $dummy)
-				$id_pms[] = (int) $pm;
+			$id_pms = array_map('intval', array_keys($_REQUEST['pm_actions']));
 
-			$request = $db->query('', '
-				SELECT id_pm_head, id_pm
-				FROM {db_prefix}personal_messages
-				WHERE id_pm IN ({array_int:id_pms})',
-				array(
-					'id_pms' => $id_pms,
-				)
-			);
-			$pm_heads = array();
-			while ($row = $db->fetch_assoc($request))
-				$pm_heads[$row['id_pm_head']] = $row['id_pm'];
-			$db->free_result($request);
+			$pm_heads = getDiscussions($id_pms);
 
-			$request = $db->query('', '
-				SELECT id_pm, id_pm_head
-				FROM {db_prefix}personal_messages
-				WHERE id_pm_head IN ({array_int:pm_heads})',
-				array(
-					'pm_heads' => array_keys($pm_heads),
-				)
-			);
+			$pms = getPmsFromDiscussion(array_keys($pm_heads));
 			// Copy the action from the single to PM to the others.
-			while ($row = $db->fetch_assoc($request))
+			foreach ($pms as $id_pm => $id_head)
 			{
-				if (isset($pm_heads[$row['id_pm_head']]) && isset($_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]]))
-					$_REQUEST['pm_actions'][$row['id_pm']] = $_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]];
+				if (isset($pm_heads[$id_head]) && isset($_REQUEST['pm_actions'][$pm_heads[$id_head]]))
+					$_REQUEST['pm_actions'][$id_pm] = $_REQUEST['pm_actions'][$pm_heads[$id_head]];
 			}
-			$db->free_result($request);
 		}
 
 		$to_delete = array();
@@ -1162,28 +1141,26 @@ class PersonalMessage_Controller
 		$label_type = array();
 		foreach ($_REQUEST['pm_actions'] as $pm => $action)
 		{
-			if ($action === 'delete')
-				$to_delete[] = (int) $pm;
-			else
+			switch (substr($action, 0, 4))
 			{
-				if (substr($action, 0, 4) == 'add_')
-				{
+				case 'dele':
+					$to_delete[] = (int) $pm;
+					break;
+				case 'add_':
 					$type = 'add';
 					$action = substr($action, 4);
-				}
-				elseif (substr($action, 0, 4) == 'rem_')
-				{
+					break;
+				case 'rem_':
 					$type = 'rem';
 					$action = substr($action, 4);
-				}
-				else
+					break;
+				default:
 					$type = 'unk';
-
-				if ($action == '-1' || $action == '0' || (int) $action > 0)
-				{
-					$to_label[(int) $pm] = (int) $action;
-					$label_type[(int) $pm] = $type;
-				}
+					if ($action == '-1' || $action == '0' || (int) $action > 0)
+					{
+						$to_label[(int) $pm] = (int) $action;
+						$label_type[(int) $pm] = $type;
+					}
 			}
 		}
 
