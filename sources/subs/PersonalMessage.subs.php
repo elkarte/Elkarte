@@ -1403,3 +1403,48 @@ function updatePMLabels($to_update, $user_id)
 
 	return $updateErrors;
 }
+
+function getPMsOlderThan($user_id, $time)
+{
+	$db = database();
+
+	// Array to store the IDs in.
+	$pm_ids = array();
+
+	// Select all the messages they have sent older than $time.
+	$request = $db->query('', '
+		SELECT id_pm
+		FROM {db_prefix}personal_messages
+		WHERE deleted_by_sender = {int:not_deleted}
+			AND id_member_from = {int:current_member}
+			AND msgtime < {int:msgtime}',
+		array(
+			'current_member' => $user_id,
+			'not_deleted' => 0,
+			'msgtime' => $time,
+		)
+	);
+	while ($row = $db->fetch_row($request))
+		$pm_ids[] = $row[0];
+	$db->free_result($request);
+
+	// This is the inbox
+	$request = $db->query('', '
+		SELECT pmr.id_pm
+		FROM {db_prefix}pm_recipients AS pmr
+			INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
+		WHERE pmr.deleted = {int:not_deleted}
+			AND pmr.id_member = {int:current_member}
+			AND pm.msgtime < {int:msgtime}',
+		array(
+			'current_member' => $user_id,
+			'not_deleted' => 0,
+			'msgtime' => $time,
+		)
+	);
+	while ($row = $db->fetch_row($request))
+		$pm_ids[] = $row[0];
+	$db->free_result($request);
+
+	return $pm_ids;
+}
