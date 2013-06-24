@@ -313,7 +313,7 @@ class SplitTopics_Controller
 
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
-				$original_msgs['selected'] = messageAt($context['not_selected']['start'], $topic, array(
+				$original_msgs['selected'] = messageAt($context['selected']['start'], $topic, array(
 					'include' => empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic],
 					'only_approved' => !$modSettings['postmod_active'] || allowedTo('approve_posts'),
 					'limit' => $context['messages_per_page'],
