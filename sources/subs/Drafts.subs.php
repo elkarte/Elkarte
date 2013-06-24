@@ -340,8 +340,6 @@ function draftsCount($member_id, $draft_type)
  */
 function draftsRecipients($allRecipients, $recipient_ids)
 {
-	$db = database();
-
 	// holds our results
 	$recipients = array(
 		'to' => array(),
