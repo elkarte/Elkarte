@@ -339,17 +339,10 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// @todo Assumes nothing needs permission more than accessing moderation center!
 		$id_notice = (int) $_GET['nid'];
-		$request = $db->query('', '
-			SELECT body, subject
-			FROM {db_prefix}log_member_notices
-			WHERE id_notice = {int:id_notice}',
-			array(
-				'id_notice' => $id_notice,
-			)
-		);
-		if ($db->num_rows($request) == 0)
+		$notice = moderatorNotice($id_notice);
+		if (empty($notice))
 			fatal_lang_error('no_access', false);
-		list ($context['notice_body'], $context['notice_subject']) = $db->fetch_row($request);
+		list ($context['notice_body'], $context['notice_subject']) = $notice;
 		$db->free_result($request);
 
 		$context['notice_body'] = parse_bbc($context['notice_body'], false);

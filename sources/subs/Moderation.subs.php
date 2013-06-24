@@ -1103,3 +1103,25 @@ function moderatorNotes($offset)
 
 	return $moderator_notes;
 }
+
+function moderatorNotice($id_notice)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT body, subject
+		FROM {db_prefix}log_member_notices
+		WHERE id_notice = {int:id_notice}',
+		array(
+			'id_notice' => $id_notice,
+		)
+	);
+	if ($db->num_rows($request) == 0)
+		return array();
+	list ($notice_body, $notice_subject) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	$notice_body = parse_bbc($notice_body, false);
+
+	return array($notice_body, $notice_subject);
+}
