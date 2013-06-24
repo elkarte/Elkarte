@@ -44,7 +44,7 @@ class Themes_Controller
 	 * sub-action.
 	 * It loads both the Themes and Settings language files.
 	 * Checks the session by GET or POST to verify the sent data.
-	 * Requires the user not be a guest. (@todo what?)
+	 * Requires the user to not be a guest.
 	 * Accessed via ?action=admin;area=theme.
 	 */
 	public function action_index()
@@ -55,7 +55,7 @@ class Themes_Controller
 		loadLanguage('Themes');
 		loadLanguage('Settings');
 
-		// No funny business - guests only.
+		// No guests in here.
 		is_not_guest();
 
 		// Default the page title to Theme Administration by default.

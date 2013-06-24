@@ -18,7 +18,9 @@ if (!defined('ELKARTE'))
 class Xml_Controller extends Action_Controller
 {
 	/**
-	 * Main function for action=xmlhttp.
+	 * Main dispatcher for action=xmlhttp.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

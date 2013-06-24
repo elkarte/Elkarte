@@ -8,11 +8,18 @@
  * @version 1.0 Alpha
  */
 
+if (!defined('ELKARTE'))
+	die('No access...');
+
+/**
+ * This class handles requests for previews of an item, in an ajax enabled template.
+ */
 class XmlPreview_Controller extends Action_Controller
 {
 	/**
-	 * Returns a preview of an item for use in an ajax enabled template
-	 *  - Calls the correct function for the action
+	 * Calls the correct function for the action.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -26,11 +33,13 @@ class XmlPreview_Controller extends Action_Controller
 			'bounce_preview' => array('action_bounce_preview'),
 		);
 
-		$context['sub_template'] = 'generic_xml';
-
 		// Valid action?
 		if (!isset($_REQUEST['item'], $subActions[$_REQUEST['item']]))
-			return false;
+			return;
+
+		// Set up the template and default sub-template.
+		loadTemplate('Xml');
+		$context['sub_template'] = 'generic_xml';
 
 		// A preview it is then
 		$this->{$subActions[$_REQUEST['item']][0]}();
