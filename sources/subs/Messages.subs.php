@@ -1035,20 +1035,20 @@ function determineRemovableMessages($topic, $messages, $allowed_all)
 	return $messages_list;
 }
 
-function countSplitMessages($topic, $include_unapproved)
+function countSplitMessages($topic, $include_unapproved, $selection = array())
 {
 	$db = database();
 
 	$return = array('not_selected' => 0, 'selected' => 0);
 	$request = $db->query('', '
-		SELECT ' . (empty($_SESSION['split_selection'][$topic]) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
+		SELECT ' . (empty($selection) ? '0' : 'm.id_msg IN ({array_int:split_msgs})') . ' AS is_selected, COUNT(*) AS num_messages
 		FROM {db_prefix}messages AS m
 		WHERE m.id_topic = {int:current_topic}' . ($include_unapproved ? '' : '
-			AND approved = {int:is_approved}') . (empty($_SESSION['split_selection'][$topic]) ? '' : '
+			AND approved = {int:is_approved}') . (empty($selection) ? '' : '
 		GROUP BY is_selected'),
 		array(
 			'current_topic' => $topic,
-			'split_msgs' => !empty($_SESSION['split_selection'][$topic]) ? $_SESSION['split_selection'][$topic] : array(),
+			'split_msgs' => $selection,
 			'is_approved' => 1,
 		)
 	);

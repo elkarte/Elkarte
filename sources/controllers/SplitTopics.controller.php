@@ -342,10 +342,13 @@ class SplitTopics_Controller
 				'only_approved' => !$modSettings['postmod_active'] || allowedTo('approve_posts'),
 				'limit' => false,
 			));
+			$selection = $_SESSION['split_selection'][$topic];
 		}
+		else
+			$selection = array();
 
 		// Get the number of messages (not) selected to be split.
-		$split_counts = countSplitMessages($topic, !$modSettings['postmod_active'] || allowedTo('approve_posts'));
+		$split_counts = countSplitMessages($topic, !$modSettings['postmod_active'] || allowedTo('approve_posts'), $selection);
 		foreach ($split_counts as $key => $num_messages)
 			$context[$key]['num_messages'] = $num_messages;
 
