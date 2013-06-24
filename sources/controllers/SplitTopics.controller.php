@@ -23,6 +23,7 @@ if (!defined('ELKARTE'))
 
 class SplitTopics_Controller
 {
+	private $_new_topic_subject = null;
 	/**
 	 * Splits a topic into two topics.
 	 * delegates to the other functions (based on the URL parameter 'sa').
@@ -107,7 +108,10 @@ class SplitTopics_Controller
 
 		// Check if this is the first message in the topic (if so, the first and second option won't be available)
 		if ($messageInfo['id_first_msg'] == $splitAt)
+		{
+			$this->_new_topic_subject = $messageInfo['subject'];
 			return $this->action_splitSelectTopics();
+		}
 
 		// Basic template information....
 		$context['message'] = array(
@@ -136,9 +140,10 @@ class SplitTopics_Controller
 		checkSession();
 
 		// Clean up the subject.
-		// @todo: actually clean the subject?
-		if (!isset($_POST['subname']) || $_POST['subname'] == '')
-			$_POST['subname'] = $txt['new_topic'];
+		if (isset($_POST['subname']))
+			$this->_new_topic_subject = trim(Util::htmlspecialchars($_POST['subname']));
+		if (empty($this->_new_topic_subject))
+			$this->_new_topic_subject = $txt['new_topic'];
 
 		if (empty($_SESSION['move_to_board']))
 		{
@@ -156,10 +161,7 @@ class SplitTopics_Controller
 
 		// Redirect to the selector if they chose selective.
 		if ($_POST['step2'] == 'selective')
-		{
-			$_REQUEST['subname'] = $_POST['subname'];
 			return $this->action_splitSelectTopics();
-		}
 
 		// We work with them topics.
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -186,7 +188,7 @@ class SplitTopics_Controller
 			fatal_lang_error('no_access', false);
 
 		$context['old_topic'] = $topic;
-		$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $_POST['subname']);
+		$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $this->_new_topic_subject);
 		$context['page_title'] = $txt['split'];
 
 		splitAttemptMove($boards, $context['new_topic']);
@@ -208,8 +210,10 @@ class SplitTopics_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Default the subject in case it's blank.
-		if (!isset($_POST['subname']) || $_POST['subname'] == '')
-			$_POST['subname'] = $txt['new_topic'];
+		if (isset($_POST['subname']))
+			$this->_new_topic_subject = trim(Util::htmlspecialchars($_POST['subname']));
+		if (empty($this->_new_topic_subject))
+			$this->_new_topic_subject = $txt['new_topic'];
 
 		// You must've selected some messages!  Can't split out none!
 		if (empty($_SESSION['split_selection'][$topic]))
@@ -229,7 +233,7 @@ class SplitTopics_Controller
 		$boards = splitDestinationBoard();
 
 		$context['old_topic'] = $topic;
-		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $_POST['subname']);
+		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
 		$context['page_title'] = $txt['split'];
 
 		splitAttemptMove($boards, $context['new_topic']);
@@ -257,7 +261,7 @@ class SplitTopics_Controller
 
 		// This is a special case for split topics from quick-moderation checkboxes
 		if (isset($_REQUEST['subname_enc']))
-			$_REQUEST['subname'] = urldecode($_REQUEST['subname_enc']);
+			$this->_new_topic_subject = urldecode($_REQUEST['subname_enc']);
 
 		$context['move_to_board'] = !empty($_SESSION['move_to_board']) ? (int) $_SESSION['move_to_board'] : 0;
 		$context['reason'] = !empty($_SESSION['reason']) ? trim(Util::htmlspecialchars($_SESSION['reason'])) : '';
@@ -279,11 +283,11 @@ class SplitTopics_Controller
 
 		$context['topic'] = array(
 			'id' => $topic,
-			'subject' => urlencode($_REQUEST['subname']),
+			'subject' => urlencode($this->_new_topic_subject),
 		);
 
 		// Some stuff for our favorite template.
-		$context['new_subject'] = $_REQUEST['subname'];
+		$context['new_subject'] = $this->_new_topic_subject;
 
 		// Using the "select" sub template.
 		$context['sub_template'] = isset($_REQUEST['xml']) ? 'split' : 'select';
@@ -349,7 +353,7 @@ class SplitTopics_Controller
 		if ($context['selected']['start'] >= $context['selected']['num_messages'])
 			$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
 
-		$page_index_url = $scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_REQUEST['subname']), array('%' => '%%')) . ';topic=' . $topic;
+		$page_index_url = $scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($this->_new_topic_subject), array('%' => '%%')) . ';topic=' . $topic;
 		// Build a page list of the not-selected topics...
 		$context['not_selected']['page_index'] = constructPageIndex($page_index_url . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
 
