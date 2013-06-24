@@ -1554,46 +1554,11 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $user_info, $scripturl;
 
-		$db = database();
-
-		$context['group_requests'] = array();
-
 		// Make sure they can even moderate someone!
 		if ($user_info['mod_cache']['gq'] == '0=1')
 			return 'group_requests_block';
 
-		// What requests are outstanding?
-		$request = $db->query('', '
-			SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, mem.member_name, mg.group_name, mem.real_name
-			FROM {db_prefix}log_group_requests AS lgr
-				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
-				INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
-			WHERE ' . ($user_info['mod_cache']['gq'] == '1=1' || $user_info['mod_cache']['gq'] == '0=1' ? $user_info['mod_cache']['gq'] : 'lgr.' . $user_info['mod_cache']['gq']) . '
-			ORDER BY lgr.id_request DESC
-			LIMIT 10',
-			array(
-			)
-		);
-		for ($i = 0; $row = $db->fetch_assoc($request); $i ++)
-		{
-			$context['group_requests'][] = array(
-				'id' => $row['id_request'],
-				'alternate' => $i % 2,
-				'request_href' => $scripturl . '?action=groups;sa=requests;gid=' . $row['id_group'],
-				'member' => array(
-					'id' => $row['id_member'],
-					'name' => $row['real_name'],
-					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-					'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-				),
-				'group' => array(
-					'id' => $row['id_group'],
-					'name' => $row['group_name'],
-				),
-				'time_submitted' => standardTime($row['time_applied']),
-			);
-		}
-		$db->free_result($request);
+		$context['group_requests'] = groupRequests();
 
 		return 'group_requests_block';
 	}
@@ -1618,28 +1583,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $modSettings;
 
-		$db = database();
-
-		if (($watched_users = cache_get_data('recent_user_watches', 240)) === null)
-		{
-			$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
-			$request = $db->query('', '
-				SELECT id_member, real_name, last_login
-				FROM {db_prefix}members
-				WHERE warning >= {int:warning_watch}
-				ORDER BY last_login DESC
-				LIMIT 10',
-				array(
-					'warning_watch' => $modSettings['warning_watch'],
-				)
-			);
-			$watched_users = array();
-			while ($row = $db->fetch_assoc($request))
-				$watched_users[] = $row;
-			$db->free_result($request);
-
-			cache_put_data('recent_user_watches', $watched_users, 240);
-		}
+		$watched_users = basicWatchedUsers();
 
 		$context['watched_users'] = array();
 		foreach ($watched_users as $user)
@@ -1670,23 +1614,13 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			checkSession();
 
-			$_POST['new_note'] = Util::htmlspecialchars(trim($_POST['new_note']));
+			$new_note = Util::htmlspecialchars(trim($_POST['new_note']));
 
 			// Make sure they actually entered something.
-			if (!empty($_POST['new_note']) && $_POST['new_note'] !== $txt['mc_click_add_note'])
+			if (!empty($new_note) && $new_note !== $txt['mc_click_add_note'])
 			{
 				// Insert it into the database then!
-				$db->insert('',
-					'{db_prefix}log_comments',
-					array(
-						'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
-						'body' => 'string', 'log_time' => 'int',
-					),
-					array(
-						$user_info['id'], $user_info['name'], 'modnote', '', $_POST['new_note'], time(),
-					),
-					array('id_comment')
-				);
+				addModeratorNote($user_info['id'], $user_info['name'], $new_note);
 
 				// Clear the cache.
 				cache_put_data('moderator_notes', null, 240);
@@ -1702,16 +1636,11 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			checkSession('get');
 
+			// Just checkin'!
+			$id_delete = (int) $_GET['delete'];
+
 			// Lets delete it.
-			$db->query('', '
-				DELETE FROM {db_prefix}log_comments
-				WHERE id_comment = {int:note}
-					AND comment_type = {string:type}',
-				array(
-					'note' => $_GET['delete'],
-					'type' => 'modnote',
-				)
-			);
+			removeModeratorNote($id_delete);
 
 			// Clear the cache.
 			cache_put_data('moderator_notes', null, 240);
@@ -1721,48 +1650,11 @@ class ModerationCenter_Controller extends Action_Controller
 		}
 
 		// How many notes in total?
-		if (($moderator_notes_total = cache_get_data('moderator_notes_total', 240)) === null)
-		{
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}log_comments AS lc
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
-				WHERE lc.comment_type = {string:modnote}',
-				array(
-					'modnote' => 'modnote',
-				)
-			);
-			list ($moderator_notes_total) = $db->fetch_row($request);
-			$db->free_result($request);
-
-			cache_put_data('moderator_notes_total', $moderator_notes_total, 240);
-		}
+		$moderator_notes_total = countModeratorNotes();
 
 		// Grab the current notes. We can only use the cache for the first page of notes.
 		$offset = isset($_GET['notes']) && isset($_GET['start']) ? $_GET['start'] : 0;
-		if ($offset != 0 || ($moderator_notes = cache_get_data('moderator_notes', 240)) === null)
-		{
-			$request = $db->query('', '
-				SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
-					lc.log_time, lc.body, lc.id_comment AS id_note
-				FROM {db_prefix}log_comments AS lc
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
-				WHERE lc.comment_type = {string:modnote}
-				ORDER BY id_comment DESC
-				LIMIT {int:offset}, 10',
-				array(
-					'modnote' => 'modnote',
-					'offset' => $offset,
-				)
-			);
-			$moderator_notes = array();
-			while ($row = $db->fetch_assoc($request))
-				$moderator_notes[] = $row;
-			$db->free_result($request);
-
-			if ($offset == 0)
-				cache_put_data('moderator_notes', $moderator_notes, 240);
-		}
+		$moderator_notes = moderatorNotes($offset);
 
 		// Lets construct a page index.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $_GET['start'], $moderator_notes_total, 10);
@@ -1792,44 +1684,12 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $user_info, $scripturl;
 
-		$db = database();
-
-		// Got the info already?
-		$cachekey = md5(serialize($user_info['mod_cache']['bq']));
-		$context['reported_posts'] = array();
-
 		if ($user_info['mod_cache']['bq'] == '0=1')
 			return 'reported_posts_block';
 
-		if (($reported_posts = cache_get_data('reported_posts_' . $cachekey, 90)) === null)
-		{
-			// By George, that means we in a position to get the reports, jolly good.
-			$request = $db->query('', '
-				SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject,
-					lr.num_reports, IFNULL(mem.real_name, lr.membername) AS author_name,
-					IFNULL(mem.id_member, 0) AS id_author
-				FROM {db_prefix}log_reported AS lr
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-				WHERE ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
-					AND lr.closed = {int:not_closed}
-					AND lr.ignore_all = {int:not_ignored}
-				ORDER BY lr.time_updated DESC
-				LIMIT 10',
-				array(
-					'not_closed' => 0,
-					'not_ignored' => 0,
-				)
-			);
-			$reported_posts = array();
-			while ($row = $db->fetch_assoc($request))
-				$reported_posts[] = $row;
-			$db->free_result($request);
-
-			// Cache it.
-			cache_put_data('reported_posts_' . $cachekey, $reported_posts, 90);
-		}
-
 		$context['reported_posts'] = array();
+
+		$reported_posts = reportedPosts();
 		foreach ($reported_posts as $i => $row)
 		{
 			$context['reported_posts'][] = array(
