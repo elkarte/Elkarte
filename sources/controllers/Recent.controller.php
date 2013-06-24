@@ -380,7 +380,7 @@ class Recent_Controller
 
 			$query_this_board = 'id_board IN ({array_int:boards})';
 			$query_parameters['boards'] = $boards;
-			$context['querystring_board_limits'] = ';c=' . implode(',', $_REQUEST['c']) . ';start=%1$d';
+			$context['querystring_board_limits'] = ';c=' . $_REQUEST['c'] . ';start=%1$d';
 		}
 		else
 		{
