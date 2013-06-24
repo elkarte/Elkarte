@@ -37,7 +37,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Themes_Controller
+class Themes_Controller extends Action_Controller
 {
 	/**
 	 * Subaction handler - manages the action and delegates control to the proper
@@ -46,6 +46,8 @@ class Themes_Controller
 	 * Checks the session by GET or POST to verify the sent data.
 	 * Requires the user to not be a guest.
 	 * Accessed via ?action=admin;area=theme.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
