@@ -922,4 +922,15 @@ class ManageNews_Controller extends Action_Controller
 
 		return $config_vars;
 	}
+
+	/**
+	 * Prepares an array of the forum news items for display in the template
+	 * Callback for createList()
+	 *
+	 * @return array
+	 */
+	function list_getNews()
+	{
+		return getNews();
+	}
 }
