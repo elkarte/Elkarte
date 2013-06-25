@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -112,9 +112,9 @@ function reloadSettings()
 	}
 
 	// Integration is cool.
-	if (defined('ELKARTE_INTEGRATION_SETTINGS'))
+	if (defined('ELK_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = unserialize(ELKARTE_INTEGRATION_SETTINGS);
+		$integration_settings = unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function, false);
 	}
@@ -249,7 +249,7 @@ function loadUserSettings()
 		// 2. RSS feeds and XMLHTTP requests don't count either.
 		// 3. If it was set within this session, no need to set it again.
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
-		if (ELKARTE != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
+		if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = cache_get_data('user_last_visit-' . $id_member, 5 * 3600)) === null))
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
@@ -1307,7 +1307,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		}
 
 		// Hmm... check #2 - is it just different by a www?  Send them to the correct place!!
-		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && ELKARTE != 'SSI')
+		if (empty($do_fix) && strtr($detected_url, array('://' => '://www.')) == $boardurl && (empty($_GET) || count($_GET) == 1) && ELK != 'SSI')
 		{
 			// Okay, this seems weird, but we don't want an endless loop - this will make $_GET not empty ;).
 			if (empty($_GET))
@@ -2492,12 +2492,12 @@ function loadDatabase()
 		$db_type = 'mysql';
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
-	if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+	if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 		$db_connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true), $db_type);
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($db_connection))
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELKARTE == 'SSI'), $db_type);
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELK == 'SSI'), $db_type);
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$db_connection)
@@ -2505,7 +2505,7 @@ function loadDatabase()
 
 	// If in SSI mode fix up the prefix.
 	$db = database();
-	if (ELKARTE == 'SSI')
+	if (ELK == 'SSI')
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 }
 

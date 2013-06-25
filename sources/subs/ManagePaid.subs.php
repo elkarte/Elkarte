@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -559,7 +559,7 @@ function deleteSubscription($id)
 }
 
 /**
- * Adds a new subscription 
+ * Adds a new subscription
  *
  * @param array $insert
  */

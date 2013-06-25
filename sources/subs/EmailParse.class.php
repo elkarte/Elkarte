@@ -10,7 +10,7 @@
  * Take an email and parse the headers and body section in to an associative array
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

@@ -15,7 +15,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class Karma_Controller extends Action_Controller

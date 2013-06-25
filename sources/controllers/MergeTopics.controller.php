@@ -18,7 +18,7 @@
  * Original module by Mach8 - We'll never forget you.
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class MergeTopics_Controller extends Action_Controller

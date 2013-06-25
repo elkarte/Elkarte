@@ -10,7 +10,7 @@
  * Handles saving of config vars in another table than settings
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
