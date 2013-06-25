@@ -46,10 +46,7 @@ $txt['default_smileyset_name'] = 'Alienine\'s Set';
 $txt['default_aaron_smileyset_name'] = 'Aaron\'s Set';
 $txt['default_akyhne_smileyset_name'] = 'Akyhne\'s Set';
 $txt['default_fugue_smileyset_name'] = 'Fugue\'s Set';
-$txt['default_theme_name'] = 'ELKARTE Default Theme - Minimalist';
-$txt['default_core_theme_name'] = 'Core Theme';
-$txt['default_classic_theme_name'] = 'Classic YaBB SE Theme';
-$txt['default_babylon_theme_name'] = 'Babylon Theme';
+$txt['default_theme_name'] = 'ElkArte Default Theme';
 
 $txt['default_administrator_group'] = 'Administrator';
 $txt['default_global_moderator_group'] = 'Global Moderator';

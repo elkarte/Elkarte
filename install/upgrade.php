@@ -3374,8 +3374,8 @@ function template_chmod()
 				{
 					popup = window.open(\'\',\'popup\',\'height=150,width=400,scrollbars=yes\');
 					var content = popup.document;
-					content.write(\'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n\');
-					content.write(\'<html xmlns="http://www.w3.org/1999/xhtml"', $upcontext['right_to_left'] ? ' dir="rtl"' : '', '>\n\t<head>\n\t\t<meta name="robots" content="noindex" />\n\t\t\');
+					content.write(\'<!DOCTYPE html>\n\');
+					content.write(\'<html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>\n\t<head>\n\t\t<meta name="robots" content="noindex" />\n\t\t\');
 					content.write(\'<title>Warning</title>\n\t\t<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css" />\n\t</head>\n\t<body id="popup">\n\t\t\');
 					content.write(\'<div class="windowbg description">\n\t\t\t<h4>The following files needs to be made writable to continue:</h4>\n\t\t\t\');
 					content.write(\'<p>', implode('<br />\n\t\t\t', $upcontext['chmod']['files']), '</p>\n\t\t\t\');
@@ -3441,8 +3441,8 @@ function template_upgrade_above()
 {
 	global $modSettings, $txt, $oursite, $settings, $upcontext, $upgradeurl;
 
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $upcontext['right_to_left'] ? ' dir="rtl"' : '', '>
+	echo '<!DOCTYPE html>
+<html ', $upcontext['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />

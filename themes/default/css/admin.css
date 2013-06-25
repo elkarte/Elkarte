@@ -115,9 +115,7 @@ body.action_admin .navigate_section ul li a {
 
 /* Secondary menu corrections. */
 .action_admin #adm_submenus {
-	margin: 0 0 -18px 0;
-	padding: 10px 15px 0 15px;
-	overflow: hidden;
+	padding: 10px 0 0 0;
 }
 
 /* A general admin wrapper class. */

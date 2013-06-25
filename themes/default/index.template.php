@@ -192,9 +192,9 @@ function template_body_above()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	// Wrapper div now echoes permanently for better layout options. h1 a is now target for "Go up" links.
+	// Wrapper div now echoes permanently for better layout options. @todo - Skip nav link.
 	echo '
-	<div id="top_section"><a id="top"></a>
+	<div id="top_section"><a id="top" href="#skipnav" title="Skip navigation"></a>
 		<div class="frame">
 			<span id="top_section_notice">';
 	// For above, see me grumblez in Issue #552. ;)
@@ -369,9 +369,9 @@ function template_body_above()
 	echo '
 		</div>';
 
-	// The main content should go here.
+	// The main content should go here. @todo - Skip nav link.
 	echo '
-		<div id="main_content_section">';
+		<div id="main_content_section"><a id="skipnav"></a>';
 }
 
 /**

@@ -3732,69 +3732,75 @@ tr.windowbg2 .stats_day {
 	box-shadow: 1px 2px 4px rgba(0,0,0,0.2), 0 0 10px rgba(0,0,0,0.05) inset;
 }
 
-/* Styles for popup windows
-------------------------------------------------------- */
+
+
+
+/*	$POPUP	*/
+/* @todo - Some code needs splitting to _variant.css.*/
+/* This section contains code for the help pop-ups.
+/* ------------------------------------------------------- */
+
+/* The darkened background. */
 .popup_container
 {
-	display: none;
 	position: fixed;
 	top: 0;
 	left: 0;
+	z-index: 100;
+	display: none;
 	width: 100%;
 	height: 100%;
-	background: #041400;
-	background: rgba(4,20,0,0.4);
-	z-index: 100;
+	/* Should be rgba only, IMHO. */
+	/*	Flat colour fallback would be bad (visually). */
+	background: rgba(0,0,0,0.4);
 }
+/* The actual pop-up wrapper. */
 .popup_window
 {
-	position: fixed;
+	margin: 15% auto;
 	width: 480px;
-	z-index: 99;
-	padding: 0 6px 6px 6px;
-	box-shadow: 0 3px 6px rgba(0,0,0,0.5);
 	border: 1px solid #777;
 	border-radius: 7px 7px 3px 3px;
-	max-height: none!important; /* Is this declaration necessary? None is the default anyway. */
-	overflow: visible!important; /* Is this declaration necessary? Visible is the default anyway. */
-	background: #fff;
+	background-color: #fafafa;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.6);
 }
+/* What it says. ;) */
 .popup_heading
 {
-	margin: 0;
-	padding: 10px 4px;
-	color: #555;
+	padding: 0 0 6px 0;
 	font-weight: 600;
-	background: none;
+	font-size: 1.1em;
+	line-height: 2em;
 }
+/* The hide icon (red cross). */
+.popup_heading .hide_popup
+{
+	float: right;
+	width: 16px;
+	height: 2em;
+	background: url(../images/buttons/delete.png) 0 50% no-repeat;
+}
+/* Just a font-size reset. */
+/* @todo - Remove description class? */
+.popup_window.description
+{
+	font-size: 1em;
+}
+/* The text content, hopefully helpful. */
 .popup_content
 {
-	color: #555;
-	/* @todo Can't really see any reason for pop-up text to be smaller than standard body text.*/
-	/* @todo - Perhaps we should just remove the description class from the div in the template. */
-	font-size: 1.11em;
-	max-height: 20em;
 	overflow: auto;
-	background: #fff;
-	margin: 0;
-	padding: 10px 8px;
+	padding: 10px;
+	max-height: 20em;
 	border: 1px solid #bbb;
 	border-bottom: 1px solid #ccc;
 	border-radius: 6px 6px 2px 2px;
-	box-shadow: 0 -2px 3px rgba(0,0,0,0.15), 0 1px 1px rgba(255,255,255,0.2);
+	background: #f5f5f5;
+	box-shadow: 0 -2px 3px rgba(0,0,0,0.15);
 }
-.popup_heading .hide_popup
-{
-	width: 16px;
-	height: 16px;
-	background: url(../images/buttons/delete.png) center center no-repeat;
-	float: right;
-}
-.popup_heading .icon
-{
-	vertical-align: middle;
-	margin: -4px 4px 0 0;
-}
+
+
+
 
 /* Styles for the progress bar
 -------------------------------------------------- */
