@@ -2499,3 +2499,93 @@ function getNumAttachments($boardsAllowed, $memID)
 
 	return $attachCount;
 }
+
+/**
+ * Get the relevant topics in the disregarded list
+ * (used by createList() callbacks)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID
+ */
+function getDisregardedBy($start, $items_per_page, $sort, $memID)
+{
+	$db = database();
+
+	// Get the list of topics we can see
+	$request = $db->query('', '
+		SELECT lt.id_topic
+		FROM {db_prefix}log_topics as lt
+			LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
+			LEFT JOIN {db_prefix}boards as b ON (t.id_board = b.id_board)
+			LEFT JOIN {db_prefix}messages as m ON (t.id_first_msg = m.id_msg)' . (in_array($sort, array('mem.real_name', 'mem.real_name DESC', 'mem.poster_time', 'mem.poster_time DESC')) ? '
+			LEFT JOIN {db_prefix}members as mem ON (m.id_member = mem.id_member)' : '') . '
+		WHERE lt.id_member = {int:current_member}
+			AND disregarded = 1
+			AND {query_see_board}
+		ORDER BY {raw:sort}
+		LIMIT {int:offset}, {int:limit}',
+		array(
+			'current_member' => $memID,
+			'sort' => $sort,
+			'offset' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$topics = array();
+	while ($row = $db->fetch_assoc($request))
+		$topics[] = $row['id_topic'];
+	$db->free_result($request);
+
+	// Any topics found?
+	$topicsInfo = array();
+	if (!empty($topics))
+	{
+		$request = $db->query('', '
+			SELECT mf.subject, mf.poster_time as started_on, IFNULL(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, IFNULL(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
+				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
+				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
+			WHERE t.id_topic IN ({array_int:topics})',
+			array(
+				'topics' => $topics,
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$topicsInfo[] = $row;
+		$db->free_result($request);
+	}
+
+	return $topicsInfo;
+}
+
+/**
+ * Count the number of topics in the disregarded list
+ *
+ * @param int $memID
+ */
+function getNumDisregardedBy($memID)
+{
+	$db = database();
+
+	// Get the total number of attachments they have posted.
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_topics as lt
+		LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
+		LEFT JOIN {db_prefix}boards as b ON (t.id_board = b.id_board)
+		WHERE id_member = {int:current_member}
+			AND disregarded = 1
+			AND {query_see_board}',
+		array(
+			'current_member' => $memID,
+		)
+	);
+	list ($disregardedCount) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $disregardedCount;
+}
