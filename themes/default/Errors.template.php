@@ -56,7 +56,12 @@ function template_error_log()
 				<h3 class="titlebg">
 					<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
 				</h3>
-			</div>', template_pagesection(false, false, 'go_down'), '
+			</div>
+			<div class="floatright" style="margin-top: 1ex">
+				<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" class="button_submit" />
+				<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" class="button_submit" />
+			</div>
+			', template_pagesection(false, false, 'go_down'), '
 			<table class="table_grid" id="error_log">
 				<tr>
 					<td colspan="3" class="windowbg">
