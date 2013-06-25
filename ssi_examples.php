@@ -417,8 +417,8 @@ function template_ssi_above()
 {
 	global $settings, $context, $scripturl;
 
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+	echo '<!DOCTYPE html>
+<html>
 	<head>
 		<title>SSI.php Examples</title>
 		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?alp21" />
@@ -552,8 +552,8 @@ function template_homepage_sample1($method = 'source')
 {
 	global $user_info;
 
-	$header = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+	$header = '<!DOCTYPE html>
+<html>
 <head>
 	<title>SSI.php example for home page</title>
 	<style type="text/css">
