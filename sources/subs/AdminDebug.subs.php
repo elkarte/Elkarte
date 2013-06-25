@@ -19,7 +19,7 @@ if (!defined('ELKARTE'))
  *
  * @return array
  */
-function list_getAdminInfoFile($filename)
+function adminInfoFile($filename)
 {
 	$db = database();
 

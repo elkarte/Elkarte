@@ -219,10 +219,10 @@ class ManageAddonSettings_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=modsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
-				'function' => 'list_integration_hooks_data',
+				'function' => array($this, 'list_getIntegrationHooks'),
 			),
 			'get_count' => array(
-				'function' => 'list_integration_hooks_count',
+				'function' => array($this, 'list_getIntegrationHooksCount'),
 			),
 			'no_items_label' => $txt['hooks_no_hooks'],
 			'columns' => array(
@@ -367,5 +367,32 @@ class ManageAddonSettings_Controller extends Action_Controller
 		// By default do the basic settings.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
 		$context['sub_action'] = $_REQUEST['sa'];
+	}
+
+	/**
+	 * Simply returns the total count of integration hooks
+	 * Callback for createList().
+	 *
+	 * @return int
+	 */
+	function list_getIntegrationHooksCount()
+	{
+		global $context;
+
+		$context['filter'] = false;
+		if (isset($_GET['filter']))
+			$context['filter'] = $_GET['filter'];
+
+		return get_integration_hooks_count($context['filter']);
+	}
+
+	/**
+	 * Callback for createList().
+	 *
+	 * @return array
+	 */
+	function list_getIntegrationHooks()
+	{
+		return get_integration_hooks();
 	}
 }
