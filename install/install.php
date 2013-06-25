@@ -166,8 +166,8 @@ function initialize_inputs()
 		session_start();
 
 		if (!headers_sent())
-			echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+			echo '<!DOCTYPE html>
+<html>
 	<head>
 		<title>', htmlspecialchars($_GET['pass_string']), '</title>
 	</head>
@@ -239,8 +239,8 @@ function load_lang_file()
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 		header('Cache-Control: no-cache');
 
-		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+		echo '<!DOCTYPE html>
+<html>
 	<head>
 		<title>Installer: Error!</title>
 	</head>
@@ -2001,8 +2001,8 @@ function template_install_above()
 {
 	global $incontext, $txt, $oursite, $installurl;
 
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', !empty($txt['lang_rtl']) ? ' dir="rtl"' : '', '>
+	echo '<!DOCTYPE html>
+<html ', !empty($txt['lang_rtl']) ? 'dir="rtl"' : '', '>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />

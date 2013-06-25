@@ -362,12 +362,14 @@ smc_Popup.prototype.show = function ()
 	popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
 	icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
 
+	// Create the div that will be shown - max-height added here - essential anyway, so better here than in the CSS.
+	// Mind you, I still haven't figured out why it should be essential. Cargo cult coding FTW. :P
 	// Create the div that will be shown
-	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '"><div class="catbg popup_heading"><a href="javascript:void(0);" class="hide_popup"></a>' + icon + this.opt.heading + '</div><div class="popup_content">' + this.opt.content + '</div></div></div>');
+	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup" title="Close"></a>' + icon + this.opt.heading + '</h3><div class="popup_content">' + this.opt.content + '</div></div></div>');
 
-	// Show it
+	// Show it - Line 370 simplified - stuff moved to CSS file.
 	this.popup_body = $('#' + this.popup_id).children('.popup_window');
-	this.popup_body.css({top: '25%', left: '50%', margin: '-' + ($(this.popup_body).height() / 2) + 'px 0 0 -' + ($(this.popup_body).width() / 2) + 'px'}).parent().fadeIn(300);
+	this.popup_body.parent().fadeIn(300);
 
 	// Trigger hide on escape or mouse click
 	var popup_instance = this;
