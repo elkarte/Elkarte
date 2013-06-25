@@ -311,14 +311,6 @@ strong {
 em {
 	font-style: italic;
 }
-/* HTML5 additions for deprecated tags. */
-.tt {
-	font-family: monospace;
-}
-/* Alternative for u tag. */
-.underline {
-	text-decoration: underline;
-}
 
 
 
