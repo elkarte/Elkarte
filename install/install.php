@@ -736,7 +736,7 @@ function action_databaseSettings()
 			'db_server' => $_POST['db_server'],
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
-			'cookiename' => 'ELKARTECookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
+			'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
 		);
 
 		// God I hope it saved!
@@ -2151,7 +2151,7 @@ function template_welcome_message()
 				if (!(\'ourVersion\' in window))
 					return;
 
-				window.ourVersion = window.ourVersion.replace(/ELKARTE\s?/g, \'\');
+				window.ourVersion = window.ourVersion.replace(/ElkArte\s?/g, \'\');
 
 				ourVer = document.getElementById("ourVersion");
 				yourVer = document.getElementById("yourVersion");

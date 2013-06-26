@@ -409,7 +409,7 @@ function loadPaymentGateways()
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '// ELKARTE Payment Gateway: ' . strtolower($matches[1])) !== false)
+				if (strpos($header, '// ElkArte Payment Gateway: ' . strtolower($matches[1])) !== false)
 				{
 					require_once(SOURCEDIR . '/' . $file);
 

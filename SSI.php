@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  */
 
-// Don't do anything if ELKARTE is already loaded.
+// Don't do anything if ElkArte is already loaded.
 if (defined('ELKARTE'))
 	return true;
 

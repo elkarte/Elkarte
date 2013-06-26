@@ -300,7 +300,7 @@ class PackageServers_Controller extends Action_Controller
 				$default_title = Util::htmlspecialchars($listing->fetch('default-website/@title'));
 		}
 
-		$the_version = strtr($forum_version, array('ELKARTE ' => ''));
+		$the_version = strtr($forum_version, array('ElkArte ' => ''));
 		if (!empty($_SESSION['version_emulate']))
 			$the_version = $_SESSION['version_emulate'];
 

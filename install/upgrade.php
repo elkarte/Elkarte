@@ -962,10 +962,10 @@ function action_welcomeLogin()
 
 	// Do they meet the install requirements?
 	if (!php_version_check())
-		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets ELKARTE\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
+		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets ElkArte\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
 
 	if (!db_version_check())
-		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of ELKARTE.<br /><br />Please ask your host to upgrade.');
+		return throw_error('Your ' . $databases[$db_type]['name'] . ' version does not meet the minimum requirements of ElkArte.<br /><br />Please ask your host to upgrade.');
 
 	$db = database();
 
@@ -996,7 +996,7 @@ function action_welcomeLogin()
 		return throw_error('The cache directory could not be found.<br /><br />Please make sure you have a directory called &quot;cache&quot; in your forum directory before continuing.');
 
 	if (!file_exists($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php') && !isset($modSettings['elkVersion']) && !isset($_GET['lang']))
-		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ELKARTE will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
+		return throw_error('The upgrader was unable to find language files for the language specified in Settings.php.<br />ElkArte will not work without the primary language files installed.<br /><br />Please either install them, or <a href="' . $upgradeurl . '?step=0;lang=english">use english instead</a>.');
 	elseif (!isset($_GET['skiplang']))
 	{
 		$temp = substr(@implode('', @file($modSettings['theme_dir'] . '/languages/index.' . $upcontext['language'] . '.php')), 0, 4096);
@@ -2984,7 +2984,7 @@ function cmdStep0()
 			$_GET['conv'] = 1;
 		elseif ($i != 0)
 		{
-			echo 'ELKARTE Command-line Upgrader
+			echo 'ElkArte Command-line Upgrader
 Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
     --language=LANG         Reset the forum\'s language to LANG.
@@ -3335,7 +3335,7 @@ function template_chmod()
 	// @todo Temporary!
 	$txt['error_ftp_no_connect'] = 'Unable to connect to FTP server with this combination of details.';
 	$txt['ftp_login'] = 'Your FTP connection information';
-	$txt['ftp_login_info'] = 'This web installer needs your FTP information in order to automate the installation for you.  Please note that none of this information is saved in your installation, it is just used to setup ELKARTE.';
+	$txt['ftp_login_info'] = 'This web installer needs your FTP information in order to automate the installation for you.  Please note that none of this information is saved in your installation, it is just used to setup ElkArte.';
 	$txt['ftp_server'] = 'Server';
 	$txt['ftp_server_info'] = 'The address (often localhost) and port for your FTP server.';
 	$txt['ftp_port'] = 'Port';
@@ -3346,7 +3346,7 @@ function template_chmod()
 	$txt['ftp_path'] = 'Install Path';
 	$txt['ftp_path_info'] = 'This is the <em>relative</em> path you use in your FTP client <a href="' . $_SERVER['PHP_SELF'] . '?ftphelp" onclick="window.open(this.href, \'\', \'width=450,height=250\');return false;" target="_blank">(more help)</a>.';
 	$txt['ftp_path_found_info'] = 'The path in the box above was automatically detected.';
-	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<span style="font-family: monospace;">www</span>&quot;, &quot;<span style="font-family: monospace;">public_html</span>&quot;, or &quot;<span style="font-family: monospace;">httpdocs</span>&quot; - but it should include the directory ELKARTE is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
+	$txt['ftp_path_help'] = 'Your FTP path is the path you see when you log in to your FTP client.  It commonly starts with &quot;<span style="font-family: monospace;">www</span>&quot;, &quot;<span style="font-family: monospace;">public_html</span>&quot;, or &quot;<span style="font-family: monospace;">httpdocs</span>&quot; - but it should include the directory ElkArte is in too, such as &quot;/public_html/forum&quot;.  It is different from your URL and full path.<br /><br />Files in this path may be overwritten, so make sure it\'s correct.';
 	$txt['ftp_path_help_close'] = 'Close';
 	$txt['ftp_connect'] = 'Connect';
 
@@ -3579,7 +3579,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">ELKARTE &copy;2011, Elkarte</a></div>
+		<div class="smalltext"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">ElkArte &copy;2011, Elkarte</a></div>
 	</div></div>
 	</body>
 </html>';
@@ -3804,7 +3804,7 @@ function template_welcome_message()
 				if (!(\'ourVersion\' in window))
 					return;
 
-				window.ourVersion = window.ourVersion.replace(/ELKARTE\s?/g, \'\');
+				window.ourVersion = window.ourVersion.replace(/ElkArte\s?/g, \'\');
 
 				ourVer = document.getElementById(\'ourVersion\');
 				yourVer = document.getElementById(\'yourVersion\');
@@ -4313,7 +4313,7 @@ function template_clean_mods()
 	$upcontext['chmod_in_form'] = true;
 
 	echo '
-	<h3>ELKARTE has detected some packages which were installed but not fully removed prior to upgrade. We recommend you remove the following mods and reinstall upon completion of the upgrade.</h3>
+	<h3>ElkArte has detected some packages which were installed but not fully removed prior to upgrade. We recommend you remove the following mods and reinstall upon completion of the upgrade.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1" name="upform" id="upform" method="post">';
 
 	// In case it's required.
@@ -4363,7 +4363,7 @@ function template_cleanup_done()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $boardurl;
 
 	echo '
-	<h3>ELKARTE has attempted to fix and reinstall mods as required. We recommend you visit the package manager upon completing upgrade to check the status of your modifications.</h3>
+	<h3>ElkArte has attempted to fix and reinstall mods as required. We recommend you visit the package manager upon completing upgrade to check the status of your modifications.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1" name="upform" id="upform" method="post">
 		<table style="width: 90%; margin: 1em 0; border-collapse:collapse; border-spacing: 1; padding: 2px; text-align:center; background: black;">
 			<tr style="background: #eee;">
@@ -4391,7 +4391,7 @@ function template_upgrade_templates()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $boardurl;
 
 	echo '
-	<h3>There have been numerous language and template changes since the previous version of ELKARTE. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
+	<h3>There have been numerous language and template changes since the previous version of ElkArte. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
 	<form action="', $upcontext['form_url'], '&amp;ssi=1', $upcontext['is_test'] ? '' : ';forreal=1', '" name="upform" id="upform" method="post">';
 
 	// Any files need to be writable?
@@ -4402,7 +4402,7 @@ function template_upgrade_templates()
 	if ($upcontext['temp_progress'] == 0 && !$upcontext['is_test'] && (!empty($upcontext['languages']) || !empty($upcontext['themes'])))
 	{
 		echo '
-		The following template files will be updated to ensure they are compatible with this version of ELKARTE. Note that this can only fix a limited number of compatibility issues and in general you should seek out the latest version of these themes/language files.
+		The following template files will be updated to ensure they are compatible with this version of ElkArte. Note that this can only fix a limited number of compatibility issues and in general you should seek out the latest version of these themes/language files.
 		<table style="width: 90%; margin: 1em 0; border-collapse:collapse; border-spacing: 1; padding: 2px; text-align:center; background: black;">
 			<tr style="background: #eeeeee;">
 				<td style="width:80%"><strong>Area</strong></td>
@@ -4494,7 +4494,7 @@ function template_upgrade_complete()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $db_prefix, $boardurl;
 
 	echo '
-	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of ELKARTE</a>.  Hope you like it!</h3>
+	<h3>That wasn\'t so hard, was it?  Now you are ready to use <a href="', $boardurl, '/index.php">your installation of ElkArte</a>.  Hope you like it!</h3>
 	<form action="', $boardurl, '/index.php">';
 
 	if (!empty($upcontext['can_delete_script']))

@@ -139,7 +139,7 @@ class Suggest_Controller extends Action_Controller
 			'SMF 2.0.2',
 			'SMF 2.0.3',
 			'SMF 2.0.4',
-			'ELKARTE 1.0',
+			'ElkArte 1.0',
 		);
 
 		foreach ($versions as $id => $version)
