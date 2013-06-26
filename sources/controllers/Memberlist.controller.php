@@ -26,15 +26,17 @@ if (!defined('ELKARTE'))
 /**
  * Memberlist Controller
  */
-class Memberlist_Controller
+class Memberlist_Controller extends Action_Controller
 {
 	/**
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
 	 *
 	 * @uses Memberlist template, main sub-template.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
@@ -177,7 +179,7 @@ class Memberlist_Controller
 	 * Can be passed a sort parameter, to order the display of members.
 	 * Calls printMemberListRows to retrieve the results of the query.
 	 */
-	function action_mlall()
+	public function action_mlall()
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
@@ -319,7 +321,7 @@ class Memberlist_Controller
 	 * If variable $_REQUEST['search'] is empty displays search dialog box, using the search sub-template.
 	 * Calls printMemberListRows to retrieve the results of the query.
 	 */
-	function action_mlsearch()
+	public function action_mlsearch()
 	{
 		global $txt, $scripturl, $context, $modSettings;
 

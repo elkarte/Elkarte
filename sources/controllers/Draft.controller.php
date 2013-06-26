@@ -6,7 +6,7 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
- * 
+ *
  */
 
 if (!defined('ELKARTE'))
@@ -17,8 +17,19 @@ if (!defined('ELKARTE'))
  * This class handles requests that allow for the saving,
  * retrieving, deleting and settings for the drafts functionality.
  */
-class Draft_Controller
+class Draft_Controller extends Action_Controller
 {
+	/**
+	 * Default method, just forwards, if we ever get here.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// where do you want to go today? :P
+		$this->action_showProfileDrafts();
+	}
+
 	/**
 	 * This method is executed before any action handler.
 	 * Loads language, common needed stuffs.

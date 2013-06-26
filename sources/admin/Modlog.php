@@ -26,15 +26,17 @@ if (!defined('ELKARTE'))
  * Depending on permissions, this class will display and allow to act on the log
  * for administrators or for moderators.
  */
-class Modlog_Controller
+class Modlog_Controller extends Action_Controller
 {
 	/**
 	 * Default method for this controller.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		// we haz nothing to do. :P
-		$this->action_modlog();
+		$this->action_log();
 	}
 
 	/**
@@ -46,7 +48,7 @@ class Modlog_Controller
 	 *
 	 * @uses Modlog template, main sub-template.
 	 */
-	public function action_modlog()
+	public function action_log()
 	{
 		global $txt, $context, $scripturl;
 

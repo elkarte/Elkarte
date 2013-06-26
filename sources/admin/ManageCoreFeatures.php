@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  * updates the settings for enabled/disabled core features as requested.
  *
  */
-class ManageCoreFeatures_Controller
+class ManageCoreFeatures_Controller extends Action_Controller
 {
 	/**
 	 * This is an overall control panel enabling/disabling lots of the forums key features.

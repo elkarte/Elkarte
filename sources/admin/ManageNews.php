@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
 /**
  * ManageNews controller, for news administration screens.
  */
-class ManageNews_Controller
+class ManageNews_Controller extends Action_Controller
 {
 	/**
 	 * News settings form.
@@ -35,6 +35,8 @@ class ManageNews_Controller
 	 * Called by ?action=admin;area=news.
 	 * It does the permission checks, and calls the appropriate function
 	 * based on the requested sub-action.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -255,7 +257,7 @@ class ManageNews_Controller
 							$("#preview_" + preview_id).text(\'' . $txt['preview'] . '\').click(function () {
 								$.ajax({
 									type: "POST",
-									url: "' . $scripturl . '?action=xmlhttp;sa=previews;xml",
+									url: "' . $scripturl . '?action=xmlpreview;xml",
 									data: {item: "newspreview", news: $("#data_" + preview_id).val()},
 									context: document.body,
 									success: function(request){
@@ -312,7 +314,7 @@ class ManageNews_Controller
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
 		$context['groups'] = array();
-		
+
 		$allgroups = getBasicMembergroupData(array('all'), array(), null, true);
 		$context['groups'] = $allgroups['groups'];
 
@@ -453,7 +455,7 @@ class ManageNews_Controller
 		if ((!empty($context['recipients']['groups']) && in_array(3, $context['recipients']['groups'])) || (!empty($context['recipients']['exclude_groups']) && in_array(3, $context['recipients']['exclude_groups'])))
 		{
 			$mods = getModerators();
-			
+
 			foreach($mods as $row)
 			{
 				if (in_array(3, $context['recipients']))
@@ -748,7 +750,7 @@ class ManageNews_Controller
 
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
-	
+
 
 			foreach ($recipients as $row)
 			{
@@ -919,5 +921,16 @@ class ManageNews_Controller
 		);
 
 		return $config_vars;
+	}
+
+	/**
+	 * Prepares an array of the forum news items for display in the template
+	 * Callback for createList()
+	 *
+	 * @return array
+	 */
+	function list_getNews()
+	{
+		return getNews();
 	}
 }

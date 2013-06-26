@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
 /**
  * ManageSearch controller admin class.
  */
-class ManageSearch_Controller
+class ManageSearch_Controller extends Action_Controller
 {
 	/**
 	 * Search settings form
@@ -40,6 +40,8 @@ class ManageSearch_Controller
 	 *
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{

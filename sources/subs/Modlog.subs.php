@@ -22,7 +22,7 @@ if (!defined('ELKARTE'))
 
 /**
  * Get the number of mod log entries.
- * Callback for createList() in action_modlog().
+ * Callback for createList() in Modlog::action_log().
  *
  * @param $query_string
  * @param $query_params
@@ -61,7 +61,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 
 /**
  * Gets the moderation log entries that match the specified parameters.
- * Callback for createList() in action_modlog().
+ * Callback for createList() in Modlog::action_log().
  *
  * @param $start
  * @param $items_per_page

@@ -21,9 +21,19 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class SplitTopics_Controller
+class SplitTopics_Controller extends Action_Controller
 {
 	private $_new_topic_subject = null;
+	/**
+	 * Intended entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Call the right method.
+	}
+
 	/**
 	 * Splits a topic into two topics.
 	 * delegates to the other functions (based on the URL parameter 'sa').

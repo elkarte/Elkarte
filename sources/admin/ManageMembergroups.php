@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
 /**
  * ManageMembergroups controller, administration page for membergroups.
  */
-class ManageMembergroups_Controller
+class ManageMembergroups_Controller extends Action_Controller
 {
 	/**
 	 * Groups Settings form
@@ -38,6 +38,7 @@ class ManageMembergroups_Controller
 	 *
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
+	 * @see Action_Controller::action_index()
 	*/
 	public function action_index()
 	{

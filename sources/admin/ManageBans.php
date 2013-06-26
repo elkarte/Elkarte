@@ -16,7 +16,7 @@ if (!defined('ELKARTE'))
  * This class controls execution for admin actions in the bans area
  * of the admin panel.
  */
-class ManageBans_Controller
+class ManageBans_Controller extends Action_Controller
 {
 	/**
 	 * Ban center. The main entrance point for all ban center functions.

@@ -15,10 +15,12 @@ if (!defined('ELKARTE'))
 /**
  * This class handles a part of the actions to mark boards, topics, or replies, as read/unread.
  */
-class MarkRead_Controller
+class MarkRead_Controller extends Action_Controller
 {
 	/**
 	 * This is the main function for markasread file.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

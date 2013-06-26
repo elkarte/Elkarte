@@ -413,7 +413,7 @@ function template_bounce_template()
 		{
 			$.ajax({
 				type: "POST",
-				url: "' . $scripturl . '?action=xmlhttp;sa=previews;xml",
+				url: "' . $scripturl . '?action=xmlpreview;xml",
 				data: {item: "bounce_preview", title: $("#template_title").val(), body: $("#template_body").val()},
 				context: document.body,
 				success: function(request){

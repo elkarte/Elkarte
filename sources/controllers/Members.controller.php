@@ -23,8 +23,19 @@ if (!defined('ELKARTE'))
 /**
  * Members Controller
  */
-class Members_Controller
+class Members_Controller extends Action_Controller
 {
+	/**
+	 * Forwards to an action method.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// I don't think we know what to do... throw dies?
+		$this->action_buddy();
+	}
+
 	/**
 	 * This simple function adds/removes the passed user from the current users buddy list.
 	 * Requires profile_identity_own permission.

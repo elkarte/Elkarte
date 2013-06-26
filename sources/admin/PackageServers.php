@@ -24,10 +24,13 @@ if (!defined('ELKARTE'))
  * PackageServers controller handles browsing, adding and removing
  * package servers, and download of a package from them.
  */
-class PackageServers_Controller
+class PackageServers_Controller extends Action_Controller
 {
 	/**
-	 * Browse the list of package servers, add servers...
+	 * Main dispatcher for package servers. Checks permissions,
+	 * load files, and forwards to the right method.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -198,7 +201,7 @@ class PackageServers_Controller
 			$packageserver = fetchPackageServers($server);
 			$url = $packageserver[0]['url'];
 			$name = $packageserver[0]['name'];
-			
+
 			// If the server does not exist, dump out.
 			if (empty($url))
 				fatal_lang_error('couldnt_connect', false);

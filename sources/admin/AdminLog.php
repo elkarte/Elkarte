@@ -17,7 +17,7 @@ if (!defined('ELKARTE'))
  * This class manages logs, and forwards to display, pruning,
  *  and other actions on logs.
  */
-class AdminLog_Controller
+class AdminLog_Controller extends Action_Controller
 {
 	/**
 	 * Pruning Settings form
@@ -44,16 +44,16 @@ class AdminLog_Controller
 				'controller' => 'ManageErrors_Controller'),
 			'adminlog' => array(
 				'file' => 'Modlog.php',
-				'function' => 'action_modlog',
+				'function' => 'action_log',
 				'controller' => 'Modlog_Controller'),
 			'modlog' => array(
 				'file' => 'Modlog.php',
-				'function' => 'action_modlog',
+				'function' => 'action_log',
 				'controller' => 'Modlog_Controller',
 				'disabled' => !in_array('ml', $context['admin_features'])),
 			'badbehaviorlog' => array(
 				'file' => 'ManageBadBehavior.php',
-				'function' => 'action_badbehaviorlog',
+				'function' => 'action_log',
 				'disabled' => empty($modSettings['badbehavior_enabled']),
 				'controller' => 'ManageBadBehavior_Controller'),
 			'banlog' => array(

@@ -21,7 +21,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class MergeTopics_Controller
+class MergeTopics_Controller extends Action_Controller
 {
 	/**
 	 * Merges two or more topics into one topic.
@@ -29,8 +29,10 @@ class MergeTopics_Controller
 	 * loads the MergeTopics template.
 	 * requires the merge_any permission.
 	 * is accessed with ?action=mergetopics.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		// Load the template....
 		loadTemplate('MergeTopics');
@@ -56,7 +58,7 @@ class MergeTopics_Controller
 	 * uses 'merge' sub template of the MergeTopics template.
 	 * allows to set a different target board.
 	 */
-	function action_mergeIndex()
+	public function action_mergeIndex()
 	{
 		global $txt, $board, $context;
 		global $scripturl, $user_info, $modSettings;
@@ -196,7 +198,7 @@ class MergeTopics_Controller
 	 * * redirects to ?action=mergetopics;sa=done.
 	 * @param array $topics = array()
 	 */
-	function action_mergeExecute($topics = array())
+	public function action_mergeExecute($topics = array())
 	{
 		global $user_info, $txt, $context, $scripturl;
 		global $language, $modSettings;
@@ -795,7 +797,7 @@ class MergeTopics_Controller
 	 * is accessed with ?action=mergetopics;sa=done.
 	 * uses 'merge_done' sub template of the MergeTopics template.
 	 */
-	function action_mergeDone()
+	public function action_mergeDone()
 	{
 		global $txt, $context;
 

@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
 /**
  * ManagePermissions handles all possible permission stuff.
  */
-class ManagePermissions_Controller
+class ManagePermissions_Controller extends Action_Controller
 {
 	/**
 	 * Permissions settings form
@@ -35,6 +35,8 @@ class ManagePermissions_Controller
 	 * Called by ?action=managepermissions.
 	 *
 	 * @uses ManagePermissions language file.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

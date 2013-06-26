@@ -20,7 +20,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class ManageCalendar_Controller
+class ManageCalendar_Controller extends Action_Controller
 {
 	/**
 	 * Calendar settings form
@@ -219,7 +219,7 @@ class ManageCalendar_Controller
 			// Not too long good sir?
 			$_REQUEST['title'] =  Util::substr($_REQUEST['title'], 0, 60);
 			$_REQUEST['holiday'] = isset($_REQUEST['holiday']) ? (int) $_REQUEST['holiday'] : 0;
-		
+
 			if (isset($_REQUEST['delete']))
 				removeHolidays($_REQUEST['holiday']);
 			else

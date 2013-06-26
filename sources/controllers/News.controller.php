@@ -23,8 +23,19 @@ if (!defined('ELKARTE'))
 /**
  * News Controller
  */
-class News_Controller
+class News_Controller extends Action_Controller
 {
+	/**
+	 * Dispatcher. Forwards to the action to execute.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// do... something, of your favorite.
+		// $this->action_xmlnews();
+	}
+
 	/**
 	 * Outputs xml data representing recent information or a profile.
 	 * Can be passed 4 subactions which decide what is output:
@@ -40,7 +51,7 @@ class News_Controller
 	 *
 	 * @uses Stats language file.
 	 */
-	function action_showfeed()
+	public function action_showfeed()
 	{
 		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
 		global $query_this_board, $forum_version, $cdata_override, $settings;
@@ -326,7 +337,7 @@ class News_Controller
 	 * @param string $xml_format
 	 * @return array
 	 */
-	function action_xmlmembers($xml_format)
+	public function action_xmlmembers($xml_format)
 	{
 		global $scripturl;
 
@@ -393,7 +404,7 @@ class News_Controller
 	 * @param $xml_format
 	 * @return array, array of topics
 	 */
-	function action_xmlnews($xml_format)
+	public function action_xmlnews($xml_format)
 	{
 		global $scripturl, $modSettings, $board;
 		global $query_this_board, $context;
@@ -541,7 +552,7 @@ class News_Controller
 	 * @param $xml_format
 	 * @return array, of recent posts
 	 */
-	function action_xmlrecent($xml_format)
+	public function action_xmlrecent($xml_format)
 	{
 		global $scripturl, $modSettings, $board, $query_this_board, $context;
 
@@ -715,7 +726,7 @@ class News_Controller
 	 * @param $xml_format
 	 * @return array, of profile data.
 	 */
-	function action_xmlprofile($xml_format)
+	public function action_xmlprofile($xml_format)
 	{
 		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
 
@@ -922,7 +933,7 @@ function cdata_parse($data, $ns = '')
 
 			if ($pos2 === false)
 				$pos2 = $n;
-			
+
 			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
 
 			if (Util::substr($data, $pos + 1, 1) == '#')

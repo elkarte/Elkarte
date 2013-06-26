@@ -15,7 +15,7 @@ if (!defined('ELKARTE'))
  * Drafts administration controller.
  * This class allows to modify admin drafts settings for the forum.
  */
-class ManageDrafts_Controller
+class ManageDrafts_Controller extends Action_Controller
 {
 	/**
 	 * Drafts settings form

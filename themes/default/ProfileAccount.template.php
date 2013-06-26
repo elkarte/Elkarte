@@ -314,7 +314,7 @@ function template_issueWarning()
 		{
 			$.ajax({
 				type: "POST",
-				url: "' . $scripturl . '?action=xmlhttp;sa=previews;xml",
+				url: "' . $scripturl . '?action=xmlpreview;xml",
 				data: {item: "warning_preview", title: $("#warn_sub").val(), body: $("#warn_body").val(), issuing: true},
 				context: document.body,
 				success: function(request){

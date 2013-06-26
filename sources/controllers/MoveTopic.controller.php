@@ -21,8 +21,19 @@ if (!defined('ELKARTE'))
 /**
  * Move Topic Controller
  */
-class MoveTopic_Controller
+class MoveTopic_Controller extends Action_Controller
 {
+	/**
+	 * Forwards to the action method to handle the action.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// move a topic, what else?!
+		// $this->action_movetopic();
+	}
+
 	/**
 	 * This function allows to move a topic, making sure to ask the moderator
 	 * to give reason for topic move.
@@ -34,7 +45,7 @@ class MoveTopic_Controller
 	 *
 	 * @uses the MoveTopic template, main sub-template.
 	 */
-	function action_movetopic()
+	public function action_movetopic()
 	{
 		global $txt, $topic, $user_info, $context, $language, $scripturl, $modSettings;
 
@@ -110,12 +121,10 @@ class MoveTopic_Controller
 	 *
 	 * @uses subs/Post.subs.php.
 	 */
-	function action_movetopic2()
+	public function action_movetopic2()
 	{
 		global $txt, $board, $topic, $scripturl, $modSettings, $context;
 		global $board, $language, $user_info;
-
-		$db = database();
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
@@ -192,7 +201,8 @@ class MoveTopic_Controller
 			// If it's still valid move onwards and upwards.
 			if ($custom_subject != '')
 			{
-				if (isset($_POST['enforce_subject']))
+				$all_messages = isset($_POST['enforce_subject']);
+				if ($all_messages)
 				{
 					// Get a response prefix, but in the forum's default language.
 					if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
@@ -208,26 +218,10 @@ class MoveTopic_Controller
 						cache_put_data('response_prefix', $context['response_prefix'], 600);
 					}
 
-					$db->query('', '
-						UPDATE {db_prefix}messages
-						SET subject = {string:subject}
-						WHERE id_topic = {int:current_topic}',
-						array(
-							'current_topic' => $topic,
-							'subject' => $context['response_prefix'] . $custom_subject,
-						)
-					);
+					topicSubject($topic_info, $custom_subject, $context['response_prefix'], $all_messages);
 				}
-
-				$db->query('', '
-					UPDATE {db_prefix}messages
-					SET subject = {string:custom_subject}
-					WHERE id_msg = {int:id_first_msg}',
-					array(
-						'id_first_msg' => $topic_info['id_first_msg'],
-						'custom_subject' => $custom_subject,
-					)
-				);
+				else
+					topicSubject($topic_info, $custom_subject);
 
 				// Fix the subject cache.
 				updateStats('subject', $topic, $custom_subject);
@@ -271,7 +265,7 @@ class MoveTopic_Controller
 				'redirect_expires' => $redirect_expires,
 				'redirect_topic' => $redirect_topic,
 			);
-			
+
 			$posterOptions = array(
 				'id' => $user_info['id'],
 				'update_post_count' => empty($board_info['count_posts']),
@@ -283,25 +277,7 @@ class MoveTopic_Controller
 
 		if ($board_from['count_posts'] != $board_info['count_posts'])
 		{
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}
-					AND approved = {int:is_approved}',
-				array(
-					'current_topic' => $topic,
-					'is_approved' => 1,
-				)
-			);
-			$posters = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				if (!isset($posters[$row['id_member']]))
-					$posters[$row['id_member']] = 0;
-
-				$posters[$row['id_member']]++;
-			}
-			$db->free_result($request);
+			$posters = postersCount($topic);
 
 			foreach ($posters as $id_member => $posts)
 			{
