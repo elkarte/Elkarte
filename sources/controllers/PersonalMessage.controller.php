@@ -25,13 +25,16 @@ if (!defined('ELKARTE'))
 /**
  * Personal Message Controller
  */
-class PersonalMessage_Controller
+class PersonalMessage_Controller extends Action_Controller
 {
 	/**
 	 * This is the main function of personal messages, called before the action handler.
 	 * PersonalMessages is a menu-based controller.
-	 * It sets up the menu. @todo and call from the menu the appropriate method/function
+	 * It sets up the menu.
+	 * @todo and call from the menu the appropriate method/function
 	 * for the current area.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{
@@ -1725,6 +1728,8 @@ class PersonalMessage_Controller
 		loadLanguage('Profile');
 		loadTemplate('Profile');
 
+		require_once(SUBSDIR . '/Profile.subs.php');
+
 		$context['page_title'] = $txt['pm_settings'];
 		$context['user']['is_owner'] = true;
 		$context['id_member'] = $user_info['id'];
@@ -1749,7 +1754,6 @@ class PersonalMessage_Controller
 			$_POST = htmlspecialchars__recursive($_POST);
 
 			// Save the fields.
-			require_once(SUBSDIR . '/Profile.subs.php');
 			saveProfileFields();
 
 			if (!empty($profile_vars))
@@ -1758,8 +1762,8 @@ class PersonalMessage_Controller
 
 		// Load up the fields.
 		require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
-		require_once(SUBSDIR . '/Profile.subs.php');
-		action_pmprefs($user_info['id']);
+		$controller = new ProfileOptions_Controller();
+		$controller->action_pmprefs($user_info['id']);
 	}
 
 	/**

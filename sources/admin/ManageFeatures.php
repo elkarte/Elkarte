@@ -24,7 +24,7 @@ if (!defined('ELKARTE'))
  * to see and change the basic feature settings of their site.
  *
  */
-class ManageFeatures_Controller
+class ManageFeatures_Controller extends Action_Controller
 {
 	/**
 	 * Basic feature settings form
@@ -58,6 +58,7 @@ class ManageFeatures_Controller
 
 	/**
 	 * This function passes control through to the relevant tab.
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

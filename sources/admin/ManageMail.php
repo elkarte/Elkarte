@@ -23,7 +23,7 @@ if (!defined('ELKARTE'))
  * It handles mail configuration, it displays and allows to remove items from the mail queue.
  *
  */
-class ManageMail_Controller
+class ManageMail_Controller extends Action_Controller
 {
 	/**
 	 * Mail settings form
@@ -33,7 +33,9 @@ class ManageMail_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control through to the relevant section.
+	 * This function checks permissions and passes control
+	 *  through to the relevant section.
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

@@ -28,7 +28,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Reports_Controller
+class Reports_Controller extends Action_Controller
 {
 	/**
 	 * Handling function for generating reports.
@@ -43,6 +43,8 @@ class Reports_Controller
 	 * Will call the relevant report generation function.
 	 * If generating report will call finishTables before returning.
 	 * Accessed through ?action=admin;area=reports.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{

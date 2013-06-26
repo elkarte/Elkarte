@@ -15,7 +15,7 @@ if (!defined('ELKARTE'))
 /**
  * ManageBBC controller handles administration options for BBC tags.
  */
-class ManageBBC_Controller
+class ManageBBC_Controller extends Action_Controller
 {
 	/**
 	 * BBC settings form

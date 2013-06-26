@@ -116,7 +116,7 @@ function recountUnapprovedPosts($approve_query = null)
 
 /**
  * How many falied emails (that they can see) do we have?
- * 
+ *
  * @param string $approve_query
  */
 function recountFailedEmails($approve_query = null)
@@ -124,7 +124,7 @@ function recountFailedEmails($approve_query = null)
 	global $context;
 
 	$db = database();
-	
+
 	if ($approve_query === null)
 		return 0;
 
@@ -337,14 +337,15 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
 }
 
 /**
- * Callback for createList() to get all the templates of a type from the system
+ * Returns all the templates of a type from the system.
+ * (used by createList() callbacks)
  *
  * @param $start
  * @param $items_per_page
  * @param $sort
  * @param $template_type type of template to load
  */
-function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
+function warningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
 {
 	global $scripturl, $user_info;
 
@@ -383,13 +384,14 @@ function list_getWarningTemplates($start, $items_per_page, $sort, $template_type
 }
 
 /**
- * Callback for createList() to get the number of templates of a type in the system
+ * Get the number of templates of a type in the system
  *  - Loads the public and users private templates
  *  - Loads warning templates by default
+ *  (used by createList() callbacks)
  *
  * @param type $template_type
  */
-function list_getWarningTemplateCount($template_type = 'warntpl')
+function warningTemplateCount($template_type = 'warntpl')
 {
 	global $user_info;
 
@@ -413,13 +415,13 @@ function list_getWarningTemplateCount($template_type = 'warntpl')
 }
 
 /**
- * Callback for createList() to get all issued warnings in the system
+ * Get all issued warnings in the system.
  *
  * @param $start
  * @param $items_per_page
  * @param $sort
  */
-function list_getWarnings($start, $items_per_page, $sort)
+function warnings($start, $items_per_page, $sort)
 {
 	global $scripturl;
 
@@ -457,9 +459,11 @@ function list_getWarnings($start, $items_per_page, $sort)
 }
 
 /**
- * Callback for createList(), get the total count of all current warnings
+ * Get the total count of all current warnings.
+ *
+ * @return int
  */
-function list_getWarningCount()
+function warningCount()
 {
 	$db = database();
 
@@ -651,4 +655,473 @@ function approveAllUnapproved()
 		approveAttachments($attaches);
 		cache_put_data('num_menu_errors', null, 900);
 	}
+}
+
+/**
+ * Returns the number of watched users in the system.
+ * (used by createList() callbacks).
+ *
+ * @param string $approve_query
+ * @param int $warning_watch
+ * @return int
+ */
+function watchedUserCount($approve_query, $warning_watch = 0)
+{
+	$db = database();
+
+	// @todo $approve_query is not used
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}members
+		WHERE warning >= {int:warning_watch}',
+		array(
+			'warning_watch' => $warning_watch,
+		)
+	);
+	list ($totalMembers) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $totalMembers;
+}
+
+/**
+ * Retrieved the watched users in the system.
+ * (used by createList() callbacks).
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $approve_query
+ * @param string $dummy
+ */
+function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
+{
+	global $txt, $modSettings, $user_info;
+
+	$db = database();
+	$request = $db->query('', '
+		SELECT id_member, real_name, last_login, posts, warning
+		FROM {db_prefix}members
+		WHERE warning >= {int:warning_watch}
+		ORDER BY {raw:sort}
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+			'warning_watch' => $modSettings['warning_watch'],
+			'sort' => $sort,
+		)
+	);
+	$watched_users = array();
+	$members = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$watched_users[$row['id_member']] = array(
+			'id' => $row['id_member'],
+			'name' => $row['real_name'],
+			'last_login' => $row['last_login'] ? standardTime($row['last_login']) : $txt['never'],
+			'last_post' => $txt['not_applicable'],
+			'last_post_id' => 0,
+			'warning' => $row['warning'],
+			'posts' => $row['posts'],
+		);
+		$members[] = $row['id_member'];
+	}
+	$db->free_result($request);
+
+	if (!empty($members))
+	{
+		// First get the latest messages from these users.
+		$request = $db->query('', '
+			SELECT m.id_member, MAX(m.id_msg) AS last_post_id
+			FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] == '1=1' ? '' : '
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
+			WHERE m.id_member IN ({array_int:member_list})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+				AND m.approved = {int:is_approved}') . '
+			GROUP BY m.id_member',
+			array(
+				'member_list' => $members,
+				'is_approved' => 1,
+			)
+		);
+		$latest_posts = array();
+		while ($row = $db->fetch_assoc($request))
+			$latest_posts[$row['id_member']] = $row['last_post_id'];
+
+		if (!empty($latest_posts))
+		{
+			// Now get the time those messages were posted.
+			$request = $db->query('', '
+				SELECT id_member, poster_time
+				FROM {db_prefix}messages
+				WHERE id_msg IN ({array_int:message_list})',
+				array(
+					'message_list' => $latest_posts,
+				)
+			);
+			while ($row = $db->fetch_assoc($request))
+			{
+				$watched_users[$row['id_member']]['last_post'] = standardTime($row['poster_time']);
+				$watched_users[$row['id_member']]['last_post_id'] = $latest_posts[$row['id_member']];
+			}
+
+			$db->free_result($request);
+		}
+
+		$request = $db->query('', '
+			SELECT MAX(m.poster_time) AS last_post, MAX(m.id_msg) AS last_post_id, m.id_member
+			FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] == '1=1' ? '' : '
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
+			WHERE m.id_member IN ({array_int:member_list})' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+				AND m.approved = {int:is_approved}') . '
+			GROUP BY m.id_member',
+			array(
+				'member_list' => $members,
+				'is_approved' => 1,
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+		{
+			$watched_users[$row['id_member']]['last_post'] = standardTime($row['last_post']);
+			$watched_users[$row['id_member']]['last_post_id'] = $row['last_post_id'];
+		}
+		$db->free_result($request);
+	}
+
+	return $watched_users;
+}
+
+/**
+ * Count of posts of watched users.
+ * (used by createList() callbacks)
+ *
+ * @param string $approve_query
+ * @param int $warning_watch
+ * @return int
+ */
+function watchedUserPostsCount($approve_query, $warning_watch)
+{
+	$db = database();
+
+	// @todo $approve_query is not used in the function
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+			FROM {db_prefix}messages AS m
+				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+			WHERE mem.warning >= {int:warning_watch}
+				AND {query_see_board}
+				' . $approve_query,
+		array(
+			'warning_watch' => $warning_watch,
+		)
+	);
+	list ($totalMemberPosts) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $totalMemberPosts;
+}
+
+/**
+ * Retrieve the posts of watched users.
+ * (used by createList() callbacks).
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $approve_query
+ * @param array $delete_boards
+ */
+function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delete_boards)
+{
+	global $scripturl, $modSettings;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT m.id_msg, m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
+			m.approved, mem.real_name, m.smileys_enabled
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE mem.warning >= {int:warning_watch}
+			AND {query_see_board}
+			' . $approve_query . '
+		ORDER BY m.id_msg DESC
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+			'warning_watch' => $modSettings['warning_watch'],
+		)
+	);
+	$member_posts = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$row['subject'] = censorText($row['subject']);
+		$row['body'] = censorText($row['body']);
+
+		$member_posts[$row['id_msg']] = array(
+			'id' => $row['id_msg'],
+			'id_topic' => $row['id_topic'],
+			'author_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+			'subject' => $row['subject'],
+			'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
+			'poster_time' => standardTime($row['poster_time']),
+			'approved' => $row['approved'],
+			'can_delete' => $delete_boards == array(0) || in_array($row['id_board'], $delete_boards),
+		);
+	}
+	$db->free_result($request);
+
+	return $member_posts;
+}
+
+/**
+ * Show a list of all the group requests they can see.
+ * Checks permissions for group moderation.
+ */
+function groupRequests()
+{
+	global $user_info, $scripturl;
+
+	$db = database();
+
+	$group_requests = array();
+
+	// Make sure they can even moderate someone!
+	if ($user_info['mod_cache']['gq'] == '0=1')
+		return 'group_requests_block';
+
+	// What requests are outstanding?
+	$request = $db->query('', '
+		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, mem.member_name, mg.group_name, mem.real_name
+		FROM {db_prefix}log_group_requests AS lgr
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
+			INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
+		WHERE ' . ($user_info['mod_cache']['gq'] == '1=1' || $user_info['mod_cache']['gq'] == '0=1' ? $user_info['mod_cache']['gq'] : 'lgr.' . $user_info['mod_cache']['gq']) . '
+		ORDER BY lgr.id_request DESC
+		LIMIT 10',
+		array(
+		)
+	);
+	for ($i = 0; $row = $db->fetch_assoc($request); $i ++)
+	{
+		$group_requests[] = array(
+			'id' => $row['id_request'],
+			'alternate' => $i % 2,
+			'request_href' => $scripturl . '?action=groups;sa=requests;gid=' . $row['id_group'],
+			'member' => array(
+				'id' => $row['id_member'],
+				'name' => $row['real_name'],
+				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
+			),
+			'group' => array(
+				'id' => $row['id_group'],
+				'name' => $row['group_name'],
+			),
+			'time_submitted' => standardTime($row['time_applied']),
+		);
+	}
+	$db->free_result($request);
+
+	return $group_requests;
+}
+
+/**
+ * Returns an array of basic info about the most active watched users.
+ */
+function basicWatchedUsers()
+{
+	global $scripturl, $modSettings;
+
+	$db = database();
+
+	if (($watched_users = cache_get_data('recent_user_watches', 240)) === null)
+	{
+		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
+		$request = $db->query('', '
+			SELECT id_member, real_name, last_login
+			FROM {db_prefix}members
+			WHERE warning >= {int:warning_watch}
+			ORDER BY last_login DESC
+			LIMIT 10',
+			array(
+				'warning_watch' => $modSettings['warning_watch'],
+			)
+		);
+		$watched_users = array();
+		while ($row = $db->fetch_assoc($request))
+			$watched_users[] = $row;
+		$db->free_result($request);
+
+		cache_put_data('recent_user_watches', $watched_users, 240);
+	}
+
+	return $watched_users;
+}
+
+/**
+ * Returns the most recent reported posts as array
+ *
+ * @return array
+ */
+function reportedPosts()
+{
+	global $user_info, $scripturl;
+
+	$db = database();
+
+	// Got the info already?
+	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
+
+	if (($reported_posts = cache_get_data('reported_posts_' . $cachekey, 90)) === null)
+	{
+		// By George, that means we in a position to get the reports, jolly good.
+		$request = $db->query('', '
+			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject,
+				lr.num_reports, IFNULL(mem.real_name, lr.membername) AS author_name,
+				IFNULL(mem.id_member, 0) AS id_author
+			FROM {db_prefix}log_reported AS lr
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
+			WHERE ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
+				AND lr.closed = {int:not_closed}
+				AND lr.ignore_all = {int:not_ignored}
+			ORDER BY lr.time_updated DESC
+			LIMIT 10',
+			array(
+				'not_closed' => 0,
+				'not_ignored' => 0,
+			)
+		);
+		$reported_posts = array();
+		while ($row = $db->fetch_assoc($request))
+			$reported_posts[] = $row;
+		$db->free_result($request);
+
+		// Cache it.
+		cache_put_data('reported_posts_' . $cachekey, $reported_posts, 90);
+	}
+
+	return $reported_posts;
+}
+
+/**
+ * Remove a moderator note.
+ */
+function removeModeratorNote($id_note)
+{
+	$db = database();
+
+	// Lets delete it.
+	$db->query('', '
+		DELETE FROM {db_prefix}log_comments
+		WHERE id_comment = {int:note}
+			AND comment_type = {string:type}',
+		array(
+			'note' => $id_note,
+			'type' => 'modnote',
+		)
+	);
+}
+
+/**
+ * Get the number of moderator notes stored on the site.
+ *
+ * @return int
+ */
+function countModeratorNotes()
+{
+	$db = database();
+
+	if (($moderator_notes_total = cache_get_data('moderator_notes_total', 240)) === null)
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}log_comments AS lc
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+			WHERE lc.comment_type = {string:modnote}',
+			array(
+				'modnote' => 'modnote',
+			)
+		);
+		list ($moderator_notes_total) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		cache_put_data('moderator_notes_total', $moderator_notes_total, 240);
+	}
+
+	return $moderator_notes_total;
+}
+
+function addModeratorNote($id_poster, $poster_name, $contents)
+{
+	$db = database();
+
+	// Insert it into the database
+	$db->insert('',
+		'{db_prefix}log_comments',
+		array(
+			'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
+			'body' => 'string', 'log_time' => 'int',
+		),
+		array(
+			$id_poster, $poster_name, 'modnote', '', $contents, time(),
+		),
+		array('id_comment')
+	);
+}
+
+function moderatorNotes($offset)
+{
+	$db = database();
+
+	// Grab the current notes.
+	// We can only use the cache for the first page of notes.
+	if ($offset != 0 || ($moderator_notes = cache_get_data('moderator_notes', 240)) === null)
+	{
+		$request = $db->query('', '
+			SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
+				lc.log_time, lc.body, lc.id_comment AS id_note
+			FROM {db_prefix}log_comments AS lc
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+			WHERE lc.comment_type = {string:modnote}
+			ORDER BY id_comment DESC
+			LIMIT {int:offset}, 10',
+			array(
+				'modnote' => 'modnote',
+				'offset' => $offset,
+			)
+		);
+		$moderator_notes = array();
+		while ($row = $db->fetch_assoc($request))
+			$moderator_notes[] = $row;
+		$db->free_result($request);
+
+		if ($offset == 0)
+			cache_put_data('moderator_notes', $moderator_notes, 240);
+	}
+
+	return $moderator_notes;
+}
+
+function moderatorNotice($id_notice)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT body, subject
+		FROM {db_prefix}log_member_notices
+		WHERE id_notice = {int:id_notice}',
+		array(
+			'id_notice' => $id_notice,
+		)
+	);
+	if ($db->num_rows($request) == 0)
+		return array();
+	list ($notice_body, $notice_subject) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	$notice_body = parse_bbc($notice_body, false);
+
+	return array($notice_body, $notice_subject);
 }

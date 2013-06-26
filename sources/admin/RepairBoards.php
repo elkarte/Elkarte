@@ -24,10 +24,12 @@ if (!defined('ELKARTE'))
  * Repair boards controller handles a special admin action:
  * boards and categories attempt to repair, from maintenance.
  */
-class RepairBoards_Controller
+class RepairBoards_Controller extends Action_Controller
 {
 	/**
 	 * Default method.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{

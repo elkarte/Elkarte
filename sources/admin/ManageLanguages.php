@@ -23,7 +23,7 @@ if (!defined('ELKARTE'))
 /**
  * Manage languages controller class.
  */
-class ManageLanguages_Controller
+class ManageLanguages_Controller extends Action_Controller
 {
 	/**
 	 * Language settings form
@@ -37,6 +37,7 @@ class ManageLanguages_Controller
 	 * Loads the ManageLanguages template. (sub-actions will use it)
 	 *
 	 * @uses ManageSettings language file
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -1046,7 +1047,7 @@ class ManageLanguages_Controller
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		
+
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
@@ -1066,10 +1067,10 @@ class ManageLanguages_Controller
 	public function settings()
 	{
 		global $txt;
-		
+
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		
+
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),

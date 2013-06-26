@@ -20,7 +20,7 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class ManageScheduledTasks_Controller
+class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
 	 * Scheduled tasks management dispatcher.
@@ -30,6 +30,8 @@ class ManageScheduledTasks_Controller
 	 *
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -101,7 +103,7 @@ class ManageScheduledTasks_Controller
 
 			// We'll recalculate the dates at the end!
 			require_once(SOURCEDIR . '/ScheduledTasks.php');
-			
+
 
 			// Enable and disable as required.
 			$enablers = array(0);
@@ -127,7 +129,7 @@ class ManageScheduledTasks_Controller
 			// Load up the tasks.
 
 			$nextTasks = loadTasks($tasks);
-			
+
 			// Lets get it on!
 			require_once(SOURCEDIR . '/ScheduledTasks.php');
 			ignore_user_abort(true);

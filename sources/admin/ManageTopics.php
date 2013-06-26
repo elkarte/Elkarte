@@ -15,7 +15,7 @@ if (!defined('ELKARTE'))
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
  */
-class ManageTopics_Controller
+class ManageTopics_Controller extends Action_Controller
 {
 	/**
 	 * Topic settings form
@@ -23,6 +23,11 @@ class ManageTopics_Controller
 	 */
 	protected $_topicSettings;
 
+	/**
+	 * Check permissions and forward to the right method.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
 	public function action_index()
 	{
 		// Only admins are allowed around here.

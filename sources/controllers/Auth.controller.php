@@ -21,8 +21,20 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Auth_Controller
+class Auth_Controller extends Action_Controller
 {
+	/**
+	 * Entry point in Auth controller
+	 * (well no, not really. We route directly to the rest.)
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// what can we do? login page!
+		$this->action_login();
+	}
+
 	/**
 	 * Ask them for their login information. (shows a page for the user to type
 	 *  in their username and password.)

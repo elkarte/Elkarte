@@ -17,13 +17,13 @@
  *
  */
 
-class Attachment_Controller
+class Attachment_Controller extends Action_Controller
 {
 	/**
 	 * The default action is to download an attachment.
 	 * This allows ?action=attachment to be forwarded to action_dlattach()
 	 */
-	public function action_attachment()
+	public function action_index()
 	{
 		// default action to execute
 		$this->action_dlattach();

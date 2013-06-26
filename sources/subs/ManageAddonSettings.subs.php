@@ -216,26 +216,21 @@ function list_integration_hooks_data($start, $per_page, $sort)
 }
 
 /**
- * Simply returns the total count of integraion hooks
- * Used but the intergation hooks list function (list_integration_hooks)
+ * Simply returns the total count of integration hooks
+ * (used by createList() callbacks)
  *
- * @global type $context
  * @return int
  */
-function list_integration_hooks_count()
+function integration_hooks_count($filter = false)
 {
 	global $context;
 
 	$hooks = get_integration_hooks();
 	$hooks_count = 0;
 
-	$context['filter'] = false;
-	if (isset($_GET['filter']))
-		$context['filter'] = $_GET['filter'];
-
 	foreach ($hooks as $hook => $functions)
 	{
-		if (empty($context['filter']) || (!empty($context['filter']) && $context['filter'] == $hook))
+		if (empty($filter) || ($filter == $hook))
 			$hooks_count += count($functions);
 	}
 
@@ -244,9 +239,10 @@ function list_integration_hooks_count()
 
 /**
  * Parses modSettings to create integration hook array
+ * (used by createList() callbacks)
  *
  * @staticvar type $integration_hooks
- * @return type
+ * @return array
  */
 function get_integration_hooks()
 {

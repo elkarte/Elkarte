@@ -20,8 +20,19 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class AdminDebug_Controller
+class AdminDebug_Controller extends Action_Controller
 {
+	/**
+	 * Main dispatcher.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// what to do first... viewquery! What, it'll work or it won't.
+		// $this->action_viewquery();
+	}
+
 	/**
 	 * Show the database queries for debugging
 	 * What this does:
@@ -210,7 +221,7 @@ class AdminDebug_Controller
 		if (empty($_REQUEST['filename']) || !is_string($_REQUEST['filename']))
 			fatal_lang_error('no_access', false);
 
-		$file = list_getAdminInfoFile($_REQUEST['filename']);
+		$file = adminInfoFile($_REQUEST['filename']);
 
 		// @todo Temp
 		// Figure out if sesc is still being used.

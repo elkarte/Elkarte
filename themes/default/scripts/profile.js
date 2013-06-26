@@ -94,7 +94,7 @@ function ajax_getSignaturePreview (showPreview)
 	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
 	$.ajax({
 		type: "POST",
-		url: smf_scripturl + "?action=xmlhttp;sa=previews;xml",
+		url: smf_scripturl + "?action=xmlpreview;xml",
 		data: {item: "sig_preview", signature: $("#signature").val(), user: $('input[name="u"]').attr("value")},
 		context: document.body,
 		success: function(request){

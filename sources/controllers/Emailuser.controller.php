@@ -21,12 +21,12 @@
 if (!defined('ELKARTE'))
 	die('No access...');
 
-class Emailuser_Controller
+class Emailuser_Controller extends Action_Controller
 {
 	/**
 	 * This function initializes or sets up the necessary, for the other actions
 	 */
-	function pre_dispatch()
+	public function pre_dispatch()
 	{
 		global $context;
 
@@ -38,11 +38,13 @@ class Emailuser_Controller
 	}
 
 	/**
-	 * Default action handler (when no ;sa is specified)
+	 * Default action handler
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_emailuser()
+	public function action_index()
 	{
-		// default action: action_sendtopic()
+		// just accept we haz a default action: action_sendtopic()
 		$this->action_sendtopic();
 	}
 
@@ -53,7 +55,7 @@ class Emailuser_Controller
 	 * Redirects back to the first page of the topic when done.
 	 * Is accessed via ?action=emailuser;sa=sendtopic.
 	 */
-	function action_sendtopic()
+	public function action_sendtopic()
 	{
 		global $topic, $txt, $context, $scripturl, $modSettings;
 
@@ -146,7 +148,7 @@ class Emailuser_Controller
 	 * Does not check permissions for a message ID as there is no information disclosed.
 	 * ?action=emailuser;sa=email
 	 */
-	function action_email()
+	public function action_email()
 	{
 		global $context, $modSettings, $user_info, $txt, $scripturl;
 
@@ -272,7 +274,7 @@ class Emailuser_Controller
 	 * Uses action_reporttm2() if post data was sent.
 	 * Accessed through ?action=reporttm.
 	 */
-	function action_reporttm()
+	public function action_reporttm()
 	{
 		global $txt, $topic, $modSettings, $user_info, $context;
 
@@ -360,7 +362,7 @@ class Emailuser_Controller
 	 * Called by action_reporttm(), and thus has the same permission and setting requirements as it does.
 	 * Accessed through ?action=reporttm when posting.
 	 */
-	function action_reporttm2()
+	public function action_reporttm2()
 	{
 		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context;
 

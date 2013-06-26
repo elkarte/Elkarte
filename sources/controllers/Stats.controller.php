@@ -23,8 +23,20 @@ if (!defined('ELKARTE'))
 /**
  * Statistics Controller
  */
-class Stats_Controller
+class Stats_Controller extends Action_Controller
 {
+	/**
+	 * Entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Call the right method... wait, we only know how to do
+		// one thing (and do it well! :P)
+		$this->action_stats();
+	}
+
 	/**
 	 * Display some useful/interesting board statistics.
 	 *
@@ -33,14 +45,14 @@ class Stats_Controller
 	 * requires the view_stats permission.
 	 * accessed from ?action=stats.
 	 */
-	function action_stats()
+	public function action_stats()
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
 		$db = database();
 
 		isAllowedTo('view_stats');
-		
+
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
 			fatal_lang_error('feature_disabled', true);

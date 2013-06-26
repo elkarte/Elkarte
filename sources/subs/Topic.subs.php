@@ -424,7 +424,7 @@ function moveTopics($topics, $toBoard)
 	// Only a single topic.
 	if (is_numeric($topics))
 		$topics = array($topics);
-	
+
 	$fromBoards = array();
 
 	// Destination board empty or equal to 0?
@@ -1126,7 +1126,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 	// Create the query, taking full and integration in to account
 	$request = $db->query('', '
 		SELECT
-			t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
+			t.id_topic, t.is_sticky, t.id_board, t.id_first_msg, t.id_last_msg,
 			t.id_member_started, t.id_member_updated, t.id_poll,
 			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
@@ -1584,16 +1584,16 @@ function updateSplitTopics($options, $id_board)
 }
 
 /**
- * Find out who started a topic
+ * Find out who started a topic, and the lock status
  *
  * @param int $topic
- * @return int
+ * @return array with id_member_started and locked
  */
-function topicStarter($topic)
+function topicStatus($topic)
 {
 	$db = database();
 
-	// Find out who started the topic - in case User Topic Locking is enabled.
+	// Find out who started the topic, and the lock status.
 	$request = $db->query('', '
 		SELECT id_member_started, locked
 		FROM {db_prefix}topics
@@ -1614,6 +1614,7 @@ function topicStarter($topic)
  * Parameter $attributes is an array with:
  *  - 'locked' => lock_value,
  *  - 'sticky' => sticky_value
+ * It sets the new value for the attribute as passed to it.
  *
  * @param int $topic
  * @param array $attributes
@@ -1634,16 +1635,62 @@ function setTopicAttribute($topic, $attributes)
 			)
 		);
 	if (isset($attributes['sticky']))
-		// Toggle the sticky value... pretty simple ;).
+		// Set the new sticky value.
 		$db->query('', '
 			UPDATE {db_prefix}topics
 			SET is_sticky = {int:is_sticky}
 			WHERE id_topic = {int:current_topic}',
 			array(
 				'current_topic' => $topic,
-				'is_sticky' => empty($attributes['sticky']) ? 1 : 0,
+				'is_sticky' => empty($attributes['sticky']) ? 0 : 1,
 			)
 		);
+}
+
+/**
+ * Retrieve the locked or sticky status of a topic.
+ *
+ * @param string $attribute 'locked' or 'sticky'
+ */
+function topicAttribute($id_topic, $attribute)
+{
+	$db = database();
+
+	if ($attribute == 'locked')
+	{
+		// check the lock status
+		$request = $db->query('', '
+			SELECT locked
+			FROM {db_prefix}topics
+			WHERE id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+		list ($locked) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		return $locked;
+	}
+
+	if  ($attribute == 'sticky')
+	{
+		// Is this topic already stickied, or no?
+		$request = $db->query('', '
+			SELECT is_sticky
+			FROM {db_prefix}topics
+			WHERE id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+		list ($sticky) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		return $sticky;
+	}
 }
 
 /**
@@ -2307,4 +2354,137 @@ function splitDestinationBoard()
 		$destination_board['id'] = $toboard;
 
 	return array('current' => $current_board, 'destination' => $destination_board);
+}
+
+/**
+ * Retrieve topic notifications count.
+ * (used by createList() callbacks, amongst others.)
+ *
+ * @param int $memID id_member
+ * @return string
+ */
+function topicNotificationCount($memID)
+{
+	global $user_info, $modSettings;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_notify AS ln' . (!$modSettings['postmod_active'] && $user_info['query_see_board'] === '1=1' ? '' : '
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)') . ($user_info['query_see_board'] === '1=1' ? '' : '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)') . '
+		WHERE ln.id_member = {int:selected_member}' . ($user_info['query_see_board'] === '1=1' ? '' : '
+			AND {query_see_board}') . ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved}' : ''),
+		array(
+			'selected_member' => $memID,
+			'is_approved' => 1,
+		)
+	);
+	list ($totalNotifications) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return (int)$totalNotifications;
+}
+
+/**
+ * Retrieve all topic notifications for the given user.
+ * (used by createList() callbacks)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID id_member
+ * @return array
+ */
+function topicNotifications($start, $items_per_page, $sort, $memID)
+{
+	global $scripturl, $user_info, $modSettings;
+
+	$db = database();
+
+	// All the topics with notification on...
+	$request = $db->query('', '
+		SELECT
+			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from, b.id_board, b.name,
+			t.id_topic, ms.subject, ms.id_member, IFNULL(mem.real_name, ms.poster_name) AS real_name_col,
+			ml.id_msg_modified, ml.poster_time, ml.id_member AS id_member_updated,
+			IFNULL(mem2.real_name, ml.poster_name) AS last_real_name
+		FROM {db_prefix}log_notify AS ln
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ms.id_member)
+			LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = ml.id_member)
+			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
+		WHERE ln.id_member = {int:selected_member}
+		ORDER BY {raw:sort}
+		LIMIT {int:offset}, {int:items_per_page}',
+		array(
+			'current_member' => $user_info['id'],
+			'is_approved' => 1,
+			'selected_member' => $memID,
+			'sort' => $sort,
+			'offset' => $start,
+			'items_per_page' => $items_per_page,
+		)
+	);
+	$notification_topics = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['subject']);
+
+		$notification_topics[] = array(
+			'id' => $row['id_topic'],
+			'poster_link' => empty($row['id_member']) ? $row['real_name_col'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name_col'] . '</a>',
+			'poster_updated_link' => empty($row['id_member_updated']) ? $row['last_real_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member_updated'] . '">' . $row['last_real_name'] . '</a>',
+			'subject' => $row['subject'],
+			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
+			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
+			'new' => $row['new_from'] <= $row['id_msg_modified'],
+			'new_from' => $row['new_from'],
+			'updated' => relativeTime($row['poster_time']),
+			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
+			'new_link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new">' . $row['subject'] . '</a>',
+			'board_link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+		);
+	}
+	$db->free_result($request);
+
+	return $notification_topics;
+}
+
+/**
+ * Get a list of posters in this topic, and their posts counts in the topic.
+ * Used to update users posts counts when topics are moved or are deleted.
+ */
+function postersCount($id_topic)
+{
+	$db = database();
+
+	// we only care about approved topics, the rest don't count.
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}messages
+		WHERE id_topic = {int:current_topic}
+			AND approved = {int:is_approved}',
+		array(
+			'current_topic' => $id_topic,
+			'is_approved' => 1,
+		)
+	);
+	$posters = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!isset($posters[$row['id_member']]))
+			$posters[$row['id_member']] = 0;
+
+		$posters[$row['id_member']]++;
+	}
+	$db->free_result($request);
+
+	return $posters;
 }

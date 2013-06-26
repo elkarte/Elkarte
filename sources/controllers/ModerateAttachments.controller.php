@@ -21,14 +21,26 @@ if (!defined('ELKARTE'))
 /**
  * Moderate Attachments Controller
  */
-class ModerateAttachments_Controller
+class ModerateAttachments_Controller extends Action_Controller
 {
+	/**
+	 * Forward to attachments approval method, the only responsibility
+	 * of this controller.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// forward to our method(s) to do the job
+		$this->action_attachapprove();
+	}
+
 	/**
 	 * Called from a mouse click,
 	 * works out what we want to do with attachments and actions it.
 	 * Accessed by ?action=attachapprove
 	 */
-	function action_attachapprove()
+	public function action_attachapprove()
 	{
 		global $user_info;
 
@@ -41,7 +53,7 @@ class ModerateAttachments_Controller
 		$is_approve = !isset($_GET['sa']) || $_GET['sa'] != 'reject' ? true : false;
 
 		$attachments = array();
-		
+
 		// If we are approving all ID's in a message , get the ID's.
 		if ($_GET['sa'] == 'all' && !empty($_GET['mid']))
 		{

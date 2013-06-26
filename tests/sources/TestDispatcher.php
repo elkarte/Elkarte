@@ -29,6 +29,7 @@ class TestDispatcher extends UnitTestCase
 			'topic' => array('lock', 'printpage', 'sticky'),
 			'profile' => array('index'),
 			'reminder' => array('picktype', 'secret2', 'setpassword', 'setpassword2'),
+			'xmlpreview' => array('index'),
 		);
 
 		foreach (array_keys($auto_actions) as $action)
@@ -69,7 +70,7 @@ class TestDispatcher extends UnitTestCase
 			'quickmod' => 'MessageIndex',
 			'quickmod2' => 'Display',
 			'openidreturn' => 'OpenID',
-			
+
 		);
 
 		foreach (array_keys($actions) as $action)
@@ -88,7 +89,7 @@ class TestDispatcher extends UnitTestCase
 		// dunno how useful this is :P
 		// controller and sa hardcoded
 		$legacy_actions = array(
-			
+
 		);
 
 		$leftovers = array(
@@ -134,7 +135,7 @@ class TestDispatcher extends UnitTestCase
 			'viewquery' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewquery'),
 			'viewadminfile' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewadminfile'),
 			'.xml' => array('News.controller.php', 'News_Controller', 'action_showfeed'),
-			'xmlhttp' => array('Xml.controller.php', 'action_xmlhttp'),
+			'xmlhttp' => array('Xml.controller.php', 'Xml_Controller', 'action_index'),
 		);
 
 		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');

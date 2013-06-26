@@ -15,12 +15,24 @@ if (!defined('ELKARTE'))
 /**
  * This class contains one likable use, which allows members to like a post
  */
-class Likes_Controller
+class Likes_Controller extends Action_Controller
 {
+	/**
+	 * Default action method, if a specific methods wasn't
+	 * directly called already. Simply forwards to likepost.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// We like you.
+		$this->action_likepost();
+	}
+
 	/**
 	 * Entry point function for likes, permission checks, just makes sure its on
 	 */
-	function pre_dispatch()
+	public function pre_dispatch()
 	{
 		global $modSettings;
 
@@ -35,7 +47,7 @@ class Likes_Controller
 	 * It redirects back to the referrer afterward.
 	 * It is accessed via ?action=like,sa=likepost
 	 */
-	function action_likepost()
+	public function action_likepost()
 	{
 		global $user_info, $topic;
 
@@ -62,7 +74,7 @@ class Likes_Controller
 	 * It redirects back to the referrer afterward.
 	 * It is accessed via ?action=like,sa=unlikepost.
 	 */
-	function action_unlikepost()
+	public function action_unlikepost()
 	{
 		global $user_info, $topic;
 
@@ -89,7 +101,7 @@ class Likes_Controller
 	 * @param type $id_liked
 	 * @return type
 	 */
-	function prepare_like()
+	private function prepare_like()
 	{
 		global $modSettings, $user_info;
 

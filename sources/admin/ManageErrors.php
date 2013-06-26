@@ -24,8 +24,19 @@ if (!defined('ELKARTE'))
 /**
  * ManageErrors controller, administration of error log.
  */
-class ManageErrors_Controller
+class ManageErrors_Controller extends Action_Controller
 {
+	/**
+	 * Calls the right handler.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// view error log
+		$this->action_log();
+	}
+
 	/**
 	 * View the forum's error log.
 	 * This function sets all the context up to show the error log for maintenance.

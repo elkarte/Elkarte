@@ -24,7 +24,7 @@ if (!defined('ELKARTE'))
  * This class is in charge with administration of smileys and message icons.
  * It handles actions from the Smileys pages in admin panel.
  */
-class ManageSmileys_Controller
+class ManageSmileys_Controller extends Action_Controller
 {
 	/**
 	 * Smileys configuration settings form
@@ -39,6 +39,8 @@ class ManageSmileys_Controller
 
 	/**
 	 * This is the dispatcher of smileys administration.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

@@ -21,14 +21,14 @@ if (!defined('ELKARTE'))
 /**
  * Reminder Controller handles sending out reminders, and checking the secret answer and question.
  */
-class Reminder_Controller
+class Reminder_Controller extends Action_Controller
 {
 	/**
 	 * This is the pre-dispatch function
 	 *
 	 * @uses Profile language files and Reminder template
 	 */
-	function pre_dispatch()
+	public function pre_dispatch()
 	{
 		global $txt, $context;
 
@@ -42,7 +42,7 @@ class Reminder_Controller
 	/**
 	 * Default action for reminder.
 	 */
-	function action_index()
+	public function action_index()
 	{
 		// nothing to do, the template will ask for an action to pick
 		createToken('remind');
@@ -52,7 +52,7 @@ class Reminder_Controller
 	 * Pick a reminder type.
 	 * sa=picktype
 	 */
-	function action_picktype()
+	public function action_picktype()
 	{
 		global $context, $txt, $scripturl, $user_info, $webmaster_email, $language, $modSettings;
 
@@ -148,7 +148,7 @@ class Reminder_Controller
 	 * Set your new password
 	 * sa=setpassword
 	 */
-	function action_setpassword()
+	public function action_setpassword()
 	{
 		global $txt, $context;
 
@@ -174,7 +174,7 @@ class Reminder_Controller
 	 * Handle the password change.
 	 * sa=setpassword2
 	 */
-	function action_setpassword2()
+	public function action_setpassword2()
 	{
 		global $context, $txt;
 
@@ -243,7 +243,7 @@ class Reminder_Controller
 	 * Verify the answer to the secret question.
 	 * sa=secret2
 	 */
-	function action_secret2()
+	public function action_secret2()
 	{
 		global $txt, $context;
 
