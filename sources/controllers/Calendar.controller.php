@@ -17,7 +17,7 @@
  * Original module by Aaron O'Neil - aaron@mud-master.com
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class Calendar_Controller extends Action_Controller

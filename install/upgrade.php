@@ -823,7 +823,7 @@ function loadEssentialData()
 	// Do the non-SSI stuff...
 	@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
-	define('ELKARTE', 1);
+	define('ELK', 1);
 
 	// Start the session.
 	if (@ini_get('session.save_handler') == 'user')

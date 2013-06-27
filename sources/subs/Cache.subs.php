@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -162,7 +162,7 @@ function cache_put_data($key, $value, $ttl = 120)
 		case 'zend':
 			// Zend Platform/ZPS/etc.
 			if (function_exists('zend_shm_cache_store'))
-				zend_shm_cache_store('ELKARTE::' . $key, $value, $ttl);
+				zend_shm_cache_store('ELK::' . $key, $value, $ttl);
 			elseif (function_exists('output_cache_put'))
 				output_cache_put($key, $value);
 			break;
@@ -181,7 +181,7 @@ function cache_put_data($key, $value, $ttl = 120)
 				@unlink(CACHEDIR . '/data_' . $key . '.php');
 			else
 			{
-				$cache_data = '<' . '?' . 'php if (!defined(\'ELKARTE\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}';
+				$cache_data = '<' . '?' . 'php if (!defined(\'ELK\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}';
 
 				// Write out the cache file, check that the cache write was successful; all the data must be written
 				// If it fails due to low diskspace, or other, remove the cache file
@@ -260,7 +260,7 @@ function cache_get_data($key, $ttl = 120)
 		case 'zend':
 			// Zend's pricey stuff.
 			if (function_exists('zend_shm_cache_fetch'))
-				$value = zend_shm_cache_fetch('ELKARTE::' . $key, $ttl);
+				$value = zend_shm_cache_fetch('ELK::' . $key, $ttl);
 			elseif (function_exists('output_cache_get'))
 				$value = output_cache_get($key, $ttl);
 			break;
@@ -402,7 +402,7 @@ function clean_cache($type = '')
 			break;
 		case 'zend':
 			if (function_exists('zend_shm_cache_clear'))
-				zend_shm_cache_clear('ELKARTE');
+				zend_shm_cache_clear('ELK');
 			break;
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
@@ -463,7 +463,7 @@ function cache_get_key($key)
 
 	// no need to do this every time, slows us down :P
 	if (empty($key_prefix))
-		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELKARTE-';
+		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELK-';
 
 	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }

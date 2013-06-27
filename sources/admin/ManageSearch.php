@@ -16,7 +16,7 @@
  * The admin screen to change the search settings.
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

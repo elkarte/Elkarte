@@ -11,7 +11,7 @@
  * and those with approve email permission
  *
  */
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

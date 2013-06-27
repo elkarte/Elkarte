@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class Emailuser_Controller extends Action_Controller

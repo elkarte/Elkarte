@@ -15,7 +15,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class ProfileInfo_Controller extends Action_Controller

@@ -15,8 +15,8 @@ class TestRequest extends UnitTestCase
 	function setUp()
 	{
 		// we are not in Elk, thereby need to set our define
-		if (!defined('ELKARTE'))
-			define('ELKARTE', 'SSI');
+		if (!defined('ELK'))
+			define('ELK', 'SSI');
 
 		// and include our class. Kinda difficult without it.
 		require_once(TESTDIR . '../sources/Request.php');

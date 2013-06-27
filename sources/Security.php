@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -136,7 +136,7 @@ function is_not_guest($message = '', $is_fatal = true)
 		obExit(false);
 
 	// Attempt to detect if they came from dlattach.
-	if (ELKARTE != 'SSI' && empty($context['theme_loaded']))
+	if (ELK != 'SSI' && empty($context['theme_loaded']))
 		loadTheme();
 
 	// Never redirect to an attachment
