@@ -121,7 +121,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	// Return path, date, mailer
 	$headers .= 'Return-Path: ' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
-	$headers .= 'X-Mailer: ELKARTE' . $line_break;
+	$headers .= 'X-Mailer: ElkArte' . $line_break;
 
 	// Using the maillist functions?
 	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null &&$message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);

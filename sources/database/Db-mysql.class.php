@@ -189,7 +189,7 @@ class Database_MySQL implements Database
 			break;
 
 			case 'identifier':
-				// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for ELKARTE.
+				// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for ElkArte.
 				return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
 			break;
 
@@ -348,7 +348,7 @@ class Database_MySQL implements Database
 			$clean .= substr($db_string, $old_pos);
 			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-			// We don't use UNION in ELKARTE, at least so far.  But it's useful for injections.
+			// We don't use UNION in ElkArte, at least so far.  But it's useful for injections.
 			if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
 				$fail = true;
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
