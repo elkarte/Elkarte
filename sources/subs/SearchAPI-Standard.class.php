@@ -28,7 +28,7 @@ class Standard_Search
 	 *
 	 * @var type
 	 */
-	public $version_compatible = 'ElkArte 1.0 ALpha';
+	public $version_compatible = 'ElkArte 1.0 Alpha';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
