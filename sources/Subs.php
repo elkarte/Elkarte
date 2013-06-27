@@ -1460,8 +1460,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'quote',
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote'] . '</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote'] . '</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1469,15 +1469,15 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '(.{1,192}?)', 'quoted' => true),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': {author}</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
 				'tag' => 'quote',
 				'type' => 'parsed_equals',
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': $1</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': $1</div><blockquote>',
+				'after' => '</blockquote>',
 				'quoted' => 'optional',
 				// Don't allow everything to be embedded with the author name.
 				'parsed_tags_allowed' => array('url', 'iurl', 'ftp'),
@@ -1490,8 +1490,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'link' => array('match' => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|action=profile;u=\d+)'),
 					'date' => array('match' => '(\d+)', 'validate' => 'relativeTime'),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1499,8 +1499,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '(.{1,192}?)'),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': {author}</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
