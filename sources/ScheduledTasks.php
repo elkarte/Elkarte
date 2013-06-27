@@ -1348,7 +1348,7 @@ function next_time($regularity, $unit, $offset)
 }
 
 /**
- * This retrieves data (e.g. last version of ELKARTE)
+ * This retrieves data (e.g. last version of ElkArte)
  */
 function scheduled_fetchFiles()
 {

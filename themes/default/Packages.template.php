@@ -758,7 +758,7 @@ function template_servers()
 								<strong>' . $txt['server_name'] . ':</strong>
 							</dt>
 							<dd>
-								<input type="text" name="servername" size="44" value="ELKARTE" class="input_text" />
+								<input type="text" name="servername" size="44" value="ElkArte" class="input_text" />
 							</dd>
 							<dt>
 								<strong>' . $txt['serverurl'] . ':</strong>

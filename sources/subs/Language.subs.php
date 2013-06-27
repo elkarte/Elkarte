@@ -329,7 +329,7 @@ function list_getLanguagesList()
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
-	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => '')));
+	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => '')));
 
 	// Load the class file and stick it into an array.
 	require_once(SUBSDIR . '/XmlArray.class.php');

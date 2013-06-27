@@ -288,7 +288,7 @@ class News_Controller extends Action_Controller
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 		<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-		<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ELKARTE' => '')), '">ELKARTE</generator>
+		<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ElkArte' => '')), '">ElkArte</generator>
 		<author>
 			<name>', strip_tags($context['forum_name']), '</name>
 		</author>';

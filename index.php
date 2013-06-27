@@ -19,7 +19,7 @@
  *
  */
 
-$forum_version = 'ELKARTE 1.0 Alpha';
+$forum_version = 'ElkArte 1.0 Alpha';
 
 // First things first, but not necessarily in that order.
 define('ELKARTE', 1);

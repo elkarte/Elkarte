@@ -293,7 +293,7 @@ class Auth_Controller extends Action_Controller
 				}
 			}
 
-			// ELKARTE's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
+			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 			if (stripos(PHP_OS, 'win') !== 0)
 			{
 				require_once(SUBSDIR . '/Compat.subs.php');
@@ -303,7 +303,7 @@ class Auth_Controller extends Action_Controller
 			// Allows mods to easily extend the $other_passwords array
 			call_integration_hook('integrate_other_passwords', array(&$other_passwords));
 
-			// Whichever encryption it was using, let's make it use ELKARTE's now ;).
+			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
 				$user_settings['passwd'] = $sha_passwd;
