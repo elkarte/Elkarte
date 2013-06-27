@@ -10,7 +10,7 @@
  * All the vital helper functions for use in email posting, formatting and conversion
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

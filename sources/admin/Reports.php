@@ -25,7 +25,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class Reports_Controller extends Action_Controller

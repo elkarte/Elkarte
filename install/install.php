@@ -296,8 +296,8 @@ function load_database()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
-	if (!defined('ELKARTE'))
-		define('ELKARTE', 1);
+	if (!defined('ELK'))
+		define('ELK', 1);
 
 	$modSettings['disableQueryCheck'] = true;
 
@@ -760,7 +760,7 @@ function action_databaseSettings()
 		}
 
 		// Now include it for database functions!
-		define('ELKARTE', 1);
+		define('ELK', 1);
 		$modSettings['disableQueryCheck'] = true;
 
 		require_once(SOURCEDIR . '/database/Database.subs.php');

@@ -9,12 +9,12 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Removes the given language from all members..
- * @param int $lang_id 
+ * @param int $lang_id
  */
 function removeLanguageFromMember($lang_id)
 {

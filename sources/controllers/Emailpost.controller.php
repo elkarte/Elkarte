@@ -10,7 +10,7 @@
  * All the functions that validate and then save an email as a post or pm
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

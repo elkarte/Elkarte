@@ -22,7 +22,7 @@
 $forum_version = 'ElkArte 1.0 Alpha';
 
 // First things first, but not necessarily in that order.
-define('ELKARTE', 1);
+define('ELK', 1);
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);

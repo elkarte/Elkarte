@@ -19,7 +19,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -121,7 +121,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	// Return path, date, mailer
 	$headers .= 'Return-Path: ' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
-	$headers .= 'X-Mailer: ElkArte' . $line_break;
+	$headers .= 'X-Mailer: ELK' . $line_break;
 
 	// Using the maillist functions?
 	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null &&$message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
@@ -145,7 +145,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$orig_message = $message;
 
 	// The mime boundary separates the different alternative versions.
-	$mime_boundary = 'ELKARTE-' . md5($message . time());
+	$mime_boundary = 'ELK-' . md5($message . time());
 
 	// Using mime, as it allows to send a plain unencoded alternative.
 	$headers .= 'Mime-Version: 1.0' . $line_break;
@@ -375,7 +375,7 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
 	}
 
 	// If they are using SSI there is a good chance obExit will never be called.  So lets be nice and flush it for them.
-	if (ELKARTE === 'SSI')
+	if (ELK === 'SSI')
 		return AddMailQueue(true);
 
 	return true;
@@ -693,13 +693,13 @@ function server_parse($message, $socket, $response)
 function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
 {
 	// append the key to the bottom of each message section, plain, html, encoded, etc
-	$message = preg_replace('~^(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
-	$message = preg_replace('~(Content-Type: text/plain;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', "$1$2{$line_break}{$line_break}[{$unq_head}]{$line_break}$3", $message);
-	$message = preg_replace('~(Content-Type: text/html;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', "$1$2<br /><br />[{$unq_head}]<br />$3", $message);
+	$message = preg_replace('~^(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1{$line_break}{$line_break}[{$unq_head}]{$line_break}$2", $message);
+	$message = preg_replace('~(Content-Type: text/plain;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1$2{$line_break}{$line_break}[{$unq_head}]{$line_break}$3", $message);
+	$message = preg_replace('~(Content-Type: text/html;.*?Content-Transfer-Encoding: 7bit' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', "$1$2<br /><br />[{$unq_head}]<br />$3", $message);
 
 	// base64 the harder one to insert our key
 	// Find the sections, un-do the chunk_split, add in the new key, and re chunky it
-	if (preg_match('~(Content-Transfer-Encoding: base64' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELKARTE-[a-z0-9]{32})~s', $message, $match))
+	if (preg_match('~(Content-Transfer-Encoding: base64' . $line_break . $line_break . ')(.*?)(' . $line_break . '--ELK-[a-z0-9]{32})~s', $message, $match))
 	{
 		// un-chunk, add in our encoded key header, and re chunk, all so we match RFC 2045 semantics.
 		$encoded_message = str_replace($line_break, '', $match[2]);
@@ -931,7 +931,7 @@ function list_getMailQueueSize()
 
 /**
  * Deletes items from the mail queue
- * @param array $items 
+ * @param array $items
  */
 function deleteMailQueueItems($items)
 {
@@ -948,7 +948,7 @@ function deleteMailQueueItems($items)
 
 /**
  * get the current mail queue status
- * @return array 
+ * @return array
  */
 function list_MailQueueStatus()
 {

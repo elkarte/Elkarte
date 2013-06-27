@@ -34,7 +34,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class Themes_Controller extends Action_Controller

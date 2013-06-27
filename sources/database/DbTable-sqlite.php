@@ -16,7 +16,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class DbTable_SQLite extends DbTable

@@ -11,7 +11,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class DbSearch_MySQL implements DbSearch

@@ -11,7 +11,7 @@
  * as best it can to undo the 78/80 character email wrap
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

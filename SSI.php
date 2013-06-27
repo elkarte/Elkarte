@@ -15,10 +15,10 @@
  */
 
 // Don't do anything if ElkArte is already loaded.
-if (defined('ELKARTE'))
+if (defined('ELK'))
 	return true;
 
-define('ELKARTE', 'SSI');
+define('ELK', 'SSI');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
