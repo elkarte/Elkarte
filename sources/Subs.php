@@ -1460,7 +1460,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'quote',
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote'] . '</div></div><blockquote>',
+				'before' => '<div class="quoteheader">' . $txt['quote'] . '</div></div><blockquote>',
 				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
 				'block_level' => true,
 			),
@@ -1529,19 +1529,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'shadow',
 				'type' => 'unparsed_commas',
 				'test' => '[#0-9a-zA-Z\-]{3,12},(left|right|top|bottom|[0123]\d{0,2})\]',
-				'before' => isBrowser('ie') ? '<span style="display: inline-block; filter: Shadow(color=$1, direction=$2); height: 1.2em;">' : '<span style="text-shadow: $1 $2">',
+				'before' => '<span style="text-shadow: $1 $2">',
 				'after' => '</span>',
-				'validate' => isBrowser('ie') ? create_function('&$tag, &$data, $disabled', '
-					if ($data[1] == \'left\')
-						$data[1] = 270;
-					elseif ($data[1] == \'right\')
-						$data[1] = 90;
-					elseif ($data[1] == \'top\')
-						$data[1] = 0;
-					elseif ($data[1] == \'bottom\')
-						$data[1] = 180;
-					else
-						$data[1] = (int) $data[1];') : create_function('&$tag, &$data, $disabled', '
+				'validate' => create_function('&$tag, &$data, $disabled', '
 					if ($data[1] == \'top\' || (is_numeric($data[1]) && $data[1] < 50))
 						$data[1] = \'0 -2px 1px\';
 					elseif ($data[1] == \'right\' || (is_numeric($data[1]) && $data[1] < 100))
