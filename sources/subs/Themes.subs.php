@@ -548,3 +548,42 @@ function loadCustomFields()
 
 	return $customFields;
 }
+
+function deleteTheme($id)
+{
+	$db = database();
+
+	// Make sure we never ever delete the default theme!
+	if ($id === 1)
+		fatal_lang_error('no_access', false);
+	
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE id_theme = {int:current_theme}',
+		array(
+			'current_theme' => $id,
+		)
+	);
+
+	// Update the members ...
+	$db->query('', '
+		UPDATE {db_prefix}members
+		SET id_theme = {int:default_theme}
+		WHERE id_theme = {int:current_theme}',
+		array(
+			'default_theme' => 0,
+			'current_theme' => $id,
+		)
+	);
+
+	// ... and the boards table.
+	$db->query('', '
+		UPDATE {db_prefix}boards
+		SET id_theme = {int:default_theme}
+		WHERE id_theme = {int:current_theme}',
+		array(
+			'default_theme' => 0,
+			'current_theme' => $id,
+		)
+	);
+}
