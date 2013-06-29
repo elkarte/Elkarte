@@ -511,7 +511,7 @@ function template_ssi_above()
 	<div id="header">
 		<div class="frame">
 			<h1 class="forumtitle">SSI.php Examples</h1>
-			<img id="logo" src="themes/default/images/logo_elk.png" alt="Elkarte Community" title="Elkarte Community" />
+			<img id="logo" src="themes/default/images/logo_elk.png" alt="ElkArte Community" title="ElkArte Community" />
 
 		</div>
 	</div>
@@ -539,7 +539,7 @@ function template_ssi_below()
 			</div>
 			<div id="footer_section">
 				<div class="frame">
-					<div class="smalltext"><a href="http://www.elkarte.net/">Elkarte Community</a></div>
+					<div class="smalltext"><a href="http://www.elkarte.net/">ElkArte Community</a></div>
 				</div>
 			</div>
 		</div>
