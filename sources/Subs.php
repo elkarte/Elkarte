@@ -1252,7 +1252,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'flash',
 				'type' => 'unparsed_commas_content',
 				'test' => '\d+,\d+\]',
-				'content' => (isBrowser('ie') ? '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" style="width: $2px; height: $3px;"><param name="movie" value="$1" /><param name="play" value="true" /><param name="loop" value="true" /><param name="quality" value="high" /><param name="AllowScriptAccess" value="never" /><embed src="$1" width="$2" height="$3" play="true" loop="true" quality="high" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed></object>' : '<embed type="application/x-shockwave-flash" src="$1" width="$2" height="$3" play="true" loop="true" quality="high" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed>'),
+				'content' => (isBrowser('ie') ? '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" style="width: $2px; height: $3px;"><param name="movie" value="$1" /><param name="play" value="true" /><param name="loop" value="true" /><param name="quality" value="high" /><param name="wmode" value="transparent"><param name="AllowScriptAccess" value="never" /><embed src="$1" width="$2" height="$3" play="true" loop="true" quality="high" wmode="transparent" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed></object>' : '<embed type="application/x-shockwave-flash" src="$1" width="$2" height="$3" play="true" loop="true" quality="high" wmode="transparent" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed>'),
 				'validate' => create_function('&$tag, &$data, $disabled', '
 					if (isset($disabled[\'url\']))
 						$tag[\'content\'] = \'$1\';
@@ -1293,9 +1293,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'glow',
 				'type' => 'unparsed_commas',
-				'test' => '[#0-9a-zA-Z\-]{3,12},([012]\d{1,2}|\d{1,2})(,[^]]+)?\]',
-				'before' => isBrowser('ie') ? '<table style="border-collapse: collapse; border-spacing: 0;display: inline; vertical-align: middle; font: inherit;"><tr><td style="filter: Glow(color=$1, strength=$2); font: inherit;">' : '<span style="text-shadow: $1 1px 1px 1px">',
-				'after' => isBrowser('ie') ? '</td></tr></table> ' : '</span>',
+				'test' => '[#0-9a-zA-Z\-]',
+				'before' => '<span style="text-shadow: $1 0 0 4px">',
+				'after' => '</span>',
 			),
 			array(
 				'tag' => 'green',
@@ -1460,8 +1460,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'quote',
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote'] . '</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote'] . '</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1469,15 +1469,15 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '(.{1,192}?)', 'quoted' => true),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': {author}</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
 				'tag' => 'quote',
 				'type' => 'parsed_equals',
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': $1</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': $1</div><blockquote>',
+				'after' => '</blockquote>',
 				'quoted' => 'optional',
 				// Don't allow everything to be embedded with the author name.
 				'parsed_tags_allowed' => array('url', 'iurl', 'ftp'),
@@ -1490,8 +1490,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'link' => array('match' => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|action=profile;u=\d+)'),
 					'date' => array('match' => '(\d+)', 'validate' => 'relativeTime'),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1499,8 +1499,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '(.{1,192}?)'),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': {author}</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1529,19 +1529,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'shadow',
 				'type' => 'unparsed_commas',
 				'test' => '[#0-9a-zA-Z\-]{3,12},(left|right|top|bottom|[0123]\d{0,2})\]',
-				'before' => isBrowser('ie') ? '<span style="display: inline-block; filter: Shadow(color=$1, direction=$2); height: 1.2em;">' : '<span style="text-shadow: $1 $2">',
+				'before' => '<span style="text-shadow: $1 $2">',
 				'after' => '</span>',
-				'validate' => isBrowser('ie') ? create_function('&$tag, &$data, $disabled', '
-					if ($data[1] == \'left\')
-						$data[1] = 270;
-					elseif ($data[1] == \'right\')
-						$data[1] = 90;
-					elseif ($data[1] == \'top\')
-						$data[1] = 0;
-					elseif ($data[1] == \'bottom\')
-						$data[1] = 180;
-					else
-						$data[1] = (int) $data[1];') : create_function('&$tag, &$data, $disabled', '
+				'validate' => create_function('&$tag, &$data, $disabled', '
 					if ($data[1] == \'top\' || (is_numeric($data[1]) && $data[1] < 50))
 						$data[1] = \'0 -2px 1px\';
 					elseif ($data[1] == \'right\' || (is_numeric($data[1]) && $data[1] < 100))
@@ -1810,6 +1800,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 							$imgtag = preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $imgtag);
 
 						// Check if the image is larger than allowed.
+						// @todo - We should seriously look at deprecating some of this in favour of CSS resizing.
 						if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 						{
 							// For images, we'll want this.
@@ -2071,6 +2062,11 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$quote_alt = !$quote_alt;
 				}
 				// Add a class to the quote to style alternating blockquotes
+				// @todo - Frankly it makes little sense to allow alternate blockquote styling without also catering for alternate quoteheader styling.
+				// @todo - I do remember coding that some time back, but it seems to have gotten lost somewhere in the SMF 2.1 and/or Elk processes.
+				// @todo - Come to think of it, it may be better to append a second class rather than alter the standard one.
+				// @todo - Example: class="bbc_quote" and class="bbc_quote alt_quote".
+				// @todo - This would mean simpler CSS for themes (like default) which do not use the alternate styling, but would still allow it for themes that want it.
 				$possible['before'] = strtr($possible['before'], array('<blockquote>' => '<blockquote class="bbc_' . ($quote_alt ? 'alternate' : 'standard') . '_quote">'));
 			}
 
@@ -3166,6 +3162,7 @@ function theme_copyright()
 		return;
 
 	// Put in the version...
+	// @todo - No necessity for inline CSS in the copyright, and better without it.
 	$forum_copyright = sprintf($forum_copyright, ucfirst(strtolower($forum_version)));
 
 	echo '
@@ -3204,6 +3201,10 @@ function template_footer()
  *  - if the admin option to combine files is set, will use Combiner.class
  *
  * @param bool $do_defered = false
+ *
+ * @todo - Note that type="text/javascript" and type="text/css" are deprecated in HTML5.
+ * @todo - There are several occurrences in this function, and the next one.
+ * @todo - Full directory search for any strays should be done, then hit the lot of them. 
  */
 function template_javascript($do_defered = false)
 {
@@ -3922,6 +3923,8 @@ function setupMenuContext()
 		return;
 
 	// Update the PM menu item if they have unread messages
+	// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
+	// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
 	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
 	{
 		$context['menu_buttons']['pm']['alttitle'] = $context['menu_buttons']['pm']['title'] . ' [' . $context['user']['unread_messages'] . ']';
