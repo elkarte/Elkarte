@@ -538,7 +538,7 @@ class Themes_Controller extends Action_Controller
 	{
 		global $txt, $context, $settings, $modSettings;
 
-		$db = database();
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 			return $this->action_admin();
@@ -629,14 +629,8 @@ class Themes_Controller extends Action_Controller
 				$inserts[] = array(0, 1, $opt, is_array($val) ? implode(',', $val) : $val);
 			// If we're actually inserting something..
 			if (!empty($inserts))
-			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$inserts,
-					array('id_member', 'id_theme', 'variable')
-				);
-			}
+				updateThemeOptions($inserts);
+
 
 			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			cache_put_data('theme_settings-1', null, 90);
