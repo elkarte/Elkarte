@@ -858,12 +858,7 @@ class Themes_Controller extends Action_Controller
 
 				if (!empty($_GET['vrt']))
 				{
-					$db->insert('replace',
-						'{db_prefix}themes',
-						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-						array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
-						array('id_theme', 'id_member', 'variable')
-					);
+					updateThemeOptions(array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']));
 					cache_put_data('theme_settings-' . $_GET['th'] . ':' . (int) $_REQUEST['u'], null, 90);
 
 					if ($user_info['id'] == $_REQUEST['u'])
