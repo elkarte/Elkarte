@@ -1911,7 +1911,7 @@ function updateDbLastError()
 
 /**
  * Create an .htaccess file to prevent mod_security.
- * Elkarte has filtering built-in.
+ * ElkArte has filtering built-in.
  */
 function fixModSecurity()
 {
@@ -2015,7 +2015,7 @@ function template_install_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+				<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
 		<div id="wrapper">
@@ -2104,7 +2104,7 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul>
-					<li class="copyright"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">Elkarte &copy; 2012, Elkarte Community</a></li>
+					<li class="copyright"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012, ElkArte Community</a></li>
 				</ul>
 			</div>
 		</div>
@@ -2113,7 +2113,7 @@ function template_install_below()
 }
 
 /**
- * Welcome them to the wonderful world of Elkarte!
+ * Welcome them to the wonderful world of ElkArte!
  */
 function template_welcome_message()
 {

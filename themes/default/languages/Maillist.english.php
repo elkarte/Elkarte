@@ -289,7 +289,7 @@ $txt['notifications_boards_update'] = 'Update';
 $txt['notifications_update'] = 'Unnotify';
 
 // Help
-$txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature">Elkarte Wiki</a>';
+$txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature">ElkArte Wiki</a>';
 $txt['maillist_help_short'] = 'This feature allows users of your forum to reply to the sites email notifications and have those replies post on the forum.  Please visit the Wiki for full instructions';
 
 // Email bounce templates
