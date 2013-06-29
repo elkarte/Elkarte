@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELK'))
+if (!defined('ELKARTE'))
 	die('No access...');
 
 /**
