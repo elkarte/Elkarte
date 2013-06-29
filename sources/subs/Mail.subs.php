@@ -113,7 +113,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 	else
 	{
-		// Standard Elkarte headers
+		// Standard ElkArte headers
 		$headers = 'From: ' . $from_name . ' <' . (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']) . '>' . $line_break;
 		$headers .= ($from !== null && strpos($from, '@') !== false) ? 'Reply-To: <' . $from . '>' . $line_break : '';
 	}

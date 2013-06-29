@@ -7,7 +7,7 @@
  *
  * @version 1.0 Alpha
  *
- * This Plugin file contains all the functions that allow for Elkarte to interface
+ * This Plugin file contains all the functions that allow for ElkArte to interface
  * with Bad Behavior.  Bad Behavior is
  * Copyright (C) 2005,2006,2007,2008,2009,2010,2011,2012 Michael Hampton
  * License: LGPLv3

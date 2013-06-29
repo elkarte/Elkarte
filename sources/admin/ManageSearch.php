@@ -1059,7 +1059,7 @@ function createSphinxConfig()
 
 	// output our minimal configuration file to get them started
 	echo '#
-# Sphinx configuration file (sphinx.conf), configured for Elkarte
+# Sphinx configuration file (sphinx.conf), configured for ElkArte
 #
 # This is the minimum needed clean, simple, functional
 #

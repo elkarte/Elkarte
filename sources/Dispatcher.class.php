@@ -17,7 +17,7 @@ if (!defined('ELK'))
  * Try first the critical functionality (maintenance, no guest access)
  * Then, in order:
  *   forum's main actions: board index, message index, display topic
- *   the current/legacy file/functions registered by Elkarte core
+ *   the current/legacy file/functions registered by ElkArte core
  * Fall back to naming patterns:
  *   filename=[action].php function=[sa]
  *   filename=[action].controller.php method=action_[sa]
