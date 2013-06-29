@@ -428,18 +428,8 @@ class Themes_Controller extends Action_Controller
 
 			// Don't delete custom fields!!
 			if ($_GET['th'] == 1)
-			{
-				$request = $db->query('', '
-					SELECT col_name
-					FROM {db_prefix}custom_fields',
-					array(
-					)
-				);
-				$customFields = array();
-				while ($row = $db->fetch_assoc($request))
-					$customFields[] = $row['col_name'];
-				$db->free_result($request);
-			}
+				$customFields = loadCustomFields();
+
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
 			$db->query('', '

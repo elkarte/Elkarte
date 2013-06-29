@@ -408,16 +408,8 @@ function countConfiguredMemberOptions()
 	$themes = array();
 
 	// Need to make sure we don't do custom fields.
-	$request = $db->query('', '
-		SELECT col_name
-		FROM {db_prefix}custom_fields',
-		array(
-		)
-	);
-	$customFields = array();
-	while ($row = $db->fetch_assoc($request))
-		$customFields[] = $row['col_name'];
-	$db->free_result($request);
+	$customFields = loadCustomFields();
+
 	$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
 	$request = $db->query('themes_count', '
@@ -532,4 +524,27 @@ function addThemeOptions($id_theme, $options, $value)
 			'value' => (is_array($value) ? implode(',', $value) : $value),
 		)
 	);
+}
+
+/**
+ * Loads all the custom profile fields.
+ *
+ * @return array
+ */
+function loadCustomFields()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT col_name
+		FROM {db_prefix}custom_fields',
+		array(
+		)
+	);
+	$customFields = array();
+	while ($row = $db->fetch_assoc($request))
+		$customFields[] = $row['col_name'];
+	$db->free_result($request);
+
+	return $customFields;
 }
