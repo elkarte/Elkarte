@@ -758,6 +758,7 @@ class Themes_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		$db = database();
 
 		loadLanguage('Profile');
@@ -800,12 +801,8 @@ class Themes_Controller extends Action_Controller
 				// A variants to save for the user?
 				if (!empty($_GET['vrt']))
 				{
-					$db->insert('replace',
-						'{db_prefix}themes',
-						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-						array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
-						array('id_theme', 'id_member', 'variable')
-					);
+					updateThemeOptions(array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']));
+
 					cache_put_data('theme_settings-' . $_GET['th'] . ':' . $user_info['id'], null, 90);
 
 					$_SESSION['id_variant'] = 0;
@@ -817,13 +814,7 @@ class Themes_Controller extends Action_Controller
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($_GET['vrt']) && ($_REQUEST['u'] == '0' || $_REQUEST['u'] == '-1'))
 			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					array($_GET['th'], 0, 'default_variant', $_GET['vrt']),
-					array('id_theme', 'id_member', 'variable')
-				);
-
+				updateThemeOptions(array($_GET['th'], 0, 'default_variant', $_GET['vrt']));
 				// Make it obvious that it's changed
 				cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			}
