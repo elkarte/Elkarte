@@ -549,6 +549,11 @@ function loadCustomFields()
 	return $customFields;
 }
 
+/**
+ * Deletes a theme from the database.
+ *
+ * @param int $id
+ */
 function deleteTheme($id)
 {
 	$db = database();
@@ -586,4 +591,29 @@ function deleteTheme($id)
 			'current_theme' => $id,
 		)
 	);
+}
+
+/**
+ * Get the next free id for the theme.
+ *
+ * @return int
+ */
+function nextTheme()
+{
+	$db = database();
+
+	// Find the newest id_theme.
+	$result = $db->query('', '
+		SELECT MAX(id_theme)
+		FROM {db_prefix}themes',
+		array(
+		)
+	);
+	list ($id_theme) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	// This will be theme number...
+	$id_theme++;
+
+	return $id_theme;
 }

@@ -1086,6 +1086,7 @@ class Themes_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		loadTemplate('Themes');
@@ -1348,17 +1349,7 @@ class Themes_Controller extends Action_Controller
 			}
 
 			// Find the newest id_theme.
-			$result = $db->query('', '
-				SELECT MAX(id_theme)
-				FROM {db_prefix}themes',
-				array(
-				)
-			);
-			list ($id_theme) = $db->fetch_row($result);
-			$db->free_result($result);
-
-			// This will be theme number...
-			$id_theme++;
+			$id_theme = nextTheme();
 
 			$inserts = array();
 			foreach ($install_info as $var => $val)
