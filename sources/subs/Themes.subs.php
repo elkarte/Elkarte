@@ -663,3 +663,21 @@ function getThemeName($id)
 
 	return $theme_name;
 }
+
+/**
+ * 
+ */
+function deleteVariants($id)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE id_theme = {int:current_theme}
+			AND variable = {string:theme_variant}',
+		array(
+			'current_theme' => $id,
+			'theme_variant' => 'theme_variant',
+		)
+	);
+}

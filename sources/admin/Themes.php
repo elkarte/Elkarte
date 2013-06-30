@@ -826,17 +826,7 @@ class Themes_Controller extends Action_Controller
 
 				// Remove any custom variants.
 				if (!empty($_GET['vrt']))
-				{
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:current_theme}
-							AND variable = {string:theme_variant}',
-						array(
-							'current_theme' => (int) $_GET['th'],
-							'theme_variant' => 'theme_variant',
-						)
-					);
-				}
+					deleteVariants((int) $_GET['th']);
 
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
