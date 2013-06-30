@@ -361,17 +361,7 @@ class Themes_Controller extends Action_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					$db->query('substring', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:default_theme}
-							AND id_member != {int:no_member}
-							AND variable = SUBSTRING({string:option}, 1, 255)',
-						array(
-							'default_theme' => 1,
-							'no_member' => 0,
-							'option' => $opt,
-						)
-					);
+					removeThemeOptions(true, false, $opt);
 					addThemeOptions(1, $opt, $val);
 
 					$old_settings[] = $opt;
@@ -428,18 +418,8 @@ class Themes_Controller extends Action_Controller
 
 			// Don't delete custom fields!!
 			if ($_GET['th'] == 1)
-			{
-				$request = $db->query('', '
-					SELECT col_name
-					FROM {db_prefix}custom_fields',
-					array(
-					)
-				);
-				$customFields = array();
-				while ($row = $db->fetch_assoc($request))
-					$customFields[] = $row['col_name'];
-				$db->free_result($request);
-			}
+				$customFields = loadCustomFields();
+
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
 			$db->query('', '
@@ -548,7 +528,7 @@ class Themes_Controller extends Action_Controller
 	{
 		global $txt, $context, $settings, $modSettings;
 
-		$db = database();
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 			return $this->action_admin();
@@ -639,14 +619,8 @@ class Themes_Controller extends Action_Controller
 				$inserts[] = array(0, 1, $opt, is_array($val) ? implode(',', $val) : $val);
 			// If we're actually inserting something..
 			if (!empty($inserts))
-			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$inserts,
-					array('id_member', 'id_theme', 'variable')
-				);
-			}
+				updateThemeOptions($inserts);
+
 
 			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			cache_put_data('theme_settings-1', null, 90);
@@ -727,7 +701,7 @@ class Themes_Controller extends Action_Controller
 	{
 		global $modSettings, $context;
 
-		$db = database();
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		checkSession('get');
 
@@ -748,33 +722,7 @@ class Themes_Controller extends Action_Controller
 				unset($known[$i]);
 		}
 
-		$db->query('', '
-			DELETE FROM {db_prefix}themes
-			WHERE id_theme = {int:current_theme}',
-			array(
-				'current_theme' => $_GET['th'],
-			)
-		);
-
-		$db->query('', '
-			UPDATE {db_prefix}members
-			SET id_theme = {int:default_theme}
-			WHERE id_theme = {int:current_theme}',
-			array(
-				'default_theme' => 0,
-				'current_theme' => $_GET['th'],
-			)
-		);
-
-		$db->query('', '
-			UPDATE {db_prefix}boards
-			SET id_theme = {int:default_theme}
-			WHERE id_theme = {int:current_theme}',
-			array(
-				'default_theme' => 0,
-				'current_theme' => $_GET['th'],
-			)
-		);
+		deleteTheme($_GET['th']);
 
 		$known = strtr(implode(',', $known), array(',,' => ','));
 
@@ -800,6 +748,7 @@ class Themes_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		$db = database();
 
 		loadLanguage('Profile');
@@ -842,12 +791,8 @@ class Themes_Controller extends Action_Controller
 				// A variants to save for the user?
 				if (!empty($_GET['vrt']))
 				{
-					$db->insert('replace',
-						'{db_prefix}themes',
-						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-						array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
-						array('id_theme', 'id_member', 'variable')
-					);
+					updateThemeOptions(array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']));
+
 					cache_put_data('theme_settings-' . $_GET['th'] . ':' . $user_info['id'], null, 90);
 
 					$_SESSION['id_variant'] = 0;
@@ -859,13 +804,7 @@ class Themes_Controller extends Action_Controller
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($_GET['vrt']) && ($_REQUEST['u'] == '0' || $_REQUEST['u'] == '-1'))
 			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					array($_GET['th'], 0, 'default_variant', $_GET['vrt']),
-					array('id_theme', 'id_member', 'variable')
-				);
-
+				updateThemeOptions(array($_GET['th'], 0, 'default_variant', $_GET['vrt']));
 				// Make it obvious that it's changed
 				cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			}
@@ -877,17 +816,7 @@ class Themes_Controller extends Action_Controller
 
 				// Remove any custom variants.
 				if (!empty($_GET['vrt']))
-				{
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:current_theme}
-							AND variable = {string:theme_variant}',
-						array(
-							'current_theme' => (int) $_GET['th'],
-							'theme_variant' => 'theme_variant',
-						)
-					);
-				}
+					deleteVariants((int) $_GET['th']);
 
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
@@ -909,12 +838,7 @@ class Themes_Controller extends Action_Controller
 
 				if (!empty($_GET['vrt']))
 				{
-					$db->insert('replace',
-						'{db_prefix}themes',
-						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-						array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
-						array('id_theme', 'id_member', 'variable')
-					);
+					updateThemeOptions(array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']));
 					cache_put_data('theme_settings-' . $_GET['th'] . ':' . (int) $_REQUEST['u'], null, 90);
 
 					if ($user_info['id'] == $_REQUEST['u'])
@@ -1142,33 +1066,20 @@ class Themes_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		loadTemplate('Themes');
 
 		if (isset($_GET['theme_id']))
 		{
-			$result = $db->query('', '
-				SELECT value
-				FROM {db_prefix}themes
-				WHERE id_theme = {int:current_theme}
-					AND id_member = {int:no_member}
-					AND variable = {string:name}
-				LIMIT 1',
-				array(
-					'current_theme' => (int) $_GET['theme_id'],
-					'no_member' => 0,
-					'name' => 'name',
-				)
-			);
-			list ($theme_name) = $db->fetch_row($result);
-			$db->free_result($result);
+			$_GET['theme_id'] = (int) $_GET['theme_id'];
 
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
 			$context['installed_theme'] = array(
-				'id' => (int) $_GET['theme_id'],
-				'name' => $theme_name,
+				'id' => $_GET['theme_id'],
+				'name' => getThemeName($_GET['theme_id']),
 			);
 
 			return;
@@ -1404,29 +1315,14 @@ class Themes_Controller extends Action_Controller
 			}
 
 			// Find the newest id_theme.
-			$result = $db->query('', '
-				SELECT MAX(id_theme)
-				FROM {db_prefix}themes',
-				array(
-				)
-			);
-			list ($id_theme) = $db->fetch_row($result);
-			$db->free_result($result);
-
-			// This will be theme number...
-			$id_theme++;
+			$id_theme = nextTheme();
 
 			$inserts = array();
 			foreach ($install_info as $var => $val)
 				$inserts[] = array($id_theme, $var, $val);
 
 			if (!empty($inserts))
-				$db->insert('insert',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$inserts,
-					array('id_theme', 'variable')
-				);
+				addTheme($inserts);
 
 			updateSettings(array('knownThemes' => strtr($modSettings['knownThemes'] . ',' . $id_theme, array(',,' => ','))));
 		}
@@ -2127,45 +2023,3 @@ class Themes_Controller extends Action_Controller
 		$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
 	}
 }
-
-/**
- * Possibly the simplest and best example of how to use the template system.
- *  - allows the theme to take care of actions.
- *  - happens if $settings['catch_action'] is set and action isn't found
- *   in the action array.
- *  - can use a template, layers, sub_template, filename, and/or function.
- * @todo look at this
- */
-function WrapAction()
-{
-	global $context, $settings;
-
-	// Load any necessary template(s)?
-	if (isset($settings['catch_action']['template']))
-	{
-		// Load both the template and language file. (but don't fret if the language file isn't there...)
-		loadTemplate($settings['catch_action']['template']);
-		loadLanguage($settings['catch_action']['template'], '', false);
-	}
-
-	// Any special layers?
-	if (isset($settings['catch_action']['layers']))
-	{
-		$template_layers = Template_Layers::getInstance();
-		foreach ($settings['catch_action']['layers'] as $layer)
-			$template_layers->add($layer);
-	}
-
-	// Just call a function?
-	if (isset($settings['catch_action']['function']))
-	{
-		if (isset($settings['catch_action']['filename']))
-			template_include(SOURCEDIR . '/' . $settings['catch_action']['filename'], true);
-
-		$settings['catch_action']['function']();
-	}
-	// And finally, the main sub template ;).
-	elseif (isset($settings['catch_action']['sub_template']))
-		$context['sub_template'] = $settings['catch_action']['sub_template'];
-}
-

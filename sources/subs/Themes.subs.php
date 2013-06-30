@@ -408,16 +408,8 @@ function countConfiguredMemberOptions()
 	$themes = array();
 
 	// Need to make sure we don't do custom fields.
-	$request = $db->query('', '
-		SELECT col_name
-		FROM {db_prefix}custom_fields',
-		array(
-		)
-	);
-	$customFields = array();
-	while ($row = $db->fetch_assoc($request))
-		$customFields[] = $row['col_name'];
-	$db->free_result($request);
+	$customFields = loadCustomFields();
+
 	$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
 	$request = $db->query('themes_count', '
@@ -441,8 +433,8 @@ function countConfiguredMemberOptions()
 /**
  * Deletes all outdated options from the themes table
  *
- * @param bol $default_theme -> true is default, false for all custom themes
- * @param bol $membergroups -> true is for members, false for guests
+ * @param bool $default_theme -> true is default, false for all custom themes
+ * @param bool $membergroups -> true is for members, false for guests
  * @param array $old_settings
  */
 function removeThemeOptions($default_theme, $membergroups, $old_settings)
@@ -457,12 +449,17 @@ function removeThemeOptions($default_theme, $membergroups, $old_settings)
 		$mem_param = array('operator' => '=', 'id' => -1);
 	else
 		$mem_param = array('operator' => '>', 'id' => 0);
+
+	if (is_array($old_settings))
+		$var = 'variable IN ({array_string:old_settings})';
+	else
+		$var = 'variable = {string:old_settings}';
 	
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme '. $default . ' {int:default_theme}
 			AND id_member ' . $mem_param['operator'] . ' {int:guest_member}
-			AND variable IN ({array_string:old_settings})',
+			AND ' . $var,
 		array(
 			'default_theme' => 1,
 			'guest_member' => $mem_param['id'],
@@ -532,4 +529,203 @@ function addThemeOptions($id_theme, $options, $value)
 			'value' => (is_array($value) ? implode(',', $value) : $value),
 		)
 	);
+}
+
+/**
+ * Loads all the custom profile fields.
+ *
+ * @return array
+ */
+function loadCustomFields()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT col_name
+		FROM {db_prefix}custom_fields',
+		array(
+		)
+	);
+	$customFields = array();
+	while ($row = $db->fetch_assoc($request))
+		$customFields[] = $row['col_name'];
+	$db->free_result($request);
+
+	return $customFields;
+}
+
+/**
+ * Deletes a theme from the database.
+ *
+ * @param int $id
+ */
+function deleteTheme($id)
+{
+	$db = database();
+
+	// Make sure we never ever delete the default theme!
+	if ($id === 1)
+		fatal_lang_error('no_access', false);
+	
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE id_theme = {int:current_theme}',
+		array(
+			'current_theme' => $id,
+		)
+	);
+
+	// Update the members ...
+	$db->query('', '
+		UPDATE {db_prefix}members
+		SET id_theme = {int:default_theme}
+		WHERE id_theme = {int:current_theme}',
+		array(
+			'default_theme' => 0,
+			'current_theme' => $id,
+		)
+	);
+
+	// ... and the boards table.
+	$db->query('', '
+		UPDATE {db_prefix}boards
+		SET id_theme = {int:default_theme}
+		WHERE id_theme = {int:current_theme}',
+		array(
+			'default_theme' => 0,
+			'current_theme' => $id,
+		)
+	);
+}
+
+/**
+ * Get the next free id for the theme.
+ *
+ * @return int
+ */
+function nextTheme()
+{
+	$db = database();
+
+	// Find the newest id_theme.
+	$result = $db->query('', '
+		SELECT MAX(id_theme)
+		FROM {db_prefix}themes',
+		array(
+		)
+	);
+	list ($id_theme) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	// This will be theme number...
+	$id_theme++;
+
+	return $id_theme;
+}
+
+/**
+ * Adds a new theme to the database.
+ *
+ * @param array $details
+ */
+function addTheme($details)
+{
+	$db = database();
+
+	$db->insert('insert',
+		'{db_prefix}themes',
+		array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		$details,
+		array('id_theme', 'variable')
+	);
+}
+
+/**
+ * Get the name of a theme
+ *
+ * @param int $id
+ * @return string
+ */
+function getThemeName($id)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT value
+		FROM {db_prefix}themes
+		WHERE id_theme = {int:current_theme}
+			AND id_member = {int:no_member}
+			AND variable = {string:name}
+		LIMIT 1',
+		array(
+			'current_theme' => $id,
+			'no_member' => 0,
+			'name' => 'name',
+		)
+	);
+	list ($theme_name) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $theme_name;
+}
+
+/**
+ * Deletes all variants from a given theme id.
+ *
+ * @param int $id
+ */
+function deleteVariants($id)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}themes
+		WHERE id_theme = {int:current_theme}
+			AND variable = {string:theme_variant}',
+		array(
+			'current_theme' => $id,
+			'theme_variant' => 'theme_variant',
+		)
+	);
+}
+
+/**
+ * Possibly the simplest and best example of how to use the template system.
+ *  - allows the theme to take care of actions.
+ *  - happens if $settings['catch_action'] is set and action isn't found
+ *   in the action array.
+ *  - can use a template, layers, sub_template, filename, and/or function.
+ * @todo look at this
+ */
+function WrapAction()
+{
+	global $context, $settings;
+
+	// Load any necessary template(s)?
+	if (isset($settings['catch_action']['template']))
+	{
+		// Load both the template and language file. (but don't fret if the language file isn't there...)
+		loadTemplate($settings['catch_action']['template']);
+		loadLanguage($settings['catch_action']['template'], '', false);
+	}
+
+	// Any special layers?
+	if (isset($settings['catch_action']['layers']))
+	{
+		$template_layers = Template_Layers::getInstance();
+		foreach ($settings['catch_action']['layers'] as $layer)
+			$template_layers->add($layer);
+	}
+
+	// Just call a function?
+	if (isset($settings['catch_action']['function']))
+	{
+		if (isset($settings['catch_action']['filename']))
+			template_include(SOURCEDIR . '/' . $settings['catch_action']['filename'], true);
+
+		$settings['catch_action']['function']();
+	}
+	// And finally, the main sub template ;).
+	elseif (isset($settings['catch_action']['sub_template']))
+		$context['sub_template'] = $settings['catch_action']['sub_template'];
 }
