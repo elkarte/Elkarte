@@ -39,3 +39,49 @@ function onlineCount()
 
 	return $users_online;
 }
+
+/**
+ * Gets avarages for posts, topics, most online and new users.
+ *
+ * @return array
+ */
+function getAverages()
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT
+			SUM(posts) AS posts, SUM(topics) AS topics, SUM(registers) AS registers,
+			SUM(most_on) AS most_on, MIN(date) AS date, SUM(hits) AS hits
+		FROM {db_prefix}log_activity',
+		array(
+		)
+	);
+	$row = $db->fetch_assoc($result);
+	$db->free_result($result);
+
+	return $row;
+}
+
+/**
+ * Get the amount of boards.
+ *
+ * @return int
+ */
+function numBoards()
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}boards AS b
+		WHERE b.redirect = {string:blank_redirect}',
+		array(
+			'blank_redirect' => '',
+		)
+	);
+	list ($num_boards) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $num_boards;
+}

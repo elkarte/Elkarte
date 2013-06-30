@@ -108,27 +108,17 @@ class Stats_Controller extends Action_Controller
 		$context['show_member_list'] = allowedTo('view_mlist');
 
 		// Get averages...
-		$result = $db->query('', '
-			SELECT
-				SUM(posts) AS posts, SUM(topics) AS topics, SUM(registers) AS registers,
-				SUM(most_on) AS most_on, MIN(date) AS date, SUM(hits) AS hits
-			FROM {db_prefix}log_activity',
-			array(
-			)
-		);
-		$row = $db->fetch_assoc($result);
-		$db->free_result($result);
-
+		$averages = getAverages();
 		// This would be the amount of time the forum has been up... in days...
-		$total_days_up = ceil((time() - strtotime($row['date'])) / (60 * 60 * 24));
+		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
 
-		$context['average_posts'] = comma_format(round($row['posts'] / $total_days_up, 2));
-		$context['average_topics'] = comma_format(round($row['topics'] / $total_days_up, 2));
-		$context['average_members'] = comma_format(round($row['registers'] / $total_days_up, 2));
-		$context['average_online'] = comma_format(round($row['most_on'] / $total_days_up, 2));
-		$context['average_hits'] = comma_format(round($row['hits'] / $total_days_up, 2));
+		$context['average_posts'] = comma_format(round($averages['posts'] / $total_days_up, 2));
+		$context['average_topics'] = comma_format(round($averages['topics'] / $total_days_up, 2));
+		$context['average_members'] = comma_format(round($averages['registers'] / $total_days_up, 2));
+		$context['average_online'] = comma_format(round($averages['most_on'] / $total_days_up, 2));
+		$context['average_hits'] = comma_format(round($averages['hits'] / $total_days_up, 2));
 
-		$context['num_hits'] = comma_format($row['hits'], 0);
+		$context['num_hits'] = comma_format($averages['hits'], 0);
 
 		// How many users are online now.
 		$context['users_online'] = onlineCount();
