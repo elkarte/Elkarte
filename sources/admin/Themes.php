@@ -2074,4 +2074,3 @@ function WrapAction()
 	elseif (isset($settings['catch_action']['sub_template']))
 		$context['sub_template'] = $settings['catch_action']['sub_template'];
 }
-
