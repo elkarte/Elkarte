@@ -85,3 +85,49 @@ function numBoards()
 
 	return $num_boards;
 }
+
+/**
+ * Get the amount of categories
+ *
+ * @return int
+ */
+function numCategories()
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}categories AS c',
+		array(
+		)
+	);
+	list ($num_categories) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $num_categories;
+}
+
+/**
+ * Gets most online members for a specific date
+ *
+ * @param int $date
+ * @return int
+ */
+function mostOnline($date)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT most_on
+		FROM {db_prefix}log_activity
+		WHERE date = {date:given_date}
+		LIMIT 1',
+		array(
+			'given_date' => $date,
+		)
+	);
+	list ($online) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $online;
+}

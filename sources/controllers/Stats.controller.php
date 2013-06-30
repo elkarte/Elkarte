@@ -124,25 +124,8 @@ class Stats_Controller extends Action_Controller
 		$context['users_online'] = onlineCount();
 
 		// Statistics such as number of boards, categories, etc.
-		$result = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}boards AS b
-			WHERE b.redirect = {string:blank_redirect}',
-			array(
-				'blank_redirect' => '',
-			)
-		);
-		list ($context['num_boards']) = $db->fetch_row($result);
-		$db->free_result($result);
-
-		$result = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}categories AS c',
-			array(
-			)
-		);
-		list ($context['num_categories']) = $db->fetch_row($result);
-		$db->free_result($result);
+		$context['num_boards'] = numBoards();
+		$context['num_categories'] = numCategories();
 
 		// Format the numbers nicely.
 		$context['users_online'] = comma_format($context['users_online']);
@@ -201,18 +184,7 @@ class Stats_Controller extends Action_Controller
 		$date = strftime('%Y-%m-%d', forum_time(false));
 
 		// Members online so far today.
-		$result = $db->query('', '
-			SELECT most_on
-			FROM {db_prefix}log_activity
-			WHERE date = {date:today_date}
-			LIMIT 1',
-			array(
-				'today_date' => $date,
-			)
-		);
-		list ($context['online_today']) = $db->fetch_row($result);
-		$db->free_result($result);
-
+		$context['online_today'] = mostOnline($date);
 		$context['online_today'] = comma_format((int) $context['online_today']);
 
 		// Poster top 10.
