@@ -433,8 +433,8 @@ function countConfiguredMemberOptions()
 /**
  * Deletes all outdated options from the themes table
  *
- * @param bol $default_theme -> true is default, false for all custom themes
- * @param bol $membergroups -> true is for members, false for guests
+ * @param bool $default_theme -> true is default, false for all custom themes
+ * @param bool $membergroups -> true is for members, false for guests
  * @param array $old_settings
  */
 function removeThemeOptions($default_theme, $membergroups, $old_settings)
@@ -449,12 +449,17 @@ function removeThemeOptions($default_theme, $membergroups, $old_settings)
 		$mem_param = array('operator' => '=', 'id' => -1);
 	else
 		$mem_param = array('operator' => '>', 'id' => 0);
+
+	if (is_array($old_settings))
+		$var = 'variable IN ({array_string:old_settings})';
+	else
+		$var = 'variable = {string:old_settings}';
 	
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme '. $default . ' {int:default_theme}
 			AND id_member ' . $mem_param['operator'] . ' {int:guest_member}
-			AND variable IN ({array_string:old_settings})',
+			AND ' . $var,
 		array(
 			'default_theme' => 1,
 			'guest_member' => $mem_param['id'],

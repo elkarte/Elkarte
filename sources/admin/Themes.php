@@ -361,17 +361,7 @@ class Themes_Controller extends Action_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					$db->query('substring', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:default_theme}
-							AND id_member != {int:no_member}
-							AND variable = SUBSTRING({string:option}, 1, 255)',
-						array(
-							'default_theme' => 1,
-							'no_member' => 0,
-							'option' => $opt,
-						)
-					);
+					removeThemeOptions(true, false, $opt);
 					addThemeOptions(1, $opt, $val);
 
 					$old_settings[] = $opt;
