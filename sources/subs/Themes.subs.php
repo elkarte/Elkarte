@@ -665,7 +665,9 @@ function getThemeName($id)
 }
 
 /**
- * 
+ * Deletes all variants from a given theme id.
+ *
+ * @param int $id
  */
 function deleteVariants($id)
 {
