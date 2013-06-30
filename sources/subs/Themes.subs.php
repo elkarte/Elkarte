@@ -634,3 +634,26 @@ function addTheme($details)
 		array('id_theme', 'variable')
 	);
 }
+
+function getThemeName($id)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT value
+		FROM {db_prefix}themes
+		WHERE id_theme = {int:current_theme}
+			AND id_member = {int:no_member}
+			AND variable = {string:name}
+		LIMIT 1',
+		array(
+			'current_theme' => $id,
+			'no_member' => 0,
+			'name' => 'name',
+		)
+	);
+	list ($theme_name) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $theme_name;
+}

@@ -1093,27 +1093,13 @@ class Themes_Controller extends Action_Controller
 
 		if (isset($_GET['theme_id']))
 		{
-			$result = $db->query('', '
-				SELECT value
-				FROM {db_prefix}themes
-				WHERE id_theme = {int:current_theme}
-					AND id_member = {int:no_member}
-					AND variable = {string:name}
-				LIMIT 1',
-				array(
-					'current_theme' => (int) $_GET['theme_id'],
-					'no_member' => 0,
-					'name' => 'name',
-				)
-			);
-			list ($theme_name) = $db->fetch_row($result);
-			$db->free_result($result);
+			$_GET['theme_id'] = (int) $_GET['theme_id'];
 
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
 			$context['installed_theme'] = array(
-				'id' => (int) $_GET['theme_id'],
-				'name' => $theme_name,
+				'id' => $_GET['theme_id'],
+				'name' => getThemeName($_GET['theme_id']),
 			);
 
 			return;
