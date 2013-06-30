@@ -617,3 +617,20 @@ function nextTheme()
 
 	return $id_theme;
 }
+
+/**
+ * Adds a new theme to the database.
+ *
+ * @param array $details
+ */
+function addTheme($details)
+{
+	$db = database();
+
+	$db->insert('insert',
+		'{db_prefix}themes',
+		array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		$details,
+		array('id_theme', 'variable')
+	);
+}

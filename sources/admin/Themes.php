@@ -1356,12 +1356,7 @@ class Themes_Controller extends Action_Controller
 				$inserts[] = array($id_theme, $var, $val);
 
 			if (!empty($inserts))
-				$db->insert('insert',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$inserts,
-					array('id_theme', 'variable')
-				);
+				addTheme($inserts);
 
 			updateSettings(array('knownThemes' => strtr($modSettings['knownThemes'] . ',' . $id_theme, array(',,' => ','))));
 		}
