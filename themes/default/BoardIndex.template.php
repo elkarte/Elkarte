@@ -208,7 +208,8 @@ function template_boardindex_outer_below()
 			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_redirect.png" alt="" /> ', $txt['redirect_board'], '</p>
 		</div>';
 
-	template_info_center();
+	if (!empty($context['info_center_callbacks']))
+		template_info_center();
 }
 
 /**
@@ -227,8 +228,62 @@ function template_info_center()
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
 
-	// This is the "Recent Posts" bar.
-	if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
+	foreach ($context['info_center_callbacks'] as $callback)
+	{
+		$func = 'template_ic_' . $callback;
+		$func();
+	}
+
+	echo '
+		</ul>
+	</div>';
+
+	// Info center collapse object.
+	echo '
+	<script><!-- // --><![CDATA[
+		var oInfoCenterToggle = new elk_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',
+			aSwappableContainers: [
+				\'upshrinkHeaderIC\'
+			],
+			aSwapImages: [
+				{
+					sId: \'upshrink_ic\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
+					altExpanded: ', JavaScriptEscape($txt['hide']), ',
+					srcCollapsed: elk_images_url + \'/expand.png\',
+					altCollapsed: ', JavaScriptEscape($txt['show']), '
+				}
+			],
+			aSwapLinks: [
+				{
+					sId: \'upshrink_link\',
+					msgExpanded: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), ',
+					msgCollapsed: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), '
+				}
+			],
+			oThemeOptions: {
+				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				sOptionName: \'minmax_preferences\',
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sAdditionalVars: \';minmax_key=info\'
+			},
+			oCookieOptions: {
+				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
+				sCookieName: \'upshrinkIC\'
+			}
+		});
+	// ]]></script>';
+}
+
+// This is the "Recent Posts" bar.
+function template_ic_recent_posts()
+{
+	global $context, $txt, $scripturl, $settings;
+
+	if (!empty($settings['number_recent_posts']))
 	{
 		// Show the Recent Posts title, and attach webslices feed to this section
 		// The format requires: hslice, entry-title and entry-content classes.
@@ -282,8 +337,13 @@ function template_info_center()
 		echo '
 			</li>';
 	}
+}
 
-	// Show information about events, birthdays, and holidays on the calendar.
+// Show information about events, birthdays, and holidays on the calendar.
+function template_ic_show_events()
+{
+	global $context, $txt, $scripturl, $settings;
+
 	if ($context['show_calendar'])
 	{
 		echo '
@@ -332,8 +392,13 @@ function template_info_center()
 		echo '
 			</li>';
 	}
+}
 
-	// Show statistical style information...
+// Show statistical style information...
+function template_ic_show_stats()
+{
+	global $txt, $scripturl, $context, $settings;
+
 	if ($settings['show_stats_index'])
 	{
 		echo '
@@ -347,6 +412,11 @@ function template_info_center()
 				</p>
 			</li>';
 	}
+}
+
+function template_ic_show_users()
+{
+	global $context, $txt, $scripturl, $settings, $modSettings;
 
 	// "Users online" - in order of activity.
 	echo '
@@ -383,48 +453,4 @@ function template_info_center()
 			echo '
 				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
 	}
-
-	echo '
-			</li>
-		</ul>
-	</div>';
-
-	// Info center collapse object.
-	echo '
-	<script><!-- // --><![CDATA[
-		var oInfoCenterToggle = new elk_Toggle({
-			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',
-			aSwappableContainers: [
-				\'upshrinkHeaderIC\'
-			],
-			aSwapImages: [
-				{
-					sId: \'upshrink_ic\',
-					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
-				}
-			],
-			aSwapLinks: [
-				{
-					sId: \'upshrink_link\',
-					msgExpanded: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), ',
-					msgCollapsed: ', JavaScriptEscape(sprintf($txt['info_center_title'], $context['forum_name_html_safe'])), '
-				}
-			],
-			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'minmax_preferences\',
-				sSessionId: elk_session_id,
-				sSessionVar: elk_session_var,
-				sAdditionalVars: \';minmax_key=info\'
-			},
-			oCookieOptions: {
-				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
-				sCookieName: \'upshrinkIC\'
-			}
-		});
-	// ]]></script>';
 }

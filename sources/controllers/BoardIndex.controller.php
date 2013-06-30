@@ -127,6 +127,15 @@ class BoardIndex_Controller extends Action_Controller
 			'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markallreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id']),
 		);
 
+		$context['info_center_callbacks'] = array();
+		if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
+			$context['info_center_callbacks'][] = 'recent_posts';
+		if ($context['show_calendar'])
+			$context['info_center_callbacks'][] = 'show_events';
+		if ($settings['show_stats_index'])
+			$context['info_center_callbacks'][] = 'show_stats';
+		$context['info_center_callbacks'][] = 'show_users';
+
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_mark_read_button');
 	}
