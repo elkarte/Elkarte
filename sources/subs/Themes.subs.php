@@ -635,6 +635,12 @@ function addTheme($details)
 	);
 }
 
+/**
+ * Get the name of a theme
+ *
+ * @param int $id
+ * @return string
+ */
 function getThemeName($id)
 {
 	$db = database();
