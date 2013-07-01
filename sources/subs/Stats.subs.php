@@ -131,3 +131,70 @@ function mostOnline($date)
 
 	return $online;
 }
+
+/**
+ * Determines the male vs. female ratio
+ *
+ * @return array
+ */
+function genderRatio()
+{
+	$db = database();
+	$gender = array();
+
+	$result = $db->query('', '
+		SELECT COUNT(*) AS total_members, gender
+		FROM {db_prefix}members
+		GROUP BY gender',
+		array(
+		)
+	);
+
+	while ($row = $db->fetch_assoc($result))
+	{
+		// Assuming we're telling... male or female?
+		if (!empty($row['gender']))
+			$gender[$row['gender'] == 2 ? 'females' : 'males'] = $row['total_members'];
+	}
+	$db->free_result($result);
+
+	return $gender;
+}
+
+function topPosters()
+{
+	global $scripturl, $modSettings;
+
+	$db = database();
+
+	$top_posters = array();
+
+	$members_result = $db->query('', '
+		SELECT id_member, real_name, posts
+		FROM {db_prefix}members
+		WHERE posts > {int:no_posts}
+		ORDER BY posts DESC
+		LIMIT {int:limit_posts}',
+		array(
+			'no_posts' => 0,
+			'limit_posts' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
+		)
+	);
+	
+	$max_num_posts = 1;
+	while ($row_members = $db->fetch_assoc($members_result))
+	{
+		$top_posters[] = array(
+			'name' => $row_members['real_name'],
+			'id' => $row_members['id_member'],
+			'num_posts' => $row_members['posts'],
+			'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
+			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
+		);
+		if ($max_num_posts < $row_members['posts'])
+			$max_num_posts = $row_members['posts'];
+	}
+	$db->free_result($members_result);
+
+	return $top_posters;
+}

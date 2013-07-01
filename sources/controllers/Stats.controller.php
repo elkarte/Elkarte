@@ -144,21 +144,7 @@ class Stats_Controller extends Action_Controller
 		// Male vs. female ratio - let's calculate this only every four minutes.
 		if (($context['gender'] = cache_get_data('stats_gender', 240)) == null)
 		{
-			$result = $db->query('', '
-				SELECT COUNT(*) AS total_members, gender
-				FROM {db_prefix}members
-				GROUP BY gender',
-				array(
-				)
-			);
-			$context['gender'] = array();
-			while ($row = $db->fetch_assoc($result))
-			{
-				// Assuming we're telling... male or female?
-				if (!empty($row['gender']))
-					$context['gender'][$row['gender'] == 2 ? 'females' : 'males'] = $row['total_members'];
-			}
-			$db->free_result($result);
+			$context['gender'] = genderRatio();
 
 			// Set these two zero if the didn't get set at all.
 			if (empty($context['gender']['males']))
@@ -188,33 +174,8 @@ class Stats_Controller extends Action_Controller
 		$context['online_today'] = comma_format((int) $context['online_today']);
 
 		// Poster top 10.
-		$members_result = $db->query('', '
-			SELECT id_member, real_name, posts
-			FROM {db_prefix}members
-			WHERE posts > {int:no_posts}
-			ORDER BY posts DESC
-			LIMIT 10',
-			array(
-				'no_posts' => 0,
-			)
-		);
-		$context['top_posters'] = array();
-		$max_num_posts = 1;
-		while ($row_members = $db->fetch_assoc($members_result))
-		{
-			$context['top_posters'][] = array(
-				'name' => $row_members['real_name'],
-				'id' => $row_members['id_member'],
-				'num_posts' => $row_members['posts'],
-				'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
-			);
-
-			if ($max_num_posts < $row_members['posts'])
-				$max_num_posts = $row_members['posts'];
-		}
-		$db->free_result($members_result);
-
+		$context['top_posters'] = topPosters();
+	
 		foreach ($context['top_posters'] as $i => $poster)
 		{
 			$context['top_posters'][$i]['post_percent'] = round(($poster['num_posts'] * 100) / $max_num_posts);
