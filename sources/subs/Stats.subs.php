@@ -248,3 +248,77 @@ function topBoards()
 
 	return $top_boards;
 }
+
+function topTopicReplies($topic_ids)
+{
+	global $modSettings, $scripturl;
+
+	$db = database();
+
+	// Are you on a larger forum?  If so, let's try to limit the number of topics we search through.
+	if ($modSettings['totalMessages'] > 100000)
+	{
+		$request = $db->query('', '
+			SELECT id_topic
+			FROM {db_prefix}topics
+			WHERE num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
+				AND approved = {int:is_approved}' : '') . '
+			ORDER BY num_replies DESC
+			LIMIT 100',
+			array(
+				'no_replies' => 0,
+				'is_approved' => 1,
+			)
+		);
+		$topic_ids = array();
+		while ($row = $db->fetch_assoc($request))
+			$topic_ids[] = $row['id_topic'];
+		$db->free_result($request);
+	}
+	else
+		$topic_ids = array();
+
+	$topic_reply_result = $db->query('', '
+		SELECT m.subject, t.num_replies, t.id_board, t.id_topic, b.name
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . ')
+		WHERE {query_see_board}' . (!empty($topic_ids) ? '
+			AND t.id_topic IN ({array_int:topic_list})' : ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved}' : '')) . '
+		ORDER BY t.num_replies DESC
+		LIMIT {int:topic_replies}',
+		array(
+			'topic_list' => $topic_ids,
+			'recycle_board' => $modSettings['recycle_board'],
+			'is_approved' => 1,
+			'topic_replies' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
+		)
+	);
+	$top_topics_replies = array();
+	$max_num_replies = 1;
+	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
+	{
+		censorText($row_topic_reply['subject']);
+		$top_topics_replies[] = array(
+			'id' => $row_topic_reply['id_topic'],
+			'board' => array(
+				'id' => $row_topic_reply['id_board'],
+				'name' => $row_topic_reply['name'],
+				'href' => $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0',
+				'link' => '<a href="' . $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0">' . $row_topic_reply['name'] . '</a>'
+			),
+			'subject' => $row_topic_reply['subject'],
+			'num_replies' => $row_topic_reply['num_replies'],
+			'href' => $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0',
+			'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0">' . $row_topic_reply['subject'] . '</a>'
+		);
+
+		if ($max_num_replies < $row_topic_reply['num_replies'])
+			$max_num_replies = $row_topic_reply['num_replies'];
+	}
+	$db->free_result($topic_reply_result);
+
+	return $top_topics_replies;
+}
