@@ -209,65 +209,9 @@ class Stats_Controller extends Action_Controller
 			$context['top_topics_views'][$i]['num_views'] = comma_format($context['top_topics_views'][$i]['num_views']);
 		}
 
-		// Try to cache this when possible, because it's a little unavoidably slow.
-		if (($members = cache_get_data('stats_top_starters', 360)) == null)
-		{
-			$request = $db->query('', '
-				SELECT id_member_started, COUNT(*) AS hits
-				FROM {db_prefix}topics' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				WHERE id_board != {int:recycle_board}' : '') . '
-				GROUP BY id_member_started
-				ORDER BY hits DESC
-				LIMIT 20',
-				array(
-					'recycle_board' => $modSettings['recycle_board'],
-				)
-			);
-			$members = array();
-			while ($row = $db->fetch_assoc($request))
-				$members[$row['id_member_started']] = $row['hits'];
-			$db->free_result($request);
-
-			cache_put_data('stats_top_starters', $members, 360);
-		}
-
-		if (empty($members))
-			$members = array(0 => 0);
-
 		// Topic poster top 10.
-		$members_result = $db->query('top_topic_starters', '
-			SELECT id_member, real_name
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:member_list})
-			ORDER BY FIND_IN_SET(id_member, {string:top_topic_posters})
-			LIMIT 10',
-			array(
-				'member_list' => array_keys($members),
-				'top_topic_posters' => implode(',', array_keys($members)),
-			)
-		);
-		$context['top_starters'] = array();
-		$max_num_topics = 1;
-		while ($row_members = $db->fetch_assoc($members_result))
-		{
-			$context['top_starters'][] = array(
-				'name' => $row_members['real_name'],
-				'id' => $row_members['id_member'],
-				'num_topics' => $members[$row_members['id_member']],
-				'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
-			);
+		$context['top_starters'] = topTopicStarter();
 
-			if ($max_num_topics < $members[$row_members['id_member']])
-				$max_num_topics = $members[$row_members['id_member']];
-		}
-		$db->free_result($members_result);
-
-		foreach ($context['top_starters'] as $i => $topic)
-		{
-			$context['top_starters'][$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);
-			$context['top_starters'][$i]['num_topics'] = comma_format($context['top_starters'][$i]['num_topics']);
-		}
 
 		// Time online top 10.
 		$temp = cache_get_data('stats_total_time_members', 600);
