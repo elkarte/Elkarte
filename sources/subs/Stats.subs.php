@@ -249,7 +249,12 @@ function topBoards()
 	return $top_boards;
 }
 
-function topTopicReplies($topic_ids)
+/**
+ * Loads a list of top x topic replies, x is configurable via $modSettings['stats_limit'].
+ *
+ * @return array
+ */
+function topTopicReplies()
 {
 	global $modSettings, $scripturl;
 
@@ -323,6 +328,11 @@ function topTopicReplies($topic_ids)
 	return $top_topics_replies;
 }
 
+/**
+ * Loads a list of top x topic views, x is configurable via $modSettings['stats_limit'].
+ *
+ * @return array
+ */
 function topTopicViews()
 {
 	global $modSettings, $scripturl;
