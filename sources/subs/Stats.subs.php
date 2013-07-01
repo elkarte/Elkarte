@@ -360,11 +360,12 @@ function topTopicViews()
 			AND t.id_topic IN ({array_int:topic_list})' : ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}' : '')) . '
 		ORDER BY t.num_views DESC
-		LIMIT 10',
+		LIMIT {int:topic_views}',
 		array(
 			'topic_list' => $topic_ids,
 			'recycle_board' => $modSettings['recycle_board'],
 			'is_approved' => 1,
+			'topic_views' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
 		)
 	);
 	$top_topics_views = array();
