@@ -496,3 +496,67 @@ function topTopicStarter()
 
 	return $top_starters;
 }
+
+function topTimeOnline()
+{
+	global $modSettings, $scripturl, $txt;
+
+	$db = database();
+
+	$max_members = isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10;
+	$temp = cache_get_data('stats_total_time_members', 600);
+	$members_result = $db->query('', '
+		SELECT id_member, real_name, total_time_logged_in
+		FROM {db_prefix}members' . (!empty($temp) ? '
+		WHERE id_member IN ({array_int:member_list_cached})' : '') . '
+		ORDER BY total_time_logged_in DESC
+		LIMIT {int:top_online}',
+		array(
+			'member_list_cached' => $temp,
+			'top_online' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 20,
+		)
+	);
+	$top_time_online = array();
+	$temp2 = array();
+	$max_time_online = 1;
+	while ($row_members = $db->fetch_assoc($members_result))
+	{
+		$temp2[] = (int) $row_members['id_member'];
+		if (count($top_time_online) >= $max_members)
+			continue;
+
+		// Figure out the days, hours and minutes.
+		$timeDays = floor($row_members['total_time_logged_in'] / 86400);
+		$timeHours = floor(($row_members['total_time_logged_in'] % 86400) / 3600);
+
+		// Figure out which things to show... (days, hours, minutes, etc.)
+		$timelogged = '';
+		if ($timeDays > 0)
+			$timelogged .= $timeDays . $txt['totalTimeLogged5'];
+		if ($timeHours > 0)
+			$timelogged .= $timeHours . $txt['totalTimeLogged6'];
+		$timelogged .= floor(($row_members['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
+
+		$top_time_online[] = array(
+			'id' => $row_members['id_member'],
+			'name' => $row_members['real_name'],
+			'time_online' => $timelogged,
+			'seconds_online' => $row_members['total_time_logged_in'],
+			'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
+			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
+		);
+
+		if ($max_time_online < $row_members['total_time_logged_in'])
+			$max_time_online = $row_members['total_time_logged_in'];
+	}
+	$db->free_result($members_result);
+
+	foreach ($top_time_online as $i => $member)
+		$top_time_online[$i]['time_percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
+
+	// Cache the ones we found for a bit, just so we don't have to look again.
+	if ($temp !== $temp2)
+		cache_put_data('stats_total_time_members', $temp2, 480);
+
+	return $top_time_online;
+}
