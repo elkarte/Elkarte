@@ -175,39 +175,15 @@ class Stats_Controller extends Action_Controller
 
 		// Poster top 10.
 		$context['top_posters'] = topPosters();
-	
-		foreach ($context['top_posters'] as $i => $poster)
-		{
-			$context['top_posters'][$i]['post_percent'] = round(($poster['num_posts'] * 100) / $max_num_posts);
-			$context['top_posters'][$i]['num_posts'] = comma_format($context['top_posters'][$i]['num_posts']);
-		}
 
 		// Board top 10.
 		$context['top_boards'] = topBoards();
 
-		foreach ($context['top_boards'] as $i => $board)
-		{
-			$context['top_boards'][$i]['post_percent'] = round(($board['num_posts'] * 100) / $max_num_posts);
-			$context['top_boards'][$i]['num_posts'] = comma_format($context['top_boards'][$i]['num_posts']);
-		}
-
 		// Topic replies top 10.
 		$context['top_topics_replies'] = topTopicReplies();
 	
-		foreach ($context['top_topics_replies'] as $i => $topic)
-		{
-			$context['top_topics_replies'][$i]['post_percent'] = round(($topic['num_replies'] * 100) / $max_num_replies);
-			$context['top_topics_replies'][$i]['num_replies'] = comma_format($context['top_topics_replies'][$i]['num_replies']);
-		}
-
 		// Topic views top 10.
 		$context['top_topics_views'] = topTopicViews();
-
-		foreach ($context['top_topics_views'] as $i => $topic)
-		{
-			$context['top_topics_views'][$i]['post_percent'] = round(($topic['num_views'] * 100) / $max_num_views);
-			$context['top_topics_views'][$i]['num_views'] = comma_format($context['top_topics_views'][$i]['num_views']);
-		}
 
 		// Topic poster top 10.
 		$context['top_starters'] = topTopicStarter();

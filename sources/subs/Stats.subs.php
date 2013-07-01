@@ -201,6 +201,12 @@ function topPosters()
 	}
 	$db->free_result($members_result);
 
+	foreach ($top_posters as $i => $poster)
+	{
+		$top_posters[$i]['post_percent'] = round(($poster['num_posts'] * 100) / $max_num_posts);
+		$top_posters[$i]['num_posts'] = comma_format($top_posters[$i]['num_posts']);
+	}
+
 	return $top_posters;
 }
 
@@ -245,6 +251,11 @@ function topBoards()
 			$max_num_posts = $row_board['num_posts'];
 	}
 	$db->free_result($boards_result);
+	foreach ($top_boards as $i => $board)
+	{
+		$top_boards[$i]['post_percent'] = round(($board['num_posts'] * 100) / $max_num_posts);
+		$top_boards[$i]['num_posts'] = comma_format($top_boards[$i]['num_posts']);
+	}
 
 	return $top_boards;
 }
@@ -324,6 +335,11 @@ function topTopicReplies()
 			$max_num_replies = $row_topic_reply['num_replies'];
 	}
 	$db->free_result($topic_reply_result);
+			foreach ($top_topics_replies as $i => $topic)
+		{
+			$top_topics_replies[$i]['post_percent'] = round(($topic['num_replies'] * 100) / $max_num_replies);
+			$top_topics_replies[$i]['num_replies'] = comma_format($top_topics_replies[$i]['num_replies']);
+		}
 
 	return $top_topics_replies;
 }
@@ -402,6 +418,12 @@ function topTopicViews()
 			$max_num_views = $row_topic_views['num_views'];
 	}
 	$db->free_result($topic_view_result);
+
+	foreach ($top_topics_views as $i => $topic)
+	{
+		$top_topics_views[$i]['post_percent'] = round(($topic['num_views'] * 100) / $max_num_views);
+		$top_topics_views[$i]['num_views'] = comma_format($top_topics_views[$i]['num_views']);
+	}
 
 	return $top_topics_views;
 }
