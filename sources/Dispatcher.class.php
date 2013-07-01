@@ -271,7 +271,7 @@ class Site_Dispatcher
 			// @todo remove this?
 			if (!empty($settings['catch_action']))
 			{
-				$this->_file_name = ADMINDIR . '/Themes.php';
+				$this->_file_name = SUBSDIR . '/Themes.subs.php';
 				$this->_function_name = 'WrapAction';
 			}
 			else
