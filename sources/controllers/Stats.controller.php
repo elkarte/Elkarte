@@ -200,69 +200,8 @@ class Stats_Controller extends Action_Controller
 			$context['top_topics_replies'][$i]['num_replies'] = comma_format($context['top_topics_replies'][$i]['num_replies']);
 		}
 
-		// Large forums may need a bit more prodding...
-		if ($modSettings['totalMessages'] > 100000)
-		{
-			$request = $db->query('', '
-				SELECT id_topic
-				FROM {db_prefix}topics
-				WHERE num_views != {int:no_views}
-				ORDER BY num_views DESC
-				LIMIT 100',
-				array(
-					'no_views' => 0,
-				)
-			);
-			$topic_ids = array();
-			while ($row = $db->fetch_assoc($request))
-				$topic_ids[] = $row['id_topic'];
-			$db->free_result($request);
-		}
-		else
-			$topic_ids = array();
-
 		// Topic views top 10.
-		$topic_view_result = $db->query('', '
-			SELECT m.subject, t.num_views, t.id_board, t.id_topic, b.name
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board}' : '') . ')
-			WHERE {query_see_board}' . (!empty($topic_ids) ? '
-				AND t.id_topic IN ({array_int:topic_list})' : ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : '')) . '
-			ORDER BY t.num_views DESC
-			LIMIT 10',
-			array(
-				'topic_list' => $topic_ids,
-				'recycle_board' => $modSettings['recycle_board'],
-				'is_approved' => 1,
-			)
-		);
-		$context['top_topics_views'] = array();
-		$max_num_views = 1;
-		while ($row_topic_views = $db->fetch_assoc($topic_view_result))
-		{
-			censorText($row_topic_views['subject']);
-
-			$context['top_topics_views'][] = array(
-				'id' => $row_topic_views['id_topic'],
-				'board' => array(
-					'id' => $row_topic_views['id_board'],
-					'name' => $row_topic_views['name'],
-					'href' => $scripturl . '?board=' . $row_topic_views['id_board'] . '.0',
-					'link' => '<a href="' . $scripturl . '?board=' . $row_topic_views['id_board'] . '.0">' . $row_topic_views['name'] . '</a>'
-				),
-				'subject' => $row_topic_views['subject'],
-				'num_views' => $row_topic_views['num_views'],
-				'href' => $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0',
-				'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0">' . $row_topic_views['subject'] . '</a>'
-			);
-
-			if ($max_num_views < $row_topic_views['num_views'])
-				$max_num_views = $row_topic_views['num_views'];
-		}
-		$db->free_result($topic_view_result);
+		$context['top_topics_views'] = topTopicViews();
 
 		foreach ($context['top_topics_views'] as $i => $topic)
 		{
