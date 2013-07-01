@@ -428,6 +428,11 @@ function topTopicViews()
 	return $top_topics_views;
 }
 
+/**
+ * Loads a list of top x topic starters, x is configurable via $modSettings['stats_limit'].
+ *
+ * @return array
+ */
 function topTopicStarter()
 {
 	global $modSettings, $scripturl;
@@ -497,6 +502,11 @@ function topTopicStarter()
 	return $top_starters;
 }
 
+/**
+ * Loads a list of top x users by online time, x is configurable via $modSettings['stats_limit'].
+ *
+ * @return array
+ */
 function topTimeOnline()
 {
 	global $modSettings, $scripturl, $txt;
