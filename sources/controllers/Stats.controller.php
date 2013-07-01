@@ -183,35 +183,8 @@ class Stats_Controller extends Action_Controller
 		}
 
 		// Board top 10.
-		$boards_result = $db->query('', '
-			SELECT id_board, name, num_posts
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board}' : '') . '
-				AND b.redirect = {string:blank_redirect}
-			ORDER BY num_posts DESC
-			LIMIT 10',
-			array(
-				'recycle_board' => $modSettings['recycle_board'],
-				'blank_redirect' => '',
-			)
-		);
-		$context['top_boards'] = array();
-		$max_num_posts = 1;
-		while ($row_board = $db->fetch_assoc($boards_result))
-		{
-			$context['top_boards'][] = array(
-				'id' => $row_board['id_board'],
-				'name' => $row_board['name'],
-				'num_posts' => $row_board['num_posts'],
-				'href' => $scripturl . '?board=' . $row_board['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['name'] . '</a>'
-			);
 
-			if ($max_num_posts < $row_board['num_posts'])
-				$max_num_posts = $row_board['num_posts'];
-		}
-		$db->free_result($boards_result);
+		$context['top_boards'] = topBoards();
 
 		foreach ($context['top_boards'] as $i => $board)
 		{

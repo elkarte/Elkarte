@@ -161,6 +161,11 @@ function genderRatio()
 	return $gender;
 }
 
+/**
+ * Loads a list of top x posters, x is configurable via $modSettings['stats_limit'].
+ *
+ * @return array
+ */
 function topPosters()
 {
 	global $scripturl, $modSettings;
@@ -197,4 +202,49 @@ function topPosters()
 	$db->free_result($members_result);
 
 	return $top_posters;
+}
+
+/**
+ * Loads a list of top x boards, x is configurable via $modSettings['stats_limit'].
+ *
+ * @return array
+ */
+function topBoards()
+{
+	global $modSettings, $scripturl;
+
+	$db = database();
+
+	$boards_result = $db->query('', '
+		SELECT id_board, name, num_posts
+		FROM {db_prefix}boards AS b
+		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : '') . '
+			AND b.redirect = {string:blank_redirect}
+		ORDER BY num_posts DESC
+		LIMIT {int:limit_boards}',
+		array(
+			'recycle_board' => $modSettings['recycle_board'],
+			'blank_redirect' => '',
+			'limit_boards' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
+		)
+	);
+	$top_boards = array();
+	$max_num_posts = 1;
+	while ($row_board = $db->fetch_assoc($boards_result))
+	{
+		$top_boards[] = array(
+			'id' => $row_board['id_board'],
+			'name' => $row_board['name'],
+			'num_posts' => $row_board['num_posts'],
+			'href' => $scripturl . '?board=' . $row_board['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['name'] . '</a>'
+		);
+
+		if ($max_num_posts < $row_board['num_posts'])
+			$max_num_posts = $row_board['num_posts'];
+	}
+	$db->free_result($boards_result);
+
+	return $top_boards;
 }
