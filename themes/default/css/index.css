@@ -55,7 +55,7 @@
 	/* Next limits maximum width on wide screens. */
 	/* Sized in em, since some people require larger text. */ 
 	/* For ease of reading, content really should not be too wide. */
-	max-width: 72em;
+	max-width: 95em;
 	/* Next is just for some testing. */
 	/*min-width: 100%;*/
 }
@@ -420,17 +420,18 @@ em {
 }
 
 /* Styles for rounded headers. */
+.category_header,
 h3.catbg, h3.titlebg, h4.titlebg, h4.catbg {
-	padding: 4px 12px 0 12px;
+	padding: 4px 12px 2px 12px;
 	border: 1px solid #ccc;
-	border-bottom: 1px solid #aaa;
+	border-bottom: 1px solid #afafaf;
 	border-radius: 6px 6px 0 0;
 	background: #ebebeb;
-	background-image: linear-gradient(to bottom, #ebebeb 0%, #c6c6c6 100%);
+	background-image: linear-gradient(to bottom, #ebebeb 0%, #c9c9c9 100%);
 	color: #555;
-	text-shadow: 1px 1px 0 #eee;
-	font-size: 1.143em;
-	line-height: 2em;
+	text-shadow: 1px 1px 0 #ebebeb;
+	font-size: 1.214em;
+	line-height: 1.8em;
 }
 
 h3.catbg a:link, h3.catbg a:visited, h4.catbg a:link, h4.catbg a:visited,
@@ -460,30 +461,8 @@ h4.titlebg .icon {
 	margin: 5px 0;
 	padding: 4px;
 }
-.table_list .unreadlink, .table_list .collapse {
+.collapse {
 	float: right;
-}
-.table_list .collapse {
-	padding: 4px 4px 0 8px;
-}
-.title_barIC>.titlebg {
-	margin: 4px 0;
-	padding: 4px 6px 0 6px;
-	border: none;
-	border-top: 1px solid #ccc;
-	border-radius: 0;
-	background: none;
-	font-size: 1em;
-}
-.title_barIC:first-child>.titlebg {
-	margin: 4px 0;
-	border: none;
-}
-/* Icons for info centre title bars. */
-.title_barIC .titlebg .icon{
-	margin: 0;
-	padding: 5px 6px 0 0;
-	vertical-align: middle;
 }
 
 /* Alternating backgrounds for posts, and several other sections of the forum. */
@@ -1812,124 +1791,118 @@ dl.settings textarea {
 	margin: 0 8px 6px 8px;
 	font-size: 0.857em;
 }
-
-/* The newsfader - re-styled a bit. */
-#newsfader {
-	margin: 0 0 6px 0;
+/* The board categories and newsfader - some shared styling. */
+.forum_category {
+	clear: both;
+	margin: 0 0 18px 0;
+	border-radius: 4px 4px 0 0;
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
+}
+#smfFadeScroller, .board_row, .childboard_row {
+	border: 1px solid #ddd;
+	margin: 2px 0 0 0;
+	background: #fff;
 }
 #smfFadeScroller {
 	overflow: auto;
 	padding: 12px 25px;
-	border: 2px solid #e4e4e4;
 	/* Longhand style due to JS bug in IE! */
 	color: #555555;
 	text-align: center;
 }
-
-/* The board index and child boards tables. @todo - Will be deprecated. */
-.boardindex_table {
-	margin: 2px 0 -8px 0;
+.board_row {
+	padding: 14px 0 10px 0;
 }
-/* Different margin, ergo new class. */
-.childboard_table {
-	margin: 2px 0 -16px 0;
+.board_row.parent_board {
+	border-bottom: none;
 }
-.table_list {
-	width: 100%;
-	border-spacing: 0;
+.childboard_row {
+	margin: 0;
+	border-top: none;
 }
-.table_list .header td {
-	padding: 0;
-}
-.table_list .icon {
-	padding: 14px 0 0 0;
-	min-width: 50px;
-	/* Top aligned is much nicer for the icon. */
-	width: 5%;
-	border-left: 2px solid #e4e4e4;
+.board_info, .board_latest {
+	display: table-cell;
 	vertical-align: top;
-	text-align: center;
+	width: 70%;
+	padding: 0 8px;
+	font-size: 0.929em;
 }
-.table_list .info {
-	padding: 0 7px 0 0;
-}
-/* The board title! */
-.table_list .info .subject {
-	color: #46823c;
-	font-weight: 600;
-	font-size: 1.1em;
-}
-.table_list .info p {
-	margin: 0;
-	padding: 0;
-	font-size: 1em;
-}
-.table_list .info .moderators {
-	font-size: 0.857em;
-}
-/* Stats and lastpost cells now have standard body text font size. */
-/* Looks good. Less code. Better legibility for more people. Bigger link target. */
-.table_list .stats {
-	padding: 7px 7px 0 7px;
-	width: 12%;
-}
-.table_list .stats p {
-	padding: 0 7px;
-	min-height: 3em;
-	border-right: 1px solid #ccc;
+.board_latest {
+	width: 40%;
+	min-width: 36em;
+	padding: 0 14px;
 	border-left: 1px solid #ccc;
+}
+.icon_anchor {
+	display: block;
 	text-align: center;
+	min-width: 50px;
+	padding: 2px 6px 0 0;
+	float: left;
 }
-.table_list .lastpost {
-	padding: 7px;
-	min-width: 25em;
-	width: 24%;
-	border-right: 2px solid #e4e4e4;
-}
-.table_list .lastpost p {
-	margin: 0;
-	padding: 0;
-}
-.table_list .lastpost p a {
-	color: #46823c;
+.board_name {
+	padding: 0 0 1px 0;
+	font-size: 1.154em;
 	font-weight: 600;
 }
-.table_list .lastpost p a:last-child {
-	color: #555;
-	font-weight: normal;
+.board_name >a {
+	color: #4b863c;
 }
-.table_list .children {
-	padding: 4px 0 0 0;
-	border-top: 1px solid #ddd;
-	border-right: 2px solid #e4e4e4;
-	background: #fff;
-	color: #555;
+.board_description, .moderators {
+	margin: 0 0 0 56px;
+}
+.moderators {
+	font-size: 0.923em;
+}
+.board_stats {
+	text-align: right;
+	padding: 1px  0 1px 6px;
+	float: right;
+	color: #777;
+	min-width: 8.4em;
+	min-height: 3.3em;
+}
+.lastpost_link, .board_lastposter, .board_lasttime {
+	white-space: pre;
+}
+.lastpost_link>a {
+	font-size: 1.077em;
+	line-height: 1.571em;
+	font-weight: 600;
+	color: #4b863c;
+}
+.board_lasttime {
+	display: block;
+}
+.childboard_row {
 	font-size: 0.857em;
 }
-.table_list .children p {
-	padding: 4px 0 0 0;
+.childboards {
+	border-top: 1px solid #ccc;
+	margin: 0 14px 0 64px;
 }
-.table_list .icon, .table_list .info, .table_list .stats, .table_list .lastpost {
-	height: 4em;
-	border-top: 2px solid #e4e4e4;
-	background: #fff;
+.childboards>li {
+	display: table-cell;
+	padding: 6px 4px 6px 0;
 }
-.table_list .divider tr td {
-	height: 18px;
-	border: none;
-	border-top: 2px solid #e4e4e4;
+.childboards>li:first-child {
+	padding: 6px 0;
 }
-.board_new_posts {
-	font-weight: 700;
+.childboard_row h4, .board_new_posts {
+	font-weight: 600;
 }
 
-/* The posting icons. */
+/* The posting icons and mark read button. */
 #posting_icons {
-	float: left;
-	margin: 8px 0 20px 0;
+	margin: 8px 8px 20px 0;
 }
-#posting_icons li {
+#posting_icons p {
+	display: table-cell;
 	font-size: 0.857em;
+}
+#posting_icons .buttonlist {
+	padding: 0;
 }
 #posting_icons img {
 	margin: 0 2px 0 12px;
@@ -1939,9 +1912,36 @@ dl.settings textarea {
 /* Styles for the info center on the board index. */
 #info_center {
 	clear: both;
+	margin: 0 0 8px 0;
+	border-radius: 4px 4px 0 0;
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
 }
 #upshrinkHeaderIC {
-	margin-top: 4px;
+	border: 1px solid #ddd;
+	margin: 0.2em 0 0 0;
+	padding: 0 8px 8px 8px;
+	background: #fff;
+}
+.ic_section_header {
+	margin: 4px 0;
+	padding: 4px 8px 0 8px;
+	border: none;
+	border-top: 1px solid #ccc;
+	border-radius: 0;
+	background: none;
+	font-size: 1em;
+	font-weight: 600;
+}
+.ic_section_header:first-child {
+	margin: 4px 0;
+	border: none;
+}
+/* Icons for info centre title bars. */
+.ic_section_header .icon{
+	margin: 0;
+	padding: 0 6px 0 0;
+	vertical-align: middle;
 }
 #ic_recentposts {
 	margin: 0 34px;
@@ -2002,31 +2002,170 @@ img.new_posts {
 #messageindex, #unread {
 	clear: both;
 }
+#unread_header {
+	margin-top: 0.5em;
+}
 /* The board description and who-is-viewing stuff. */
 #description_board {
 	margin: 10px 0 0 0;
-	padding: 8px 10px 6px 10px;
-	border: 2px solid #ddd;
+	background: #e4e4e4;
+	border-radius: 4px 4px 0 0;
+	box-shadow: 1px 2px 4px #eee;
 }
-#description_board h3 {
-	font-weight: 600;
+#description_board .moderators {
+	margin: 0;
+	font-size: 0.765em;
+}
+#description_board>p{
+	background: #fff;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	margin-top: 2px;
+	padding: 4px 12px;
 }
 .whoisviewing {
-	padding: 4px;
+	padding: 4px 0;
+	display: block;
 	font-size: 0.857em;
 }
-.lastpost img {
+.topic_listing {
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
+	padding: 1px 0 0 0;
+}
+.topic_listing>li {
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	margin: 1px 0 0 0;
+}
+.topic_listing>.topic_sorting_row {
+	margin: 0;
+}
+.topic_sorting_row, .basic_row {
+	background: #fff;
+}
+.topic_sorting_row>h3 {
+	display: table-cell;
+	padding: 10px 12px 8px 12px;
+	width: 100%;
+	font-weight: 600;
+	font-size: 1.071em;
+}
+.topic_sorting_row>p {
+	display: table-cell;
+	vertical-align: middle;
+	width: 2%;
+	padding: 8px 8px 0 8px;
+}
+.topic_info {
+	display: table-cell;
+	vertical-align: top;
+	width: 70%;
+	padding: 7px 8px 6px 12px;
+}
+.topic_icons {
+	float: left;
+	text-align: center;
+	min-width: 50px;
+	padding: 6px 16px 0 0;
+	position: relative;
+}
+.fred {
+	position: absolute;
+	left: 50%;
+	top: 20px;
+	margin: 0 0 0 -2px;
+}
+.topic_name, .topic_starter {
+	margin: 0 0 0 50px;
+}
+.topic_name h4 {
+	line-height: 1.429em;
+	display: inline-block;
+}
+.topic_name h4 a {
+	color: #4b863c;
+	font-weight: 600;
+}
+.sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
+	color: #555;
+}
+.locked_row .topic_name h4 a {
+	color: #777;
+}
+.topic_starter {
+	font-size: 0.929em;
+}
+.small_pagelinks {
+	float: right;
+}
+.topic_latest {
+	display: table-cell;
+	vertical-align: top;
+	width: 30%;
+	min-width: 34em;
+	padding: 7px 4px 6px 4px;
+	font-size: 0.929em;
+}
+.topic_stats {
+	text-align: right;
+	float: right;
+	min-width: 14em;
+	-moz-box-sizing: border-box;
+	padding: 0 16px 0 16px;
+	color: #777;
+}
+.topic_lastpost img {
 	float: right;
 	padding: 4px;
 }
-select.qaction, input.qaction {
-	margin: 2px 0 0;
+.topic_moderation, .topic_moderation_alt {
+	display: table-cell;
+	vertical-align: middle;
+	width: 2%;
+	padding: 0 8px;
+}
+.topic_moderation_alt {
+	min-width: 56px;
+}
+.topic_moderation_alt img {
+	padding: 2px 2px 0 2px;
+}
+.qaction_row {
+	background: #fff;
+	text-align: right;
+	padding: 4px;
+}
+.qaction {
+	margin: 1px 0 0;
 	padding: 1px;
 }
-.qaction_cell .button_submit {
+.qaction_row .button_submit {
 	margin: 2px 4px;
 	padding: 1px 6px;
 }
+.approvetopic_row {
+	background: #fff5cd;
+}
+.approve_row {
+	background: #fff5cd;
+}
+.sticky_row, .locked_row.sticky_row {
+	background: #ffffe0;
+}
+.sticky_row .topic_info {
+	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+}
+.locked_row.sticky_row .topic_info {
+	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+}
+.locked_row {
+	background: #f7f7f7;
+}
+.locked_row .topic_info {
+	background: url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+}
+
 #quick_mod_jump_to {
 	font-size: 1em;
 }
@@ -2042,8 +2181,11 @@ select.qaction, input.qaction {
 	padding: 0 6px;
 	line-height: 2em;
 }
+#message_index_jump_to {
+	font-size: 1.167em;
+}
 #message_index_jump_to .button_submit {
-	margin: 2px;
+	margin: 4px 0 0 2px;
 }
 
 
@@ -2294,6 +2436,7 @@ select.qaction, input.qaction {
 .poster .icons, .poster .membergroup, .poster .title, .poster_online, .poster  .warning {
 	margin: 3px 0 0 0;
 	padding: 0;
+	font-size: 1em;
 }
 .poster  .membergroup {
 	font-weight: bold;
@@ -3985,21 +4128,6 @@ tr.windowbg2 .stats_day {
 
 /* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages */
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-	.table_list .stats .table_grid .stats {
-		display: none;
-	}
-	.table_list .lastpost p {
-		margin-top: 1px;
-		padding: 1px 5px 2px 10px;
-		border-left: 1px solid #ccc;
-	}
-	.table_grid .lastpost p {
-		border-left: 1px solid #ccc;
-	}
-	.table_grid .last_post {
-		width: 30%;
-	}
-}
 /* 7" Tablets like Google Nexus (landscape) or other mobile devices */
 @media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
@@ -4108,19 +4236,19 @@ tr.windowbg2 .stats_day {
 }
 
 /* @todo - WIP - Clean up before next code dump.*/
-.test_ul_table .board_stats, .test_ul_table .topic_stats {
-	display: table-cell;
-}
 @media screen and (max-width: 70em) {
-	.test_ul_table .board_stats {
+	.board_latest {
+		min-width: 27em; 
+	}
+	.board_stats {
 		display: none;
 	}
 }
-@media screen and (max-width: 60em) {
-	.test_ul_table .topic_stats {
-		display: none;
+@media screen and (max-width: 80em) {
+	.topic_latest {
+		min-width: 17em; 
 	}
-	.test_ul_table div>span {
-		display: block;
+	.board_stats, .topic_stats {
+		display: none;
 	}
 }
