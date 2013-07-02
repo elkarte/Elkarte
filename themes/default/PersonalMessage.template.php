@@ -16,6 +16,7 @@
 
 /**
  * This is the main sidebar for the personal messages section.
+ * @todo - Started markup clean up in this template. More stuffz to check later.
  */
 function template_pm_above()
 {
@@ -87,12 +88,11 @@ function template_folder()
 		// Show the helpful titlebar - generally.
 		if ($context['display_mode'] != 1)
 			echo '
-						<div class="cat_bar">
-							<h3 class="catbg">
-								<span id="author">', $txt['author'], '</span>
-								<span id="topic_title">', $txt[$context['display_mode'] == 0 ? 'messages' : 'conversation'], '</span>
-							</h3>
-						</div>';
+					<div class="forumposts">
+						<h3 class="catbg">
+							<span id="author">', $txt['author'], '</span>
+							<span id="topic_title">', $txt[$context['display_mode'] == 0 ? 'messages' : 'conversation'], '</span>
+						</h3>';
 
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		if ($context['display_mode'] == 2)
@@ -249,7 +249,7 @@ function template_folder()
 						$shown = true;
 						echo '
 								<div class="custom_fields_above_signature">
-									<ul class="nolist">';
+									<ul>';
 					}
 					echo '
 										<li>', $custom['value'], '</li>';
@@ -268,7 +268,8 @@ function template_folder()
 
 			echo '
 							</div>
-						</div>';
+						</div>
+					</div>';
 		}
 
 		if (empty($context['display_mode']))
@@ -952,11 +953,10 @@ function template_send()
 	if (!empty($context['send_log']))
 	{
 		echo '
-			<div class="cat_bar">
+			<div class="forumposts">
 				<h3 class="catbg">', $txt['pm_send_report'], '</h3>
-			</div>
-			<div class="windowbg">
-				<div class="content">';
+				<div class="windowbg">
+					<div class="content">';
 				if (!empty($context['send_log']['sent']))
 					foreach ($context['send_log']['sent'] as $log_entry)
 						echo '<span class="error">', $log_entry, '</span><br />';
@@ -964,6 +964,7 @@ function template_send()
 					foreach ($context['send_log']['failed'] as $log_entry)
 						echo '<span class="error">', $log_entry, '</span><br />';
 				echo '
+					</div>
 				</div>
 			</div>
 			<br />';
@@ -971,134 +972,122 @@ function template_send()
 
 	// Show the preview of the personal message.
 	echo '
-		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-				</h3>
-			</div>
-			<div class="windowbg">
-				<div class="content">
-					<div class="post" id="preview_body">
-						', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
-					</div>
-				</div>
+		<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+			<h3 class="catbg">
+				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
+			</h3>
+			<div class="post" id="preview_body">
+				', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 			</div>
 		</div>';
 
 	// Main message editing box.
 	echo '
-		<div class="cat_bar">
+	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
+		<div class="forumposts">
 			<h3 class="catbg">
 					<img src="', $settings['images_url'], '/icons/im_newmsg.png" class="icon" alt="', $txt['new_message'], '" title="', $txt['new_message'], '" />&nbsp;', $txt['new_message'], '
-			</h3>
-		</div>';
+			</h3>';
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
-		<div>
-			<div class="roundframe">
-				<br class="clear" />';
+			<div class="windowbg">
+				<div class="editor_wrapper">';
 
 	// If there were errors for sending the PM, show them.
 	template_show_error('post_error');
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
-				<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
-					sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
-				</div>';
+					<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+						sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
+					</div>';
 
 	echo '
-				<dl id="post_header">';
+					<dl id="post_header">';
 
 	// To and bcc. Include a button to search for members.
 	echo '
-					<dt>
-						<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</span>
-					</dt>';
+						<dt>
+							<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</span>
+						</dt>';
 
 	// Autosuggest will be added by the JavaScript later on.
 	echo '
-					<dd id="pm_to" class="clear_right">
-						<input type="text" name="to" id="to_control" value="', $context['to_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />';
+						<dd id="pm_to" class="clear_right">
+							<input type="text" name="to" id="to_control" value="', $context['to_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />';
 
 	// A link to add BCC, only visible with JavaScript enabled.
 	echo '
-						<span class="smalltext" id="bcc_link_container" style="display: none;"></span>';
+							<span class="smalltext" id="bcc_link_container" style="display: none;"></span>';
 
 	// A div that'll contain the items found by the autosuggest.
 	echo '
-						<div id="to_item_list_container"></div>';
+							<div id="to_item_list_container"></div>';
 
 	echo '
-					</dd>';
+						</dd>';
 
 	// This BCC row will be hidden by default if JavaScript is enabled.
 	echo '
-					<dt  class="clear_left" id="bcc_div">
-						<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</span>
-					</dt>
-					<dd id="bcc_div2">
-						<input type="text" name="bcc" id="bcc_control" value="', $context['bcc_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />
-						<div id="bcc_item_list_container"></div>
-					</dd>';
+						<dt  class="clear_left" id="bcc_div">
+							<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</span>
+						</dt>
+						<dd id="bcc_div2">
+							<input type="text" name="bcc" id="bcc_control" value="', $context['bcc_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />
+							<div id="bcc_item_list_container"></div>
+						</dd>';
 
 	// The subject of the PM.
 	echo '
-					<dt class="clear_left">
-						<span', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</span>
-					</dt>
-					<dd id="pm_subject">
-						<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"',isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
-					</dd>
-				</dl><hr class="clear" />';
+						<dt class="clear_left">
+							<span', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</span>
+						</dt>
+						<dd id="pm_subject">
+							<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"',isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
+						</dd>
+					</dl><hr class="clear" />';
 
 	// Showing BBC?
 	if ($context['show_bbc'])
 	{
 		echo '
-				<div id="bbcBox_message"></div>';
+					<div id="bbcBox_message"></div>';
 	}
 
 	// What about smileys?
 	if (!empty($context['smileys']['postform']) || !empty($context['smileys']['popup']))
 		echo '
-				<div id="smileyBox_message"></div>';
+					<div id="smileyBox_message"></div>';
 
 	// Show BBC buttons, smileys and textbox.
 	echo '
-				', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	// Require an image to be typed to save spamming?
 	if ($context['require_verification'])
 	{
 		echo '
-				<div class="post_verification">
-					<strong>', $txt['pm_visual_verification_label'], ':</strong>
-					', template_control_verification($context['visual_verification_id'], 'all'), '
-				</div>';
+					<div class="post_verification">
+						<strong>', $txt['pm_visual_verification_label'], ':</strong>
+						', template_control_verification($context['visual_verification_id'], 'all'), '
+					</div>';
 	}
 
 	// Send, Preview, spellcheck buttons.
 	echo '
-				<p>
-					<label for="outbox"><input type="checkbox" name="outbox" id="outbox" value="1" tabindex="', $context['tabindex']++, '"', $context['copy_to_outbox'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_save_outbox'], '</label>
-				</p>
-				<hr class="hrcolor" />
-				<span id="post_confirm_strip" class="righttext">
-					', template_control_richedit_buttons($context['post_box_name']), '
-				</span>
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
-				<input type="hidden" name="replied_to" value="', !empty($context['quoted_message']['id']) ? $context['quoted_message']['id'] : 0, '" />
-				<input type="hidden" name="pm_head" value="', !empty($context['quoted_message']['pm_head']) ? $context['quoted_message']['pm_head'] : 0, '" />
-				<input type="hidden" name="f" value="', isset($context['folder']) ? $context['folder'] : '', '" />
-				<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />
-				<br class="clear_right" />
-			</div>
-		</div>
-	</form>';
+					<p>
+						<label for="outbox"><input type="checkbox" name="outbox" id="outbox" value="1" tabindex="', $context['tabindex']++, '"', $context['copy_to_outbox'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_save_outbox'], '</label>
+					</p>
+					<hr class="hrcolor" />
+					<span id="post_confirm_strip" class="righttext">
+						', template_control_richedit_buttons($context['post_box_name']), '
+					</span>
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
+					<input type="hidden" name="replied_to" value="', !empty($context['quoted_message']['id']) ? $context['quoted_message']['id'] : 0, '" />
+					<input type="hidden" name="pm_head" value="', !empty($context['quoted_message']['pm_head']) ? $context['quoted_message']['pm_head'] : 0, '" />
+					<input type="hidden" name="f" value="', isset($context['folder']) ? $context['folder'] : '', '" />
+					<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />';
 
 	// If the admin enabled the pm drafts feature, show a draft selection box
 	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts_pm_save']) && !empty($context['drafts']) && !empty($options['drafts_show_saved_enabled']))
@@ -1123,6 +1112,12 @@ function template_send()
 				</dl>
 			</div>';
 	}
+
+	echo '
+				</div>
+			</div>
+		</div>
+	</form>';
 
 	// The vars used to preview a personal message without loading a new page.
 	echo '
@@ -1175,17 +1170,17 @@ function template_send()
 		echo '
 	<br />
 	<br />
-	<div class="cat_bar">
+	<div class="forumposts">
 		<h3 class="catbg">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h3>
-	</div>
-	<div class="windowbg2">
-		<div class="content">
-			<div class="clear">
-				<span class="smalltext floatright">', $txt['on'], ': ', $context['quoted_message']['time'], '</span>
-				<strong>', $txt['from'], ': ', $context['quoted_message']['member']['name'], '</strong>
+		<div class="windowbg2">
+			<div class="content">
+				<div class="clear">
+					<span class="smalltext floatright">', $txt['on'], ': ', $context['quoted_message']['time'], '</span>
+					<strong>', $txt['from'], ': ', $context['quoted_message']['member']['name'], '</strong>
+				</div>
+				<hr />
+				', $context['quoted_message']['body'], '
 			</div>
-			<hr />
-			', $context['quoted_message']['body'], '
 		</div>
 	</div><br class="clear" />';
 

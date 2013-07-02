@@ -55,7 +55,9 @@
 	/* Next limits maximum width on wide screens. */
 	/* Sized in em, since some people require larger text. */ 
 	/* For ease of reading, content really should not be too wide. */
-	max-width: 100em;
+	max-width: 72em;
+	/* Next is just for some testing. */
+	/*min-width: 100%;*/
 }
 
 /* Normal, standard links. */
@@ -80,12 +82,12 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	background: #555;
+	background: #555 linear-gradient(to right, #333 0%, #888 50%, #333 100%);
 	color: #555;
 	/* Set a font-size that will look the same in all browsers. */
 	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
 	/* Font size is chosen to be exactly 10 point for hinting, ClearType, etc. */
-	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
 }
 
 /* Tables should show empty cells. */
@@ -115,12 +117,17 @@ input, button, select, textarea, .editor {
 }
 
 /* Collection of pseudo element clearfixes. */
+/* @todo - Clean up old catbg and titlebg stuff. */
 h3.catbg:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after,
 #main_menu:after, .frame:after, #upper_section:after, #inner_wrap:after,
-#main_content_section:after, #main_container:after, .quickbuttons:after,
-.attachments_bot:after {
+#main_content_section:after, #main_container:after, .attachments_bot:after {
 	display: block;
 	clear: both;
+	content:"";
+}
+.quickbuttons:after {
+	display: block;
+	clear: right;
 	content:"";
 }
 
@@ -162,7 +169,7 @@ textarea, .editor {
 }
 /* Apply the font only to these elements. */
 input, button, select {
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 select {
 	padding: 2px;
@@ -226,7 +233,7 @@ input[disabled].input_text {
 	margin: 0;
 	padding: 2px 5px;
 	color: #555;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 .button_submit:hover, .button_reset:hover, .button_link:hover {
 	border: 1px solid #ccc;
@@ -357,10 +364,10 @@ em {
 /* Default font sizes: small (9pt), normal (10pt), and large (14pt). */
 /* @todo - th shouldn't be required. Are margins required? */
 .smalltext, .smalltext th {
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 .largetext {
-	font-size: 1.4em;
+	font-size: 1.286em;
 }
 .centertext {
 	margin: 0 auto;
@@ -409,7 +416,7 @@ em {
 	margin-top: -1px;
 	padding: 1px;
 	height: 2em;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 
 /* Styles for rounded headers. */
@@ -422,8 +429,8 @@ h3.catbg, h3.titlebg, h4.titlebg, h4.catbg {
 	background-image: linear-gradient(to bottom, #ebebeb 0%, #c6c6c6 100%);
 	color: #555;
 	text-shadow: 1px 1px 0 #eee;
-	font-size: 1.3em;
-	line-height: 1.8em;
+	font-size: 1.143em;
+	line-height: 2em;
 }
 
 h3.catbg a:link, h3.catbg a:visited, h4.catbg a:link, h4.catbg a:visited,
@@ -436,7 +443,6 @@ h3.catbg a:hover, h4.catbg a:hover, h3.titlebg a:hover, h4.titlebg a:hover {
 }
 h3.catbg .icon {
 	margin: 0 5px 0 0;
-	vertical-align: middle;
 }
 h4.catbg .toggle img {
 	margin: 0 5px 0 5px;
@@ -444,7 +450,7 @@ h4.catbg .toggle img {
 }
 h4.titlebg .icon {
 	float: left;
-	margin: 0 8px 0 0;
+	margin: 0 5px 0 0;
 }
 
 /* Upshrinks in cat and title bars. */
@@ -467,7 +473,7 @@ h4.titlebg .icon {
 	border-top: 1px solid #ccc;
 	border-radius: 0;
 	background: none;
-	font-size: 1.1em;
+	font-size: 1em;
 }
 .title_barIC:first-child>.titlebg {
 	margin: 4px 0;
@@ -497,17 +503,16 @@ h4.titlebg .icon {
 div.windowbg, div.windowbg2 {
 	overflow: auto;
 	padding: 10px 0;
-	border-radius: 5px;
 }
 
 /* Custom highlighted text style for modern browsers. */
 /* Nicer than default blue. Needs two separate rules. */
 ::-moz-selection {
-	background: #ebffd8;
+	background: #d8ffdf;
 	color: #444;
 }
 ::selection {
-	background: #ebffd8;
+	background: #d8ffdf;
 	color: #444;
 }
 
@@ -559,7 +564,7 @@ div.windowbg, div.windowbg2 {
 	margin: 0 0 12px 0;
 	padding: 6px 12px;
 	border: 1px solid #ccc;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 /* Information boxes. */
 .information {
@@ -644,9 +649,7 @@ div.windowbg, div.windowbg2 {
 
 /* @todo - Ha. Just another silly bunch of divs. */
 .content {
-	margin: 0;
-	padding: 6px 15px;
-	border: none;
+	padding: 0.2em 1em;
 }
 .content p {
 	margin: 0 0 6px 0;
@@ -689,7 +692,7 @@ div.windowbg, div.windowbg2 {
 	background: #fff;
 	color: #555;
 	font-weight: 600;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 .codeheader {
 	border-top: 3px solid #aaa;
@@ -708,7 +711,7 @@ div.windowbg, div.windowbg2 {
 	border: 1px solid #ccc;
 	border-top: none;
 	background: #fff;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 /* Extra quote styling */
 .bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
@@ -779,10 +782,10 @@ div.windowbg, div.windowbg2 {
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 }
 /* /me uses this a lot. (emote, try typing /me in a post.) */
-/* @todo - Change this. Itz uggerz. */
 .meaction {
-	color: blue;
+	color: #306430;
 	font-style: italic;
+	font-weight: bold;
 }
 
 
@@ -809,7 +812,7 @@ div.windowbg, div.windowbg2 {
 	margin-right: 20px;
 	color: orange;
 	text-decoration: underline;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 
 
@@ -903,7 +906,7 @@ div.windowbg, div.windowbg2 {
 	float: left;
 	padding: 0 4px 4px 4px;
 	width: 50%;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 
 /* Main forum area. */
@@ -945,7 +948,7 @@ div.windowbg, div.windowbg2 {
 
 /* The content section */
 #main_content_section {
-	padding: 2px 12px 16px 12px;
+	padding: 2px 1em 1em 1em;
 	/* Yes. :) */
 	min-height: 180px;
 }
@@ -1010,6 +1013,7 @@ div.windowbg, div.windowbg2 {
 	position: relative;
 	float: left;
 	padding: 1px;
+	font-size: 0.929em;
 	line-height: 2.3em;
 }
 
@@ -1182,7 +1186,7 @@ div.windowbg, div.windowbg2 {
 	border-radius: 2px;
 	background: #eee;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.08);
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 #main_content_section .navigate_section {
 	margin: 9px 0 3px 0;
@@ -1253,7 +1257,7 @@ div.windowbg, div.windowbg2 {
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
 	color: #555;
 	text-transform: uppercase;
-	font-size: 0.8em;
+	font-size: 0.786em;
 	line-height: 2.2em;
 }
 
@@ -1286,20 +1290,17 @@ div.windowbg, div.windowbg2 {
 /* The quick buttons. */
 /* ------------------------------------------------------- */
 .quickbuttons {
-	margin: 11px 11px 4px 0;
+	margin: 8px 0 4px 0;
 	text-align: right;
 }
 /* Corrections for lone button in topic summary (Post.template.php). */
-#recent .quickbuttons {
+#topic_summary .quickbuttons {
 	float: right;
-	margin: 0;
+	margin: -4px 0 4px 0;
 }
-#recent .quickbuttons .listlevel1 {
+#topic_summary .quickbuttons .listlevel1 {
 	border-radius: 4px;
-}
-/* @todo - What is this stuff? Must look it up later. */
-.windowbg .post_wrapper:hover ul.nojs_visible, .windowbg2 .post_wrapper:hover ul.nojs_visible {
-	visibility: visible;
+	font-size: 1em;
 }
 .quickbuttons .listlevel1 {
 	float: right;
@@ -1310,7 +1311,7 @@ div.windowbg, div.windowbg2 {
 	background: #fcfcfc;
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
 	color: #555;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 /* The next bit is getting a tad verbose for my liking. */
 .content .quickbuttons .listlevel1:first-child {
@@ -1345,7 +1346,7 @@ div.windowbg, div.windowbg2 {
 }
 .quickbuttons .listlevel1.modified, .quickbuttons .listlevel1.modified:hover {
 	float: left;
-	padding: 0.65em 0 0 6px;
+	padding: 0 0 0 6px;
 	border: none;
 	background: none;
 	box-shadow: none;
@@ -1432,11 +1433,13 @@ div.windowbg, div.windowbg2 {
 	padding: 4px 5em 4px 4px;
 	cursor: pointer;
 }
-.quickbuttons .inline_mod_check {
-	padding: 3px 0 0 3px;
+.quickbuttons .inline_mod_check, .quickbuttons .inline_mod_check:hover {
+	padding: 7px 0;
+	line-height: 1em;
 	border: none;
 	background: none;
 	box-shadow: none;
+	float: left;
 }
 .quickbuttons .post_options {
 	padding: 0 0 0 0;
@@ -1445,6 +1448,9 @@ div.windowbg, div.windowbg2 {
 .quickbuttons .post_options .linklevel1, .quickbuttons .post_options .linklevel1:hover {
 	padding: 0 4px 0 4px;
 	background-image: none;
+}
+.quickbuttons .likes_button, .quickbuttons .likes_button:hover {
+	background: url(../images/icons/heart.png) 4px 50% no-repeat;
 }
 /* @todo */
 .quickbuttons .menulevel2, .follow_ups  .menulevel2 {
@@ -1492,7 +1498,7 @@ div.windowbg, div.windowbg2 {
 }
 .follow_ups {
 	float: right;
-	margin: -8px 0 0 0;
+	margin: -6px 0 0 0;
 }
 .follow_ups:after {
 	display: none;
@@ -1532,14 +1538,15 @@ div.windowbg, div.windowbg2 {
 .selectbox, .pagelinks {
 	margin: 5px 0 0 0;
 	color: #555;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 /* @todo - Styling will need a bit more thought here. */
-/*Do not use display: inline-block;*/
+/* @todo - Styling will need a bit more thought here. */
+/* Do not use display: inline-block;*/
 /* Why not? Because it has a well-known quirk. It's white-space-dependent. */
 /* http://robertnyman.com/2010/02/24/css-display-inline-block-why-it-rocks-and-why-it-sucks/ */
 /* Specifically, the section titled "The enormous drawback". */
-.navPages, .expand_pages .navPages, .current_page {
+.pagelinks .navPages {
 	display: block;
 	float: left;
 	padding: 2px 5px 1px 5px;
@@ -1548,7 +1555,7 @@ div.windowbg, div.windowbg2 {
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
 	color: #555;
 }
-.navPages:hover, .expand_pages .navPages:hover, .current_page  {
+.pagelinks .navPages:hover, .pagelinks .current_page  {
 	border: 1px solid #ccc;
 	border-top: 1px solid #aaa;
 	border-left: 1px solid #bbb;
@@ -1557,17 +1564,19 @@ div.windowbg, div.windowbg2 {
 	color: #555;
 	text-decoration: none;
 }
+.pagelinks .current_page  {
+	display: block;
+	float: left;
+	padding: 1px 8px 2px 8px;
+	font-weight: bold;
+	font-size: 1.2em;
+	line-height: 1.4em;
+}
 .expand_pages {
 	display: block;
 	float: left;
 	min-width: 1.5em;
 	text-align: center;
-}
-.current_page  {
-	padding: 1px 8px 2px 8px;
-	font-weight: bold;
-	font-size: 1.2em;
-	line-height: 1.4em;
 }
 .next_page, .previous_page {
 	padding: 0 2px;
@@ -1579,16 +1588,13 @@ div.windowbg, div.windowbg2 {
 .pagelinks :last-child {
 	border-radius: 0 2px 2px 0;
 }
-/* Frankly these things are too small to be any use. Kill small tags? */
-/* @todo - Search by tag name, and a cruddy one at that. Fix later. */
-small .navPages {
-	padding: 1px;
-	border: none !important;
+/* @todo - Fix for all templates. */
+.small_pagelinks {
+	float: right;
 }
-/* @todo - Search by tag name, and a cruddy one at that. Fix later. */
-small span.pagelink, small span.expand_pages {
-	border: none;
-	background: none;
+.small_pagelinks .navPages {
+	padding: 2px 3px 0 3px;
+	font-size: 0.889em;
 }
 /* Go up and go down links. */
 /* @todo - These need to be deprecated. Really. Haz good plan. */
@@ -1600,7 +1606,7 @@ small span.pagelink, small span.expand_pages {
 	background: #fcfcfc;
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
 	color: #555;
-	font-size: 0.9em;
+	font-size: 0.857em;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #bbb;
 	border-radius: 2px;
@@ -1622,25 +1628,33 @@ small span.pagelink, small span.expand_pages {
 /* for stable positioning as browser font size settings change. */
 #gotop, #gobottom {
 	position: fixed;
+	/* Try alternate styling. */
+	/*right: 0;*/
+	left: 0;
 	z-index: 9;
 	display: block;
-	margin: 8.5em 0 0 -0.65em;
+	/*margin: 8.5em  0 0 -0.65em;*/
+	margin: 11em 0 0 -0.1em;
 	padding: 0 0.3em;
-	height: 2.1em;
+	height: 2.5em;
 	border: 1px solid #bbb;
-	border-radius: 7px 3px 0 0;
+	border-radius: 0 7px 0 0;
 	background: #ebebeb;
 	background-image: linear-gradient(to bottom, #ebebeb 0%, #c6c6c6 100%);
 	font-size: 1.5em;
-	line-height: 2.1em;
+	line-height: 2.5em;
+	/* Try alternate styling. */
+	opacity: 0.5;
 }
 #gobottom {
-	margin-top: 10.6em;
-	border-radius: 0 0 3px 7px;
+	margin-top: 13.5em;
+	border-radius: 0 0 7px 0;
 }
 #gotop:hover, #gobottom:hover {
-	background: #eee;
+	/*background: #eee;*/
 	text-decoration: none;
+	/* Try alternate styling. */
+	opacity: 1;
 }
 
 
@@ -1649,47 +1663,37 @@ small span.pagelink, small span.expand_pages {
 /*	$TABLES		*/
 /* ------------------------------------------------------- */
 
+/* @todo */
 /* A general table class. */
-/* @todo */
-.table_grid {
-	margin: 10px 0 0 0;
+.table_grid, .table_padding {
+	margin: 0;
 	width: 100%;
-	border: 1px solid #ccc;
+	border-spacing: 0;
 	border-collapse: collapse;
+	border: 2px solid #ddd;
+	border-top: none;
 }
-.table_grid .catbg, .table_grid .catbg th, .table_grid .catbg th a {
+.table_grid .catbg, .table_grid .catbg th {
 	font-size: 1em;
+	font-weight: 600;
 }
-.table_grid .catbg th {
-	padding: 4px 3px 3px 3px;
-}
-/* @todo */
-.table_grid .catbg th, #show_attachments th, #searchform .roundframe .title_bar {
+.table_grid th {
+	padding: 4px;
 	border-top: 2px solid #ddd;
 	border-bottom: 2px solid #ddd;
-	border-radius: 2px 2px 0 0;
 	background: #fff;
 	color: #555;
-	text-align: left;
 }
 /* @todo- Eh wot? Hmmm. */
 .table_grid .catbg .stats {
-	text-align: center;
 	white-space: nowrap;
 }
-.table_grid .last_th input {
-	margin: 0 2px;
+.last_th .input_check {
+	margin: 4px 0 0 0;
 }
-.table_grid th.lefttext {
-	padding: 0 8px;
-}
-/* Message index board descriptions. */
-/* @todo - Why is this stranded in this spot? */
-.description_header {
-	margin: 6px 0 0 0;
-}
-.table_grid td {
-	padding: 3px;
+/* @todo - Check out table_padding class in more detail. */
+.table_grid td, .table_padding td {
+	padding: 4px;
 	border-bottom: 1px solid #ccc;
 }
 .table_grid  textarea {
@@ -1701,57 +1705,6 @@ small span.pagelink, small span.expand_pages {
 .table_grid  textarea {
 	width: 100%;
 }
-.table_grid  .fred {
-	position: absolute;
-	right: 4px;
-	bottom: -3px;
-	z-index: 5;
-}
-.table_grid .icon2 div {
-	position: relative;
-	margin: auto;
-	width: 40px;
-}
-.table_grid .moderation {
-	border-left: 1px solid #ccc;
-}
-/* Subtle zebra striping to make tables easier to follow. Will make a solution for IE8. */
-.table_grid tr:nth-child(even) td {
-	background: #fdfdfd;
-}
-.table_grid tr:nth-child(odd) td {
-	background: #fafafa;
-}
-/* @todo - Shouldn't need declarations with so many tag names. */
-.table_grid  tr td.stickybg , .table_grid tr td.stickybg2 {
-	background: #fffee2;
-}
-.table_grid  tr td.lockedbg, .table_grid tr td.lockedbg2 {
-	background: #efefef;
-}
-/* And now those precious little icons, boy are they cute ! */
-/* @todo - More stuff. Oh dear. */
-.table_grid .stickybg.subject, .table_grid .stickybg2.subject {
-	background: #fffee2 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
-}
-.table_grid .locked_sticky.subject, .table_grid .locked_sticky2.subject {
-	background: #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
-}
-.table_grid .lockedbg.subject, .table_grid .lockedbg2.subject{
-	background: #efefef url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
-/* The message index topic table. @todo - WTF for we have so many declarations for basic tables? */
-.topic_table .icon1, .topic_table .icon2, .topic_table .stats {
-	text-align: center;
-}
-.topic_table .subject p, .topic_table .stats, .topic_table .lastpost {
-	margin: 0;
-	padding: 0;
-	font-size: 0.9em;
-}
-.topic_table .lastpost {
-	padding: 4px;
-}
 
 /* Search results need some help as well */
 /* @todo */
@@ -1762,43 +1715,6 @@ small span.pagelink, small span.expand_pages {
 	background:  #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
 }
 
-/* Colors for topics or posts that require approval action */
-/* @todo */
-.table_grid td.approvebg:nth-child(n), .table_grid td.approvebg2:nth-child(n)
-.table_grid td.approvetbg:nth-child(n), .table_grid td.approvetbg2:nth-child(n) {
-	background: #fff6ca;
-}
-/* Colors for background of posts requiring approval */
-/* @todo */
-#forumposts .approvebg, .table_grid td.approvebg {
-	background: #ffeaea;
-	color: #555;
-}
-#forumposts .approvebg2, .table_grid td.approvebg2 {
-	background: #fff2f2;
-	color: #555;
-}
-/* Color for background of *topics* requiring approval */
-/* @todo */
-.approvetbg {
-	background: #e4a17c;
-	color: #555;
-}
-.approvetbg2 {
-	background: #f3bd9f;
-	color: #555;
-}
-
-/* @todo - Bad class name. Rarely used. Change or deprecate. */
-/* Could probably replace with table_grid in the same places.*/
-.table_padding {
-	border-spacing: 0;
-	border-collapse: collapse;
-}
-.table_padding td {
-	padding: 4px;
-}
-
 /* GenericList */
 .additional_row {
 	padding: 6px 0;
@@ -1807,9 +1723,11 @@ small span.pagelink, small span.expand_pages {
 	margin: 0 0 -4px 4px;
 }
 
-/* table_grid styles for Profile > Show Permissions. */
+/* @todo - If keeping this, move to $PROFILE */
+/* Table_grid cells for Profile > Show Permissions. */
 #permissions .table_grid td {
 	padding: 5px 10px;
+	/* Why cursor on a table cell? */
 	cursor: default;
 }
 
@@ -1892,7 +1810,7 @@ dl.settings textarea {
 /* The small stats, under upper linktree. */
 #index_common_stats {
 	margin: 0 8px 6px 8px;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 
 /* The newsfader - re-styled a bit. */
@@ -1908,7 +1826,7 @@ dl.settings textarea {
 	text-align: center;
 }
 
-/* The board index and child boards tables. */
+/* The board index and child boards tables. @todo - Will be deprecated. */
 .boardindex_table {
 	margin: 2px 0 -8px 0;
 }
@@ -1947,7 +1865,7 @@ dl.settings textarea {
 	font-size: 1em;
 }
 .table_list .info .moderators {
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 /* Stats and lastpost cells now have standard body text font size. */
 /* Looks good. Less code. Better legibility for more people. Bigger link target. */
@@ -1986,7 +1904,7 @@ dl.settings textarea {
 	border-right: 2px solid #e4e4e4;
 	background: #fff;
 	color: #555;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 .table_list .children p {
 	padding: 4px 0 0 0;
@@ -2011,7 +1929,7 @@ dl.settings textarea {
 	margin: 8px 0 20px 0;
 }
 #posting_icons li {
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 #posting_icons img {
 	margin: 0 2px 0 12px;
@@ -2028,7 +1946,7 @@ dl.settings textarea {
 #ic_recentposts {
 	margin: 0 34px;
 	width: 96%;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 #ic_recentposts td, #ic_recentposts th {
 	padding: 1px 4px;
@@ -2036,10 +1954,10 @@ dl.settings textarea {
 	vertical-align: top;
 	text-align: left;
 }
-#ic_recentposts .recentpost strong {
+#ic_recentposts .recentpost {
 	width: 40%;
 }
-#ic_recentposts .recentpost>strong>a {
+#ic_recentposts .recentpost a {
 	color: #46823c;
 }
 #ic_recentposts .recentposter {
@@ -2053,7 +1971,7 @@ dl.settings textarea {
 }
 #upshrinkHeaderIC .inline {
 	padding: 0 40px 2px 40px;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 #upshrinkHeaderIC .inline span {
 	padding: 4px 0 0 0;
@@ -2095,7 +2013,7 @@ img.new_posts {
 }
 .whoisviewing {
 	padding: 4px;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 .lastpost img {
 	float: right;
@@ -2103,11 +2021,11 @@ img.new_posts {
 }
 select.qaction, input.qaction {
 	margin: 2px 0 0;
-	padding: 0;
-	font-size: 0.82em;
+	padding: 1px;
 }
 .qaction_cell .button_submit {
-	margin: 6px 4px 0 4px;
+	margin: 2px 4px;
+	padding: 1px 6px;
 }
 #quick_mod_jump_to {
 	font-size: 1em;
@@ -2229,41 +2147,43 @@ select.qaction, input.qaction {
 
 /* On to the posts */
 /* @todo - Minor conflict between recent and unread. */
-#forumposts,
-#recentposts, #recent {
+.forumposts {
 	clear: both;
 	margin: 8px 0 0 0;
-	padding: 0 0 6px 0;
-	border: 1px solid #ddd;
-	border-radius: 6px 6px 0 0;
-	background: #eee;
-}
-/* There's a reason for this. See if you can figure it out. :D */
-/* @todo - New .forumposts class. Better. */
-#forumposts .cat_bar, #recentposts .cat_bar, #recent .cat_bar {
-	margin: -1px -1px 1px -1px;
+	border-radius: 4px 4px 0 0;
+	background: #e2e2e2;
+	box-shadow: 1px 2px 4px #eee;
 }
 /* Topic information */
-#forumposts .catbg img {
+.forumposts .catbg img {
 	padding: 5px 3px 0 0;
 }
-#forumposts .catbg span {
-	padding: 2px 0;
+.forumposts .catbg span {
+	padding: 0 0 2px 0;
 	white-space: pre;
-	/* Specific sizing for clarity without ClearType. */
-	font-weight: normal;
-	font-size: 0.818em;
+	font-size: 0.857em;
 }
 #whoisviewing {
-	padding: 4px 10px;
+	padding: 4px 1em;
+	font-size: 0.857em;
 }
 /* Poster and postarea + moderation area underneath */
 /* @todo - New .forumposts class. Better. */
-#whoisviewing, #forumposts .windowbg, #forumposts .windowbg2, #forumposts .approvebg, #forumposts .approvebg2, .core_posts {
+#whoisviewing, .forumposts .windowbg, .forumposts .windowbg2,
+.forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
-	margin: 6px 6px 0 6px;
+	margin: 0.5em 0 0 0;
 	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
 	background: #fff;
+}
+
+/* Colors for background of posts requiring approval */
+.forumposts .approvebg {
+	background: #ffeaea;
+}
+.forumposts .approvebg2 {
+	background: #fff2f2;
 }
 
 /* @todo - Also, look at simplifying markup in posts < ETA: Mostly done, but poster area still needs some work. */
@@ -2272,16 +2192,17 @@ select.qaction, input.qaction {
 /* Just break the few words here, and leave more space for topic content. */
 .poster {
 	float: left;
-	margin: -8px -10px 0 0;
-	width: 170px;
+	margin: -4px 0 0 0;
+	width: 15em;
 	word-wrap: break-word;
-	word-break: hyphenate;
+	word-break: hyphenate; background: #fff;
+	font-size: 0.857em;
 }
 .poster2 {
 	margin: 0;
 	max-width: 25em;
 	width: auto;
-	font-size: 1em;
+	font-size: 0.857em;
 }
 /* #todo - Add an h4 or h5 tag here for a11y. */ 
 .poster .name {
@@ -2291,12 +2212,11 @@ select.qaction, input.qaction {
 	color: #46823c;
 	text-align: center;
 	font-weight: 600;
-	font-size: 1.2em;
-	line-height: 1.5em;
+	font-size: 1.333em;
 }
 .poster2 .name {
 	padding: 0 8px;
-	font-size: 1em;
+	font-size: 1.333em;
 }
 /* Drop menu for the poster info. */
 /* @todo - Can probably clean up the CSS a bit more here. */
@@ -2317,8 +2237,7 @@ select.qaction, input.qaction {
 	left: 0;
 	float: none;
 	padding: 6px 0.5em 4px 0.5em;
-	width: 15.2em;
-	font-size: 0.9em;
+	width: 15em;
 }
 .poster .listlevel2, .poster .listlevel2:hover {
 	float: none;
@@ -2352,7 +2271,6 @@ select.qaction, input.qaction {
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	font-size: 1.1em;
 }
 .poster .menulevel2 .report_seperator {
 	height: 2px;
@@ -2376,7 +2294,6 @@ select.qaction, input.qaction {
 .poster .icons, .poster .membergroup, .poster .title, .poster_online, .poster  .warning {
 	margin: 3px 0 0 0;
 	padding: 0;
-	font-size: 0.9em;
 }
 .poster  .membergroup {
 	font-weight: bold;
@@ -2384,13 +2301,13 @@ select.qaction, input.qaction {
 /* @todo - Re-code this a bit to give background on anchor. */
 .poster_online .linklevel1 {
 	display: block;
-	margin: 3px 10px;
+	margin: 3px 1em;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #bbb;
 	border-radius: 2px;
 	background: #fcfcfc;
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
-	line-height: 1.8em;
+	line-height: 2em;
 }
 .listlevel1.poster_online .linklevel1:hover {
 	border: 1px solid #ccc;
@@ -2410,19 +2327,21 @@ select.qaction, input.qaction {
 /* End nifty new flyout. */
 
 .postarea {
-	margin: 0 0 0 160px;
-	padding: 0 10px;
+	margin: 0 0 0 12.2em;
+	padding: 0 1em;
+}
+#topic_summary .postarea {
+	margin: 0;
+	font-size: 0.857em;
 }
 .post_subject {
 	display: block;
 	float: right;
 	overflow: hidden;
-	padding-right: 1em;
 	max-width: 15em;
-	color: #555;
+	color: #777;
 	text-overflow: ellipsis;
 	white-space: pre;
-	font-size: 0.9em;
 }
 .messageicon {
 	float: left;
@@ -2438,22 +2357,34 @@ select.qaction, input.qaction {
 .groupicon img {
 	padding: 0 3px 0 3px;
 }
+.keyinfo {
+	font-size: 0.857em;
+}
+#topic_summary .keyinfo {
+	font-size: 1em;
+}
 .keyinfo h5 {
 	padding: 1px 0 5px 0;
-	color: #555;
-	font-size: 0.9em;
 }
+#topic_summary .keyinfo h5 {
+	padding: 0;
+	font-size: 1.167em;
+}
+/* @todo - Move strong tag outside anchor. Will save css. */
 .keyinfo h5 a, .keyinfo h5 a strong {
 	color: #46823c;
+	font-weight: 600;
 }
 .inner {
 	margin: 0;
 	padding: 7px 8px 2px 2px;
-	min-height: 85px;
+	min-height: 70px;
 	border-top: 1px solid #bfbfbf;
-	box-shadow: 0 1px 0 #fff inset;
 	word-wrap: break-word;
 	hyphens: auto;
+}
+#topic_summary .inner {
+	clear: both;
 }
 .smiley {
 	vertical-align: bottom;
@@ -2463,8 +2394,7 @@ select.qaction, input.qaction {
 	overflow: auto;
 	padding: 8px 0;
 	border-top: 1px solid #bfbfbf;
-	box-shadow: 0 1px 0 #fff inset;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 .attachments {
 	margin: 20px 0 0 0;
@@ -2480,9 +2410,8 @@ select.qaction, input.qaction {
 .attachments hr {
 	clear: both;
 }
-
 /* Separator of posts. More useful in the print stylesheet. */
-#forumposts .post_separator {
+.forumposts .post_separator {
 	display: none;
 }
 
@@ -2517,20 +2446,10 @@ select.qaction, input.qaction {
 #quickreplybox {
 	clear: both;
 }
-#quickReplyOptions {
-	overflow: auto;
-	padding: 6px;
-	border: 1px solid #e0e0e0;
-	border-top: none;
-	border-radius: 0 0 4px 4px;
-	background: #eee;
-}
-#quickReplyOptions .roundframe {
-	overflow: auto;
-	padding: 8px 10% 12px 10%;
-	border: 1px solid #e0e0e0;
-	border-radius: 0;
-	background: #fff;
+.editor_wrapper {
+	margin: 0 auto;
+	width: 60em;
+	max-width: 97%;
 }
 #quickReplyOptions form textarea {
 	min-width: 100%;
@@ -2560,45 +2479,13 @@ dl.send_mail dd {
 /* ------------------------------------------------------- */
 
 /* The main post editor section. */
-#postmodify .roundframe {
-	padding: 12px 12%;
-}
-#postmodify {
-	margin: 0;
-}
-#postmodify .roundframe .title_bar{
-	margin: 15px 0 0 0;
-	border: 1px solid #aaa;
-	border-top: 1px solid #ccc;
-	border-left: 1px solid #bbb;
-	border-radius: 4px 4px 0 0;
-	background: #f7f7f7;
-	box-shadow: 0 -1px 2px rgba(0,0,0,0.1) inset;
-}
-#postmodify .roundframe .titlebg{
-	padding: 5px 5px 4px 10px;
-	border: none;
-	background: none;
-	box-shadow: none;
-}
-#postmodify .roundframe .titlebg img {
-	padding: 4px 4px 0 4px;
-	border: 1px solid #ccc;
-	border-right: 1px solid #bbb;
-	border-bottom: 1px solid #afafaf;
-	border-radius: 3px;
+#preview_body {
+	padding: 0.5em 1em;
+	overflow: auto;
+	margin: 0.5em 0 0 0;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
 	background: #fff;
-	box-shadow: -1px -1px 3px rgba(96,134,166,0.2) inset;
-}
-#postmodify .roundframe .titlebg img:hover{
-	border: 1px solid #ccc;
-	border-top: 1px solid #aaa;
-	border-left: 1px solid #bbb;
-	background: #fafafa;
-	box-shadow: 1px 1px 3px rgba(96,134,166,0.3) inset;
-}
-#postmodify .roundframe div{
-	padding-right: 0;
 }
 #postmodify #message{
 	width: 100%;
@@ -2636,11 +2523,16 @@ ul.post_options li {
 	margin: 2px 0;
 	width: 49%;
 }
-#postAdditionalOptions {
+#postAdditionalOptionsHeader, #postDraftOptionsHeader {
+	margin: 1em  0 0 0;
+	background: #fafafa;
+	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
+	border-bottom: 1px solid #ccc;
+}
+#postAdditionalOptions, #postDraftOptions {
 	overflow: hidden;
-	border: 1px solid #aaa;
+	border: 1px solid #ccc;
 	border-top: none;
-	border-left: 1px solid #bbb;
 	border-radius: 0 0 4px 4px;
 	background: #fdfdfd;
 }
@@ -2662,24 +2554,21 @@ ul.post_options li {
 #postAttachment dt, #postAttachment2 dt {
 	font-weight: bold;
 }
-#postDraftOptions {
-	border: 1px solid #aaa;
-	border-top: none;
-	border-left: 1px solid #bbb;
-	border-radius: 0 0 4px 4px;
-	background: #fdfdfd;
-}
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{
 	margin: 0;
 	padding: 5px 10px;
-	width: 50%;
+	width: 60%;
 	border-top: 1px solid #e4e4e4;
+	font-size: 0.857em;
+}
+#postDraftOptions .settings dd{
+	width: 40%;
 }
 #postDraftOptions .settings dd:first-child, #postDraftOptions .settings dt:first-child{
 	border-top: none;
 }
 #postDraftOptions .settings strong{
-	color: #555;
+	font-size: 1.167em;
 }
  /* @todo - Next may be deprecated. */
 #post_confirm_strip,
@@ -3121,12 +3010,10 @@ dl.merge_topic dd {
 	float: right;
 }
 .counter {
-	float: left;
-	margin: 0 0 0 0;
-	padding: 5px 6px 1px 2px;
-	color: #3f3f3f;
+	float: right;
+	padding: 6px;
 	font-weight: bold;
-	font-size: 2.2em;
+	font-size: 2em;
 }
 .topic_details {
 	padding: 0 4px 4px 4px;
@@ -3242,7 +3129,7 @@ dl.merge_topic dd {
 /*Issue a warning*/
 #warn_body {
 	width: 80%;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 #warning_text {
 	position: absolute;
@@ -3359,7 +3246,7 @@ dl.merge_topic dd {
 	width: 100%;
 	background: #e4e4e4;
 	text-align: center;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 .calendar_table th, .calendar_table td {
 	padding: 2px 0;
@@ -3441,6 +3328,27 @@ dl.merge_topic dd {
 	margin: -5px 0;
 	padding: 0 6px;
 }
+/* See, I told you there was wombatz here. */
+/*
+			   ,.--""""--.._
+			 ."     .'      `-.
+			;      ;           ;
+		   '      ;             )
+		  /     '             . ;
+		 /     ;     `.        `;
+	   ,.'     :         .     : )
+	   ;|\'    :      `./|) \  ;/
+	   ;| \"  -,-   "-./ |;  ).;
+	   /\/              \/   );
+	  :                 \    ;
+	  :     _      _     ;   )
+	  `.   \;\    /;/    ;  /
+		!    :   :     ,/  ;
+		 (`. : _ : ,/""   ;
+		  \\\`"^" ` :    ;
+				   (    )
+	 akg           ////
+*/
 
 
 
@@ -4009,6 +3917,23 @@ tr.windowbg2 .stats_day {
 /*	$MEDIA		*/
 /* Experimental media queries.
 /* ------------------------------------------------------- */
+/* NOTE:
+/* When setting break points for media queries, don't set them in pixels.
+/* Use em instead.
+/* Why? Because the point of re-stacking/dropping content is to fit it all
+/* in the available space. This is dependent not just on width in pixels,
+/* but also on the user-selected text size that is set in the browser.
+/*
+/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+/* a user requires text 50% larger than theme default, then their screen is
+/* effectively a lot smaller than its nominal resolution would indicate.
+/* If the break points are set in em, suddenly the media queries become equally
+/* responsive for all users, without any extra code being required.
+/*
+/* Testing em break points is just as easy as testing pixels,
+/* and it will make more people happier. This is cool. :)
+/*
+/* Of course, having comments to map em to px for each query is a good idea too.
 
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
 @media screen and (min-width: 320px) and (max-width: 480px) {
@@ -4179,5 +4104,23 @@ tr.windowbg2 .stats_day {
 	}
 	input {
 		max-width: 200px;
+	}
+}
+
+/* @todo - WIP - Clean up before next code dump.*/
+.test_ul_table .board_stats, .test_ul_table .topic_stats {
+	display: table-cell;
+}
+@media screen and (max-width: 70em) {
+	.test_ul_table .board_stats {
+		display: none;
+	}
+}
+@media screen and (max-width: 60em) {
+	.test_ul_table .topic_stats {
+		display: none;
+	}
+	.test_ul_table div>span {
+		display: block;
 	}
 }

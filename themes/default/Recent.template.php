@@ -22,14 +22,12 @@ function template_main()
 	global $context, $settings, $txt, $scripturl;
 		template_pagesection(false, false, 'go_down');
 	echo '
-		<div id="recentposts" class="main_section">';// @todo - Why is this main_section when unread has main_content in the same place?
+		<div id="recentposts" class="forumposts">';
 		//template_pagesection(false, false, 'go_down');
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />',$txt['recent_posts'],'
-				</h3>
-			</div>';
+			<h3 class="catbg">
+				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />',$txt['recent_posts'],'
+			</h3>';
 	//template_pagesection(false, false, 'go_down');
 	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too. 
 	foreach ($context['posts'] as $post)
@@ -42,7 +40,7 @@ function template_main()
 						<h5>', $post['board']['link'], ' / ', $post['link'], '</h5>
 						<span class="smalltext">', $txt['last_post'], ' ', $txt['by'], ' <strong>', $post['poster']['link'], ' </strong> - ', $post['time'], '</span>
 					</div>
-					<div class="list_posts">', $post['message'], '</div>';
+					<div class="inner">', $post['message'], '</div>';
 
 		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 			echo '
