@@ -315,13 +315,13 @@ function template_action_showPosts()
 {
 	global $context, $scripturl, $txt;
 
+		template_pagesection(false, false, 'go_down');
+
 	echo '
-		<div class="cat_bar">
+		<div class="forumposts">
 			<h3 class="catbg">
 				', (!isset($context['attachments']) && empty($context['is_topics']) ? $txt['showMessages'] : (!empty($context['is_topics']) ? $txt['showTopics'] : $txt['showAttachments'])), ' - ', $context['member']['name'], '
-			</h3>
-		</div>';
-		template_pagesection(false, false, 'go_down');
+			</h3>';
 
 	// Are we displaying posts or attachments?
 	if (!isset($context['attachments']))
@@ -330,14 +330,14 @@ function template_action_showPosts()
 		foreach ($context['posts'] as $post)
 		{
 			echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
+			<div class="', $post['alternate'] == 0 ? 'windowbg2' : 'windowbg', '">
 				<div class="content">
 					<div class="counter">', $post['counter'], '</div>
 					<div class="topic_details">
 						<h5><strong><a href="', $scripturl, '?board=', $post['board']['id'], '.0">', $post['board']['name'], '</a> / <a href="', $scripturl, '?topic=', $post['topic'], '.', $post['start'], '#msg', $post['id'], '">', $post['subject'], '</a></strong></h5>
 						<span class="smalltext">', $post['time'], '</span>
 					</div>
-					<div class="list_posts">';
+					<div class="inner">';
 
 			if (!$post['approved'])
 				echo '
@@ -393,6 +393,9 @@ function template_action_showPosts()
 						', isset($context['attachments']) ? $txt['show_attachments_none'] : ($context['is_topics'] ? $txt['show_topics_none'] : $txt['show_posts_none']), '
 					</div>
 				</div>';
+
+	echo '
+		</div>';
 
 	// Show more page numbers.
 	template_pagesection();

@@ -22,14 +22,12 @@ function template_main()
 	global $context, $settings, $txt, $scripturl;
 		template_pagesection(false, false, 'go_down');
 	echo '
-		<div id="recentposts" class="main_section">';// @todo - Why is this main_section when unread has main_content in the same place?
+		<div id="recentposts" class="forumposts">';
 		//template_pagesection(false, false, 'go_down');
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />',$txt['recent_posts'],'
-				</h3>
-			</div>';
+			<h3 class="catbg">
+				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />',$txt['recent_posts'],'
+			</h3>';
 	//template_pagesection(false, false, 'go_down');
 	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too. 
 	foreach ($context['posts'] as $post)
@@ -42,7 +40,7 @@ function template_main()
 						<h5>', $post['board']['link'], ' / ', $post['link'], '</h5>
 						<span class="smalltext">', $txt['last_post'], ' ', $txt['by'], ' <strong>', $post['poster']['link'], ' </strong> - ', $post['time'], '</span>
 					</div>
-					<div class="list_posts">', $post['message'], '</div>';
+					<div class="inner">', $post['message'], '</div>';
 
 		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 			echo '
@@ -91,9 +89,6 @@ function template_unread()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
-	echo '
-				<div id="recentposts" class="main_content">';// @todo - Why is this main_content when recent posts has main_section in the same place?
-
 	if (!empty($context['topics']))
 	{
 		template_pagesection('recent_buttons', 'right', 'go_down');
@@ -107,106 +102,87 @@ function template_unread()
 
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
-					<div class="tborder topic_table" id="unread">
-						<table class="table_grid" >
-							<thead>
-								<tr class="catbg">
-									<th scope="col" class="first_th" style="width:8%">&nbsp;</th>
-									<th scope="col">
-										<a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] == 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>
-									<th scope="col" class="centertext" style="width:14%">
-										<a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] == 'replies' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] == 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>';
+						<h2 class="category_header" id="unread_header">
+							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], ' 
+						</h2>
+						<ul class="topic_listing" id="unread">
+							<li class="topic_sorting_row">
+								<h3>
+									Sort by: <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] == 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+											/ <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] == 'replies' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] == 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+											 / <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] == 'last_post' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] == 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+								</h3>';
 
 		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])
 			echo '
-									<th scope="col"style="width:22%">
-										<a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] == 'last_post' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] == 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>
-									<th class="last_th centertext">
-										<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
-									</th>';
-		else
-			echo '
-									<th scope="col" class="smalltext last_th" style="width:22%">
-										<a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] == 'last_post' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] == 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>';
+								<p>
+									<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
+								</p>';
+
 		echo '
-								</tr>
-							</thead>
-							<tbody>';
+							</li>';
 
 		foreach ($context['topics'] as $topic)
 		{
 			// Calculate the color class of the topic.
 			$color_class = '';
 			if ($topic['is_sticky'] && $topic['is_locked'])
-				$color_class = 'stickybg locked_sticky';
+				$color_class = 'locked_row sticky_row';
 			// Sticky topics should get a different color, too.
 			elseif ($topic['is_sticky'])
-				$color_class = 'stickybg';
+				$color_class = 'sticky_row';
 			// Locked topics get special treatment as well.
 			elseif ($topic['is_locked'])
-				$color_class = 'lockedbg';
+				$color_class = 'locked_row';
 			// Last, but not least: regular topics.
 			else
-				$color_class = 'windowbg';
+				$color_class = 'basic_row';
 
-			$color_class2 = $color_class . '2';
-
-			// [WIP] There is trial code here to hide the topic icon column. Hardly anyone will miss it.
-			// [WIP] Markup can be cleaned up later. CSS can go in the CSS files later.
 			echo '
-								<tr>
-									<td class="', $color_class, ' icon2">
-										<div style="position: relative; width: 40px; margin: auto;">
-											<img src="', $topic['first_post']['icon_url'], '" alt="" />
-											', $topic['is_posted_in'] ? '<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="fred" />' : '','
-										</div>
-									</td>
-									<td class="', $color_class2, ' subject">
-										<div>';
+							<li class="', $color_class, '">
+								<div class="topic_info">
+									<p class="topic_icons">
+										<img src="', $topic['first_post']['icon_url'], '" alt="" /><img src="', $settings['images_url'], '/icons/profile_sm.png" alt="" class="fred" />
+									</p>
+									<div class="topic_name">';
 
-			// [WIP] MEthinks the orange icons look better if they aren't all over the page.
 			echo '
-											<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
+										<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
+										<h4>
 											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(empty($settings['message_index_preview_first']) ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
-											<p>
-												', $topic['first_post']['started_by'], '
-												<small id="pages', $topic['first_post']['id'], '">', $topic['pages'], '</small>
-											</p>
-										</div>
-									</td>
-									<td class="', $color_class, ' stats">
+										</h4>
+									</div>
+									<p class="topic_starter">
+										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], '
+										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">', $topic['pages'], '</span>
+									</p>
+								</div>
+								<div class="topic_latest">
+									<p class="topic_stats">
 										', $topic['replies'], ' ', $txt['replies'], '
 										<br />
 										', $topic['views'], ' ', $txt['views'], '
-									</td>
-									<td class="', $color_class2, ' lastpost">
-										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" class="floatright" /></a>
+									</p>
+									<p class="topic_lastpost">
+										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
 										', $topic['last_post']['time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
-									</td>';
+									</p>
+								</div>';
 
 			if ($context['showCheckboxes'])
 				echo '
-									<td class="', $color_class, ' moderation centertext" style="vertical-align:middle">
-										<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
-									</td>';
+								<p class="topic_moderation" >
+									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
+								</p>';
 			echo '
-								</tr>';
+							</li>';
 		}
 
-		if (empty($context['topics']))
-			echo '
-								<tr style="display: none;"><td></td></tr>';
-
 		echo '
-							</tbody>
-						</table>
-					</div>';
+						</ul>';
+
 		template_pagesection('recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
@@ -215,11 +191,9 @@ function template_unread()
 	}
 	else
 		echo '
-					<div class="cat_bar">
-						<h3 class="catbg centertext">
-							', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
-						</h3>
-					</div>';
+					<h2 class="category_header">
+						', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
+					</h2>';
 
 	echo '
 					<div id="topic_icons" class="description">
@@ -231,8 +205,7 @@ function template_unread()
 							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
 							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
 						</p>
-					</div>
-				</div>';
+					</div>';
 }
 
 /**
@@ -241,9 +214,6 @@ function template_unread()
 function template_replies()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
-
-	echo '
-				<div id="recentposts" class="main_content">';// @todo - Why is this main_content when recent posts has main_section in the same place?
 
 	if (!empty($context['topics']))
 	{
@@ -258,105 +228,88 @@ function template_replies()
 
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
-					<div class="tborder topic_table" id="unread">
-						<table class="table_grid" >
-							<thead>
-								<tr class="catbg">
-									<th scope="col" class="first_th" style="width:8%">&nbsp;</th>
-									<th scope="col">
-										<a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] === 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>
-									<th scope="col" class="centertext" style="width:14%">
-										<a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] === 'replies' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] === 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>';
+						<h2 class="category_header" id="unread_header">
+							', $txt['unread_replies'], ' 
+						</h2>
+						<ul class="topic_listing" id="unread">
+							<li class="topic_sorting_row">
+								<h3>
+									Sort by: <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] === 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+											/ <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] === 'replies' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] === 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+											 / <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] === 'last_post' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] === 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
+								</h3>';
 
 		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])
 			echo '
-									<th scope="col" style="width:22%">
-										<a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] === 'last_post' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] === 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>
-									<th class="last_th centertext">
-										<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
-									</th>';
-		else
-			echo '
-									<th scope="col" class="last_th" style="width:22%">
-										<a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] === 'last_post' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] === 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									</th>';
+								<p>
+									<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
+								</p>';
+
 		echo '
-								</tr>
-							</thead>
-							<tbody>';
+							</li>';
 
 		foreach ($context['topics'] as $topic)
 		{
 			// Calculate the color class of the topic.
 			$color_class = '';
 			if ($topic['is_sticky'] && $topic['is_locked'])
-				$color_class = 'stickybg locked_sticky';
+				$color_class = 'locked_row sticky_row';
 			// Sticky topics should get a different color, too.
 			elseif ($topic['is_sticky'])
-				$color_class = 'stickybg';
+				$color_class = 'sticky_row';
 			// Locked topics get special treatment as well.
 			elseif ($topic['is_locked'])
-				$color_class = 'lockedbg';
+				$color_class = 'locked_row';
 			// Last, but not least: regular topics.
 			else
-				$color_class = 'windowbg';
+				$color_class = 'basic_row';
 
-			$color_class2 = $color_class . '2';
-
-			// [WIP] There is trial code here to hide the topic icon column. Hardly anyone will miss it.
-			// [WIP] Markup can be cleaned up later. CSS can go in the CSS files later.
 			echo '
-								<tr>
-									<td class="', $color_class, ' icon1 windowbg" style="display: none;">
-										<img src="', $settings['images_url'], '/topic/', $topic['class'], '.png" alt="" />
-									</td>
-									<td class="', $color_class, ' icon2 windowbg">
-										<div style="position: relative; width: 40px; margin: auto;">
-											<img src="', $topic['first_post']['icon_url'], '" alt="" />
-											', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" style="position: absolute; z-index: 5; right: 4px; bottom: -3px;" />' : '','
-										</div>
-									</td>
-									<td class="subject ', $color_class2, ' windowbg2">
-										<div>';
+							<li class="', $color_class, '">
+								<div class="topic_info">
+									<p class="topic_icons">
+										<img src="', $topic['first_post']['icon_url'], '" alt="" /><img src="', $settings['images_url'], '/icons/profile_sm.png" alt="" class="fred" />
+									</p>
+									<div class="topic_name">';
 
 			// [WIP] MEthinks the orange icons look better if they aren't all over the page.
 			echo '
-											<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
-											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic[(empty($settings['message_index_preview_first']) ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span>', $topic['is_sticky'] ? '</strong>' : '', '
-											<p>
-												', $topic['first_post']['started_by'], '
-												<small id="pages', $topic['first_post']['id'], '">', $topic['pages'], '</small>
-											</p>
-										</div>
-									</td>
-									<td class="', $color_class, ' stats windowbg">
+										<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
+										<h4>
+											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic[(empty($settings['message_index_preview_first']) ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+										</h4>
+									</div>
+									<p class="topic_starter">
+										', $topic['first_post']['started_by'], '
+										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">', $topic['pages'], '</span>
+									</p>
+								</div>
+								<div class="topic_latest">
+									<p class="topic_stats">
 										', $topic['replies'], ' ', $txt['replies'], '
 										<br />
 										', $topic['views'], ' ', $txt['views'], '
-									</td>
-									<td class="', $color_class2, ' lastpost windowbg2">
-										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" class="floatright" /></a>
+									</p>
+									<p class="topic_lastpost">
+										<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
 										', $topic['last_post']['time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
-									</td>';
+									</p>
+								</div>';
 
 			if ($context['showCheckboxes'])
 				echo '
-									<td class="' . (!empty($color_class) ? $color_class : 'windowbg2') . ' moderation centertext" style="vertical-align:middle">
-										<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
-									</td>';
+								<p class="topic_moderation">
+									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
+								</p>';
 			echo '
-								</tr>';
+							</li>';
 		}
 
 		echo '
-							</tbody>
-						</table>
-					</div>';
+						</ul>';
+
 		template_pagesection('recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
@@ -365,11 +318,9 @@ function template_replies()
 	}
 	else
 		echo '
-					<div class="cat_bar">
-						<h3 class="catbg centertext">
-							', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
-						</h3>
-					</div>';
+					<h2 class="category_header">
+						', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
+					</h2>';
 
 	echo '
 					<div id="topic_icons" class="description">
@@ -381,6 +332,5 @@ function template_replies()
 							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
 							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
 						</p>
-					</div>
-				</div>';
+					</div>';
 }
