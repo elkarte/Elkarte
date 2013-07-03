@@ -33,14 +33,12 @@ function template_main()
 
 	// Show the topic information - icon, subject, etc.
 	echo '
-			<div id="forumposts">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
-						', $txt['topic'], ': ', $context['subject'], '&nbsp;<span>(', $context['num_views_text'], ')</span>
-						<span class="nextlinks floatright">', $context['previous_next'], '</span>
-					</h3>
-				</div>';
+			<div id="forumposts" class="forumposts">
+				<h3 class="catbg">
+					<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
+					', $txt['topic'], ': ', $context['subject'], '&nbsp;<span>(', $context['num_views_text'], ')</span>
+					<span class="nextlinks floatright">', $context['previous_next'], '</span>
+				</h3>';
 
 	if (!empty($settings['display_who_viewing']))
 	{
@@ -153,17 +151,17 @@ function template_main()
 		echo '
 						<ul class="quickbuttons">';
 
+		// Show a checkbox for quick moderation?
+		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
+			echo '
+							<li class="listlevel1 inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
+
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'] && !empty($message['modified']['name']))
 			echo '
 							<li class="listlevel1 modified" id="modified_', $message['id'], '">
 								', $message['modified']['last_edit_text'], '
 							</li>';
-
-		// Show a checkbox for quick moderation?
-		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
-			echo '
-							<li class="listlevel1 inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
@@ -211,47 +209,54 @@ function template_main()
 						echo '
 									<li class="listlevel2"><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a></li>';
 
-			// Can they like this post
-			if ($message['can_like'])
-						echo '
-									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 like_button">', $txt['like_post'], '</a></li>';
-			// Or remove the like they made
-			elseif ($message['can_unlike'])
-						echo '
-									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 unlike_button">', $txt['unlike_post'], '</a></li>';
-
 			echo '
 								</ul>';
 		}
 
+		// Has anyone liked this post? @todo - Still needs a bit of tweaking.
+		//if (!empty($message['like_counter']))
+			echo '
+							<li class="listlevel1"><a href="#" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] :'&nbsp;', '</a>';
+
+			// Can they like this post
+			if ($message['can_like'])
+			{
+						echo '
+								<ul class="menulevel2">
+									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 like_button">', $txt['like_post'], '</a></li>
+								</ul>';
+			}
+			// Or remove the like they made
+			elseif ($message['can_unlike'])
+			{
+						echo '
+								<ul class="menulevel2">
+									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 unlike_button">', $txt['unlike_post'], '</a></li>
+								</ul>';
+			}
+
+			echo '
+							</li>';
+
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
-							</li>
 							<li class="listlevel1 quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
-
-
-		// Can they reply? Have they turned on quick reply?
-		if ($context['can_quote'] && !empty($options['display_quick_reply']))
-			echo '
-							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a>';
-		// So... quick reply is off, but they *can* reply?
-		elseif ($context['can_quote'])
-			echo '
-							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a>';
 
 		// Can they quote to a new topic? @todo - This needs rethinking for gui layout.
 		if ($context['can_follow_up'])
 			echo '
-								<ul class="menulevel2">
-									<li class="listlevel2"><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel2 quotetonew_button">', $txt['quote_new'], '</a></li>
-								</ul>
-							</li>';
 
-		// Has anyone liked this post?
-		if (!empty($message['like_counter']))
+							<li class="listlevel1"><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel1 quotetonew_button">', $txt['quote_new'], '</a></li>';
+
+		// Can they reply? Have they turned on quick reply?
+		if ($context['can_quote'] && !empty($options['display_quick_reply']))
 			echo '
-							<li class="listlevel1 quick_edit"><img src="', $settings['images_url'], '/icons/heart.png" alt="', $txt['likes'], '" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="likes">', $message['like_counter'], ' ', $txt['likes'], '</li>';
+							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+		// So... quick reply is off, but they *can* reply?
+		elseif ($context['can_quote'])
+			echo '
+							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 
 		echo '
 						</ul>';
@@ -270,7 +275,7 @@ function template_main()
 					$shown = true;
 					echo '
 						<div class="custom_fields_above_signature">
-							<ul class="nolist">';
+							<ul>';
 				}
 
 				echo '
@@ -309,15 +314,13 @@ function template_quickreply_below()
 	{
 		echo '
 			<a id="quickreply"></a>
-			<div class="tborder" id="quickreplybox">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<a href="javascript:oQuickReply.swap();"><img src="', $settings['images_url'], '/', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '.png" alt="+" id="quickReplyExpand" class="icon" /></a>
-						<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
-					</h3>
-				</div>
-				<div id="quickReplyOptions"', $options['display_quick_reply'] > 1 ? '' : ' style="display: none"', '>
-					<div class="roundframe">
+			<div class="forumposts" id="quickreplybox">
+				<h3 class="catbg">
+					<a href="javascript:oQuickReply.swap();"><img src="', $settings['images_url'], '/', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '.png" alt="+" id="quickReplyExpand" class="icon" /></a>
+					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
+				</h3>
+				<div id="quickReplyOptions" class="windowbg"', $options['display_quick_reply'] > 1 ? '' : ' style="display: none"', '>
+					<div class="editor_wrapper">
 						<p class="smalltext lefttext">', $txt['quick_reply_desc'], '</p>
 						', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
