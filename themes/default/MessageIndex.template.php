@@ -235,7 +235,7 @@ function template_main()
 		// No topics.... just say, "sorry bub".
 		else
 			echo '
-					<strong>', $txt['msg_alert_none'], '</strong>';
+					<strong>', $txt['topic_alert_none'], '</strong>';
 
 		echo '
 			</li>';
