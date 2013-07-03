@@ -123,7 +123,7 @@ function template_display_child_boards_above()
 				<ul class="childboards">
 					<li>
 						<h4>', $txt['parent_boards'], ':</h4>
-					<li>
+					</li>
 					<li>
 						', implode('</li><li> - ', $children), '
 					</li>

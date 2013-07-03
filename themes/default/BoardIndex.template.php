@@ -145,7 +145,7 @@ function template_main()
 					<ul class="childboards">
 						<li>
 							<h4>', $txt['parent_boards'], ':</h4>
-						<li>
+						</li>
 						<li>
 							', implode('</li><li> - ', $children), '
 						</li>
