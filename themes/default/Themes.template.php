@@ -179,10 +179,10 @@ function template_main()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		window.smfForum_scripturl = elk_scripturl;
-		window.smfForum_sessionid = elk_session_id;
-		window.smfForum_sessionvar = elk_session_var;
-		window.smfThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
+		window.elkForum_scripturl = elk_scripturl;
+		window.elkForum_sessionid = elk_session_id;
+		window.elkForum_sessionvar = elk_session_var;
+		window.elkThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
 	// ]]></script>';
 
 	if (empty($modSettings['disable_elk_js']))

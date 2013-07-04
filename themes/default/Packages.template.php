@@ -548,9 +548,9 @@ function template_browse()
 			</div>
 
 			<script><!-- // --><![CDATA[
-				window.smfForum_scripturl = elk_scripturl;
-				window.smfForum_sessionid = elk_session_id;
-				window.smfForum_sessionvar = elk_session_var;';
+				window.elkForum_scripturl = elk_scripturl;
+				window.elkForum_sessionid = elk_session_id;
+				window.elkForum_sessionvar = elk_session_var;';
 
 		// Make a list of already installed mods so nothing is listed twice ;).
 		echo '
