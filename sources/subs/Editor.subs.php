@@ -880,7 +880,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
 
 			addInlineJavascript('
-				var verification' . $this->_options['id'] . 'Handle = new smfCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
+				var verification' . $this->_options['id'] . 'Handle = new elkCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
 		}
 
 		if ($isNew || $force_refresh)
