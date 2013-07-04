@@ -1409,7 +1409,7 @@ function smfFooterHighlight(element, value)
 }
 
 // Get the text in a code tag.
-function smfSelectText(oCurElement, bActOnElement)
+function elkSelectText(oCurElement, bActOnElement)
 {
 	// The place we're looking for is one div up, and next door - if it's auto detect.
 	if (typeof(bActOnElement) == 'boolean' && bActOnElement)
