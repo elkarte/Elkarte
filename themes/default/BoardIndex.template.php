@@ -447,7 +447,7 @@ function template_news_fader()
 
 	// No, here we need a list because the fade uses the list to split the items.
 	echo '
-		<ul id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
+		<ul id="elkFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
 			<li>
 				', implode('</li><li>', $context['news_lines']), '
 			</li>
@@ -458,7 +458,7 @@ function template_news_fader()
 
 		// Create a news fader object.
 		var oNewsFader = new smc_NewsFader({
-			sFaderControlId: \'smfFadeScroller\',
+			sFaderControlId: \'elkFadeScroller\',
 			sItemTemplate: ', JavaScriptEscape('<strong>%1$s</strong>'), ',
 			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
 		});
@@ -468,7 +468,7 @@ function template_news_fader()
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($options['collapse_news_fader']) ? 'false' : 'true', ',
 			aSwappableContainers: [
-				\'smfFadeScroller\'
+				\'elkFadeScroller\'
 			],
 			aSwapImages: [
 				{
