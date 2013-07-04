@@ -391,7 +391,7 @@ function template_registration_form()
 				"password_no_match": "', $txt['registration_password_no_match'], '",
 				"password_valid": "', $txt['registration_password_valid'], '"
 			};
-			var verificationHandle = new smfRegister("registration", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+			var verificationHandle = new elkRegister("registration", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 			// Update the authentication status.
 			updateAuthMethod();
 		// ]]></script>';

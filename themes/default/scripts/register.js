@@ -14,7 +14,7 @@
  * This file contains javascript associated with the registration screen
  */
 
-function smfRegister(formID, passwordDifficultyLevel, regTextStrings)
+function elkRegister(formID, passwordDifficultyLevel, regTextStrings)
 {
 	this.addVerify = addVerificationField;
 	this.autoSetup = autoSetup;
