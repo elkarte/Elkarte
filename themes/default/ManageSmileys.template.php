@@ -50,10 +50,10 @@ function template_editsets()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		function smfSetLatestSmileys()
+		function elkSetLatestSmileys()
 		{
-			if (typeof(window.smfLatestSmileys) != "undefined")
-				setInnerHTML(document.getElementById("smileysLatest"), window.smfLatestSmileys);';
+			if (typeof(window.elkLatestSmileys) != "undefined")
+				setInnerHTML(document.getElementById("smileysLatest"), window.elkLatestSmileys);';
 
 		if (!empty($context['selected_set']))
 			echo '
@@ -67,7 +67,7 @@ function template_editsets()
 		}';
 
 		echo '
-			smfSetLatestSmileys();';
+			elkSetLatestSmileys();';
 
 		echo '
 	// ]]></script>';
