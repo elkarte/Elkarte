@@ -457,14 +457,14 @@ function template_news_fader()
 	<script><!-- // --><![CDATA[
 
 		// Create a news fader object.
-		var oNewsFader = new smc_NewsFader({
+		var oNewsFader = new elk_NewsFader({
 			sFaderControlId: \'elkFadeScroller\',
 			sItemTemplate: ', JavaScriptEscape('<strong>%1$s</strong>'), ',
 			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
 		});
 
 		// Create the news fader toggle.
-		var smfNewsFadeToggle = new smc_Toggle({
+		var elkNewsFadeToggle = new smc_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($options['collapse_news_fader']) ? 'false' : 'true', ',
 			aSwappableContainers: [
