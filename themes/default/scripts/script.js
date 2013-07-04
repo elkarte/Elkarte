@@ -1617,7 +1617,7 @@ function updateActionDef(optNum)
 	}
 }
 
-function smfSetLatestPackages()
+function elkSetLatestPackages()
 {
 	if (typeof(window.smfLatestPackages) != "undefined")
 		setInnerHTML(document.getElementById("packagesLatest"), window.smfLatestPackages);

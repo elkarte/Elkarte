@@ -554,7 +554,7 @@ function template_browse()
 
 		// Make a list of already installed mods so nothing is listed twice ;).
 		echo '
-				window.smfInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
+				window.elkInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
 				window.ourVersion = "', $context['forum_version'], '";
 			// ]]></script>';
 
@@ -565,7 +565,7 @@ function template_browse()
 		echo '
 			<script><!-- // --><![CDATA[
 				var tempOldOnload;
-				smfSetLatestPackages();
+				elkSetLatestPackages();
 			// ]]></script>
 
 		</div>';
