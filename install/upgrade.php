@@ -633,7 +633,7 @@ if (!isset($settings['default_theme_dir']))
 
 $upcontext['is_large_forum'] = (empty($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '1.1 RC1') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
 // Default title...
-$upcontext['page_title'] = isset($modSettings['elkVersion']) ? 'Updating Your Elkarte Install!' : (isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!');
+$upcontext['page_title'] = isset($modSettings['elkVersion']) ? 'Updating Your ElkArte Install!' : (isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!');
 
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
 
@@ -741,7 +741,7 @@ function upgradeExit($fallThrough = false)
 			if (function_exists('debug_print_backtrace'))
 				debug_print_backtrace();
 
-			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the Elkarte Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
+			echo "\n" . 'Error: Unexpected call to use the ' . (isset($upcontext['sub_template']) ? $upcontext['sub_template'] : '') . ' template. Please copy and paste all the text above and visit the ElkArte Community to tell the Developers that they\'ve made a doh!; they\'ll get you up and running again.';
 			flush();
 			die();
 		}
@@ -1036,7 +1036,7 @@ function action_welcomeLogin()
 				<li>Source Directory: ' . BOARDDIR . '</li>
 				<li>Cache Directory: ' . $CACHEDIR_temp . '</li>
 			</ul>
-			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the Elkarte website before continuing.';
+			If these seem incorrect please open Settings.php in a text editor before proceeding with this upgrade. If they are incorrect due to you moving your forum to a new location please download and execute the <a href="https://github.com/emanuele45/tools/downloads">Repair Settings</a> tool from the ElkArte website before continuing.';
 
 	// Either we're logged in or we're going to present the login.
 	if (checkLogin())
@@ -3478,7 +3478,7 @@ function template_upgrade_above()
 	<div id="header"><div class="frame">
 		<div id="top_section">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
-			<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+			<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 		</div>
 		<div id="upper_section" class="middletext flow_hidden">
 			<div class="user"></div>
@@ -3579,7 +3579,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">ElkArte &copy;2011, Elkarte</a></div>
+		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy;2011, ElkArte</a></div>
 	</div></div>
 	</body>
 </html>';
@@ -4512,8 +4512,8 @@ function template_upgrade_complete()
 			<img src="', $settings['default_theme_url'], '/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />
-			If you had any problems with this upgrade, or have any problems using Elkarte, please don\'t hesitate to <a href="http://www.elkarte.net/index.php">look to us for assistance</a>.<br />
+			If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="http://www.elkarte.net/index.php">look to us for assistance</a>.<br />
 			<br />
 			Best of luck,<br />
-			Elkarte';
+			ElkArte';
 }

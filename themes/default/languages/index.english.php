@@ -115,7 +115,8 @@ $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
 $txt['last_poster'] = 'Last post by';
 //$txt['last_post_message'] = '<strong>Last post</strong> by %1$s<br />in %2$s<br />on %3$s';
-$txt['last_post_message'] = '<strong>Last post: </strong>%3$s<br />%2$s by %1$s';
+// @todo - Clean this up a bit. See notes in template. Also, needs another string for topic_listing sorting options.
+$txt['last_post_message'] = '<span class="lastpost_link">%2$s</span><span class="board_lastposter"> by %1$s</span><span class="board_lasttime"><strong>Last post: </strong>%3$s</span>';
 $txt['boardindex_total_posts'] = '%1$s Posts in %2$d Topics by %3$d Members';
 $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
@@ -449,7 +450,7 @@ $txt['code'] = 'Code';
 $txt['code_select'] = '[Select]';
 $txt['quote_from'] = 'Quote from';
 $txt['quote'] = 'Quote';
-$txt['quote_new'] = 'Quote to new topic';
+$txt['quote_new'] = 'New topic';
 $txt['follow_ups'] = 'Follow-ups';
 $txt['topic_derived_from'] = 'Topic derived from %1$s';
 $txt['fulledit'] = 'Full&nbsp;edit';
@@ -491,7 +492,7 @@ $txt['status'] = 'Status';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="License" target="_blank" class="new_win">Elkarte &copy; 2013</a>';
+$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="License" target="_blank" class="new_win">ElkArte &copy; 2013</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';

@@ -269,7 +269,7 @@ function cache_get_data($key, $ttl = 120)
 				$value = xcache_get($key);
 			break;
 		default:
-			// Otherwise it's Elkarte data!
+			// Otherwise it's ElkArte data!
 			if (file_exists(CACHEDIR . '/data_' . $key . '.php') && filesize(CACHEDIR . '/data_' . $key . '.php') > 10)
 			{
 				// php will cache file_exists et all, we can't 100% depend on its results so proceed with caution

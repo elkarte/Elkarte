@@ -227,7 +227,7 @@ class News_Controller extends Action_Controller
 			<title>', $feed_title, '</title>
 			<link>', $scripturl, '</link>
 			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<generator>Elkarte</generator>
+			<generator>ElkArte</generator>
 			<ttl>30</ttl>
 			<image>
 				<url>', $settings['default_theme_dir'], '/images/logo.png</url>
