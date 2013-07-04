@@ -219,9 +219,9 @@ function template_download_language()
 				aSwapImages: [
 					{
 						sId: \'toggle_image_', $theme, '\',
-						srcExpanded: smf_images_url + \'/sort_down.png\',
+						srcExpanded: elk_images_url + \'/sort_down.png\',
 						altExpanded: \'*\',
-						srcCollapsed: smf_images_url + \'/selected.png\',
+						srcCollapsed: elk_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
 					}
 				]

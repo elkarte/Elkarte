@@ -2749,7 +2749,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		ob_clean();
 
 		echo strtr($temp, array(
-			'var smf_iso_case_folding' => 'var target_blank = \'_blank\'; var smf_iso_case_folding',
+			'var elk_iso_case_folding' => 'var target_blank = \'_blank\'; var elk_iso_case_folding',
 			'target="_blank"' => 'onclick="this.target=target_blank"'));
 	}
 
@@ -2916,7 +2916,7 @@ function setupThemeContext($forceload = false)
 			new smc_Popup({
 				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
 				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
-				icon: smf_images_url + \'/im_sm_newmsg.png\'
+				icon: elk_images_url + \'/im_sm_newmsg.png\'
 			});
 		});');
 
@@ -2925,11 +2925,11 @@ function setupThemeContext($forceload = false)
 	{
 		// @todo Move this over to script.js?
 		addInlineJavascript('
-		var smf_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
-		var smf_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
-		window.addEventListener("load", smf_avatarResize, false);' : '
+		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
+		var elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
+		window.addEventListener("load", elk_avatarResize, false);' : '
 		var window_oldAvatarOnload = window.onload;
-		window.onload = smf_avatarResize;'));
+		window.onload = elk_avatarResize;'));
 	}
 
 	// This looks weird, but it's because BoardIndex.controller.php references the variable.
@@ -2948,7 +2948,7 @@ function setupThemeContext($forceload = false)
 	$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
 	if (empty($settings['theme_version']))
-		addJavascriptVar('smf_scripturl', $scripturl);
+		addJavascriptVar('elk_scripturl', $scripturl);
 
 	if (!isset($context['page_title']))
 		$context['page_title'] = '';

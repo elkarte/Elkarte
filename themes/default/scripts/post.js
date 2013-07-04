@@ -58,7 +58,7 @@ function previewPost()
 {
 	// @todo Currently not sending poll options and option checkboxes.
 	var textFields = [
-		'subject', post_box_name, smf_session_var, 'icon', 'guestname', 'email', 'evtitle', 'question', 'topic'
+		'subject', post_box_name, elk_session_var, 'icon', 'guestname', 'email', 'evtitle', 'question', 'topic'
 	];
 	var numericFields = [
 		'board', 'topic', 'last_msg',
@@ -73,7 +73,7 @@ function previewPost()
 	var x = new Array();
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + smf_session_var + '=' + smf_session_id + ';xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
 
 	document.getElementById('preview_section').style.display = '';
 	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
@@ -101,7 +101,7 @@ function previewPM()
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	// Send in document for previewing
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
@@ -130,7 +130,7 @@ function previewNews()
 	x[x.length] = 'item=newsletterpreview';
 
 	// Send in document for previewing
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
@@ -184,7 +184,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	}
 
 	// And some security
-	fields[fields.length] = smf_session_var + '=' + smf_session_id;
+	fields[fields.length] = elk_session_var + '=' + elk_session_id;
 
 	return fields;
 }
@@ -322,8 +322,8 @@ function onDocSent(XMLDoc)
 
 	location.hash = '#' + 'preview_section';
 
-	if (typeof(smf_codeFix) != 'undefined')
-		smf_codeFix();
+	if (typeof(elk_codeFix) != 'undefined')
+		elk_codeFix();
 }
 
 // Add additional poll option fields
@@ -361,9 +361,9 @@ function addAttachment()
 function insertQuoteFast(messageid)
 {
 	if (window.XMLHttpRequest)
-		getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=quotefast;quote=' + messageid + ';xml;pb=' + post_box_name + ';mode=0', onDocReceived);
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';xml;pb=' + post_box_name + ';mode=0', onDocReceived);
 	else
-		reqWin(smf_prepareScriptUrl(smf_scripturl) + 'action=quotefast;quote=' + messageid + ';pb=' + post_box_name + ';mode=0', 240, 90);
+		reqWin(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';pb=' + post_box_name + ';mode=0', 240, 90);
 
 	return true;
 }

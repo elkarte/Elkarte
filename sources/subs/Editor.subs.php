@@ -178,7 +178,7 @@ function create_control_richedit($editorOptions)
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
 		addInlineJavascript('
-		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
+		var elk_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
 		var bbc_quote = \'' . addcslashes($txt['quote'], "'") . '\';
 		var bbc_search_on = \'' . addcslashes($txt['search_on'], "'") . '\';');
@@ -1434,7 +1434,7 @@ function html_to_bbc($text)
 	// Remove any formatting within code tags.
 	if (strpos($text, '[code') !== false)
 	{
-		$text = preg_replace('~<br\s?/?' . '>~i', '#smf_br_spec_grudge_cool!#', $text);
+		$text = preg_replace('~<br\s?/?' . '>~i', '#elk_br_spec_grudge_cool!#', $text);
 		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		// Only mess with stuff outside [code] tags.
@@ -1445,7 +1445,7 @@ function html_to_bbc($text)
 				$parts[$i] = strip_tags($parts[$i]);
 		}
 
-		$text = strtr(implode('', $parts), array('#smf_br_spec_grudge_cool!#' => '<br />'));
+		$text = strtr(implode('', $parts), array('#elk_br_spec_grudge_cool!#' => '<br />'));
 	}
 
 	// Remove scripts, style and comment blocks.
@@ -1469,7 +1469,7 @@ function html_to_bbc($text)
 				$found = array_search($file, $smileysto);
 				// Note the weirdness here is to stop double spaces between smileys.
 				if ($found)
-					$matches[1][$k] = '-[]-smf_smily_start#|#' . htmlspecialchars($smileysfrom[$found]) . '-[]-smf_smily_end#|#';
+					$matches[1][$k] = '-[]-elk_smily_start#|#' . htmlspecialchars($smileysfrom[$found]) . '-[]-elk_smily_end#|#';
 				else
 					$matches[1][$k] = '';
 			}
@@ -1499,7 +1499,7 @@ function html_to_bbc($text)
 
 				foreach ($matches[1] as $k => $file)
 					if (isset($mappings[$file]))
-						$matches[1][$k] = '-[]-smf_smily_start#|#' . $mappings[$file] . '-[]-smf_smily_end#|#';
+						$matches[1][$k] = '-[]-elk_smily_start#|#' . $mappings[$file] . '-[]-elk_smily_end#|#';
 			}
 		}
 
@@ -1507,7 +1507,7 @@ function html_to_bbc($text)
 		$text = str_replace($matches[0], $matches[1], $text);
 
 		// Now sort out spaces
-		$text = str_replace(array('-[]-smf_smily_end#|#-[]-smf_smily_start#|#', '-[]-smf_smily_end#|#', '-[]-smf_smily_start#|#'), ' ', $text);
+		$text = str_replace(array('-[]-elk_smily_end#|#-[]-elk_smily_start#|#', '-[]-elk_smily_end#|#', '-[]-elk_smily_start#|#'), ' ', $text);
 	}
 
 	// Only try to buy more time if the client didn't quit.

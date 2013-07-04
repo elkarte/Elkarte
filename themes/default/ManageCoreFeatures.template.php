@@ -65,7 +65,7 @@ function template_core_features()
 				// Launch AJAX request.
 				$.ajax({
 					// The link we are accessing.
-					url: smf_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
+					url: elk_scripturl + "?action=xmlhttp;sa=corefeatures;xml",
 
 					// The type of request.
 					type: "post",

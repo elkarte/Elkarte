@@ -402,9 +402,9 @@ function template_info_center()
 			aSwapImages: [
 				{
 					sId: \'upshrink_ic\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
@@ -418,8 +418,8 @@ function template_info_center()
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'minmax_preferences\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
 				sAdditionalVars: \';minmax_key=info\'
 			},
 			oCookieOptions: {
@@ -473,17 +473,17 @@ function template_news_fader()
 			aSwapImages: [
 				{
 					sId: \'newsupshrink\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'collapse_news_fader\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id
+				sSessionVar: elk_session_var,
+				sSessionId: elk_session_id
 			},
 			oCookieOptions: {
 				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',

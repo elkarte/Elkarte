@@ -14,7 +14,7 @@
  * This file contains javascript utility functions
  */
 
-var smf_formSubmitted = false;
+var elk_formSubmitted = false;
 var lastKeepAliveCheck = new Date().getTime();
 
 // Some very basic browser detection - from Mozilla's sniffer page.
@@ -124,7 +124,7 @@ String.prototype.oCharsetConversion = {
 // Convert a string to an 8 bit representation (like in PHP).
 String.prototype.php_to8bit = function ()
 {
-	if (smf_charset == 'UTF-8')
+	if (elk_charset == 'UTF-8')
 	{
 		var n, sReturn = '';
 
@@ -146,7 +146,7 @@ String.prototype.php_to8bit = function ()
 
 	else if (this.oCharsetConversion.from.length == 0)
 	{
-		switch (smf_charset)
+		switch (elk_charset)
 		{
 			case 'ISO-8859-1':
 				this.oCharsetConversion = {
@@ -256,7 +256,7 @@ String.prototype.php_strtr = function (sFrom, sTo)
 // Simulate PHP's strtolower (in SOME cases PHP uses ISO-8859-1 case folding).
 String.prototype.php_strtolower = function ()
 {
-	return typeof(smf_iso_case_folding) == 'boolean' && smf_iso_case_folding == true ? this.php_strtr(
+	return typeof(elk_iso_case_folding) == 'boolean' && elk_iso_case_folding == true ? this.php_strtr(
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZ\x8a\x8c\x8e\x9f\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde',
 		'abcdefghijklmnopqrstuvwxyz\x9a\x9c\x9e\xff\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe'
 	) : this.php_strtr('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
@@ -323,8 +323,8 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><img src="' + smf_images_url + '/loading.gif" ></div>';
-	var sIcon = smf_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
+	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>';
+	var sIcon = elk_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
 	var sHeader = typeof(sHeader) == 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
@@ -353,7 +353,7 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 function smc_Popup(oOptions)
 {
 	this.opt = oOptions;
-	this.popup_id = this.opt.custom_id ? this.opt.custom_id : 'smf_popup';
+	this.popup_id = this.opt.custom_id ? this.opt.custom_id : 'elk_popup';
 	this.show();
 }
 
@@ -510,7 +510,7 @@ function isEmptyText(theField)
 // Only allow form submission ONCE.
 function submitonce(theform)
 {
-	smf_formSubmitted = true;
+	elk_formSubmitted = true;
 }
 
 function submitThisOnce(oControl)
@@ -522,7 +522,7 @@ function submitThisOnce(oControl)
 	for (var i = 0, n = aTextareas.length; i < n; i++)
 		aTextareas[i].readOnly = true;
 
-	return !smf_formSubmitted;
+	return !elk_formSubmitted;
 }
 
 // Deprecated, as innerHTML is supported everywhere.
@@ -606,28 +606,28 @@ function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 
 // Keep the session alive - always!
 var lastKeepAliveCheck = new Date().getTime();
-function smf_sessionKeepAlive()
+function elk_sessionKeepAlive()
 {
 	var curTime = new Date().getTime();
 
 	// Prevent a Firefox bug from hammering the server.
-	if (smf_scripturl && curTime - lastKeepAliveCheck > 900000)
+	if (elk_scripturl && curTime - lastKeepAliveCheck > 900000)
 	{
 		var tempImage = new Image();
-		tempImage.src = smf_prepareScriptUrl(smf_scripturl) + 'action=keepalive;time=' + curTime;
+		tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=keepalive;time=' + curTime;
 		lastKeepAliveCheck = curTime;
 	}
 
-	window.setTimeout('smf_sessionKeepAlive();', 1200000);
+	window.setTimeout('elk_sessionKeepAlive();', 1200000);
 }
-window.setTimeout('smf_sessionKeepAlive();', 1200000);
+window.setTimeout('elk_sessionKeepAlive();', 1200000);
 
 // Set a theme option through javascript.
-function smf_setThemeOption(option, value, theme, cur_session_id, cur_session_var, additional_vars)
+function elk_setThemeOption(option, value, theme, cur_session_id, cur_session_var, additional_vars)
 {
 	// Compatibility.
 	if (cur_session_id == null)
-		cur_session_id = smf_session_id;
+		cur_session_id = elk_session_id;
 	if (typeof(cur_session_var) == 'undefined')
 		cur_session_var = 'sesc';
 
@@ -635,10 +635,10 @@ function smf_setThemeOption(option, value, theme, cur_session_id, cur_session_va
 		additional_vars = '';
 
 	var tempImage = new Image();
-	tempImage.src = smf_prepareScriptUrl(smf_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + cur_session_var + '=' + cur_session_id + additional_vars + (theme == null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
+	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + cur_session_var + '=' + cur_session_id + additional_vars + (theme == null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
 }
 
-function smf_avatarResize()
+function elk_avatarResize()
 {
 	var possibleAvatars = document.getElementsByTagName('img');
 
@@ -656,15 +656,15 @@ function smf_avatarResize()
 		{
 			this.avatar.width = this.width;
 			this.avatar.height = this.height;
-			if (smf_avatarMaxWidth != 0 && this.width > smf_avatarMaxWidth)
+			if (elk_avatarMaxWidth != 0 && this.width > elk_avatarMaxWidth)
 			{
-				this.avatar.height = (smf_avatarMaxWidth * this.height) / this.width;
-				this.avatar.width = smf_avatarMaxWidth;
+				this.avatar.height = (elk_avatarMaxWidth * this.height) / this.width;
+				this.avatar.width = elk_avatarMaxWidth;
 			}
-			if (smf_avatarMaxHeight != 0 && this.avatar.height > smf_avatarMaxHeight)
+			if (elk_avatarMaxHeight != 0 && this.avatar.height > elk_avatarMaxHeight)
 			{
-				this.avatar.width = (smf_avatarMaxHeight * this.avatar.width) / this.avatar.height;
-				this.avatar.height = smf_avatarMaxHeight;
+				this.avatar.width = (elk_avatarMaxHeight * this.avatar.width) / this.avatar.height;
+				this.avatar.height = elk_avatarMaxHeight;
 			}
 		}
 		tempAvatars[j].src = possibleAvatars[i].src;
@@ -682,7 +682,7 @@ function hashLoginPassword(doForm, cur_session_id, token)
 {
 	// Compatibility.
 	if (cur_session_id == null)
-		cur_session_id = smf_session_id;
+		cur_session_id = elk_session_id;
 
 	if (typeof(hex_sha1) == 'undefined')
 		return;
@@ -707,7 +707,7 @@ function hashAdminPassword(doForm, username, cur_session_id, token)
 {
 	// Compatibility.
 	if (cur_session_id == null)
-		cur_session_id = smf_session_id;
+		cur_session_id = elk_session_id;
 
 	if (typeof(hex_sha1) == 'undefined')
 		return;
@@ -950,7 +950,7 @@ smc_Toggle.prototype.changeState = function(bCollapse, bInit)
 		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
 
 	if (!bInit && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
-		smf_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, smf_session_id, smf_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
+		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, elk_session_id, elk_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
 }
 
 smc_Toggle.prototype.toggle = function()
@@ -989,7 +989,7 @@ function create_ajax_indicator_ele()
 	var cancel_link = document.createElement('a');
 	cancel_link.href = 'javascript:ajax_indicator(false)';
 	var cancel_img = document.createElement('img');
-	cancel_img.src = smf_images_url + '/icons/quick_remove.png';
+	cancel_img.src = elk_images_url + '/icons/quick_remove.png';
 
 	if (typeof(ajax_notification_cancel_text) != 'undefined')
 	{
@@ -1036,7 +1036,7 @@ function createEventListener(oTarget)
 // This function will retrieve the contents needed for the jump to boxes.
 function grabJumpToContent(elem)
 {
-	var oXMLDoc = getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=jumpto;xml');
+	var oXMLDoc = getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml');
 	var aBoardsAndCategories = new Array();
 	var bIE5x = !('implementation' in document);
 
@@ -1088,7 +1088,7 @@ JumpTo.prototype.showSelect = function ()
 	var sChildLevelPrefix = '';
 	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
-	setInnerHTML(document.getElementById(this.opt.sContainerId), this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled == true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName != undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName != undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect != undefined && this.opt.bNoRedirect == true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel != undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + smf_prepareScriptUrl(smf_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : '')));
+	setInnerHTML(document.getElementById(this.opt.sContainerId), this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled == true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName != undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName != undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect != undefined && this.opt.bNoRedirect == true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel != undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(smf_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : '')));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 }
 
@@ -1157,7 +1157,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	if (!this.opt.bNoRedirect)
 		this.dropdownList.onchange = function() {
 			if (this.selectedIndex > 0 && this.options[this.selectedIndex].value)
-				window.location.href = smf_scripturl + this.options[this.selectedIndex].value.substr(smf_scripturl.indexOf('?') == -1 || this.options[this.selectedIndex].value.substr(0, 1) != '?' ? 0 : 1);
+				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') == -1 || this.options[this.selectedIndex].value.substr(0, 1) != '?' ? 0 : 1);
 		}
 }
 
@@ -1225,13 +1225,13 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 
 		// Start to fetch its contents.
 		ajax_indicator(true);
-		sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=' + this.opt.sAction + ';xml', '', this.onIconsReceived);
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=' + this.opt.sAction + ';xml', '', this.onIconsReceived);
 
 		createEventListener(document.body);
 	}
 
 	// Set the position of the container.
-	var aPos = smf_itemPos(oDiv);
+	var aPos = elk_itemPos(oDiv);
 
 	this.oContainerDiv.style.top = (aPos[1] + oDiv.offsetHeight) + 'px';
 	this.oContainerDiv.style.left = (aPos[0] - 1) + 'px';
@@ -1282,7 +1282,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 	{
 		ajax_indicator(true);
 		this.tmpMethod = getXMLDocument;
-		var oXMLDoc = this.tmpMethod(smf_prepareScriptUrl(smf_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + smf_session_var + '=' + smf_session_id + ';icon=' + sNewIcon + ';xml');
+		var oXMLDoc = this.tmpMethod(elk_prepareScriptUrl(elk_scripturl) + 'action=jsmodify;topic=' + this.opt.iTopicId + ';msg=' + this.iCurMessageId + ';' + elk_session_var + '=' + elk_session_id + ';icon=' + sNewIcon + ';xml');
 		delete this.tmpMethod;
 		ajax_indicator(false);
 
@@ -1324,7 +1324,7 @@ IconList.prototype.collapseList = function()
 }
 
 // Handy shortcuts for getting the mouse position on the screen - only used for IE at the moment.
-function smf_mousePose(oEvent)
+function elk_mousePose(oEvent)
 {
 	var x = 0;
 	var y = 0;
@@ -1344,7 +1344,7 @@ function smf_mousePose(oEvent)
 }
 
 // Short function for finding the actual position of an item.
-function smf_itemPos(itemHandle)
+function elk_itemPos(itemHandle)
 {
 	var itemX = 0;
 	var itemY = 0;
@@ -1370,7 +1370,7 @@ function smf_itemPos(itemHandle)
 }
 
 // This function takes the script URL and prepares it to allow the query string to be appended to it.
-function smf_prepareScriptUrl(sUrl)
+function elk_prepareScriptUrl(sUrl)
 {
 	return sUrl.indexOf('?') == -1 ? sUrl + '?' : sUrl + (sUrl.charAt(sUrl.length - 1) == '?' || sUrl.charAt(sUrl.length - 1) == '&' || sUrl.charAt(sUrl.length - 1) == ';' ? '' : ';');
 }
@@ -1405,7 +1405,7 @@ function addLoadEvent(fNewOnload)
 
 function smfFooterHighlight(element, value)
 {
-	element.src = smf_images_url + '/' + (value ? 'h_' : '') + element.id + '.png';
+	element.src = elk_images_url + '/' + (value ? 'h_' : '') + element.id + '.png';
 }
 
 // Get the text in a code tag.
@@ -1579,7 +1579,7 @@ function expandCollapse(id, icon, speed)
 
 	// change the icon on the box as well?
 	if (icon)
-		$('#' + icon).attr("src", smf_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
+		$('#' + icon).attr("src", elk_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
 
 	// open or collaspe the content id
 	oId.slideToggle(speed);
@@ -1639,10 +1639,10 @@ function updateAuthMethod()
 		return true;
 
 	document.forms.creator.openid_url.disabled = currentAuthMethod == "openid" ? false : true;
-	document.forms.creator.smf_autov_pwmain.disabled = currentAuthMethod == "passwd" ? false : true;
-	document.forms.creator.smf_autov_pwverify.disabled = currentAuthMethod == "passwd" ? false : true;
-	document.getElementById("smf_autov_pwmain_div").style.display = currentAuthMethod == "passwd" ? "" : "none";
-	document.getElementById("smf_autov_pwverify_div").style.display = currentAuthMethod == "passwd" ? "" : "none";
+	document.forms.creator.elk_autov_pwmain.disabled = currentAuthMethod == "passwd" ? false : true;
+	document.forms.creator.elk_autov_pwverify.disabled = currentAuthMethod == "passwd" ? false : true;
+	document.getElementById("elk_autov_pwmain_div").style.display = currentAuthMethod == "passwd" ? "" : "none";
+	document.getElementById("elk_autov_pwverify_div").style.display = currentAuthMethod == "passwd" ? "" : "none";
 
 	if (currentAuthMethod == "passwd")
 	{
@@ -1654,8 +1654,8 @@ function updateAuthMethod()
 	}
 	else
 	{
-		document.forms.creator.smf_autov_pwmain.style.backgroundColor ="";
-		document.forms.creator.smf_autov_pwverify.style.backgroundColor = "";
+		document.forms.creator.elk_autov_pwmain.style.backgroundColor ="";
+		document.forms.creator.elk_autov_pwverify.style.backgroundColor = "";
 		document.forms.creator.openid_url.style.backgroundColor = "#FCE184";
 		document.getElementById("auth_openid_div").style.display = "";
 		document.getElementById("auth_pass_div").style.display = "none";

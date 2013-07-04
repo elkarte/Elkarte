@@ -39,9 +39,9 @@ function template_editsets()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		window.smfForum_scripturl = smf_scripturl;
-		window.smfForum_sessionid = smf_session_id;
-		window.smfForum_sessionvar = smf_session_var;
+		window.smfForum_scripturl = elk_scripturl;
+		window.smfForum_sessionid = elk_session_id;
+		window.smfForum_sessionvar = elk_session_var;
 	// ]]></script>';
 
 	if (empty($modSettings['disable_elk_js']))

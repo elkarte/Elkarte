@@ -82,7 +82,7 @@ function smc_toggleImageDimensions()
 addLoadEvent(smc_toggleImageDimensions);
 
 // Adds a button to a certain button strip.
-function smf_addButton(sButtonStripId, bUseImage, oOptions)
+function elk_addButton(sButtonStripId, bUseImage, oOptions)
 {
 	var oButtonStrip = document.getElementById(sButtonStripId);
 	var aItems = oButtonStrip.getElementsByTagName('span');

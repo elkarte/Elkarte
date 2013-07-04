@@ -26,7 +26,7 @@
 	 */
 	elk_Drafts.prototype.draftSave = function() {
 		// No change since the last save, or form submitted
-		if (!this.opts._bCheckDraft || smf_formSubmitted)
+		if (!this.opts._bCheckDraft || elk_formSubmitted)
 			return false;
 
 		// Still saving the last one or other?
@@ -52,7 +52,7 @@
 			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'save_draft=true',
-			smf_session_var + '=' + smf_session_id
+			elk_session_var + '=' + elk_session_id
 		];
 
 		// Get the locked an/or sticky values if they have been selected or set that is
@@ -72,7 +72,7 @@
 		aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');
 
 		// Send in document for saving and hope for the best
-		sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=post2;board=" + this.opts.iBoard + ";xml", aSections.join("&"), this.onDraftDone);
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=post2;board=" + this.opts.iBoard + ";xml", aSections.join("&"), this.onDraftDone);
 
 		// Set the flag off so we don't save again (until a keypress indicates they changed the text)
 		this.opts._bCheckDraft = false;
@@ -88,7 +88,7 @@
 	elk_Drafts.prototype.draftPMSave = function ()
 	{
 		// No change since the last PM save, or elk is doing its thing
-		if (!this.opts._bCheckDraft || smf_formSubmitted)
+		if (!this.opts._bCheckDraft || elk_formSubmitted)
 			return false;
 
 		// Still saving the last one or some other?
@@ -117,7 +117,7 @@
 			'recipient_to=' + aTo,
 			'recipient_bcc=' + aBcc,
 			'save_draft=true',
-			smf_session_var + '=' + smf_session_id
+			elk_session_var + '=' + elk_session_id
 		];
 
 		// Saving a copy in the outbox?
@@ -129,7 +129,7 @@
 			aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');
 
 		// Send in (post) the document for saving
-		sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=pm;sa=send2;xml", aSections.join("&"), this.onDraftDone);
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=pm;sa=send2;xml", aSections.join("&"), this.onDraftDone);
 
 		// Set the flag as updated
 		this.opts._bCheckDraft = false;

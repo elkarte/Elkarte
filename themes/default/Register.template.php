@@ -84,7 +84,7 @@ function template_registration_form()
 		<script><!-- // --><![CDATA[
 			function verifyAgree()
 			{
-				if (currentAuthMethod == \'passwd\' && document.forms.registration.smf_autov_pwmain.value != document.forms.registration.smf_autov_pwverify.value)
+				if (currentAuthMethod == \'passwd\' && document.forms.registration.elk_autov_pwmain.value != document.forms.registration.elk_autov_pwverify.value)
 				{
 					alert("', $txt['register_passwords_differ_js'], '");
 					return false;
@@ -125,18 +125,18 @@ function template_registration_form()
 			<div class="windowbg2">
 				<fieldset class="content">
 					<dl class="register_form">
-						<dt><strong><label for="smf_autov_username">', $txt['username'], ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_username">', $txt['username'], ':</label></strong></dt>
 						<dd>
-							<input type="text" name="user" id="smf_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
-							<span id="smf_autov_username_div" style="display: none;">
-								<a id="smf_autov_username_link" href="#">
-									<img id="smf_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
+							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
+							<span id="elk_autov_username_div" style="display: none;">
+								<a id="elk_autov_username_link" href="#">
+									<img id="elk_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
 								</a>
 							</span>
 						</dd>
-						<dt><strong><label for="smf_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
 						<dd>
-							<input type="email" name="email" id="smf_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
+							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
 						</dd>
 						<dt><strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong></dt>
 						<dd>
@@ -168,20 +168,20 @@ function template_registration_form()
 
 	echo '
 					<dl class="register_form" id="password1_group">
-						<dt><strong><label for="smf_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd1" id="smf_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['choose_pass']), '" required="required" />
-							<span id="smf_autov_pwmain_div" style="display: none;">
-								<img id="smf_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['choose_pass']), '" required="required" />
+							<span id="elk_autov_pwmain_div" style="display: none;">
+								<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 							</span>
 						</dd>
 					</dl>
 					<dl class="register_form" id="password2_group">
-						<dt><strong><label for="smf_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd2" id="smf_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['verify_pass']), '" required="required" />
-							<span id="smf_autov_pwverify_div" style="display: none;">
-								<img id="smf_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['verify_pass']), '" required="required" />
+							<span id="elk_autov_pwverify_div" style="display: none;">
+								<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 							</span>
 						</dd>
 					</dl>';

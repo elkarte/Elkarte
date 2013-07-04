@@ -300,7 +300,7 @@ smc_AutoSuggest.prototype.positionDiv = function()
 	this.bPositionComplete = true;
 
 	// Put the div under the text box.
-	var aParentPos = smf_itemPos(this.oTextHandle);
+	var aParentPos = elk_itemPos(this.oTextHandle);
 
 	this.oSuggestDivHandle.style.left = aParentPos[0] + 'px';
 	this.oSuggestDivHandle.style.top = (aParentPos[1] + this.oTextHandle.offsetHeight) + 'px';
@@ -370,7 +370,7 @@ smc_AutoSuggest.prototype.addItemLink = function (sItemId, sItemName, bFromSubmi
 
 	var oNewDiv = document.createElement('div');
 	oNewDiv.id = 'suggest_' + this.opt.sSuggestId + '_' + sItemId;
-	setInnerHTML(oNewDiv, this.sItemTemplate.replace(/%post_name%/g, this.opt.sPostName).replace(/%item_id%/g, sItemId).replace(/%item_href%/g, smf_prepareScriptUrl(smf_scripturl) + this.opt.sURLMask.replace(/%item_id%/g, sItemId)).replace(/%item_name%/g, sItemName).replace(/%images_url%/g, smf_images_url).replace(/%self%/g, this.opt.sSelf).replace(/%delete_text%/g, this.sTextDeleteItem));
+	setInnerHTML(oNewDiv, this.sItemTemplate.replace(/%post_name%/g, this.opt.sPostName).replace(/%item_id%/g, sItemId).replace(/%item_href%/g, elk_prepareScriptUrl(elk_scripturl) + this.opt.sURLMask.replace(/%item_id%/g, sItemId)).replace(/%item_name%/g, sItemName).replace(/%images_url%/g, elk_images_url).replace(/%self%/g, this.opt.sSelf).replace(/%delete_text%/g, this.sTextDeleteItem));
 	this.oItemList.appendChild(oNewDiv);
 
 	// If there's a registered callback, call it.
@@ -637,7 +637,7 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	sSearchString = sSearchString.php_to8bit().php_urlencode();
 
 	// Get the document.
-	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, smf_prepareScriptUrl(smf_scripturl)).replace(/%suggest_type%/g, this.opt.sSearchType).replace(/%search%/g, sSearchString).replace(/%sessionVar%/g, this.opt.sSessionVar).replace(/%sessionID%/g, this.opt.sSessionId).replace(/%time%/g, new Date().getTime()), '', this.onSuggestionReceived);
+	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, elk_prepareScriptUrl(elk_scripturl)).replace(/%suggest_type%/g, this.opt.sSearchType).replace(/%search%/g, sSearchString).replace(/%sessionVar%/g, this.opt.sSessionVar).replace(/%sessionID%/g, this.opt.sSessionId).replace(/%time%/g, new Date().getTime()), '', this.onSuggestionReceived);
 
 	return true;
 }

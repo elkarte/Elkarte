@@ -242,7 +242,7 @@ function smfRegister(formID, passwordDifficultyLevel, regTextStrings)
 
 		// Request a search on that username.
 		checkName = curUsername.php_to8bit().php_urlencode();
-		getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkName, checkUsernameCallback);
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkName, checkUsernameCallback);
 
 		return true;
 	}
@@ -273,7 +273,7 @@ function smfRegister(formID, passwordDifficultyLevel, regTextStrings)
 			alt = '*';
 
 		var curImage = imageIcon ? (imageIcon == 'check' ? 'field_check.png' : 'field_valid.png') : 'field_invalid.png';
-		imageHandle.src = smf_images_url + '/icons/' + curImage;
+		imageHandle.src = elk_images_url + '/icons/' + curImage;
 		imageHandle.alt = alt;
 		imageHandle.title = alt;
 
@@ -294,10 +294,10 @@ function updateAuthMethod()
 		return true;
 
 	document.forms.registration.openid_url.disabled = currentAuthMethod == 'openid' ? false : true;
-	document.forms.registration.smf_autov_pwmain.disabled = currentAuthMethod == 'passwd' ? false : true;
-	document.forms.registration.smf_autov_pwverify.disabled = currentAuthMethod == 'passwd' ? false : true;
-	document.getElementById('smf_autov_pwmain_div').style.display = currentAuthMethod == 'passwd' ? '' : 'none';
-	document.getElementById('smf_autov_pwverify_div').style.display = currentAuthMethod == 'passwd' ? '' : 'none';
+	document.forms.registration.elk_autov_pwmain.disabled = currentAuthMethod == 'passwd' ? false : true;
+	document.forms.registration.elk_autov_pwverify.disabled = currentAuthMethod == 'passwd' ? false : true;
+	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod == 'passwd' ? '' : 'none';
+	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod == 'passwd' ? '' : 'none';
 
 	if (currentAuthMethod == 'passwd')
 	{
@@ -310,8 +310,8 @@ function updateAuthMethod()
 	}
 	else
 	{
-		document.forms.registration.smf_autov_pwmain.style.backgroundColor = '';
-		document.forms.registration.smf_autov_pwverify.style.backgroundColor = '';
+		document.forms.registration.elk_autov_pwmain.style.backgroundColor = '';
+		document.forms.registration.elk_autov_pwverify.style.backgroundColor = '';
 		document.forms.registration.openid_url.style.backgroundColor = '#FFF0F0';
 		document.getElementById('password1_group').style.display = 'none';
 		document.getElementById('password2_group').style.display = 'none';

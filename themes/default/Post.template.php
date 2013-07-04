@@ -188,9 +188,9 @@ function template_load_drafts_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -204,8 +204,8 @@ function template_load_drafts_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});
@@ -517,9 +517,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postMoreExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -533,8 +533,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=post\'
 				},
 			});';
@@ -551,9 +551,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -567,8 +567,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});';
