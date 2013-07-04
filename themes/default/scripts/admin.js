@@ -98,7 +98,7 @@ elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 	document.getElementById('update-link').href = this.opt.sUpdateNotificationLink.replace('%package%', window.ourUpdatePackage);
 
 	// If we decide to override life into "red" mode, do it.
-	if ('smfUpdateCritical' in window)
+	if ('elkUpdateCritical' in window)
 	{
 		document.getElementById('update_table').style.backgroundColor = '#aa2222';
 		document.getElementById('update_title').style.backgroundColor = '#dd2222';
@@ -559,7 +559,7 @@ function addAnotherOption(parent, oDtName, oDdName)
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
 
-function smfSetLatestThemes()
+function elkSetLatestThemes()
 {
 	if (typeof(window.ourLatestThemes) !== "undefined")
 		setInnerHTML(document.getElementById("themeLatest"), window.ourLatestThemes);

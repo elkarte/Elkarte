@@ -192,7 +192,7 @@ function template_main()
 	echo '
 		<script><!-- // --><![CDATA[
 			var tempOldOnload;
-			smfSetLatestThemes();
+			elkSetLatestThemes();
 		// ]]></script>';
 }
 

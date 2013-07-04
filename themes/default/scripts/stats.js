@@ -161,7 +161,7 @@ elk_StatsCenter.prototype.init = function ()
 
 elk_StatsCenter.prototype.onBeforeCollapseYear = function (oToggle)
 {
-	// Tell SMF that all underlying months have disappeared.
+	// Tell ElkArte that all underlying months have disappeared.
 	for (var sMonth in this.oYears[oToggle.opt.sYearId].oMonths)
 		if (this.oYears[oToggle.opt.sYearId].oMonths[sMonth].oToggle.opt.aSwappableContainers.length > 0)
 			this.oYears[oToggle.opt.sYearId].oMonths[sMonth].oToggle.changeState(true);
@@ -172,7 +172,7 @@ elk_StatsCenter.prototype.onBeforeCollapseMonth = function (oToggle)
 {
 	if (!oToggle.bCollapsed)
 	{
-		// Tell SMF that it the state has changed.
+		// Tell ElkArte that it the state has changed.
 		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=stats;collapse=' + oToggle.opt.sMonthId + ';xml');
 
 		// Remove the month rows from the year toggle.
@@ -205,7 +205,7 @@ elk_StatsCenter.prototype.onBeforeExpandMonth = function (oToggle)
 		this.bIsLoading = true;
 	}
 
-	// Silently let SMF know this one is expanded.
+	// Silently let ElkArte know this one is expanded.
 	else
 		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=stats;expand=' + oToggle.opt.sMonthId + ';xml');
 }
