@@ -790,13 +790,13 @@ function template_quotefast()
 
 			if (\'DOMParser\' in window && !(\'opera\' in window))
 			{
-				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_") + "</temp>", "text/xml");
-				quote = xmldoc.childNodes[0].textContent.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_") + "</temp>", "text/xml");
+				quote = xmldoc.childNodes[0].textContent.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 			else if (\'innerText\' in stage)
 			{
-				setInnerHTML(stage, quote.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-				quote = stage.innerText.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				setInnerHTML(stage, quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 
 			if (\'opera\' in window)
