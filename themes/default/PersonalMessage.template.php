@@ -794,7 +794,7 @@ function template_search()
 			createEventListener(window);
 			window.addEventListener("load", initSearch, false);
 
-			var oAdvancedPanelToggle = new smc_Toggle({
+			var oAdvancedPanelToggle = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pm']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -1131,7 +1131,7 @@ function template_send()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true', ',
 				aSwappableContainers: [

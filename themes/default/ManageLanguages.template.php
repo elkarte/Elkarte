@@ -206,7 +206,7 @@ function template_download_language()
 	{
 		$count = 0;
 		echo '
-			var oTogglePanel_', $theme, ' = new smc_Toggle({
+			var oTogglePanel_', $theme, ' = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [';

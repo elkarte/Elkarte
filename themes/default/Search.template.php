@@ -235,7 +235,7 @@ function template_main()
 						});
 
 						// Some javascript for the advanced toggling
-						var oAdvancedPanelToggle = new smc_Toggle({
+						var oAdvancedPanelToggle = new elk_Toggle({
 							bToggleEnabled: true,
 							bCurrentlyCollapsed: ', empty($context['minmax_preferences']['search']) ? 'false' : 'true', ',
 							aSwappableContainers: [

@@ -393,7 +393,7 @@ function template_info_center()
 	// Info center collapse object.
 	echo '
 	<script><!-- // --><![CDATA[
-		var oInfoCenterToggle = new smc_Toggle({
+		var oInfoCenterToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',
 			aSwappableContainers: [
@@ -464,7 +464,7 @@ function template_news_fader()
 		});
 
 		// Create the news fader toggle.
-		var elkNewsFadeToggle = new smc_Toggle({
+		var elkNewsFadeToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($options['collapse_news_fader']) ? 'false' : 'true', ',
 			aSwappableContainers: [

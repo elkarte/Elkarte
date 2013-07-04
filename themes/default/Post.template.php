@@ -179,7 +179,7 @@ function template_load_drafts_below()
 		// Code for showing and hiding drafts
 		echo '
 		<script><!-- // --><![CDATA[
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -275,7 +275,7 @@ function template_topic_replies_below()
 		foreach ($ignored_posts as $post_id)
 		{
 			echo '
-			aIgnoreToggles[', $post_id, '] = new smc_Toggle({
+			aIgnoreToggles[', $post_id, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -502,7 +502,7 @@ function template_postarea_below()
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
-			var oSwapAdditionalOptions = new smc_Toggle({
+			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['post']) ? 'false' : 'true', ',
 				funcOnBeforeCollapse: function () {
@@ -542,7 +542,7 @@ function template_postarea_below()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [

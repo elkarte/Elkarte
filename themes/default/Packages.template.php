@@ -349,7 +349,7 @@ function template_view_package()
 			foreach ($js_operations as $key => $operation)
 			{
 				echo '
-			aOperationElements[', $key, '] = new smc_Toggle({
+			aOperationElements[', $key, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', $operation ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -626,7 +626,7 @@ function template_browse()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['pkg']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -974,7 +974,7 @@ function template_package_list()
 			foreach ($context['package_list'] as $section => $ps)
 			{
 				echo '
-				var oPackageServerToggle_', $section, ' = new smc_Toggle({
+				var oPackageServerToggle_', $section, ' = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: ', count($ps['items']) == 1 || $section_count == 1 ? 'false' : 'true', ',
 					aSwappableContainers: [
@@ -995,7 +995,7 @@ function template_package_list()
 				{
 					if (!$package['is_text'] && !$package['is_line'] && !$package['is_remote'])
 						echo '
-				var oPackageToggle_', $section, '_pkg_', $id, ' = new smc_Toggle({
+				var oPackageToggle_', $section, '_pkg_', $id, ' = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [

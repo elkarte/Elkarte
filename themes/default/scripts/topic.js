@@ -819,7 +819,7 @@ function ignore_toggles(msgids, text)
 	for (i = 0; i < msgids.length; i++)
 	{
 		var msgid = msgids[i];
-		new smc_Toggle({
+		new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: true,
 			aSwappableContainers: [

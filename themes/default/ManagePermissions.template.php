@@ -202,7 +202,7 @@ function template_permission_index()
 		// Javascript for the advanced stuff.
 		echo '
 	<script><!-- // --><![CDATA[
-		var oPermissionsPanelToggle = new smc_Toggle({
+		var oPermissionsPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['app']) ? 'true' : 'false', ',
 			aSwappableContainers: [

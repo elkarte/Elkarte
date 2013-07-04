@@ -552,7 +552,7 @@ function template_menu()
 	// Note that this definition had to be shifted for the js to work with the new markup.
 	echo '
 				<script><!-- // --><![CDATA[
-					var oMainHeaderToggle = new smc_Toggle({
+					var oMainHeaderToggle = new elk_Toggle({
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',
 						aSwappableContainers: [

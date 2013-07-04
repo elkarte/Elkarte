@@ -64,7 +64,7 @@ elk_StatsCenter.prototype.init = function ()
 			oCurYear.bIsCollapsed = oCurYear.oCollapseImage.src.indexOf(this.opt.sYearImageCollapsed) >= 0;
 
 			// Setup the toggle element for the year.
-			oCurYear.oToggle = new smc_Toggle({
+			oCurYear.oToggle = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: oCurYear.bIsCollapsed,
 				instanceRef: this,
@@ -113,7 +113,7 @@ elk_StatsCenter.prototype.init = function ()
 			var sLinkText = getInnerHTML(document.getElementById(this.opt.sMonthLinkIdPrefix + sMonthId));
 
 			// Setup the toggle element for the month.
-			oCurMonth.oToggle = new smc_Toggle({
+			oCurMonth.oToggle = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: oCurMonth.bIsCollapsed,
 				instanceRef: this,

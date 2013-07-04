@@ -796,8 +796,8 @@ smc_Cookie.prototype.set = function(sKey, sValue)
 	document.cookie = sKey + '=' + encodeURIComponent(sValue);
 }
 
-// *** smc_Toggle class.
-function smc_Toggle(oOptions)
+// *** elk_Toggle class.
+function elk_Toggle(oOptions)
 {
 	this.opt = oOptions;
 	this.bCollapsed = false;
@@ -805,7 +805,7 @@ function smc_Toggle(oOptions)
 	this.init();
 }
 
-smc_Toggle.prototype.init = function ()
+elk_Toggle.prototype.init = function ()
 {
 	// The master switch can disable this toggle fully.
 	if ('bToggleEnabled' in this.opt && !this.opt.bToggleEnabled)
@@ -876,7 +876,7 @@ smc_Toggle.prototype.init = function ()
 }
 
 // Collapse or expand the section.
-smc_Toggle.prototype.changeState = function(bCollapse, bInit)
+elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 {
 	// Default bInit to false.
 	bInit = typeof(bInit) == 'undefined' ? false : true;
@@ -953,7 +953,7 @@ smc_Toggle.prototype.changeState = function(bCollapse, bInit)
 		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, elk_session_id, elk_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
 }
 
-smc_Toggle.prototype.toggle = function()
+elk_Toggle.prototype.toggle = function()
 {
 	// Change the state by reversing the current state.
 	this.changeState(!this.bCollapsed);

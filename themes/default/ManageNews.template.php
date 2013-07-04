@@ -129,7 +129,7 @@ function template_email_members()
 	// This is some javascript for the simple/advanced toggling and member suggest
 	echo '
 	<script><!-- // --><![CDATA[
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['apn']) ? 'false' : 'true', ',
 			aSwappableContainers: [

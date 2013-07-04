@@ -301,7 +301,7 @@ function onDocSent(XMLDoc)
 		{
 			for (var i = 0; i < numIgnoredReplies; i++)
 			{
-				aIgnoreToggles[ignored_replies[i]] = new smc_Toggle({
+				aIgnoreToggles[ignored_replies[i]] = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [
