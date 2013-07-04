@@ -1044,7 +1044,7 @@ function grabJumpToContent(elem)
 
 	if (oXMLDoc.responseXML)
 	{
-		var items = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('item');
+		var items = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('item');
 		for (var i = 0, n = items.length; i < n; i++)
 		{
 			aBoardsAndCategories[aBoardsAndCategories.length] = {
@@ -1246,7 +1246,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 // Setup the list of icons once it is received through xmlHTTP.
 IconList.prototype.onIconsReceived = function (oXMLDoc)
 {
-	var icons = oXMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('icon');
+	var icons = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('icon');
 	var sItems = '';
 
 	for (var i = 0, n = icons.length; i < n; i++)
@@ -1286,7 +1286,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		delete this.tmpMethod;
 		ajax_indicator(false);
 
-		var oMessage = oXMLDoc.responseXML.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
+		var oMessage = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('message')[0];
 		if (oMessage.getElementsByTagName('error').length === 0)
 		{
 			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length !== 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))

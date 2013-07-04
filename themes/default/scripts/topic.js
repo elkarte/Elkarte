@@ -176,7 +176,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 		return true;
 	}
 
-	var message = XMLDoc.getElementsByTagName("smf")[0].getElementsByTagName("message")[0];
+	var message = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("message")[0];
 	var subject = message.getElementsByTagName("subject")[0];
 	var error = message.getElementsByTagName("error")[0];
 
@@ -552,7 +552,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	ajax_indicator(false);
 
 	// If we didn't get a valid document, just cancel.
-	if (!XMLDoc || !XMLDoc.getElementsByTagName('smf')[0])
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
 		// Mozilla will nicely tell us what's wrong.
 		if (XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName == 'parsererror')
@@ -566,7 +566,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		return;
 	}
 
-	var message = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
+	var message = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0];
 	var body = message.getElementsByTagName('body')[0];
 	var error = message.getElementsByTagName('error')[0];
 

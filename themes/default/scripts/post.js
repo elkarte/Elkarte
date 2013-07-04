@@ -192,7 +192,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 // Callback function of the XMLhttp request
 function onDocSent(XMLDoc)
 {
-	if (!XMLDoc || !XMLDoc.getElementsByTagName('smf')[0])
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
 		document.forms[form_name].preview.onclick = new function () {return true;};
 		document.forms[form_name].preview.click();
@@ -200,7 +200,7 @@ function onDocSent(XMLDoc)
 	}
 
 	// Show the preview section.
-	var preview = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('preview')[0];
+	var preview = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('preview')[0];
 	setInnerHTML(document.getElementById('preview_subject'), preview.getElementsByTagName('subject')[0].firstChild.nodeValue);
 
 	var bodyText = '';
@@ -211,7 +211,7 @@ function onDocSent(XMLDoc)
 	document.getElementById('preview_body').className = 'post';
 
 	// Show a list of errors (if any).
-	var errors = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('errors')[0];
+	var errors = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('errors')[0];
 	var errorList = '';
 	var errorCode = '';
 
@@ -259,7 +259,7 @@ function onDocSent(XMLDoc)
 	{
 		// Set the new last message id.
 		if ('last_msg' in document.forms[form_name])
-			document.forms[form_name].last_msg.value = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('last_msg')[0].firstChild.nodeValue;
+			document.forms[form_name].last_msg.value = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('last_msg')[0].firstChild.nodeValue;
 
 		// Remove the new image from old-new replies!
 		for (i = 0; i < new_replies.length; i++)
@@ -267,7 +267,7 @@ function onDocSent(XMLDoc)
 		new_replies = new Array();
 
 		var ignored_replies = new Array(), ignoring;
-		var newPosts = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0};
+		var newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0};
 		var numNewPosts = newPosts.length;
 
 		if (numNewPosts != 0)

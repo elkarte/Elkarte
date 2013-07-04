@@ -82,7 +82,7 @@ function template_core_features()
 							$(ajax_infobar).attr(\'class\', \'errorbox\');
 							$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
 						}
-						else if ($(request).find("smf").length !== 0)
+						else if ($(request).find("elk").length !== 0)
 						{
 							$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
 							cc.attr({
