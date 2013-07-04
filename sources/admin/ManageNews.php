@@ -171,7 +171,7 @@ class ManageNews_Controller extends Action_Controller
 		$listOptions = array(
 			'id' => 'news_lists',
 			'get_items' => array(
-				'function' => 'list_getNews',
+				'function' => 'getNews',
 			),
 			'columns' => array(
 				'news' => array(
@@ -921,16 +921,5 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		return $config_vars;
-	}
-
-	/**
-	 * Prepares an array of the forum news items for display in the template
-	 * Callback for createList()
-	 *
-	 * @return array
-	 */
-	function list_getNews()
-	{
-		return getNews();
 	}
 }

@@ -445,11 +445,13 @@ function template_news_fader()
 			', $txt['news'], '
 		</h2>';
 
-	// Just use a basic paragraph here, as only one news item is shown at a time.
+	// No, here we need a list because the fade uses the list to split the items.
 	echo '
-		<p id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
-			', implode($context['news_lines']), '
-		</p>
+		<ul id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
+			<li>
+				', implode('</li><li>', $context['news_lines']), '
+			</li>
+		</ul>
 	</div>
 	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
 	<script><!-- // --><![CDATA[
