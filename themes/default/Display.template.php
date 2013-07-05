@@ -916,7 +916,7 @@ function template_display_calendar_above()
 
 function template_pages_and_buttons_above()
 {
-	global $context, $txt, $modSettings;
+	global $context;
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.
 	echo '
@@ -928,7 +928,7 @@ function template_pages_and_buttons_above()
 
 function template_pages_and_buttons_below()
 {
-	global $context, $txt, $modSettings;
+	global $context;
 
 
 	// Show the page index... "Pages: [1]".
