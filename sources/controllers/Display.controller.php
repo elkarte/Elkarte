@@ -1043,6 +1043,7 @@ class Display_Controller
 			'can_like' => $message['use_likes'] && !$message['likes'],
 			'can_unlike' => $message['use_likes'] && $message['likes'],
 			'like_counter' =>$message['like_count'],
+			'likes_enabled' => !empty($modSettings['likes_enabled']) ? true : false,
 		);
 
 		// Is this user the message author?
