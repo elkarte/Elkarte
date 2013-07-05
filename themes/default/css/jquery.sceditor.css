@@ -11,38 +11,30 @@
 
 .sceditor-container {
 	position: relative;
-	border: 1px solid #aaa;
+	border: 1px solid #bbb;
 	background: #fff;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-opera-border-radius: 4px;
-	-khtml-border-radius: 4px;
 	border-radius: 4px;
 }
 .sceditor-container.resizing {
 	overflow: hidden;
 }
-.sceditor-container, .sceditor-container div, div.sceditor-dropdown, div.sceditor-dropdown div {
-	padding: 0;
-	margin: 0;
+.sceditor-container, .sceditor-container div, .sceditor-dropdown, .sceditor-dropdown div {
 	z-index: 3;
 }
 .sceditor-container iframe, .sceditor-container textarea {
 	border: 0;
 	outline: none;
-	color: #111;
+	color: #444;
 	padding: 5px;
-	margin: 0 0 12px 0;
+	margin: 12px 0;
 	resize: none;
-	background: #fff;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 /* Necessary for stabilising font-size in source mode! */
 .sceditor-container textarea, .sceditor-container textarea:focus {
 	font-size: 1em;
 	box-shadow: none;
 }
-div.sceditor-resize-cover {
+.sceditor-resize-cover {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -53,53 +45,51 @@ div.sceditor-resize-cover {
 	filter: alpha(opacity=70);
 	opacity: 0.7;
 }
-div.sceditor-grip {
+.sceditor-grip {
 	overflow: hidden;
-	height: 12px;
+	height: 22px;
 	cursor: pointer;
 	position: absolute;
 	bottom: 0;
-	left: -1px;
-	right: -1px;
+	left: 0;
+	right: 0;
 	z-index: 3;
-	background: #fff url('../images/bbc/grip.png') 100% 100% no-repeat;
-	border: 1px solid #ccc;
-	border-bottom: none;
+	background: #fafafa url('../images/bbc/grip.png') 100% 100% no-repeat;
+	border-top: 1px solid #ccc;
 	border-radius: 0 0 4px 4px;
-	box-shadow: -1px -2px 4px rgba(0,0,0,0.1) inset, 2px 2px 4px rgba(255,255,255,0.75) inset;
+	box-shadow: -1px -2px 4px rgba(0,0,0,0.1) inset;
 }
-div.sceditor-dropdown {
+.sceditor-dropdown {
 	position: absolute;
-	margin: 22px 0 0 1px;
+	margin: 22px 0 0 0;
 	border: 1px solid #bbb;
 	background: #fff;
-	color: #222;
-	font-size: 13px;
+	color: #444;
 	z-index: 6;
 }
-div.sceditor-dropdown form {
+.sceditor-dropdown form {
 	margin: 0;
 }
-div.sceditor-dropdown label {
+.sceditor-dropdown label {
 	display: block;
 	font-weight: bold;
-	font-size: .95em;
+	font-size: .929em;
 	margin: .65em 0 .15em;
 }
-div.sceditor-dropdown .button {
+.sceditor-dropdown .button {
 	margin: .5em 0 0;
 }
 .sceditor-pastetext textarea {
 	border: 1px solid #bbb;
 	width: 20em;
 }
-div.sceditor-inserttable, div.sceditor-insertimage, div.sceditor-pastetext, div.sceditor-insertlink, div.sceditor-insertemail {
+.sceditor-inserttable, .sceditor-insertimage, .sceditor-pastetext, .sceditor-insertlink, .sceditor-insertemail {
 	padding: 5px;
 }
 #sceditor-smileycontainer {
 	float:left;
 }
-div.sceditor-smileyPopup {
+.sceditor-smileyPopup {
 	margin: 0;
 }
 .sceditor-insertemoticon img, .sceditor-smileyPopup img {
@@ -118,7 +108,7 @@ div.sceditor-smileyPopup {
 	border-left: none;
 	border-right: 1px solid #bbb;
 	border-bottom: 1px solid #aaa;
-	color: #222;
+	color: #444;
 }
 .sceditor-more:hover {
 	background: #fafafa;
@@ -137,9 +127,9 @@ div.sceditor-smileyPopup {
 	display: block;
 	padding: 4px 6px;
 	cursor: pointer;
-	font-size: 14px;
+	font-size: 1em;
 	text-decoration: none;
-	color: #222;
+	color: #444;
 }
 .sceditor-fontsize-option:hover, .sceditor-font-option:hover {
 	background: #eee;
@@ -149,49 +139,44 @@ div.sceditor-smileyPopup {
 }
 .sceditor-color-option {
 	display: block;
-	border: 1px solid #fff;
+	border: 2px solid transparent;
+	margin: 2px;
 	height: 20px;
 	width: 100px;
 	overflow: hidden;
 }
 .sceditor-color-option:hover {
-	border: 1px solid #333;
+	border: 2px solid #333;
 }
-div.sceditor-toolbar {
+.sceditor-toolbar {
 	overflow: hidden;
-	padding: 3px 5px 0 5px;
-	background: #f7f7f7;
+	padding: 5px 5px 0 5px;
+	background: #fafafa;
 	border-bottom: 1px solid #aaa;
 	border-radius: 4px 4px 0 0;
 	box-shadow: 0 -1px 2px rgba(0,0,0,0.1) inset;
 }
-div.sceditor-group {
+.sceditor-group {
 	overflow: hidden;
 	display: inline-block;
-	background: none;
-	margin: 0;
-	padding: 0 0 2px;
+	margin: 2px 0 2px -1px;
+	border: 1px solid #bbb;
+	border-bottom: 1px solid #aaa;
+	border-left: none;
 }
-div.sceditor-row {
+.sceditor-row {
 	overflow: hidden;
 	display: inline-block;
-	border-left: 1px solid #ccc;
-	border-radius: 1px;
-	margin: 4px 2px 2px 2px;
+	margin: 4px;
 }
 .sceditor-button {
 	float: left;
 	cursor: pointer;
 	background: #fff;
-	border: 1px solid #ccc;
-	border-left: none;
-	border-right: 1px solid #bbb;
-	border-bottom: 1px solid #aaa;
-	border-radius: 1px;
-	box-shadow: -1px -1px 3px rgba(96,134,166,0.2) inset;
+	border-left: 1px solid #bbb;
+	box-shadow: -1px -1px 2px rgba(0,0,0,0.15) inset;
 	padding: 3px 6px 2px 6px;
 	color: #222;
-	margin: 0;
 }
 .sceditor-button.disabled div {
 	filter: alpha(opacity=30);
@@ -209,20 +194,15 @@ div.sceditor-row {
 	background-position:center center !important;
 }
 .sceditor-button div {
-	margin: 0;
-	padding: 0;
 	text-indent: -9999px;
 }
 .sceditor-button:hover {
 	background: #fafafa;
-	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15) inset;
-	border: 1px solid #ccc;
-	border-left: none;
-	border-top: 1px solid #aaa;
+	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2) inset;
 }
 .sceditor-button.active {
-	background: #fafafa;
-	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) inset;
+	background: #dfffbf;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.2) inset;
 }
 .sceditor-button-emoticon {
 	display:none;
@@ -237,11 +217,8 @@ div.sceditor-row {
 	background: url('../images/bbc/toggle.png');
 }
 .sourceMode .sceditor-button-source {
-	background: #fafafa;
-	box-shadow: 1px 1px 3px rgba(96,134,166,0.3) inset;
-	border: 1px solid #ccc;
-	border-left: none;
-	border-top: 1px solid #aaa;
+	background: #dfffbf;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.15) inset;
 }
 .sceditor-button-font div {
 	background: url('../images/bbc/font.png');
