@@ -206,7 +206,7 @@ function template_download_language()
 	{
 		$count = 0;
 		echo '
-			var oTogglePanel_', $theme, ' = new smc_Toggle({
+			var oTogglePanel_', $theme, ' = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [';
@@ -219,9 +219,9 @@ function template_download_language()
 				aSwapImages: [
 					{
 						sId: \'toggle_image_', $theme, '\',
-						srcExpanded: smf_images_url + \'/sort_down.png\',
+						srcExpanded: elk_images_url + \'/sort_down.png\',
 						altExpanded: \'*\',
-						srcCollapsed: smf_images_url + \'/selected.png\',
+						srcCollapsed: elk_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
 					}
 				]

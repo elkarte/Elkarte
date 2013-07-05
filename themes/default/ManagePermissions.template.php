@@ -202,7 +202,7 @@ function template_permission_index()
 		// Javascript for the advanced stuff.
 		echo '
 	<script><!-- // --><![CDATA[
-		var oPermissionsPanelToggle = new smc_Toggle({
+		var oPermissionsPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['app']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -211,9 +211,9 @@ function template_permission_index()
 			aSwapImages: [
 				{
 					sId: \'permissions_panel_toggle\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 				}
 			],
@@ -227,8 +227,8 @@ function template_permission_index()
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: elk_session_var,
+				sSessionId: elk_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=app\'
 			}
@@ -491,11 +491,11 @@ function template_modify_group()
 	{
 		echo '
 		<script><!-- // --><![CDATA[
-			window.smf_usedDeny = false;
+			window.elk_usedDeny = false;
 
 			function warnAboutDeny()
 			{
-				if (window.smf_usedDeny)
+				if (window.elk_usedDeny)
 					return confirm("', $txt['permissions_deny_dangerous'], '");
 				else
 					return true;
@@ -699,7 +699,7 @@ function template_modify_group_simple($type)
 							<input type="radio" id="select_off_', $permission['id'], '" name="perm[', $type, '][', $permission['id'], ']"', $permission['select'] == 'off' ? ' checked="checked"' : '', ' value="off" onclick="determineGroupState(\'', $id_group, '\');" class="input_radio" ', $disable_field, '/>
 						</td>
 						<td style="width: 10px; vertical-align:top; padding-bottom: 2px">
-							<input type="radio" id="select_deny_', $permission['id'], '" name="perm[', $type, '][', $permission['id'], ']"', $permission['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" onclick="window.smf_usedDeny = true; determineGroupState(\'', $id_group, '\');" class="input_radio" ', $disable_field, '/>
+							<input type="radio" id="select_deny_', $permission['id'], '" name="perm[', $type, '][', $permission['id'], ']"', $permission['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" onclick="window.elk_usedDeny = true; determineGroupState(\'', $id_group, '\');" class="input_radio" ', $disable_field, '/>
 						</td>';
 
 				echo '
@@ -1000,7 +1000,7 @@ function template_modify_group_classic($type)
 									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] == 'off' ? ' checked="checked"' : '', ' value="off" class="input_radio" ', $disable_field, '/>
 								</td>
 								<td>
-									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select']== 'denied' ? ' checked="checked"' : '', ' value="deny" id="', $permission['any']['id'], '_deny" onclick="window.smf_usedDeny = true;" class="input_radio" ', $disable_field, '/>
+									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select']== 'denied' ? ' checked="checked"' : '', ' value="deny" id="', $permission['any']['id'], '_deny" onclick="window.elk_usedDeny = true;" class="input_radio" ', $disable_field, '/>
 								</td>';
 
 						echo '
@@ -1025,7 +1025,7 @@ function template_modify_group_classic($type)
 									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] == 'off' ? ' checked="checked"' : '', ' value="off" class="input_radio" ', $disable_field, '/>
 								</td>
 								<td>
-									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" onclick="window.smf_usedDeny = true;" class="input_radio" ', $disable_field, '/>
+									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['id'], ']"', $permission['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" onclick="window.elk_usedDeny = true;" class="input_radio" ', $disable_field, '/>
 								</td>';
 
 						echo '

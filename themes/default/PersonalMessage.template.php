@@ -682,7 +682,7 @@ function template_search()
 					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 					<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit floatnone" />
 				</div>
-				<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="smf_setThemeOption(\'minmax_preferences\', \'1\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
+				<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
 				<input type="hidden" name="advanced" value="0" />
 			</div>
 		</fieldset>';
@@ -743,7 +743,7 @@ function template_search()
 					<dt>
 					</dt>
 					<dd>
-						<a class="button_link floatleft" href="', $scripturl, '?action=pm;sa=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value)">', $txt['pm_search_simple'], '</a>
+						<a class="button_link floatleft" href="', $scripturl, '?action=pm;sa=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value)">', $txt['pm_search_simple'], '</a>
 					</dd>
 				</dl>
 				<input type="hidden" name="advanced" value="1" />';
@@ -794,7 +794,7 @@ function template_search()
 			createEventListener(window);
 			window.addEventListener("load", initSearch, false);
 
-			var oAdvancedPanelToggle = new smc_Toggle({
+			var oAdvancedPanelToggle = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pm']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -803,9 +803,9 @@ function template_search()
 				aSwapImages: [
 					{
 						sId: \'advanced_panel_toggle\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 					}
 				],
@@ -819,8 +819,8 @@ function template_search()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=pm\'
 				},
 			});
@@ -1131,7 +1131,7 @@ function template_send()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -1140,9 +1140,9 @@ function template_send()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -1156,8 +1156,8 @@ function template_send()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=pmdraft\'
 				},
 			});';
@@ -1186,10 +1186,10 @@ function template_send()
 
 	echo '
 		<script><!-- // --><![CDATA[
-			var oPersonalMessageSend = new smf_PersonalMessageSend({
+			var oPersonalMessageSend = new elk_PersonalMessageSend({
 				sSelf: \'oPersonalMessageSend\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
 				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 				sToControlId: \'to_control\',
 				aToRecipients: [';

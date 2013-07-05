@@ -393,7 +393,7 @@ function template_info_center()
 	// Info center collapse object.
 	echo '
 	<script><!-- // --><![CDATA[
-		var oInfoCenterToggle = new smc_Toggle({
+		var oInfoCenterToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',
 			aSwappableContainers: [
@@ -402,9 +402,9 @@ function template_info_center()
 			aSwapImages: [
 				{
 					sId: \'upshrink_ic\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
@@ -418,8 +418,8 @@ function template_info_center()
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'minmax_preferences\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
 				sAdditionalVars: \';minmax_key=info\'
 			},
 			oCookieOptions: {
@@ -447,7 +447,7 @@ function template_news_fader()
 
 	// No, here we need a list because the fade uses the list to split the items.
 	echo '
-		<ul id="smfFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
+		<ul id="elkFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
 			<li>
 				', implode('</li><li>', $context['news_lines']), '
 			</li>
@@ -457,33 +457,33 @@ function template_news_fader()
 	<script><!-- // --><![CDATA[
 
 		// Create a news fader object.
-		var oNewsFader = new smc_NewsFader({
-			sFaderControlId: \'smfFadeScroller\',
+		var oNewsFader = new elk_NewsFader({
+			sFaderControlId: \'elkFadeScroller\',
 			sItemTemplate: ', JavaScriptEscape('<strong>%1$s</strong>'), ',
 			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
 		});
 
 		// Create the news fader toggle.
-		var smfNewsFadeToggle = new smc_Toggle({
+		var elkNewsFadeToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($options['collapse_news_fader']) ? 'false' : 'true', ',
 			aSwappableContainers: [
-				\'smfFadeScroller\'
+				\'elkFadeScroller\'
 			],
 			aSwapImages: [
 				{
 					sId: \'newsupshrink\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'collapse_news_fader\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id
+				sSessionVar: elk_session_var,
+				sSessionId: elk_session_id
 			},
 			oCookieOptions: {
 				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',

@@ -62,7 +62,7 @@ $(document).ready(function() {
 });
 
 // Toggles the element height and width styles of an image.
-function smc_toggleImageDimensions()
+function elk_ToggleImageDimensions()
 {
 	var oImages = document.getElementsByTagName('IMG');
 	for (oImage in oImages)
@@ -79,10 +79,10 @@ function smc_toggleImageDimensions()
 }
 
 // Add a load event for the function above.
-addLoadEvent(smc_toggleImageDimensions);
+addLoadEvent(elk_ToggleImageDimensions);
 
 // Adds a button to a certain button strip.
-function smf_addButton(sButtonStripId, bUseImage, oOptions)
+function elk_addButton(sButtonStripId, bUseImage, oOptions)
 {
 	var oButtonStrip = document.getElementById(sButtonStripId);
 	var aItems = oButtonStrip.getElementsByTagName('span');

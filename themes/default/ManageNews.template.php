@@ -129,7 +129,7 @@ function template_email_members()
 	// This is some javascript for the simple/advanced toggling and member suggest
 	echo '
 	<script><!-- // --><![CDATA[
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['apn']) ? 'false' : 'true', ',
 			aSwappableContainers: [
@@ -138,9 +138,9 @@ function template_email_members()
 			aSwapImages: [
 				{
 					sId: \'advanced_panel_toggle\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 				}
 			],
@@ -154,8 +154,8 @@ function template_email_members()
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: elk_session_var,
+				sSessionId: elk_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=apn\'
 			}
@@ -165,8 +165,8 @@ function template_email_members()
 	<script><!-- // --><![CDATA[
 		var oMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'members\',
 			sControlId: \'members\',
 			sSearchType: \'member\',
@@ -179,8 +179,8 @@ function template_email_members()
 		});
 		var oExcludeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oExcludeMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'exclude_members\',
 			sControlId: \'exclude_members\',
 			sSearchType: \'member\',
