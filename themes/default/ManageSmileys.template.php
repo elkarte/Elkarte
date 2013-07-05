@@ -39,9 +39,9 @@ function template_editsets()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		window.smfForum_scripturl = smf_scripturl;
-		window.smfForum_sessionid = smf_session_id;
-		window.smfForum_sessionvar = smf_session_var;
+		window.elkForum_scripturl = elk_scripturl;
+		window.elkForum_sessionid = elk_session_id;
+		window.elkForum_sessionvar = elk_session_var;
 	// ]]></script>';
 
 	if (empty($modSettings['disable_elk_js']))
@@ -50,10 +50,10 @@ function template_editsets()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		function smfSetLatestSmileys()
+		function elkSetLatestSmileys()
 		{
-			if (typeof(window.smfLatestSmileys) != "undefined")
-				setInnerHTML(document.getElementById("smileysLatest"), window.smfLatestSmileys);';
+			if (typeof(window.elkLatestSmileys) != "undefined")
+				setInnerHTML(document.getElementById("smileysLatest"), window.elkLatestSmileys);';
 
 		if (!empty($context['selected_set']))
 			echo '
@@ -67,7 +67,7 @@ function template_editsets()
 		}';
 
 		echo '
-			smfSetLatestSmileys();';
+			elkSetLatestSmileys();';
 
 		echo '
 	// ]]></script>';

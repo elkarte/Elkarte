@@ -444,8 +444,8 @@ function template_quickreply_below()
 						bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
 						iTopicId: ', $context['current_topic'], ',
 						iStart: ', $context['start'], ',
-						sScriptUrl: smf_scripturl,
-						sImagesUrl: smf_images_url,
+						sScriptUrl: elk_scripturl,
+						sImagesUrl: elk_images_url,
 						sContainerId: "quickReplyOptions",
 						sImageId: "quickReplyExpand",
 						sImageCollapsed: "collapse.png",
@@ -460,8 +460,8 @@ function template_quickreply_below()
 						sSelf: \'oInTopicModeration\',
 						sCheckboxContainerMask: \'in_topic_mod_check_\',
 						aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
-						sSessionId: smf_session_id,
-						sSessionVar: smf_session_var,
+						sSessionId: elk_session_id,
+						sSessionVar: elk_session_var,
 						sButtonStrip: \'moderationbuttons\',
 						sButtonStripDisplay: \'moderationbuttons_strip\',
 						bUseImageButton: false,
@@ -485,7 +485,7 @@ function template_quickreply_below()
 					{
 						var oQuickModify = new QuickModify({
 							sIconHide: \'xx.png\',
-							sScriptUrl: smf_scripturl,
+							sScriptUrl: elk_scripturl,
 							sClassName: \'quick_edit\',
 							sIDSubject: \'post_subject_\',
 							sIDInfo: \'info_\',
@@ -495,7 +495,7 @@ function template_quickreply_below()
 								<div id="quick_edit_body_container" style="width: 90%">
 									<div id="error_box" class="errorbox" style="display:none;"></div>
 									<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
-									<input type="hidden" name="\' + smf_session_var + \'" value="\' + smf_session_id + \'" />
+									<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
 									<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
 									<input type="hidden" name="msg" value="%msg_id%" />
 									<div class="righttext">
@@ -527,12 +527,12 @@ function template_quickreply_below()
 						aIconLists[aIconLists.length] = new IconList({
 							sBackReference: "aIconLists[" + aIconLists.length + "]",
 							sIconIdPrefix: "msg_icon_",
-							sScriptUrl: smf_scripturl,
+							sScriptUrl: elk_scripturl,
 							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
 							iBoardId: ', $context['current_board'], ',
 							iTopicId: ', $context['current_topic'], ',
-							sSessionId: smf_session_id,
-							sSessionVar: smf_session_var,
+							sSessionId: elk_session_id,
+							sSessionVar: elk_session_var,
 							sAction: "messageicons;board=',  $context['current_board'], '" ,
 							sLabelIconList: "', $txt['message_icon'], '",
 							sBoxBackground: "transparent",

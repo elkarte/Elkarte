@@ -59,7 +59,7 @@ function template_main()
 
 		// Show the button to enable advanced search
 		echo '
-							<a class="button_link floatnone" href="', $scripturl, '?action=search;advanced" onclick="smf_setThemeOption(\'minmax_preferences\', \'1\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
+							<a class="button_link floatnone" href="', $scripturl, '?action=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
 							<input type="hidden" name="advanced" value="0" />
 						</div>
 					</fieldset>';
@@ -130,7 +130,7 @@ function template_main()
 								<dt>
 								</dt>
 								<dd>
-									<a href="', $scripturl, '?action=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="button_link floatnone">', $txt['search_simple'], '</a>
+									<a href="', $scripturl, '?action=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="button_link floatnone">', $txt['search_simple'], '</a>
 								</dd>
 							</dl>
 							<input type="hidden" name="advanced" value="1" />';
@@ -227,15 +227,15 @@ function template_main()
 
 						var oAddMemberSuggest = new smc_AutoSuggest({
 							sSelf: \'oAddMemberSuggest\',
-							sSessionId: smf_session_id,
-							sSessionVar: smf_session_var,
+							sSessionId: elk_session_id,
+							sSessionVar: elk_session_var,
 							sControlId: \'userspec\',
 							sSearchType: \'member\',
 							bItemList: false
 						});
 
 						// Some javascript for the advanced toggling
-						var oAdvancedPanelToggle = new smc_Toggle({
+						var oAdvancedPanelToggle = new elk_Toggle({
 							bToggleEnabled: true,
 							bCurrentlyCollapsed: ', empty($context['minmax_preferences']['search']) ? 'false' : 'true', ',
 							aSwappableContainers: [
@@ -244,9 +244,9 @@ function template_main()
 							aSwapImages: [
 								{
 									sId: \'advanced_panel_toggle\',
-									srcExpanded: smf_images_url + \'/collapse.png\',
+									srcExpanded: elk_images_url + \'/collapse.png\',
 									altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-									srcCollapsed: smf_images_url + \'/expand.png\',
+									srcCollapsed: elk_images_url + \'/expand.png\',
 									altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 								}
 							],
@@ -260,8 +260,8 @@ function template_main()
 							oThemeOptions: {
 								bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 								sOptionName: \'minmax_preferences\',
-								sSessionId: smf_session_id,
-								sSessionVar: smf_session_var,
+								sSessionId: elk_session_id,
+								sSessionVar: elk_session_var,
 								sAdditionalVars: \';minmax_key=search\'
 							},
 						});

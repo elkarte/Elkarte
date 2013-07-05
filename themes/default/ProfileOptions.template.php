@@ -122,8 +122,8 @@ function template_editBuddies()
 	<script><!-- // --><![CDATA[
 		var oAddBuddySuggest = new smc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'new_buddy\',
 			sControlId: \'new_buddy\',
 			sSearchType: \'member\',
@@ -222,8 +222,8 @@ function template_editIgnoreList()
 	<script><!-- // --><![CDATA[
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
@@ -1528,15 +1528,15 @@ function template_authentication_method()
 									<em>', $txt['choose_pass'], ':</em>
 								</dt>
 								<dd>
-									<input type="password" name="passwrd1" id="smf_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
-									<span id="smf_autov_pwmain_div" style="display: none;"><img id="smf_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" /></span>
+									<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
+									<span id="elk_autov_pwmain_div" style="display: none;"><img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" /></span>
 								</dd>
 								<dt>
 									<em>', $txt['verify_pass'], ':</em>
 								</dt>
 								<dd>
-									<input type="password" name="passwrd2" id="smf_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
-									<span id="smf_autov_pwverify_div" style="display: none;"><img id="smf_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" /></span>
+									<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
+									<span id="elk_autov_pwverify_div" style="display: none;"><img id="elk_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" /></span>
 								</dd>
 							</dl>
 						</dd>
@@ -1581,7 +1581,7 @@ function template_authentication_method()
 		"password_no_match": "', $txt['registration_password_no_match'], '",
 		"password_valid": "', $txt['registration_password_valid'], '"
 	};
-	var verificationHandle = new smfRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 	var currentAuthMethod = \'passwd\';
 	updateAuthMethod();
 	// ]]></script>';

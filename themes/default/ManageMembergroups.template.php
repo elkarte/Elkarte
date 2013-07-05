@@ -299,7 +299,7 @@ function template_edit_group()
 						<dd>
 							<span class="floatleft">
 								', $txt['membergroups_images_url'], '
-								<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value === 0) this.form.icon_count.value = 1;else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'msg_icon_0\').src = smf_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value : \'blank.png\')" size="20" class="input_text" />
+								<input type="text" name="icon_image" id="icon_image_input" value="', $context['group']['icon_image'], '" onchange="if (this.value &amp;&amp; this.form.icon_count.value === 0) this.form.icon_count.value = 1;else if (!this.value) this.form.icon_count.value = 0; document.getElementById(\'msg_icon_0\').src = elk_images_url + \'/group_icons/\' + (this.value &amp;&amp; this.form.icon_count.value > 0 ? this.value : \'blank.png\')" size="20" class="input_text" />
 							</span>
 							<span id="messageicon_0" class="groupicon">
 								<img id="msg_icon_0" src="', $settings['images_url'], '/group_icons/', $context['group']['icon_image'] == '' ? 'blank.png' : $context['group']['icon_image'], '" alt="*" />
@@ -340,10 +340,10 @@ function template_edit_group()
 		aIconLists[aIconLists.length] = new IconList({
 			sBackReference: "aIconLists[" + aIconLists.length + "]",
 			sIconIdPrefix: "msg_icon_",
-			sScriptUrl: smf_scripturl,
+			sScriptUrl: elk_scripturl,
 			bShowModify: false,
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sAction: "groupicons" ,
 			sLabelIconList: "', $txt['membergroups_icons'], '",
 			sLabelIconBox: "icon_image_input",
@@ -363,8 +363,8 @@ function template_edit_group()
 	<script><!-- // --><![CDATA[
 		var oModeratorSuggest = new smc_AutoSuggest({
 			sSelf: \'oModeratorSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'group_moderators\',
 			sControlId: \'group_moderators\',
 			sSearchType: \'member\',
@@ -690,8 +690,8 @@ function template_group_members()
 		<script><!-- // --><![CDATA[
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
 				sSuggestId: \'to_suggest\',
 				sControlId: \'toAdd\',
 				sSearchType: \'member\',

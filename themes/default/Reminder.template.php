@@ -114,16 +114,16 @@ function template_set_password()
 				<dl>
 					<dt>', $txt['choose_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd1" id="smf_autov_pwmain" size="22" class="input_password" />
-						<span id="smf_autov_pwmain_div" style="display: none;">
-							<img id="smf_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
+						<span id="elk_autov_pwmain_div" style="display: none;">
+							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
 					<dt>', $txt['verify_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd2" id="smf_autov_pwverify" size="22" class="input_password" />
-						<span id="smf_autov_pwverify_div" style="display: none;">
-							<img id="smf_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
+						<span id="elk_autov_pwverify_div" style="display: none;">
+							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
 				</dl>
@@ -143,7 +143,7 @@ function template_set_password()
 		"password_no_match": "', $txt['registration_password_no_match'], '",
 		"password_valid": "', $txt['registration_password_valid'], '"
 	};
-	var verificationHandle = new smfRegister("reminder_form", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+	var verificationHandle = new elkRegister("reminder_form", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 // ]]></script>';
 }
 
@@ -174,16 +174,16 @@ function template_ask()
 		echo '
 					<dt>', $txt['choose_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd1" id="smf_autov_pwmain" size="22" class="input_password" />
-						<span id="smf_autov_pwmain_div" style="display: none;">
-							<img id="smf_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
+						<span id="elk_autov_pwmain_div" style="display: none;">
+							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
 					<dt>', $txt['verify_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd2" id="smf_autov_pwverify" size="22" class="input_password" />
-						<span id="smf_autov_pwverify_div" style="display: none;">
-							<img id="smf_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
+						<span id="elk_autov_pwverify_div" style="display: none;">
+							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 						</span>
 					</dd>';
 
@@ -209,7 +209,7 @@ function template_ask()
 		"password_no_match": "', $txt['registration_password_no_match'], '",
 		"password_valid": "', $txt['registration_password_valid'], '"
 	};
-	var verificationHandle = new smfRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 // ]]></script>';
 
 }

@@ -73,7 +73,7 @@ function template_latest_news()
 								<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
 								<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
 								<script><!-- // --><![CDATA[
-									var oAdminIndex = new smf_AdminIndex({
+									var oAdminIndex = new elk_AdminIndex({
 										sSelf: \'oAdminCenter\',
 										bLoadAnnouncements: true,
 										sAnnouncementTemplate: ', JavaScriptEscape('

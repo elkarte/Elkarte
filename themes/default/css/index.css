@@ -1799,12 +1799,12 @@ dl.settings textarea {
 	background: #e4e4e4;
 	box-shadow: 1px 2px 4px #eee;
 }
-#smfFadeScroller, .board_row, .childboard_row {
+#elkFadeScroller, .board_row, .childboard_row {
 	border: 1px solid #ddd;
 	margin: 2px 0 0 0;
 	background: #fff;
 }
-#smfFadeScroller {
+#elkFadeScroller {
 	overflow: auto;
 	padding: 12px 25px;
 	/* Longhand style due to JS bug in IE! */

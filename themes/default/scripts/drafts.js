@@ -86,7 +86,7 @@ elk_DraftAutoSave.prototype.draftKeypress = function()
 elk_DraftAutoSave.prototype.draftSave = function ()
 {
 	// Form submitted or nothing changed since the last save
-	if (smf_formSubmitted || !this.bCheckDraft)
+	if (elk_formSubmitted || !this.bCheckDraft)
 		return false;
 
 	// Still saving the last one or other?
@@ -110,11 +110,11 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 		'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'save_draft=true',
-		smf_session_var + '=' + smf_session_id,
+		elk_session_var + '=' + elk_session_id,
 	];
 
 	// Send in document for saving and hope for the best
-	sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=post2;board=" + this.opt.iBoard + ";xml", aSections.join("&"), this.onDraftDone);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=post2;board=" + this.opt.iBoard + ";xml", aSections.join("&"), this.onDraftDone);
 
 	// Save the latest for compare
 	this.bCheckDraft = false;

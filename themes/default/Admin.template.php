@@ -112,7 +112,7 @@ function template_admin()
 	echo '
 					<script src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
 					<script><!-- // --><![CDATA[
-						var oAdminIndex = new smf_AdminIndex({
+						var oAdminIndex = new elk_AdminIndex({
 							sSelf: \'oAdminCenter\',
 
 							bLoadAnnouncements: true,
@@ -154,7 +154,7 @@ function template_admin()
 									</div>
 								</div>
 							'), ',
-							sUpdateNotificationLink: smf_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
+							sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
 						});
 					// ]]></script>';
@@ -698,7 +698,7 @@ function template_view_versions()
 	echo '
 						<script src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
 						<script><!-- // --><![CDATA[
-							var oViewVersions = new smf_ViewVersions({
+							var oViewVersions = new elk_ViewVersions({
 								aKnownLanguages: [
 									\'.', implode('\',
 									\'.', $context['default_known_languages']), '\'

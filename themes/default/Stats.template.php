@@ -396,7 +396,7 @@ function template_main()
 	</div>
 	<script src="', $settings['default_theme_url'], '/scripts/stats.js"></script>
 	<script><!-- // --><![CDATA[
-		var oStatsCenter = new smf_StatsCenter({
+		var oStatsCenter = new elk_StatsCenter({
 			sTableId: \'stats\',
 
 			reYearPattern: /year_(\d+)/,

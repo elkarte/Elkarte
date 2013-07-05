@@ -61,7 +61,7 @@ function template_view_package()
 				<div class="content">
 					', $context['package_readme'], '
 					<span class="floatright">', $txt['package_available_readme_language'], '
-						<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = smf_prepareScriptUrl(smf_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
+						<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
 							foreach ($context['readmes'] as $a => $b)
 								echo '<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
 			echo '
@@ -83,7 +83,7 @@ function template_view_package()
 				<div class="content">
 					', $context['package_license'], '
 					<span class="floatright">', $txt['package_available_license_language'], '
-						<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = smf_prepareScriptUrl(smf_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
+						<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
 							foreach ($context['licenses'] as $a => $b)
 								echo '<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
 			echo '
@@ -349,7 +349,7 @@ function template_view_package()
 			foreach ($js_operations as $key => $operation)
 			{
 				echo '
-			aOperationElements[', $key, '] = new smc_Toggle({
+			aOperationElements[', $key, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', $operation ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -358,9 +358,9 @@ function template_view_package()
 				aSwapImages: [
 					{
 						sId: \'operation_img_', $key, '\',
-						srcExpanded: smf_images_url + \'/selected_open.png\',
+						srcExpanded: elk_images_url + \'/selected_open.png\',
 						altExpanded: \'*\',
-						srcCollapsed: smf_images_url + \'/selected.png\',
+						srcCollapsed: elk_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
 					}
 				]
@@ -548,13 +548,13 @@ function template_browse()
 			</div>
 
 			<script><!-- // --><![CDATA[
-				window.smfForum_scripturl = smf_scripturl;
-				window.smfForum_sessionid = smf_session_id;
-				window.smfForum_sessionvar = smf_session_var;';
+				window.elkForum_scripturl = elk_scripturl;
+				window.elkForum_sessionid = elk_session_id;
+				window.elkForum_sessionvar = elk_session_var;';
 
 		// Make a list of already installed mods so nothing is listed twice ;).
 		echo '
-				window.smfInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
+				window.elkInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
 				window.ourVersion = "', $context['forum_version'], '";
 			// ]]></script>';
 
@@ -565,7 +565,7 @@ function template_browse()
 		echo '
 			<script><!-- // --><![CDATA[
 				var tempOldOnload;
-				smfSetLatestPackages();
+				elkSetLatestPackages();
 			// ]]></script>
 
 		</div>';
@@ -626,7 +626,7 @@ function template_browse()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['pkg']) ? 'true' : 'false', ',
 			aSwappableContainers: [
@@ -635,9 +635,9 @@ function template_browse()
 			aSwapImages: [
 				{
 					sId: \'advanced_panel_toggle\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 				}
 			],
@@ -651,8 +651,8 @@ function template_browse()
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'admin_preferences\',
-				sSessionId: smf_session_id,
-				sSessionVar: smf_session_var,
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=pkg\'
 			},
@@ -662,8 +662,8 @@ function template_browse()
 	<script><!-- // --><![CDATA[
 			var oAddVersionSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddVersionSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sControlId: \'ve\',
 			sSearchType: \'versions\',
 			bItemList: false
@@ -974,7 +974,7 @@ function template_package_list()
 			foreach ($context['package_list'] as $section => $ps)
 			{
 				echo '
-				var oPackageServerToggle_', $section, ' = new smc_Toggle({
+				var oPackageServerToggle_', $section, ' = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: ', count($ps['items']) == 1 || $section_count == 1 ? 'false' : 'true', ',
 					aSwappableContainers: [
@@ -983,9 +983,9 @@ function template_package_list()
 					aSwapImages: [
 						{
 							sId: \'ps_img_', $section, '\',
-							srcExpanded: smf_images_url + \'/collapse.png\',
+							srcExpanded: elk_images_url + \'/collapse.png\',
 							altExpanded: \'*\',
-							srcCollapsed: smf_images_url + \'/expand.png\',
+							srcCollapsed: elk_images_url + \'/expand.png\',
 							altCollapsed: \'*\'
 						}
 					]
@@ -995,7 +995,7 @@ function template_package_list()
 				{
 					if (!$package['is_text'] && !$package['is_line'] && !$package['is_remote'])
 						echo '
-				var oPackageToggle_', $section, '_pkg_', $id, ' = new smc_Toggle({
+				var oPackageToggle_', $section, '_pkg_', $id, ' = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [
@@ -1004,9 +1004,9 @@ function template_package_list()
 					aSwapImages: [
 						{
 							sId: \'ps_img_', $section, '_pkg_', $id, '\',
-							srcExpanded: smf_images_url + \'/collapse.png\',
+							srcExpanded: elk_images_url + \'/collapse.png\',
 							altExpanded: \'*\',
-							srcCollapsed: smf_images_url + \'/expand.png\',
+							srcCollapsed: elk_images_url + \'/expand.png\',
 							altCollapsed: \'*\'
 						}
 					]
@@ -1315,7 +1315,7 @@ function template_file_permissions()
 		{
 			ajax_indicator(true);
 
-			getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
+			getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + \'action=admin;area=packages;fileoffset=\' + (parseInt(this.offset) + ', $context['file_limit'], ') + \';onlyfind=\' + escape(this.path) + \';sa=perms;xml;', $context['session_var'], '=', $context['session_id'], '\', onNewFolderReceived);
 		}
 
 		// Getting something back?
