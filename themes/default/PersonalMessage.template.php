@@ -64,41 +64,43 @@ function template_folder()
 
 	// The every helpful javascript!
 	echo '
-						<script><!-- // --><![CDATA[
-							var allLabels = {};
-							var currentLabels = {};
-							var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
-							var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
-						// ]]></script>';
+				<script><!-- // --><![CDATA[
+					var allLabels = {};
+					var currentLabels = {};
+					var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
+					var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
+				// ]]></script>';
 
 	echo '
-						<form class="flow_hidden" action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
+				<form class="flow_hidden" action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
 
-	// If we are not in single display mode show the subjects on the top!
+	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
 	if ($context['display_mode'] != 1)
 	{
 		template_subject_list();
 		echo '
-						<div class="clear_right"><br /></div>';
+					<hr class="clear" />';
 	}
 
 	// Got some messages to display?
 	if ($context['get_pmessage']('message', true))
 	{
-		// Show the helpful titlebar - generally.
-		if ($context['display_mode'] != 1)
-			echo '
-					<div class="forumposts">
-						<h3 class="catbg">
-							<span id="author">', $txt['author'], '</span>
-							<span id="topic_title">', $txt[$context['display_mode'] == 0 ? 'messages' : 'conversation'], '</span>
-						</h3>';
 
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		if ($context['display_mode'] == 2)
 			template_pagesection('conversation_buttons', 'right', 'go_down');
 		else
 			template_pagesection(false, false, 'go_down');
+
+			echo '
+					<div class="forumposts">';
+
+		// Show the helpful titlebar - generally.
+		if ($context['display_mode'] != 1)
+			echo '
+						<h3 class="catbg">
+							', $txt[$context['display_mode'] == 0 ? 'messages' : 'conversation'], '
+						</h3>';
 
 		while ($message = $context['get_pmessage']('message'))
 		{
@@ -115,7 +117,7 @@ function template_folder()
 				echo '
 							<div class="postarea"', (empty($options['hide_poster_area']) ? '' : ' style="margin:0"'), '>
 								<div class="keyinfo">
-									', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2" style="">' .  template_build_pmposter_div($message) . '</ul>' : ''), '
+									', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' .  template_build_pmposter_div($message) . '</ul>' : ''), '
 									<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
 									<h5 id="info_', $message['id'], '">';
 
@@ -159,6 +161,10 @@ function template_folder()
 				echo '
 									<li class="listlevel1 inline_mod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
 
+			// Remove is always an option
+			echo '
+									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a></li>';
+
 			// Show reply buttons if you have the permission to send PMs.
 			if ($context['can_send_pm'])
 			{
@@ -172,7 +178,7 @@ function template_folder()
 
 					echo '
 									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>
-									<li><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote', $context['folder'] == 'sent' ? '' : ';u=' . $message['member']['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 				}
 				// This is for "forwarding" - even if the member is gone.
 				else
@@ -180,9 +186,7 @@ function template_folder()
 									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a></li>';
 			}
 
-			// Remove is always an option
 			echo '
-									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a></li>
 								</ul>';
 
 			// Add a selection box if we have labels enabled.
@@ -268,9 +272,11 @@ function template_folder()
 
 			echo '
 							</div>
-						</div>
-					</div>';
+						</div>';
 		}
+
+		echo '
+					</div>';
 
 		if (empty($context['display_mode']))
 			template_pagesection(false, false, 'go_up', array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="button_submit" />'));
@@ -278,21 +284,20 @@ function template_folder()
 		elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
 			template_pagesection('conversation_buttons', 'right');
 
-		echo '
-						<br />';
 	}
 
-	// Individual messages = buttom list!
+	// Individual messages = button list!
 	if ($context['display_mode'] == 1)
 	{
-		template_subject_list();
 		echo '
-						<br />';
+					<br />';
+
+		template_subject_list();
 	}
 
 	echo '
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						</form>';
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				</form>';
 }
 
 /**
@@ -346,8 +351,8 @@ function template_build_pmposter_div($message)
 		if ($message['member']['karma']['allow'])
 			$poster_div .= '
 									<li class="listlevel2 karma_allow">
-										<a linklevel2" href="' . $scripturl . '?action=karma;sa=applaud;uid=' . $message['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>
-										<a linktlevel2" href="' . $scripturl . '?action=karma;sa=smite;uid=' . $message['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>
+										<a class="linklevel2" href="' . $scripturl . '?action=karma;sa=applaud;uid=' . $message['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaApplaudLabel'] . '</a>
+										<a class="linklevel2" href="' . $scripturl . '?action=karma;sa=smite;uid=' . $message['member']['id'] . ';f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '') . ';pm=' . $message['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>
 									</li>';
 
 		// Show the member's gender icon?
@@ -538,7 +543,7 @@ function template_subject_list()
 	global $context, $settings, $txt, $scripturl;
 
 	echo '
-						<table class="table_grid">
+					<table class="table_grid">
 						<thead>
 							<tr class="catbg">
 								<th style="width:4%" class="centertext first_th">
@@ -602,50 +607,51 @@ function template_subject_list()
 
 	echo '
 						</tbody>
-						</table>';
+					</table>';
 
 	$extra = '
-							<div class="floatright">';
+					<div class="floatright">';
+
 	if ($context['show_delete'])
 	{
 		if (!empty($context['currently_using_labels']) && $context['folder'] != 'sent')
 		{
 			$extra .= '
-								<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
-									<option value="">' . $txt['pm_sel_label_title'] . ':</option>
-									<option value="" disabled="disabled">---------------</option>';
+						<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
+							<option value="">' . $txt['pm_sel_label_title'] . ':</option>
+							<option value="" disabled="disabled">---------------</option>';
 
 			$extra .= '
-									<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
+							<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-									<option value="add_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+							<option value="add_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-									<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
+							<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-									<option value="rem_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+							<option value="rem_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-								</select>
-								<noscript>
-									<input type="submit" value="' . $txt['pm_apply'] . '" class="button_submit" style="float: none" />
-								</noscript>';
+						</select>
+						<noscript>
+							<input type="submit" value="' . $txt['pm_apply'] . '" class="button_submit" style="float: none" />
+						</noscript>';
 		}
 
 		$extra .= '
-								<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="button_submit" style="float: none" />';
+						<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="button_submit" style="float: none" />';
 	}
 	$extra .= '
-							</div>';
+					</div>';
 
 	template_pagesection(false, false, '', array('top_button' => false, 'extra' => $extra));
 }
