@@ -213,31 +213,28 @@ function template_main()
 								</ul>';
 		}
 
-		// Has anyone liked this post? @todo - Still needs a bit of tweaking.
-		//if (!empty($message['like_counter']))
+		// Hide likes for those who can't like or unlike for now..
+		if ($message['likes_enabled'])
+		{
 			echo '
-							<li class="listlevel1"><a href="#" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] :'&nbsp;', '</a>';
+							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] :'&nbsp;', '</a>';
 
-			// Can they like this post
+			// Can they like this post?
 			if ($message['can_like'])
-			{
-						echo '
+				echo '
 								<ul class="menulevel2">
 									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 like_button">', $txt['like_post'], '</a></li>
 								</ul>';
-			}
 			// Or remove the like they made
 			elseif ($message['can_unlike'])
-			{
-						echo '
+				echo '
 								<ul class="menulevel2">
 									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 unlike_button">', $txt['unlike_post'], '</a></li>
 								</ul>';
-			}
 
 			echo '
 							</li>';
-
+		}
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
@@ -916,7 +913,7 @@ function template_display_calendar_above()
 
 function template_pages_and_buttons_above()
 {
-	global $context, $txt, $modSettings;
+	global $context;
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.
 	echo '
@@ -928,7 +925,7 @@ function template_pages_and_buttons_above()
 
 function template_pages_and_buttons_below()
 {
-	global $context, $txt, $modSettings;
+	global $context;
 
 
 	// Show the page index... "Pages: [1]".
