@@ -1442,7 +1442,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$simpleActions = array(
 		'findmember',
 		'quickhelp',
-		'printpage',
 		'quotefast',
 		'spellcheck',
 	);
