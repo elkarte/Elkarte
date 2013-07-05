@@ -1324,20 +1324,6 @@ class Control_Verification_Questions implements Control_Verifications
 }
 
 /**
- * Compatibility function - used in 1.1 for showing a post box.
- * @todo: remove?
- *
- * @param string $msg
- * @return string
- */
-function theme_postbox($msg)
-{
-	global $context;
-
-	return template_control_richedit($context['post_box_name']);
-}
-
-/**
  * !!!Compatibility!!!
  * Since we changed the editor we don't need it any more, but let's keep it if any mod wants to use it
  * Convert only the BBC that can be edited in HTML mode for the editor.
