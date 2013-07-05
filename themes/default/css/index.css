@@ -55,7 +55,7 @@
 	/* Next limits maximum width on wide screens. */
 	/* Sized in em, since some people require larger text. */ 
 	/* For ease of reading, content really should not be too wide. */
-	max-width: 95em;
+	max-width: 90em;
 	/* Next is just for some testing. */
 	/*min-width: 100%;*/
 }
@@ -3436,104 +3436,72 @@ dl.merge_topic dd {
 /* ------------------------------------------------------- */
 
 /*@todo - major simplification required - markup and CSS. */
-#statistics {
-	padding: 6px 0;
+.statistics {
+	margin: 6px 0;
 }
-#statistics .cat_bar {
-	margin: 4px 0 0 0;
-}
-#statistics .title_bar {
-	margin: 1px 4px 0 4px;
+.statistics .category_header {
+	background: none;
 	border: none;
-	border-bottom: 2px solid #f5f5f5;
-	background: none;
+	border-bottom: 2px solid #ccc;
+	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+	width: 49%;
+	margin: 0 0.5% 0 50.5%;
+	text-shadow: none;
+	font-size: 1.143em;
 }
-#statistics .titlebg {
-	padding: 6px;
-	border-bottom: 1px solid #bbb;
-	font-size: 1.1em;
+#top_row .category_header {
+	width: 99%;
+	margin: 0 0.5%;
 }
-#statistics .titlebg img {
-	margin: 5px 6px 0 3px;
+.statistics .category_header.floatleft {
+	margin: 0 0.5%;
 }
-#statistics .flow_hidden {
-	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	background: #f5f5f5;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
-}
-#statistics .windowbg2 {
-	background: none;
-}
-#stats_left, #top_posters, #top_topics_replies, #top_topics_starter,
-#stats_right, #top_boards, #top_topics_views, #most_online {
-	float: left;
-	padding: 0 3px 0 0;
-	width: 50%;
-}
-#stats_right, #top_boards, #top_topics_views, #most_online {
-	float: right;
-	padding: 0 0 0 3px;
-}
-#stats_left{
-	margin-top: 8px;
-	border-right: 1px solid #bbb;
-}
-#stats_right{
-	margin-top: 8px;
-	border-left: 1px solid #fff;
+.statistics .flow_hidden, #forum_history .flow_hidden {
+	border: 1px solid #ddd;
+	margin: 4px 0 0 0;
+	background: #fefefe;
 }
 .stats {
-	clear: both;
 	overflow: hidden;
+	padding: 0 16px;
+	width: 50%;
+	margin: 12px 0 12px 50%;
 }
-#stats_left .stats, #stats_right .stats{
-	margin: -8px 0 -12px 0;
+.stats.floatleft {
+	clear: left;
+	margin: 12px 0;
+	border-right: 1px solid #ccc;
 }
 .stats dt {
 	float: left;
 	clear: both;
-	margin: 0 0 4px 0;
+	margin: 0 2% 4px 0;
 	padding: 0;
-	width: 50%;
+	width: 48%;
 	font-size: 1em;
 	line-height: 1.5em;
 }
-.stats dd {
+#top_row .stats dd, .statsbar {
 	position: relative;
 	float: right;
 	margin: 0 0 4px 0;
 	padding: 0 4px 0 0;
-	min-height: 1.6em;
+	min-height: 1.5em;
 	width: 50%;
 	border: 1px solid #aaa;
-	border-radius: 2px;
 	background: #fff;
-	text-align: right;
-	font-size: 1em;
-	line-height: 1.4em;
-}
-/* Give a bit more room for the date here. */
-#stats_left dt {
-	width: 35%;
-}
-#stats_left dd {
-	width: 65%;
 }
 /* Methinks topic links, etc need a little more oomph next to the orange bars. */
-.top_row .stats dd {
-	border: none;
+#top_row .stats dd {
+	border: 1px solid transparent;
 	background: none;
 }
 .statsbar .bar {
 	display: block;
 	float: left;
 	margin: 0 4px 0 0;
+	font-size: 1em;
 	height: 1.5em;
-	border-right: 1px solid #999;
-	border-radius: 1px 0 0 1px;
 	background: #47b263;
 	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
 }
@@ -3549,39 +3517,37 @@ dl.merge_topic dd {
 	line-height: 1.4em;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
-.stats dd span {
+.statsbar .righttext {
 	position: absolute;
 	top: 0;
 	right: 0;
 	z-index: 2;
-	padding: 0 2px;
+	padding: 0 4px;
 	background: #fff;
-	white-space: pre;
+	line-height: 1.75em;
+	font-size: 0.857em;
 }
 #stats {
-	margin: 4px 0;
+	margin: 6px 0 16px 0;
+	border: none;
 }
-#stats th {
-	padding-top: 4px;
-	padding-bottom: 4px;
-	border-bottom: 1px solid #ccc;
+#stats th, #stats td {
+	width: 15%;
+	padding: 4px 12px;
+	text-align: center;
 }
-#stats .titlebg th {
-	padding: 8px;
-	border-bottom: 1px solid #ccc;
-	background: #fff;
+#stats .history_head {
+	border-top: none;
 }
-#stats .first_th {
-	padding-left: 8px;
-}
-tr.windowbg2 .stats_month {
-	padding: 0 2em;
+#stats .lefttext {
 	width: 25%;
 	text-align: left;
 }
-tr.windowbg2 .stats_day {
-	padding: 0 3.5em;
-	text-align: left;
+#stats .stats_month {
+	padding: 4px 8px 4px 30px;
+}
+#stats .stats_day {
+	padding: 4px 8px 4px 60px;
 }
 
 
