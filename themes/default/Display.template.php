@@ -213,31 +213,28 @@ function template_main()
 								</ul>';
 		}
 
-		// Has anyone liked this post? @todo - Still needs a bit of tweaking.
-		//if (!empty($message['like_counter']))
+		// Hide likes for those who can't like or unlike for now..
+		if ($message['likes_enabled'])
+		{
 			echo '
-							<li class="listlevel1"><a href="#" title="', $txt['liked_by'], ' ', implode(', ', $context['likes'][$message['id']]['member']), '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] :'&nbsp;', '</a>';
+							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] :'&nbsp;', '</a>';
 
-			// Can they like this post
+			// Can they like this post?
 			if ($message['can_like'])
-			{
-						echo '
+				echo '
 								<ul class="menulevel2">
 									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 like_button">', $txt['like_post'], '</a></li>
 								</ul>';
-			}
 			// Or remove the like they made
 			elseif ($message['can_unlike'])
-			{
-						echo '
+				echo '
 								<ul class="menulevel2">
 									<li class="listlevel2"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel2 unlike_button">', $txt['unlike_post'], '</a></li>
 								</ul>';
-			}
 
 			echo '
 							</li>';
-
+		}
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
@@ -444,8 +441,8 @@ function template_quickreply_below()
 						bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
 						iTopicId: ', $context['current_topic'], ',
 						iStart: ', $context['start'], ',
-						sScriptUrl: smf_scripturl,
-						sImagesUrl: smf_images_url,
+						sScriptUrl: elk_scripturl,
+						sImagesUrl: elk_images_url,
 						sContainerId: "quickReplyOptions",
 						sImageId: "quickReplyExpand",
 						sImageCollapsed: "collapse.png",
@@ -460,8 +457,8 @@ function template_quickreply_below()
 						sSelf: \'oInTopicModeration\',
 						sCheckboxContainerMask: \'in_topic_mod_check_\',
 						aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
-						sSessionId: smf_session_id,
-						sSessionVar: smf_session_var,
+						sSessionId: elk_session_id,
+						sSessionVar: elk_session_var,
 						sButtonStrip: \'moderationbuttons\',
 						sButtonStripDisplay: \'moderationbuttons_strip\',
 						bUseImageButton: false,
@@ -485,7 +482,7 @@ function template_quickreply_below()
 					{
 						var oQuickModify = new QuickModify({
 							sIconHide: \'xx.png\',
-							sScriptUrl: smf_scripturl,
+							sScriptUrl: elk_scripturl,
 							sClassName: \'quick_edit\',
 							sIDSubject: \'post_subject_\',
 							sIDInfo: \'info_\',
@@ -495,7 +492,7 @@ function template_quickreply_below()
 								<div id="quick_edit_body_container" style="width: 90%">
 									<div id="error_box" class="errorbox" style="display:none;"></div>
 									<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
-									<input type="hidden" name="\' + smf_session_var + \'" value="\' + smf_session_id + \'" />
+									<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
 									<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
 									<input type="hidden" name="msg" value="%msg_id%" />
 									<div class="righttext">
@@ -527,12 +524,12 @@ function template_quickreply_below()
 						aIconLists[aIconLists.length] = new IconList({
 							sBackReference: "aIconLists[" + aIconLists.length + "]",
 							sIconIdPrefix: "msg_icon_",
-							sScriptUrl: smf_scripturl,
+							sScriptUrl: elk_scripturl,
 							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
 							iBoardId: ', $context['current_board'], ',
 							iTopicId: ', $context['current_topic'], ',
-							sSessionId: smf_session_id,
-							sSessionVar: smf_session_var,
+							sSessionId: elk_session_id,
+							sSessionVar: elk_session_var,
 							sAction: "messageicons;board=',  $context['current_board'], '" ,
 							sLabelIconList: "', $txt['message_icon'], '",
 							sBoxBackground: "transparent",
@@ -916,7 +913,7 @@ function template_display_calendar_above()
 
 function template_pages_and_buttons_above()
 {
-	global $context, $txt, $modSettings;
+	global $context;
 
 	// Show the anchor for the top and for the first message. If the first message is new, say so.
 	echo '
@@ -928,7 +925,7 @@ function template_pages_and_buttons_above()
 
 function template_pages_and_buttons_below()
 {
-	global $context, $txt, $modSettings;
+	global $context;
 
 
 	// Show the page index... "Pages: [1]".

@@ -179,7 +179,7 @@ function template_load_drafts_below()
 		// Code for showing and hiding drafts
 		echo '
 		<script><!-- // --><![CDATA[
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -188,9 +188,9 @@ function template_load_drafts_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -204,8 +204,8 @@ function template_load_drafts_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});
@@ -275,7 +275,7 @@ function template_topic_replies_below()
 		foreach ($ignored_posts as $post_id)
 		{
 			echo '
-			aIgnoreToggles[', $post_id, '] = new smc_Toggle({
+			aIgnoreToggles[', $post_id, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -502,7 +502,7 @@ function template_postarea_below()
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
-			var oSwapAdditionalOptions = new smc_Toggle({
+			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['post']) ? 'false' : 'true', ',
 				funcOnBeforeCollapse: function () {
@@ -517,9 +517,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postMoreExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -533,8 +533,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=post\'
 				},
 			});';
@@ -542,7 +542,7 @@ function template_postarea_below()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -551,9 +551,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -567,8 +567,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});';
@@ -790,13 +790,13 @@ function template_quotefast()
 
 			if (\'DOMParser\' in window && !(\'opera\' in window))
 			{
-				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_") + "</temp>", "text/xml");
-				quote = xmldoc.childNodes[0].textContent.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_") + "</temp>", "text/xml");
+				quote = xmldoc.childNodes[0].textContent.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 			else if (\'innerText\' in stage)
 			{
-				setInnerHTML(stage, quote.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-				quote = stage.innerText.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				setInnerHTML(stage, quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 
 			if (\'opera\' in window)

@@ -7,7 +7,7 @@
  *
  * This software is a derived product, based on:
  *
- * Simple Machines Forum (SMF)
+ * Simple Machines Forum (elk)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
@@ -19,9 +19,9 @@ function template_sendbody()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<message view="', $context['view'], '">', cleanXml($context['message']), '</message>
-</smf>';
+</elk>';
 }
 
 function template_quotefast()
@@ -29,9 +29,9 @@ function template_quotefast()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<quote>', cleanXml($context['quote']['xml']), '</quote>
-</smf>';
+</elk>';
 }
 
 function template_modifyfast()
@@ -39,10 +39,10 @@ function template_modifyfast()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<subject><![CDATA[', cleanXml($context['message']['subject']), ']]></subject>
 	<message id="msg_', $context['message']['id'], '"><![CDATA[', cleanXml($context['message']['body']), ']]></message>
-</smf>';
+</elk>';
 
 }
 
@@ -51,7 +51,7 @@ function template_modifydone()
 	global $context, $txt;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<message id="msg_', $context['message']['id'], '">';
 	if (empty($context['message']['errors']))
 	{
@@ -65,7 +65,7 @@ function template_modifydone()
 		<error in_subject="', $context['message']['error_in_subject'] ? '1' : '0', '" in_body="', cleanXml($context['message']['error_in_body']) ? '1' : '0', '"><![CDATA[', implode('<br />', $context['message']['errors']), ']]></error>';
 	echo '
 	</message>
-</smf>';
+</elk>';
 }
 
 function template_modifytopicdone()
@@ -73,7 +73,7 @@ function template_modifytopicdone()
 	global $context, $txt;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<message id="msg_', $context['message']['id'], '">';
 	if (empty($context['message']['errors']))
 	{
@@ -88,7 +88,7 @@ function template_modifytopicdone()
 		<error in_subject="', $context['message']['error_in_subject'] ? '1' : '0', '"><![CDATA[', cleanXml(implode('<br />', $context['message']['errors'])), ']]></error>';
 	echo '
 	</message>
-</smf>';
+</elk>';
 }
 
 function template_post()
@@ -96,7 +96,7 @@ function template_post()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<preview>
 		<subject><![CDATA[', $context['preview_subject'], ']]></subject>
 		<body><![CDATA[', $context['preview_message'], ']]></body>
@@ -133,7 +133,7 @@ function template_post()
 	}
 
 	echo '
-</smf>';
+</elk>';
 }
 
 function template_pm()
@@ -142,7 +142,7 @@ function template_pm()
 
 	// @todo something could be removed...otherwise it can be merged again with template_post
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<preview>
 		<subject><![CDATA[', $context['preview_subject'], ']]></subject>
 		<body><![CDATA[', $context['preview_message'], ']]></body>
@@ -162,7 +162,7 @@ function template_pm()
 	</errors>';
 
 	echo '
-</smf>';
+</elk>';
 }
 
 function template_stats()
@@ -170,7 +170,7 @@ function template_stats()
 	global $context, $modSettings;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>';
+<elk>';
 	foreach ($context['yearly'] as $year)
 		foreach ($year['months'] as $month)
 		{
@@ -183,7 +183,7 @@ function template_stats()
 	</month>';
 		}
 		echo '
-</smf>';
+</elk>';
 }
 
 function template_split()
@@ -191,7 +191,7 @@ function template_split()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<pageIndex section="not_selected" startFrom="', $context['not_selected']['start'], '"><![CDATA[', $context['not_selected']['page_index'], ']]></pageIndex>
 	<pageIndex section="selected" startFrom="', $context['selected']['start'], '"><![CDATA[', $context['selected']['page_index'], ']]></pageIndex>';
 	foreach ($context['changes'] as $change)
@@ -209,7 +209,7 @@ function template_split()
 	</change>';
 	}
 	echo '
-</smf>';
+</elk>';
 }
 
 // This is just to hold off some errors if people are stupid.
@@ -230,7 +230,7 @@ function template_results()
 {
 	global $context, $txt;
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>';
+<elk>';
 
 	if (empty($context['topics']))
 		echo '
@@ -285,7 +285,7 @@ function template_results()
 	}
 
 	echo '
-</smf>';
+</elk>';
 }
 
 function template_jump_to()
@@ -293,7 +293,7 @@ function template_jump_to()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>';
+<elk>';
 	foreach ($context['categories'] as $category)
 	{
 		echo '
@@ -303,7 +303,7 @@ function template_jump_to()
 	<item type="board" id="', $board['id'], '" childlevel="', $board['child_level'], '"><![CDATA[', cleanXml($board['name']), ']]></item>';
 	}
 	echo '
-</smf>';
+</elk>';
 }
 
 function template_message_icons()
@@ -311,12 +311,12 @@ function template_message_icons()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>';
+<elk>';
 	foreach ($context['icons'] as $icon)
 		echo '
 	<icon value="', $icon['value'], '" url="', $icon['url'], '"><![CDATA[', cleanXml($icon['name']), ']]></icon>';
 	echo '
-</smf>';
+</elk>';
 }
 
 function template_check_username()
@@ -324,9 +324,9 @@ function template_check_username()
 	global $context;
 
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
-<smf>
+<elk>
 	<username valid="', $context['valid_username'] ? 1 : 0, '">', cleanXml($context['checked_username']), '</username>
-</smf>';
+</elk>';
 }
 
 function template_generic_xml_buttons()
@@ -357,7 +357,7 @@ function template_generic_xml()
 	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>';
 
 	// Show the data.
-	template_generic_xml_recursive($context['xml_data'], 'smf', '', -1);
+	template_generic_xml_recursive($context['xml_data'], 'elk', '', -1);
 }
 
 // Recursive function for displaying generic XML data.

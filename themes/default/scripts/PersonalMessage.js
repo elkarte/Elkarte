@@ -14,7 +14,7 @@
  * This file contains javascript surrounding personal messages send form.
  */
 
-function smf_PersonalMessageSend(oOptions)
+function elk_PersonalMessageSend(oOptions)
 {
 	this.opt = oOptions;
 	this.oBccDiv = null;
@@ -25,7 +25,7 @@ function smf_PersonalMessageSend(oOptions)
 	this.init();
 }
 
-smf_PersonalMessageSend.prototype.init = function()
+elk_PersonalMessageSend.prototype.init = function()
 {
 	if (!this.opt.bBccShowByDefault)
 	{
@@ -84,7 +84,7 @@ smf_PersonalMessageSend.prototype.init = function()
 
 }
 
-smf_PersonalMessageSend.prototype.showBcc = function()
+elk_PersonalMessageSend.prototype.showBcc = function()
 {
 	// No longer hide it, show it to the world!
 	this.oBccDiv.style.display = '';
@@ -93,7 +93,7 @@ smf_PersonalMessageSend.prototype.showBcc = function()
 
 
 // Prevent items to be added twice or to both the 'To' and 'Bcc'.
-smf_PersonalMessageSend.prototype.callbackAddItem = function(oAutoSuggestInstance, sSuggestId)
+elk_PersonalMessageSend.prototype.callbackAddItem = function(oAutoSuggestInstance, sSuggestId)
 {
 	this.oToAutoSuggest.deleteAddedItem(sSuggestId);
 	this.oBccAutoSuggest.deleteAddedItem(sSuggestId);

@@ -179,10 +179,10 @@ function template_main()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		window.smfForum_scripturl = smf_scripturl;
-		window.smfForum_sessionid = smf_session_id;
-		window.smfForum_sessionvar = smf_session_var;
-		window.smfThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
+		window.elkForum_scripturl = elk_scripturl;
+		window.elkForum_sessionid = elk_session_id;
+		window.elkForum_sessionvar = elk_session_var;
+		window.elkThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
 	// ]]></script>';
 
 	if (empty($modSettings['disable_elk_js']))
@@ -192,7 +192,7 @@ function template_main()
 	echo '
 		<script><!-- // --><![CDATA[
 			var tempOldOnload;
-			smfSetLatestThemes();
+			elkSetLatestThemes();
 		// ]]></script>';
 }
 
@@ -725,8 +725,8 @@ function template_pick()
 		{
 			echo '
 			<script><!-- // --><![CDATA[
-			var sBaseUseUrl', $theme['id'], ' = smf_prepareScriptUrl(smf_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
-			var sBasePreviewUrl', $theme['id'], ' = smf_prepareScriptUrl(smf_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
+			var sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
+			var sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
 			var oThumbnails', $theme['id'], ' = {';
 
 			// All the variant thumbnails.
@@ -957,7 +957,7 @@ function template_edit_style()
 
 						// Revert to the theme they actually use ;).
 						var tempImage = new Image();
-						tempImage.src = smf_prepareScriptUrl(smf_scripturl) + "action=admin;area=theme;sa=edit;theme=', $settings['theme_id'], ';preview;" + (new Date().getTime());
+						tempImage.src = elk_prepareScriptUrl(elk_scripturl) + "action=admin;area=theme;sa=edit;theme=', $settings['theme_id'], ';preview;" + (new Date().getTime());
 
 						refreshPreviewCache = null;
 						refreshPreview(false);
@@ -974,7 +974,7 @@ function template_edit_style()
 				myDoc.open("GET", url + (url.indexOf("?") == -1 ? "?" : ";") + "theme=', $context['theme_id'], '" + anchor, true);
 				myDoc.send(null);
 			}
-			navigatePreview(smf_scripturl);
+			navigatePreview(elk_scripturl);
 
 			var refreshPreviewCache;
 			function refreshPreview(check)
@@ -986,7 +986,7 @@ function template_edit_style()
 					return;
 				refreshPreviewCache = document.forms.stylesheetForm.entire_file.value;
 				// Replace the paths for images.
-				refreshPreviewCache = refreshPreviewCache.replace(/url\(\.\.\/images/gi, "url(" + smf_images_url);
+				refreshPreviewCache = refreshPreviewCache.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
 
 				// Try to do it without a complete reparse.
 				if (identical)
@@ -1021,7 +1021,7 @@ function template_edit_style()
 					var stylesheetMatch = new RegExp(\'<link rel="stylesheet"[^>]+href="[^"]+\' + editFilename + \'[^>]*>\');
 
 					// Replace the paths for images.
-					preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + smf_images_url);
+					preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
 					data = data.replace(stylesheetMatch, "<style type=\"text/css\" id=\"css_preview_sheet\">" + preview_sheet + "<" + "/style>");
 
 					frames["css_preview_box"].document.open();

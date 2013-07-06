@@ -15,7 +15,7 @@
  */
 
 /*
-	smf_AdminIndex(oOptions)
+	elk_AdminIndex(oOptions)
 	{
 		public init()
 		public loadAdminIndex()
@@ -24,13 +24,13 @@
 		public checkUpdateAvailable()
 	}
 */
-function smf_AdminIndex(oOptions)
+function elk_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
 	this.init();
 }
 
-smf_AdminIndex.prototype.init = function ()
+elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
 	var fHandlePageLoaded = function () {
@@ -39,7 +39,7 @@ smf_AdminIndex.prototype.init = function ()
 	addLoadEvent(fHandlePageLoaded);
 }
 
-smf_AdminIndex.prototype.loadAdminIndex = function ()
+elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
 	// Load the text box containing the latest news items.
 	if (this.opt.bLoadAnnouncements)
@@ -54,7 +54,7 @@ smf_AdminIndex.prototype.loadAdminIndex = function ()
 		this.checkUpdateAvailable();
 }
 
-smf_AdminIndex.prototype.setAnnouncements = function ()
+elk_AdminIndex.prototype.setAnnouncements = function ()
 {
 	if (!('ourAnnouncements' in window) || !('length' in window.ourAnnouncements))
 		return;
@@ -66,7 +66,7 @@ smf_AdminIndex.prototype.setAnnouncements = function ()
 	setInnerHTML(document.getElementById(this.opt.sAnnouncementContainerId), this.opt.sAnnouncementTemplate.replace('%content%', sMessages));
 }
 
-smf_AdminIndex.prototype.showCurrentVersion = function ()
+elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	if (!('elkVersion' in window))
 		return;
@@ -81,7 +81,7 @@ smf_AdminIndex.prototype.showCurrentVersion = function ()
 		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
 }
 
-smf_AdminIndex.prototype.checkUpdateAvailable = function ()
+elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
 	if (!('ourUpdatePackage' in window))
 		return;
@@ -98,7 +98,7 @@ smf_AdminIndex.prototype.checkUpdateAvailable = function ()
 	document.getElementById('update-link').href = this.opt.sUpdateNotificationLink.replace('%package%', window.ourUpdatePackage);
 
 	// If we decide to override life into "red" mode, do it.
-	if ('smfUpdateCritical' in window)
+	if ('elkUpdateCritical' in window)
 	{
 		document.getElementById('update_table').style.backgroundColor = '#aa2222';
 		document.getElementById('update_title').style.backgroundColor = '#dd2222';
@@ -109,7 +109,7 @@ smf_AdminIndex.prototype.checkUpdateAvailable = function ()
 }
 
 /*
-	smf_ViewVersions(oOptions)
+	elk_ViewVersions(oOptions)
 	{
 		public init()
 		public loadViewVersions
@@ -118,14 +118,14 @@ smf_AdminIndex.prototype.checkUpdateAvailable = function ()
 		public determineVersions()
 	}
 */
-function smf_ViewVersions (oOptions)
+function elk_ViewVersions (oOptions)
 {
 	this.opt = oOptions;
 	this.oSwaps = {};
 	this.init();
 }
 
-smf_ViewVersions.prototype.init = function ()
+elk_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
@@ -135,12 +135,12 @@ smf_ViewVersions.prototype.init = function ()
 	addLoadEvent(fHandlePageLoaded);
 }
 
-smf_ViewVersions.prototype.loadViewVersions = function ()
+elk_ViewVersions.prototype.loadViewVersions = function ()
 {
 	this.determineVersions();
 }
 
-smf_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
+elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 {
 	// If it is undefined, or currently off, turn it on - otherwise off.
 	this.oSwaps[sName] = !(sName in this.oSwaps) || !this.oSwaps[sName];
@@ -154,7 +154,7 @@ smf_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 	return false;
 }
 
-smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
+elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
 	var aVersions = aParts = new Array();
 	var aCompare = new Array(sCurrent, sTarget);
@@ -203,7 +203,7 @@ smf_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 	return false;
 }
 
-smf_ViewVersions.prototype.determineVersions = function ()
+elk_ViewVersions.prototype.determineVersions = function ()
 {
 	var oHighYour = {
 		sources: '??',
@@ -559,7 +559,7 @@ function addAnotherOption(parent, oDtName, oDdName)
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
 
-function smfSetLatestThemes()
+function elkSetLatestThemes()
 {
 	if (typeof(window.ourLatestThemes) !== "undefined")
 		setInnerHTML(document.getElementById("themeLatest"), window.ourLatestThemes);
@@ -606,7 +606,7 @@ function toggleBreakdown(id_group, forcedisplayType)
 		displayType = forcedisplayType;
 
 	// swap the image
-	document.getElementById("group_toggle_img_" + id_group).src = smf_images_url + "/" + (displayType === "none" ? "selected" : "selected_open") + ".png";
+	document.getElementById("group_toggle_img_" + id_group).src = elk_images_url + "/" + (displayType === "none" ? "selected" : "selected_open") + ".png";
 
 	// show or hide the elements
 	var aContainer = new Array();
@@ -662,7 +662,7 @@ function selectMethod(element)
 function updatePreview()
 {
 	var currentImage = document.getElementById("preview");
-	currentImage.src = smf_smiley_url + "/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
+	currentImage.src = elk_smiley_url + "/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
 }
 
 function swap_database_changes()
@@ -690,7 +690,7 @@ function testFTP()
 		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + escape(document.getElementById(oPostData[i]).value);
 
 	// Post the data out.
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + smf_session_var + '=' + smf_session_id, sPostData, testFTPResults);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
 }
 
 function expandFolder(folderIdent, folderReal)
@@ -717,7 +717,7 @@ function expandFolder(folderIdent, folderReal)
 	else if (window.XMLHttpRequest)
 	{
 		ajax_indicator(true);
-		getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + smf_session_var + '=' + smf_session_id, onNewFolderReceived);
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 	}
 	// Otherwise reload.
 	else

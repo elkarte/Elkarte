@@ -584,8 +584,8 @@ function template_modify_board()
 <script><!-- // --><![CDATA[
 	var oModeratorSuggest = new smc_AutoSuggest({
 		sSelf: \'oModeratorSuggest\',
-		sSessionId: smf_session_id,
-		sSessionVar: smf_session_var,
+		sSessionId: elk_session_id,
+		sSessionVar: elk_session_var,
 		sSuggestId: \'moderators\',
 		sControlId: \'moderators\',
 		sSearchType: \'member\',

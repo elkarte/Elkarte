@@ -13,7 +13,7 @@
  *
  * This file contains javascript associated with the new fader
  */
-function smc_NewsFader(oOptions)
+function elk_NewsFader(oOptions)
 {
 	var
 		aFaderItems = oOptions.aFaderItems || [],

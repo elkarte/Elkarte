@@ -3451,8 +3451,8 @@ function template_upgrade_above()
 		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/install.css?alp21" />
 				<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
-			var smf_scripturl = \'', $upgradeurl, '\';
-			var smf_charset = \'UTF-8\';
+			var elk_scripturl = \'', $upgradeurl, '\';
+			var elk_charset = \'UTF-8\';
 			var startPercent = ', $upcontext['overall_percent'], ';
 
 			// This function dynamically updates the step progress bar - and overall one as required.

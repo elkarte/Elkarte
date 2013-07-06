@@ -47,7 +47,7 @@
 /* ------------------------------------------------------- */
 /* Visible menu bar: wrapper/background. */
 #main_menu {
-	border-radius: 6px 6px 0 0;
+	border-radius: 6px 6px 2px 2px;
 	background: #4b863c;
 	background-image: linear-gradient(to bottom, #5BA048 0%, #3d6e32 100%);
 }
@@ -109,15 +109,12 @@
 }
 /* Top level subsection indicators. */
 /* Comment these out if you don't want them. */
-#main_menu .subsections .linklevel1, .admin_menu .subsections .linklevel1 {
-	padding: 0 0.8em 0 0.5em;
-}
-#main_menu .subsections .linklevel1:after,.admin_menu .subsections .linklevel1:after {
+.subsections:hover .linklevel1:after {
 	position: absolute;
-	top: 0.25em;
-	right: 0.2em;
-	content:" \2193";
-	font-size: 1.3em;
+	top: 0.8em;
+	right: 0.7em;
+	content:" \2228";
+	font-weight: normal;
 }
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
@@ -184,9 +181,117 @@
 	font-weight: 600;
 }
 /* Level 1: subsection indicators. */
-#menu_sidebar .listlevel1.subsections .linklevel1:after {
+#menu_sidebar .subsections .linklevel1:after {
 	position: absolute;
+	top: 0.3em;
 	right: 6px;
 	content: "\2192";
 }
 /*End sidebar flyout coding. */
+
+
+
+
+
+
+
+
+/*	$BOARDS		*/
+/* ------------------------------------------------------- */
+
+/* --------------------------------------------------------------------- */
+/* The following are alternative layout orders for the board index rows. */
+/* They are basic demonstrations only. Extra custom styling can be done.
+/* These demos can be commented and un-commented to see them in action.
+/* Note: similar tricks can be performed with the new message index too.
+/* --------------------------------------------------------------------- */
+
+/* This one simply puts the board stats back in the old SMF location. */
+/*
+.board_stats {
+	text-align: left;
+	padding: 1px  6px 1px 0;
+	float: left;
+}
+*/
+
+/* This one flips the row left to right, and sets the lastpost text to LTR. */
+/*
+.board_row {
+	direction: rtl;
+}
+.board_latest {
+	direction: ltr;
+	border: none;
+}
+*/
+
+/* This one does the LTR flip, and puts the board icon at far right. */
+/*
+.board_row {
+	direction: rtl;
+}
+.icon_anchor {
+	float: right;
+	padding: 2px 0 0 6px;
+}
+.board_latest {
+	direction: ltr;
+	border: none;
+}
+*/
+
+/* ------------------------------------------------------ */
+/* This is where the fun starts. Absolute positioning. :D */
+/* ------------------------------------------------------ */
+/* This one takes the previous example, and puts the board icon back to far left. */
+/*
+.board_row {
+	direction: rtl;
+	position: relative;
+}
+.icon_anchor {
+	position: absolute;
+	left: 8px;
+}
+.board_latest {
+	direction: ltr;
+	border: none;
+	padding-left: 66px;
+}
+*/
+
+/* You want more? Ok. This one does the above, but also puts board stats over
+/* at far right, and sets board name and description back to left aligned. */
+/*
+.board_row {
+	direction: rtl;
+	position: relative;
+}
+.board_info {
+	direction: ltr;
+	padding-right: 8.4em;
+}
+.icon_anchor {
+	position: absolute;
+	left: 8px;
+}
+.board_description, .moderators {
+	margin: 0;
+}
+.board_latest {
+	direction: ltr;
+	border: none;
+	padding-left: 66px;
+}
+.board_stats {
+	position: absolute;
+	right: 8px;
+}
+*/
+
+/* There are more options, but those should be enough to give the general idea. */
+
+/* ------------------------------------------------ */
+/* End alternative layouts. Back to standard stuff. */
+/* ------------------------------------------------ */

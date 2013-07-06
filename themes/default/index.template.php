@@ -552,7 +552,7 @@ function template_menu()
 	// Note that this definition had to be shifted for the js to work with the new markup.
 	echo '
 				<script><!-- // --><![CDATA[
-					var oMainHeaderToggle = new smc_Toggle({
+					var oMainHeaderToggle = new elk_Toggle({
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',
 						aSwappableContainers: [
@@ -561,21 +561,21 @@ function template_menu()
 						aSwapImages: [
 							{
 								sId: \'upshrink\',
-								srcExpanded: smf_images_url + \'/upshrink.png\',
+								srcExpanded: elk_images_url + \'/upshrink.png\',
 								altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-								srcCollapsed: smf_images_url + \'/upshrink2.png\',
+								srcCollapsed: elk_images_url + \'/upshrink2.png\',
 								altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 							}
 						],
 						oThemeOptions: {
 							bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 							sOptionName: \'minmax_preferences\',
-							sSessionId: smf_session_id,
-							sSessionVar: smf_session_var,
+							sSessionId: elk_session_id,
+							sSessionVar: elk_session_var,
 							sAdditionalVars: \';minmax_key=upshrink\'
 						},
 						oCookieOptions: {
-							bUseCookie: smf_member_id == 0 ? true : false,
+							bUseCookie: elk_member_id == 0 ? true : false,
 							sCookieName: \'upshrink\'
 						}
 					});

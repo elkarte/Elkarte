@@ -1556,17 +1556,17 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Default JS variables for use in every theme
 	$context['javascript_vars'] = array(
-		'smf_theme_url' => '"' . $settings['theme_url'] . '"',
-		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'smf_images_url' => '"' . $settings['images_url'] . '"',
-		'smf_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
-		'smf_scripturl' => '"' . $scripturl . '"',
-		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'smf_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
-		'smf_charset' => '"UTF-8"',
-		'smf_session_id' => '"' . $context['session_id'] . '"',
-		'smf_session_var' => '"' . $context['session_var'] . '"',
-		'smf_member_id' => $context['user']['id'],
+		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
+		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
+		'elk_images_url' => '"' . $settings['images_url'] . '"',
+		'elk_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
+		'elk_scripturl' => '"' . $scripturl . '"',
+		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
+		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
+		'elk_charset' => '"UTF-8"',
+		'elk_session_id' => '"' . $context['session_id'] . '"',
+		'elk_session_var' => '"' . $context['session_var'] . '"',
+		'elk_member_id' => $context['user']['id'],
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
@@ -1596,12 +1596,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
 			addInlineJavascript('
-		function smfAutoTask()
+		function elkAutoTask()
 		{
 			var tempImage = new Image();
-			tempImage.src = smf_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
+			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
 		}
-		window.setTimeout("smfAutoTask();", 1);');
+		window.setTimeout("elkAutoTask();", 1);');
 		}
 	}
 

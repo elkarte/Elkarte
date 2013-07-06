@@ -348,8 +348,8 @@ function template_modify_user_subscription()
 		<script><!-- // --><![CDATA[
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'name_subscriber\',
 			sControlId: \'name_control\',
 			sSearchType: \'member\',

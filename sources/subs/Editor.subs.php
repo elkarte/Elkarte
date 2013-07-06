@@ -178,7 +178,7 @@ function create_control_richedit($editorOptions)
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
 		addInlineJavascript('
-		var smf_smileys_url = \'' . $settings['smileys_url'] . '\';
+		var elk_smileys_url = \'' . $settings['smileys_url'] . '\';
 		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
 		var bbc_quote = \'' . addcslashes($txt['quote'], "'") . '\';
 		var bbc_search_on = \'' . addcslashes($txt['search_on'], "'") . '\';');
@@ -880,7 +880,7 @@ class Control_Verification_Captcha implements Control_Verifications
 			$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
 
 			addInlineJavascript('
-				var verification' . $this->_options['id'] . 'Handle = new smfCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
+				var verification' . $this->_options['id'] . 'Handle = new elkCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
 		}
 
 		if ($isNew || $force_refresh)

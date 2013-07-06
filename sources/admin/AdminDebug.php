@@ -227,9 +227,9 @@ class AdminDebug_Controller extends Action_Controller
 		// Figure out if sesc is still being used.
 		if (strpos($file['file_data'], ';sesc=') !== false)
 			$file['file_data'] = '
-if (!(\'smfForum_sessionvar\' in window))
-	window.smfForum_sessionvar = \'sesc\';
-' . strtr($file['file_data'], array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
+if (!(\'elkForum_sessionvar\' in window))
+	window.elkForum_sessionvar = \'sesc\';
+' . strtr($file['file_data'], array(';sesc=' => ';\' + window.elkForum_sessionvar + \'='));
 
 		Template_Layers::getInstance()->removeAll();
 
