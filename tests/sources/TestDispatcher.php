@@ -26,7 +26,7 @@ class TestDispatcher extends UnitTestCase
 			'emailuser' => array('sendtopic', 'email'),
 			'groups' => array('index', 'members', 'requests'),
 			'help' => array('index', 'help'),
-			'topic' => array('lock', 'printpage', 'sticky'),
+			'topic' => array('lock', 'sticky'),
 			'profile' => array('index'),
 			'reminder' => array('picktype', 'secret2', 'setpassword', 'setpassword2'),
 			'xmlpreview' => array('index'),
