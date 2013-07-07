@@ -487,7 +487,6 @@ function template_user_subscription()
 
 	echo '
 		</form>
-		<br class="clear"/>
 		<div class="title_bar">
 			<h3 class="titlebg">', $txt['paid_current'], '</h3>
 		</div>
@@ -602,8 +601,7 @@ function template_choose_payment()
 	}
 
 	echo '
-	</div>
-	<br class="clear" />';
+	</div>';
 }
 
 /**

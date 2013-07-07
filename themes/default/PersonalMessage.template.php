@@ -688,7 +688,7 @@ function template_search()
 					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 					<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit floatnone" />
 				</div>
-				<a class="button_link floatnone" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
+				<a class="button_link" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
 				<input type="hidden" name="advanced" value="0" />
 			</div>
 		</fieldset>';
@@ -1174,8 +1174,7 @@ function template_send()
 	// Show the message you're replying to.
 	if ($context['reply'])
 		echo '
-	<br />
-	<br />
+
 	<div class="forumposts">
 		<h3 class="catbg">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h3>
 		<div class="windowbg2">
@@ -1283,7 +1282,7 @@ function template_labels()
 	global $context, $scripturl, $txt;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8">
+	<form class="flow_auto" action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_manage_labels'], '</h3>
 		</div>
@@ -1349,8 +1348,8 @@ function template_labels()
 	echo '
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 	</form>
-	<br class="clear" />
-	<form action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8" style="margin-top: 1ex;">
+	<br />
+	<form class="flow_auto" action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8" style="margin-top: 1ex;">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['pm_label_add_new'], '</h3>
 		</div>

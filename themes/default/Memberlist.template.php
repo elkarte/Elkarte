@@ -70,7 +70,7 @@ function template_main()
 		foreach ($context['members'] as $member)
 		{
 			echo '
-				<tr class="windowbg', $alternate ? '2' : '', '"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>
+				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>
 					<td class="centertext">
 						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '', '
 					</td>
@@ -92,21 +92,7 @@ function template_main()
 			if (!isset($context['disabled_fields']['posts']))
 			{
 				echo '
-						<td class="statsbar">';
-
-				// show a relative bar graph of posts
-				if (isset($member['post_percent']))
-					echo '
-							<div class="postsbar">
-								<div class="bar" style="width: ', $member['post_percent'] * 0.6, '%;"></div>
-								<span class="righttext" style="white-space: nowrap;">', $member['posts'], '</span>
-							</div>';
-				else
-					echo '
-							<span class="righttext" style="white-space: nowrap;">', $member['posts'], '</span>';
-
-				echo '
-						</td>';
+						<td class="centertext">', $member['posts'], '</td>';
 			}
 
 			// Any custom fields on display?

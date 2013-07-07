@@ -180,7 +180,7 @@ function template_maintenance()
 		</div>
 		<p class="description">
 			<img class="floatleft" src="', $settings['images_url'], '/construction.png" style="width:40px; height:40px" alt="', $txt['in_maintain_mode'], '" />
-			', $context['description'], '<br class="clear" />
+			', $context['description'], '
 		</p>
 		<div class="title_bar">
 			<h4 class="titlebg">', $txt['admin_login'], '</h4>
@@ -197,7 +197,6 @@ function template_maintenance()
 				<dd><input type="checkbox" name="cookieneverexp" class="input_check" /></dd>
 			</dl>
 			<input type="submit" value="', $txt['login'], '" class="button_submit" />
-			<br class="clear" />
 		</div>
 		<input type="hidden" name="hash_passwrd" value="" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

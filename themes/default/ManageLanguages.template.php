@@ -343,8 +343,7 @@ function template_modify_language_entries()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
 					<input type="submit" value="', $txt['go'], '" class="button_submit" style="float: none"/>
-			</div>
-			<br class="clear" />';
+			</div>';
 
 	// Is it not writable?
 	// Show an error.

@@ -201,8 +201,7 @@ function template_maintenance()
 
 					// ]]></script>
 				</div>
-			</div>
-			<br class="clear" />';
+			</div>';
 }
 
 /**
@@ -225,8 +224,7 @@ function template_attachment_repair()
 				', $txt['repair_attachments_complete_desc'], '
 			</div>
 		</div>
-	</div>
-	<br class="clear" />';
+	</div>';
 	}
 
 	// What about if no errors were even found?
@@ -242,8 +240,7 @@ function template_attachment_repair()
 				', $txt['repair_attachments_no_errors'], '
 			</div>
 		</div>
-	</div>
-	<br class="clear" />';
+	</div>';
 	}
 	// Otherwise, I'm sad to say, we have a problem!
 	else
@@ -273,8 +270,7 @@ function template_attachment_repair()
 				</div>
 			</div>
 		</form>
-	</div>
-	<br class="clear" />';
+	</div>';
 	}
 }
 
