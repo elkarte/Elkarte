@@ -34,8 +34,7 @@ function template_fatal_error()
 		<div class="windowbg generic_list_wrapper">
 			<div ', $context['error_code'], 'class="padding">', $context['error_message'], '</div>
 		</div>
-	</div>
-	<br class="clear" />';
+	</div>';
 
 	// Show a back button (using javascript.)
 	echo '

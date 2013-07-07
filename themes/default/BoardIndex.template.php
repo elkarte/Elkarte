@@ -437,16 +437,12 @@ function template_news_fader()
 {
 	global $settings, $options, $txt, $context;
 
-	// An aside seems better here than a section.
 	echo '
 	<div id="newsfader" class="forum_category">
 		<h2 class="category_header">
 			<img id="newsupshrink" src="', $settings['images_url'], '/collapse.png" alt="*" title="', $txt['hide'], '" style="display: none;vertical-align: bottom" />
 			', $txt['news'], '
-		</h2>';
-
-	// No, here we need a list because the fade uses the list to split the items.
-	echo '
+		</h2>
 		<ul id="elkFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
 			<li>
 				', implode('</li><li>', $context['news_lines']), '

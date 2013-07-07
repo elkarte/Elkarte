@@ -1045,7 +1045,6 @@ function template_modify_group_classic($type)
 						</table>';
 	}
 	echo '
-				<br class="clear" />
 				</div>
 			</div>';
 }

@@ -59,7 +59,7 @@ function template_main()
 
 		// Show the button to enable advanced search
 		echo '
-							<a class="button_link floatnone" href="', $scripturl, '?action=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
+							<a class="button_link" href="', $scripturl, '?action=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
 							<input type="hidden" name="advanced" value="0" />
 						</div>
 					</fieldset>';
@@ -206,8 +206,7 @@ function template_main()
 
 			echo '
 								</ul>
-							</div>
-							<br class="clear" />';
+							</div>';
 
 			echo '
 							<div class="padding flow_auto">
@@ -360,19 +359,18 @@ function template_results()
 		$controller = $context['get_topics'][0];
 		while ($topic = $controller->{$context['get_topics'][1]}())
 		{
-			$color_class = '';
-			// Locked and Sticky
+			// We start with locked and sticky topics.
 			if ($topic['is_sticky'] && $topic['is_locked'])
-				$color_class = 'locked_stickybg';
+				$color_class = 'locked_row sticky_row';
 			// Sticky topics should get a different color, too.
 			elseif ($topic['is_sticky'])
-				$color_class = 'stickybg';
+				$color_class = 'sticky_row';
 			// Locked topics get special treatment as well.
 			elseif ($topic['is_locked'])
-				$color_class = 'lockedbg';
+				$color_class = 'locked_row';
 			// Last, but not least: regular topics.
 			else
-				$color_class = $message['alternate'] == 0 ? 'windowbg' : 'windowbg2';
+				$color_class = 'basic_row';
 
 			echo '
 					<div class="search_results_posts">
@@ -381,6 +379,7 @@ function template_results()
 
 			foreach ($topic['matches'] as $message)
 			{
+				// @todo - Clean this up a bit. Too much crud.
 				echo '
 								<div class="topic_details floatleft" style="width: 94%; border-bottom: 0px">
 									<div class="counter">', $message['counter'], '</div>
@@ -427,7 +426,6 @@ function template_results()
 
 				if ($message['body_highlighted'] != '')
 					echo '
-								<br class="clear" />
 								<div class="list_posts double_height">', $message['body_highlighted'], '</div>';
 			}
 
@@ -529,7 +527,6 @@ function template_results()
 								</ul>
 							</div>';
 				echo '
-							<br class="clear" />
 						</div>
 					</div>
 				</div>';
@@ -541,7 +538,6 @@ function template_results()
 
 	// Show a jump to box for easy navigation.
 	echo '
-				<br class="clear" />
 				<div class="smalltext righttext" id="search_jump_to">&nbsp;</div>
 				<script><!-- // --><![CDATA[';
 

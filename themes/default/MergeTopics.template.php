@@ -40,8 +40,7 @@ function template_merge_done()
 					</ul>
 				</div>
 			</div>
-		</div>
-	<br class="clear" />';
+		</div>';
 }
 
 /**

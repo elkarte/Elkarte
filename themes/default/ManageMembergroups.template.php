@@ -479,7 +479,6 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 							</fieldset>';
 	else
 		echo '
-								<br class="clear" />
 								<span class="select_all_box">
 									<em>', $txt['all'], ': </em>
 									<input type="radio" name="select_all" id="allow_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'boardaccess\', \'allow\');" /> <label for="allow_all">', $txt['board_perms_allow'], '</label>

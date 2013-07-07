@@ -176,7 +176,6 @@ function template_select()
 					<li class="dummy" />
 				</ul>
 			</div>
-			<br class="clear" />
 			<div class="flow_auto">
 				<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 				<input type="hidden" name="subname" value="', $context['new_subject'], '" />

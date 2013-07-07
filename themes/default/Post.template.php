@@ -460,8 +460,7 @@ function template_postarea_below()
 						</span>
 					</div>
 				</div>
-			</div>
-			<br class="clear" />';
+			</div>';
 
 	// Assuming this isn't a new topic pass across the last message id.
 	if (isset($context['topic_last_message']))

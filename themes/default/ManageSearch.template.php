@@ -140,7 +140,7 @@ function template_select_search_method()
 					</dl>
 					', $context['double_index'] ? '<div class="noticebox">
 					' . $txt['search_double_index'] . '</div>' : '', '
-					<fieldset class="search_settings floatleft">
+					<fieldset class="search_settings">
 						<legend>', $txt['search_index'], '</legend>
 						<dl>
 							<dt><input type="radio" name="search_index" value=""', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' class="input_radio" />
@@ -216,12 +216,11 @@ function template_select_search_method()
 	echo '
 						</dl>
 					</fieldset>
-					<fieldset class="search_settings floatright">
+					<fieldset class="search_settings">
 					<legend>', $txt['search_method'], '</legend>
 						<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
 						<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
 					</fieldset>
-					<br class="clear"/>
 					<input type="submit" name="save" value="', $txt['search_method_save'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-msmpost_token_var'], '" value="', $context['admin-msmpost_token'], '" />
@@ -389,7 +388,6 @@ function template_show_spider_logs()
 	template_show_list('spider_logs');
 
 	echo '
-		<br class="clear" />
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=logs" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['spider_logs_delete'], '</h3>

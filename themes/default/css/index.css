@@ -45,10 +45,9 @@
 /*	$GENERAL	*/
 /* ------------------------------------------------------- */
 
-/* Forum width controls for top bar, header, main content and footer. */
-/* Put these here to make them easy to find. */
-/* To style these areas, look in $MAIN */
-#wrapper, .frame {
+/* Put this here to make it easy to find. */
+/* Width control for top bar, header, main content and footer content. */
+.wrapper {
 	margin: 0 auto;
 	/* Next controls forum width, when it is not set in admin. */
 	width: 90%;
@@ -86,7 +85,6 @@ body {
 	color: #555;
 	/* Set a font-size that will look the same in all browsers. */
 	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
-	/* Font size is chosen to be exactly 10 point for hinting, ClearType, etc. */
 	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
 }
 
@@ -106,20 +104,17 @@ input, button, select, textarea, .editor {
 	margin: 0;
 }
 /* Declarations for specific divs. @todo - Maybe simplify - test. */
-.frame, #upper_section .user, #upper_section .news,
-.navigate_section, div.windowbg, div.windowbg2,
+.wrapper, .user, .news, .navigate_section, div.windowbg, div.windowbg2,
 .roundframe, .description, .information, .infobox, .noticebox,
 .signature, .attachments, .custom_fields_above_signature,
-.generic_list_wrapper, #gotop, #gobottom,
-#stats_left, #top_posters, #top_topics_replies, #top_topics_starter,
-#stats_right, #top_boards, #top_topics_views, #most_online {
+.category_header, .generic_list_wrapper, #gotop, #gobottom {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 /* Collection of pseudo element clearfixes. */
 /* @todo - Clean up old catbg and titlebg stuff. */
 h3.catbg:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after,
-#main_menu:after, .frame:after, #upper_section:after, #inner_wrap:after,
+#main_menu:after, .wrapper:after, #upper_section:after, #inner_wrap:after,
 #main_content_section:after, #main_container:after, .attachments_bot:after,
 .editor_wrapper:after {
 	display: block;
@@ -879,6 +874,15 @@ div.windowbg, div.windowbg2 {
 	padding: 0;
 }
 
+/* Main forum area. */
+/* Box-shadow only on this one. */
+#wrapper {
+	margin-top: 20px;
+	border: 1px solid #444;
+	border-radius: 10px;
+	background: #fbfbfb;
+	box-shadow: 0 3px 4px #222;
+}
 /* The user info, news, etc.*/
 #upper_section {
 	padding: 4px 10px;
@@ -889,16 +893,6 @@ div.windowbg, div.windowbg2 {
 	padding: 0 4px 4px 4px;
 	width: 50%;
 	font-size: 0.857em;
-}
-
-/* Main forum area. */
-/* Box-shadow only on this one. */
-#wrapper {
-	margin-top: 20px;
-	border: 1px solid #444;
-	border-radius: 10px;
-	background: #fbfbfb;
-	box-shadow: 0 3px 4px #222;
 }
 .greeting {
 	font-weight: bold;
@@ -931,7 +925,6 @@ div.windowbg, div.windowbg2 {
 /* The content section */
 #main_content_section {
 	padding: 2px 1em 1em 1em;
-	/* Yes. :) */
 	min-height: 180px;
 }
 
@@ -941,7 +934,7 @@ div.windowbg, div.windowbg2 {
 	border-top: 4px solid #090909;
 	background: #041400;
 }
-#footer_section .frame {
+#footer_section .wrapper {
 	padding: 20px 5px;
 }
 #footer_section p, #footer_section a {
@@ -1633,7 +1626,7 @@ div.windowbg, div.windowbg2 {
 	width: 100%;
 	border-spacing: 0;
 	border-collapse: collapse;
-	border: 2px solid #ddd;
+	border: 1px solid #ddd;
 	border-top: none;
 }
 .table_grid .catbg, .table_grid .catbg th {
@@ -1655,9 +1648,17 @@ div.windowbg, div.windowbg2 {
 	margin: 4px 0 0 0;
 }
 /* @todo - Check out table_padding class in more detail. */
+/* @todo - Can probably deprecate. Just use table_grid everywhere. */
 .table_grid td, .table_padding td {
 	padding: 4px;
 	border-bottom: 1px solid #ccc;
+}
+/* Subtle zebra striping for rows. */
+.table_grid .standard_row, .table_padding .standard_row {
+	background: #fff;
+}
+.table_grid .alternate_row, .table_padding .alternate_row {
+	background: #fafafa;
 }
 .table_grid  textarea {
 	width: 100%;
@@ -1667,15 +1668,6 @@ div.windowbg, div.windowbg2 {
 }
 .table_grid  textarea {
 	width: 100%;
-}
-
-/* Search results need some help as well */
-/* @todo */
-.search_results_posts .lockedbg {
-	background:  #efefef url(../images/icons/quick_lock.png) no-repeat 95% 15px;
-}
-.search_results_posts .stickybg, .search_results_posts .locked_stickybg {
-	background:  #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
 }
 
 /* GenericList */
@@ -2139,12 +2131,21 @@ img.new_posts {
 .locked_row.sticky_row .topic_info {
 	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
-.locked_row {
+/* @todo - Extra classes for search results, etc. See if I can clean them up. */
+.locked_row, .locked_row.core_posts {
 	background: #f7f7f7;
 }
-.locked_row .topic_info {
+.locked_row .topic_info, .locked_row .topic_details {
 	background: url(../images/icons/quick_lock.png) no-repeat 98% 4px;
 }
+/* Search results need some help as well */
+/* @todo - Sort markup so this can call above classes. *//*
+.search_results_posts .lockedbg {
+	background:  #efefef url(../images/icons/quick_lock.png) no-repeat 95% 15px;
+}
+.search_results_posts .stickybg, .search_results_posts .locked_stickybg {
+	background:  #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
+}*/
 
 #quick_mod_jump_to {
 	font-size: 1em;
@@ -3434,8 +3435,6 @@ dl.merge_topic dd {
 
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
-
-/*@todo - major simplification required - markup and CSS. */
 .statistics {
 	margin: 6px 0;
 }
@@ -3443,7 +3442,6 @@ dl.merge_topic dd {
 	background: none;
 	border: none;
 	border-bottom: 2px solid #ccc;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	width: 49%;
 	margin: 0 0.5% 0 50.5%;
 	text-shadow: none;
@@ -3504,17 +3502,6 @@ dl.merge_topic dd {
 	height: 1.5em;
 	background: #47b263;
 	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
-}
-/* @todo- This is for the frigging memberlist, not for the stats centre. */
-.postsbar {
-	margin: 1px 0;
-	min-height: 1.4em;
-	width: 110px;
-	border: 1px solid #aaa;
-	border-radius: 2px;
-	background: #fff;
-	text-align: right;
-	line-height: 1.4em;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
@@ -3883,6 +3870,7 @@ dl.merge_topic dd {
 /* Styles for (fatal) errors. */
 #fatal_error {
 	margin: auto;
+	padding-bottom: 1em;
 	width: 80%;
 }
 .errorbox {
@@ -4022,16 +4010,18 @@ dl.merge_topic dd {
 	}
 }
 
-/* Desktops and laptops */
+/* @todo - Just commenting some of this stuff out
+/* until queries are sorted for the new markup, and for break points in em. */
+/* Desktops and laptops *//*
 @media screen and (min-width: 1224px) {}
-/* Large screens */
+/* Large screens *//*
 @media screen and (min-width: 1824px) {}
-/* 10" Tablets (landscape) */
+/* 10" Tablets (landscape) *//*
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {}
 
-/* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages */
+/* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages *//*
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-/* 7" Tablets like Google Nexus (landscape) or other mobile devices */
+/* 7" Tablets like Google Nexus (landscape) or other mobile devices *//*
 @media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
 	 	 display: none;
@@ -4105,7 +4095,7 @@ dl.merge_topic dd {
 	}
 }
 
-/* mobile devices with low screen resolutions */
+/* mobile devices with low screen resolutions *//*
 @media screen and (max-width: 400px) and (orientation: portrait) {
 	#top_section_notice, #logo, #topic_icons div p, .optional {
 		display: none;
@@ -4137,21 +4127,49 @@ dl.merge_topic dd {
 		max-width: 200px;
 	}
 }
+*/
+/* @todo - WIP - Still needs more elements and stuff. */
 
-/* @todo - WIP - Clean up before next code dump.*/
+/* Not sure how fussy we should get here,
+/* given that there is supposed to be a separate phone theme.
+/* Am currently inclined to think that just having break points that correlate
+/* to 1024, 800 and 480 at standard font size is probably adequate. */
+
+/* This one does 1024 screens at default font size. */
 @media screen and (max-width: 70em) {
 	.board_latest {
 		min-width: 27em; 
 	}
-	.board_stats {
-		display: none;
-	}
-}
-@media screen and (max-width: 80em) {
 	.topic_latest {
 		min-width: 17em; 
 	}
 	.board_stats, .topic_stats {
+		display: none;
+	}
+}
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 52em) {
+	.board_latest {
+		min-width: 21em; 
+	}
+	.board_lastposter {
+		display: block;
+	}
+}
+/* This one does 480 screens at default font size. */
+@media screen and (max-width: 32em) {
+	#wrapper, .frame {
+		min-width: 100%;
+		border-radius: 0;
+	}
+	.board_info, .board_latest {
+		display: block;
+	}
+	.board_latest {
+		padding-left: 64px;
+		border-left: none;
+	}
+	.board_description, .moderators {
 		display: none;
 	}
 }
