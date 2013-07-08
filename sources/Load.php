@@ -1384,8 +1384,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$context['user']['name'] = $txt['guest_title'];
 
 	// Set up some additional interface preference context
-	if ($user_info['is_admin'])
-		$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 
 	if (!$user_info['is_guest'])
 		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
