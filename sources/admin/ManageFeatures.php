@@ -80,6 +80,9 @@ class ManageFeatures_Controller extends Action_Controller
 				'controller' => $this,
 				'function' => 'action_karmaSettings_display',
 				'enabled' => in_array('k', $context['admin_features'])),
+			'pmsettings' => array(
+				'controller' => $this,
+				'function' => 'action_pmsettings'),
 			'likes' => array(
 				'controller' => $this,
 				'function' => 'action_likesSettings_display',
@@ -122,6 +125,8 @@ class ManageFeatures_Controller extends Action_Controller
 				'layout' => array(
 				),
 				'karma' => array(
+				),
+				'pmsettings' => array(
 				),
 				'likes' => array(
 				),
@@ -1284,6 +1289,84 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		createToken('admin-ecp');
+	}
+
+	/**
+	 * Editing personal messages settings
+	 */
+	public function action_pmsettings()
+	{
+		global $txt, $scripturl, $context;
+
+		// initialize the form
+		$this->_initPMSettingsForm();
+
+		// retrieve the current config settings
+		$config_vars = $this->_PMSettings->settings();
+
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
+		loadLanguage('ManageMembers');
+
+		$context['pm_limits'] = loadPMLimits();
+
+		// Saving?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			$limits_to_update = array();
+			foreach ($context['pm_limits'] as $group_id => $group)
+			{
+				if (isset($_POST['group'][$group_id]) && $_POST['group'][$group_id] != $group['max_messages'])
+					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $_POST['group'][$group_id]));
+			}
+
+			call_integration_hook('integrate_save_pmsettings_settings');
+
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=featuresettings;sa=pmsettings');
+		}
+
+		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=pmsettings';
+		$context['settings_title'] = $txt['personal_messages'];
+		// We need this for the in-line permissions
+		createToken('admin-mp');
+
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Initializes the personal messages settings admin page.
+	 */
+	private function _initPMSettingsForm()
+	{
+		global $txt;
+
+		// We're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// instantiate the form
+		$this->_PMSettings = new Settings_Form();
+
+		$config_vars = array(
+			// Reporting of personal messages?
+			array('check', 'enableReportPM'),
+			// Inline permissions.
+			array('permissions', 'pm_send'),
+			// PM Settings
+			array('title', 'antispam_PM'),
+				'pm1' => array('int', 'max_pm_recipients', 'postinput' => $txt['max_pm_recipients_note']),
+				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
+				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
+			array('title', 'membergroups_max_messages'),
+				array('desc', 'membergroups_max_messages_desc'),
+				array('callback', 'pm_limits'),
+		);
+
+		call_integration_hook('integrate_pmsettings_settings', array(&$config_vars));
+
+		return $this->_PMSettings->settings($config_vars);
 	}
 
 	/**

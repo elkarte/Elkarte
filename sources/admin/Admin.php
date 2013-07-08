@@ -168,6 +168,7 @@ class Admin_Controller extends Action_Controller
 							'basic' => array($txt['mods_cat_features']),
 							'layout' => array($txt['mods_cat_layout']),
 							'karma' => array($txt['karma'], 'enabled' => in_array('k', $context['admin_features'])),
+							'pmsettings' => array($txt['personal_messages']),
 							'likes' => array($txt['likes'], 'enabled' => in_array('l', $context['admin_features'])),
 							'sig' => array($txt['signature_settings_short']),
 							'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => in_array('cp', $context['admin_features'])),

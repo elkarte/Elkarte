@@ -85,10 +85,6 @@ $txt['enableReportPM'] = 'Enable reporting of personal messages';
 $txt['antispam_PM'] = 'Personal Message Limits';
 $txt['max_pm_recipients'] = 'Maximum number of recipients allowed in a personal message';
 $txt['max_pm_recipients_note'] = '(0 for no limit, admins are exempt)';
-$txt['pm_posts_verification'] = 'Post count under which users must pass verification when sending personal messages';
-$txt['pm_posts_verification_note'] = '(0 for no limit, admins are exempt)';
-$txt['pm_posts_per_hour'] = 'Number of personal messages a user may send in an hour';
-$txt['pm_posts_per_hour_note'] = '(0 for no limit, moderators are exempt)';
 $txt['compactTopicPagesEnable'] = 'Limit number of displayed page links';
 $txt['contiguous_page_display'] = 'Contiguous pages to display';
 $txt['to_display'] = 'to display';
@@ -278,6 +274,12 @@ $txt['signature_max_image_width'] = 'Maximum width of signature images (pixels)'
 $txt['signature_max_image_height'] = 'Maximum height of signature images (pixels)';
 $txt['signature_max_font_size'] = 'Maximum font size allowed in signatures (pixels)';
 $txt['signature_bbc'] = 'Enabled BBC tags';
+
+$txt['groups_pm_send'] = 'Membergroups allowed to send personal messages';
+$txt['pm_posts_verification'] = 'Post count under which users must pass verification when sending personal messages';
+$txt['pm_posts_verification_note'] = '(0 for no limit, admins are exempt)';
+$txt['pm_posts_per_hour'] = 'Number of personal messages a user may send in an hour';
+$txt['pm_posts_per_hour_note'] = '(0 for no limit, moderators are exempt)';
 
 $txt['custom_profile_title'] = 'Custom Profile Fields';
 $txt['custom_profile_desc'] = 'From this page you can create your own custom profile fields that fit in with your own forums requirements';
