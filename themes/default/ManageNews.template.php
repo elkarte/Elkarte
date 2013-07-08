@@ -51,7 +51,6 @@ function template_email_members()
 	echo '
 						</dd>
 					</dl>
-					<br class="clear" />
 				</div>
 			</div>
 			<br />

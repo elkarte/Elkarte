@@ -83,12 +83,12 @@ function template_init()
 	// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
 	// How do we get anchors only, where they will work? Spans and strong only where necessary?
 	$settings['page_index_template'] = array(
-		'base_link' => '<a class="navPages" href="{base_link}">%2$s</a>',
-		'previous_page' => '<span class="previous_page">{prev_txt}</span>',
-		'current_page' => '<strong class="current_page">%1$s</strong>',
-		'next_page' => '<span class="next_page">{next_txt}</span>',
-		'expand_pages' => '<span class="expand_pages" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
-		'all' => '<span class="all_pages">{all_txt}</span>',
+		'base_link' => '<a class="navPages" href="{base_link}" role="menuitem">%2$s</a>',
+		'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
+		'current_page' => '<strong class="current_page" role="menuitem">%1$s</strong>',
+		'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
+		'expand_pages' => '<span class="expand_pages" role="menuitem" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
+		'all' => '<span class="all_pages" role="menuitem">{all_txt}</span>',
 	);
 }
 
@@ -118,9 +118,7 @@ function template_html_above()
 	if (!empty($settings['forum_width']))
 		echo '
 	<style>
-		#wrapper, .frame {
-			width: ', $settings['forum_width'], ';
-		}
+		.wrapper {width: ', $settings['forum_width'], ';}
 	</style>';
 
 	echo '
@@ -195,7 +193,7 @@ function template_body_above()
 	// Wrapper div now echoes permanently for better layout options. @todo - Skip nav link.
 	echo '
 	<div id="top_section"><a id="top" href="#skipnav" title="Skip navigation"></a>
-		<div class="frame">
+		<div class="wrapper">
 			<span id="top_section_notice">';
 	// For above, see me grumblez in Issue #552. ;)
 
@@ -271,8 +269,8 @@ function template_body_above()
 	</div>';
 
 	echo '
-	<header id="header"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
-		<div class="frame">
+	<div id="header"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
+		<div class="wrapper">
 			<h1 class="forumtitle">
 				<a href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
 			</h1>';
@@ -282,8 +280,8 @@ function template_body_above()
 
 	echo'
 		</div>
-	</header>
-	<div id="wrapper">
+	</div>
+	<div id="wrapper" class="wrapper">
 		<a href="#top" id="gotop" title="', $txt['go_up'], '">&#8593;</a>
 		<a href="#bot" id="gobottom" title="', $txt['go_down'], '">&#8595;</a>';
 
@@ -386,11 +384,10 @@ function template_body_below()
 	</div>';
 
 	// Show the XHTML and RSS links, as well as the copyright.
-	// Footer is now full-width by default. Frame inside it will match theme wrapper width automatically.
-	// Have removed "Go to top" link from footer, as I have a better idea. ;)
+	// Footer is full-width. Wrapper inside automatically matches admin width setting.
 	echo '
-	<footer id="footer_section"><a id="bot"></a>
-		<div class="frame">
+	<div id="footer_section"><a id="bot"></a>
+		<div class="wrapper">
 			<ul>
 				<li class="copyright">', theme_copyright(), '
 				</li>
@@ -406,7 +403,7 @@ function template_body_below()
 
 	echo '
 		</div>
-	</footer>';
+	</div>';
 }
 
 /**
@@ -434,7 +431,8 @@ function theme_linktree($force_show = false)
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
 		return;
 
-	// Div here has been deprecated in favour of plain ul.
+	// @todo - Look at changing markup here slightly. Need to incorporate relevant aria roles.
+	// @todo - For a11y, probably best to split into two separate block level elements that can each have role="menubar".
 	echo '
 				<ul class="navigate_section">';
 
@@ -457,8 +455,7 @@ function theme_linktree($force_show = false)
 		if (isset($tree['extra_before']))
 			echo $tree['extra_before'];
 
-		// Show the link, including a URL if it should have one. Why were spans here? Why do people fall in love with spans?
-		// Spans have no semantic meaning, and offer no markup or CSS benefits here. Just use a plain anchor. [/grumble] :P
+		// Show the link, including a URL if it should have one.
 		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . $tree['name'] . '</a>' : $tree['name'];
 
 		// Show something after the link...?
@@ -483,20 +480,17 @@ function template_menu()
 	global $context, $settings, $txt;
 
 	// WAI-ARIA a11y tweaks have been applied here.
-	// ID's for nav and ul have been swapped so semantics makes sense.
 	echo '
-				<nav id="menu_nav" role="navigation">
+				<div id="menu_nav" role="navigation">
 					<ul id="main_menu">';
 
-	// Also, elements have had classes changed for greater ease of customisation.
-	// See http://www.elkarte.net/index.php?topic=439.msg3100#msg3100 and previous posts for details.
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
 							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', $button['title'], '</a>';
 
-		// does it have child buttons? (2nd level menus)
+		// Any 2nd level menus?
 		if (!empty($button['sub_buttons']))
 		{
 			echo '
@@ -536,9 +530,7 @@ function template_menu()
 						</li>';
 	}
 
-	// The upshrink image, right-floated. Yes, I know it takes some space from the menu bar.
-	// Menu bar will still accommodate ten buttons on a 1024, with theme set to 90%. That's more than enough.
-	// If anyone is terrified of losing 40px out of the menu bar, set your theme to 92% instead of 90%. :P
+	// The upshrink image, right-floated.
 	echo '
 						<li id="collapse_button">
 							<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />
@@ -546,10 +538,9 @@ function template_menu()
 
 	echo '
 					</ul>
-				</nav>';
+				</div>';
 
 	// Define the upper_section toggle in JavaScript.
-	// Note that this definition had to be shifted for the js to work with the new markup.
 	echo '
 				<script><!-- // --><![CDATA[
 					var oMainHeaderToggle = new elk_Toggle({
@@ -607,7 +598,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		// Kept for backward compatibility
 		if (!isset($value['test']) || !empty($context[$value['test']]))
 			$buttons[] = '
-								<li><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
+								<li role="menuitem"><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
 	}
 
 	// No buttons? No button strip either.
@@ -615,7 +606,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		return;
 
 	echo '
-							<ul class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
+							<ul role="menubar" class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
 								', implode('', $buttons), '
 							</ul>';
 }
@@ -710,12 +701,13 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
 
 	if (!empty($options['page_index_markup']))
 	// Hmmm. I'm a tad wary of having floatleft here but anyway............
-		$pages = '<div class="pagelinks floatleft">' . $options['page_index_markup'] . '</div>';
+	// @todo - Try using table-cell display here. Should do auto rtl support. Less markup, less css. :)
+		$pages = '<div class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</div>';
 	else
 	{
 		if (!isset($options['page_index']))
 			$options['page_index'] = 'page_index';
-		$pages = empty($context[$options['page_index']]) ? '' : '<div class="pagelinks floatleft">' . $context[$options['page_index']] . '</div>';
+		$pages = empty($context[$options['page_index']]) ? '' : '<div class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</div>';
 	}
 
 	if (!isset($options['extra']))

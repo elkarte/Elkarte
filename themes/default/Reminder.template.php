@@ -35,7 +35,6 @@ function template_main()
 					<dd><input type="text" name="user" size="30" class="input_text" /></dd>
 				</dl>
 				<input type="submit" value="', $txt['reminder_continue'], '" class="button_submit" />
-				<br class="clear" />
 			</div>
 		</div>
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

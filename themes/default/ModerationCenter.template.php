@@ -37,10 +37,6 @@ function template_moderation_center()
 		echo '
 							<div class="modblock_', $alternate ? 'left' : 'right', '">', function_exists($block_function) ? $block_function() : '', '</div>';
 
-		if (!$alternate)
-			echo '
-							<br class="clear" />';
-
 		$alternate = !$alternate;
 	}
 

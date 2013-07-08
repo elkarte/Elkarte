@@ -638,8 +638,7 @@ function template_admin_register()
 
 			</form>
 		</div>
-	</div>
-	<br class="clear" />';
+	</div>';
 }
 
 /**
@@ -833,6 +832,5 @@ function template_contact_form_done()
 		</div>
 		<div class="windowbg2">
 				', $txt['contact_thankyou'], '
-		</div>
-		<br class="clear" />';
+		</div>';
 }

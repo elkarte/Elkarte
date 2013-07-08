@@ -119,6 +119,8 @@ function template_show_list($list_id = null)
 			<tbody>';
 
 	// Show a nice message informing there are no items in this list.
+	// @todo - Nasty having styles and aligns still in the markup (IE6 stuffz).
+	// @todo - Should be done via the class.
 	if (empty($cur_list['rows']) && !empty($cur_list['no_items_label']))
 		echo '
 				<tr>
@@ -132,7 +134,7 @@ function template_show_list($list_id = null)
 		foreach ($cur_list['rows'] as $id => $row)
 		{
 			echo '
-				<tr class="windowbg', $alternate ? '2' : '', $row['class'], '"', $row['style'], ' id="list_', $list_id, '_', $id, '">';
+				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row ', $row['class'], '" id="list_', $list_id, '_', $id, '">';
 
 			foreach ($row['data'] as $row_data)
 				echo '
