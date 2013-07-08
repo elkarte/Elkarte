@@ -46,7 +46,7 @@ function template_ask()
 								<input type="radio" id="selective" name="step2" value="selective" class="input_radio" /> <label for="selective">', $txt['select_split_posts'], '</label>
 							</li>
 						</ul>
-						<hr class="hrcolor" />
+						<hr />
 						<label for="messageRedirect"><input type="checkbox" name="messageRedirect" id="messageRedirect" onclick="document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" class="input_check" /> ', $txt['splittopic_notification'], '.</label>
 						<fieldset id="reasonArea" style="margin-top: 1ex; display: none;', '">
 							<dl class="settings">

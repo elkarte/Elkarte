@@ -140,12 +140,12 @@ function template_view_package()
 			</div>
 			<table class="table_grid">
 			<thead>
-				<tr class="catbg">
-					<th class="first_th" scope="col" style="width:20px"></th>
+				<tr class="table_head">
+					<th scope="col" style="width:20px"></th>
 					<th scope="col" style="width:30px"></th>
 					<th scope="col" class="lefttext">', $txt['package_install_type'], '</th>
 					<th scope="col" class="lefttext" style="width:50%">', $txt['package_install_action'], '</th>
-					<th class="last_th lefttext" scope="col" style="width:20%">', $txt['package_install_desc'], '</th>
+					<th class="lefttext" scope="col" style="width:20%">', $txt['package_install_desc'], '</th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -173,8 +173,8 @@ function template_view_package()
 			{
 				echo '
 				<tr id="operation_', $action_num, '">
-					<td colspan="5" class="windowbg3">
-						<table class="table_padding" style="width:100%">';
+					<td colspan="5" class="standard_row">
+						<table class="table_grid">';
 
 				// Show the operations.
 				$alternate2 = true;
@@ -270,8 +270,8 @@ function template_view_package()
 					{
 						echo '
 					<tr id="operation_', $action_num, '">
-						<td colspan="5" class="windowbg3">
-							<table class="table_padding" style="width:100%">';
+						<td colspan="5" class="standard_row">
+							<table class="table_grid">';
 
 						$alternate2 = true;
 						$operation_num = 1;
@@ -316,7 +316,7 @@ function template_view_package()
 	if (!$context['ftp_needed'] && (!empty($context['actions']) || !empty($context['database_changes'])))
 	{
 		echo '
-			<div class="righttext padding">
+			<div class="righttext">
 				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', !empty($context['has_failure']) ? '(submitThisOnce(this) &amp;&amp; confirm(\'' . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . '\'))' : 'submitThisOnce(this)', ';" class="button_submit" />
 			</div>';
 	}
@@ -611,7 +611,7 @@ function template_browse()
 								<input type="text" name="version_emulate" id="ve" value="', $context['forum_version'], '" size="25" class="input_text" />
 							</dd>
 						</dl>
-						<div class="righttext padding">
+						<div class="righttext">
 							<input type="submit" value="', $txt['package_apply'], '" class="button_submit" />
 						</div>
 					</div>
@@ -813,7 +813,7 @@ function template_servers()
 							<input type="file" name="package" size="38" class="input_file" />
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" value="' . $txt['package_upload'] . '" class="button_submit" />
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 				</form>
@@ -889,7 +889,7 @@ function template_package_list()
 				// This is supposed to be a rule..
 				elseif ($package['is_line'])
 					echo '
-							<hr class="hrcolor" />';
+							<hr />';
 				// A remote link.
 				elseif ($package['is_remote'])
 				{
@@ -957,7 +957,7 @@ function template_package_list()
 	echo '
 			</div>
 		</div>
-		<div class="padding smalltext floatleft">
+		<div>
 			', $txt['package_installed_key'], '
 			<img src="', $settings['images_url'], '/icons/package_installed.png" alt="" class="centericon" style="margin-left: 1ex;" /> ', $txt['package_installed_current'], '
 			<img src="', $settings['images_url'], '/icons/package_old.png" alt="" class="centericon" style="margin-left: 2ex;" /> ', $txt['package_installed_old'], '
@@ -1278,13 +1278,10 @@ function template_view_operations()
 		<script src="', $settings['default_theme_url'], '/scripts/theme.js?alp21"></script>
 	</head>
 	<body>
-		<div class="padding windowbg">
-			<div class="padding">
-				', $context['operations']['search'], '
-			</div>
-			<div class="padding">
+		<div class="windowbg">
+			', $context['operations']['search'], '
+			<br />
 				', $context['operations']['replace'], '
-			</div>
 		</div>
 	</body>
 </html>';
@@ -1519,14 +1516,14 @@ function template_file_permissions()
 		</div>
 		<table class="table_grid">
 			<thead>
-				<tr class="catbg">
-					<th class="first_th lefttext" style="width:30%">&nbsp;', $txt['package_file_perms_name'], '&nbsp;</th>
+				<tr class="table_head">
+					<th class="lefttext" style="width:30%">&nbsp;', $txt['package_file_perms_name'], '&nbsp;</th>
 					<th class="lefttext" style="width:30%">', $txt['package_file_perms_status'], '</th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
-					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
-					<th class="last_th centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
+					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
+					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
+					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
+					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
+					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
 				</tr>
 			</thead>
 			<tbody>';

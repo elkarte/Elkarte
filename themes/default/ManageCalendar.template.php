@@ -72,7 +72,7 @@ function template_edit_holiday()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />';
+					<hr />';
 
 	if ($context['is_new'])
 		echo '

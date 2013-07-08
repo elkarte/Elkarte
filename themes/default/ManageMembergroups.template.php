@@ -571,8 +571,8 @@ function template_group_members()
 			', template_pagesection(false, false, 'go_down'), '
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th"><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['name'], $context['sort_by'] == 'name' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a></th>';
+					<tr class="table_head">
+						<th><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['name'], $context['sort_by'] == 'name' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a></th>';
 
 	if ($context['can_send_email'])
 		echo '
@@ -584,7 +584,7 @@ function template_group_members()
 						<th ', empty($context['group']['assignable']) ? ' class="last_th" colspan="2"' : '', '><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=posts', $context['sort_by'] == 'posts' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['posts'], $context['sort_by'] == 'posts' ? ' <img src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '','</a></th>';
 	if (!empty($context['group']['assignable']))
 		echo '
-						<th class="last_th centertext" style="width:4%"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
+						<th style="width:4%"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
 	echo '
 					</tr>
 				</thead>

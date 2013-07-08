@@ -34,11 +34,11 @@ function template_main()
 	// Show the topic information - icon, subject, etc.
 	echo '
 			<div id="forumposts" class="forumposts">
-				<h3 class="catbg">
+				<h2 class="category_header">
 					<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
-					', $txt['topic'], ': ', $context['subject'], '&nbsp;<span>(', $context['num_views_text'], ')</span>
-					<span class="nextlinks floatright">', $context['previous_next'], '</span>
-				</h3>';
+					', $txt['topic'], ': ', $context['subject'], '&nbsp;<span class="views_text">(', $context['num_views_text'], ')</span>
+					<span class="nextlinks">', $context['previous_next'], '</span>
+				</h2>';
 
 	if (!empty($settings['display_who_viewing']))
 	{
@@ -89,8 +89,8 @@ function template_main()
 			echo '
 					<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>';
 
-			echo '
-					<div class="postarea"', (empty($options['hide_poster_area']) ? '' : ' style="margin:0"'), '>
+				echo '
+					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 						<div class="keyinfo">
 						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' .  template_build_poster_div($message, $ignoring) . '</ul>' : '');
 
@@ -313,10 +313,10 @@ function template_quickreply_below()
 		echo '
 			<a id="quickreply"></a>
 			<div class="forumposts" id="quickreplybox">
-				<h3 class="catbg">
+				<h2 class="category_header">
 					<a href="javascript:oQuickReply.swap();"><img src="', $settings['images_url'], '/', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '.png" alt="+" id="quickReplyExpand" class="icon" /></a>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
-				</h3>
+				</h2>
 				<div id="quickReplyOptions" class="windowbg"', $options['display_quick_reply'] > 1 ? '' : ' style="display: none"', '>
 					<div class="editor_wrapper">
 						<p class="smalltext lefttext">', $txt['quick_reply_desc'], '</p>
@@ -375,7 +375,7 @@ function template_quickreply_below()
 		}
 
 		echo '
-							<div class="padding">
+							<div>
 								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
 								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
@@ -391,7 +391,7 @@ function template_quickreply_below()
 
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 				echo '
-								<div class="clear righttext padding"><span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span><span id="draft_lastautosave"></span></div>';
+								<div class="clear righttext"><span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span><span id="draft_lastautosave"></span></div>';
 		}
 
 		echo '
@@ -845,7 +845,7 @@ function template_display_poll_above()
 		// Show a warning if they are allowed more than one option.
 		if ($context['poll']['allowed_warning'])
 			echo '
-							<p class="smallpadding">', $context['poll']['allowed_warning'], '</p>';
+							<p>', $context['poll']['allowed_warning'], '</p>';
 
 		echo '
 							<ul class="options">';
@@ -890,7 +890,7 @@ function template_display_calendar_above()
 	echo '
 			<div class="linked_events">
 				<div class="title_bar">
-					<h3 class="titlebg headerpadding">', $txt['calendar_linked_events'], '</h3>
+					<h3 class="titlebg">', $txt['calendar_linked_events'], '</h3>
 				</div>
 				<div class="windowbg">
 					<div class="content">

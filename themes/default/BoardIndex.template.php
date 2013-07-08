@@ -251,10 +251,10 @@ function template_info_center()
 			echo '
 				<table id="ic_recentposts">
 					<tr>
-						<th class="recentpost first_th">', $txt['message'], '</th>
+						<th class="recentpost">', $txt['message'], '</th>
 						<th class="recentposter">', $txt['author'], '</th>
 						<th class="recentboard">', $txt['board'], '</th>
-						<th class="recenttime last_th">', $txt['date'], '</th>
+						<th class="recenttime">', $txt['date'], '</th>
 					</tr>';
 
 			/* Each post in latest_posts has:

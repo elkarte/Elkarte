@@ -53,12 +53,12 @@ function template_find_members()
 		// ]]></script>
 	</head>
 	<body id="help_popup">
-		<form action="', $scripturl, '?action=findmember;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8" class="padding description">
+		<form action="', $scripturl, '?action=findmember;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 			<div class="roundframe">
 				<div class="cat_bar">
 					<h3 class="catbg">', $txt['find_members'], '</h3>
 				</div>
-				<div class="padding">
+				<div>
 					<strong>', $txt['find_username'], ':</strong><br />
 					<input type="text" name="search" id="search" value="', isset($context['last_search']) ? $context['last_search'] : '', '" style="margin-top: 4px; width: 96%;" class="input_text" autofocus="autofocus" placeholder="', $txt['find_members'], '" required="required" /><br />
 					<span class="smalltext"><em>', $txt['find_wildcards'], '</em></span><br />';
@@ -85,7 +85,7 @@ function template_find_members()
 	else
 	{
 		echo '
-				<ul class="padding">';
+				<ul>';
 
 		$alternate = true;
 		foreach ($context['results'] as $result)
