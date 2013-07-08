@@ -569,17 +569,17 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			// Do the update of the membergroup settings.
 			$properties = array(
-					'max_messages' => $_POST['max_messages'],
-					'min_posts' => $_POST['min_posts'],
-					'group_type' => $_POST['group_type'],
-					'group_hidden' => $_POST['group_hidden'],
-					'group_inherit' => $group_inherit,
-					'current_group' => $current_group['id_group'],
-					'group_name' => $_POST['group_name'],
-					'online_color' => $_POST['online_color'],
-					'icons' => $_POST['icons'],
-					'group_desc' => $_POST['group_desc'],
-				);
+				'max_messages' => $_POST['max_messages'],
+				'min_posts' => $_POST['min_posts'],
+				'group_type' => $_POST['group_type'],
+				'hidden' => $_POST['group_hidden'],
+				'id_parent' => $group_inherit,
+				'current_group' => $current_group['id_group'],
+				'group_name' => $_POST['group_name'],
+				'online_color' => $_POST['online_color'],
+				'icons' => $_POST['icons'],
+				'description' => $_POST['group_desc'],
+			);
 			updateMembergroupProperties($properties);
 
 			call_integration_hook('integrate_save_membergroup', array($current_group['id_group']));

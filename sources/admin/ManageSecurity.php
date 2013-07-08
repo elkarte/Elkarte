@@ -186,9 +186,6 @@ class ManageSecurity_Controller extends Action_Controller
 				array('select', 'password_strength', array($txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high'])),
 				array('check', 'enable_password_conversion'),
 			'',
-				// Reporting of personal messages?
-				array('check', 'enableReportPM'),
-			'',
 				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
 		);
 
@@ -615,9 +612,6 @@ class ManageSecurity_Controller extends Action_Controller
 				// Password strength.
 				array('select', 'password_strength', array($txt['setting_password_strength_low'], $txt['setting_password_strength_medium'], $txt['setting_password_strength_high'])),
 				array('check', 'enable_password_conversion'),
-			'',
-				// Reporting of personal messages?
-				array('check', 'enableReportPM'),
 			'',
 				array('select', 'frame_security', array('SAMEORIGIN' => $txt['setting_frame_security_SAMEORIGIN'], 'DENY' => $txt['setting_frame_security_DENY'], 'DISABLE' => $txt['setting_frame_security_DISABLE'])),
 		);

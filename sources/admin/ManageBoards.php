@@ -782,7 +782,7 @@ class ManageBoards_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
-				array('permissions', 'manage_boards'),
+				array('permissions', 'manage_boards', 'helptext' => ''),
 			'',
 				// Other board settings.
 				array('check', 'countChildPosts'),
@@ -811,7 +811,7 @@ class ManageBoards_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
-				array('permissions', 'manage_boards'),
+				array('permissions', 'manage_boards', 'helptext' => ''),
 			'',
 				// Other board settings.
 				array('check', 'countChildPosts'),

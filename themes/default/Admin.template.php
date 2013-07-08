@@ -1511,3 +1511,17 @@ function template_callback_external_search_engines()
 			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
 }
+
+function template_callback_pm_limits()
+{
+	global $context;
+
+	foreach ($context['pm_limits'] as $group_id => $group)
+		echo '
+			<dt>
+				<label for="id_group_', $group_id, '">', $group['group_name'], '</label>
+			</dt>
+			<dd>
+				<input type="text" id="id_group_', $group_id, '" name="group[', $group_id, ']" value="', $group['max_messages'], '" size="6" class="input_text" />
+			</dd>';
+}
