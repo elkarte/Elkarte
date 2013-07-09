@@ -360,7 +360,7 @@ function get_file_listing($path, $relative)
  */
 function updateThemePath($setValues)
 {
-	$db = database;
+	$db = database();
 
 	$db->insert('replace',
 		'{db_prefix}themes',
