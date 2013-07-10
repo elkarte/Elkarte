@@ -44,7 +44,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		$subActions = array(
 			'taskedit' => array($this, 'action_edit'),
-			'action_log' => array($this, 'action_log'),
+			'tasklog' => array($this, 'action_log'),
 			'tasks' => array($this, 'action_tasks'),
 		);
 
