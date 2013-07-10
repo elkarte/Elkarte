@@ -556,7 +556,7 @@ function template_set_settings()
 			</div>
 			<div class="windowbg">
 				<div class="content">
-					<dl class="settings flow_auto">';
+					<dl class="settings">';
 
 	foreach ($context['settings'] as $setting)
 	{
@@ -565,8 +565,8 @@ function template_set_settings()
 		{
 			echo '
 					</dl>
-					<hr class="hrcolor" />
-					<dl class="settings flow_auto">';
+					<hr />
+					<dl class="settings">';
 		}
 		// A checkbox?
 		elseif ($setting['type'] == 'checkbox')
@@ -682,7 +682,7 @@ function template_pick()
 			</div>
 			<div class="', $theme['selected'] ? 'windowbg' : 'windowbg2', '">
 				<div class="flow_hidden content">
-					<div class="floatright"><a href="', $scripturl, '?action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '"><img src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" class="padding" /></a></div>
+					<div class="floatright"><a href="', $scripturl, '?action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '"><img src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" /></a></div>
 					<p>', $theme['description'], '</p>';
 
 		if (!empty($theme['variants']))
@@ -882,10 +882,10 @@ function template_browse()
 	<div id="admincenter">
 		<table class="table_grid tborder">
 		<thead>
-			<tr class="catbg">
-				<th class="lefttext first_th" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
+			<tr class="table_head">
+				<th class="lefttext" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
 				<th scope="col" style="width:35%">', $txt['themeadmin_edit_modified'], '</th>
-				<th class="last_th" scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
+				<th scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
 			</tr>
 		</thead>
 		<tbody>';

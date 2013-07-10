@@ -40,7 +40,7 @@ function template_admin()
 										<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
 									</h3>
 								</div>
-								<div class="windowbg nopadding">
+								<div class="windowbg">
 									<div class="content">
 										<div id="ourAnnouncements">', $txt['lfyi'], '</div>
 									</div>
@@ -55,7 +55,7 @@ function template_admin()
 										<a href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
 									</h3>
 								</div>
-								<div class="windowbg nopadding">
+								<div class="windowbg">
 									<div class="content">
 										<div id="version_details">
 											<strong>', $txt['support_versions'], ':</strong><br />
@@ -335,8 +335,8 @@ function template_view_versions()
 						<div class="information">', $txt['version_check_desc'], '</div>
 							<table class="table_grid">
 								<thead>
-									<tr class="catbg lefttext">
-										<th class="first_th" scope="col" style="width:50%">
+									<tr class="table_head lefttext">
+										<th scope="col" style="width:50%">
 											<strong>', $txt['admin_elkfile'], '</strong>
 										</th>
 										<th scope="col" style="width:25%">
@@ -755,7 +755,7 @@ function template_edit_censored()
 					<script><!-- // --><![CDATA[
 						document.getElementById("moreCensoredWords_link").style.display = "";
 					// ]]></script>
-					<hr class="hrcolor clear" style="width:100%; height:1px" />
+					<hr class="clear" />
 					<dl class="settings">
 						<dt>
 							<strong><label for="censorWholeWord_check">', $txt['censor_whole_words'], ':</label></strong>
@@ -1052,7 +1052,7 @@ function template_show_settings()
 			if ($config_var == '')
 				echo '
 					</dl>
-					<hr class="hrcolor clear" />
+					<hr class="clear" />
 					<dl class="settings">';
 			else
 				echo '
@@ -1303,14 +1303,14 @@ function template_repair_boards()
 				<p>
 					', $txt['errors_fix'], '
 				</p>
-				<p class="padding">
+				<p>
 					<strong><a href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
 				</p>';
 		}
 		else
 			echo '
 				<p>', $txt['maintain_no_errors'], '</p>
-				<p class="padding">
+				<p>
 					<a href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 				</p>';
 
@@ -1332,7 +1332,7 @@ function template_repair_boards()
 		{
 			echo '
 				<p>', $txt['errors_fixed'], '</p>
-				<p class="padding">
+				<p>
 					<a href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 				</p>';
 		}
@@ -1377,10 +1377,10 @@ function template_php_info()
 		echo '
 		<table id="', str_replace(' ', '_', $area), '" class="table_grid">
 			<thead>
-			<tr class="catbg">
-				<th class="first_th" scope="col" style="width:33%"></th>
-				<th scope="col" style="width:33%" class="centertext"><strong>', $area, '</strong></th>
-				<th class="last_th" scope="col" style="width:33%"></th>
+			<tr class="table_head">
+				<th scope="col" style="width:33%"></th>
+				<th scope="col" style="width:33%"><strong>', $area, '</strong></th>
+				<th scope="col" style="width:33%"></th>
 			</tr>
 			</thead>
 			<tbody>';
@@ -1466,7 +1466,7 @@ function template_clean_cache_button_below()
 
 /**
  * Admin quick search box.
- */
+ * @todo - See comments under https://github.com/elkarte/Elkarte/issues/617#issuecomment-20564476 */
 function template_admin_quick_search()
 {
 	global $context, $settings, $txt, $scripturl;

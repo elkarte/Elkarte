@@ -119,6 +119,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			echo ',
 					toolbar: "emoticon,source",';
 
+		// @todo - Check width for editor. It overflows a little past where it should be.
+		// Should be able to fix with box-sizing or something. 100% should work for width.
 		echo '
 				});
 				$("#', $editor_id, '").data("sceditor").createPermanentDropDown();
@@ -184,7 +186,7 @@ function template_control_richedit_buttons($editor_id)
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			echo '
 		<br />
-		<span class="righttext padding" style="display: block">
+		<span class="righttext" style="display: block">
 			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
 		</span>';
@@ -200,7 +202,7 @@ function template_control_richedit_buttons($editor_id)
 		// Load in the PM autosaver if its enabled and the user wants to use it
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			echo '
-		<span class="righttext padding" style="display: block">
+		<span class="righttext" style="display: block">
 			<span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span>
 			<span id="draft_lastautosave" ></span>
 		</span>';

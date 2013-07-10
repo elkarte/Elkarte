@@ -55,7 +55,7 @@ function template_showDrafts()
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
 		echo '
-		<div class="tborder windowbg2 padding centertext">
+		<div class="information centertext">
 			', $txt['draft_none'], '
 		</div>';
 	else
@@ -109,7 +109,7 @@ function template_profile_save()
 
 	echo '
 
-					<hr class="hrcolor clear" style="width: 100%; height: 1px" />';
+					<hr class="clear" />';
 
 	// Only show the password box if it's actually needed.
 	if ($context['require_password'])

@@ -476,7 +476,7 @@ function template_coppa_form()
 
 	// Show the form (As best we can)
 	echo '
-		<table class="tborder centertext" style="width:100%" >
+		<table class="table_grid">
 			<tr>
 				<td class="lefttext">', $context['forum_contacts'], '</td>
 			</tr>
@@ -499,8 +499,7 @@ function template_coppa_form()
 					', $context['coppa_body'], '
 				</td>
 			</tr>
-		</table>
-		<br />';
+		</table>';
 }
 
 /**
@@ -808,7 +807,7 @@ function template_contact_form()
 
 			echo '
 				</dl>
-				<hr class="hrcolor" />
+				<hr />
 				<div class="flow_auto" >
 					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />

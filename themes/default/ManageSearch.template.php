@@ -257,7 +257,7 @@ function template_create_index()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="save" value="', $txt['search_create_index_start'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
@@ -287,7 +287,7 @@ function template_create_index_progress()
 							<div class="green_percent" style="width: ', $context['percentage'], '%;">&nbsp;</div>
 						</div>
 					</div>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="cont" value="', $txt['search_create_index_continue'], '" class="button_submit" />
 				</div>
 			</div>
@@ -364,7 +364,7 @@ function template_spider_edit()
 							<textarea name="spider_ip" id="spider_ip" rows="4" cols="20">', $context['spider']['ip_info'], '</textarea>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-ses_token_var'], '" value="', $context['admin-ses_token'], '" />
@@ -429,7 +429,7 @@ function template_show_spider_stats()
 					<p>
 						', sprintf($txt['spider_stats_delete_older'], '<input type="text" name="older" id="older" value="90" size="3" class="input_text" />'), '
 					</p>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-ss_token_var'], '" value="', $context['admin-ss_token'], '" />
 					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" class="button_submit" />

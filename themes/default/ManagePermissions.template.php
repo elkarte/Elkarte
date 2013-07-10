@@ -46,21 +46,21 @@ function template_permission_index()
 		echo '
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th">', $txt['membergroups_name'], '</th>
-						<th class="centertext" style="width:10%">', $txt['membergroups_members_top'], '</th>';
+					<tr class="table_head">
+						<th>', $txt['membergroups_name'], '</th>
+						<th style="width:10%">', $txt['membergroups_members_top'], '</th>';
 
 			if (empty($modSettings['permission_enable_deny']))
 				echo '
-						<th class="centertext" style="width:16%">', $txt['membergroups_permissions'], '</th>';
+						<th style="width:16%">', $txt['membergroups_permissions'], '</th>';
 			else
 				echo '
-						<th class="centertext" style="width:8%">', $txt['permissions_allowed'], '</th>
-						<th class="centertext" style="width:8%">', $txt['permissions_denied'], '</th>';
+						<th style="width:8%">', $txt['permissions_allowed'], '</th>
+						<th style="width:8%">', $txt['permissions_denied'], '</th>';
 
 			echo '
-						<th class="centertext" style="width:10%;vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
-						<th class="last_th centertext" style="width:4%;vertical-align:middle">
+						<th style="width:10%; vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
+						<th style="width:4%;vertical-align:middle">
 							', $context['can_modify'] ? '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'group\');" />' : '', '
 						</th>
 					</tr>
@@ -388,10 +388,10 @@ function template_edit_profiles()
 
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th">', $txt['permissions_profile_name'], '</th>
-						<th', !empty($context['show_rename_boxes']) ? ' class="last_th"' : '', '>', $txt['permissions_profile_used_by'], '</th>
-						<th class="last_th" style="width:5%', !empty($context['show_rename_boxes']) ? ';display:none"' : '"', ' >', $txt['delete'], '</th>
+					<tr class="table_head">
+						<th>', $txt['permissions_profile_name'], '</th>
+						<th>', $txt['permissions_profile_used_by'], '</th>
+						<th style="width:5%', !empty($context['show_rename_boxes']) ? ';display:none"' : '"', ' >', $txt['delete'], '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -425,7 +425,7 @@ function template_edit_profiles()
 	echo '
 				</tbody>
 			</table>
-			<div class="flow_auto righttext padding">
+			<div class="flow_auto righttext">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />';
 
@@ -465,7 +465,7 @@ function template_edit_profiles()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />
 					<input type="submit" name="create" value="', $txt['permissions_profile_new_create'], '" class="button_submit" />
@@ -566,9 +566,7 @@ function template_modify_group()
 
 	if ($context['profile']['can_modify'])
 		echo '
-			<div class="padding">
-				<input type="submit" value="', $txt['permissions_commit'], '" class="button_submit" />
-			</div>';
+			<input type="submit" value="', $txt['permissions_commit'], '" class="button_submit" />';
 
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -591,18 +589,18 @@ function template_modify_group_simple($type)
 	echo '
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th lefttext" colspan="2" style="width:100%"></th>';
+					<tr class="table_head">
+						<th class="lefttext" colspan="2" style="width:100%"></th>';
 				if (empty($modSettings['permission_enable_deny']) || $context['group']['id'] == -1)
 					echo '
 						<th></th>
 						<th></th>
-						<th class="last_th centertext">&nbsp;</th>';
+						<th>&nbsp;</th>';
 				else
 					echo '
-						<th class="centertext">', $txt['permissions_option_on'], '</th>
-						<th class="centertext">', $txt['permissions_option_off'], '</th>
-						<th class="last_th centertext">', $txt['permissions_option_deny'], '</th>';
+						<th>', $txt['permissions_option_on'], '</th>
+						<th>', $txt['permissions_option_off'], '</th>
+						<th>', $txt['permissions_option_deny'], '</th>';
 
 				echo '
 					</tr>
@@ -893,7 +891,7 @@ function template_modify_group_classic($type)
 				if ($has_display_content)
 				{
 					echo '
-							<tr class="catbg">
+							<tr class="table_head">
 								<th class="lefttext" colspan="2" style="width:100%">
 									<strong class="smalltext">', $permissionGroup['name'], '</strong>
 								</th>';
@@ -903,9 +901,9 @@ function template_modify_group_classic($type)
 								<th></th><th></th><th></th>';
 					else
 						echo '
-								<th class="centertext"><div>', $txt['permissions_option_on'], '</div></th>
-								<th class="centertext"><div>', $txt['permissions_option_off'], '</div></th>
-								<th class="centertext"><div>', $txt['permissions_option_deny'], '</div></th>';
+								<th><div>', $txt['permissions_option_on'], '</div></th>
+								<th><div>', $txt['permissions_option_off'], '</div></th>
+								<th><div>', $txt['permissions_option_deny'], '</div></th>';
 					echo '
 							</tr>';
 				}
@@ -1138,7 +1136,7 @@ function template_postmod_permissions()
 				<div class="information">', $txt['permissions_post_moderation_deny_note'], '</div>';
 
 	echo '
-				<div class="righttext padding">
+				<div class="righttext">
 					', $txt['permissions_post_moderation_select'], ':
 					<select name="pid" onchange="document.forms.postmodForm.submit();">';
 
@@ -1153,18 +1151,18 @@ function template_postmod_permissions()
 			</div>
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th"></th>
-						<th class="centertext" colspan="3">
+					<tr class="table_head">
+						<th></th>
+						<th colspan="3">
 							', $txt['permissions_post_moderation_new_topics'], '
 						</th>
-						<th class="centertext" colspan="3">
+						<th colspan="3">
 							', $txt['permissions_post_moderation_replies_own'], '
 						</th>
-						<th class="centertext" colspan="3">
+						<th colspan="3">
 							', $txt['permissions_post_moderation_replies_any'], '
 						</th>
-						<th class="last_th centertext" colspan="3">
+						<th colspan="3">
 							', $txt['permissions_post_moderation_attachments'], '
 						</th>
 					</tr>
@@ -1172,18 +1170,18 @@ function template_postmod_permissions()
 						<th style="width:30%">
 							', $txt['permissions_post_moderation_group'], '
 						</th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
-						<th class="centertext"><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_moderate.png" alt="', $txt['permissions_post_moderation_moderate'], '" title="', $txt['permissions_post_moderation_moderate'], '" /></th>
+						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_deny.png" alt="', $txt['permissions_post_moderation_disallow'], '" title="', $txt['permissions_post_moderation_disallow'], '" /></th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -1218,7 +1216,7 @@ function template_postmod_permissions()
 	echo '
 				</tbody>
 			</table>
-			<div class="righttext padding">
+			<div class="righttext">
 				<input type="submit" name="save_changes" value="', $txt['permissions_commit'], '" class="button_submit" />
 				<input type="hidden" name="', $context['admin-mppm_token_var'], '" value="', $context['admin-mppm_token'], '" />
 			</div>

@@ -23,7 +23,7 @@ function template_main()
 
 	// Display the table header and linktree.
 	echo '
-	<div class="main_section" id="whos_online">
+	<div id="whos_online">
 		<form action="', $scripturl, '?action=who" method="post" id="whoFilter" accept-charset="UTF-8">
 			<div class="title_bar">
 				<h4 class="titlebg margin_lower">', $txt['who_title'], '</h4>
@@ -49,8 +49,8 @@ function template_main()
 			<div class="topic_table" id="mlist">
 				<table class="table_grid" >
 					<thead>
-						<tr class="catbg">
-							<th scope="col" class="lefttext first_th" style="width:40%">
+						<tr class="table_head">
+							<th scope="col" class="lefttext" style="width:40%">
 								<a href="', $scripturl, '?action=who;start=', $context['start'], ';show=', $context['show_by'], ';sort=user', $context['sort_direction'] != 'down' && $context['sort_by'] == 'user' ? '' : ';asc', '" rel="nofollow">', $txt['who_user'], $context['sort_by'] == 'user' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
 							</th>
 							<th scope="col" class="lefttext" style="width:10%">
@@ -130,7 +130,7 @@ function template_credits()
 
 	// The most important part - the credits :P.
 	echo '
-	<div class="main_section" id="credits">
+	<div id="credits">
 		<div class="cat_bar">
 			<h3 class="catbg">', $txt['credits'], '</h3>
 		</div>';
