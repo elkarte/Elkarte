@@ -225,7 +225,7 @@ function template_list_themes()
 			<div id="theme_', $theme['id'], '" class="windowbg">
 				<div class="title_bar">
 					<h3 class="titlebg">
-						<span class="floatleft"><strong><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list">', $theme['name'], '</a></strong>', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '', '</span>';
+						<span class="floatleft"><strong>', $theme['name'], '</strong>', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '', '</span>';
 
 			// You *cannot* delete the default theme. It's important!
 			if ($theme['id'] != 1)
@@ -237,6 +237,7 @@ function template_list_themes()
 				</div>
 				<div class="content">
 					<dl class="settings themes_list">
+						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list">', $txt['theme_edit_settings'], '</a></dt>
 						<dt>', $txt['themeadmin_list_theme_dir'], ':</dt>
 						<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
 						<dt>', $txt['themeadmin_list_theme_url'], ':</dt>
