@@ -245,7 +245,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
 		FROM {db_prefix}user_drafts as ud' . ($draft_type === 0 ? '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
-		WHERE ud.id_member = {int:id_member}' . ((!empty($topic) && $draft_type === 0) ? '
+		WHERE ud.id_member = {int:id_member}' . (($draft_type === 0) ? '
 			AND id_topic = {int:id_topic}' : (!empty($topic) ? '
 			AND id_reply = {int:id_topic}' : '')) . '
 			AND type = {int:draft_type}' . (!empty($drafts_keep_days) ? '
