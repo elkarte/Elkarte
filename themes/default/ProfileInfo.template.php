@@ -454,8 +454,8 @@ function template_action_showPermissions()
 					<table class="table_grid">
 						<thead>
 							<tr class="titlebg">
-								<th class="lefttext first_th" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
-								<th class="lefttext last_th" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
+								<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
+								<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
 							</tr>
 						</thead>
 						<tbody>';
@@ -521,8 +521,8 @@ function template_action_showPermissions()
 				<table class="table_grid">
 					<thead>
 						<tr class="titlebg">
-							<th class="lefttext first_th" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
-							<th class="lefttext last_th" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
+							<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
+							<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
 						</tr>
 					</thead>
 					<tbody>';

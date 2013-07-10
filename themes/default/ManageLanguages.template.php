@@ -80,8 +80,8 @@ function template_download_language()
 			</div>
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th" scope="col">
+					<tr class="table_head">
+						<th scope="col">
 							', $txt['languages_download_filename'], '
 						</th>
 						<th scope="col" style="width:100">
@@ -90,7 +90,7 @@ function template_download_language()
 						<th scope="col" style="width:100">
 							', $txt['languages_download_exists'], '
 						</th>
-						<th class="last_th centertext" scope="col" style="width:4%">
+						<th scope="col" style="width:4%">
 							', $txt['languages_download_copy'], '
 						</th>
 					</tr>
@@ -189,7 +189,7 @@ function template_download_language()
 
 	// Install?
 	echo '
-			<div class="righttext padding">
+			<div class="righttext">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-dlang_token_var'], '" value="', $context['admin-dlang_token'], '" />
 				<input type="submit" name="do_install" value="', $txt['add_language_elk_install'], '" class="button_submit" />

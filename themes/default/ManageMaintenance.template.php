@@ -532,7 +532,7 @@ function template_convert_msgbody()
 
 	echo '
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
-				<hr class="hrcolor" />
+				<hr />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 				<input type="submit" name="do_conversion" value="', $txt['convert_proceed'], '" class="button_submit" />

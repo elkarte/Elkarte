@@ -179,7 +179,7 @@ function template_custom_email()
 							<textarea id="email_body" name="email_body" rows="10" cols="20" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 90%; min-width: 90%' : 'width: 90%') . ';"></textarea>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<div class="flow_auto">
 						<input type="submit" name="send" value="', $txt['sendtopic_send'], '" class="button_submit" />
 					</div>

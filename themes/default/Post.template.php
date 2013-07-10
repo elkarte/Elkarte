@@ -28,7 +28,7 @@ function template_main()
 	// If this message has been edited in the past - display when it was.
 	if (isset($context['last_modified']))
 		echo '
-					<div class="padding smalltext">
+					<div class="smalltext">
 						', $context['last_modified_text'], '
 					</div>';
 
@@ -222,7 +222,7 @@ function template_topic_replies_below()
 	{
 		echo '
 		<div id="topic_summary" class="forumposts">
-			<h3 class="catbg">', $txt['topic_summary'], '</h3>
+			<h3 class="category_header">', $txt['topic_summary'], '</h3>
 			<span id="new_replies"></span>';
 
 		$ignored_posts = array();
@@ -234,7 +234,7 @@ function template_topic_replies_below()
 
 			echo '
 			<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', '">
-				<div class="postarea" id="msg', $post['id'], '">
+				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">
 							<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '&nbsp;-&nbsp;', $post['time'], '
@@ -447,7 +447,6 @@ function template_postarea_below()
 
 	// Finally, the submit buttons.
 	echo '
-						<br class="clear_right" />
 						<span id="post_confirm_buttons">
 							', template_control_richedit_buttons($context['post_box_name']);
 
@@ -734,7 +733,7 @@ function template_spellcheck()
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
 			<div id="spellview">&nbsp;</div>
-			<table class="table_padding" style="width:100%">
+			<table class="table_grid">
 				<tr class="windowbg">
 					<td style="width:50%;vertical-align:top">
 						', $txt['spellcheck_change_to'], '<br />
