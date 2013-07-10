@@ -785,9 +785,10 @@ function createToken($action, $type = 'post')
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
  * @param bool $reset = true
- * @return boolean
+ * @param bool $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
+ * @return boolean except for $action == 'login' where the token is returned
  */
-function validateToken($action, $type = 'post', $reset = true)
+function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 {
 	$type = $type == 'get' || $type == 'request' ? $type : 'post';
 
@@ -830,7 +831,10 @@ function validateToken($action, $type = 'post', $reset = true)
 		// I'm back baby.
 		createToken($action, $type);
 
-		fatal_lang_error('token_verify_fail', false);
+		if ($fatal)
+			fatal_lang_error('token_verify_fail', false);
+		else
+			return false;
 	}
 	// Remove this token as its useless
 	else
