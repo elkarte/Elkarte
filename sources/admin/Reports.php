@@ -299,7 +299,7 @@ class Reports_Controller extends Action_Controller
 			$group_clause = '1=1';
 
 		// Fetch all the board names.
-		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board'));
+		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board', 'selects' => 'permissions'));
 		$profiles = array();
 		foreach ($boards as $row)
 			$profiles[] = $row['id_profile'];
