@@ -19,8 +19,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Sphinxql.php, used when an Sphinx search daemon is used and you want to access it
- * via Sphinx's own implementation of MySQL network protocol
+ * SearchAPI-Sphinxql.class.php, SphinxQL API, used when an Sphinx search daemon is running
+ * Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
  */
 class Sphinxql_Search
 {

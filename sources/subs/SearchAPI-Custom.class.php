@@ -19,7 +19,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Custom.php, Custom Search API class .. used when custom ElkArte index is used
+ * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used
  */
 class Custom_Search
 {
