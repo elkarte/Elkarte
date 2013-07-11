@@ -310,7 +310,7 @@ class Profile_Controller extends Action_Controller
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',
 						'permission' => array(
-							'own' => array('issue_warning'),
+							'own' => array(),
 							'any' => array('issue_warning'),
 						),
 					),
