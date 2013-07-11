@@ -173,15 +173,17 @@ class Data_Validator
 	/**
 	 * Return errors
 	 *
-	 * @param mixed $raw - true returns the faw error array,
+	 * @param mixed $raw - true returns the raw error array,
 	 *					 - array returns just error messages of those fields
 	 *					 - otherwise all error message(s)
 	 * @return array
 	 */
 	public function validation_errors($raw = false)
 	{
+		// Return the array
 		if ($raw === true)
 			return $this->_validation_errors;
+		// Otherwise return the formated text string(s)
 		else
 			return $this->_get_error_messages($raw);
 	}
