@@ -431,6 +431,7 @@ class ManageSearch_Controller extends Action_Controller
 						'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
 					)
 				);
+
 			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
@@ -460,6 +461,7 @@ class ManageSearch_Controller extends Action_Controller
 						'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
 					)
 				);
+
 			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
@@ -557,8 +559,6 @@ class ManageSearch_Controller extends Action_Controller
 	function action_create()
 	{
 		global $modSettings, $context, $db_prefix, $txt;
-
-		$db = database();
 
 		// Get hang of db_search
 		$db_search = db_search();
