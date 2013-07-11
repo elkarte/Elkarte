@@ -81,9 +81,6 @@ class Emailuser_Controller extends Action_Controller
 		// Sending yet, or just getting prepped?
 		if (empty($_POST['send']))
 		{
-			// No errors, yet.
-			$sendtopic_errors = error_context::context('sendtopic', 1);
-
 			$context['page_title'] = sprintf($txt['sendtopic_title'], $row['subject']);
 			$context['start'] = $_REQUEST['start'];
 
@@ -220,7 +217,14 @@ class Emailuser_Controller extends Action_Controller
 
 		// Any errors or are we good to go?
 		if (!$validator->validate($_POST))
-			fatal_error(implode('<br />', $validator->validation_errors()), false);
+		{
+			$context['sendtopic_error'] = array(
+				'errors' => $validator->validation_errors(),
+				'type' => 'minor',
+				'title' => $txt['validation_failure'],
+			);
+			return;
+		}
 
 		// Emails don't like entities...
 		$row['subject'] = un_htmlspecialchars($row['subject']);
