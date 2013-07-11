@@ -19,7 +19,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Standard.php, Standard non full index, non custom index search
+ * SearchAPI-Standard.class.php, Standard non full index, non custom index search
  */
 class Standard_Search
 {
