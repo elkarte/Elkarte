@@ -102,6 +102,8 @@ function template_custom_email()
 {
 	global $context, $settings, $txt, $scripturl;
 
+	template_show_error('sendemail_error');
+
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=email" method="post" accept-charset="UTF-8">
