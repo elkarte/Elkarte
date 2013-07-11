@@ -63,7 +63,7 @@ function validateSession($type = 'admin')
 	// If we're using XML give an additional ten minutes grace as an admin can't log on in XML mode.
 	if (isset($_GET['xml']))
 		$refreshTime += 600;
-print_r($refreshTime);
+
 	// Is the security option off?
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
 		return;
