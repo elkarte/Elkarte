@@ -34,6 +34,7 @@ INSERT IGNORE INTO {$db_prefix}settings
 VALUES
 	('avatar_default', '0'),
 	('gravatar_rating', 'g'),
+	('admin_session_lifetime', 10),
 	('xmlnews_limit', 5),
 	('visual_verification_num_chars', '6'),
 	('enable_disregard', 0),

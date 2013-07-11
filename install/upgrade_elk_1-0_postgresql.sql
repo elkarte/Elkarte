@@ -42,6 +42,10 @@ VALUES
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
+	('admin_session_lifetime', 10);
+INSERT IGNORE INTO {$db_prefix}settings
+	(variable, value)
+VALUES
 	('xmlnews_limit', 5);
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)

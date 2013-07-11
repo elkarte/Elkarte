@@ -2269,6 +2269,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('registration_method'
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('send_validation_onChange', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('send_welcomeEmail', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_editDisplayName', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('admin_session_lifetime', '10');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_hideOnline', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('guest_hideContacts', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('spamWaitTime', '5');
