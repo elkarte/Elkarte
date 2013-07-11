@@ -234,7 +234,7 @@ class ManageSearch_Controller extends Action_Controller
 			'',
 				// Some limitations.
 				array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
-			array('title', 'additional_search_engines'),
+				array('title', 'additional_search_engines'),
 				array('callback', 'external_search_engines'),
 		);
 
@@ -303,8 +303,6 @@ class ManageSearch_Controller extends Action_Controller
 	function action_edit()
 	{
 		global $txt, $context, $modSettings, $db_type, $db_prefix;
-
-		$db = database();
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
