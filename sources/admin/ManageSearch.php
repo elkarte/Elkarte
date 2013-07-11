@@ -616,9 +616,7 @@ class ManageSearch_Controller extends Action_Controller
 
 		// Step 0: let the user determine how they like their index.
 		if ($context['step'] === 0)
-		{
 			$context['sub_template'] = 'create_index';
-		}
 
 		// Step 1: insert all the words.
 		if ($context['step'] === 1)
@@ -718,6 +716,7 @@ class ManageSearch_Controller extends Action_Controller
 							$inserts,
 							array('id_word', 'id_msg')
 						);
+
 					if ($num_messages['todo'] === 0)
 					{
 						$context['step'] = 2;
@@ -732,7 +731,6 @@ class ManageSearch_Controller extends Action_Controller
 				$context['percentage'] = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 3) * 80;
 			}
 		}
-
 		// Step 2: removing the words that occur too often and are of no use.
 		elseif ($context['step'] === 2)
 		{
@@ -781,6 +779,7 @@ class ManageSearch_Controller extends Action_Controller
 						break;
 					}
 				}
+
 				$context['percentage'] = 80 + round($context['start'] / $index_properties[$context['index_settings']['bytes_per_word']]['max_size'], 3) * 20;
 			}
 		}
@@ -1007,6 +1006,7 @@ function detectFulltextIndex()
 		while ($row = $db->fetch_assoc($request))
 			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
 				$context['cannot_create_fulltext'] = true;
+			
 		$db->free_result($request);
 	}
 }
