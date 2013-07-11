@@ -326,3 +326,11 @@ if (@$modSettings['ourVersion'] < '1.0')
 }
 ---}
 ---#
+
+/******************************************************************************/
+--- Cleaning up integration hooks
+/******************************************************************************/
+---#
+DELETE FROM {$db_prefix}settings
+WHERE variable LIKE 'integrate_%';
+---#
