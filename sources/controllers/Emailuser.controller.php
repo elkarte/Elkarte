@@ -319,10 +319,17 @@ class Emailuser_Controller extends Action_Controller
 		// Can we see this person's email address?
 		$context['can_view_receipient_email'] = $context['show_email_address'] == 'yes' || $context['show_email_address'] == 'yes_permission_override';
 
+		// Template
+		$context['sub_template'] = 'custom_email';
+		$context['page_title'] = $txt['send_email'];
+
 		// Are we actually sending it?
 		if (isset($_POST['send']) && isset($_POST['email_body']))
 		{
 			checkSession();
+
+			// Don't let them send too many!
+			spamProtection('sendmail');
 
 			require_once(SUBSDIR . '/Mail.subs.php');
 			require_once(SUBSDIR . '/DataValidator.class.php');
@@ -353,7 +360,14 @@ class Emailuser_Controller extends Action_Controller
 			{
 				$errors = $validator->validation_errors(array('y_name', 'y_email'));
 				if ($errors)
-					fatal_error(implode('<br />', $errors), false);
+				{
+					$context['sendemail_error'] = array(
+						'errors' => $errors,
+						'type' => 'minor',
+						'title' => $txt['validation_failure'],
+					);
+					return;
+				}
 
 				$from_name = $validator->y_name;
 				$from_email = $validator->y_email;
@@ -367,7 +381,14 @@ class Emailuser_Controller extends Action_Controller
 			// Check we have a body (etc).
 			$errors = $validator->validation_errors(array('email_body', 'email_subject'));
 			if (!empty($errors))
-				fatal_error(implode('<br />', $errors), false);
+			{
+				$context['sendemail_error'] = array(
+					'errors' => $errors,
+					'type' => 'minor',
+					'title' => $txt['validation_failure'],
+				);
+				return;
+			}
 
 			// We use a template in case they want to customise!
 			$replacements = array(
@@ -376,9 +397,6 @@ class Emailuser_Controller extends Action_Controller
 				'SENDERNAME' => $from_name,
 				'RECPNAME' => $context['recipient']['name'],
 			);
-
-			// Don't let them send too many!
-			spamProtection('sendmail');
 
 			// Get the template and get out!
 			$emaildata = loadEmailTemplate('send_email', $replacements);
@@ -392,9 +410,6 @@ class Emailuser_Controller extends Action_Controller
 			else
 				redirectexit();
 		}
-
-		$context['sub_template'] = 'custom_email';
-		$context['page_title'] = $txt['send_email'];
 	}
 
 	/**
