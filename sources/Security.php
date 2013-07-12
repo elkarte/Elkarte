@@ -47,7 +47,7 @@ function validateSession($type = 'admin')
 
 	if (isset($modSettings['admin_session_lifetime']))
 	{
-		// Maybe someone is paranoia or mistakenly misconfired the param? Give'em at least 5 minutes.
+		// Maybe someone is paranoid or mistakenly misconfigured the param? Give them at least 5 minutes.
 		if ($modSettings['admin_session_lifetime'] < 5)
 			$refreshTime = 300;
 
