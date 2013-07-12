@@ -866,7 +866,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 		if ($cutword)
 		{
 			// Look for len - buffer characters and cut on first word boundary after
-			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~s', $text, $matches);
+			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~su', $text, $matches);
 
 			// Always one clown in the audience who likes long words or not using the spacebar
 			if (Util::strlen($matches[1]) > $len + $buffer)
