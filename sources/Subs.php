@@ -2448,7 +2448,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	else
 		$message = strtr($message, array("\n" => ''));
 
-	if ($message[0] === ' ')
+	if (isset($message[0]) && $message[0] === ' ')
 		$message = '&nbsp;' . substr($message, 1);
 
 	// Cleanup whitespace.
@@ -3204,7 +3204,7 @@ function template_footer()
  *
  * @todo - Note that type="text/javascript" and type="text/css" are deprecated in HTML5.
  * @todo - There are several occurrences in this function, and the next one.
- * @todo - Full directory search for any strays should be done, then hit the lot of them. 
+ * @todo - Full directory search for any strays should be done, then hit the lot of them.
  */
 function template_javascript($do_defered = false)
 {
