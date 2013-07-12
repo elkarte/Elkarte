@@ -866,7 +866,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 		if ($cutword)
 		{
 			// Look for len - buffer characters and cut on first word boundary after
-			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~s', $text, $matches);
+			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~su', $text, $matches);
 
 			// Always one clown in the audience who likes long words or not using the spacebar
 			if (Util::strlen($matches[1]) > $len + $buffer)
@@ -2130,7 +2130,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		}
 
 		// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
-		if ($smileys !== false && $tag === null && isset($itemcodes[$message[$pos + 1]]) && $message[$pos + 2] == ']' && !isset($disabled['list']) && !isset($disabled['li']))
+		if ($smileys !== false && $tag === null && isset($message[$pos + 2]) && isset($itemcodes[$message[$pos + 1]]) && $message[$pos + 2] === ']' && !isset($disabled['list']) && !isset($disabled['li']))
 		{
 			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", "\n", '>')))
 				continue;
@@ -2448,7 +2448,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	else
 		$message = strtr($message, array("\n" => ''));
 
-	if ($message[0] === ' ')
+	if (isset($message[0]) && $message[0] === ' ')
 		$message = '&nbsp;' . substr($message, 1);
 
 	// Cleanup whitespace.
@@ -3204,7 +3204,7 @@ function template_footer()
  *
  * @todo - Note that type="text/javascript" and type="text/css" are deprecated in HTML5.
  * @todo - There are several occurrences in this function, and the next one.
- * @todo - Full directory search for any strays should be done, then hit the lot of them. 
+ * @todo - Full directory search for any strays should be done, then hit the lot of them.
  */
 function template_javascript($do_defered = false)
 {
