@@ -3220,11 +3220,11 @@ function isPackageInstalled($id)
 	$db = database();
 
 	$result = array(
-		'package_id' => '',
-		'install_state' => '',
-		'old_themes' => '',
-		'old_version' => '',
-		'db_changes' => ''
+		'package_id' => null,
+		'install_state' => null,
+		'old_themes' => null,
+		'old_version' => null,
+		'db_changes' => null
 	);
 
 	if (empty($id))
