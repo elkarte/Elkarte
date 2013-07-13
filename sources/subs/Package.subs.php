@@ -1487,7 +1487,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 
 	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
 	list($the_brand,) = explode(' ', $forum_version, 2);
-	if ($the_brand = 'ElkArte')
+	if ($the_brand == 'ElkArte')
 		$the_version = '1' . $the_version;
 
 	// Loop through each version, save the highest we can find
