@@ -1482,8 +1482,8 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	if ($reset)
 		$near_version = 0;
 
-	// Normalize the $versions while we remove our previous Doh!
-	$versions = explode(',', strtolower($versions));
+	// Normalize the $versions
+	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
 	list($the_brand,) = explode(' ', $forum_version, 2);
