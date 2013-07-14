@@ -521,7 +521,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		$context['num_tables_optimized'] = count($context['optimized_tables']);
 
 		// Check that we don't auto optimise again too soon!
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		calculateNextTrigger('auto_optimize', true);
 	}
 
@@ -755,7 +755,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		updateStats('topic');
 
 		// Finally, update the latest event times.
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		calculateNextTrigger();
 
 		redirectexit('action=admin;area=maintain;sa=routine;done=recount');

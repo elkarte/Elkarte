@@ -293,7 +293,7 @@ class ManageCoreFeatures_Controller extends Action_Controller
 					// Should we calculate next trigger?
 					if ($value)
 					{
-						require_once(SOURCEDIR . \'/ScheduledTasks.php\');
+						require_once(SUBSDIR . \'/ScheduledTasks.subs.php\');
 						calculateNextTrigger(\'paid_subscriptions\');
 					}
 				'),

@@ -102,8 +102,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			checkSession();
 
 			// We'll recalculate the dates at the end!
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
-
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Enable and disable as required.
 			$enablers = array(0);
@@ -291,7 +290,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			validateToken('admin-st');
 
 			// We'll need this for calculating the next event.
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Do we have a valid offset?
 			preg_match('~(\d{1,2}):(\d{1,2})~', $_POST['offset'], $matches);
