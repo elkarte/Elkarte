@@ -25,7 +25,7 @@ function like_post($id_liker, $liked_message, $direction)
 	if (!empty($liked_message))
 	{
 		// You can't like your own stuff, no matter how brilliant you think you are
-		if ($liked_message['id_member'] === $id_liker)
+		if ($liked_message['id_member'] == $id_liker)
 			fatal_lang_error('cant_like_yourself', false);
 
 		addlike($id_liker, $liked_message, $direction);
