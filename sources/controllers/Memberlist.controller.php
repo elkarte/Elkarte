@@ -445,24 +445,7 @@ class Memberlist_Controller extends Action_Controller
 			$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $_POST['search'] . ';fields=' . implode(',', $_POST['fields']), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
 		}
 		else
-		{
-			// These are all the possible fields.
-			$context['search_fields'] = array(
-				'name' => $txt['mlist_search_name'],
-				'email' => $txt['mlist_search_email'],
-				'website' => $txt['mlist_search_website'],
-				'group' => $txt['mlist_search_group'],
-			);
-
-			foreach ($context['custom_search_fields'] as $field)
-				$context['search_fields']['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
-
-			// What do we search for by default?
-			$context['search_defaults'] = array('name', 'email');
-
-			$context['sub_template'] = 'search';
-			$context['old_search'] = isset($_GET['search']) ? $_GET['search'] : (isset($_POST['search']) ? htmlspecialchars($_POST['search']) : '');
-		}
+			redirectexit('action=memberlist');
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=memberlist;sa=search',
