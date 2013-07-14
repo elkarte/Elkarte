@@ -21,9 +21,37 @@ function template_main()
 {
 	global $context, $settings, $scripturl, $txt;
 
-	template_pagesection('memberlist_buttons', 'right', 'go_down');
+	$extra = '
+	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
+		<ul class="floatright">
+			<li>
+				<input onfocus="toggle_mlsearch_opt();" onblur="toggle_mlsearch_opt();" type="text" name="search" value="" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
+				<input type="submit" name="search2" value="' . $txt['search'] . '" class="button_submit" />
+				<ul id="mlsearch_options">';
+
+	foreach ($context['search_fields'] as $id => $title)
+	{
+		$extra .= '
+				<li class="mlsearch_option">
+					<label for="fields-' . $id . '"><input type="checkbox" name="fields[]" id="fields-' . $id . '" value="' . $id . '" ' . (in_array($id, $context['search_defaults']) ? 'checked="checked"' : '') . ' class="input_check floatright" />' . $title . '</label>
+				</li>';
+	}
+
+	$extra .= '
+				</ul>
+			</li>
+		</ul>
+	</form>';
+
+	template_pagesection('memberlist_buttons', 'right', 'go_down', array('extra' => $extra));
 
 	echo '
+	<script><!-- // --><![CDATA[
+		function toggle_mlsearch_opt()
+		{
+			$("#mlsearch_options").slideToggle("fast");
+		}
+	// ]]></script>
 	<div id="memberlist">
 		<h2 class="category_header">
 				<span class="floatleft">', $txt['members_list'], '</span>';

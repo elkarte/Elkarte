@@ -160,8 +160,24 @@ class Memberlist_Controller extends Action_Controller
 		// Build the memberlist button array.
 		$context['memberlist_buttons'] = array(
 			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist' . ';sa=all', 'active'=> true),
-			'mlist_search' => array('text' => 'mlist_search', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist' . ';sa=search'),
 		);
+
+		// Are there custom fields they can search?
+		ml_findSearchableCustomFields();
+
+		// These are all the possible fields.
+		$context['search_fields'] = array(
+			'name' => $txt['mlist_search_name'],
+			'email' => $txt['mlist_search_email'],
+			'website' => $txt['mlist_search_website'],
+			'group' => $txt['mlist_search_group'],
+		);
+
+		foreach ($context['custom_search_fields'] as $field)
+			$context['search_fields']['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
+
+		// What do we search for by default?
+		$context['search_defaults'] = array('name', 'email');
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_memberlist_buttons');
@@ -455,6 +471,5 @@ class Memberlist_Controller extends Action_Controller
 
 		// Highlight the correct button, too!
 		unset($context['memberlist_buttons']['view_all_members']['active']);
-		$context['memberlist_buttons']['mlist_search']['active'] = true;
 	}
 }
