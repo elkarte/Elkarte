@@ -291,11 +291,11 @@ function template_settings()
 		array(
 			'id' => 'message_index_preview',
 			'label' => $txt['message_index_preview'],
-		),
-		array(
-			'id' => 'message_index_preview_first',
-			'label' => $txt['message_index_preview_first'],
-			'description' => $txt['message_index_preview_first_desc'],
+			'options' => array(
+				0 => $txt['message_index_preview_off'],
+				1 => $txt['message_index_preview_first'],
+				2 => $txt['message_index_preview_last'],
+			),
 		),
 	);
 }
