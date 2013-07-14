@@ -370,6 +370,7 @@ $helptxt['globalCookies'] = 'Makes log in cookies available across subdomains.  
 $helptxt['globalCookiesDomain'] = 'Define the main domain to be used when log in cookies are available across subdomains';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
 $helptxt['admin_session_lifetime'] = 'This controls the length of time an admin session can remain active. Once this timer expires the session will end, requiring you to enter your admin credentials to continue accessing the admin area. The minimum value is 5 minutes, the maximum allowed value is 14400 minutes (a day). It is strongly recommended to use a value less than 60 minutes for security reasons.';
+$helptxt['auto_admin_session'] = 'This controls  whether an administrative session is activated during logon or not.';
 $helptxt['securityDisable'] = 'This <em>disables</em> the additional password check for the administration section. This is not recommended!';
 $helptxt['securityDisable_why'] = 'This is your current password. (the same one you use to login.)<br /><br />Having to type this helps ensure that you want to do whatever administration you are doing, and that it is <strong>you</strong> doing it.';
 $helptxt['securityDisable_moderate'] = 'This <em>disables</em> the additional password check for the moderation section. This is not recommended!';

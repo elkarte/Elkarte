@@ -176,6 +176,7 @@ class ManageSecurity_Controller extends Action_Controller
 				array('check', 'enableErrorQueryLogging'),
 			'',
 				array('int', 'admin_session_lifetime'),
+				array('check', 'auto_admin_session'),
 				array('check', 'securityDisable'),
 				array('check', 'securityDisable_moderate'),
 			'',
