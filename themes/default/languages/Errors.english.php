@@ -196,6 +196,8 @@ $txt['ban_no_triggers'] = 'Did you forget to select ban triggers? We need at lea
 $txt['ban_ban_item_empty'] = 'Ban trigger not found';
 $txt['impossible_insert_new_bangroup'] = 'An error occurred while inserting the new ban';
 
+$txt['cant_like_yourself']= 'Liking your own posts ... its like laughing at your own jokes when there is no one else around  ... lol ... Wait did I just lol myself?';
+
 $txt['ban_name_exists'] = 'The name of this ban (%1$s) already exists. Please choose a different name.';
 $txt['ban_trigger_already_exists'] = 'This ban trigger (%1$s) already exists in %2$s.';
 $txt['attach_check_nag'] = 'Unable to continue due to incomplete data (%1$s).';
