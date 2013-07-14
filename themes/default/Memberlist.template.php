@@ -69,10 +69,6 @@ function template_main()
 	// Display each of the column headers of the table.
 	foreach ($context['columns'] as $key => $column)
 	{
-		// @TODO maybe find something nicer?
-		if ($key == 'email_address' && !$context['can_send_email'])
-			continue;
-
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
@@ -98,37 +94,36 @@ function template_main()
 		foreach ($context['members'] as $member)
 		{
 			echo '
-				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>
-					<td class="centertext">
-						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '', '
-					</td>
-					<td>', $member['link'], '</td>';
-
-			if ($context['can_send_email'])
-				echo '
-					<td class="centertext">', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>', '</td>';
-
-			if (!isset($context['disabled_fields']['website']))
-				echo '
-					<td class="centertext">', $member['website']['url'] != '' ? '<a href="' . $member['website']['url'] . '" target="_blank" class="new_win"><img src="' . $settings['images_url'] . '/profile/www.png" alt="' . $member['website']['title'] . '" title="' . $member['website']['title'] . '" /></a>' : '', '</td>';
-
-			// Group and date.
-			echo '
-					<td>', empty($member['group']) ? $member['post_group'] : $member['group'], '</td>
-					<td>', $member['registered_date'], '</td>';
-
-			if (!isset($context['disabled_fields']['posts']))
+				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>';
+			foreach ($context['columns'] as $column => $values)
 			{
-				echo '
-						<td class="centertext">', $member['posts'], '</td>';
-			}
-
-			// Any custom fields on display?
-			if (!empty($context['custom_profile_fields']['columns']))
-			{
-				foreach ($context['custom_profile_fields']['columns'] as $key => $column)
-					echo '
-						<td>', $member['options'][substr($key, 5)], '</td>';
+				if (isset($member[$column]))
+				{
+					if ($column == 'online')
+					{
+						echo '
+						<td class="centertext">
+							', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '', '
+						</td>';
+						continue;
+					}
+					elseif ($column == 'email_address')
+					{
+						echo '
+						<td class="centertext">', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>', '</td>';
+						continue;
+					}
+					else
+						echo '
+						<td>', $member[$column], '</td>';
+				}
+				// Any custom fields on display?
+				elseif (!empty($context['custom_profile_fields']['columns']) && isset($context['custom_profile_fields']['columns'][$column]))
+				{
+					foreach ($context['custom_profile_fields']['columns'] as $key => $col)
+						echo '
+							<td>', $member['options'][substr($key, 5)], '</td>';
+				}
 			}
 
 			echo '

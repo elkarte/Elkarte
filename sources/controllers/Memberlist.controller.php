@@ -69,7 +69,7 @@ class Memberlist_Controller extends Action_Controller
 
 		// Set up the standard columns...
 		$context['columns'] = array(
-			'is_online' => array(
+			'online' => array(
 				'label' => $txt['status'],
 				'width' => 60,
 				'class' => 'first_th centertext',
@@ -109,7 +109,7 @@ class Memberlist_Controller extends Action_Controller
 					'up' => 'IFNULL(mg.group_name, 1=1) ASC, mg.group_name ASC'
 				),
 			),
-			'registered' => array(
+			'date_registered' => array(
 				'label' => $txt['date_registered'],
 				'sort' => array(
 					'down' => 'mem.date_registered DESC',
@@ -155,7 +155,6 @@ class Memberlist_Controller extends Action_Controller
 		);
 
 		$context['can_send_pm'] = allowedTo('pm_send');
-		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		// Build the memberlist button array.
 		$context['memberlist_buttons'] = array(
@@ -181,6 +180,13 @@ class Memberlist_Controller extends Action_Controller
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_memberlist_buttons');
+
+		if (!allowedTo('send_email_to_members'))
+			unset($context['columns']['email_address']);
+		if (isset($context['disabled_fields']['website']))
+			unset($context['columns']['website']);
+		if (isset($context['disabled_fields']['posts']))
+			unset($context['columns']['posts']);
 
 		// Jump to the sub action.
 		if (isset($subActions[$context['listing_by']]))
