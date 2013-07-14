@@ -104,7 +104,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 						{
 							$hook_status[$hook][$hook_name]['exists'] = true;
 							$hook_status[$hook][$hook_name]['in_file'] = $file['name'];
-							// I want to remember all the functions called within this file (to check later if they are enabled or disabled and decide if the integrare_*_include of that file can be disabled too)
+							// I want to remember all the functions called within this file (to check later if they are enabled or disabled and decide if the integrate_*_include of that file can be disabled too)
 							$temp_data['function'][$file['name']][] = $function_o;
 							unset($temp_hooks[$hook][$function_o]);
 						}
@@ -113,7 +113,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 						{
 							$hook_status[$hook][$hook_name]['exists'] = true;
 							$hook_status[$hook][$hook_name]['in_file'] = $file['name'];
-							// I want to remember all the functions called within this file (to check later if they are enabled or disabled and decide if the integrare_*_include of that file can be disabled too)
+							// I want to remember all the functions called within this file (to check later if they are enabled or disabled and decide if the integrate_*_include of that file can be disabled too)
 							$temp_data['function'][$file['name']][] = $function_o;
 							unset($temp_hooks[$hook][$function_o]);
 						}
