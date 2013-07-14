@@ -537,7 +537,7 @@ class Packages_Controller extends Action_Controller
 				else
 				{
 					// See if this dependency is installed
-					$installed_version = checkPackageDependency();
+					$installed_version = checkPackageDependency($action['id']);
 
 					// Do a version level check (if requested) in the most basic way
 					$version_check = (isset($action['version']) ? $installed_version == $action['version'] : true);
