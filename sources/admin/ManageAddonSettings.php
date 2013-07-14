@@ -383,7 +383,7 @@ class ManageAddonSettings_Controller extends Action_Controller
 		if (isset($_GET['filter']))
 			$context['filter'] = $_GET['filter'];
 
-		return get_integration_hooks_count($context['filter']);
+		return integration_hooks_count($context['filter']);
 	}
 
 	/**
@@ -391,8 +391,8 @@ class ManageAddonSettings_Controller extends Action_Controller
 	 *
 	 * @return array
 	 */
-	function list_getIntegrationHooks()
+	function list_getIntegrationHooks($start, $per_page, $sort)
 	{
-		return get_integration_hooks();
+		return list_integration_hooks_data($start, $per_page, $sort);
 	}
 }
