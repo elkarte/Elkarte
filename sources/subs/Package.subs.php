@@ -1483,7 +1483,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 		$near_version = 0;
 
 	// Normalize the $versions while we remove our previous Doh!
-	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
+	$versions = explode(',', strtolower($versions));
 
 	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
 	list($the_brand,) = explode(' ', $forum_version, 2);
@@ -1497,9 +1497,9 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 		if (strpos($for, '*') !== false)
 			$for = str_replace('*', '0dev0', $for) . '-' . str_replace('*', '999', $for);
 
-		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 2.0 vs 2.0.99
+		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 1.0 vs 1.0.99
 		if (strpos($for, '-') !== false)
-			list ($for, $higher) = explode('-', $for);
+			list ($for,) = explode('-', $for);
 
 		// Do the compare, if the for is greater, than what we have but not greater than what we are running .....
 		if (compareVersions($near_version, $for) === -1 && compareVersions($for, $the_version) !== 1)
@@ -1521,9 +1521,9 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
  */
 function matchPackageVersion($version, $versions)
 {
-	// Make sure everything is lowercase and clean of spaces and unpleasant history.
-	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
-	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
+	// Make sure everything is lowercase and clean of spaces.
+	$version = str_replace(' ', '', strtolower($version));
+	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// Perhaps we do accept anything?
 	if (in_array('all', $versions))
@@ -1571,7 +1571,7 @@ function compareVersions($version1, $version2)
 	foreach (array(1 => $version1, $version2) as $id => $version)
 	{
 		// Clean the version and extract the version parts.
-		$clean = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
+		$clean = str_replace(' ', '', strtolower($version));
 		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)~', $clean, $parts);
 
 		// Build an array of parts.
