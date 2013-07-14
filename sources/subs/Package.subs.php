@@ -3291,8 +3291,9 @@ function setPackageState($id)
 /**
  * Checks if a package is installed, and if so returns its version level
  *
+ * @param string $id
  */
-function checkPackageDependency()
+function checkPackageDependency($id)
 {
 	$db = database();
 
@@ -3307,7 +3308,7 @@ function checkPackageDependency()
 		LIMIT 1',
 		array(
 			'not_installed' => 0,
-			'current_package' => $action['id'],
+			'current_package' => $id,
 		)
 	);
 	while ($row = $db->fetch_row($request));
