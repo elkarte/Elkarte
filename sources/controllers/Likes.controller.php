@@ -128,7 +128,7 @@ class Likes_Controller extends Action_Controller
 		}
 
 		// Past the post threshold?
-		if (!$user_info['is_admin'] && !empty($modSettings['likeDisplayLimit']) && $user_info['posts'] < $modSettings['likeDisplayLimit'])
+		if (!$user_info['is_admin'] && !empty($modSettings['likeMinPosts']) && $user_info['posts'] < $modSettings['likeMinPosts'])
 			$check = false;
 
 		return $check;
