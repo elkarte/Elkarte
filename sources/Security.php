@@ -42,8 +42,27 @@ function validateSession($type = 'admin')
 	call_integration_hook('integrate_validateSession', array(&$types));
 	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
 
+	// Set the lifetime for our admin session. Default is ten minutes.
+	$refreshTime =  600;
+
+	if (isset($modSettings['admin_session_lifetime']))
+	{
+		// Maybe someone is paranoid or mistakenly misconfigured the param? Give them at least 5 minutes.
+		if ($modSettings['admin_session_lifetime'] < 5)
+			$refreshTime = 300;
+
+		// A whole day should be more than enough..
+		elseif ($modSettings['admin_session_lifetime'] > 14400)
+			$refreshTime = 86400;
+
+		// We are between our internal min and max. Let's keep the board owner's value.
+		else
+			$refreshTime = $modSettings['admin_session_lifetime'] * 60;
+	}
+
 	// If we're using XML give an additional ten minutes grace as an admin can't log on in XML mode.
-	$refreshTime = isset($_GET['xml']) ? 4200 : 3600;
+	if (isset($_GET['xml']))
+		$refreshTime += 600;
 
 	// Is the security option off?
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
