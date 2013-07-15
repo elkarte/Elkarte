@@ -192,7 +192,7 @@ function template_unread()
 	else
 		echo '
 					<h2 class="category_header">
-						', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
+						', $context['showing_all_topics'] ? $txt['topic_alert_none'] : $txt['unread_topics_visit_none'], '
 					</h2>';
 
 	echo '
@@ -319,7 +319,7 @@ function template_replies()
 	else
 		echo '
 					<h2 class="category_header">
-						', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
+						', $context['showing_all_topics'] ? $txt['topic_alert_none'] : $txt['unread_topics_visit_none'], '
 					</h2>';
 
 	echo '
