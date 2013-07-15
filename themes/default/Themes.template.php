@@ -222,21 +222,22 @@ function template_list_themes()
 	foreach ($context['themes'] as $theme)
 	{
 		echo '
-			<div class="title_bar">
-				<h3 class="titlebg">
-					<span class="floatleft"><strong><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list">', $theme['name'], '</a></strong>', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '', '</span>';
+			<div id="theme_', $theme['id'], '" class="windowbg">
+				<div class="title_bar">
+					<h3 class="titlebg">
+						', $theme['name'], '', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '';
 
 			// You *cannot* delete the default theme. It's important!
 			if ($theme['id'] != 1)
 				echo '
-					<span class="floatright"><a href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '" onclick="return confirm(\'', $txt['theme_remove_confirm'], '\');"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" /></a></span>';
+						<a class="floatright delete_theme" data-theme_id="', $theme['id'], '" href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" /></a>';
 
 			echo '
-				</h3>
-			</div>
-			<div class="windowbg">
+					</h3>
+				</div>
 				<div class="content">
 					<dl class="settings themes_list">
+						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="button_link floatleft">', $txt['theme_edit_settings'], '</a></dt>
 						<dt>', $txt['themeadmin_list_theme_dir'], ':</dt>
 						<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
 						<dt>', $txt['themeadmin_list_theme_url'], ':</dt>
@@ -273,7 +274,51 @@ function template_list_themes()
 					<input type="hidden" name="', $context['admin-tl_token_var'], '" value="', $context['admin-tl_token'], '" />
 				</div>
 			</div>
+			<script><!-- // --><![CDATA[
+				$(document).ready(function () {
+					$(".delete_theme").bind("click", function (event) {
+						event.preventDefault();
+						var theme_id = $(this).data("theme_id"),
+							base_url = $(this).attr("href"),
+							pattern = new RegExp(elk_session_var + "=" + elk_session_id + ";(.*)$");
+						var tokens = pattern.exec(base_url)[1].split("=");
+						var token = tokens[1],
+							token_var = tokens[0];
 
+						if (confirm(\'', $txt['theme_remove_confirm'], '\'))
+						{
+							$.ajax({
+								type: "GET",
+								url: base_url + ";api;xml",
+								success: function(request){
+									if ($(request).find("error").length == 0)
+									{
+										var new_token = $(request).find("token").text(),
+											new_token_var = $(request).find("token_var").text();
+										$("#theme_" + theme_id).slideToggle("fals", function () {
+											$(this).remove();
+										});
+
+										$(".delete_theme").each(function () {
+											var a1 = $(this).attr("href");
+											$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
+										});
+									}
+									// @todo improve error handling
+									else
+									{
+										alert($(request).find("text").text());
+										window.location = base_url;
+									}
+								},
+								error: function(request){
+									window.location = base_url;
+								}
+							});
+						}
+					});
+				});
+			// ]]></script>
 		</form>
 	</div>';
 }
