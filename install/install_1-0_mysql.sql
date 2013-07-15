@@ -1671,8 +1671,8 @@ VALUES
 	(8, 0, 0, 1, 'd', 1, 'birthdayemails'),
 	(9, 0, 0, 1, 'w', 0, 'weekly_maintenance'),
 	(10, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
-	(11, 0, 120, 1, 'd', 1, 'remove_temp_attachments'),
-	(12, 0, 180, 1, 'd', 1, 'remove_topic_redirect'),
+	(11, 0, 120, 1, 'd', 0, 'remove_temp_attachments'),
+	(12, 0, 180, 1, 'd', 0, 'remove_topic_redirect'),
 	(13, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
 	(14, 0, 0, 6, 'h', 0, 'remove_old_followups'),
 	(15, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
