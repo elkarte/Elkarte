@@ -2340,7 +2340,7 @@ function template_database_settings()
 			</tr>
 		</table>';
 
-	// Allow the toggling of input boxes for SQLite etc.
+	// Allow the toggling of input boxes for Postgresql
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		function validatePgsql()
