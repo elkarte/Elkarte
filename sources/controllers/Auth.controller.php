@@ -366,7 +366,7 @@ class Auth_Controller extends Action_Controller
  	*/
 	public function action_logout($internal = false, $redirect = true)
 	{
-		global $user_info, $user_settings, $context, $modSettings;
+		global $user_info, $user_settings, $context;
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
@@ -393,6 +393,9 @@ class Auth_Controller extends Action_Controller
 			// If you log out, you aren't online anymore :P.
 			logOnline($user_info['id'], false);
 		}
+
+		// Logout? Let's kill the admin session, too. 
+		unset($_SESSION['admin_time']);
 
 		$_SESSION['log_time'] = 0;
 
@@ -468,7 +471,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_salt()
 	{
-		global $user_info, $user_settings, $context;
+		global $user_info, $user_settings, $context, $cookiename;
 
 		// we deal only with logged in folks in here!
 		if (!$user_info['is_guest'])
@@ -497,7 +500,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_check()
 	{
-		global $user_info, $modSettings;
+		global $user_info, $modSettings, $user_settings;
 
 		// Only our members, please.
 		if (!$user_info['is_guest'])
@@ -621,7 +624,10 @@ function doLogin()
 	// An administrator, set up the login so they don't have to type it again.
 	if ($user_info['is_admin'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
 	{
-		$_SESSION['admin_time'] = time();
+		// Let's validate if they really want..
+		if (!empty($modSettings['auto_admin_session']) && $modSettings['auto_admin_session'] == 1)
+			$_SESSION['admin_time'] = time();
+
 		unset($_SESSION['just_registered']);
 	}
 
