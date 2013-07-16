@@ -736,9 +736,6 @@ class Packages_Controller extends Action_Controller
 	public function action_install2()
 	{
 		global $txt, $context, $boardurl, $scripturl, $modSettings;
-		global $user_info;
-
-		$db = database();
 
 		// Make sure we don't install this mod twice.
 		checkSubmitOnce('check');
@@ -817,6 +814,7 @@ class Packages_Controller extends Action_Controller
 
 		// Now load up the paths of the themes that we need to know about.
 		$theme_paths = getThemesPathbyID($custom_themes);
+		$themes_installed = array(1);
 
 		// Are there any theme copying that we want to take place?
 		$context['theme_copies'] = array(
