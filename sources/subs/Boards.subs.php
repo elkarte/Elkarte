@@ -1383,7 +1383,7 @@ function getBoardModerators($idboard, $only_id = false)
 			FROM {db_prefix}moderators
 			WHERE id_board = {int:current_board}',
 			array(
-				'current_board' => $board,
+				'current_board' => $idboard,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
