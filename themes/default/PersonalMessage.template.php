@@ -312,7 +312,7 @@ function template_build_pmposter_div($message)
 
 	// Show information about the poster of this message.
 	$poster_div .= '
-							<li class="listlevel1" aria-haspopup="true">';
+							<li class="listlevel1 subsections" aria-haspopup="true">';
 
 	// Show a link to the member's profile.
 	$poster_div .= '
@@ -684,7 +684,7 @@ function template_search()
 				<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
 				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit floatnone" />
 			</div>
-			<a class="button_link" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
+			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
 			<input type="hidden" name="advanced" value="0" />
 		</fieldset>';
 	}
@@ -888,12 +888,12 @@ function template_search_results()
 			// You can only reply if they are not a guest...
 			if (!$message['member']['is_guest'])
 				echo '
-						<li class="listlevel1 quote"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a></li>
-						<li class="listlevel1 reply"><a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a></li>';
+						<li class="listlevel1"><a class="linklevel1 reply_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';u=', $message['member']['id'], '">', $txt['reply'], '</a></li>
+						<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote;u=', $context['folder'] == 'sent' ? '' : $message['member']['id'], '">', $txt['quote'], '</a></li>';
 					// This is for "forwarding" - even if the member is gone.
 					else
 						echo '
-						<li class="listlevel1 quote"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a></li>';
+						<li class="listlevel1"><a class="linklevel1 quote_button" href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote">', $txt['quote'], '</a></li>';
 			echo '
 					</ul>';
 			}
@@ -1069,10 +1069,9 @@ function template_send()
 					<p>
 						<label for="outbox"><input type="checkbox" name="outbox" id="outbox" value="1" tabindex="', $context['tabindex']++, '"', $context['copy_to_outbox'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_save_outbox'], '</label>
 					</p>
-					<hr />
-					<span id="post_confirm_strip" class="righttext">
+					<div class="submitbutton">
 						', template_control_richedit_buttons($context['post_box_name']), '
-					</span>
+					</div>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
 					<input type="hidden" name="replied_to" value="', !empty($context['quoted_message']['id']) ? $context['quoted_message']['id'] : 0, '" />
@@ -1084,7 +1083,6 @@ function template_send()
 	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts_pm_save']) && !empty($context['drafts']) && !empty($options['drafts_show_saved_enabled']))
 	{
 		echo '
-			<br />
 			<div id="postDraftOptionsHeader" class="title_bar">
 				<h4 class="titlebg">
 					<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '.png"  alt="*" /><strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
@@ -1490,7 +1488,7 @@ function template_rules()
 		</tbody>
 		</table>
 		<div class="righttext">
-			<a class="button_link" href="', $scripturl, '?action=pm;sa=manrules;add;rid=0">', $txt['pm_add_rule'], '</a>';
+			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=manrules;add;rid=0">', $txt['pm_add_rule'], '</a>';
 
 	if (!empty($context['rules']))
 		echo '
@@ -1766,16 +1764,14 @@ function template_showPMDrafts()
 				<div class="list_posts">
 					', $draft['body'], '
 				</div>
-				<div class="floatright">
-					<ul class="quickbuttons">
-						<li>
-							<a href="', $scripturl, '?action=pm;sa=showpmdrafts;id_draft=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" class="reply_button"><span>', $txt['draft_edit'], '</span></a>
-						</li>
-						<li>
-							<a href="', $scripturl, '?action=pm;sa=showpmdrafts;delete=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="remove_button"><span>', $txt['draft_delete'], '</span></a>
-						</li>
-					</ul>
-				</div>
+				<ul class="quickbuttons">
+					<li class="listlevel1">
+						<a href="', $scripturl, '?action=pm;sa=showpmdrafts;id_draft=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 reply_button">', $txt['draft_edit'], '</a>
+					</li>
+					<li class="listlevel1">
+						<a href="', $scripturl, '?action=pm;sa=showpmdrafts;delete=', $draft['id_draft'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['draft_remove'], '?\');" class="linklevel1 remove_button">', $txt['draft_delete'], '</a>
+					</li>
+				</ul>
 			</div>
 		</div>';
 		}

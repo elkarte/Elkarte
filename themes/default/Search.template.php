@@ -56,7 +56,7 @@ function template_main()
 
 		// Show the button to enable advanced search
 		echo '
-						<a class="button_link" href="', $scripturl, '?action=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
+						<a class="linkbutton" href="', $scripturl, '?action=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['search_advanced'], '</a>
 						<input type="hidden" name="advanced" value="0" />
 					</fieldset>';
 	}
@@ -490,28 +490,26 @@ function template_results()
 
 				if ($topic['can_reply'] || $topic['can_mark_notify'])
 					echo '
-							<div class="quickbuttons_wrap">
-								<ul class="smalltext quickbuttons">';
-
-				// If they *can* reply?
-				if ($topic['can_reply'])
-					echo '
-									<li><a href="', $scripturl . '?action=post;topic=' . $topic['id'] . '.' . $message['start'], '" class="reply_button">', $txt['reply'], '</a></li>';
-
-				// If they *can* quote?
-				if ($topic['can_quote'])
-					echo '
-									<li><a href="', $scripturl . '?action=post;topic=' . $topic['id'] . '.' . $message['start'] . ';quote=' . $message['id'] . '" class="quote_button">', $txt['quote'], '</a></li>';
+							<ul class="quickbuttons">';
 
 				// Can we request notification of topics?
 				if ($topic['can_mark_notify'])
 					echo '
-									<li><a href="', $scripturl . '?action=notify;topic=' . $topic['id'] . '.' . $message['start'], '" class="notify_button">', $txt['notify'], '</a></li>';
+								<li class="listlevel1"><a href="', $scripturl . '?action=notify;topic=' . $topic['id'] . '.' . $message['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
+
+				// If they *can* reply?
+				if ($topic['can_reply'])
+					echo '
+								<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=' . $topic['id'] . '.' . $message['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
+
+				// If they *can* quote?
+				if ($topic['can_quote'])
+					echo '
+								<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=' . $topic['id'] . '.' . $message['start'] . ';quote=' . $message['id'] . '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 
 				if ($topic['can_reply'] || $topic['can_mark_notify'])
 					echo '
-								</ul>
-							</div>';
+							</ul>';
 				echo '
 						</div>
 					</div>

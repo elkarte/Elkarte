@@ -176,9 +176,6 @@ function template_boardindex_outer_above()
 			', $settings['show_latest_member'] ? ' ' . sprintf($txt['welcome_newest_member'], ' <strong>' . $context['common_stats']['latest_member']['link'] . '</strong>') : '' , '
 		</div>';
 
-	// Show the news fader?  (assuming there are things to show...)
-	if ($settings['show_newsfader'] && !empty($context['news_lines']))
-		template_news_fader();
 }
 
 function template_boardindex_outer_below()
@@ -213,21 +210,20 @@ function template_info_center()
 
 	// Here's where the "Info Center" starts...
 	echo '
-	<div id="info_center">
+	<div id="info_center" class="forum_category">
 		<h2 class="category_header">
 			<img class="icon" id="upshrink_ic" title="', $txt['hide'], '" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
-		<div id="upshrinkHeaderIC"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
+		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
 
 	// This is the "Recent Posts" bar.
 	if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
 	{
 		// Show the Recent Posts title, and attach webslices feed to this section
-		// The format requires: hslice, entry-title and entry-content classes
-		// @todo - Note that the old titlebg has been changed to an h3, with a different name.
+		// The format requires: hslice, entry-title and entry-content classes.
 		echo '
-			<div class="hslice" id="recent_posts_content">
+			<li class="board_row hslice" id="recent_posts_content">
 				<h3 class="ic_section_header">
 					<a href="', $scripturl, '?action=recent"><img class="icon" src="', $settings['images_url'], '/post/xx.png" alt="" />', $txt['recent_posts'], '</a>
 				</h3>
@@ -272,42 +268,43 @@ function template_info_center()
 				</table>';
 		}
 		echo '
-			</div>';
+			</li>';
 	}
 
 	// Show information about events, birthdays, and holidays on the calendar.
 	if ($context['show_calendar'])
 	{
 		echo '
-			<h3 class="ic_section_header">
-				<a href="', $scripturl, '?action=calendar' . '"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
-			</h3>';
+			<li class="board_row">
+				<h3 class="ic_section_header">
+					<a href="', $scripturl, '?action=calendar' . '"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
+				</h3>';
 
 		// Holidays like "Christmas", "Chanukah", and "We Love [Unknown] Day" :P.
 		if (!empty($context['calendar_holidays']))
 			echo '
-			<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';
+				<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';
 
 		// People's birthdays. Like mine. And yours, I guess. Kidding.
 		if (!empty($context['calendar_birthdays']))
 		{
 			echo '
-			<p class="inline">
-				<span class="birthday">', $context['calendar_only_today'] ? $txt['birthdays'] : $txt['birthdays_upcoming'], '</span>';
+				<p class="inline">
+					<span class="birthday">', $context['calendar_only_today'] ? $txt['birthdays'] : $txt['birthdays_upcoming'], '</span>';
 			// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
 			foreach ($context['calendar_birthdays'] as $member)
 				echo '
-				<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
 			echo '
-			</p>';
+				</p>';
 		}
 
 		// Events like community get-togethers.
 		if (!empty($context['calendar_events']))
 		{
 			echo '
-			<p class="inline">
-				<span class="event">', $context['calendar_only_today'] ? $txt['events'] : $txt['events_upcoming'], '</span> ';
+				<p class="inline">
+					<span class="event">', $context['calendar_only_today'] ? $txt['events'] : $txt['events_upcoming'], '</span> ';
 
 			// Each event in calendar_events should have:
 			//		title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
@@ -315,31 +312,34 @@ function template_info_center()
 				echo '
 					', $event['can_edit'] ? '<a href="' . $event['modify_href'] . '" title="' . $txt['calendar_edit'] . '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" class="centericon" /></a> ' : '', $event['href'] == '' ? '' : '<a href="' . $event['href'] . '">', $event['is_today'] ? '<strong>' . $event['title'] . '</strong>' : $event['title'], $event['href'] == '' ? '' : '</a>', $event['is_last'] ? '<br />' : ', ';
 			echo '
-			</p>';
+				</p>';
 		}
+
+		echo '
+			</li>';
 	}
 
 	// Show statistical style information...
 	if ($settings['show_stats_index'])
 	{
 		echo '
-			<h3 class="ic_section_header">
-				<a href="', $scripturl, '?action=stats" title="', $txt['more_stats'], '"><img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />', $txt['forum_stats'], '</a>
-			</h3>
-			<p class="inline">
-				', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - '. $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', '<br />
-				', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )<br />' : ''), '
-				<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
-			</p>';
+			<li class="board_row">
+				<h3 class="ic_section_header">
+					<a href="', $scripturl, '?action=stats" title="', $txt['more_stats'], '"><img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />', $txt['forum_stats'], '</a>
+				</h3>
+				<p class="inline">
+					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - '. $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
+					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
+				</p>
+			</li>';
 	}
 
 	// "Users online" - in order of activity.
 	echo '
-			<h3 class="ic_section_header">
-				', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" />', $txt['online_users'], '', $context['show_who'] ? '</a>' : '', '
-			</h3>
-			<p class="inline">
-				', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<strong>', $txt['online'], ': </strong>', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
+			<li class="board_row">
+				<h3 class="ic_section_header">
+					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" />', $txt['online_now'], ': 
+					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	// Handle hidden users and buddies.
 	$bracketList = array();
@@ -355,39 +355,23 @@ function template_info_center()
 
 	echo $context['show_who'] ? '</a>' : '', '
 
-				&nbsp;-&nbsp;', $txt['most_online_today'], ': <strong>', comma_format($modSettings['mostOnlineToday']), '</strong>&nbsp;-&nbsp;
-				', $txt['most_online_ever'], ': ', comma_format($modSettings['mostOnline']), ' (<time datetime="', htmlTime($modSettings['mostDate']), '">', relativeTime($modSettings['mostDate']), '</time>)<br />';
+				</h3>';
 
 	// Assuming there ARE users online... each user in users_online has an id, username, name, group, href, and link.
 	if (!empty($context['users_online']))
 	{
 		echo '
-				', sprintf($txt['users_active'], $modSettings['lastActive']), ': ', implode(', ', $context['list_users_online']);
+				<p class="inline">', sprintf($txt['users_active'], $modSettings['lastActive']), ': ', implode(', ', $context['list_users_online']), '</p>';
 
 		// Showing membergroups?
 		if (!empty($settings['show_group_key']) && !empty($context['membergroups']))
 			echo '
-				<span class="membergroups">[' . implode(',&nbsp;', $context['membergroups']). ']</span>';
+				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']). ']</p>';
 	}
 
 	echo '
-			</p>';
-
-	// If they are logged in, but statistical information is off... show a personal message bar.
-	// @todo - Methinks this next bit is prehistoric bloat. Kill it, if nobody objects.
-	/*if ($context['user']['is_logged'] && !$settings['show_stats_index'])
-	{
-		echo '
-			<h3 class="subsection_header">
-				', $context['allow_pm'] ? '<a href="' . $scripturl . '?action=pm">' : '', '<img class="icon" src="', $settings['images_url'], '/message_sm.png" alt="" />', $txt['personal_message'], '', $context['allow_pm'] ? '</a>' : '', '
-			</h3>
-			<p class="inline">
-					', empty($context['user']['messages']) ? $txt['you_have_no_msg'] : ($context['user']['messages'] == 1 ? sprintf($txt['you_have_one_msg'], $scripturl . '?action=pm') : sprintf($txt['you_have_many_msgs'], $scripturl . '?action=pm', $context['user']['messages'])), '
-			</p>';
-	}*/
-
-	echo '
-		</div>
+			</li>
+		</ul>
 	</div>';
 
 	// Info center collapse object.
@@ -425,65 +409,6 @@ function template_info_center()
 			oCookieOptions: {
 				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
 				sCookieName: \'upshrinkIC\'
-			}
-		});
-	// ]]></script>';
-}
-
-/**
- * This is the newsfader
- */
-function template_news_fader()
-{
-	global $settings, $options, $txt, $context;
-
-	echo '
-	<div id="newsfader" class="forum_category">
-		<h2 class="category_header">
-			<img id="newsupshrink" src="', $settings['images_url'], '/collapse.png" alt="*" title="', $txt['hide'], '" style="display: none;vertical-align: bottom" />
-			', $txt['news'], '
-		</h2>
-		<ul id="elkFadeScroller"', empty($options['collapse_news_fader']) ? '' : ' style="display: none;"', '>
-			<li>
-				', implode('</li><li>', $context['news_lines']), '
-			</li>
-		</ul>
-	</div>
-	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
-	<script><!-- // --><![CDATA[
-
-		// Create a news fader object.
-		var oNewsFader = new elk_NewsFader({
-			sFaderControlId: \'elkFadeScroller\',
-			sItemTemplate: ', JavaScriptEscape('<strong>%1$s</strong>'), ',
-			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
-		});
-
-		// Create the news fader toggle.
-		var elkNewsFadeToggle = new elk_Toggle({
-			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($options['collapse_news_fader']) ? 'false' : 'true', ',
-			aSwappableContainers: [
-				\'elkFadeScroller\'
-			],
-			aSwapImages: [
-				{
-					sId: \'newsupshrink\',
-					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
-				}
-			],
-			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'collapse_news_fader\',
-				sSessionVar: elk_session_var,
-				sSessionId: elk_session_id
-			},
-			oCookieOptions: {
-				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
-				sCookieName: \'newsupshrink\'
 			}
 		});
 	// ]]></script>';

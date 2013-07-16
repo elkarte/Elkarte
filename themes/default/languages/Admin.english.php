@@ -261,7 +261,7 @@ $txt['errlog_desc'] = 'The error log tracks every error encountered by your foru
 $txt['errlog_no_entries'] = 'There are currently no error log entries.';
 
 $txt['theme_settings'] = 'Theme Settings';
-$txt['theme_edit_settings'] = 'Edit this theme\'s Settings';
+$txt['theme_edit_settings'] = 'Edit this theme\'s settings';
 $txt['theme_current_settings'] = 'Current Theme';
 
 $txt['dvc_your'] = 'Your Version';

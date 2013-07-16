@@ -170,7 +170,7 @@ function template_callback_badbehavior_add_ip()
 	echo '
 			<dt id="add_more_ip_placeholder" style="display: none;"></dt>
 			<dd></dd>
-			<dt id="add_more_ip_div"><a href="#" onclick="addAnotherOption(sIpParent, oIpOptionsdt, oIpOptionsdd); return false;" class="button_link floatleft">', $txt['badbehavior_ip_wl_add'], '</a></dt>
+			<dt id="add_more_ip_div"><a href="#" onclick="addAnotherOption(sIpParent, oIpOptionsdt, oIpOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_ip_wl_add'], '</a></dt>
 			<dd></dd>';
 }
 
@@ -220,7 +220,7 @@ function template_callback_badbehavior_add_url()
 	echo '
 			<dt id="add_more_url_placeholder" style="display: none;"></dt>
 			<dd></dd>
-			<dt id="add_more_url_div"><a href="#" onclick="addAnotherOption(sUrlParent, oUrlOptionsdt, oUrlOptionsdd); return false;" class="button_link floatleft">', $txt['badbehavior_url_wl_add'], '</a></dt>
+			<dt id="add_more_url_div"><a href="#" onclick="addAnotherOption(sUrlParent, oUrlOptionsdt, oUrlOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_url_wl_add'], '</a></dt>
 			<dd></dd>';
 }
 

@@ -20,9 +20,9 @@ function template_report_sent_above()
 
 	// Let them know, if their report was a success!
 	echo '
-			<div class="infobox">
-				', $txt['report_sent'], '
-			</div>';
+		<div class="infobox">
+			', $txt['report_sent'], '
+		</div>';
 }
 
 function template_main()
@@ -33,17 +33,17 @@ function template_main()
 
 	// Show the topic information - icon, subject, etc.
 	echo '
-			<div id="forumposts" class="forumposts">
-				<h2 class="category_header">
-					<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
-					', $txt['topic'], ': ', $context['subject'], '&nbsp;<span class="views_text">(', $context['num_views_text'], ')</span>
-					<span class="nextlinks">', $context['previous_next'], '</span>
-				</h2>';
+		<div id="forumposts" class="forumposts">
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
+				', $txt['topic'], ': ', $context['subject'], '&nbsp;<span class="views_text">(', $context['num_views_text'], ')</span>
+				<span class="nextlinks">', $context['previous_next'], '</span>
+			</h2>';
 
 	if (!empty($settings['display_who_viewing']))
 	{
 		echo '
-				<p id="whoisviewing">';
+			<p id="whoisviewing">';
 
 		// Show just numbers...?
 		if ($settings['display_who_viewing'] == 1)
@@ -54,11 +54,11 @@ function template_main()
 
 		// Now show how many guests are here too.
 		echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_topic'], '
-				</p>';
+			</p>';
 	}
 
 	echo '
-				<form action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" style="margin: 0;" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
+			<form action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" style="margin: 0;" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
 
 	$ignoredMsgs = array();
 	$removableMessageIDs = array();
@@ -98,7 +98,7 @@ function template_main()
 		{
 			echo '
 							<ul class="quickbuttons follow_ups">
-								<li class="listlevel1" aria-haspopup="true">', $txt['follow_ups'], '
+								<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1">', $txt['follow_ups'], '</a>
 									<ul class="menulevel2">';
 
 				foreach($context['follow_ups'][$message['id']] as $follow_up)
@@ -166,7 +166,7 @@ function template_main()
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
-							<li class="listlevel1 post_options" aria-haspopup="true"><a href="', $scripturl, '?action=post;msg=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], '" class="linklevel1">', $txt['post_options'], '</a>';
+							<li class="listlevel1 subsections" aria-haspopup="true"><a', ($message['can_modify'] && !empty($options['use_click_menu'])) ? ' href="'. $scripturl. '?action=post;msg='. $message['id']. ';topic='. $context['current_topic']. '.'. $context['start']. '"' :'', ' class="linklevel1 post_options">', $txt['post_options'], '</a>';
 
 		if ($message['can_modify'] || $message['can_remove'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{
@@ -214,10 +214,11 @@ function template_main()
 		}
 
 		// Hide likes for those who can't like or unlike for now..
-		if ($message['likes_enabled'])
+		// Really, guests and bots shouldn't get to play with this.
+		if ($message['likes_enabled'] && $context['user']['is_logged'])
 		{
 			echo '
-							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] :'&nbsp;', '</a>';
+							<li class="listlevel1 subsections"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] :'&nbsp;', '</a>';
 
 			// Can they like this post?
 			if ($message['can_like'])
@@ -239,7 +240,7 @@ function template_main()
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
-							<li class="listlevel1 quick_edit"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</li>';
+							<li class="listlevel1 quick_edit"><a class="linklevel1"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</a></li>';
 
 		// Can they quote to a new topic? @todo - This needs rethinking for gui layout.
 		if ($context['can_follow_up'])
@@ -250,11 +251,11 @@ function template_main()
 		// Can they reply? Have they turned on quick reply?
 		if ($context['can_quote'] && !empty($options['display_quick_reply']))
 			echo '
-							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+							<li class="listlevel1"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" onclick="return oQuickReply.quote(', $message['id'], ');" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 		// So... quick reply is off, but they *can* reply?
 		elseif ($context['can_quote'])
 			echo '
-							<li class="listlevel1 quote"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+							<li class="listlevel1"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 
 		echo '
 						</ul>';
@@ -298,8 +299,8 @@ function template_main()
 	}
 
 	echo '
-				</form>
-			</div>';
+			</form>
+		</div>';
 }
 
 function template_quickreply_below()
@@ -375,7 +376,7 @@ function template_quickreply_below()
 		}
 
 		echo '
-							<div>
+							<div class="submitbutton">
 								<input type="submit" name="post" value="', $txt['post'], '" onclick="return submitThisOnce(this);" accesskey="s" tabindex="', $context['tabindex']++, '" class="button_submit" />
 								<input type="submit" name="preview" value="', $txt['preview'], '" onclick="return submitThisOnce(this);" accesskey="p" tabindex="', $context['tabindex']++, '" class="button_submit" />';
 
@@ -391,7 +392,7 @@ function template_quickreply_below()
 
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 				echo '
-								<div class="clear righttext"><span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span><span id="draft_lastautosave"></span></div>';
+								<div class="clear"><span id="throbber" style="display:none"><img src="' . $settings['images_url'] . '/loading_sm.gif" alt="" class="centericon" />&nbsp;</span><span id="draft_lastautosave"></span></div>';
 		}
 
 		echo '
@@ -567,7 +568,7 @@ function template_build_poster_div($message, $ignoring)
 
 	// Show information about the poster of this message.
 	$poster_div .= '
-							<li class="listlevel1" aria-haspopup="true">';
+							<li class="listlevel1 subsections" aria-haspopup="true">';
 
 	// Show a link to the member's profile.
 	$poster_div .= '
@@ -764,7 +765,7 @@ function template_build_poster_div($message, $ignoring)
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
 			$poster_div .= '
-							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '[<strong>'. $context['user']['unread_messages'] . '</strong>]' : '')  . '</a></li>';
+							<li class="listlevel1 poster_online"><a class="linklevel1'. ($context['user']['unread_messages'] > 0 ? ' new_pm':''). '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">'. $context['user']['unread_messages'] . '</span>' : '')  . '</a></li>';
 		}
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{

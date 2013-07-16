@@ -39,7 +39,7 @@ function template_fatal_error()
 	// Show a back button (using javascript.)
 	echo '
 	<div class="centertext">
-		<a class="button_link" style="float:none" href="javascript:history.go(-1)">', $txt['back'], '</a>
+		<a class="linkbutton" href="javascript:history.go(-1)">', $txt['back'], '</a>
 	</div>';
 }
 
@@ -228,8 +228,8 @@ function template_attachment_errors()
 		template_show_error($key);
 
 	echo
-			!empty($context['back_link']) ? ('<a class="button_link" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '','
-			<a class="button_link" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
+			!empty($context['back_link']) ? ('<a class="linkbutton" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '','
+			<a class="linkbutton" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
 
 		</div>
 	</div>';
