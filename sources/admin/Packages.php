@@ -736,9 +736,6 @@ class Packages_Controller extends Action_Controller
 	public function action_install2()
 	{
 		global $txt, $context, $boardurl, $scripturl, $modSettings;
-		global $user_info;
-
-		$db = database();
 
 		// Make sure we don't install this mod twice.
 		checkSubmitOnce('check');
