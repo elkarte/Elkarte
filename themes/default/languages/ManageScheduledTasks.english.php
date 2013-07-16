@@ -31,11 +31,15 @@ $txt['scheduled_task_weekly_maintenance'] = 'Weekly Maintenance';
 $txt['scheduled_task_desc_weekly_maintenance'] = 'Runs essential weekly maintenance on the forum - should not be disabled.';
 $txt['scheduled_task_paid_subscriptions'] = 'Paid Subscription Checks';
 $txt['scheduled_task_desc_paid_subscriptions'] = 'Sends out any necessary paid subscription reminders and removes expired member subscriptions.';
-$txt['scheduled_task_remove_topic_redirect'] = 'Remove MOVED: redirection topics';
+$txt['scheduled_task_remove_topic_redirect'] = 'Remove MOVED: Redirection Topics';
 $txt['scheduled_task_desc_remove_topic_redirect'] = 'Deletes "MOVED:" topic notifications as specified when the moved notice was created.';
-$txt['scheduled_task_remove_temp_attachments'] = 'Remove temporary attachment files';
+$txt['scheduled_task_remove_temp_attachments'] = 'Remove Temporary Attachment Files';
 $txt['scheduled_task_desc_remove_temp_attachments'] = 'Deletes temporary files created while attaching a file to a post that for any reason weren\'t renamed or deleted before.';
-$txt['scheduled_task_maillist_fetch_IMAP'] = 'Fetch emails from IMAP';
+$txt['scheduled_task_remove_old_drafts'] = 'Remove Old Drafts';
+$txt['scheduled_task_desc_remove_old_drafts'] = 'Deletes drafts older than the number of days defined in the draft settings in the admin panel.';
+$txt['scheduled_task_remove_old_followups'] = 'Remove Old Follow-ups';
+$txt['scheduled_task_desc_remove_old_followups'] = 'Deletes follow-up entries still present in the database, but pointing to non-existent topics.';
+$txt['scheduled_task_maillist_fetch_IMAP'] = 'Fetch Emails from IMAP';
 $txt['scheduled_task_desc_maillist_fetch_IMAP'] = 'Fetches emails for the mailing list feature from an IMAP box and processes them.';
 
 $txt['scheduled_task_reg_starting'] = 'Starting at %1$s';
@@ -60,9 +64,3 @@ $txt['scheduled_log_time_taken'] = 'Time taken';
 $txt['scheduled_log_time_taken_seconds'] = '%1$d seconds';
 $txt['scheduled_log_empty_log'] = 'Clear Log';
 $txt['scheduled_log_empty_log_confirm'] = 'Are you sure you want to completely clear the log?';
-
-$txt['scheduled_task_remove_old_drafts'] = 'Remove old drafts';
-$txt['scheduled_task_desc_remove_old_drafts'] = 'Deletes drafts older than the number of days defined in the draft settings in the admin panel.';
-
-$txt['scheduled_task_remove_old_followups'] = 'Remove old follow-ups';
-$txt['scheduled_task_desc_remove_old_followups'] = 'Deletes follow-up entries still present in the database, but pointing to non-existent topics.';
