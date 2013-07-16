@@ -817,6 +817,7 @@ class Packages_Controller extends Action_Controller
 
 		// Now load up the paths of the themes that we need to know about.
 		$theme_paths = getThemesPathbyID($custom_themes);
+		$themes_installed = array(1);
 
 		// Are there any theme copying that we want to take place?
 		$context['theme_copies'] = array(
