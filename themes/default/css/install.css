@@ -119,14 +119,14 @@ img#logo {
 	color: red;
 	padding: 0.5em;
 }
-.panel .button_submit, .panel .button_link {
+.panel .button_submit, .panel .linkbutton {
 	font-size: 1em;
 	font-weight: bold;
 	color: #333;
 	padding: 3px 6px;
 	text-decoration: none;
 }
-.panel .button_submit:hover, .panel .button_link:hover {
+.panel .button_submit:hover, .panel .linkbutton:hover {
 	color: #af6700;
 	text-decoration: none;
 }

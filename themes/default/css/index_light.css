@@ -43,161 +43,535 @@
 
 
 
+/*	$GENERAL	*/
+/* ------------------------------------------------------- */
+/* Normal, standard links. */
+a, a:link, a:visited,
+/* Links that open in a new window. */
+a.new_win:link, a.new_win:visited {
+	color: #49643d;
+	text-decoration: none;
+}
+/* Cursor declared here.Should not be required anywhere else. */
+a:hover, a.new_win:hover {
+	text-decoration: underline;
+}
+
+/* Stop white band under footer on short pages. */
+/* This color should match $FOOTER background. */
+html {
+	background: #222;
+}
+body {
+	background: #555;
+	background-image: linear-gradient(to right, #333 0%, #888 50%, #333 100%);
+	color: #666;
+}
+
+
+
+
+/* @todo - Quite a lot more code to be split. */
+
+
+
+
+/*	$BBC		*/
+/* ------------------------------------------------------- */
+/* The "Quote:" and "Code:" header parts... */
+.codeheader, .quoteheader {
+	border: 1px solid #ccc;
+	border-bottom: none;
+	background: #fff;
+	color: #555;
+}
+.codeheader {
+	border-top: 3px solid #aaa;
+}
+/* [Select] link to copy code. */
+.codeoperation {
+	font-weight: normal;
+}
+/* A quote, perhaps from another post. */
+.bbc_standard_quote, .bbc_alternate_quote,
+/* A code block - maybe PHP ;) - shared styles. */
+.bbc_code {
+	border: 1px solid #ccc;
+	border-top: none;
+	background: #fff;
+}
+/* Extra quote styling */
+.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
+	box-shadow: 2px 2px 2px #ddd;
+}
+/* Extra code block styling. */
+.bbc_code {
+	border-top: 3px solid #aaa;
+	border-bottom: 3px solid #aaa;
+	background: #f8f8f8;
+}
+/* Styling for BBC tags */
+.bbc_link:link, .bbc_link:visited {
+	color: #377828;
+	box-shadow: 0 -1px 0 #cedccb inset;
+}
+.bbc_link:hover {
+	color: #377828;
+	box-shadow: 0 -1px 0 #66aa55 inset;
+	text-decoration: none;
+}
+/* /me uses this a lot. (emote, try typing /me in a post.) */
+.meaction {
+	color: #50aa3a;
+	font-weight: bold;
+}
+.meaction:before {
+	content:"\2620";
+	font-size: 1.5em;
+	line-height: 1em;
+	vertical-align: middle;
+}
+
+
+
+
+/*	$AJAX		*/
+/* ------------------------------------------------------- */
+/* The "Loading" bar for quick edit, etc. */
+#ajax_in_progress {
+	border-bottom: 4px solid #3d6e32;
+	background: #fff;
+	color: #306430;
+}
+#ajax_in_progress a {
+	text-decoration: underline;
+}
+
+
+
+
+/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+/* The top bar. */
+#top_section {
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #eee);
+	box-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 1px 0 #3a642d inset;
+	border-top: 4px solid #5ba048;
+	border-bottom: 4px solid #3d6e32;
+}
+/* Maintenance mode warning. */
+.notice {
+	font-weight: 700;
+	color: #a80000;
+}
+#search_form .input_text {
+	border-radius: 2px 0 0 2px;
+	border-right: none;
+}
+#search_form .button_submit {
+	border-radius: 0 2px 2px 0;
+	font-variant: small-caps;
+	color: #333;
+}
+#search_form select {
+	padding-right: 4px;
+	border: 1px solid #bbb;
+	border-right: none;
+	opacity: 0.8;
+}
+#search_form select:focus {
+	border: 1px solid #999;
+	border-right: none;
+	opacity: 1;
+}
+.forumtitle>a {
+	color: #377828;
+	text-shadow: 1px 1px 0 #fff;
+}
+/* News section. */
+#news {
+	padding: 0 0 1em 1em;
+	font-size: 0.929em;
+}
+#news>h2 {
+	float:left;
+	color: #4b863c;
+	font-size: 1.25em;
+	line-height: 1.2em;
+	font-weight: 700;
+	font-variant: small-caps;
+	margin: 7px -4em 0 12px;
+}
+#news>h2:after {
+	content:"\2026";
+}
+#news_line, #elkFadeScroller {
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	background: #fff;
+	box-shadow: 1px 2px 3px #eee;
+	/* Longhand style due to JS bug in IE! */
+	color: #666666;
+	height: 60px;
+	min-height: 60px;
+	overflow: auto;
+	resize: vertical;
+	text-indent: 5em;
+}
+/* Main forum area. */
+/* Box-shadow only on this one. */
+#wrapper {
+	border: 3px solid #4b863c;
+	margin-top: 16px;
+	border-radius: 5px;
+	background: #fafafa;
+	box-shadow: 0 2px 4px #111;
+	padding-top: 12px;
+	border-top: 3px solid #5ba048;
+	border-bottom: 3px solid #437837;
+}
+/* The footer with copyright links etc. */
+#footer_section {
+	color: #bbb;
+	border-top: 4px solid #aaa;
+	background: #222;
+	border-top: 6px solid #3d6e32;
+	box-shadow: 0 -1px 0 #777, 0 1px 0 #0e0e0e inset;
+}
+#footer_section p, #footer_section a {
+	color: #bbb;
+}
+
+
+
+
 /*	$MENUS		*/
 /* ------------------------------------------------------- */
-/* Visible menu bar: wrapper/background. */
-#main_menu {
-	border-radius: 6px 6px 2px 2px;
-	background: #4b863c;
-	background-image: linear-gradient(to bottom, #5BA048 0%, #3d6e32 100%);
-}
-/* Needed for new PM notifications. */
-.listlevel1 strong {
-	color: #fff;
-}
-/* Level 1 Menu bar: link or button. General sizing. */
-#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
-	border-radius: 4px;
-	color: #fff;
-	/* If there will be a border on hover, ensure there is a default border. */
-	/* Applying a default transparent border stops links jumping on hover. */
-	border: 1px solid transparent;
-}
-/* Override link colour for admin/profile/etc menus. */
-.admin_menu .linklevel1, #adm_submenus .linklevel1 {
-	color: #444;
+/* Level 1 Menu bar: link or button. General styling. */
+.linklevel1, .linklevel1:link, .linklevel1:visited {
+	border-radius: 2px;
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	box-shadow: 1px 1px 2px #e5e5e5;
+	color: #566e4b;
 }
 /* Level 1 button hover and focus effects. */
-#main_menu .active, /* Level 1 active button shares same styling. */
-#main_menu .linklevel1:hover, #main_menu .listlevel1:hover .linklevel1, #main_menu .linklevel1:focus,
-/* For primary admin/profile/etc drop menus. */
-.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
-/* For secondary admin/profile/etc menus. */
-#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
-	border: 1px solid #afafaf;
-	border-top: 1px solid #bbb;
-	background: #fcfcfc;
-	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
+.linklevel1:hover, .listlevel1:hover .linklevel1,
+.linklevel2:hover, .listlevel2:hover .linklevel2,
+.linklevel3:hover, .listlevel3:hover .linklevel3,
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
+#menu_current_area>strong>.linklevel1 {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
 	color: #555;
 	text-decoration: none;
 }
-/* Main menu Level 1 active button and hover need a different border. */
-#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel1:hover .linklevel1, #main_menu .linklevel1:focus {
-	border: 1px solid #38642d;
-}
-/* Level 1 active buttons for primary admin/profile/etc drop menus... */
-.admin_menu .active,
-/* ......and for secondary admin/profile/etc menu strip. */
-#adm_submenus .active {
-	border: 1px solid #38642d;
+/* Level 1 active buttons. */
+.linklevel1.active, .listlevel1:hover .active,
+#collapse_button .linklevel1, .pm_indicator {
+	border: 1px solid #38642e;
+	border-left: 1px solid #38642d;
+	border-top: 1px solid #4b863c;
 	background: #4b863c;
-	background-image: linear-gradient(to bottom, #5BA048 0%, #3d6e32 100%);
+	background-image: linear-gradient(to bottom, #5ba048, #3d6e32);
 	color: #fff;
+	font-weight: 600;
+	box-shadow: 1px 1px 2px #bbb;
 }
 /* Hover effects for those buttons. */
-.admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
+.linklevel1.active:hover,.listlevel1:hover .linklevel1.active,
+#collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
 	border: 1px solid #5aa049;
 	border-top: 1px solid #2d5024;
 	border-left: 1px solid #2d5024;
 	background: #437837;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.3) inset;
-	color: #fff;
-}
-/* Level 1 active buttons get a bit more weight. */
-.active {
-	font-weight: 600;
 }
 /* Top level subsection indicators. */
 /* Comment these out if you don't want them. */
 .subsections:hover .linklevel1:after {
 	position: absolute;
-	top: 0.8em;
-	right: 0.7em;
-	content:" \2228";
-	font-weight: normal;
+	right: 0.4em;
+	content:" \25bc";
+}
+#main_menu .subsections:hover .linklevel1:after {
+	top: 88%;
+	font-size: 1.4em;
+	color: #eee;
+	text-shadow: 0 4px 0 #3d6e32;
+}
+.admin_menu  .subsections:hover .linklevel1:after {
+	top: 72%;
+	color: #3d6e32;
+	font-size: 1.2em;
+}
+/* Corrections for other menus. */
+.quickbuttons .subsections:hover .linklevel1:after {
+	top: 1.9em;
+	font-size: 1em;
+}
+.subsections:hover .name.linklevel1:after {
+	top: 1.6em;
+	font-size: 1em;
+	color: #5ba048;
+}
+.poster2 .subsections:hover .name.linklevel1:after {
+	top: 1em;
+}
+/* Do one override here for .poster. Still saves code all round. */
+.avatar .linklevel1, .avatar:hover .linklevel1, .avatar .linklevel1:focus,
+.name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
+	background: none;
+	border: none;
+	box-shadow: none;
+	color: #4b863c;
+}
+.name.linklevel1:hover {
+	text-decoration: underline;
 }
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border: 1px solid #aaa;
-	border-radius: 4px;
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	border-radius: 2px;
 	background: #fff;
-	box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+	box-shadow: 3px 3px 3px rgba(0,0,0,0.2);
+}
+/* Tricky PM indicator. Define it carefully,
+/* just in case someone tries to use this class elsewhere. */
+.pm_indicator {
+	position: absolute;
+	top: -1.5em;
+	right: -0.5em;
+	float: left;
+	padding: 0 0.8em;
+	border-radius: 8px 8px 8px 0;
+	box-shadow: 3px 3px 3px rgba(0,0,0,0.25);
+	font-weight: 700;
+	line-height: 1.8em;
+	font-size: 0.923em;
+	z-index: 2;
+}
+.poster .pm_indicator {
+	font-size: 1em;
 }
 /* Levels 2 and 3 drop menus: link or button. */
-.linklevel2, .linklevel3 {
+.linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
 	border: 1px solid transparent;
-	border-radius: 3px;
-	color: #555;
-	/* Applying a default transparent border stops links jumping on hover. */
+	color: #666;
 }
 /* Admin menu icons. */
 .linklevel2>img {
 	margin: 0 0 0 -4px;
 	vertical-align: middle;
 }
-/* Levels 2 and 3: hover effects. */
-.listlevel2:hover .linklevel2, /* linklevel2 highlighted with cursor over level 3. */
-.linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
-.linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
-	border: 1px solid #afafaf;
-	border-top: 1px solid #bbb;
-	background: #fcfcfc;
-	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
-	color: #555;
-	text-decoration: none;
-}
 /* Level 2: subsection indicators. */
-.listlevel2.subsections .linklevel2:after {
+.listlevel2.subsections .linklevel2:after,
+#menu_sidebar .subsections .linklevel1:after,
+#menu_sidebar .subsections:hover .linklevel1:after {
 	position: absolute;
+	top: 0;
 	right: 6px;
 	color: #777;
 	content: "\2192";
 	font-size: 1.3em;
 }
+/* Level 2: dividers between admin/moderation, and pm/profile links. */
+#button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
+	margin-top: 7px;
+	padding-top: 4px;
+	border-top: 1px solid #ddd;
+	box-shadow: 0 -1px 0 #bbb;
+}
 /* Levels 2 and 3: highlighting of current section */
-/* @todo - This should probably be applied to main menu as well, just for consistency. */
-.linklevel2.chosen, .linklevel3.chosen {
-	font-weight: 600;
+/* @todo - Should probably be applied to main menu as well, for consistency. */
+.linklevel2.chosen, .linklevel3.chosen,
+#menu_current_area .linklevel1 {
+	font-weight: 700;
 }
 
 /* Styles for sidebar menus.
 ------------------------------------------------------- */
-/* Same styling for Level 1 and Level 2. */
-#menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
+/* Cancel default backgrounds for sidebar. */
+#menu_sidebar .linklevel1 {
 	border: 1px solid transparent;
+	background: none;
+	box-shadow: none;
 	color: #555;
-}
-#menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus, #menu_current_area .linklevel1,
-#menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
-	border: 1px solid #afafaf;
-	border-top: 1px solid #bbb;
-	border-radius: 3px;
-	background: #fcfcfc;
-	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
-	color: #555;
-	text-decoration: none;
-}
-#menu_current_area .linklevel1 {
-	font-weight: 600;
-}
-/* Level 1: subsection indicators. */
-#menu_sidebar .subsections .linklevel1:after {
-	position: absolute;
-	top: 0.3em;
-	right: 6px;
-	content: "\2192";
 }
 /*End sidebar flyout coding. */
 
 
 
 
+/*	$LINKTREE	*/
+/* ------------------------------------------------------- */
+/* The navigation list (i.e. linktree) */
+/* Wrapper/background. */
+.navigate_section {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background: #fcfcfc;
+	box-shadow: 1px 2px 3px #eee;
+}
+/* Color for linktree items. */
+.linktree {
+	background: #fcfcfc;
+	border-top: 1px solid #ccc;
+	border-right: 2px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	border-radius: 2px 0 0 2px;
+}
+.linktree a {
+	color: #555;
+}
+.linktree:hover, .linktree>a:hover,
+.linktree_last, .linktree_last>a,
+.linktree_last>a:hover, .linktree_last strong {
+	color: #fff;
+	text-decoration: none;
+}
+.linktree:before {
+	border-left: 0.75em solid #ccc;
+}
+.linktree:hover:before, .linktree_last:before {
+	border-left: 0.75em solid #3d6e32;
+}
+.linktree:after {
+	border-left: 0.75em solid #fcfcfc;
+}
+.linktree:hover, .linktree_last {
+	border-top: 1px solid #3d6e32;
+	border-right: 2px solid #3d6e32;
+	border-bottom: 1px solid #3d6e32;
+	background: #5ba048;
+	background-image: linear-gradient(to right, #4b863c, #5ba048);
+}
+.linktree:hover:after, .linktree_last:after {
+	border-left: 0.75em solid #5ba048;
+}
+.linktree_last:hover {
+	background: #4b863c;
+}
+.linktree_last:hover:after {
+	border-left: 0.75em solid #4b863c;
+}
+
+/*	$BUTTONS	*/
+/* This section contains code for the quickbuttons (quote, quick edit, etc)
+/* and for the buttonlist class (reply, add poll, notify, etc).
+/* These classes share some styling.
+/* Declarations are amalgamated where styling is shared.
+/* ------------------------------------------------------- */
+/* Styles for the standard button lists.
+/* ------------------------------------------------------- */
+/* @todo - Save code by amalgamating common button background declarations. */
+.buttonlist li a {
+	text-transform: uppercase;
+}
+/* The active one */
+.buttonlist li a.active {
+	box-shadow: 1px 1px 2px #ccc;
+}
+
+/* The quick buttons. */
+/* ------------------------------------------------------- */
+.quickbuttons .modified {
+	color: #777;
+}
+/* Cancel generic border-radius. */
+.quickbuttons .linklevel1 {
+	color: #555;
+	border-radius: 0;
+}
+/* Radius left end of the first (Quote) button. */
+.linklevel1.quote_button {
+	border-radius: 2px 0 0 2px;
+}
+/* Radius right end of the last button. */
+.linklevel1.post_options, .linklevel1.remove_button {
+	border-radius: 0 2px 2px 0;
+}
+/* Single buttons get all corners rounded. */
+.follow_ups .linklevel1, #topic_summary .linklevel1 {
+	border-radius: 2px;
+}
 
 
 
 
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
+/* Set up some general framing classes. @todo */
+/*			.forum_category for board index/child boards. */
+/*			.forumposts for thread pages and recent posts, etc. */
+/*			.content_category for general divisions around the place. */
+/* All styled the same in default variant, but available for fun and games. */
+
+/* The board categories and newsfader - some shared styling. */
+.forum_category, .forumposts, .content_category {
+	border-radius: 5px 5px 0 0;
+	background: #deedda;
+	box-shadow: 1px 2px 3px #eee;
+}
+/* @todo - Clean this up, once new classes are assigned to old windowbg stuffz. */
+.board_row, .childboard_row, .forumposts>div, .forumposts>li,
+.content_category>div, .content_category>li {
+	border: 1px solid #cfcfcf;
+	background: #fff;
+}
+.forumposts .windowbg, .forumposts .windowbg2 {
+	margin-top: 2px;
+}
+.board_row.parent_board {
+	border-bottom: none;
+}
+.childboard_row {
+	border-top: none;
+}
+.board_latest {
+	border-left: 1px solid #ccc;
+}
+.board_name >a {
+	color: #377828;
+}
+.board_stats {
+	color: #777;
+}
+.lastpost_link>a {
+	color: #377828;
+}
+.board_latest strong {
+	color: #777;
+}
+.childboards {
+	border-top: 1px solid #ccc;
+}
+.childboard_row h4, .board_new_posts {
+	font-weight: 700;
+	color: #777;
+}
+/* Styles for the info center on the board index. */
+.ic_section_header {
+	border-bottom: 1px solid #ddd;
+}
+.ic_section_header>a {
+	color: #666;
+}
+#ic_recentposts td {
+	border-top: 1px solid #ddd;
+}
+.recentpost>strong>a, .inline>strong>a {
+	color: #46823c;
+}
 
 /* --------------------------------------------------------------------- */
 /* The following are alternative layout orders for the board index rows. */
@@ -205,7 +579,6 @@
 /* These demos can be commented and un-commented to see them in action.
 /* Note: similar tricks can be performed with the new message index too.
 /* --------------------------------------------------------------------- */
-
 /* This one simply puts the board stats back in the old SMF location. */
 /*
 .board_stats {
@@ -214,7 +587,6 @@
 	float: left;
 }
 */
-
 /* This one flips the row left to right, and sets the lastpost text to LTR. */
 /*
 .board_row {
@@ -225,7 +597,6 @@
 	border: none;
 }
 */
-
 /* This one does the LTR flip, and puts the board icon at far right. */
 /*
 .board_row {
@@ -240,7 +611,6 @@
 	border: none;
 }
 */
-
 /* ------------------------------------------------------ */
 /* This is where the fun starts. Absolute positioning. :D */
 /* ------------------------------------------------------ */
@@ -260,7 +630,6 @@
 	padding-left: 66px;
 }
 */
-
 /* You want more? Ok. This one does the above, but also puts board stats over
 /* at far right, and sets board name and description back to left aligned. */
 /*
@@ -289,9 +658,120 @@
 	right: 8px;
 }
 */
-
 /* There are more options, but those should be enough to give the general idea. */
-
 /* ------------------------------------------------ */
 /* End alternative layouts. Back to standard stuff. */
 /* ------------------------------------------------ */
+
+
+
+
+/* $CALENDAR	*/
+/* ------------------------------------------------------- */
+/* Calendar colors for birthdays, events and holidays */
+.birthday {
+	color: #920ac4;
+}
+.event {
+	color: #078907;
+}
+.holiday {
+	color: #555080;
+}
+.calendar_table {
+	border-top: 1px solid #ddd;
+	background: #ddd;
+}
+.calendar_table th, .calendar_table td {
+	background: #fff;
+}
+/* Used to indicate the current day. */
+#main_grid .calendar_today, #month_grid .calendar_today {
+	border: 1px solid #aaa;
+	background: #ebffd8;
+}
+#main_grid .weeks {
+	font-weight: bold;
+	font-size: 1.8em;
+}
+#main_grid .weeks a:hover {
+	text-decoration: none;
+}
+#main_grid .days {
+	vertical-align: top;
+}
+.weeklist {
+	background: #e4e4e4;
+}
+.weeklist>li {
+	border: 1px solid #ddd;
+	background: #fff;
+}
+.weeklist h4 {
+	border-right: 2px solid #ddd;
+}
+.weeklist h4 a:hover {
+	text-decoration: none;
+}
+.modify_event {
+	color: red;
+}
+.hidelink {
+	font-style: italic;
+}
+/* Add a background that fits with the calendar. */
+#calendar_navigation {
+	border: 1px solid #ddd;
+	border-top: none;
+}
+
+
+
+
+/* $STATISTICS	*/
+/* ------------------------------------------------------- */
+.statistics .category_header {
+	background: none;
+	border: none;
+	border-bottom: 2px solid #ccc;
+	text-shadow: none;
+}
+.statistics .flow_hidden, #forum_history .flow_hidden {
+	border: 1px solid #ddd;
+	background: #fefefe;
+}
+.stats.floatleft {
+	border-right: 1px solid #ccc;
+}
+#top_row .stats dd, .statsbar {
+	border: 1px solid #aaa;
+	background: #fff;
+}
+/* Methinks topic links, etc need a little more oomph next to the orange bars. */
+#top_row .stats dd {
+	border: 1px solid transparent;
+	background: none;
+}
+.statsbar .bar {
+	background: #47b263;
+	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
+}
+/* Absolute positioning stops these breaking the bars on narrow screens. */
+.statsbar .righttext {
+	background: #fff;
+}
+#stats {
+	border: none;
+}
+
+/* Test code - an attempt to make recent posts less overwhelming. */
+#recentposts .inner {
+	height: 7.2em;
+	overflow: hidden;
+	resize: vertical;
+	position: relative;
+}
+#recentposts .inner blockquote {
+	height: 1.5em;
+	overflow: hidden;
+}

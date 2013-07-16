@@ -447,7 +447,7 @@ function template_postarea_below()
 
 	// Finally, the submit buttons.
 	echo '
-						<span id="post_confirm_buttons">
+						<div id="post_confirm_buttons" class="submitbutton">
 							', template_control_richedit_buttons($context['post_box_name']);
 
 	// Option to delete an event if user is editing one.
@@ -456,7 +456,7 @@ function template_postarea_below()
 							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
 
 	echo '
-						</span>
+						</div>
 					</div>
 				</div>
 			</div>';

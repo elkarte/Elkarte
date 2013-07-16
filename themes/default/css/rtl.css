@@ -200,7 +200,7 @@ div#upper_section div.user ul {
 	padding-right: 10px;
 }
 
-.button_submit, .button_reset, .button_link {
+.button_submit, .button_reset, .linkbutton {
 	float: left;
 }
 
