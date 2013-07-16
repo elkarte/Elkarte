@@ -35,6 +35,8 @@ $txt['scheduled_task_remove_topic_redirect'] = 'Remove MOVED: redirection topics
 $txt['scheduled_task_desc_remove_topic_redirect'] = 'Deletes "MOVED:" topic notifications as specified when the moved notice was created.';
 $txt['scheduled_task_remove_temp_attachments'] = 'Remove temporary attachment files';
 $txt['scheduled_task_desc_remove_temp_attachments'] = 'Deletes temporary files created while attaching a file to a post that for any reason weren\'t renamed or deleted before.';
+$txt['scheduled_task_maillist_fetch_IMAP'] = 'Fetch emails from IMAP';
+$txt['scheduled_task_desc_maillist_fetch_IMAP'] = 'Fetches emails for the mailing list feature from an IMAP box and processes them.';
 
 $txt['scheduled_task_reg_starting'] = 'Starting at %1$s';
 $txt['scheduled_task_reg_repeating'] = 'repeating every %1$d %2$s';
