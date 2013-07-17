@@ -27,7 +27,7 @@ class ManageBadBehavior_Controller extends Action_Controller
 	 * View the forum's badbehavior log.
 	 * This function sets all the context up to show the badbehavior log for review.
 	 * It requires the maintain_forum permission.
-	 * It is accessed from ?action=admin;area=logs;sa=errorlog.
+	 * It is accessed from ?action=admin;area=logs;sa=badbehaviorlog.
 	 *
 	 * @uses the BadBehavior template and badbehavior_log sub template.
 	 */
