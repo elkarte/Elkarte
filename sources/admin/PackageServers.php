@@ -49,7 +49,7 @@ class PackageServers_Controller extends Action_Controller
 		// Use the PackageServers template.
 		loadTemplate('PackageServers', 'admin');
 
-		$context['page_title'] = $txt['package'];
+		$context['page_title'] = $txt['package_servers'];
 
 		// Here is a list of all the potentially valid actions.
 		$subActions = array(
