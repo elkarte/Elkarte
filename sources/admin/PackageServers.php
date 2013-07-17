@@ -13,7 +13,8 @@
  *
  * @version 1.0 Alpha
  *
- * This file handles the package servers and packages download from Package Manager.
+ * This file handles the package servers and packages download, in Package Servers
+ * area of admininstration panel.
  *
  */
 
@@ -77,23 +78,11 @@ class PackageServers_Controller extends Action_Controller
 
 		// Now create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['package_manager'],
-			//'help' => 'registrations',
+			'title' => $txt['package_servers'],
 			'description' => $txt['package_manager_desc'],
 			'tabs' => array(
-				'browse' => array(
-				),
 				'servers' => array(
 					'description' => $txt['download_packages_desc'],
-				),
-				'installed' => array(
-					'description' => $txt['installed_packages_desc'],
-				),
-				'perms' => array(
-					'description' => $txt['package_file_perms_desc'],
-				),
-				'options' => array(
-					'description' => $txt['package_install_options_ftp_why'],
 				),
 			),
 		);
