@@ -492,7 +492,8 @@ class Register_Controller extends Action_Controller
 					$save_variables[$k] = $v;
 
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			openID_validate($_POST['openid_identifier'], false, $save_variables);
+			$openID = new OpenID();
+			$openID->validate($_POST['openid_identifier'], false, $save_variables);
 		}
 		// If we've come from OpenID set up some default stuff.
 		elseif ($verifiedOpenID || (!empty($_POST['openid_identifier']) && $_POST['authenticate'] == 'openid'))
