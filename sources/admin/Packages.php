@@ -36,15 +36,7 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		// @todo Remove this!
-		if (isset($_GET['get']) || isset($_GET['pgdownload']))
-		{
-			require_once(ADMINDIR . '/PackageServers.php');
-			$controller = new PackageServers_Controller();
-			$controller->action_index();
-			return;
-		}
-
+		// Admins-only!
 		isAllowedTo('admin_forum');
 
 		// Load all the basic stuff.
@@ -89,9 +81,6 @@ class Packages_Controller extends Action_Controller
 			'description' => $txt['package_manager_desc'],
 			'tabs' => array(
 				'browse' => array(
-				),
-				'packageget' => array(
-					'description' => $txt['download_packages_desc'],
 				),
 				'installed' => array(
 					'description' => $txt['installed_packages_desc'],

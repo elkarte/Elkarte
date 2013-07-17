@@ -154,7 +154,7 @@ function template_admin()
 									</div>
 								</div>
 							'), ',
-							sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
+							sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
 						});
 					// ]]></script>';

@@ -13,7 +13,6 @@ $txt['notes_file'] = 'Instruction/Additional notes file';
 $txt['list_file'] = 'List files in package';
 $txt['files_archive'] = 'Files in archive';
 $txt['package_get'] = 'Package Get';
-$txt['package_servers'] = 'Package servers';
 $txt['package_browse'] = 'Browse';
 $txt['add_server'] = 'Add server';
 $txt['server_name'] = 'Server name';

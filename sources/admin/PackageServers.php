@@ -36,7 +36,10 @@ class PackageServers_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
+		// This is for admins only.
 		isAllowedTo('admin_forum');
+
+		// Load our subs.
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Use the Packages language file. (split servers?)
@@ -60,9 +63,6 @@ class PackageServers_Controller extends Action_Controller
 		// Now let's decide where we are taking this...
 		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
 			$subAction = $_REQUEST['sa'];
-		// We need to support possible old javascript links...
-		elseif (isset($_GET['pgdownload']))
-			$subAction = 'download';
 		else
 			$subAction = 'servers';
 
@@ -73,7 +73,7 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_action'] = $subAction;
 
 		// We need to force the "Download" tab as selected.
-		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'packageget';
+		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'servers';
 
 		// Now create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -83,7 +83,7 @@ class PackageServers_Controller extends Action_Controller
 			'tabs' => array(
 				'browse' => array(
 				),
-				'packageget' => array(
+				'servers' => array(
 					'description' => $txt['download_packages_desc'],
 				),
 				'installed' => array(
@@ -195,7 +195,7 @@ class PackageServers_Controller extends Action_Controller
 		if (isset($_GET['server']))
 		{
 			if ($_GET['server'] == '')
-				redirectexit('action=admin;area=packages;get');
+				redirectexit('action=admin;area=packageservers');
 
 			$server = (int) $_GET['server'];
 
@@ -233,7 +233,7 @@ class PackageServers_Controller extends Action_Controller
 
 				$context['page_title'] = $txt['package_servers'];
 				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute']));
-				$context['proceed_href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
+				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
 
 				return;
 			}
@@ -346,14 +346,14 @@ class PackageServers_Controller extends Action_Controller
 
 						$current_url .= $thisPackage->fetch('@href');
 						if (isset($_GET['absolute']))
-							$package['href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;absolute=' . $current_url;
+							$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . $current_url;
 						else
-							$package['href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;server=' . $context['package_server'] . ';relative=' . $current_url;
+							$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $context['package_server'] . ';relative=' . $current_url;
 					}
 					else
 					{
 						$current_url = $thisPackage->fetch('@href');
-						$package['href'] = $scripturl . '?action=admin;area=packages;get;sa=browse;absolute=' . $current_url;
+						$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . $current_url;
 					}
 
 					$package['name'] = Util::htmlspecialchars($thisPackage->fetch('.'));
@@ -402,7 +402,7 @@ class PackageServers_Controller extends Action_Controller
 					$package['href'] = $url . '/' . $package['filename'];
 					$package['name'] = Util::htmlspecialchars($package['name']);
 					$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
-					$package['download']['href'] = $scripturl . '?action=admin;area=packages;get;sa=download' . $server_att . ';package=' . $current_url . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$package['download']['href'] = $scripturl . '?action=admin;area=packageservers;sa=download' . $server_att . ';package=' . $current_url . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
 
 					if ($thisPackage->exists('author') || isset($default_author))
@@ -579,7 +579,7 @@ class PackageServers_Controller extends Action_Controller
 			fatal_lang_error($packageInfo);
 
 		// Use FTP if necessary.
-		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packages;get;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
+		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
 
 		// Done!  Did we get this package automatically?
@@ -721,7 +721,7 @@ class PackageServers_Controller extends Action_Controller
 
 		addPackageServer($servername, $serverurl);
 
-		redirectexit('action=admin;area=packages;get');
+		redirectexit('action=admin;area=packageservers');
 	}
 
 	/**
@@ -736,6 +736,6 @@ class PackageServers_Controller extends Action_Controller
 		$_GET['server'] = (int) $_GET['server'];
 		deletePackageServer($_GET['server']);
 
-		redirectexit('action=admin;area=packages;get');
+		redirectexit('action=admin;area=packageservers');
 	}
 }
