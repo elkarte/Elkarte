@@ -150,6 +150,28 @@ class Action
 	}
 
 	/**
+	 * Return the subaction.
+	 * This method checks if $sa is enabled, and falls back to default if not.
+	 * Used only to set the context for the template.
+	 *
+	 * @param string $sa
+	 */
+	public function subaction($sa)
+	{
+		$subAction = $this->_subActions[$sa];
+
+		// if it's disabled, then default action
+		if (isset($subAction['enabled']) && !$subAction['enabled'])
+			if (!empty($this->_default))
+				$sa = $this->_default;
+			else
+				// no dice
+				fatal_lang_error('error_sa_not_set');
+
+		return $sa;
+	}
+
+	/**
 	 * Security check: verify that the user has the permission to perform the given action.
 	 * Verifies if the user has the permission set for the given action.
 	 * Return true if no permission was set for the action.
