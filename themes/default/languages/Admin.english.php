@@ -716,6 +716,7 @@ $txt['permissions_post_moderation'] = 'Post Moderation';
 
 $txt['browse_packages'] = 'Browse Packages';
 $txt['download_packages'] = 'Download Packages';
+$txt['upload_packages'] = 'Upload Package';
 $txt['installed_packages'] = 'Installed Packages';
 $txt['package_file_perms'] = 'File Permissions';
 $txt['package_settings'] = 'Settings';

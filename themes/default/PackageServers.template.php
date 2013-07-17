@@ -31,55 +31,10 @@ function template_servers()
 	echo '
 	<div id="admin_form_wrapper">
 		<div class="cat_bar">
-			<h3 class="catbg">', $txt['download_new_package'], '</h3>
+			<h3 class="catbg">', $txt['package_servers'], '</h3>
 		</div>';
 
-	if ($context['package_download_broken'])
-	{
-		echo '
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['package_ftp_necessary'], '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<p>
-					', $txt['package_ftp_why_download'], '
-				</p>
-				<form action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
-					<dl class="settings">
-						<dt>
-							<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $context['package_ftp']['server'], '" class="input_text" />
-							<label for="ftp_port">', $txt['package_ftp_port'], ':&nbsp;</label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', $context['package_ftp']['port'], '" class="input_text" />
-						</dd>
-						<dt>
-							<label for="ftp_username">', $txt['package_ftp_username'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" style="width: 99%;" class="input_text" />
-						</dd>
-						<dt>
-							<label for="ftp_password">', $txt['package_ftp_password'], ':</label>
-						</dt>
-						<dd>
-							<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
-						</dd>
-						<dt>
-							<label for="ftp_path">', $txt['package_ftp_path'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" style="width: 99%;" class="input_text" />
-						</dd>
-					</dl>
-					<div class="righttext">
-						<input type="submit" value="', $txt['package_proceed'], '" class="button_submit" />
-					</div>
-				</form>
-			</div>
-		</div>';
-	}
+	template_ftp_required();
 
 	echo '
 		<div class="windowbg2">
@@ -87,6 +42,7 @@ function template_servers()
 				<fieldset>
 					<legend>' . $txt['package_servers'] . '</legend>
 					<ul class="package_servers">';
+
 	foreach ($context['servers'] as $server)
 		echo '
 						<li class="flow_auto">
@@ -143,27 +99,6 @@ function template_servers()
 						</div>
 					</form>
 				</fieldset>
-			</div>
-		</div>
-		<br />
-		<div class="cat_bar">
-			<h3 class="catbg">' . $txt['package_upload_title'] . '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
-					<dl class="settings">
-						<dt>
-							<strong>' . $txt['package_upload_select'] . ':</strong>
-						</dt>
-						<dd>
-							<input type="file" name="package" size="38" class="input_file" />
-						</dd>
-					</dl>
-					<hr />
-					<input type="submit" value="' . $txt['package_upload'] . '" class="button_submit" />
-					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-				</form>
 			</div>
 		</div>
 	</div>';
@@ -365,6 +300,9 @@ function template_package_list()
 		}
 }
 
+/**
+ * Displays a success message for the download or upload of a package.
+ */
 function template_downloaded()
 {
 	global $context, $txt, $scripturl;
@@ -388,4 +326,102 @@ function template_downloaded()
 			</div>
 		</div>
 	</div>';
+}
+
+/**
+ * Shows a form to upload a package from the local computer.
+ */
+function template_upload()
+{
+	global $context, $txt, $scripturl;
+
+	if (!empty($context['package_ftp']['error']))
+			echo '
+					<div class="errorbox">
+						<span class="tt">', $context['package_ftp']['error'], '</span>
+					</div>';
+
+	echo '
+	<div id="admin_form_wrapper">
+		<div class="cat_bar">
+			<h3 class="catbg">', $txt['upload_new_package'], '</h3>
+		</div>';
+
+	template_ftp_required();
+
+	echo '
+		<div class="cat_bar">
+			<h3 class="catbg">' . $txt['package_upload_title'] . '</h3>
+		</div>
+		<div class="windowbg">
+			<div class="content">
+				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
+					<dl class="settings">
+						<dt>
+							<strong>' . $txt['package_upload_select'] . ':</strong>
+						</dt>
+						<dd>
+							<input type="file" name="package" size="38" class="input_file" />
+						</dd>
+					</dl>
+					<hr />
+					<input type="submit" value="' . $txt['package_upload'] . '" class="button_submit" />
+					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+				</form>
+			</div>
+		</div>
+	</div>';
+}
+
+/**
+ * Section of package servers tabs
+ * It displays a form to connect to admin's FTP account.
+ */
+function template_ftp_required()
+{
+	global $context, $txt, $scripturl;
+
+	echo '
+		<div class="title_bar">
+			<h3 class="titlebg">', $txt['package_ftp_necessary'], '</h3>
+		</div>
+		<div class="windowbg">
+			<div class="content">
+				<p>
+					', $txt['package_ftp_why_download'], '
+				</p>
+				<form action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
+					<dl class="settings">
+						<dt>
+							<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
+						</dt>
+						<dd>
+							<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $context['package_ftp']['server'], '" class="input_text" />
+							<label for="ftp_port">', $txt['package_ftp_port'], ':&nbsp;</label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', $context['package_ftp']['port'], '" class="input_text" />
+						</dd>
+						<dt>
+							<label for="ftp_username">', $txt['package_ftp_username'], ':</label>
+						</dt>
+						<dd>
+							<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" style="width: 99%;" class="input_text" />
+						</dd>
+						<dt>
+							<label for="ftp_password">', $txt['package_ftp_password'], ':</label>
+						</dt>
+						<dd>
+							<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
+						</dd>
+						<dt>
+							<label for="ftp_path">', $txt['package_ftp_path'], ':</label>
+						</dt>
+						<dd>
+							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" style="width: 99%;" class="input_text" />
+						</dd>
+					</dl>
+					<div class="righttext">
+						<input type="submit" value="', $txt['package_proceed'], '" class="button_submit" />
+					</div>
+				</form>
+			</div>
+		</div>';
 }

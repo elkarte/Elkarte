@@ -60,6 +60,7 @@ class PackageServers_Controller extends Action_Controller
 			'download' => array($this, 'action_download'),
 			'remove' => array($this, 'action_remove'),
 			'upload' => array($this, 'action_upload'),
+			'upload2' => array($this, 'action_upload2'),
 		);
 
 		// Now let's decide where we are taking this...
@@ -77,10 +78,13 @@ class PackageServers_Controller extends Action_Controller
 		// Now create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['package_servers'],
-			'description' => $txt['package_manager_desc'],
+			'description' => $txt['package_servers_desc'],
 			'tabs' => array(
 				'servers' => array(
 					'description' => $txt['download_packages_desc'],
+				),
+				'upload' => array(
+					'description' => $txt['upload_packages_desc'],
 				),
 			),
 		);
@@ -551,9 +555,9 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Upload a new package to the packages directory.
-	 * Accessed by action=admin;area=packageservers;sa=upload
+	 * Accessed by action=admin;area=packageservers;sa=upload2
 	 */
-	public function action_upload()
+	public function action_upload2()
 	{
 		global $txt, $scripturl, $context;
 
@@ -684,6 +688,25 @@ class PackageServers_Controller extends Action_Controller
 		deletePackageServer($_GET['server']);
 
 		redirectexit('action=admin;area=packageservers');
+	}
+
+	/**
+	 * Display the upload package form.
+	 */
+	public function action_upload()
+	{
+		global $txt, $context, $modSettings;
+
+		// Set up the upload template, and page title.
+		$context['sub_template'] = 'upload';
+		$context['page_title'] .= ' - ' . $txt['upload_packages'];
+
+		// Check if we will be able to write new archives in /packages folder.
+		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
+
+		// Give FTP a chance...
+		if ($context['package_download_broken'])
+			$this->ftp_connect();
 	}
 
 	/**

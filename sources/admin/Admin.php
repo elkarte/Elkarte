@@ -124,7 +124,8 @@ class Admin_Controller extends Action_Controller
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_packages',
 						'subsections' => array(
-							'servers' => array($txt['download_packages'], 'url' => $scripturl . '?action=admin;area=packageservers'),
+							'servers' => array($txt['download_packages']),
+							'upload' => array($txt['upload_packages']),
 						),
 					),
 					'search' => array(
