@@ -71,7 +71,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'servers');
 
 		$context['sub_action'] = $subAction;
 
@@ -681,7 +681,7 @@ class PackageServers_Controller extends Action_Controller
 	{
 		checkSession('get');
 
-		require_once(SUBSDIR . '/PackageServer.subs.php');
+		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// We no longer browse this server.
 		$_GET['server'] = (int) $_GET['server'];
