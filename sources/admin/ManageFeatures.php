@@ -99,8 +99,7 @@ class ManageFeatures_Controller extends Action_Controller
 		call_integration_hook('integrate_modify_features', array(&$subActions));
 
 		// By default do the basic settings.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
-		$subAction = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
