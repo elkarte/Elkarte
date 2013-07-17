@@ -58,7 +58,7 @@ class PackageServers_Controller extends Action_Controller
 			'browse' => array($this, 'action_browse'),
 			'download' => array($this, 'action_download'),
 			'remove' => array($this, 'action_remove'),
-			'upload' => array($this, 'action_update'),
+			'upload' => array($this, 'action_upload'),
 		);
 
 		// Now let's decide where we are taking this...
@@ -603,7 +603,7 @@ class PackageServers_Controller extends Action_Controller
 	/**
 	 * Upload a new package to the directory.
 	 */
-	public function action_update()
+	public function action_upload()
 	{
 		global $txt, $scripturl, $context;
 
