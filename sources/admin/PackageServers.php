@@ -39,9 +39,11 @@ class PackageServers_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// Use the Packages template... no reason to separate.
+		// Use the Packages language file. (split servers?)
 		loadLanguage('Packages');
-		loadTemplate('Packages', 'admin');
+
+		// Use the PackageServers template.
+		loadTemplate('PackageServers', 'admin');
 
 		$context['page_title'] = $txt['package'];
 
