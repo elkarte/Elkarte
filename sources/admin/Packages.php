@@ -77,7 +77,6 @@ class Packages_Controller extends Action_Controller
 		// Set up some tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['package_manager'],
-			// @todo 'help' => 'registrations',
 			'description' => $txt['package_manager_desc'],
 			'tabs' => array(
 				'browse' => array(

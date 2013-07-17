@@ -30,6 +30,7 @@ class PackageServers_Controller extends Action_Controller
 	/**
 	 * Main dispatcher for package servers. Checks permissions,
 	 * load files, and forwards to the right method.
+	 * Accessed by action=admin;area=packageservers
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -73,9 +74,6 @@ class PackageServers_Controller extends Action_Controller
 
 		$context['sub_action'] = $subAction;
 
-		// We need to force the "Download" tab as selected.
-		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'servers';
-
 		// Now create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['package_servers'],
@@ -93,6 +91,7 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Load a list of package servers.
+	 * Accessed by action=admin;area=packageservers;sa=servers
 	 */
 	public function action_list()
 	{
@@ -106,81 +105,26 @@ class PackageServers_Controller extends Action_Controller
 
 		// Load the list of servers.
 		$context['servers'] = fetchPackageServers();
+
+		// Check if we will be able to write new archives in /packages folder.
 		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
 
 		if ($context['package_download_broken'])
-		{
-			@chmod(BOARDDIR . '/packages', 0777);
-			@chmod(BOARDDIR . '/packages/installed.list', 0777);
-		}
-
-		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
-
-		if ($context['package_download_broken'])
-		{
-			if (isset($_POST['ftp_username']))
-			{
-				require_once(SUBSDIR . '/FTPConnection.class.php');
-				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
-
-				if ($ftp->error === false)
-				{
-					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-					if (!$ftp->chdir($_POST['ftp_path']))
-					{
-						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
-					}
-				}
-			}
-
-			if (!isset($ftp) || $ftp->error !== false)
-			{
-				if (!isset($ftp))
-				{
-					require_once(SUBSDIR . '/FTPConnection.class.php');
-					$ftp = new Ftp_Connection(null);
-				}
-				elseif ($ftp->error !== false && !isset($ftp_error))
-					$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
-
-				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
-
-				if ($found_path || !isset($_POST['ftp_path']))
-					$_POST['ftp_path'] = $detect_path;
-
-				if (!isset($_POST['ftp_username']))
-					$_POST['ftp_username'] = $username;
-
-				$context['package_ftp'] = array(
-					'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-					'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-					'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
-					'path' => $_POST['ftp_path'],
-					'error' => empty($ftp_error) ? null : $ftp_error,
-				);
-			}
-			else
-			{
-				$context['package_download_broken'] = false;
-
-				$ftp->chmod('packages', 0777);
-				$ftp->chmod('packages/installed.list', 0777);
-
-				$ftp->close();
-			}
-		}
+			$this->ftp_connect();
 	}
 
 	/**
 	 * Browse a server's list of packages.
+	 * Accessed by action=admin;area=packageservers;sa=browse
 	 */
 	public function action_browse()
 	{
 		global $txt, $context, $scripturl, $forum_version, $context;
 
+		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
+		// Browsing the packages from a server
 		if (isset($_GET['server']))
 		{
 			if ($_GET['server'] == '')
@@ -206,7 +150,7 @@ class PackageServers_Controller extends Action_Controller
 		}
 		elseif (isset($_GET['absolute']) && $_GET['absolute'] != '')
 		{
-			// Initialize the requried variables.
+			// Initialize the required variables.
 			$server = '';
 			$url = $_GET['absolute'];
 			$name = '';
@@ -268,6 +212,8 @@ class PackageServers_Controller extends Action_Controller
 		// By default we use an unordered list, unless there are no lists with more than one package.
 		$context['list_type'] = 'ul';
 
+		// Load the installed packages
+		// We'll figure out if what they select a package they already have installed.
 		$instmods = loadInstalledPackages();
 
 		$installed_mods = array();
@@ -394,6 +340,7 @@ class PackageServers_Controller extends Action_Controller
 					$package['download']['href'] = $scripturl . '?action=admin;area=packageservers;sa=download' . $server_att . ';package=' . $current_url . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
 
+					// Author name, email
 					if ($thisPackage->exists('author') || isset($default_author))
 					{
 						if ($thisPackage->exists('author/@email'))
@@ -414,6 +361,7 @@ class PackageServers_Controller extends Action_Controller
 						}
 					}
 
+					// Author website
 					if ($thisPackage->exists('website') || isset($default_website))
 					{
 						if ($thisPackage->exists('website') && $thisPackage->exists('website/@title'))
@@ -426,22 +374,22 @@ class PackageServers_Controller extends Action_Controller
 							$package['author']['website']['name'] = $default_website;
 
 						if ($thisPackage->exists('website') && $thisPackage->fetch('website') != '')
-							$authorhompage = $thisPackage->fetch('website');
+							$authorhomepage = $thisPackage->fetch('website');
 						else
-							$authorhompage = $default_website;
+							$authorhomepage = $default_website;
 
-						if (stripos($authorhompage, 'a href') === false)
+						if (stripos($authorhomepage, 'a href') === false)
 						{
-							$package['author']['website']['href'] = $authorhompage;
-							$package['author']['website']['link'] = '<a href="' . $authorhompage . '">' . $package['author']['website']['name'] . '</a>';
+							$package['author']['website']['href'] = $authorhomepage;
+							$package['author']['website']['link'] = '<a href="' . $authorhomepage . '">' . $package['author']['website']['name'] . '</a>';
 						}
 						else
 						{
-							if (preg_match('/a href="(.+?)"/', $authorhompage, $match) == 1)
+							if (preg_match('/a href="(.+?)"/', $authorhomepage, $match) == 1)
 								$package['author']['website']['href'] = $match[1];
 							else
 								$package['author']['website']['href'] = '';
-							$package['author']['website']['link'] = $authorhompage;
+							$package['author']['website']['link'] = $authorhomepage;
 						}
 					}
 					else
@@ -500,6 +448,7 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Download a package.
+	 * Accessed by action=admin;area=packageservers;sa=download
 	 */
 	public function action_download()
 	{
@@ -533,7 +482,7 @@ class PackageServers_Controller extends Action_Controller
 		}
 		else
 		{
-			// Initialize the requried variables.
+			// Initialize the required variables.
 			$server = '';
 			$url = '';
 		}
@@ -601,7 +550,8 @@ class PackageServers_Controller extends Action_Controller
 	}
 
 	/**
-	 * Upload a new package to the directory.
+	 * Upload a new package to the packages directory.
+	 * Accessed by action=admin;area=packageservers;sa=upload
 	 */
 	public function action_upload()
 	{
@@ -657,10 +607,12 @@ class PackageServers_Controller extends Action_Controller
 				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
 					continue;
 
+				// Read package info for the archive we found
 				$packageInfo = getPackageInfo($package);
 				if (!is_array($packageInfo))
 					continue;
 
+				// If it was already uploaded, don't upload it again.
 				if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
 				{
 					@unlink($destination);
@@ -689,10 +641,13 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Add a package server to the list.
+	 * Accessed by action=admin;area=packageservers;sa=add
 	 */
 	public function action_add()
 	{
+		// Load our subs file.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
+
 		// Validate the user.
 		checkSession();
 
@@ -708,6 +663,7 @@ class PackageServers_Controller extends Action_Controller
 		if (strpos($serverurl, 'http://') !== 0 && strpos($serverurl, 'https://') !== 0)
 			$serverurl = 'http://' . $serverurl;
 
+		// Add it to the list of package servers.
 		addPackageServer($servername, $serverurl);
 
 		redirectexit('action=admin;area=packageservers');
@@ -715,6 +671,7 @@ class PackageServers_Controller extends Action_Controller
 
 	/**
 	 * Remove a server from the list.
+	 * Accessed by action=admin;area=packageservers;sa=remove
 	 */
 	public function action_remove()
 	{
@@ -722,9 +679,92 @@ class PackageServers_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/PackageServer.subs.php');
 
+		// We no longer browse this server.
 		$_GET['server'] = (int) $_GET['server'];
 		deletePackageServer($_GET['server']);
 
 		redirectexit('action=admin;area=packageservers');
+	}
+
+	/**
+	 * This method attempts to chmod packages and installed.list
+	 * using FTP if necessary.
+	 * It sets the $context['package_download_broken'] status for the template.
+	 * Used by package servers pages.
+	 */
+	public function ftp_connect()
+	{
+		global $context;
+
+		// Try to chmod from PHP first
+		@chmod(BOARDDIR . '/packages', 0777);
+		@chmod(BOARDDIR . '/packages/installed.list', 0777);
+
+		$unwritable = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
+
+		if ($unwritable)
+		{
+			// Are they connecting to their FTP account already?
+			if (isset($_POST['ftp_username']))
+			{
+				require_once(SUBSDIR . '/FTPConnection.class.php');
+				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+
+				if ($ftp->error === false)
+				{
+					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+					if (!$ftp->chdir($_POST['ftp_path']))
+					{
+						$ftp_error = $ftp->error;
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
+					}
+				}
+			}
+
+			// No attempt yet, or we had an error last time
+			if (!isset($ftp) || $ftp->error !== false)
+			{
+				// Maybe we didn't even try yet
+				if (!isset($ftp))
+				{
+					require_once(SUBSDIR . '/FTPConnection.class.php');
+					$ftp = new Ftp_Connection(null);
+				}
+				// ...or we failed
+				elseif ($ftp->error !== false && !isset($ftp_error))
+					$ftp_error = $ftp->last_message === null ? '' : $ftp->last_message;
+
+				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
+
+				if ($found_path || !isset($_POST['ftp_path']))
+					$_POST['ftp_path'] = $detect_path;
+
+				if (!isset($_POST['ftp_username']))
+					$_POST['ftp_username'] = $username;
+
+				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
+				$context['package_ftp'] = array(
+					'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
+					'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
+					'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+					'path' => $_POST['ftp_path'],
+					'error' => empty($ftp_error) ? null : $ftp_error,
+				);
+
+				// Announce the template it's time to display the ftp connection box.
+				$context['package_download_broken'] = true;
+			}
+			else
+			{
+				// FTP connection has succeeded
+				$context['package_download_broken'] = false;
+
+				// Try to chmod packages folder and our list file.
+				$ftp->chmod('packages', 0777);
+				$ftp->chmod('packages/installed.list', 0777);
+
+				$ftp->close();
+			}
+		}
 	}
 }
