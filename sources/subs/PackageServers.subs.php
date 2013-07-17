@@ -21,19 +21,19 @@ if (!defined('ELK'))
 function fetchPackageServers($server = null)
 {
 	$db = database();
-	
+
 	$servers = array();
 
 	// Load the list of servers.
 	$request = $db->query('', '
 		SELECT id_server, name, url
 		FROM {db_prefix}package_servers' .
-		(!empty($server) ? 'WHERE id_server = {int:current_server}' : ''),
+		(!empty($server) ? ' WHERE id_server = {int:current_server}' : ''),
 		array(
 			'current_server' => $server,
 		)
 	);
-	
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		$servers[] = array(
