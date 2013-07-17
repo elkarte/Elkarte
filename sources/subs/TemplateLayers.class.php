@@ -303,6 +303,9 @@ class Template_Layers
 		return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
 	}
 
+	/**
+	 * Turns "error mode" on, so that only the allowed layers are displayed
+	 */
 	public function isError()
 	{
 		$this->_is_error = true;
