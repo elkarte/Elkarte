@@ -303,7 +303,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 	// Reuse the message array if available
 	if (empty($messages))
-		$messages = messagesFromTopics($topics);
+		$messages = messagesInTopics($topics);
 
 	// Remove all likes now that the topic is gone
 	$db->query('', '
