@@ -1251,7 +1251,7 @@ class Packages_Controller extends Action_Controller
 				'title' => $installed ? $txt['view_and_remove'] : $txt[$type . '_package'],
 				'no_items_label' => $txt['no_packages'],
 				'get_items' => array(
-					'function' => array($this, 'list_getPackages'),
+					'function' => array($this, 'list_packages'),
 					'params' => array('type' => $type, 'installed' => $installed),
 				),
 				'base_href' => $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';type=' . $type,
@@ -2073,7 +2073,7 @@ class Packages_Controller extends Action_Controller
 	 * @param bool $installed
 	 * @return type
 	 */
-	function list_getPackages($start, $items_per_page, $sort, $params, $installed)
+	function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
 		global $scripturl, $context, $forum_version;
 		static $instmods, $packages;
