@@ -22,20 +22,36 @@ class Action
 	/**
 	 * Array of sub-actions.
 	 * The accepted array format is:
-	 *  - 'sub_action name' => 'function name', or
-	 *  - 'sub_action name' => array ('function' => 'function name'), or
-	 *  - 'sub_action name' => array (
+	 *    'sub_action name' => 'function name',
+	 *  or
+	 *    'sub_action name' => array (
+	 *  	'function' => 'function name'),
+	 *  or
+	 *    'sub_action name' => array (
 	 *  	'controller' => 'controller name',
-	 *  	'function' => 'method name'), or
-	 *  - 'sub_action name' => array ('controller object, i.e. $this', 'method name'), or
-	 *  - 'sub_action name' => array (
+	 *  	'function' => 'method name'
+	 *  	'enabled' => true/false),
+	 *  or
+	 *    'sub_action name' => array (
+	 *  	'controller object, i.e. $this',
+	 *  	'method name',
+	 *  	'enabled' => true/false),
+	 *  or
+	 *    'sub_action name' => array (
 	 *  	'file' => 'file name',
 	 *		'dir' => 'controller file location', if not set ADMINDIR is assumed
 	 *  	'controller' => 'controller name',
-	 *  	'function' => 'method name')
+	 *  	'function' => 'method name',
+	 *  	'enabled' => true/false)
 	 * @var array
 	 */
 	protected $_subActions;
+
+	/**
+	 * The default subAction.
+	 * @var string
+	 */
+	protected $_default;
 
 	/**
 	 * Initialize the instance with an array of sub-actions.
@@ -44,7 +60,7 @@ class Action
 	 *
 	 * @param array $subactions
 	 */
-	function initialize ($subactions)
+	function initialize($subactions, $default = '')
 	{
 		$this->_subActions = array();
 
@@ -52,6 +68,9 @@ class Action
 			$subactions = array($subactions);
 
 		$this->_subActions = $subactions;
+
+		if (isset($subactions[$default]))
+			$this->_default = $default;
 	}
 
 	/**
@@ -71,6 +90,15 @@ class Action
 
 		$subAction = $this->_subActions[$sa];
 
+		// unless it's disabled, then we redirect to the default action
+		if (isset($subAction['enabled']) && !$subAction['enabled'])
+			if (!empty($this->_default))
+				$subAction = $this->_subActions[$this->_default];
+			else
+				// no dice
+				fatal_lang_error('error_sa_not_set');
+
+		// are you even permitted to?
 		if (isset($subAction['permission']))
 			isAllowedTo($subAction['permission']);
 
