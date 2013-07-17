@@ -483,9 +483,10 @@ class ProfileOptions_Controller extends Action_Controller
 			elseif ($_POST['authenticate'] == 'openid' && !empty($_POST['openid_identifier']))
 			{
 				require_once(SUBSDIR . '/OpenID.subs.php');
+				require_once(SUBSDIR . '/Members.subs.php');
 				$_POST['openid_identifier'] = openID_canonize($_POST['openid_identifier']);
 
-				if (openid_member_exists($_POST['openid_identifier']))
+				if (memberExists($_POST['openid_identifier']))
 					$post_errors[] = 'openid_in_use';
 				elseif (empty($post_errors))
 				{

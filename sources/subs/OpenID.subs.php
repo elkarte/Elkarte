@@ -46,6 +46,9 @@ function openID_validate($openid_uri, $return = false, $save_fields = array(), $
 	if (($assoc = openID_getAssociation($response_data['server'])) == null)
 		$assoc = openID_makeAssociation($response_data['server']);
 
+	// include file for member existence
+	require_once(SUBSDIR . '/Members.subs.php');
+
 	// Before we go wherever it is we are going, store the GET and POST data, because it might be useful when we get back.
 	$request_time = time();
 	// Just in case they are doing something else at this time.
@@ -68,7 +71,7 @@ function openID_validate($openid_uri, $return = false, $save_fields = array(), $
 	);
 
 	// If they are logging in but don't yet have an account or they are registering, let's request some additional information
-	if (($_REQUEST['action'] == 'login2' && !openid_member_exists($openid_url)) || ($_REQUEST['action'] == 'register' || $_REQUEST['action'] == 'register2'))
+	if (($_REQUEST['action'] == 'login2' && !memberExists($openid_url)) || ($_REQUEST['action'] == 'register' || $_REQUEST['action'] == 'register2'))
 	{
 		// Email is required.
 		$parameters[] = 'openid.sreg.required=email';
@@ -267,30 +270,6 @@ function openID_canonize($uri)
 		$uri .= '/';
 
 	return $uri;
-}
-
-/**
- * Check if the URI is already registered for an existing member
- *
- * @param string $uri
- * @return array
- */
-function openid_member_exists($url)
-{
-	$db = database();
-
-	$request = $db->query('openid_member_exists', '
-		SELECT mem.id_member, mem.member_name
-		FROM {db_prefix}members AS mem
-		WHERE mem.openid_uri = {string:openid_uri}',
-		array(
-			'openid_uri' => $url,
-		)
-	);
-	$member = $db->fetch_assoc($request);
-	$db->free_result($request);
-
-	return $member;
 }
 
 /**

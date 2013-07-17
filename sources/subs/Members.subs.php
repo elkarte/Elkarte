@@ -1904,3 +1904,28 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 
 	return $members;
 }
+
+
+/**
+ * Check if the OpenID URI is already registered for an existing member
+ *
+ * @param string $uri
+ * @return array
+ */
+function memberExists($url)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT mem.id_member, mem.member_name
+		FROM {db_prefix}members AS mem
+		WHERE mem.openid_uri = {string:openid_uri}',
+		array(
+			'openid_uri' => $url,
+		)
+	);
+	$member = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $member;
+}
