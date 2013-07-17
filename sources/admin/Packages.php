@@ -1179,21 +1179,6 @@ class Packages_Controller extends Action_Controller
 	}
 
 	/**
-	 * List the installed packages.
-	 */
-	public function InstalledList()
-	{
-		global $txt, $context;
-
-		// @todo this isn't used, why
-		$context['page_title'] .= ' - ' . $txt['installed_packages'];
-		$context['sub_template'] = 'view_installed';
-
-		// Load the installed mods and send them to the template.
-		$context['installed_mods'] = loadInstalledPackages();
-	}
-
-	/**
 	 * Empty out the installed list.
 	 */
 	public function action_flush()
