@@ -1929,3 +1929,32 @@ function memberExists($url)
 
 	return $member;
 }
+
+/**
+ * Find the most recent members
+ *
+ * @param int $limit
+ */
+function recentMembers($limit)
+{
+	$db = database();
+
+	// Find the most recent members.
+	$request = $db->query('', '
+		SELECT id_member, member_name, real_name, date_registered, last_login
+		FROM {db_prefix}members
+		ORDER BY id_member DESC
+		LIMIT {int:limit}',
+		array(
+			'limit' => $limit,
+		)
+	);
+
+	$members = array();
+	while ($row = $db->fetch_assoc($request))
+		$members[] = $row;
+
+	$db->free_result($request);
+
+	return $members;
+}

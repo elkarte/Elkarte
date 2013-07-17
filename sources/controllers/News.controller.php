@@ -347,17 +347,11 @@ class News_Controller extends Action_Controller
 			return array();
 
 		// Find the most recent members.
-		$request = $db->query('', '
-			SELECT id_member, member_name, real_name, date_registered, last_login
-			FROM {db_prefix}members
-			ORDER BY id_member DESC
-			LIMIT {int:limit}',
-			array(
-				'limit' => $_GET['limit'],
-			)
-		);
+		require_once(SUBSDIR . '/Members.subs.php');
+		$members = recentMembers((int)$_GET['limit']);
+
 		$data = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($members as $row)
 		{
 			// Make the data look rss-ish.
 			if ($xml_format == 'rss' || $xml_format == 'rss2')
@@ -390,7 +384,6 @@ class News_Controller extends Action_Controller
 					'link' => $scripturl . '?action=profile;u=' . $row['id_member']
 				);
 		}
-		$db->free_result($request);
 
 		return $data;
 	}
