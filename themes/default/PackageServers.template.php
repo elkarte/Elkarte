@@ -45,7 +45,7 @@ function template_servers()
 				<p>
 					', $txt['package_ftp_why_download'], '
 				</p>
-				<form action="', $scripturl, '?action=admin;area=packages;get" method="post" accept-charset="UTF-8">
+				<form action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
 					<dl class="settings">
 						<dt>
 							<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
@@ -91,15 +91,15 @@ function template_servers()
 		echo '
 						<li class="flow_auto">
 							<span class="floatleft">' . $server['name'] . '</span>
-							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packages;get;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">[ ' . $txt['delete'] . ' ]</a></span>
-							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packages;get;sa=browse;server=' . $server['id'] . '">[ ' . $txt['package_browse'] . ' ]</a></span>
+							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">[ ' . $txt['delete'] . ' ]</a></span>
+							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $server['id'] . '">[ ' . $txt['package_browse'] . ' ]</a></span>
 						</li>';
 	echo '
 					</ul>
 				</fieldset>
 				<fieldset>
 					<legend>' . $txt['add_server'] . '</legend>
-					<form action="' . $scripturl . '?action=admin;area=packages;get;sa=add" method="post" accept-charset="UTF-8">
+					<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
 						<dl class="settings">
 							<dt>
 								<strong>' . $txt['server_name'] . ':</strong>
@@ -122,7 +122,7 @@ function template_servers()
 				</fieldset>
 				<fieldset>
 					<legend>', $txt['package_download_by_url'], '</legend>
-					<form action="', $scripturl, '?action=admin;area=packages;get;sa=download;byurl;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+					<form action="', $scripturl, '?action=admin;area=packageservers;sa=download;byurl;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 						<dl class="settings">
 							<dt>
 								<strong>' . $txt['serverurl'] . ':</strong>
@@ -151,7 +151,7 @@ function template_servers()
 		</div>
 		<div class="windowbg">
 			<div class="content">
-				<form action="' . $scripturl . '?action=admin;area=packages;get;sa=upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
+				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
 					<dl class="settings">
 						<dt>
 							<strong>' . $txt['package_upload_select'] . ':</strong>
@@ -384,7 +384,7 @@ function template_downloaded()
 					</li>
 				</ul>
 				<br /><br />
-				<p><a href="', $scripturl, '?action=admin;area=packages;get', (isset($context['package_server']) ? ';sa=browse;server=' . $context['package_server'] : ''), '">[ ', $txt['back'], ' ]</a></p>
+				<p><a href="', $scripturl, '?action=admin;area=packageservers', (isset($context['package_server']) ? ';sa=browse;server=' . $context['package_server'] : ''), '">[ ', $txt['back'], ' ]</a></p>
 			</div>
 		</div>
 	</div>';
