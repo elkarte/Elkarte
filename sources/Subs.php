@@ -3062,88 +3062,7 @@ function template_header()
 	$checked_securityFiles = false;
 	$showed_banned = false;
 	foreach (Template_Layers::getInstance()->prepareContext() as $layer)
-	{
 		loadSubTemplate($layer . '_above', 'ignore');
-
-		// May seem contrived, but this is done in case the body and main layer aren't there...
-		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && !$checked_securityFiles)
-		{
-			$checked_securityFiles = true;
-			// @todo add a hook here
-			$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
-			foreach ($securityFiles as $i => $securityFile)
-			{
-				if (!file_exists(BOARDDIR . '/' . $securityFile))
-					unset($securityFiles[$i]);
-			}
-
-			// We are already checking so many files...just few more doesn't make any difference! :P
-			require_once(SUBSDIR . '/Attachments.subs.php');
-			$path = getAttachmentPath();
-			secureDirectory($path, true);
-			secureDirectory(CACHEDIR);
-
-			// If agreement is enabled, at least the english version shall exists
-			if ($modSettings['requireAgreement'])
-				$agreement = !file_exists(BOARDDIR . '/agreement.txt');
-
-			if (!empty($securityFiles) || (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR)) || !empty($agreement))
-			{
-				echo '
-		<div class="errorbox">
-			<p class="alert">!!</p>
-			<h3>', empty($securityFiles) ? $txt['generic_warning'] : $txt['security_risk'], '</h3>
-			<p>';
-
-				foreach ($securityFiles as $securityFile)
-				{
-					echo '
-				', $txt['not_removed'], '<strong>', $securityFile, '</strong>!<br />';
-
-					if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
-						echo '
-				', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
-				}
-
-				if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
-					echo '
-				<strong>', $txt['cache_writable'], '</strong><br />';
-
-				if (!empty($agreement))
-					echo '
-				<strong>', $txt['agreement_missing'], '</strong><br />';
-
-				echo '
-			</p>
-		</div>';
-			}
-		}
-		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && (isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > mktime()))
-			echo '<div class="noticebox">', sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])), '</div>';
-
-		// If the user is banned from posting inform them of it.
-		elseif (in_array($layer, array('main', 'body')) && isset($_SESSION['ban']['cannot_post']) && !$showed_banned)
-		{
-			$showed_banned = true;
-			echo '
-				<div class="windowbg alert" style="margin: 2ex; padding: 2ex; border: 2px dashed red;">
-					', sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
-
-			if (!empty($_SESSION['ban']['cannot_post']['reason']))
-				echo '
-					<div style="padding-left: 4ex; padding-top: 1ex;">', $_SESSION['ban']['cannot_post']['reason'], '</div>';
-
-			if (!empty($_SESSION['ban']['expire_time']))
-				echo '
-					<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
-			else
-				echo '
-					<div>', $txt['your_ban_expires_never'], '</div>';
-
-			echo '
-				</div>';
-		}
-	}
 
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
 	{
@@ -3341,6 +3260,73 @@ function template_css()
 				echo '
 	<link rel="stylesheet" type="text/css" href="', $file['filename'], '" id="', $id,'" />';
 		}
+	}
+}
+
+/**
+ * I know this is becoming annoying, though this template
+ * *shall* be present for security reasons, so better it stays here
+ */
+function template_admin_warning_above()
+{
+	global $context, $user_info, $scripturl, $txt, $modSettings;
+
+	if (!empty($context['security_controls']['files']))
+	{
+		echo '
+	<div class="errorbox">
+		<p class="alert">!!</p>
+		<h3>', empty($context['security_controls']['files']['to_remove']) ? $txt['generic_warning'] : $txt['security_risk'], '</h3>
+		<p>';
+
+		if (!empty($context['security_controls']['files']['to_remove']))
+		{
+			foreach ($context['security_controls']['files']['to_remove'] as $securityFile)
+			{
+				echo '
+			', $txt['not_removed'], '<strong>', $securityFile, '</strong>!<br />';
+
+				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
+					echo '
+			', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
+			}
+		}
+
+		if (!empty($context['security_controls']['files']['cache']))
+			echo '
+			<strong>', $txt['cache_writable'], '</strong><br />';
+
+		if (!empty($context['security_controls']['files']['agreement']))
+			echo '
+			<strong>', $txt['agreement_missing'], '</strong><br />';
+
+		echo '
+		</p>
+	</div>';
+	}
+	if (!empty($context['security_controls']['admin_session']))
+		echo '<div class="noticebox">', sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])), '</div>';
+
+	// If the user is banned from posting inform them of it.
+	if (isset($_SESSION['ban']['cannot_post']))
+	{
+		echo '
+			<div class="windowbg alert" style="margin: 2ex; padding: 2ex; border: 2px dashed red;">
+				', sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
+
+		if (!empty($_SESSION['ban']['cannot_post']['reason']))
+			echo '
+				<div style="padding-left: 4ex; padding-top: 1ex;">', $_SESSION['ban']['cannot_post']['reason'], '</div>';
+
+		if (!empty($_SESSION['ban']['expire_time']))
+			echo '
+				<div>', sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)), '</div>';
+		else
+			echo '
+				<div>', $txt['your_ban_expires_never'], '</div>';
+
+		echo '
+			</div>';
 	}
 }
 

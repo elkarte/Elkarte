@@ -473,6 +473,8 @@ function banPermissions()
 			'remove_own', 'remove_any',
 			'post_unapproved_topics', 'post_unapproved_replies_own', 'post_unapproved_replies_any',
 		);
+		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+
 		call_integration_hook('integrate_post_ban_permissions', array(&$denied_permissions));
 		$user_info['permissions'] = array_diff($user_info['permissions'], $denied_permissions);
 	}
