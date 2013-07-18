@@ -1122,9 +1122,9 @@ class Admin_Controller extends Action_Controller
 			if (strpos($key, '-admin') !== false)
 				unset($_SESSION['token'][$key]);
 
-		if (isset($_SERVER['HTTP_REFERER']))
+		if (isser($_GET['redir']) && isset($_SERVER['HTTP_REFERER']))
 			redirectexit($_SERVER['HTTP_REFERER']);
 		else
-			redirectexit('action=admin');
+			redirectexit();
 	}
 }
