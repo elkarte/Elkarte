@@ -534,14 +534,14 @@ class MergeTopics_Controller extends Action_Controller
 			cache_put_data('response_prefix', $context['response_prefix'], 600);
 		}
 
-		$_POST['enforce_subject'] = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])): '';
+		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])): '';
 
 		// Change the topic IDs of all messages that will be merged.  Also adjust subjects if 'enforce subject' was checked.
 		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET
 				id_topic = {int:id_topic},
-				id_board = {int:target_board}' . (empty($_POST['enforce_subject']) ? '' : ',
+				id_board = {int:target_board}' . (empty($enforce_subject) ? '' : ',
 				subject = {string:subject}') . '
 			WHERE id_topic IN ({array_int:topic_list})',
 			array(
@@ -731,7 +731,7 @@ class MergeTopics_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Search.subs.php');
 		$searchAPI = findSearchAPI();
 		if (is_callable(array($searchAPI, 'topicMerge')))
-			$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($_POST['enforce_subject']) ? null : array($context['response_prefix'], $target_subject));
+			$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($enforce_subject) ? null : array($context['response_prefix'], $target_subject));
 
 		// Send them to the all done page.
 		redirectexit('action=mergetopics;sa=done;to=' . $id_topic . ';targetboard=' . $target_board);
