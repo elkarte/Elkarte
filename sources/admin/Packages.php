@@ -1485,7 +1485,7 @@ class Packages_Controller extends Action_Controller
 
 		// Load the required file.
 		require_once(SUBSDIR . '/Package.subs.php');
-		require_once(SUBSDIR . 'Themes.subs.php');
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Uninstalling the mod?
 		$reverse = isset($_REQUEST['reverse']) ? true : false;
