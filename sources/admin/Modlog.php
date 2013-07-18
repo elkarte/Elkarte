@@ -185,7 +185,7 @@ class Modlog_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => $txt['modlog_action'],
-						'class' => 'lefttext first_th',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'db' => 'action_text',
@@ -255,7 +255,6 @@ class Modlog_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" name="all" class="input_check" onclick="invertAll(this, this.form);" />',
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$entry', '
