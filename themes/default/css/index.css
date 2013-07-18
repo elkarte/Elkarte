@@ -221,7 +221,7 @@ input[disabled].input_text {
 	background: none;
 	vertical-align: middle;
 }
-/* Nobody ever uses the silly thing, but anyway.... */
+/* The OpenID login form */
 .openid_login {
 	padding-left: 18px;
 	background: white url(../images/openid.png) no-repeat;
