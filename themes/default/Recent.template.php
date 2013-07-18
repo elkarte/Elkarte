@@ -337,7 +337,7 @@ function template_replies()
 		echo '
 					<div class="forum_category">
 						<h2 class="category_header">
-							', $txt['msg_alert_none'], '
+							', $txt['topic_alert_none'], '
 						</h2>
 						<div class="board_row centertext">
 							', $context['showing_all_topics'] ? '<strong>'. $txt['find_no_results']. '</strong>' : $txt['unread_topics_visit_none'], '
