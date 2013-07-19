@@ -52,6 +52,8 @@ $txt['membergroups_icon_image'] = 'Icon image filename';
 $txt['membergroups_icon_image_note'] = 'Upload icon images in to the default theme directory to enable selection.';
 $txt['membergroups_max_messages'] = 'Max personal messages';
 $txt['membergroups_max_messages_note'] = '0 = unlimited';
+$txt['membergroups_max_messages_desc'] = 'Here you can set the limit of personal messages a user can keep on the server.<br />
+To allow store an unlimited number of personal messages, you can set the value to 0';
 $txt['membergroups_edit_save'] = 'Save';
 $txt['membergroups_delete'] = 'Delete';
 $txt['membergroups_confirm_delete'] = 'Are you sure you want to delete this group?';

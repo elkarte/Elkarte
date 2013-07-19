@@ -1213,3 +1213,32 @@ function toggleNewPM($id_member, $new = false)
 		)
 	);
 }
+
+/**
+ * Load the PM limits for each group or for a specified group
+ *
+ * @param int (optional) the id of a membergroup
+ */
+function loadPMLimits($id_group = false)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_group, group_name, max_messages
+		FROM {db_prefix}membergroups' . ($id_group ? '
+		WHERE id_group = {int:id_group}' : ''),
+		array(
+			'id_group' => $id_group,
+		)
+	);
+
+	$groups = array();
+	while ($row = $db->fetch_assoc($request))
+		if ($row['id_group'] != 1)
+			$groups[$row['id_group']] = $row;
+
+	$db->free_result($request);
+
+	return $groups;
+}
+
