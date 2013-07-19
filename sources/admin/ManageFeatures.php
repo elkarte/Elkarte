@@ -72,23 +72,25 @@ class ManageFeatures_Controller extends Action_Controller
 		$subActions = array(
 			'basic' => array(
 				'controller' => $this,
-				'function' => 'action_basicSettings_display',
-				'default' => true),
+				'function' => 'action_basicSettings_display'),
 			'layout' => array(
 				'controller' => $this,
 				'function' => 'action_layoutSettings_display'),
 			'karma' => array(
 				'controller' => $this,
-				'function' => 'action_karmaSettings_display'),
+				'function' => 'action_karmaSettings_display',
+				'enabled' => in_array('k', $context['admin_features'])),
 			'likes' => array(
 				'controller' => $this,
-				'function' => 'action_likesSettings_display'),
+				'function' => 'action_likesSettings_display',
+				'enabled' => in_array('l', $context['admin_features'])),
 			'sig' => array(
 				'controller' => $this,
 				'function' => 'action_signatureSettings_display'),
 			'profile' => array(
 				'controller' => $this,
-				'function' => 'action_profile'),
+				'function' => 'action_profile',
+				'enabled' => in_array('cp', $context['admin_features'])),
 			'profileedit' => array(
 				'controller' => $this,
 				'function' => 'action_profileedit'),
@@ -96,25 +98,12 @@ class ManageFeatures_Controller extends Action_Controller
 
 		call_integration_hook('integrate_modify_features', array(&$subActions));
 
-		// If Advanced Profile Fields are disabled don't show the setting page
-		if (!in_array('cp', $context['admin_features']))
-			unset($subActions['profile']);
-
-		// Same for Karma
-		if (!in_array('k', $context['admin_features']))
-			unset($subActions['karma']);
-
-		// And likes
-		if (!in_array('l', $context['admin_features']))
-			unset($subActions['likes']);
-
 		// By default do the basic settings.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
-		$subAction = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'basic');
 
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');

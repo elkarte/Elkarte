@@ -72,11 +72,11 @@ class ManageRegistration_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_registrations', array(&$subActions));
 
 		// Work out which to call...
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('moderate_forum') ? 'register' : 'settings');
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'register';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'register');
 
 		// You way will end here if you don't have permission.
 		$action->isAllowedTo($subAction);

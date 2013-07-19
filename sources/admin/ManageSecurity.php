@@ -63,14 +63,10 @@ class ManageSecurity_Controller extends Action_Controller
 			'general' => array($this, 'action_securitySettings_display'),
 			'spam' => array($this, 'action_spamSettings_display'),
 			'badbehavior' => array($this, 'action_bbSettings_display'),
-			'moderation' => array($this, 'action_moderationSettings_display'),
+			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => in_array('w', $context['admin_features'])),
 		);
 
 		call_integration_hook('integrate_modify_security', array(&$subActions));
-
-		// If Warning System is disabled don't show the setting page
-		if (!in_array('w', $context['admin_features']))
-			unset($subActions['moderation']);
 
 		// @FIXME
 		// loadGeneralSettingParameters($subActions, 'general');
@@ -92,7 +88,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// Set up action stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'general');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

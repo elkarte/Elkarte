@@ -58,7 +58,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Set up the action class
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'emaillist');
 
 		// Default to sub action 'emaillist' if none was given
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']][1])) ? $_REQUEST['sa'] : 'emaillist';

@@ -66,14 +66,14 @@ class ManageMembers_Controller extends Action_Controller
 
 		call_integration_hook('integrate_manage_members', array(&$subActions));
 
-		// Default to sub action 'index' or 'settings' depending on permissions.
+		// Default to sub action 'all'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'all';
 
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'all');
 
 		// You can't pass!
-		$action->isAllowedTo($subAction); // this isn't the simplest way, but lets accept it
+		$action->isAllowedTo($subAction);
 
 		// Load the essentials.
 		loadLanguage('ManageMembers');
