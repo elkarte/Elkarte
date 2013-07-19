@@ -188,7 +188,6 @@ $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a m
 $txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. Click <a href="%3$s">here</a> to view them all.';
 $txt['send_message'] = 'Send message';
 
-$txt['msg_alert_none'] = 'No messages...';
 $txt['msg_alert_you_have'] = 'you have'; //Deprecated
 $txt['msg_alert_messages'] = 'messages'; //Deprecated
 $txt['msg_alert_no_messages'] = 'you don\'t have any message';
@@ -197,6 +196,9 @@ $txt['msg_alert_many_message'] = 'you have <a href="%1$s">%2$d messages</a>';
 $txt['msg_alert_one_new'] = '1 is new';
 $txt['msg_alert_many_new'] = '%1$d are new';
 $txt['remove_message'] = 'Remove this message';
+
+$txt['topic_alert_none'] = 'No messages...';
+$txt['pm_alert_none'] = 'No messages...';
 
 $txt['online_users'] = 'Users Online'; //Deprecated
 $txt['online_now'] = 'Online Now';
@@ -227,6 +229,7 @@ $txt['memberlist_searchable'] = 'Searchable list of all registered members.';
 $txt['welcome_member'] = 'Please welcome'; //Deprecated
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
+$txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
 $txt['last_edit'] = 'Last Edit'; //Deprecated
 $txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
