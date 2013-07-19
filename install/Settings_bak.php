@@ -62,7 +62,7 @@ $webmaster_email = 'noreply@myserver.com';
  * Name of the cookie to set for authentication.
  * @var string
  */
-$cookiename = 'ELKARTECookie11';
+$cookiename = 'ElkArteCookie11';
 
 ########## Database Info ##########
 /**

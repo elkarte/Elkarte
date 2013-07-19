@@ -15,7 +15,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -976,9 +976,9 @@ class Display_Controller
 		// Are you allowed to remove at least a single reply?
 		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
 
-		// Have you liked this post, can you
-		$message['likes'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
-		$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] !== $user_info['id'];
+		// Have you liked this post, can you?
+		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
+		$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] != $user_info['id'] && (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
@@ -1040,9 +1040,10 @@ class Display_Controller
 			'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$message['approved'] || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
 			'can_remove' => allowedTo('delete_any') || (allowedTo('delete_replies') && $context['user']['started']) || (allowedTo('delete_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time())),
 			'can_see_ip' => allowedTo('moderate_forum') || ($message['id_member'] == $user_info['id'] && !empty($user_info['id'])),
-			'can_like' => $message['use_likes'] && !$message['likes'],
-			'can_unlike' => $message['use_likes'] && $message['likes'],
-			'like_counter' =>$message['like_count'],
+			'can_like' => $message['use_likes'] && !$message['you_liked'],
+			'can_unlike' => $message['use_likes'] && $message['you_liked'],
+			'like_counter' => $message['like_count'],
+			'likes_enabled' => !empty($modSettings['likes_enabled']) && ($message['use_likes'] || ($message['like_count'] != 0)),
 		);
 
 		// Is this user the message author?

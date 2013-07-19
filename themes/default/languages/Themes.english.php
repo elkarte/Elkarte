@@ -65,8 +65,9 @@ $txt['enable_random_news'] = 'Enable random news line in the forum header';
 $txt['show_group_key'] = 'Show group key on board index';
 $txt['additional_options_collapsable'] = 'Enable collapsible additional post options';
 $txt['message_index_preview'] = 'Show post previews on the message index';
-$txt['message_index_preview_first'] = 'When using post previews, Show the text of the first post';
-$txt['message_index_preview_first_desc'] = 'Leave un-checked to show the text of the last post instead';
+$txt['message_index_preview_off'] = 'Do not show the previews';
+$txt['message_index_preview_first'] = 'Show the text of the first post';
+$txt['message_index_preview_last'] = 'Show the text of the last post';
 $txt['allow_no_censored'] = 'Allow users to turn off word censoring';
 $txt['who_display_viewing'] = 'Show who is viewing the board index and posts';
 $txt['who_display_viewing_off'] = 'Don\'t show';
@@ -148,7 +149,9 @@ $txt['themeadmin_selectable'] = 'Themes that the user is able to select';
 $txt['themeadmin_themelist_link'] = 'Show the list of themes';
 
 // Strings for the variants
-$txt['variant_red'] = 'Minimalist White';
+$txt['variant_light'] = 'ElkArte Light';
+$txt['variant_dark'] = 'ElkArte Dark';
+$txt['variant_basic'] = 'ElkArte Basic';
 $txt['variant_red'] = 'Red Sector';
 $txt['variant_green'] = 'Green Style';
 $txt['variant_blue'] = 'Blue Sky';

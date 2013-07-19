@@ -17,12 +17,12 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Get the number of mod log entries.
- * Callback for createList() in action_modlog().
+ * Callback for createList() in Modlog::action_log().
  *
  * @param $query_string
  * @param $query_params
@@ -61,7 +61,7 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
 
 /**
  * Gets the moderation log entries that match the specified parameters.
- * Callback for createList() in action_modlog().
+ * Callback for createList() in Modlog::action_log().
  *
  * @param $start
  * @param $items_per_page
@@ -348,7 +348,7 @@ function deleteLogAction($id_log, $time, $delete = null)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_actions
 		WHERE id_log = {int:moderate_log}
-			' . isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '' . '
+			' . (isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '') . '
 			AND log_time < {int:twenty_four_hours_wait}',
 		array(
 			'twenty_four_hours_wait' => time() - $time * 3600,

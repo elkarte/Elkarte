@@ -9,20 +9,29 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class ManageBadBehavior_Controller
+class ManageBadBehavior_Controller extends Action_Controller
 {
+	/**
+	 * Call the appropriate action method.
+	 */
+	public function action_index()
+	{
+		// all we know how to do is...
+		$this->action_log();
+	}
+
 	/**
 	 * View the forum's badbehavior log.
 	 * This function sets all the context up to show the badbehavior log for review.
 	 * It requires the maintain_forum permission.
-	 * It is accessed from ?action=admin;area=logs;sa=errorlog.
+	 * It is accessed from ?action=admin;area=logs;sa=badbehaviorlog.
 	 *
 	 * @uses the BadBehavior template and badbehavior_log sub template.
 	 */
-	public function action_badbehaviorlog()
+	public function action_log()
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
 

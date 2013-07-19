@@ -51,7 +51,6 @@ function template_email_members()
 	echo '
 						</dd>
 					</dl>
-					<br class="clear" />
 				</div>
 			</div>
 			<br />
@@ -129,7 +128,7 @@ function template_email_members()
 	// This is some javascript for the simple/advanced toggling and member suggest
 	echo '
 	<script><!-- // --><![CDATA[
-		var oAdvancedPanelToggle = new smc_Toggle({
+		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['apn']) ? 'false' : 'true', ',
 			aSwappableContainers: [
@@ -138,9 +137,9 @@ function template_email_members()
 			aSwapImages: [
 				{
 					sId: \'advanced_panel_toggle\',
-					srcExpanded: smf_images_url + \'/collapse.png\',
+					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-					srcCollapsed: smf_images_url + \'/expand.png\',
+					srcCollapsed: elk_images_url + \'/expand.png\',
 					altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 				}
 			],
@@ -154,8 +153,8 @@ function template_email_members()
 			oThemeOptions: {
 				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 				sOptionName: \'admin_preferences\',
-				sSessionVar: smf_session_var,
-				sSessionId: smf_session_id,
+				sSessionVar: elk_session_var,
+				sSessionId: elk_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=apn\'
 			}
@@ -165,8 +164,8 @@ function template_email_members()
 	<script><!-- // --><![CDATA[
 		var oMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'members\',
 			sControlId: \'members\',
 			sSearchType: \'member\',
@@ -179,8 +178,8 @@ function template_email_members()
 		});
 		var oExcludeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oExcludeMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'exclude_members\',
 			sControlId: \'exclude_members\',
 			sSearchType: \'member\',
@@ -229,7 +228,6 @@ function template_email_members_compose()
 				', $txt['email_variables'], '
 			</div>
 			<div class="windowbg">
-				<div class="content">
 				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
 					<dl>
 						<dt>
@@ -247,7 +245,8 @@ function template_email_members_compose()
 					<dd id="pm_subject">
 						<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="60" maxlength="60"',isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
 					</dd>
-				</dl><hr class="clear" />
+				</dl>
+				<hr class="clear" />
 				<div id="bbcBox_message"></div>';
 
 	// What about smileys?
@@ -265,10 +264,8 @@ function template_email_members_compose()
 					<li><label for="send_html"><input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '</label></li>
 					<li><label for="parse_html"><input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" class="input_check" /> ', $txt['email_parsed_html'], '</label></li>
 				</ul>
-				<br class="clear_right" />
-				<span id="post_confirm_buttons">
+				<div class="submitbutton">
 					', template_control_richedit_buttons($context['post_box_name']), '
-				</span>
 				</div>
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -328,7 +325,7 @@ function template_email_members_send()
 						<div class="full_bar">', $context['percentage_done'], '% ', $txt['email_done'], '</div>
 						<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
 					</div>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="cont" value="', $txt['email_continue'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="subject" value="', $context['subject'], '" />

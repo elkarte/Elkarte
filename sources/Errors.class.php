@@ -9,7 +9,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('Hacking attempt...');
 
 /**

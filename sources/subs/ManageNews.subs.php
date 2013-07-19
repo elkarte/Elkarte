@@ -15,15 +15,15 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Prepares an array of the forum news items for display in the template
+ * Prepares an array of the forum news items
  *
  * @return array
  */
-function list_getNews()
+function getNews()
 {
 	global $modSettings;
 

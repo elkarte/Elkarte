@@ -18,13 +18,13 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManagePaid controller, administration controller for paid subscriptions.
  */
-class ManagePaid_Controller
+class ManagePaid_Controller extends Action_Controller
 {
 	/**
 	 * Paid subscriptions settings form.
@@ -38,6 +38,8 @@ class ManagePaid_Controller
 	 * It defaults to sub-action 'view'.
 	 * Accessed from ?action=admin;area=paidsubscribe.
 	 * It requires admin_forum permission for admin based actions.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -588,7 +590,7 @@ class ManagePaid_Controller
 		$context['sub_id'] = (int) $_REQUEST['sid'];
 		// Load the subscription information.
 		$context['subscription'] = getSubscription($context['sub_id']);
-	
+
 		// Are we searching for people?
 		$search_string = isset($_POST['ssearch']) && !empty($_POST['sub_search']) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
 		$search_vars = empty($_POST['sub_search']) ? array() : array('search' => '%' . $_POST['sub_search'] . '%', 'guest' => $txt['guest']);
@@ -818,7 +820,7 @@ class ManagePaid_Controller
 						'end_time' => $endtime,
 						'status' => $status,
 					);
-					
+
 					logSubscription($details);
 				}
 			}
@@ -826,7 +828,7 @@ class ManagePaid_Controller
 			else
 			{
 				$subscription_status = getSubscriptionStatus($context['log_id']);
-				
+
 				// Pick the right permission stuff depending on what the status is changing from/to.
 				if ($subscription_status['old_status'] == 1 && $status != 1)
 					removeSubscription($context['sub_id'], $subscription_status['id_member']);
@@ -841,7 +843,7 @@ class ManagePaid_Controller
 						'end_time' => $endtime,
 						'status' => $status,
 						'current_log_item' => $context['log_id']
-					);		
+					);
 					updateSubscriptionItem($item);
 				}
 			}

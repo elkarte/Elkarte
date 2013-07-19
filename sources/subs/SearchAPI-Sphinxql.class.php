@@ -15,26 +15,26 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Sphinxql.php, used when an Sphinx search daemon is used and you want to access it
- * via Sphinx's own implementation of MySQL network protocol
+ * SearchAPI-Sphinxql.class.php, SphinxQL API, used when an Sphinx search daemon is running
+ * Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
  */
 class Sphinxql_Search
 {
 	/**
-	 * This is the last version of ELKARTE that this was tested on, to protect against API changes.
+	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ELKARTE 1.0 Alpha';
+	public $version_compatible = 'ElkArte 1.0 Alpha';
 
 	/**
-	 * This won't work with versions of ELKARTE less than this.
+	 * This won't work with versions of ElkArte less than this.
 	 * @var string
 	 */
-	public $min_elk_version = 'ELKARTE 1.0 Alpha';
+	public $min_elk_version = 'ElkArte 1.0 Alpha';
 
 	/**
 	 * Is it supported?

@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -285,4 +285,159 @@ function sortSpiderTable()
 
 	// Remove the sorting column.
 	$table->db_remove_column('{db_prefix}spiders', 'temp_order');
+}
+
+/**
+ * Return spiders, within the limits specified by parameters
+ * (used by createList() callbacks)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string sort
+ */
+function getSpiders($start, $items_per_page, $sort)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_spider, spider_name, user_agent, ip_info
+		FROM {db_prefix}spiders
+		ORDER BY ' . $sort . '
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+		)
+	);
+	$spiders = array();
+	while ($row = $db->fetch_assoc($request))
+		$spiders[$row['id_spider']] = $row;
+	$db->free_result($request);
+
+	return $spiders;
+}
+
+/**
+ * Return the registered spiders count.
+ * (used by createList() callbacks)
+ *
+ * @return int
+ */
+function getNumSpiders()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*) AS num_spiders
+		FROM {db_prefix}spiders',
+		array(
+		)
+	);
+	list ($numSpiders) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $numSpiders;
+}
+
+/**
+ * Retrieve spider logs within the specified limits.
+ * (used by createList() callbacks)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @return array
+ */
+function getSpiderLogs($start, $items_per_page, $sort)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT sl.id_spider, sl.url, sl.log_time, s.spider_name
+		FROM {db_prefix}log_spider_hits AS sl
+			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = sl.id_spider)
+		ORDER BY ' . $sort . '
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+		)
+	);
+	$spider_logs = array();
+	while ($row = $db->fetch_assoc($request))
+		$spider_logs[] = $row;
+	$db->free_result($request);
+
+	return $spider_logs;
+}
+
+/**
+ * Returns the count of spider logs.
+ * (used by createList() callbacks)
+ *
+ * @return int
+ */
+function getNumSpiderLogs()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*) AS num_logs
+		FROM {db_prefix}log_spider_hits',
+		array(
+		)
+	);
+	list ($numLogs) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $numLogs;
+}
+
+/**
+ * Get a list of spider stats from the log_spider table within the specified
+ * limits.
+ * (used by createList() callbacks)
+ *
+ * @param type $start
+ * @param type $items_per_page
+ * @param type $sort
+ * @return array
+ */
+function getSpiderStats($start, $items_per_page, $sort)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT ss.id_spider, ss.stat_date, ss.page_hits, s.spider_name
+		FROM {db_prefix}log_spider_stats AS ss
+			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = ss.id_spider)
+		ORDER BY ' . $sort . '
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array(
+		)
+	);
+	$spider_stats = array();
+	while ($row = $db->fetch_assoc($request))
+		$spider_stats[] = $row;
+	$db->free_result($request);
+
+	return $spider_stats;
+}
+
+/**
+ * Get the number of spider stat rows from the log spicer stats table
+ * (used by createList() callbacks)
+ *
+ * @return int
+ */
+function getNumSpiderStats()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*) AS num_stats
+		FROM {db_prefix}log_spider_stats',
+		array(
+		)
+	);
+	list ($numStats) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $numStats;
 }

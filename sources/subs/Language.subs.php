@@ -9,12 +9,12 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Removes the given language from all members..
- * @param int $lang_id 
+ * @param int $lang_id
  */
 function removeLanguageFromMember($lang_id)
 {
@@ -329,7 +329,7 @@ function list_getLanguagesList()
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
-	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => '')));
+	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => '')));
 
 	// Load the class file and stick it into an array.
 	require_once(SUBSDIR . '/XmlArray.class.php');

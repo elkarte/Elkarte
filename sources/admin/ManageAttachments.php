@@ -15,14 +15,14 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * This is the attachments and avatars controller class.
  * It is doing the job of attachments and avatars maintenance and management.
  */
-class ManageAttachments_Controller
+class ManageAttachments_Controller extends Action_Controller
 {
 	/**
 	 * Attachments settings form
@@ -31,14 +31,16 @@ class ManageAttachments_Controller
 	protected $_attachSettingsForm;
 
 	/**
-	 * The main 'Attachments and Avatars' management function.
-	 * This function is the entry point for index.php?action=admin;area=manageattachments
+	 * The main 'Attachments and Avatars' admin.
+	 * This method is the entry point for index.php?action=admin;area=manageattachments
 	 * and it calls a function based on the sub-action.
 	 * It requires the manage_attachments permission.
 	 *
 	 * @uses ManageAttachments template.
 	 * @uses Admin language file.
 	 * @uses template layer 'manage_files' for showing the tab bar.
+	 *
+	 * @see Action_Controller::action_index()
 	 *
 	 */
 	public function action_index()

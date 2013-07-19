@@ -17,11 +17,22 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class AdminDebug_Controller
+class AdminDebug_Controller extends Action_Controller
 {
+	/**
+	 * Main dispatcher.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// what to do first... viewquery! What, it'll work or it won't.
+		// $this->action_viewquery();
+	}
+
 	/**
 	 * Show the database queries for debugging
 	 * What this does:
@@ -57,8 +68,8 @@ class AdminDebug_Controller
 
 		$query_id = isset($_REQUEST['qq']) ? (int) $_REQUEST['qq'] - 1 : -1;
 
-		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+		echo '<!DOCTYPE html>
+<html', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<title>', $context['forum_name_html_safe'], '</title>
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
@@ -210,15 +221,15 @@ class AdminDebug_Controller
 		if (empty($_REQUEST['filename']) || !is_string($_REQUEST['filename']))
 			fatal_lang_error('no_access', false);
 
-		$file = list_getAdminInfoFile($_REQUEST['filename']);
+		$file = adminInfoFile($_REQUEST['filename']);
 
 		// @todo Temp
 		// Figure out if sesc is still being used.
 		if (strpos($file['file_data'], ';sesc=') !== false)
 			$file['file_data'] = '
-if (!(\'smfForum_sessionvar\' in window))
-	window.smfForum_sessionvar = \'sesc\';
-' . strtr($file['file_data'], array(';sesc=' => ';\' + window.smfForum_sessionvar + \'='));
+if (!(\'elkForum_sessionvar\' in window))
+	window.elkForum_sessionvar = \'sesc\';
+' . strtr($file['file_data'], array(';sesc=' => ';\' + window.elkForum_sessionvar + \'='));
 
 		Template_Layers::getInstance()->removeAll();
 

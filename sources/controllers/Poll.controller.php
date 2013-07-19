@@ -15,7 +15,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -24,8 +24,18 @@ if (!defined('ELKARTE'))
  * editing polls. Note that that posting polls is done in
  * Post.controller.php.
  */
-class Poll_Controller
+class Poll_Controller extends Action_Controller
 {
+	/**
+	 * Forward to the right action.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Figure out the right action to do.
+	}
+
 	/**
 	 * Allow the user to vote.
 	 * It is called to register a vote in a poll.

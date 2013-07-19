@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
  * to register a new member, to see and edit the  registration agreement,
  * to set up reserved words for forum names.
  */
-class ManageRegistration_Controller
+class ManageRegistration_Controller extends Action_Controller
 {
 	/**
 	 * Registration settings form
@@ -43,6 +43,8 @@ class ManageRegistration_Controller
 	 *
 	 * @uses Login language file
 	 * @uses Register template.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -70,11 +72,11 @@ class ManageRegistration_Controller
 		call_integration_hook('integrate_manage_registrations', array(&$subActions));
 
 		// Work out which to call...
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('moderate_forum') ? 'register' : 'settings');
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'register';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'register');
 
 		// You way will end here if you don't have permission.
 		$action->isAllowedTo($subAction);
@@ -174,7 +176,7 @@ class ManageRegistration_Controller
 			foreach ($membergroups as $membergroup)
 				$groups[$membergroup['id']] = $membergroup['name'];
 
-			$context['member_groups'] = $groups; 
+			$context['member_groups'] = $groups;
 		}
 		else
 			$context['member_groups'] = array();

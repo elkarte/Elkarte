@@ -140,7 +140,7 @@ function template_select_search_method()
 					</dl>
 					', $context['double_index'] ? '<div class="noticebox">
 					' . $txt['search_double_index'] . '</div>' : '', '
-					<fieldset class="search_settings floatleft">
+					<fieldset class="search_settings">
 						<legend>', $txt['search_index'], '</legend>
 						<dl>
 							<dt><input type="radio" name="search_index" value=""', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' class="input_radio" />
@@ -216,12 +216,11 @@ function template_select_search_method()
 	echo '
 						</dl>
 					</fieldset>
-					<fieldset class="search_settings floatright">
+					<fieldset class="search_settings">
 					<legend>', $txt['search_method'], '</legend>
 						<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
 						<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
 					</fieldset>
-					<br class="clear"/>
 					<input type="submit" name="save" value="', $txt['search_method_save'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-msmpost_token_var'], '" value="', $context['admin-msmpost_token'], '" />
@@ -258,7 +257,7 @@ function template_create_index()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="save" value="', $txt['search_create_index_start'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
@@ -288,7 +287,7 @@ function template_create_index_progress()
 							<div class="green_percent" style="width: ', $context['percentage'], '%;">&nbsp;</div>
 						</div>
 					</div>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="cont" value="', $txt['search_create_index_continue'], '" class="button_submit" />
 				</div>
 			</div>
@@ -365,7 +364,7 @@ function template_spider_edit()
 							<textarea name="spider_ip" id="spider_ip" rows="4" cols="20">', $context['spider']['ip_info'], '</textarea>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-ses_token_var'], '" value="', $context['admin-ses_token'], '" />
@@ -389,7 +388,6 @@ function template_show_spider_logs()
 	template_show_list('spider_logs');
 
 	echo '
-		<br class="clear" />
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=logs" method="post" accept-charset="UTF-8">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['spider_logs_delete'], '</h3>
@@ -431,7 +429,7 @@ function template_show_spider_stats()
 					<p>
 						', sprintf($txt['spider_stats_delete_older'], '<input type="text" name="older" id="older" value="90" size="3" class="input_text" />'), '
 					</p>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-ss_token_var'], '" value="', $context['admin-ss_token'], '" />
 					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" class="button_submit" />

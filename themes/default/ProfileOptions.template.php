@@ -31,16 +31,16 @@ function template_editBuddies()
 			</h3>
 		</div>
 		<table class="table_grid">
-			<tr class="catbg">
-				<th class="first_th" scope="col" style="width:20%">', $txt['name'], '</th>
-				<th class="centertext" scope="col">', $txt['status'], '</th>';
+			<tr class="table_head">
+				<th scope="col" style="width:20%">', $txt['name'], '</th>
+				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
 		echo '
-				<th class="centertext" scope="col">', $txt['email'], '</th>';
+				<th scope="col">', $txt['email'], '</th>';
 
 	echo '
-				<th class="last_th centertext" scope="col"></th>
+				<th scope="col"></th>
 			</tr>';
 
 	// If they don't have any buddies don't list them!
@@ -104,7 +104,7 @@ function template_editBuddies()
 					</dt>
 					<dd>
 						<input type="text" name="new_buddy" id="new_buddy" size="30" class="input_text" />
-						<input type="submit" value="', $txt['buddy_add_button'], '" class="button_submit floatnone" />
+						<input type="submit" value="', $txt['buddy_add_button'], '" class="button_submit" />
 					</dd>
 				</dl>';
 
@@ -122,8 +122,8 @@ function template_editBuddies()
 	<script><!-- // --><![CDATA[
 		var oAddBuddySuggest = new smc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'new_buddy\',
 			sControlId: \'new_buddy\',
 			sSearchType: \'member\',
@@ -148,16 +148,16 @@ function template_editIgnoreList()
 			</h3>
 		</div>
 		<table class="table_grid">
-			<tr class="catbg">
-				<th class="first_th" scope="col" style="width:20%">', $txt['name'], '</th>
-				<th class="centertext" scope="col">', $txt['status'], '</th>';
+			<tr class="table_head">
+				<th scope="col" style="width:20%">', $txt['name'], '</th>
+				<th scope="col">', $txt['status'], '</th>';
 
 	if ($context['can_send_email'])
 		echo '
-				<th class="centertext" scope="col">', $txt['email'], '</th>';
+				<th scope="col">', $txt['email'], '</th>';
 
 	echo '
-				<th class="centertext last_th" scope="col"></th>
+				<th scope="col"></th>
 			</tr>';
 
 	// If they don't have anyone on their ignore list, don't list it!
@@ -205,7 +205,7 @@ function template_editIgnoreList()
 					</dt>
 					<dd>
 						<input type="text" name="new_ignore" id="new_ignore" size="25" class="input_text" />
-						<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit floatnone" />
+						<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit" />
 					</dd>
 				</dl>';
 
@@ -222,8 +222,8 @@ function template_editIgnoreList()
 	<script><!-- // --><![CDATA[
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'new_ignore\',
 			sControlId: \'new_ignore\',
 			sSearchType: \'member\',
@@ -290,7 +290,7 @@ function template_edit_options()
 		{
 			echo '
 					</dl>
-					<hr class="hrcolor clear" style="width: 100%; height: 1px" />
+					<hr class="clear" />
 					<dl>';
 		}
 		elseif ($field['type'] == 'callback')
@@ -378,7 +378,7 @@ function template_edit_options()
 	{
 		if ($lastItem != 'hr')
 			echo '
-					<hr class="hrcolor clear" style="width: 100%; height: 1px" />';
+					<hr class="clear" />';
 
 		echo '
 					<dl>';
@@ -850,7 +850,7 @@ function template_action_notification()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<div>
 						<input id="notify_submit" type="submit" value="', $txt['notify_save'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['token_check']) ? '
@@ -916,11 +916,11 @@ function template_groupMembership()
 	else
 	{
 		echo '
-			<table style="width:100%" class="table_padding">
+			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th" scope="col" ', $context['can_edit_primary'] ? ' colspan="2"' : '', '>', $txt['current_membergroups'], '</th>
-						<th class="last_th" scope="col"></th>
+					<tr class="table_head">
+						<th scope="col" ', $context['can_edit_primary'] ? ' colspan="2"' : '', '>', $txt['current_membergroups'], '</th>
+						<th scope="col"></th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -966,13 +966,13 @@ function template_groupMembership()
 		{
 			echo '
 			<br />
-			<table style="width:100%" class="table_padding">
+			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th" scope="col">
+					<tr class="table_head">
+						<th scope="col">
 							', $txt['available_groups'], '
 						</th>
-						<th class="last_th" scope="col"></th>
+						<th scope="col"></th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -1528,15 +1528,15 @@ function template_authentication_method()
 									<em>', $txt['choose_pass'], ':</em>
 								</dt>
 								<dd>
-									<input type="password" name="passwrd1" id="smf_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
-									<span id="smf_autov_pwmain_div" style="display: none;"><img id="smf_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" /></span>
+									<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
+									<span id="elk_autov_pwmain_div" style="display: none;"><img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" /></span>
 								</dd>
 								<dt>
 									<em>', $txt['verify_pass'], ':</em>
 								</dt>
 								<dd>
-									<input type="password" name="passwrd2" id="smf_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
-									<span id="smf_autov_pwverify_div" style="display: none;"><img id="smf_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" /></span>
+									<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
+									<span id="elk_autov_pwverify_div" style="display: none;"><img id="elk_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" /></span>
 								</dd>
 							</dl>
 						</dd>
@@ -1544,7 +1544,7 @@ function template_authentication_method()
 
 	if ($context['require_password'])
 		echo '
-					<hr class="hrcolor clear" style="width: 100%; height: 1px" />
+					<hr class="clear" />
 					<dl>
 						<dt>
 							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '>', $txt['current_password'], ': </strong><br />
@@ -1556,7 +1556,7 @@ function template_authentication_method()
 					</dl>';
 
 	echo '
-					<hr class="hrcolor" />';
+					<hr />';
 
 	if (!empty($context['token_check']))
 		echo '
@@ -1581,7 +1581,7 @@ function template_authentication_method()
 		"password_no_match": "', $txt['registration_password_no_match'], '",
 		"password_valid": "', $txt['registration_password_valid'], '"
 	};
-	var verificationHandle = new smfRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 	var currentAuthMethod = \'passwd\';
 	updateAuthMethod();
 	// ]]></script>';

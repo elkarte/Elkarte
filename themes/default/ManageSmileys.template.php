@@ -39,9 +39,9 @@ function template_editsets()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		window.smfForum_scripturl = smf_scripturl;
-		window.smfForum_sessionid = smf_session_id;
-		window.smfForum_sessionvar = smf_session_var;
+		window.elkForum_scripturl = elk_scripturl;
+		window.elkForum_sessionid = elk_session_id;
+		window.elkForum_sessionvar = elk_session_var;
 	// ]]></script>';
 
 	if (empty($modSettings['disable_elk_js']))
@@ -50,10 +50,10 @@ function template_editsets()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		function smfSetLatestSmileys()
+		function elkSetLatestSmileys()
 		{
-			if (typeof(window.smfLatestSmileys) != "undefined")
-				setInnerHTML(document.getElementById("smileysLatest"), window.smfLatestSmileys);';
+			if (typeof(window.elkLatestSmileys) != "undefined")
+				setInnerHTML(document.getElementById("smileysLatest"), window.elkLatestSmileys);';
 
 		if (!empty($context['selected_set']))
 			echo '
@@ -67,7 +67,7 @@ function template_editsets()
 		}';
 
 		echo '
-			smfSetLatestSmileys();';
+			elkSetLatestSmileys();';
 
 		echo '
 	// ]]></script>';
@@ -153,7 +153,7 @@ function template_modifyset()
 
 		echo '
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="smiley_save" value="', $txt['smiley_sets_save'], '" class="button_submit" />
 				</div>
 			</div>
@@ -242,7 +242,7 @@ function template_modifysmiley()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="smiley_save" value="', $txt['smileys_save'], '" class="button_submit" />
 					<input type="submit" name="deletesmiley" value="', $txt['smileys_delete'], '" onclick="return confirm(\'', $txt['smileys_delete_confirm'], '\');" class="button_submit" />
 				</div>
@@ -393,7 +393,7 @@ function template_addsmiley()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="smiley_save" value="', $txt['smileys_save'], '" class="button_submit" />
 				</div>
 			</div>
@@ -525,7 +525,7 @@ function template_editicon()
 					<input type="hidden" name="icon" value="', $context['icon']['id'], '" />';
 
 	echo '
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="icons_save" value="', $txt['smileys_save'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>

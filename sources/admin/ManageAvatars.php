@@ -9,14 +9,14 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * This is the avatars administration controller class.
  * It is doing the job of maintenance and allow display and change of admin settings.
  */
-class ManageAvatars_Controller
+class ManageAvatars_Controller extends Action_Controller
 {
 	/**
 	 * Avatars settings form

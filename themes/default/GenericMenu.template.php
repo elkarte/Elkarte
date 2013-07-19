@@ -213,10 +213,9 @@ function template_generic_menu_tabs(&$menu_context)
 	if (!empty($tab_context['title']))
 	{
 		echo '
-					<div class="cat_bar">
-						<h3 class="catbg">';
+					<div class="category_header">';
 
-		// The function is in Admin.template.php, but since this template is used elsewhere too better check if the function is available
+		// The function is in Admin.template.php, but since this template is used elsewhere too better check if the function is available.
 		if (function_exists('template_admin_quick_search'))
 			template_admin_quick_search();
 
@@ -269,6 +268,9 @@ function template_generic_menu_tabs(&$menu_context)
 				}
 			}
 		}
+
+		echo '
+						<h3 class="floatleft">';
 
 		// Show an icon and/or a help item?
 		if (!empty($selected_tab['icon']) || !empty($tab_context['icon']) || !empty($selected_tab['help']) || !empty($tab_context['help']))

@@ -17,18 +17,18 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class Announce_Controller
+class Announce_Controller extends Action_Controller
 {
 	/**
 	 * Default (sub)action for ?action=announce
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
-		loadLanguage('Post');
-
 		// default for action=announce: action_selectgroup() function.
 		$this->action_selectgroup();
 	}

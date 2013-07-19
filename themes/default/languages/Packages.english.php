@@ -3,7 +3,7 @@
 // Version: 1.0; Packages
 
 $txt['package_proceed'] = 'Proceed';
-$txt['php_script'] = 'Modification file was extracted, but this add-on also comes with a PHP script which should be executed before it will work';
+$txt['php_script'] = 'The add-on archive was extracted, but this add-on also comes with a PHP script which should be executed before it will work';
 $txt['package_run'] = 'Run';
 $txt['package_id'] = 'ID';
 $txt['package_read'] = 'Read';
@@ -13,7 +13,6 @@ $txt['notes_file'] = 'Instruction/Additional notes file';
 $txt['list_file'] = 'List files in package';
 $txt['files_archive'] = 'Files in archive';
 $txt['package_get'] = 'Package Get';
-$txt['package_servers'] = 'Package servers';
 $txt['package_browse'] = 'Browse';
 $txt['add_server'] = 'Add server';
 $txt['server_name'] = 'Server name';
@@ -25,7 +24,7 @@ $txt['package_downloaded_successfully'] = 'Package has been downloaded successfu
 $txt['package_manager'] = 'Package Manager';
 $txt['install_mod'] = 'Install Add-on';
 $txt['uninstall_mod'] = 'Uninstall Add-on';
-$txt['sql_file'] = 'The Modification file has been extracted.  This add-on also comes with a database file containing changes the database needs.  You will need to execute this file for the add-on to function properly.';
+$txt['sql_file'] = 'The add-on archive has been extracted.  This add-on also comes with a database file containing changes the database needs.  You will need to execute this file for the add-on to function properly.';
 $txt['sql_queries'] = 'SQL Queries';
 $txt['no_mods_installed'] = 'No add-ons currently installed';
 $txt['browse_installed'] = 'Browse installed add-ons';
@@ -37,10 +36,13 @@ $txt['lets_try_anyway'] = 'Let me try anyway.';
 
 $txt['package_manager_desc'] = 'From this easy to use interface, you can download and install add-ons for use on your forum.';
 $txt['installed_packages_desc'] = 'You can use the interface below to view those packages currently installed on the forum, and remove the ones you no longer require.';
-$txt['download_packages_desc'] = 'From this section you can choose to either download new packages from package servers, or upload a package file directly to the forum.';
+$txt['download_packages_desc'] = 'From this section you can add or remove package servers, browse for packages, or download new packages from servers.';
+$txt['package_servers_desc'] = 'From this easy to use interface, you can manage your package servers and download add-on archives on your forum.';
+$txt['upload_packages_desc'] = 'From this section you can upload a package file from your local computer directly to the forum.';
 
 $txt['create_package'] = 'Create a new Package';
 $txt['download_new_package'] = 'Download new packages';
+$txt['upload_new_package'] = 'Upload new package';
 $txt['view_and_remove'] = 'View and remove installed packages';
 $txt['modification_package'] = 'Add-on packages';
 $txt['avatar_package'] = 'Avatar packages';

@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -990,10 +990,10 @@ function getEventProperties($event_id, $calendar_only = false)
 		SELECT
 			c.id_event, c.id_board, c.id_topic, MONTH(c.start_date) AS month,
 			DAYOFMONTH(c.start_date) AS day, YEAR(c.start_date) AS year,
-			(TO_DAYS(c.end_date) - TO_DAYS(c.start_date)) AS span, c.id_member, c.title' . ($simple ? '' : ',
+			(TO_DAYS(c.end_date) - TO_DAYS(c.start_date)) AS span, c.id_member, c.title' . ($calendar_only ? '' : ',
 			t.id_first_msg, t.id_member_started,
 			mb.real_name, m.modified_time') . '
-		FROM {db_prefix}calendar AS c' . ($simple ? '' : '
+		FROM {db_prefix}calendar AS c' . ($calendar_only ? '' : '
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = c.id_topic)
 			LEFT JOIN {db_prefix}members AS mb ON (mb.id_member = t.id_member_started)
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg  = t.id_first_msg)') . '

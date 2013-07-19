@@ -18,36 +18,53 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManageErrors controller, administration of error log.
  */
-class ManageErrors_Controller
+class ManageErrors_Controller extends Action_Controller
 {
 	/**
+	 * Calls the right handler.
+	 * Requires admin_forum permission.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Check for the administrative permission to do this.
+		isAllowedTo('admin_forum');
+
+		// The error log. View the list or view a file?
+		if (isset($_REQUEST['activity']))
+			$activity = $_REQUEST['activity'];
+
+		// Some code redundancy... and we only take this!
+		if (isset($activity) && $activity == 'file')
+			// view the file with the error
+			$this->action_viewfile();
+		else
+			// view error log
+			$this->action_log();
+	}
+
+	/**
 	 * View the forum's error log.
-	 * This function sets all the context up to show the error log for maintenance.
-	 * It requires the maintain_forum permission.
+	 * This method sets all the context up to show the error log for maintenance.
+	 * It requires the admin_forum permission.
 	 * It is accessed from ?action=admin;area=logs;sa=errorlog.
 	 *
 	 * @uses the Errors template and error_log sub template.
 	 */
-	public function action_log()
+	protected function action_log()
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
 
 		$db = database();
 
 		require_once(SUBSDIR . '/Error.subs.php');
-
-		// Viewing contents of a file?
-		if (isset($_GET['file']))
-			return $this->action_viewfile();
-
-		// Check for the administrative permission to do this.
-		isAllowedTo('admin_forum');
 
 		// Templates, etc...
 		loadLanguage('ManageMaintenance');
@@ -203,16 +220,16 @@ class ManageErrors_Controller
 	 * Preconditions:
 	 *  - file must be readable,
 	 *  - full file path must be base64 encoded,
-	 *  - user must have admin_forum permission.
 	 * The line number number is specified by $_REQUEST['line']...
 	 * The function will try to get the 20 lines before and after the specified line.
 	 */
-	public function action_viewfile()
+	protected function action_viewfile()
 	{
 		global $context;
 
-		// Check for the administrative permission to do this.
-		isAllowedTo('admin_forum');
+		// We can't help you if you don't spell it out loud :P
+		if (!isset($_REQUEST['file']))
+			redirectexit();
 
 		// Decode the file and get the line
 		$filename = base64_decode($_REQUEST['file']);

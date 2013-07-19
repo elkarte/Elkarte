@@ -17,13 +17,13 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Manage languages controller class.
  */
-class ManageLanguages_Controller
+class ManageLanguages_Controller extends Action_Controller
 {
 	/**
 	 * Language settings form
@@ -37,6 +37,7 @@ class ManageLanguages_Controller
 	 * Loads the ManageLanguages template. (sub-actions will use it)
 	 *
 	 * @uses ManageSettings language file
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -61,8 +62,8 @@ class ManageLanguages_Controller
 		call_integration_hook('integrate_manage_languages', array(&$subActions));
 
 		// By default we're managing languages.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
+		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -72,8 +73,8 @@ class ManageLanguages_Controller
 
 		// Call the right function for this sub-action.
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch($_REQUEST['sa']);
+		$action->initialize($subActions, 'edit');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -341,7 +342,7 @@ class ManageLanguages_Controller
 			elseif (!empty($install_files))
 			{
 				// @todo retrieve the language pack per naming pattern from our sites
-				$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => ''))) . ';fetch=' . urlencode($_GET['did']), BOARDDIR, false, true, $install_files);
+				$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => ''))) . ';fetch=' . urlencode($_GET['did']), BOARDDIR, false, true, $install_files);
 				// Make sure the files aren't stuck in the cache.
 				package_flush_cache();
 				$context['install_complete'] = sprintf($txt['languages_download_complete_desc'], $scripturl . '?action=admin;area=languages');
@@ -352,7 +353,7 @@ class ManageLanguages_Controller
 
 		// @todo Open up the old china.
 		if (!isset($archive_content))
-			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ELKARTE ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
+			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
 
 		if (empty($archive_content))
 			fatal_error($txt['add_language_error_no_response']);
@@ -1046,7 +1047,7 @@ class ManageLanguages_Controller
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		
+
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),
@@ -1066,10 +1067,10 @@ class ManageLanguages_Controller
 	public function settings()
 	{
 		global $txt;
-		
+
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-		
+
 		$config_vars = array(
 			'language' => array('language', $txt['default_language'], 'file', 'select', array(), null, 'disabled' => $settings_not_writable),
 			array('userLanguage', $txt['userLanguage'], 'db', 'check', null, 'userLanguage'),

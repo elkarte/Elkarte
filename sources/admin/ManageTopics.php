@@ -9,13 +9,13 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
  */
-class ManageTopics_Controller
+class ManageTopics_Controller extends Action_Controller
 {
 	/**
 	 * Topic settings form
@@ -23,6 +23,11 @@ class ManageTopics_Controller
 	 */
 	protected $_topicSettings;
 
+	/**
+	 * Check permissions and forward to the right method.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
 	public function action_index()
 	{
 		// Only admins are allowed around here.
@@ -31,14 +36,13 @@ class ManageTopics_Controller
 		$subActions = array(
 			'display' => array (
 				'controller' => $this,
-				'function' => 'action_topicSettings_display',
-				'default' => true));
+				'function' => 'action_topicSettings_display'));
 
 		$subAction = 'display';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'display');
 
 		// lets just do it!
 		$action->dispatch($subAction);

@@ -143,18 +143,6 @@ h4.titlebg img.icon {
 	background:  #e3e9ef url(../images/admin/subsection_rtl.png) no-repeat 1% 40%, url(../images/theme/lower_section.png) 0 0 repeat-x;
 }
 
-/* The dropdown menu toggle image */
-#menu_toggle {
-	float: left;
-	margin-right: 0;
-	margin-left: 10px;
-	padding-top: 3px;
-}
-#menu_toggle span {
-	position: relative;
-	left: 0;
-}
-
 li#collapse_button {
 	float: left;
 	position: relative;
@@ -212,7 +200,7 @@ div#upper_section div.user ul {
 	padding-right: 10px;
 }
 
-.button_submit, .button_reset, .button_link {
+.button_submit, .button_reset, .linkbutton {
 	float: left;
 }
 

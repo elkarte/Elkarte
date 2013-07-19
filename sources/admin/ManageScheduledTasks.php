@@ -17,10 +17,10 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class ManageScheduledTasks_Controller
+class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
 	 * Scheduled tasks management dispatcher.
@@ -30,6 +30,8 @@ class ManageScheduledTasks_Controller
 	 *
 	 * @uses ManageScheduledTasks template file
 	 * @uses ManageScheduledTasks language file
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -42,7 +44,7 @@ class ManageScheduledTasks_Controller
 
 		$subActions = array(
 			'taskedit' => array($this, 'action_edit'),
-			'action_log' => array($this, 'action_log'),
+			'tasklog' => array($this, 'action_log'),
 			'tasks' => array($this, 'action_tasks'),
 		);
 
@@ -56,7 +58,7 @@ class ManageScheduledTasks_Controller
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'tasks');
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -100,8 +102,7 @@ class ManageScheduledTasks_Controller
 			checkSession();
 
 			// We'll recalculate the dates at the end!
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
-			
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Enable and disable as required.
 			$enablers = array(0);
@@ -127,7 +128,7 @@ class ManageScheduledTasks_Controller
 			// Load up the tasks.
 
 			$nextTasks = loadTasks($tasks);
-			
+
 			// Lets get it on!
 			require_once(SOURCEDIR . '/ScheduledTasks.php');
 			ignore_user_abort(true);
@@ -289,7 +290,7 @@ class ManageScheduledTasks_Controller
 			validateToken('admin-st');
 
 			// We'll need this for calculating the next event.
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Do we have a valid offset?
 			preg_match('~(\d{1,2}):(\d{1,2})~', $_POST['offset'], $matches);

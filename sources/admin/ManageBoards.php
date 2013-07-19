@@ -17,10 +17,10 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class ManageBoards_Controller
+class ManageBoards_Controller extends Action_Controller
 {
 	/**
 	 * Boards settings form.

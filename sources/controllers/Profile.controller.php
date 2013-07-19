@@ -19,16 +19,18 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class Profile_Controller
+class Profile_Controller extends Action_Controller
 {
 	/**
 	 * Allow the change or view of profiles.
 	 * Loads the profile menu.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
 		global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
@@ -78,6 +80,7 @@ class Profile_Controller
 					'summary' => array(
 						'label' => $txt['summary'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_summary',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -87,6 +90,7 @@ class Profile_Controller
 					'statistics' => array(
 						'label' => $txt['statPanel'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_statPanel',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -96,6 +100,7 @@ class Profile_Controller
 					'showposts' => array(
 						'label' => $txt['showPosts'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_showPosts',
 						'subsections' => array(
 							'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
@@ -122,6 +127,7 @@ class Profile_Controller
 					'permissions' => array(
 						'label' => $txt['showPermissions'],
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_showPermissions',
 						'permission' => array(
 							'own' => 'manage_permissions',
@@ -131,7 +137,8 @@ class Profile_Controller
 					'history' => array(
 						'label' => $txt['history'],
 						'file' => '/controllers/ProfileHistory.controller.php',
-						'function' => 'action_history',
+						'controller' => 'ProfileHistory_Controller',
+						'function' => 'action_index',
 						'subsections' => array(
 							'activity' => array($txt['trackActivity'], 'moderate_forum'),
 							'ip' => array($txt['trackIP'], 'moderate_forum'),
@@ -147,6 +154,7 @@ class Profile_Controller
 						'label' => $txt['profile_view_warnings'],
 						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $cur_profile['warning'] && (!empty($modSettings['warning_show']) && ($context['user']['is_owner'] || $modSettings['warning_show'] == 2)),
 						'file' => '/controllers/ProfileInfo.controller.php',
+						'controller' => 'ProfileInfo_Controller',
 						'function' => 'action_viewWarning',
 						'permission' => array(
 							'own' => 'profile_view_own',
@@ -161,6 +169,7 @@ class Profile_Controller
 					'account' => array(
 						'label' => $txt['account'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_account',
 						'enabled' => $context['user']['is_admin'] || ($cur_profile['id_group'] != 1 && !in_array(1, explode(',', $cur_profile['additional_groups']))),
 						'sc' => 'post',
@@ -174,6 +183,7 @@ class Profile_Controller
 					'forumprofile' => array(
 						'label' => $txt['forumprofile'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_forumProfile',
 						'sc' => 'post',
 						'token' => 'profile-fp%u',
@@ -185,6 +195,7 @@ class Profile_Controller
 					'theme' => array(
 						'label' => $txt['theme'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_themepick',
 						'sc' => 'post',
 						'token' => 'profile-th%u',
@@ -196,6 +207,7 @@ class Profile_Controller
 					'authentication' => array(
 						'label' => $txt['authentication'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_authentication',
 						'enabled' => !empty($modSettings['enableOpenID']) || !empty($cur_profile['openid_uri']),
 						'sc' => 'post',
@@ -210,6 +222,7 @@ class Profile_Controller
 					'notification' => array(
 						'label' => $txt['notification'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_notification',
 						'sc' => 'post',
 						'token' => 'profile-nt%u',
@@ -222,6 +235,7 @@ class Profile_Controller
 					'pmprefs' => array(
 						'label' => $txt['pmprefs'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_pmprefs',
 						'enabled' => allowedTo(array('profile_extra_own', 'profile_extra_any')),
 						'sc' => 'post',
@@ -234,6 +248,7 @@ class Profile_Controller
 					'ignoreboards' => array(
 						'label' => $txt['ignoreboards'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_ignoreboards',
 						'enabled' => !empty($modSettings['allow_ignore_boards']),
 						'sc' => 'post',
@@ -246,6 +261,7 @@ class Profile_Controller
 					'lists' => array(
 						'label' => $txt['editBuddyIgnoreLists'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_editBuddyIgnoreLists',
 						'enabled' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 						'sc' => 'post',
@@ -262,6 +278,7 @@ class Profile_Controller
 					'groupmembership' => array(
 						'label' => $txt['groupmembership'],
 						'file' => '/controllers/ProfileOptions.controller.php',
+						'controller' => 'ProfileOptions_Controller',
 						'function' => 'action_groupMembership',
 						'enabled' => !empty($modSettings['show_group_membership']) && $context['user']['is_owner'],
 						'sc' => 'request',
@@ -293,7 +310,7 @@ class Profile_Controller
 						'function' => 'action_issuewarning',
 						'token' => 'profile-iw%u',
 						'permission' => array(
-							'own' => array('issue_warning'),
+							'own' => array(),
 							'any' => array('issue_warning'),
 						),
 					),
@@ -309,6 +326,7 @@ class Profile_Controller
 					'subscriptions' => array(
 						'label' => $txt['subscriptions'],
 						'file' => '/controllers/ProfileSubscriptions.controller.php',
+						'controller' => 'ProfileSubscriptions_Controller',
 						'function' => 'action_subscriptions',
 						'enabled' => !empty($modSettings['paid_enabled']),
 						'permission' => array(
@@ -331,6 +349,7 @@ class Profile_Controller
 					),
 					'activateaccount' => array(
 						'file' => '/controllers/ProfileAccount.controller.php',
+						'controller' => 'ProfileAccount_Controller',
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
 						'token' => 'profile-aa%u',
@@ -552,7 +571,11 @@ class Profile_Controller
 			if ($current_area == 'activateaccount')
 			{
 				if (empty($post_errors))
-					action_activateaccount();
+				{
+					require_once(CONTROLLERDIR . '/ProfileAccount.controller.php');
+					$controller = new ProfileAccount_Controller();
+					$controller->action_activateaccount();
+				}
 			}
 			elseif ($current_area == 'deleteaccount')
 			{
@@ -566,14 +589,20 @@ class Profile_Controller
 			}
 			elseif ($current_area == 'groupmembership' && empty($post_errors))
 			{
-				$msg = action_groupMembership2($profile_vars, $post_errors, $memID);
+				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+				$controller = new Profileoptions_Controller();
+				$msg = $controller->action_groupMembership2($profile_vars, $post_errors, $memID);
 
 				// Whatever we've done, we have nothing else to do here...
 				redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $memID) . ';area=groupmembership' . (!empty($msg) ? ';msg=' . $msg : ''));
 			}
 			// Authentication changes?
 			elseif ($current_area == 'authentication')
-				action_authentication($memID, true);
+			{
+				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
+				$controller = new ProfileOptions_Controller();
+				$controller->action_authentication($memID, true);
+			}
 			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'pmprefs')))
 				saveProfileFields();
 			else

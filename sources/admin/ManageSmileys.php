@@ -17,14 +17,14 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * This class is in charge with administration of smileys and message icons.
  * It handles actions from the Smileys pages in admin panel.
  */
-class ManageSmileys_Controller
+class ManageSmileys_Controller extends Action_Controller
 {
 	/**
 	 * Smileys configuration settings form
@@ -39,6 +39,8 @@ class ManageSmileys_Controller
 
 	/**
 	 * This is the dispatcher of smileys administration.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -50,35 +52,20 @@ class ManageSmileys_Controller
 		loadTemplate('ManageSmileys');
 
 		$subActions = array(
-			'addsmiley' => array($this, 'action_addsmiley'),
-			'editicon' => array($this, 'action_editicon'),
-			'editicons' => array($this, 'action_editicon'),
+			'addsmiley' => array($this, 'action_addsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
+			'editicon' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable'])),
+			'editicons' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable'])),
 			'editsets' => array($this, 'action_edit'),
-			'editsmileys' => array($this, 'action_editsmiley'),
+			'editsmileys' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
 			'import' => array($this, 'action_edit'),
 			'modifyset' => array($this, 'action_edit'),
-			'modifysmiley' => array($this, 'action_editsmiley'),
-			'setorder' => array($this, 'action_setorder'),
+			'modifysmiley' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
+			'setorder' => array($this, 'action_setorder', 'enabled' => !empty($modSettings['smiley_enable'])),
 			'settings' => array($this, 'action_smileySettings_display'),
 			'install' => array($this, 'action_install')
 		);
 
 		call_integration_hook('integrate_manage_smileys', array(&$subActions));
-
-		// If customized smileys is disabled don't show the setting page
-		if (empty($modSettings['smiley_enable']))
-		{
-			unset($subActions['addsmiley']);
-			unset($subActions['editsmileys']);
-			unset($subActions['setorder']);
-			unset($subActions['modifysmiley']);
-		}
-		// If customized message icons is disabled don't show their page either!
-		if (empty($modSettings['messageIcons_enable']))
-		{
-			unset($subActions['editicon']);
-			unset($subActions['editicons']);
-		}
 
 		// Set the smiley context.
 		$this->_initSmileyContext();
@@ -88,11 +75,11 @@ class ManageSmileys_Controller
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'editsets');
 
 		// Set up template stuff
 		$context['page_title'] = $txt['smileys_manage'];
-		$context['sub_action'] = $subAction;
+		$context['sub_action'] = $action->subaction($subAction);
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -523,7 +510,7 @@ class ManageSmileys_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="delete" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="button_submit" /> <a class="button_link" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset' . '">' . $txt['smiley_sets_add'] . '</a> ',
+					'value' => '<input type="submit" name="delete" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="button_submit" /> <a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset' . '">' . $txt['smiley_sets_add'] . '</a> ',
 				),
 			),
 		);

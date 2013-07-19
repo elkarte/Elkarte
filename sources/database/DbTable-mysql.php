@@ -16,7 +16,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class DbTable_MySQL extends DbTable
@@ -125,7 +125,7 @@ class DbTable_MySQL extends DbTable
 		// Righty - let's do the damn thing!
 		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
 		foreach ($columns as $column)
-			$table_query .= "\n\t" . elk_db_create_query_column($column)  . ',';
+			$table_query .= "\n\t" . $this->db_create_query_column($column)  . ',';
 
 		// Loop through the indexes next...
 		foreach ($indexes as $index)
@@ -246,7 +246,7 @@ class DbTable_MySQL extends DbTable
 		// Now add the thing!
 		$query = '
 			ALTER TABLE ' . $table_name . '
-			ADD ' . elk_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
+			ADD ' . $this->db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
 
 		$db->query('', $query,
 			array(

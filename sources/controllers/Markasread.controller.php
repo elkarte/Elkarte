@@ -9,16 +9,18 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * This class handles a part of the actions to mark boards, topics, or replies, as read/unread.
  */
-class MarkRead_Controller
+class MarkRead_Controller extends Action_Controller
 {
 	/**
 	 * This is the main function for markasread file.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -61,7 +63,7 @@ class MarkRead_Controller
 	 */
 	public function action_index_api()
 	{
-		global $context, $txt, $user_info;
+		global $context, $txt, $user_info, $scripturl;
 
 		loadTemplate('Xml');
 
@@ -195,7 +197,7 @@ class MarkRead_Controller
 			$earlyMsg = 0;
 		else
 		{
-			$earlyMsg = messageAt((int) $_REQUEST['start'], $topic);
+			list($earlyMsg) = messageAt((int) $_REQUEST['start'], $topic);
 			$earlyMsg--;
 		}
 

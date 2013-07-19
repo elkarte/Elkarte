@@ -15,13 +15,13 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManagePermissions handles all possible permission stuff.
  */
-class ManagePermissions_Controller
+class ManagePermissions_Controller extends Action_Controller
 {
 	/**
 	 * Permissions settings form
@@ -35,6 +35,8 @@ class ManagePermissions_Controller
 	 * Called by ?action=managepermissions.
 	 *
 	 * @uses ManagePermissions language file.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -509,23 +511,11 @@ class ManagePermissions_Controller
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		$context['group']['id'] = (int) $_GET['group'];
 
-		// Are they toggling the view?
-		if (isset($_GET['view']))
-		{
-			$context['admin_preferences']['pv'] = $_GET['view'] == 'classic' ? 'classic' : 'simple';
-
-			// Update the users preferences.
-			require_once(SUBSDIR . '/Admin.subs.php');
-			updateAdminPreferences();
-		}
-
-		$context['view_type'] = !empty($context['admin_preferences']['pv']) && $context['admin_preferences']['pv'] == 'classic' ? 'classic' : 'simple';
-
 		// It's not likely you'd end up here with this setting disabled.
 		if ($_GET['group'] == 1)
 			redirectexit('action=admin;area=permissions');
 
-		loadAllPermissions($context['view_type']);
+		loadAllPermissions();
 		loadPermissionProfiles();
 
 		if ($context['group']['id'] > 0)
@@ -590,20 +580,13 @@ class ManagePermissions_Controller
 					{
 						// Create a shortcut for the current permission.
 						$curPerm = &$context['permissions'][$permissionType]['columns'][$position][$permissionGroup]['permissions'][$perm['id']];
-						if ($tmp['view'] == 'classic')
+						if ($perm['has_own_any'])
 						{
-							if ($perm['has_own_any'])
-							{
-								$curPerm['any']['select'] = in_array($perm['id'] . '_any', $permissions[$permissionType]['allowed']) ? 'on' : (in_array($perm['id'] . '_any', $permissions[$permissionType]['denied']) ? 'denied' : 'off');
-								$curPerm['own']['select'] = in_array($perm['id'] . '_own', $permissions[$permissionType]['allowed']) ? 'on' : (in_array($perm['id'] . '_own', $permissions[$permissionType]['denied']) ? 'denied' : 'off');
-							}
-							else
-								$curPerm['select'] = in_array($perm['id'], $permissions[$permissionType]['denied']) ? 'denied' : (in_array($perm['id'], $permissions[$permissionType]['allowed']) ? 'on' : 'off');
+							$curPerm['any']['select'] = in_array($perm['id'] . '_any', $permissions[$permissionType]['allowed']) ? 'on' : (in_array($perm['id'] . '_any', $permissions[$permissionType]['denied']) ? 'denied' : 'off');
+							$curPerm['own']['select'] = in_array($perm['id'] . '_own', $permissions[$permissionType]['allowed']) ? 'on' : (in_array($perm['id'] . '_own', $permissions[$permissionType]['denied']) ? 'denied' : 'off');
 						}
 						else
-						{
 							$curPerm['select'] = in_array($perm['id'], $permissions[$permissionType]['denied']) ? 'denied' : (in_array($perm['id'], $permissions[$permissionType]['allowed']) ? 'on' : 'off');
-						}
 					}
 				}
 			}

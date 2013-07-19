@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -866,7 +866,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 		if ($cutword)
 		{
 			// Look for len - buffer characters and cut on first word boundary after
-			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~s', $text, $matches);
+			preg_match('~(.{' . ($len - $buffer) . '}.*?)\b~su', $text, $matches);
 
 			// Always one clown in the audience who likes long words or not using the spacebar
 			if (Util::strlen($matches[1]) > $len + $buffer)
@@ -1154,7 +1154,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_content',
-				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
+				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
 					global $context;
@@ -1191,7 +1191,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_equals_content',
-				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
+				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code">$1</pre>',
 				// @todo Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
 					global $context;
@@ -1252,7 +1252,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'flash',
 				'type' => 'unparsed_commas_content',
 				'test' => '\d+,\d+\]',
-				'content' => (isBrowser('ie') ? '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" style="width: $2px; height: $3px;"><param name="movie" value="$1" /><param name="play" value="true" /><param name="loop" value="true" /><param name="quality" value="high" /><param name="AllowScriptAccess" value="never" /><embed src="$1" width="$2" height="$3" play="true" loop="true" quality="high" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed></object>' : '<embed type="application/x-shockwave-flash" src="$1" width="$2" height="$3" play="true" loop="true" quality="high" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed>'),
+				'content' => (isBrowser('ie') ? '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" style="width: $2px; height: $3px;"><param name="movie" value="$1" /><param name="play" value="true" /><param name="loop" value="true" /><param name="quality" value="high" /><param name="wmode" value="transparent"><param name="AllowScriptAccess" value="never" /><embed src="$1" width="$2" height="$3" play="true" loop="true" quality="high" wmode="transparent" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed></object>' : '<embed type="application/x-shockwave-flash" src="$1" width="$2" height="$3" play="true" loop="true" quality="high" wmode="transparent" AllowScriptAccess="never" /><noembed><a href="$1" target="_blank" class="new_win">$1</a></noembed>'),
 				'validate' => create_function('&$tag, &$data, $disabled', '
 					if (isset($disabled[\'url\']))
 						$tag[\'content\'] = \'$1\';
@@ -1293,9 +1293,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'glow',
 				'type' => 'unparsed_commas',
-				'test' => '[#0-9a-zA-Z\-]{3,12},([012]\d{1,2}|\d{1,2})(,[^]]+)?\]',
-				'before' => isBrowser('ie') ? '<table style="border-collapse: collapse; border-spacing: 0;display: inline; vertical-align: middle; font: inherit;"><tr><td style="filter: Glow(color=$1, strength=$2); font: inherit;">' : '<span style="text-shadow: $1 1px 1px 1px">',
-				'after' => isBrowser('ie') ? '</td></tr></table> ' : '</span>',
+				'test' => '[#0-9a-zA-Z\-]',
+				'before' => '<span style="text-shadow: $1 0 0 4px">',
+				'after' => '</span>',
 			),
 			array(
 				'tag' => 'green',
@@ -1415,7 +1415,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'me',
 				'type' => 'unparsed_equals',
-				'before' => '<div class="meaction">* $1 ',
+				'before' => '<div class="meaction">&nbsp;$1 ',
 				'after' => '</div>',
 				'quoted' => 'optional',
 				'block_level' => true,
@@ -1460,8 +1460,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'quote',
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote'] . '</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote'] . '</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1469,15 +1469,15 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '(.{1,192}?)', 'quoted' => true),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': {author}</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
 				'tag' => 'quote',
 				'type' => 'parsed_equals',
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': $1</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': $1</div><blockquote>',
+				'after' => '</blockquote>',
 				'quoted' => 'optional',
 				// Don't allow everything to be embedded with the author name.
 				'parsed_tags_allowed' => array('url', 'iurl', 'ftp'),
@@ -1490,8 +1490,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					'link' => array('match' => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|action=profile;u=\d+)'),
 					'date' => array('match' => '(\d+)', 'validate' => 'relativeTime'),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . $txt['search_on'] . ' {date}</a></div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader"><a href="' . $scripturl . '?{link}">' . $txt['quote_from'] . ': {author} ' . ($modSettings['todayMod'] == 3 ? ' - ' : $txt['search_on']) . ' {date}</a></div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1499,8 +1499,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'parameters' => array(
 					'author' => array('match' => '(.{1,192}?)'),
 				),
-				'before' => '<div class="quoteheader"><div class="topslice_quote">' . $txt['quote_from'] . ': {author}</div></div><blockquote>',
-				'after' => '</blockquote><div class="quotefooter"><div class="botslice_quote"></div></div>',
+				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
+				'after' => '</blockquote>',
 				'block_level' => true,
 			),
 			array(
@@ -1529,19 +1529,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'shadow',
 				'type' => 'unparsed_commas',
 				'test' => '[#0-9a-zA-Z\-]{3,12},(left|right|top|bottom|[0123]\d{0,2})\]',
-				'before' => isBrowser('ie') ? '<span style="display: inline-block; filter: Shadow(color=$1, direction=$2); height: 1.2em;">' : '<span style="text-shadow: $1 $2">',
+				'before' => '<span style="text-shadow: $1 $2">',
 				'after' => '</span>',
-				'validate' => isBrowser('ie') ? create_function('&$tag, &$data, $disabled', '
-					if ($data[1] == \'left\')
-						$data[1] = 270;
-					elseif ($data[1] == \'right\')
-						$data[1] = 90;
-					elseif ($data[1] == \'top\')
-						$data[1] = 0;
-					elseif ($data[1] == \'bottom\')
-						$data[1] = 180;
-					else
-						$data[1] = (int) $data[1];') : create_function('&$tag, &$data, $disabled', '
+				'validate' => create_function('&$tag, &$data, $disabled', '
 					if ($data[1] == \'top\' || (is_numeric($data[1]) && $data[1] < 50))
 						$data[1] = \'0 -2px 1px\';
 					elseif ($data[1] == \'right\' || (is_numeric($data[1]) && $data[1] < 100))
@@ -1810,6 +1800,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 							$imgtag = preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $imgtag);
 
 						// Check if the image is larger than allowed.
+						// @todo - We should seriously look at deprecating some of this in favour of CSS resizing.
 						if (!empty($modSettings['max_image_width']) && !empty($modSettings['max_image_height']))
 						{
 							// For images, we'll want this.
@@ -2071,6 +2062,11 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$quote_alt = !$quote_alt;
 				}
 				// Add a class to the quote to style alternating blockquotes
+				// @todo - Frankly it makes little sense to allow alternate blockquote styling without also catering for alternate quoteheader styling.
+				// @todo - I do remember coding that some time back, but it seems to have gotten lost somewhere in the SMF 2.1 and/or Elk processes.
+				// @todo - Come to think of it, it may be better to append a second class rather than alter the standard one.
+				// @todo - Example: class="bbc_quote" and class="bbc_quote alt_quote".
+				// @todo - This would mean simpler CSS for themes (like default) which do not use the alternate styling, but would still allow it for themes that want it.
 				$possible['before'] = strtr($possible['before'], array('<blockquote>' => '<blockquote class="bbc_' . ($quote_alt ? 'alternate' : 'standard') . '_quote">'));
 			}
 
@@ -2134,7 +2130,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		}
 
 		// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
-		if ($smileys !== false && $tag === null && isset($itemcodes[$message[$pos + 1]]) && $message[$pos + 2] == ']' && !isset($disabled['list']) && !isset($disabled['li']))
+		if ($smileys !== false && $tag === null && isset($message[$pos + 2]) && isset($itemcodes[$message[$pos + 1]]) && $message[$pos + 2] === ']' && !isset($disabled['list']) && !isset($disabled['li']))
 		{
 			if ($message[$pos + 1] == '0' && !in_array($message[$pos - 1], array(';', ' ', "\t", "\n", '>')))
 				continue;
@@ -2452,7 +2448,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	else
 		$message = strtr($message, array("\n" => ''));
 
-	if ($message[0] === ' ')
+	if (isset($message[0]) && $message[0] === ' ')
 		$message = '&nbsp;' . substr($message, 1);
 
 	// Cleanup whitespace.
@@ -2753,7 +2749,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		ob_clean();
 
 		echo strtr($temp, array(
-			'var smf_iso_case_folding' => 'var target_blank = \'_blank\'; var smf_iso_case_folding',
+			'var elk_iso_case_folding' => 'var target_blank = \'_blank\'; var elk_iso_case_folding',
 			'target="_blank"' => 'onclick="this.target=target_blank"'));
 	}
 
@@ -2920,7 +2916,7 @@ function setupThemeContext($forceload = false)
 			new smc_Popup({
 				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
 				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
-				icon: smf_images_url + \'/im_sm_newmsg.png\'
+				icon: elk_images_url + \'/im_sm_newmsg.png\'
 			});
 		});');
 
@@ -2929,11 +2925,11 @@ function setupThemeContext($forceload = false)
 	{
 		// @todo Move this over to script.js?
 		addInlineJavascript('
-		var smf_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
-		var smf_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
-		window.addEventListener("load", smf_avatarResize, false);' : '
+		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ';
+		var elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('ie') ? '
+		window.addEventListener("load", elk_avatarResize, false);' : '
 		var window_oldAvatarOnload = window.onload;
-		window.onload = smf_avatarResize;'));
+		window.onload = elk_avatarResize;'));
 	}
 
 	// This looks weird, but it's because BoardIndex.controller.php references the variable.
@@ -2952,7 +2948,7 @@ function setupThemeContext($forceload = false)
 	$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
 	if (empty($settings['theme_version']))
-		addJavascriptVar('smf_scripturl', $scripturl);
+		addJavascriptVar('elk_scripturl', $scripturl);
 
 	if (!isset($context['page_title']))
 		$context['page_title'] = '';
@@ -3038,7 +3034,7 @@ function template_rawdata()
  */
 function template_header()
 {
-	global $txt, $modSettings, $context, $settings, $user_info;
+	global $txt, $modSettings, $context, $settings, $user_info, $scripturl;
 
 	setupThemeContext();
 
@@ -3122,6 +3118,9 @@ function template_header()
 		</div>';
 			}
 		}
+		if (in_array($layer, array('body', 'main')) && allowedTo('admin_forum') && !$user_info['is_guest'] && (isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > mktime()))
+			echo '<div class="noticebox">', sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])), '</div>';
+
 		// If the user is banned from posting inform them of it.
 		elseif (in_array($layer, array('main', 'body')) && isset($_SESSION['ban']['cannot_post']) && !$showed_banned)
 		{
@@ -3166,6 +3165,7 @@ function theme_copyright()
 		return;
 
 	// Put in the version...
+	// @todo - No necessity for inline CSS in the copyright, and better without it.
 	$forum_copyright = sprintf($forum_copyright, ucfirst(strtolower($forum_version)));
 
 	echo '
@@ -3204,6 +3204,10 @@ function template_footer()
  *  - if the admin option to combine files is set, will use Combiner.class
  *
  * @param bool $do_defered = false
+ *
+ * @todo - Note that type="text/javascript" and type="text/css" are deprecated in HTML5.
+ * @todo - There are several occurrences in this function, and the next one.
+ * @todo - Full directory search for any strays should be done, then hit the lot of them.
  */
 function template_javascript($do_defered = false)
 {
@@ -3654,33 +3658,71 @@ function setupMenuContext()
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
 		$buttons = array(
+
+			// The old "logout" is meh. Not a real word. "Log out" is better.
+			'logout' => array(
+				'title' => $txt['logout'],
+				'href' => $scripturl . '?action=logout;%1$s=%2$s',
+				'show' => !$user_info['is_guest'],
+				'sub_buttons' => array(
+				),
+			),
+
 			'home' => array(
-				'title' => $txt['home'],
+				'title' => $txt['community'],
 				'href' => $scripturl,
 				'show' => true,
 				'sub_buttons' => array(
+					'help' => array(
+						'title' => $txt['help'],
+						'href' => $scripturl . '?action=help',
+						'show' => true,
+						'sub_buttons' => array(
+						),
+					),
+					'search' => array(
+						'title' => $txt['search'],
+						'href' => $scripturl . '?action=search',
+						'show' => $context['allow_search'],
+						'sub_buttons' => array(
+						),
+					),
+					'calendar' => array(
+						'title' => $txt['calendar'],
+						'href' => $scripturl . '?action=calendar',
+						'show' => $context['allow_calendar'],
+						'sub_buttons' => array(
+						),
+					),
+					'memberlist' => array(
+						'title' => $txt['members_title'],
+						'href' => $scripturl . '?action=memberlist',
+						'show' => $context['allow_memberlist'],
+						'sub_buttons' => array(
+						),
+					),
+					'recent' => array(
+						'title' => $txt['recent_posts'],
+						'href' => $scripturl . '?action=recent',
+						'show' => true,
+						'sub_buttons' => array(
+						),
+					),
 				),
-				'is_last' => $context['right_to_left'],
 			),
-			'help' => array(
-				'title' => $txt['help'],
-				'href' => $scripturl . '?action=help',
-				'show' => true,
-				'sub_buttons' => array(
-				),
-			),
-			'search' => array(
-				'title' => $txt['search'],
-				'href' => $scripturl . '?action=search',
-				'show' => $context['allow_search'],
-				'sub_buttons' => array(
-				),
-			),
+
+			// Will change title correctly if user is either a mod or an admin.
+			// Button highlighting works properly too (see current action stuffz).
 			'admin' => array(
-				'title' => $txt['admin'],
-				'href' => $scripturl . '?action=admin',
-				'show' => $context['allow_admin'],
+				'title' => $context['allow_admin'] && ($context['current_action'] !== 'moderate') ? $txt['admin'] : $txt['moderate'],
+				'href' => $context['allow_admin'] ? $scripturl . '?action=admin' : $scripturl . '?action=moderate',
+				'show' => $context['allow_moderation_center'],
 				'sub_buttons' => array(
+					'admin_center' => array(
+						'title' => $txt['admin_center'],
+						'href' => $scripturl . '?action=admin',
+						'show' => $context['allow_admin'],
+					),
 					'featuresettings' => array(
 						'title' => $txt['modSettings_title'],
 						'href' => $scripturl . '?action=admin;area=featuresettings',
@@ -3691,79 +3733,86 @@ function setupMenuContext()
 						'href' => $scripturl . '?action=admin;area=packages',
 						'show' => allowedTo('admin_forum'),
 					),
+					'permissions' => array(
+						'title' => $txt['edit_permissions'],
+						'href' => $scripturl . '?action=admin;area=permissions',
+						'show' => allowedTo('manage_permissions'),
+					),
 					'errorlog' => array(
 						'title' => $txt['errlog'],
 						'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
 						'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
 					),
-					'permissions' => array(
-						'title' => $txt['edit_permissions'],
-						'href' => $scripturl . '?action=admin;area=permissions',
-						'show' => allowedTo('manage_permissions'),
-						'is_last' => true,
+					'moderate_sub' => array(
+						'title' => $txt['moderate'],
+						'href' => $scripturl . '?action=moderate',
+						'show' => $context['allow_admin'],
+						'sub_buttons' => array(
+							'reports' => array(
+								'title' => $txt['mc_reported_posts'],
+								'href' => $scripturl . '?action=moderate;area=reports',
+								'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+							),
+							'modlog' => array(
+								'title' => $txt['modlog_view'],
+								'href' => $scripturl . '?action=moderate;area=modlog',
+								'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+							),
+							'attachments' => array(
+								'title' => $txt['mc_unapproved_attachments'],
+								'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+							),
+							'poststopics' => array(
+								'title' => $txt['mc_unapproved_poststopics'],
+								'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
+								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+							),
+							'postbyemail' => array(
+								'title' => $txt['mc_emailerror'],
+								'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+								'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+							),
+						),
 					),
-				),
-			),
-			'moderate' => array(
-				'title' => $txt['moderate'],
-				'href' => $scripturl . '?action=moderate',
-				'show' => $context['allow_moderation_center'],
-				'sub_buttons' => array(
-					'modlog' => array(
-						'title' => $txt['modlog_view'],
-						'href' => $scripturl . '?action=moderate;area=modlog',
-						'show' => !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
-					),
-					'poststopics' => array(
-						'title' => $txt['mc_unapproved_poststopics'],
-						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
-						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
-					),
-					'postbyemail' => array(
-						'title' => $txt['mc_emailerror'],
-						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
-						'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-					),
-					'attachments' => array(
-						'title' => $txt['mc_unapproved_attachments'],
-						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-						'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					'moderate' => array(
+						'title' => $txt['moderate'],
+						'href' => $scripturl . '?action=moderate',
+						'show' => !$context['allow_admin'],
 					),
 					'reports' => array(
 						'title' => $txt['mc_reported_posts'],
 						'href' => $scripturl . '?action=moderate;area=reports',
-						'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
-						'is_last' => true,
+						'show' => !$context['allow_admin'] && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					),
+					'modlog' => array(
+						'title' => $txt['modlog_view'],
+						'href' => $scripturl . '?action=moderate;area=modlog',
+						'show' => !$context['allow_admin'] && !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					),
+					'attachments' => array(
+						'title' => $txt['mc_unapproved_attachments'],
+						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'poststopics' => array(
+						'title' => $txt['mc_unapproved_poststopics'],
+						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
+						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'postbyemail' => array(
+						'title' => $txt['mc_emailerror'],
+						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'show' => !$context['allow_admin'] && !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 					),
 				),
 			),
-			'profile' => array(
-				'title' => $txt['profile'],
-				'href' => $scripturl . '?action=profile',
-				'show' => $context['allow_edit_profile'],
-				'sub_buttons' => array(
-					'account' => array(
-						'title' => $txt['account'],
-						'href' => $scripturl . '?action=profile;area=account',
-						'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
-					),
-					'profile' => array(
-						'title' => $txt['forumprofile'],
-						'href' => $scripturl . '?action=profile;area=forumprofile',
-						'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
-						'is_last' => true,
-					),
-					'theme' => array(
-						'title' => $txt['theme'],
-						'href' => $scripturl . '?action=profile;area=theme',
-						'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
-					),
-				),
-			),
+
+			// Language string needs agreement here. Anything but bloody username, please. :P
 			'pm' => array(
-				'title' => $txt['pm_short'],
-				'href' => $scripturl . '?action=pm',
-				'show' => $context['allow_pm'],
+				'title' => $context['allow_pm'] && !$context['allow_edit_profile'] ? $txt['pm_short'] : $txt['account_short'],
+				'href' => $context['allow_pm'] ? $scripturl . '?action=pm' : $scripturl . '?action=profile',
+				'show' => $context['allow_pm'] || $context['allow_edit_profile'],
 				'sub_buttons' => array(
 					'pm_read' => array(
 						'title' => $txt['pm_menu_read'],
@@ -3774,46 +3823,56 @@ function setupMenuContext()
 						'title' => $txt['pm_menu_send'],
 						'href' => $scripturl . '?action=pm;sa=send',
 						'show' => allowedTo('pm_send'),
-						'is_last' => true,
+					),
+					'profile' => array(
+						'title' => $txt['profile'],
+						'href' => $scripturl . '?action=profile',
+						'show' => $context['allow_edit_profile'],
+						'sub_buttons' => array(
+							'account' => array(
+								'title' => $txt['account'],
+								'href' => $scripturl . '?action=profile;area=account',
+								'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
+							),
+							'profile' => array(
+								'title' => $txt['forumprofile'],
+								'href' => $scripturl . '?action=profile;area=forumprofile',
+								'show' => allowedTo(array('profile_extra_any', 'profile_extra_own')),
+							),
+							'theme' => array(
+								'title' => $txt['theme'],
+								'href' => $scripturl . '?action=profile;area=theme',
+								'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
+							),
+						),
 					),
 				),
 			),
-			'calendar' => array(
-				'title' => $txt['calendar'],
-				'href' => $scripturl . '?action=calendar',
-				'show' => $context['allow_calendar'],
+
+			// The old language string made no sense, and was too long.
+			// "New posts" is better, because there are probably a pile
+			// of old unread posts, and they wont be reached from this button.
+			'unread' => array(
+				'title' => $txt['view_unread_category'],
+				'href' => $scripturl . '?action=unread',
+				'show' => !$user_info['is_guest'],
 				'sub_buttons' => array(
-					'view' => array(
-						'title' => $txt['calendar_menu'],
-						'href' => $scripturl . '?action=calendar',
-						'show' => allowedTo('calendar_post'),
-					),
-					'post' => array(
-						'title' => $txt['calendar_post_event'],
-						'href' => $scripturl . '?action=calendar;sa=post',
-						'show' => allowedTo('calendar_post'),
-						'is_last' => true,
-					),
 				),
 			),
-			'memberlist' => array(
-				'title' => $txt['members_title'],
-				'href' => $scripturl . '?action=memberlist',
-				'show' => $context['allow_memberlist'],
+
+			// The old language string made no sense, and was too long.
+			// "New replies" is better, because there are "updated topics"
+			// that the user has never posted in and doesn't care about.
+			'updated' => array(
+				'title' => $txt['view_replies_category'],
+				'href' => $scripturl . '?action=unreadreplies',
+				'show' => !$user_info['is_guest'],
 				'sub_buttons' => array(
-					'mlist_view' => array(
-						'title' => $txt['mlist_menu_view'],
-						'href' => $scripturl . '?action=memberlist',
-						'show' => true,
-					),
-					'mlist_search' => array(
-						'title' => $txt['mlist_search'],
-						'href' => $scripturl . '?action=memberlist;sa=search',
-						'show' => true,
-						'is_last' => true,
-					),
 				),
 			),
+
+			// "Log out" would be better here.
+			// "Login" is not a word, and sort of runs together into a bleh.
 			'login' => array(
 				'title' => $txt['login'],
 				'href' => $scripturl . '?action=login',
@@ -3821,22 +3880,15 @@ function setupMenuContext()
 				'sub_buttons' => array(
 				),
 			),
+
 			'register' => array(
 				'title' => $txt['register'],
 				'href' => $scripturl . '?action=register',
 				'show' => $user_info['is_guest'] && $context['can_register'],
 				'sub_buttons' => array(
 				),
-				'is_last' => !$context['right_to_left'],
 			),
-			'logout' => array(
-				'title' => $txt['logout'],
-				'href' => $scripturl . '?action=logout;%1$s=%2$s',
-				'show' => !$user_info['is_guest'],
-				'sub_buttons' => array(
-				),
-				'is_last' => !$context['right_to_left'],
-			),
+
 		);
 
 		// Allow editing menu buttons easily.
@@ -3852,15 +3904,6 @@ function setupMenuContext()
 				// This button needs some action.
 				if (isset($button['action_hook']))
 					$needs_action_hook = true;
-
-				// Make sure the last button truely is the last button.
-				if (!empty($button['is_last']))
-				{
-                    // @todo: $last_button not initialized, probably a bug..
-					if (isset($last_button))
-						unset($menu_buttons[$last_button]['is_last']);
-					$last_button = $act;
-				}
 
 				// Go through the sub buttons if there are any.
 				if (!empty($button['sub_buttons']))
@@ -3901,6 +3944,8 @@ function setupMenuContext()
 		$current_action = $context['current_action'];
 	elseif ($context['current_action'] == 'search2')
 		$current_action = 'search';
+	elseif ($context['current_action'] == 'profile')
+		$current_action = 'pm';
 	elseif ($context['current_action'] == 'theme')
 		$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? 'profile' : 'admin';
 	elseif ($context['current_action'] == 'register2')
@@ -3909,6 +3954,8 @@ function setupMenuContext()
 		$current_action = 'login';
 	elseif ($context['current_action'] == 'groups' && $context['allow_moderation_center'])
 		$current_action = 'moderate';
+	elseif ($context['current_action'] == 'moderate' && $context['allow_admin'])
+		$current_action = 'admin';
 
 	// Not all actions are simple.
 	if (!empty($needs_action_hook))
@@ -3922,6 +3969,8 @@ function setupMenuContext()
 		return;
 
 	// Update the PM menu item if they have unread messages
+	// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
+	// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
 	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
 	{
 		$context['menu_buttons']['pm']['alttitle'] = $context['menu_buttons']['pm']['title'] . ' [' . $context['user']['unread_messages'] . ']';

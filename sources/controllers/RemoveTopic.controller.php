@@ -18,14 +18,23 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Remove Topic Controller
  */
-class RemoveTopic_Controller
+class RemoveTopic_Controller extends Action_Controller
 {
+	/**
+	 * Intended entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// call the right method
+	}
 	/**
 	 * Completely remove an entire topic.
 	 * Redirects to the board when completed.

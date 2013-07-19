@@ -17,14 +17,26 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Statistics Controller
  */
-class Stats_Controller
+class Stats_Controller extends Action_Controller
 {
+	/**
+	 * Entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Call the right method... wait, we only know how to do
+		// one thing (and do it well! :P)
+		$this->action_stats();
+	}
+
 	/**
 	 * Display some useful/interesting board statistics.
 	 *
@@ -33,14 +45,14 @@ class Stats_Controller
 	 * requires the view_stats permission.
 	 * accessed from ?action=stats.
 	 */
-	function action_stats()
+	public function action_stats()
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
 		$db = database();
 
 		isAllowedTo('view_stats');
-		
+
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
 			fatal_lang_error('feature_disabled', true);
@@ -96,51 +108,24 @@ class Stats_Controller
 		$context['show_member_list'] = allowedTo('view_mlist');
 
 		// Get averages...
-		$result = $db->query('', '
-			SELECT
-				SUM(posts) AS posts, SUM(topics) AS topics, SUM(registers) AS registers,
-				SUM(most_on) AS most_on, MIN(date) AS date, SUM(hits) AS hits
-			FROM {db_prefix}log_activity',
-			array(
-			)
-		);
-		$row = $db->fetch_assoc($result);
-		$db->free_result($result);
-
+		$averages = getAverages();
 		// This would be the amount of time the forum has been up... in days...
-		$total_days_up = ceil((time() - strtotime($row['date'])) / (60 * 60 * 24));
+		$total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
 
-		$context['average_posts'] = comma_format(round($row['posts'] / $total_days_up, 2));
-		$context['average_topics'] = comma_format(round($row['topics'] / $total_days_up, 2));
-		$context['average_members'] = comma_format(round($row['registers'] / $total_days_up, 2));
-		$context['average_online'] = comma_format(round($row['most_on'] / $total_days_up, 2));
-		$context['average_hits'] = comma_format(round($row['hits'] / $total_days_up, 2));
+		$context['average_posts'] = comma_format(round($averages['posts'] / $total_days_up, 2));
+		$context['average_topics'] = comma_format(round($averages['topics'] / $total_days_up, 2));
+		$context['average_members'] = comma_format(round($averages['registers'] / $total_days_up, 2));
+		$context['average_online'] = comma_format(round($averages['most_on'] / $total_days_up, 2));
+		$context['average_hits'] = comma_format(round($averages['hits'] / $total_days_up, 2));
 
-		$context['num_hits'] = comma_format($row['hits'], 0);
+		$context['num_hits'] = comma_format($averages['hits'], 0);
 
 		// How many users are online now.
 		$context['users_online'] = onlineCount();
 
 		// Statistics such as number of boards, categories, etc.
-		$result = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}boards AS b
-			WHERE b.redirect = {string:blank_redirect}',
-			array(
-				'blank_redirect' => '',
-			)
-		);
-		list ($context['num_boards']) = $db->fetch_row($result);
-		$db->free_result($result);
-
-		$result = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}categories AS c',
-			array(
-			)
-		);
-		list ($context['num_categories']) = $db->fetch_row($result);
-		$db->free_result($result);
+		$context['num_boards'] = numBoards();
+		$context['num_categories'] = numCategories();
 
 		// Format the numbers nicely.
 		$context['users_online'] = comma_format($context['users_online']);
@@ -159,21 +144,7 @@ class Stats_Controller
 		// Male vs. female ratio - let's calculate this only every four minutes.
 		if (($context['gender'] = cache_get_data('stats_gender', 240)) == null)
 		{
-			$result = $db->query('', '
-				SELECT COUNT(*) AS total_members, gender
-				FROM {db_prefix}members
-				GROUP BY gender',
-				array(
-				)
-			);
-			$context['gender'] = array();
-			while ($row = $db->fetch_assoc($result))
-			{
-				// Assuming we're telling... male or female?
-				if (!empty($row['gender']))
-					$context['gender'][$row['gender'] == 2 ? 'females' : 'males'] = $row['total_members'];
-			}
-			$db->free_result($result);
+			$context['gender'] = genderRatio();
 
 			// Set these two zero if the didn't get set at all.
 			if (empty($context['gender']['males']))
@@ -199,346 +170,26 @@ class Stats_Controller
 		$date = strftime('%Y-%m-%d', forum_time(false));
 
 		// Members online so far today.
-		$result = $db->query('', '
-			SELECT most_on
-			FROM {db_prefix}log_activity
-			WHERE date = {date:today_date}
-			LIMIT 1',
-			array(
-				'today_date' => $date,
-			)
-		);
-		list ($context['online_today']) = $db->fetch_row($result);
-		$db->free_result($result);
-
+		$context['online_today'] = mostOnline($date);
 		$context['online_today'] = comma_format((int) $context['online_today']);
 
 		// Poster top 10.
-		$members_result = $db->query('', '
-			SELECT id_member, real_name, posts
-			FROM {db_prefix}members
-			WHERE posts > {int:no_posts}
-			ORDER BY posts DESC
-			LIMIT 10',
-			array(
-				'no_posts' => 0,
-			)
-		);
-		$context['top_posters'] = array();
-		$max_num_posts = 1;
-		while ($row_members = $db->fetch_assoc($members_result))
-		{
-			$context['top_posters'][] = array(
-				'name' => $row_members['real_name'],
-				'id' => $row_members['id_member'],
-				'num_posts' => $row_members['posts'],
-				'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
-			);
-
-			if ($max_num_posts < $row_members['posts'])
-				$max_num_posts = $row_members['posts'];
-		}
-		$db->free_result($members_result);
-
-		foreach ($context['top_posters'] as $i => $poster)
-		{
-			$context['top_posters'][$i]['post_percent'] = round(($poster['num_posts'] * 100) / $max_num_posts);
-			$context['top_posters'][$i]['num_posts'] = comma_format($context['top_posters'][$i]['num_posts']);
-		}
+		$context['top_posters'] = topPosters();
 
 		// Board top 10.
-		$boards_result = $db->query('', '
-			SELECT id_board, name, num_posts
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board}' : '') . '
-				AND b.redirect = {string:blank_redirect}
-			ORDER BY num_posts DESC
-			LIMIT 10',
-			array(
-				'recycle_board' => $modSettings['recycle_board'],
-				'blank_redirect' => '',
-			)
-		);
-		$context['top_boards'] = array();
-		$max_num_posts = 1;
-		while ($row_board = $db->fetch_assoc($boards_result))
-		{
-			$context['top_boards'][] = array(
-				'id' => $row_board['id_board'],
-				'name' => $row_board['name'],
-				'num_posts' => $row_board['num_posts'],
-				'href' => $scripturl . '?board=' . $row_board['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['name'] . '</a>'
-			);
-
-			if ($max_num_posts < $row_board['num_posts'])
-				$max_num_posts = $row_board['num_posts'];
-		}
-		$db->free_result($boards_result);
-
-		foreach ($context['top_boards'] as $i => $board)
-		{
-			$context['top_boards'][$i]['post_percent'] = round(($board['num_posts'] * 100) / $max_num_posts);
-			$context['top_boards'][$i]['num_posts'] = comma_format($context['top_boards'][$i]['num_posts']);
-		}
-
-		// Are you on a larger forum?  If so, let's try to limit the number of topics we search through.
-		if ($modSettings['totalMessages'] > 100000)
-		{
-			$request = $db->query('', '
-				SELECT id_topic
-				FROM {db_prefix}topics
-				WHERE num_replies != {int:no_replies}' . ($modSettings['postmod_active'] ? '
-					AND approved = {int:is_approved}' : '') . '
-				ORDER BY num_replies DESC
-				LIMIT 100',
-				array(
-					'no_replies' => 0,
-					'is_approved' => 1,
-				)
-			);
-			$topic_ids = array();
-			while ($row = $db->fetch_assoc($request))
-				$topic_ids[] = $row['id_topic'];
-			$db->free_result($request);
-		}
-		else
-			$topic_ids = array();
+		$context['top_boards'] = topBoards();
 
 		// Topic replies top 10.
-		$topic_reply_result = $db->query('', '
-			SELECT m.subject, t.num_replies, t.id_board, t.id_topic, b.name
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board}' : '') . ')
-			WHERE {query_see_board}' . (!empty($topic_ids) ? '
-				AND t.id_topic IN ({array_int:topic_list})' : ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : '')) . '
-			ORDER BY t.num_replies DESC
-			LIMIT 10',
-			array(
-				'topic_list' => $topic_ids,
-				'recycle_board' => $modSettings['recycle_board'],
-				'is_approved' => 1,
-			)
-		);
-		$context['top_topics_replies'] = array();
-		$max_num_replies = 1;
-		while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
-		{
-			censorText($row_topic_reply['subject']);
-
-			$context['top_topics_replies'][] = array(
-				'id' => $row_topic_reply['id_topic'],
-				'board' => array(
-					'id' => $row_topic_reply['id_board'],
-					'name' => $row_topic_reply['name'],
-					'href' => $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0',
-					'link' => '<a href="' . $scripturl . '?board=' . $row_topic_reply['id_board'] . '.0">' . $row_topic_reply['name'] . '</a>'
-				),
-				'subject' => $row_topic_reply['subject'],
-				'num_replies' => $row_topic_reply['num_replies'],
-				'href' => $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0',
-				'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0">' . $row_topic_reply['subject'] . '</a>'
-			);
-
-			if ($max_num_replies < $row_topic_reply['num_replies'])
-				$max_num_replies = $row_topic_reply['num_replies'];
-		}
-		$db->free_result($topic_reply_result);
-
-		foreach ($context['top_topics_replies'] as $i => $topic)
-		{
-			$context['top_topics_replies'][$i]['post_percent'] = round(($topic['num_replies'] * 100) / $max_num_replies);
-			$context['top_topics_replies'][$i]['num_replies'] = comma_format($context['top_topics_replies'][$i]['num_replies']);
-		}
-
-		// Large forums may need a bit more prodding...
-		if ($modSettings['totalMessages'] > 100000)
-		{
-			$request = $db->query('', '
-				SELECT id_topic
-				FROM {db_prefix}topics
-				WHERE num_views != {int:no_views}
-				ORDER BY num_views DESC
-				LIMIT 100',
-				array(
-					'no_views' => 0,
-				)
-			);
-			$topic_ids = array();
-			while ($row = $db->fetch_assoc($request))
-				$topic_ids[] = $row['id_topic'];
-			$db->free_result($request);
-		}
-		else
-			$topic_ids = array();
-
+		$context['top_topics_replies'] = topTopicReplies();
+	
 		// Topic views top 10.
-		$topic_view_result = $db->query('', '
-			SELECT m.subject, t.num_views, t.id_board, t.id_topic, b.name
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND b.id_board != {int:recycle_board}' : '') . ')
-			WHERE {query_see_board}' . (!empty($topic_ids) ? '
-				AND t.id_topic IN ({array_int:topic_list})' : ($modSettings['postmod_active'] ? '
-				AND t.approved = {int:is_approved}' : '')) . '
-			ORDER BY t.num_views DESC
-			LIMIT 10',
-			array(
-				'topic_list' => $topic_ids,
-				'recycle_board' => $modSettings['recycle_board'],
-				'is_approved' => 1,
-			)
-		);
-		$context['top_topics_views'] = array();
-		$max_num_views = 1;
-		while ($row_topic_views = $db->fetch_assoc($topic_view_result))
-		{
-			censorText($row_topic_views['subject']);
-
-			$context['top_topics_views'][] = array(
-				'id' => $row_topic_views['id_topic'],
-				'board' => array(
-					'id' => $row_topic_views['id_board'],
-					'name' => $row_topic_views['name'],
-					'href' => $scripturl . '?board=' . $row_topic_views['id_board'] . '.0',
-					'link' => '<a href="' . $scripturl . '?board=' . $row_topic_views['id_board'] . '.0">' . $row_topic_views['name'] . '</a>'
-				),
-				'subject' => $row_topic_views['subject'],
-				'num_views' => $row_topic_views['num_views'],
-				'href' => $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0',
-				'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0">' . $row_topic_views['subject'] . '</a>'
-			);
-
-			if ($max_num_views < $row_topic_views['num_views'])
-				$max_num_views = $row_topic_views['num_views'];
-		}
-		$db->free_result($topic_view_result);
-
-		foreach ($context['top_topics_views'] as $i => $topic)
-		{
-			$context['top_topics_views'][$i]['post_percent'] = round(($topic['num_views'] * 100) / $max_num_views);
-			$context['top_topics_views'][$i]['num_views'] = comma_format($context['top_topics_views'][$i]['num_views']);
-		}
-
-		// Try to cache this when possible, because it's a little unavoidably slow.
-		if (($members = cache_get_data('stats_top_starters', 360)) == null)
-		{
-			$request = $db->query('', '
-				SELECT id_member_started, COUNT(*) AS hits
-				FROM {db_prefix}topics' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				WHERE id_board != {int:recycle_board}' : '') . '
-				GROUP BY id_member_started
-				ORDER BY hits DESC
-				LIMIT 20',
-				array(
-					'recycle_board' => $modSettings['recycle_board'],
-				)
-			);
-			$members = array();
-			while ($row = $db->fetch_assoc($request))
-				$members[$row['id_member_started']] = $row['hits'];
-			$db->free_result($request);
-
-			cache_put_data('stats_top_starters', $members, 360);
-		}
-
-		if (empty($members))
-			$members = array(0 => 0);
+		$context['top_topics_views'] = topTopicViews();
 
 		// Topic poster top 10.
-		$members_result = $db->query('top_topic_starters', '
-			SELECT id_member, real_name
-			FROM {db_prefix}members
-			WHERE id_member IN ({array_int:member_list})
-			ORDER BY FIND_IN_SET(id_member, {string:top_topic_posters})
-			LIMIT 10',
-			array(
-				'member_list' => array_keys($members),
-				'top_topic_posters' => implode(',', array_keys($members)),
-			)
-		);
-		$context['top_starters'] = array();
-		$max_num_topics = 1;
-		while ($row_members = $db->fetch_assoc($members_result))
-		{
-			$context['top_starters'][] = array(
-				'name' => $row_members['real_name'],
-				'id' => $row_members['id_member'],
-				'num_topics' => $members[$row_members['id_member']],
-				'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
-			);
-
-			if ($max_num_topics < $members[$row_members['id_member']])
-				$max_num_topics = $members[$row_members['id_member']];
-		}
-		$db->free_result($members_result);
-
-		foreach ($context['top_starters'] as $i => $topic)
-		{
-			$context['top_starters'][$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);
-			$context['top_starters'][$i]['num_topics'] = comma_format($context['top_starters'][$i]['num_topics']);
-		}
+		$context['top_starters'] = topTopicStarter();
 
 		// Time online top 10.
-		$temp = cache_get_data('stats_total_time_members', 600);
-		$members_result = $db->query('', '
-			SELECT id_member, real_name, total_time_logged_in
-			FROM {db_prefix}members' . (!empty($temp) ? '
-			WHERE id_member IN ({array_int:member_list_cached})' : '') . '
-			ORDER BY total_time_logged_in DESC
-			LIMIT 20',
-			array(
-				'member_list_cached' => $temp,
-			)
-		);
-		$context['top_time_online'] = array();
-		$temp2 = array();
-		$max_time_online = 1;
-		while ($row_members = $db->fetch_assoc($members_result))
-		{
-			$temp2[] = (int) $row_members['id_member'];
-			if (count($context['top_time_online']) >= 10)
-				continue;
-
-			// Figure out the days, hours and minutes.
-			$timeDays = floor($row_members['total_time_logged_in'] / 86400);
-			$timeHours = floor(($row_members['total_time_logged_in'] % 86400) / 3600);
-
-			// Figure out which things to show... (days, hours, minutes, etc.)
-			$timelogged = '';
-			if ($timeDays > 0)
-				$timelogged .= $timeDays . $txt['totalTimeLogged5'];
-			if ($timeHours > 0)
-				$timelogged .= $timeHours . $txt['totalTimeLogged6'];
-			$timelogged .= floor(($row_members['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
-
-			$context['top_time_online'][] = array(
-				'id' => $row_members['id_member'],
-				'name' => $row_members['real_name'],
-				'time_online' => $timelogged,
-				'seconds_online' => $row_members['total_time_logged_in'],
-				'href' => $scripturl . '?action=profile;u=' . $row_members['id_member'],
-				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row_members['id_member'] . '">' . $row_members['real_name'] . '</a>'
-			);
-
-			if ($max_time_online < $row_members['total_time_logged_in'])
-				$max_time_online = $row_members['total_time_logged_in'];
-		}
-		$db->free_result($members_result);
-
-		foreach ($context['top_time_online'] as $i => $member)
-			$context['top_time_online'][$i]['time_percent'] = round(($member['seconds_online'] * 100) / $max_time_online);
-
-		// Cache the ones we found for a bit, just so we don't have to look again.
-		if ($temp !== $temp2)
-			cache_put_data('stats_total_time_members', $temp2, 480);
+		$context['top_time_online'] = topTimeOnline();
 
 		// Activity by month.
 		$months_result = $db->query('', '

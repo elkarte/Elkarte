@@ -15,7 +15,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -67,8 +67,6 @@ function currentMemberID($fatal = true, $reload_id = false)
 function setupProfileContext($fields)
 {
 	global $profile_fields, $context, $cur_profile, $txt;
-
-	$db = database();
 
 	// Make sure we have this!
 	loadProfileFields(true);
@@ -290,9 +288,7 @@ function loadCustomFields($memID, $area = 'summary')
  */
 function loadProfileFields($force_reload = false)
 {
-	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $old_profile, $cur_profile, $language;
-
-	$db = database();
+	global $context, $profile_fields, $txt, $scripturl, $modSettings, $user_info, $cur_profile, $language;
 
 	// Don't load this twice!
 	if (!empty($profile_fields) && !$force_reload)
@@ -927,10 +923,7 @@ function loadProfileFields($force_reload = false)
  */
 function saveProfileFields()
 {
-	global $profile_fields, $profile_vars, $context, $old_profile;
-	global $post_errors, $modSettings, $cur_profile;
-
-	$db = database();
+	global $profile_fields, $profile_vars, $context, $old_profile, $post_errors, $cur_profile;
 
 	// Load them up.
 	loadProfileFields();
@@ -1070,8 +1063,6 @@ function saveProfileFields()
  */
 function profileValidateEmail($email, $memID = 0)
 {
-	global $context;
-
 	$db = database();
 
 	$email = strtr($email, array('&#039;' => '\''));
@@ -1111,11 +1102,7 @@ function profileValidateEmail($email, $memID = 0)
  */
 function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
 {
-	global $user_info, $txt, $modSettings, $user_profile;
-	global $context, $settings;
-
-
-	$db = database();
+	global $context, $user_profile;
 
 	// These make life easier....
 	$old_profile = &$user_profile[$memID];
@@ -1515,8 +1502,6 @@ function profileSendActivation()
 {
 	global $profile_vars, $txt, $context, $scripturl, $cookiename, $cur_profile, $language, $modSettings;
 
-	$db = database();
-
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Shouldn't happen but just in case.
@@ -1567,8 +1552,6 @@ function profileSendActivation()
 function profileLoadSignatureData()
 {
 	global $modSettings, $context, $txt, $cur_profile, $memberContext;
-
-	$db = database();
 
 	// Signature limits.
 	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
@@ -1758,9 +1741,7 @@ function profileLoadGroups()
  */
 function profileLoadLanguages()
 {
-	global $context, $modSettings, $settings, $cur_profile, $language;
-
-	$db = database();
+	global $context;
 
 	$context['profile_languages'] = array();
 
@@ -1782,9 +1763,7 @@ function profileLoadLanguages()
  */
 function profileReloadUser()
 {
-	global $modSettings, $context, $cur_profile, $profile_vars;
-
-	$db = database();
+	global $modSettings, $context, $cur_profile;
 
 	// Log them back in - using the verify password as they must have matched and this one doesn't get changed by anyone!
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
@@ -2400,4 +2379,213 @@ function list_getUserWarningCount($memID)
 	$db->free_result($request);
 
 	return $total_warnings;
+}
+
+/**
+ * Get a list of attachments for this user
+ * (used by createList() callback and others)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param array $boardsAllowed
+ * @param ing $memID
+ * @return array
+ */
+function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
+{
+	global $board, $modSettings, $context, $settings, $scripturl, $txt;
+
+	$db = database();
+
+	// Retrieve some attachments.
+	$request = $db->query('', '
+		SELECT a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
+			(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
+			m.id_msg, m.id_topic, m.id_board, m.poster_time, m.subject, b.name
+		FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
+			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+		WHERE a.attachment_type = {int:attachment_type}
+			AND a.id_msg != {int:no_message}
+			AND m.id_member = {int:current_member}' . (!empty($board) ? '
+			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
+			AND m.approved = {int:is_approved}') . '
+		ORDER BY {raw:sort}
+		LIMIT {int:offset}, {int:limit}',
+		array(
+			'boards_list' => $boardsAllowed,
+			'attachment_type' => 0,
+			'no_message' => 0,
+			'current_member' => $memID,
+			'is_approved' => 1,
+			'board' => $board,
+			'sort' => $sort,
+			'offset' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$attachments = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!$row['approved'])
+			$row['filename'] = str_replace(array('{attachment_link}', '{txt_awaiting}'), array('<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>', $txt['awaiting_approval']), $settings['attachments_awaiting_approval']);
+		else
+			$row['filename'] = '<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $row['filename'] . '</a>';
+
+		$attachments[] = array(
+			'id' => $row['id_attach'],
+			'filename' => $row['filename'],
+			'fileext' => $row['fileext'],
+			'width' => $row['width'],
+			'height' => $row['height'],
+			'downloads' => $row['downloads'],
+			'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
+			'id_thumb' => $row['id_thumb'],
+			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censorText($row['subject']) . '</a>',
+			'posted' => $row['poster_time'],
+			'msg' => $row['id_msg'],
+			'topic' => $row['id_topic'],
+			'board' => $row['id_board'],
+			'board_name' => $row['name'],
+			'approved' => $row['approved'],
+		);
+	}
+
+	$db->free_result($request);
+
+	return $attachments;
+}
+
+/**
+ * Gets the total number of attachments for the user
+ * (used by createList() callbacks)
+ *
+ * @param type $boardsAllowed
+ * @param type $memID
+ * @return type
+ */
+function getNumAttachments($boardsAllowed, $memID)
+{
+	global $board, $modSettings, $context;
+
+	$db = database();
+
+	// Get the total number of attachments they have posted.
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}attachments AS a
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+		WHERE a.attachment_type = {int:attachment_type}
+			AND a.id_msg != {int:no_message}
+			AND m.id_member = {int:current_member}' . (!empty($board) ? '
+			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
+			AND m.approved = {int:is_approved}'),
+		array(
+			'boards_list' => $boardsAllowed,
+			'attachment_type' => 0,
+			'no_message' => 0,
+			'current_member' => $memID,
+			'is_approved' => 1,
+			'board' => $board,
+		)
+	);
+	list ($attachCount) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $attachCount;
+}
+
+/**
+ * Get the relevant topics in the disregarded list
+ * (used by createList() callbacks)
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memID
+ */
+function getDisregardedBy($start, $items_per_page, $sort, $memID)
+{
+	$db = database();
+
+	// Get the list of topics we can see
+	$request = $db->query('', '
+		SELECT lt.id_topic
+		FROM {db_prefix}log_topics as lt
+			LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
+			LEFT JOIN {db_prefix}boards as b ON (t.id_board = b.id_board)
+			LEFT JOIN {db_prefix}messages as m ON (t.id_first_msg = m.id_msg)' . (in_array($sort, array('mem.real_name', 'mem.real_name DESC', 'mem.poster_time', 'mem.poster_time DESC')) ? '
+			LEFT JOIN {db_prefix}members as mem ON (m.id_member = mem.id_member)' : '') . '
+		WHERE lt.id_member = {int:current_member}
+			AND disregarded = 1
+			AND {query_see_board}
+		ORDER BY {raw:sort}
+		LIMIT {int:offset}, {int:limit}',
+		array(
+			'current_member' => $memID,
+			'sort' => $sort,
+			'offset' => $start,
+			'limit' => $items_per_page,
+		)
+	);
+	$topics = array();
+	while ($row = $db->fetch_assoc($request))
+		$topics[] = $row['id_topic'];
+	$db->free_result($request);
+
+	// Any topics found?
+	$topicsInfo = array();
+	if (!empty($topics))
+	{
+		$request = $db->query('', '
+			SELECT mf.subject, mf.poster_time as started_on, IFNULL(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, IFNULL(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
+				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
+				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)
+			WHERE t.id_topic IN ({array_int:topics})',
+			array(
+				'topics' => $topics,
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$topicsInfo[] = $row;
+		$db->free_result($request);
+	}
+
+	return $topicsInfo;
+}
+
+/**
+ * Count the number of topics in the disregarded list
+ *
+ * @param int $memID
+ */
+function getNumDisregardedBy($memID)
+{
+	$db = database();
+
+	// Get the total number of attachments they have posted.
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_topics as lt
+		LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
+		LEFT JOIN {db_prefix}boards as b ON (t.id_board = b.id_board)
+		WHERE id_member = {int:current_member}
+			AND disregarded = 1
+			AND {query_see_board}',
+		array(
+			'current_member' => $memID,
+		)
+	);
+	list ($disregardedCount) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $disregardedCount;
 }

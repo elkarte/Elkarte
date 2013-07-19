@@ -16,9 +16,9 @@
  */
 
 // This won't be dedicated without this - this must exist in each gateway!
-// ELKARTE Payment Gateway: paypal
+// ElkArte Payment Gateway: paypal
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

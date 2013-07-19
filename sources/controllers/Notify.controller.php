@@ -18,14 +18,25 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Notify Controller
  */
-class Notify_Controller
+class Notify_Controller extends Action_Controller
 {
+	/**
+	 * Dispatch to the right action.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// forward to our respective method.
+		// $this->action_notify();
+	}
+
 	/**
 	 * Turn off/on notification for a particular topic.
 	 * Must be called with a topic specified in the URL.

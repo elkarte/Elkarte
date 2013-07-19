@@ -15,7 +15,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 class Database_MySQL implements Database
@@ -189,7 +189,7 @@ class Database_MySQL implements Database
 			break;
 
 			case 'identifier':
-				// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for ELKARTE.
+				// Backticks inside identifiers are supported as of MySQL 4.1. We don't need them for Elk.
 				return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
 			break;
 
@@ -348,7 +348,7 @@ class Database_MySQL implements Database
 			$clean .= substr($db_string, $old_pos);
 			$clean = trim(strtolower(preg_replace($allowed_comments_from, $allowed_comments_to, $clean)));
 
-			// We don't use UNION in ELKARTE, at least so far.  But it's useful for injections.
+			// We don't use UNION in Elk, at least so far.  But it's useful for injections.
 			if (strpos($clean, 'union') !== false && preg_match('~(^|[^a-z])union($|[^[a-z])~s', $clean) != 0)
 				$fail = true;
 			// Comments?  We don't use comments in our queries, we leave 'em outside!
@@ -617,7 +617,7 @@ class Database_MySQL implements Database
 				if (in_array($query_errno, array(2006, 2013)) && $db_connection == $connection)
 				{
 					// Are we in SSI mode?  If so try that username and password first
-					if (ELKARTE == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+					if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 					{
 						if (empty($db_persist))
 							$db_connection = @mysql_connect($db_server, $ssi_db_user, $ssi_db_passwd);

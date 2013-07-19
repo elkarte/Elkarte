@@ -15,18 +15,20 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * PostModeration Controller handles post moderation actions. (approvals, unapprovals)
  */
-class PostModeration_Controller
+class PostModeration_Controller extends Action_Controller
 {
 	/**
-	 * This is a handling function for all things post moderation.
+	 * This is the entry point for all things post moderation.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_postmoderation()
+	public function action_index()
 	{
 		// @todo We'll shift these later bud.
 		loadLanguage('ModerationCenter');
@@ -50,7 +52,7 @@ class PostModeration_Controller
 	/**
 	 * View all unapproved posts.
 	 */
-	function action_unapproved()
+	public function action_unapproved()
 	{
 		global $txt, $scripturl, $context, $user_info;
 
@@ -288,7 +290,7 @@ class PostModeration_Controller
 	/**
 	 * View all unapproved attachments.
 	 */
-	function action_unapproved_attachments()
+	public function action_unapproved_attachments()
 	{
 		global $txt, $scripturl, $context, $user_info, $modSettings;
 
@@ -496,7 +498,7 @@ class PostModeration_Controller
 	/**
  	 * Approve a post, just the one.
  	 */
-	function action_approve()
+	public function action_approve()
 	{
 		global $user_info, $topic, $board;
 

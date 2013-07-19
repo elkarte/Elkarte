@@ -19,14 +19,26 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Register Controller
  */
-class Register_Controller
+class Register_Controller extends Action_Controller
 {
+	/**
+	 * Intended entry point for this class.
+	 * By default, this is called for action=register
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// figure out what action to do... register, what else.
+		$this->action_register();
+	}
+
 	/**
  	* Begin the registration process.
  	* Accessed by ?action=register

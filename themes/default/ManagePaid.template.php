@@ -63,7 +63,7 @@ function template_modify_subscription()
 							<input type="checkbox" name="active" id="activated_check"', empty($context['sub']['active']) ? '' : ' checked="checked"', ' class="input_check" />
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<dl class="settings">
 						<dt>
 							', $txt['paid_mod_prim_group'], ':<br /><span class="smalltext">', $txt['paid_mod_prim_group_desc'], '</span>
@@ -105,7 +105,7 @@ function template_modify_subscription()
 							<textarea name="emailcomplete" rows="6" cols="40">', $context['sub']['email_complete'], '</textarea>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="radio" name="duration_type" id="duration_type_fixed" value="fixed" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? 'checked="checked"' : '', ' class="input_radio" onclick="toggleDuration(\'fixed\');" />
 					<strong>', $txt['paid_mod_fixed_price'], '</strong>
 					<br />
@@ -190,7 +190,7 @@ function template_modify_subscription()
 							</dl>
 						</fieldset>
 					</div>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="save" value="', $txt['paid_settings_save'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-pms_token_var'], '" value="', $context['admin-pms_token'], '" />
@@ -348,8 +348,8 @@ function template_modify_user_subscription()
 		<script><!-- // --><![CDATA[
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'name_subscriber\',
 			sControlId: \'name_control\',
 			sSearchType: \'member\',
@@ -472,7 +472,7 @@ function template_user_subscription()
 					', sprintf($modSettings['paid_currency_symbol'], $subscription['costs']['fixed']);
 
 				echo '
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="sub_id[', $subscription['id'], ']" value="', $txt['paid_order'], '" class="button_submit" />';
 			}
 			else
@@ -487,7 +487,6 @@ function template_user_subscription()
 
 	echo '
 		</form>
-		<br class="clear"/>
 		<div class="title_bar">
 			<h3 class="titlebg">', $txt['paid_current'], '</h3>
 		</div>
@@ -496,11 +495,11 @@ function template_user_subscription()
 		</div>
 		<table class="table_grid">
 			<thead>
-				<tr class="catbg">
-					<th class="first_th" style="width:30%">', $txt['paid_name'], '</th>
-					<th class="centertext">', $txt['paid_status'], '</th>
-					<th class="centertext">', $txt['start_date'], '</th>
-					<th class="last_th centertext">', $txt['end_date'], '</th>
+				<tr class="table_head">
+					<th class="style="width:30%">', $txt['paid_name'], '</th>
+					<th>', $txt['paid_status'], '</th>
+					<th>', $txt['start_date'], '</th>
+					<th>', $txt['end_date'], '</th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -602,8 +601,7 @@ function template_choose_payment()
 	}
 
 	echo '
-	</div>
-	<br class="clear" />';
+	</div>';
 }
 
 /**

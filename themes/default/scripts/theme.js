@@ -22,14 +22,27 @@ $(document).ready(function() {
 		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons').superfish({delay : 300, speed: 175});
 
 	// Smooth scroll navigation
-	$('.topbottom').bind('click', function(event) {
-		event.preventDefault();
+	//$('.topbottom').bind('click', function(event) {
+	//	event.preventDefault();
 
-		// Position to the id pagetop or pagebot
-		var link = $('#page' + this.hash.substring(1)),
-			link_y = link.height() + 15;
+	//	// Position to the id pagetop or pagebot
+	//	var link = $('#page' + this.hash.substring(1)),
+	//		link_y = link.height() + 15;
 
-		$('html,body').animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1500);
+	//	$('html,body').animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1500);
+	//});
+
+	// Couldn't make sense of that lot, so replaced it with something that works. :P
+	// Smooth scroll to top.
+	$("a[href=#top]").bind("click", function(e) {
+		$("html,body").animate({scrollTop:0}, 1200);
+		e.preventDefault();
+	});
+
+	// Smooth scroll to bottom.
+	$("a[href=#bot]").bind("click", function(e) {
+		$("html,body").animate({scrollTop:$(document).height()}, 1200);
+		e.preventDefault();
 	});
 
 	// tooltips
@@ -49,7 +62,7 @@ $(document).ready(function() {
 });
 
 // Toggles the element height and width styles of an image.
-function smc_toggleImageDimensions()
+function elk_ToggleImageDimensions()
 {
 	var oImages = document.getElementsByTagName('IMG');
 	for (oImage in oImages)
@@ -66,10 +79,10 @@ function smc_toggleImageDimensions()
 }
 
 // Add a load event for the function above.
-addLoadEvent(smc_toggleImageDimensions);
+addLoadEvent(elk_ToggleImageDimensions);
 
 // Adds a button to a certain button strip.
-function smf_addButton(sButtonStripId, bUseImage, oOptions)
+function elk_addButton(sButtonStripId, bUseImage, oOptions)
 {
 	var oButtonStrip = document.getElementById(sButtonStripId);
 	var aItems = oButtonStrip.getElementsByTagName('span');

@@ -10,7 +10,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
- * Extension functions to provide Elkarte compatibility with sceditor
+ * Extension functions to provide ElkArte compatibility with sceditor
  */
 
 (function($) {
@@ -202,7 +202,7 @@
 })(jQuery);
 
 /**
- * Elkarte unique commands to add to the toolbar
+ * ElkArte unique commands to add to the toolbar
  *
  * Adds FTP, Glow, Shadow, Tt, Pre and Move commands
  */
@@ -301,7 +301,7 @@ $.sceditor.command.set(
 );
 
 /**
- * Elkarte modifications to existing commands so they display as we like
+ * ElkArte modifications to existing commands so they display as we like
  *
  * Makes changes to the text inserted for Bulletlist, OrderedList and Table
  */
@@ -324,7 +324,7 @@ $.sceditor.command.set(
 );
 
 /**
- * Elkarte custom bbc tags added to provide for the existing user experience
+ * ElkArte custom bbc tags added to provide for the existing user experience
  *
  * Adds BBC codes Abbr, Acronym, Bdo, List, Tt, Pre, Php, Move
  * Adds bbc colors Black, Red, Blue, Green, White
@@ -468,7 +468,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 );
 
 /**
- * Elkarte modified tags, modified so they support the existing paradigm
+ * ElkArte modified tags, modified so they support the existing paradigm
  *
  * Changes the way existing editor tags work
  * Modifies code, quote, list, ul, ol, li
@@ -566,7 +566,7 @@ $.sceditorBBCodePlugin.bbcode.set(
 				{
 					attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
 
-					sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : smf_scripturl + '?' + attr_link;
+					sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
 					sAuthor = sAuthor === '' ? '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>' : '<a href="' + sLink + '">' + sAuthor + '</a>';
 				}
 			}

@@ -18,18 +18,29 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Message Index Controller
  */
-class MessageIndex_Controller
+class MessageIndex_Controller extends Action_Controller
 {
+	/**
+	 * Dispatches forward to message index handler.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// forward to message index, it's not like we know much more :P
+		$this->action_messageindex();
+	}
+
 	/**
 	 * Show the list of topics in this board, along with any child boards.
 	 */
-	function action_messageindex()
+	public function action_messageindex()
 	{
 		global $txt, $scripturl, $board, $modSettings, $context;
 		global $options, $settings, $board_info, $user_info;
@@ -520,7 +531,7 @@ class MessageIndex_Controller
 	 * Allows for moderation from the message index.
 	 * @todo refactor this...
 	 */
-	function action_quickmod()
+	public function action_quickmod()
 	{
 		global $board, $user_info, $modSettings, $context;
 
@@ -1018,7 +1029,7 @@ class MessageIndex_Controller
 			logAction($lockStatus[$topic] ? 'lock' : 'unlock', array('topic' => $topic, 'board' => $lockCacheBoards[$topic]));
 			sendNotifications($topic, $lockStatus[$topic] ? 'lock' : 'unlock');
 		}
-		
+
 		foreach ($stickyCache as $topic)
 		{
 			logAction($stickyCacheStatus[$topic] ? 'unsticky' : 'sticky', array('topic' => $topic, 'board' => $stickyCacheBoards[$topic]));

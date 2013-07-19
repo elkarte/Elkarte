@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -87,8 +87,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	global $boardurl, $modSettings, $memcached;
-	global $cache_hits, $cache_count, $db_show_debug;
+	global $modSettings, $memcached, $cache_hits, $cache_count, $db_show_debug;
 	global $cache_accelerator, $cache_enable;
 
 	if (empty($cache_enable))
@@ -163,7 +162,7 @@ function cache_put_data($key, $value, $ttl = 120)
 		case 'zend':
 			// Zend Platform/ZPS/etc.
 			if (function_exists('zend_shm_cache_store'))
-				zend_shm_cache_store('ELKARTE::' . $key, $value, $ttl);
+				zend_shm_cache_store('ELK::' . $key, $value, $ttl);
 			elseif (function_exists('output_cache_put'))
 				output_cache_put($key, $value);
 			break;
@@ -182,7 +181,7 @@ function cache_put_data($key, $value, $ttl = 120)
 				@unlink(CACHEDIR . '/data_' . $key . '.php');
 			else
 			{
-				$cache_data = '<' . '?' . 'php if (!defined(\'ELKARTE\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}';
+				$cache_data = '<' . '?' . 'php if (!defined(\'ELK\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}';
 
 				// Write out the cache file, check that the cache write was successful; all the data must be written
 				// If it fails due to low diskspace, or other, remove the cache file
@@ -210,9 +209,8 @@ function cache_put_data($key, $value, $ttl = 120)
  */
 function cache_get_data($key, $ttl = 120)
 {
-	global $boardurl, $modSettings, $memcached;
-	global $cache_hits, $cache_count, $db_show_debug;
-	global $cache_accelerator, $cache_enable;
+	global $modSettings, $memcached, $cache_hits, $cache_count, $db_show_debug;
+	global $cache_accelerator, $cache_enable, $expired;
 
 	if (empty($cache_enable))
 		return;
@@ -262,7 +260,7 @@ function cache_get_data($key, $ttl = 120)
 		case 'zend':
 			// Zend's pricey stuff.
 			if (function_exists('zend_shm_cache_fetch'))
-				$value = zend_shm_cache_fetch('ELKARTE::' . $key, $ttl);
+				$value = zend_shm_cache_fetch('ELK::' . $key, $ttl);
 			elseif (function_exists('output_cache_get'))
 				$value = output_cache_get($key, $ttl);
 			break;
@@ -271,7 +269,7 @@ function cache_get_data($key, $ttl = 120)
 				$value = xcache_get($key);
 			break;
 		default:
-			// Otherwise it's Elkarte data!
+			// Otherwise it's ElkArte data!
 			if (file_exists(CACHEDIR . '/data_' . $key . '.php') && filesize(CACHEDIR . '/data_' . $key . '.php') > 10)
 			{
 				// php will cache file_exists et all, we can't 100% depend on its results so proceed with caution
@@ -308,7 +306,7 @@ function cache_get_data($key, $ttl = 120)
  */
 function get_memcached_server($level = 3)
 {
-	global $modSettings, $memcached, $db_persist, $cache_memcached;
+	global $memcached, $db_persist, $cache_memcached;
 
 	$servers = explode(',', $cache_memcached);
 	$server = explode(':', trim($servers[array_rand($servers)]));
@@ -404,7 +402,7 @@ function clean_cache($type = '')
 			break;
 		case 'zend':
 			if (function_exists('zend_shm_cache_clear'))
-				zend_shm_cache_clear('ELKARTE');
+				zend_shm_cache_clear('ELK');
 			break;
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
@@ -465,7 +463,7 @@ function cache_get_key($key)
 
 	// no need to do this every time, slows us down :P
 	if (empty($key_prefix))
-		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELKARTE-';
+		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELK-';
 
 	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }

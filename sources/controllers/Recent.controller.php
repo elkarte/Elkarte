@@ -17,14 +17,24 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Recent Post Controller
  */
-class Recent_Controller
+class Recent_Controller extends Action_Controller
 {
+	/**
+	 * Intended entry point for recent controller class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// figure out what action to do
+	}
+
 	/**
 	 * Find the ten most recent posts.
 	 * Accessed by action=recent.
@@ -380,7 +390,7 @@ class Recent_Controller
 
 			$query_this_board = 'id_board IN ({array_int:boards})';
 			$query_parameters['boards'] = $boards;
-			$context['querystring_board_limits'] = ';c=' . implode(',', $_REQUEST['c']) . ';start=%1$d';
+			$context['querystring_board_limits'] = ';c=' . $_REQUEST['c'] . ';start=%1$d';
 		}
 		else
 		{

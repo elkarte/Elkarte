@@ -58,7 +58,7 @@ function previewPost()
 {
 	// @todo Currently not sending poll options and option checkboxes.
 	var textFields = [
-		'subject', post_box_name, smf_session_var, 'icon', 'guestname', 'email', 'evtitle', 'question', 'topic'
+		'subject', post_box_name, elk_session_var, 'icon', 'guestname', 'email', 'evtitle', 'question', 'topic'
 	];
 	var numericFields = [
 		'board', 'topic', 'last_msg',
@@ -73,7 +73,7 @@ function previewPost()
 	var x = new Array();
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + smf_session_var + '=' + smf_session_id + ';xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
 
 	document.getElementById('preview_section').style.display = '';
 	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
@@ -101,7 +101,7 @@ function previewPM()
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	// Send in document for previewing
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
@@ -130,7 +130,7 @@ function previewNews()
 	x[x.length] = 'item=newsletterpreview';
 
 	// Send in document for previewing
-	sendXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=xmlhttp;sa=previews;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
@@ -184,7 +184,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	}
 
 	// And some security
-	fields[fields.length] = smf_session_var + '=' + smf_session_id;
+	fields[fields.length] = elk_session_var + '=' + elk_session_id;
 
 	return fields;
 }
@@ -192,7 +192,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 // Callback function of the XMLhttp request
 function onDocSent(XMLDoc)
 {
-	if (!XMLDoc || !XMLDoc.getElementsByTagName('smf')[0])
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
 		document.forms[form_name].preview.onclick = new function () {return true;};
 		document.forms[form_name].preview.click();
@@ -200,7 +200,7 @@ function onDocSent(XMLDoc)
 	}
 
 	// Show the preview section.
-	var preview = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('preview')[0];
+	var preview = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('preview')[0];
 	setInnerHTML(document.getElementById('preview_subject'), preview.getElementsByTagName('subject')[0].firstChild.nodeValue);
 
 	var bodyText = '';
@@ -211,7 +211,7 @@ function onDocSent(XMLDoc)
 	document.getElementById('preview_body').className = 'post';
 
 	// Show a list of errors (if any).
-	var errors = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('errors')[0];
+	var errors = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('errors')[0];
 	var errorList = '';
 	var errorCode = '';
 
@@ -259,7 +259,7 @@ function onDocSent(XMLDoc)
 	{
 		// Set the new last message id.
 		if ('last_msg' in document.forms[form_name])
-			document.forms[form_name].last_msg.value = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('last_msg')[0].firstChild.nodeValue;
+			document.forms[form_name].last_msg.value = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('last_msg')[0].firstChild.nodeValue;
 
 		// Remove the new image from old-new replies!
 		for (i = 0; i < new_replies.length; i++)
@@ -267,7 +267,7 @@ function onDocSent(XMLDoc)
 		new_replies = new Array();
 
 		var ignored_replies = new Array(), ignoring;
-		var newPosts = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0};
+		var newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0};
 		var numNewPosts = newPosts.length;
 
 		if (numNewPosts != 0)
@@ -284,8 +284,10 @@ function onDocSent(XMLDoc)
 				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 == 0 ? '2' : '') + ' core_posts"><div class="content" id="msg' + newPosts[i].getAttribute("id") + '"><div class="floatleft"><h5>' + txt_posted_by + ': ' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '</h5><span class="smalltext">&#171;&nbsp;<strong>' + txt_on + ':</strong> ' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + '&nbsp;&#187;</span> <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></div>';
 
 				if (can_quote)
-					newPostsHTML += '<ul class="smalltext quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="quote_button"><span>' + txt_bbc_quote + '</span></a></li></ul>';
+					newPostsHTML += '<ul class="quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="linklevel1 quote_button">' + txt_bbc_quote + '</a></li></ul>';
 
+				// Eh wot? Why is this here? That explains why I keep getting extra effing line breaks before quotes.
+				// Is this essential? Will something break if we remove it? Would be great to get rid of it if possible.
 				newPostsHTML += '<br class="clear" />';
 
 				if (ignoring)
@@ -301,7 +303,7 @@ function onDocSent(XMLDoc)
 		{
 			for (var i = 0; i < numIgnoredReplies; i++)
 			{
-				aIgnoreToggles[ignored_replies[i]] = new smc_Toggle({
+				aIgnoreToggles[ignored_replies[i]] = new elk_Toggle({
 					bToggleEnabled: true,
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [
@@ -322,8 +324,8 @@ function onDocSent(XMLDoc)
 
 	location.hash = '#' + 'preview_section';
 
-	if (typeof(smf_codeFix) != 'undefined')
-		smf_codeFix();
+	if (typeof(elk_codeFix) != 'undefined')
+		elk_codeFix();
 }
 
 // Add additional poll option fields
@@ -361,9 +363,9 @@ function addAttachment()
 function insertQuoteFast(messageid)
 {
 	if (window.XMLHttpRequest)
-		getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + 'action=quotefast;quote=' + messageid + ';xml;pb=' + post_box_name + ';mode=0', onDocReceived);
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';xml;pb=' + post_box_name + ';mode=0', onDocReceived);
 	else
-		reqWin(smf_prepareScriptUrl(smf_scripturl) + 'action=quotefast;quote=' + messageid + ';pb=' + post_box_name + ';mode=0', 240, 90);
+		reqWin(elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + messageid + ';pb=' + post_box_name + ';mode=0', 240, 90);
 
 	return true;
 }

@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -930,8 +930,6 @@ function updateBanMembers()
 
 function getMemberData($id)
 {
-	$db = database();
-
 	$suggestions = array();
 	require_once(SUBSDIR . '/Members.subs.php');
 	$result = getBasicMemberData($id, array('moderation' => true));

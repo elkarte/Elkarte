@@ -28,18 +28,16 @@ function template_main()
 	// If this message has been edited in the past - display when it was.
 	if (isset($context['last_modified']))
 		echo '
-					<div class="padding smalltext">
+					<div class="smalltext">
 						', $context['last_modified_text'], '
 					</div>';
 
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
-					<div id="postAdditionalOptionsHeader" class="title_bar">
-						<h4 class="titlebg">
-							<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a></strong>
-						</h4>
-					</div>
+					<h4 id="postAdditionalOptionsHeader" class="titlebg">
+						<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a></strong>
+					</h4>
 					<div id="postAdditionalOptions"', empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
 
 	// Display the check boxes for all the standard options - if they are available to the user!
@@ -158,11 +156,9 @@ function template_load_drafts_below()
 	if (!empty($options['drafts_show_saved_enabled']))
 	{
 		echo '
-					<div id="postDraftOptionsHeader" class="title_bar">
-						<h4 class="titlebg">
-							<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
-						</h4>
-					</div>
+					<h4 id="postDraftOptionsHeader" class="titlebg">
+						<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
+					</h4>
 					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>
 						<dl class="settings">
 							<dt>
@@ -183,7 +179,7 @@ function template_load_drafts_below()
 		// Code for showing and hiding drafts
 		echo '
 		<script><!-- // --><![CDATA[
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -192,9 +188,9 @@ function template_load_drafts_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -208,8 +204,8 @@ function template_load_drafts_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});
@@ -225,10 +221,8 @@ function template_topic_replies_below()
 	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
 	{
 		echo '
-		<div id="recent" class="flow_hidden main_section">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['topic_summary'], '</h3>
-			</div>
+		<div id="topic_summary" class="forumposts">
+			<h3 class="category_header">', $txt['topic_summary'], '</h3>
 			<span id="new_replies"></span>';
 
 		$ignored_posts = array();
@@ -239,34 +233,35 @@ function template_topic_replies_below()
 				$ignored_posts[] = $ignoring = $post['id'];
 
 			echo '
-				<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', ' core_posts">
-				<div class="content" id="msg', $post['id'], '">
-					<h5 class="floatleft">
-						<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '
-					</h5>&nbsp;-&nbsp;', $post['time'];
+			<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', '">
+				<div class="postarea2" id="msg', $post['id'], '">
+					<div class="keyinfo">
+						<h5 class="floatleft">
+							<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '&nbsp;-&nbsp;', $post['time'], '
+						</h5>';
 
 			if ($context['can_quote'])
 			{
 				echo '
-					<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
-						<li><a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" class="quote_button">',$txt['bbc_quote'],'</a></li>
-					</ul>';
+						<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
+							<li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">',$txt['bbc_quote'],'</a></li>
+						</ul>';
 			}
 
 			echo '
-					<br class="clear" />';
+					</div>';
 
 			if ($ignoring)
 			{
 				echo '
-					<div id="msg_', $post['id'], '_ignored_prompt" class="smalltext">
-						', $txt['ignoring_user'], '
-						<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
-					</div>';
+						<div id="msg_', $post['id'], '_ignored_prompt">
+							', $txt['ignoring_user'], '
+							<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+						</div>';
 			}
 
 			echo '
-					<div class="list_posts smalltext" id="msg_', $post['id'], '_body">', $post['body'], '</div>
+					<div class="inner" id="msg_', $post['id'], '_body">', $post['body'], '</div>
 				</div>
 			</div>';
 		}
@@ -280,7 +275,7 @@ function template_topic_replies_below()
 		foreach ($ignored_posts as $post_id)
 		{
 			echo '
-			aIgnoreToggles[', $post_id, '] = new smc_Toggle({
+			aIgnoreToggles[', $post_id, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -334,29 +329,21 @@ function template_postarea_above()
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
-			<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-					</h3>
+			<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+				<h3 class="catbg">
+					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
+				</h3>
+				<div class="post" id="preview_body">
+					', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 				</div>
-				<div class="windowbg">
-					<div class="content">
-						<div class="post" id="preview_body">
-							', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
-						</div>
-					</div>
-				</div>
-			</div><br />';
+			</div>';
 
 	// Start the main table.
 	echo '
-			<div class="cat_bar">
+			<div class="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
 				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
-			<div>
-				<div class="roundframe">', isset($context['current_topic']) ? '
-					<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '';
+				<div class="windowbg">
+					<div class="editor_wrapper">';
 
 	// If an error occurred, explain what happened.
 	template_show_error('post_error');
@@ -365,81 +352,81 @@ function template_postarea_above()
 	if (!$context['becomes_approved'])
 	{
 		echo '
-					<div class="infobox">
-						', $txt['wait_for_approval'], '
-						<input type="hidden" name="not_approved" value="1" />
-					</div>';
+						<div class="infobox">
+							', $txt['wait_for_approval'], '
+							<input type="hidden" name="not_approved" value="1" />
+						</div>';
 	}
 
 	// If it's locked, show a message to warn the replyer.
 	echo '
-					<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
-						', $txt['topic_locked_no_reply'], '
-					</p>';
+						<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
+							', $txt['topic_locked_no_reply'], '
+						</p>';
 
 	if (!empty($modSettings['drafts_post_enabled']))
 		echo '
-				<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
-					sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
-				</div>';
+						<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+							sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
+						</div>';
 
 	// The post header... important stuff
 	echo '
-					<dl id="post_header">';
+						<dl id="post_header">';
 
 	// Guests have to put in their name and email...
 	if (isset($context['name']) && isset($context['email']))
 	{
 		echo '
-						<dt>
-							<span', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</span>
-						</dt>
-						<dd>
-							<input type="text" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-						</dd>';
+							<dt>
+								<span', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</span>
+							</dt>
+							<dd>
+								<input type="text" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+							</dd>';
 
 		if (empty($modSettings['guest_post_no_email']))
 			echo '
-						<dt>
-							<span', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</span>
-						</dt>
-						<dd>
-							<input type="text" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-						</dd>';
+							<dt>
+								<span', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</span>
+							</dt>
+							<dd>
+								<input type="text" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+							</dd>';
 	}
 
 	// Now show the subject box for this post.
 	echo '
-						<dt class="clear">
-							<span', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</span>
-						</dt>
-						<dd>
-							<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
-						</dd>
-						<dt class="clear_left">
-							', $txt['message_icon'], ':
-						</dt>
-						<dd>
-							<select name="icon" id="icon" onchange="showimage()">';
+							<dt class="clear">
+								<span', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</span>
+							</dt>
+							<dd>
+								<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
+							</dd>
+							<dt class="clear_left">
+								', $txt['message_icon'], ':
+							</dt>
+							<dd>
+								<select name="icon" id="icon" onchange="showimage()">';
 
 	// Loop through each message icon allowed, adding it to the drop down list.
 	foreach ($context['icons'] as $icon)
 		echo '
-								<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
+									<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
 
 	echo '
-							</select>
-							<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
-						</dd>';
+								</select>
+								<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
+							</dd>';
 	if (!empty($context['show_boards_dropdown']))
 		echo '
-						<dt class="clear_left">
-							', $txt['post_in_board'], ':
-						</dt>
-						<dd>', template_select_boards('post_in_board'), '
-						</dd>';
+							<dt class="clear_left">
+								', $txt['post_in_board'], ':
+							</dt>
+							<dd>', template_select_boards('post_in_board'), '
+							</dd>';
 	echo '
-					</dl>';
+						</dl>';
 }
 
 function template_postarea_below()
@@ -450,30 +437,29 @@ function template_postarea_below()
 	if ($context['require_verification'])
 	{
 		echo '
-					<div class="post_verification">
-						<span', !empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '', '>
-							<strong>', $txt['verification'], ':</strong>
-						</span>
-						', template_control_verification($context['visual_verification_id'], 'all'), '
-					</div>';
+						<div class="post_verification">
+							<span', !empty($context['post_error']['need_qr_verification']) ? ' class="error"' : '', '>
+								<strong>', $txt['verification'], ':</strong>
+							</span>
+							', template_control_verification($context['visual_verification_id'], 'all'), '
+						</div>';
 	}
 
 	// Finally, the submit buttons.
 	echo '
-					<br class="clear_right" />
-					<span id="post_confirm_buttons">
-						', template_control_richedit_buttons($context['post_box_name']);
+						<div id="post_confirm_buttons" class="submitbutton">
+							', template_control_richedit_buttons($context['post_box_name']);
 
 	// Option to delete an event if user is editing one.
 	if ($context['make_event'] && !$context['event']['new'])
 		echo '
-						<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
+							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
 
 	echo '
-					</span>
+						</div>
+					</div>
 				</div>
-			</div>
-			<br class="clear" />';
+			</div>';
 
 	// Assuming this isn't a new topic pass across the last message id.
 	if (isset($context['topic_last_message']))
@@ -514,7 +500,7 @@ function template_postarea_below()
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
-			var oSwapAdditionalOptions = new smc_Toggle({
+			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['post']) ? 'false' : 'true', ',
 				funcOnBeforeCollapse: function () {
@@ -529,9 +515,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postMoreExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -545,8 +531,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=post\'
 				},
 			});';
@@ -554,7 +540,7 @@ function template_postarea_below()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -563,9 +549,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -579,8 +565,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});';
@@ -702,8 +688,8 @@ function template_spellcheck()
 	global $context, $settings, $txt;
 
 	// The style information that makes the spellchecker look... like the forum hopefully!
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+	echo '<!DOCTYPE html>
+<html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<title>', $txt['spell_check'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -747,7 +733,7 @@ function template_spellcheck()
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
 			<div id="spellview">&nbsp;</div>
-			<table class="table_padding" style="width:100%">
+			<table class="table_grid">
 				<tr class="windowbg">
 					<td style="width:50%;vertical-align:top">
 						', $txt['spellcheck_change_to'], '<br />
@@ -778,8 +764,8 @@ function template_quotefast()
 {
 	global $context, $settings, $txt;
 
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+	echo '<!DOCTYPE html>
+<html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $txt['retrieving_quote'], '</title>
@@ -802,13 +788,13 @@ function template_quotefast()
 
 			if (\'DOMParser\' in window && !(\'opera\' in window))
 			{
-				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_") + "</temp>", "text/xml");
-				quote = xmldoc.childNodes[0].textContent.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_") + "</temp>", "text/xml");
+				quote = xmldoc.childNodes[0].textContent.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 			else if (\'innerText\' in stage)
 			{
-				setInnerHTML(stage, quote.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-				quote = stage.innerText.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				setInnerHTML(stage, quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 
 			if (\'opera\' in window)

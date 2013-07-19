@@ -19,10 +19,10 @@
  *
  */
 
-$forum_version = 'ELKARTE 1.0 Alpha';
+$forum_version = 'ElkArte 1.0 Alpha';
 
 // First things first, but not necessarily in that order.
-define('ELKARTE', 1);
+define('ELK', 1);
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
@@ -79,6 +79,7 @@ require_once(SOURCEDIR . '/BrowserDetect.class.php');
 require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
+require_once(SOURCEDIR . '/Action.controller.php');
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)

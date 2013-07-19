@@ -1,96 +1,12 @@
-/* Experimental code to hide header content in admin. Will not be used in deafult.
-/* Not checked since main theme was rewritten for the new look. Beware.
-/* Commenting out the entire block sets admin back to the default header.
-------------------------------------------------------- */
-/*
-body.action_admin #header {
-	padding: 2px 2px 0 2px;
-}
-body.action_admin #header .frame {
-	padding: 0 0 50px 0;
-	background:  url(../images/theme/bars.png) 0 -560px repeat-x;
-}
-body.action_admin #top_section, body.action_admin #upper_section {
-	display: none;
-}
-body.action_admin #upper_wrap {
-	background: none;
-	padding: 4px 8px 0 8px;
-}
-body.action_admin #main_content_section {
-	margin: -45px 0 0 0;
-}
-body.action_admin .navigate_section ul {
-	padding: 5px 8px;
-	background: #fff url(../images/theme/lower_section.png) 0 100% repeat-x;
-	border: 1px solid #b8b8b8;
-	border-radius: 5px;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-body.action_admin .navigate_section ul li.unread_links {
-	display: none;
-}
-body.action_admin .navigate_section ul li a {
-	font-weight: bold;
-}*/
-/* End experimental header hiding stuffz. */
-
-
 /* Common admin center classes.
 ------------------------------------------------------- */
-/* @todo
-/* The CSS targeting for all this gets a bit convoluted and requires a good clean up.
-/* It's left over from when I started theming admin independently over a Curve forum.
+
+/* @todo - Start stripping a pile of crud from this file.
+/* Once I can see how it looks without the crud, I can decide what it really needs.
 /* Can be simplified quite a lot before production builds. */
 
-/* Re-style default cat bars to get rid of header bar mania. */
-#manage_maintenance .cat_bar, #core_features .cat_bar, #support_credits .cat_bar {
-	border: none;
-	border-top: 1px solid #bbb;
-}
-#manage_maintenance .cat_bar .catbg, #manage_boards .cat_bar .catbg, #core_features .cat_bar .catbg,
-#support_credits .cat_bar .catbg, .generic_list_wrapper .cat_bar .catbg {
-	border: none;
-	border-top: 1px solid #fff;
-	text-shadow: none;
-}
-#admin_main_section .cat_bar:first-child, #admin_main_section .cat_bar:first-child h3.catbg,
-#mod_main_section .cat_bar:first-child, #mod_main_section .cat_bar:first-child h3.catbg,
-#support_credits .cat_bar, #support_credits .cat_bar:first-child,
-#support_credits .cat_bar h3.catbg, #support_credits .cat_bar:first-child h3.catbg,
-#manage_maintenance .cat_bar, #manage_maintenance .cat_bar:first-child,
-#manage_maintenance .cat_bar h3.catbg, #manage_maintenance .cat_bar:first-child h3.catbg {
-	color: #444;
-	font-size: 1.1em;
-	background: none;
-	border-radius: 0;
-	text-shadow: none;
-}
-#admin_main_section .cat_bar:first-child, #admin_main_section .cat_bar:first-child h3.catbg,
-#mod_main_section .cat_bar:first-child, #mod_main_section .cat_bar:first-child h3.catbg,
-#support_credits .cat_bar:first-child, #support_credits .cat_bar:first-child h3.catbg,
-#manage_maintenance .cat_bar:first-child, #manage_maintenance .cat_bar:first-child h3.catbg {
-	border: none;
-}
-
-/* Special styling for admin descriptions. */
-.action_admin p.description, .action_admin  .information {
-	overflow: auto;
-	background: none;
-	border: 1px solid #ddd;
-	border-top: none;
-	border-radius: 0 0 7px 7px;
-	margin: 0;
-	padding: 12px 9px 8px 9px;
-}
-.action_admin p.description a {
-	font-weight: bold;
-}
-.action_admin p.description  img {
-	vertical-align: middle;
-}
+/* @todo - Special styling for admin descriptions. */
 .action_admin .generic_list_wrapper .information {
-	background: #fff url(../images/theme/lower_section.png) 0 100% repeat-x;
 	margin: 8px 0;
 	padding: 4px 12px 2px 12px;
 	border: 1px solid #ccc;
@@ -109,18 +25,14 @@ body.action_admin .navigate_section ul li a {
 #admin_content .windowbg, #admin_content .windowbg2 {
 	margin-bottom: 5px;
 }
+#admincenter {
+	overflow: auto;
+}
 #admincenter .content {
 	padding: 12px;
 }
 
-/* Secondary menu corrections. */
-.action_admin #adm_submenus {
-	margin: 0 0 -18px 0;
-	padding: 10px 15px 0 15px;
-	overflow: hidden;
-}
-
-/* A general admin wrapper class. */
+/* @todo - A general admin wrapper class. */
 #admin_main_section, div.quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
 #core_features, #generate_reports_type,
@@ -154,91 +66,13 @@ div.quick_tasks {
 #mailqueue_stats .windowbg .content {
 	padding: 12px 9px 0 9px;
 }
-#admin_form_wrapper .cat_bar:first-child, #admin_newsletters .cat_bar:first-child,
-#generate_reports_type .cat_bar:first-child, #groupForm .cat_bar:first-child,
-#admin_form_wrapper .title_bar, #mailqueue_stats .cat_bar:first-child,
-#new_group .cat_bar:first-child, #view_group .cat_bar, #view_group .cat_bar:first-child {
-	background: none;
-	border: none;
-	border-bottom: 1px solid #fff;
-	box-shadow: none;
-}
-#admin_form_wrapper .cat_bar:first-child h3.catbg, #admin_newsletters .cat_bar:first-child h3.catbg,
-#generate_reports_type .cat_bar:first-child h3.catbg, #groupForm .cat_bar:first-child h3.catbg,
-#admin_form_wrapper h3.titlebg, #mailqueue_stats .cat_bar:first-child  h3.catbg,
-#new_group .cat_bar:first-child  h3.catbg, #view_group .cat_bar  h3.catbg, #view_group .cat_bar:first-child  h3.catbg {
-	color: #444;
-	text-shadow: none;
-	padding: 3px 1px 5px 1px;
-	margin: 0;
-	border-bottom: 1px solid #bbb;
-}
-#admin_form_wrapper .title_bar {
-	background: #fff url(../images/theme/lower_section.png) 0 0 repeat-x;
-	border: 1px solid #ccc;
-	border-radius: 2px 2px 0 0;
-	margin: 0;
-}
-.action_admin .generic_list_wrapper .title_bar {
-	background: none;
-	border-bottom: 1px solid #fff;
-}
-.action_admin .generic_list_wrapper .titlebg {
-	border-bottom: 1px solid #bbb;
-}
-#admin_form_wrapper h3.titlebg {
-	color: #666;
-	border-bottom: none;
-	padding: 8px 6px 5px 6px;
-}
-#view_group .title_bar {
-	background: none;
-	border-bottom: none;
-	border-top: 1px solid #bbb;
-	margin: -12px 0;
-}
-#view_group .titlebg {
-	border-top: 1px solid #fff;
-	border-bottom: none;
-}
 #view_group .table_grid {
 	margin: 4px 0 8px 0;
-}
-.action_admin .table_grid th, .action_admin .table_grid .first_th, .action_admin .table_grid .last_th {
-	border-radius: 0;
-	border-top: 2px solid #ff9400;
-	border-bottom: 2px solid #bf6900;
-	padding: 6px 6px 5px 6px;
-	background: #fff;
-	color: #666;
-}
-.action_admin .table_grid tr.catbg th a:link {
-	color: #666;
-}
-.action_admin .table_grid .first_th, .action_admin .table_grid  td:first-child {
-	border-left: 1px solid #ccc;
-}
-.action_admin .table_grid .last_th, .action_admin .table_grid td {
-	border-right: 1px solid #ccc;
-}
-.action_admin .table_grid td {
-	border-bottom: 1px solid #ccc;
-}
-.action_admin .table_grid tr:nth-child(even) td {
-	background: #fdfdfd;
-}
-.action_admin .table_grid tr:nth-child(odd) td {
-	background: #f8f8f8;
-}
-.action_admin .table_grid .windowbg3 tr:nth-child(odd) td, .action_admin .table_grid .windowbg3 tr:nth-child(even) td {
-	color: #222;
-	background: #cacdd3;
 }
 
 /* Newsletters screen.
 ---------------------------------------------*/
 #admin_newsletters .information {
-	background: #fff url(../images/theme/lower_section.png) 0 50% repeat-x;
 	margin: 8px 0;
 	padding: 8px 12px 6px 12px;
 	border: 1px solid #ccc;
@@ -247,14 +81,12 @@ div.quick_tasks {
 }
 #advanced_panel_header {
 	margin-bottom: 8px;
-	background: #fff url(../images/theme/lower_section.png) 0 100% repeat-x;
+	background: #fff;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 	border: 1px solid #ccc;
 	border-radius: 2px;
 }
-#advanced_panel_header a {
-	color: #444;
-}
+
 /*-------------------------------------------*/
 .action_admin .generic_list .flow_auto {
 	padding: 4px 2px;
@@ -300,48 +132,21 @@ legend {
 
 /* Styles for the admin home screen.
 ------------------------------------------------------- */
-/* Admin quick search bar, and results page. */
-h3.catbg #quick_search form {
-	font-size: 0.9em;
+/* @todo - Admin quick search bar, and results page. */
+#quick_search {
+	font-size: 0.892em;
 }
-h3.catbg #quick_search form input, h3.catbg #quick_search form select, h3.catbg #quick_search form .button_submit {
-	margin: 0 3px;
-	padding: 3px;
-	border-radius: 4px;
-	border: 1px solid #777;
-	vertical-align: top;
+/* Chrome fix. */
+#quick_search .icon, #quick_search .input_text,
+#quick_search select, #quick_search .button_submit {
+	float: left;
+	margin: 2px 0 0 4px;
 }
-h3.catbg #quick_search form select {
-	font-size: 0.9em;
-	margin: 0;
-	padding: 2px;
-}
-h3.catbg #quick_search form select option {
-	padding: 2px 4px;
-}
-h3.catbg #quick_search form .button_submit {
-	font-weight: bold;
-	background: #fff url(../images/theme/lower_section.png) 0 100% repeat-x;
-	padding: 2px 6px 2px 6px;
-}
-h3.catbg #quick_search form .button_submit:hover {
-	background: #fff;
+#quick_search .icon {
+	margin: 8px 0 0 0;
 }
 
-/* Browser tweaks. */
-#chrome #quick_search form input {
-	padding: 2px 3px;
-}
-#chrome #quick_search .button_submit, #ie #quick_search .button_submit, #opera #quick_search .button_submit {
-	margin: 0 5px;
-	padding: 5px 9px 4px 9px;
-}
-#chrome  #quick_search .button_submit {
-	margin: -24px 5px 0 5px;
-	padding: 2px 5px;
-}
-
-/* The welcome thingy. */
+/* @todo - The welcome thingy. */
 #admincenter .roundframe, #modcenter .roundframe {
 	background: none;
 	border: none;
@@ -390,9 +195,6 @@ h3.catbg #quick_search form .button_submit:hover {
 	border-radius: 7px 7px 0 0;
 	border-bottom: none;
 }
-#admin_main_section .cat_bar {
-	background: none;
-}
 #admin_main_section .catbg, #admin_main_section .catbg a {
 	color: #444;
 	max-height: 1.5em;
@@ -412,7 +214,7 @@ h3.catbg #quick_search form .button_submit:hover {
 	border-top: 1px solid #bbb;
 	border-bottom: 1px solid #ddd;
 	border-radius: 0;
-	background: #fff url(../images/theme/upper_section.png) 0 -50px repeat-x;
+	background: #fff;
 	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
 	height: 12em;
 	overflow: auto;
@@ -498,7 +300,7 @@ div.quick_tasks {
 	position: relative;
 	padding: 6px 12px 12px 12px;
 }
-#support_credits h3.catbg, #support_credits .cat_bar:first-child h3.catbg {
+#support_credits h3.catbg {
 	padding: 12px 6px 6px 6px;
 }
 #support_resources {
@@ -517,19 +319,8 @@ div.quick_tasks {
 	margin: 12px 0 0 0;
 	padding: 0;
 }
-#support_credits a {
-	border-bottom: 1px solid #d2d2d2;
-}
-#support_credits a:hover {
-	color: #00163d;
-	text-decoration: none;
-	border-bottom: 1px solid #556f82;
-}
 #support_credits img.icon {
 	vertical-align: middle;
-}
-#support_credits .catbg a.help, #support_credits .catbg a.help:hover {
-	border-bottom: none;
 }
 #latestSupport{
 	padding: 0 25px 15px 25px;
@@ -724,14 +515,10 @@ dl.settings dd.questions input {
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
 }
-#manage_boards .title_bar {
-	background: none;
-	border-bottom: 1px solid #fff;
-}
 #manage_boards .titlebg {
 	border-bottom: 1px solid #bbb;
 }
-#manage_boards .cat_bar, #manage_boards .windowbg {
+#manage_boards .windowbg {
 	background: none;
 	margin: 0 0 0 0;
 	padding: 0 0 0 0;
@@ -741,10 +528,6 @@ dl.settings dd.questions input {
 #manage_boards .catbg {
 	padding: 8px 16px 4px 16px;
 	color: #444;
-}
-#manage_boards .cat_bar .catbg {
-	border: none;
-	border-bottom: 1px solid #bbb;
 }
 #manage_boards .catbg a {
 	color: #346;
@@ -792,34 +575,19 @@ dl.settings dd.questions input {
 	padding: 0 0.5em;
 }
 #manage_boards span.modify_boards a {
-	background: #fff url(../images/theme/lower_section.png) 0 0 repeat-x;
+	background: #fff;
 	border: 1px solid #aaa;
 	border-radius: 3px;
 	box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 	padding: 3px 6px;
-	font: 95%/115% verdana, Helvetica, sans-serif;
 	color: #222;
 	font-size: 1em;
 }
 #manage_boards span.modify_boards a:hover {
-	background: #fff url(../images/theme/upper_section.png) 0 -40px repeat-x;
+	background: #fff;
 	text-decoration: none;
 	color: #444;
 	box-shadow: -1px -1px 1px rgba(0,0,0,0.1);
-}
-#manage_boards .button_submit {
-	box-shadow: 1px 1px 2px rgba(0,0,0,0.1), 0 -1px 3px rgba(0,0,0,0.1) inset;
-	border-top: 1px solid #bbb;
-	border-left: 1px solid #bbb;
-	background: #dceeff;
-	text-shadow: 0 0 2px #fff;
-	margin: 0 8px;
-}
-#manage_boards  .button_submit:hover {
-	box-shadow: -1px -1px 1px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.1) inset;
-	border-top: 1px solid #999;
-	border-left: 1px solid #999;
-	background: #cde7ff;
 }
 #manage_boards dl {
 	padding: 8px 6px 0 6px;
@@ -849,29 +617,23 @@ dl.settings dd.questions input {
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
 #manage_maintenance .catbg {
-	border-top: 1px solid #fff;
-	padding-top: 14px;
-	color: #555;
-}
-#manage_maintenance .cat_bar:first-child, #manage_maintenance .cat_bar:first-child .catbg {
-	border-top: none;
-	margin: 0 0 -4px 0;
+	border: none;
+	background: none;
 }
 #manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
 	background: none;
-	padding: 0 0 12px 0;
-	margin: 0;
+	padding: 0;
+	margin:  0 0 4px 0;
+	border-bottom: 1px solid #ccc;
+	box-shadow: 0 1px 0 #fff;
 }
-#manage_maintenance p {
-	margin: -5px 0 0 0;
-	padding: 0 0 10px 0;
-}
-#manage_maintenance p .button_submit{
-	margin: 10px 10px 0 10px;
+#manage_maintenance .button_submit{
+	margin: 4px 10px 10px 10px;
 }
 /* Stop the submit buttons running away on wide screens.*/
 #manage_maintenance form {
-	max-width: 80em;
+	max-width: 75em;
+	margin: 0 12px;
 }
 #manage_maintenance .settings {
 	margin: 16px 0 0 0;
@@ -915,7 +677,10 @@ dl.settings dd.large_caption {
 	text-align: right;
 }
 .search_settings {
-	width: 47%;
+	float: left;
+	width: 49%;
+	margin: 0 0.5% 1em 0.5%;
+	overflow: auto;
 }
 
 /* Styles for the manage bans section.
@@ -942,9 +707,6 @@ ul.pending_payments {
 	margin: 0;
 	padding: 0;
 }
-ul.pending_payments li {
-	list-style-type: none;
-}
 
 /* Styles for the manage permissions section.
 ------------------------------------------------- */
@@ -957,7 +719,6 @@ ul.pending_payments li {
 	margin: 0 0 0.6em 0;
 }
 .perm_boards li {
-	list-style-type: none;
 	border: 1px solid #cacdd3;
 	padding: 0.2em;
 	margin: 1px;
@@ -1051,7 +812,7 @@ dl.themes_list dd {
 	border-top: 1px solid #bbb;
 	border-bottom: 1px solid #ddd;
 	border-radius: 0;
-	background: #fff url(../images/theme/upper_section.png) 0 -50px repeat-x;
+	background: #fff;
 	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
 	height: 12em;
 	overflow: auto;
@@ -1067,7 +828,7 @@ dl.themes_list dd {
 	float: right;
 	margin: 0 0 1em 0;
 }
-.modblock_left #smfAnnouncements {
+.modblock_left #ourAnnouncements {
 	height: 15em;
 	overflow: auto;
 }
@@ -1082,7 +843,7 @@ ul.moderation_notes {
 }
 ul.moderation_notes li {
 	padding: 0.2em;
-	border-bottom: 1px solid #cccccc;
+	border-bottom: 1px solid #ccc;
 }
 .notes {
 	margin-top: 0.4em;
@@ -1106,6 +867,9 @@ ul.moderation_notes li {
 }
 #error_log td div {
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
+	word-wrap: break-word;
+	word-break: hyphenate;
 }
 #error_log .error_who, #error_log .error_type {
 	float: left;
@@ -1137,19 +901,6 @@ ul.moderation_notes li {
 	margin: 0 8px 0 0;
 }
 
-
-/* More error log stuff. Could still be cleaned up a bit.
---------------------------------------------------*/
-#error_log {
-	margin: 4px 0;
-}
-#error_log tr:first-child td {
-	border-top: 2px solid #ff9400;
-	border-bottom: 2px solid #bf6900;
-	background: #fff;
-	padding: 8px;
-}
-
 /* Styles for the Report generation
 ------------------------------------------------- */
 #report_buttons {
@@ -1161,100 +912,108 @@ ul.moderation_notes li {
 	border-right: 1px solid #ddd;
 }
 
+/* Admin menu icons as sprites @todo - Can clean this up some more. */
+/* Use some longhand declarations to cut the length of the entire list. */ 
+/* ------------------------------------------------- */
+
 /* Admin menu icons as sprites
 ------------------------------------------------- */
+.linklevel2>img {
+	background-image: url(../images/admin/admin_sprite.png);
+	background-repeat: no-repeat;
+}
 .admin_img_administration {
-	background: url(../images/admin/admin_sprite.png) no-repeat 0 0;
+	background-position: 0 0;
 }
 .admin_img_attachment {
-	background: url(../images/admin/admin_sprite.png) no-repeat -16px 0;
+	background-position: -16px 0;
 }
 .admin_img_ban {
-	background: url(../images/admin/admin_sprite.png) no-repeat -32px 0;
+	background-position: -32px 0;
 }
 .admin_img_boards {
-	background: url(../images/admin/admin_sprite.png) no-repeat -48px 0;
+	background-position: -48px 0;
 }
 .admin_img_calendar {
-	background: url(../images/admin/admin_sprite.png) no-repeat -64px 0;
+	background-position: -64px 0;
 }
 .admin_img_corefeatures {
-	background: url(../images/admin/admin_sprite.png) no-repeat -80px 0;
+	background-position: -80px 0;
 }
 .admin_img_current_theme {
-	background: url(../images/admin/admin_sprite.png) no-repeat -96px 0;
+	background-position: -96px 0;
 }
 .admin_img_engines {
-	background: url(../images/admin/admin_sprite.png) no-repeat -112px 0;
+	background-position: -112px 0;
 }
 .admin_img_exit {
-	background: url(../images/admin/admin_sprite.png) no-repeat -128px 0;
+	background-position: -128px 0;
 }
 .admin_img_features {
-	background: url(../images/admin/admin_sprite.png) no-repeat -144px 0;
+	background-position: -144px 0;
 }
 .admin_img_languages {
-	background: url(../images/admin/admin_sprite.png) no-repeat -160px 0;
+	background-position: -160px 0;
 }
 .admin_img_logs {
-	background: url(../images/admin/admin_sprite.png) no-repeat -176px 0;
+	background-position: -176px 0;
 }
 .admin_img_mail {
-	background: url(../images/admin/admin_sprite.png) no-repeat -192px 0;
+	background-position: -192px 0;
 }
 .admin_img_maintain {
-	background: url(../images/admin/admin_sprite.png) no-repeat -208px 0;
+	background-position: -208px 0;
 }
 .admin_img_membergroups {
-	background: url(../images/admin/admin_sprite.png) no-repeat -224px 0;
+	background-position: -224px 0;
 }
 .admin_img_members {
-	background: url(../images/admin/admin_sprite.png) no-repeat -240px 0;
+	background-position: -240px 0;
 }
 .admin_img_modifications {
-	background: url(../images/admin/admin_sprite.png) no-repeat -256px 0;
+	background-position: -256px 0;
 }
 .admin_img_news {
-	background: url(../images/admin/admin_sprite.png) no-repeat -272px 0;
+	background-position: -272px 0;
 }
 .admin_img_packages {
-	background: url(../images/admin/admin_sprite.png) no-repeat -288px 0;
+	background-position: -288px 0;
 }
 .admin_img_paid {
-	background: url(../images/admin/admin_sprite.png) no-repeat -304px 0;
+	background-position: -304px 0;
 }
 .admin_img_permissions {
-	background: url(../images/admin/admin_sprite.png) no-repeat -320px 0;
+	background-position: -320px 0;
 }
 .admin_img_posts {
-	background: url(../images/admin/admin_sprite.png) no-repeat -336px 0;
+	background-position: -336px 0;
 }
 .admin_img_regcenter {
-	background: url(../images/admin/admin_sprite.png) no-repeat -352px 0;
+	background-position: -352px 0;
 }
 .admin_img_reports {
-	background: url(../images/admin/admin_sprite.png) no-repeat -368px 0;
+	background-position: -368px 0;
 }
 .admin_img_scheduled {
-	background: url(../images/admin/admin_sprite.png) no-repeat -384px 0;
+	background-position: -384px 0;
 }
 .admin_img_search {
-	background: url(../images/admin/admin_sprite.png) no-repeat -400px 0;
+	background-position: -400px 0;
 }
 .admin_img_security {
-	background: url(../images/admin/admin_sprite.png) no-repeat -416px 0;
+	background-position: -416px 0;
 }
 .admin_img_server {
-	background: url(../images/admin/admin_sprite.png) no-repeat -432px 0;
+	background-position: -432px 0;
 }
 .admin_img_smiley {
-	background: url(../images/admin/admin_sprite.png) no-repeat -448px 0;
+	background-position: -448px 0;
 }
 .admin_img_support {
-	background: url(../images/admin/admin_sprite.png) no-repeat -464px 0;
+	background-position: -464px 0;
 }
 .admin_img_themes {
-	background: url(../images/admin/admin_sprite.png) no-repeat -480px 0;
+	background-position: -480px 0;
 }
 .pagelink, .current_page, .expand_pages {
 	border: 0;
@@ -1290,9 +1049,6 @@ ul.moderation_notes li {
 	}
 	.dropmenu li li a {
 		line-height: 3.2em;
-	}
-	#menu_toggle {
-		display: none;
 	}
 	h3.catbg #quick_search form {
 		margin: 0 0 8px 0;

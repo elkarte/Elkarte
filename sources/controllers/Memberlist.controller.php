@@ -20,21 +20,23 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Memberlist Controller
  */
-class Memberlist_Controller
+class Memberlist_Controller extends Action_Controller
 {
 	/**
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
 	 *
 	 * @uses Memberlist template, main sub-template.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
@@ -67,10 +69,9 @@ class Memberlist_Controller
 
 		// Set up the standard columns...
 		$context['columns'] = array(
-			'is_online' => array(
+			'online' => array(
 				'label' => $txt['status'],
 				'width' => 60,
-				'class' => 'first_th centertext',
 				'sort' => array(
 					'down' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
 					'up' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
@@ -78,6 +79,7 @@ class Memberlist_Controller
 			),
 			'real_name' => array(
 				'label' => $txt['username'],
+				'class' => "lefttext",
 				'sort' => array(
 					'down' => 'mem.real_name DESC',
 					'up' => 'mem.real_name ASC'
@@ -85,7 +87,6 @@ class Memberlist_Controller
 			),
 			'email_address' => array(
 				'label' => $txt['email'],
-				'class' => "centertext",
 				'sort' => array(
 					'down' => allowedTo('moderate_forum') ? 'mem.email_address DESC' : 'mem.hide_email DESC, mem.email_address DESC',
 					'up' => allowedTo('moderate_forum') ? 'mem.email_address ASC' : 'mem.hide_email ASC, mem.email_address ASC'
@@ -93,7 +94,6 @@ class Memberlist_Controller
 			),
 			'website_url' => array(
 				'label' => $txt['website'],
-				'class' => "centertext",
 				'link_with' => 'website',
 				'sort' => array(
 					'down' => 'LENGTH(mem.website_url) > 0 ASC, IFNULL(mem.website_url, 1=1) DESC, mem.website_url DESC',
@@ -102,13 +102,15 @@ class Memberlist_Controller
 			),
 			'id_group' => array(
 				'label' => $txt['position'],
+				'class' => "lefttext",
 				'sort' => array(
 					'down' => 'IFNULL(mg.group_name, 1=1) DESC, mg.group_name DESC',
 					'up' => 'IFNULL(mg.group_name, 1=1) ASC, mg.group_name ASC'
 				),
 			),
-			'registered' => array(
+			'date_registered' => array(
 				'label' => $txt['date_registered'],
+				'class' => "lefttext",
 				'sort' => array(
 					'down' => 'mem.date_registered DESC',
 					'up' => 'mem.date_registered ASC'
@@ -153,16 +155,38 @@ class Memberlist_Controller
 		);
 
 		$context['can_send_pm'] = allowedTo('pm_send');
-		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		// Build the memberlist button array.
 		$context['memberlist_buttons'] = array(
 			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist' . ';sa=all', 'active'=> true),
-			'mlist_search' => array('text' => 'mlist_search', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist' . ';sa=search'),
 		);
+
+		// Are there custom fields they can search?
+		ml_findSearchableCustomFields();
+
+		// These are all the possible fields.
+		$context['search_fields'] = array(
+			'name' => $txt['mlist_search_name'],
+			'email' => $txt['mlist_search_email'],
+			'website' => $txt['mlist_search_website'],
+			'group' => $txt['mlist_search_group'],
+		);
+
+		foreach ($context['custom_search_fields'] as $field)
+			$context['search_fields']['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
+
+		// What do we search for by default?
+		$context['search_defaults'] = array('name', 'email');
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_memberlist_buttons');
+
+		if (!allowedTo('send_email_to_members'))
+			unset($context['columns']['email_address']);
+		if (isset($context['disabled_fields']['website']))
+			unset($context['columns']['website']);
+		if (isset($context['disabled_fields']['posts']))
+			unset($context['columns']['posts']);
 
 		// Jump to the sub action.
 		if (isset($subActions[$context['listing_by']]))
@@ -177,7 +201,7 @@ class Memberlist_Controller
 	 * Can be passed a sort parameter, to order the display of members.
 	 * Calls printMemberListRows to retrieve the results of the query.
 	 */
-	function action_mlall()
+	public function action_mlall()
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
@@ -319,7 +343,7 @@ class Memberlist_Controller
 	 * If variable $_REQUEST['search'] is empty displays search dialog box, using the search sub-template.
 	 * Calls printMemberListRows to retrieve the results of the query.
 	 */
-	function action_mlsearch()
+	public function action_mlsearch()
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
@@ -427,24 +451,7 @@ class Memberlist_Controller
 			$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $_POST['search'] . ';fields=' . implode(',', $_POST['fields']), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
 		}
 		else
-		{
-			// These are all the possible fields.
-			$context['search_fields'] = array(
-				'name' => $txt['mlist_search_name'],
-				'email' => $txt['mlist_search_email'],
-				'website' => $txt['mlist_search_website'],
-				'group' => $txt['mlist_search_group'],
-			);
-
-			foreach ($context['custom_search_fields'] as $field)
-				$context['search_fields']['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
-
-			// What do we search for by default?
-			$context['search_defaults'] = array('name', 'email');
-
-			$context['sub_template'] = 'search';
-			$context['old_search'] = isset($_GET['search']) ? $_GET['search'] : (isset($_POST['search']) ? htmlspecialchars($_POST['search']) : '');
-		}
+			redirectexit('action=memberlist');
 
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=memberlist;sa=search',
@@ -453,6 +460,5 @@ class Memberlist_Controller
 
 		// Highlight the correct button, too!
 		unset($context['memberlist_buttons']['view_all_members']['active']);
-		$context['memberlist_buttons']['mlist_search']['active'] = true;
 	}
 }

@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -27,8 +27,19 @@ if (!defined('ELKARTE'))
  * updates the settings for enabled/disabled core features as requested.
  *
  */
-class ManageCoreFeatures_Controller
+class ManageCoreFeatures_Controller extends Action_Controller
 {
+	/**
+	 * Default handler.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// just delegate to our preferred default
+		$this->action_features();
+	}
+
 	/**
 	 * This is an overall control panel enabling/disabling lots of the forums key features.
 	 *
@@ -41,7 +52,7 @@ class ManageCoreFeatures_Controller
 	 * 		save_callback	- Function called on save, takes state as parameter.
 	 *
 	 */
-	public function action_index()
+	public function action_features()
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
 
@@ -293,7 +304,7 @@ class ManageCoreFeatures_Controller
 					// Should we calculate next trigger?
 					if ($value)
 					{
-						require_once(SOURCEDIR . \'/ScheduledTasks.php\');
+						require_once(SUBSDIR . \'/ScheduledTasks.subs.php\');
 						calculateNextTrigger(\'paid_subscriptions\');
 					}
 				'),

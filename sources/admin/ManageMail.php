@@ -15,7 +15,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -23,7 +23,7 @@ if (!defined('ELKARTE'))
  * It handles mail configuration, it displays and allows to remove items from the mail queue.
  *
  */
-class ManageMail_Controller
+class ManageMail_Controller extends Action_Controller
 {
 	/**
 	 * Mail settings form
@@ -33,7 +33,9 @@ class ManageMail_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control through to the relevant section.
+	 * This function checks permissions and passes control
+	 *  through to the relevant section.
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -59,8 +61,8 @@ class ManageMail_Controller
 		call_integration_hook('integrate_manage_mail', array(&$subActions));
 
 		// By default we want to browse
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
+		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -71,8 +73,8 @@ class ManageMail_Controller
 
 		// Call the right function for this sub-action.
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch($_REQUEST['sa']);
+		$action->initialize($subActions, 'browse');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -200,7 +202,7 @@ class ManageMail_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="button_submit" /><a class="button_link" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
+					'value' => '<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="button_submit" /><a class="linkbutton" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
 				),
 			),
 		);

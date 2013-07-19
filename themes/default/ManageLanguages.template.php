@@ -80,8 +80,8 @@ function template_download_language()
 			</div>
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th" scope="col">
+					<tr class="table_head">
+						<th scope="col">
 							', $txt['languages_download_filename'], '
 						</th>
 						<th scope="col" style="width:100">
@@ -90,7 +90,7 @@ function template_download_language()
 						<th scope="col" style="width:100">
 							', $txt['languages_download_exists'], '
 						</th>
-						<th class="last_th centertext" scope="col" style="width:4%">
+						<th scope="col" style="width:4%">
 							', $txt['languages_download_copy'], '
 						</th>
 					</tr>
@@ -189,7 +189,7 @@ function template_download_language()
 
 	// Install?
 	echo '
-			<div class="righttext padding">
+			<div class="righttext">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-dlang_token_var'], '" value="', $context['admin-dlang_token'], '" />
 				<input type="submit" name="do_install" value="', $txt['add_language_elk_install'], '" class="button_submit" />
@@ -206,7 +206,7 @@ function template_download_language()
 	{
 		$count = 0;
 		echo '
-			var oTogglePanel_', $theme, ' = new smc_Toggle({
+			var oTogglePanel_', $theme, ' = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [';
@@ -219,9 +219,9 @@ function template_download_language()
 				aSwapImages: [
 					{
 						sId: \'toggle_image_', $theme, '\',
-						srcExpanded: smf_images_url + \'/sort_down.png\',
+						srcExpanded: elk_images_url + \'/sort_down.png\',
 						altExpanded: \'*\',
-						srcCollapsed: smf_images_url + \'/selected.png\',
+						srcCollapsed: elk_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
 					}
 				]
@@ -343,8 +343,7 @@ function template_modify_language_entries()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
 					<input type="submit" value="', $txt['go'], '" class="button_submit" style="float: none"/>
-			</div>
-			<br class="clear" />';
+			</div>';
 
 	// Is it not writable?
 	// Show an error.

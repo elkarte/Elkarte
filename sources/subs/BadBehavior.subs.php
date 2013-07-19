@@ -9,7 +9,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -126,7 +126,6 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 			$key_response['response'] = '';
 			$key_response['explanation'] = '';
 			$key_response['log'] = '';
-			trigger_error('bb2_get_response(): returned invalid response key \'' . $key_response[0] . '\'', E_USER_WARNING);
 		}
 
 		$bb_entries[$row['id']] = array(

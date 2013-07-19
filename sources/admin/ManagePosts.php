@@ -15,14 +15,14 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManagePosts controller handles all the administration settings
  *  for topics and posts.
  */
-class ManagePosts_Controller
+class ManagePosts_Controller extends Action_Controller
 {
 	/**
 	 * Posts settings form
@@ -38,6 +38,8 @@ class ManagePosts_Controller
 	 *
 	 * Accessed from ?action=admin;area=postsettings.
 	 * Requires (and checks for) the admin_forum permission.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{

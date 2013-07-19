@@ -315,13 +315,13 @@ function template_action_showPosts()
 {
 	global $context, $scripturl, $txt;
 
+		template_pagesection(false, false, 'go_down');
+
 	echo '
-		<div class="cat_bar">
+		<div class="forumposts">
 			<h3 class="catbg">
 				', (!isset($context['attachments']) && empty($context['is_topics']) ? $txt['showMessages'] : (!empty($context['is_topics']) ? $txt['showTopics'] : $txt['showAttachments'])), ' - ', $context['member']['name'], '
-			</h3>
-		</div>';
-		template_pagesection(false, false, 'go_down');
+			</h3>';
 
 	// Are we displaying posts or attachments?
 	if (!isset($context['attachments']))
@@ -330,14 +330,14 @@ function template_action_showPosts()
 		foreach ($context['posts'] as $post)
 		{
 			echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg2' : 'windowbg', ' core_posts">
+			<div class="', $post['alternate'] == 0 ? 'windowbg2' : 'windowbg', '">
 				<div class="content">
 					<div class="counter">', $post['counter'], '</div>
 					<div class="topic_details">
 						<h5><strong><a href="', $scripturl, '?board=', $post['board']['id'], '.0">', $post['board']['name'], '</a> / <a href="', $scripturl, '?topic=', $post['topic'], '.', $post['start'], '#msg', $post['id'], '">', $post['subject'], '</a></strong></h5>
 						<span class="smalltext">', $post['time'], '</span>
 					</div>
-					<div class="list_posts">';
+					<div class="inner">';
 
 			if (!$post['approved'])
 				echo '
@@ -351,33 +351,31 @@ function template_action_showPosts()
 
 			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 				echo '
-				<div class="floatright">
-					<ul class="smalltext quickbuttons">';
-
-			// If they *can* reply?
-			if ($post['can_reply'])
-				echo '
-						<li><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="reply_button"><span>', $txt['reply'], '</span></a></li>';
-
-			// If they *can* quote?
-			if ($post['can_quote'])
-				echo '
-						<li><a href="', $scripturl . '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="quote_button"><span>', $txt['quote'], '</span></a></li>';
-
-			// Can we request notification of topics?
-			if ($post['can_mark_notify'])
-				echo '
-						<li><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="notify_button"><span>', $txt['notify'], '</span></a></li>';
+					<ul class="quickbuttons">';
 
 			// How about... even... remove it entirely?!
 			if ($post['can_delete'])
 				echo '
-						<li><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';profile;u=', $context['member']['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="remove_button"><span>', $txt['remove'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';profile;u=', $context['member']['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button"><span>', $txt['remove'], '</span></a></li>';
+
+			// Can we request notification of topics?
+			if ($post['can_mark_notify'])
+				echo '
+						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
+
+			// If they *can* reply?
+			if ($post['can_reply'])
+				echo '
+						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
+
+			// If they *can* quote?
+			if ($post['can_quote'])
+				echo '
+						<li class="listlevel1"><a href="', $scripturl . '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 
 			if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 				echo '
-					</ul>
-				</div>';
+					</ul>';
 
 			echo '
 				</div>
@@ -395,6 +393,9 @@ function template_action_showPosts()
 						', isset($context['attachments']) ? $txt['show_attachments_none'] : ($context['is_topics'] ? $txt['show_topics_none'] : $txt['show_posts_none']), '
 					</div>
 				</div>';
+
+	echo '
+		</div>';
 
 	// Show more page numbers.
 	template_pagesection();
@@ -453,8 +454,8 @@ function template_action_showPermissions()
 					<table class="table_grid">
 						<thead>
 							<tr class="titlebg">
-								<th class="lefttext first_th" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
-								<th class="lefttext last_th" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
+								<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
+								<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
 							</tr>
 						</thead>
 						<tbody>';
@@ -520,8 +521,8 @@ function template_action_showPermissions()
 				<table class="table_grid">
 					<thead>
 						<tr class="titlebg">
-							<th class="lefttext first_th" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
-							<th class="lefttext last_th" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
+							<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_permission'], '</th>
+							<th class="lefttext" scope="col" style="width:50%">', $txt['showPermissions_status'], '</th>
 						</tr>
 					</thead>
 					<tbody>';

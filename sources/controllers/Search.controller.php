@@ -16,19 +16,29 @@
  * Handle all of the searching from here.
  *
  */
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ELKARTE 1.0 Alpha',
-	// This is the minimum version of ELKARTE that an API could have been written for to work. (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ELKARTE 1+0=Alpha', array('+' => '.', '=' => ' ')),
+	'forum_version' => 'ElkArte 1.0 Alpha',
+	// This is the minimum version of ElkArte that an API could have been written for to work. (strtr to stop accidentally updating version on release)
+	'search_version' => strtr('ElkArte 1+0=Alpha', array('+' => '.', '=' => ' ')),
 );
 
-class Search_Controller
+class Search_Controller extends Action_Controller
 {
+	/**
+	 * Intended entry point for this class.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Call the right method.
+	}
+
 	/**
 	 * Ask the user what they want to search for.
 	 * What it does:

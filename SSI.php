@@ -14,11 +14,11 @@
  * @version 1.0 Alpha
  */
 
-// Don't do anything if ELKARTE is already loaded.
-if (defined('ELKARTE'))
+// Don't do anything if ElkArte is already loaded.
+if (defined('ELK'))
 	return true;
 
-define('ELKARTE', 'SSI');
+define('ELK', 'SSI');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -96,6 +96,7 @@ require_once(SOURCEDIR . '/BrowserDetect.class.php');
 require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
+require_once(SOURCEDIR . '/Action.controller.php');
 
 // Clean the request variables.
 cleanRequest();
@@ -103,7 +104,7 @@ cleanRequest();
 // Create a variable to store some specific functions in.
 $smcFunc = array();
 
-// Initate the database connection and define some database functions to use.
+// Initiate the database connection and define some database functions to use.
 loadDatabase();
 
 // Load settings from the database.

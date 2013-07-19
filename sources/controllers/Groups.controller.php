@@ -17,14 +17,16 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class Groups_Controller
+class Groups_Controller extends Action_Controller
 {
 	/**
 	 * Entry point to groups.
 	 * It allows moderators and users to access the group showing functions.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{
@@ -40,7 +42,7 @@ class Groups_Controller
 	public function pre_dispatch()
 	{
 		global $context, $txt, $scripturl, $user_info;
-		
+
 		// Get the template stuff up and running.
 		loadLanguage('ManageMembers');
 		loadLanguage('ModerationCenter');
@@ -51,7 +53,8 @@ class Groups_Controller
 		{
 			require_once(CONTROLLERDIR . '/ModerationCenter.controller.php');
 			$_GET['area'] = (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'requests') ? 'groups' : 'viewgroups';
-			action_modcenter(true);
+			$controller = new ModerationCenter_Controller();
+			$controller->prepareModcenter();
 		}
 		// Otherwise add something to the link tree, for normal people.
 		else
@@ -68,7 +71,7 @@ class Groups_Controller
 	/**
 	 * This very simply lists the groups, nothing snazy.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $txt, $context, $scripturl, $user_info;
 
@@ -197,7 +200,7 @@ class Groups_Controller
 	 * It redirects to itself.
 	 * @uses ManageMembergroups template, group_members sub template.
 	 */
-	function action_members()
+	public function action_members()
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
@@ -441,7 +444,7 @@ class Groups_Controller
 	/**
 	 * Show and manage all group requests.
 	 */
-	function action_requests()
+	public function action_requests()
 	{
 		global $txt, $context, $scripturl, $user_info, $modSettings, $language;
 

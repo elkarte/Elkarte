@@ -16,7 +16,7 @@
  * Handle online users
  *
  */
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -340,6 +340,11 @@ function printMemberListRows($request)
 		$context['members'][$member] = $memberContext[$member];
 		$context['members'][$member]['post_percent'] = round(($context['members'][$member]['real_posts'] * 100) / $most_posts);
 		$context['members'][$member]['registered_date'] = strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
+		$context['members'][$member]['real_name'] = $context['members'][$member]['link'];
+		$context['members'][$member]['email_address'] = $context['members'][$member]['email'];
+		$context['members'][$member]['website_url'] = $context['members'][$member]['website']['url'] != '' ? '<a href="' . $context['members'][$member]['website']['url'] . '" target="_blank" class="new_win"><img src="' . $settings['images_url'] . '/profile/www.png" alt="' . $context['members'][$member]['website']['title'] . '" title="' . $context['members'][$member]['website']['title'] . '" /></a>' : '';
+		$context['members'][$member]['id_group'] = empty($context['members'][$member]['group']) ? $context['members'][$member]['post_group'] : $context['members'][$member]['group'];
+		$context['members'][$member]['date_registered'] = $context['members'][$member]['registered'];
 
 		// Take care of the custom fields if any are being displayed
 		if (!empty($context['custom_profile_fields']['columns']))

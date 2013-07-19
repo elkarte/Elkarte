@@ -17,14 +17,17 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class ManageMaintenance_Controller
+class ManageMaintenance_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher, the maintenance access point.
-	 * This, as usual, checks permissions, loads language files, and forwards to the actual workers.
+	 * This, as usual, checks permissions, loads language files,
+	 * and forwards to the actual workers.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -518,7 +521,7 @@ class ManageMaintenance_Controller
 		$context['num_tables_optimized'] = count($context['optimized_tables']);
 
 		// Check that we don't auto optimise again too soon!
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		calculateNextTrigger('auto_optimize', true);
 	}
 
@@ -752,7 +755,7 @@ class ManageMaintenance_Controller
 		updateStats('topic');
 
 		// Finally, update the latest event times.
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		calculateNextTrigger();
 
 		redirectexit('action=admin;area=maintain;sa=routine;done=recount');

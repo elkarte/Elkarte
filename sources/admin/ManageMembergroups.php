@@ -15,13 +15,13 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManageMembergroups controller, administration page for membergroups.
  */
-class ManageMembergroups_Controller
+class ManageMembergroups_Controller extends Action_Controller
 {
 	/**
 	 * Groups Settings form
@@ -38,6 +38,7 @@ class ManageMembergroups_Controller
 	 *
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
+	 * @see Action_Controller::action_index()
 	*/
 	public function action_index()
 	{
@@ -218,7 +219,7 @@ class ManageMembergroups_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="button_link" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;generalgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;generalgroup">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
@@ -330,7 +331,7 @@ class ManageMembergroups_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="button_link" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;postgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;postgroup">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
@@ -520,7 +521,7 @@ class ManageMembergroups_Controller
 			$current_group = membergroupById($current_group_id);
 
 		// Now, do we have a valid id?
-		if (!allowedTo('admin_forum') && !empty($groups) && $current_group['group_type'] == 1)
+		if (!allowedTo('admin_forum') && !empty($current_group_id) && $current_group['group_type'] == 1)
 			fatal_lang_error('membergroup_does_not_exist', false);
 
 		// The delete this membergroup button was pressed.
@@ -529,7 +530,7 @@ class ManageMembergroups_Controller
 			checkSession();
 			validateToken('admin-mmg');
 
-			if (empty($groups))
+			if (empty($current_group_id))
 				fatal_lang_error('membergroup_does_not_exist', false);
 
 			// Let's delete the group
@@ -544,7 +545,7 @@ class ManageMembergroups_Controller
 			checkSession();
 			validateToken('admin-mmg');
 
-			if (empty($groups))
+			if (empty($current_group_id))
 				fatal_lang_error('membergroup_does_not_exist', false);
 
 			// Can they really inherit from this group?
@@ -562,7 +563,7 @@ class ManageMembergroups_Controller
 			$_POST['group_desc'] = isset($_POST['group_desc']) && ($current_group['id_group'] == 1 || (isset($_POST['group_type']) && $_POST['group_type'] != -1)) ? trim($_POST['group_desc']) : '';
 			$_POST['group_type'] = !isset($_POST['group_type']) || $_POST['group_type'] < 0 || $_POST['group_type'] > 3 || ($_POST['group_type'] == 1 && !allowedTo('admin_forum')) ? 0 : (int) $_POST['group_type'];
 			$_POST['group_hidden'] = empty($_POST['group_hidden']) || $_POST['min_posts'] != -1 || $current_group['id_group'] == 3 ? 0 : (int) $_POST['group_hidden'];
-			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? $group_inherit : -2;
+			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? (int) $_POST['group_inherit'] : -2;
 
 			//@todo Don't set online_color for the Moderators group?
 
@@ -630,7 +631,7 @@ class ManageMembergroups_Controller
 			$moderator_string = isset($_POST['group_moderators']) ? trim($_POST['group_moderators']) : '';
 			detachGroupModerators($current_group['id_group']);
 
-			if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $_POST['min_posts'] == -1 && $groups[$current_groups]['id_group'] != 3)
+			if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $_POST['min_posts'] == -1 && $current_group['id_group'] != 3)
 			{
 				// Get all the usernames from the string
 				if (!empty($moderator_string))

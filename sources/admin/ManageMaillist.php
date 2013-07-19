@@ -11,7 +11,7 @@
  * and those with approve email permission
  *
  */
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -21,7 +21,7 @@ if (!defined('ELKARTE'))
  *  - handles the adding / editing / removing of both filters and parsers
  *
  */
-class ManageMaillist_Controller
+class ManageMaillist_Controller extends Action_Controller
 {
 	/**
 	 * Basic feature settings form
@@ -31,7 +31,9 @@ class ManageMaillist_Controller
 
 	/**
 	 * Main dispatcher.
-	 * This function checks permissions and passes control to the sub action.
+	 * This function checks permissions and passes control
+	 *  to the sub action.
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -56,7 +58,7 @@ class ManageMaillist_Controller
 
 		// Set up the action class
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'emaillist');
 
 		// Default to sub action 'emaillist' if none was given
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']][1])) ? $_REQUEST['sa'] : 'emaillist';
@@ -1320,6 +1322,8 @@ class ManageMaillist_Controller
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
+		// We'll need this, because bounce templates are stored
+		// with warning templates.
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Submitting a new one or editing an existing one then pass this request off
@@ -1342,11 +1346,10 @@ class ManageMaillist_Controller
 			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailtemplates;' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'title',
 			'get_items' => array(
-				'function' => 'list_getWarningTemplates',
-				'params' => array('bnctpl'),
+				'function' => array($this, 'list_getBounceTemplates'),
 			),
 			'get_count' => array(
-				'function' => 'list_getWarningTemplateCount',
+				'function' => array($this, 'list_getBounceTemplateCount'),
 				'params' => array('bnctpl'),
 			),
 			'columns' => array(
@@ -1534,5 +1537,28 @@ class ManageMaillist_Controller
 		}
 
 		createToken('mod-mlt');
+	}
+
+	/**
+	 * Callback for createList() to get all the bounce templates from the system
+	 *
+	 * @param $start
+	 * @param $items_per_page
+	 * @param $sort
+	 * @param $template_type type of template to load
+	 */
+	public function list_getBounceTemplates($start, $items_per_page, $sort)
+	{
+		return warningTemplates($start, $items_per_page, $sort, 'bnctpl');
+	}
+
+	/**
+	 * Callback for createList() to get the number of bounce templates in the system
+	 *
+	 * @param string $template_type
+	 */
+	public function list_getBounceTemplateCount()
+	{
+		return warningTemplateCount('bnctpl');
 	}
 }

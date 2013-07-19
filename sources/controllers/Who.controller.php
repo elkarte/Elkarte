@@ -18,13 +18,13 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Who Controller
  */
-class Who_Controller
+class Who_Controller extends Action_Controller
 {
 	/**
 	 * Default action of this class.

@@ -1,38 +1,74 @@
-/* Styles for the general looks for the Curve II theme.
-------------------------------------------------------- */
+/* INTRODUCTION
+/* This is the standard Elkarte default theme.
+/* This file contains essential layout code only.
+/* Colors, gradients, images, etc are in _variantname.css.
+/*
+/* All theme variants depend on this layout code for stability.
+/* It is better to copy code to a variant CSS file for testing.
+/* ------------------------------------------------------- */
+/* $CONTENTS - still a bit WIP. @todo
+/*
+/*		$GENERAL.............Global resets, clearfixes, etc.
+/*		$COMMON..............Common classes to drive you bonkers.
+/*		$BBC.................Quotes, code blocks, BBC styles.
+/*		$AJAX................The "loading" bar (quick edit, etc).
+/*
+/*		$MAIN................Forum header, wrapper, and footer.
+/*		$MENUS...............Main and secondary menus.
+/*		$LINKTREE............The breadcrumbs.
+/*		$BUTTONS.............Most button strips.
+/*		$PAGELINKS...........Page navigation links.
+/*
+/*		$TABLES..............Generic tables (memberlist, error log, etc).
+/*		$SETTINGS............Generic lists for settings pages.
+/*		$BOARDS..............Board index, child boards, and message index.
+/*
+/*		$TOPICS..............The display template (topic view), including send.
+/*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+/*		$MODERATE............Move topic, split topic, merge topic.
+/*
+/*		$PROFILE.............The profile areas.
+/*		$PERSONAL............The personal messages (PM) areas.
+/*		$CALENDAR............Wombats (and the calendar).
+/*		$STATISTICS..........The statistics centre.
+/*
+/*		$HELP................Help pages, help icons and pop-ups, tooltips.
+/*		$SEARCH..............Search pages, including memberlist search.
+/*		$LOGIN...............Login and registration, maintenance mode.
+/*
+/*		$ERRORS..............Error messages.
+/*		$PROGRESS............Nifty progress bars.
+/*		$MEDIA...............Experimental media queries.
+/* ------------------------------------------------------- */
 
-/* Normal, standard links. */
-a:link, a:visited,
-/* Links that open in a new window. */
-a.new_win:link, a.new_win:visited {
-	color: #555;
-	text-decoration: none;
+
+/*	$GENERAL	*/
+/* ------------------------------------------------------- */
+/* Put this here to make it easy to find. */
+/* Width control for top bar, header, main content and footer content. */
+.wrapper {
+	margin: 0 auto;
+	/* Next controls forum width, when it is not set in admin. */
+	width: 90%;
+	/* Next limits maximum width on wide screens. */
+	/* Sized in em, since some people require larger text. */ 
+	/* For ease of reading, content really should not be too wide. */
+	max-width: 90em;
+	/* Next is just for some testing. */
+	/*min-width: 100%;*/
 }
-a:hover,a.new_win:hover {
-	text-decoration: underline;
+
 /* Cursor declared here.Should not be required anywhere else. */
+a:hover, a.new_win:hover {
 	cursor: pointer;
 }
 
-/* Stop white band under footer on short pages. */
-html {
-	background: #162812;
-}
 body {
 	margin: 0;
-	padding: 0;
-	background: #555;
+	padding: 0 0 0 0;
 	/* Set a font-size that will look the same in all browsers. */
 	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
-	/* Font size is chosen to be exactly 10 point for hinting, ClearType, etc. */
-	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
-	color: #555;
-}
-
-/* Help popups require a different styling of the body element. */
-/* @todo - Deprecated? */
-#help_popup {
-	padding: 12px;
+	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
 }
 
 /* Tables should show empty cells. */
@@ -41,49 +77,125 @@ table {
 }
 
 /* Global box sizing, for stabilising fluid layouts. */
-/* Default most elements to zero padding and margin. */
 /* IMPORTANT: Do not declare div here (borks jQuery menus). */
-/* @todo - Will move decalrations for specific divs here later. */
-p, ul, ol, li, dl, dd ,dt, fieldset, form {
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+/* Default most elements to zero padding and margin. */
+/* Declare these separately to divs to avoid padding and margin problems. */
+h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dd ,dt,
+p, fieldset, form, input, button, select, textarea, .editor {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	padding: 0;
 	margin: 0;
+	font-weight: normal;
+	font-size: 1em;
+}
+/* Declarations for specific elements. @todo - Maybe simplify - test. */
+.wrapper, div.windowbg, div.windowbg2,
+.roundframe, .description, .information, .infobox, .noticebox,
+.category_header, .generic_list_wrapper, .submitbutton {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+/* Collection of pseudo element clearfixes. */
+/* @todo - Clean up old catbg and titlebg stuff. */
+h3.catbg:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after,
+.category_header:after, .wrapper:after,
+#main_content_section:after, #main_container:after,
+.attachments_bot:after, .editor_wrapper:after {
+	display: block;
+	clear: both;
+	content:"";
+}
+.quickbuttons:after {
+	display: block;
+	clear: right;
+	content:"";
+}
+/* @todo */
+.statistics>.flow_hidden>.category_header:after {
+	display: none;
 }
 /* Set list-style to none by default. Best in most places.*/
 ul, ol {
 	list-style: none;
 }
 
-/* We can style the different types of input buttons to be uniform throughout different browsers and their color themes.
-	.button_submit - covers input[type=submit], input[type=button], button[type=submit] and button[type=button] in all browsers
-	.button_link   - covers links to make them look like a submit button
-	.button_reset  - covers input[type=reset] and button[type=reset] throughout all browsers
-	.input_check   - covers input[type=checkbox] throughout all browsers
-	.input_radio   - covers input[type=radio] throughout all browsers
-	.input_text    - covers input[type=text] throughout all browsers
-	.input_file    - covers input[type=file] throughout all browsers
+/* No image should have a border when linked. */
+/* @todo - I'm sure this would be better done with specific classes
+/* rather than global tag name. */
+a img {
+	border: 0;
+}
+
+
+
+/* -------------------------------------------- */
+/* @todo - Code after this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
+/* Code splitting will continue as time and bugz and whatever allow. */
+/* -------------------------------------------- */
+
+
+
+
+
+/* Style the different types of inputs to be uniform for all browsers. */
+
+/* NOTE: This does require some browser-specific code to get good results. */
+/* Paddings on all types of inputs are set here. */
+/* If specific styling is wanted for some inputs, be aware of browser
+/* differences when adding custom padding, or it will drive you mental. */
+
+/* ALSO: This is still not quite pixel perfect everywhere for all browsers,
+/* in particular not for Internet Explorer. They can live with it. */ 
+/*
+	.button_submit	-	covers input[type=submit], input[type=button],
+						button[type=submit] and button[type=button]
+
+	.linkbutton	-	covers links, to make them look like a submit button.
+	.button_reset	-	covers input[type=reset] and button[type=reset]
+	.input_check	-	covers input[type=checkbox]
+	.input_radio	-	covers input[type=radio]
+	.input_text		-	covers input[type=text]
+	.input_file		-	covers input[type=file]
 */
-/* Thought it made sense to declare box-sizing here too. */
-input, button, select, textarea, textarea.editor {
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+input, button, select, textarea, .editor {
+	border: 1px solid #ccc;
+	border-radius: 2px;
 	background: #fff;
-	outline: none !important;
-	border: 1px solid #bbb;
-	vertical-align: middle;
-	border-radius: 3px;
-	box-shadow: 0 2px 5px rgba(0,0,0,0.05) inset;
-	padding: 3px;
+	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+	color: #666;
 }
 /* The following is necessary. */
-textarea, textarea.editor {
+/* @todo - Chase down SCEditor colours n stuff. Bleh. :P */
+textarea, .editor {
+	border-radius: 4px;
 	font-size: 1em;
 }
-/* Apply the font only to these elements. */
-input, button, select {
-	font-size: 0.9em;
+.sceditor-container {
+	margin: 0 0 12px 0;
 }
+/* Gecko-specific reset - makes buttons consistent with other browsers. */
+/* Yes, rotten browser-specific code. It will save some dramas though. */
+button::-moz-focus-inner, input[type='button']::-moz-focus-inner,
+input[type='reset']::-moz-focus-inner, input[type='submit']::-moz-focus-inner,
+select::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+/* Apply the font only to these elements, and top align them. */
+input, button, select {
+	padding: 2px 6px;
+	vertical-align: top;
+	font-size: 0.857em;
+}
+/* Selects require browser-specific targeting too, unfortunately. */
 select {
+	padding: 1px;
+}
+#opera select, #chrome select {
 	padding: 2px;
 }
 select option {
@@ -92,69 +204,104 @@ select option {
 input:hover, textarea:hover, button:hover, select:hover {
 	border: 1px solid #999;
 }
-textarea:hover, textarea.editor:hover {
+textarea:hover, .editor:hover {
 	background: #fbfbfb;
 }
-input:focus, textarea:focus, button:focus, select:focus, textarea.editor:focus {
-	outline:none !important;
+input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
+	outline: none;
 	border: 1px solid #999;
-	box-shadow: 0 2px 5px rgba(0,0,0,0.1) inset;
+}
+/* Give disabled text input elements a different background color. */
+input[disabled].input_text {
+	background: #eee;
+}
+/* No borders around checkboxes or radio buttons, and middle aligned. */
+.input_check, .input_radio {
+	border: none;
+	background: none;
+	vertical-align: middle;
+}
+/* The OpenID login form */
+.openid_login {
+	padding-left: 18px;
+	background: white url(../images/openid.png) no-repeat;
 }
 
-/* HTML5 additions for deprecated tags */
-.tt {
-	font-family: monospace;
-}
-
-/* Buttons should be styled a bit differently, in order to make them look more button'ish. */
-#frmLogin input.button_submit, #guest_form input.button_submit, #calendar_navigation input.button_submit {
-	float: none;
-	margin-left: inherit;
-}
-.button_submit, .button_reset, .button_link {
-	color: #555;
-	margin: 0 0 0 12px;
-	padding: 2px 4px;
-	float: right;
-	border: 1px solid #bbb;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #efefef url(../images/theme/lower_section.png) 0 6px repeat-x;
+/* Common button styling. */
+/* @todo - Will have to do some shuffling here. */
+/* The old .button_submit class was problematic, due to forcing float right on all buttons. */
+/* It is being replaced with three classes:
+/*					.button_submit is not floated	*/
+/*					.right_submit is right floated	*/
+/*					.left_submit is left floated	*/
+/* The button_reset class may need attention too.	*/
+.button_submit, .right_submit, .left_submit, .button_reset,
+/* Anchors styled to look like buttons. */
+/* The old .button_link class has been replaced with the following three classes. */
+/* These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	padding: 2px 6px;
+	vertical-align: top;
 	border-radius: 2px;
-}
-a.button_link {
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	color: #555;
-	padding: 2px 5px;
-	margin: 0 !important;
-	font-size: 0.9em;
-	line-height: 18px;/* @todo */
+	box-shadow: 1px 1px 2px #e5e5e5;
 }
-.button_submit:hover, .button_reset:hover, .button_link:hover {
+.left_submit, .linkbutton_left {
+	float: left;
+}
+.right_submit, .linkbutton_right {
+	float: right;
+}
+/* Hover effects. */
+.button_submit:hover, .right_submit:hover, .left_submit:hover,
+.button_reset:hover,
+.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
 	color: #555;
-	cursor: pointer;
 	text-decoration: none;
-	border: 1px solid #aaa;
+	cursor: pointer;
 }
-.selectbox select {
-	margin: 0 !important;
+/* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
+/* Old markup had crud like <div class="smalltext righttext padding ffs zomg"> */
+/* Use new class that is defined to suit, and with a sensible name. */
+.submitbutton {
+	text-align: right;
+	padding: 6px 0;
+	overflow: auto;
+	width: 100%;
 }
-/* FF rounding error on zoom? */
-#firefox a.button_link {
-	line-height: 17.25px;
+/* @todo - Test this out some more. */
+.submitbutton .button_submit{
+	padding: 4px 8px;
+}
+/* May not keep this. Sick of IE silliness. :P */
+#ie #search_form .button_submit, #ie #guest_form .button_submit {
+	padding: 1px 6px;
 }
 
 /* the new "button" */
 /* @todo - Might add extra fallbacks. Possibly monospace. */
 /* @todo - Also, look at deprecating spans here. */
 a.new_posts, span.new_posts {
+	border-radius: 2px;
+	background: #5aa05e;
 	color: #fff;
 	font-weight: bold;
 	line-height: 1.12px;
-	border-radius: 2px;
-	background: #46823c;
 }
 span.new_posts {
 	display: inline;
-	padding: 1px 5px 2px 5px;
+	padding: 1px 4px 2px 4px;
 	font-size: 9px;
 	font-family: verdana, sans-serif;
 }
@@ -162,83 +309,78 @@ a span.new_posts:hover {
 	text-decoration: underline;
 }
 
-/* All input elements that are checkboxes or radio buttons shouldn't have a border around them. */
-input.input_check, .input_radio {
-	border: none;
-	background: none;
-	vertical-align: top;
-}
-h3.catbg input.input_check {
-	margin: 0 7px 0 7px;
-}
-
-/* Give disabled text input elements a different background color. */
-input[disabled].input_text {
-	background: #eee;
-}
-
 /* Standard horizontal rule.. ([hr], etc.) */
-hr, .hrcolor {
-	border: none;
+hr {
 	margin: 12px 0;
-	height: 2px;
-	background: #fff;
-	background-color: #fff;
-	box-shadow: 0 1px 0 #bbb inset;
-}
-
-/* Default <strong> color on these tags. */
-h1, h2, h3, h4, h5, h6 {
-	font-size: 1em;
-	font-weight: normal;
-	margin: 0;
-	padding: 0;
-	color: #555;
+	height: 1px;
+	border-top: 1px solid #bbb;
+	background: #eee;
+	background-color: #eee;
 }
 
 /* Fieldsets are used to group elements. */
+/* @todo - Can we do this by class? What about default styling? Needed? */
+/* Declaring as overflow: auto; is probably a good idea. Test for teh bugz. */
 fieldset {
-	padding: 18px;
-	margin: 0 0 6px 0;
-	border: 1px solid #ccc;
-	border-radius: 3px;
+	overflow: auto;
+	border: none;
 }
 fieldset legend {
 	font-weight: bold;
-	color: #555;
-	box-shadow: none;
-	border: none;
 }
 .content fieldset {
 	border: double #ccc;
 }
 
-/* Define strong as bold, and em as italics */
-/* Note: in some places, strong is defined as font-weight: 600; */
-/* This will default to bold for fonts which do not support numerical font-weight. */
+/* Define strong as font-weight: 600; - defaults to bold */
+/* for fonts which do not support numerical font-weight) */
 strong {
-	font-weight: bold;
-	/* Having bold slightly lighter balances apparent darkness. */
-	color: #777;
+	color: #666;
+	font-weight: 600;
 }
+/*...and em as italics */
 em {
 	font-style: italic;
 }
-/* Alternative for u tag */
+
+
+
+
+
+/*	$COMMON		*/
+/* ------------------------------------------------------- */
+
+/* HTML5 additions for deprecated tags. */
+.tt {
+	font-family: monospace;
+}
+/* Alternative for u tag. */
 .underline {
 	text-decoration: underline;
 }
 
-/* Common classes to easy styling.
-------------------------------------------------------- */
+/* @todo - Test this everywhere. */
+.standard_category {
+	clear: both;
+	margin: 1em 0 0 0;
+	border-radius: 4px 4px 0 0;
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
+}
+/* @todo - Test this everywhere. */
+.standard_category>.content {
+	border: 1px solid #ddd;
+	margin: 4px 0 0 0;
+	background: #fff;
+	overflow: auto;
+}
+
+/* Floats, overflows, clears. @todo */
 .floatright {
 	float: right;
 }
 .floatleft {
 	float: left;
-}
-.floatnone {
-	float: none;
 }
 .flow_auto {
 	overflow: auto;
@@ -256,353 +398,150 @@ em {
 	clear: right;
 }
 
-/* Default font sizes: small (8pt), normal (10pt), and large (14pt). */
-.smalltext, tr.smalltext th {
-	font-size: 0.9em;
+/* Default font sizes (defined in em, so IE can resize): small (12px default),
+/* normal (14px default), and large (16px default).
+/* Since these are purely presentational classes, they should be used sparingly. */
+/* @todo - th shouldn't be required. */
+.smalltext, .smalltext th {
+	font-size: 0.857em;
 }
 .largetext {
-	font-size: 1.4em;
+	font-size: 1.286em;
 }
 .centertext {
-	margin: 0 auto;
 	text-align: center;
 }
 .righttext {
-	margin-left: auto;
-	margin-right: 0;
 	text-align: right;
 }
 .lefttext {
-	margin-left: 0;
-	margin-right: auto;
 	text-align: left;
 }
 .double_height {
 	line-height: 2em;
 }
 
-/* some common padding styles */
-.padding {
-	padding: 8px;
-}
-.main_section, .lower_padding {
-	padding-bottom: 6px;
-}
-
-/* Some BBC related styles.
-------------------------------------------------------- */
-/* The "Quote:" and "Code:" header parts... */
-.codeheader, .quoteheader {
-	color: #555;
-	font-size: 0.9em;
-	font-weight: 600;
-	margin: 6px 0 0 0;
-	padding: 2px 6px;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-bottom: none;
-}
-/* [Select] link to copy code. */
-.codeoperation {
-	font-weight: normal;
-}
-/* A quote, perhaps from another post. */
-.bbc_standard_quote, .bbc_alternate_quote,
-/* A code block - maybe PHP ;) - shared styles. */
-.bbc_code {
-	margin: 0 0 8px 0;
-	padding: 6px 10px;
-	font-size: 0.9em;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-top: none;
-	overflow: auto;
-}
-/* Extra quote styling */
-.bbc_standard_quote, .bbc_alternate_quote, .quoteheader {
-	box-shadow: 2px 2px 2px #bbb;
-}
-/* Extra code block styling. */
-.bbc_code {
-	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
-	background: #f3f3f3;
-	border-top: 3px solid #aaa;
-	border-bottom: 3px solid #aaa;
-	overflow: auto;
-	white-space: nowrap;
-	height: 20em;
-	resize: vertical;
-}
-/* Stop em compounding when elements are nested. */
-.bbc_standard_quote .bbc_alternate_quote, .bbc_alternate_quote .bbc_standard_quote,
-.bbc_standard_quote .bbc_code, .bbc_alternate_quote .bbc_code, .bbc_standard_quote .codeheader,
-.bbc_alternate_quote .codeheader, .bbc_standard_quote .quoteheader, .bbc_alternate_quote .quoteheader {
-	font-size: 1em;
-}
-
-/* Styling for BBC tags */
-.bbc_link:link, .bbc_link:visited {
-	border-bottom: 1px solid #A8B6CF;
-}
-.bbc_link:hover {
-	text-decoration: none;
-	border-bottom: 1px solid #555;
-}
-.bbc_size {
-	line-height: 1.4em;
-}
-.bbc_color a {
-	color: inherit;
-}
-.bbc_strong {
-	color: inherit;
-}
-.bbc_img {
-	border: 0;
-}
-.bbc_table {
-	font: inherit;
-	color: inherit;
-}
-.bbc_table td {
-	font: inherit;
-	color: inherit;
-	vertical-align: top;
-}
-.bbc_u {
-	text-decoration: underline;
-}
-.bbc_list {
-	text-align: left;
-	padding: 0 0 0 35px;
-	list-style-type: inherit;
-}
-/* Everything is same except HTML5 valid */
-.bbc_tt {
-	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
-}
-
-/* No image should have a border when linked. */
-a img {
-	border: 0;
-}
-
-/* Generally, those [?] icons. This makes your cursor a help icon. */
-.help {
-	cursor: help;
-}
-.help .icon {
-	margin: 0;
-	cursor: help;
-	opacity: 0.8;
-}
-.help .icon:hover {
-	opacity: 1;
-}
-/* /me uses this a lot. (emote, try typing /me in a post.) */
-.meaction {
-	font-style: italic;
-	color: blue;
-}
-
-/* Highlighted text - such as search results. */
-.highlight {
-	font-weight: bold;
-	color: #ff7200 !important;
-	font-size: 1.1em;
-}
-
-/* A more discreet highlight color, for selected membergroups etc. */
-/* Could be deprecated. Is used by JS to show a selected item */
-.highlight2 {
-	background: #D1E1EF;
-	color: #555 !important;
-	font-size: 1.1em;
-}
-
-/* Generic, mostly color-related, classes.
-------------------------------------------------------- */
-.titlebg, .titlebg2, tr.titlebg th, tr.titlebg td, tr.titlebg2 td,
-.catbg, .catbg2, tr.catbg td, tr.catbg2 td, tr.catbg th, tr.catbg2 th {
-	/* @todo - Change background image for simple sprite combined with buttons. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 100% repeat-x;
-}
-.titlebg, .titlebg2, tr.titlebg th, tr.titlebg td, tr.titlebg2 td {
+/* Generic header bars. @todo - To be deprecated. */
+.titlebg, .catbg {
+	padding: 0 6px;
+	background: #ebebeb;
+	background-image: linear-gradient(to bottom, #ebebeb 0%, #c6c6c6 100%);
 	color: #555;
 	font-size: 1.1em;
 }
-.catbg, .catbg2, tr.catbg td, tr.catbg2 td, tr.catbg th, tr.catbg2 th {
+.catbg {
 	font-size: 1.2em;
 }
-
-/* adjust the table versions of headers */
-tr.titlebg th, tr.titlebg2 th, td.titlebg, td.titlebg2, tr.catbg th, tr.catbg2 th, td.catbg, td.catbg2 {
-	padding: 0 6px;
-}
-tr.titlebg th a:link, tr.titlebg th a:visited, tr.titlebg2 td a:link, tr.titlebg2 td a:visited,
-tr.catbg th a:link, tr.catbg th a:visited, tr.catbg2 td a:link, tr.catbg2 td a:visited {
-	color: #555;
-}
 .catbg select {
-	height: 2em;
-	font-size: 0.9em;
-	padding: 1px;
 	margin-top: -1px;
+	padding: 1px;
+	height: 2em;
+	font-size: 0.857em;
+}
+/* Styles for main headers. */
+.category_header, .forum_category .category_header,
+/* Generic header bars. @todo - To be deprecated. */
+h3.catbg, h3.titlebg, h4.titlebg, h4.catbg {
+	padding: 4px 10px 2px 10px;
+	border: 1px solid #ccc;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #bbb;
+	border-radius: 3px 3px 0 0;
+	background: #ebebeb;
+	background-image: linear-gradient(to bottom, #fafafa, #eaeaea);
+	color: #566450;
+	text-shadow: 1px 1px 0 #ebebeb;
+	font-size: 1.214em;
+	line-height: 1.8em;
+}
+/* Single ones a bit darker than board index ones. */
+.forumposts .category_header, .content_category .category_header {
+	border-top: 1px solid #cfcfcf;
+	border-bottom: 1px solid #b7b7b7;
+	background: #e9e9e9;
+	background-image: linear-gradient(to bottom, #f6f6f6, #e4e4e4);
+}
+/* Styles for subsection headers. @todo */
+.secondary_header {
+	margin: 12px 0 0 0;
+	padding: 4px 12px 2px 12px;
+	border: 1px solid #ccc;
+	border-top: 1px solid #dfdfdf;
+	background: #fafafa;
+	background-image: linear-gradient(to bottom, #fafafa, #ebebeb);
+	text-shadow: 1px 1px 0 #fff;
+	font-size: 1.143em;
+	line-height: 1.8em;
+}
+.category_header a:link {
+	color: #777;
 }
 
-/* Styles for rounded headers.
-------------------------------------------------------- */
-h3.catbg, h3.catbg2, h3.titlebg, h4.titlebg, h4.catbg, h4.catbg2 {
-	background: none;
-	color: #555;
-	font-size: 1.3em;
-	line-height: 1.8em;
-	text-shadow: 1px 1px 0 #eee;
-	padding: 4px 12px 0 12px;
-}
-h3.catbg:after, h3.catbg2:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after, h4.catbg2:after {
-	content:"";
-	display: block;
-	clear: both;
-}
-h3.catbg a:link, h3.catbg a:visited, h4.catbg a:link, h4.catbg a:visited, h3.catbg2 a, h3.catbg2,
-h3.titlebg a, h3.titlebg, h4.titlebg, h4.titlebg a, .table_list tbody.header td, .table_list tbody.header td a {
+h3.catbg a:link, h3.catbg a:visited, h4.catbg a:link, h4.catbg a:visited,
+h3.titlebg a, h3.titlebg, h4.titlebg, h4.titlebg a {
 	color: #555;
 }
-h3.catbg a:hover, h4.catbg a:hover,h3.catbg2 a:hover, h3.titlebg a:hover, h4.titlebg a:hover {
+h3.catbg a:hover, h4.catbg a:hover, h3.titlebg a:hover, h4.titlebg a:hover {
 	color: #333;
 	text-decoration: none;
 }
-h3.catbg img.icon {
-	vertical-align: middle;
+h3.catbg .icon {
 	margin: 0 5px 0 0;
 }
-h4.catbg .toggle img {
-	vertical-align: middle;
-	margin: 0 5px 0 5px;
-}
-h4.titlebg img.icon {
+h4.titlebg .icon {
 	float: left;
-	margin: 0 8px 0 0;
+	margin: 0 5px 0 0;
+}
+.category_header .icon {
+	margin: 0 5px 0 0;
+	vertical-align: middle;
 }
 
-/* Box-sizing for these should be useful. */
-.cat_bar, .title_bar, .title_barIC {
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-	padding: 0;
+/* Upshrinks in cat and title bars. */
+/* @todo - Why is this stranded in this spot? */
+#upshrink_ic, #newsupshrink, .panel_toggle, #quickReplyExpand {
+	float: right;
+	margin: 4px 0 0 0;
+	padding: 4px;
 }
-.cat_bar, .title_bar {
-	/* @todo - Change background image for simple sprite combined with buttons. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 100% repeat-x;
-	border: 1px solid #ccc;
-	border-bottom: 1px solid #aaa;
-	border-radius: 6px 6px 0 0;
-}
-.title_barIC {
-	margin: 4px 2px 0 2px;
-	border-top: 1px solid #eee;
-	box-shadow: 0 -1px 0 #ccc;
-}
-.title_barIC:first-child {
-	border-top: none;
-	box-shadow: none;
-}
-.title_barIC>.titlebg {
-	padding: 0 6px;
+.collapse {
+	margin: 2px 4px -2px 0;
+	float: right;
 }
 
 /* Alternating backgrounds for posts, and several other sections of the forum. */
-.windowbg, #preview_body {
-	color: #555;
-}
-.windowbg2 {
-	color: #555;
-}
-.windowbg3 {
-	color: #555;
-}
+.windowbg, #preview_body, .windowbg2 {}
 
 /* General code for generic divs. Should make them behave. */
+/* @todo - Not keen on this. Do no-tag-names solution instead? */
 div.windowbg, div.windowbg2 {
-	border-radius: 5px;
 	overflow: auto;
 	padding: 10px 0;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
-/* The page navigation area - now cleaned up for happier parrots. */
-/* Could still be a bit more stylish. */
-.pagesection {
-	padding: 2px 4px;
-	overflow: hidden;
-	margin: 0;
-	clear: both;
+/* Custom highlighted text style for modern browsers. */
+/* Nicer than default blue. Needs two separate rules. */
+::-moz-selection {
+	background: #d8ffdf;
+	color: #444;
 }
-#main_content_section .pagesection {
-	margin: 4px 0 0 0;
+::selection {
+	background: #d8ffdf;
+	color: #444;
 }
-.pagesection .floatright input, .pagesection .floatright select {
-	margin-top: 3px;
+
+/* Other highlighted text, such as search results. */
+.highlight {
+	color: #ff7200;
+	font-weight: bold;
+	font-size: 1.1em;
 }
-.selectbox, .pagelinks {
-	margin: 8px 0 0 0;
-	font-size: 0.9em;
-}
-.pagelinks  :first-child {
-	border-radius: 4px 0 0 4px;
-}
-.pagelinks :last-child {
-	border-radius: 0 4px 4px 0;
-}
-.navPages, .expand_pages, .current_page {
-	border: 1px solid #ccc;
-	border-left: none;
-	padding: 1px 5px;
-	background: #efefef;
-	display: inline-block;
-}
-/* @todo - Ugh. Search by tag name, and a cruddy one at that. Fix later. */
-small .navPages {
-	border: none !important;
-	padding: 1px;
-}
-.next_page, .previous_page {
-	text-transform: capitalize;
-	padding: 0 2px;
-}
-.current_page  {
+/* Legacy highlight color, for selected membergroups etc. */
+/* Used by JS to show a selected item. @todo - deprecate? */
+.highlight2 {
+	background: #d1e1ef;
 	color: #555;
-	font-family: verdana, sans-serif;
-}
-/* @todo - Ugh. Search by tag name, and a cruddy one at that. Fix later. */
-small span.pagelink, small span.expand_pages {
-	border: none;
-	background: none;
-}
-/* Go up and go down links. */
-/* @todo - These need to be deprecated. Really. Haz good plan. */
-.topbottom {
-	display: block;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 0 repeat-x;
-	border: 1px solid #ccc;
-	border-right: 1px solid #bbb;
-	border-bottom: 1px solid #aaa;
-	border-radius: 3px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-	padding: 2px 7px 1px 7px;
-	margin: 5px 8px 0 0;
-	color: #555;
-}
-.topbottom:hover {
-	text-decoration: none;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 12px repeat-x;
-	color: #af6700;
-	border: 1px solid #ccc;
-	border-left: 1px solid #bbb;
-	border-top: 1px solid #aaa;
-	box-shadow: -1px -1px 2px rgba(0,0,0,0.07), -1px -2px 4px rgba(255,255,255,0.33) inset;
+	font-size: 1.1em;
 }
 
 /* Sometimes there will be an error when you post */
@@ -618,18 +557,7 @@ small span.pagelink, small span.expand_pages {
 	color: red;
 }
 
-/* Calendar colors for birthdays, events and holidays */
-.birthday {
-	color: #920ac4;
-}
-.event {
-	color: #078907;
-}
-.holiday {
-	color: #555080;
-}
-
-/* Colors for warnings */
+/* Colors for warnings. */
 .warn_mute {
 	color: red;
 }
@@ -639,79 +567,982 @@ small span.pagelink, small span.expand_pages {
 .warn_watch, .success {
 	color: green;
 }
-
-a.moderation_link, a.moderation_link:visited {
+.moderation_link, .moderation_link:visited {
 	color: red;
 	font-weight: bold;
 }
 
-.openid_login {
-	background: white url(../images/openid.png) no-repeat;
-	padding-left: 18px;
-}
-
-/* a descriptive style */
-.description, .information, .plainbox {
+/* Lotsa boxes. */
+.description, .information, .noticebox, .infobox {
+	margin: 0 0 12px 0;
 	padding: 6px 12px;
-	font-size: 0.9em;
-	line-height: 1.4em;
 	border: 1px solid #ccc;
-	border-top: none;
-	border-radius: 0 0 3px 3px;
-	background: none;
-	margin: -1px 0 12px 0;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+	background: #fff;
+	font-size: 0.857em;
 }
-/* a simple full surrounding box */
-.simplebox {
-	padding: .5em 1em;
-	font-size: 0.9em;
-	line-height: 1.4em;
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	background: none;
-	margin: .5em 0 1em 0;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
-/* an informative style */
+/* Information boxes. */
 .information {
 	background: #f0f6f0;
-	margin: 2px 1px 12px 1px;
 }
 .information p {
 	padding: 12px;
-	margin: 0;
 }
-.para2 {
-	padding: 12px 0 44px 0;
-	margin: 0;
+/* More little boxes on a hillside. */
+.noticebox {
+	padding-left: 35px;
+	border-top: 1px solid #ffd324;
+	border-bottom: 1px solid #ffd324;
+	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
+}
+.infobox {
+	padding-left: 35px;
+	border-top: 1px solid green;
+	border-bottom: 1px solid green;
+	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
 }
 
-/* AJAX notification bar
-------------------------------------------------------- */
+/* Used for sections that need somewhat larger corners */
+/* @todo - Daft name. Other stuffz. :P */
+.roundframe {
+	overflow: hidden;
+	margin: 2px 0 0 0;
+	padding: 9px;
+	border: 1px solid #c5c5c5;
+	border-radius: 7px;
+	background: #f5f5f5;
+}
+.roundframe p {
+	padding: 6px;
+}
+
+/* The generic wrapper thingy. Hangover from SMF 2.1 Alpha. Does we wants it? */
+.generic_list_wrapper {
+	overflow: auto;
+	margin: 0;
+	padding: 8px 8px 16px 8px;
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+}
+.generic_list_wrapper .title_bar{
+	border-bottom: 1px solid #fff;
+	border-radius: 0;
+	background: none;
+}
+.generic_list_wrapper .titlebg {
+	border-bottom: 1px solid #aaa;
+	background: none;
+	font-size: 1.1em;
+}
+.generic_list_wrapper .additional_row {
+	margin: 0;
+	padding: 5px 0;
+	border-radius: 0;
+}
+.generic_list_wrapper .information .additional_row {
+	border: none;
+}
+.generic_list_wrapper .information {
+	margin: 0;
+	padding: 0;
+	border: none;
+	border-bottom: 1px solid #fff;
+	background: none;
+}
+
+/* @todo - Ha. Just another silly bunch of divs. */
+.content {
+	padding: 0.2em 1em;
+}
+.content p {
+	margin: 0 0 6px 0;
+}
+
+/* Styles used by the auto suggest control. */
+.auto_suggest_div {
+	position: absolute;
+	z-index: 100;
+	visibility: hidden;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+}
+.auto_suggest_div:focus {
+	outline: none !important;
+	border: 1px solid #bbb;
+}
+.auto_suggest_item {
+	padding: 1px 4px;
+	background: #ddd;
+}
+.auto_suggest_item_hover {
+	padding: 1px 4px;
+	background: #888;
+	color: #eee;
+	cursor: pointer;
+}
+
+
+
+
+/* -------------------------------------------- */
+/* @todo - Code before this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
+/* Code splitting will continue as time and bugz and whatever allow. */
+/* -------------------------------------------- */
+
+
+
+
+/*	$BBC		*/
+/* ------------------------------------------------------- */
+/* The "Quote:" and "Code:" header parts... */
+.codeheader, .quoteheader {
+	margin: 6px 0 0 0;
+	padding: 4px 6px 2px 6px;
+	font-weight: 600;
+	font-size: 0.857em;
+}
+/* [Select] link to copy code. */
+.codeoperation {
+	font-weight: normal;
+}
+/* A quote, perhaps from another post. */
+.bbc_standard_quote, .bbc_alternate_quote,
+/* A code block - maybe PHP ;) - shared styles. */
+.bbc_code {
+	overflow: auto;
+	margin: 0 0 1em 0;
+	padding: 6px 10px;
+	font-size: 0.857em;
+}
+/* Extra code block styling. */
+.bbc_code {
+	overflow: auto;
+	height: 20em;
+	white-space: nowrap;
+	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
+	resize: vertical;
+}
+/* Stop em compounding when elements are nested. */
+/* @todo - Scrap old extra divs in Subs.php. */
+.bbc_standard_quote .bbc_alternate_quote, .bbc_alternate_quote .bbc_standard_quote,
+.bbc_standard_quote .bbc_code, .bbc_alternate_quote .bbc_code, .bbc_standard_quote .codeheader,
+.bbc_alternate_quote .codeheader, .bbc_standard_quote .quoteheader, .bbc_alternate_quote .quoteheader,
+/* And for quote inside small text areas, like the topic summary. */
+#topic_summary .bbc_standard_quote, #topic_summary .bbc_alternate_quote ,
+#topic_summary .bbc_code, #topic_summary .codeheader, #topic_summary .quoteheader {
+	font-size: 1em;
+}
+/* Styling for BBC tags */
+.bbc_size {
+	line-height: 1.4em;
+}
+/* @todo - Are all these "inherit" declarations really necessary? */
+.bbc_color a {
+	color: inherit;
+}
+.bbc_strong {
+	color: inherit;
+}
+.bbc_img {
+	border: 0;
+}
+.bbc_table {
+	color: inherit;
+	font: inherit;
+}
+.bbc_table td {
+	color: inherit;
+	font: inherit;
+	vertical-align: top;
+}
+.bbc_u {
+	text-decoration: underline;
+}
+.bbc_list {
+	padding: 0 0 0 35px;
+	list-style-type: inherit;
+	text-align: left;
+}
+/* Everything is same except HTML5 valid */
+.bbc_tt {
+	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
+}
+
+
+
+
+/*	$AJAX		*/
+/* ------------------------------------------------------- */
+
+/* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress {
-	background: url(../images/theme/loadingbar.png) repeat-x; /* @todo - this could be done without an image. */
-	color: #f96f00;
-	text-align: center;
-	font-size: 1.6em;
-	padding: 8px;
-	width: 100%;
-	height: 66px;
-	line-height: 25px;
 	position: fixed;
 	top: 0;
 	left: 0;
+	padding: 15px;
+	width: 100%;
+	text-align: center;
+	font-size: 1.6em;
 }
 #ajax_in_progress a {
 	color: orange;
 	text-decoration: underline;
-	font-size: 0.9em;
-	float: right;
-	margin-right: 20px;
 }
 
-/* Lists with settings use these a lot.
+
+
+
+/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+/* The top bar. */
+#top_section {
+	margin: 0;
+	padding: 0;
+}
+#top_section_notice {
+	float: right;
+	margin: 0;
+	padding: 14px 8px 0 8px;
+	line-height: 1.3em;
+	/* @todo - See me grumblez in Issue #552. ;) */
+}
+#search_form {
+	padding: 12px 0 4px 8px;
+	float: left;
+}
+/* @todo - Simplify. */
+#search_form .input_text, #search_form select, #search_form .button_submit {
+	margin: 0;
+	border-radius: 0;
+	font-size: 0.929em;
+	/* Webkit (bleh) fix. */
+	float: left;
+}
+/* The logo and slogan. @todo - Simplify. */
+#header {
+	padding: 2px 2px 0 2px;
+}
+/* The main title. */
+.forumtitle {
+	float: left;
+	padding: 10px 10px 6px 8px;
+	font-size: 2.357em;
+	line-height: 1.455em;
+}
+/* Float these items to the right. @todo - Simplify. */
+#siteslogan, #logo {
+	float: right;
+	margin: 0;
+	padding: 0.95em 12px 0 12px;
+	font-size: 1.8em;
+	line-height: 1.5em;
+}
+/* Tweak the logo */
+#logo {
+	margin: 0 8px 0 0;
+	padding: 0;
+}
+/* Main forum area. */
+/* Box-shadow only on this one. */
+#wrapper {
+	margin-top: 20px;
+	padding: 1.2em 1em;
+}
+/* The user info, news, etc.*/
+#news {
+	display: table-cell;
+	vertical-align: top;
+	width: 90%;
+}
+#upper_section>.user {
+	display: table-cell;
+	vertical-align: top;
+	min-width: 24em;
+	font-size: 0.857em;
+}
+.greeting {
+	font-weight: bold;
+}
+/* The login form. */
+#guest_form {
+	padding: 0 0 8px 0;
+}
+#guest_form input, #guest_form select {
+	font-size: 1.083em;
+	margin: 0 4px 8px 0;
+}
+/* User information. @todo - Simplify. */
+#upper_section .avatar {
+	float: left;
+	margin: 0 5px 5px 0;
+}
+/* No more huge avatars up top. YAY! */
+#upper_section .avatar img {
+	width: auto;
+	height: auto;
+	max-width: 60px;
+	max-height: 60px;
+}
+/* The content section */
+#main_content_section {
+	padding: 1em 0 0 0;
+	min-height: 180px;
+}
+/* The footer with copyright links etc. */
+#footer_section {
+	margin: 35px 0 0 0;
+}
+#footer_section .wrapper {
+	padding: 20px 5px;
+}
+#footer_section p, #footer_section a {
+	font-size: 0.857em;
+}
+#footer_section li {
+	display: inline;
+	padding-right: 5px;
+}
+#footer_section .copyright {
+	display: block;
+}
+
+
+
+
+/*	$MENUS	*/
+/* This section contains code for the main forum menu (#main_menu),
+/* and for the secondary menus in admin/profile/pm (.admin_menu),
+/* and for the tertiary menu strip in admin/etc (#adm_submenus).
+/*
+/* Top level <ul> elements have the class or id mentioned above.
+/* <li> elements are for positioning only (classes are listlevel1, etc).
+/* Top level links (like main menu buttons) have the class linklevel1.
+/* Drop menu wrappers are either menulevel2 or menulevel3.
+/* Drop menu links are either linklevel2 or linklevel3.
+/* ------------------------------------------------------- */
+/* Main menu bar: wrapper/background. */
+#menu_nav {
+	padding: 6px;
+}
+#main_menu {
+	position: relative;
+}
+/* Wrapper for primary admin/profile/etc menus. */
+.admin_menu {
+	padding: 0 3px;
+}
+/* Wrapper for secondary admin/profile/etc menus. */
+#adm_submenus {
+	overflow: auto;
+	padding: 0 3px;
+}
+/* Level 1 button positioning. */
+/* 1px padding gives slight gap between buttons, and drop menus. */
+.listlevel1 {
+	position: relative;
+	float: left;
+	margin: 0 2px;
+	padding: 2px 0;
+	font-size: 0.929em;
+	line-height: 2.077em;
+}
+.poster .listlevel1 {
+	line-height: 1.667em;
+	padding: 0;
+}
+.listlevel1:hover {
+	z-index: 5;
+}
+.listlevel1#collapse_button, .listlevel1#button_logout {
+	float: right;
+}
+/* Level 1 Menu bar: link or button. */
+.linklevel1 {
+	display: block;
+	padding: 0 0.6em;
+}
+#collapse_button .linklevel1 {
+	display: block;
+	padding: 0 16px;
+	border-radius: 2px;
+	overflow: hidden;
+	position: relative;
+}
+#upshrink {
+	position: absolute;
+	top: 50%;
+	margin-top: -55px;
+	left: 50%;
+	margin-left: -58px;
+	padding: 47px 50px;
+}
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	position: absolute;
+	top: 100%;
+	left: -9999px;
+	z-index: 90;
+	margin: 0;
+	padding: 0.6em;
+	width: 18.4em;
+}
+/* Level 3: drop menu positioning. */
+.menulevel3 {
+	margin: -2em 0 0 15.3em;
+}
+/* Reposition Level 2 drop menu as visible on hover. */
+/* @todo - Check Superfish class. I think .sfhover may be deprecated. */
+.listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
+	left: 0;
+}
+/* Hiding Level 3 drop menu off hover. */
+.listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
+	left: -9999px;
+}
+/* Reposition Level 3 drop menu as visible on hover. */
+.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
+	left: -14px;
+}
+/* Level 2 and 3 button positioning. */
+/* 1px vertical padding gives slight gap between buttons. */
+.listlevel2, .listlevel3 {
+	position: relative;
+	float: none;
+	padding: 1px 0;
+	width: 17em;
+}
+/* Levels 2 and 3 drop menus: link or button. */
+.linklevel2, .linklevel3 {
+	position: relative;
+	display: block;
+	padding: 0 7px;
+}
+/* @todo - Note: The next declarations are for keyboard access with js disabled. */
+/* Hmm. These are tricky with the new Superfish/Superclick combo. */
+/* May need a noScript class added somewhere. Pondering required. */
+/*
+.linklevel2:focus, .linklevel3:focus {
+	margin-left: 9990px;
+	width: 17em;
+}
+.linklevel3:focus {
+	margin-left: 19950px;
+}
+*/
+/* @todo - Cancel those for hover and/or js access. */
+/*
+.listlevel2:hover .linklevel2:focus, .listlevel2.sfhover .linklevel2:focus,
+.listlevel3:hover .linklevel3:focus, .listlevel3.sfhover .linklevel3:focus {
+	z-index: 999;
+	margin-left: 0;
+	width: auto;
+}
+*/
+/* Styles for sidebar menus.
 ------------------------------------------------------- */
+#main_admsection {
+	overflow: auto;
+}
+#menu_sidebar {
+	float: left;
+	padding: 0 10px 1em 0;
+	width: 200px;
+}
+/* @todo */
+#menu_sidebar .catbg {
+	padding: 3px 10px 2px 10px;
+	font-size: 1.1em;
+}
+#menu_sidebar .sidebar_menu {
+	padding: 4px 0 9px 0;
+}
+/* Same styling for Level 1 and Level 2. */
+#menu_sidebar .listlevel1 {
+	float: none;
+	padding: 1px 0;
+}
+#menu_sidebar  .listlevel1:hover .menulevel2,
+#menu_sidebar  .listlevel1.sfhover .menulevel2 {
+	top: 0.35em;
+	left: 170px;
+}
+/* @todo - Note: The next declarations are for keyboard access with js disabled. */
+/* Hmm. These are tricky with the new Superfish/Superclick combo. */
+/* May need a noScript class added somewhere. Pondering required. */
+/*
+#menu_sidebar .linklevel2:focus {
+	margin-left: 10150px;
+	width: 17em;
+}
+*/
+/* Cancel those for hover and/or js access. */
+/*
+#menu_sidebar .listlevel2:hover .linklevel2:focus, #menu_sidebar .listlevel2.sfhover .linklevel2:focus {
+	margin-left: 0;
+	width: auto;
+}
+*/
+
+
+
+
+/*	$LINKTREE	*/
+/* ------------------------------------------------------- */
+/* The navigation list (i.e. linktree) */
+.navigate_section {
+	overflow: hidden;
+	margin: 3px 0 0 0;
+	padding: 0 4px;
+}
+#main_content_section .navigate_section {
+	margin: 12px 0 6px 0;
+}
+.linktree, .linktree_last {
+	position: relative;
+	float: left;
+	margin: -1px 1em -1px -1em;
+	padding: 0 0.5em 0 1.5em;
+	font-size: 0.929em;
+	line-height: 2.154em;
+}
+.linktree a, .linktree em, .linktree_last a, .linktree_last em {
+	display: inline-block;
+}
+/* Nifty indicators. */
+.linktree:before, .linktree:after, .linktree_last:before, .linktree_last:after {
+	content:"";
+	position: absolute;
+	display: block;
+	left: 100%;
+	top: 50%;
+	margin-top: -1.077em;
+	margin-left: 2px;
+	height: 0;
+	width: 0;
+	border: 1.077em solid transparent;
+	border-right: none;
+	z-index: 2;
+}
+.linktree:after, .linktree_last:after {
+	margin-left: 0;
+}
+
+
+
+
+/*	$BUTTONS	*/
+/* This section contains code for the quickbuttons (quote, quick edit, etc)
+/* and for the buttonlist class (reply, add poll, notify, etc).
+/* These classes share some styling.
+/* Declarations are amalgamated where styling is shared.
+/* ------------------------------------------------------- */
+
+/* Styles for the standard button lists.
+/* ------------------------------------------------------- */
+.buttonlist {
+	padding: 5px 5px 0 5px;
+}
+.buttonlist li {
+	float: left;
+	margin: 0 0 0 4px;
+	line-height: 2.231em;
+}
+/* @todo - Save code by amalgamating common button background declarations. */
+.buttonlist li a {
+	display: block;
+	padding: 2px 8px 1px 8px;
+	font-size: 0.786em;
+	line-height: 2em;
+}
+
+
+
+
+/* -------------------------------------------- */
+/* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
+/* Code splitting will continue as time and bugz and whatever allow. */
+/* -------------------------------------------- */
+
+
+
+
+/* The quick buttons. */
+/* ------------------------------------------------------- */
+.quickbuttons {
+	margin: 8px 0 6px 0;
+	text-align: right;
+}
+/* Follow ups and topic summary need it a bit different. */
+.follow_ups, #topic_summary .quickbuttons {
+	float: right;
+	margin: -7px 0 0 7px;
+}
+/* Most of them. */
+.quickbuttons .listlevel1 {
+	position: relative;
+	float: right;
+	margin: 2px 0;
+	padding: 2px 0;
+	font-size: 0.857em;
+}
+/* Odd cases. */
+.follow_ups .listlevel1, #topic_summary .quickbuttons .listlevel1 {
+	font-size: 1em;
+}
+.quickbuttons .modified {
+	float: left;
+	padding: 0 0 0 6px;
+}
+.quickbuttons .inline_mod_check {
+	padding: 7px 0;
+	line-height: 1em;
+	float: left;
+}
+/* @todo - Save code by amalgamating common button background declarations. */
+.quickbuttons .linklevel1 {
+	float: left;
+	padding: 1px 6px 0 22px;
+	line-height: 2em;
+	cursor: pointer;
+}
+/* @todo - Check with js disabled after sorting most of the other crud. */
+/* Note: The next declarations are for keyboard access with js disabled. */
+/*.quickbuttons .linklevel1:focus {
+	margin: 0 -9910px 0 9910px;
+}*/
+/* Cancel for hover and/or js access. */
+/*.quickbuttons .listlevel1:hover .linklevel1:focus, .quickbuttons .listlevel1.sfhover .linklevel1:focus {
+	margin: 0;
+}*/
+.quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
+	position: absolute;
+	z-index: 5;
+	display: block;
+	height: 24px;
+	width: 18px;
+	left: 3px;
+	top: 50%;
+	margin-top: -12px;
+	content:"";
+}
+/* The rest of them. */
+.quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
+	background-repeat: no-repeat;
+/* A rare example of where longhand background declarations work well. */
+	background-image: url(../images/theme/quickbuttons.png);
+}
+/* The long list of sprite coordinates is much less verbose this way. */
+.quote_button:before {
+	background-position: 0 0;
+}
+.remove_button:before {
+	background-position: 0 -24px;
+}
+.modify_button:before {
+	background-position: 0 -48px;
+}
+.approve_button:before {
+	background-position: 0 -72px;
+}
+.restore_button:before {
+	background-position: 0 -96px;
+}
+.split_button:before {
+	background-position: 0 -120px;
+}
+.reply_button:before {
+	background-position: 0 -144px;
+}
+.reply_all_button:before {
+	background-position: 0 -144px;
+}
+.notify_button:before {
+	background-position: 0 -168px;
+}
+.unapprove_button:before {
+	background-position: 0 -192px;
+}
+.close_button:before {
+	background-position: 0 -216px;
+}
+.im_reply_button:before {
+	background-position: 0 -240px;
+}
+.details_button:before {
+	background-position: 0 -264px;
+}
+.ignore_button:before {
+	background-position: 0 -288px;
+}
+.report_button:before {
+	background-position: 0 -312px;
+}
+.warn_button:before {
+	background-position: 0 -336px;
+}
+.quotetonew_button:before {
+	background-position: 0 -360px;
+}
+.like_button:before {
+	background-position: 0 -384px;
+}
+.unlike_button:before {
+	background-position: 0 -408px;
+}
+/* This one is not sprited yet. */
+.linklevel1.likes_button:before {
+	background: url(../images/icons/heart.png) 2px 50% no-repeat;
+}
+/* No icon here. */
+.quick_edit .linklevel1:before, .linklevel1.post_options:before,
+.follow_ups .linklevel1:before {
+	display: none;
+}
+/* "More..." gets custom padding (no icon). */ 
+.linklevel1.post_options {
+	padding: 1px 6px 0 6px;
+}
+/* Follow ups gets custom padding (no icon). */
+.follow_ups .linklevel1 {
+	padding: 1px 6px 0 6px;
+}
+/* Quick edit is a special case. */
+.quickbuttons .quick_edit .linklevel1 {
+	position: relative;
+	overflow: hidden;
+}
+.quickbuttons .quick_edit img {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	margin-top: -48px;
+	padding: 40px 5em 40px 4px;
+}
+/* Quickbutton and follow ups drop menus. */
+.quickbuttons .menulevel2, .follow_ups  .menulevel2 {
+	padding: 0.5em;
+	width: auto;
+	text-align: left;
+}
+.quickbuttons .listlevel1:hover .menulevel2,
+.quickbuttons .listlevel1.sfhover .menulevel2 {
+	right: -1px;
+	left: auto;
+}
+.quickbuttons .listlevel2 {
+	width: 12em;
+}
+.follow_ups .listlevel2 {
+	width: 20em;
+}
+.quickbuttons .linklevel2 {
+	padding: 0 6px 0 26px;
+	line-height: 2.1em;
+}
+
+
+
+
+/*	$PAGELINKS	*/
+/* ------------------------------------------------------- */
+
+/* The page navigation area. */
+.pagesection {
+	clear: both;
+	overflow: hidden;
+	padding: 4px;
+}
+.pagesection .floatright input, .pagesection .floatright select {
+	margin-top: 3px;
+}
+.selectbox, .pagelinks {
+	margin: 5px 0 0 0;
+	color: #555;
+	font-size: 0.857em;
+}
+/* @todo - Styling will need a bit more thought here. */
+/* Do not use display: inline-block;*/
+/* Why not? Because it has a well-known quirk. It's white-space-dependent. */
+/* http://robertnyman.com/2010/02/24/css-display-inline-block-why-it-rocks-and-why-it-sucks/ */
+/* Specifically, the section titled "The enormous drawback". */
+/* @todo - Save code by amalgamating common button background declarations. */
+.pagelinks .navPages {
+	display: block;
+	float: left;
+	padding: 2px 5px 1px 5px;
+	border: 1px solid #afafaf;
+	border-top: 1px solid #bbb;
+	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
+	color: #555;
+}
+.pagelinks .navPages:hover, .pagelinks .current_page  {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	/* @todo - Simplify. */
+	color: #555;
+	text-decoration: none;
+}
+.pagelinks .current_page  {
+	display: block;
+	float: left;
+	padding: 1px 8px 2px 8px;
+	font-weight: bold;
+	font-size: 1.167em;
+}
+.expand_pages {
+	display: block;
+	float: left;
+	min-width: 1.5em;
+	text-align: center;
+}
+.next_page, .previous_page {
+	padding: 0 2px;
+	text-transform: capitalize;
+}
+.pagelinks  :first-child {
+	border-radius: 2px 0 0 2px;
+}
+.pagelinks :last-child {
+	border-radius: 0 2px 2px 0;
+}
+/* @todo - Fix for all templates. */
+.small_pagelinks {
+	float: right;
+}
+.small_pagelinks .navPages {
+	padding: 2px 3px 0 3px;
+	font-size: 0.889em;
+}
+/* Globally accessible top/bottom links. */
+#gotop, #gobottom {
+	position: fixed;
+	bottom: 50%;
+	right: 0;
+	z-index: 9;
+	padding: 1.3em 0.1em 0 0.1em;
+	height: 1.5em;
+	border: 1px solid #222;
+	border-bottom: none;
+	border-radius: 20px 0 0 0;
+	background: #eee;
+	color: #eee;
+	font-size: 2em;
+	font-weight: 700;
+	opacity: 0.2;
+}
+#gobottom {
+	top: 50%;
+	padding: 0.8em 0.1em 0.5em 0.1em;
+	border-top: none;
+	border-radius: 0 0 0 20px;
+}
+#gotop:hover, #gobottom:hover {
+	color: #444;
+	text-decoration: none;
+	opacity: 1;
+}
+/* Skip navigation link. */
+#top {
+	position: fixed;
+	top: -10em;
+	left: 10%;
+	padding: 1em 2em;
+	border: 4px solid #5ba048;
+	border-radius: 0 0 6px 6px;
+	background: #fff;
+	font-weight: 700;
+}
+#top:focus {
+	top: -4px;
+}
+
+
+
+
+/*	$TABLES		*/
+/* ------------------------------------------------------- */
+
+/* @todo */
+/* A general table class. */
+.table_grid {
+	margin: 0;
+	width: 100%;
+	border-spacing: 0;
+	border-collapse: collapse;
+	border: 1px solid #ddd;
+	border-top: none;
+}
+.table_head>th {
+	padding: 5px 8px;
+	border-top: 2px solid #ddd;
+	border-bottom: 2px solid #ddd;
+	background: #fff;
+	color: #555;
+	font-size: 1em;
+	font-weight: 600;
+}
+/* Trial extra classes, for table_heads that have equal width columns. */
+/* @todo - Not sure how much these will be used. Try them out. */
+.two_column>th {
+	width: 50%;
+}
+.three_column>th {
+	width: 33.333%;
+}
+.four_column>th {
+	width: 25%;
+}
+.five_column>th {
+	width: 20%;
+}
+/* Basic cells. */
+.table_grid td {
+	padding: 5px 8px;
+	border-bottom: 1px solid #ccc;
+}
+/* Subtle zebra striping for rows. */
+.table_grid .standard_row {
+	background: #fff;
+}
+.table_grid .alternate_row {
+	background: #fafafa;
+}
+.table_grid  textarea {
+	width: 100%;
+}
+.table_grid .statsbar div {
+	display: none;
+}
+.table_grid  textarea {
+	width: 100%;
+}
+/* GenericList */
+.additional_row {
+	padding: 6px 0;
+}
+.sort {
+	margin: 0 0 -4px 4px;
+}
+
+/* For Errors.template.php. */
+/* ------------------------------------------------------- */
+#errorfile_table .current {
+	border: 1px solid #444;
+	background: #fff5cd;
+	font-weight: bold;
+}
+
+
+
+
+/* $SETTINGS	*/
+/* ------------------------------------------------------- */
+
+/* Lists - settings use these a lot.
+/* @todo - Inefficient selector. Should not need dl tag. */
 dl.settings {
 	clear: right;
 	overflow: auto;
@@ -719,33 +1550,34 @@ dl.settings {
 	padding: 0;
 }
 dl.settings dt {
-	width: 40%;
 	float: left;
+	clear: both;
 	margin: 0 0 10px 0;
 	padding: 0;
-	clear: both;
+	width: 40%;
 }
 dl.settings .settings_title {
-	width: 100%;
 	float: none;
+	clear: both;
 	margin: 0 0 10px 0;
 	padding: 5px 0 0 0;
+	width: 100%;
 	font-weight: bold;
-	clear: both;
 }
+/* @todo -Inefficient selector. Should not need dl or dt tags. */
 dl.settings dt.windowbg {
-	width: 98%;
 	float: left;
+	clear: both;
 	margin: 0 0 3px 0;
 	padding: 0 0 5px 0;
-	clear: both;
+	width: 98%;
 }
 dl.settings dd {
-	width: 55%;
 	float: right;
 	overflow: auto;
 	margin: 0 0 3px 0;
 	padding: 0;
+	width: 55%;
 }
 dl.settings img {
 	margin: 0 10px 0 0;
@@ -760,1060 +1592,168 @@ dl.settings textarea {
 	width: 85%;
 }
 
-/* Message index board descriptions*/
-.description_header {
-	margin: 6px 0 0 0;
-}
 
-/* Upshrinks in cat and title bars. */
-#upshrink_ic, #newsupshrink, .panel_toggle, #quickReplyExpand {
-	float: right;
-	margin: 5px 0;
-	padding: 4px;
-}
-.table_list .unreadlink, .table_list a.collapse {
-	float: right;
-}
-.table_list a.collapse {
-	padding: 4px 4px 0 8px;
-}
 
-/* Basic icons in cat and title bars. */
-.title_barIC>.titlebg>a>.icon{
-	margin: 0;
-	padding: 8px 8px 0 0;
-	vertical-align: middle;
-}
 
-.table_grid .last_th input {
-	margin: 0 2px;
-}
-.table_grid th.lefttext {
-	padding: 0 8px;
-}
+/* -------------------------------------------- */
+/* @todo - Code before this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
+/* Code splitting will continue as time and bugz and whatever allow. */
+/* -------------------------------------------- */
 
-/* a general table class */
-.table_grid {
-	border-collapse: collapse;
-	margin-top: 1px;
-	width: 100%;
-}
-.table_grid td {
-	padding: 3px;
-}
-.table_grid  textarea {
-	width: 100%;
-}
-/* @todo - Bad class name. Rarely used. Change or deprecate. */
-/* Could probably replace with table_grid in the same places.*/
-.table_padding {
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-.table_padding td {
-	padding: 4px;
-}
 
-/* GenericList */
-.additional_row {
-	padding: 6px 0;
-}
-.sort {
-	margin: 0 0 -4px 4px;
-}
 
-/* table_grid styles for Profile > Show Permissions. */
-#permissions .table_grid td {
-	padding: 5px 10px;
-	cursor: default;
-}
 
-/* Used for sections that need somewhat larger corners.
------------------------------------------------------------ */ /* @todo */
-.roundframe {
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-	margin: 2px 0 0 0;
-	padding: 9px;
-	background: #f5f5f5;
-	border: 1px solid #c5c5c5;
-	border-radius: 7px;
-	overflow: hidden;
-}
-.roundframe dl, .roundframe dt, .roundframe p {
-	margin: 0;
-}
-.roundframe p {
-	padding: 6px;
-}
-
-/* The main content area.
-------------------------------------------------------- */
-.content {
-	padding: 6px 15px;
-	margin: 0;
-	border: none;
-}
-.content p {
-	margin: 0 0 6px 0;
-}
-
-/* Styles used by the auto suggest control.
-------------------------------------------------------- */
-.auto_suggest_div {
-	position: absolute;
-	visibility: hidden;
-	border-radius: 3px;
-	border: 1px solid #bbb;
-	z-index: 100;
-}
-.auto_suggest_div:focus {
-	outline: none !important;
-	border: 1px solid #bbb;
-}
-.auto_suggest_item {
-	background: #ddd;
-	padding: 1px 4px;
-}
-.auto_suggest_item_hover {
-	background: #888;
-	cursor: pointer;
-	color: #eee;
-	padding: 1px 4px;
-}
-
-/* Styles for the standard dropdown menus.
------------------------------------------------------------ */
-/* @todo - Lots of interdependent revision here to minimise code. */
-/* @todo - If making any changes, please check very carefully.
------------------------------------------------------------ */
-/* Wrapper for main menu - no visible styling. */
-#menu_nav {
-	margin: 6px;
-	padding: 0;
-}
-/* Menu bar: wrapper/background. */
-#main_menu {
-	padding: 0 8px;
-	border-radius: 6px 6px 0 0;
-}
-/* @todo - Collect all pseudo clearfixes in one declaration. */
-#main_menu:after {
-	content:"";
-	display: block;
-	clear: both;
-}
-#main_menu, .admin_menu .linklevel1.active, #adm_submenus .linklevel1.active {
-	background: #4b863c;
-	background-image: linear-gradient(to bottom, #5BA048 0%, #3d6e32 100%); /* W3C */
-	color: #fff;
-}
-/* Level 1 button background. */
-.listlevel1 {
-	margin: 5px 0;
-	padding: 1px;
-	float: left;
-	line-height: 2.3em;
-	position: relative;
-}
-/* Needed for new PM notifications. */
-.listlevel1 strong {
-	color: #555;
-}
-/* For the upshrink button in the main menu bar. */
-#collapse_button {
-	position: absolute;
-	top: 4px;
-	right: 8px;
-}
-#upshrink {
-	padding: 4px 9px 3px 9px;
-}
-#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
-	padding: 0 0.5em;
-	margin: 0;
-	display: block;
-	border: 1px solid transparent;
-	border-radius: 4px;
-	color: #fff;
-}
-.admin_menu .linklevel1, #adm_submenus .linklevel1 {
-	color: #444;
-}
-/* Level 1 hover effects. */
-#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel:hover .linklevel1, #main_menu .linklevel1:focus,
-.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus, .admin_menu .listlevel2:hover .linklevel2,
-#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
-	background: #efefef url(../images/theme/lower_section.png) 0 8px repeat-x;
-	color: #444;
-	border: 1px solid #bbb;
-	text-decoration: none;
-}
-/* Level 1 active button. */
-.admin_menu .active, .admin_menu .active:hover,
-#adm_submenus .active, #adm_submenus .active:hover {
-	font-weight: 600;
-	border: 1px solid #38642d;
-}
-/* Top level subsection indicators, just in case anyone wants them. */
-#main_menu .subsections .linklevel1:after,
-.admin_menu .subsections .linklevel1:after {
-	content:" \2193";
-}
-/* Levels 2 and 3 submenu wrapper. */
-.menulevel2, .menulevel3 {
-	z-index: 90;
-	position: absolute;
-	top: 100%;
-	left: -9999px;
-	width: 18.2em;
-	padding: 0.5em;
-	background: #fff;
-	border: 1px solid #bbb;
-	border-radius: 3px;
-	box-shadow: 3px 3px 4px rgba(0,0,0,0.3);
-}
-.listlevel2 {
-	margin: 0;
-	padding: 0;
-	width: 17em;
-	position: relative;
-	float: none;
-}
-.linklevel2, .linklevel3 {
-	position: relative;
-	line-height: 2.2em;
-	padding: 0 7px;
-	display: block;
-	color: #555;
-	border: 1px solid transparent;
-	border-radius: 3px;
-}
-.linklevel2>img {
-	vertical-align: middle;
-	margin: 0 0 0 -4px;
-}
-/* @todo - Note: The next declarations are for keyboard access with js disabled. */
-/*.dropmenu ul a:focus, .dropmenu ul ul a:focus {
-	margin-left: 9990px;
-	border: none;
-	width: 17em;
-}
-.dropmenu ul ul a:focus {
-	margin-left: 19950px;
-}
-/* @todo - Cancel those for hover and/or js access. */
-/*.dropmenu ul li:hover a:focus, .dropmenu ul li.sfhover a:focus {
-	margin-left: 0;
-	width: auto;
-}
-/* Level 3 submenu wrapper positioning. */
-.menulevel3 {
-	margin: -2em 0 0 15.3em;
-}
-/* Levels 2 and 3 hover effects. */
-.listlevel2:hover .linklevel2, .linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus {
-	color: #555;
-	border: 1px solid #ccc;
-}
-/* Reposition Level 2 submenu as visible on hover. */
-.listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
-	left: 1px;
-}
-/* Hiding Level 3 submenu off hover. */
-.listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
-	left: -9999px;
-}
-/* Reposition as visible on hover. */
-.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
-	left: -14px;
-}
-/* Nice and light subsection indicators. */
-.listlevel2.subsections .linklevel2:after {
-	content: "\2192";
-	position: absolute;
-	right: 6px;
-}
-/* Highlighting of current section */
-.linklevel2.chosen, .linklevel3.chosen {
-	font-weight: bold;
-}
-/* The extra menu rows for admin sections, etc. */
-#adm_submenus {
-	padding: 10px 15px;
-	overflow: auto;
-}
-
-/* Styles for sidebar menus.
-------------------------------------------------------- */
-#main_container {
-	position: relative;
-}
-/* @todo - Collect all pseudo clearfixes in one declaration. */
-#main_container:after {
-	content:"";
-	display: block;
-	clear: both;
-}
-#main_admsection {
-	position: relative;
-	left: 0;
-	right: 0;
-	overflow: auto;
-}
-#menu_sidebar {
-	width: 185px;
-	float: left;
-	padding: 0 10px 1em 0;
-}
-#menu_sidebar .catbg {
-	padding: 5px 8px;
-	font-size: 1em;
-}
-#menu_sidebar .sidebar_menu {
-	padding: 4px 0 9px 0;
-	float: none;
-}
-#menu_sidebar .listlevel1 {
-	margin: 0 0 1px 0;
-	line-height: 1.7em;
-	border: 1px solid transparent;
-	border-radius: 2px;
-	float: none;
-}
-#menu_sidebar .listlevel1:hover, #menu_sidebar .listlevel2:hover, #menu_current_area {
-	background: #ebebeb;
-	border: 1px solid #ccc;
-}
-#menu_sidebar .linklevel1 {
-	display: block;
-	text-decoration: none;
-	padding: 2px 7px;
-	color: #555;
-}
-#menu_sidebar .listlevel1.subsections .linklevel1:after {
-	content: "\2192";
-	position: absolute;
-	right: 6px;
-}
-#menu_sidebar  .listlevel1:hover .menulevel2, #menu_sidebar  .listlevel1.sfhover .menulevel2 {
-	top: -1px;
-	left: 160px;
-}
-#menu_sidebar .linklevel2 {
-	padding: 0 7px;
-	border: none;
-}
-/* @todo - Check these again. */
-/* Note: The next declarations are for keyboard access with js disabled. */
-#menu_sidebar .linklevel2:focus {
-	margin-left: 10150px;
-	width: 17em;
-}
-/* @todo - Check these again. */
-/* Cancel those for hover and/or js access. */
-#menu_sidebar .listlevel2:hover .linklevel2:focus, #menu_sidebar .listlevel2.sfhover .linklevel2:focus {
-	margin-left: 0;
-	width: auto;
-}
-/*End sidebar flyout coding. */
-
-/* The quick buttons - let's keep all this drop menu stuff in one place. */
-/* Superfluous div deprecated in favour of plain ul. */
-.quickbuttons {
-	margin: 11px 11px 4px 0;
-	text-align: right;
-}
-/* @todo - Collect all pseudo clearfixes in one declaration. */
-.quickbuttons:after {
-	content:"";
-	display: block;
-	clear: both;
-}
-/* @todo - What is this stuff? Must look it up later. */
-.windowbg .post_wrapper:hover ul.nojs_visible, .windowbg2 .post_wrapper:hover ul.nojs_visible {
-	visibility: visible;
-}
-.quickbuttons .listlevel1 {
-	float: right;
-	margin: 3px 0;
-	padding: 0 1px;
-	font-size: 0.9em;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 6px repeat-x;
-	border: 1px solid #ccc;
-	color: #555;
-	overflow: visible;
-	/* @todo */ width: auto;
-}
-.quickbuttons .listlevel1:last-child {
-	border-radius: 4px 0 0 4px;
-}
-.quickbuttons .listlevel1:hover {
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #fff url(../images/theme/upper_section.png) 0 -30px repeat-x;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
-	border: 1px solid #ccc;
-	border-left: 1px solid #bbb;
-	border-top: 1px solid #aaa;
-}
-.quickbuttons .linklevel1, .quickbuttons .linklevel1:hover {
-	margin: 0;
-	padding: 0 4px 0 20px;
-	line-height: 2.0em;
-	float: left;
-	text-decoration: none;
-	color: #555;
-}
-/* @todo - Check with js disabled after sorting most of the other crud. */
-/* Note: The next declarations are for keyboard access with js disabled. */
-.quickbuttons .linklevel1:focus {
-	margin: 0 -9910px 0 9910px;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #e3e9ef url(../images/theme/lower_section.png) 0 0 repeat-x;
-}
-/* Cancel for hover and/or js access. */
-.quickbuttons .listlevel1:hover .linklevel1:focus, .quickbuttons .listlevel1.sfhover .linklevel1:focus {
-	margin: 0;
-}
-.quickbuttons .listlevel1.modified, .quickbuttons .listlevel1.modified:hover {
-	float: left;
-	color: #777;
-	background: none;
-	box-shadow: none;
-	border: none;
-	padding: 0.65em 0 0 6px;
-}
-.quickbuttons .linklevel1, .quickbuttons .linklevel1:hover,
-.quickbuttons .linklevel2, .quickbuttons .linklevel2:hover {
-/* A rare example of where longhand background declarations work well. */
-	background-image: url(../images/theme/quickbuttons.png);
-	background-repeat: no-repeat;
-}
-/* The long list of sprite coordinates is much less verbose this way. */
-.quickbuttons .quote_button {
-	background-position: 0 0;
-}
-.quickbuttons .remove_button {
-	background-position: 0 -24px;
-}
-.quickbuttons .modify_button {
-	background-position: 0 -48px;
-}
-.quickbuttons .approve_button {
-	background-position: 0 -72px;
-}
-.quickbuttons .restore_button {
-	background-position: 0 -96px;
-}
-.quickbuttons .split_button {
-	background-position: 0 -120px;
-}
-.quickbuttons .reply_button {
-	background-position: 0 -144px;
-}
-.quickbuttons .reply_all_button {
-	background-position: 0 -144px;
-}
-.quickbuttons .notify_button {
-	background-position: 0 -168px;
-}
-.quickbuttons .unapprove_button {
-	background-position: 0 -192px;
-}
-.quickbuttons .close_button {
-	background-position: 0 -216px;
-}
-.quickbuttons .im_reply_button {
-	background-position: 0 -240px;
-}
-.quickbuttons .details_button {
-	background-position: 0 -264px;
-}
-.quickbuttons .ignore_button {
-	background-position: 0 -288px;
-}
-.quickbuttons .report_button {
-	background-position: 0 -312px;
-}
-.quickbuttons .warn_button {
-	background-position: 0 -336px;
-}
-.quickbuttons .quotetonew_button {
-	background-position: 0 -360px;
-}
-.quickbuttons .like_button {
-	background-position: 0 -384px;
-}
-.quickbuttons .unlike_button {
-	background-position: 0 -408px;
-}
-.quickbuttons .inline_mod_check {
-	padding: 1px 1px 1px 1px;
-}
-.quickbuttons .quick_edit, .quickbuttons .post_options {
-	padding: 0 6px 0 22px;
-	line-height: 2.0em;
-	position: relative;
-	color: #555;
-}
-.quickbuttons .quick_edit img {
-	padding: 4px 5em 4px 4px;
-	position: absolute;
-	left: 0;
-	top: 0;
-	cursor: pointer;
-	margin: 0;
-}
-.quickbuttons .inline_mod_check {
-	padding: 3px 0 0 3px;
-	background: none;
-	border: none;
-	box-shadow: none;
-}
-.quickbuttons .post_options {
-	padding: 0 0 0 0;
-	border-radius: 0 4px 4px 0;
-}
-.quickbuttons .post_options .linklevel1, .quickbuttons .post_options .linklevel1:hover {
-	padding: 0 4px 0 4px;
-	background-image: none;
-}
-/* @todo */
-.quickbuttons .menulevel2, .follow_ups  .menulevel2 {
-	z-index: 90;
-	position: absolute;
-	top: 100%;
-	left: -9999px;
-	width: auto;
-	padding: 0.5em;
-	background: #fff;
-	border: 1px solid #bbb;
-	border-radius: 3px;
-	box-shadow: 3px 3px 4px rgba(0,0,0,0.3);
-	padding: 0.5em;
-	text-align: left;
-	white-space: nowrap;
-}
-.quickbuttons .listlevel1:hover .menulevel2, .quickbuttons .listlevel1.sfhover .menulevel2,
-.follow_ups .listlevel1:hover .menulevel2, .follow_ups .listlevel1.sfhover .menulevel2 {
-	left: auto;
-	right: -1px;
-}
-.quickbuttons .listlevel2 {
-	clear: right;
-}
-.quickbuttons .listlevel1.sfhover .listlevel2, .quickbuttons .listlevel1:hover .listlevel2 {
-	background: none;
-	box-shadow: none;
-	width: 12.5em;
-	border: 1px solid transparent;
-	border-radius: 3px;
-}
-.quickbuttons .listlevel2:hover {
-	border: 1px solid #cfcfcf;
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 10px repeat-x;
-}
-.quickbuttons .linklevel2, .quickbuttons .linklevel2:hover, .quickbuttons .linklevel2:focus {
-	padding: 0 6px 0 26px;
-	display: block;
-	line-height: 2.0em;
-}
-.follow_ups {
-	float: right;
-	margin: -8px 0 0 0;
-}
-.follow_ups:after {
-	display: none;
-}
-.follow_ups .listlevel1 {
-	padding: 0 4px;
-	line-height: 1.9em;
-	cursor: pointer;
-}
-.follow_ups .listlevel1:first-child {
-	border-radius: 4px;
-	margin-right: 0.75em;
-}
-.follow_ups .listlevel1.sfhover .listlevel2, .follow_ups .listlevel1:hover .listlevel2 {
-	width: 20em;
-	background-image: none;
-}
-
-/* End quickbuttons and follow ups code. */
-
-/* Styles for the standard button lists.
-------------------------------------------------------- */
-.buttonlist {
-	padding: 5px;
-	margin: 0;
-}
-.buttonlist li {
-	margin: 0 0 0 6px;
-	padding: 0;
-	float: left;
-}
-.buttonlist li a {
-	display: block;
-	background: #ebebeb url(../images/theme/lower_section.png) 0 -10px repeat-x;
-	border: 1px solid #bbb;
-	border-bottom: 1px solid #aaa;
-	border-radius: 1px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-	color: #555;
-	font-size: 0.8em;
-	text-transform: uppercase;
-	line-height: 2.2em;
-	padding: 0 8px;
-}
-/* @todo - What on earth is buttonlist_c? */
-.pagesection ul.buttonlist_c {
-	position: absolute;
-	right: 5px;
-	text-align: right;
-	white-space: nowrap;
-}
-.pagesection ul.buttonlist_c>li>ul, .buttonlist>li>ul {
-	display: none;
-}
-#pagetop, #pagebot {
-	margin-top: 7px;
-}
-/* @todo - Will these be used? */
-.buttonlist>li>ul li {
-	float: none;
-}
-.buttonlist>li>ul {
-	background-color: #fff;
-}
-.buttonlist li a:hover {
-	border: 1px solid #ccc;
-	border-bottom: 1px solid #bbb;
-	background: #efefef url(../images/theme/lower_section.png) 0 0 repeat-x;
-	text-decoration: none;
-}
-/* the active one */
-.buttonlist li a.active {
-	background: -moz-linear-gradient(top,  #5BA048 0%, #3d6e32 100%); /* FF3.6+ */
-	background: -webkit-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #5BA048 0%,#3d6e32 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #5BA048 0%,#3d6e32 100%); /* W3C */
-	color: #fff;
-	font-weight: bold;
-	border: 1px solid #46823c;
-}
-.buttonlist li a.active:hover {
-	color: #ccc;
-}
-/* @tdo - What are these classes? */
-.align_top li a, .align_bottom li a {
-	margin: 0 12px 0 0;
-}
-
-/* Styles for the general looks of the theme.
-------------------------------------------------------- */
-/* Do all these here to save repetition. */
-#header .frame, #upper_section .user,
-#upper_section .news, .navigate_section,
-#lower_section, #lower_section .frame, #footer_section .frame {
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
-/* @todo - Collect all pseudo clearfixes in one declaration. */
-/* Collection of clearfixes for main areas. */
-.frame:after, #upper_section:after, #inner_wrap:after, #main_content_section:after {
-	content:"";
-	display: block;
-	clear: both;
-}
-/* These divisions wrap the forum sections when a forum width is set. */
-#wrapper, .frame {
-	margin: 0 auto;
-	/* min-width: 750px; */
-	width: 95%;
-	/* @todo Just trying this out. Methinks stuff gets too strung out on wide screens. */
-	max-width: 100em;
-}
-/* Box-shadow only on this one. */
-#wrapper {
-	margin-top: 20px;
-	background: #fbfbfb;
-	border: 1px solid #444;
-	border-radius: 8px;
-	box-shadow: 0 3px 4px #222;
-}
-/* The top bar. */
-#top_section {
-	margin: 0;
-	padding: 0 4px;
-	background: #ebebeb url(../images/theme/lower_section.png) 0 100% repeat-x;
-	border-bottom: 1px solid #bbb;
-	box-shadow: 0 1px 4px rgba(0,0,0,0.16);
-}
-#top_section_notice {
-	margin: 0;
-	padding: 9px 9px 7px 9px;
-	line-height: 1.3em;
-	/* See me grumblez in Issue #552. ;) */
-	float: left;
-}
-#search_form {
-	padding: 4px 0 0 0;
-	text-align: right;
-	min-width: 16em;
-}
-#search_form .input_text, #search_form select, #search_form .button_submit {
-	padding: 2px;
-	margin: 0 0 0 0;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-left: 1px solid #bbb;
-	border-top: 1px solid #aaa;
-	box-shadow: -1px -1px 2px rgba(0,0,0,0.07), -3px -3px 6px rgba(255,255,255,0.8) inset;
-}
-#search_form select {
-	padding: 1px;
-}
-#chrome #search_form select {
-	padding: 2px;
-}
-#search_form .button_submit {
-	padding: 1px 3px 0;
-	margin: 2px 5px 0;
-	background: #efefef url(../images/theme/lower_section.png) 0 0 repeat-x;
-	color: #555;
-}
-#search_form .button_submit:hover {
-	background: #efefef url(../images/theme/upper_section.png) 0 12px repeat-x;
-	color: #a85400;
-	text-decoration: none;
-}
-/* The logo and slogan. */
-#header {
-	padding: 2px 2px 12px 2px;
-	background: #fbfbfb;
-	border-bottom: 1px solid #777;
-	box-shadow: 0 2px 3px rgba(0,0,0,0.4);
-}
-/* The main title. */
-.forumtitle {
-	font-size: 2.2em;
-	padding: 24px 12px 4px 12px;
-	float: left;
-}
-.forumtitle>a {
-	color: #46823c;
-}
-/* Float these items to the right */
-#siteslogan, #logo {
-	margin: 0;
-	padding: 0;
-	float: right;
-	line-height: 50px;
-	font-size: 1.8em;
-}
-/* Tweak the logo */
-#logo {
-	margin: 10px 10px 0 0;
-}
-/* The user info, news, etc.*/
-#upper_section {
-	padding: 4px 10px;
-}
-/* The upper_section, float the two each way */
-#inner_wrap>div {
-	width: 50%;
-	float: left;
-	padding: 0 4px 4px 4px;
-	font-size: 0.9em;
-}
-.greeting {
-	font-weight: bold;
-}
-/* The login form. */
-#guest_form {
-	padding: 4px;
-}
-/* User information. */
-#inner_wrap a.avatar {
-	float: left;
-	margin: 0 10px 5px 0;
-	max-width: 40px;
-}
-/* No more huge avatars up top. YAY! */
-#inner_wrap a.avatar img {
-	height: auto;
-	width: 100%;
-}
-/* News section. */
-#inner_wrap .news {
-	max-width: 27em;
-	float: right;
-}
-#inner_wrap .news h2, #inner_wrap .news p {
-	display: inline;
-	padding: 0 0 0 4px;
-}
-
-/* The content section */
-#main_content_section {
-	padding: 2px 12px 16px 12px;
-}
-
-/* Deprecated parent div in favour of plain ul. */
-/* The navigation list (i.e. linktree) */
-.navigate_section {
-	margin: 0 3px 6px 3px;
-	padding: 2px 0 0 10px;
-	font-size: 0.9em;
-	overflow: hidden;
-	border: 1px solid #ccc;
-	border-radius: 2px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.08);
-	background: #eee;
-}
-#main_content_section .navigate_section {
-	margin: 6px 0 0 0;
-}
-.navigate_section li {
-	float: left;
-	padding: 0 2em 0 0;
-	line-height: 2em;
-	color: #444;
-	position: relative;
-}
-.navigate_section li a, .navigate_section li em {
-	padding: 0.2em 0;
-	display: inline-block;
-}
-/* Sized carefully for stability with non-standard font sizes. */
-.linktree:after {
-	content:" \2192";
-	font-size: 2em;
-	line-height: 1em;
-	position: absolute;
-	top: 0;
-	right: 0.1em;
-	display: block;
-}
-.navigate_section .board_moderators a {
-	padding: 0.2em 0;
-}
-/* "Unread posts" and "New replies" links, accessible with header collapsed. */
-.navigate_section .unread_links {
-	float: right;
-	padding: 0;
-}
-.navigate_section .unread_links a {
-	padding: 0.2em 10px 0.2em 0;
-}
-
-/* The footer with copyright links etc. */
-#footer_section {
-	margin: 35px 0 0 0;
-	background: #162812;
-	border-top: 3px solid #111;
-}
-#footer_section .frame {
-	padding: 20px 5px;
-}
-#footer_section p, #footer_section a {
-	color: #fff;
-	font-size: 0.8em;
-}
-#footer_section li {
-	display: inline;
-	padding-right: 5px;
-}
-#footer_section .copyright {
-	display: block;
-}
-
-/* Globally accessible "go up" link. */
-#bot {
-	display: block;
-	width: 25px;
-	float: right;
-}
-#bot img{
-	padding: 4px;
-}
-
-/* Styles for the board index and child boards tables.
-------------------------------------------------------- */
-.boardindex_table {
-	margin: 2px 0 -8px 0;
-}
-/* Different margin, ergo new class. */
-.childboard_table {
-	margin: 2px 0 -16px 0;
-}
-.table_list {
-	width: 100%;
-	border-spacing: 0;
-}
-.table_list .header td {
-	padding: 0;
-}
-.table_list td.icon {
-	padding: 14px 0 0 0;
-	width: 5%;
-	min-width: 50px;
-	/*Top aligned is much nicer for the icon. */
-	vertical-align: top;
-	border-left: 2px solid #e4e4e4;
-	text-align: center;
-}
-.table_list td.info {
-	padding: 0 7px 0 0;
-}
-/* The board title! */
-.table_list .info .subject {
-	font-weight: 600;
-	font-size: 1.1em;
-	color: #46823c;
-}
-.table_list .info p {
-	margin: 0;
-	padding: 0;
-	font-size: 1em;
-}
-.table_list .info .moderators {
-	font-size: 0.9em;
-}
-/* Stats and lastpost cells now have standard body text font size. */
-/* Looks good. Less code. Better legibility for more people. Bigger link target. */
-.table_list .stats {
-	padding: 7px 7px 0 7px;
-	width: 12%;
-}
-.table_list .stats p {
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #ccc;
-	min-height: 3em;
-	padding: 0 7px;
-	text-align: center;
-}
-.table_list .lastpost {
-	width: 24%;
-	min-width: 25em;
-	padding: 7px;
-	border-right: 2px solid #e4e4e4;
-}
-.table_list .lastpost p {
-	margin: 0;
-	padding: 0;
-}
-.table_list .lastpost p a {
-	color: #46823c;
-	font-weight: 600;
-}
-.table_list .lastpost p a:last-child {
-	color: #555;
-	font-weight: normal;
-}
-.table_list td.children {
-	color: #555;
-	font-size: 0.9em;
-	padding: 4px 0 0 0;
-	border-top: 1px solid #ddd;
-	border-right: 2px solid #e4e4e4;
-	background: #fff;
-}
-.table_list .children p {
-	padding: 4px 0 0 0;
-}
-.table_list .icon, .table_list .info, .table_list .stats, .table_list .lastpost {
-	background: #fff;
-	border-top: 2px solid #e4e4e4;
-	height: 4em;
-}
-.table_list .divider tr td {
-	border: none;
-	border-top: 2px solid #e4e4e4;
-	height: 18px;
-}
-.board_new_posts {
-	font-weight: 700;
-}
-
-/* The posting icons - simplified for happier parrots. */
-#posting_icons {
-	margin: 8px 0 20px 0;
-	float: left;
-}
-#posting_icons li {
-	font-size: 0.9em;
-}
-#posting_icons img {
-	vertical-align: middle;
-	margin: 0 2px 0 12px;
-}
-
-/* The newsfader - re-styled a bit. */
-#newsfader {
-	margin: 0 0 6px 0;
-}
-#smfFadeScroller {
-	text-align: center;
-	padding: 12px 25px;
-	overflow: auto;
-	border: 2px solid #e4e4e4;
-	color: #555555; /* shouldn't be shorthand style due to a JS bug in IE! */
-}
-
-/* Styles for the info center on the board index.
----------------------------------------------------- */
-#info_center {
-	clear: both;
-}
-#upshrinkHeaderIC {
-	margin-top: 4px;
-}
-#ic_recentposts {
-	line-height: 1.6em;
-	width: 96%;
-	margin: 0 34px;
-	font-size: 0.9em;
-}
-#ic_recentposts td, #ic_recentposts th {
-	border-top: 1px solid #ddd;
-	padding: 1px 4px;
-	vertical-align: top;
-	text-align: left;
-}
-#ic_recentposts .recentpost strong {
-	width: 40%;
-}
-#ic_recentposts .recentpost>strong>a {
-	font-weight: 600;
-	color: #46823c;
-}
-#ic_recentposts .recentposter {
-	width: 15%;
-}
-#ic_recentposts .recentboard {
-	width: 20%;
-}
-#ic_recentposts .recenttime {
-	width: 25%;
-}
-#upshrinkHeaderIC p.inline {
-	padding: 0 40px 2px 40px;
-	line-height: 1.5em;
-	font-size: 0.9em;
-}
-#upshrinkHeaderIC p.inline span {
-	padding: 4px 0 0 0;
-}
-#upshrinkHeaderIC .membergroups {
-	display: block;
-}
-
+/*	$BOARDS		*/
+/* ------------------------------------------------------- */
 /* The small stats, under upper linktree. */
 #index_common_stats {
 	margin: 0 8px 6px 8px;
-	font-size: 0.9em;
+	font-size: 0.857em;
+}
+/* The board categories and newsfader - some shared styling. */
+.forum_category {
+	clear: both;
+	margin: 0 0 1em 0;
+}
+.category_boards, .board_row, .childboard_row {
+	margin: 1px 0 0 0;
+}
+.board_row {
+	padding: 14px 0 11px 0;
+}
+.childboard_row {
+	margin: 0;
+}
+.board_info, .board_latest {
+	display: table-cell;
+	vertical-align: top;
+	width: 70%;
+	padding: 0 8px;
+	font-size: 0.929em;
+}
+.board_latest {
+	width: 40%;
+	min-width: 36em;
+	padding: 0 14px;
+}
+.icon_anchor {
+	display: block;
+	text-align: center;
+	min-width: 50px;
+	padding: 2px 6px 0 0;
+	float: left;
+}
+.board_name {
+	padding: 0 0 1px 0;
+	font-size: 1.154em;
+}
+.board_description, .moderators {
+	margin: 0 0 0 56px;
+}
+.moderators {
+	font-size: 0.923em;
+}
+.board_stats {
+	text-align: right;
+	padding: 1px  0 1px 6px;
+	float: right;
+	min-width: 8.4em;
+}
+.lastpost_link, .board_lastposter, .board_lasttime {
+	white-space: pre;
+}
+.lastpost_link>a {
+	font-size: 1.077em;
+	line-height: 1.571em;
+}
+.board_lasttime {
+	display: block;
+}
+.childboard_row {
+	font-size: 0.857em;
+}
+.childboards {
+	margin: 0 14px 0 64px;
+}
+.childboards>li {
+	display: inline-block;
+	padding: 6px 0.3em 4px 0;
+}
+/* The posting icons and mark read button. */
+#posting_icons {
+	margin: 0 4px 20px 4px;
+}
+#posting_icons p {
+	display: table-cell;
+	padding: 0 6px;
+	font-size: 0.857em;
+}
+#posting_icons .buttonlist {
+	padding: 0;
+}
+#posting_icons img {
+	margin: 0 2px;
+	vertical-align: middle;
+}
+/* Styles for the info center on the board index. */
+#upshrinkHeaderIC .board_row {
+	padding: 8px 12px;
+}
+.ic_section_header {
+	margin: 0 0 8px 0;
+	padding: 0 0 4px 0;
+	font-size: 1.072em;
+}
+/* Icons for info centre title bars. */
+.ic_section_header .icon{
+	margin: -3px 4px 0 4px;
+	vertical-align: middle;
+}
+#ic_recentposts {
+	margin: 0 auto;
+	width: 95%;
+	font-size: 0.857em;
+	border-collapse: collapse;
+}
+#ic_recentposts td, #ic_recentposts th {
+	padding: 2px 4px;
+	vertical-align: top;
+	text-align: left;
+}
+.recentpost {
+	width: 40%;
+}
+.recentposter {
+	width: 15%;
+}
+.recentboard {
+	width: 20%;
+}
+.recenttime {
+	width: 25%;
+}
+.inline {
+	padding: 0 32px;
+	font-size: 0.857em;
+}
+
+
+
+
+/* -------------------------------------------- */
+/* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
+/* Code splitting will continue as time and bugz and whatever allow. */
+/* -------------------------------------------- */
+
+
+
+
+/* For the who is template. */
+/* Sort of a stray - ?action=who;sa=credits */
+#credits p {
+	margin: 0;
+	padding: 0;
+	font-style: italic;
 }
 
 /* @todo - Would prefer to deprecate this. Tied up with js. */
@@ -1825,72 +1765,209 @@ img.new_posts {
 	display:inline-block;
 }
 
-/* Styles for the message (topic) index.
----------------------------------------------------- */
+
+/* Styles for the message (topic) index. */
 #messageindex, #unread {
 	clear: both;
+}
+#unread_header {
+	margin-top: 0.5em;
 }
 /* The board description and who-is-viewing stuff. */
 #description_board {
 	margin: 10px 0 0 0;
-	padding: 8px 10px 6px 10px;
-	border: 2px solid #ddd;
+	background: #e4e4e4;
+	border-radius: 4px 4px 0 0;
+	box-shadow: 1px 2px 4px #eee;
 }
-#description_board h3 {
-	font-weight: 600;
+#description_board .moderators {
+	margin: 0;
+	font-size: 0.765em;
+}
+#description_board>p{
+	background: #fff;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	margin-top: 2px;
+	padding: 4px 12px;
 }
 .whoisviewing {
-	font-size: 0.9em;
-	padding: 4px;
+	padding: 4px 0;
+	display: block;
+	font-size: 0.857em;
 }
-.lastpost img {
+.topic_listing {
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
+	padding: 1px 0 0 0;
+}
+.topic_listing>li {
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	margin: 1px 0 0 0;
+}
+.topic_listing>.topic_sorting_row {
+	margin: 0;
+}
+.topic_sorting_row, .basic_row {
+	background: #fff;
+}
+.topic_sorting_row>h3 {
+	display: table-cell;
+	padding: 10px 12px 8px 12px;
+	width: 100%;
+	font-weight: 600;
+	font-size: 1.071em;
+}
+.topic_sorting_row>p {
+	display: table-cell;
+	vertical-align: middle;
+	width: 2%;
+	padding: 8px 8px 0 8px;
+}
+.topic_info {
+	display: table-cell;
+	vertical-align: top;
+	width: 70%;
+	padding: 7px 8px 6px 12px;
+}
+.topic_icons {
+	float: left;
+	text-align: center;
+	min-width: 50px;
+	padding: 6px 16px 0 0;
+	position: relative;
+}
+.fred {
+	position: absolute;
+	left: 50%;
+	top: 20px;
+	margin: 0 0 0 -2px;
+}
+.topic_name, .topic_starter {
+	margin: 0 0 0 50px;
+}
+.topic_name h4 {
+	line-height: 1.429em;
+	display: inline-block;
+}
+.topic_name h4 a {
+	color: #4b863c;
+	font-weight: 600;
+}
+.sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
+	color: #555;
+}
+.locked_row .topic_name h4 a {
+	color: #777;
+}
+.topic_starter {
+	font-size: 0.929em;
+}
+.small_pagelinks {
+	float: right;
+}
+.topic_latest {
+	display: table-cell;
+	vertical-align: top;
+	width: 30%;
+	min-width: 34em;
+	padding: 7px 4px 6px 4px;
+	font-size: 0.929em;
+}
+.topic_stats {
+	text-align: right;
+	float: right;
+	min-width: 14em;
+	-moz-box-sizing: border-box;
+	padding: 0 16px 0 16px;
+	color: #777;
+}
+.topic_lastpost img {
 	float: right;
 	padding: 4px;
 }
-.titlebg td.qaction_cell {
-	font-size: 0.909em;
+.topic_moderation, .topic_moderation_alt {
+	display: table-cell;
+	vertical-align: middle;
+	width: 2%;
+	padding: 0 8px;
 }
-select.qaction, input.qaction {
-	padding: 0;
-	margin: 2px 0 0;
+.topic_moderation_alt {
+	min-width: 56px;
 }
-.qaction_cell .button_submit {
-	margin: 2px 4px 0 4px;
+.topic_moderation_alt img {
+	padding: 2px 2px 0 2px;
+}
+.qaction_row {
+	background: #fff;
+	text-align: right;
+	padding: 6px;
+}
+.qaction_row .button_submit {
+	margin: 0;
+}
+.approvetopic_row, .approve_row {
+	background: #fff5cd;
+}
+.sticky_row, .locked_row.sticky_row {
+	background: #ffffe0;
+}
+.sticky_row .topic_info {
+	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+}
+.locked_row.sticky_row .topic_info {
+	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+}
+/* @todo - Extra classes for search results, etc. See if I can clean them up. */
+.locked_row, .locked_row.core_posts {
+	background: #f7f7f7;
+}
+.locked_row .topic_info, .locked_row .topic_details {
+	background: url(../images/icons/quick_lock.png) no-repeat 98% 4px;
+}
+/* Search results need some help as well */
+/* @todo - Sort markup so this can call above classes. *//*
+.search_results_posts .lockedbg {
+	background:  #efefef url(../images/icons/quick_lock.png) no-repeat 95% 15px;
+}
+.search_results_posts .stickybg, .search_results_posts .locked_stickybg {
+	background:  #fffee2 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
+}*/
+
+#quick_mod_jump_to {
+	font-size: 1em;
 }
 #topic_icons {
-	margin-top: 10px;
 	float: left;
+	margin-top: 10px;
+	padding: 8px 12px;
 	width: 100%;
-}
-#topic_icons .description {
 	border: 1px solid #ddd;
 	border-radius: 3px;
-	padding: 8px 12px 0 12px;
-}
-#topic_icons.description.none {
-	margin-top: 0;
 }
 #topic_icons p {
+	padding: 0 6px;
 	line-height: 2em;
 }
-#topic_icons p.floatleft {
-	padding: 0 12px 2px 0;
+#message_index_jump_to {
+	font-size: 1.167em;
 }
-/* Just to correct Fred there without requiring an extra image. Should make a new Fred with clear padding. */
-#topic_icons p.floatleft img:first-child {
-	padding: 0 2px;
-}
-#message_index_jump_to_select {
-	font-size: 1em;
-	margin: 0 -12px 0 0;
-	padding: 2px;
+/* @todo - An oddone. Look into it later. */
+#message_index_jump_to label {
+	vertical-align: top;
 }
 #message_index_jump_to .button_submit {
-	padding: 4px 6px 2px 6px;
+	margin: 0;
 }
 
-/* Styles for the display template (topic view).
----------------------------------------------------- */
+
+
+
+/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+
+/* The display template (topic view).
 /* Events */
 .linked_events {
 	padding: 12px 0;
@@ -1911,60 +1988,53 @@ select.qaction, input.qaction {
 }
 
 /* Poll vote options */
+ /* @todo - Slow selectors for the next few declarations here. Change? */
 #poll_options ul.options {
-	border-top: 1px solid #9999aa;
+	margin: 0 0 12px 0;
 	padding: 12px 30px 0 25px;
-	margin: 0 0 12px 0;
-}
-#poll_options div.submitbutton {
-	border-bottom: 1px solid #9999aa;
-	clear: both;
-	padding: 0 0 12px 25px;
-	margin: 0 0 12px 0;
+	border-top: 1px solid #9999aa;
 }
 
 /* Poll results */
 #poll_options dl.options {
+	margin: 0 0 12px 0;
+	padding: 12px 0 12px 25px;
 	border: solid #9999aa;
 	border-width: 1px 0;
-	padding: 12px 0 12px 25px;
-	margin: 0 0 12px 0;
-	line-height: 1.4em;
 }
 #poll_options dl.options dt {
-	padding: 4px 0;
-	width: 30%;
-	max-width: 30em;
 	float: left;
-	margin: 0;
 	clear: left;
+	margin: 0;
+	padding: 4px 0;
+	max-width: 30em;
+	width: 30%;
 }
 #poll_options dl.options .voted {
 	font-weight: bold;
 }
 #poll_options dl.options dd {
-	width: 60%;
-	max-width: 45em;
+	position: relative;
 	float: left;
 	margin: 0 0 4px 0;
 	padding: 0 4px 0 0;
-	line-height: 1.4em;
 	min-height: 1.4em;
-	background: #fff;
+	max-width: 45em;
+	width: 60%;
 	border: 1px solid #aaa;
 	border-radius: 2px;
-	position: relative;
+	background: #fff;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 #poll_options dl.options .percentage {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 2;
 	display: block;
 	float: right;
 	margin: 0 0 0 0;
 	padding: 0 2px;
-	position: absolute;
-	right: 0;
-	top: 0;
-	z-index: 2;
 	background: #fff;
 	white-space: pre;
 }
@@ -1975,215 +2045,179 @@ select.qaction, input.qaction {
 	padding: 0 6px 6px 6px;
 }
 #pollmoderation {
+	overflow: auto;
 	margin: 0;
 	padding: 0;
-	overflow: auto;
-}
-#poll_options .submitbutton {
-	float: right;
-	width: 100%;
 }
 
 /* On to the posts */
-#forumposts {
+.forumposts {
 	clear: both;
 	margin: 8px 0 0 0;
-	padding: 0 0 6px 0;
-	border: 1px solid #ddd;
-	border-radius: 6px 6px 0 0;
-	background: #eee;
-}
-/* There's a reason for this. See if you can figure it out. :D */
-#forumposts .cat_bar {
-	margin: -1px -1px 1px -1px;
+	border-radius: 4px 4px 0 0;
+	background: #e2e2e2;
+	box-shadow: 1px 2px 4px #eee;
 }
 /* Topic information */
-#forumposts .catbg img {
-	padding: 5px 3px 0 0;
-}
-#forumposts .catbg span {
+.views_text, .nextlinks {
 	white-space: pre;
-	/* Specific sizing for clarity without ClearType. */
-	font-size: 0.818em;
-	font-weight: normal;
-	padding: 2px 0;
+	font-size: 0.765em;
+}
+.nextlinks {
+	float: right;
 }
 #whoisviewing {
-	padding: 4px 10px;
+	padding: 4px 1em;
+	font-size: 0.857em;
 }
 /* Poster and postarea + moderation area underneath */
-#whoisviewing, #forumposts .windowbg, #forumposts .windowbg2, #forumposts .approvebg, #forumposts .approvebg2 {
+
+#whoisviewing, .forumposts .windowbg, .forumposts .windowbg2,
+.forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
-	background: #fff;
-	margin: 6px 6px 0 6px;
+	margin: 4px 0 0 0;
 	border: 1px solid #ddd;
-}
-/* @todo - Collect all pseudo clearfixes in one declaration. */
-/* @todo - Also, look at simplifying markup in posts < ETA: Mostly done, but poster area still needs some work. */
-/* Poster details and list of items */
-.poster {
-	float: left;
-	/* Don't set this in em - will eat too much space if people need large text. */
-	/* Just break the few words here, and leave more space for topic content. */
-	margin: -8px -10px 0 0;
-	width: 170px;
-	word-break: hyphenate;
-	word-wrap: break-word;
-}
-.poster2 {
-	margin: 0;
-	width: auto;
-	max-width: 25em;
-	font-size: 1em;
-}
-/* #todo - Why a span? Just use li class="name" and an anchor. */
-/* @todo - Then CSS becomes .name>a {..stuff..} - easy. */
-.poster .name {
-	display: block;
-	padding: 6px;
-	line-height: 1.5em;
-	text-align: center;
-	color: #46823c;
-	font-size: 1.2em;
-	font-weight: 600;
-	overflow: hidden;
-}
-.poster2 .name {
-	padding: 0 8px;
-	font-size: 1em;
-}
-/* Nifty new flyout menu for the poster info. */
-/* Revised for less code. Partly dependent on previous .dropmenu declarations. */
-/* @todo Can probably clean up the CSS a bit more here. */
-/* Check inheritance with font size in the dropdown. */
-.poster .listlevel1, .poster .listlevel1.sfhover {
-	padding: 0;
-	margin: 0;
-	float: none;
-	line-height: 1.5em;
-	text-align: center;
-}
-.poster .listlevel1:hover .linklevel1, .poster  .listlevel1.sfhover .linklevel1,
-.poster .linklevel1:hover, .poster .linklevel1 {
-	background: none;
-	border: none;
-}
-.poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
-	top: 100%;
-	float: none;
-	left: 0;
-	padding: 6px 0.5em 4px 0.5em;
-	width: 15.2em;
-	font-size: 0.9em;
-}
-.poster .listlevel2, .poster .listlevel2:hover {
-	float: none;
-	text-align: left;
-	clear: both;
-	background: none;
-	border: none;
-	width: 14em;
-}
-.poster .karma_allow .linklevel2 {
-	float: left;
-}
-.poster .listlevel2 ol {
-	padding: 0 0 0 0;
-	margin: 6px 0 0 0;
-	float: left;
-	width: 100%;
-}
-.poster .menulevel2 .cf_icons, .poster .menulevel2 ol li {
-	padding: 3px;
-}
-.poster .menulevel2 ol li {
-	display: table-cell;
-}
-.poster .postgroup, .poster .postcount, .poster .karma,
-.poster .karma_allow, .poster .gender, .poster .blurb {
-	padding: 0 10px;
-}
-.poster .menulevel2 .report_link, .poster .menulevel2 .warning, .poster .menulevel2 .poster_ip {
-	margin: 0;
-	padding: 0;
-	float: left;
-	width: 100%;
-	font-size: 1.1em;
-}
-.poster .menulevel2 .report_seperator {
-	height: 2px;
-	background: #ccc;
-	box-shadow: 0 -1px 0 #fff inset;
-}
-.poster .menulevel2 .warning a, .poster .menulevel2 .warning img {
-	width: auto;
-	display: table-cell;
-	vertical-align: middle;
-	padding: 0 4px;
-	line-height: 1.4em;
-}
-.poster .listlevel2 hr {
-	margin: 4px 3px;
-}
-.poster .listlevel2.poster_ip a {
-	display: table-cell;
+	border-bottom: 1px solid #ccc;
+	background: #fff;
 }
 
-/* The visible stuff below the avatar. */
-.poster .icons, .poster .membergroup, .poster .title, .poster_online, .poster  .warning {
-	font-size: 0.9em;
-	line-height: 1.4em;
-	padding: 0;
-	margin: 3px 0 0 0;
+/* Colors for background of posts requiring approval */
+.forumposts .approvebg, .forumposts .approvebg2 {
+	background: #fff5cd;
 }
+
+/* Poster details and list of items */
+.poster {
+	display: table-cell;
+	vertical-align: top;
+	min-width: 15em;
+	word-wrap: break-word;
+	word-break: hyphenate;
+	font-size: 0.857em;
+}
+.poster.poster2 {
+	display: block;
+	float: left;
+	margin: 0;
+	min-width: 0;
+	font-size: 1em;
+}
+.poster .listlevel1, .poster.poster2 .listlevel1 {
+	float: none;
+	text-align: center;
+	font-size: 1em;
+}
+/* #todo - Add an h3 for a11y? Breaks Stoopidfish. Bleh. :P */ 
+.poster .name {
+	overflow: hidden;
+	margin-top: -0.4em;
+	padding: 6px;
+	color: #46823c;
+	text-align: center;
+	font-weight: 600;
+	font-size: 1.333em;
+}
+.poster.poster2 .name {
+	margin-top: 0;
+	padding: 0 8px 0 0;
+	text-align: left;
+	font-size: 1.167em;
+}
+/* Drop menu for the poster info. */
+.poster .listlevel1.sfhover .menulevel2, .poster .listlevel1:hover .menulevel2 {
+	top: 95%;
+	left: 0;
+	padding: 6px 1em 4px 1em;
+	width: 16em;
+	background: #fff;
+	text-align: left;
+}
+.poster .listlevel2 {
+	width: 14em;
+}
+.poster .linklevel2, .poster .linklevel2:focus,
+.poster .listlevel2:hover .linklevel2 {
+	border: 1px solid transparent;
+	background: none;
+	padding: 0;
+}
+.poster .listlevel2:hover .linklevel2:hover {
+	text-decoration: underline;
+}
+.karma_allow>.linklevel2 {
+	display: inline-block;
+}
+.listlevel2>ol>li {
+	display: table-cell;
+}
+.report_seperator {
+	margin: 6px 0 0 0;
+	height: 1px;
+	background: #bbb;
+	border-bottom: 1px solid #eee;
+}
+/* Icon tweaks for several areas. */
+.poster .icons>img, .poster .linklevel1>img, .poster .linklevel2>img {
+	vertical-align: middle;
+}
+.listlevel2>ol>li img, .listlevel2.warning img, .listlevel2.poster_ip img {
+	padding: 0 4px;
+}
+.avatar>.linklevel1>.avatar {
+	width: auto;
+	height: auto;
+	max-width: 13em;
+	max-height: 20em;
+}
+/* The visible stuff below the avatar. */
 .poster  .membergroup {
 	font-weight: bold;
 }
-/* @todo - Re-code this a bit to give background on anchor. */
-.poster  .poster_online a {
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #ebebeb url(../images/theme/lower_section.png) 0 0 repeat-x;
-	border: 1px solid #ccc;
-	border-right: 1px solid #bbb;
-	border-bottom: 1px solid #aaa;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-	border-radius: 2px;
-	margin: 3px 10px;
-	line-height: 1.8em;
+/* @todo - Save code by amalgamating common button background declarations. */
+.poster_online .linklevel1 {
+	position: relative;
 	display: block;
+	margin: 3px 1.5em;
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	border-radius: 2px;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
+	box-shadow: 1px 1px 2px #eee;
+	line-height: 2em;
 }
-.poster  .poster_online a:hover {
-	/* @todo - Change background image for simple sprite combined with bars. */
-	background: #fff url(../images/theme/upper_section.png) 0 -30px repeat-x;
-	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
+.poster_online .linklevel1:hover {
 	border: 1px solid #ccc;
-	border-left: 1px solid #bbb;
 	border-top: 1px solid #aaa;
+	border-left: 1px solid #bbb;
+	background: #f0f0f0;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.07) inset;
 	text-decoration: none;
-}
-.poster  .warning a img {
-	vertical-align: bottom;
-	padding: 0 2px;
-}
-.poster img {
-	vertical-align: middle;
 }
 /* End nifty new flyout. */
 
 .postarea {
-	margin: 0 0 0 160px;
-	padding: 0 10px;
+	display: table-cell;
+	vertical-align: top;
+	width: 100%;
+	padding: 0 1em 0 0;
+}
+.postarea2 {
+	display: block;
+	padding: 0 1em;
+}
+#topic_summary .postarea2 {
+	font-size: 0.857em;
 }
 .post_subject {
-	color: #555;
 	display: block;
 	float: right;
-	font-size: 0.9em;
-	max-width: 15em;
 	overflow: hidden;
+	max-width: 15em;
+	color: #777;
 	text-overflow: ellipsis;
 	white-space: pre;
-	padding-right: 1em;
 }
 .messageicon {
 	float: left;
@@ -2199,35 +2233,47 @@ select.qaction, input.qaction {
 .groupicon img {
 	padding: 0 3px 0 3px;
 }
-.keyinfo h5 {
-	color: #555;
-	padding: 1px 0 5px 0;
-	font-size: 0.9em;
+.keyinfo {
+	font-size: 0.857em;
 }
+#topic_summary .keyinfo {
+	font-size: 1em;
+}
+.keyinfo h5 {
+	padding: 1px 0 5px 0;
+}
+#topic_summary .keyinfo h5 {
+	padding: 0;
+	font-size: 1.167em;
+}
+/* @todo - Move strong tag outside anchor. Will save css. */
 .keyinfo h5 a, .keyinfo h5 a strong {
 	color: #46823c;
+	font-weight: 600;
 }
 .inner {
-	padding: 7px 8px 2px 2px;
 	margin: 0;
+	padding: 7px 8px 2px 2px;
+	min-height: 70px;
 	border-top: 1px solid #bfbfbf;
-	box-shadow: 0 1px 0 #fff inset;
-	min-height: 85px;
-	hyphens: auto;
 	word-wrap: break-word;
+	hyphens: auto;
+}
+#topic_summary .inner {
+	clear: both;
 }
 .smiley {
 	vertical-align: bottom;
 }
-/* All the signatures used in the forum. If your forum users use Mozilla, Opera, or Safari, you might add max-height here ;). */
+/* All the signatures used in the forum. */
 .signature, .attachments, .custom_fields_above_signature {
 	overflow: auto;
-	padding: 12px 0 3px 0;
+	padding: 8px 0;
 	border-top: 1px solid #bfbfbf;
-	box-shadow: 0 1px 0 #fff inset;
-	line-height: 1.4em;
-	font-size: 0.9em;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+	font-size: 0.857em;
+}
+.attachments {
+	margin: 20px 0 0 0;
 }
 .attachments .floatleft {
 	padding: 0 6px 8px 6px;
@@ -2236,12 +2282,12 @@ select.qaction, input.qaction {
 	margin: 0 auto;
 	text-align: center;
 }
+/* @todo - Look at deprecating this hr. */
 .attachments hr {
 	clear: both;
 }
-
 /* Separator of posts. More useful in the print stylesheet. */
-#forumposts .post_separator {
+.forumposts .post_separator {
 	display: none;
 }
 
@@ -2254,94 +2300,115 @@ select.qaction, input.qaction {
 	margin: 4px 0 4px -4px;
 }
 #moderationbuttons ul li {
-	padding: 0 6px 4px 0;
 	margin: 0;
+	padding: 0 6px 4px 0;
 }
 
 /* The jump to box */
 #display_jump_to {
-	padding: 11px 5px 5px 0;
-	margin: 0;
-	border: none;
 	float: right;
-	font-size: 1em;
-}
-#display_jump_to select {
-	margin: 0 -12px 0 0;
-	padding: 2px;
+	padding: 11px 5px 5px 0;
 }
 
-/* Styles for the quick reply area.
-----------------------------------------------------*/
+/* The quick reply area. */
 /* @todo - Markup and CSS could be tweaked here. */
 #quickreplybox {
 	clear: both;
 }
-#quickReplyOptions .roundframe {
-	margin: 8px 0 0 0;
-	padding: 8px 10% 12px 10%;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
-	overflow: auto;
+.editor_wrapper {
+	margin: 0 auto;
+	width: 60em;
+	max-width: 97%;
 }
 #quickReplyOptions form textarea {
-	height: 100px;
-	width: 635px;
-	max-width: 100%;
 	min-width: 100%;
+	max-width: 100%;
+	width: 635px;
+	height: 100px;
+}
+/* The send topic section. */
+fieldset.send_topic {
+	padding: 6px;
+	border: none;
+}
+dl.send_topic {
+	margin-bottom: 0;
+}
+dl.send_mail dt {
+	width: 35%;
+}
+dl.send_mail dd {
+	width: 64%;
 }
 
-/* Styles for edit post section
----------------------------------------------------- */
-#postmodify div.roundframe {
-	padding: 12px 12%;
+
+
+
+/*	$EDITOR		*/
+/* ------------------------------------------------------- */
+
+/* The main post editor section. */
+#preview_body {
+	padding: 0.5em 1em;
+	overflow: auto;
+	margin: 0.5em 0 0 0;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	background: #fff;
 }
-#postmodify {
-	margin: 0;
+#postmodify #message{
+	width: 100%;
+}
+#postmodify .lastedit{
+	font-weight: bold;
 }
 #post_header, .postbox {
-	padding: 6px;
 	overflow: hidden;
+	padding: 6px;
 }
 #post_header dt, .postbox dt {
 	float: left;
+	margin: 6px 0 0 0;
 	padding: 0;
 	width: 15%;
-	margin: 6px 0 0 0;
 	font-weight: bold;
 }
 #post_header dd, .postbox dd {
 	float: left;
+	margin: 4px 0;
 	padding: 0;
 	width: 83%;
-	margin: 4px 0;
 }
 #post_header img {
 	vertical-align: middle;
 }
 ul.post_options {
+	overflow: auto;
 	margin: 0 0 0 12px;
-	padding: 0;
-	overflow: hidden;
 }
 ul.post_options li {
+	float: left;
 	margin: 2px 0;
 	width: 49%;
-	float: left;
 }
-#postAdditionalOptions {
-	background: #fdfdfd;
-	border: 1px solid #aaa;
-	border-left: 1px solid #bbb;
+#postAdditionalOptionsHeader, #postDraftOptionsHeader {
+	margin: 1em 0 0 0;
+	background: #fafafa;
+	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
+	border-bottom: 1px solid #ccc;
+}
+#postAdditionalOptions, #postDraftOptions {
+	margin: 0 0 1em 0;
+	overflow: auto;
+	border: 1px solid #ccc;
 	border-top: none;
-	overflow: hidden;
 	border-radius: 0 0 4px 4px;
+	background: #fdfdfd;
 }
 #postMoreOptions, #postAttachment, #postAttachment2 {
-	border-top: 1px solid #ccc;
 	margin: -1px 0 0 0;
 	padding: 10px;
+	border-top: 1px solid #ccc;
 }
 #postAttachment, #postAttachment2 {
 	overflow: hidden;
@@ -2350,39 +2417,27 @@ ul.post_options li {
 	margin: 4px 0 4px 12px;
 }
 #postAttachment dd {
-	width: 45%;
 	float: left;
+	width: 45%;
 }
 #postAttachment dt, #postAttachment2 dt {
 	font-weight: bold;
 }
-#postAttachment3 /* @todo - Can't see this called anywhere in Post.template.php */{
-	margin-left: 12px;
-}
-#postDraftOptions {
-	background: #fdfdfd;
-	border: 1px solid #aaa;
-	border-left: 1px solid #bbb;
-	border-top: none;
-	border-radius: 0 0 4px 4px;
-}
 #postDraftOptions .settings dd, #postDraftOptions .settings dt{
-	width: 50%;
-	border-top: 1px solid #e4e4e4;
-	padding: 5px 10px;
 	margin: 0;
+	padding: 5px 10px;
+	width: 60%;
+	border-top: 1px solid #e4e4e4;
+	font-size: 0.857em;
+}
+#postDraftOptions .settings dd{
+	width: 40%;
 }
 #postDraftOptions .settings dd:first-child, #postDraftOptions .settings dt:first-child{
-	border-top: none; /* Some people are OCD, like me. :P */
+	border-top: none;
 }
 #postDraftOptions .settings strong{
-	color: #555;
-}
-#post_confirm_strip /* < That may be deprecated. */, #shortcuts {
-	padding: 12px 0;
-}
-#post_confirm_buttons .smalltext {
-	padding: 0 10px;
+	font-size: 1.167em;
 }
 .post_verification {
 	margin-top: 6px;
@@ -2410,59 +2465,57 @@ ul.post_options li {
 	margin: 6px;
 }
 
-/* Styles for edit event section
----------------------------------------------------- */
+/* The event editor section. */
 #post_event .roundframe {
-	padding: 12px 12%;
 	overflow: auto;
+	padding: 12px 12%;
 }
 #post_event fieldset {
-	padding: 6px;
 	clear: both;
+	padding: 6px;
 }
 #post_event #event_main input {
-	margin: 0 0 12px 0;
 	float: left;
+	margin: 0 0 12px 0;
 }
 #post_event #event_main div.smalltext {
-	width: 34.6em;
 	float: right;
+	width: 34.6em;
 }
 #post_event div.event_options {
 	float: right;
 }
 #post_event .event_main, .event_options {
-	padding: 0;
 	overflow: hidden;
+	padding: 0;
 }
-#post_event ul.event_main li {
-	list-style-type: none;
+#post_event .event_main li {
+	float: left;
 	margin: 2px 0;
 	width: 49%;
-	float: left;
 }
+/* @todo - div.event_options and ul.event_options? Meh. :P Fix. */
 #post_event ul.event_options {
 	margin: 0;
 	padding: 0 0 8px 8px;
 }
 #post_event ul.event_options li {
-	list-style-type: none;
 	margin: 0;
 	float: left;
 }
-#post_event #event_main select, #post_event ul.event_options li select, #post_event ul.event_options li .input_check {
+#post_event #event_main select, #post_event ul.event_options li select,
+#post_event ul.event_options li .input_check {
 	margin: 0 12px 0 0;
 }
 
-/* Styles for edit poll section.
----------------------------------------------------- */
+/* The poll editor section. */
 #edit_poll {
 	overflow: hidden;
 }
 #edit_poll fieldset {
-	padding: 6px;
 	clear: both;
 	overflow: hidden;
+	padding: 6px;
 }
 #edit_poll fieldset input {
 	margin-left: 8.1em;
@@ -2481,8 +2534,8 @@ ul.post_options li {
 	margin: 2px 0;
 }
 #edit_poll dl.poll_options dt {
-	width: 33%;
 	padding: 0 0 0 12px;
+	width: 33%;
 }
 #edit_poll dl.poll_options dd {
 	width: 65%;
@@ -2491,21 +2544,13 @@ ul.post_options li {
 	margin-left: 0;
 }
 
-/* Styles for the recent messages section.
----------------------------------------------------- */
-#readbuttons_top .pagelinks, #readbuttons .pagelinks {
-	padding-bottom: 12px;
-	width: 60%;
-}
-#readbuttons .pagelinks {
-	padding-top: 12px;
-}
-#recent {
-	clear: both;
-}
 
-/* Styles for the move topic section.
----------------------------------------------------- */
+
+
+/*	$MODERATE	*/
+/* ------------------------------------------------------- */
+
+/* The move topic section. */
 #move_topic dl {
 	margin-bottom: 0;
 }
@@ -2516,32 +2561,15 @@ ul.post_options li {
 	width: 59%;
 }
 .split_topics, .move_topic {
-	width: 710px;
 	margin: auto;
+	width: 710px;
 	text-align: left;
 }
-div.split_topics fieldset, div.move_topic fieldset {
+.split_topics fieldset, .move_topic fieldset {
 	padding: 6px;
 }
 
-/* Styles for the send topic section.
----------------------------------------------------- */
-fieldset.send_topic {
-	border: none;
-	padding: 6px;
-}
-dl.send_topic {
-	margin-bottom: 0;
-}
-dl.send_mail dt {
-	width: 35%;
-}
-dl.send_mail dd {
-	width: 64%;
-}
-
-/* Styles for the report topic section.
----------------------------------------------------- */
+/* The report topic section. */
 #report_topic dl {
 	margin-bottom: 0;
 }
@@ -2552,27 +2580,22 @@ dl.send_mail dd {
 	width: 79%;
 }
 
-/* Styles for the split topic section.
----------------------------------------------------- */
+/* The split topic section. */
 #selected, #not_selected {
 	width: 49%;
 }
-ul.split_messages li.windowbg, ul.split_messages li.windowbg2 {
+.split_messages .windowbg, .split_messages .windowbg2 {
 	margin: 1px;
 }
-ul.split_messages li .split_icon {
+.split_messages .split_icon {
 	padding: 0 6px;
 }
-ul.split_messages div.post {
+.split_messages .post {
 	padding: 12px 0 0 0;
 	border-top: 1px solid #fff;
 }
 
-/* Styles for the merge topic section.
----------------------------------------------------- */
-.merge_topics li {
-	list-style-type: none;
-}
+/* The merge topic section. */
 dl.merge_topic dt {
 	width: 25%;
 }
@@ -2586,236 +2609,17 @@ dl.merge_topic dd {
 	margin: 6px 0;
 }
 
-/* Styles for the login areas.
-------------------------------------------------------- */
-.login {
-	width: 540px;
-	margin: 0 auto;
-}
-.login dl {
-	overflow: auto;
-	clear: right;
-}
-.login dt, .login dd {
-	margin: 0 0 5px 0;
-	width: 44%;
-	padding: 1px;
-}
-.login dt {
-	float: left;
-	clear: both;
-	text-align: right;
-	font-weight: bold;
-}
-.login dd {
-	width: 54%;
-	float: right;
-	text-align: left;
-}
-.login p {
-	text-align: center;
-}
 
-/* Additional register fields */
-dl.register_form {
-	margin: 0;
-	clear: right;
-}
-dl.register_form dt {
-	font-weight: normal;
-	float: left;
-	clear: both;
-	width: 50%;
-	margin: 6px 0 0 0;
-}
-dl.register_form dt span {
-	display: block;
-}
-dl.register_form dd {
-	float: left;
-	width: 49%;
-	margin: 6px 0 0 0;
-}
-#confirm_buttons {
-	text-align: center;
-	padding: 12px 0;
-}
-.coppa_contact {
-	padding: 4px;
-	width: 32ex;
-	background: #fff;
-	color: #555;
-	margin-left: 5ex;
-	border: 1px solid #555;
-}
-.valid_input {
-	background: #f5fff0;
-}
-.invalid_input {
-	background: #fff0f0;
-}
 
-/* Styles for maintenance mode.
-------------------------------------------------------- */
-#maintenance_mode {
-	width: 75%;
-	min-width: 520px;
-	text-align: left;
-}
-#maintenance_mode img.floatleft {
-	margin-right: 12px;
-}
 
-/* Common for all admin sections */
-h3.titlebg img {
-	vertical-align: middle;
-	margin: 0 5px 0 0;
-}
-tr.titlebg td {
-	padding-left: 8px;
-}
-#admin_content {
-	clear: left;
-	padding-top: 6px;
-}
+/*	$PROFILE	*/
+/* ------------------------------------------------------- */
 
-/* Custom profile fields like to play with us some times. */
-#admin_content .custom_field {
-	margin-bottom: 15px;
-}
-#admin_login .centertext {
-	padding: 12px;
-}
-#admin_login .centertext .error {
-	padding: 0 0 12px 0;
-}
-#admin_login .centertext a.help img {
-	vertical-align: middle;
-}
-
-tr.windowbg td, tr.windowbg2 td, tr.approvebg td, tr.highlight2 td {
-	padding: 4px 8px;
-}
-#credits p {
-	padding: 0;
-	font-style: italic;
-	margin: 0;
-}
-
-/* Styles for generic tables.
-------------------------------------------------------- */
-.topic_table table {
-	width: 100%;
-}
-.topic_table .icon1, .topic_table .icon2, .topic_table .stats {
-	text-align: center;
-}
-.topic_table table thead {
-	border-bottom: 1px solid #fff;
-}
-/* The subject column */
-.topic_table td {
-	font-size: 1em;
-}
-.topic_table td.subject p, .topic_table td.stats {
-	font-size: 0.9em;
-	padding: 0;
-	margin: 0;
-}
-.topic_table td.lastpost {
-	font-size: 0.9em;
-	line-height: 1.3em;
-	padding: 4px;
-}
-
-.errorfile_table {
-	background: #f0f4f7;
-	border-spacing: 3px;
-	border-collapse: collapse;
-}
-.errorfile_table .current {
-	font-weight: bold;
-	border: 1px solid black;
-	border-width: 1px 0 1px 1px;
-}
-
-/* Styles for (fatal) errors.
-------------------------------------------------- */
-#fatal_error {
-	width: 80%;
-	margin: auto;
-}
-.errorbox {
-	/* @todo - Change background image for simple sprite combined with quickbuttons? */
-	background: #fee url(../images/profile/warning_mute.png) 10px 50% no-repeat;
-	text-align: left;
-	border-top: 2px solid #c34;
-	border-bottom: 2px solid #c34;
-	padding: 7px 10px 7px 35px;
-	margin-bottom: 12px;
-}
-.errorbox h3 {
-	padding: 0;
-	margin: 0;
-	font-size: 1.1em;
-	text-decoration: underline;
-}
-.errorbox p {
-	margin: 12px 0 0 0;
-}
-.errorbox p.alert {
-	padding: 0;
-	margin: 0;
-	float: left;
-	width: 12px;
-	font-size: 1.5em;
-}
-.errorbox span {
-	text-decoration: underline;
-}
-
-/* Styles for info boxes
-------------------------------------------------- */
-.noticebox {
-	color: #555;
-	/* @todo - Change background image for simple sprite combined with quickbuttons? */
-	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
-	text-align: left;
-	border-top: 1px solid #ffd324;
-	border-bottom: 1px solid #ffd324;
-	padding: 7px 10px 7px 35px;
-	margin-bottom: 12px;
-}
-.infobox {
-	color: #555;
-	/* @todo - Change background image for simple sprite combined with quickbuttons? */
-	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
-	text-align: left;
-	border-top: 1px solid green;
-	border-bottom: 1px solid green;
-	padding: 7px 10px 7px 35px;
-	margin-bottom: 12px;
-}
-.descbox {
-	text-align: left;
-	padding: 7px 10px 7px 35px;
-	border: 1px solid #c5c5c5;
-	border-radius: 7px;
-	margin: 6px 0;
-}
-
-/* Styles for the profile section. @todo - Yup, it's on the list.
-------------------------------------------------- */
-dl {
-	overflow: auto;
-	margin: 0;
-	padding: 0;
-}
-
+/* @todo - Yup, it's on the list. */
 /* The basic user info on the left */
 #basicinfo {
-	width: 20%;
 	float: left;
+	width: 20%;
 }
 #basicinfo .windowbg .content {
 	padding-left: 20px;
@@ -2823,31 +2627,31 @@ dl {
 #basicinfo ul .cf_icon {
 	display: block;
     float: left;
-    height: 20px;
     margin: 4px 5px 0 0;
+    height: 20px;
 }
 #detailedinfo {
-	width: 79.5%;
 	float: right;
+	width: 79.5%;
 }
 #basicinfo h4 {
-	font-size: 1.4em;
-	font-weight: 100;
-	white-space: pre-wrap;
 	overflow: hidden;
+	white-space: pre-wrap;
+	font-weight: 100;
+	font-size: 1.4em;
 }
 #basicinfo h4 .position {
-	font-size: 0.8em;
-	font-weight: 100;
 	display: block;
+	font-weight: 100;
+	font-size: 0.8em;
 }
-#basicinfo img.avatar {
+#basicinfo .avatar {
 	display: block;
 	margin: 10px 0 0 0;
 }
 #basicinfo ul {
-	list-style-type: none;
 	margin: 10px 0 0 0;
+	list-style-type: none;
 }
 #basicinfo ul li {
 	display: block;
@@ -2871,19 +2675,19 @@ dl {
 	border-bottom: 1px #ccc solid;
 }
 #detailedinfo dt, #tracking dt {
-	width: 35%;
 	float: left;
+	clear: both;
 	margin: 0 0 3px 0;
 	padding: 0;
-	font-weight: bold;
+	width: 35%;
 	color: #555;
-	clear: both;
+	font-weight: bold;
 }
 #detailedinfo dd, #tracking dd {
-	width: 65%;
 	float: left;
 	margin: 0 0 3px 0;
 	padding: 0;
+	width: 65%;
 }
 #detailedinfo .noborder {
 	border-bottom: 0;
@@ -2909,7 +2713,7 @@ dl {
 	float: left;
 	width: 35%;
 }
-#main_admsection #basicinfo img.avatar {
+#main_admsection #basicinfo .avatar {
 	float: right;
 	vertical-align: top;
 }
@@ -2923,104 +2727,131 @@ dl {
 	display: none;
 	clear: both;
 }
-#main_admsection #basicinfo .botslice {
-	clear: both;
-}
 
 /* Profile statistics */
-#generalstats div.content dt {
-	width: 50%;
+#generalstats .content dt {
 	float: left;
-	margin: 0 0 3px 0;
-	padding: 0;
-	font-weight: bold;
 	clear: both;
-}
-#generalstats div.content dd {
+	margin: 0 0 3px 0;
+	padding: 0;
 	width: 50%;
+	font-weight: bold;
+}
+#generalstats .content dd {
 	float: left;
 	margin: 0 0 3px 0;
 	padding: 0;
+	width: 50%;
 }
 
 /* Activity by time */
 #activitytime {
 	margin: 6px 0;
 }
+#activitytime .cat_bar, #popularposts .cat_bar, #popularactivity .cat_bar{
+	border-top: 1px solid #999;
+	border-bottom: 1px solid #fff;
+	border-radius: 0;
+	background: none;
+}
+#activitytime .catbg, #popularposts .catbg, #popularactivity .catbg {
+	padding: 6px 6px 5px 6px;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	box-shadow: 0 1px 0 #fff inset, 0 -1px 0 #999 inset;
+	color: #555;
+	text-shadow: none;
+	font-size: 1em;
+}
+#activitytime .windowbg2 .flow_hidden {
+	border: none;
+	background: none;
+	box-shadow: none;
+}
+#show_attachments th {
+	text-align: left;
+}
 .activity_stats {
 	margin: 0;
 	padding: 0;
 }
 .activity_stats li {
+	float: left;
 	margin: 0;
 	padding: 0;
 	width: 4.16%;
-	float: left;
 }
 .activity_stats li span {
 	display: block;
 	border: solid #555;
 	border-width: 1px 1px 1px 1px;
-	border-left: none;
 	border-right: none;
+	border-left: none;
 	background: #eee;
 	text-align: center;
 }
-.activity_stats li.last span {
+.activity_stats .last span {
 	border-right: none;
 }
-.activity_stats li div.bar {
+.activity_stats li .bar {
 	margin: 0 auto;
 	width: 15px;
 	border: 1px solid #ccc;
 	border-bottom: none;
 	background: #fff;
 }
-.activity_stats li div.bar div {
-	/* @todo - Change background for simple sprite combined with quickbuttons? */
-	background: #6294CE;
-	background: orange;
-	box-shadow: 4px -4px 4px rgba(0,0,0,0.1) inset, 4px 4px 4px rgba(255,255,255,0.3) inset;
+.activity_stats li .bar div {
+	background: #47b263;
+	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
 }
-.activity_stats li div.bar span {
+.activity_stats li .bar span {
 	position: absolute;
 	top: -1555em;
 	left: -1555em;
 }
 
 /* Most popular boards by posts and activity */
+/* @todo - Use box-sizing and 50% width for better stability. */
 #popularposts {
-	width: 49.5%;
 	float: left;
+	width: 49.5%;
 }
 #popularactivity {
-	width: 49.5%;
 	float: right;
+	width: 49.5%;
 }
 
 #popularposts div.content dt, #popularactivity div.content dt {
-	width: 65%;
 	float: left;
+	clear: both;
 	margin: 0 0 3px 0;
 	padding: 0;
+	width: 65%;
 	font-weight: bold;
-	clear: both;
 }
 #popularposts div.content dd, #popularactivity div.content dd {
-	width: 35%;
 	float: left;
 	margin: 0 0 3px 0;
 	padding: 0;
+	width: 35%;
 }
 
 .profile_pie {
-	background: url(../images/stats_pie.png); /* Image will need changing to match new theme.*/
 	float: left;
-	height: 20px;
-	width: 20px;
 	margin: 0 12px 0 0;
 	padding: 0;
+	width: 20px;
+	height: 20px;
 	text-indent: -1555em;
+	/* Image will need changing to match new theme.*/
+	background: url(../images/stats_pie.png);
+}
+
+/* @todo - Buddy section stuff. */
+.add_buddy .roundframe, .add_buddy .title_bar {
+	max-width: 70em;
+	border: none;
+	background: none;
 }
 
 /* View posts */
@@ -3028,25 +2859,24 @@ dl {
 	float: right;
 }
 .counter {
-	margin: 0 0 0 0;
-	padding: 5px 6px 1px 2px;
-	font-size: 2.2em;
+	float: right;
+	padding: 6px;
 	font-weight: bold;
-	color: #3f3f3f;
-	float: left;
+	font-size: 2em;
 }
 .topic_details {
-	border-bottom: 1px solid #999;
 	padding: 0 4px 4px 4px;
+	border-bottom: 1px solid #999;
 }
 .list_posts {
+	overflow: auto;
+	clear: both;
+	margin: 0;
+	padding-top: 12px;
 	border-top: 1px solid #ccc;
 	box-shadow: 0 1px 0 #fff inset;
-	padding-top: 12px;
-	margin: 0;
-	overflow: auto;
-	hyphens: auto;
 	word-wrap: break-word;
+	hyphens: auto;
 }
 .topic h4 {
 	margin: 3px 0;
@@ -3054,34 +2884,34 @@ dl {
 .topic .post {
 	margin: 0 12px;
 	min-height: 80px;
-	height: auto !important;
+	height: auto;
 	height: 80px;
 }
 .topic .mod_icons {
-	text-align: right;
 	margin-right: 12px;
+	text-align: right;
 }
 
 #tracking div.content dl {
-	border-bottom: 0;
 	margin: 0;
 	padding: 0;
+	border-bottom: 0;
 }
 
 #creator dl {
 	margin: 0;
 }
 #creator dt {
-	width: 40%;
 	float: left;
 	clear: both;
 	margin: 0 0 10px 0;
+	width: 40%;
 }
 #creator dd {
 	float: right;
-	width: 55%;
-	margin: 0 0 10px 2px;
 	overflow: auto;
+	margin: 0 0 10px 2px;
+	width: 55%;
 }
 .centericon {
 	vertical-align: middle;
@@ -3092,13 +2922,13 @@ dl {
 	width: 90%;
 }
 .ignoreboards a {
-	font-weight: bold;
-	border-bottom: 1px solid #c4c4c4;
 	padding: 1px 0;
+	border-bottom: 1px solid #c4c4c4;
+	font-weight: bold;
 }
 .ignoreboards a:hover {
-	text-decoration: none;
 	border-bottom: 1px solid #555;
+	text-decoration: none;
 }
 .ignoreboards ul {
 	margin: 0;
@@ -3142,196 +2972,43 @@ dl {
 
 /* Pick theme */
 #pick_theme {
-	width: 100%;
 	float: left;
+	width: 100%;
 }
 
 /*Issue a warning*/
 #warn_body {
 	width: 80%;
-	font-size: 0.9em;
+	font-size: 0.857em;
 }
 #warning_text {
+	position: absolute;
+	z-index: 2;
 	padding-top: 1pt;
 	width: 100%;
-	z-index: 2;
-	color: black;
-	position: absolute;
-	font-weight: bold;
+	font-weight: 600;
 }
 
-/* Styles for the statistics center.
-------------------------------------------------- */
-/*@todo - major simplification required - markup and CSS. */
-#statistics {
-	padding: 6px 0;
-}
-#statistics div {
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
-#statistics .title_bar {
-	margin: 4px 0 0 0;
-}
-#statistics .titlebg img {
-	margin: 3px 6px 0 3px;
-}
-#statistics .cat_bar {
-	margin: 4px 0 0 0;
-}
-#statistics .flow_hidden {
-	margin: 4px 0;
-	padding: 2px 6px;
-	border-radius: 7px;
-}
-#statistics div.windowbg2 {
-	background: none;
-}
-#stats_left, #top_posters, #top_topics_replies, #top_topics_starter {
-	float: left;
-	width: 50%;
-	padding: 0 3px 0 0;
-}
-#stats_right, #top_boards, #top_topics_views, #most_online {
-	float: right;
-	width: 50%;
-	padding: 0 0 0 3px;
-}
-#stats_left{
-	border-right: 1px solid #bbb;
-	margin-top: 8px;
-}
-#stats_right{
-	border-left: 1px solid #fff;
-	margin-top: 8px;
-}
-dl.stats {
-	clear: both;
-	overflow: hidden;
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
-}
-#stats_left dl.stats, #stats_right dl.stats{
-	margin: -8px 0 -12px 0;
-}
-dl.stats dt {
-	width: 50%;
-	float: left;
-	margin: 0 0 4px 0;
-	padding: 0;
-	line-height: 1.5em;
-	clear: both;
-	font-size: 1em;
-}
-dl.stats dd {
-	text-align: right;
-	width: 50%;
-	font-size: 1em;
-	float: right;
-	margin: 0 0 4px 0;
-	padding: 0 4px 0 0;
-	line-height: 1.4em;
-	min-height: 1.6em;
-	background: #fff;
-	border: 1px solid #aaa;
-	border-radius: 2px;
-	position: relative;
-}
-/* Methinks topic links, etc need a little more oomph next to the orange bars. */
-/* Open to suggestions. */
-#stats_left dt a {
-	color: #232f46;
-}
-.top_row dl.stats dd {
-	background: none; border: none;
-}
-/* Give a bit more room for the date here. */
-#stats_left dt {
-	width: 35%;
-}
-#stats_left dd {
-	width: 65%;
-}
-.statsbar div.bar {
-	float: left;
-	background: orange;
-	border-right: 1px solid #999;
-	border-radius: 1px 0 0 1px;
-	/* @todo - Change background for simple sprite combined with butttons/bars. */
-	box-shadow: 4px -4px 8px rgba(0,0,0,0.1) inset, 4px 4px 8px rgba(255,255,255,0.3) inset;
-	display: block;
-	margin: 0 4px 0 0;
-	height: 1.5em;
-}
-.postsbar /* Here be funny stuff - deprecated? */ {
-	width: 110px;
-	text-align: right;
-	background: none repeat scroll 0 0 #fff;
-	border: 1px solid #aaa;
-	border-radius: 2px;
-	line-height: 1.4em;
-	margin: 1px 0;
-	min-height: 1.4em;
-}
-/* Absolute positioning stops these breaking the bars on narrow screens. */
-dl.stats dd span {
-	padding: 0 2px;
-	position: absolute;
-	right: 0;
-	top: 0;
-	z-index: 2;
-	background: #fff;
-	white-space: pre;
-}
-#stats {
-	margin: 4px 0;
-}
-#stats .first_th {
-	padding-left: 8px;
-}
-#stats tr.windowbg2 th.lefttext {
-	border-left: 1px solid #fff;
-}
-#stats tr.windowbg2 th {
-	border-right: 1px solid #fff;
-	border-bottom: 1px solid #fff;
-}
-tr.windowbg2 .stats_month {
-	width: 25%;
-	padding: 0 2em;
-	text-align: left;
-	border-left: 1px solid #fff;
-}
-tr.windowbg2 .stats_day {
-	padding: 0 3.5em;
-	text-align: left;
-	border-left: 1px solid #fff;
-}
 
-/* Styles for the personal messages section.
-------------------------------------------------- */
-#personal_messages h3 #author, #personal_messages h3 #topic_title {
-	float: left;
-}
-#personal_messages h3 #author {
-	margin: 0 0 0 6px;
-}
-#personal_messages h3 #topic_title {
-	margin: 0 0 0 9em;
-}
+
+
+/* $PERSONAL	*/
+/* ------------------------------------------------------- */
+
 #personal_messages .labels {
 	margin: 11px 0 0;
 }
 #personal_messages .capacity_bar {
 	display: block;
 	margin: 6px 0 0 12px;
+	width: 10em;
 	height: 12px;
 	border: 1px solid #adadad;
-	width: 10em;
 }
 #personal_messages .capacity_bar span {
-	border-right: 1px solid #adadad;
 	display: block;
 	height: 12px;
+	border-right: 1px solid #adadad;
 }
 #personal_messages .capacity_bar .empty {
 	background: #a6d69d;
@@ -3352,9 +3029,9 @@ tr.windowbg2 .stats_day {
 	padding: 4px 1px;
 }
 .addrules dt.floatleft {
+	padding: 0 15px 6px 15px;
 	width: 15em;
 	color: #555;
-	padding: 0 15px 6px 15px;
 }
 #addrule fieldset {
 	clear: both;
@@ -3364,69 +3041,65 @@ tr.windowbg2 .stats_day {
 	margin-right:10px;
 }
 
-/* Styles for the calendar section.
-------------------------------------------------- */
-/* Removed css and redundant tags/classes from template. */
-/* Parrots are stoked. Fred happy too. */
+
+
+
+/* -------------------------------------------- */
+/* @todo - Code before this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
+/* Code splitting will continue as time and bugz and whatever allow. */
+/* -------------------------------------------- */
+
+
+
+
+/* $CALENDAR	*/
+/* ------------------------------------------------------- */
 #calendar {
-	overflow: hidden;
+	text-align: center;
 }
 #month_grid {
+	float: left;
 	padding: 0 15px 0 0;
 	width: 215px;
-	float: left;
 }
 #main_grid {
-	position: relative;
-	overflow: hidden;
+	overflow: auto;
 }
-#month_grid .catbg {
-	font-size: 1.1em;
-	text-align: center;
+#month_grid .category_header {
+	font-size: 1em;
 }
-#main_grid .catbg {
-	font-size: 1.5em;
-	text-align: center;
+#main_grid .category_header {
+	font-size: 1.357em;
 }
-#main_grid .catbg .floatleft, #main_grid .catbg .floatright {
+.previous_month, .next_month {
+	float: left;
 	display: block;
+	margin: -0.1em 0 0 0;
 	font-size: 1.5em;
-	margin: -3px 0 0 0;
+}
+.next_month {
+	float: right;
 }
 .calendar_table {
 	width: 100%;
-	font-size: 0.9em;
-	text-align: center;
-	background: #e4e4e4;
+	border-spacing: 1px;
+	font-size: 0.857em;
 }
 .calendar_table th, .calendar_table td {
 	padding: 2px 0;
-	background: #fff;
 }
 #month_grid .calendar_table {
 	margin-bottom: 12px;
-	border-top: 1px solid #ddd;
-	border-spacing: 1px;
-	background: #ddd;
 }
-#main_grid .titlebg2, #month_grid .titlebg2 {
-	background: none;
-	font-size: 0.889em;
-}
-#main_grid .titlebg2 {
-	font-size: 1.1em;
+#month_grid .table_head {
+	font-size: 0.909em;
 }
 #main_grid .days {
-	width: 14%;
 	padding: 4px;
+	width: 14%;
 }
 #main_grid .windowbg.days {
 	height: 100px;
-}
-/* Used to indicate the current day. */
-#main_grid .calendar_today, #month_grid .calendar_today {
-	border: 1px solid #aaa;
-	background: #ebffd8;
 }
 #main_grid .weeks {
 	font-weight: bold;
@@ -3438,115 +3111,330 @@ tr.windowbg2 .stats_day {
 #main_grid .days {
 	vertical-align: top;
 }
-#main_grid .weekly {
-	font-size: 1.4em;
-}
 .weeklist {
-	border-bottom: 2px solid #e4e4e4;
+	text-align: left;
+	padding: 2px 0;
 }
 .weeklist>li {
+	margin: 2px 0;
 	overflow: hidden;
-	border: 2px solid #e4e4e4;
-	border-bottom: none;
 }
 .weeklist h4 {
 	float: left;
-	width: 140px;
-	font-size: 1.2em;
 	padding: 10px;
-	border-right: 2px solid #e4e4e4;
-}
-.weeklist h4 a:hover {
-	text-decoration: none;
+	width: 10em;
+	font-size: 1.143em;
 }
 /* Use the old one true layout trick here. */
 .weeklist .windowbg2, .weeklist .calendar_today {
-	margin: 0 0 -95px 160px;
+	margin: 0 0 -95px 11.5em;
 	padding: 8px 8px 100px 8px;
-}
-.modify_event {
-	color: red;
-}
-.hidelink {
-	font-style: italic;
 }
 /* Add a background that fits with the calendar. */
 #calendar_navigation {
 	padding: 12px 0;
-	text-align: center;
-	border: 2px solid #e4e4e4;
-	border-top: none;
 }
 /* Cheat and match this to the submit button. */
 #calendar_navigation .buttonlist {
 	margin: -5px 0;
 	padding: 0 6px;
 }
+/* See, I told you there was wombatz here. */
+/*
+			   ,.--""""--.._
+			 ."     .'      `-.
+			;      ;           ;
+		   '      ;             )
+		  /     '             . ;
+		 /     ;     `.        `;
+	   ,.'     :         .     : )
+	   ;|\'    :      `./|) \  ;/
+	   ;| \"  -,-   "-./ |;  ).;
+	   /\/              \/   );
+	  :                 \    ;
+	  :     _      _     ;   )
+	  `.   \;\    /;/    ;  /
+		!    :   :     ,/  ;
+		 (`. : _ : ,/""   ;
+		  \\\`"^" ` :    ;
+				   (    )
+	 akg           ////
+*/
 
-/* Styles for the memberlist section.
-------------------------------------------------- */
-#mlist_search {
-	margin: auto;
-	width: 500px;
-	overflow: hidden;
+
+
+/* $STATISTICS	*/
+/* ------------------------------------------------------- */
+.statistics {
+	margin: 3px 0;
 }
-#mlist_search .input_text {
+.statistics .category_header {
+	width: 49%;
+	margin: 0 0.5% 0 50.5%;
+	font-size: 1.143em;
+}
+#top_row .category_header {
+	width: 99%;
+	margin: 0 0.5%;
+}
+.statistics .category_header.floatleft {
+	margin: 0 0.5%;
+}
+.statistics .flow_hidden, #forum_history .flow_hidden {
+	margin: 4px 0 0 0;
+}
+.stats {
+	overflow: hidden;
+	padding: 0 16px;
+	width: 50%;
+	margin: 12px 0 12px 50%;
+}
+.stats.floatleft {
+	clear: left;
+	margin: 12px 0;
+}
+.stats dt {
+	float: left;
+	clear: both;
+	margin: 0 2% 4px 0;
+	padding: 0;
+	width: 48%;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+#top_row .stats dd, .statsbar {
+	position: relative;
+	float: right;
+	margin: 0 0 4px 0;
+	padding: 0 4px 0 0;
+	min-height: 1.5em;
+	width: 50%;
+}
+.statsbar .bar {
+	display: block;
+	float: left;
+	margin: 0 4px 0 0;
+	font-size: 1em;
+	height: 1.5em;
+}
+/* Absolute positioning stops these breaking the bars on narrow screens. */
+.statsbar .righttext {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 2;
+	padding: 0 4px;
+	line-height: 1.75em;
+	font-size: 0.857em;
+}
+#stats {
+	margin: 6px 0 16px 0;
+}
+#stats th, #stats td {
+	width: 15%;
+	padding: 4px 12px;
+	text-align: center;
+}
+#stats .history_head {
+	border-top: none;
+}
+#stats .lefttext {
+	width: 25%;
+	text-align: left;
+}
+#stats .stats_month {
+	padding: 4px 8px 4px 30px;
+}
+#stats .stats_day {
+	padding: 4px 8px 4px 60px;
+}
+
+
+
+
+/* -------------------------------------------- */
+/* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
+/* Code splitting will continue as time and bugz and whatever allow. */
+/* -------------------------------------------- */
+
+
+
+
+/*	$HELP		*/
+/* @todo - Some code needs splitting to _variant.css.*/
+/* ------------------------------------------------------- */
+
+/* Styles for the help section. */
+#help_container {
+	overflow: auto;
+	margin: 0 0 0 0;
+	padding: 0 0 8px 0;
+}
+#helpmain {
+	overflow: auto;
+	margin: 12px 0 0 0;
+	padding: 8px 20px 12px 20px;
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+}
+#helpmain p {
+	margin: 10px 0;
+}
+#helpmain ul {
+	margin: 0 0 0 25px;
+	line-height: 2em;
+}
+#helpmain ul li{
+	list-style-type: disc;
+}
+#helpmain ul li a {
+	font-weight: bold;
+}
+
+/* Generally, those [?] icons. This makes your cursor a help icon. */
+/* @todo - Hmmm. */
+.help {
+	cursor: help;
+}
+
+.help .icon {
+	margin: 0;
+	opacity: 0.8;
+	cursor: help;
+}
+
+.help .icon:hover {
+	opacity: 1;
+}
+
+/* Styles for the tooltips. */
+.tooltip {
+	position: absolute;
+	left: -9999px;
+	z-index: 999;
+	padding: 6px 9px;
+	max-width: 350px;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	background: #fff;
+	box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+	word-wrap: break-word;
+}
+
+/* What's this? @todo - Deprecated? */
+#help_popup {
+	padding: 12px;
+}
+
+/* The darkened background for help pop-ups. */
+.popup_container
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	display: none;
 	width: 100%;
-	overflow: hidden;
+	height: 100%;
+	/* Should be rgba only, IMHO. */
+	/*	Flat colour fallback would be bad (visually). */
+	background: rgba(0,0,0,0.4);
 }
 
-/* Styles for the basic search section.
-------------------------------------------------- */
-#simple_search p {
-	padding: 6px;
-	margin: 0;
+/* The actual pop-up wrapper. */
+.popup_window
+{
+	margin: 15% auto;
+	width: 480px;
+	border: 1px solid #777;
+	border-radius: 7px 7px 3px 3px;
+	background-color: #fafafa;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.6);
 }
-#simple_search, #simple_search p, #advanced_search {
-	text-align: center !important;
-	margin: 0;
+
+/* What it says. ;) */
+.popup_heading
+{
+	padding: 0 0 6px 0;
+	font-weight: 600;
+	font-size: 1.1em;
+	line-height: 2em;
+}
+
+/* The hide icon (red cross). */
+.popup_heading .hide_popup
+{
+	float: right;
+	width: 16px;
+	height: 2em;
+	background: url(../images/buttons/delete.png) 0 50% no-repeat;
+}
+
+/* Just a font-size reset. */
+/* @todo - Remove description class? */
+.popup_window.description
+{
+	font-size: 1em;
+}
+
+/* The text content, hopefully helpful. */
+.popup_content
+{
+	overflow: auto;
+	padding: 10px;
+	max-height: 20em;
+	border: 1px solid #bbb;
+	border-bottom: 1px solid #ccc;
+	border-radius: 6px 6px 2px 2px;
+	background: #f5f5f5;
+	box-shadow: 0 -2px 3px rgba(0,0,0,0.15);
+}
+
+
+
+/*	$SEARCH		*/
+/* ------------------------------------------------------- */
+
+/* The basic search section. */
+#simple_search, #advanced_search {
+	margin: 4px 0 0 0;
+	text-align: center;
 }
 #search_error {
-	font-style: italic;
 	padding: 4px 12px;
+	font-style: italic;
 }
 #search_term_input {
-	font-size: 1.1em;
 	margin: 0 0 12px;
+	font-size: 1.1em;
 }
 
-/* Styles for the advanced search section.
-------------------------------------------------- */
-#searchform fieldset {
-	text-align: left;
-	padding: 0;
-	border: none;
-}
-#advanced_search #search_options {
-	margin: 0 auto;
-	width: 600px;
-	padding-top: 12px;
+/* The advanced search section. */
+#search_options {
 	overflow: hidden;
+	margin: 0 auto;
+	padding-top: 12px;
+	width: 600px;
 }
 #advanced_search dt {
-	clear: both;
 	float: left;
+	clear: both;
 	padding: 2px;
-	text-align: right;
 	width: 15%;
+	text-align: right;
 }
 #advanced_search dd {
-	width: 80%;
 	float: left;
-	padding: 2px;
 	margin: 0 0 0 6px;
+	padding: 2px;
+	width: 80%;
 	text-align: left;
 }
-#searchform p.clear {
-	clear: both;
-}
 
-/* Styles for the search results page.
-------------------------------------------------- */
+/* The search results page.
+/* The search results page. @todo - Duplicated in the .table_grid code? */
+@todo - Search results in a table? I'm sure that's deprecated years ago. */
 .topic_table td blockquote, .topic_table td .quoteheader {
 	margin: 6px;
 }
@@ -3557,515 +3445,257 @@ tr.windowbg2 .stats_day {
 	padding: 5px 12px 0 0;
 }
 
-/* Styles for the help section.
-------------------------------------------------- */
-#help_container {
-	margin: 0 0 0 0;
-	padding: 0 0 8px 0;
+/* The memberlist. */
+#memberlist {
+	margin: 6px 0 0 0;
+}
+#memberlist>.content {
+	padding: 12px 0;
+}
+#memberlist_search, #memberlist>.content>.submitbutton {
+	margin: 0 auto;
+	width: 32em;
+}
+#memberlist_search>dt, #memberlist_search>dd {
+	width: 12em;
+}
+#memberlist_search>dd {
+	width: 20em;
+}
+#memberlist_search .input_check {
+	margin: 4px 0 0 0;
+}
+#memberlist_search .input_text {
+	margin: 0 0 12px 0;
+	overflow: hidden;
+	width: 100%;
+}
+
+
+
+
+/*	$LOGIN		*/
+/* ------------------------------------------------------- */
+
+/* Styles for the login areas. */
+/* @todo - Width would be better in em. */
+.login {
+	margin: 0 auto;
+	width: 540px;
+}
+.login dl {
+	clear: right;
 	overflow: auto;
 }
-#helpmain {
-	margin: 12px 0 0 0;
-	padding: 8px 20px 12px 20px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
-	overflow: auto;
+.login dt, .login dd {
+	margin: 0 0 5px 0;
+	padding: 1px;
+	width: 44%;
 }
-#helpmain p {
-	margin: 10px 0;
-	line-height: 1.5em;
-}
-#helpmain ul {
-	line-height: 2em;
-	margin: 0 0 0 25px;
-}
-#helpmain ul li{
-	list-style-type: disc;
-}
-#helpmain ul li a {
+.login dt {
+	float: left;
+	clear: both;
+	text-align: right;
 	font-weight: bold;
 }
-
-/* Styles for the tooltips
-------------------------------------------------------- */
-.tooltip {
-	position: absolute;
-	z-index: 999;
-	left: -9999px;
-	word-wrap: break-word;
-	max-width: 350px;
-	padding: 6px 9px;
-	color: #555;
-	background: #fff;
-	border: 1px solid #aaa;
-	border-radius: 4px 4px 4px 4px;
-	box-shadow: 1px 2px 4px rgba(0,0,0,0.2), 0 0 10px rgba(0,0,0,0.05) inset;
-}
-
-/* Styles for popup windows
-------------------------------------------------------- */
-.popup_container
-{
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: #284050;
-	background: rgba(40,64,80,0.5);
-	z-index: 100;
-}
-.popup_window
-{
-	position: fixed;
-	width: 480px;
-	z-index: 99;
-	padding: 0 6px 6px 6px;
-	box-shadow: 0 3px 6px rgba(0,0,0,0.5);
-	border: 1px solid #777;
-	border-radius: 7px 7px 3px 3px;
-	max-height: none!important; /* Is this declaration necessary? None is the default anyway. */
-	overflow: visible!important;
-	/* @todo - Change background image for simple sprite combined with buttons. */
-	background: #fff url(../images/theme/lower_section.png) 0 100% repeat-x;
-}
-.popup_heading
-{
-	margin: 0;
-	padding: 10px 4px;
-	color: #bf6900;
-	background: none;
-}
-.popup_content
-{
-	color: #555;
-	/* @todo Can't really see any reason for pop-up text to be smaller than standard body text.*/
-	/* Perhaps we should just remove the description class from the div in the template. */
-	font-size: 1.11em;
-	line-height: 1.6em;
-	max-height: 20em;
-	overflow: auto;
-	/* @todo - Change background image for simple sprite combined with buttons. */
-	background: #fff url(../images/theme/upper_section.png) 0 -55px repeat-x;
-	margin: 0;
-	padding: 10px 8px;
-	border: 1px solid #bbb;
-	border-bottom: 1px solid #ccc;
-	border-radius: 6px 6px 2px 2px;
-	box-shadow: 0 -2px 3px rgba(0,0,0,0.15), 0 1px 1px rgba(255,255,255,0.2);
-}
-.popup_heading .hide_popup
-{
-	width: 16px;
-	height: 16px;
-	background: url(../images/buttons/delete.png) center center no-repeat;
+.login dd {
 	float: right;
+	width: 54%;
+	text-align: left;
 }
-.popup_heading .icon
-{
-	vertical-align: middle;
-	margin: -4px 4px 0 0;
+.login p {
+	text-align: center;
 }
 
-/* Styles for the progress bar
--------------------------------------------------- */
+/* Additional register fields. */
+.register_form {
+	clear: right;
+	margin: 0;
+}
+.register_form dt {
+	float: left;
+	clear: both;
+	margin: 6px 0 0 0;
+	width: 50%;
+	font-weight: normal;
+}
+.register_form dt span {
+	display: block;
+}
+.register_form dd {
+	float: left;
+	margin: 6px 0 0 0;
+	width: 49%;
+}
+#confirm_buttons {
+	padding: 12px 0;
+	text-align: center;
+}
+.coppa_contact {
+	margin-left: 5ex;
+	padding: 4px;
+	width: 32ex;
+	border: 1px solid #555;
+	background: #fff;
+	color: #555;
+}
+.valid_input {
+	background: #f5fff0;
+}
+.invalid_input {
+	background: #fff0f0;
+}
+
+/* Styles for maintenance mode. */
+#maintenance_mode {
+	min-width: 520px;
+	width: 75%;
+	text-align: left;
+}
+#maintenance_mode .floatleft {
+	margin-right: 12px;
+}
+
+/* Common for all admin sections. */ 
+/* @todo - Why is admin stuff in index.css? */
+#admin_content {
+	clear: both;
+	padding-top: 8px;
+}
+/* Custom profile fields like to play with us some times. */
+#admin_content .custom_field {
+	margin-bottom: 15px;
+}
+#admin_login .centertext {
+	padding: 12px;
+}
+#admin_login .centertext .error {
+	padding: 0 0 12px 0;
+}
+#admin_login .centertext a.help img {
+	vertical-align: middle;
+}
+
+
+
+
+/*	$ERRORS		*/
+/* ------------------------------------------------------- */
+
+/* Styles for (fatal) errors. */
+#fatal_error {
+	margin: auto;
+	padding-bottom: 1em;
+	width: 80%;
+}
+.errorbox {
+	margin-bottom: 12px;
+	padding: 7px 10px 7px 35px;
+	border-top: 2px solid #c34;
+	border-bottom: 2px solid #c34;
+	background: #fee url(../images/profile/warning_mute.png) 10px 50% no-repeat;
+	text-align: left;
+}
+.errorbox h3 {
+	margin: 0;
+	padding: 0;
+	text-decoration: underline;
+	font-size: 1.1em;
+}
+.errorbox p {
+	margin: 12px 0 0 0;
+}
+.errorbox .alert {
+	float: left;
+	margin: 0;
+	padding: 0;
+	width: 12px;
+	font-size: 1.5em;
+}
+.errorbox span {
+	text-decoration: underline;
+}
+
+
+
+
+/*	$PROGRESS	*/
+/* ------------------------------------------------------- */
+/* Styles for the progress bar */
+/* @todo - Height in pt? WTF? */
 .progress_bar {
-	height: 15pt;
-	border: 1px solid black;
-	background-color: white;
+	position: relative;
+	margin: 20px auto 0 auto;
 	padding: 3px;
 	width: 80%;
-	margin: 20px auto 0 auto; /* Top padding should get rid of the <br /> tags in admin for these bars. */
-	position: relative;
+	height: 15pt;
+	border: 1px solid black;
 	border-radius: 5px;
+	background: white;
 	box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
 }
 .progress_bar .full_bar {
+	position: absolute;
+	z-index: 2;
 	padding-top: 1pt;
 	width: 100%;
+	border-radius: 3px;
 	color: black;
-	position: absolute;
 	text-align: center;
 	font-weight: bold;
-	border-radius: 3px;
-	z-index: 2;
 }
 .progress_bar .green_percent {
-	height: 15pt;
-	background-color: #c1ffc1;
-	/* @todo- Are gradients, which wont work in IE8 anyway, currently worth the code bloat? */
-	/* @todo - Suggest changing background image for simple sprite combined with buttons. */
-	background-image: -webkit-linear-gradient(top, #c1ffc1, green); /* Chrome10+,Safari5.1+ */
-	background-image: -moz-linear-gradient(top, #c1ffc1, green); /* FF3.6+ */
-	background-image: -ms-linear-gradient(top, #c1ffc1, green); /* IE10+ */
-	background-image: -o-linear-gradient(top, #c1ffc1, green); /* Opera 11.10+ */
-	background-image: linear-gradient(top, #c1ffc1, green);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #c1ffc1), color-stop(100%, green)); /* Chrome,Safari4+ */
-	border-radius: 3px;
 	z-index: 1;
+	height: 15pt;
+	border-radius: 3px;
+	background-color: #c1ffc1;
+	background-image: linear-gradient(to botttom, #c1ffc1 0%, green 100%);
 }
 .progress_bar .blue_percent {
-	height: 15pt;
-	background-color: #98b8f4;
-	background-image: -webkit-linear-gradient(top, #98b8f4, blue);
-	background-image: -moz-linear-gradient(top, #98b8f4, blue);
-	background-image: -ms-linear-gradient(top, #98b8f4, blue);
-	background-image: -o-linear-gradient(top, #98b8f4, blue);
-	background-image: linear-gradient(top, #98b8f4, blue);
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #98b8f4), color-stop(100%, blue));
-	border-radius: 3px;
 	z-index: 1;
-}
-
-/* @todo - End of the world. Here be dragons n stuff. :P */
-/* General @todo stuff follows. Added here temporarily while trying stuff out. */
-/* That is a really bad practice. I must stop doing that. Start rationalising this lot. */
-/* Forum posts may require some special treatment for dealing with clearing floated content. */
-/* Suspect it will be necessary to use float: left; width: 100%; on the windowbg and windowbg2 divs. */
-#statistics .flow_hidden {
-	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
-}
-
-/* Colors for topics or posts that require approval action */
-.table_grid td.approvebg:nth-child(n), .table_grid td.approvebg2:nth-child(n) {
-	border-bottom: 1px solid #ccc;
-	background: #fff6ca;
-}
-.table_grid td.approvetbg:nth-child(n), .table_grid td.approvetbg2:nth-child(n) {
-	border-bottom: 1px solid #ccc;
-	background: #fff6ca;
-}
-
-#statistics .flow_hidden {
-	background: #e8eff5;
-	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
-}
-#statistics .title_bar {
-	background: none;
-	border-bottom: 2px solid #f5f5f5;
-	border-radius: 2px 2px 0 0;
-	margin: 1px 4px 0 4px;
-}
-#statistics h4.titlebg {
-	background: none;
-	border-bottom: 1px solid #bbb;
-	border-radius: 0;
-	padding: 6px 0;
-	margin: 0;
-	font-size: 1.1em;
-}
-/* The generic wrapper thingy for teh awesome cool looks innit. */
-/* This lot will be simplified once I get all the styling hooks in place. */
-.generic_list_wrapper, .action_profile  #permissions, #postmodify .roundframe, .add_buddy, #creator .windowbg2,
-#notify_options .windowbg2, #info_center, #profileview, #messageindex, #unread, #mlist,
-.core_posts, #recent .core_posts, #recent .topic_table, #searchform .roundframe {
-	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
-	overflow: auto;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
-.generic_list_wrapper {
-	margin-top: -5px;
-}
-.generic_list_wrapper .title_bar{
-	background: none;
-	border-bottom: 1px solid #fff;
-	border-radius: 0;
-}
-.generic_list_wrapper .titlebg {
-	background: none;
-	border-bottom: 1px solid #aaa;
-	font-size: 1.1em;
-}
-.generic_list_wrapper .additional_row {
-	margin: 0;
-	padding: 5px 0;
-	border-radius: 0;
-}
-.generic_list_wrapper .table_grid {
-	border-bottom: 1px solid #aaa;
-}
-.table_grid .catbg, .table_grid .catbg th, .table_grid .catbg th a {
-	font-size: 1em;
-}
-.generic_list_wrapper .information .additional_row {
-	border: none;
-}
-.generic_list_wrapper .information {
-	margin: 0;
-	padding: 0;
-	background: none;
-	border: none;
-	border-bottom: 1px solid #fff;
-}
-#searchform .roundframe {
-	margin: 8px 0 0 0;
-	padding: 32px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
-	overflow: auto;
-}
-.add_buddy .roundframe, .add_buddy .title_bar {
-	background: none;
-	border: none;
-	max-width: 70em;
-}
-#activitytime .windowbg2 .flow_hidden {
-	background: none;
-	border: none;
-	box-shadow: none;
-}
-/* Post.template topic summary uses #recent */
-#recent .core_posts {
-	padding: 8px 0;
-}
-#recent .core_posts span {
-	font-weight: normal;
-}
-#recent .quickbuttons {
-	margin-top: -2px;
-}
-/* Will find a less verbose way of handling this. */
-.action_recent #recent .core_posts, .action_profile #recent .core_posts {
-	padding: 8px 12px;
-}
-.action_recent #recent .quickbuttons {
-	margin-top: 8px;
-}
-/* @todo Some odd inheritance glitch here with font-size. Check it out. */
-.topic_details .smalltext {
-	font-size: 0.9em;
-}
-#recent .pagesection {
-	padding: 3px 4px;
-	margin: 0 0 -10px 0;
-}
-.table_grid tr.catbg th, #show_attachments th, #searchform .roundframe .title_bar {
-	border-top: 2px solid #ff9400;
-	border-bottom: 2px solid #bf6900;
-	background: #fff;
-	color: #555;
-	border-radius: 2px 2px 0 0;
-	text-align: left;
-}
-.table_grid tr.catbg th.stats {
-	text-align: center;
-	white-space: nowrap;
-}
-.table_grid tr.catbg th.centertext, .table_grid tr.windowbg2 td.centertext, .table_grid tr.windowbg td.centertext, .table_grid tr.highlight2 td.centertext {
-	text-align: center;
-}
-.table_grid tr.catbg th.lefttext, .table_grid tr.windowbg2 td.lefttext, .table_grid tr.windowbg td.lefttext, .table_grid tr.highlight2 td.lefttext {
-	margin-left: 0;
-	margin-right: auto;
-	text-align: left;
-}
-.table_grid tr.catbg th.righttext, .table_grid tr.windowbg2 td.righttext, .table_grid tr.windowbg td.righttext, .table_grid tr.highlight2 td.righttext {
-	margin-left: auto;
-	margin-right: 0;
-	text-align: right;
-}
-#show_attachments th {
-	text-align: left;
-}
-.table_grid tr.catbg th {
-	padding: 4px 3px 3px 3px;
-}
-tr.catbg th:first-child, #show_attachments th:first-child {
-	border-left: 1px solid #ddd;
-}
-tr.catbg th:last-child, #show_attachments th:last-child {
-	border-right: 1px solid #ddd;
-}
-
-#postmodify .roundframe .title_bar, #activitytime .cat_bar, #popularposts .cat_bar, #popularactivity .cat_bar{
-	background: none;
-	border-top: 1px solid #999;
-	border-bottom: 1px solid #fff;
-	border-radius: 0;
-}
-#postmodify .roundframe .titlebg, #activitytime .catbg, #popularposts .catbg, #popularactivity .catbg {
-	border-bottom: 1px solid #ccc;
-	border-top: 1px solid #ccc;
-	box-shadow: 0 1px 0 #fff inset, 0 -1px 0 #999 inset;
-	padding: 6px 6px 5px 6px;
-	font-size: 1em;
-	color: #555;
-	text-shadow: none;
-}
-#postmodify .roundframe .title_bar{
-	background: #f7f7f7;
-	border: 1px solid #aaa;
-	border-left: 1px solid #bbb;
-	border-top: 1px solid #ccc;
-	border-radius: 4px 4px 0 0;
-	box-shadow: 0 -1px 2px rgba(0,0,0,0.1) inset;
-	margin: 15px 0 0 0;
-}
-#postmodify .roundframe .titlebg{
-	background: none;
-	border: none;
-	box-shadow: none;
-	padding: 5px 5px 4px 10px;
-}
-#postmodify .roundframe .titlebg img {
+	height: 15pt;
 	border-radius: 3px;
-	padding: 4px 4px 0 4px;
-	background: #fff;
-	box-shadow: -1px -1px 3px rgba(96,134,166,0.2) inset;
-	border: 1px solid #ccc;
-	border-right: 1px solid #bbb;
-	border-bottom: 1px solid #afafaf;
-}
-#postmodify .roundframe .titlebg img:hover{
-	background: #fafafa;
-	box-shadow: 1px 1px 3px rgba(96,134,166,0.3) inset;
-	border: 1px solid #ccc;
-	border-left: 1px solid #bbb;
-	border-top: 1px solid #aaa;
-}
-#postmodify .roundframe div{
-	padding-right: 0;
-}
-#postmodify #message{
-	width: 100%;
-	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
-#postmodify .lastedit{
-	font-weight: bold;
+	background-color: #98b8f4;
+	background-image: linear-gradient(to bottom , #98b8f4 0%, blue 100%);
 }
 
-/* Subtle zebra striping to make tables easier to follow. Will make a solution for IE8. */
-/* CSS for locked, sticky, etc has not been applied yet. Don't panic. She'll be right, mate. :P */
-.table_grid tr td:last-child {
-	border-right: 1px solid #ccc;
-}
-.table_grid td.statsbar div {
-	display: none;
-}
-.table_grid tr td:first-child, .table_grid td.icon2 {
-	border-left: 1px solid #ccc;
-}
-.table_grid  img.fred {
-	position: absolute;
-	z-index: 5;
-	right: 4px;
-	bottom: -3px;
-}
-.table_grid td.icon2 div {
-	position: relative;
-	width: 40px;
-	margin: auto;
-}
-.table_grid td.lastpost, .table_grid td.whos_viewing, .table_grid td.moderation, .table_grid td.qaction_cell {
-	border-right: 1px solid #ccc;
-}
-.table_grid td.windowbg, .table_grid td.windowbg2, .table_grid td.lockedbg, .table_grid td.lockedbg2,
-.table_grid td.stickybg, .table_grid td.stickybg2, .table_grid td.locked_sticky, .table_grid td.locked_sticky2,
-.table_grid td.whos_viewing, .table_grid td.moderation, .table_grid td.qaction_cell, .table_grid tbody ,
-.table_grid td.approvetbg, .table_grid td.approvetbg2, .table_grid td.approvebg, .table_grid td.approvebg2 {
-	border-bottom: 1px solid #ccc;
-}
-.table_grid tr:nth-child(even) td {
-	background: #fdfdfd;
-}
-.table_grid tr:nth-child(odd) td {
-	background: #fafafa;
-}
-.table_grid td.whos_viewing {
-	font-size: 0.9em;
-}
 
-/* @todo tempo Colors for locked and sticky topics so we something to look at till this is done :P*/
-.table_grid tr td.stickybg {
-	background: #f2e3d9;
-}
-.table_grid tr td.stickybg2 {
-	background: #f2e3d9;
-}
-.table_grid tr td.lockedbg {
-	background: #f0f4f7;
-}
-.table_grid tr td.lockedbg2 {
-	background: #f0f4f7;
-}
-/* And now those precious little icons, boy are they cute ! */
-/* Removed a couple of deprecated classes that used to exist in Recent.template.php. */
-/* @todo - More stuff. Oh dear. */
-.table_grid tr td.stickybg.subject {
-	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
-}
-.table_grid tr td.stickybg2.subject {
-	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
-}
-.table_grid tr td.locked_sticky.subject {
-	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
-}
-.table_grid tr td.locked_sticky2.subject {
-	background: #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
-}
-.table_grid tr td.lockedbg.subject {
-	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
-.table_grid tr td.lockedbg2.subject{
-	background: #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 98% 4px;
-}
-/* Search results need some help as well */
-.search_results_posts .lockedbg {
-	background:  #f0f4f7 url(../images/icons/quick_lock.png) no-repeat 95% 15px;
-}
-.search_results_posts .stickybg {
-	background: #f2e3d9 url(../images/icons/quick_sticky.png) no-repeat 95% 15px;
-}
-.search_results_posts .locked_stickybg {
-	background:  #f2e3d9 url(../images/icons/quick_sticky_lock.png) no-repeat 95% 15px;
-}
 
-/* Colors for background of posts requiring approval */
-#forumposts .approvebg, .table_grid td.approvebg {
-	color: #555;
-	background: #ffeaea;
-}
-#forumposts .approvebg2, .table_grid td.approvebg2 {
-	color: #555;
-	background: #fff2f2;
-}
-/* Color for background of *topics* requiring approval */
-.approvetbg {
-	color: #555;
-	background: #e4a17c;
-}
-.approvetbg2 {
-	color: #555;
-	background: #f3bd9f;
-}
 
-/* Experimental media screen additions. */
-/*--------------------------------------*/
+/*	$MEDIA		*/
+/* Experimental media queries.
+/* ------------------------------------------------------- */
+/* NOTE:
+/* When setting break points for media queries, don't set them in pixels.
+/* Use em instead.
+/* Why? Because the point of re-stacking/dropping content is to fit it all
+/* in the available space. This is dependent not just on width in pixels,
+/* but also on the user-selected text size that is set in the browser.
+/*
+/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+/* a user requires text 50% larger than theme default, then their screen is
+/* effectively a lot smaller than its nominal resolution would indicate.
+/* If the break points are set in em, suddenly the media queries become equally
+/* responsive for all users, without any extra code being required.
+/*
+/* Testing em break points is just as easy as testing pixels,
+/* and it will make more people happier. This is cool. :)
+/*
+/* Of course, having comments to map em to px for each query is a good idea too.
+
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
 @media screen and (min-width: 320px) and (max-width: 480px) {
-	#posting_icons, .table_list td.stats, .table_list td.lastpost, .table_grid td.lastpost, .table_grid th.last_post, .table_grid td.stats, .table_grid th.stats {
+	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
 		display: none;
 	}
 	#wrapper, .frame {
+		width: 100%;
 		min-width: 300px;
-		width: 100% !important;
 	}
 	#main_content_section {
 		padding: 1px 2px 16px 3px;
 	}
-	.poster img.avatar {
+	.poster .avatar {
 		width: 30px;
 	}
 	.poster {
@@ -4094,55 +3724,43 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	}
 }
 
-/* Desktops and laptops */
+/* @todo - Just commenting some of this stuff out
+/* until queries are sorted for the new markup, and for break points in em. */
+/* Desktops and laptops *//*
 @media screen and (min-width: 1224px) {}
-/* Large screens */
+/* Large screens *//*
 @media screen and (min-width: 1824px) {}
-/* 10" Tablets (landscape) */
+/* 10" Tablets (landscape) *//*
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {}
-/* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages */
+
+/* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages *//*
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-	.table_list td.stats .table_grid td.stats, .table_grid th.stats {
-		display: none;
-	}
-	.table_list td.lastpost p {
-		border-left: 1px solid #ccc;
-		padding: 1px 5px 2px 10px;
-		margin-top: 1px;
-	}
-	.table_grid td.lastpost p {
-		border-left: 1px solid #ccc;
-	}
-	.table_grid th.last_post {
-		width: 30%;
-	}
-}
-/* 7" Tablets like Google Nexus (landscape) or other mobile devices */
+/* 7" Tablets like Google Nexus (landscape) or other mobile devices *//*
 @media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
-	 	 display: none !important;
+	 	 display: none;
 	 }
 	 #posting_icons, #top_section div ul{
-		 display: none !important;
+		 display: none;
 	 }
 	 #collapse_button, #button_home, #button_help, #button_memberlist, #button_search {
 	 	 display: none;
 	 }
 	#menu_nav {
-		padding: 0 !important;
+		padding: 0;
 	}
 	.catbg img, .catbg span {
 		display: none;
 	}
 	.poster {
-		float: none;
 		margin-bottom: 5px;
+		float: none;
 	}
 	.postarea{
 		margin: 0;
 	}
 	.mark_read {
-		margin-bottom: 15px !important;
+		margin-bottom: 15px;
 	}
 	#top_section {
 		padding-bottom: 5px;
@@ -4155,20 +3773,20 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	{
 		display: none;
 	}
-	td.info {
+	.info {
 		border-right: 1px solid #ccc;
 	}
 	.news {
 		display: none;
 	}
-	div.user {
+	.user {
 		float: none;
 		width: 95%;
 	}
 	.poster {
 		float: none;
-		border: 0 !important;
-		box-shadow: none !important;
+		border: 0;
+		box-shadow: none;
 	}
 	.postarea, .moderatorbar {
 		margin: 0;
@@ -4186,16 +3804,12 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	input {
 		max-width: 230px;
 	}
-	.post_wrapper {
-		border: 1px solid #ddd;
-		border-radius: 8px;
-		padding: 6px;
-	}
-	.quickbuttons li.modified {
+	.quickbuttons .modified {
 		display: none;
 	}
 }
-/* mobile devices with low screen resolutions */
+
+/* mobile devices with low screen resolutions *//*
 @media screen and (max-width: 400px) and (orientation: portrait) {
 	#top_section_notice, #logo, #topic_icons div p, .optional {
 		display: none;
@@ -4205,12 +3819,12 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 		width: 50px;
 	}
 	#message_index_jump_to {
-		display: block !important;
+		display: block;
 		margin-bottom: 7px;
 	}
 	.buttonlist ul li {
-		font-size: 0.8em !important;
 		margin-left: 3px;
+		font-size: 0.8em;
 	}
 	#description_board {
 		display: none;
@@ -4225,5 +3839,84 @@ tr.catbg th:last-child, #show_attachments th:last-child {
 	}
 	input {
 		max-width: 200px;
+	}
+}
+*/
+/* @todo - WIP - Still needs more elements and stuff. */
+
+/* Not sure how fussy we should get here,
+/* given that there is supposed to be a separate phone theme.
+/* Am currently inclined to think that just having break points that correlate
+/* to 1024, 800 and 480 at standard font size is probably adequate. */
+
+/* This one does 1024 screens at default font size. */
+@media screen and (min-width: 52em) and (max-width: 70em) {
+	.board_latest {
+		min-width: 27em; 
+	}
+	.topic_latest {
+		min-width: 17em; 
+	}
+	.board_stats, .topic_stats {
+		display: none;
+	}
+}
+/* This one does 800 screens at default font size. */
+@media screen and (min-width: 32em) and (max-width: 52em) {
+	.wrapper {
+		min-width: 98%;
+	}
+	.board_latest {
+		min-width: 20em; 
+	}
+	.board_lastposter {
+		display: block;
+	}
+	.board_stats, .topic_stats {
+		display: none;
+	}
+	/* Playing silly buggers with a sidebar menu option for narrow screens. */
+	#main_container {
+	position:relative;
+	padding: 0 0 0 12px;
+	}
+	#menu_sidebar {
+		position: absolute;
+		left: -0.8em;
+		width: 6px;
+		min-height: 500px;
+		border: 1px solid #aaa;
+		border-radius: 4px;
+		background: #fff;
+		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+		z-index: 90;
+	}
+	#menu_sidebar ul, #menu_sidebar .cat_bar {
+		display: none;
+	}
+	#menu_sidebar:hover {
+		width: 200px;
+		padding: 0.8em 1em 1em 0.6em;
+	}
+	#menu_sidebar:hover ul, #menu_sidebar:hover .cat_bar {
+		display: block;
+	}
+	/* End playing silly buggers. */
+}
+/* This one does 480 screens at default font size. */
+@media screen and (max-width: 32em) {
+	.frame {
+		min-width: 100%;
+		border-radius: 0;
+	}
+	.board_info, .board_latest {
+		display: block;
+	}
+	.board_latest {
+		padding-left: 64px;
+		border-left: none;
+	}
+	.board_description, .moderators {
+		display: none;
 	}
 }

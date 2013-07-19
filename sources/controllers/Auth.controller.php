@@ -18,11 +18,23 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class Auth_Controller
+class Auth_Controller extends Action_Controller
 {
+	/**
+	 * Entry point in Auth controller
+	 * (well no, not really. We route directly to the rest.)
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// what can we do? login page!
+		$this->action_login();
+	}
+
 	/**
 	 * Ask them for their login information. (shows a page for the user to type
 	 *  in their username and password.)
@@ -281,7 +293,7 @@ class Auth_Controller
 				}
 			}
 
-			// ELKARTE's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
+			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 			if (stripos(PHP_OS, 'win') !== 0)
 			{
 				require_once(SUBSDIR . '/Compat.subs.php');
@@ -291,7 +303,7 @@ class Auth_Controller
 			// Allows mods to easily extend the $other_passwords array
 			call_integration_hook('integrate_other_passwords', array(&$other_passwords));
 
-			// Whichever encryption it was using, let's make it use ELKARTE's now ;).
+			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
 				$user_settings['passwd'] = $sha_passwd;
@@ -354,7 +366,7 @@ class Auth_Controller
  	*/
 	public function action_logout($internal = false, $redirect = true)
 	{
-		global $user_info, $user_settings, $context, $modSettings;
+		global $user_info, $user_settings, $context;
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
@@ -381,6 +393,9 @@ class Auth_Controller
 			// If you log out, you aren't online anymore :P.
 			logOnline($user_info['id'], false);
 		}
+
+		// Logout? Let's kill the admin session, too. 
+		unset($_SESSION['admin_time']);
 
 		$_SESSION['log_time'] = 0;
 
@@ -456,7 +471,7 @@ class Auth_Controller
 	 */
 	public function action_salt()
 	{
-		global $user_info, $user_settings, $context;
+		global $user_info, $user_settings, $context, $cookiename;
 
 		// we deal only with logged in folks in here!
 		if (!$user_info['is_guest'])
@@ -485,7 +500,7 @@ class Auth_Controller
 	 */
 	public function action_check()
 	{
-		global $user_info, $modSettings;
+		global $user_info, $modSettings, $user_settings;
 
 		// Only our members, please.
 		if (!$user_info['is_guest'])
@@ -609,7 +624,10 @@ function doLogin()
 	// An administrator, set up the login so they don't have to type it again.
 	if ($user_info['is_admin'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
 	{
-		$_SESSION['admin_time'] = time();
+		// Let's validate if they really want..
+		if (!empty($modSettings['auto_admin_session']) && $modSettings['auto_admin_session'] == 1)
+			$_SESSION['admin_time'] = time();
+
 		unset($_SESSION['just_registered']);
 	}
 

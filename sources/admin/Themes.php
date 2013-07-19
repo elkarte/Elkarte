@@ -34,28 +34,33 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class Themes_Controller
+class Themes_Controller extends Action_Controller
 {
 	/**
 	 * Subaction handler - manages the action and delegates control to the proper
 	 * sub-action.
 	 * It loads both the Themes and Settings language files.
 	 * Checks the session by GET or POST to verify the sent data.
-	 * Requires the user not be a guest. (@todo what?)
+	 * Requires the user to not be a guest.
 	 * Accessed via ?action=admin;area=theme.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
-	function action_thememain()
+	public function action_index()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context;
+
+		if (isset($_REQUEST['api']))
+			return $this->action_index_api();
 
 		// Load the important language files...
 		loadLanguage('Themes');
 		loadLanguage('Settings');
 
-		// No funny business - guests only.
+		// No guests in here.
 		is_not_guest();
 
 		// Default the page title to Theme Administration by default.
@@ -63,15 +68,17 @@ class Themes_Controller
 
 		// Theme administration, removal, choice, or installation...
 		$subActions = array(
-			'admin' => 'action_admin',
-			'list' => 'action_list',
-			'reset' => 'action_options',
-			'options' => 'action_options',
-			'install' => 'action_install',
-			'remove' => 'action_remove',
-			'pick' => 'action_pick',
-			'edit' => 'action_edit',
-			'copy' => 'action_copy',
+			'admin' => array($this, 'action_admin'),
+			'list' => array($this, 'action_list'),
+			'reset' => array($this, 'action_options'),
+			'options' => array($this, 'action_options'),
+			'install' => array($this, 'action_install'),
+			'remove' => array($this, 'action_remove'),
+			'pick' => array($this, 'action_pick'),
+			'edit' => array($this, 'action_edit'),
+			'copy' => array($this, 'action_copy'),
+			'themelist' => array($this, 'action_themelist'),
+			'browse' => array($this, 'action_browse'),
 		);
 
 		// @todo Layout Settings?
@@ -94,15 +101,75 @@ class Themes_Controller
 					'edit' => array(
 						'description' => $txt['themeadmin_edit_desc'],
 					),
+					'themelist' => array(
+						'description' => $txt['themeadmin_edit_desc'],
+					),
+					'browse' => array(
+						'description' => $txt['themeadmin_edit_desc'],
+					),
 				),
 			);
 		}
 
 		// Follow the sa or just go to administration.
 		if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
+			$subAction = $_GET['sa'];
+		else
+			$subAction = 'admin';
+
+		$action = new Action();
+		$action->initialize($subActions, 'admin');
+		$action->dispatch($subAction);
+	}
+
+	public function action_index_api()
+	{
+		global $txt, $context, $user_info;
+
+		loadTemplate('Xml');
+
+		Template_Layers::getInstance()->removeAll();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		// No guests in here.
+		if ($user_info['is_guest'])
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_guests']
+			);
+			return;
+		}
+
+		// Theme administration, removal, choice, or installation...
+		// Of all the actions we currently know only this
+		$subActions = array(
+// 			'admin' => 'action_admin',
+// 			'list' => 'action_list',
+// 			'reset' => 'action_options',
+// 			'options' => 'action_options',
+// 			'install' => 'action_install',
+			'remove' => 'action_remove_api',
+// 			'pick' => 'action_pick',
+// 			'edit' => 'action_edit',
+// 			'copy' => 'action_copy',
+// 			'themelist' => 'action_themelist',
+// 			'browse' => 'action_browse',
+		);
+
+		// Follow the sa or just go to administration.
+		if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
 			$this->{$subActions[$_GET['sa']]}();
 		else
-			$this->{$subActions['admin']}();
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['error_sa_not_set']
+			);
+			return;
+		}
 	}
 
 	/**
@@ -115,11 +182,9 @@ class Themes_Controller
 	 *  @uses Themes template
 	 *  @uses Admin language file
 	 */
-	function action_admin()
+	public function action_admin()
 	{
 		global $context, $modSettings;
-
-		$db = database();
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
@@ -180,11 +245,11 @@ class Themes_Controller
 	 * This function lists the available themes and provides an interface
 	 * to reset the paths of all the installed themes.
 	 */
-	function action_list()
+	public function action_list()
 	{
 		global $context, $boardurl;
 
-		$db = database();
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		loadLanguage('Admin');
 		isAllowedTo('admin_forum');
@@ -197,25 +262,7 @@ class Themes_Controller
 			checkSession();
 			validateToken('admin-tl');
 
-			$request = $db->query('', '
-				SELECT id_theme, variable, value
-				FROM {db_prefix}themes
-				WHERE variable IN ({string:theme_dir}, {string:theme_url}, {string:images_url}, {string:base_theme_dir}, {string:base_theme_url}, {string:base_images_url})
-					AND id_member = {int:no_member}',
-				array(
-					'no_member' => 0,
-					'theme_dir' => 'theme_dir',
-					'theme_url' => 'theme_url',
-					'images_url' => 'images_url',
-					'base_theme_dir' => 'base_theme_dir',
-					'base_theme_url' => 'base_theme_url',
-					'base_images_url' => 'base_images_url',
-				)
-			);
-			$themes = array();
-			while ($row = $db->fetch_assoc($request))
-				$themes[$row['id_theme']][$row['variable']] = $row['value'];
-			$db->free_result($request);
+			$themes = installedThemes();
 
 			$setValues = array();
 			foreach ($themes as $id => $theme)
@@ -238,43 +285,14 @@ class Themes_Controller
 			}
 
 			if (!empty($setValues))
-			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$setValues,
-					array('id_theme', 'variable', 'id_member')
-				);
-			}
+				updateThemePath($setValues);
 
 			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		loadTemplate('Themes');
 
-		$request = $db->query('', '
-			SELECT id_theme, variable, value
-			FROM {db_prefix}themes
-			WHERE variable IN ({string:name}, {string:theme_dir}, {string:theme_url}, {string:images_url})
-				AND id_member = {int:no_member}',
-			array(
-				'no_member' => 0,
-				'name' => 'name',
-				'theme_dir' => 'theme_dir',
-				'theme_url' => 'theme_url',
-				'images_url' => 'images_url',
-			)
-		);
-		$context['themes'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!isset($context['themes'][$row['id_theme']]))
-				$context['themes'][$row['id_theme']] = array(
-					'id' => $row['id_theme'],
-				);
-			$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
-		}
-		$db->free_result($request);
+		$context['themes'] = installedThemes();
 
 		foreach ($context['themes'] as $i => $theme)
 		{
@@ -306,10 +324,11 @@ class Themes_Controller
 	/**
 	 * Administrative global settings.
 	 */
-	function action_options()
+	public function action_options()
 	{
 		global $txt, $context, $settings, $modSettings;
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		$db = database();
 
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
@@ -318,70 +337,16 @@ class Themes_Controller
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 		{
-			$request = $db->query('', '
-				SELECT id_theme, variable, value
-				FROM {db_prefix}themes
-				WHERE variable IN ({string:name}, {string:theme_dir})
-					AND id_member = {int:no_member}',
-				array(
-					'no_member' => 0,
-					'name' => 'name',
-					'theme_dir' => 'theme_dir',
-				)
-			);
-			$context['themes'] = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				if (!isset($context['themes'][$row['id_theme']]))
-					$context['themes'][$row['id_theme']] = array(
-						'id' => $row['id_theme'],
-						'num_default_options' => 0,
-						'num_members' => 0,
-					);
-				$context['themes'][$row['id_theme']][$row['variable']] = $row['value'];
-			}
-			$db->free_result($request);
+			$context['themes'] = installedThemes();
 
-			$request = $db->query('', '
-				SELECT id_theme, COUNT(*) AS value
-				FROM {db_prefix}themes
-				WHERE id_member = {int:guest_member}
-				GROUP BY id_theme',
-				array(
-					'guest_member' => -1,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$context['themes'][$row['id_theme']]['num_default_options'] = $row['value'];
-			$db->free_result($request);
+			//How many options do we have setup for guests?
+			$guestOptions = countConfiguredGuestOptions();
+			foreach ($guestOptions as $guest_option)
+				$context['themes'][$guest_option['id_theme']]['num_default_options'] = $guest_option['value'];
 
-			// Need to make sure we don't do custom fields.
-			$request = $db->query('', '
-				SELECT col_name
-				FROM {db_prefix}custom_fields',
-				array(
-				)
-			);
-			$customFields = array();
-			while ($row = $db->fetch_assoc($request))
-				$customFields[] = $row['col_name'];
-			$db->free_result($request);
-			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
-
-			$request = $db->query('themes_count', '
-				SELECT COUNT(DISTINCT id_member) AS value, id_theme
-				FROM {db_prefix}themes
-				WHERE id_member > {int:no_member}
-					' . $customFieldsQuery . '
-				GROUP BY id_theme',
-				array(
-					'no_member' => 0,
-					'custom_fields' => empty($customFields) ? array() : $customFields,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$context['themes'][$row['id_theme']]['num_members'] = $row['value'];
-			$db->free_result($request);
+			$memberOptions = countConfiguredMemberOptions();
+			foreach ($memberOptions as $member_option)
+				$context['themes'][$member_option['id_theme']]['num_members'] = $member_option['value'];
 
 			// There has to be a Settings template!
 			foreach ($context['themes'] as $k => $v)
@@ -425,24 +390,9 @@ class Themes_Controller
 			{
 				// Are there options in non-default themes set that should be cleared?
 				if (!empty($old_settings))
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme != {int:default_theme}
-							AND id_member = {int:guest_member}
-							AND variable IN ({array_string:old_settings})',
-						array(
-							'default_theme' => 1,
-							'guest_member' => -1,
-							'old_settings' => $old_settings,
-						)
-					);
+					removeThemeOptions(false, false, $old_settings);
 
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$setValues,
-					array('id_theme', 'variable', 'id_member')
-				);
+				updateThemeOptions($setValues);
 			}
 
 			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
@@ -468,27 +418,8 @@ class Themes_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					$db->query('substring', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:default_theme}
-							AND id_member != {int:no_member}
-							AND variable = SUBSTRING({string:option}, 1, 255)',
-						array(
-							'default_theme' => 1,
-							'no_member' => 0,
-							'option' => $opt,
-						)
-					);
-					$db->query('substring', '
-						INSERT INTO {db_prefix}themes
-							(id_member, id_theme, variable, value)
-						SELECT id_member, 1, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
-						FROM {db_prefix}members',
-						array(
-							'option' => $opt,
-							'value' => (is_array($val) ? implode(',', $val) : $val),
-						)
-					);
+					removeThemeOptions(true, false, $opt);
+					addThemeOptions(1, $opt, $val);
 
 					$old_settings[] = $opt;
 				}
@@ -508,17 +439,7 @@ class Themes_Controller
 
 			// Delete options from other themes.
 			if (!empty($old_settings))
-				$db->query('', '
-					DELETE FROM {db_prefix}themes
-					WHERE id_theme != {int:default_theme}
-						AND id_member > {int:no_member}
-						AND variable IN ({array_string:old_settings})',
-					array(
-						'default_theme' => 1,
-						'no_member' => 0,
-						'old_settings' => $old_settings,
-					)
-				);
+				removeThemeOptions(false, true, $old_settings);
 
 			foreach ($_POST['options'] as $opt => $val)
 			{
@@ -538,32 +459,11 @@ class Themes_Controller
 							'option' => $opt,
 						)
 					);
-					$db->query('substring', '
-						INSERT INTO {db_prefix}themes
-							(id_member, id_theme, variable, value)
-						SELECT id_member, {int:current_theme}, SUBSTRING({string:option}, 1, 255), SUBSTRING({string:value}, 1, 65534)
-						FROM {db_prefix}members',
-						array(
-							'current_theme' => $_GET['th'],
-							'option' => $opt,
-							'value' => (is_array($val) ? implode(',', $val) : $val),
-						)
-					);
+					addThemeOptions($_GET['th'], $opt, $val);
 				}
 				elseif ($_POST['options_master'][$opt] == 2)
-				{
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE variable = {string:option}
-							AND id_member > {int:no_member}
-							AND id_theme = {int:current_theme}',
-						array(
-							'no_member' => 0,
-							'current_theme' => $_GET['th'],
-							'option' => $opt,
-						)
-					);
-				}
+					removeThemeOption($_GET['th'], $opt);
+
 			}
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
@@ -575,18 +475,8 @@ class Themes_Controller
 
 			// Don't delete custom fields!!
 			if ($_GET['th'] == 1)
-			{
-				$request = $db->query('', '
-					SELECT col_name
-					FROM {db_prefix}custom_fields',
-					array(
-					)
-				);
-				$customFields = array();
-				while ($row = $db->fetch_assoc($request))
-					$customFields[] = $row['col_name'];
-				$db->free_result($request);
-			}
+				$customFields = loadCustomFields();
+
 			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
 
 			$db->query('', '
@@ -691,11 +581,11 @@ class Themes_Controller
 	 * - requires admin_forum permission.
 	 * - accessed with ?action=admin;area=theme;sa=list&th=xx.
 	 */
-	function action_setthemesettings()
+	public function action_setthemesettings()
 	{
 		global $txt, $context, $settings, $modSettings;
 
-		$db = database();
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 			return $this->action_admin();
@@ -786,14 +676,8 @@ class Themes_Controller
 				$inserts[] = array(0, 1, $opt, is_array($val) ? implode(',', $val) : $val);
 			// If we're actually inserting something..
 			if (!empty($inserts))
-			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$inserts,
-					array('id_member', 'id_theme', 'variable')
-				);
-			}
+				updateThemeOptions($inserts);
+
 
 			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			cache_put_data('theme_settings-1', null, 90);
@@ -870,11 +754,11 @@ class Themes_Controller
 	 * - requires an administrator.
 	 * - accessed with ?action=admin;area=theme;sa=remove.
 	 */
-	function action_remove()
+	public function action_remove()
 	{
 		global $modSettings, $context;
 
-		$db = database();
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		checkSession('get');
 
@@ -895,33 +779,7 @@ class Themes_Controller
 				unset($known[$i]);
 		}
 
-		$db->query('', '
-			DELETE FROM {db_prefix}themes
-			WHERE id_theme = {int:current_theme}',
-			array(
-				'current_theme' => $_GET['th'],
-			)
-		);
-
-		$db->query('', '
-			UPDATE {db_prefix}members
-			SET id_theme = {int:default_theme}
-			WHERE id_theme = {int:current_theme}',
-			array(
-				'default_theme' => 0,
-				'current_theme' => $_GET['th'],
-			)
-		);
-
-		$db->query('', '
-			UPDATE {db_prefix}boards
-			SET id_theme = {int:default_theme}
-			WHERE id_theme = {int:current_theme}',
-			array(
-				'default_theme' => 0,
-				'current_theme' => $_GET['th'],
-			)
-		);
+		deleteTheme($_GET['th']);
 
 		$known = strtr(implode(',', $known), array(',,' => ','));
 
@@ -934,6 +792,81 @@ class Themes_Controller
 		redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
+	public function action_remove_api()
+	{
+		global $modSettings, $context, $txt;
+
+		require_once(SUBSDIR . '/Themes.subs.php');
+
+		if (checkSession('get', '', false))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['session_verify_fail'],
+			);
+			return;
+		}
+
+		if (!allowedTo('admin_forum'))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['cannot_admin_forum'],
+			);
+			return;
+		}
+
+		if (!validateToken('admin-tr', 'request', true, false))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['token_verify_fail'],
+			);
+			return;
+		}
+
+		// The theme's ID must be an integer.
+		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+
+		// You can't delete the default theme!
+		if ($_GET['th'] == 1)
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['no_access'],
+			);
+			return;
+		}
+
+		$known = explode(',', $modSettings['knownThemes']);
+		for ($i = 0, $n = count($known); $i < $n; $i++)
+		{
+			if ($known[$i] == $_GET['th'])
+				unset($known[$i]);
+		}
+
+		deleteTheme($_GET['th']);
+
+		$known = strtr(implode(',', $known), array(',,' => ','));
+
+		// Fix it if the theme was the overall default theme.
+		if ($modSettings['theme_guests'] == $_GET['th'])
+			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
+		else
+			updateSettings(array('knownThemes' => $known));
+
+		createToken('admin-tr', 'request');
+		$context['xml_data'] = array(
+			'success' => 1,
+			'token_var' => $context['admin-tr_token_var'],
+			'token' => $context['admin-tr_token'],
+		);
+	}
+
 	/**
 	 * Choose a theme from a list.
 	 * allows an user or administrator to pick a new theme with an interface.
@@ -943,10 +876,11 @@ class Themes_Controller
 	 * @todo thought so... Might be better to split this file in ManageThemes and Themes,
 	 * with centralized admin permissions on ManageThemes.
 	 */
-	function action_pick()
+	public function action_pick()
 	{
 		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		$db = database();
 
 		loadLanguage('Profile');
@@ -989,12 +923,8 @@ class Themes_Controller
 				// A variants to save for the user?
 				if (!empty($_GET['vrt']))
 				{
-					$db->insert('replace',
-						'{db_prefix}themes',
-						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-						array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']),
-						array('id_theme', 'id_member', 'variable')
-					);
+					updateThemeOptions(array($_GET['th'], $user_info['id'], 'theme_variant', $_GET['vrt']));
+
 					cache_put_data('theme_settings-' . $_GET['th'] . ':' . $user_info['id'], null, 90);
 
 					$_SESSION['id_variant'] = 0;
@@ -1006,13 +936,7 @@ class Themes_Controller
 			// If changing members or guests - and there's a variant - assume changing default variant.
 			if (!empty($_GET['vrt']) && ($_REQUEST['u'] == '0' || $_REQUEST['u'] == '-1'))
 			{
-				$db->insert('replace',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					array($_GET['th'], 0, 'default_variant', $_GET['vrt']),
-					array('id_theme', 'id_member', 'variable')
-				);
-
+				updateThemeOptions(array($_GET['th'], 0, 'default_variant', $_GET['vrt']));
 				// Make it obvious that it's changed
 				cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			}
@@ -1024,17 +948,7 @@ class Themes_Controller
 
 				// Remove any custom variants.
 				if (!empty($_GET['vrt']))
-				{
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:current_theme}
-							AND variable = {string:theme_variant}',
-						array(
-							'current_theme' => (int) $_GET['th'],
-							'theme_variant' => 'theme_variant',
-						)
-					);
-				}
+					deleteVariants((int) $_GET['th']);
 
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 			}
@@ -1056,12 +970,7 @@ class Themes_Controller
 
 				if (!empty($_GET['vrt']))
 				{
-					$db->insert('replace',
-						'{db_prefix}themes',
-						array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-						array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']),
-						array('id_theme', 'id_member', 'variable')
-					);
+					updateThemeOptions(array($_GET['th'], (int) $_REQUEST['u'], 'theme_variant', $_GET['vrt']));
 					cache_put_data('theme_settings-' . $_GET['th'] . ':' . (int) $_REQUEST['u'], null, 90);
 
 					if ($user_info['id'] == $_REQUEST['u'])
@@ -1278,7 +1187,7 @@ class Themes_Controller
 	 * Requires admin_forum.
 	 * Accessed with ?action=admin;area=theme;sa=install.
 	 */
-	function action_install()
+	public function action_install()
 	{
 		global $boardurl, $txt, $context, $settings, $modSettings;
 
@@ -1289,33 +1198,20 @@ class Themes_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
+		require_once(SUBSDIR . '/Themes.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		loadTemplate('Themes');
 
 		if (isset($_GET['theme_id']))
 		{
-			$result = $db->query('', '
-				SELECT value
-				FROM {db_prefix}themes
-				WHERE id_theme = {int:current_theme}
-					AND id_member = {int:no_member}
-					AND variable = {string:name}
-				LIMIT 1',
-				array(
-					'current_theme' => (int) $_GET['theme_id'],
-					'no_member' => 0,
-					'name' => 'name',
-				)
-			);
-			list ($theme_name) = $db->fetch_row($result);
-			$db->free_result($result);
+			$_GET['theme_id'] = (int) $_GET['theme_id'];
 
 			$context['sub_template'] = 'installed';
 			$context['page_title'] = $txt['theme_installed'];
 			$context['installed_theme'] = array(
-				'id' => (int) $_GET['theme_id'],
-				'name' => $theme_name,
+				'id' => $_GET['theme_id'],
+				'name' => getThemeName($_GET['theme_id']),
 			);
 
 			return;
@@ -1390,9 +1286,9 @@ class Themes_Controller
 
 			// Lets add a theme_info.xml to this theme.
 			$xml_info = '<' . '?xml version="1.0"?' . '>
-	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:smf="http://www.simplemachines.org/">
+	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:elk="http://www.simplemachines.org/">
 		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>smf:' . Util::strtolower(str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
+		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
 		<version>' . $modSettings['elkVersion'] . '</version>
 		<!-- Theme name, used purely for aesthetics. -->
 		<name>' . $_REQUEST['copy'] . '</name>
@@ -1551,29 +1447,14 @@ class Themes_Controller
 			}
 
 			// Find the newest id_theme.
-			$result = $db->query('', '
-				SELECT MAX(id_theme)
-				FROM {db_prefix}themes',
-				array(
-				)
-			);
-			list ($id_theme) = $db->fetch_row($result);
-			$db->free_result($result);
-
-			// This will be theme number...
-			$id_theme++;
+			$id_theme = nextTheme();
 
 			$inserts = array();
 			foreach ($install_info as $var => $val)
 				$inserts[] = array($id_theme, $var, $val);
 
 			if (!empty($inserts))
-				$db->insert('insert',
-					'{db_prefix}themes',
-					array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-					$inserts,
-					array('id_theme', 'variable')
-				);
+				addTheme($inserts);
 
 			updateSettings(array('knownThemes' => strtr($modSettings['knownThemes'] . ',' . $id_theme, array(',,' => ','))));
 		}
@@ -1591,7 +1472,7 @@ class Themes_Controller
 	 * - optionally contains &th=theme id
 	 * - does not log access to the Who's Online log. (in index.php..)
 	 */
-	function action_jsoption()
+	public function action_jsoption()
 	{
 		global $settings, $user_info, $options;
 
@@ -1684,8 +1565,6 @@ class Themes_Controller
 	 * Allows choosing, browsing, and editing a theme files.
 	 *
 	 * Its subactions handle several features:
-	 *  - edit_list: show a list of installed themes
-	 *  - edit_browse: display the list of files in the current theme, and allow browsing
 	 *  - edit_template: display and edit a PHP template file
 	 *  - edit_style: display and edit a CSS file
 	 *  - edit_file: display and edit other files in the theme
@@ -1693,11 +1572,9 @@ class Themes_Controller
 	 * uses the Themes template
 	 * accessed via ?action=admin;area=theme;sa=edit
 	 */
-	function action_edit()
+	public function action_edit()
 	{
-		global $context, $settings, $scripturl;
-
-		$db = database();
+		global $context;
 
 		isAllowedTo('admin_forum');
 		loadTemplate('Themes');
@@ -1707,21 +1584,13 @@ class Themes_Controller
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
+		//Unfortunately we cannot edit an unkwown theme.. redirect.
 		if (empty($selectedTheme))
-		{
-			// you didn't choose a theme:
-			// we show you all installed themes
-			$this->action_edit_list();
+			redirectexit('action=admin;area=theme;sa=themelist');
 
-			// ugly, but safer :P
-			return;
-		}
+		// you're browsing around, aren't you
 		elseif (!isset($_REQUEST['filename']))
-		{
-			// you're browsing around, aren't you
-			$this->action_edit_browse();
-			return;
-		}
+			redirectexit('action=admin;area=theme;sa=browse;th=' . $selectedTheme);
 
 		// We don't have errors. Yet.
 		$context['session_error'] = false;
@@ -1732,12 +1601,12 @@ class Themes_Controller
 		$context['theme_id'] = $selectedTheme;
 		$theme_dir = themeDirectory($context['theme_id']);
 
-		prepareThemeEditContext($theme_dir);
+		$this->prepareThemeEditContext($theme_dir);
 
 		// Saving?
 		if (isset($_POST['save']))
 		{
-			$this->action_edit_submit();
+			$this->_action_edit_submit();
 
 			// now lets get out of here!
 			return;
@@ -1748,15 +1617,15 @@ class Themes_Controller
 		// controller functions, which isn't cool. To be refactored.
 		if (substr($_REQUEST['filename'], -4) == '.css')
 		{
-			$this->action_edit_style($theme_dir);
+			$this->_action_edit_style($theme_dir);
 		}
 		elseif (substr($_REQUEST['filename'], -13) == '.template.php')
 		{
-			$this->action_edit_template($theme_dir);
+			$this->_action_edit_template($theme_dir);
 		}
 		else
 		{
-			$this->action_edit_file($theme_dir);
+			$this->_action_edit_file($theme_dir);
 		}
 
 		// Create a special token to allow editing of multiple files.
@@ -1771,7 +1640,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	function action_edit_style($theme_dir)
+	private function _action_edit_style($theme_dir)
 	{
 		global $context;
 
@@ -1788,7 +1657,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	function action_edit_template($theme_dir)
+	private function _action_edit_template($theme_dir)
 	{
 		global $context;
 
@@ -1829,7 +1698,7 @@ class Themes_Controller
 	 *
 	 * @param string $theme_dir absolute path of the selected theme directory
 	 */
-	function action_edit_file($theme_dir)
+	private function _action_edit_file($theme_dir)
 	{
 		global $context;
 
@@ -1846,9 +1715,9 @@ class Themes_Controller
 	 * This function is forwarded to, from
 	 * ?action=admin;area=theme;sa=edit
 	 */
-	function action_edit_submit()
+	private function _action_edit_submit()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 		if (empty($selectedTheme))
@@ -1911,7 +1780,7 @@ class Themes_Controller
 				fclose($fp);
 
 				// we're done here.
-				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . dirname($_REQUEST['filename']));
+				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . dirname($_REQUEST['filename']));
 			}
 			else
 			{
@@ -1982,12 +1851,22 @@ class Themes_Controller
 	 * The display will allow to choose a file for editing,
 	 * if it is writable.
 	 *
-	 * This function is forwarded to, from
-	 * ?action=admin;area=theme;sa=edit
+	 * ?action=admin;area=theme;sa=browse
 	 */
-	function action_edit_browse()
+	public function action_browse()
 	{
 		global $context, $scripturl;
+
+		isAllowedTo('admin_forum');
+		loadTemplate('Themes');
+
+		// We'll work hard with them themes!
+		require_once(SUBSDIR . '/Themes.subs.php');
+
+		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
+
+		if (empty($selectedTheme))
+			redirectexit('action=admin;area=theme;sa=themelist');
 
 		// Get first the directory of the theme we are editing.
 		$context['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
@@ -2024,7 +1903,7 @@ class Themes_Controller
 				'is_template' => false,
 				'is_image' => false,
 				'is_editable' => false,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $temp,
+				'href' => $scripturl . '?action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . $temp,
 				'size' => '',
 			));
 		}
@@ -2032,19 +1911,22 @@ class Themes_Controller
 			$context['theme_files'] = get_file_listing($theme_dir, '');
 
 		// finally, load the sub-template
-		$context['sub_template'] = 'edit_browse';
+		$context['sub_template'] = 'browse';
 	}
 
 	/**
 	 * List installed themes.
 	 * The listing will allow editing if the files are writable.
-	 *
-	 * This function is forwarded to, from
-	 * ?action=admin;area=theme;sa=edit
 	 */
-	function action_edit_list()
+	public function action_themelist()
 	{
 		global $context;
+
+		isAllowedTo('admin_forum');
+		loadTemplate('Themes');
+
+		// We'll work hard with them themes!
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		$context['themes'] = installedThemes();
 
@@ -2081,14 +1963,14 @@ class Themes_Controller
 			}
 		}
 
-		$context['sub_template'] = 'edit_list';
+		$context['sub_template'] = 'themelist';
 	}
 
 	/**
 	 * Makes a copy of a template file in a new location
 	 * @uses Themes template, copy_template sub-template.
 	 */
-	function action_copy()
+	public function action_copy()
 	{
 		global $context, $settings;
 
@@ -2236,150 +2118,40 @@ class Themes_Controller
 
 		$context['sub_template'] = 'copy_template';
 	}
-}
 
-/**
- * Generates a file listing for a given directory
- *
- * @param type $path
- * @param type $relative
- * @return type
- */
-function get_file_listing($path, $relative)
-{
-	global $scripturl, $txt, $context;
-
-	// Is it even a directory?
-	if (!is_dir($path))
-		fatal_lang_error('error_invalid_dir', 'critical');
-
-	$dir = dir($path);
-	$entries = array();
-	while ($entry = $dir->read())
-		$entries[] = $entry;
-	$dir->close();
-
-	natcasesort($entries);
-
-	$listing1 = array();
-	$listing2 = array();
-
-	foreach ($entries as $entry)
+	/**
+	* This function makes necessary pre-checks and fills
+	* the contextual data as needed by theme edition functions.
+	*
+	* @param string $theme_dir absolute path of the selected theme directory
+	*/
+	private function prepareThemeEditContext($theme_dir)
 	{
-		// Skip all dot files, including .htaccess.
-		if (substr($entry, 0, 1) == '.' || $entry == 'CVS')
-			continue;
+		global $context;
 
-		if (is_dir($path . '/' . $entry))
-			$listing1[] = array(
-				'filename' => $entry,
-				'is_writable' => is_writable($path . '/' . $entry),
-				'is_directory' => true,
-				'is_template' => false,
-				'is_image' => false,
-				'is_editable' => false,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=' . $relative . $entry,
-				'size' => '',
-			);
+		// Eh? not trying to sneak a peek outside the theme directory are we
+		if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
+			fatal_lang_error('theme_edit_missing', false);
+
+		// You're editing a file: we have extra-checks coming up first.
+		if (substr($_REQUEST['filename'], 0, 1) == '.')
+			$_REQUEST['filename'] = '';
 		else
 		{
-			$size = filesize($path . '/' . $entry);
-			if ($size > 2048 || $size == 1024)
-				$size = comma_format($size / 1024) . ' ' . $txt['themeadmin_edit_kilobytes'];
-			else
-				$size = comma_format($size) . ' ' . $txt['themeadmin_edit_bytes'];
+			$_REQUEST['filename'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_REQUEST['filename']);
 
-			$listing2[] = array(
-				'filename' => $entry,
-				'is_writable' => is_writable($path . '/' . $entry),
-				'is_directory' => false,
-				'is_template' => preg_match('~\.template\.php$~', $entry) != 0,
-				'is_image' => preg_match('~\.(jpg|jpeg|gif|bmp|png)$~', $entry) != 0,
-				'is_editable' => is_writable($path . '/' . $entry) && preg_match('~\.(php|pl|css|js|vbs|xml|xslt|txt|xsl|html|htm|shtm|shtml|asp|aspx|cgi|py)$~', $entry) != 0,
-				'href' => $scripturl . '?action=admin;area=theme;th=' . $_GET['th'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;filename=' . $relative . $entry,
-				'size' => $size,
-				'last_modified' => standardTime(filemtime($path . '/' . $entry)),
-			);
+			$temp = realpath($theme_dir . '/' . $_REQUEST['filename']);
+			if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) !== realpath($theme_dir))
+				$_REQUEST['filename'] = '';
 		}
+
+		// we shouldn't end up with no file
+		if (empty($_REQUEST['filename']))
+			fatal_lang_error('theme_edit_missing', false);
+
+		// initialize context
+		$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
+		$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
+		$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
 	}
-
-	return array_merge($listing1, $listing2);
-}
-
-/**
- * Possibly the simplest and best example of how to use the template system.
- *  - allows the theme to take care of actions.
- *  - happens if $settings['catch_action'] is set and action isn't found
- *   in the action array.
- *  - can use a template, layers, sub_template, filename, and/or function.
- * @todo look at this
- */
-function WrapAction()
-{
-	global $context, $settings;
-
-	// Load any necessary template(s)?
-	if (isset($settings['catch_action']['template']))
-	{
-		// Load both the template and language file. (but don't fret if the language file isn't there...)
-		loadTemplate($settings['catch_action']['template']);
-		loadLanguage($settings['catch_action']['template'], '', false);
-	}
-
-	// Any special layers?
-	if (isset($settings['catch_action']['layers']))
-	{
-		$template_layers = Template_Layers::getInstance();
-		foreach ($settings['catch_action']['layers'] as $layer)
-			$template_layers->add($layer);
-	}
-
-	// Just call a function?
-	if (isset($settings['catch_action']['function']))
-	{
-		if (isset($settings['catch_action']['filename']))
-			template_include(SOURCEDIR . '/' . $settings['catch_action']['filename'], true);
-
-		$settings['catch_action']['function']();
-	}
-	// And finally, the main sub template ;).
-	elseif (isset($settings['catch_action']['sub_template']))
-		$context['sub_template'] = $settings['catch_action']['sub_template'];
-}
-
-/**
- * This function makes necessary pre-checks and fills
- * the contextual data as needed by theme edition functions.
- *
- * @param string $theme_dir absolute path of the selected theme directory
- */
-function prepareThemeEditContext($theme_dir)
-{
-	global $context;
-
-	// Eh? not trying to sneak a peek outside the theme directory are we
-	if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
-		fatal_lang_error('theme_edit_missing', false);
-
-	// You're editing a file: we have extra-checks coming up first.
-	if (substr($_REQUEST['filename'], 0, 1) == '.')
-		$_REQUEST['filename'] = '';
-	else
-	{
-		$_REQUEST['filename'] = preg_replace(array('~^[\./\\:\0\n\r]+~', '~[\\\\]~', '~/[\./]+~'), array('', '/', '/'), $_REQUEST['filename']);
-
-		$temp = realpath($theme_dir . '/' . $_REQUEST['filename']);
-		if (empty($temp) || substr($temp, 0, strlen(realpath($theme_dir))) !== realpath($theme_dir))
-			$_REQUEST['filename'] = '';
-	}
-
-	// we shouldn't end up with no file
-	if (empty($_REQUEST['filename']))
-		fatal_lang_error('theme_edit_missing', false);
-
-	// initialize context
-	$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
-	$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
-	$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
-
 }

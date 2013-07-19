@@ -448,7 +448,7 @@ function template_modify_board()
 							});
 						});
 					// ]]></script>
-					<hr class="hrcolor" />';
+					<hr />';
 
 	if (empty($context['board']['is_recycle']) && empty($context['board']['topics']))
 		echo '
@@ -551,7 +551,7 @@ function template_modify_board()
 					</div>';
 
 	if (!empty($context['board']['is_recycle']))
-		echo '<div class="simplebox">', $txt['mboards_recycle_disabled_delete'], '</div>';
+		echo '<div class="information">', $txt['mboards_recycle_disabled_delete'], '</div>';
 
 	echo '
 					<input type="hidden" name="rid" value="', $context['redirect_location'], '" />
@@ -584,8 +584,8 @@ function template_modify_board()
 <script><!-- // --><![CDATA[
 	var oModeratorSuggest = new smc_AutoSuggest({
 		sSelf: \'oModeratorSuggest\',
-		sSessionId: smf_session_id,
-		sSessionVar: smf_session_var,
+		sSessionId: elk_session_id,
+		sSessionVar: elk_session_var,
 		sSuggestId: \'moderators\',
 		sControlId: \'moderators\',
 		sSearchType: \'member\',

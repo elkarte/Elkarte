@@ -17,20 +17,22 @@
  * Original module by Aaron O'Neil - aaron@mud-master.com
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class Calendar_Controller
+class Calendar_Controller extends Action_Controller
 {
 	/**
 	 * Default action handler for requests on the calendar
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
 		// when you don't know what you're doing... we know! :P
 		$this->action_calendar();
 	}
-	
+
 	/**
 	 * Show the calendar.
 	 * It loads the specified month's events, holidays, and birthdays.
@@ -386,7 +388,7 @@ class Calendar_Controller
 		$filecontents = '';
 		$filecontents .= 'BEGIN:VCALENDAR' . "\n";
 		$filecontents .= 'METHOD:PUBLISH' . "\n";
-		$filecontents .= 'PRODID:-//ElkarteCommunity//ELKARTE ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('ELKARTE ' => ''))) . '//EN' . "\n";
+		$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('ElkArte ' => ''))) . '//EN' . "\n";
 		$filecontents .= 'VERSION:2.0' . "\n";
 		$filecontents .= 'BEGIN:VEVENT' . "\n";
 		$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";

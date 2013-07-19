@@ -9,7 +9,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -17,7 +17,7 @@ if (!defined('ELKARTE'))
  * Try first the critical functionality (maintenance, no guest access)
  * Then, in order:
  *   forum's main actions: board index, message index, display topic
- *   the current/legacy file/functions registered by Elkarte core
+ *   the current/legacy file/functions registered by ElkArte core
  * Fall back to naming patterns:
  *   filename=[action].php function=[sa]
  *   filename=[action].controller.php method=action_[sa]
@@ -132,28 +132,22 @@ class Site_Dispatcher
 		// $_GET['action'] => array($file, $class, $method)
 		$actionArray = array(
 			'activate' => array('Register.controller.php', 'Register_Controller', 'action_activate'),
-			'admin' => array('Admin.php', 'AdminMain'),
-			// 'announce' => array('Announce.controller.php', 'Announce_Controller', 'action_index'),
+			'admin' => array('Admin.php', 'Admin_Controller', 'action_index'),
 			'attachapprove' => array('ModerateAttachments.controller.php', 'ModerateAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members.controller.php', 'Members_Controller', 'action_buddy'),
-			// 'calendar' => array('Calendar.controller.php', 'Calendar_Controller', 'action_calendar'),
 			'collapse' => array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_collapse'),
 			'contact' => array('Register.controller.php', 'Register_Controller', 'action_contact'),
 			'coppa' => array('Register.controller.php', 'Register_Controller', 'action_coppa'),
 			'deletemsg' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_deletemsg'),
-			'dlattach' => array('Attachment.controller.php', 'Attachment_Controller', 'action_dlattach'),
+			'dlattach' => array('Attachment.controller.php', 'Attachment_Controller', 'action_index'),
 			'disregardtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_disregardtopic'),
 			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
 			'editpoll2' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll2'),
-			// 'emailuser' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_emailuser'),
 			'findmember' => array('Members.controller.php', 'Members_Controller', 'action_findmember'),
-			// 'groups' => array('Groups.controller.php', 'Groups_Controller', 'action_list'),
-			// 'help' => array('Help.controller.php', 'Help_Controller', 'action_help'),
 			'quickhelp' => array('Help.controller.php', 'Help_Controller', 'action_quickhelp'),
 			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
-			// 'lock' => array('Topic.controller.php', 'Topic_Controller', 'action_lock'),
 			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
 			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
 			'login2' => array('Auth.controller.php', 'Auth_Controller', 'action_login2'),
@@ -161,7 +155,7 @@ class Site_Dispatcher
 			'markasread' => array('Markasread.controller.php', 'MarkRead_Controller', 'action_index'),
 			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
 			'memberlist' => array('Memberlist.controller.php', 'Memberlist_Controller', 'action_index'),
-			'moderate' => array('ModerationCenter.controller.php', 'ModerationCenter_Controller', 'action_modcenter'),
+			'moderate' => array('ModerationCenter.controller.php', 'ModerationCenter_Controller', 'action_index'),
 			'karma' => array('Karma.controller.php', 'Karma_Controller', ''),
 			'movetopic' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic'),
 			'movetopic2' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic2'),
@@ -171,7 +165,6 @@ class Site_Dispatcher
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
-			// 'printpage' => array('Topic.controller.php', 'Topic_Controller', 'action_printpage'), // done
 			'profile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
 			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
@@ -179,21 +172,18 @@ class Site_Dispatcher
 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
 			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
 			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),
-			// 'reminder' => array('Reminder.controller.php', ''),
 			'removepoll' => array('Poll.controller.php', 'Poll_Controller', 'action_removepoll'),
 			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),
 			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
 			'search' => array('Search.controller.php', 'Search_Controller', 'action_plushsearch1'),
 			'search2' => array('Search.controller.php', 'Search_Controller', 'action_plushsearch2'),
-			// 'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
 			'suggest' => array('Suggest.controller.php', 'Suggest_Controller', 'action_suggest'),
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'Stats_Controller', 'action_stats'),
-			// 'sticky' => array('Topic.controller.php', 'Topic_Controller', 'action_sticky'), // done
 			'theme' => array('Themes.php', 'Themes_Controller', 'action_thememain'),
-			'trackip' => array('ProfileHistory.controller.php', 'action_trackip'),
+			'trackip' => array('ProfileHistory.controller.php', 'ProfileHistory_Controller', 'action_trackip'),
 			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
 			'unreadreplies' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
 			'verificationcode' => array('Register.controller.php', 'Register_Controller', 'action_verificationcode'),
@@ -202,7 +192,8 @@ class Site_Dispatcher
 			'viewquery' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewquery'),
 			'viewadminfile' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewadminfile'),
 			'.xml' => array('News.controller.php', 'News_Controller', 'action_showfeed'),
-			'xmlhttp' => array('Xml.controller.php', 'action_xmlhttp'),
+			'xmlhttp' => array('Xml.controller.php', 'Xml_Controller', 'action_index'),
+			'xmlpreview' => array('Xmlpreview.controller.php', 'XmlPreview_Controller', 'action_index'),
 		);
 
 		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
@@ -280,7 +271,7 @@ class Site_Dispatcher
 			// @todo remove this?
 			if (!empty($settings['catch_action']))
 			{
-				$this->_file_name = ADMINDIR . '/Themes.php';
+				$this->_file_name = SUBSDIR . '/Themes.subs.php';
 				$this->_function_name = 'WrapAction';
 			}
 			else

@@ -1,0 +1,200 @@
+/* INTRODUCTION
+/* This is a very basic version of the Elkarte default theme.
+/* It is intended primarily as a "clean slate" for custom theming.
+/* This is eye candy only. All the layout code is in index.css.
+/*
+/* All theme variants depend on the layout code for stability.
+/* It is better to copy code to a variant CSS file for testing.
+/*
+/* This variant uses named colours instead of hex codes.
+/* CSS colour names at http://www.w3schools.com/cssref/css_colornames.asp
+/* ------------------------------------------------------- */
+/* $CONTENTS - still a bit WIP. @todo
+/*
+/*		$GENERAL.............Global resets, clearfixes, etc.
+/*		$COMMON..............Common classes to drive you bonkers.
+/*		$BBC.................Quotes, code blocks, BBC styles.
+/*		$AJAX................The "loading" bar (quick edit, etc).
+/*
+/*		$MAIN................Forum header, wrapper, and footer.
+/*		$MENUS...............Main and secondary menus.
+/*		$LINKTREE............The breadcrumbs.
+/*		$BUTTONS.............Most button strips.
+/*		$PAGELINKS...........Page navigation links.
+/*
+/*		$TABLES..............Generic tables (memberlist, error log, etc).
+/*		$SETTINGS............Generic lists for settings pages.
+/*		$BOARDS..............Board index, child boards, and message index.
+/*
+/*		$TOPICS..............The display template (topic view), including send.
+/*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+/*		$MODERATE............Move topic, split topic, merge topic.
+/*
+/*		$PROFILE.............The profile areas.
+/*		$PERSONAL............The personal messages (PM) areas.
+/*		$CALENDAR............Wombats (and the calendar).
+/*		$STATISTICS..........The statistics centre.
+/*
+/*		$HELP................Help pages, help icons and pop-ups, tooltips.
+/*		$SEARCH..............Search pages, including memberlist search.
+/*		$LOGIN...............Login and registration, maintenance mode.
+/*
+/*		$ERRORS..............Error messages.
+/*		$PROGRESS............Nifty progress bars.
+/*		$MEDIA...............Experimental media queries.
+/* ------------------------------------------------------- */
+
+
+
+
+/*	$MENUS		*/
+/* ------------------------------------------------------- */
+
+/* Visible menu bar: wrapper/background. */
+#main_menu {
+	background: forestgreen;
+}
+
+/* Needed for new PM notifications. */
+.listlevel1 strong {
+	color: white;
+}
+
+/* Level 1 Menu bar: link or button. */
+/* If there will be a border on hover, have a border here. */
+/* A default transparent border stops links jumping on hover. */
+#main_menu .linklevel1, .admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	border: 1px solid transparent;
+	color: white;
+}
+
+/* Override link colour for admin/profile/etc menus. */
+.admin_menu .linklevel1, #adm_submenus .linklevel1 {
+	color: black;
+}
+
+/* Level 1 button hover and focus effects. */
+#main_menu .active, /* Level 1 active button shares same styling. */
+#main_menu .linklevel1:hover, #main_menu .listlevel1:hover .linklevel1, #main_menu .linklevel1:focus,
+
+/* For primary admin/profile/etc drop menus. */
+.admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
+
+/* For secondary admin/profile/etc menus. */
+#adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
+	border: 1px solid darkgray;
+	color: black;
+	text-decoration: none;
+	/* This is a pale grey. */
+	background: gainsboro;
+}
+
+/* Main menu Level 1 active button and hover need a different border. */
+#main_menu .active, #main_menu .linklevel1:hover, #main_menu .listlevel1:hover .linklevel1, #main_menu .linklevel1:focus {
+	border: 1px solid black;
+}
+
+/* Level 1 active buttons for primary admin/profile/etc drop menus... */
+.admin_menu .active,
+/* ......and for secondary admin/profile/etc menu strip. */
+#adm_submenus .active {
+	border: 1px solid black;
+	background: forestgreen;
+	color: white;
+}
+
+/* Hover effects for those buttons. */
+.admin_menu .active:hover, .admin_menu .listlevel1:hover .active, #adm_submenus .active:hover {
+	border: 1px solid black;
+	background: darkgreen;
+	color: white;
+}
+
+/* Level 1 active buttons get a bit more weight. */
+.active {
+	font-weight: bold;
+}
+
+/* Top level subsection indicators. */
+/* Comment these out if you don't want them. */
+#main_menu .subsections .linklevel1, .admin_menu .subsections .linklevel1 {
+	padding: 0 0.8em 0 0.5em;
+}
+#main_menu .subsections .linklevel1:after,.admin_menu .subsections .linklevel1:after {
+	position: absolute;
+	top: 0.5em;
+	right: 0.3em;
+	content:" \2193";
+	font-size: 1.3em;
+}
+
+/* Levels 2 and 3: drop menu wrapper. */
+.menulevel2, .menulevel3 {
+	border: 1px solid darkgray;
+	background: white;
+}
+
+/* Levels 2 and 3 drop menus: link or button. */
+.linklevel2, .linklevel3 {
+	border: 1px solid transparent;
+	color: black;
+	/* Applying a default transparent border stops links jumping on hover. */
+}
+
+/* Admin menu icons. */
+.linklevel2>img {
+	margin: 0 0 0 -4px;
+	vertical-align: middle;
+}
+
+/* Levels 2 and 3: hover effects. */
+.listlevel2:hover .linklevel2, /* < highlighted with cursor over level 3. */
+.linklevel2:hover, .linklevel2:focus, .linklevel2.sfhover:focus,
+.linklevel3:hover, .linklevel3:focus, .linklevel3.sfhover:focus {
+	border: 1px solid darkgray;
+	background: gainsboro;
+	color: black;
+	text-decoration: none;
+}
+
+/* Level 2: subsection indicators. */
+.listlevel2.subsections .linklevel2:after {
+	position: absolute;
+	right: 6px;
+	color: black;
+	content: "\2192";
+	font-size: 1.3em;
+}
+
+/* Levels 2 and 3: highlighting of current section */
+.linklevel2.chosen, .linklevel3.chosen {
+	font-weight: bold;
+}
+
+/* Styles for sidebar menus. */
+/* Same styling for Level 1 and Level 2. */
+#menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
+	border: 1px solid transparent;
+	color: black;
+}
+
+#menu_sidebar .linklevel1:hover, #menu_sidebar .linklevel1:focus, #menu_current_area .linklevel1,
+#menu_sidebar .linklevel2:hover, #menu_sidebar .linklevel2:focus {
+	border: 1px solid darkgray;
+	background: gainsboro;
+	color: black;
+	text-decoration: none;
+}
+
+#menu_current_area .linklevel1 {
+	font-weight: bold;
+}
+
+/* Level 1: subsection indicators. */
+#menu_sidebar .listlevel1.subsections .linklevel1:after {
+	position: absolute;
+	right: 6px;
+	content: "\2192";
+}
+
+/*End sidebar flyout coding. */

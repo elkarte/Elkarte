@@ -16,13 +16,13 @@
  * The admin screen to change the search settings.
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManageSearch controller admin class.
  */
-class ManageSearch_Controller
+class ManageSearch_Controller extends Action_Controller
 {
 	/**
 	 * Search settings form
@@ -40,6 +40,8 @@ class ManageSearch_Controller
 	 *
 	 * @uses ManageSearch template.
 	 * @uses Search language file.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	function action_index()
 	{
@@ -201,7 +203,7 @@ class ManageSearch_Controller
 			'',
 				// Some limitations.
 				array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
-			array('title', 'additiona_search_engines'),
+				array('title', 'additional_search_engines'),
 				array('callback', 'external_search_engines'),
 		);
 
@@ -232,7 +234,7 @@ class ManageSearch_Controller
 			'',
 				// Some limitations.
 				array('int', 'search_floodcontrol_time', 'subtext' => $txt['search_floodcontrol_time_desc'], 6, 'postinput' => $txt['seconds']),
-			array('title', 'additiona_search_engines'),
+				array('title', 'additional_search_engines'),
 				array('callback', 'external_search_engines'),
 		);
 
@@ -301,8 +303,6 @@ class ManageSearch_Controller
 	function action_edit()
 	{
 		global $txt, $context, $modSettings, $db_type, $db_prefix;
-
-		$db = database();
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
@@ -431,6 +431,7 @@ class ManageSearch_Controller
 						'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
 					)
 				);
+
 			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
@@ -460,6 +461,7 @@ class ManageSearch_Controller
 						'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
 					)
 				);
+
 			if ($request !== false && $db->num_rows($request) == 1)
 			{
 				// Only do this if the user has permission to execute this query.
@@ -558,8 +560,6 @@ class ManageSearch_Controller
 	{
 		global $modSettings, $context, $db_prefix, $txt;
 
-		$db = database();
-
 		// Get hang of db_search
 		$db_search = db_search();
 		$db = database();
@@ -616,9 +616,7 @@ class ManageSearch_Controller
 
 		// Step 0: let the user determine how they like their index.
 		if ($context['step'] === 0)
-		{
 			$context['sub_template'] = 'create_index';
-		}
 
 		// Step 1: insert all the words.
 		if ($context['step'] === 1)
@@ -718,6 +716,7 @@ class ManageSearch_Controller
 							$inserts,
 							array('id_word', 'id_msg')
 						);
+
 					if ($num_messages['todo'] === 0)
 					{
 						$context['step'] = 2;
@@ -732,7 +731,6 @@ class ManageSearch_Controller
 				$context['percentage'] = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 3) * 80;
 			}
 		}
-
 		// Step 2: removing the words that occur too often and are of no use.
 		elseif ($context['step'] === 2)
 		{
@@ -781,6 +779,7 @@ class ManageSearch_Controller
 						break;
 					}
 				}
+
 				$context['percentage'] = 80 + round($context['start'] / $index_properties[$context['index_settings']['bytes_per_word']]['max_size'], 3) * 20;
 			}
 		}
@@ -1007,6 +1006,7 @@ function detectFulltextIndex()
 		while ($row = $db->fetch_assoc($request))
 			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
 				$context['cannot_create_fulltext'] = true;
+			
 		$db->free_result($request);
 	}
 }
@@ -1057,7 +1057,7 @@ function createSphinxConfig()
 
 	// output our minimal configuration file to get them started
 	echo '#
-# Sphinx configuration file (sphinx.conf), configured for Elkarte
+# Sphinx configuration file (sphinx.conf), configured for ElkArte
 #
 # This is the minimum needed clean, simple, functional
 #

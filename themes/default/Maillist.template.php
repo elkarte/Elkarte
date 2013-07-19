@@ -392,7 +392,7 @@ function template_bounce_template()
 						<br />';
 
 	echo '
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
 					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
 				</div>
@@ -413,7 +413,7 @@ function template_bounce_template()
 		{
 			$.ajax({
 				type: "POST",
-				url: "' . $scripturl . '?action=xmlhttp;sa=previews;xml",
+				url: "' . $scripturl . '?action=xmlpreview;xml",
 				data: {item: "bounce_preview", title: $("#template_title").val(), body: $("#template_body").val()},
 				context: document.body,
 				success: function(request){

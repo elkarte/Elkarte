@@ -18,7 +18,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -409,7 +409,7 @@ function loadPaymentGateways()
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '// ELKARTE Payment Gateway: ' . strtolower($matches[1])) !== false)
+				if (strpos($header, '// ElkArte Payment Gateway: ' . strtolower($matches[1])) !== false)
 				{
 					require_once(SOURCEDIR . '/' . $file);
 
@@ -559,7 +559,7 @@ function deleteSubscription($id)
 }
 
 /**
- * Adds a new subscription 
+ * Adds a new subscription
  *
  * @param array $insert
  */

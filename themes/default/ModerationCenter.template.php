@@ -37,10 +37,6 @@ function template_moderation_center()
 		echo '
 							<div class="modblock_', $alternate ? 'left' : 'right', '">', function_exists($block_function) ? $block_function() : '', '</div>';
 
-		if (!$alternate)
-			echo '
-							<br class="clear" />';
-
 		$alternate = !$alternate;
 	}
 
@@ -73,7 +69,7 @@ function template_latest_news()
 								<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
 								<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
 								<script><!-- // --><![CDATA[
-									var oAdminIndex = new smf_AdminIndex({
+									var oAdminIndex = new elk_AdminIndex({
 										sSelf: \'oAdminCenter\',
 										bLoadAnnouncements: true,
 										sAnnouncementTemplate: ', JavaScriptEscape('
@@ -278,16 +274,16 @@ function template_reported_posts()
 									', $report['body'], '
 
 									<ul class="quickbuttons">
-										<li>
-											<a href="', $report['report_href'], '" class="details_button">', $txt['mc_reportedp_details'], '</a>
+										<li class="listlevel1">
+											<a href="', $report['report_href'], '" class="linklevel1 details_button">', $txt['mc_reportedp_details'], '</a>
 										</li>
-										<li>
-											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';ignore=', (int) !$report['ignore'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$report['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', ' class="ignore_button">', $report['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';ignore=', (int) !$report['ignore'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$report['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', ' class="linklevel1 ignore_button">', $report['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
 										</li>
-										<li>
-											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
 										</li>
-										<li class="inline_mod_check">'
+										<li  class="listlevel1 inline_mod_check">'
 											, !$context['view_closed'] ? '<input type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
 										</li>
 									</ul>
@@ -577,7 +573,7 @@ function template_moderation_settings()
 
 	echo '
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['mod-set_token_var'], '" value="', $context['mod-set_token'], '" />
 					<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
@@ -595,8 +591,8 @@ function template_show_notice()
 	global $txt, $settings, $context;
 
 	// We do all the HTML for this one!
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+	echo '<!DOCTYPE html>
+<html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $context['page_title'], '</title>
@@ -691,7 +687,7 @@ function template_warn_template()
 						<br />';
 
 	echo '
-					<hr class="hrcolor" />
+					<hr />
 					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
 					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
 				</div>
@@ -712,7 +708,7 @@ function template_warn_template()
 		{
 			$.ajax({
 				type: "POST",
-				url: "' . $scripturl . '?action=xmlhttp;sa=previews;xml",
+				url: "' . $scripturl . '?action=xmlpreview;xml",
 				data: {item: "warning_preview", title: $("#template_title").val(), body: $("#template_body").val(), user: $(\'input[name="u"]\').attr("value")},
 				context: document.body,
 				success: function(request){

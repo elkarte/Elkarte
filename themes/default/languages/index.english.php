@@ -36,14 +36,56 @@ $txt['newmessages1'] = 'are new'; //Deprecated
 $txt['newmessages3'] = 'New'; //Deprecated
 $txt['newmessages4'] = ','; //Deprecated
 
+// Let's get all the main menu strings in one place.
+$txt['home'] = 'Home';
+$txt['community'] = 'Community';
+// Sub menu labels
+$txt['help'] = 'Help';
+$txt['search'] = 'Search';
+$txt['calendar'] = 'Calendar';
+$txt['members'] = 'Members';
+$txt['recent_posts'] = 'Recent Posts';
+
 $txt['admin'] = 'Admin';
+// Sub menu labels
+$txt['errlog'] = 'Error Log';
+$txt['package'] = 'Package Manager';
+$txt['edit_permissions'] = 'Permissions';
+$txt['modSettings_title'] = 'Features and Options';
+
 $txt['moderate'] = 'Moderate';
+// Sub menu labels
+$txt['modlog_view'] = 'Moderation Log';
+$txt['mc_emailerror'] = 'Unapproved Emails';
+$txt['mc_reported_posts'] = 'Reported Posts';
+$txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
+$txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
+
+$txt['pm_short'] = 'My Messages';
+// Sub menu labels
+$txt['pm_menu_read'] = 'Read your messages';
+$txt['pm_menu_send'] = 'Send a message';
+
+$txt['account_short'] = 'My Account';
+// Sub menu labels
+$txt['profile'] = 'Profile';
+$txt['summary'] = 'Summary';
+$txt['theme'] = 'Look and Layout';
+$txt['account'] = 'Account Settings';
+$txt['forumprofile'] = 'Forum Profile';
+
+$txt['view_unread_category'] = 'New Posts';
+$txt['view_replies_category'] = 'New Replies';
+
+$txt['login'] = 'Log in';
+$txt['register'] = 'Register';
+$txt['logout'] = 'Log out';
+// End main menu strings.
 
 $txt['save'] = 'Save';
 
 $txt['modify'] = 'Modify';
 $txt['forum_index'] = '%1$s - Index';
-$txt['members'] = 'Members';
 $txt['board_name'] = 'Board name';
 $txt['posts'] = 'Posts';
 
@@ -56,7 +98,6 @@ $txt['on'] = 'on';
 $txt['remove'] = 'Remove';
 $txt['start_new_topic'] = 'Start new topic';
 
-$txt['login'] = 'Login';
 // Use numeric entities in the below string.
 $txt['username'] = 'Username';
 $txt['password'] = 'Password';
@@ -85,7 +126,6 @@ $txt['total'] = 'Total';
 $txt['posts_made'] = 'Posts';
 $txt['topics_made'] = 'Topics';
 $txt['website'] = 'Website';
-$txt['register'] = 'Register';
 $txt['contact'] = 'Contact Us';
 $txt['warning_status'] = 'Warning Status';
 $txt['user_warn_watch'] = 'User is on moderator watch list';
@@ -98,7 +138,6 @@ $txt['warning_issue'] = 'Warn';
 
 $txt['message_index'] = 'Message Index';
 $txt['news'] = 'News';
-$txt['home'] = 'Home';
 $txt['page'] = 'Page';
 $txt['prev'] = 'previous page';
 $txt['next'] = 'next page';
@@ -107,7 +146,6 @@ $txt['lock_unlock'] = 'Lock/Unlock Topic';
 $txt['post'] = 'Post';
 $txt['error_occurred'] = 'An Error Has Occurred';
 $txt['at'] = 'at';
-$txt['logout'] = 'Logout';
 $txt['started_by'] = 'Started by';
 $txt['topic_started_by'] = 'Started by <strong>%1$s</strong> in <em>%2$s</em>';
 $txt['replies'] = 'Replies';
@@ -115,7 +153,9 @@ $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
 $txt['last_poster'] = 'Last post by';
 //$txt['last_post_message'] = '<strong>Last post</strong> by %1$s<br />in %2$s<br />on %3$s';
-$txt['last_post_message'] = '<strong>Last post: </strong>%3$s<br />%2$s by %1$s';
+// @todo - Clean this up a bit. See notes in template. Also, needs another string for topic_listing sorting options.
+// Just moved a space, so the output looks better when things break to an extra line.
+$txt['last_post_message'] = '<span class="lastpost_link">%2$s </span><span class="board_lastposter">by %1$s</span><span class="board_lasttime"><strong>Last post: </strong>%3$s</span>';
 $txt['boardindex_total_posts'] = '%1$s Posts in %2$d Topics by %3$d Members';
 $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
@@ -133,7 +173,7 @@ $txt['notify_replies'] = 'Notify of replies';
 $txt['move_topic'] = 'Move Topic';
 $txt['move_to'] = 'Move to';
 $txt['pages'] = 'Pages';
-$txt['users_active'] = 'Users active in past %1$d minutes';
+$txt['users_active'] = 'Active in past %1$d minutes';
 $txt['personal_messages'] = 'Personal Messages';
 $txt['reply_quote'] = 'Reply with quote';
 $txt['reply'] = 'Reply';
@@ -148,7 +188,6 @@ $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a m
 $txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. Click <a href="%3$s">here</a> to view them all.';
 $txt['send_message'] = 'Send message';
 
-$txt['msg_alert_none'] = 'No messages...';
 $txt['msg_alert_you_have'] = 'you have'; //Deprecated
 $txt['msg_alert_messages'] = 'messages'; //Deprecated
 $txt['msg_alert_no_messages'] = 'you don\'t have any message';
@@ -158,7 +197,11 @@ $txt['msg_alert_one_new'] = '1 is new';
 $txt['msg_alert_many_new'] = '%1$d are new';
 $txt['remove_message'] = 'Remove this message';
 
-$txt['online_users'] = 'Users Online';
+$txt['topic_alert_none'] = 'No messages...';
+$txt['pm_alert_none'] = 'No messages...';
+
+$txt['online_users'] = 'Users Online'; //Deprecated
+$txt['online_now'] = 'Online Now';
 $txt['personal_message'] = 'Personal Message';
 $txt['jump_to'] = 'Jump to';
 $txt['go'] = 'Go';
@@ -186,17 +229,16 @@ $txt['memberlist_searchable'] = 'Searchable list of all registered members.';
 $txt['welcome_member'] = 'Please welcome'; //Deprecated
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
+$txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
 $txt['last_edit'] = 'Last Edit'; //Deprecated
 $txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
-
-$txt['recent_posts'] = 'Recent Posts';
 
 $txt['location'] = 'Location';
 $txt['gender'] = 'Gender';
 $txt['date_registered'] = 'Date Registered';
 
-$txt['recent_view'] = 'View the most recent posts on the forum.';
+$txt['recent_view'] = 'View all recent posts.';
 $txt['recent_updated'] = 'is the most recently updated topic';
 $txt['is_recent_updated'] = '%1$s is the most recently updated topic';
 
@@ -297,7 +339,6 @@ $txt['participation_caption'] = 'Topic you have posted in';
 $txt['go_caps'] = 'GO';
 
 $txt['print'] = 'Print';
-$txt['profile'] = 'Profile';
 $txt['topic_summary'] = 'Topic Summary';
 $txt['not_applicable'] = 'N/A';
 $txt['message_lowercase'] = 'message'; //Deprecated
@@ -449,7 +490,7 @@ $txt['code'] = 'Code';
 $txt['code_select'] = '[Select]';
 $txt['quote_from'] = 'Quote from';
 $txt['quote'] = 'Quote';
-$txt['quote_new'] = 'Quote to new topic';
+$txt['quote_new'] = 'New topic';
 $txt['follow_ups'] = 'Follow-ups';
 $txt['topic_derived_from'] = 'Topic derived from %1$s';
 $txt['fulledit'] = 'Full&nbsp;edit';
@@ -491,7 +532,7 @@ $txt['status'] = 'Status';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="License" target="_blank" class="new_win">Elkarte &copy; 2013</a>';
+$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="License" target="_blank" class="new_win">ElkArte &copy; 2013</a>';
 
 $txt['birthdays'] = 'Birthdays:';
 $txt['events'] = 'Events:';
@@ -640,7 +681,7 @@ $txt['liked_you'] = 'You';
 $txt['liked_more'] = 'more';
 
 $txt['unread_topics_visit'] = 'Recent Unread Topics';
-$txt['unread_topics_visit_none'] = 'No unread topics found since your last visit.  <a href="' . $scripturl . '?action=unread;all">Click here to try all unread topics</a>.';
+$txt['unread_topics_visit_none'] = 'No unread topics found since your last visit. <a href="' . $scripturl . '?action=unread;all" class="linkbutton">Click here to try all unread topics</a>';
 $txt['unread_topics_all'] = 'All Unread Topics';
 $txt['unread_replies'] = 'Updated Topics';
 
@@ -763,10 +804,6 @@ $txt['split_reset_selection'] = 'reset selection';
 $txt['modify_cancel'] = 'Cancel';
 $txt['mark_read_short'] = 'Mark Read';
 
-$txt['pm_short'] = 'My Messages';
-$txt['pm_menu_read'] = 'Read your messages';
-$txt['pm_menu_send'] = 'Send a message';
-
 $txt['hello_member_ndt'] = 'Hello';
 
 $txt['unapproved_posts'] = 'Unapproved Posts (Topics: %1$d, Posts: %2$d)';
@@ -775,7 +812,6 @@ $txt['ajax_in_progress'] = 'Loading...';
 
 $txt['mod_reports_waiting'] = 'There are currently %1$d moderator reports open.';
 
-$txt['view_unread_category'] = 'Unread Posts';
 $txt['new_posts_in_category'] = 'Click to see the new posts in %1$s';
 $txt['verification'] = 'Verification';
 $txt['visual_verification_description'] = 'Type the letters shown in the picture';
@@ -783,20 +819,6 @@ $txt['visual_verification_sound'] = 'Listen to the letters';
 $txt['visual_verification_request_new'] = 'Request another image';
 
 // Sub menu labels
-$txt['summary'] = 'Summary';
-$txt['account'] = 'Account Settings';
-$txt['theme'] = 'Look and Layout';
-$txt['forumprofile'] = 'Forum Profile';
-
-$txt['modSettings_title'] = 'Features and Options';
-$txt['package'] = 'Package Manager';
-$txt['errlog'] = 'Error Log';
-$txt['edit_permissions'] = 'Permissions';
-$txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
-$txt['mc_emailerror'] = 'Unapproved Emails';
-$txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
-$txt['mc_reported_posts'] = 'Reported Posts';
-$txt['modlog_view'] = 'Moderation Log';
 $txt['calendar_menu'] = 'View Calendar';
 
 // @todo Send email strings - should move?

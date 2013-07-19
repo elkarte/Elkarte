@@ -15,19 +15,31 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
-class Karma_Controller
+class Karma_Controller extends Action_Controller
 {
 	/**
- 	* Modify a user's karma.
- 	* It redirects back to the referrer afterward, whether by javascript or the passed parameters.
- 	* Requires the karma_edit permission, and that the user isn't a guest.
- 	* It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
- 	* It is accessed via ?action=karma, sa=smite or sa=applaud.
+	 * Default entry point, in case action methods aren't directly
+	 * called. Simply forward to applaud.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Applauds for us :P
+		$this->action_applaud();
+	}
+
+	/**
+ 	 * Modify a user's karma.
+ 	 * It redirects back to the referrer afterward, whether by javascript or the passed parameters.
+ 	 * Requires the karma_edit permission, and that the user isn't a guest.
+ 	 * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
+ 	 * It is accessed via ?action=karma, sa=smite or sa=applaud.
  	*/
-	function action_applaud()
+	public function action_applaud()
 	{
 		global $user_info;
 
@@ -41,7 +53,10 @@ class Karma_Controller
 		redirect_karma();
 	}
 
-	function action_smite()
+	/**
+	 * Smite a user.
+	 */
+	public function action_smite()
 	{
 		global $user_info;
 
@@ -127,8 +142,8 @@ function redirect_karma()
 	// JavaScript as a last resort.
 	else
 	{
-		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', $context['right_to_left'] ? ' dir="rtl"' : '', '>
+		echo '<!DOCTYPE html>
+<html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<title>...</title>
 		<script type="text/javascript"><!-- // --><![CDATA[

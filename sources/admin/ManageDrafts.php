@@ -8,14 +8,14 @@
  * @version 1.0 Alpha
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Drafts administration controller.
  * This class allows to modify admin drafts settings for the forum.
  */
-class ManageDrafts_Controller
+class ManageDrafts_Controller extends Action_Controller
 {
 	/**
 	 * Drafts settings form

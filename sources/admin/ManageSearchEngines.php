@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -25,7 +25,7 @@ if (!defined('ELKARTE'))
  * This class handles all search engines pages in admin panel,
  *  forwards to display and allows to change options.
  */
-class ManageSearchEngines_Controller
+class ManageSearchEngines_Controller extends Action_Controller
 {
 	/**
 	 * Search engines settings form
@@ -35,6 +35,8 @@ class ManageSearchEngines_Controller
 
 	/**
  	* Entry point for this section.
+ 	*
+ 	* @see Action_Controller::action_index()
  	*/
 	function action_index()
 	{
@@ -281,10 +283,10 @@ class ManageSearchEngines_Controller
 			'base_href' => $scripturl . '?action=admin;area=sengines;sa=spiders',
 			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => 'list_getSpiders',
+				'function' => array($this, 'list_getSpiders'),
 			),
 			'get_count' => array(
-				'function' => 'list_getNumSpiders',
+				'function' => array($this, 'list_getNumSpiders'),
 			),
 			'no_items_label' => $txt['spiders_no_entries'],
 			'columns' => array(
@@ -517,10 +519,10 @@ class ManageSearchEngines_Controller
 			'base_href' => $context['admin_area'] == 'sengines' ? $scripturl . '?action=admin;area=sengines;sa=logs' : $scripturl . '?action=admin;area=logs;sa=spiderlog',
 			'default_sort_col' => 'log_time',
 			'get_items' => array(
-				'function' => 'list_getSpiderLogs',
+				'function' => array($this, 'list_getSpiderLogs'),
 			),
 			'get_count' => array(
-				'function' => 'list_getNumSpiderLogs',
+				'function' => array($this, 'list_getNumSpiderLogs'),
 			),
 			'columns' => array(
 				'name' => array(
@@ -720,10 +722,10 @@ class ManageSearchEngines_Controller
 			'base_href' => $scripturl . '?action=admin;area=sengines;sa=stats',
 			'default_sort_col' => 'stat_date',
 			'get_items' => array(
-				'function' => 'list_getSpiderStats',
+				'function' => array($this, 'list_getSpiderStats'),
 			),
 			'get_count' => array(
-				'function' => 'list_getNumSpiderStats',
+				'function' => array($this, 'list_getNumSpiderStats'),
 			),
 			'no_items_label' => $txt['spider_stats_no_entries'],
 			'columns' => array(
@@ -784,151 +786,80 @@ class ManageSearchEngines_Controller
 
 		$context['sub_template'] = 'show_spider_stats';
 	}
-}
 
-/**
- * Callback function for createList()
- * @param int $start
- * @param int $items_per_page
- * @param string sort
- */
-function list_getSpiders($start, $items_per_page, $sort)
-{
-	$db = database();
+	/**
+	 * Callback function for createList()
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string sort
+	 * @return array
+	 */
+	function list_getSpiders($start, $items_per_page, $sort)
+	{
+		// retrieve spiders within these limits
+		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		return getSpiders($start, $items_per_page, $sort);
+	}
 
-	$request = $db->query('', '
-		SELECT id_spider, spider_name, user_agent, ip_info
-		FROM {db_prefix}spiders
-		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
-		array(
-		)
-	);
-	$spiders = array();
-	while ($row = $db->fetch_assoc($request))
-		$spiders[$row['id_spider']] = $row;
-	$db->free_result($request);
+	/**
+	 * Callback function for createList()
+	 *
+	 * @return int
+	 */
+	function list_getNumSpiders()
+	{
+		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		return getNumSpiders();
+	}
 
-	return $spiders;
-}
+	/**
+	 * Callback function for createList()
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 * @return array
+	 */
+	function list_getSpiderLogs($start, $items_per_page, $sort)
+	{
+		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		return getSpiderLogs($start, $items_per_page, $sort);
+	}
 
-/**
- * Callback function for createList()
- * @return int
- */
-function list_getNumSpiders()
-{
-	$db = database();
+	/**
+	 * Callback function for createList()
+	 *
+	 * @return int
+	 */
+	function list_getNumSpiderLogs()
+	{
+		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		return getNumSpiderLogs();
+	}
 
-	$request = $db->query('', '
-		SELECT COUNT(*) AS num_spiders
-		FROM {db_prefix}spiders',
-		array(
-		)
-	);
-	list ($numSpiders) = $db->fetch_row($request);
-	$db->free_result($request);
+	/**
+	 * Callback function for createList()
+	 *
+	 * @param type $start
+	 * @param type $items_per_page
+	 * @param type $sort
+	 * @return array
+	 */
+	function list_getSpiderStats($start, $items_per_page, $sort)
+	{
+		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		return getSpiderStats($start, $items_per_page, $sort);
+	}
 
-	return $numSpiders;
-}
-
-/**
- * Callback function for createList()
- *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @return array
- */
-function list_getSpiderLogs($start, $items_per_page, $sort)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT sl.id_spider, sl.url, sl.log_time, s.spider_name
-		FROM {db_prefix}log_spider_hits AS sl
-			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = sl.id_spider)
-		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
-		array(
-		)
-	);
-	$spider_logs = array();
-	while ($row = $db->fetch_assoc($request))
-		$spider_logs[] = $row;
-	$db->free_result($request);
-
-	return $spider_logs;
-}
-
-/**
- * Callback function for createList()
- * @return int
- */
-function list_getNumSpiderLogs()
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*) AS num_logs
-		FROM {db_prefix}log_spider_hits',
-		array(
-		)
-	);
-	list ($numLogs) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $numLogs;
-}
-
-/**
- * Callback function for createList()
- * Get a list of spider stats from the log_spider table
- *
- * @param type $start
- * @param type $items_per_page
- * @param type $sort
- * @return array
- */
-function list_getSpiderStats($start, $items_per_page, $sort)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT ss.id_spider, ss.stat_date, ss.page_hits, s.spider_name
-		FROM {db_prefix}log_spider_stats AS ss
-			INNER JOIN {db_prefix}spiders AS s ON (s.id_spider = ss.id_spider)
-		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
-		array(
-		)
-	);
-	$spider_stats = array();
-	while ($row = $db->fetch_assoc($request))
-		$spider_stats[] = $row;
-	$db->free_result($request);
-
-	return $spider_stats;
-}
-
-/**
- * Callback function for createList()
- * Get the number of spider stat rows from the log spicer stats table
- *
- * @return int
- */
-function list_getNumSpiderStats()
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*) AS num_stats
-		FROM {db_prefix}log_spider_stats',
-		array(
-		)
-	);
-	list ($numStats) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $numStats;
+	/**
+	 * Callback function for createList()
+	 *
+	 * @return int
+	 */
+	function list_getNumSpiderStats()
+	{
+		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		return getNumSpiderStats();
+	}
 }

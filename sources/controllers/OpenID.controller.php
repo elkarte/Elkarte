@@ -13,14 +13,25 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * OpenID controller.
  */
-class OpenID_Controller
+class OpenID_Controller extends Action_Controller
 {
+	/**
+	 * Forward to the right action.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// we only know one thing and know it well :P
+		$this->action_openidreturn();
+	}
+
 	/**
 	 * Callback action handler for OpenID
 	 */

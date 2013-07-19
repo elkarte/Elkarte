@@ -6,10 +6,10 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
- * 
+ *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -17,8 +17,19 @@ if (!defined('ELKARTE'))
  * This class handles requests that allow for the saving,
  * retrieving, deleting and settings for the drafts functionality.
  */
-class Draft_Controller
+class Draft_Controller extends Action_Controller
 {
+	/**
+	 * Default method, just forwards, if we ever get here.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Where do you want to go today? :P
+		$this->action_showProfileDrafts();
+	}
+
 	/**
 	 * This method is executed before any action handler.
 	 * Loads language, common needed stuffs.
@@ -165,7 +176,7 @@ class Draft_Controller
 			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
 			fatal_lang_error('no_access', false);
 
-		// set up what we will need
+		// Set up what we will need
 		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
 
 		// If just deleting a draft, do it and then redirect back.
@@ -178,7 +189,7 @@ class Draft_Controller
 			redirectexit('action=pm;sa=showpmdrafts;start=' . $context['start']);
 		}
 
-		// perhaps a draft was selected for editing? if so pass this off
+		// Perhaps a draft was selected for editing? if so pass this off
 		if (!empty($_REQUEST['id_draft']) && !empty($context['drafts_pm_save']))
 		{
 			checkSession('get');
@@ -186,7 +197,7 @@ class Draft_Controller
 			redirectexit('action=pm;sa=send;id_draft=' . $id_draft);
 		}
 
-		// init
+		// Init
 		$user_drafts = array();
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
@@ -210,7 +221,7 @@ class Draft_Controller
 			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
 		}
 
-		// go get em'
+		// Go get em'
 		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
 		$limit = $start . ', ' . $maxIndex;
 		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
@@ -266,11 +277,11 @@ class Draft_Controller
 			);
 		}
 
-		// if the drafts were retrieved in reverse order, then put them in the right order again.
+		// If the drafts were retrieved in reverse order, then put them in the right order again.
 		if ($reverse)
 			$context['drafts'] = array_reverse($context['drafts'], true);
 
-		// off to the template we go
+		// Off to the template we go
 		$context['page_title'] = $txt['drafts'];
 		$context['sub_template'] = 'showPMDrafts';
 		$context['linktree'][] = array(

@@ -166,8 +166,8 @@ function initialize_inputs()
 		session_start();
 
 		if (!headers_sent())
-			echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+			echo '<!DOCTYPE html>
+<html>
 	<head>
 		<title>', htmlspecialchars($_GET['pass_string']), '</title>
 	</head>
@@ -239,8 +239,8 @@ function load_lang_file()
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 		header('Cache-Control: no-cache');
 
-		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+		echo '<!DOCTYPE html>
+<html>
 	<head>
 		<title>Installer: Error!</title>
 	</head>
@@ -296,8 +296,8 @@ function load_database()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
-	if (!defined('ELKARTE'))
-		define('ELKARTE', 1);
+	if (!defined('ELK'))
+		define('ELK', 1);
 
 	$modSettings['disableQueryCheck'] = true;
 
@@ -736,7 +736,7 @@ function action_databaseSettings()
 			'db_server' => $_POST['db_server'],
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
-			'cookiename' => 'ELKARTECookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
+			'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
 		);
 
 		// God I hope it saved!
@@ -760,7 +760,7 @@ function action_databaseSettings()
 		}
 
 		// Now include it for database functions!
-		define('ELKARTE', 1);
+		define('ELK', 1);
 		$modSettings['disableQueryCheck'] = true;
 
 		require_once(SOURCEDIR . '/database/Database.subs.php');
@@ -1911,7 +1911,7 @@ function updateDbLastError()
 
 /**
  * Create an .htaccess file to prevent mod_security.
- * Elkarte has filtering built-in.
+ * ElkArte has filtering built-in.
  */
 function fixModSecurity()
 {
@@ -2001,8 +2001,8 @@ function template_install_above()
 {
 	global $incontext, $txt, $oursite, $installurl;
 
-	echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"', !empty($txt['lang_rtl']) ? ' dir="rtl"' : '', '>
+	echo '<!DOCTYPE html>
+<html ', !empty($txt['lang_rtl']) ? 'dir="rtl"' : '', '>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
@@ -2015,7 +2015,7 @@ function template_install_above()
 		<div id="header">
 			<div class="frame">
 				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="themes/default/images/logo.png" alt="Elkarte Community" title="Elkarte Community" />
+				<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
 		<div id="wrapper">
@@ -2104,7 +2104,7 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul>
-					<li class="copyright"><a href="http://www.elkarte.net/" title="Elkarte Community" target="_blank" class="new_win">Elkarte &copy; 2012, Elkarte Community</a></li>
+					<li class="copyright"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012, ElkArte Community</a></li>
 				</ul>
 			</div>
 		</div>
@@ -2113,7 +2113,7 @@ function template_install_below()
 }
 
 /**
- * Welcome them to the wonderful world of Elkarte!
+ * Welcome them to the wonderful world of ElkArte!
  */
 function template_welcome_message()
 {
@@ -2151,7 +2151,7 @@ function template_welcome_message()
 				if (!(\'ourVersion\' in window))
 					return;
 
-				window.ourVersion = window.ourVersion.replace(/ELKARTE\s?/g, \'\');
+				window.ourVersion = window.ourVersion.replace(/ElkArte\s?/g, \'\');
 
 				ourVer = document.getElementById("ourVersion");
 				yourVer = document.getElementById("yourVersion");
@@ -2340,7 +2340,7 @@ function template_database_settings()
 			</tr>
 		</table>';
 
-	// Allow the toggling of input boxes for SQLite etc.
+	// Allow the toggling of input boxes for Postgresql
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		function validatePgsql()

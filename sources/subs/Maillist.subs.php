@@ -10,7 +10,7 @@
  * All of the helper functions for use by the maillist controller
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**

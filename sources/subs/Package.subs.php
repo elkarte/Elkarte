@@ -20,7 +20,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -1039,7 +1039,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	// We haven't found the package script yet...
 	$script = false;
-	$the_version = strtr($forum_version, array('ELKARTE ' => ''));
+	$the_version = strtr($forum_version, array('ElkArte ' => ''));
 
 	// Emulation support...
 	if (!empty($_SESSION['version_emulate']))
@@ -1482,12 +1482,12 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	if ($reset)
 		$near_version = 0;
 
-	// Normalize the $versions while we remove our previous Doh!
-	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
+	// Normalize the $versions
+	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
 	list($the_brand,) = explode(' ', $forum_version, 2);
-	if ($the_brand = 'ELKARTE')
+	if ($the_brand == 'ElkArte')
 		$the_version = '1' . $the_version;
 
 	// Loop through each version, save the highest we can find
@@ -1497,9 +1497,9 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 		if (strpos($for, '*') !== false)
 			$for = str_replace('*', '0dev0', $for) . '-' . str_replace('*', '999', $for);
 
-		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 2.0 vs 2.0.99
+		// If we have a range, grab the lower value, done this way so it looks normal-er to the user e.g. 1.0 vs 1.0.99
 		if (strpos($for, '-') !== false)
-			list ($for, $higher) = explode('-', $for);
+			list ($for,) = explode('-', $for);
 
 		// Do the compare, if the for is greater, than what we have but not greater than what we are running .....
 		if (compareVersions($near_version, $for) === -1 && compareVersions($for, $the_version) !== 1)
@@ -1521,9 +1521,9 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
  */
 function matchPackageVersion($version, $versions)
 {
-	// Make sure everything is lowercase and clean of spaces and unpleasant history.
-	$version = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
-	$versions = explode(',', str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($versions)));
+	// Make sure everything is lowercase and clean of spaces.
+	$version = str_replace(' ', '', strtolower($version));
+	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// Perhaps we do accept anything?
 	if (in_array('all', $versions))
@@ -1571,7 +1571,7 @@ function compareVersions($version1, $version2)
 	foreach (array(1 => $version1, $version2) as $id => $version)
 	{
 		// Clean the version and extract the version parts.
-		$clean = str_replace(array(' ', '2.0rc1-1'), array('', '2.0rc1.1'), strtolower($version));
+		$clean = str_replace(' ', '', strtolower($version));
 		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)~', $clean, $parts);
 
 		// Build an array of parts.
@@ -3117,7 +3117,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		{
 			fwrite($fp, 'GET ' . ($match[6] !== '/' ? str_replace(' ', '%20', $match[6]) : '') . ' HTTP/1.0' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/ELKARTE' . "\r\n");
+			fwrite($fp, 'User-Agent: PHP/ELK' . "\r\n");
 			if ($keep_alive)
 				fwrite($fp, 'Connection: Keep-Alive' . "\r\n\r\n");
 			else
@@ -3127,7 +3127,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		{
 			fwrite($fp, 'POST ' . ($match[6] !== '/' ? $match[6] : '') . ' HTTP/1.0' . "\r\n");
 			fwrite($fp, 'Host: ' . $match[3] . (empty($match[5]) ? ($match[2] ? ':443' : '') : ':' . $match[5]) . "\r\n");
-			fwrite($fp, 'User-Agent: PHP/ELKARTE' . "\r\n");
+			fwrite($fp, 'User-Agent: PHP/ELK' . "\r\n");
 			if ($keep_alive)
 				fwrite($fp, 'Connection: Keep-Alive' . "\r\n");
 			else
@@ -3220,11 +3220,11 @@ function isPackageInstalled($id)
 	$db = database();
 
 	$result = array(
-		'package_id' => '',
-		'install_state' => '',
-		'old_themes' => '',
-		'old_version' => '',
-		'db_changes' => ''
+		'package_id' => null,
+		'install_state' => null,
+		'old_themes' => null,
+		'old_version' => null,
+		'db_changes' => null
 	);
 
 	if (empty($id))
@@ -3291,8 +3291,9 @@ function setPackageState($id)
 /**
  * Checks if a package is installed, and if so returns its version level
  *
+ * @param string $id
  */
-function checkPackageDependency()
+function checkPackageDependency($id)
 {
 	$db = database();
 
@@ -3307,7 +3308,7 @@ function checkPackageDependency()
 		LIMIT 1',
 		array(
 			'not_installed' => 0,
-			'current_package' => $action['id'],
+			'current_package' => $id,
 		)
 	);
 	while ($row = $db->fetch_row($request));

@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -27,7 +27,7 @@ if (!defined('ELKARTE'))
 
 function createList($listOptions)
 {
-	global $context, $settings, $options, $txt, $modSettings, $scripturl;
+	global $context;
 
 	assert(isset($listOptions['id']));
 	assert(isset($listOptions['columns']));

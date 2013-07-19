@@ -15,14 +15,14 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
  * ManageSecurity controller handles the Security and Moderation
  * pages in admin panel.
  */
-class ManageSecurity_Controller
+class ManageSecurity_Controller extends Action_Controller
 {
 	/**
 	 * Bad Behavior settings form.
@@ -50,6 +50,8 @@ class ManageSecurity_Controller
 
 	/**
 	 * This function passes control through to the relevant security tab.
+	 *
+	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
@@ -61,14 +63,10 @@ class ManageSecurity_Controller
 			'general' => array($this, 'action_securitySettings_display'),
 			'spam' => array($this, 'action_spamSettings_display'),
 			'badbehavior' => array($this, 'action_bbSettings_display'),
-			'moderation' => array($this, 'action_moderationSettings_display'),
+			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => in_array('w', $context['admin_features'])),
 		);
 
 		call_integration_hook('integrate_modify_security', array(&$subActions));
-
-		// If Warning System is disabled don't show the setting page
-		if (!in_array('w', $context['admin_features']))
-			unset($subActions['moderation']);
 
 		// @FIXME
 		// loadGeneralSettingParameters($subActions, 'general');
@@ -90,7 +88,7 @@ class ManageSecurity_Controller
 
 		// Set up action stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'general');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -173,6 +171,8 @@ class ManageSecurity_Controller
 				array('check', 'enableErrorLogging'),
 				array('check', 'enableErrorQueryLogging'),
 			'',
+				array('int', 'admin_session_lifetime'),
+				array('check', 'auto_admin_session'),
 				array('check', 'securityDisable'),
 				array('check', 'securityDisable_moderate'),
 			'',
@@ -499,7 +499,7 @@ class ManageSecurity_Controller
 
 		// instantiate the form
 		$this->_bbSettings = new Settings_Form();
-		
+
 		// See if they supplied a valid looking http:BL API Key
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 
@@ -683,7 +683,7 @@ class ManageSecurity_Controller
 	public function bbSettings()
 	{
 		global $txt, $context, $modSettings;
-		
+
 		// See if they supplied a valid looking http:BL API Key
 		$context['invalid_badbehavior_httpbl_key'] = (!empty($modSettings['badbehavior_httpbl_key']) && (strlen($modSettings['badbehavior_httpbl_key']) !== 12 || !ctype_lower($modSettings['badbehavior_httpbl_key'])));
 

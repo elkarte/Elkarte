@@ -179,10 +179,10 @@ function template_main()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		window.smfForum_scripturl = smf_scripturl;
-		window.smfForum_sessionid = smf_session_id;
-		window.smfForum_sessionvar = smf_session_var;
-		window.smfThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
+		window.elkForum_scripturl = elk_scripturl;
+		window.elkForum_sessionid = elk_session_id;
+		window.elkForum_sessionvar = elk_session_var;
+		window.elkThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
 	// ]]></script>';
 
 	if (empty($modSettings['disable_elk_js']))
@@ -192,7 +192,7 @@ function template_main()
 	echo '
 		<script><!-- // --><![CDATA[
 			var tempOldOnload;
-			smfSetLatestThemes();
+			elkSetLatestThemes();
 		// ]]></script>';
 }
 
@@ -224,8 +224,8 @@ function template_list_themes()
 		echo '
 			<div class="title_bar">
 				<h3 class="titlebg">
-					<span class="floatleft"><strong><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list">', $theme['name'], '</a></strong>', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '', '</span>';
-
+					', $theme['name'], '', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '';
+ 
 			// You *cannot* delete the default theme. It's important!
 			if ($theme['id'] != 1)
 				echo '
@@ -237,6 +237,7 @@ function template_list_themes()
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings themes_list">
+						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
 						<dt>', $txt['themeadmin_list_theme_dir'], ':</dt>
 						<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
 						<dt>', $txt['themeadmin_list_theme_url'], ':</dt>
@@ -273,7 +274,51 @@ function template_list_themes()
 					<input type="hidden" name="', $context['admin-tl_token_var'], '" value="', $context['admin-tl_token'], '" />
 				</div>
 			</div>
+			<script><!-- // --><![CDATA[
+				$(document).ready(function () {
+					$(".delete_theme").bind("click", function (event) {
+						event.preventDefault();
+						var theme_id = $(this).data("theme_id"),
+							base_url = $(this).attr("href"),
+							pattern = new RegExp(elk_session_var + "=" + elk_session_id + ";(.*)$");
+						var tokens = pattern.exec(base_url)[1].split("=");
+						var token = tokens[1],
+							token_var = tokens[0];
 
+						if (confirm(\'', $txt['theme_remove_confirm'], '\'))
+						{
+							$.ajax({
+								type: "GET",
+								url: base_url + ";api;xml",
+								success: function(request){
+									if ($(request).find("error").length == 0)
+									{
+										var new_token = $(request).find("token").text(),
+											new_token_var = $(request).find("token_var").text();
+										$("#theme_" + theme_id).slideToggle("fals", function () {
+											$(this).remove();
+										});
+
+										$(".delete_theme").each(function () {
+											var a1 = $(this).attr("href");
+											$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
+										});
+									}
+									// @todo improve error handling
+									else
+									{
+										alert($(request).find("text").text());
+										window.location = base_url;
+									}
+								},
+								error: function(request){
+									window.location = base_url;
+								}
+							});
+						}
+					});
+				});
+			// ]]></script>
 		</form>
 	</div>';
 }
@@ -467,7 +512,7 @@ function template_set_settings()
 							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;filename=index.template.php">', $txt['theme_edit_index'], '</a>
 						</li>
 						<li>
-							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit;directory=css">', $txt['theme_edit_style'], '</a>
+							<a href="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse;directory=css">', $txt['theme_edit_style'], '</a>
 						</li>
 					</ul>
 				</div>
@@ -556,7 +601,7 @@ function template_set_settings()
 			</div>
 			<div class="windowbg">
 				<div class="content">
-					<dl class="settings flow_auto">';
+					<dl class="settings">';
 
 	foreach ($context['settings'] as $setting)
 	{
@@ -565,8 +610,8 @@ function template_set_settings()
 		{
 			echo '
 					</dl>
-					<hr class="hrcolor" />
-					<dl class="settings flow_auto">';
+					<hr />
+					<dl class="settings">';
 		}
 		// A checkbox?
 		elseif ($setting['type'] == 'checkbox')
@@ -682,7 +727,7 @@ function template_pick()
 			</div>
 			<div class="', $theme['selected'] ? 'windowbg' : 'windowbg2', '">
 				<div class="flow_hidden content">
-					<div class="floatright"><a href="', $scripturl, '?action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '"><img src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" class="padding" /></a></div>
+					<div class="floatright"><a href="', $scripturl, '?action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '"><img src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" /></a></div>
 					<p>', $theme['description'], '</p>';
 
 		if (!empty($theme['variants']))
@@ -725,8 +770,8 @@ function template_pick()
 		{
 			echo '
 			<script><!-- // --><![CDATA[
-			var sBaseUseUrl', $theme['id'], ' = smf_prepareScriptUrl(smf_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
-			var sBasePreviewUrl', $theme['id'], ' = smf_prepareScriptUrl(smf_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
+			var sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
+			var sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\';
 			var oThumbnails', $theme['id'], ' = {';
 
 			// All the variant thumbnails.
@@ -786,7 +831,7 @@ function template_installed()
 /**
  * Interface to edit a list.
  */
-function template_edit_list()
+function template_themelist()
 {
 	global $context, $scripturl, $txt;
 
@@ -806,15 +851,15 @@ function template_edit_list()
 		echo '
 		<div class="title_bar">
 			<h3 class="titlebg">
-				<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit">', $theme['name'], '</a>', !empty($theme['version']) ? '
+				<a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $theme['name'], '</a>', !empty($theme['version']) ? '
 				<em>(' . $theme['version'] . ')</em>' : '', '
 			</h3>
 		</div>
 		<div class="windowbg', $alternate ? '' : '2','">
 			<div class="content">
 				<ul>
-					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=edit">', $txt['themeadmin_edit_browse'], '</a></li>', $theme['can_edit_style'] ? '
-					<li><a href="' . $scripturl . '?action=admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=edit;directory=css">' . $txt['themeadmin_edit_style'] . '</a></li>' : '', '
+					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=browse">', $txt['themeadmin_edit_browse'], '</a></li>', $theme['can_edit_style'] ? '
+					<li><a href="' . $scripturl . '?action=admin;area=theme;th=' . $theme['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=css">' . $txt['themeadmin_edit_style'] . '</a></li>' : '', '
 					<li><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=copy">', $txt['themeadmin_edit_copy_template'], '</a></li>
 				</ul>
 			</div>
@@ -874,7 +919,7 @@ function template_copy_template()
 /**
  * Interface to browse the files of a theme in admin panel.
  */
-function template_edit_browse()
+function template_browse()
 {
 	global $context, $txt;
 
@@ -882,10 +927,10 @@ function template_edit_browse()
 	<div id="admincenter">
 		<table class="table_grid tborder">
 		<thead>
-			<tr class="catbg">
-				<th class="lefttext first_th" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
+			<tr class="table_head">
+				<th class="lefttext" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
 				<th scope="col" style="width:35%">', $txt['themeadmin_edit_modified'], '</th>
-				<th class="last_th" scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
+				<th scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
 			</tr>
 		</thead>
 		<tbody>';
@@ -957,7 +1002,7 @@ function template_edit_style()
 
 						// Revert to the theme they actually use ;).
 						var tempImage = new Image();
-						tempImage.src = smf_prepareScriptUrl(smf_scripturl) + "action=admin;area=theme;sa=edit;theme=', $settings['theme_id'], ';preview;" + (new Date().getTime());
+						tempImage.src = elk_prepareScriptUrl(elk_scripturl) + "action=admin;area=theme;sa=edit;theme=', $settings['theme_id'], ';preview;" + (new Date().getTime());
 
 						refreshPreviewCache = null;
 						refreshPreview(false);
@@ -974,7 +1019,7 @@ function template_edit_style()
 				myDoc.open("GET", url + (url.indexOf("?") == -1 ? "?" : ";") + "theme=', $context['theme_id'], '" + anchor, true);
 				myDoc.send(null);
 			}
-			navigatePreview(smf_scripturl);
+			navigatePreview(elk_scripturl);
 
 			var refreshPreviewCache;
 			function refreshPreview(check)
@@ -986,7 +1031,7 @@ function template_edit_style()
 					return;
 				refreshPreviewCache = document.forms.stylesheetForm.entire_file.value;
 				// Replace the paths for images.
-				refreshPreviewCache = refreshPreviewCache.replace(/url\(\.\.\/images/gi, "url(" + smf_images_url);
+				refreshPreviewCache = refreshPreviewCache.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
 
 				// Try to do it without a complete reparse.
 				if (identical)
@@ -1021,7 +1066,7 @@ function template_edit_style()
 					var stylesheetMatch = new RegExp(\'<link rel="stylesheet"[^>]+href="[^"]+\' + editFilename + \'[^>]*>\');
 
 					// Replace the paths for images.
-					preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + smf_images_url);
+					preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
 					data = data.replace(stylesheetMatch, "<style type=\"text/css\" id=\"css_preview_sheet\">" + preview_sheet + "<" + "/style>");
 
 					frames["css_preview_box"].document.open();

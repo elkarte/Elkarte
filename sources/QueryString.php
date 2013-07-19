@@ -17,7 +17,7 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 /**
@@ -333,7 +333,7 @@ function JavaScriptEscape($string)
 		'<script' => '<scri\'+\'pt',
 		'<body>' => '<bo\'+\'dy>',
 		'<a href' => '<a hr\'+\'ef',
-		$scripturl => '\' + smf_scripturl + \'',
+		$scripturl => '\' + elk_scripturl + \'',
 	)) . '\'';
 }
 
