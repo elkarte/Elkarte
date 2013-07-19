@@ -1667,7 +1667,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Likely to need all the groups!
-		$context['groups'] = loadGroups($user_info['id'], allowedTo('manage_membergroups'));
+		$context['groups'] = accessibleGroups();
 
 		// Applying all rules?
 		if (isset($_GET['apply']))
