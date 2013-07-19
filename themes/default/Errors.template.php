@@ -32,14 +32,14 @@ function template_fatal_error()
 			</h3>
 		</div>
 		<div class="windowbg generic_list_wrapper">
-			<div ', $context['error_code'], 'class="padding">', $context['error_message'], '</div>
+			<div ', $context['error_code'], '>', $context['error_message'], '</div>
 		</div>
 	</div>';
 
 	// Show a back button (using javascript.)
 	echo '
 	<div class="centertext">
-		<a class="button_link" style="float:none" href="javascript:history.go(-1)">', $txt['back'], '</a>
+		<a class="linkbutton" href="javascript:history.go(-1)">', $txt['back'], '</a>
 	</div>';
 }
 
@@ -194,7 +194,7 @@ function template_show_file()
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
 	</head>
 	<body>
-		<table class="errorfile_table">';
+		<table id="errorfile_table" class="table_grid">';
 	foreach ($context['file_data']['contents'] as $index => $line)
 	{
 		$line_num = $index + $context['file_data']['min'];
@@ -222,17 +222,15 @@ function template_attachment_errors()
 				', $txt['attach_error_title'], '
 			</h3>
 		</div>
-		<div class="windowbg">
-			<div class="padding">';
+		<div class="windowbg">';
 
 	foreach ($context['attachment_error_keys'] as $key)
 		template_show_error($key);
 
 	echo
-				!empty($context['back_link']) ? ('<a class="button_link" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '',
-				'
-				<a class="button_link" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
-			</div>
+			!empty($context['back_link']) ? ('<a class="linkbutton" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '','
+			<a class="linkbutton" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
+
 		</div>
 	</div>';
 }

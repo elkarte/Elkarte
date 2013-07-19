@@ -69,14 +69,14 @@ function template_init()
 	// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
 	$settings['require_theme_strings'] = false;
 
-	// This is used for the color variants
+	// This is used for the color variants.
 	$settings['theme_variants'] = array('light', 'dark', 'basic', 'blue', 'red', 'green');
 
-	// Set the following variable to true is this theme wants to display the avatar of the user that posted the last post on the board index and message index
+	// If the following variable is set to true, the avatar of the last poster will be displayed on the board index and message index.
 	$settings['avatars_on_indexes'] = false;
 
-	// This bit of template is used by default in the main menu to create the number next to the title of the menu to indicate for example the number of unread messages
-	$settings['menu_numeric_notice'] = ' [<strong>%1$s</strong>]';
+	// This is used in the main menu, to create a number next to the title of the menu, to indicate unread messages, moderation reports, etc.
+	$settings['menu_numeric_notice'] = ' <span class="pm_indicator">%1$s</span>';
 
 	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
 	// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
@@ -190,14 +190,23 @@ function template_body_above()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	// Wrapper div now echoes permanently for better layout options. @todo - Skip nav link.
+	// Go to top/bottom of page links,and skipnav link for a11y. @todo - Skipnav should have proper text string.
 	echo '
-	<div id="top_section"><a id="top" href="#skipnav" title="Skip navigation"></a>
+	<a id="top" href="#skipnav">Skip navigation</a>
+	<a href="#top" id="gotop" title="', $txt['go_up'], '">&#8593;</a>
+	<a href="#bot" id="gobottom" title="', $txt['go_down'], '">&#8595;</a>';
+
+	// Skip nav link.
+	echo '
+	<div id="top_section">
 		<div class="wrapper">
-			<span id="top_section_notice">';
-	// For above, see me grumblez in Issue #552. ;)
+			<p id="top_section_notice">';
 
 	// If the user is logged in, display the time, or a maintenance warning for admins.
+	// @todo - TBH I always intended the time/date to be more or less a place holder for more important things.
+	// The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
+	// I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
+	// This could still be done via conditional, so that administration and moderation notices were still active when applicable.
 	if ($context['user']['is_logged'])
 	{
 		// Is the forum in maintenance mode?
@@ -212,13 +221,13 @@ function template_body_above()
 		echo sprintf($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest'], $txt['guest_title'], $scripturl . '?action=login');
 
 	echo '
-			</span>';
+			</p>';
 
 	if ($context['allow_search'])
 	{
 		echo '
 			<form id="search_form" action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8">
-				<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />&nbsp;';
+				<input type="text" name="search" value="" class="input_text" placeholder="', $txt['search'], '" />';
 
 		// Using the quick search dropdown?
 		if (!empty($modSettings['search_dropdown']))
@@ -232,7 +241,7 @@ function template_body_above()
 			// Can't limit it to a specific topic if we are not in one
 			if (!empty($context['current_topic']))
 				echo '
-					<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
+				<option value="topic"', ($selected == 'current_topic' ? ' selected="selected"' : ''), '>', $txt['search_thistopic'], '</option>';
 
 			// Can't limit it to a specific board if we are not in one
 			if (!empty($context['current_board']))
@@ -259,18 +268,14 @@ function template_body_above()
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
 		echo '
-				<input type="submit" name="search2" value="', $txt['search'], '" class="button_submit" />
+				<input type="submit" name="search2" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select':'', '" />
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 	}
 
 	echo '
 		</div>
-	</div>';
-
-	echo '
-	<div id="header"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
-		<div class="wrapper">
+		<div id="header" class="wrapper"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
 			<h1 class="forumtitle">
 				<a href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
 			</h1>';
@@ -278,51 +283,47 @@ function template_body_above()
 	echo '
 			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/'. $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="ElkArte Community" title="ElkArte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
+	// Show the menu here, according to the menu sub template.
 	echo'
+		</div>';
+
+	// WAI-ARIA a11y tweaks have been applied here.
+	echo '
+		<div id="menu_nav" class="wrapper" role="navigation">
+			', template_menu(), '
 		</div>
 	</div>
 	<div id="wrapper" class="wrapper">
-		<a href="#top" id="gotop" title="', $txt['go_up'], '">&#8593;</a>
-		<a href="#bot" id="gobottom" title="', $txt['go_down'], '">&#8595;</a>';
+		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
+			<div class="user">';
 
-	// Added top of page and bottom of page links there ^^ for use anywhere on any page.
-	// Show the menu here, according to the menu sub template. Moved this. Like it here.
-	// Upper section and main content markup simplified. Less divs = happier parrots!
-		template_menu();
-
-	echo '
-		<div id="upper_section">
-			<div id="inner_wrap"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
-				<div class="user">';
-	// For above, see me grumblez in Issue #552. ;)
-
-	// Otherwise they're a guest - this time ask them to either register or login - lazy bums...
+	// Show log in form to guests.
 	if (!empty($context['show_login_bar']))
 	{
 		echo '
-					<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
-					<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
-						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
-						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
-						<select name="cookielength">
-							<option value="60">', $txt['one_hour'], '</option>
-							<option value="1440">', $txt['one_day'], '</option>
-							<option value="10080">', $txt['one_week'], '</option>
-							<option value="43200">', $txt['one_month'], '</option>
-							<option value="-1" selected="selected">', $txt['forever'], '</option>
-						</select>
-						<input type="submit" value="', $txt['login'], '" class="button_submit" />
-						<div>', $txt['quick_login_dec'], '</div>';
+				<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
+				<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+					<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
+					<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
+					<select name="cookielength">
+						<option value="60">', $txt['one_hour'], '</option>
+						<option value="1440">', $txt['one_day'], '</option>
+						<option value="10080">', $txt['one_week'], '</option>
+						<option value="43200">', $txt['one_month'], '</option>
+						<option value="-1" selected="selected">', $txt['forever'], '</option>
+					</select>
+					<input type="submit" value="', $txt['login'], '" class="button_submit" />
+					<div>', $txt['quick_login_dec'], '</div>';
 
 		if (!empty($modSettings['enableOpenID']))
 			echo '
-						<br /><input type="text" name="openid_identifier" size="25" class="input_text openid_login" />';
+					<br /><input type="text" name="openid_identifier" size="25" class="input_text openid_login" />';
 
 		echo '
-						<input type="hidden" name="hash_passwrd" value="" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-					</form>';
+					<input type="hidden" name="hash_passwrd" value="" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+				</form>';
 	}
 
 	// If the user is logged in, display stuff like their name, new messages, etc.
@@ -330,42 +331,55 @@ function template_body_above()
 	{
 		if (!empty($context['user']['avatar']))
 			echo '
-					<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
+				<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
 		echo '
-					<ul>
-						<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
+				<ul>
+					<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
 
 		// Are there any members waiting for approval?
 		if (!empty($context['unapproved_members']))
 			echo '
-						<li>', $context['unapproved_members_text'], '</li>';
+					<li>', $context['unapproved_members_text'], '</li>';
 
 		if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
 			echo '
-						<li><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></li>';
+					<li><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></li>';
 
 		echo '
-					</ul>';
+				</ul>';
 	}
 
 	echo'
-				</div>';
-	// Show a random news item? (or you could pick one from news_lines...)
-	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
-		echo '
-				<div class="news">
-					<h2>', $txt['news'], ': </h2>
-					<p>', $context['random_news_line'], '</p>
-				</div>';
-
-	echo '
 			</div>';
 
-	// Show the navigation tree.
-	theme_linktree();
+	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
+	// News fader is nixed when upper section is collapsed, just to save running the javascript all the time when it is not wanted.
+	// Requires page refresh when upper section is expanded, to show the fader again. I think this is acceptable, but am open to suggestions.
+	if(!empty($context['random_news_line']))
+	{
+		if (!empty($settings['show_newsfader']) && empty($context['minmax_preferences']['upshrink']))
+		{
+			echo '
+			<div id="news">
+				<h2>', $txt['news'], '</h2>
+				', template_news_fader(), '
+			</div>';
+		}
+		elseif (empty($settings['show_newsfader']) && !empty($settings['enable_news']))
+		{
+			echo '
+			<div id="news">
+				<h2>', $txt['news'], '</h2>
+				<p id="news_line">', $context['random_news_line'], '</p>
+			</div>';
+		}
+	}
 
 	echo '
 		</div>';
+
+	// Show the navigation tree.
+		theme_linktree();
 
 	// The main content should go here. @todo - Skip nav link.
 	echo '
@@ -432,23 +446,15 @@ function theme_linktree($force_show = false)
 		return;
 
 	// @todo - Look at changing markup here slightly. Need to incorporate relevant aria roles.
-	// @todo - For a11y, probably best to split into two separate block level elements that can each have role="menubar".
 	echo '
 				<ul class="navigate_section">';
-
-	if ($context['user']['is_logged'])
-		echo '
-					<li class="unread_links">
-						<a href="', $scripturl, '?action=unread" title="', $txt['unread_since_visit'], '">', $txt['view_unread_category'], '</a>
-						<a href="', $scripturl, '?action=unreadreplies" title="', $txt['show_unread_replies'], '">', $txt['unread_replies'], '</a>
-					</li>';
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
 	// Added a linktree class to make targeting dividers easy.
 	foreach ($context['linktree'] as $link_num => $tree)
 	{
 		echo '
-					<li class="', ($link_num == count($context['linktree']) - 1) ? 'last' : 'linktree', '">';
+					<li class="linktree', ($link_num == count($context['linktree']) - 1) ? '_last' : '', '">';
 
 		// Dividers moved to pseudo-elements in CSS. @todo- rtl.css
 		// Show something before the link?
@@ -481,8 +487,13 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
-				<div id="menu_nav" role="navigation">
 					<ul id="main_menu">';
+
+	// The upshrink image, right-floated.
+	echo '
+						<li id="collapse_button" class="listlevel1 floatright">
+							<a class="linklevel1"><img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />&nbsp;</a>
+						</li>';
 
 	foreach ($context['menu_buttons'] as $act => $button)
 	{
@@ -530,15 +541,8 @@ function template_menu()
 						</li>';
 	}
 
-	// The upshrink image, right-floated.
 	echo '
-						<li id="collapse_button">
-							<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />
-						</li>';
-
-	echo '
-					</ul>
-				</div>';
+					</ul>';
 
 	// Define the upper_section toggle in JavaScript.
 	echo '
@@ -547,7 +551,7 @@ function template_menu()
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',
 						aSwappableContainers: [
-							\'inner_wrap\',\'header\'
+							\'upper_section\',\'header\'
 						],
 						aSwapImages: [
 							{
@@ -598,7 +602,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		// Kept for backward compatibility
 		if (!isset($value['test']) || !empty($context[$value['test']]))
 			$buttons[] = '
-								<li role="menuitem"><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
+								<li role="menuitem"><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="linklevel1 button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
 	}
 
 	// No buttons? No button strip either.
@@ -725,4 +729,29 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
 				$options['extra'], '
 			</div>';
 
+}
+
+/**
+ * This is the newsfader
+ */
+function template_news_fader()
+{
+	global $settings, $options, $txt, $context;
+
+	echo '
+		<ul id="elkFadeScroller">
+			<li>
+				', implode('</li><li>', $context['news_lines']), '
+			</li>
+		</ul>
+	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
+	<script><!-- // --><![CDATA[
+
+		// Create a news fader object.
+		var oNewsFader = new elk_NewsFader({
+			sFaderControlId: \'elkFadeScroller\',
+			sItemTemplate: ', JavaScriptEscape('%1$s'), ',
+			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
+		});
+	// ]]></script>';
 }

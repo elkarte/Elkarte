@@ -40,7 +40,7 @@ function template_admin()
 										<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
 									</h3>
 								</div>
-								<div class="windowbg nopadding">
+								<div class="windowbg">
 									<div class="content">
 										<div id="ourAnnouncements">', $txt['lfyi'], '</div>
 									</div>
@@ -55,7 +55,7 @@ function template_admin()
 										<a href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
 									</h3>
 								</div>
-								<div class="windowbg nopadding">
+								<div class="windowbg">
 									<div class="content">
 										<div id="version_details">
 											<strong>', $txt['support_versions'], ':</strong><br />
@@ -154,7 +154,7 @@ function template_admin()
 									</div>
 								</div>
 							'), ',
-							sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packages;pgdownload;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
+							sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
 						});
 					// ]]></script>';
@@ -335,14 +335,14 @@ function template_view_versions()
 						<div class="information">', $txt['version_check_desc'], '</div>
 							<table class="table_grid">
 								<thead>
-									<tr class="catbg lefttext">
-										<th class="first_th" scope="col" style="width:50%">
+									<tr class="table_head lefttext">
+										<th scope="col" style="width:50%">
 											<strong>', $txt['admin_elkfile'], '</strong>
 										</th>
 										<th scope="col" style="width:25%">
 											<strong>', $txt['dvc_your'], '</strong>
 										</th>
-										<th class="last_th" scope="col" style="width:25%">
+										<th scope="col" style="width:25%">
 											<strong>', $txt['dvc_current'], '</strong>
 										</th>
 									</tr>
@@ -755,7 +755,7 @@ function template_edit_censored()
 					<script><!-- // --><![CDATA[
 						document.getElementById("moreCensoredWords_link").style.display = "";
 					// ]]></script>
-					<hr class="hrcolor clear" style="width:100%; height:1px" />
+					<hr class="clear" />
 					<dl class="settings">
 						<dt>
 							<strong><label for="censorWholeWord_check">', $txt['censor_whole_words'], ':</label></strong>
@@ -1052,7 +1052,7 @@ function template_show_settings()
 			if ($config_var == '')
 				echo '
 					</dl>
-					<hr class="hrcolor clear" />
+					<hr class="clear" />
 					<dl class="settings">';
 			else
 				echo '
@@ -1303,14 +1303,14 @@ function template_repair_boards()
 				<p>
 					', $txt['errors_fix'], '
 				</p>
-				<p class="padding">
+				<p>
 					<strong><a href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
 				</p>';
 		}
 		else
 			echo '
 				<p>', $txt['maintain_no_errors'], '</p>
-				<p class="padding">
+				<p>
 					<a href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 				</p>';
 
@@ -1332,7 +1332,7 @@ function template_repair_boards()
 		{
 			echo '
 				<p>', $txt['errors_fixed'], '</p>
-				<p class="padding">
+				<p>
 					<a href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 				</p>';
 		}
@@ -1377,10 +1377,10 @@ function template_php_info()
 		echo '
 		<table id="', str_replace(' ', '_', $area), '" class="table_grid">
 			<thead>
-			<tr class="catbg">
-				<th class="first_th" scope="col" style="width:33%"></th>
-				<th scope="col" style="width:33%" class="centertext"><strong>', $area, '</strong></th>
-				<th class="last_th" scope="col" style="width:33%"></th>
+			<tr class="table_head three_column">
+				<th scope="col"></th>
+				<th scope="col"><strong>', $area, '</strong></th>
+				<th scope="col"></th>
 			</tr>
 			</thead>
 			<tbody>';
@@ -1399,21 +1399,21 @@ function template_php_info()
 					// heading row for the settings section of this categorys settings
 					echo '
 			<tr class="titlebg">
-				<td class="centertext" style="width:33%"><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
-				<td class="centertext" style="width:33%"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
-				<td class="centertext" style="width:33%"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
+				<td class="centertext"><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
+				<td class="centertext"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
+				<td class="centertext"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
 			</tr>';
 					$localmaster = false;
 				}
 
 				echo '
 			<tr>
-				<td style="width:33;" class="windowbg lefttext', $alternate ? '2' : '', '">', $key, '</td>';
+				<td class="windowbg', $alternate ? '2' : '', '">', $key, '</td>';
 
 				foreach ($setting as $key_lm => $value)
 				{
 					echo '
-				<td style="width:33%;" class="windowbg lefttext', $alternate ? '2' : '', '">', $value, '</td>';
+				<td class="windowbg', $alternate ? '2' : '', '">', $value, '</td>';
 				}
 				echo '
 			</tr>';
@@ -1423,8 +1423,8 @@ function template_php_info()
 			{
 				echo '
 			<tr>
-				<td style="width:33%" class="windowbg lefttext', $alternate ? '2' : '', '">', $key,  '</td>
-				<td class=" windowbg lefttext', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
+				<td class="windowbg', $alternate ? '2' : '', '">', $key,  '</td>
+				<td class=" windowbg', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
 			</tr>';
 			}
 
@@ -1466,25 +1466,23 @@ function template_clean_cache_button_below()
 
 /**
  * Admin quick search box.
- */
+ * @todo - See comments under https://github.com/elkarte/Elkarte/issues/617#issuecomment-20564476 */
 function template_admin_quick_search()
 {
 	global $context, $settings, $txt, $scripturl;
 
 	if ($context['user']['is_admin'])
 		echo '
-			<object id="quick_search">
-				<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" class="floatright">
-					<img class="icon" src="', $settings['images_url'] , '/filter.png" alt="" />
-					<input type="text" name="search_term" value="', $txt['admin_search'], '" onclick="if (this.value == \'', $txt['admin_search'], '\') this.value = \'\';" class="input_text" />
-					<select name="search_type">
-						<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
-						<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
-						<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
-					</select>
-					<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
-				</form>
-			</object>';
+			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" id="quick_search" class="floatright">
+				<img class="icon" src="', $settings['images_url'] , '/filter.png" alt="" />
+				<input type="text" name="search_term" value="', $txt['admin_search'], '" onclick="if (this.value == \'', $txt['admin_search'], '\') this.value = \'\';" class="input_text" />
+				<select name="search_type">
+					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
+					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
+					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
+				</select>
+				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
+			</form>';
 }
 
 /**

@@ -40,7 +40,7 @@ class AdminLog_Controller extends Action_Controller
 		$log_functions = array(
 			'errorlog' => array(
 				'file' => 'ManageErrors.php',
-				'function' => 'action_log',
+				'function' => 'action_index',
 				'controller' => 'ManageErrors_Controller'),
 			'adminlog' => array(
 				'file' => 'Modlog.php',
@@ -64,7 +64,7 @@ class AdminLog_Controller extends Action_Controller
 				'file' => 'ManageSearchEngines.php',
 				'function' => 'action_logs',
 				'controller' => 'ManageSearchEngines_Controller'),
-			'action_log' => array(
+			'tasklog' => array(
 				'file' => 'ManageScheduledTasks.php',
 				'function' => 'action_log',
 				'controller' => 'ManageScheduledTasks_Controller'),

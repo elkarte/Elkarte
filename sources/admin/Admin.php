@@ -110,10 +110,22 @@ class Admin_Controller extends Action_Controller
 						'class' => 'admin_img_packages',
 						'subsections' => array(
 							'browse' => array($txt['browse_packages']),
-							'packageget' => array($txt['download_packages'], 'url' => $scripturl . '?action=admin;area=packages;sa=packageget;get'),
 							'installed' => array($txt['installed_packages']),
 							'perms' => array($txt['package_file_perms']),
 							'options' => array($txt['package_settings']),
+						),
+					),
+					'packageservers' => array(
+						'label' => $txt['package_servers'],
+						'file' => 'PackageServers.php',
+						'controller' => 'PackageServers_Controller',
+						'function' => 'action_index',
+						'permission' => array('admin_forum'),
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_packages',
+						'subsections' => array(
+							'servers' => array($txt['download_packages']),
+							'upload' => array($txt['upload_packages']),
 						),
 					),
 					'search' => array(
@@ -1123,6 +1135,9 @@ class Admin_Controller extends Action_Controller
 			if (strpos($key, '-admin') !== false)
 				unset($_SESSION['token'][$key]);
 
-		redirectexit('action=admin');
+		if (isset($_GET['redir']) && isset($_SERVER['HTTP_REFERER']))
+			redirectexit($_SERVER['HTTP_REFERER']);
+		else
+			redirectexit();
 	}
 }

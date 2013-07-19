@@ -46,25 +46,25 @@ function template_main()
 			echo '
 					<ul class="quickbuttons">';
 
-		// If they *can* reply?
-		if ($post['can_reply'])
+		// How about... even... remove it entirely?!
+		if ($post['can_delete'])
 			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 reply_button"><span>', $txt['reply'], '</span></a></li>';
-
-		// If they *can* quote?
-		if ($post['can_quote'])
-			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button"><span>', $txt['quote'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';recent;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button">', $txt['remove'], '</a></li>';
 
 		// Can we request notification of topics?
 		if ($post['can_mark_notify'])
 			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 notify_button"><span>', $txt['notify'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=notify;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 notify_button">', $txt['notify'], '</a></li>';
 
-		// How about... even... remove it entirely?!
-		if ($post['can_delete'])
+		// If they *can* reply?
+		if ($post['can_reply'])
 			echo '
-						<li class="listlevel1"><a href="', $scripturl, '?action=deletemsg;msg=', $post['id'], ';topic=', $post['topic'], ';recent;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['remove_message'], '?\');" class="linklevel1 remove_button"><span>', $txt['remove'], '</span></a></li>';
+						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], '" class="linklevel1 reply_button">', $txt['reply'], '</a></li>';
+
+		// If they *can* quote?
+		if ($post['can_quote'])
+			echo '
+						<li class="listlevel1"><a href="', $scripturl, '?action=post;topic=', $post['topic'], '.', $post['start'], ';quote=', $post['id'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
 
 		if ($post['can_reply'] || $post['can_mark_notify'] || $post['can_delete'])
 			echo '
@@ -100,7 +100,6 @@ function template_unread()
 						<input type="hidden" name="qaction" value="markread" />
 						<input type="hidden" name="redirect_url" value="action=unread', (!empty($context['showing_all_topics']) ? ';all' : ''), $context['querystring_board_limits'], '" />';
 
-		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
 						<h2 class="category_header" id="unread_header">
 							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], ' 
@@ -150,7 +149,7 @@ function template_unread()
 			echo '
 										<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
 										<h4>
-											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(empty($settings['message_index_preview_first']) ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
 									<p class="topic_starter">
@@ -188,12 +187,6 @@ function template_unread()
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
-	}
-	else
-		echo '
-					<h2 class="category_header">
-						', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
-					</h2>';
 
 	echo '
 					<div id="topic_icons" class="description">
@@ -206,6 +199,18 @@ function template_unread()
 							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
 						</p>
 					</div>';
+	}
+	else
+		echo '
+					<div class="forum_category">
+						<h2 class="category_header">
+							', $txt['topic_alert_none'], '
+						</h2>
+						<div class="board_row centertext">
+							', $context['showing_all_topics'] ? '<strong>'. $txt['find_no_results']. '</strong>' : $txt['unread_topics_visit_none'], '
+						</div>
+					</div>';
+
 }
 
 /**
@@ -277,7 +282,7 @@ function template_replies()
 			echo '
 										<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
 										<h4>
-											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic[(empty($settings['message_index_preview_first']) ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
 									<p class="topic_starter">
@@ -315,12 +320,6 @@ function template_replies()
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
-	}
-	else
-		echo '
-					<h2 class="category_header">
-						', $context['showing_all_topics'] ? $txt['msg_alert_none'] : $txt['unread_topics_visit_none'], '
-					</h2>';
 
 	echo '
 					<div id="topic_icons" class="description">
@@ -332,5 +331,16 @@ function template_replies()
 							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
 							<img src="' . $settings['images_url'] . '/icons/quick_sticky.png" alt="" class="centericon" /> ' . $txt['sticky_topic'] . '<br />' : '') . '
 						</p>
+					</div>';
+	}
+	else
+		echo '
+					<div class="forum_category">
+						<h2 class="category_header">
+							', $txt['topic_alert_none'], '
+						</h2>
+						<div class="board_row centertext">
+							', $context['showing_all_topics'] ? '<strong>'. $txt['find_no_results']. '</strong>' : $txt['unread_topics_visit_none'], '
+						</div>
 					</div>';
 }

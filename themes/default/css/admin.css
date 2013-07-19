@@ -5,14 +5,6 @@
 /* Once I can see how it looks without the crud, I can decide what it really needs.
 /* Can be simplified quite a lot before production builds. */
 
-/* Re-style default cat bars to get rid of header bar mania. */
-#manage_maintenance .cat_bar .catbg, #manage_boards .cat_bar .catbg, #core_features .cat_bar .catbg,
-#support_credits .cat_bar .catbg, .generic_list_wrapper .cat_bar .catbg {
-	border: none;
-	border-top: 1px solid #fff;
-	text-shadow: none;
-}
-
 /* @todo - Special styling for admin descriptions. */
 .action_admin .generic_list_wrapper .information {
 	margin: 8px 0;
@@ -73,18 +65,6 @@ div.quick_tasks {
 }
 #mailqueue_stats .windowbg .content {
 	padding: 12px 9px 0 9px;
-}
-.action_admin .generic_list_wrapper .titlebg {
-	border-bottom: 1px solid #bbb;
-}
-#admin_form_wrapper h3.titlebg {
-	color: #666;
-	border-bottom: none;
-	padding: 8px 6px 5px 6px;
-}
-#view_group .titlebg {
-	border-top: 1px solid #fff;
-	border-bottom: none;
 }
 #view_group .table_grid {
 	margin: 4px 0 8px 0;
@@ -153,30 +133,17 @@ legend {
 /* Styles for the admin home screen.
 ------------------------------------------------------- */
 /* @todo - Admin quick search bar, and results page. */
-h3.catbg #quick_search form {
-	font-size: 0.9em;
+#quick_search {
+	font-size: 0.892em;
 }
-h3.catbg #quick_search form input, h3.catbg #quick_search form select, h3.catbg #quick_search form .button_submit {
-	margin: 0 3px;
-	padding: 3px;
-	border-radius: 4px;
-	border: 1px solid #777;
-	vertical-align: top;
+/* Chrome fix. */
+#quick_search .icon, #quick_search .input_text,
+#quick_search select, #quick_search .button_submit {
+	float: left;
+	margin: 2px 0 0 4px;
 }
-h3.catbg #quick_search form select {
-	font-size: 0.9em;
-	margin: 0;
-	padding: 2px;
-}
-h3.catbg #quick_search form select option {
-	padding: 2px 4px;
-}
-h3.catbg #quick_search form .button_submit {
-	font-weight: bold;
-	padding: 2px 6px 2px 6px;
-}
-h3.catbg #quick_search form .button_submit:hover {
-	background: #fff;
+#quick_search .icon {
+	margin: 8px 0 0 0;
 }
 
 /* @todo - The welcome thingy. */
@@ -650,25 +617,23 @@ dl.settings dd.questions input {
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
 #manage_maintenance .catbg {
-	border-top: 1px solid #fff;
-	padding-top: 14px;
-	color: #555;
+	border: none;
+	background: none;
 }
 #manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
 	background: none;
-	padding: 0 0 12px 0;
-	margin: 0;
+	padding: 0;
+	margin:  0 0 4px 0;
+	border-bottom: 1px solid #ccc;
+	box-shadow: 0 1px 0 #fff;
 }
-#manage_maintenance p {
-	margin: -5px 0 0 0;
-	padding: 0 0 10px 0;
-}
-#manage_maintenance p .button_submit{
-	margin: 10px 10px 0 10px;
+#manage_maintenance .button_submit{
+	margin: 4px 10px 10px 10px;
 }
 /* Stop the submit buttons running away on wide screens.*/
 #manage_maintenance form {
-	max-width: 80em;
+	max-width: 75em;
+	margin: 0 12px;
 }
 #manage_maintenance .settings {
 	margin: 16px 0 0 0;
@@ -1084,9 +1049,6 @@ ul.moderation_notes li {
 	}
 	.dropmenu li li a {
 		line-height: 3.2em;
-	}
-	#menu_toggle {
-		display: none;
 	}
 	h3.catbg #quick_search form {
 		margin: 0 0 8px 0;

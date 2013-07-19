@@ -284,8 +284,10 @@ function onDocSent(XMLDoc)
 				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 == 0 ? '2' : '') + ' core_posts"><div class="content" id="msg' + newPosts[i].getAttribute("id") + '"><div class="floatleft"><h5>' + txt_posted_by + ': ' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '</h5><span class="smalltext">&#171;&nbsp;<strong>' + txt_on + ':</strong> ' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + '&nbsp;&#187;</span> <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></div>';
 
 				if (can_quote)
-					newPostsHTML += '<ul class="smalltext quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="quote_button"><span>' + txt_bbc_quote + '</span></a></li></ul>';
+					newPostsHTML += '<ul class="quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="linklevel1 quote_button">' + txt_bbc_quote + '</a></li></ul>';
 
+				// Eh wot? Why is this here? That explains why I keep getting extra effing line breaks before quotes.
+				// Is this essential? Will something break if we remove it? Would be great to get rid of it if possible.
 				newPostsHTML += '<br class="clear" />';
 
 				if (ignoring)

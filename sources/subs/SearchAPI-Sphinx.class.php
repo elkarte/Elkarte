@@ -19,8 +19,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Sphinx.php, used when an Sphinx search daemon is used and access is via
- * Sphinx native search API (SphinxAPI)
+ * SearchAPI-Sphinx.class.php, Sphinx API, used when an Sphinx search daemon is running
+ * Access is via the Sphinx native search API (SphinxAPI)
  */
 class Sphinx_Search
 {

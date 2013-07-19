@@ -224,8 +224,8 @@ function template_list_themes()
 		echo '
 			<div class="title_bar">
 				<h3 class="titlebg">
-					<span class="floatleft"><strong><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list">', $theme['name'], '</a></strong>', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '', '</span>';
-
+					', $theme['name'], '', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '';
+ 
 			// You *cannot* delete the default theme. It's important!
 			if ($theme['id'] != 1)
 				echo '
@@ -237,6 +237,7 @@ function template_list_themes()
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings themes_list">
+						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
 						<dt>', $txt['themeadmin_list_theme_dir'], ':</dt>
 						<dd', $theme['valid_path'] ? '' : ' class="error"', '>', $theme['theme_dir'], $theme['valid_path'] ? '' : ' ' . $txt['themeadmin_list_invalid'], '</dd>
 						<dt>', $txt['themeadmin_list_theme_url'], ':</dt>
@@ -273,7 +274,51 @@ function template_list_themes()
 					<input type="hidden" name="', $context['admin-tl_token_var'], '" value="', $context['admin-tl_token'], '" />
 				</div>
 			</div>
+			<script><!-- // --><![CDATA[
+				$(document).ready(function () {
+					$(".delete_theme").bind("click", function (event) {
+						event.preventDefault();
+						var theme_id = $(this).data("theme_id"),
+							base_url = $(this).attr("href"),
+							pattern = new RegExp(elk_session_var + "=" + elk_session_id + ";(.*)$");
+						var tokens = pattern.exec(base_url)[1].split("=");
+						var token = tokens[1],
+							token_var = tokens[0];
 
+						if (confirm(\'', $txt['theme_remove_confirm'], '\'))
+						{
+							$.ajax({
+								type: "GET",
+								url: base_url + ";api;xml",
+								success: function(request){
+									if ($(request).find("error").length == 0)
+									{
+										var new_token = $(request).find("token").text(),
+											new_token_var = $(request).find("token_var").text();
+										$("#theme_" + theme_id).slideToggle("fals", function () {
+											$(this).remove();
+										});
+
+										$(".delete_theme").each(function () {
+											var a1 = $(this).attr("href");
+											$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
+										});
+									}
+									// @todo improve error handling
+									else
+									{
+										alert($(request).find("text").text());
+										window.location = base_url;
+									}
+								},
+								error: function(request){
+									window.location = base_url;
+								}
+							});
+						}
+					});
+				});
+			// ]]></script>
 		</form>
 	</div>';
 }
@@ -556,7 +601,7 @@ function template_set_settings()
 			</div>
 			<div class="windowbg">
 				<div class="content">
-					<dl class="settings flow_auto">';
+					<dl class="settings">';
 
 	foreach ($context['settings'] as $setting)
 	{
@@ -565,8 +610,8 @@ function template_set_settings()
 		{
 			echo '
 					</dl>
-					<hr class="hrcolor" />
-					<dl class="settings flow_auto">';
+					<hr />
+					<dl class="settings">';
 		}
 		// A checkbox?
 		elseif ($setting['type'] == 'checkbox')
@@ -682,7 +727,7 @@ function template_pick()
 			</div>
 			<div class="', $theme['selected'] ? 'windowbg' : 'windowbg2', '">
 				<div class="flow_hidden content">
-					<div class="floatright"><a href="', $scripturl, '?action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '"><img src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" class="padding" /></a></div>
+					<div class="floatright"><a href="', $scripturl, '?action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '" id="theme_thumb_preview_', $theme['id'], '" title="', $txt['theme_preview'], '"><img src="', $theme['thumbnail_href'], '" id="theme_thumb_', $theme['id'], '" alt="" /></a></div>
 					<p>', $theme['description'], '</p>';
 
 		if (!empty($theme['variants']))
@@ -882,10 +927,10 @@ function template_browse()
 	<div id="admincenter">
 		<table class="table_grid tborder">
 		<thead>
-			<tr class="catbg">
-				<th class="lefttext first_th" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
+			<tr class="table_head">
+				<th class="lefttext" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
 				<th scope="col" style="width:35%">', $txt['themeadmin_edit_modified'], '</th>
-				<th class="last_th" scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
+				<th scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
 			</tr>
 		</thead>
 		<tbody>';

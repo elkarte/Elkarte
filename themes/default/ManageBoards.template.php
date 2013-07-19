@@ -448,7 +448,7 @@ function template_modify_board()
 							});
 						});
 					// ]]></script>
-					<hr class="hrcolor" />';
+					<hr />';
 
 	if (empty($context['board']['is_recycle']) && empty($context['board']['topics']))
 		echo '

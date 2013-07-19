@@ -53,6 +53,9 @@ class Themes_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
+		if (isset($_REQUEST['api']))
+			return $this->action_index_api();
+
 		// Load the important language files...
 		loadLanguage('Themes');
 		loadLanguage('Settings');
@@ -65,17 +68,17 @@ class Themes_Controller extends Action_Controller
 
 		// Theme administration, removal, choice, or installation...
 		$subActions = array(
-			'admin' => 'action_admin',
-			'list' => 'action_list',
-			'reset' => 'action_options',
-			'options' => 'action_options',
-			'install' => 'action_install',
-			'remove' => 'action_remove',
-			'pick' => 'action_pick',
-			'edit' => 'action_edit',
-			'copy' => 'action_copy',
-			'themelist' => 'action_themelist',
-			'browse' => 'action_browse',
+			'admin' => array($this, 'action_admin'),
+			'list' => array($this, 'action_list'),
+			'reset' => array($this, 'action_options'),
+			'options' => array($this, 'action_options'),
+			'install' => array($this, 'action_install'),
+			'remove' => array($this, 'action_remove'),
+			'pick' => array($this, 'action_pick'),
+			'edit' => array($this, 'action_edit'),
+			'copy' => array($this, 'action_copy'),
+			'themelist' => array($this, 'action_themelist'),
+			'browse' => array($this, 'action_browse'),
 		);
 
 		// @todo Layout Settings?
@@ -110,9 +113,63 @@ class Themes_Controller extends Action_Controller
 
 		// Follow the sa or just go to administration.
 		if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
+			$subAction = $_GET['sa'];
+		else
+			$subAction = 'admin';
+
+		$action = new Action();
+		$action->initialize($subActions, 'admin');
+		$action->dispatch($subAction);
+	}
+
+	public function action_index_api()
+	{
+		global $txt, $context, $user_info;
+
+		loadTemplate('Xml');
+
+		Template_Layers::getInstance()->removeAll();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		// No guests in here.
+		if ($user_info['is_guest'])
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_guests']
+			);
+			return;
+		}
+
+		// Theme administration, removal, choice, or installation...
+		// Of all the actions we currently know only this
+		$subActions = array(
+// 			'admin' => 'action_admin',
+// 			'list' => 'action_list',
+// 			'reset' => 'action_options',
+// 			'options' => 'action_options',
+// 			'install' => 'action_install',
+			'remove' => 'action_remove_api',
+// 			'pick' => 'action_pick',
+// 			'edit' => 'action_edit',
+// 			'copy' => 'action_copy',
+// 			'themelist' => 'action_themelist',
+// 			'browse' => 'action_browse',
+		);
+
+		// Follow the sa or just go to administration.
+		if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
 			$this->{$subActions[$_GET['sa']]}();
 		else
-			$this->{$subActions['admin']}();
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['error_sa_not_set']
+			);
+			return;
+		}
 	}
 
 	/**
@@ -733,6 +790,81 @@ class Themes_Controller extends Action_Controller
 			updateSettings(array('knownThemes' => $known));
 
 		redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
+	}
+
+	public function action_remove_api()
+	{
+		global $modSettings, $context, $txt;
+
+		require_once(SUBSDIR . '/Themes.subs.php');
+
+		if (checkSession('get', '', false))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['session_verify_fail'],
+			);
+			return;
+		}
+
+		if (!allowedTo('admin_forum'))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['cannot_admin_forum'],
+			);
+			return;
+		}
+
+		if (!validateToken('admin-tr', 'request', true, false))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['token_verify_fail'],
+			);
+			return;
+		}
+
+		// The theme's ID must be an integer.
+		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+
+		// You can't delete the default theme!
+		if ($_GET['th'] == 1)
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['no_access'],
+			);
+			return;
+		}
+
+		$known = explode(',', $modSettings['knownThemes']);
+		for ($i = 0, $n = count($known); $i < $n; $i++)
+		{
+			if ($known[$i] == $_GET['th'])
+				unset($known[$i]);
+		}
+
+		deleteTheme($_GET['th']);
+
+		$known = strtr(implode(',', $known), array(',,' => ','));
+
+		// Fix it if the theme was the overall default theme.
+		if ($modSettings['theme_guests'] == $_GET['th'])
+			updateSettings(array('theme_guests' => '1', 'knownThemes' => $known));
+		else
+			updateSettings(array('knownThemes' => $known));
+
+		createToken('admin-tr', 'request');
+		$context['xml_data'] = array(
+			'success' => 1,
+			'token_var' => $context['admin-tr_token_var'],
+			'token' => $context['admin-tr_token'],
+		);
 	}
 
 	/**

@@ -38,21 +38,24 @@ class ManageBans_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Bans.subs.php');
 
 		$subActions = array(
-			'add' => 'action_edit',
-			'browse' => 'action_browse',
-			'edittrigger' => 'action_edittrigger',
-			'edit' => 'action_edit',
-			'list' => 'action_list',
-			'log' => 'action_log',
+			'add' => array($this, 'action_edit'),
+			'browse' => array($this, 'action_browse'),
+			'edittrigger' => array($this, 'action_edittrigger'),
+			'edit' => array($this, 'action_edit'),
+			'list' => array($this, 'action_list'),
+			'log' => array($this, 'action_log'),
 		);
+
+		$action = new Action();
+		$action->initialize($subActions);
 
 		call_integration_hook('integrate_manage_bans', array(&$subActions));
 
 		// Default the sub-action to 'view ban list'.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'list';
 
 		$context['page_title'] = $txt['ban_title'];
-		$context['sub_action'] = $_REQUEST['sa'];
+		$context['sub_action'] = $subAction;
 
 		// Tabs for browsing the different ban functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -63,29 +66,29 @@ class ManageBans_Controller extends Action_Controller
 				'list' => array(
 					'description' => $txt['ban_description'],
 					'href' => $scripturl . '?action=admin;area=ban;sa=list',
-					'is_selected' => $_REQUEST['sa'] == 'list' || $_REQUEST['sa'] == 'edit' || $_REQUEST['sa'] == 'edittrigger',
+					'is_selected' => $subAction == 'list' || $subAction == 'edit' || $subAction == 'edittrigger',
 				),
 				'add' => array(
 					'description' => $txt['ban_description'],
 					'href' => $scripturl . '?action=admin;area=ban;sa=add',
-					'is_selected' => $_REQUEST['sa'] == 'add',
+					'is_selected' => $subAction == 'add',
 				),
 				'browse' => array(
 					'description' => $txt['ban_trigger_browse_description'],
 					'href' => $scripturl . '?action=admin;area=ban;sa=browse',
-					'is_selected' => $_REQUEST['sa'] == 'browse',
+					'is_selected' => $subAction == 'browse',
 				),
 				'log' => array(
 					'description' => $txt['ban_log_description'],
 					'href' => $scripturl . '?action=admin;area=ban;sa=log',
-					'is_selected' => $_REQUEST['sa'] == 'log',
+					'is_selected' => $subAction == 'log',
 					'is_last' => true,
 				),
 			),
 		);
 
 		// Call the right function for this sub-action.
-		$this->{$subActions[$_REQUEST['sa']]}();
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -409,7 +412,7 @@ class ManageBans_Controller extends Action_Controller
 						array(
 							'position' => 'below_table_data',
 							'value' => '
-							<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="button_submit" /> <a class="button_link" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>',
+							<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="button_submit" /> <a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>',
 							'style' => 'text-align: right;',
 						),
 						array(

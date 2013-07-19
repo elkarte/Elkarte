@@ -30,6 +30,17 @@ if (!defined('ELK'))
 class ManageCoreFeatures_Controller extends Action_Controller
 {
 	/**
+	 * Default handler.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// just delegate to our preferred default
+		$this->action_features();
+	}
+
+	/**
 	 * This is an overall control panel enabling/disabling lots of the forums key features.
 	 *
 	 * Uses internally an array of all the features that can be enabled/disabled.
@@ -41,7 +52,7 @@ class ManageCoreFeatures_Controller extends Action_Controller
 	 * 		save_callback	- Function called on save, takes state as parameter.
 	 *
 	 */
-	public function action_index()
+	public function action_features()
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
 
@@ -293,7 +304,7 @@ class ManageCoreFeatures_Controller extends Action_Controller
 					// Should we calculate next trigger?
 					if ($value)
 					{
-						require_once(SOURCEDIR . \'/ScheduledTasks.php\');
+						require_once(SUBSDIR . \'/ScheduledTasks.subs.php\');
 						calculateNextTrigger(\'paid_subscriptions\');
 					}
 				'),

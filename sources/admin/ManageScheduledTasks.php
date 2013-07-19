@@ -44,7 +44,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		$subActions = array(
 			'taskedit' => array($this, 'action_edit'),
-			'action_log' => array($this, 'action_log'),
+			'tasklog' => array($this, 'action_log'),
 			'tasks' => array($this, 'action_tasks'),
 		);
 
@@ -58,7 +58,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'tasks');
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -102,8 +102,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			checkSession();
 
 			// We'll recalculate the dates at the end!
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
-
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Enable and disable as required.
 			$enablers = array(0);
@@ -291,7 +290,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			validateToken('admin-st');
 
 			// We'll need this for calculating the next event.
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
+			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Do we have a valid offset?
 			preg_match('~(\d{1,2}):(\d{1,2})~', $_POST['offset'], $matches);

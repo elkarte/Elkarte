@@ -46,7 +46,7 @@ class Reports_Controller extends Action_Controller
 	 *
 	 * @see Action_Controller::action_index()
 	 */
-	function action_index()
+	public function action_index()
 	{
 		global $txt, $context, $scripturl;
 
@@ -146,7 +146,7 @@ class Reports_Controller extends Action_Controller
 	 * never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	function action_boards()
+	public function action_boards()
 	{
 		global $context, $txt, $modSettings;
 
@@ -265,7 +265,7 @@ class Reports_Controller extends Action_Controller
 	 * never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	function action_board_perms()
+	public function action_board_perms()
 	{
 		global $context, $txt, $modSettings;
 
@@ -299,7 +299,7 @@ class Reports_Controller extends Action_Controller
 			$group_clause = '1=1';
 
 		// Fetch all the board names.
-		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board'));
+		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board', 'selects' => 'permissions'));
 		$profiles = array();
 		foreach ($boards as $row)
 			$profiles[] = $row['id_profile'];
@@ -432,7 +432,7 @@ class Reports_Controller extends Action_Controller
 	 * never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	function action_member_groups()
+	public function action_member_groups()
 	{
 		global $context, $txt, $settings, $modSettings;
 
@@ -557,7 +557,7 @@ class Reports_Controller extends Action_Controller
 	 * never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	function action_group_perms()
+	public function action_group_perms()
 	{
 		global $context, $txt, $modSettings;
 
@@ -662,7 +662,7 @@ class Reports_Controller extends Action_Controller
 	 * never access the context directly, but use the data handling
 	 * functions to do so.
 	 */
-	function action_staff()
+	public function action_staff()
 	{
 		global $context, $txt;
 

@@ -1688,44 +1688,57 @@ function doAutoSubmit()
 	setTimeout("doAutoSubmit();", 1000);
 }
 
+/**
+ * Turn a regular url button in to an ajax request
+ */
 function toggleButtonAJAX(btn, confirmation_msg_variable)
 {
-	ajax_indicator(true);
-
 	$.ajax({
 		type: 'GET',
 		url: btn.href + ';xml;api',
 		context: document.body,
-		success: function(request) {
-			var oElement = $(request).find('elk')[0];
-			if (oElement.getElementsByTagName('error').length == 0)
-			{
-				var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
-				var url = oElement.getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities();
-				var confirm_elem = oElement.getElementsByTagName('confirm');
-				if (confirm_elem.length == 1)
-					var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
+		beforeSend: ajax_indicator(true)
+	})
+	.done(function(request) {
+		var oElement = $(request).find('elk')[0];
 
-				$('.' + btn.className).each(function() {
-					// @todo: the span should be moved somewhere in themes.js?
-					$(this).html('<span>' + text + '</span>');
-					$(this).attr('href', url);
+		// No errors
+		if (oElement.getElementsByTagName('error').length === 0)
+		{
+			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities(),
+				url = oElement.getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities(),
+				confirm_elem = oElement.getElementsByTagName('confirm');
 
-					// Replaces the confirmations message with the new one
-					if (typeof(confirm_text) != 'undefined')
-						eval(confirmation_msg_variable + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
-				});
-			}
-			else
-			{
-				if (oElement.getElementsByTagName('text').length != 0)
-					alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities());
+			// Update the page so button/link/confirm/etc to reflect the new on or off status
+			if (confirm_elem.length === 1)
+				var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
 
-				if (oElement.getElementsByTagName('url').length != 0)
-					window.location.href = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
-			}
-			ajax_indicator(false);
-		},
+			$('.' + btn.className).each(function() {
+				// @todo: the span should be moved somewhere in themes.js?
+				$(this).html('<span>' + text + '</span>');
+				$(this).attr('href', url);
+
+				// Replaces the confirmations message with the new one
+				if (typeof(confirm_text) !== 'undefined')
+					eval(confirmation_msg_variable + '= \'' + confirm_text.replace(/[\\']/g, '\\$&') + '\'');
+			});
+		}
+		else
+		{
+			// Error returned from the called function, show an alert
+			if (oElement.getElementsByTagName('text').length !== 0)
+				alert(oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities());
+
+			if (oElement.getElementsByTagName('url').length !== 0)
+				window.location.href = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
+		}
+	})
+	.fail(function(){
+		// ajax failure code
+	 })
+	.always(function() {
+		// turn off the indicator
+		ajax_indicator(false);
 	});
 
 	return false;

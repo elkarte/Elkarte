@@ -348,7 +348,7 @@ function deleteLogAction($id_log, $time, $delete = null)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_actions
 		WHERE id_log = {int:moderate_log}
-			' . isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '' . '
+			' . (isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '') . '
 			AND log_time < {int:twenty_four_hours_wait}',
 		array(
 			'twenty_four_hours_wait' => time() - $time * 3600,
