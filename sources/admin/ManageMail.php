@@ -61,8 +61,8 @@ class ManageMail_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_mail', array(&$subActions));
 
 		// By default we want to browse
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
+		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -73,8 +73,8 @@ class ManageMail_Controller extends Action_Controller
 
 		// Call the right function for this sub-action.
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch($_REQUEST['sa']);
+		$action->initialize($subActions, 'browse');
+		$action->dispatch($subAction);
 	}
 
 	/**

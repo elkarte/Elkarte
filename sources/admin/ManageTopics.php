@@ -36,14 +36,13 @@ class ManageTopics_Controller extends Action_Controller
 		$subActions = array(
 			'display' => array (
 				'controller' => $this,
-				'function' => 'action_topicSettings_display',
-				'default' => true));
+				'function' => 'action_topicSettings_display'));
 
 		$subAction = 'display';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'display');
 
 		// lets just do it!
 		$action->dispatch($subAction);

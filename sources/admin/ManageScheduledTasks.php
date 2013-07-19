@@ -58,7 +58,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'tasks');
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(

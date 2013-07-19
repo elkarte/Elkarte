@@ -62,8 +62,8 @@ class ManageLanguages_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_languages', array(&$subActions));
 
 		// By default we're managing languages.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
+		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -73,8 +73,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// Call the right function for this sub-action.
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch($_REQUEST['sa']);
+		$action->initialize($subActions, 'edit');
+		$action->dispatch($subAction);
 	}
 
 	/**

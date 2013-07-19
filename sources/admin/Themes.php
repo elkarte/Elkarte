@@ -68,17 +68,17 @@ class Themes_Controller extends Action_Controller
 
 		// Theme administration, removal, choice, or installation...
 		$subActions = array(
-			'admin' => 'action_admin',
-			'list' => 'action_list',
-			'reset' => 'action_options',
-			'options' => 'action_options',
-			'install' => 'action_install',
-			'remove' => 'action_remove',
-			'pick' => 'action_pick',
-			'edit' => 'action_edit',
-			'copy' => 'action_copy',
-			'themelist' => 'action_themelist',
-			'browse' => 'action_browse',
+			'admin' => array($this, 'action_admin'),
+			'list' => array($this, 'action_list'),
+			'reset' => array($this, 'action_options'),
+			'options' => array($this, 'action_options'),
+			'install' => array($this, 'action_install'),
+			'remove' => array($this, 'action_remove'),
+			'pick' => array($this, 'action_pick'),
+			'edit' => array($this, 'action_edit'),
+			'copy' => array($this, 'action_copy'),
+			'themelist' => array($this, 'action_themelist'),
+			'browse' => array($this, 'action_browse'),
 		);
 
 		// @todo Layout Settings?
@@ -113,9 +113,13 @@ class Themes_Controller extends Action_Controller
 
 		// Follow the sa or just go to administration.
 		if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
-			$this->{$subActions[$_GET['sa']]}();
+			$subAction = $_GET['sa'];
 		else
-			$this->{$subActions['admin']}();
+			$subAction = 'admin';
+
+		$action = new Action();
+		$action->initialize($subActions, 'admin');
+		$action->dispatch($subAction);
 	}
 
 	public function action_index_api()
