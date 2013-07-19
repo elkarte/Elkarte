@@ -38,7 +38,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 */
 	function action_index()
 	{
-		global $txt, $scripturl, $context, $user_info, $user_settings, $modSettings;
+		global $context;
 
 		// Finally all the things we know how to do
 		$subActions = array(
@@ -250,10 +250,13 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			case 'date':
 				$sort_by_query = 'pm.id_pm';
+				break;
 			case 'name':
 				$sort_by_query = 'IFNULL(mem.real_name, \'\')';
+				break;
 			case 'subject':
 				$sort_by_query = 'pm.subject';
+				break;
 			default:
 				$sort_by_query = 'pm.id_pm';
 		}
@@ -337,148 +340,19 @@ class PersonalMessage_Controller extends Action_Controller
 			'current_page' => $start / $modSettings['defaultMaxMessages'] + 1,
 			'num_pages' => floor(($max_messages - 1) / $modSettings['defaultMaxMessages']) + 1
 		);
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
-		// First work out what messages we need to see - if grouped is a little trickier...
-		if ($context['display_mode'] == 2)
-		{
-			$db = database();
-
-			// On a non-default sort due to PostgreSQL we have to do a harder sort.
-			if ($db->db_title() == 'PostgreSQL' && $sort_by_query != 'pm.id_pm')
-			{
-				$sub_request = $db->query('', '
-					SELECT MAX({raw:sort}) AS sort_param, pm.id_pm_head
-					FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($sort_by == 'name' ? '
-						LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
-						INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
-							AND pmr.id_member = {int:current_member}
-							AND pmr.deleted = {int:not_deleted}
-							' . $labelQuery . ')') . ($sort_by == 'name' ? ( '
-						LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
-					WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
-						AND pm.deleted_by_sender = {int:not_deleted}' : '1=1') . (empty($pmsg) ? '' : '
-						AND pm.id_pm = {int:id_pm}') . '
-					GROUP BY pm.id_pm_head
-					ORDER BY sort_param' . ($descending ? ' DESC' : ' ASC') . (empty($pmsg) ? '
-					LIMIT ' . $start . ', ' . $modSettings['defaultMaxMessages'] : ''),
-					array(
-						'current_member' => $user_info['id'],
-						'not_deleted' => 0,
-						'id_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
-						'id_pm' => isset($pmsg) ? $pmsg : '0',
-						'sort' => $sort_by_query,
-					)
-				);
-				$sub_pms = array();
-				while ($row = $db->fetch_assoc($sub_request))
-					$sub_pms[$row['id_pm_head']] = $row['sort_param'];
-
-				$db->free_result($sub_request);
-
-				$request = $db->query('', '
-					SELECT pm.id_pm AS id_pm, pm.id_pm_head
-					FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($sort_by == 'name' ? '
-						LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
-						INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
-							AND pmr.id_member = {int:current_member}
-							AND pmr.deleted = {int:not_deleted}
-							' . $labelQuery . ')') . ($sort_by == 'name' ? ( '
-						LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
-					WHERE ' . (empty($sub_pms) ? '0=1' : 'pm.id_pm IN ({array_int:pm_list})') . '
-					ORDER BY ' . ($sort_by_query == 'pm.id_pm' && $context['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($descending ? ' DESC' : ' ASC') . (empty($pmsg) ? '
-					LIMIT ' . $start . ', ' . $modSettings['defaultMaxMessages'] : ''),
-					array(
-						'current_member' => $user_info['id'],
-						'pm_list' => array_keys($sub_pms),
-						'not_deleted' => 0,
-						'sort' => $sort_by_query,
-						'id_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
-					)
-				);
-			}
-			else
-			{
-				$request = $db->query('pm_conversation_list', '
-					SELECT MAX(pm.id_pm) AS id_pm, pm.id_pm_head
-					FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($sort_by == 'name' ? '
-						LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
-						INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
-							AND pmr.id_member = {int:current_member}
-							AND pmr.deleted = {int:deleted_by}
-							' . $labelQuery . ')') . ($sort_by == 'name' ? ( '
-						LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:pm_member})') : '') . '
-					WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
-						AND pm.deleted_by_sender = {int:deleted_by}' : '1=1') . (empty($pmsg) ? '' : '
-						AND pm.id_pm = {int:pmsg}') . '
-					GROUP BY pm.id_pm_head
-					ORDER BY ' . ($sort_by_query == 'pm.id_pm' && $context['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($descending ? ' DESC' : ' ASC') . (isset($pmsg) ? '
-					LIMIT ' . $start . ', ' . $modSettings['defaultMaxMessages'] : ''),
-					array(
-						'current_member' => $user_info['id'],
-						'deleted_by' => 0,
-						'sort' => $sort_by_query,
-						'pm_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
-						'pmsg' => isset($pmsg) ? (int) $pmsg : 0,
-					)
-				);
-			}
-		}
-		// This is kinda simple!
-		else
-		{
-			// @todo SLOW This query uses a filesort. (inbox only.)
-			$request = $db->query('', '
-				SELECT pm.id_pm, pm.id_pm_head, pm.id_member_from
-				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? '' . ($sort_by == 'name' ? '
-					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
-					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
-						AND pmr.id_member = {int:current_member}
-						AND pmr.deleted = {int:is_deleted}
-						' . $labelQuery . ')') . ($sort_by == 'name' ? ( '
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:pm_member})') : '') . '
-				WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {raw:current_member}
-					AND pm.deleted_by_sender = {int:is_deleted}' : '1=1') . (empty($pmsg) ? '' : '
-					AND pm.id_pm = {int:pmsg}') . '
-				ORDER BY ' . ($sort_by_query == 'pm.id_pm' && $context['folder'] != 'sent' ? 'pmr.id_pm' : '{raw:sort}') . ($descending ? ' DESC' : ' ASC') . (isset($pmsg) ? '
-				LIMIT ' . $start . ', ' . $modSettings['defaultMaxMessages'] : ''),
-				array(
-					'current_member' => $user_info['id'],
-					'is_deleted' => 0,
-					'sort' => $sort_by_query,
-					'pm_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
-					'pmsg' => isset($pmsg) ? (int) $pmsg : 0,
-				)
-			);
-		}
-		// Load the id_pms and initialize recipients.
-		$pms = array();
-		$lastData = array();
-		$posters = $context['folder'] == 'sent' ? array($user_info['id']) : array();
-		$recipients = array();
-
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!isset($recipients[$row['id_pm']]))
-			{
-				if (isset($row['id_member_from']))
-					$posters[$row['id_pm']] = $row['id_member_from'];
-				$pms[$row['id_pm']] = $row['id_pm'];
-				$recipients[$row['id_pm']] = array(
-					'to' => array(),
-					'bcc' => array()
-				);
-			}
-
-			// Keep track of the last message so we know what the head is without another query!
-			if ((empty($pmID) && (empty($options['view_newest_pm_first']) || !isset($lastData))) || empty($lastData) || (!empty($pmID) && $pmID == $row['id_pm']))
-			{
-				$lastData = array(
-					'id' => $row['id_pm'],
-					'head' => $row['id_pm_head'],
-				);
-			}
-		}
-		$db->free_result($request);
+		list($pms, $posters, $recipients, $lastData) = loadPMs(array(
+			'sort_by_query' => $sort_by_query,
+			'display_mode' => $context['display_mode'],
+			'sort_by' => $sort_by,
+			'label_query' => $labelQuery,
+			'pmsg' => isset($pmsg) ? (int) $pmsg : 0,
+			'descending' => $descending,
+			'start' => $start,
+			'limit' => $modSettings['defaultMaxMessages'],
+			'folder' => $context['folder'],
+		), $user_info['id']);
 
 		// Make sure that we have been given a correct head pm id!
 		if ($context['display_mode'] === 2 && !empty($pmID) && $pmID != $lastData['id'])
@@ -1070,7 +944,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Make sure that we remove the members who did get it from the screen.
 		if (!$is_recipient_change)
 		{
-			foreach ($recipientList as $recipientType => $dummy)
+			foreach (array_keys($recipientList) as $recipientType)
 			{
 				if (!empty($namesNotFound[$recipientType]))
 				{
@@ -1231,9 +1105,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 */
 	function action_pmactions()
 	{
-		global $context, $user_info, $options;
-
-		$db = database();
+		global $context, $user_info;
 
 		checkSession('request');
 
@@ -1252,38 +1124,17 @@ class PersonalMessage_Controller extends Action_Controller
 		// If we are in conversation, we may need to apply this to every message in the conversation.
 		if ($context['display_mode'] == 2 && isset($_REQUEST['conversation']))
 		{
-			$id_pms = array();
-			foreach ($_REQUEST['pm_actions'] as $pm => $dummy)
-				$id_pms[] = (int) $pm;
+			$id_pms = array_map('intval', array_keys($_REQUEST['pm_actions']));
 
-			$request = $db->query('', '
-				SELECT id_pm_head, id_pm
-				FROM {db_prefix}personal_messages
-				WHERE id_pm IN ({array_int:id_pms})',
-				array(
-					'id_pms' => $id_pms,
-				)
-			);
-			$pm_heads = array();
-			while ($row = $db->fetch_assoc($request))
-				$pm_heads[$row['id_pm_head']] = $row['id_pm'];
-			$db->free_result($request);
+			$pm_heads = getDiscussions($id_pms);
 
-			$request = $db->query('', '
-				SELECT id_pm, id_pm_head
-				FROM {db_prefix}personal_messages
-				WHERE id_pm_head IN ({array_int:pm_heads})',
-				array(
-					'pm_heads' => array_keys($pm_heads),
-				)
-			);
+			$pms = getPmsFromDiscussion(array_keys($pm_heads));
 			// Copy the action from the single to PM to the others.
-			while ($row = $db->fetch_assoc($request))
+			foreach ($pms as $id_pm => $id_head)
 			{
-				if (isset($pm_heads[$row['id_pm_head']]) && isset($_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]]))
-					$_REQUEST['pm_actions'][$row['id_pm']] = $_REQUEST['pm_actions'][$pm_heads[$row['id_pm_head']]];
+				if (isset($pm_heads[$id_head]) && isset($_REQUEST['pm_actions'][$pm_heads[$id_head]]))
+					$_REQUEST['pm_actions'][$id_pm] = $_REQUEST['pm_actions'][$pm_heads[$id_head]];
 			}
-			$db->free_result($request);
 		}
 
 		$to_delete = array();
@@ -1291,28 +1142,26 @@ class PersonalMessage_Controller extends Action_Controller
 		$label_type = array();
 		foreach ($_REQUEST['pm_actions'] as $pm => $action)
 		{
-			if ($action === 'delete')
-				$to_delete[] = (int) $pm;
-			else
+			switch (substr($action, 0, 4))
 			{
-				if (substr($action, 0, 4) == 'add_')
-				{
+				case 'dele':
+					$to_delete[] = (int) $pm;
+					break;
+				case 'add_':
 					$type = 'add';
 					$action = substr($action, 4);
-				}
-				elseif (substr($action, 0, 4) == 'rem_')
-				{
+					break;
+				case 'rem_':
 					$type = 'rem';
 					$action = substr($action, 4);
-				}
-				else
+					break;
+				default:
 					$type = 'unk';
-
-				if ($action == '-1' || $action == '0' || (int) $action > 0)
-				{
-					$to_label[(int) $pm] = (int) $action;
-					$label_type[(int) $pm] = $type;
-				}
+					if ($action == '-1' || $action == '0' || (int) $action > 0)
+					{
+						$to_label[(int) $pm] = (int) $action;
+						$label_type[(int) $pm] = $type;
+					}
 			}
 		}
 
@@ -1323,57 +1172,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Are we labeling anything?
 		if (!empty($to_label) && $context['folder'] == 'inbox')
 		{
-			$updateErrors = 0;
-
-			// Get information about each message...
-			$request = $db->query('', '
-				SELECT id_pm, labels
-				FROM {db_prefix}pm_recipients
-				WHERE id_member = {int:current_member}
-					AND id_pm IN ({array_int:to_label})
-				LIMIT ' . count($to_label),
-				array(
-					'current_member' => $user_info['id'],
-					'to_label' => array_keys($to_label),
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
-
-				// Already exists?  Then... unset it!
-				$ID_LABEL = array_search($to_label[$row['id_pm']], $labels);
-				if ($ID_LABEL !== false && $label_type[$row['id_pm']] !== 'add')
-					unset($labels[$ID_LABEL]);
-				elseif ($label_type[$row['id_pm']] !== 'rem')
-					$labels[] = $to_label[$row['id_pm']];
-
-				if (!empty($options['pm_remove_inbox_label']) && $to_label[$row['id_pm']] != '-1' && ($key = array_search('-1', $labels)) !== false)
-					unset($labels[$key]);
-
-				$set = implode(',', array_unique($labels));
-				if ($set == '')
-					$set = '-1';
-
-				// Check that this string isn't going to be too large for the database.
-				if ($set > 60)
-					$updateErrors++;
-				else
-				{
-					$db->query('', '
-						UPDATE {db_prefix}pm_recipients
-						SET labels = {string:labels}
-						WHERE id_pm = {int:id_pm}
-							AND id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-							'id_pm' => $row['id_pm'],
-							'labels' => $set,
-						)
-					);
-				}
-			}
-			$db->free_result($request);
+			$updateErrors = changePMLabels($to_label, $label_type, $user_info['id']);
 
 			// Any errors?
 			// @todo Separate the sprintf?
@@ -1429,8 +1228,6 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
-		$db = database();
-
 		// Actually delete the messages.
 		if (isset($_REQUEST['age']))
 		{
@@ -1439,43 +1236,8 @@ class PersonalMessage_Controller extends Action_Controller
 			// Calculate the time to delete before.
 			$deleteTime = max(0, time() - (86400 * (int) $_REQUEST['age']));
 
-			// Array to store the IDs in.
-			$toDelete = array();
-
-			// Select all the messages they have sent older than $deleteTime.
-			$request = $db->query('', '
-				SELECT id_pm
-				FROM {db_prefix}personal_messages
-				WHERE deleted_by_sender = {int:not_deleted}
-					AND id_member_from = {int:current_member}
-					AND msgtime < {int:msgtime}',
-				array(
-					'current_member' => $user_info['id'],
-					'not_deleted' => 0,
-					'msgtime' => $deleteTime,
-				)
-			);
-			while ($row = $db->fetch_row($request))
-				$toDelete[] = $row[0];
-			$db->free_result($request);
-
-			// Select all messages in their inbox older than $deleteTime.
-			$request = $db->query('', '
-				SELECT pmr.id_pm
-				FROM {db_prefix}pm_recipients AS pmr
-					INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
-				WHERE pmr.deleted = {int:not_deleted}
-					AND pmr.id_member = {int:current_member}
-					AND pm.msgtime < {int:msgtime}',
-				array(
-					'current_member' => $user_info['id'],
-					'not_deleted' => 0,
-					'msgtime' => $deleteTime,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$toDelete[] = $row['id_pm'];
-			$db->free_result($request);
+			// Select all the messages older than $deleteTime.
+			$toDelete = getPMsOlderThan($user_info['id'], $deleteTime);
 
 			// Delete the actual messages.
 			deleteMessages($toDelete);
@@ -1600,48 +1362,7 @@ class PersonalMessage_Controller extends Action_Controller
 						$searchArray[] = $i;
 				}
 
-				// Now find the messages to change.
-				$request = $db->query('', '
-					SELECT id_pm, labels
-					FROM {db_prefix}pm_recipients
-					WHERE FIND_IN_SET({raw:find_label_implode}, labels) != 0
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'find_label_implode' => '\'' . implode('\', labels) != 0 OR FIND_IN_SET(\'', $searchArray) . '\'',
-					)
-				);
-				while ($row = $db->fetch_assoc($request))
-				{
-					// Do the long task of updating them...
-					$toChange = explode(',', $row['labels']);
-
-					foreach ($toChange as $key => $value)
-						if (in_array($value, $searchArray))
-						{
-							if (isset($new_labels[$value]))
-								$toChange[$key] = $new_labels[$value];
-							else
-								unset($toChange[$key]);
-						}
-
-					if (empty($toChange))
-						$toChange[] = '-1';
-
-					// Update the message.
-					$db->query('', '
-						UPDATE {db_prefix}pm_recipients
-						SET labels = {string:new_labels}
-						WHERE id_pm = {int:id_pm}
-							AND id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-							'id_pm' => $row['id_pm'],
-							'new_labels' => implode(',', array_unique($toChange)),
-						)
-					);
-				}
-				$db->free_result($request);
+				$updateErrors = updateLabelsToPM($searchArray, $new_labels, $user_info['id']);
 
 				// Now do the same the rules - check through each rule.
 				foreach ($context['rules'] as $k => $rule)
@@ -1944,32 +1665,9 @@ class PersonalMessage_Controller extends Action_Controller
 		// Load them... load them!!
 		loadRules();
 
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Likely to need all the groups!
-		$request = $db->query('', '
-			SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
-			FROM {db_prefix}membergroups AS mg
-				LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
-			WHERE mg.min_posts = {int:min_posts}
-				AND mg.id_group != {int:moderator_group}
-				AND mg.hidden = {int:not_hidden}
-			ORDER BY mg.group_name',
-			array(
-				'current_member' => $user_info['id'],
-				'min_posts' => -1,
-				'moderator_group' => 3,
-				'not_hidden' => 0,
-			)
-		);
-		$context['groups'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Hide hidden groups!
-			if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
-				continue;
-
-			$context['groups'][$row['id_group']] = $row['group_name'];
-		}
-		$db->free_result($request);
+		$context['groups'] = accessibleGroups();
 
 		// Applying all rules?
 		if (isset($_GET['apply']))
@@ -2042,22 +1740,13 @@ class PersonalMessage_Controller extends Action_Controller
 				// Members need to be found.
 				if ($type == 'mid')
 				{
+					require_once(SUBSDIR . '/Members.subs.php');
 					$name = trim($_POST['ruledef'][$ind]);
-					$request = $db->query('', '
-						SELECT id_member
-						FROM {db_prefix}members
-						WHERE real_name = {string:member_name}
-							OR member_name = {string:member_name}',
-						array(
-							'member_name' => $name,
-						)
-					);
-					if ($db->num_rows($request) == 0)
+					$member = getMemberByName($name, true);
+					if (empty($member))
 						continue;
-					list ($memID) = $db->fetch_row($request);
-					$db->free_result($request);
 
-					$criteria[] = array('t' => 'mid', 'v' => $memID);
+					$criteria[] = array('t' => 'mid', 'v' => $member['id_member']);
 				}
 				elseif ($type == 'bud')
 					$criteria[] = array('t' => 'bud', 'v' => 1);

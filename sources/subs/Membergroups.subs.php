@@ -1657,3 +1657,88 @@ function prepareMembergroupPermissions()
 
 	return $profile_groups;
 }
+
+/**
+ * Returns the groups that a user could see.
+ * Ask and it will give you.
+ *
+ * @param int the id of a member
+ * @param bool true if hidden groups (that the user can moderate) should be loaded (default false)
+ * @param int minimum number of posts for the group (-1 for non-post based groups)
+ *
+ * @return array
+ */
+function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
+		FROM {db_prefix}membergroups AS mg
+			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
+		WHERE mg.min_posts = {int:min_posts}
+			AND mg.id_group != {int:moderator_group}' . ($show_hidden ? '' : '
+			AND mg.hidden = {int:not_hidden}') . '
+		ORDER BY mg.group_name',
+		array(
+			'current_member' => $id_member,
+			'min_posts' => $min_posts,
+			'moderator_group' => 3,
+			'not_hidden' => 0,
+		)
+	);
+	$groups = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Hide hidden groups!
+		if ($show_hidden && $row['hidden'] && !$row['can_moderate'])
+			continue;
+
+		$groups[$row['id_group']] = $row['group_name'];
+	}
+
+	$db->free_result($request);
+
+	return $groups;
+}
+
+/**
+ * Returns the groups that the current user can see.
+ * uses $user_info and allowedTo().
+ *
+ * @return array
+ */
+function accessibleGroups()
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
+		FROM {db_prefix}membergroups AS mg
+			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
+		WHERE mg.min_posts = {int:min_posts}
+			AND mg.id_group != {int:moderator_group}
+		ORDER BY mg.group_name',
+		array(
+			'current_member' => $user_info['id'],
+			'min_posts' => -1,
+			'moderator_group' => 3,
+			'not_hidden' => 0,
+		)
+	);
+	$groups = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Hide hidden groups!
+		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups')) 
+			continue;
+
+		$groups[$row['id_group']] = $row['group_name'];
+	}
+
+	$db->free_result($request);
+
+	return $groups;
+}
