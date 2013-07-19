@@ -1725,7 +1725,6 @@ function accessibleGroups()
 			'current_member' => $user_info['id'],
 			'min_posts' => -1,
 			'moderator_group' => 3,
-			'not_hidden' => 0,
 		)
 	);
 	$groups = array();
