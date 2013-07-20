@@ -882,6 +882,23 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 	return false;
 }
 
+function addRequiredElem($this_form, classname, focused)
+{
+	if (typeof(focused) == 'undefined')
+		focused = false;
+
+	$this_form.find('input[name="' + classname + '"]').after($('<span class="requiredfield" />').text(required_field).fadeIn());
+	$this_form.find('input[name="' + classname + '"]').keyup(function () {
+		$this_form.find('.' + classname + ' .requiredfield').fadeOut(function () {
+			$(this).remove();
+		});	});
+	if (!focused)
+	{
+		$this_form.find('input[name="' + classname + '"]').focus();
+		focused = true;
+	}
+}
+
 function sendtopicForm(oPopup_body, url, oContainer)
 {
 	if (typeof(this_body) != 'undefined')
@@ -892,6 +909,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
 	if (typeof(send_comment) != 'undefined')
 	{
 		$this_form.find('input[name="comment"]').val(send_comment);
+		$this_form.find('input[name="y_name"]').val(sender_name);
+		$this_form.find('input[name="y_email"]').val(sender_mail);
 		$this_form.find('input[name="r_name"]').val(recipient_name);
 		$this_form.find('input[name="r_email"]').val(recipient_mail);
 	}
@@ -902,9 +921,37 @@ function sendtopicForm(oPopup_body, url, oContainer)
 		this_body = $(oPopup_body).html();
 
 		data = $this_form.serialize() + '&send=1';
+
 		send_comment = $this_form.find('input[name="comment"]').val();
+		sender_name = $this_form.find('input[name="y_name"]').val();
+		sender_mail = $this_form.find('input[name="y_email"]').val();
 		recipient_name = $this_form.find('input[name="r_name"]').val();
 		recipient_mail = $this_form.find('input[name="r_email"]').val();
+
+		var missing_elems = false;
+		if (sender_name == '')
+		{
+			addRequiredElem($this_form, 'y_name', missing_elems);
+			missing_elems = true;
+		}
+		if (sender_mail == '')
+		{
+			addRequiredElem($this_form, 'y_email', missing_elems);
+			missing_elems = true;
+		}
+		if (recipient_name == '')
+		{
+			addRequiredElem($this_form, 'r_name', missing_elems);
+			missing_elems = true;
+		}
+		if (recipient_mail == '')
+		{
+			addRequiredElem($this_form, 'r_email', missing_elems);
+			missing_elems = true;
+		}
+
+		if (missing_elems)
+			return;
 
 		$.ajax({
 			type: 'post',

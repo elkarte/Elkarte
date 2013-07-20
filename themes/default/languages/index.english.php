@@ -146,6 +146,7 @@ $txt['lock_unlock'] = 'Lock/Unlock Topic';
 $txt['post'] = 'Post';
 $txt['error_occurred'] = 'An Error Has Occurred';
 $txt['send_error_occurred'] = 'An error has occurred, please click <a href="{href}">here</a> to try again.';
+$txt['require_field'] = 'This is a required field.';
 $txt['at'] = 'at';
 $txt['started_by'] = 'Started by';
 $txt['topic_started_by'] = 'Started by <strong>%1$s</strong> in <em>%2$s</em>';

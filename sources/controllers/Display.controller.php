@@ -815,6 +815,7 @@ class Display_Controller
 			addJavascriptVar('sendtopic_back', $txt['back'], true);
 			addJavascriptVar('sendtopic_close', $txt['find_close'], true);
 			addJavascriptVar('sendtopic_error', $txt['send_error_occurred'], true);
+			addJavascriptVar('required_field', $txt['require_field'], true);
 		}
 
 		// Build the normal button array.

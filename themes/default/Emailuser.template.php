@@ -59,19 +59,19 @@ function template_main()
 							<dt>
 								<label for="y_name"><strong>', $txt['sendtopic_sender_name'], ':</strong></label>
 							</dt>
-							<dd>
-								<input type="text" id="y_name" name="y_name" size="30" maxlength="40" value="', $context['user']['name'], '" class="input_text" />
+							<dd class="y_name">
+								<input required="required" type="text" id="y_name" name="y_name" size="30" maxlength="40" value="', $context['user']['name'], '" class="input_text" />
 							</dd>
 							<dt>
 								<label for="y_email"><strong>', $txt['sendtopic_sender_email'], ':</strong></label>
 							</dt>
-							<dd>
-								<input type="text" id="y_email" name="y_email" size="30" maxlength="50" value="', $context['user']['email'], '" class="input_text" />
+							<dd class="y_email">
+								<input required="required" type="text" id="y_email" name="y_email" size="30" maxlength="50" value="', $context['user']['email'], '" class="input_text" />
 							</dd>
 							<dt>
 								<label for="comment"><strong>', $txt['sendtopic_comment'], ':</strong></label>
 							</dt>
-							<dd>
+							<dd class="comment">
 								<input type="text" id="comment" name="comment" size="30" maxlength="100" class="input_text" />
 							</dd>
 						</dl>
@@ -81,14 +81,14 @@ function template_main()
 							<dt>
 								<label for="r_name"><strong>', $txt['sendtopic_receiver_name'], ':</strong></label>
 							</dt>
-							<dd>
-								<input type="text" id="r_name" name="r_name" size="30" maxlength="40" class="input_text" />
+							<dd class="r_name">
+								<input required="required" type="text" id="r_name" name="r_name" size="30" maxlength="40" class="input_text" />
 							</dd>
 							<dt>
 								<label for="r_email"><strong>', $txt['sendtopic_receiver_email'], ':</strong></label>
 							</dt>
-							<dd>
-								<input type="text" id="r_email" name="r_email" size="30" maxlength="50" class="input_text" />
+							<dd class="r_email">
+								<input required="required" type="text" id="r_email" name="r_email" size="30" maxlength="50" class="input_text" />
 							</dd>
 						</dl>
 					</fieldset>
