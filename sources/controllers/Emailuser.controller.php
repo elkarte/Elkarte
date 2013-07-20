@@ -92,6 +92,107 @@ class Emailuser_Controller extends Action_Controller
 		checkSession();
 		spamProtection('sendtopic');
 
+		$result = $this->_sendTopic($row);
+		if ($result !== true)
+			fatal_lang_error($result, false);
+
+		// Back to the topic!
+		redirectexit('topic=' . $topic . '.0');
+	}
+
+	public function action_sendtopic_api()
+	{
+		global $topic, $modSettings, $txt, $context, $scripturl;
+
+		loadTemplate('Xml');
+
+		Template_Layers::getInstance()->removeAll();
+		$context['sub_template'] = 'generic_xml_buttons';
+
+		if (empty($_POST['send']))
+			die();
+
+		// We need at least a topic... go away if you don't have one.
+		// Guests can't mark things.
+		if (empty($topic))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_a_topic']
+			);
+			return;
+		}
+
+		// Is the session valid?
+		if (checkSession('post', '', false))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $topic . '.0',
+			);
+			return;
+		}
+
+		require_once(SUBSDIR . '/Topic.subs.php');
+
+		$row = getTopicInfo($topic, 'message');
+		if (empty($row))
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_a_topic']
+			);
+			return;
+		}
+
+		// Can't send topic if its unapproved and using post moderation.
+		if ($modSettings['postmod_active'] && !$row['approved'])
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt['not_approved_topic']
+			);
+			return;
+		}
+
+		$is_spam = spamProtection('sendtopic', false);
+		if ($is_spam !== false)
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => sprintf($txt['sendtopic_WaitTime_broken'], $is_spam)
+			);
+			return;
+		}
+
+		// Censor the subject....
+		censorText($row['subject']);
+
+		$result = $this->_sendTopic($row);
+		if ($result !== true)
+		{
+			loadLanguage('Errors');
+			$context['xml_data'] = array(
+				'error' => 1,
+				'text' => $txt[$result]
+			);
+			return;
+		}
+
+		$context['xml_data'] = array(
+			'text' => $txt['topic_sent'],
+		);
+	}
+
+	private function _sendTopic($row)
+	{
+		global $scripturl, $topic;
+
 		// This is needed for sendmail().
 		require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -101,19 +202,19 @@ class Emailuser_Controller extends Action_Controller
 
 		// Make sure they aren't playing "let's use a fake email".
 		if ($_POST['y_name'] == '_' || !isset($_POST['y_name']) || $_POST['y_name'] == '')
-			fatal_lang_error('no_name', false);
+			return 'no_name';
 		if (!isset($_POST['y_email']) || $_POST['y_email'] == '')
-			fatal_lang_error('no_email', false);
+			return 'no_email';
 		if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['y_email']) == 0)
-			fatal_lang_error('email_invalid_character', false);
+			return 'email_invalid_character';
 
 		// The receiver should be valid to.
 		if ($_POST['r_name'] == '_' || !isset($_POST['r_name']) || $_POST['r_name'] == '')
-			fatal_lang_error('no_name', false);
+			return 'no_name';
 		if (!isset($_POST['r_email']) || $_POST['r_email'] == '')
-			fatal_lang_error('no_email', false);
+			return 'no_email';
 		if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['r_email']) == 0)
-			fatal_lang_error('email_invalid_character', false);
+			return 'email_invalid_character';
 
 		// Emails don't like entities...
 		$row['subject'] = un_htmlspecialchars($row['subject']);
@@ -137,8 +238,7 @@ class Emailuser_Controller extends Action_Controller
 		// And off we go!
 		sendmail($_POST['r_email'], $emaildata['subject'], $emaildata['body'], $_POST['y_email']);
 
-		// Back to the topic!
-		redirectexit('topic=' . $topic . '.0');
+		return true;
 	}
 
 	/**

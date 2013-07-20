@@ -840,3 +840,128 @@ function ignore_toggles(msgids, text)
 		});
 	}
 }
+
+// Open the sendtopic overlay div
+// @todo make these... "things" look nice
+function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
+{
+	// Set up our div details
+	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>';
+	var sIcon = elk_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
+	var sHeader = typeof(sHeader) == 'string' ? sHeader : help_popup_heading_text;
+	var oPopup_body;
+
+	// Load the help page content (we just want the text to show)
+	$.ajax({
+		url: desktopURL,
+		type: "GET",
+		dataType: "html",
+		success: function (data, textStatus, xhr) {
+			var $base_obj = $('<div id="temp_help">').html(data).find('#send_topic');
+			var title = '';
+			$base_obj.find('h3').each(function () {
+				title = $(this).text();
+				$(this).remove();
+			});
+			var form = $base_obj.find('form');
+			var url = $base_obj.find('form').attr('action');
+			var this_body, send_comment, recipient_name, recipient_mail;
+
+			// Create the div that we are going to load
+			var oContainer = new smc_Popup({heading: (title != '' ? title : sHeader), content: sAjax_indicator, icon: sIcon});
+			oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
+			oPopup_body.html($base_obj.html());
+
+			sendtopicForm(oPopup_body, url, oContainer);
+		},
+		error: function (xhr, textStatus, errorThrown) {
+			oPopup_body.html(textStatus);
+		}
+	});
+
+	return false;
+}
+
+function sendtopicForm(oPopup_body, url, oContainer)
+{
+	if (typeof(this_body) != 'undefined')
+		oPopup_body.html(this_body);
+
+	var $this_form = $(oPopup_body).find('form');
+
+	if (typeof(send_comment) != 'undefined')
+	{
+		$this_form.find('input[name="comment"]').val(send_comment);
+		$this_form.find('input[name="r_name"]').val(recipient_name);
+		$this_form.find('input[name="r_email"]').val(recipient_mail);
+	}
+
+	oPopup_body.find('input[name="send"]').each(function () {
+		$(this).bind('click', function (event) {
+
+			event.preventDefault();
+
+			this_body = $(oPopup_body).html();
+
+			data = $this_form.serialize() + '&send=1';
+			send_comment = $this_form.find('input[name="comment"]').val();
+			recipient_name = $this_form.find('input[name="r_name"]').val();
+			recipient_mail = $this_form.find('input[name="r_email"]').val();
+
+			$.ajax({
+				type: 'post',
+				url: url + ';api',
+				data: data,
+				success: function (request) {
+					var oElement = $(request).find('elk')[0];
+					if (oElement.getElementsByTagName('error').length == 0)
+					{
+						var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+
+						text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+						oPopup_body.html(text);
+						oPopup_body.find('input[name="cancel"]').each(function () {
+							$(this).bind('click', function (event) {
+								event.preventDefault();
+								oContainer.hide();
+							});
+						});
+					}
+					else
+					{
+						if (oElement.getElementsByTagName('text').length != 0)
+						{
+							var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+
+							text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+							oPopup_body.html(text);
+							oPopup_body.find('input[name="send"]').each(function () {
+								$(this).bind('click', function (event) {
+									event.preventDefault();
+									data = $(oPopup_body).find('form').serialize() + '&send=1';
+									sendtopicForm(oPopup_body, url, oContainer);
+								});
+							});
+							oPopup_body.find('input[name="cancel"]').each(function () {
+								$(this).bind('click', function (event) {
+									event.preventDefault();
+									oContainer.hide();
+								});
+							});
+						}
+
+						if (oElement.getElementsByTagName('url').length != 0)
+						{
+							var url_redir = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
+							oPopup_body.html(sendtopic_error.replace('{href}', url_redir));
+						}
+					}
+				},
+				error: function() {
+					oPopup_body.html(sendtopic_error.replace('{href}', url));
+				},
+			});
+
+		});
+	});
+}
