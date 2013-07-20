@@ -1200,6 +1200,8 @@ function loadRules($reload = false)
  */
 function toggleNewPM($id_member, $new = false)
 {
+	global $user_info;
+
 	$db = database();
 	
 	$db->query('', '
