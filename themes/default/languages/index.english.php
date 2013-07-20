@@ -187,7 +187,7 @@ $txt['welcome_member'] = 'Please welcome'; //Deprecated
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
 $txt['last_edit'] = 'Last Edit'; //Deprecated
-$txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
+$txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: <time title="%3$s">%1$s</time> by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
 
 $txt['recent_posts'] = 'Recent Posts';

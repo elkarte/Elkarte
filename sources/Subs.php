@@ -762,10 +762,11 @@ function relativeTime($timestamp, $show_today = true, $offset_type = false)
 
 	// We don't want relative times? Bypass to standardTime();
 	if ($modSettings['todayMod'] < 3)
-	{
-		$past_time = standardTime($timestamp, $show_today, $offset_type);
-		return $past_time;
-	}
+		return standardTime($timestamp, $show_today, $offset_type);
+
+	// No use in doing calculations if there's nothing to work with.
+	if (!$timestamp)
+		return 0;
 
     $past_time = time() - $timestamp;
 

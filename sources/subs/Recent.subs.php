@@ -85,7 +85,7 @@ function getLastPosts($latestPostOptions)
 			'subject' => $row['subject'],
 			'short_subject' => shorten_text($row['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24),
 			'preview' => $row['body'],
-			'time' => relativeTime($row['poster_time']),
+			'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'raw_timestamp' => $row['poster_time'],
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#msg' . $row['id_msg'],
@@ -177,7 +177,7 @@ function getRecentPosts($messages, $start)
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
 			'start' => $row['num_replies'],
 			'subject' => $row['subject'],
-			'time' => standardTime($row['poster_time']),
+			'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'first_poster' => array(
 				'id' => $row['id_first_member'],
