@@ -75,7 +75,7 @@ function action_loadlocale()
  */
 function getMessageIcons($board_id)
 {
-	global $modSettings, $context, $txt, $settings;
+	global $modSettings, $txt, $settings;
 
 	$db = database();
 
