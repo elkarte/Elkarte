@@ -476,6 +476,7 @@ class Emailuser_Controller extends Action_Controller
 		}
 
 		// Find out who the real moderators are - for mod preferences.
+		require_once(SUBSDIR . '/Boards.subs.php');
 		$real_mods = getBoardModerators($board, true);
 
 		// Send every moderator an email.
