@@ -856,7 +856,8 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 		url: desktopURL,
 		type: "GET",
 		dataType: "html",
-		success: function (data, textStatus, xhr) {
+	})
+	.done(function (data) {
 			var $base_obj = $('<div id="temp_help">').html(data).find('#send_topic');
 			var title = '';
 			$base_obj.find('h3').each(function () {
@@ -873,10 +874,9 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 			oPopup_body.html($base_obj.html());
 
 			sendtopicForm(oPopup_body, url, oContainer);
-		},
-		error: function (xhr, textStatus, errorThrown) {
+	})
+	.fail(function (xhr, textStatus, errorThrown) {
 			oPopup_body.html(textStatus);
-		}
 	});
 
 	return false;
@@ -896,30 +896,51 @@ function sendtopicForm(oPopup_body, url, oContainer)
 		$this_form.find('input[name="r_email"]').val(recipient_mail);
 	}
 
-	oPopup_body.find('input[name="send"]').each(function () {
-		$(this).bind('click', function (event) {
+	oPopup_body.find('input[name="send"]').bind('click', function (event) {
+		event.preventDefault();
 
-			event.preventDefault();
+		this_body = $(oPopup_body).html();
 
-			this_body = $(oPopup_body).html();
+		data = $this_form.serialize() + '&send=1';
+		send_comment = $this_form.find('input[name="comment"]').val();
+		recipient_name = $this_form.find('input[name="r_name"]').val();
+		recipient_mail = $this_form.find('input[name="r_email"]').val();
 
-			data = $this_form.serialize() + '&send=1';
-			send_comment = $this_form.find('input[name="comment"]').val();
-			recipient_name = $this_form.find('input[name="r_name"]').val();
-			recipient_mail = $this_form.find('input[name="r_email"]').val();
+		$.ajax({
+			type: 'post',
+			url: url + ';api',
+			data: data
+		})
+		.done(function (request) {
+				var oElement = $(request).find('elk')[0];
+				if (oElement.getElementsByTagName('error').length == 0)
+				{
+					var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 
-			$.ajax({
-				type: 'post',
-				url: url + ';api',
-				data: data,
-				success: function (request) {
-					var oElement = $(request).find('elk')[0];
-					if (oElement.getElementsByTagName('error').length == 0)
+					text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+					oPopup_body.html(text);
+					oPopup_body.find('input[name="cancel"]').each(function () {
+						$(this).bind('click', function (event) {
+							event.preventDefault();
+							oContainer.hide();
+						});
+					});
+				}
+				else
+				{
+					if (oElement.getElementsByTagName('text').length != 0)
 					{
 						var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 
 						text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
 						oPopup_body.html(text);
+						oPopup_body.find('input[name="send"]').each(function () {
+							$(this).bind('click', function (event) {
+								event.preventDefault();
+								data = $(oPopup_body).find('form').serialize() + '&send=1';
+								sendtopicForm(oPopup_body, url, oContainer);
+							});
+						});
 						oPopup_body.find('input[name="cancel"]').each(function () {
 							$(this).bind('click', function (event) {
 								event.preventDefault();
@@ -927,41 +948,16 @@ function sendtopicForm(oPopup_body, url, oContainer)
 							});
 						});
 					}
-					else
+
+					if (oElement.getElementsByTagName('url').length != 0)
 					{
-						if (oElement.getElementsByTagName('text').length != 0)
-						{
-							var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
-
-							text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
-							oPopup_body.html(text);
-							oPopup_body.find('input[name="send"]').each(function () {
-								$(this).bind('click', function (event) {
-									event.preventDefault();
-									data = $(oPopup_body).find('form').serialize() + '&send=1';
-									sendtopicForm(oPopup_body, url, oContainer);
-								});
-							});
-							oPopup_body.find('input[name="cancel"]').each(function () {
-								$(this).bind('click', function (event) {
-									event.preventDefault();
-									oContainer.hide();
-								});
-							});
-						}
-
-						if (oElement.getElementsByTagName('url').length != 0)
-						{
-							var url_redir = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
-							oPopup_body.html(sendtopic_error.replace('{href}', url_redir));
-						}
+						var url_redir = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
+						oPopup_body.html(sendtopic_error.replace('{href}', url_redir));
 					}
-				},
-				error: function() {
-					oPopup_body.html(sendtopic_error.replace('{href}', url));
-				},
-			});
-
+				}
+		})
+		.fail(function() {
+				oPopup_body.html(sendtopic_error.replace('{href}', url));
 		});
 	});
 }
