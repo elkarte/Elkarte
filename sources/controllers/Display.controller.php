@@ -1022,11 +1022,11 @@ class Display_Controller
 			'icon' => $message['icon'],
 			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
 			'subject' => $message['subject'],
-			'time' => relativeTime($message['poster_time']),
+			'time' => '<time datetime="' . htmlTime($message['poster_time']) . '" title="' . standardTime($message['poster_time']) . '">' . relativeTime($message['poster_time']) . '</time>',
 			'timestamp' => forum_time(true, $message['poster_time']),
 			'counter' => $counter,
 			'modified' => array(
-				'time' => relativeTime($message['modified_time']),
+				'time' => '<time datetime="' . htmlTime($message['modified_time']) . '" title="' . standardTime($message['modified_time']) . '">' . relativeTime($message['modified_time']) . '</time>',
 				'timestamp' => forum_time(true, $message['modified_time']),
 				'name' => $message['modified_name']
 			),
@@ -1049,7 +1049,7 @@ class Display_Controller
 		// Is this user the message author?
 		$output['is_message_author'] = $message['id_member'] == $user_info['id'];
 		if (!empty($output['modified']['name']))
-			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name']);
+			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], $output['modified']['time_full']);
 
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
 

@@ -259,8 +259,7 @@ function getBoardIndex($boardIndexOptions)
 		$row_board['short_subject'] = shorten_text($row_board['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24);
 		$this_last_post = array(
 			'id' => $row_board['id_msg'],
-			'time' => $row_board['poster_time'] > 0 ? ('<time datetime="' . htmlTime($row_board['poster_time']) . '">' . relativeTime($row_board['poster_time']) . '</time>') : $txt['not_applicable'],
-			'timestamp' => forum_time(true, $row_board['poster_time']),
+			'time' => $row_board['poster_time'] > 0 ? ('<time datetime="' . htmlTime($row_board['poster_time']) . '" title="' . standardTime($row_board['poster_time']) . '">' . relativeTime($row_board['poster_time']) . '</time>') : $txt['not_applicable'],
 			'subject' => $row_board['short_subject'],
 			'member' => array(
 				'id' => $row_board['id_member'],
