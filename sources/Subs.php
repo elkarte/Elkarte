@@ -3657,6 +3657,14 @@ function setupMenuContext()
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
+		// Update the Moderation menu items with action item totals
+		if ($context['allow_moderation_center'])
+		{
+			// Get the numbers for the menu ...
+			require_once(SUBSDIR . '/Moderation.subs.php');
+			$mod_count = loadModeratorMenuCounts();
+		}
+
 		$buttons = array(
 
 			// The old "logout" is meh. Not a real word. "Log out" is better.
@@ -3715,6 +3723,7 @@ function setupMenuContext()
 			// Button highlighting works properly too (see current action stuffz).
 			'admin' => array(
 				'title' => $context['allow_admin'] && ($context['current_action'] !== 'moderate') ? $txt['admin'] : $txt['moderate'],
+				'counter' => $mod_count['total'],
 				'href' => $context['allow_admin'] ? $scripturl . '?action=admin' : $scripturl . '?action=moderate',
 				'show' => $context['allow_moderation_center'],
 				'sub_buttons' => array(
@@ -3745,11 +3754,13 @@ function setupMenuContext()
 					),
 					'moderate_sub' => array(
 						'title' => $txt['moderate'],
+						'counter' => $mod_count['total'],
 						'href' => $scripturl . '?action=moderate',
 						'show' => $context['allow_admin'],
 						'sub_buttons' => array(
 							'reports' => array(
 								'title' => $txt['mc_reported_posts'],
+								'counter' => $mod_count['reports'],
 								'href' => $scripturl . '?action=moderate;area=reports',
 								'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
 							),
@@ -3760,16 +3771,19 @@ function setupMenuContext()
 							),
 							'attachments' => array(
 								'title' => $txt['mc_unapproved_attachments'],
+								'counter' => $mod_count['attachments'],
 								'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 							),
 							'poststopics' => array(
 								'title' => $txt['mc_unapproved_poststopics'],
+								'counter' => $mod_count['postmod'],
 								'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 							),
 							'postbyemail' => array(
 								'title' => $txt['mc_emailerror'],
+								'counter' => $mod_count['emailmod'],
 								'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 								'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 							),
@@ -3777,6 +3791,7 @@ function setupMenuContext()
 					),
 					'moderate' => array(
 						'title' => $txt['moderate'],
+						'counter' => $mod_count['total'],
 						'href' => $scripturl . '?action=moderate',
 						'show' => !$context['allow_admin'],
 					),
@@ -3809,8 +3824,11 @@ function setupMenuContext()
 			),
 
 			// Language string needs agreement here. Anything but bloody username, please. :P
+			// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
+			// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
 			'pm' => array(
 				'title' => $context['allow_pm'] && !$context['allow_edit_profile'] ? $txt['pm_short'] : $txt['account_short'],
+				'counter' => $context['user']['unread_messages'],
 				'href' => $context['allow_pm'] ? $scripturl . '?action=pm' : $scripturl . '?action=profile',
 				'show' => $context['allow_pm'] || $context['allow_edit_profile'],
 				'sub_buttons' => array(
@@ -3905,12 +3923,25 @@ function setupMenuContext()
 				if (isset($button['action_hook']))
 					$needs_action_hook = true;
 
+				if (!empty($button['counter']))
+				{
+					$button['alttitle'] = $button['title'] . ' [' . $button['counter'] . ']';
+					if (!empty($settings['menu_numeric_notice']))
+						$button['title'] .= sprintf($settings['menu_numeric_notice'], $button['counter']);
+				}
+
 				// Go through the sub buttons if there are any.
 				if (!empty($button['sub_buttons']))
 					foreach ($button['sub_buttons'] as $key => $subbutton)
 					{
 						if (empty($subbutton['show']))
 							unset($button['sub_buttons'][$key]);
+						elseif (!empty($subbutton['counter']))
+						{
+							$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $subbutton['counter'] . ']';
+							if (!empty($settings['menu_numeric_notice']))
+								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'], $subbutton['counter']);
+						}
 
 						// 2nd level sub buttons next...
 						if (!empty($subbutton['sub_buttons']))
@@ -3919,6 +3950,12 @@ function setupMenuContext()
 							{
 								if (empty($sub_button2['show']))
 									unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
+								elseif (!empty($sub_button2['counter']))
+								{
+									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $sub_button2['title'] . ' [' . $sub_button2['counter'] . ']';
+									if (!empty($settings['menu_numeric_notice']))
+										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'], $sub_button2['counter']);
+								}
 							}
 						}
 					}
@@ -3963,58 +4000,6 @@ function setupMenuContext()
 
 	if (isset($context['menu_buttons'][$current_action]))
 		$context['menu_buttons'][$current_action]['active_button'] = true;
-
-	// No need for accurate text if we are in xml mode
-	if (isset($_REQUEST['xml']))
-		return;
-
-	// Update the PM menu item if they have unread messages
-	// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
-	// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
-	if (!$user_info['is_guest'] && $context['user']['unread_messages'] > 0 && isset($context['menu_buttons']['pm']))
-	{
-		$context['menu_buttons']['pm']['alttitle'] = $context['menu_buttons']['pm']['title'] . ' [' . $context['user']['unread_messages'] . ']';
-		if (!empty($settings['menu_numeric_notice']))
-			$context['menu_buttons']['pm']['title'] .= sprintf($settings['menu_numeric_notice'], $context['user']['unread_messages']);
-	}
-
-	// Update the Moderation menu items with action item totals
-	if ($context['allow_moderation_center'])
-	{
-		// Get the numbers for the menu ...
-		require_once(SUBSDIR . '/Moderation.subs.php');
-		$mod_count = loadModeratorMenuCounts();
-
-		if (!empty($mod_count['total']))
-		{
-			$context['menu_buttons']['moderate']['alttitle'] = $context['menu_buttons']['moderate']['title'] . ' [' . $mod_count['total'] . ']';
-			$context['menu_buttons']['moderate']['title'] .= !empty($mod_count['total']) ? sprintf($settings['menu_numeric_notice'], $mod_count['total']) : '';
-
-			if (!empty($mod_count['postmod']))
-			{
-				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] . ' [' . $mod_count['postmod'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['poststopics']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['postmod']);
-			}
-
-			if (!empty($mod_count['emailmod']))
-			{
-				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] . ' [' . $mod_count['emailmod'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['postbyemail']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['emailmod']);
-			}
-
-			if (!empty($mod_count['attachments']))
-			{
-				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] . ' [' . $mod_count['attachments'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['attachments']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['attachments']);
-			}
-
-			if (!empty($mod_count['reports']))
-			{
-				$context['menu_buttons']['moderate']['sub_buttons']['reports']['alttitle'] = $context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] . ' [' . $mod_count['reports'] . ']';
-				$context['menu_buttons']['moderate']['sub_buttons']['reports']['title'] .= sprintf($settings['menu_numeric_notice'], $mod_count['reports']);
-			}
-		}
-	}
 }
 
 /**
