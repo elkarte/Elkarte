@@ -189,12 +189,14 @@ function loadModeratorMenuCounts($brd = null)
 	if ($temp === null || !isset($temp[$cache_key]))
 	{
 		// Starting out with nothing is a good start
-		$menu_errors[$cache_key]['attachments'] = 0;
-		$menu_errors[$cache_key]['reports'] = 0;
-		$menu_errors[$cache_key]['emailmod'] = 0;
-		$menu_errors[$cache_key]['postmod'] = 0;
-		$menu_errors[$cache_key]['topics'] = 0;
-		$menu_errors[$cache_key]['posts'] = 0;
+		$menu_errors[$cache_key] = array(
+			'attachments' => 0,
+			'reports' => 0,
+			'emailmod' => 0,
+			'postmod' => 0,
+			'topics' => 0,
+			'posts' => 0,
+		);
 
 		if ($modSettings['postmod_active'] && !empty($approve_boards))
 		{
