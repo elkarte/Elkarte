@@ -3723,7 +3723,7 @@ function setupMenuContext()
 			// Button highlighting works properly too (see current action stuffz).
 			'admin' => array(
 				'title' => $context['allow_admin'] && ($context['current_action'] !== 'moderate') ? $txt['admin'] : $txt['moderate'],
-				'counter' => $mod_count['total'],
+				'counter' => isset($mod_count) ? $mod_count['total'] : 0,
 				'href' => $context['allow_admin'] ? $scripturl . '?action=admin' : $scripturl . '?action=moderate',
 				'show' => $context['allow_moderation_center'],
 				'sub_buttons' => array(
@@ -3754,13 +3754,13 @@ function setupMenuContext()
 					),
 					'moderate_sub' => array(
 						'title' => $txt['moderate'],
-						'counter' => $mod_count['total'],
+						'counter' => isset($mod_count) ? $mod_count['total'] : 0,
 						'href' => $scripturl . '?action=moderate',
 						'show' => $context['allow_admin'],
 						'sub_buttons' => array(
 							'reports' => array(
 								'title' => $txt['mc_reported_posts'],
-								'counter' => $mod_count['reports'],
+								'counter' => isset($mod_count) ? $mod_count['reports'] : 0,
 								'href' => $scripturl . '?action=moderate;area=reports',
 								'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
 							),
@@ -3771,19 +3771,19 @@ function setupMenuContext()
 							),
 							'attachments' => array(
 								'title' => $txt['mc_unapproved_attachments'],
-								'counter' => $mod_count['attachments'],
+								'counter' => isset($mod_count) ? $mod_count['attachments'] : 0,
 								'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 							),
 							'poststopics' => array(
 								'title' => $txt['mc_unapproved_poststopics'],
-								'counter' => $mod_count['postmod'],
+								'counter' => isset($mod_count) ? $mod_count['postmod'] : 0,
 								'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 							),
 							'postbyemail' => array(
 								'title' => $txt['mc_emailerror'],
-								'counter' => $mod_count['emailmod'],
+								'counter' => isset($mod_count) ? $mod_count['emailmod'] : 0,
 								'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 								'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 							),
@@ -3791,12 +3791,13 @@ function setupMenuContext()
 					),
 					'moderate' => array(
 						'title' => $txt['moderate'],
-						'counter' => $mod_count['total'],
+						'counter' => isset($mod_count) ? $mod_count['total'] : 0,
 						'href' => $scripturl . '?action=moderate',
 						'show' => !$context['allow_admin'],
 					),
 					'reports' => array(
 						'title' => $txt['mc_reported_posts'],
+						'counter' => isset($mod_count) ? $mod_count['reports'] : 0,
 						'href' => $scripturl . '?action=moderate;area=reports',
 						'show' => !$context['allow_admin'] && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
 					),
@@ -3807,16 +3808,19 @@ function setupMenuContext()
 					),
 					'attachments' => array(
 						'title' => $txt['mc_unapproved_attachments'],
+						'counter' => isset($mod_count) ? $mod_count['attachments'] : 0,
 						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 					),
 					'poststopics' => array(
 						'title' => $txt['mc_unapproved_poststopics'],
+						'counter' => isset($mod_count) ? $mod_count['postmod'] : 0,
 						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 					),
 					'postbyemail' => array(
 						'title' => $txt['mc_emailerror'],
+						'counter' => isset($mod_count) ? $mod_count['emailmod'] : 0,
 						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 						'show' => !$context['allow_admin'] && !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 					),
