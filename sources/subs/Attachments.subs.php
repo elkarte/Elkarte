@@ -1255,7 +1255,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	require_once(SUBSDIR . '/Graphics.subs.php');
 	if (!empty($modSettings['avatar_download_png']))
 		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
- 	else
+	else
 		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height);
 
 	if ($success)

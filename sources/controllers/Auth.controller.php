@@ -356,14 +356,14 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
- 	* Logs the current user out of their account.
- 	* It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
- 	* It redirects back to $_SESSION['logout_url'], if it exists.
- 	* It is accessed via ?action=logout;session_var=...
- 	*
- 	* @param bool $internal if true, it doesn't check the session
- 	* @param $redirect
- 	*/
+	* Logs the current user out of their account.
+	* It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
+	* It redirects back to $_SESSION['logout_url'], if it exists.
+	* It is accessed via ?action=logout;session_var=...
+	*
+	* @param bool $internal if true, it doesn't check the session
+	* @param $redirect
+	*/
 	public function action_logout($internal = false, $redirect = true)
 	{
 		global $user_info, $user_settings, $context;
@@ -443,10 +443,10 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
- 	* Display a message about the forum being in maintenance mode.
- 	* Displays a login screen with sub template 'maintenance'.
- 	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
- 	*/
+	* Display a message about the forum being in maintenance mode.
+	* Displays a login screen with sub template 'maintenance'.
+	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
+	*/
 	public function action_maintenance_mode()
 	{
 		global $txt, $mtitle, $mmessage, $context;

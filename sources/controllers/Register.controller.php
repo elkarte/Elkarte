@@ -40,11 +40,11 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
- 	* Begin the registration process.
- 	* Accessed by ?action=register
- 	*
- 	* @param array $reg_errors = array()
- 	*/
+	* Begin the registration process.
+	* Accessed by ?action=register
+	*
+	* @param array $reg_errors = array()
+	*/
 	function action_register($reg_errors = array())
 	{
 		global $txt, $context, $modSettings, $user_info;
