@@ -177,6 +177,9 @@ textarea, .editor {
 .sceditor-container {
 	margin: 0 0 12px 0;
 }
+.messageicon_img {
+	margin: 0 15px;
+}
 /* Gecko-specific reset - makes buttons consistent with other browsers. */
 /* Yes, rotten browser-specific code. It will save some dramas though. */
 button::-moz-focus-inner, input[type='button']::-moz-focus-inner,
