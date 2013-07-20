@@ -3471,7 +3471,23 @@ dl.merge_topic dd {
 	width: 100%;
 }
 
-
+#mlsearch {
+  padding-top: 5px;
+}
+#mlsearch_options {
+  position: absolute;
+  display: none;
+  background: #FAFAFA;
+  padding: 0.5em;
+  border: 1px solid #DDDDDD;
+  border-radius: 5px;
+}
+#mlsearch_options .mlsearch_option .input_check {
+  margin-left: 0.5em;
+}
+#mlsearch_options .mlsearch_option {
+  padding: 0.2em 0;
+}
 
 
 /*	$LOGIN		*/

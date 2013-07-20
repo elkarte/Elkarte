@@ -59,6 +59,7 @@ class Themes_Controller extends Action_Controller
 		// Load the important language files...
 		loadLanguage('Themes');
 		loadLanguage('Settings');
+		require_once(SUBSDIR . '/Action.class.php');
 
 		// No guests in here.
 		is_not_guest();
