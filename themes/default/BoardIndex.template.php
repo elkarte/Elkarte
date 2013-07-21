@@ -188,7 +188,7 @@ function template_boardindex_outer_below()
 		<div id="posting_icons">';
 
 	// Show the mark all as read button?
-	if ($settings['show_mark_read'] && !empty($context['categories']))
+	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
 	echo '
 			', template_button_strip($context['mark_read_button'], 'right');
 
