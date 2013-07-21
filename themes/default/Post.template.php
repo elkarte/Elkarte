@@ -381,7 +381,7 @@ function template_postarea_above()
 							<dt>
 								<span', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</span>
 							</dt>
-							<dd>
+							<dd class="guestname">
 								<input type="text" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
 							</dd>';
 
@@ -390,7 +390,7 @@ function template_postarea_above()
 							<dt>
 								<span', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</span>
 							</dt>
-							<dd>
+							<dd class="guestmeail">
 								<input type="text" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
 							</dd>';
 	}
@@ -400,13 +400,13 @@ function template_postarea_above()
 							<dt class="clear">
 								<span', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</span>
 							</dt>
-							<dd>
+							<dd class="postsubject">
 								<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
 							</dd>
 							<dt class="clear_left">
 								', $txt['message_icon'], ':
 							</dt>
-							<dd>
+							<dd class="messageicon">
 								<select name="icon" id="icon" onchange="showimage()">';
 
 	// Loop through each message icon allowed, adding it to the drop down list.
@@ -416,14 +416,14 @@ function template_postarea_above()
 
 	echo '
 								</select>
-								<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
+								<img src="', $context['icon_url'], '" class="messageicon_img" alt="" />
 							</dd>';
 	if (!empty($context['show_boards_dropdown']))
 		echo '
 							<dt class="clear_left">
 								', $txt['post_in_board'], ':
 							</dt>
-							<dd>', template_select_boards('post_in_board'), '
+							<dd class="boardsdrop">', template_select_boards('post_in_board'), '
 							</dd>';
 	echo '
 						</dl>';
