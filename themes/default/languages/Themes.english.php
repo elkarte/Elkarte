@@ -152,6 +152,3 @@ $txt['themeadmin_themelist_link'] = 'Show the list of themes';
 $txt['variant_light'] = 'ElkArte Light';
 $txt['variant_dark'] = 'ElkArte Dark';
 $txt['variant_basic'] = 'ElkArte Basic';
-$txt['variant_red'] = 'Red Sector';
-$txt['variant_green'] = 'Green Style';
-$txt['variant_blue'] = 'Blue Sky';
