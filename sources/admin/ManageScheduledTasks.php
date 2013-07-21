@@ -373,7 +373,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				'function' => 'list_getTaskLogEntries',
 			),
 			'get_count' => array(
-				'function' => 'list_getNumTaskLogEntries',
+				'function' => 'list_getNumaction_logEntries(',
 			),
 			'columns' => array(
 				'name' => array(

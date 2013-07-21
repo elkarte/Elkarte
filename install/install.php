@@ -1334,7 +1334,7 @@ function action_adminAccount()
  */
 function action_deleteInstall()
 {
-	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
+	global $txt, $db_prefix, $db_connection, $cookiename, $incontext;
 	global $db_character_set, $mbname, $context, $scripturl, $boardurl;
 	global $current_version, $databases, $forum_version, $modSettings, $user_info, $language, $db_type;
 
