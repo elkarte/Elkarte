@@ -152,6 +152,7 @@ $txt['replies'] = 'Replies';
 $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
 $txt['last_poster'] = 'Last post by';
+$txt['sort_by'] = 'Sort by';
 //$txt['last_post_message'] = '<strong>Last post</strong> by %1$s<br />in %2$s<br />on %3$s';
 // @todo - Clean this up a bit. See notes in template. Also, needs another string for topic_listing sorting options.
 // Just moved a space, so the output looks better when things break to an extra line.

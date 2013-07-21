@@ -840,3 +840,12 @@ function ignore_toggles(msgids, text)
 		});
 	}
 }
+
+function sortTopics(elem)
+{
+	var url = elem[elem.selectedIndex].value;
+	if (!$('#topics_sort_dir img').hasClass('up'))
+		url += ';desc';
+
+	window.location = url;
+}

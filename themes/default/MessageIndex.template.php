@@ -220,7 +220,17 @@ function template_main()
 			echo '
 
 				<h3>
-					Sort by: ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], ' / ', $context['topics_headers']['likes'], '
+					', $txt['sort_by'], ':
+					<select onchange="sortTopics(this)" id="topics_sort">';
+			foreach ($context['topics_headers'] as $header)
+			{
+				if ($header['selected'])
+					$sort_dir_url = $header['url'];
+				echo '
+						<option ', $header['selected'] ? 'selected="selected" ' : '', 'value="', $header['url'], '">', $header['name'], '</option>';
+			}
+			echo '
+					</select> <a id="topics_sort_dir" href="', $sort_dir_url, '"><img class="', $context['sort_direction'], '"src="', $settings['images_url'], '/sort_', $context['sort_direction'], '.png" /></a>
 				</h3>';
 
 			// Show a "select all" box for quick moderation?
