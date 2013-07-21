@@ -260,6 +260,7 @@ function getBoardIndex($boardIndexOptions)
 		$this_last_post = array(
 			'id' => $row_board['id_msg'],
 			'time' => $row_board['poster_time'] > 0 ? ('<time datetime="' . htmlTime($row_board['poster_time']) . '" title="' . standardTime($row_board['poster_time']) . '">' . relativeTime($row_board['poster_time']) . '</time>') : $txt['not_applicable'],
+			'timestamp' => forum_time(true, $row_board['poster_time']),
 			'subject' => $row_board['short_subject'],
 			'member' => array(
 				'id' => $row_board['id_member'],
