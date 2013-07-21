@@ -51,7 +51,7 @@
 	/* Next controls forum width, when it is not set in admin. */
 	width: 90%;
 	/* Next limits maximum width on wide screens. */
-	/* Sized in em, since some people require larger text. */ 
+	/* Sized in em, since some people require larger text. */
 	/* For ease of reading, content really should not be too wide. */
 	max-width: 90em;
 	/* Next is just for some testing. */
@@ -149,7 +149,7 @@ a img {
 /* differences when adding custom padding, or it will drive you mental. */
 
 /* ALSO: This is still not quite pixel perfect everywhere for all browsers,
-/* in particular not for Internet Explorer. They can live with it. */ 
+/* in particular not for Internet Explorer. They can live with it. */
 /*
 	.button_submit	-	covers input[type=submit], input[type=button],
 						button[type=submit] and button[type=button]
@@ -1289,16 +1289,15 @@ div.windowbg, div.windowbg2 {
 .unlike_button:before {
 	background-position: 0 -408px;
 }
-/* This one is not sprited yet. */
-.linklevel1.likes_button:before {
-	background: url(../images/icons/heart.png) 2px 50% no-repeat;
+.likes_button:before {
+	background-position: 0 -432px;
 }
 /* No icon here. */
 .quick_edit .linklevel1:before, .linklevel1.post_options:before,
 .follow_ups .linklevel1:before {
 	display: none;
 }
-/* "More..." gets custom padding (no icon). */ 
+/* "More..." gets custom padding (no icon). */
 .linklevel1.post_options {
 	padding: 1px 6px 0 6px;
 }
@@ -2107,7 +2106,7 @@ img.new_posts {
 	text-align: center;
 	font-size: 1em;
 }
-/* #todo - Add an h3 for a11y? Breaks Stoopidfish. Bleh. :P */ 
+/* #todo - Add an h3 for a11y? Breaks Stoopidfish. Bleh. :P */
 .poster .name {
 	overflow: hidden;
 	margin-top: -0.4em;
@@ -3572,7 +3571,7 @@ dl.merge_topic dd {
 	margin-right: 12px;
 }
 
-/* Common for all admin sections. */ 
+/* Common for all admin sections. */
 /* @todo - Why is admin stuff in index.css? */
 #admin_content {
 	clear: both;
@@ -3868,10 +3867,10 @@ dl.merge_topic dd {
 /* This one does 1024 screens at default font size. */
 @media screen and (min-width: 52em) and (max-width: 70em) {
 	.board_latest {
-		min-width: 27em; 
+		min-width: 27em;
 	}
 	.topic_latest {
-		min-width: 17em; 
+		min-width: 17em;
 	}
 	.board_stats, .topic_stats {
 		display: none;
@@ -3883,7 +3882,7 @@ dl.merge_topic dd {
 		min-width: 98%;
 	}
 	.board_latest {
-		min-width: 20em; 
+		min-width: 20em;
 	}
 	.board_lastposter {
 		display: block;
