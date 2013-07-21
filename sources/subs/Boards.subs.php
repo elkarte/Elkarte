@@ -1584,7 +1584,7 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
  *
  * @todo unify the two queries?
  */
-function fetchBoardsInfo($conditions, $params = array())
+function fetchBoardsInfo($conditions = 'all', $params = array())
 {
 	global $modSettings;
 
@@ -1602,6 +1602,7 @@ function fetchBoardsInfo($conditions, $params = array())
 	else
 		$sort_by = '';
 
+	// if $conditions wasn't set or is 'all', get all boards
 	if (!is_array($conditions) && $conditions == 'all')
 	{
 		// id_board, name, id_profile => used in admin/Reports.php
@@ -1613,11 +1614,14 @@ function fetchBoardsInfo($conditions, $params = array())
 	}
 	else
 	{
+		// only some category?
 		if (!empty($conditions['categories']))
 		{
 			$clauses[] = 'id_cat IN ({array_int:category_list})';
 			$clauseParameters['category_list'] = is_array($conditions['categories']) ? $conditions['categories'] : array($conditions['categories']);
 		}
+
+		// only a few boards, perhaps!
 		if (!empty($conditions['boards']))
 		{
 			$clauses[] = 'id_board IN ({array_int:board_list})';

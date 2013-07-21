@@ -273,6 +273,8 @@ class Reports_Controller extends Action_Controller
 
 		// Get as much memory as possible as this can be big.
 		setMemoryLimit('256M');
+
+		// Boards, first.
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		if (isset($_REQUEST['boards']))
@@ -283,8 +285,16 @@ class Reports_Controller extends Action_Controller
 				$query_boards['boards'] = array_map('intval', $_REQUEST['boards']);
 		}
 		else
-			$query_boards = '1=1';
+			$query_boards = 'all';
 
+		// Fetch the board names and profiles.
+		// This returns id_board, name, id_profile keys
+		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board', 'selects' => 'permissions'));
+		$profiles = array();
+		foreach ($boards as $b)
+			$profiles[] = $b['id_profile'];
+
+		// Groups, next.
 		$query_groups = array();
 		if (isset($_REQUEST['groups']))
 		{
@@ -297,12 +307,6 @@ class Reports_Controller extends Action_Controller
 		}
 		else
 			$group_clause = '1=1';
-
-		// Fetch all the board names.
-		$boards = fetchBoardsInfo($query_boards, array('sort_by' => 'id_board', 'selects' => 'permissions'));
-		$profiles = array();
-		foreach ($boards as $row)
-			$profiles[] = $row['id_profile'];
 
 		// Get all the possible membergroups, except admin!
 		$request = $db->query('', '
@@ -330,7 +334,7 @@ class Reports_Controller extends Action_Controller
 		// Make sure that every group is represented - plus in rows!
 		setKeys('rows', $member_groups);
 
-		// Cache every permission setting, to make sure we don't miss any allows.
+		// Permissions, last!
 		$permissions = array();
 		$board_permissions = array();
 		$request = $db->query('', '
