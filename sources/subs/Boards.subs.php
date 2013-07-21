@@ -948,7 +948,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	if (isset($boardListOptions['ignore']))
 	{
 		$select .= ',' . (!empty($boardListOptions['ignore']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored';
-		$where_parameters['included_boards'] = $boardListOptions['ignore'];
+		$where_parameters['ignore_boards'] = $boardListOptions['ignore'];
 	}
 
 	if (!empty($boardListOptions['ignore_boards']))
