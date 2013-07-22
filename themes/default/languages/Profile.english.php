@@ -286,10 +286,9 @@ $txt['timeformat_easy5'] = 'DD-MM-YYYY, HH:MM:SS';
 
 $txt['poster'] = 'Poster';
 
-$txt['board_desc_inside'] = 'Show board descriptions inside boards.';
 $txt['show_children'] = 'Show child boards on every page inside boards, not just the first.';
-$txt['use_sidebar_menu'] = 'Use sidebar menus instead of dropdown menus when possible.';
-$txt['use_click_menu'] = 'Use click-to drop down instead of hover-to drop down menus when possible.';
+$txt['use_sidebar_menu'] = 'Use sidebar menus instead of dropdown menus.';
+$txt['use_click_menu'] = 'Use click instead of hover to open menus.';
 $txt['show_no_avatars'] = 'Don\'t show users\' avatars.';
 $txt['show_no_signatures'] = 'Don\'t show users\' signatures.';
 $txt['show_no_censored'] = 'Leave words uncensored.';
