@@ -820,7 +820,7 @@ class Post_Controller extends Action_Controller
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 
-		// Build a list of drafts that they can load in to the editor
+		// Build a list of drafts that they can load into the editor
 		if (!empty($context['drafts_save']))
 		{
 			$this->_prepareDraftsContext($user_info['id'], $topic);

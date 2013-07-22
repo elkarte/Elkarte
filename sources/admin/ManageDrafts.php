@@ -121,7 +121,6 @@ class ManageDrafts_Controller extends Action_Controller
 			// Draft settings ...
 			array('check', 'drafts_post_enabled'),
 			array('check', 'drafts_pm_enabled'),
-			array('check', 'drafts_show_saved_enabled', 'subtext' => $txt['drafts_show_saved_enabled_subnote']),
 			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
 			'',
 			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
@@ -147,7 +146,6 @@ class ManageDrafts_Controller extends Action_Controller
 			// Draft settings ...
 			array('check', 'drafts_post_enabled'),
 			array('check', 'drafts_pm_enabled'),
-			array('check', 'drafts_show_saved_enabled', 'subtext' => $txt['drafts_show_saved_enabled_subnote']),
 			array('int', 'drafts_keep_days', 'postinput' => $txt['days_word'], 'subtext' => $txt['drafts_keep_days_subnote']),
 			'',
 			array('check', 'drafts_autosave_enabled', 'subtext' => $txt['drafts_autosave_enabled_subnote']),
