@@ -1017,6 +1017,9 @@ div.windowbg, div.windowbg2 {
 	display: block;
 	padding: 0 7px;
 }
+.linklevel2.help {
+	display: inline-block;
+}
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
 /* Hmm. These are tricky with the new Superfish/Superclick combo. */
 /* May need a noScript class added somewhere. Pondering required. */
@@ -2143,13 +2146,14 @@ img.new_posts {
 .poster .listlevel2:hover .linklevel2:hover {
 	text-decoration: underline;
 }
-.karma_allow>.linklevel2 {
+.listlevel2.karma_applaud, .listlevel2.karma_smite {
 	display: inline-block;
+	width: 45%;
 }
 .listlevel2>ol>li {
 	display: table-cell;
 }
-.report_seperator {
+.separator_report {
 	margin: 6px 0 0 0;
 	height: 1px;
 	background: #bbb;
@@ -2159,7 +2163,7 @@ img.new_posts {
 .poster .icons>img, .poster .linklevel1>img, .poster .linklevel2>img {
 	vertical-align: middle;
 }
-.listlevel2>ol>li img, .listlevel2.warning img, .listlevel2.poster_ip img {
+.listlevel2>ol>li img, .listlevel2.warning img, .listlevel2.has_warning img, .listlevel2.poster_ip img {
 	padding: 0 4px;
 }
 .avatar>.linklevel1>.avatar {
