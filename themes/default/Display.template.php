@@ -254,7 +254,8 @@ function template_main()
 						</ul>';
 
 		// Are there any custom profile fields for above the signature?
-		if (!empty($message['member']['custom_fields']))
+		// Show them if signatures are enabled and you want to see them.
+		if (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 		{
 			$shown = false;
 			foreach ($message['member']['custom_fields'] as $custom)
