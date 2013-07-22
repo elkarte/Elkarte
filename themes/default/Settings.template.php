@@ -23,11 +23,6 @@ function template_options()
 
 	$context['theme_options'] = array(
 		array(
-			'id' => 'show_children',
-			'label' => $txt['show_children'],
-			'default' => true,
-		),
-		array(
 			'id' => 'use_sidebar_menu',
 			'label' => $txt['use_sidebar_menu'],
 			'default' => true,

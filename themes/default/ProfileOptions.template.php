@@ -575,13 +575,6 @@ function template_profile_theme_settings()
 
 	echo '
 							<dt>
-								<label for="show_children">', $txt['show_children'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" name="default_options[show_children]" value="0" />
-								<input type="checkbox" name="default_options[show_children]" id="show_children" value="1"', !empty($context['member']['options']['show_children']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt>
 								<label for="use_sidebar_menu">', $txt['use_sidebar_menu'], '</label>
 							</dt>
 							<dd>
