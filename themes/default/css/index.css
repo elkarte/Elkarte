@@ -2339,8 +2339,40 @@ dl.send_mail dt {
 dl.send_mail dd {
 	width: 64%;
 }
+.requiredfield:before {
+	content: ' ';
+	height: 0;
+	position: absolute;
+	width: 0;
 
+	border: 10px solid transparent;
+	border-bottom-color: #437837;
 
+	bottom: 90%;
+	left: 5%;
+}
+.requiredfield {
+	color: #FFFFFF;
+	position: absolute;
+	top: 20px;
+	left: 5%;
+	font-size: 90%;
+	background: #437837;
+	border-bottom: 1px solid #5AA049;
+	border-left: 1px solid #2D5024;
+	border-right: 1px solid #5AA049;
+	border-top: 1px solid #2D5024;
+	line-height: 1.1em;
+	display: none;
+}
+.popup_content .r_name, .popup_content .r_email,
+.popup_content .y_name, .popup_content .y_email {
+	position: relative;
+	overflow: visible !important;
+}
+.popup_content dl.settings dt {
+	margin-bottom: 15px;
+}
 
 
 /*	$EDITOR		*/
