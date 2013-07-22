@@ -1218,7 +1218,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * @param string $error_type used also as a $txt index. (not an actual string.)
  * @return boolean
  */
-function spamProtection($error_type)
+function spamProtection($error_type, $fatal = true)
 {
 	global $modSettings, $user_info;
 
@@ -1265,8 +1265,13 @@ function spamProtection($error_type)
 	if ($db->affected_rows() != 1)
 	{
 		// Spammer!  You only have to wait a *few* seconds!
-		fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
-		return true;
+		if ($fatal)
+		{
+			fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
+			return true;
+		}
+		else
+			return $timeLimit;
 	}
 
 	// They haven't posted within the limit.
