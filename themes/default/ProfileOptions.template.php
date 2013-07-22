@@ -636,16 +636,6 @@ function template_profile_theme_settings()
 								<input type="checkbox" name="default_options[no_new_reply_warning]" id="no_new_reply_warning" value="1"', !empty($context['member']['options']['no_new_reply_warning']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>';
 
-	if (!empty($modSettings['enable_buddylist']))
-		echo '
-							<dt>
-								<label for="posts_apply_ignore_list">', $txt['posts_apply_ignore_list'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" name="default_options[posts_apply_ignore_list]" value="0" />
-								<input type="checkbox" name="default_options[posts_apply_ignore_list]" id="posts_apply_ignore_list" value="1"', !empty($context['member']['options']['posts_apply_ignore_list']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>';
-
 	echo '
 							<dt>
 								<label for="view_newest_first">', $txt['recent_posts_at_top'], '</label>

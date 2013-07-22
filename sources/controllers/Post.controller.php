@@ -785,7 +785,7 @@ class Post_Controller extends Action_Controller
 			{
 				$post['is_new'] = !empty($context['new_replies']);
 				$post['counter'] = $counter++;
-				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($post['id_poster'], $user_info['ignoreusers']);
+				$post['is_ignored'] = !empty($modSettings['enable_buddylist']) && in_array($post['id_poster'], $user_info['ignoreusers']);
 
 				if (!empty($context['new_replies']))
 					$context['new_replies']--;
