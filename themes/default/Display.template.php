@@ -727,7 +727,7 @@ function template_build_poster_div($message, $ignoring)
 	// Show avatars, images, etc.?
 	if (empty($options['hide_poster_area']))
 	{
-		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && empty($options['hide_poster_area']) && !empty($message['member']['avatar']['image']))
+		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 		$poster_div .= '
 							<li class="listlevel1 avatar">
 								<a class="linklevel1" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
