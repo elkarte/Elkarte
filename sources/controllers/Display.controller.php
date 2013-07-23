@@ -57,6 +57,7 @@ class Display_Controller
 
 		// And the topic functions
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SOURCEDIR . '/Positioning.class.php');
 
 		// Not only does a prefetch make things slower for the server, but it makes it impossible to know if they read it.
 		if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
@@ -959,6 +960,14 @@ class Display_Controller
 		if (!$message)
 			return false;
 
+		// Starting fresh at each message
+		$poster_area_visible = Positioning_Items::context('poster_area_visible');
+		$poster_area_hidden = Positioning_Items::context('poster_area_hidden');
+		$poster_area_icons = Positioning_Items::context('poster_area_icons');
+		$poster_area_visible->removeAll();
+		$poster_area_hidden->removeAll();
+		$poster_area_icons->removeAll();
+
 		// $context['icon_sources'] says where each icon should come from - here we set up the ones which will always exist!
 		if (empty($context['icon_sources']))
 		{
@@ -1059,6 +1068,315 @@ class Display_Controller
 		if (!empty($output['modified']['name']))
 			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], standardTime($output['modified']['timestamp']));
 
+		// Show avatars?
+		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && empty($options['hide_poster_area']) && !empty($memberContext[$message['id_member']]['avatar']['image']))
+		{
+			$poster_area_visible->add('avatar');
+			$output['avatar'] = array(
+				'url' => $scripturl . '?action=profile;u=' . $message['id_member'],
+				'text' => $memberContext[$message['id_member']]['avatar']['image'],
+			);
+		}
+		// Show the post group icons, but not for guests.
+		if (!$memberContext[$message['id_member']]['is_guest'])
+		{
+			$poster_area_visible->add('icons');
+			$output['icons'] = array(
+				'text' => $memberContext[$message['id_member']]['group_icons'],
+			);
+		}
+
+		// Show the member's primary group (like 'Administrator') if they have one.
+		if (!empty($memberContext[$message['id_member']]['group']))
+		{
+			$poster_area_visible->add('membergroup');
+			$output['membergroup'] = array(
+				'text' => $memberContext[$message['id_member']]['group'],
+			);
+		}
+
+		// Show the member's custom title, if they have one.
+		if (!empty($memberContext[$message['id_member']]['title']))
+		{
+			$poster_area_visible->add('title');
+			$output['title'] = array(
+				'text' => $memberContext[$message['id_member']]['title'],
+			);
+		}
+
+		// Show online and offline buttons? PHP could do with a little bit of cleaning up here for brevity, but it works.
+		// The plan is to make these buttons act sensibly, and link to your own inbox in your own posts (with new PM notification).
+		// Still has a little bit of hard-coded text. This may be a place where translators should be able to write inclusive strings,
+		// instead of dealing with $txt['by'] etc in the markup. Must be brief to work, anyway. Cannot ramble on at all.
+		if ($context['can_send_pm'] && $output['is_message_author'])
+		{
+			$poster_area_visible->add('poster_online');
+			$output['poster_online'] = array(
+				'text' => $txt['pm_short'],
+				'url' => $scripturl . '?action=pm',
+			);
+			if ($context['user']['unread_messages'] > 0)
+				$output['poster_online']['indicator'] = $context['user']['unread_messages'];
+		}
+		elseif ($context['can_send_pm'] && !$output['is_message_author'] && !$memberContext[$message['id_member']]['is_guest'])
+		{
+			$poster_area_visible->add('poster_online');
+			$output['poster_online'] = array(
+				'text' => $txt['send_message'],
+				'url' => $scripturl . '?action=pm;sa=send;u=' . $memberContext[$message['id_member']]['id'],
+			);
+
+			if (!empty($modSettings['onlineEnable']))
+			{
+				$output['poster_online']['options'] = ' title="' . $memberContext[$message['id_member']]['online']['member_online_text'] . '"';
+				$output['poster_online']['img'] = ' <img src="' . $memberContext[$message['id_member']]['online']['image_href'] . '" alt="" />';
+			}
+		}
+		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']))
+		{
+			$poster_area_visible->add('poster_online');
+			$output['poster_online'] = array(
+				'text' => $memberContext[$message['id_member']]['online']['is_online'] ? $txt['online'] : $txt['offline'],
+				'img' => '<img src="' . $memberContext[$message['id_member']]['online']['image_href'] . '" alt="" />',
+			);
+		}
+
+		// Are we showing the warning status?
+		if (!$memberContext[$message['id_member']]['is_guest'] && $memberContext[$message['id_member']]['can_see_warning'])
+		{
+			$poster_area_visible->add('warning');
+			$output['warning'] = array(
+				'text' => '<span class="warn_' . $memberContext[$message['id_member']]['warning_status'] . '">' . $txt['warn_' . $memberContext[$message['id_member']]['warning_status']] . '</span>',
+				'url' => $scripturl . '?action=profile;area=issuewarning;u=' . $memberContext[$message['id_member']]['id'],
+				'img' => '<img src="' . $settings['images_url'] . '/profile/warning_' . $memberContext[$message['id_member']]['warning_status'] . '.png" alt="' . $txt['user_warn_' . $memberContext[$message['id_member']]['warning_status']] . '" />',
+			);
+		}
+
+		// Don't show these things for guests.
+		if (!$memberContext[$message['id_member']]['is_guest'])
+		{
+			// Show the post group if and only if they have no other group or the option is on, and they are in a post group.
+			if ((empty($settings['hide_post_group']) || $memberContext[$message['id_member']]['group'] == '') && $memberContext[$message['id_member']]['post_group'] != '')
+			{
+				$poster_area_hidden->add('postgroup');
+				$output['hidden_fields']['postgroup'] = array(
+					'text' => $memberContext[$message['id_member']]['post_group'],
+				);
+			}
+
+			// Show how many posts they have made.
+			if (!isset($context['disabled_fields']['posts']))
+			{
+				$poster_area_hidden->add('postcount');
+				$output['hidden_fields']['postcount'] = array(
+					'text' => $txt['member_postcount'] . ': ' . $memberContext[$message['id_member']]['posts'],
+				);
+			}
+
+			// Is karma display enabled?  Total or +/-?
+			if ($modSettings['karmaMode'] == '1')
+			{
+				$poster_area_hidden->add('karma');
+				$output['hidden_fields']['karma'] = array(
+					'text' => $modSettings['karmaLabel'] . ' ' . $memberContext[$message['id_member']]['karma']['good'] - $memberContext[$message['id_member']]['karma']['bad'],
+				);
+			}
+			elseif ($modSettings['karmaMode'] == '2')
+			{
+				$poster_area_hidden->add('karma');
+				$output['hidden_fields']['karma'] = array(
+					'text' => $modSettings['karmaLabel'] . ' +' . $memberContext[$message['id_member']]['karma']['good'] . '/-' . $memberContext[$message['id_member']]['karma']['bad'],
+				);
+			}
+
+			// Is this user allowed to modify this member's karma?
+			if ($memberContext[$message['id_member']]['karma']['allow'])
+			{
+				$poster_area_hidden->add('karma_applaud');
+				$output['hidden_fields']['karma_applaud'] = array(
+					'text' => $modSettings['karmaApplaudLabel'],
+					'url' => $scripturl . '?action=karma;sa=applaud;uid=' . $memberContext[$message['id_member']]['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $message['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				);
+				$poster_area_hidden->add('karma_smite');
+				$output['hidden_fields']['karma_smite'] = array(
+					'text' => $modSettings['karmaSmiteLabel'],
+					'url' => $scripturl . '?action=karma;sa=smite;uid=' . $memberContext[$message['id_member']]['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $message['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				);
+			}
+
+			// Show the member's gender icon?
+			if (!empty($settings['show_gender']) && $memberContext[$message['id_member']]['gender']['image'] != '' && !isset($context['disabled_fields']['gender']))
+			{
+				$poster_area_hidden->add('gender');
+				$output['hidden_fields']['gender'] = array(
+					'text' => $txt['gender'] . ': ' . $memberContext[$message['id_member']]['gender']['image'],
+				);
+			}
+
+			// Show their personal text?
+			if (!empty($settings['show_blurb']) && $memberContext[$message['id_member']]['blurb'] != '')
+			{
+				$poster_area_hidden->add('blurb');
+				$output['hidden_fields']['blurb'] = array(
+					'text' => $memberContext[$message['id_member']]['blurb'],
+				);
+			}
+
+			if ($memberContext[$message['id_member']]['show_profile_buttons'])
+			{
+				// Don't show an icon if they haven't specified a website.
+				if ($memberContext[$message['id_member']]['website']['url'] != '' && !isset($context['disabled_fields']['website']))
+				{
+					$poster_area_icons->add('website');
+					$output['hidden_fields']['profile']['website'] = array(
+						'text' => $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/www_sm.png" alt="' . $memberContext[$message['id_member']]['website']['title'] . '" />' : $txt['www'],
+						'url' => $memberContext[$message['id_member']]['website']['url'],
+						'options' => ' title="' . $memberContext[$message['id_member']]['website']['title'] . '" target="_blank" class="new_win"',
+					);
+				}
+
+				// Don't show the email address if they want it hidden.
+				if (in_array($memberContext[$message['id_member']]['show_email'], array('yes' . 'yes_permission_override' . 'no_through_forum')) && $context['can_send_email'])
+				{
+					$poster_area_icons->add('website');
+					$output['hidden_fields']['profile']['website'] = array(
+						'text' => $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email'],
+						'url' => $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'],
+						'options' => ' rel="nofollow"',
+					);
+				}
+
+				// Want to send them a PM, can you? @todo - This seems to be broken and IMO should be dropped anyway, at least if poster div is not hidden.
+				if ($context['can_send_pm'] && !$output['is_message_author'] && !empty($modSettings['onlineEnable']))
+				{
+					$poster_area_icons->add('website');
+					$output['hidden_fields']['profile']['website'] = array(
+						'text' => $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email'],
+						'url' => $scripturl . '?action=pm;sa=send;u=' . $memberContext[$message['id_member']]['id'],
+						'options' => ' title="' . $memberContext[$message['id_member']]['online']['member_online_text'] . '"',
+						'img' => '<img src="'. $memberContext[$message['id_member']]['online']['image_href']. '" alt="" />',
+					);
+				}
+			}
+
+			// Any custom fields to show?
+			if (!empty($memberContext[$message['id_member']]['custom_fields']))
+			{
+				foreach ($memberContext[$message['id_member']]['custom_fields'] as $custom)
+				{
+					if (empty($custom['placement']) && !empty($custom['value']))
+					{
+						$poster_area_hidden->add($custom['colname']);
+						$output['hidden_fields'][$custom['colname']] = array(
+							'text' => $custom['title'] . ': ' . $custom['value'],
+						);
+						continue;
+					}
+					elseif ($custom['placement'] != 1 || empty($custom['value']))
+						continue;
+
+					$poster_area_icons->add($custom['colname']);
+					$output['hidden_fields']['profile'][$custom['colname']] = array(
+						'text' => $custom['value'],
+					);
+				}
+			}
+
+			if ($poster_area_icons->hasItems())
+			{
+				$poster_area_hidden->add('profile');
+				$output['hidden_fields']['profile']['values'] = $poster_area_icons->prepareContext();
+			}
+		}
+		// Otherwise, show the guest's email.
+		elseif (!empty($memberContext[$message['id_member']]['email']) && in_array($memberContext[$message['id_member']]['show_email'], array('yes' . 'yes_permission_override' . 'no_through_forum')) && $context['can_send_email'])
+		{
+			$poster_area_hidden->add('email');
+			$output['hidden_fields']['email'] = array(
+				'text' => $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email'],
+				'url' => $scripturl . '?action=emailuser;sa=email;msg=' . $message['id_msg'],
+				'options' => ' rel="nofollow"',
+			);
+		}
+
+		// Stuff for the staff to wallop them with.
+		$poster_area_hidden->add('separator_report');
+
+		// Can we issue a warning because of this post?  Remember, we can't give guests warnings.
+		if ($context['can_issue_warning'] && !$output['is_message_author'] && !$memberContext[$message['id_member']]['is_guest'])
+		{
+			$poster_area_hidden->add('warning');
+			$output['hidden_fields']['warning'] = array(
+				'text' => $txt['warning_issue'],
+				'url' => $scripturl . '?action=profile;area=issuewarning;u=' . $memberContext[$message['id_member']]['id'] . ';msg=' . $message['id_msg'],
+				'options' => ' alt="' . $txt['issue_warning_post'] . '" title="' . $txt['issue_warning_post'] . '"',
+				'img' => '<img src="' . $settings['images_url'] . '/profile/warn.png" alt="' . $txt['issue_warning_post'] . '" title="' . $txt['issue_warning_post'] . '" />',
+			);
+
+			// Do they have a warning in place?
+			if ($memberContext[$message['id_member']]['can_see_warning'] && !empty($options['hide_poster_area']))
+			{
+				$poster_area_hidden->add('has_warning');
+				$output['hidden_fields']['has_warning'] = array(
+					'text' => '<span class="warn_' . $memberContext[$message['id_member']]['warning_status'] . '">' . $txt['warn_' . $memberContext[$message['id_member']]['warning_status']] . '</span>',
+					'url' => $scripturl . '?action=profile;area=issuewarning;u=' . $memberContext[$message['id_member']]['id'],
+					'img' => '<img src="' . $settings['images_url'] . '/profile/warning_' . $memberContext[$message['id_member']]['warning_status'] . '.png" alt="' . $txt['user_warn_' . $memberContext[$message['id_member']]['warning_status']] . '" />',
+				);
+			}
+		}
+
+		// Show the IP to this user for this post - because you can moderate?
+		if (!empty($context['can_moderate_forum']) && !empty($memberContext[$message['id_member']]['ip']))
+		{
+			$poster_area_hidden->add('poster_ip');
+			$output['hidden_fields']['poster_ip'] = array(
+				'text' => $memberContext[$message['id_member']]['ip'] . '</a><a href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>',
+				'class' => 'help',
+				'img' => '<img src="' . $settings['images_url'] . '/ip.png" alt="" /> ',
+				'url' => $scripturl . '?action=' . (!empty($memberContext[$message['id_member']]['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $memberContext[$message['id_member']]['id'] . ';searchip=' . $memberContext[$message['id_member']]['ip']),
+			);
+		}
+		// Or, should we show it because this is you?
+		elseif ($message['can_see_ip'])
+		{
+			$poster_area_hidden->add('poster_ip');
+			$output['hidden_fields']['poster_ip'] = array(
+				'text' => $memberContext[$message['id_member']]['ip'],
+				'class' => 'help',
+				'options' => ' onclick="return reqOverlayDiv(this.href);"',
+				'img' => '<img src="' . $settings['images_url'] . '/ip.png" alt="" /> ',
+				'url' => $scripturl . '?action=quickhelp;help=see_member_ip',
+			);
+		}
+		// Okay, are you at least logged in?  Then we can show something about why IPs are logged...
+		elseif (!$context['user']['is_guest'])
+		{
+			$poster_area_hidden->add('poster_ip');
+			$output['hidden_fields']['poster_ip'] = array(
+				'text' => $txt['logged'],
+				'class' => 'help',
+				'options' => ' onclick="return reqOverlayDiv(this.href);"',
+				'img' => '<img src="' . $settings['images_url'] . '/ip.png" alt="" /> ',
+				'url' => $scripturl . '?action=quickhelp;help=see_member_ip',
+			);
+		}
+		// Otherwise, you see NOTHING!
+		else
+		{
+			$poster_area_hidden->add('poster_ip');
+			$output['hidden_fields']['poster_ip'] = array(
+				'text' => $txt['logged'],
+			);
+		}
+
+
+		$output['poster_area_visible'] = $poster_area_visible->prepareContext();
+		$output['poster_area_hidden'] = $poster_area_hidden->prepareContext();
+
+/*
+		$poster_area_visible
+		$poster_area_hidden
+*/
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
 
 		if (empty($options['view_newest_first']))
