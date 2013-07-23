@@ -503,7 +503,7 @@ class MessageIndex_Controller extends Action_Controller
 			call_integration_hook('integrate_quick_mod_actions');
 		}
 
-		if (!empty($context['boards']) && (!empty($options['show_children']) || $context['start'] == 0))
+		if (!empty($context['boards']) && $context['start'] == 0)
 			$template_layers->add('display_child_boards');
 
 		// If there are children, but no topics and no ability to post topics...

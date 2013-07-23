@@ -23,16 +23,6 @@ function template_options()
 
 	$context['theme_options'] = array(
 		array(
-			'id' => 'show_board_desc',
-			'label' => $txt['board_desc_inside'],
-			'default' => true,
-		),
-		array(
-			'id' => 'show_children',
-			'label' => $txt['show_children'],
-			'default' => true,
-		),
-		array(
 			'id' => 'use_sidebar_menu',
 			'label' => $txt['use_sidebar_menu'],
 			'default' => true,
@@ -71,11 +61,6 @@ function template_options()
 			'id' => 'view_newest_pm_first',
 			'label' => $txt['recent_pms_at_top'],
 			'default' => true,
-		),
-		array(
-			'id' => 'posts_apply_ignore_list',
-			'label' => $txt['posts_apply_ignore_list'],
-			'default' => false,
 		),
 		array(
 			'id' => 'wysiwyg_default',

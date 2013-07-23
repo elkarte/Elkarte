@@ -575,20 +575,6 @@ function template_profile_theme_settings()
 
 	echo '
 							<dt>
-								<label for="show_board_desc">', $txt['board_desc_inside'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" name="default_options[show_board_desc]" value="0" />
-								<input type="checkbox" name="default_options[show_board_desc]" id="show_board_desc" value="1"', !empty($context['member']['options']['show_board_desc']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt>
-								<label for="show_children">', $txt['show_children'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" name="default_options[show_children]" value="0" />
-								<input type="checkbox" name="default_options[show_children]" id="show_children" value="1"', !empty($context['member']['options']['show_children']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>
-							<dt>
 								<label for="use_sidebar_menu">', $txt['use_sidebar_menu'], '</label>
 							</dt>
 							<dd>
@@ -648,16 +634,6 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[no_new_reply_warning]" value="0" />
 								<input type="checkbox" name="default_options[no_new_reply_warning]" id="no_new_reply_warning" value="1"', !empty($context['member']['options']['no_new_reply_warning']) ? ' checked="checked"' : '', ' class="input_check" />
-							</dd>';
-
-	if (!empty($modSettings['enable_buddylist']))
-		echo '
-							<dt>
-								<label for="posts_apply_ignore_list">', $txt['posts_apply_ignore_list'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" name="default_options[posts_apply_ignore_list]" value="0" />
-								<input type="checkbox" name="default_options[posts_apply_ignore_list]" id="posts_apply_ignore_list" value="1"', !empty($context['member']['options']['posts_apply_ignore_list']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>';
 
 	echo '
@@ -730,15 +706,6 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[drafts_autosave_enabled]" value="0" />
 								<label for="drafts_autosave_enabled"><input type="checkbox" name="default_options[drafts_autosave_enabled]" id="drafts_autosave_enabled" value="1"', !empty($context['member']['options']['drafts_autosave_enabled']) ? ' checked="checked"' : '', ' class="input_check" /></label>
-							</dd>';
-	if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_show_saved_enabled']))
-		echo '
-							<dt>
-								<label for="drafts_show_saved_enabled">', $txt['drafts_show_saved_enabled'], '</label>
-							</dt>
-							<dd>
-								<input type="hidden" name="default_options[drafts_show_saved_enabled]" value="0" />
-								<label for="drafts_show_saved_enabled"><input type="checkbox" name="default_options[drafts_show_saved_enabled]" id="drafts_show_saved_enabled" value="1"', !empty($context['member']['options']['drafts_show_saved_enabled']) ? ' checked="checked"' : '', ' class="input_check" /></label>
 							</dd>';
 
 	echo '

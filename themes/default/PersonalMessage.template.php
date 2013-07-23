@@ -238,7 +238,8 @@ function template_folder()
 			}
 
 			// Are there any custom profile fields for above the signature?
-			if (!empty($message['member']['custom_fields']))
+			// Show them if signatures are enabled and you want to see them.
+			if (!empty($message['member']['custom_fields']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 			{
 				$shown = false;
 				foreach ($message['member']['custom_fields'] as $custom)
@@ -478,7 +479,7 @@ function template_build_pmposter_div($message)
 	// Show avatars, images, etc.?
 	if (empty($options['hide_poster_area']))
 	{
-		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && empty($options['hide_poster_area']) && !empty($message['member']['avatar']['image']))
+		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 		$poster_div .= '
 							<li class="listlevel1 avatar">
 								<a class="linklevel1" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
@@ -1080,7 +1081,7 @@ function template_send()
 					<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />';
 
 	// If the admin enabled the pm drafts feature, show a draft selection box
-	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts_pm_save']) && !empty($context['drafts']) && !empty($options['drafts_show_saved_enabled']))
+	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts_pm_save']) && !empty($context['drafts']))
 	{
 		echo '
 			<div id="postDraftOptionsHeader" class="title_bar">
