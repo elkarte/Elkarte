@@ -149,7 +149,7 @@ function template_pages_and_buttons_above()
 
 	template_pagesection('normal_buttons', 'right', 'go_down');
 
-	if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
+	if (!empty($context['description']) || !empty($context['moderators']))
 	{
 		echo '
 		<div id="description_board">
@@ -162,11 +162,11 @@ function template_pages_and_buttons_above()
 			echo '
 			</h2>';
 
-		if (!empty($options['show_board_desc']) && !empty($context['description'])||(!empty($settings['display_who_viewing'])))
+		if (!empty($context['description']) || !empty($settings['display_who_viewing']))
 			echo '
 			<p>';
 
-		if (!empty($options['show_board_desc']) && !empty($context['description']))
+		if (!empty($context['description']))
 			echo '
 			', $context['description'], '&nbsp;';
 
@@ -187,7 +187,7 @@ function template_pages_and_buttons_above()
 			</span>';
 		}
 
-		if (!empty($options['show_board_desc']) && !empty($context['description'])||(!empty($settings['display_who_viewing'])))
+		if (!empty($context['description']) || !empty($settings['display_who_viewing']))
 			echo'
 			</p>';
 

@@ -152,10 +152,8 @@ function template_load_drafts_below()
 {
 	global $context, $settings, $txt, $options;
 
-	// If the admin enabled the drafts feature, show a draft selection box
-	if (!empty($options['drafts_show_saved_enabled']))
-	{
-		echo '
+	// Show a draft selection box
+	echo '
 					<h4 id="postDraftOptionsHeader" class="titlebg">
 						<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
 					</h4>
@@ -168,16 +166,16 @@ function template_load_drafts_below()
 								<strong>', $txt['draft_saved_on'], '</strong>
 							</dd>';
 
-		foreach ($context['drafts'] as $draft)
-			echo '
+	foreach ($context['drafts'] as $draft)
+		echo '
 							<dt>', $draft['link'], '</dt>
 							<dd>', $draft['poster_time'], '</dd>';
-		echo '
+	echo '
 						</dl>
 					</div>';
 
-		// Code for showing and hiding drafts
-		echo '
+	// Code for showing and hiding drafts
+	echo '
 		<script><!-- // --><![CDATA[
 			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
@@ -210,7 +208,6 @@ function template_load_drafts_below()
 				},
 			});
 		// ]]></script>';
-	}
 }
 
 function template_topic_replies_below()
