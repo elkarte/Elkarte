@@ -349,9 +349,9 @@ class ManageRegistration_Controller extends Action_Controller
 		Settings_Form::prepare_db($config_vars);
 	}
 
- 	/**
- 	 * Initialize settings form with the configuration settings
- 	 *  for new members registration.
+	/**
+	 * Initialize settings form with the configuration settings
+	 *  for new members registration.
 	 *
 	 * @return array;
 	 */

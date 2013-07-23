@@ -539,7 +539,8 @@ class Profile_Controller extends Action_Controller
 				if (!empty($user_settings['openid_uri']))
 				{
 					require_once(SUBSDIR . '/OpenID.subs.php');
-					openID_revalidate();
+					$openID = new OpenID();
+					$openID->revalidate();
 				}
 				else
 				{

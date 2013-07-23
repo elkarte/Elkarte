@@ -1170,7 +1170,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 	);
 
 	// Allow mods with their own post tables to reattribute posts as well :)
- 	call_integration_hook('integrate_reattribute_posts', array($memID, $email, $membername, $post_count));
+	call_integration_hook('integrate_reattribute_posts', array($memID, $email, $membername, $post_count));
 }
 
 /**
@@ -1897,6 +1897,60 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 		)
 	);
 
+	while ($row = $db->fetch_assoc($request))
+		$members[] = $row;
+
+	$db->free_result($request);
+
+	return $members;
+}
+
+
+/**
+ * Check if the OpenID URI is already registered for an existing member
+ *
+ * @param string $uri
+ * @return array
+ */
+function memberExists($url)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT mem.id_member, mem.member_name
+		FROM {db_prefix}members AS mem
+		WHERE mem.openid_uri = {string:openid_uri}',
+		array(
+			'openid_uri' => $url,
+		)
+	);
+	$member = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $member;
+}
+
+/**
+ * Find the most recent members
+ *
+ * @param int $limit
+ */
+function recentMembers($limit)
+{
+	$db = database();
+
+	// Find the most recent members.
+	$request = $db->query('', '
+		SELECT id_member, member_name, real_name, date_registered, last_login
+		FROM {db_prefix}members
+		ORDER BY id_member DESC
+		LIMIT {int:limit}',
+		array(
+			'limit' => $limit,
+		)
+	);
+
+	$members = array();
 	while ($row = $db->fetch_assoc($request))
 		$members[] = $row;
 

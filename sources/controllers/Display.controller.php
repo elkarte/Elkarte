@@ -583,7 +583,7 @@ class Display_Controller
 			'messages_per_page' => $context['messages_per_page'],
 			'start' => $start,
 			'offset' => $limit,
- 		);
+		);
 
 		// Get each post and poster in this topic.
 		$topic_details = getTopicsPostsAndPoster($topic, $limit_settings, $ascending);

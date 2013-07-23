@@ -26,9 +26,9 @@ class AdminLog_Controller extends Action_Controller
 	protected $_pruningSettings;
 
 	/**
- 	 * This method decides which log to load.
- 	 * Accessed by ?action=admin;area=logs
- 	 */
+	 * This method decides which log to load.
+	 * Accessed by ?action=admin;area=logs
+	 */
 	public function action_index()
 	{
 		global $context, $txt, $scripturl, $modSettings;

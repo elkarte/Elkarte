@@ -29,11 +29,11 @@ class Admin_Controller extends Action_Controller
 {
 	/**
 	 * The main admin handling function.
- 	 * It initialises all the basic context required for the admin center.
- 	 * It passes execution onto the relevant admin section.
- 	 * If the passed section is not found it shows the admin home page.
- 	 * Accessed by ?action=admin.
- 	 */
+	 * It initialises all the basic context required for the admin center.
+	 * It passes execution onto the relevant admin section.
+	 * If the passed section is not found it shows the admin home page.
+	 * Accessed by ?action=admin.
+	 */
 	public function action_index()
 	{
 		global $txt, $context, $scripturl, $modSettings, $settings;

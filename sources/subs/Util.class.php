@@ -19,8 +19,8 @@ if (!defined('ELK'))
 class Util
 {
 	/**
- 	* Compatibility function: it initializes $smcFunc array with utility methods.
- 	*/
+	* Compatibility function: it initializes $smcFunc array with utility methods.
+	*/
 	static function compat_init()
 	{
 		global $smcFunc;
