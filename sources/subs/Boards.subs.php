@@ -166,7 +166,7 @@ function getMsgMemberID($messageID)
 
 /**
  * Modify the settings and position of a board.
- * Used by ManageBoards.php to change the settings of a board.
+ * Used by ManageBoards.controller.php to change the settings of a board.
  *
  * @param int $board_id
  * @param array &$boardOptions
@@ -1605,7 +1605,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 	// if $conditions wasn't set or is 'all', get all boards
 	if (!is_array($conditions) && $conditions == 'all')
 	{
-		// id_board, name, id_profile => used in admin/Reports.php
+		// id_board, name, id_profile => used in admin/ManageReports.controller.php
 		$request = $db->query('', '
 			SELECT ' . (!empty($params['count']) ? 'COUNT(*)' : 'id_board, name, id_profile') . '
 			FROM {db_prefix}boards',

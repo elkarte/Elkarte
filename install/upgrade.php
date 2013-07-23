@@ -3006,7 +3006,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
-		&& @file_exists(SOURCEDIR . '/ManageBoards.php');
+		&& @file_exists(SOURCEDIR . '/ManageBoards.controller.php');
 	if (!$check && !isset($modSettings['elkVersion']))
 		print_error('Error: Some files are missing or out-of-date.', true);
 

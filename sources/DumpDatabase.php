@@ -26,7 +26,7 @@ if (!defined('ELK'))
  * It uses gzip compression if compress is set in the URL/post data.
  * It may possibly time out, and mess up badly if you were relying on it. :P
  * The data dumped depends on whether "struct" and "data" are passed.
- * It is called from ManageMaintenance.php.
+ * It is called from ManageMaintenance.controller.php.
  */
 function DumpDatabase2()
 {

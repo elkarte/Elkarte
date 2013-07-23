@@ -132,7 +132,7 @@ class Site_Dispatcher
 		// $_GET['action'] => array($file, $class, $method)
 		$actionArray = array(
 			'activate' => array('Register.controller.php', 'Register_Controller', 'action_activate'),
-			'admin' => array('Admin.php', 'Admin_Controller', 'action_index'),
+			'admin' => array('Admin.controller.php', 'Admin_Controller', 'action_index'),
 			'attachapprove' => array('ModerateAttachments.controller.php', 'ModerateAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members.controller.php', 'Members_Controller', 'action_buddy'),
 			'collapse' => array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_collapse'),
@@ -146,7 +146,7 @@ class Site_Dispatcher
 			'findmember' => array('Members.controller.php', 'Members_Controller', 'action_findmember'),
 			'quickhelp' => array('Help.controller.php', 'Help_Controller', 'action_quickhelp'),
 			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
-			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
+			'jsoption' => array('ManageThemes.controller.php', 'ManageThemes_Controller', 'action_jsoption'),
 			'loadeditorlocale' => array('subs/Editor.subs.php', 'action_loadlocale'),
 			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
 			'login' => array('Auth.controller.php', 'Auth_Controller', 'action_login'),
@@ -182,7 +182,7 @@ class Site_Dispatcher
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
 			'stats' => array('Stats.controller.php', 'Stats_Controller', 'action_stats'),
-			'theme' => array('Themes.php', 'Themes_Controller', 'action_thememain'),
+			'theme' => array('ManageThemes.controller.php', 'ManageThemes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory.controller.php', 'ProfileHistory_Controller', 'action_trackip'),
 			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
 			'unreadreplies' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),

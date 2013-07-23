@@ -14,7 +14,7 @@ if (!defined('ELK'))
 /**
  * Delete all or some of the errors in the error log.
  * It applies any necessary filters to deletion.
- * This should only be called by ManageErrors::action_log().
+ * This should only be called by ManageErrors.controller::action_log().
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the error log when done.
  */

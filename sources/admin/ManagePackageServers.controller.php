@@ -25,7 +25,7 @@ if (!defined('ELK'))
  * PackageServers controller handles browsing, adding and removing
  * package servers, and download of a package from them.
  */
-class PackageServers_Controller extends Action_Controller
+class ManagePackageServers_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher for package servers. Checks permissions,

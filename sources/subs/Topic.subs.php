@@ -1145,7 +1145,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 
 /**
  * So long as you are sure... all old posts will be gone.
- * Used in ManageMaintenance.php to prune old topics.
+ * Used in ManageMaintenance.controller.php to prune old topics.
  */
 function removeOldTopics()
 {

@@ -60,7 +60,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$subActions = array(
 			'attachments' => array($this, 'action_attachSettings_display'),
 			'avatars' => array(
-				'file' => 'ManageAvatars.php',
+				'file' => 'ManageAvatars.controller.php',
 				'controller' => 'ManageAvatars_Controller',
 				'function' => 'action_index'),
 			'attachpaths' => array ($this, 'action_attachpaths'),
@@ -131,8 +131,8 @@ class ManageAttachments_Controller extends Action_Controller
 		call_integration_hook('integrate_modify_attachment_settings');
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
-		require_once(ADMINDIR . '/ManagePermissions.php');
-		require_once(ADMINDIR . '/ManageServer.php');
+		require_once(ADMINDIR . '/ManagePermissions.controller.php');
+		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Saving settings?

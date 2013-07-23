@@ -312,7 +312,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		require_once(ADMINDIR . '/RepairBoards.php');
+		require_once(ADMINDIR . '/RepairBoards.controller.php');
 		$controller = new RepairBoards_Controller();
 		$controller->action_repairboards();
 	}

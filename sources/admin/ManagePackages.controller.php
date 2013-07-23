@@ -25,7 +25,7 @@ if (!defined('ELK'))
  * Its main job is to install/uninstall, allow to browse, packages and package servers.
  * In fact, just about everything related to add-on packages, including FTP connections when necessary.
  */
-class Packages_Controller extends Action_Controller
+class ManagePackages_Controller extends Action_Controller
 {
 	/**
 	 * Entry point, the default method of this controller.

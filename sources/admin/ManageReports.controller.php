@@ -28,7 +28,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Reports_Controller extends Action_Controller
+class ManageReports_Controller extends Action_Controller
 {
 	/**
 	 * Handling function for generating reports.

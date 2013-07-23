@@ -37,7 +37,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Themes_Controller extends Action_Controller
+class ManageThemes_Controller extends Action_Controller
 {
 	/**
 	 * Subaction handler - manages the action and delegates control to the proper
