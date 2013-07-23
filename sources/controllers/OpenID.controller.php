@@ -60,14 +60,16 @@ class OpenID_Controller extends Action_Controller
 			if (isset($_GET[$key]))
 				$_GET[$key] = str_replace(' ', '+', $_GET[$key]);
 
+		$openID = new OpenID();
+
 		// Did they tell us to remove any associations?
 		if (!empty($_GET['openid_invalidate_handle']))
-			openid_removeAssociation($_GET['openid_invalidate_handle']);
+			$openID->removeAssociation($_GET['openid_invalidate_handle']);
 
-		$server_info = openid_getServerInfo($_GET['openid_identity']);
+		$server_info = $openID->getServerInfo($_GET['openid_identity']);
 
 		// Get the association data.
-		$assoc = openID_getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
+		$assoc = $openID->getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
 		if ($assoc === null)
 			fatal_lang_error('openid_no_assoc');
 

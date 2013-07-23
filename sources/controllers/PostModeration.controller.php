@@ -496,8 +496,8 @@ class PostModeration_Controller extends Action_Controller
 	}
 
 	/**
- 	 * Approve a post, just the one.
- 	 */
+	 * Approve a post, just the one.
+	 */
 	public function action_approve()
 	{
 		global $user_info, $topic, $board;

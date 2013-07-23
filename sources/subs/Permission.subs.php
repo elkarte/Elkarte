@@ -206,7 +206,7 @@ class InlinePermissions_Form
 {
 	/**
 	 * Save the permissions of a form containing inline permissions.
- 	 *
+	 *
 	 * @param array $permissions
 	 */
 	static function save_inline_permissions($permissions)

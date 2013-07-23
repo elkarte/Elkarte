@@ -109,7 +109,8 @@ function validateSession($type = 'admin')
 	if (!empty($user_settings['openid_uri']))
 	{
 		require_once(SUBSDIR . '/OpenID.subs.php');
-		openID_revalidate();
+		$openID = new OpenID();
+		$openID->revalidate();
 
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);

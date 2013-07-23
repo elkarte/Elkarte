@@ -161,10 +161,10 @@ class Settings_Form
 	}
 
 	/**
- 	* Helper method, it sets up the context for database settings.
- 	*
- 	* @param array $config_vars
- 	*/
+	* Helper method, it sets up the context for database settings.
+	*
+	* @param array $config_vars
+	*/
 	static function prepare_db(&$config_vars)
 	{
 		global $txt, $helptxt, $context, $modSettings;
@@ -325,9 +325,9 @@ class Settings_Form
 	 * - Used to save those settings set from ?action=admin;area=serversettings.
 	 * - Requires the admin_forum permission.
 	 * - Contains arrays of the types of data to save into Settings.php.
- 	 *
+	 *
 	 * @param array $config_vars
- 	*/
+	*/
 	function save()
 	{
 		validateToken('admin-ssc');
@@ -425,10 +425,10 @@ class Settings_Form
 	}
 
 	/**
- 	* Helper method for saving database settings.
- 	*
- 	* @param array $config_vars
- 	*/
+	* Helper method for saving database settings.
+	*
+	* @param array $config_vars
+	*/
 	static function save_db(&$config_vars)
 	{
 		validateToken('admin-dbsc');
@@ -519,7 +519,7 @@ class Settings_Form
 	 *   new settings file fail
 	 *
 	 * @param array $config_vars
- 	*/
+	*/
 	static function save_file($config_vars)
 	{
 		global $context;
