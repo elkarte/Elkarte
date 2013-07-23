@@ -1482,7 +1482,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$layers = explode(',', $settings['theme_layers']);
 		else
 			$layers = array('html', 'body');
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::getInstance(true);
 		foreach ($layers as $layer)
 			$template_layers->addBegin($layer);
 	}
