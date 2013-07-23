@@ -42,7 +42,7 @@ class ManagePackages_Controller extends Action_Controller
 		// Load all the basic stuff.
 		require_once(SUBSDIR . '/Package.subs.php');
 		loadLanguage('Packages');
-		loadTemplate('Packages', 'admin');
+		loadTemplate('ManagePackages', 'admin');
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.

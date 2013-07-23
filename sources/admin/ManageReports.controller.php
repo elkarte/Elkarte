@@ -54,8 +54,8 @@ class ManageReports_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Let's get our things running...
-		loadTemplate('Reports');
-		loadLanguage('Reports');
+		loadTemplate('ManageReports');
+		loadLanguage('ManageReports');
 
 		$context['page_title'] = $txt['generate_reports'];
 

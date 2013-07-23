@@ -57,7 +57,7 @@ class ManageThemes_Controller extends Action_Controller
 			return $this->action_index_api();
 
 		// Load the important language files...
-		loadLanguage('Themes');
+		loadLanguage('ManageThemes');
 		loadLanguage('Settings');
 		require_once(SUBSDIR . '/Action.class.php');
 
@@ -193,7 +193,7 @@ class ManageThemes_Controller extends Action_Controller
 		// If we aren't submitting - that is, if we are about to...
 		if (!isset($_POST['save']))
 		{
-			loadTemplate('Themes');
+			loadTemplate('ManageThemes');
 
 			// Make our known themes a little easier to work with.
 			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',',$modSettings['knownThemes']) : array();
@@ -291,7 +291,7 @@ class ManageThemes_Controller extends Action_Controller
 			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		$context['themes'] = installedThemes();
 
@@ -354,7 +354,7 @@ class ManageThemes_Controller extends Action_Controller
 				if (empty($v['theme_dir']) || (!file_exists($v['theme_dir'] . '/Settings.template.php') && empty($v['num_members'])))
 					unset($context['themes'][$k]);
 
-			loadTemplate('Themes');
+			loadTemplate('ManageThemes');
 			$context['sub_template'] = 'reset_list';
 
 			createToken('admin-stor', 'request');
@@ -570,7 +570,7 @@ class ManageThemes_Controller extends Action_Controller
 		loadTheme($old_id, false);
 		$settings = $old_settings;
 
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 		createToken('admin-sto');
 	}
 
@@ -743,7 +743,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		$settings = $old_settings;
 
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		// We like Kenny better than Token.
 		createToken('admin-sts');
@@ -885,7 +885,7 @@ class ManageThemes_Controller extends Action_Controller
 		$db = database();
 
 		loadLanguage('Profile');
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		// Build the link tree.
 		$context['linktree'][] = array(
@@ -1202,7 +1202,7 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		if (isset($_GET['theme_id']))
 		{
@@ -1578,7 +1578,7 @@ class ManageThemes_Controller extends Action_Controller
 		global $context;
 
 		isAllowedTo('admin_forum');
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1859,7 +1859,7 @@ class ManageThemes_Controller extends Action_Controller
 		global $context, $scripturl;
 
 		isAllowedTo('admin_forum');
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1924,7 +1924,7 @@ class ManageThemes_Controller extends Action_Controller
 		global $context;
 
 		isAllowedTo('admin_forum');
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		// We'll work hard with them themes!
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1978,7 +1978,7 @@ class ManageThemes_Controller extends Action_Controller
 		$db = database();
 
 		isAllowedTo('admin_forum');
-		loadTemplate('Themes');
+		loadTemplate('ManageThemes');
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'edit';
 

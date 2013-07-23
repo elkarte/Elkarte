@@ -48,7 +48,7 @@ class ManagePackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers', 'admin');
+		loadTemplate('ManagePackageServers', 'admin');
 
 		$context['page_title'] = $txt['package_servers'];
 

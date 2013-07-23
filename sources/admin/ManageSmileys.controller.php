@@ -1588,7 +1588,7 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['uninstalling'] = false;
 			$context['is_installed'] = false;
 			$context['package_name'] = $smileyInfo['name'];
-			loadTemplate('Packages');
+			loadTemplate('ManagePackages');
 		}
 		// Do the actual install
 		else
