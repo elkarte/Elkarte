@@ -529,7 +529,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'logs' => array(
 						'label' => $txt['logs'],
-						'file' => 'AdminLog.php',
+						'file' => 'AdminLog.controller.php',
 						'controller' => 'AdminLog_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
