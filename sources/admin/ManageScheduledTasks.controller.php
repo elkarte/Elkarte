@@ -90,7 +90,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
+		// We'll need to recalculate dates and stuff like that.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 		// Mama, setup the template first - cause it's like the most important bit, like pickle in a sandwich.
 		// ... ironically I don't like pickle. </grudge>
 		$context['sub_template'] = 'view_scheduled_tasks';
@@ -100,9 +102,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		if (isset($_REQUEST['save']) && isset($_POST['enable_task']))
 		{
 			checkSession();
-
-			// We'll recalculate the dates at the end!
-			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Enable and disable as required.
 			$enablers = array(0);
@@ -130,13 +129,16 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			$nextTasks = loadTasks($tasks);
 
 			// Lets get it on!
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
+			require_once(SUBSDIR . '/ScheduledTask.class.php');
+			$task = new ScheduledTask();
+
 			ignore_user_abort(true);
 			foreach ($nextTasks as $task_id => $taskname)
 			{
 				$start_time = microtime(true);
-				// The functions got to exist for us to use it.
-				if (!function_exists('scheduled_' . $taskname))
+
+				// The methods got to exist for the tasks.
+				if (!method_exists($task, 'scheduled_' . $taskname))
 					continue;
 
 				// Try to stop a timeout, this would be bad...
@@ -145,7 +147,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					@apache_reset_timeout();
 
 				// Do the task...
-				$completed = call_user_func('scheduled_' . $taskname);
+				$completed = $task->{'scheduled_' . $taskname}();
 
 				// Log that we did it ;)
 				if ($completed)
@@ -345,7 +347,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		$db = database();
 
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-		// Lets load the language just incase we are outside the Scheduled area.
+		// Lets load the language just in case we are outside the Scheduled area.
 		loadLanguage('ManageScheduledTasks');
 
 		// Empty the log?

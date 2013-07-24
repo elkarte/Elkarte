@@ -1448,7 +1448,7 @@ function action_deleteInstall()
 	$db->free_result($request);
 
 	// Now is the perfect time to fetch remote files.
-	require_once(SOURCEDIR . '/ScheduledTasks.php');
+	require_once(SUBSDIR . '/ScheduledTask.class.php');
 
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))
@@ -1456,7 +1456,8 @@ function action_deleteInstall()
 		// The variable is usually defined in index.php so lets just use our variable to do it for us.
 		$forum_version = $current_version;
 		// Now go get those files!
-		scheduled_fetchFiles();
+		$task = new ScheduledTask();
+		$task->scheduled_fetchFiles();
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
 		$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;

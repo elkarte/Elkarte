@@ -152,7 +152,6 @@ function next_time($regularity, $unit, $offset)
 	return $next_time;
 }
 
-
 /**
  * Loads a basic tasks list.
  *
