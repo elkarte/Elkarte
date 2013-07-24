@@ -25,7 +25,7 @@ if (!defined('ELK'))
  * PackageServers controller handles browsing, adding and removing
  * package servers, and download of a package from them.
  */
-class ManagePackageServers_Controller extends Action_Controller
+class PackageServers_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher for package servers. Checks permissions,
@@ -48,7 +48,7 @@ class ManagePackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('ManagePackageServers', 'admin');
+		loadTemplate('PackageServers', 'admin');
 
 		$context['page_title'] = $txt['package_servers'];
 

@@ -25,7 +25,7 @@ if (!defined('ELK'))
  * Its main job is to install/uninstall, allow to browse, packages and package servers.
  * In fact, just about everything related to add-on packages, including FTP connections when necessary.
  */
-class ManagePackages_Controller extends Action_Controller
+class Packages_Controller extends Action_Controller
 {
 	/**
 	 * Entry point, the default method of this controller.
@@ -42,7 +42,7 @@ class ManagePackages_Controller extends Action_Controller
 		// Load all the basic stuff.
 		require_once(SUBSDIR . '/Package.subs.php');
 		loadLanguage('Packages');
-		loadTemplate('ManagePackages', 'admin');
+		loadTemplate('Packages', 'admin');
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.

@@ -102,8 +102,8 @@ class Admin_Controller extends Action_Controller
 					),
 					'packages' => array(
 						'label' => $txt['package'],
-						'file' => 'ManagePackages.controller.php',
-						'controller' => 'ManagePackages_Controller',
+						'file' => 'Packages.controller.php',
+						'controller' => 'Packages_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
@@ -118,7 +118,7 @@ class Admin_Controller extends Action_Controller
 					'packageservers' => array(
 						'label' => $txt['package_servers'],
 						'file' => 'PackageServers.controller.php',
-						'controller' => 'ManagePackageServers_Controller',
+						'controller' => 'PackageServers_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
 						'icon' => 'transparent.png',
