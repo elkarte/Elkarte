@@ -398,25 +398,25 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 function loadPaymentGateways()
 {
 	$gateways = array();
-	if ($dh = opendir(SOURCEDIR))
+	if ($dh = opendir(SUBSDIR))
 	{
 		while (($file = readdir($dh)) !== false)
 		{
-			if (is_file(SOURCEDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
+			if (is_file(SUBSDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
 			{
 				// Check this is definitely a valid gateway!
-				$fp = fopen(SOURCEDIR . '/' . $file, 'rb');
+				$fp = fopen(SUBSDIR . '/' . $file, 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '// ElkArte Payment Gateway: ' . strtolower($matches[1])) !== false)
+				if (strpos($header, 'Payment Gateway: ' . strtolower($matches[1])) !== false)
 				{
-					require_once(SOURCEDIR . '/' . $file);
+					require_once(SUBSDIR . '/' . $file);
 
 					$gateways[] = array(
 						'filename' => $file,
 						'code' => strtolower($matches[1]),
-						// Don't need anything snazier than this yet.
+						// Don't need anything snazzier than this yet.
 						'valid_version' => class_exists(strtolower($matches[1]) . '_payment') && class_exists(strtolower($matches[1]) . '_display'),
 						'payment_class' => strtolower($matches[1]) . '_payment',
 						'display_class' => strtolower($matches[1]) . '_display',

@@ -11,10 +11,15 @@
  *
  * @version 1.0 Alpha
  *
+ * Payment Gateway: authorize
+ *
  */
 
+if (!defined('ELK'))
+	die('No access...');
+
 /**
- * Payment Gateway: authorize.net
+ * Class for returning available form data for this gateway
  */
 class authorize_display
 {

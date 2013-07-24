@@ -11,10 +11,12 @@
  *
  * @version 1.0 Alpha
  *
+ * Payment Gateway: twocheckout
+ *
  */
 
 /**
- * Payment Gateway: two-checkout
+ * The available form data for the gateway
  */
 class twocheckout_display
 {
