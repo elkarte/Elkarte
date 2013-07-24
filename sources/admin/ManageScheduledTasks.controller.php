@@ -90,7 +90,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		// Mama, setup the template first - cause it's like the most important bit, like pickle in a sandwich.
 		// ... ironically I don't like pickle. </grudge>
 		$context['sub_template'] = 'view_scheduled_tasks';
@@ -277,7 +277,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		$context['page_title'] = $txt['scheduled_task_edit'];
 		$context['server_time'] = standardTime(time(), false, 'server');
 
-		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		// Cleaning...
 		if (!isset($_GET['tid']))
 			fatal_lang_error('no_access', false);
@@ -344,7 +344,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		$db = database();
 
-		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		// Lets load the language just incase we are outside the Scheduled area.
 		loadLanguage('ManageScheduledTasks');
 
