@@ -28,7 +28,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class ManageReports_Controller extends Action_Controller
+class Reports_Controller extends Action_Controller
 {
 	/**
 	 * Handling function for generating reports.
@@ -54,8 +54,8 @@ class ManageReports_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Let's get our things running...
-		loadTemplate('ManageReports');
-		loadLanguage('ManageReports');
+		loadTemplate('Reports');
+		loadLanguage('Reports');
 
 		$context['page_title'] = $txt['generate_reports'];
 

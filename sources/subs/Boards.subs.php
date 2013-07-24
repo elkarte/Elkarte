@@ -1605,7 +1605,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 	// if $conditions wasn't set or is 'all', get all boards
 	if (!is_array($conditions) && $conditions == 'all')
 	{
-		// id_board, name, id_profile => used in admin/ManageReports.controller.php
+		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
 			SELECT ' . (!empty($params['count']) ? 'COUNT(*)' : 'id_board, name, id_profile') . '
 			FROM {db_prefix}boards',

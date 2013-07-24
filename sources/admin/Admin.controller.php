@@ -521,8 +521,8 @@ class Admin_Controller extends Action_Controller
 					'reports' => array(
 						'enabled' => in_array('rg', $context['admin_features']),
 						'label' => $txt['generate_reports'],
-						'file' => 'ManageReports.controller.php',
-						'controller' => 'ManageReports_Controller',
+						'file' => 'Reports.controller.php',
+						'controller' => 'Reports_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_reports',
