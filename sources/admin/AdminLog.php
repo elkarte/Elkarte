@@ -52,10 +52,10 @@ class AdminLog_Controller extends Action_Controller
 				'controller' => 'Modlog_Controller',
 				'disabled' => !in_array('ml', $context['admin_features'])),
 			'badbehaviorlog' => array(
-				'file' => 'ManageBadBehavior.controller.php',
+				'file' => 'BadBehavior.controller.php',
 				'function' => 'action_log',
 				'disabled' => empty($modSettings['badbehavior_enabled']),
-				'controller' => 'ManageBadBehavior_Controller'),
+				'controller' => 'BadBehavior_Controller'),
 			'banlog' => array(
 				'file' => 'ManageBans.controller.php',
 				'function' => 'action_log',
