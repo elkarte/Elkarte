@@ -27,7 +27,7 @@ if (!defined('ELK'))
 function loadTasks($tasks)
 {
 	$db = database();
-	
+
 	$request = $db->query('', '
 		SELECT id_task, task
 		FROM {db_prefix}scheduled_tasks
@@ -156,13 +156,12 @@ function loadTaskDetails($id_task)
 }
 
 /**
- * Callback function for createList() in ScheduledTasks().
+ * Returns an array of registered scheduled tasks.
+ * Used also by createList() callbacks.
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @return array
  */
-function list_getScheduledTasks()
+function scheduledTasks()
 {
 	global $txt;
 
@@ -198,13 +197,16 @@ function list_getScheduledTasks()
 }
 
 /**
- * Callback function for createList() in action_log().
+ * Return task log entries, within the passed limits.
+ * Used by createList() callbacks.
  *
  * @param int $start
  * @param int $items_per_page
  * @param string $sort
+ *
+ * @return array
  */
-function list_getTaskLogEntries($start, $items_per_page, $sort)
+function getTaskLogEntries($start, $items_per_page, $sort)
 {
 	global $txt;
 
@@ -233,9 +235,12 @@ function list_getTaskLogEntries($start, $items_per_page, $sort)
 }
 
 /**
- * Callback function for createList() in action_log().
+ * Return the number of task log entries.
+ * Used by createList() callbacks.
+ *
+ * @return int
  */
-function list_getNumaction_logEntries()
+function countTaskLogEntries()
 {
 	$db = database();
 

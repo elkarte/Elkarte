@@ -162,7 +162,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			'title' => $txt['maintain_tasks'],
 			'base_href' => $scripturl . '?action=admin;area=scheduledtasks',
 			'get_items' => array(
-				'function' => 'list_getScheduledTasks',
+				'function' => array($this, 'list_getScheduledTasks'),
 			),
 			'columns' => array(
 				'name' => array(
@@ -370,10 +370,10 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			'base_href' => $context['admin_area'] == 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'list_getTaskLogEntries',
+				'function' => array($this, 'list_getTaskLogEntries'),
 			),
 			'get_count' => array(
-				'function' => 'list_getNumaction_logEntries(',
+				'function' => array($this, 'list_getNumTaskLogEntries('),
 			),
 			'columns' => array(
 				'name' => array(
@@ -445,5 +445,34 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		// Make it all look tify.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'tasklog';
 		$context['page_title'] = $txt['scheduled_log'];
+	}
+
+	/**
+	 * Callback function for createList() in action_tasks().
+	 *
+	 */
+	function list_getScheduledTasks()
+	{
+		return scheduledTasks();
+	}
+
+	/**
+	 * Callback function for createList() in action_log().
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	function list_getTaskLogEntries($start, $items_per_page, $sort)
+	{
+		return getTaskLogEntries($start, $items_per_page, $sort);
+	}
+
+	/**
+	 * Callback function for createList() in action_log().
+	 */
+	function list_getNumTaskLogEntries()
+	{
+		return countTaskLogEntries();
 	}
 }
