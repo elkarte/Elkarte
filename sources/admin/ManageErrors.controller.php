@@ -68,7 +68,7 @@ class ManageErrors_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Error.subs.php');
 
 		// Templates, etc...
-		loadLanguage('ManageMaintenance');
+		loadLanguage('Maintenance');
 		loadTemplate('Errors');
 
 		// You can filter by any of the following columns:

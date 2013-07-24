@@ -20,7 +20,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class ManageMaintenance_Controller extends Action_Controller
+class Maintenance_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher, the maintenance access point.
@@ -37,8 +37,8 @@ class ManageMaintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Need something to talk about?
-		loadLanguage('ManageMaintenance');
-		loadTemplate('ManageMaintenance');
+		loadLanguage('Maintenance');
+		loadTemplate('Maintenance');
 
 		// This uses admin tabs - as it should!
 		$context[$context['admin_menu_name']]['tab_data'] = array(

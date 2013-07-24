@@ -482,8 +482,8 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'maintain' => array(
 						'label' => $txt['maintain_title'],
-						'file' => 'ManageMaintenance.controller.php',
-						'controller' => 'ManageMaintenance_Controller',
+						'file' => 'Maintenance.controller.php',
+						'controller' => 'Maintenance_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_maintain',
