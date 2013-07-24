@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * to admin search and otherwise benefit from admin areas security,
  * checks and display.
  */
-class ManageAddonSettings_Controller extends Action_Controller
+class AddonSettings_Controller extends Action_Controller
 {
 	/**
 	 * General addon settings form.
@@ -169,7 +169,7 @@ class ManageAddonSettings_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt, $modSettings, $settings;
 
-		require_once(SUBSDIR . '/ManageAddonSettings.subs.php');
+		require_once(SUBSDIR . '/AddonSettings.subs.php');
 
 		$context['filter_url'] = '';
 		$context['current_filter'] = '';
