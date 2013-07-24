@@ -226,7 +226,7 @@ class ManagePosts_Controller extends Action_Controller
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
 			if (isset($_POST['max_messageLength']) && $_POST['max_messageLength'] != $modSettings['max_messageLength'] && $db_type == 'mysql')
 			{
-				require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();
 				foreach ($colData as $column)
 					if ($column['name'] == 'body')

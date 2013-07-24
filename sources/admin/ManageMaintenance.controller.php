@@ -132,7 +132,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		$db = database();
 
 		// We need this, really..
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_database';
@@ -345,7 +345,7 @@ class ManageMaintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		checkSession();
 		validateToken('admin-maint');
@@ -490,7 +490,7 @@ class ManageMaintenance_Controller extends Action_Controller
 
 		ignore_user_abort(true);
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		$context['page_title'] = $txt['database_optimize'];
 		$context['sub_template'] = 'optimize';
@@ -548,7 +548,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		// validate the request or the loop
 		if (!isset($_REQUEST['step']))
