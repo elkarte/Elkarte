@@ -115,7 +115,7 @@ class ManagePaid_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/ManagePaid.subs.php');
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		// initialize the form
 		$this->_init_paidSettingsForm();
@@ -272,7 +272,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		// Some basic stuff.
 		$context['page_title'] = $txt['paid_subs_view'];
-		require_once(SUBSDIR . '/ManagePaid.subs.php');
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		loadSubscriptions();
 
 		$listOptions = array(
@@ -413,7 +413,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		$db = database();
 
-		require_once(SUBSDIR . '/ManagePaid.subs.php');
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		$context['sub_id'] = isset($_REQUEST['sid']) ? (int) $_REQUEST['sid'] : 0;
 		$context['action_type'] = $context['sub_id'] ? (isset($_REQUEST['delete']) ? 'delete' : 'edit') : 'add';
@@ -581,7 +581,7 @@ class ManagePaid_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/ManagePaid.subs.php');
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['viewing_users_subscribed'];
@@ -758,7 +758,7 @@ class ManagePaid_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		require_once(SUBSDIR . '/ManagePaid.subs.php');
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		loadSubscriptions();
 
