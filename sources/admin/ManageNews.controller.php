@@ -163,7 +163,7 @@ class ManageNews_Controller extends Action_Controller
 
 		// We're going to want this for making our list.
 		require_once(SUBSDIR . '/List.subs.php');
-		require_once(SUBSDIR . '/ManageNews.subs.php');
+		require_once(SUBSDIR . '/News.subs.php');
 
 		$context['page_title'] = $txt['admin_edit_news'];
 
@@ -309,7 +309,7 @@ class ManageNews_Controller extends Action_Controller
 		global $txt, $context;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/ManageNews.subs.php');
+		require_once(SUBSDIR . '/News.subs.php');
 
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
@@ -446,7 +446,7 @@ class ManageNews_Controller extends Action_Controller
 
 		// We need a couple strings from the email template file
 		loadLanguage('EmailTemplates');
-		require_once(SUBSDIR . '/ManageNews.subs.php');
+		require_once(SUBSDIR . '/News.subs.php');
 		// Get a list of all full banned users.  Use their Username and email to find them.
 		// Only get the ones that can't login to turn off notification.
 		$context['recipients']['exclude_members'] = excludeBannedMembers();
