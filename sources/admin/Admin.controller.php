@@ -151,8 +151,8 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'corefeatures' => array(
 						'label' => $txt['core_settings_title'],
-						'file' => 'ManageCoreFeatures.controller.php',
-						'controller' => 'ManageCoreFeatures_Controller',
+						'file' => 'CoreFeatures.controller.php',
+						'controller' => 'CoreFeatures_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_corefeatures',
@@ -909,14 +909,14 @@ class Admin_Controller extends Action_Controller
 		$include_files = array(
 			'ManageFeatures', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
-			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts',
-			'ManageAddonSettings', 'ManageSecurity'
+			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'CoreFeatures', 'AdminLog', 'ManageDrafts',
+			'AddonSettings', 'ManageSecurity'
 		);
 
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
-			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
+			array('config_vars', 'area=corefeatures', 'CoreFeatures_Controller'),
 			array('basicSettings', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
 			array('layoutSettings', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
 			array('karmaSettings', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),

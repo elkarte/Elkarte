@@ -13,7 +13,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManageAddonSettings controller handles administration settings added
+ * AddonSettings controller handles administration settings added
  * in the common area for all addons in admin panel.
  * Some addons will define their own areas, but for simple cases,
  * when you have only a setting or two, this area will allow you
