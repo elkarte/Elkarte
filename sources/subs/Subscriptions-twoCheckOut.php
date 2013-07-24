@@ -34,7 +34,9 @@ class twocheckout_display
 		return $setting_data;
 	}
 
-	// Can we accept payments with 2co?
+	/**
+	 * Can we accept payments with 2co?
+	 */
 	public function gatewayEnabled()
 	{
 		global $modSettings;
@@ -109,32 +111,42 @@ class twocheckout_payment
 		return explode('+', $_POST['x_invoice_num']);
 	}
 
-	// Is this a refund?
+	/**
+	 * Returns whether this is this a refund
+	 */
 	public function isRefund()
 	{
 		return false;
 	}
 
-	// Is this a subscription?
+	/**
+	 * Returns whether this is a subscription
+	 */
 	public function isSubscription()
 	{
 		return false;
 	}
 
-	// Is this a normal payment?
+	/**
+	 * Returns whether this is a normal payment
+	 */
 	function isPayment()
 	{
 		// We have to assume so?
 		return true;
 	}
 
-	// How much was paid?
+	/**
+	 * Returns the cost
+	 */
 	public function getCost()
 	{
 		return $_POST['x_amount'];
 	}
 
-	// Redirect the user away.
+	/**
+	 * Redirect the user away.
+	 */
 	public function close()
 	{
 		exit();

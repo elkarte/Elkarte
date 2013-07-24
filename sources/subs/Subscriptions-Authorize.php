@@ -25,7 +25,9 @@ class authorize_display
 {
 	public $title = 'Authorize.net | Credit Card';
 
-	// Settings for the gateway.
+	/**
+	 * Settings for the gateway.
+	 */
 	public function getGatewaySettings()
 	{
 		global $txt;
@@ -38,7 +40,11 @@ class authorize_display
 		return $setting_data;
 	}
 
-	// Is it enabled?
+	/**
+	 * Whether this gateway is enabled.
+	 *
+	 * @return bool
+	 */
 	public function gatewayEnabled()
 	{
 		global $modSettings;
@@ -46,7 +52,17 @@ class authorize_display
 		return !empty($modSettings['authorize_id']) && !empty($modSettings['authorize_transid']);
 	}
 
-	// Returns the fields needed for the transaction
+	/**
+	 * Returns the fields needed for the transaction.
+	 *
+	 * @param int $unique_id
+	 * @param array $sub_data
+	 * @param int $value
+	 * @param string $period
+	 * @param string $return_url
+	 *
+	 * @return array
+	 */
 	public function fetchGatewayFields($unique_id, $sub_data, $value, $period, $return_url)
 	{
 		global $modSettings, $txt, $boardurl, $context;
@@ -112,7 +128,9 @@ class authorize_payment
 		return true;
 	}
 
-	// Validate this is valid for this transaction type.
+	/**
+	 * Validate this is valid for this transaction type.
+	 */
 	public function precheck()
 	{
 		global $modSettings;
@@ -136,19 +154,25 @@ class authorize_payment
 		return explode('+', $_POST['x_invoice_num']);
 	}
 
-	// Is this a refund?
+	/**
+	 * Returns if this is a refund.
+	 */
 	public function isRefund()
 	{
 		return false;
 	}
 
-	// Is this a subscription?
+	/**
+	 * Returns if this is a subscription.
+	 */
 	public function isSubscription()
 	{
 		return false;
 	}
 
-	// Is this a normal payment?
+	/**
+	 * Returns if this is a normal payment.
+	 */
 	public function isPayment()
 	{
 		if ($_POST['x_response_code'] == 1)
@@ -157,13 +181,17 @@ class authorize_payment
 			return false;
 	}
 
-	// How much was paid?
+	/**
+	 * Retrieve the cost.
+	 */
 	public function getCost()
 	{
 		return $_POST['x_amount'];
 	}
 
-	// Redirect the user away.
+	/**
+	 * Redirect the user away.
+	 */
 	public function close()
 	{
 		exit();
