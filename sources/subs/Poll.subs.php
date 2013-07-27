@@ -404,3 +404,24 @@ function determineVote($topic)
 
 	return $row;
 }
+
+/**
+ * Removes the member's vote from a poll.
+ *
+ * @param int $id_member
+ * @param int $id_poll
+ */
+function removeVote($id_member, $id_poll)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_polls
+		WHERE id_member = {int:current_member}
+			AND id_poll = {int:id_poll}',
+		array(
+			'current_member' => $id_member,
+			'id_poll' => $id_poll,
+		)
+	);
+}

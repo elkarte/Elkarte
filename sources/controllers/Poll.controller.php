@@ -146,15 +146,7 @@ class Poll_Controller extends Action_Controller
 				);
 
 				// Delete off the log.
-				$db->query('', '
-					DELETE FROM {db_prefix}log_polls
-					WHERE id_member = {int:current_member}
-						AND id_poll = {int:id_poll}',
-					array(
-						'current_member' => $user_info['id'],
-						'id_poll' => $row['id_poll'],
-					)
-				);
+				removeVote($user_info['id'], $row['id_poll']);
 			}
 
 			// Redirect back to the topic so the user can vote again!
