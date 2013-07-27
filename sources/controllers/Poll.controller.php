@@ -51,7 +51,6 @@ class Poll_Controller extends Action_Controller
 		global $topic, $user_info, $modSettings;
 
 		require_once(SUBSDIR . '/Poll.subs.php');
-		$db = database();
 
 		// Make sure you can vote.
 		isAllowedTo('poll_vote');
@@ -59,7 +58,7 @@ class Poll_Controller extends Action_Controller
 		loadLanguage('Post');
 
 		// Check if they have already voted, or voting is locked.
-		$row = determineVote($topic);
+		$row = checkVote($topic);
 
 		if (empty($row))
 			fatal_lang_error('poll_error', false);
@@ -114,37 +113,13 @@ class Poll_Controller extends Action_Controller
 			$pollOptions = array();
 
 			// Find out what they voted for before.
-			$request = $db->query('', '
-				SELECT id_choice
-				FROM {db_prefix}log_polls
-				WHERE id_member = {int:current_member}
-					AND id_poll = {int:id_poll}',
-				array(
-					'current_member' => $user_info['id'],
-					'id_poll' => $row['id_poll'],
-				)
-			);
-			while ($choice = $db->fetch_row($request))
-				$pollOptions[] = $choice[0];
-			$db->free_result($request);
+			$pollOptions = determineVote($user_info['id'], $row['id_poll']);
 
 			// Just skip it if they had voted for nothing before.
 			if (!empty($pollOptions))
 			{
 				// Update the poll totals.
-				$db->query('', '
-					UPDATE {db_prefix}poll_choices
-					SET votes = votes - 1
-					WHERE id_poll = {int:id_poll}
-						AND id_choice IN ({array_int:poll_options})
-						AND votes > {int:votes}',
-					array(
-						'poll_options' => $pollOptions,
-						'id_poll' => $row['id_poll'],
-						'votes' => 0,
-					)
-				);
-
+				decreaseVoteCounter($row['id_poll'], $pollOptions);
 				// Delete off the log.
 				removeVote($user_info['id'], $row['id_poll']);
 			}
@@ -175,23 +150,9 @@ class Poll_Controller extends Action_Controller
 		}
 
 		// Add their vote to the tally.
-		$db->insert('insert',
-			'{db_prefix}log_polls',
-			array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
-			$inserts,
-			array('id_poll', 'id_member', 'id_choice')
-		);
+		addVote($inserts);
+		increaseVoteCounter($row['id_poll'], $pollOptions);
 
-		$db->query('', '
-			UPDATE {db_prefix}poll_choices
-			SET votes = votes + 1
-			WHERE id_poll = {int:id_poll}
-				AND id_choice IN ({array_int:poll_options})',
-			array(
-				'poll_options' => $pollOptions,
-				'id_poll' => $row['id_poll'],
-			)
-		);
 
 		// If it's a guest don't let them vote again.
 		if ($user_info['is_guest'] && count($pollOptions) > 0)
@@ -203,14 +164,7 @@ class Poll_Controller extends Action_Controller
 			$_COOKIE['guest_poll_vote'] .= ';' . $row['id_poll'] . ',' . time() . ',' . (count($pollOptions) > 1 ? explode(',' . $pollOptions) : $pollOptions[0]);
 
 			// Increase num guest voters count by 1
-			$db->query('', '
-				UPDATE {db_prefix}polls
-				SET num_guest_voters = num_guest_voters + 1
-				WHERE id_poll = {int:id_poll}',
-				array(
-					'id_poll' => $row['id_poll'],
-				)
-			);
+			increaseGuestVote($row['id_poll']);
 
 			require_once(SUBSDIR . '/Auth.subs.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));

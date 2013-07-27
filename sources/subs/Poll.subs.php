@@ -377,7 +377,7 @@ function pollStarters($id_topic)
 	return $pollStarters;
 }
 
-function determineVote($topic)
+function checkVote($topic)
 {
 	global $user_info;
 
@@ -424,4 +424,114 @@ function removeVote($id_member, $id_poll)
 			'id_poll' => $id_poll,
 		)
 	);
+}
+
+/**
+ * Used to decrease the vote counter for the given poll.
+ *
+ * @param int $id_poll
+ * @param array $options
+ */
+function decreaseVoteCounter($id_poll, $options)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}poll_choices
+		SET votes = votes - 1
+		WHERE id_poll = {int:id_poll}
+			AND id_choice IN ({array_int:poll_options})
+			AND votes > {int:votes}',
+		array(
+			'poll_options' => $options,
+			'id_poll' => $id_poll,
+			'votes' => 0,
+		)
+	);
+}
+
+/**
+ * Increase the vote counter for the given poll.
+ * @param int $id_poll
+ * @param array $options
+ */
+function increaseVoteCounter($id_poll, $options)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}poll_choices
+		SET votes = votes + 1
+		WHERE id_poll = {int:id_poll}
+			AND id_choice IN ({array_int:poll_options})',
+		array(
+			'poll_options' => $options,
+			'id_poll' => $id_poll,
+		)
+	);
+}
+
+/**
+ * Add a vote to a poll.
+ * 
+ * @param array $insert
+ */
+function addVote($insert)
+{
+	$db = database();
+
+	$db->insert('insert',
+		'{db_prefix}log_polls',
+		array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
+		$insert,
+		array('id_poll', 'id_member', 'id_choice')
+	);
+}
+
+/**
+ * Increase the vote counter for guest votes.
+ *
+ * @param int $id_poll
+ */
+function increaseGuestVote($id_poll)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}polls
+		SET num_guest_voters = num_guest_voters + 1
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $id_poll,
+		)
+	);
+}
+
+/**
+ * Determines who voted what.
+ *
+ * @param int $id_member
+ * @param int $id_poll
+ * @return type
+ */
+function determineVote($id_member, $id_poll)
+{
+	$db = database();
+	$pollOptions = array();
+
+	$request = $db->query('', '
+		SELECT id_choice
+		FROM {db_prefix}log_polls
+		WHERE id_member = {int:current_member}
+			AND id_poll = {int:id_poll}',
+		array(
+			'current_member' => $id_member,
+			'id_poll' => $id_poll,
+		)
+	);
+	while ($choice = $db->fetch_row($request))
+		$pollOptions[] = $choice[0];
+	$db->free_result($request);
+
+	return $pollOptions;
 }
