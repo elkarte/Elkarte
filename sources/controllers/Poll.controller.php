@@ -50,6 +50,7 @@ class Poll_Controller extends Action_Controller
 	{
 		global $topic, $user_info, $modSettings;
 
+		require_once(SUBSDIR . '/Poll.subs.php');
 		$db = database();
 
 		// Make sure you can vote.
@@ -58,24 +59,10 @@ class Poll_Controller extends Action_Controller
 		loadLanguage('Post');
 
 		// Check if they have already voted, or voting is locked.
-		$request = $db->query('', '
-			SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
-				p.guest_vote, p.reset_poll, p.num_guest_voters
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-				LEFT JOIN {db_prefix}log_polls AS lp ON (p.id_poll = lp.id_poll AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
-			WHERE t.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-				'not_guest' => 0,
-			)
-		);
-		if ($db->num_rows($request) == 0)
+		$row = determineVote($topic);
+
+		if (empty($row))
 			fatal_lang_error('poll_error', false);
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
 
 		// If this is a guest can they vote?
 		if ($user_info['is_guest'])

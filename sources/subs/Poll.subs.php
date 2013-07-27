@@ -376,3 +376,31 @@ function pollStarters($id_topic)
 
 	return $pollStarters;
 }
+
+function determineVote($topic)
+{
+	global $user_info;
+
+	$db = database();
+
+	// Check if they have already voted, or voting is locked.
+	$request = $db->query('', '
+		SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
+			p.guest_vote, p.reset_poll, p.num_guest_voters
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+			LEFT JOIN {db_prefix}log_polls AS lp ON (p.id_poll = lp.id_poll AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'not_guest' => 0,
+		)
+	);
+
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $row;
+}
