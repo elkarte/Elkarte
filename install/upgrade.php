@@ -20,16 +20,16 @@ define('CURRENT_VERSION', '1.0 Alpha');
 define('CURRENT_LANG_VERSION', '1.0');
 
 $GLOBALS['required_php_version'] = '5.1.0';
-$GLOBALS['required_mysql_version'] = '4.0.18';
+$GLOBALS['required_mysql_version'] = '4.1.0';
 
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.0.18',
-		'version_check' => 'return min(mysql_get_server_info(), mysql_get_client_info());',
+		'version' => '4.1.0',
+		'version_check' => 'return min(mysqli_get_server_info(), mysqli_get_client_info());',
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysql_get_server_info();',
+		'utf8_version_check' => 'return mysqli_get_server_info();',
 		'alter_support' => true,
 	),
 	'postgresql' => array(
@@ -2526,7 +2526,7 @@ function upgrade_query($string, $unbuffered = false)
 	// If MySQL we do something more clever.
 	if ($db_type == 'mysql')
 	{
-		$mysql_errno = mysql_errno($db_connection);
+		$mysql_errno = mysqli_errno($db_connection);
 		$error_query = in_array(substr(trim($string), 0, 11), array('INSERT INTO', 'UPDATE IGNO', 'ALTER TABLE', 'DROP TABLE ', 'ALTER IGNOR'));
 
 		// Error numbers:
@@ -2545,21 +2545,20 @@ function upgrade_query($string, $unbuffered = false)
 		if ($mysql_errno == 1016)
 		{
 			if (preg_match('~\'([^\.\']+)~', $db_error_message, $match) != 0 && !empty($match[1]))
-				mysql_query( '
+				mysqli_query( '
 					REPAIR TABLE `' . $match[1] . '`');
 
-			$result = mysql_query($string);
+			$result = mysqli_query($string);
 			if ($result !== false)
 				return $result;
 		}
 		elseif ($mysql_errno == 2013)
 		{
-			$db_connection = mysql_connect($db_server, $db_user, $db_passwd);
-			mysql_select_db($db_name, $db_connection);
+			$db_connection = mysqli_connect($db_server, $db_user, $db_passwd, $db_name);
 
 			if ($db_connection)
 			{
-				$result = mysql_query($string);
+				$result = mysqli_query($string);
 
 				if ($result !== false)
 					return $result;

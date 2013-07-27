@@ -28,15 +28,15 @@ $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
 		'version' => '4.1.0',
-		'version_check' => 'return min(mysql_get_server_info(), mysql_get_client_info());',
-		'supported' => function_exists('mysql_connect'),
-		'default_user' => 'mysql.default_user',
-		'default_password' => 'mysql.default_password',
-		'default_host' => 'mysql.default_host',
-		'default_port' => 'mysql.default_port',
+		'version_check' => 'return min(mysqli_get_server_info(), mysqli_get_client_info());',
+		'supported' => function_exists('mysqli_connect'),
+		'default_user' => 'mysqli.default_user',
+		'default_password' => 'mysqli.default_password',
+		'default_host' => 'mysqli.default_host',
+		'default_port' => 'mysqli.default_port',
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysql_get_server_info();',
+		'utf8_version_check' => 'return mysqli_get_server_info();',
 		'alter_support' => true,
 		'validate_prefix' => create_function('&$value', '
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
@@ -1033,7 +1033,7 @@ function action_databasePopulation()
 		{
 			// Error 1050: Table already exists!
 			// @todo Needs to be made better!
-			if (($db_type != 'mysql' || mysql_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
+			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
 			{
 				$exists[] = $match[1];
 				$incontext['sql_results']['table_dups']++;
