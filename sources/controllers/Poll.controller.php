@@ -190,54 +190,36 @@ class Poll_Controller extends Action_Controller
 	function action_lockvoting()
 	{
 		global $topic, $user_info;
-
-		$db = database();
+		
+		require_once(SUBSDIR . '/Poll.subs.php');
 
 		checkSession('get');
 
 		// Get the poll starter, ID, and whether or not it is locked.
-		$request = $db->query('', '
-			SELECT t.id_member_started, t.id_poll, p.voting_locked
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-			WHERE t.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		list ($memberID, $pollID, $voting_locked) = $db->fetch_row($request);
+		$poll = pollStatus($topic);
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
-			isAllowedTo('poll_lock_' . ($user_info['id'] == $memberID ? 'own' : 'any'));
+			isAllowedTo('poll_lock_' . ($user_info['id'] == $poll['id_member'] ? 'own' : 'any'));
 
 		// It's been locked by a non-moderator.
-		if ($voting_locked == '1')
-			$voting_locked = '0';
+		if ($poll['locked'] == '1')
+			$poll['locked'] = '0';
 		// Locked by a moderator, and this is a moderator.
-		elseif ($voting_locked == '2' && allowedTo('moderate_board'))
-			$voting_locked = '0';
+		elseif ($poll['locked'] == '2' && allowedTo('moderate_board'))
+			$poll['locked'] = '0';
 		// Sorry, a moderator locked it.
-		elseif ($voting_locked == '2' && !allowedTo('moderate_board'))
+		elseif ($poll['locked'] == '2' && !allowedTo('moderate_board'))
 			fatal_lang_error('locked_by_admin', 'user');
 		// A moderator *is* locking it.
-		elseif ($voting_locked == '0' && allowedTo('moderate_board'))
-			$voting_locked = '2';
+		elseif ($poll['locked'] == '0' && allowedTo('moderate_board'))
+			$poll['locked'] = '2';
 		// Well, it's gonna be locked one way or another otherwise...
 		else
-			$voting_locked = '1';
+			$poll['locked'] = '1';
 
 		// Lock!  *Poof* - no one can vote.
-		$db->query('', '
-			UPDATE {db_prefix}polls
-			SET voting_locked = {int:voting_locked}
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'voting_locked' => $voting_locked,
-				'id_poll' => $pollID,
-			)
-		);
+		lockPoll($poll['id_poll'], $poll['locked']);
 
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
 	}

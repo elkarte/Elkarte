@@ -535,3 +535,38 @@ function determineVote($id_member, $id_poll)
 
 	return $pollOptions;
 }
+function pollStatus($id_topic)
+{
+	$db = database();
+
+	$poll = array();
+
+	$request = $db->query('', '
+			SELECT t.id_member_started, t.id_poll, p.voting_locked
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+			WHERE t.id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+		list ($poll['id_member'], $poll['id_poll'], $poll['locked']) = $db->fetch_row($request);
+
+		return $poll;
+}
+
+function lockPoll($id_poll, $locked)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}polls
+		SET voting_locked = {int:voting_locked}
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'voting_locked' => $locked,
+			'id_poll' => $id_poll,
+		)
+	);
+}
