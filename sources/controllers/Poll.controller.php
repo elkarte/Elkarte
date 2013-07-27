@@ -241,8 +241,6 @@ class Poll_Controller extends Action_Controller
 	{
 		global $txt, $user_info, $context, $topic, $board, $scripturl;
 
-		$db = database();
-
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
 
@@ -422,29 +420,7 @@ class Poll_Controller extends Action_Controller
 			// Get all the choices - if this is an edit.
 			if ($context['is_edit'])
 			{
-				$request = $db->query('', '
-					SELECT label, votes, id_choice
-					FROM {db_prefix}poll_choices
-					WHERE id_poll = {int:id_poll}',
-					array(
-						'id_poll' => $pollinfo['id_poll'],
-					)
-				);
-				$context['choices'] = array();
-				$number = 1;
-				while ($row = $db->fetch_assoc($request))
-				{
-					censorText($row['label']);
-
-					$context['choices'][$row['id_choice']] = array(
-						'id' => $row['id_choice'],
-						'number' => $number++,
-						'votes' => $row['votes'],
-						'label' => $row['label'],
-						'is_last' => false
-					);
-				}
-				$db->free_result($request);
+				$context['choices'] = getPollChoices($pollinfo['id_poll']);
 
 				$last_id = max(array_keys($context['choices'])) + 1;
 

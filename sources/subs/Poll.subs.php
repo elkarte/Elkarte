@@ -570,3 +570,34 @@ function lockPoll($id_poll, $locked)
 		)
 	);
 }
+
+function getPollChoices($id_poll)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT label, votes, id_choice
+		FROM {db_prefix}poll_choices
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $id_poll,
+		)
+	);
+
+	$choices = array();	
+	$number = 1;
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['label']);
+		$choices[$row['id_choice']] = array(
+			'id' => $row['id_choice'],
+			'number' => $number++,
+			'votes' => $row['votes'],
+			'label' => $row['label'],
+			'is_last' => false
+		);
+	}
+	$db->free_result($request);
+
+	return $choices;
+}
