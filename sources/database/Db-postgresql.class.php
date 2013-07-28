@@ -22,6 +22,8 @@ class Database_PostgreSQL implements Database
 {
 	private static $_db = null;
 
+	private $_connection = null;
+
 	private function __construct()
 	{
 		// Private constructor.
@@ -206,13 +208,13 @@ class Database_PostgreSQL implements Database
 	 */
 	function quote($db_string, $db_values, $connection = null)
 	{
-		global $db_callback, $db_connection;
+		global $db_callback;
 
 		// Only bother if there's something to replace.
 		if (strpos($db_string, '{') !== false)
 		{
 			// This is needed by the callback function.
-			$db_callback = array($db_values, $connection === null ? $db_connection : $connection);
+			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
 
 			// Do the quoting and escaping
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
@@ -237,11 +239,11 @@ class Database_PostgreSQL implements Database
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
+		global $db_cache, $db_count, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $db_last_result, $db_replace_result, $modSettings;
 
 		// Decide which connection to use.
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// Special queries that need processing.
 		$replacements = array(
@@ -481,12 +483,12 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert_id($table, $field = null, $connection = null)
 	{
-		global $db_connection, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		if ($connection === false)
-			$connection = $db_connection;
+			$connection = $this->_connection;
 
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
@@ -539,10 +541,8 @@ class Database_PostgreSQL implements Database
 	 */
 	function db_transaction($type = 'commit', $connection = null)
 	{
-		global $db_connection;
-
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		if ($type == 'begin')
 			return @pg_query($connection, 'BEGIN');
@@ -574,14 +574,14 @@ class Database_PostgreSQL implements Database
 	function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
-		global $forum_version, $db_connection, $db_last_error, $db_persist;
+		global $forum_version, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// This is the error message...
 		$query_error = @pg_last_error($connection);
@@ -695,9 +695,9 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_replace_result, $db_in_transact, $db_connection, $db_prefix;
+		global $db_replace_result, $db_in_transact, $db_prefix;
 
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		if (empty($data))
 			return;
@@ -792,9 +792,9 @@ class Database_PostgreSQL implements Database
 	 * Dummy function really. Doesn't do anything on PostgreSQL.
 	 *
 	 * @param string $db_name = null
-	 * @param resource $db_connection = null
+	 * @param resource $connection = null
 	 */
-	function select_db($db_name = null, $db_connection = null)
+	function select_db($db_name = null, $connection = null)
 	{
 		return true;
 	}

@@ -27,7 +27,7 @@ if (!defined('ELK'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $db_connection, $_PHPA, $memcached, $modSettings;
+	global $txt, $_PHPA, $memcached, $modSettings;
 
 	$db = database();
 
@@ -53,8 +53,7 @@ function getServerVersions($checkFor)
 	// Now lets check for the Database.
 	if (in_array('db_server', $checkFor))
 	{
-		$db = database();
-		if (!isset($db_connection) || $db_connection === false)
+		if (empty($db->connection()))
 			trigger_error('getServerVersions(): you need to be connected to the database in order to get its server version', E_USER_NOTICE);
 		else
 		{

@@ -44,7 +44,7 @@ class AdminDebug_Controller extends Action_Controller
 	 */
 	public function action_viewquery()
 	{
-		global $scripturl, $settings, $context, $db_connection, $txt, $db_show_debug;
+		global $scripturl, $settings, $context, $txt, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
 		if (!isset($db_show_debug) || $db_show_debug !== true || !isset($_SESSION['debug']))
@@ -164,7 +164,7 @@ class AdminDebug_Controller extends Action_Controller
 				{
 					echo '
 		<table border="1" cellpadding="4" cellspacing="0" style="empty-cells: show; font-family: serif; margin-bottom: 2ex;">
-			<tr><td>', $db->last_error($db_connection), '</td></tr>
+			<tr><td>', $db->last_error($db->connection()), '</td></tr>
 		</table>';
 					continue;
 				}

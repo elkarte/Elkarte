@@ -509,7 +509,7 @@ class Database_MySQL implements Database
 	function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
-		global $forum_version, $db_connection, $db_last_error, $db_persist;
+		global $forum_version, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// Get the file and line numbers.
@@ -618,23 +618,23 @@ class Database_MySQL implements Database
 				{
 					// Are we in SSI mode?  If so try that username and password first
 					if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-						$db_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
+						$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
 
 					// Fall back to the regular username and password if need be
-					if (!$db_connection)
-						$db_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);
+					if (!$new_connection)
+						$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);
 				}
 
-				if ($db_connection)
+				if ($new_connection)
 				{
-					$this->_connection = $db_connection;
+					$this->_connection = $new_connection;
 
 					// Try a deadlock more than once more.
 					for ($n = 0; $n < 4; $n++)
 					{
 						$ret = $this->query('', $db_string, false, false);
 
-						$new_errno = mysqli_errno($db_connection);
+						$new_errno = mysqli_errno($new_connection);
 						if ($ret !== false || in_array($new_errno, array(1205, 1213)))
 							break;
 					}
