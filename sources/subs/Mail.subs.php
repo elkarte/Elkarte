@@ -1031,3 +1031,27 @@ function updateSuccessQueue()
 		)
 	);
 }
+
+/**
+ * Reset to 0 the next send time for emails queue.
+ */
+function resetNextSendTime()
+{
+	global $modSettings;
+
+	$db = database();
+
+	// Update the setting to zero, yay
+	// ...unless someone else did.
+	$db->query('', '
+		UPDATE {db_prefix}settings
+		SET value = {string:no_send}
+		WHERE variable = {string:mail_next_send}
+			AND value = {string:last_mail_send}',
+		array(
+			'no_send' => '0',
+			'mail_next_send' => 'mail_next_send',
+			'last_mail_send' => $modSettings['mail_next_send'],
+		)
+	);
+}

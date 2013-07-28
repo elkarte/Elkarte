@@ -175,6 +175,10 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (isset($_GET['ts']) && $_GET['ts'] != $modSettings['mail_next_send'] && empty($force_send))
 		return false;
 
+	// Prepare to send each email, and log that for future proof.
+	require_once(SUBSDIR . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Maillist.subs.php');
+
 	// By default move the next sending on by 10 seconds, and require an affected row.
 	if (!$override_limit)
 	{
@@ -252,37 +256,14 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 
 	// Delete, delete, delete!!!
 	if (!empty($ids))
-		$db->query('', '
-			DELETE FROM {db_prefix}mail_queue
-			WHERE id_mail IN ({array_int:mail_list})',
-			array(
-				'mail_list' => $ids,
-			)
-		);
+		deleteMailQueueItems($ids);
 
 	// Don't believe we have any left?
 	if (count($ids) < $number)
-	{
-		// Only update the setting if no-one else has beaten us to it.
-		$db->query('', '
-			UPDATE {db_prefix}settings
-			SET value = {string:no_send}
-			WHERE variable = {string:mail_next_send}
-				AND value = {string:last_mail_send}',
-			array(
-				'no_send' => '0',
-				'mail_next_send' => 'mail_next_send',
-				'last_mail_send' => $modSettings['mail_next_send'],
-			)
-		);
-	}
+		resetNextSendTime();
 
 	if (empty($ids))
 		return false;
-
-	// Send each email, and log that for future proof.
-	require_once(SUBSDIR . '/Mail.subs.php');
-	require_once(SUBSDIR . '/Maillist.subs.php');
 
 	$sent = array();
 	$failed_emails = array();
