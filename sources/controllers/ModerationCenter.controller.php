@@ -113,7 +113,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'admin/Modlog.php',
+						'file' => 'admin/Modlog.controller.php',
 						'controller' => 'Modlog_Controller',
 						'function' => 'action_log',
 					),
@@ -148,7 +148,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'emailmod' => array(
 						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'admin/ManageMaillist.php',
+						'file' => 'admin/ManageMaillist.controller.php',
 						'function' => 'UnapprovedEmails',
 						'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 					),

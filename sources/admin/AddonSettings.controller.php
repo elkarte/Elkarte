@@ -13,7 +13,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ManageAddonSettings controller handles administration settings added
+ * AddonSettings controller handles administration settings added
  * in the common area for all addons in admin panel.
  * Some addons will define their own areas, but for simple cases,
  * when you have only a setting or two, this area will allow you
@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * to admin search and otherwise benefit from admin areas security,
  * checks and display.
  */
-class ManageAddonSettings_Controller extends Action_Controller
+class AddonSettings_Controller extends Action_Controller
 {
 	/**
 	 * General addon settings form.
@@ -169,7 +169,7 @@ class ManageAddonSettings_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt, $modSettings, $settings;
 
-		require_once(SUBSDIR . '/ManageAddonSettings.subs.php');
+		require_once(SUBSDIR . '/AddonSettings.subs.php');
 
 		$context['filter_url'] = '';
 		$context['current_filter'] = '';

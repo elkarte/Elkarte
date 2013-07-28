@@ -213,6 +213,7 @@ class AdminDebug_Controller extends Action_Controller
 		global $context, $modSettings;
 
 		require_once(SUBSDIR . '/AdminDebug.subs.php');
+
 		// Don't allow non-administrators.
 		isAllowedTo('admin_forum');
 

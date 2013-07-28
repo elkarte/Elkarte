@@ -71,7 +71,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'maillist' => array(
 						'label' => $txt['mail_center'],
-						'file' => 'ManageMaillist.php',
+						'file' => 'ManageMaillist.controller.php',
 						'controller' => 'ManageMaillist_Controller',
 						'function' => 'action_index',
 						'icon' => 'mail.png',
@@ -88,7 +88,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'news' => array(
 						'label' => $txt['news_title'],
-						'file' => 'ManageNews.php',
+						'file' => 'ManageNews.controller.php',
 						'controller' => 'ManageNews_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -102,7 +102,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'packages' => array(
 						'label' => $txt['package'],
-						'file' => 'Packages.php',
+						'file' => 'Packages.controller.php',
 						'controller' => 'Packages_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
@@ -117,7 +117,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'packageservers' => array(
 						'label' => $txt['package_servers'],
-						'file' => 'PackageServers.php',
+						'file' => 'PackageServers.controller.php',
 						'controller' => 'PackageServers_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
@@ -151,15 +151,15 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'corefeatures' => array(
 						'label' => $txt['core_settings_title'],
-						'file' => 'ManageCoreFeatures.php',
-						'controller' => 'ManageCoreFeatures_Controller',
+						'file' => 'CoreFeatures.controller.php',
+						'controller' => 'CoreFeatures_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_corefeatures',
 					),
 					'featuresettings' => array(
 						'label' => $txt['modSettings_title'],
-						'file' => 'ManageFeatures.php',
+						'file' => 'ManageFeatures.controller.php',
 						'controller' => 'ManageFeatures_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -176,7 +176,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'securitysettings' => array(
 						'label' => $txt['admin_security_moderation'],
-						'file' => 'ManageSecurity.php',
+						'file' => 'ManageSecurity.controller.php',
 						'controller' => 'ManageSecurity_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -190,7 +190,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'languages' => array(
 						'label' => $txt['language_configuration'],
-						'file' => 'ManageLanguages.php',
+						'file' => 'ManageLanguages.controller.php',
 						'controller' => 'ManageLanguages_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -203,7 +203,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'serversettings' => array(
 						'label' => $txt['admin_server_settings'],
-						'file' => 'ManageServer.php',
+						'file' => 'ManageServer.controller.php',
 						'controller' => 'ManageServer_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -219,8 +219,8 @@ class Admin_Controller extends Action_Controller
 					),
 					'current_theme' => array(
 						'label' => $txt['theme_current_settings'],
-						'file' => 'Themes.php',
-						'controller' => 'Themes_Controller',
+						'file' => 'ManageThemes.controller.php',
+						'controller' => 'ManageThemes_Controller',
 						'function' => 'action_index',
 						'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
 						'icon' => 'transparent.png',
@@ -228,8 +228,8 @@ class Admin_Controller extends Action_Controller
 					),
 					'theme' => array(
 						'label' => $txt['theme_admin'],
-						'file' => 'Themes.php',
-						'controller' => 'Themes_Controller',
+						'file' => 'ManageThemes.controller.php',
+						'controller' => 'ManageThemes_Controller',
 						'function' => 'action_index',
 						'custom_url' => $scripturl . '?action=admin;area=theme',
 						'icon' => 'transparent.png',
@@ -245,8 +245,8 @@ class Admin_Controller extends Action_Controller
 					),
 					'modsettings' => array(
 						'label' => $txt['admin_modifications'],
-						'file' => 'ManageAddonSettings.php',
-						'controller' => 'ManageAddonSettings_Controller',
+						'file' => 'AddonSettings.controller.php',
+						'controller' => 'AddonSettings_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_modifications',
@@ -266,7 +266,7 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'manageboards' => array(
 						'label' => $txt['admin_boards'],
-						'file' => 'ManageBoards.php',
+						'file' => 'ManageBoards.controller.php',
 						'controller' => 'ManageBoards_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -280,7 +280,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'postsettings' => array(
 						'label' => $txt['manageposts'],
-						'file' => 'ManagePosts.php',
+						'file' => 'ManagePosts.controller.php',
 						'controller' => 'ManagePosts_Controller',
 						'function' => 'action_index',
 						'permission' => array('admin_forum'),
@@ -295,7 +295,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'managedrafts' => array(
 						'label' => $txt['manage_drafts'],
-						'file' => 'ManageDrafts.php',
+						'file' => 'ManageDrafts.controller.php',
 						'controller' => 'ManageDrafts_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -305,7 +305,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'managecalendar' => array(
 						'label' => $txt['manage_calendar'],
-						'file' => 'ManageCalendar.php',
+						'file' => 'ManageCalendar.controller.php',
 						'controller' => 'ManageCalendar_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -319,7 +319,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'managesearch' => array(
 						'label' => $txt['manage_search'],
-						'file' => 'ManageSearch.php',
+						'file' => 'ManageSearch.controller.php',
 						'controller' => 'ManageSearch_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -334,7 +334,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
-						'file' => 'ManageSmileys.php',
+						'file' => 'ManageSmileys.controller.php',
 						'controller' => 'ManageSmileys_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -351,7 +351,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'manageattachments' => array(
 						'label' => $txt['attachments_avatars'],
-						'file' => 'ManageAttachments.php',
+						'file' => 'ManageAttachments.controller.php',
 						'controller' => 'ManageAttachments_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -373,7 +373,7 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'viewmembers' => array(
 						'label' => $txt['admin_users'],
-						'file' => 'ManageMembers.php',
+						'file' => 'ManageMembers.controller.php',
 						'controller' => 'ManageMembers_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -386,7 +386,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'membergroups' => array(
 						'label' => $txt['admin_groups'],
-						'file' => 'ManageMembergroups.php',
+						'file' => 'ManageMembergroups.controller.php',
 						'controller' => 'ManageMembergroups_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -400,7 +400,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'permissions' => array(
 						'label' => $txt['edit_permissions'],
-						'file' => 'ManagePermissions.php',
+						'file' => 'ManagePermissions.controller.php',
 						'controller' => 'ManagePermissions_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -416,7 +416,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'regcenter' => array(
 						'label' => $txt['registration_center'],
-						'file' => 'ManageRegistration.php',
+						'file' => 'ManageRegistration.controller.php',
 						'controller' => 'ManageRegistration_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -431,7 +431,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'ban' => array(
 						'label' => $txt['ban_title'],
-						'file' => 'ManageBans.php',
+						'file' => 'ManageBans.controller.php',
 						'controller' => 'ManageBans_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -447,7 +447,7 @@ class Admin_Controller extends Action_Controller
 					'paidsubscribe' => array(
 						'label' => $txt['paid_subscriptions'],
 						'enabled' => in_array('ps', $context['admin_features']),
-						'file' => 'ManagePaid.php',
+						'file' => 'ManagePaid.controller.php',
 						'controller' => 'ManagePaid_Controller',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_paid',
@@ -461,7 +461,7 @@ class Admin_Controller extends Action_Controller
 					'sengines' => array(
 						'label' => $txt['search_engines'],
 						'enabled' => in_array('sp', $context['admin_features']),
-						'file' => 'ManageSearchEngines.php',
+						'file' => 'ManageSearchEngines.controller.php',
 						'controller' => 'ManageSearchEngines_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -482,8 +482,8 @@ class Admin_Controller extends Action_Controller
 				'areas' => array(
 					'maintain' => array(
 						'label' => $txt['maintain_title'],
-						'file' => 'ManageMaintenance.php',
-						'controller' => 'ManageMaintenance_Controller',
+						'file' => 'Maintenance.controller.php',
+						'controller' => 'Maintenance_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_maintain',
@@ -496,7 +496,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'scheduledtasks' => array(
 						'label' => $txt['maintain_tasks'],
-						'file' => 'ManageScheduledTasks.php',
+						'file' => 'ManageScheduledTasks.controller.php',
 						'controller' => 'ManageScheduledTasks_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -508,7 +508,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'mailqueue' => array(
 						'label' => $txt['mailqueue_title'],
-						'file' => 'ManageMail.php',
+						'file' => 'ManageMail.controller.php',
 						'controller' => 'ManageMail_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -521,7 +521,7 @@ class Admin_Controller extends Action_Controller
 					'reports' => array(
 						'enabled' => in_array('rg', $context['admin_features']),
 						'label' => $txt['generate_reports'],
-						'file' => 'Reports.php',
+						'file' => 'Reports.controller.php',
 						'controller' => 'Reports_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -529,7 +529,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'logs' => array(
 						'label' => $txt['logs'],
-						'file' => 'AdminLog.php',
+						'file' => 'AdminLog.controller.php',
 						'controller' => 'AdminLog_Controller',
 						'function' => 'action_index',
 						'icon' => 'transparent.png',
@@ -547,7 +547,7 @@ class Admin_Controller extends Action_Controller
 					),
 					'repairboards' => array(
 						'label' => $txt['admin_repair'],
-						'file' => 'RepairBoards.php',
+						'file' => 'RepairBoards.controller.php',
 						'controller' => 'RepairBoards_Controller',
 						'function' => 'action_repairboards',
 						'select' => 'maintain',
@@ -909,14 +909,14 @@ class Admin_Controller extends Action_Controller
 		$include_files = array(
 			'ManageFeatures', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
 			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
-			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'ManageCoreFeatures', 'AdminLog', 'ManageDrafts',
-			'ManageAddonSettings', 'ManageSecurity'
+			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'CoreFeatures', 'AdminLog', 'ManageDrafts',
+			'AddonSettings', 'ManageSecurity'
 		);
 
 		// This is a special array of functions that contain setting data
 		// - we query all these to simply pull all setting bits!
 		$settings_search = array(
-			array('config_vars', 'area=corefeatures', 'ManageCoreFeatures_Controller'),
+			array('config_vars', 'area=corefeatures', 'CoreFeatures_Controller'),
 			array('basicSettings', 'area=featuresettings;sa=basic', 'ManageFeatures_Controller'),
 			array('layoutSettings', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
 			array('karmaSettings', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
@@ -925,7 +925,7 @@ class Admin_Controller extends Action_Controller
 			array('securitySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
 			array('spamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
 			array('moderationSettings', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
-			array('settings', 'area=modsettings;sa=general', 'ManageAddonSettings_Controller'),
+			array('settings', 'area=modsettings;sa=general', 'AddonSettings_Controller'),
 			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
 			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
@@ -1054,7 +1054,7 @@ class Admin_Controller extends Action_Controller
 	{
 		global $context;
 
-		require_once(ADMINDIR . '/ManageMembers.php');
+		require_once(ADMINDIR . '/ManageMembers.controller.php');
 		$_REQUEST['sa'] = 'query';
 
 		$_POST['membername'] = un_htmlspecialchars($context['search_term']);

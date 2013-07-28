@@ -90,7 +90,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
+		// We'll need to recalculate dates and stuff like that.
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 		// Mama, setup the template first - cause it's like the most important bit, like pickle in a sandwich.
 		// ... ironically I don't like pickle. </grudge>
 		$context['sub_template'] = 'view_scheduled_tasks';
@@ -100,9 +102,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		if (isset($_REQUEST['save']) && isset($_POST['enable_task']))
 		{
 			checkSession();
-
-			// We'll recalculate the dates at the end!
-			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Enable and disable as required.
 			$enablers = array(0);
@@ -130,13 +129,16 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			$nextTasks = loadTasks($tasks);
 
 			// Lets get it on!
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
+			require_once(SUBSDIR . '/ScheduledTask.class.php');
+			$task = new ScheduledTask();
+
 			ignore_user_abort(true);
 			foreach ($nextTasks as $task_id => $taskname)
 			{
 				$start_time = microtime(true);
-				// The functions got to exist for us to use it.
-				if (!function_exists('scheduled_' . $taskname))
+
+				// The methods got to exist for the tasks.
+				if (!method_exists($task, 'scheduled_' . $taskname))
 					continue;
 
 				// Try to stop a timeout, this would be bad...
@@ -145,7 +147,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					@apache_reset_timeout();
 
 				// Do the task...
-				$completed = call_user_func('scheduled_' . $taskname);
+				$completed = $task->{'scheduled_' . $taskname}();
 
 				// Log that we did it ;)
 				if ($completed)
@@ -162,7 +164,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			'title' => $txt['maintain_tasks'],
 			'base_href' => $scripturl . '?action=admin;area=scheduledtasks',
 			'get_items' => array(
-				'function' => 'list_getScheduledTasks',
+				'function' => array($this, 'list_getScheduledTasks'),
 			),
 			'columns' => array(
 				'name' => array(
@@ -277,7 +279,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		$context['page_title'] = $txt['scheduled_task_edit'];
 		$context['server_time'] = standardTime(time(), false, 'server');
 
-		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
+		// We'll need this to calculate the next event.
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 		// Cleaning...
 		if (!isset($_GET['tid']))
 			fatal_lang_error('no_access', false);
@@ -288,9 +292,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		{
 			checkSession();
 			validateToken('admin-st');
-
-			// We'll need this for calculating the next event.
-			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Do we have a valid offset?
 			preg_match('~(\d{1,2}):(\d{1,2})~', $_POST['offset'], $matches);
@@ -342,10 +343,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt;
 
-		$db = database();
-
-		require_once(SUBSDIR . '/ManageScheduledTasks.subs.php');
-		// Lets load the language just incase we are outside the Scheduled area.
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+		
+		// Lets load the language just in case we are outside the Scheduled area.
 		loadLanguage('ManageScheduledTasks');
 
 		// Empty the log?
@@ -354,11 +354,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-tl');
 
-			$db->query('truncate_table', '
-				TRUNCATE {db_prefix}log_scheduled_tasks',
-				array(
-				)
-			);
+			emptyTaskLog();
 		}
 
 		// Setup the list.
@@ -370,10 +366,10 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			'base_href' => $context['admin_area'] == 'scheduledtasks' ? $scripturl . '?action=admin;area=scheduledtasks;sa=tasklog' : $scripturl . '?action=admin;area=logs;sa=tasklog',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'list_getTaskLogEntries',
+				'function' => array($this, 'list_getTaskLogEntries'),
 			),
 			'get_count' => array(
-				'function' => 'list_getNumaction_logEntries(',
+				'function' => array($this, 'list_getNumTaskLogEntries('),
 			),
 			'columns' => array(
 				'name' => array(
@@ -445,5 +441,34 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		// Make it all look tify.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'tasklog';
 		$context['page_title'] = $txt['scheduled_log'];
+	}
+
+	/**
+	 * Callback function for createList() in action_tasks().
+	 *
+	 */
+	function list_getScheduledTasks()
+	{
+		return scheduledTasks();
+	}
+
+	/**
+	 * Callback function for createList() in action_log().
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 */
+	function list_getTaskLogEntries($start, $items_per_page, $sort)
+	{
+		return getTaskLogEntries($start, $items_per_page, $sort);
+	}
+
+	/**
+	 * Callback function for createList() in action_log().
+	 */
+	function list_getNumTaskLogEntries()
+	{
+		return countTaskLogEntries();
 	}
 }

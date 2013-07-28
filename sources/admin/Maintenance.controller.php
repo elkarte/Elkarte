@@ -20,7 +20,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class ManageMaintenance_Controller extends Action_Controller
+class Maintenance_Controller extends Action_Controller
 {
 	/**
 	 * Main dispatcher, the maintenance access point.
@@ -37,8 +37,8 @@ class ManageMaintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// Need something to talk about?
-		loadLanguage('ManageMaintenance');
-		loadTemplate('ManageMaintenance');
+		loadLanguage('Maintenance');
+		loadTemplate('Maintenance');
 
 		// This uses admin tabs - as it should!
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -132,7 +132,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		$db = database();
 
 		// We need this, really..
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		// set up the sub-template
 		$context['sub_template'] = 'maintain_database';
@@ -312,7 +312,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		require_once(ADMINDIR . '/RepairBoards.php');
+		require_once(ADMINDIR . '/RepairBoards.controller.php');
 		$controller = new RepairBoards_Controller();
 		$controller->action_repairboards();
 	}
@@ -345,7 +345,7 @@ class ManageMaintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		checkSession();
 		validateToken('admin-maint');
@@ -490,7 +490,7 @@ class ManageMaintenance_Controller extends Action_Controller
 
 		ignore_user_abort(true);
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		$context['page_title'] = $txt['database_optimize'];
 		$context['sub_template'] = 'optimize';
@@ -548,7 +548,7 @@ class ManageMaintenance_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		checkSession('request');
 
-		require_once(SUBSDIR . '/ManageMaintenance.subs.php');
+		require_once(SUBSDIR . '/Maintenance.subs.php');
 
 		// validate the request or the loop
 		if (!isset($_REQUEST['step']))
