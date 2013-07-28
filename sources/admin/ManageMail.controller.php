@@ -386,7 +386,6 @@ class ManageMail_Controller extends Action_Controller
 		checkSession('get');
 
 		// This is certainly needed!
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// If we don't yet have the total to clear, find it.
@@ -396,7 +395,7 @@ class ManageMail_Controller extends Action_Controller
 		$sent_emails = isset($_GET['sent']) ? (int) $_GET['sent'] : 0;
 
 		// Send 50 at a time, then go for a break...
-		while (ReduceMailQueue(50, true, true) === true)
+		while (reduceMailQueue(50, true, true) === true)
 		{
 			// Sent another 50.
 			$sent_emails += 50;

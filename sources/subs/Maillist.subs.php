@@ -146,7 +146,7 @@ function list_maillist_count_unapproved()
  *
  * @param type $id
  */
-function maillist_delete_entry($id)
+function maillist_delete_error_entry($id)
 {
 	$db = database();
 
@@ -389,4 +389,23 @@ function maillist_templates()
 	$db->free_result($request);
 
 	return $notification_templates;
+}
+
+/**
+ * Log in post-by emails an email being sent
+ *
+ * @param array $sent
+ */
+function log_email($sent)
+{
+	$db = database();
+
+	$db->insert('ignore',
+		'{db_prefix}postby_emails',
+		array(
+			'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
+		),
+		$sent,
+		array('id_email')
+	);
 }

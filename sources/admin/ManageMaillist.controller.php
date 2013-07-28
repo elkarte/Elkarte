@@ -340,7 +340,7 @@ class ManageMaillist_Controller extends Action_Controller
 		{
 			// remove this entry
 			require_once(SUBSDIR . '/Maillist.subs.php');
-			maillist_delete_entry($id);
+			maillist_delete_error_entry($id);
 		}
 
 		// Flush the cache
@@ -399,7 +399,7 @@ class ManageMaillist_Controller extends Action_Controller
 					// Assuming all went well, remove this entry and file since we are done.
 					if ($text === true)
 					{
-						maillist_delete_entry($id);
+						maillist_delete_error_entry($id);
 
 						// Flush the menu count cache
 						cache_put_data('num_menu_errors', null, 900);
