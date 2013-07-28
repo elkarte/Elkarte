@@ -280,8 +280,10 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (empty($ids))
 		return false;
 
-	// Send each email, yea!
+	// Send each email, and log that for future proof.
 	require_once(SUBSDIR . '/Mail.subs.php');
+	require_once(SUBSDIR . '/Maillist.subs.php');
+
 	$sent = array();
 	$failed_emails = array();
 
@@ -344,65 +346,19 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	// Clear out the stat cache.
 	trackStats();
 
-	// Log each email.
+	// Log each of the sent emails.
 	if (!empty($sent))
-	{
-		$db->insert('ignore',
-			'{db_prefix}postby_emails',
-			array(
-				'id_email' => 'int', 'time_sent' => 'string', 'email_to' => 'string'
-			),
-			$sent,
-			array('id_email')
-		);
-	}
+		log_email($sent);
 
 	// Any emails that didn't send?
 	if (!empty($failed_emails))
 	{
-		// Update the failed attempts check.
-		$db->insert('replace',
-			'{db_prefix}settings',
-			array('variable' => 'string', 'value' => 'string'),
-			array('mail_failed_attempts', empty($modSettings['mail_failed_attempts']) ? 1 : ++$modSettings['mail_failed_attempts']),
-			array('variable')
-		);
-
-		// If we have failed to many times, tell mail to wait a bit and try again.
-		if ($modSettings['mail_failed_attempts'] > 5)
-			$db->query('', '
-				UPDATE {db_prefix}settings
-				SET value = {string:next_mail_send}
-				WHERE variable = {string:mail_next_send}
-					AND value = {string:last_send}',
-				array(
-					'next_mail_send' => time() + 60,
-					'mail_next_send' => 'mail_next_send',
-					'last_send' => $modSettings['mail_next_send'],
-				)
-			);
-
-		// Add our email back to the queue, manually.
-		$db->insert('insert',
-			'{db_prefix}mail_queue',
-			array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'message_id' => 'int'),
-			$failed_emails,
-			array('id_mail')
-		);
-
+		updateFailedEmails($failed_emails);
 		return false;
 	}
-	// We where unable to send the email, clear our failed attempts.
+	// We were able to send the email, clear our failed attempts.
 	elseif (!empty($modSettings['mail_failed_attempts']))
-		$db->query('', '
-			UPDATE {db_prefix}settings
-			SET value = {string:zero}
-			WHERE variable = {string:mail_failed_attempts}',
-			array(
-				'zero' => '0',
-				'mail_failed_attempts' => 'mail_failed_attempts',
-			)
-		);
+		updateSuccessQueue();
 
 	// Had something to send...
 	return true;

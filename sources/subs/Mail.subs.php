@@ -947,7 +947,8 @@ function deleteMailQueueItems($items)
 }
 
 /**
- * get the current mail queue status
+ * Get the current mail queue status
+ *
  * @return array
  */
 function list_MailQueueStatus()
@@ -967,4 +968,66 @@ function list_MailQueueStatus()
 	$db->free_result($request);
 
 	return $items;
+}
+
+/**
+ * This function handles updates to account for failed emails.
+ * It is used to keep track of failed emails attempts and next try.
+ *
+ * @param array $failed_emails
+ */
+function updateFailedQueue($failed_emails)
+{
+	global $modSettings;
+
+	$db = database();
+
+	// Update the failed attempts check.
+	$db->insert('replace',
+		'{db_prefix}settings',
+		array('variable' => 'string', 'value' => 'string'),
+		array('mail_failed_attempts', empty($modSettings['mail_failed_attempts']) ? 1 : ++$modSettings['mail_failed_attempts']),
+		array('variable')
+	);
+
+	// If we have failed to many times, tell mail to wait a bit and try again.
+	if ($modSettings['mail_failed_attempts'] > 5)
+		$db->query('', '
+			UPDATE {db_prefix}settings
+			SET value = {string:next_mail_send}
+			WHERE variable = {string:mail_next_send}
+				AND value = {string:last_send}',
+			array(
+				'next_mail_send' => time() + 60,
+				'mail_next_send' => 'mail_next_send',
+				'last_send' => $modSettings['mail_next_send'],
+			)
+		);
+
+	// Add our email back to the queue, manually.
+	$db->insert('insert',
+		'{db_prefix}mail_queue',
+		array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'message_id' => 'int'),
+		$failed_emails,
+		array('id_mail')
+	);
+}
+
+/**
+ * Updates the failed attempts to email in the database.
+ * It sets mail failed attempts value to 0.
+ */
+function updateSuccessQueue()
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}settings
+		SET value = {string:zero}
+		WHERE variable = {string:mail_failed_attempts}',
+		array(
+			'zero' => '0',
+			'mail_failed_attempts' => 'mail_failed_attempts',
+		)
+	);
 }
