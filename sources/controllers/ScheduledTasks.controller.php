@@ -99,12 +99,12 @@ class ScheduledTasks_Controller
 				// Do also some timestamp checking,
 				// and do this only if we updated it before.
 				$task = new ScheduledTask();
-				if (method_exists($task, 'scheduled_' . $row['task']) && (!isset($_GET['ts']) || $_GET['ts'] == $row['next_time']) && $affected_rows)
+				if (method_exists($task, $row['task']) && (!isset($_GET['ts']) || $_GET['ts'] == $row['next_time']) && $affected_rows)
 				{
 					ignore_user_abort(true);
 
 					// Do the task...
-					$completed = $task->{'scheduled_' . $row['task']}();
+					$completed = $task->{$row['task']}();
 
 					// Log that we did it ;)
 					if ($completed)

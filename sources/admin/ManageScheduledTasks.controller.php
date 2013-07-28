@@ -125,7 +125,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				$tasks[] = (int) $task;
 
 			// Load up the tasks.
-
 			$nextTasks = loadTasks($tasks);
 
 			// Lets get it on!
@@ -138,7 +137,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				$start_time = microtime(true);
 
 				// The methods got to exist for the tasks.
-				if (!method_exists($task, 'scheduled_' . $taskname))
+				if (!method_exists($task, $taskname))
 					continue;
 
 				// Try to stop a timeout, this would be bad...
@@ -147,7 +146,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					@apache_reset_timeout();
 
 				// Do the task...
-				$completed = $task->{'scheduled_' . $taskname}();
+				$completed = $task->{$taskname}();
 
 				// Log that we did it ;)
 				if ($completed)
@@ -344,7 +343,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-		
+
 		// Lets load the language just in case we are outside the Scheduled area.
 		loadLanguage('ManageScheduledTasks');
 
