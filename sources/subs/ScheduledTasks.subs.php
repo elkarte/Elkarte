@@ -403,3 +403,120 @@ function emptyTaskLog()
 		)
 	);
 }
+
+/**
+ * Process the next tasks, one by one, and update the results.
+ *
+ * @param int $ts = 0
+ */
+function processNextTasks($ts = 0)
+{
+	global $time_start;
+
+	$db = database();
+
+	// We'll run tasks, or so we hope.
+	require_once(SUBSDIR . '/ScheduledTask.class.php');
+
+	// Select the next task to do.
+	$request = $db->query('', '
+		SELECT id_task, task, next_time, time_offset, time_regularity, time_unit
+		FROM {db_prefix}scheduled_tasks
+		WHERE disabled = {int:not_disabled}
+			AND next_time <= {int:current_time}
+		ORDER BY next_time ASC
+		LIMIT 1',
+		array(
+			'not_disabled' => 0,
+			'current_time' => time(),
+		)
+	);
+	if ($db->num_rows($request) != 0)
+	{
+		// The two important things really...
+		$row = $db->fetch_assoc($request);
+
+		// When should this next be run?
+		$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
+
+		// How long in seconds it the gap?
+		$duration = $row['time_regularity'];
+		if ($row['time_unit'] == 'm')
+			$duration *= 60;
+		elseif ($row['time_unit'] == 'h')
+			$duration *= 3600;
+		elseif ($row['time_unit'] == 'd')
+			$duration *= 86400;
+		elseif ($row['time_unit'] == 'w')
+			$duration *= 604800;
+
+		// If we were really late running this task actually skip the next one.
+		if (time() + ($duration / 2) > $next_time)
+			$next_time += $duration;
+
+		// Update it now, so no others run this!
+		$db->query('', '
+			UPDATE {db_prefix}scheduled_tasks
+			SET next_time = {int:next_time}
+			WHERE id_task = {int:id_task}
+				AND next_time = {int:current_next_time}',
+			array(
+				'next_time' => $next_time,
+				'id_task' => $row['id_task'],
+				'current_next_time' => $row['next_time'],
+			)
+		);
+		$affected_rows = $db->affected_rows();
+
+		// The method must exist in ScheduledTask class, or we are wasting our time.
+		// Do also some timestamp checking,
+		// and do this only if we updated it before.
+		$task = new ScheduledTask();
+		if (method_exists($task, $row['task']) && (!empty($ts) || $ts == $row['next_time']) && $affected_rows)
+		{
+			ignore_user_abort(true);
+
+			// Do the task...
+			$completed = $task->{$row['task']}();
+
+			// Log that we did it ;)
+			if ($completed)
+			{
+				$total_time = round(microtime(true) - $time_start, 3);
+				logTask($row['id_task'], (int)$total_time);
+			}
+		}
+	}
+	$db->free_result($request);
+}
+
+/**
+ * Retrieve info if there's any next task scheduled and when.
+ *
+ * @return mixed int|false
+ */
+function nextTime()
+{
+	$db = database();
+
+	// The next stored timestamp, is there any?
+	$request = $db->query('', '
+		SELECT next_time
+		FROM {db_prefix}scheduled_tasks
+		WHERE disabled = {int:not_disabled}
+		ORDER BY next_time ASC
+		LIMIT 1',
+		array(
+			'not_disabled' => 0,
+		)
+	);
+	// No new task scheduled?
+	if ($db->num_rows($request) === 0)
+		$result = false;
+	else
+		list ($result) = $db->fetch_row($request);
+
+	$db->free_result($request);
+
+	return $result;
+}
