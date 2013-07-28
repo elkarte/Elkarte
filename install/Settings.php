@@ -77,6 +77,11 @@ $db_type = 'mysql';
  */
 $db_server = 'localhost';
 /**
+ * The port for the database server
+ * @var string
+ */
+$db_port = '';
+/**
  * The database name
  * @var string
  */

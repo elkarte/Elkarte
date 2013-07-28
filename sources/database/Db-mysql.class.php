@@ -51,11 +51,15 @@ class Database_MySQL implements Database
 		if (self::$_db === null)
 			self::$_db = new self();
 
+		// Non-standard port
+		if (!empty($db_options['port']))
+			$db_port = (int)$db_options['port'];
+
 		// Select the database. Maybe.
 		if (empty($db_options['dont_select_db']))
-			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
 		else
-			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd);
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, "", $db_port);
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)

@@ -49,10 +49,14 @@ class Database_PostgreSQL implements Database
 		if (self::$_db === null)
 			self::$_db = new self();
 
+		// Non-standard port (@todo)
+		if (!empty($db_options['port']))
+			$db_server .= (int)$db_options['port'];
+
 		if (!empty($db_options['persist']))
 			$connection = @pg_pconnect('host=' . $db_server . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
 		else
-			$connection = @pg_connect( 'host=' . $db_server . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
+			$connection = @pg_connect('host=' . $db_server . ' dbname=' . $db_name . ' user=\'' . $db_user . '\' password=\'' . $db_passwd . '\'');
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)

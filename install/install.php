@@ -307,7 +307,7 @@ function load_database()
 		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
-			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist), $db_type);
+			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
 	}
 
 	return database();
@@ -643,6 +643,7 @@ function action_databaseSettings()
 
 	// Set up the defaults.
 	$incontext['db']['server'] = 'localhost';
+	$incontext['db']['port'] = '';
 	$incontext['db']['user'] = '';
 	$incontext['db']['name'] = '';
 	$incontext['db']['pass'] = '';
@@ -683,15 +684,12 @@ function action_databaseSettings()
 		$incontext['db']['user'] = $_POST['db_user'];
 		$incontext['db']['name'] = $_POST['db_name'];
 		$incontext['db']['server'] = $_POST['db_server'];
+		$incontext['db']['port'] = $_POST['db_port'];
 		$incontext['db']['prefix'] = $_POST['db_prefix'];
 	}
 	else
 	{
 		$incontext['db']['prefix'] = 'elkarte_';
-
-		// Should we use a non standard port?
-		if (!empty($db_port))
-			$incontext['db']['server'] .= ':' . $db_port;
 	}
 
 	// Are we submitting?
@@ -733,6 +731,7 @@ function action_databaseSettings()
 			'db_user' => $_POST['db_user'],
 			'db_passwd' => isset($_POST['db_passwd']) ? $_POST['db_passwd'] : '',
 			'db_server' => $_POST['db_server'],
+			'db_port' => $_POST['db_port'],
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
 			'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
@@ -765,7 +764,7 @@ function action_databaseSettings()
 		require_once(SOURCEDIR . '/database/Database.subs.php');
 
 		// Attempt a connection.
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true), $db_type);
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 		$db = database();
 
 		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
@@ -773,7 +772,7 @@ function action_databaseSettings()
 		{
 			$db_error = $db->last_error();
 
-			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true), $db_type);
+			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 			if ($db_connection != null)
 			{
 				$db_user = $_POST['db_prefix'] . $db_user;
