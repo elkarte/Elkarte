@@ -161,8 +161,6 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 {
 	global $modSettings, $context, $webmaster_email, $scripturl;
 
-	$db = database();
-
 	// Are we intending another script to be sending out the queue?
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))
 		return false;
@@ -182,21 +180,8 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	// By default move the next sending on by 10 seconds, and require an affected row.
 	if (!$override_limit)
 	{
-		// Set our delay based on our per min limit (mail_limit)
-		$delay = !empty($modSettings['mail_queue_delay']) ? $modSettings['mail_queue_delay'] : (!empty($modSettings['mail_limit']) && $modSettings['mail_limit'] < 5 ? 10 : 5);
-
-		$db->query('', '
-			UPDATE {db_prefix}settings
-			SET value = {string:next_mail_send}
-			WHERE variable = {string:mail_next_send}
-				AND value = {string:last_send}',
-			array(
-				'next_mail_send' => time() + $delay,
-				'mail_next_send' => 'mail_next_send',
-				'last_send' => $modSettings['mail_next_send'],
-			)
-		);
-		if ($db->affected_rows() == 0)
+		// Update next send time for our mails queue, if there was something to update. Otherwise bail out :P
+		if (!updateNextSendTime())
 			return false;
 		$modSettings['mail_next_send'] = time() + $delay;
 	}
@@ -227,32 +212,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	}
 
 	// Now we know how many we're sending, let's send them.
-	$request = $db->query('', '
-		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, message_id
-		FROM {db_prefix}mail_queue
-		ORDER BY priority ASC, id_mail ASC
-		LIMIT ' . $number,
-		array(
-		)
-	);
-	$ids = array();
-	$emails = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// We want to delete these from the database ASAP, so just get the data and go.
-		$ids[] = $row['id_mail'];
-		$emails[] = array(
-			'to' => $row['recipient'],
-			'body' => $row['body'],
-			'subject' => $row['subject'],
-			'headers' => $row['headers'],
-			'send_html' => $row['send_html'],
-			'time_sent' => $row['time_sent'],
-			'priority' => $row['priority'],
-			'message_id' => $row['message_id'],
-		);
-	}
-	$db->free_result($request);
+	list ($ids, $emails) = emailsInfo($number);
 
 	// Delete, delete, delete!!!
 	if (!empty($ids))
@@ -265,6 +225,7 @@ function ReduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (empty($ids))
 		return false;
 
+	// We have some to send, lets send them!
 	$sent = array();
 	$failed_emails = array();
 
