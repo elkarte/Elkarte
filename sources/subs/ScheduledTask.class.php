@@ -822,7 +822,7 @@ class ScheduledTask
 
 		// We just pass through to the daily function - avoid duplication!
 		$is_weekly = true;
-		return scheduled_daily_digest();
+		return $this->scheduled_daily_digest();
 	}
 
 	/**
