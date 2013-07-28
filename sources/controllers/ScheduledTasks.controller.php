@@ -36,7 +36,7 @@ class ScheduledTasks_Controller
 
 		// Include the ScheduledTasks subs and class.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-		require_once(SUBSDIR . '/ScheduledTasks.class.php');
+		require_once(SUBSDIR . '/ScheduledTask.class.php');
 
 		// Special case for doing the mail queue.
 		if (isset($_GET['scheduled']) && $_GET['scheduled'] == 'mailq')
