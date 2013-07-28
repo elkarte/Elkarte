@@ -1899,7 +1899,7 @@ function action_deleteUpgrade()
 		cli_scheduled_fetchFiles();
 	else
 	{
-		require_once(SOURCEDIR . '/ScheduledTasks.php');
+		require_once(CONTROLLERDIR . '/ScheduledTasks.controller.php');
 		$forum_version = CURRENT_VERSION;  // The variable is usually defined in index.php so lets just use the constant to do it for us.
 		scheduled_fetchFiles(); // Now go get those files!
 	}
