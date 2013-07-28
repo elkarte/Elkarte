@@ -28,7 +28,7 @@ $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
 		'version' => '4.1.0',
-		'version_check' => 'return min(mysqli_get_server_info(), mysqli_get_client_info());',
+		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'supported' => function_exists('mysqli_connect'),
 		'default_user' => 'mysqli.default_user',
 		'default_password' => 'mysqli.default_password',
@@ -36,7 +36,7 @@ $databases = array(
 		'default_port' => 'mysqli.default_port',
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysqli_get_server_info();',
+		'utf8_version_check' => 'return mysqli_get_server_info($db_connection);',
 		'alter_support' => true,
 		'validate_prefix' => create_function('&$value', '
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
@@ -765,7 +765,7 @@ function action_databaseSettings()
 		require_once(SOURCEDIR . '/database/Database.subs.php');
 
 		// Attempt a connection.
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true), $db_type);
 		$db = database();
 
 		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
@@ -773,7 +773,7 @@ function action_databaseSettings()
 		{
 			$db_error = $db->last_error();
 
-			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
+			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true), $db_type);
 			if ($db_connection != null)
 			{
 				$db_user = $_POST['db_prefix'] . $db_user;
