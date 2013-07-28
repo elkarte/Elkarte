@@ -26,8 +26,6 @@ class ScheduledTasks_Controller
 	 */
 	function action_autotask()
 	{
-		global $time_start;
-
 		// Include the ScheduledTasks subs worker.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
