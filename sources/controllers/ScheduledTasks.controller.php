@@ -26,8 +26,6 @@ class ScheduledTasks_Controller
 	 */
 	function action_autotask()
 	{
-		global $time_start;
-
 		// Include the ScheduledTasks subs worker.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
@@ -38,7 +36,7 @@ class ScheduledTasks_Controller
 		{
 			call_integration_hook('integrate_autotask_include');
 
-			$ts = isset($_GET['ts']) ? (int)$_GET['ts'] : 0;
+			$ts = isset($_GET['ts']) ? (int) $_GET['ts'] : 0;
 			processNextTasks($ts);
 
 			// Get the timestamp stored for the next task, if any.
