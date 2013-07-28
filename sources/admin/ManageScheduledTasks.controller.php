@@ -343,8 +343,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $scripturl, $context, $txt;
 
-		$db = database();
-
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 		
 		// Lets load the language just in case we are outside the Scheduled area.
