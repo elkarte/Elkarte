@@ -377,13 +377,18 @@ function pollStarters($id_topic)
 	return $pollStarters;
 }
 
+/**
+ * Check if they have already voted, or voting is locked.
+ *
+ * @param int $topic
+ * @return type
+ */
 function checkVote($topic)
 {
 	global $user_info;
 
 	$db = database();
 
-	// Check if they have already voted, or voting is locked.
 	$request = $db->query('', '
 		SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
 			p.guest_vote, p.reset_poll, p.num_guest_voters
@@ -535,6 +540,13 @@ function determineVote($id_member, $id_poll)
 
 	return $pollOptions;
 }
+
+/**
+ * Get some basic details from a poll
+ *
+ * @param int $id_topic
+ * @return array
+ */
 function pollStatus($id_topic)
 {
 	$db = database();
@@ -556,6 +568,12 @@ function pollStatus($id_topic)
 		return $poll;
 }
 
+/**
+ * Update the locked status from a given poll.
+ *
+ * @param int $id_poll
+ * @param int $locked
+ */
 function lockPoll($id_poll, $locked)
 {
 	$db = database();
@@ -571,6 +589,12 @@ function lockPoll($id_poll, $locked)
 	);
 }
 
+/**
+ * Gets poll choices from a given poll.
+ *
+ * @param int $id_poll
+ * @return array
+ */
 function getPollChoices($id_poll)
 {
 	$db = database();
@@ -602,6 +626,12 @@ function getPollChoices($id_poll)
 	return $choices;
 }
 
+/**
+ * Get the poll starter from a given poll.
+ *
+ * @param int$id_topic
+ * @return array
+ */
 function getPollStarter($id_topic)
 {
 	$db = database();
