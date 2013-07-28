@@ -518,20 +518,7 @@ class Poll_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Poll.subs.php');
 
 		// Get the starter and the poll's ID - if it's an edit.
-		$request = $db->query('', '
-			SELECT t.id_member_started, t.id_poll, p.id_member AS poll_starter, p.expire_time
-			FROM {db_prefix}topics AS t
-				LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-			WHERE t.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		if ($db->num_rows($request) == 0)
-			fatal_lang_error('no_board');
-		$bcinfo = $db->fetch_assoc($request);
-		$db->free_result($request);
+		$bcinfo = getPollStarter($topic);
 
 		// Check their adding/editing is valid.
 		if (!$isEdit && !empty($bcinfo['id_poll']))
