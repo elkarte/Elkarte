@@ -2484,7 +2484,7 @@ function template_include($filename, $once = false)
  */
 function loadDatabase()
 {
-	global $db_persist, $db_server, $db_user, $db_passwd;
+	global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
 	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
 	// Database stuffs
