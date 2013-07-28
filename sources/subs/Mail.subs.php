@@ -1087,6 +1087,12 @@ function updateNextSendTime()
 	return true;
 }
 
+/**
+ * Retrieve all details from the database on the next emails.
+ *
+ * @param int $number
+ * @return array
+ */
 function emailsInfo($number)
 {
 	$db = database();
