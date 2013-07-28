@@ -389,3 +389,17 @@ function countTaskLogEntries()
 
 	return $num_entries;
 }
+
+/**
+ * Empty the scheduled tasks log.
+ */
+function emptyTaskLog()
+{
+	$db = database();
+
+	$db->query('truncate_table', '
+		TRUNCATE {db_prefix}log_scheduled_tasks',
+		array(
+		)
+	);
+}

@@ -279,7 +279,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		$context['page_title'] = $txt['scheduled_task_edit'];
 		$context['server_time'] = standardTime(time(), false, 'server');
 
+		// We'll need this to calculate the next event.
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+
 		// Cleaning...
 		if (!isset($_GET['tid']))
 			fatal_lang_error('no_access', false);
@@ -290,9 +292,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		{
 			checkSession();
 			validateToken('admin-st');
-
-			// We'll need this for calculating the next event.
-			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 			// Do we have a valid offset?
 			preg_match('~(\d{1,2}):(\d{1,2})~', $_POST['offset'], $matches);
@@ -347,6 +346,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		$db = database();
 
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+		
 		// Lets load the language just in case we are outside the Scheduled area.
 		loadLanguage('ManageScheduledTasks');
 
@@ -356,11 +356,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-tl');
 
-			$db->query('truncate_table', '
-				TRUNCATE {db_prefix}log_scheduled_tasks',
-				array(
-				)
-			);
+			emptyTaskLog();
 		}
 
 		// Setup the list.
