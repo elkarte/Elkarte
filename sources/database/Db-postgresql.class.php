@@ -1216,7 +1216,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return string
 	 */
-	function db_server_info()
+	function db_server_info($connection = null)
 	{
 		// give info on client! we use it in install and upgrade and such things.
 		$version = pg_version();

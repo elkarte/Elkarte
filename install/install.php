@@ -49,7 +49,6 @@ $databases = array(
 		'function_check' => 'pg_connect',
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),
-		'always_has_db' => true,
 		'utf8_support' => true,
 		'utf8_version' => '8.0',
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
@@ -766,8 +765,7 @@ function action_databaseSettings()
 		require_once(SOURCEDIR . '/database/Database.subs.php');
 
 		// Attempt a connection.
-		$needsDB = !empty($databases[$db_type]['always_has_db']);
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
 		$db = database();
 
 		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
@@ -775,7 +773,7 @@ function action_databaseSettings()
 		{
 			$db_error = $db->last_error();
 
-			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
+			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true), $db_type);
 			if ($db_connection != null)
 			{
 				$db_user = $_POST['db_prefix'] . $db_user;
@@ -799,7 +797,7 @@ function action_databaseSettings()
 		}
 
 		// Let's try that database on for size... assuming we haven't already lost the opportunity.
-		if ($db_name != '' && !$needsDB)
+		if ($db_name != '')
 		{
 			$db->query('', "
 				CREATE DATABASE IF NOT EXISTS `$db_name`",

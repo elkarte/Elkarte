@@ -22,6 +22,8 @@ class Database_MySQL implements Database
 {
 	private static $_db = null;
 
+	private $_connection = null;
+
 	private function __construct()
 	{
 		// Private constructor.
@@ -45,11 +47,15 @@ class Database_MySQL implements Database
 	{
 		global $mysql_set_mode;
 
-		// initialize the instance... if not done already!
+		// Initialize the instance... if not done already!
 		if (self::$_db === null)
 			self::$_db = new self();
 
-		$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd);
+		// Select the database. Maybe.
+		if (empty($db_options['dont_select_db']))
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);
+		else
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd);
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)
@@ -60,16 +66,14 @@ class Database_MySQL implements Database
 				display_db_error();
 		}
 
-		// Select the database, unless told not to
-		if (empty($db_options['dont_select_db']) && !@mysqli_select_db($connection, $db_name) && empty($db_options['non_fatal']))
-			display_db_error();
-
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
 			$this->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 			array(),
 			false
 		);
+
+		self::$_db->_connection = $connection;
 
 		return $connection;
 	}
@@ -209,13 +213,13 @@ class Database_MySQL implements Database
 	 */
 	function quote($db_string, $db_values, $connection = null)
 	{
-		global $db_callback, $db_connection;
+		global $db_callback;
 
 		// Only bother if there's something to replace.
 		if (strpos($db_string, '{') !== false)
 		{
 			// This is needed by the callback function.
-			$db_callback = array($db_values, $connection === null ? $db_connection : $connection);
+			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
 
 			// Do the quoting and escaping
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
@@ -237,7 +241,7 @@ class Database_MySQL implements Database
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
+		global $db_cache, $db_count, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $modSettings;
 
 		// Comments that are allowed in a query are preg_removed.
@@ -255,7 +259,7 @@ class Database_MySQL implements Database
 		);
 
 		// Decide which connection to use.
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// One more query....
 		$db_count = !isset($db_count) ? 1 : $db_count + 1;
@@ -386,9 +390,7 @@ class Database_MySQL implements Database
 	 */
 	function affected_rows($connection = null)
 	{
-		global $db_connection;
-
-		return mysqli_affected_rows($connection === null ? $db_connection : $connection);
+		return mysqli_affected_rows($connection === null ? $this->_connection : $connection);
 	}
 
 	/**
@@ -400,12 +402,12 @@ class Database_MySQL implements Database
 	 */
 	function insert_id($table, $field = null, $connection = null)
 	{
-		global $db_connection, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// MySQL doesn't need the table or field information.
-		return mysqli_insert_id($connection === null ? $db_connection : $connection);
+		return mysqli_insert_id($connection === null ? $this->_connection : $connection);
 	}
 
 	/**
@@ -471,10 +473,8 @@ class Database_MySQL implements Database
 	 */
 	function db_transaction($type = 'commit', $connection = null)
 	{
-		global $db_connection;
-
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		if ($type == 'begin')
 			return @mysqli_query($connection, 'BEGIN');
@@ -493,10 +493,8 @@ class Database_MySQL implements Database
 	 */
 	function last_error($connection = null)
 	{
-		global $db_connection;
-
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		return mysqli_error($connection);
 	}
@@ -518,7 +516,7 @@ class Database_MySQL implements Database
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// This is the error message...
 		$query_error = mysqli_error($connection);
@@ -616,22 +614,21 @@ class Database_MySQL implements Database
 			// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 			if (in_array($query_errno, array(1205, 1213, 2006, 2013)))
 			{
-				if (in_array($query_errno, array(2006, 2013)) && $db_connection == $connection)
+				if (in_array($query_errno, array(2006, 2013)) && $this->_connection == $connection)
 				{
 					// Are we in SSI mode?  If so try that username and password first
 					if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-						$db_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $ssi_db_user, $ssi_db_passwd);
+						$db_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
 
 					// Fall back to the regular username and password if need be
 					if (!$db_connection)
-						@mysql_pconnect((!empty($db_persist) ? 'p:' : '') . $db_server, $db_user, $db_passwd);
-
-					if (!$db_connection || !@mysqli_select_db($db_connection, $db_name))
-						$db_connection = false;
+						$db_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);
 				}
 
 				if ($db_connection)
 				{
+					$this->_connection = $db_connection;
+
 					// Try a deadlock more than once more.
 					for ($n = 0; $n < 4; $n++)
 					{
@@ -699,9 +696,9 @@ class Database_MySQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_connection, $db_prefix;
+		global $db_prefix;
 
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// With nothing to insert, simply return.
 		if (empty($data))
@@ -1311,12 +1308,10 @@ class Database_MySQL implements Database
 	 *
 	 * @return string
 	 */
-	function db_server_info()
+	function db_server_info($connection = null)
 	{
-		global $db_connection;
-
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		return mysqli_get_server_info($connection);
 	}
@@ -1347,12 +1342,21 @@ class Database_MySQL implements Database
 	 */
 	function select_db($dbName = null, $connection = null)
 	{
-		global $db_connection;
-
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		return mysqli_select_db($connection, $dbName);
+	}
+
+	/**
+	 * Retrieve the connection object
+	 *
+	 * @return mysqli
+	 */
+	function connection()
+	{
+		// find it, find it
+		return $this->_connection;
 	}
 
 	/**
