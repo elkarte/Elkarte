@@ -5,21 +5,17 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
  * @version 1.0 Alpha
- *
- * This file is automatically called and handles all manner of scheduled things.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * This controller class action handlers are automatically called.
+ * It handles execution of scheduled tasks, mail queue scheduling included.
+ */
 class ScheduledTasks_Controller
 {
 	/**
@@ -60,7 +56,7 @@ class ScheduledTasks_Controller
 		if (!isset($_GET['scheduled']))
 			return true;
 
-		// Finally, send some stuff...
+		// Finally, send some bland image
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 		header('Content-Type: image/gif');
