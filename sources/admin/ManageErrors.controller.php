@@ -62,12 +62,13 @@ class ManageErrors_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $context, $modSettings, $user_profile, $filter;
 
+		// we'll escape some strings...
 		$db = database();
 
 		require_once(SUBSDIR . '/Error.subs.php');
 
 		// Templates, etc...
-		loadLanguage('ManageMaintenance');
+		loadLanguage('Maintenance');
 		loadTemplate('Errors');
 
 		// You can filter by any of the following columns:

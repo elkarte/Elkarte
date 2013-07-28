@@ -27,7 +27,7 @@ if (!defined('ELK'))
  * updates the settings for enabled/disabled core features as requested.
  *
  */
-class ManageCoreFeatures_Controller extends Action_Controller
+class CoreFeatures_Controller extends Action_Controller
 {
 	/**
 	 * Default handler.
@@ -56,7 +56,7 @@ class ManageCoreFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
 
-		loadTemplate('ManageCoreFeatures');
+		loadTemplate('CoreFeatures');
 
 		$core_features = $this->settings();
 

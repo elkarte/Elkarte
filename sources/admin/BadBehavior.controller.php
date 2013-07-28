@@ -12,7 +12,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class ManageBadBehavior_Controller extends Action_Controller
+class BadBehavior_Controller extends Action_Controller
 {
 	/**
 	 * Call the appropriate action method.

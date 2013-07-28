@@ -398,25 +398,25 @@ function addSubscription($id_subscribe, $id_member, $renewal = 0, $forceStartTim
 function loadPaymentGateways()
 {
 	$gateways = array();
-	if ($dh = opendir(SOURCEDIR))
+	if ($dh = opendir(SUBSDIR))
 	{
 		while (($file = readdir($dh)) !== false)
 		{
-			if (is_file(SOURCEDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
+			if (is_file(SUBSDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
 			{
 				// Check this is definitely a valid gateway!
-				$fp = fopen(SOURCEDIR . '/' . $file, 'rb');
+				$fp = fopen(SUBSDIR . '/' . $file, 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
-				if (strpos($header, '// ElkArte Payment Gateway: ' . strtolower($matches[1])) !== false)
+				if (strpos($header, 'Payment Gateway: ' . strtolower($matches[1])) !== false)
 				{
-					require_once(SOURCEDIR . '/' . $file);
+					require_once(SUBSDIR . '/' . $file);
 
 					$gateways[] = array(
 						'filename' => $file,
 						'code' => strtolower($matches[1]),
-						// Don't need anything snazier than this yet.
+						// Don't need anything snazzier than this yet.
 						'valid_version' => class_exists(strtolower($matches[1]) . '_payment') && class_exists(strtolower($matches[1]) . '_display'),
 						'payment_class' => strtolower($matches[1]) . '_payment',
 						'display_class' => strtolower($matches[1]) . '_display',
@@ -645,6 +645,28 @@ function updateSubscription($update, $ignore_active)
 }
 
 /**
+ * Update a non-recurrent subscription
+ * (one-time payment)
+ *
+ * @param array $subscriptionInfo
+ */
+function updateNonrecurrent($subscriptionInfo)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_subscribed
+		SET payments_pending = {int:payments_pending}, pending_details = {string:pending_details}
+		WHERE id_sublog = {int:current_subscription_item}',
+		array(
+			'payments_pending' => $subscription_info['payments_pending'],
+			'current_subscription_item' => $subscription_info['id_sublog'],
+			'pending_details' => $subscription_info['pending_details'],
+		)
+	);
+}
+
+/**
  * Get the details from a given subscription.
  *
  * @param type $sub_id
@@ -846,6 +868,42 @@ function updateSubscriptionItem($item)
 			'end_time' => $item['end_time'],
 			'status' => $item['status'],
 			'current_log_item' => $item['current_log_item'],
+		)
+	);
+}
+
+function handleRefund($subscription_info, $member_id, $time)
+{
+	$db = database();
+
+	// If the end time subtracted by current time is not greater than the duration
+	// (length of subscription), then we close it.
+	if ($subscription_info['end_time'] - time() < $subscription_info['length'])
+	{
+		// Delete user subscription.
+		removeSubscription($subscription_id, $member_id);
+		$subscription_act = time();
+		$status = 0;
+	}
+	else
+	{
+		loadSubscriptions();
+		$subscription_act = $subscription_info['end_time'] - $time;
+		$status = 1;
+	}
+
+	// Mark it as complete so we have a record.
+	$db->query('', '
+		UPDATE {db_prefix}log_subscribed
+		SET end_time = {int:current_time}
+		WHERE id_subscribe = {int:current_subscription}
+			AND id_member = {int:current_member}
+			AND status = {int:status}',
+		array(
+			'current_time' => $subscription_act,
+			'current_subscription' => $subscription_id,
+			'current_member' => $member_id,
+			'status' => $status,
 		)
 	);
 }

@@ -562,7 +562,7 @@ class ManageServer_Controller extends Action_Controller
 			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		loadLanguage('ManageMaintenance');
+		loadLanguage('Maintenance');
 		createToken('admin-maint');
 		Template_Layers::getInstance()->add('clean_cache_button');
 

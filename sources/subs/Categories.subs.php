@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * Edit the position and properties of a category.
  * general function to modify the settings and position of a category.
- * used by ManageBoards.php to change the settings of a category.
+ * used by ManageBoards.controller.php to change the settings of a category.
  *
  * @param int $category_id
  * @param array $catOptions
