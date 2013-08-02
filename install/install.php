@@ -1456,7 +1456,7 @@ function action_deleteInstall()
 		$forum_version = $current_version;
 		// Now go get those files!
 		$task = new ScheduledTask();
-		$task->scheduled_fetchFiles();
+		$task->fetchFiles();
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
 		$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
