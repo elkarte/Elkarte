@@ -684,7 +684,7 @@ function action_databaseSettings()
 		$incontext['db']['user'] = $_POST['db_user'];
 		$incontext['db']['name'] = $_POST['db_name'];
 		$incontext['db']['server'] = $_POST['db_server'];
-		$incontext['db']['port'] = $_POST['db_port'];
+		$incontext['db']['port'] = !empty($_POST['db_port']) ? $_POST['db_port'] : '';
 		$incontext['db']['prefix'] = $_POST['db_prefix'];
 	}
 	else
@@ -731,7 +731,7 @@ function action_databaseSettings()
 			'db_user' => $_POST['db_user'],
 			'db_passwd' => isset($_POST['db_passwd']) ? $_POST['db_passwd'] : '',
 			'db_server' => $_POST['db_server'],
-			'db_port' => $_POST['db_port'],
+			'db_port' => !empty($_POST['db_port']) ? $_POST['db_port'] : '',
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
 			'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
@@ -2288,6 +2288,7 @@ function template_database_settings()
 						<option value="', $key, '"', isset($_POST['db_type']) && $_POST['db_type'] == $key ? ' selected="selected"' : '', '>', $db['name'], '</option>';
 
 	echo '
+					</select>
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_type_info'], '</div>
 				</td>
 			</tr>';
