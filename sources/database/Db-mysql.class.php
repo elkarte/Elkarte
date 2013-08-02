@@ -53,7 +53,9 @@ class Database_MySQL implements Database
 
 		// Non-standard port
 		if (!empty($db_options['port']))
-			$db_port = (int)$db_options['port'];
+			$db_port = (int) $db_options['port'];
+		else
+			$db_port = '';
 
 		// Select the database. Maybe.
 		if (empty($db_options['dont_select_db']))
