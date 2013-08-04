@@ -28,8 +28,16 @@ class Positioning_Items
 	 * Holds the unique identifier of the item (a name).
 	 *
 	 * @var string
+	 * @todo not used?
 	 */
 	private $_name = null;
+
+	/**
+	 * Holds all the items to add
+	 *
+	 * @var array
+	 */
+	private $_items = null;
 
 	/**
 	 * An array containing all the items added
@@ -125,10 +133,27 @@ class Positioning_Items
 	 * @param string $item name of a item
 	 * @param int $priority an integer defining the priority of the item.
 	 */
-	public function add($item, $priority = null)
+	public function add($key, $item, $priority = null)
 	{
-		$this->_all_general[$item] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+		$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+		$this->_items[$key] = $item;
 		$this->_general_highest_priority = max($this->_all_general) + 100;
+	}
+
+	/**
+	 * Add a new item to the pile
+	 *
+	 * @param string $item name of a item
+	 * @param int $priority an integer defining the priority of the item.
+	 */
+	public function addBulk($items)
+	{
+		foreach ($items as $key => $item)
+		{
+			$this->_all_general[$key] = $this->_general_highest_priority;
+			$this->_items[$key] = $item;
+			$this->_general_highest_priority = max($this->_all_general) + 100;
+		}
 	}
 
 	/**
@@ -137,9 +162,10 @@ class Positioning_Items
 	 * @param string $item the name of a item
 	 * @param string $following the name of the item before which $item must be added
 	 */
-	public function addBefore($item, $following)
+	public function addBefore($key, $item, $following)
 	{
-		$this->_all_before[$item] = $following;
+		$this->_all_before[$key] = $following;
+		$this->_items[$key] = $item;
 	}
 
 	/**
@@ -148,9 +174,10 @@ class Positioning_Items
 	 * @param string $item the name of a item
 	 * @param string $following the name of the item after which $item must be added
 	 */
-	public function addAfter($item, $previous)
+	public function addAfter($key, $item, $previous)
 	{
-		$this->_all_after[$item] = $previous;
+		$this->_all_after[$key] = $previous;
+		$this->_items[$key] = $item;
 	}
 
 	/**
@@ -159,9 +186,10 @@ class Positioning_Items
 	 * @param string $item name of a item
 	 * @param int $priority an integer defining the priority of the item.
 	 */
-	public function addEnd($item, $priority = null)
+	public function addEnd($key, $item, $priority = null)
 	{
-		$this->_all_end[$item] = $priority === null ? $this->_end_highest_priority : (int) $priority;
+		$this->_all_end[$key] = $priority === null ? $this->_end_highest_priority : (int) $priority;
+		$this->_items[$key] = $item;
 		$this->_end_highest_priority = max($this->_all_end) + 100;
 	}
 
@@ -171,9 +199,10 @@ class Positioning_Items
 	 * @param string $item name of a item
 	 * @param int $priority an integer defining the priority of the item.
 	 */
-	public function addBegin($item, $priority = null)
+	public function addBegin($key, $item, $priority = null)
 	{
-		$this->_all_begin[$item] = $priority === null ? $this->_begin_highest_priority : (int) -$priority;
+		$this->_all_begin[$key] = $priority === null ? $this->_begin_highest_priority : (int) -$priority;
+		$this->_items[$key] = $item;
 		$this->_begin_highest_priority = max($this->_all_begin) + 100;
 	}
 
@@ -182,18 +211,18 @@ class Positioning_Items
 	 *
 	 * @param string $item the name of a item
 	 */
-	public function remove($item)
+	public function remove($key)
 	{
-		if (isset($this->_all_general[$item]))
-			unset($this->_all_general[$item]);
-		elseif (isset($this->_all_after[$item]))
-			unset($this->_all_after[$item]);
-		elseif (isset($this->_all_before[$item]))
-			unset($this->_all_before[$item]);
-		elseif (isset($this->_all_end[$item]))
-			unset($this->_all_end[$item]);
-		elseif (isset($this->_all_begin[$item]))
-			unset($this->_all_begin[$item]);
+		if (isset($this->_all_general[$key]))
+			unset($this->_all_general[$key]);
+		if (isset($this->_all_after[$key]))
+			unset($this->_all_after[$key]);
+		if (isset($this->_all_before[$key]))
+			unset($this->_all_before[$key]);
+		if (isset($this->_all_end[$key]))
+			unset($this->_all_end[$key]);
+		if (isset($this->_all_begin[$key]))
+			unset($this->_all_begin[$key]);
 	}
 
 	/**
@@ -280,7 +309,9 @@ class Positioning_Items
 		}
 
 		asort($all_items);
-		$this->_sorted_items = array_keys($all_items);
+
+		foreach ($all_items as $key => $priority)
+			$this->_sorted_items[$key] = $this->_items[$key];
 
 		return $this->_sorted_items;
 	}
