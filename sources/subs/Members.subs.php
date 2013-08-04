@@ -439,10 +439,9 @@ function deleteMembers($users, $check_not_admin = false)
  * If an error is detected will fatal error on all errors unless return_errors is true.
  *
  * @param array $regOptions
- * @param bool $return_errors - specify whether to return the errors
  * @return int, the ID of the newly created member
  */
-function registerMember(&$regOptions, $return_errors = false)
+function registerMember(&$regOptions, $error_context = 'register')
 {
 	global $scripturl, $txt, $modSettings, $user_info;
 
@@ -455,7 +454,7 @@ function registerMember(&$regOptions, $return_errors = false)
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
-	$reg_errors = array();
+	$reg_errors = error_context::context($error_context, 0);
 
 	// Registration from the admin center, let them sweat a little more.
 	if ($regOptions['interface'] == 'admin')
@@ -489,11 +488,9 @@ function registerMember(&$regOptions, $return_errors = false)
 
 	// @todo Separate the sprintf?
 	if (empty($regOptions['email']) || preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $regOptions['email']) === 0 || strlen($regOptions['email']) > 255)
-		$reg_errors[] = array('done', sprintf($txt['valid_email_needed'], Util::htmlspecialchars($regOptions['username'])));
+		$reg_errors->addError(array('valid_email_needed', array(Util::htmlspecialchars($regOptions['username']))));
 
-	$username_validation_errors = validateUsername(0, $regOptions['username'], true, !empty($regOptions['check_reserved_name']));
-	if (!empty($username_validation_errors))
-		$reg_errors = array_merge($reg_errors, $username_validation_errors);
+	validateUsername(0, $regOptions['username'], $error_context, !empty($regOptions['check_reserved_name']));
 
 	// Generate a validation code if it's supposed to be emailed.
 	$validation_code = '';
@@ -509,13 +506,13 @@ function registerMember(&$regOptions, $return_errors = false)
 	}
 	// Does the first password match the second?
 	elseif ($regOptions['password'] != $regOptions['password_check'] && $regOptions['auth_method'] == 'password')
-		$reg_errors[] = array('lang', 'passwords_dont_match');
+		$reg_errors->addError('passwords_dont_match');
 
 	// That's kind of easy to guess...
 	if ($regOptions['password'] == '')
 	{
 		if ($regOptions['auth_method'] == 'password')
-			$reg_errors[] = array('lang', 'no_password');
+			$reg_errors->addError('no_password');
 		else
 			$regOptions['password'] = sha1(mt_rand());
 	}
@@ -527,13 +524,13 @@ function registerMember(&$regOptions, $return_errors = false)
 
 		// Password isn't legal?
 		if ($passwordError != null)
-			$reg_errors[] = array('lang', 'profile_error_password_' . $passwordError);
+			$reg_errors->addError('profile_error_password_' . $passwordError);
 	}
 
 	// If they are using an OpenID that hasn't been verified yet error out.
 	// @todo Change this so they can register without having to attempt a login first
 	if ($regOptions['auth_method'] == 'openid' && (empty($_SESSION['openid']['verified']) || $_SESSION['openid']['openid_uri'] != $regOptions['openid']))
-		$reg_errors[] = array('lang', 'openid_not_verified');
+		$reg_errors->addError('openid_not_verified');
 
 	// You may not be allowed to register this email.
 	if (!empty($regOptions['check_email_ban']))
@@ -553,35 +550,12 @@ function registerMember(&$regOptions, $return_errors = false)
 	);
 	// @todo Separate the sprintf?
 	if ($db->num_rows($request) != 0)
-		$reg_errors[] = array('lang', 'email_in_use', false, array(htmlspecialchars($regOptions['email'])));
+		$reg_errors->addError(array('email_in_use', array(htmlspecialchars($regOptions['email']))), 1);
 	$db->free_result($request);
 
-	// If we found any errors we need to do something about it right away!
-	foreach ($reg_errors as $key => $error)
-	{
-		/* Note for each error:
-			0 = 'lang' if it's an index, 'done' if it's clear text.
-			1 = The text/index.
-			2 = Whether to log.
-			3 = sprintf data if necessary. */
-		if ($error[0] == 'lang')
-			loadLanguage('Errors');
-		$message = $error[0] == 'lang' ? (empty($error[3]) ? $txt[$error[1]] : vsprintf($txt[$error[1]], $error[3])) : $error[1];
-
-		// What to do, what to do, what to do.
-		if ($return_errors)
-		{
-			if (!empty($error[2]))
-				log_error($message, $error[2]);
-			$reg_errors[$key] = $message;
-		}
-		else
-			fatal_error($message, empty($error[2]) ? false : $error[2]);
-	}
-
 	// If there's any errors left return them at once!
-	if (!empty($reg_errors))
-		return $reg_errors;
+	if ($reg_errors->hasErrors())
+		return false;
 
 	$reservedVars = array(
 		'actual_theme_url',

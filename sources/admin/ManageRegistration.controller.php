@@ -148,7 +148,15 @@ class ManageRegistration_Controller extends Action_Controller
 			);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			$memberID = registerMember($regOptions);
+			$reg_errors = error_context::context('register', 0);
+			$memberID = registerMember($regOptions, 'register');
+
+			// If there are "important" errors and you are not an admin: log the first error
+			// Otherwise grab all of them and don't log anything
+			$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
+			foreach ($reg_errors->prepareErrors($error_severity) as $error)
+				fatal_error($error, $error_severity === null ? false : 'general');
+
 			if (!empty($memberID))
 			{
 				$context['new_member'] = array(
