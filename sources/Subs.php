@@ -3734,7 +3734,17 @@ function setupMenuContext()
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
 		require_once(SOURCEDIR . '/Positioning.class.php');
+		// Start things up: this is what we know by default
 		$menu = Positioning_Items::context('main_menu');
+		$sub_buttons = array(
+			'home' => Positioning_Items::context('home_sub_buttons'),
+			'admin' => Positioning_Items::context('admin_sub_buttons'),
+			'pm' => Positioning_Items::context('pm_sub_buttons'),
+			'moderate_sub' => Positioning_Items::context('moderate_sub_sub_buttons'),
+			'profile' => Positioning_Items::context('profile_sub_buttons'),
+		);
+
+		// The main menu
 		$menu->addBulk(
 			array(
 				// The old "logout" is meh. Not a real word. "Log out" is better.
@@ -3742,16 +3752,12 @@ function setupMenuContext()
 					'title' => $txt['logout'],
 					'href' => $scripturl . '?action=logout;%1$s=%2$s',
 					'show' => !$user_info['is_guest'],
-					'sub_buttons' => array(
-					),
 				),
 
 				'home' => array(
 					'title' => $txt['community'],
 					'href' => $scripturl,
 					'show' => true,
-					'sub_buttons' => array(
-					),
 				),
 
 				// Will change title correctly if user is either a mod or an admin.
@@ -3761,8 +3767,6 @@ function setupMenuContext()
 					'counter' => 'total',
 					'href' => $context['allow_admin'] ? $scripturl . '?action=admin' : $scripturl . '?action=moderate',
 					'show' => $context['allow_moderation_center'],
-					'sub_buttons' => array(
-					),
 				),
 
 				// Language string needs agreement here. Anything but bloody username, please. :P
@@ -3773,8 +3777,6 @@ function setupMenuContext()
 					'counter' => 'unread_messages',
 					'href' => $context['allow_pm'] ? $scripturl . '?action=pm' : $scripturl . '?action=profile',
 					'show' => $context['allow_pm'] || $context['allow_edit_profile'],
-					'sub_buttons' => array(
-					),
 				),
 
 				// The old language string made no sense, and was too long.
@@ -3784,8 +3786,6 @@ function setupMenuContext()
 					'title' => $txt['view_unread_category'],
 					'href' => $scripturl . '?action=unread',
 					'show' => !$user_info['is_guest'],
-					'sub_buttons' => array(
-					),
 				),
 
 				// The old language string made no sense, and was too long.
@@ -3795,8 +3795,6 @@ function setupMenuContext()
 					'title' => $txt['view_replies_category'],
 					'href' => $scripturl . '?action=unreadreplies',
 					'show' => !$user_info['is_guest'],
-					'sub_buttons' => array(
-					),
 				),
 
 				// "Log out" would be better here.
@@ -3805,67 +3803,49 @@ function setupMenuContext()
 					'title' => $txt['login'],
 					'href' => $scripturl . '?action=login',
 					'show' => $user_info['is_guest'],
-					'sub_buttons' => array(
-					),
 				),
 
 				'register' => array(
 					'title' => $txt['register'],
 					'href' => $scripturl . '?action=register',
 					'show' => $user_info['is_guest'] && $context['can_register'],
-					'sub_buttons' => array(
-					),
 				),
 			)
 		);
 
-		$sub_buttons = array(
-			'home' => Positioning_Items::context('home_sub_buttons'),
-			'admin' => Positioning_Items::context('admin_sub_buttons'),
-			'pm' => Positioning_Items::context('pm_sub_buttons'),
-			'moderate_sub' => Positioning_Items::context('moderate_sub_sub_buttons'),
-			'profile' => Positioning_Items::context('profile_sub_buttons'),
-		);
-
+		// All the submenus of "something"
+		// Home button
 		$sub_buttons['home']->addBulk(
 			array(
 				'help' => array(
 					'title' => $txt['help'],
 					'href' => $scripturl . '?action=help',
 					'show' => true,
-					'sub_buttons' => array(
-					),
 				),
 				'search' => array(
 					'title' => $txt['search'],
 					'href' => $scripturl . '?action=search',
 					'show' => $context['allow_search'],
-					'sub_buttons' => array(
-					),
 				),
 				'calendar' => array(
 					'title' => $txt['calendar'],
 					'href' => $scripturl . '?action=calendar',
 					'show' => $context['allow_calendar'],
-					'sub_buttons' => array(
-					),
 				),
 				'memberlist' => array(
 					'title' => $txt['members_title'],
 					'href' => $scripturl . '?action=memberlist',
 					'show' => $context['allow_memberlist'],
-					'sub_buttons' => array(
-					),
 				),
 				'recent' => array(
 					'title' => $txt['recent_posts'],
 					'href' => $scripturl . '?action=recent',
 					'show' => true,
-					'sub_buttons' => array(
-					),
 				),
 			)
 		);
+
+		// Admin button
 		$sub_buttons['admin']->addBulk(
 			array(
 				'admin_center' => array(
@@ -3898,8 +3878,6 @@ function setupMenuContext()
 					'counter' => 'total',
 					'href' => $scripturl . '?action=moderate',
 					'show' => $context['allow_admin'],
-					'sub_buttons' => array(
-					),
 				),
 				'moderate' => array(
 					'title' => $txt['moderate'],
@@ -3938,6 +3916,8 @@ function setupMenuContext()
 				),
 			)
 		);
+
+		// Personal messages
 		$sub_buttons['pm']->addBulk(
 			array(
 				'pm_read' => array(
@@ -3954,11 +3934,11 @@ function setupMenuContext()
 					'title' => $txt['profile'],
 					'href' => $scripturl . '?action=profile',
 					'show' => $context['allow_edit_profile'],
-					'sub_buttons' => array(
-					),
 				),
 			)
 		);
+
+		// Moderation
 		$sub_buttons['moderate_sub']->addBulk(
 			array(
 				'reports' => array(
@@ -3992,6 +3972,8 @@ function setupMenuContext()
 				),
 			)
 		);
+
+		// Profile
 		$sub_buttons['profile']->addBulk(
 			array(
 				'account' => array(
