@@ -105,9 +105,6 @@ foreach ($incontext['steps'] as $num => $step)
 		// The current weight of this step in terms of overall progress.
 		$incontext['step_weight'] = $step[3];
 
-		// Make sure we reset the skip button.
-		$incontext['skip'] = false;
-
 		// Call the step and if it returns false that means pause!
 		if (function_exists($step[2]) && $step[2]() === false)
 			break;
@@ -1169,10 +1166,6 @@ function action_adminAccount()
 	$incontext['page_title'] = $txt['user_settings'];
 	$incontext['continue'] = 1;
 
-	// Skipping?
-	if (!empty($_POST['skip']))
-		return true;
-
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
 	$db = load_database();
@@ -1187,7 +1180,7 @@ function action_adminAccount()
 
 	$incontext['require_db_confirm'] = empty($db_type);
 
-	// Only allow skipping if we think they already have an account setup.
+	// Only allow create an admin account if they don't have one already.
 	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
@@ -1198,8 +1191,9 @@ function action_adminAccount()
 			'admin_group' => 1,
 		)
 	);
+	// Skip the step if an admin already exists
 	if ($db->num_rows($request) != 0)
-		$incontext['skip'] = 1;
+		return true;
 	$db->free_result($request);
 
 	// Trying to create an account?
@@ -2073,7 +2067,7 @@ function template_install_below()
 {
 	global $incontext, $txt;
 
-	if (!empty($incontext['continue']) || !empty($incontext['skip']))
+	if (!empty($incontext['continue']))
 	{
 		echo '
 								<div class="clear">';
@@ -2081,9 +2075,6 @@ function template_install_below()
 		if (!empty($incontext['continue']))
 			echo '
 									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
-		if (!empty($incontext['skip']))
-			echo '
-									<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		echo '
 								</div>';
 	}
