@@ -376,3 +376,280 @@ function pollStarters($id_topic)
 
 	return $pollStarters;
 }
+
+/**
+ * Check if they have already voted, or voting is locked.
+ *
+ * @param int $topic
+ * @return type
+ */
+function checkVote($topic)
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
+			p.guest_vote, p.reset_poll, p.num_guest_voters
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+			LEFT JOIN {db_prefix}log_polls AS lp ON (p.id_poll = lp.id_poll AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_member' => $user_info['id'],
+			'current_topic' => $topic,
+			'not_guest' => 0,
+		)
+	);
+
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $row;
+}
+
+/**
+ * Removes the member's vote from a poll.
+ *
+ * @param int $id_member
+ * @param int $id_poll
+ */
+function removeVote($id_member, $id_poll)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_polls
+		WHERE id_member = {int:current_member}
+			AND id_poll = {int:id_poll}',
+		array(
+			'current_member' => $id_member,
+			'id_poll' => $id_poll,
+		)
+	);
+}
+
+/**
+ * Used to decrease the vote counter for the given poll.
+ *
+ * @param int $id_poll
+ * @param array $options
+ */
+function decreaseVoteCounter($id_poll, $options)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}poll_choices
+		SET votes = votes - 1
+		WHERE id_poll = {int:id_poll}
+			AND id_choice IN ({array_int:poll_options})
+			AND votes > {int:votes}',
+		array(
+			'poll_options' => $options,
+			'id_poll' => $id_poll,
+			'votes' => 0,
+		)
+	);
+}
+
+/**
+ * Increase the vote counter for the given poll.
+ * @param int $id_poll
+ * @param array $options
+ */
+function increaseVoteCounter($id_poll, $options)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}poll_choices
+		SET votes = votes + 1
+		WHERE id_poll = {int:id_poll}
+			AND id_choice IN ({array_int:poll_options})',
+		array(
+			'poll_options' => $options,
+			'id_poll' => $id_poll,
+		)
+	);
+}
+
+/**
+ * Add a vote to a poll.
+ * 
+ * @param array $insert
+ */
+function addVote($insert)
+{
+	$db = database();
+
+	$db->insert('insert',
+		'{db_prefix}log_polls',
+		array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
+		$insert,
+		array('id_poll', 'id_member', 'id_choice')
+	);
+}
+
+/**
+ * Increase the vote counter for guest votes.
+ *
+ * @param int $id_poll
+ */
+function increaseGuestVote($id_poll)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}polls
+		SET num_guest_voters = num_guest_voters + 1
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $id_poll,
+		)
+	);
+}
+
+/**
+ * Determines who voted what.
+ *
+ * @param int $id_member
+ * @param int $id_poll
+ * @return type
+ */
+function determineVote($id_member, $id_poll)
+{
+	$db = database();
+	$pollOptions = array();
+
+	$request = $db->query('', '
+		SELECT id_choice
+		FROM {db_prefix}log_polls
+		WHERE id_member = {int:current_member}
+			AND id_poll = {int:id_poll}',
+		array(
+			'current_member' => $id_member,
+			'id_poll' => $id_poll,
+		)
+	);
+	while ($choice = $db->fetch_row($request))
+		$pollOptions[] = $choice[0];
+	$db->free_result($request);
+
+	return $pollOptions;
+}
+
+/**
+ * Get some basic details from a poll
+ *
+ * @param int $id_topic
+ * @return array
+ */
+function pollStatus($id_topic)
+{
+	$db = database();
+
+	$poll = array();
+
+	$request = $db->query('', '
+			SELECT t.id_member_started, t.id_poll, p.voting_locked
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+			WHERE t.id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+		list ($poll['id_member'], $poll['id_poll'], $poll['locked']) = $db->fetch_row($request);
+
+		return $poll;
+}
+
+/**
+ * Update the locked status from a given poll.
+ *
+ * @param int $id_poll
+ * @param int $locked
+ */
+function lockPoll($id_poll, $locked)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}polls
+		SET voting_locked = {int:voting_locked}
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'voting_locked' => $locked,
+			'id_poll' => $id_poll,
+		)
+	);
+}
+
+/**
+ * Gets poll choices from a given poll.
+ *
+ * @param int $id_poll
+ * @return array
+ */
+function getPollChoices($id_poll)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT label, votes, id_choice
+		FROM {db_prefix}poll_choices
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $id_poll,
+		)
+	);
+
+	$choices = array();	
+	$number = 1;
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['label']);
+		$choices[$row['id_choice']] = array(
+			'id' => $row['id_choice'],
+			'number' => $number++,
+			'votes' => $row['votes'],
+			'label' => $row['label'],
+			'is_last' => false
+		);
+	}
+	$db->free_result($request);
+
+	return $choices;
+}
+
+/**
+ * Get the poll starter from a given poll.
+ *
+ * @param int$id_topic
+ * @return array
+ */
+function getPollStarter($id_topic)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT t.id_member_started, t.id_poll, p.id_member AS poll_starter, p.expire_time
+		FROM {db_prefix}topics AS t
+			LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+		WHERE t.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $id_topic,
+		)
+	);
+	if ($db->num_rows($request) == 0)
+		fatal_lang_error('no_board');
+	$bcinfo = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $bcinfo;
+}

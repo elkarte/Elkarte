@@ -50,7 +50,7 @@ class Poll_Controller extends Action_Controller
 	{
 		global $topic, $user_info, $modSettings;
 
-		$db = database();
+		require_once(SUBSDIR . '/Poll.subs.php');
 
 		// Make sure you can vote.
 		isAllowedTo('poll_vote');
@@ -58,24 +58,10 @@ class Poll_Controller extends Action_Controller
 		loadLanguage('Post');
 
 		// Check if they have already voted, or voting is locked.
-		$request = $db->query('', '
-			SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
-				p.guest_vote, p.reset_poll, p.num_guest_voters
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-				LEFT JOIN {db_prefix}log_polls AS lp ON (p.id_poll = lp.id_poll AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
-			WHERE t.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_member' => $user_info['id'],
-				'current_topic' => $topic,
-				'not_guest' => 0,
-			)
-		);
-		if ($db->num_rows($request) == 0)
+		$row = checkVote($topic);
+
+		if (empty($row))
 			fatal_lang_error('poll_error', false);
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
 
 		// If this is a guest can they vote?
 		if ($user_info['is_guest'])
@@ -127,47 +113,15 @@ class Poll_Controller extends Action_Controller
 			$pollOptions = array();
 
 			// Find out what they voted for before.
-			$request = $db->query('', '
-				SELECT id_choice
-				FROM {db_prefix}log_polls
-				WHERE id_member = {int:current_member}
-					AND id_poll = {int:id_poll}',
-				array(
-					'current_member' => $user_info['id'],
-					'id_poll' => $row['id_poll'],
-				)
-			);
-			while ($choice = $db->fetch_row($request))
-				$pollOptions[] = $choice[0];
-			$db->free_result($request);
+			$pollOptions = determineVote($user_info['id'], $row['id_poll']);
 
 			// Just skip it if they had voted for nothing before.
 			if (!empty($pollOptions))
 			{
 				// Update the poll totals.
-				$db->query('', '
-					UPDATE {db_prefix}poll_choices
-					SET votes = votes - 1
-					WHERE id_poll = {int:id_poll}
-						AND id_choice IN ({array_int:poll_options})
-						AND votes > {int:votes}',
-					array(
-						'poll_options' => $pollOptions,
-						'id_poll' => $row['id_poll'],
-						'votes' => 0,
-					)
-				);
-
+				decreaseVoteCounter($row['id_poll'], $pollOptions);
 				// Delete off the log.
-				$db->query('', '
-					DELETE FROM {db_prefix}log_polls
-					WHERE id_member = {int:current_member}
-						AND id_poll = {int:id_poll}',
-					array(
-						'current_member' => $user_info['id'],
-						'id_poll' => $row['id_poll'],
-					)
-				);
+				removeVote($user_info['id'], $row['id_poll']);
 			}
 
 			// Redirect back to the topic so the user can vote again!
@@ -196,23 +150,9 @@ class Poll_Controller extends Action_Controller
 		}
 
 		// Add their vote to the tally.
-		$db->insert('insert',
-			'{db_prefix}log_polls',
-			array('id_poll' => 'int', 'id_member' => 'int', 'id_choice' => 'int'),
-			$inserts,
-			array('id_poll', 'id_member', 'id_choice')
-		);
+		addVote($inserts);
+		increaseVoteCounter($row['id_poll'], $pollOptions);
 
-		$db->query('', '
-			UPDATE {db_prefix}poll_choices
-			SET votes = votes + 1
-			WHERE id_poll = {int:id_poll}
-				AND id_choice IN ({array_int:poll_options})',
-			array(
-				'poll_options' => $pollOptions,
-				'id_poll' => $row['id_poll'],
-			)
-		);
 
 		// If it's a guest don't let them vote again.
 		if ($user_info['is_guest'] && count($pollOptions) > 0)
@@ -224,14 +164,7 @@ class Poll_Controller extends Action_Controller
 			$_COOKIE['guest_poll_vote'] .= ';' . $row['id_poll'] . ',' . time() . ',' . (count($pollOptions) > 1 ? explode(',' . $pollOptions) : $pollOptions[0]);
 
 			// Increase num guest voters count by 1
-			$db->query('', '
-				UPDATE {db_prefix}polls
-				SET num_guest_voters = num_guest_voters + 1
-				WHERE id_poll = {int:id_poll}',
-				array(
-					'id_poll' => $row['id_poll'],
-				)
-			);
+			increaseGuestVote($row['id_poll']);
 
 			require_once(SUBSDIR . '/Auth.subs.php');
 			$cookie_url = url_parts(!empty($modSettings['localCookies']), !empty($modSettings['globalCookies']));
@@ -257,54 +190,36 @@ class Poll_Controller extends Action_Controller
 	function action_lockvoting()
 	{
 		global $topic, $user_info;
-
-		$db = database();
+		
+		require_once(SUBSDIR . '/Poll.subs.php');
 
 		checkSession('get');
 
 		// Get the poll starter, ID, and whether or not it is locked.
-		$request = $db->query('', '
-			SELECT t.id_member_started, t.id_poll, p.voting_locked
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-			WHERE t.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		list ($memberID, $pollID, $voting_locked) = $db->fetch_row($request);
+		$poll = pollStatus($topic);
 
 		// If the user _can_ modify the poll....
 		if (!allowedTo('poll_lock_any'))
-			isAllowedTo('poll_lock_' . ($user_info['id'] == $memberID ? 'own' : 'any'));
+			isAllowedTo('poll_lock_' . ($user_info['id'] == $poll['id_member'] ? 'own' : 'any'));
 
 		// It's been locked by a non-moderator.
-		if ($voting_locked == '1')
-			$voting_locked = '0';
+		if ($poll['locked'] == '1')
+			$poll['locked'] = '0';
 		// Locked by a moderator, and this is a moderator.
-		elseif ($voting_locked == '2' && allowedTo('moderate_board'))
-			$voting_locked = '0';
+		elseif ($poll['locked'] == '2' && allowedTo('moderate_board'))
+			$poll['locked'] = '0';
 		// Sorry, a moderator locked it.
-		elseif ($voting_locked == '2' && !allowedTo('moderate_board'))
+		elseif ($poll['locked'] == '2' && !allowedTo('moderate_board'))
 			fatal_lang_error('locked_by_admin', 'user');
 		// A moderator *is* locking it.
-		elseif ($voting_locked == '0' && allowedTo('moderate_board'))
-			$voting_locked = '2';
+		elseif ($poll['locked'] == '0' && allowedTo('moderate_board'))
+			$poll['locked'] = '2';
 		// Well, it's gonna be locked one way or another otherwise...
 		else
-			$voting_locked = '1';
+			$poll['locked'] = '1';
 
 		// Lock!  *Poof* - no one can vote.
-		$db->query('', '
-			UPDATE {db_prefix}polls
-			SET voting_locked = {int:voting_locked}
-			WHERE id_poll = {int:id_poll}',
-			array(
-				'voting_locked' => $voting_locked,
-				'id_poll' => $pollID,
-			)
-		);
+		lockPoll($poll['id_poll'], $poll['locked']);
 
 		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
 	}
@@ -325,8 +240,6 @@ class Poll_Controller extends Action_Controller
 	function action_editpoll()
 	{
 		global $txt, $user_info, $context, $topic, $board, $scripturl;
-
-		$db = database();
 
 		if (empty($topic))
 			fatal_lang_error('no_access', false);
@@ -507,29 +420,7 @@ class Poll_Controller extends Action_Controller
 			// Get all the choices - if this is an edit.
 			if ($context['is_edit'])
 			{
-				$request = $db->query('', '
-					SELECT label, votes, id_choice
-					FROM {db_prefix}poll_choices
-					WHERE id_poll = {int:id_poll}',
-					array(
-						'id_poll' => $pollinfo['id_poll'],
-					)
-				);
-				$context['choices'] = array();
-				$number = 1;
-				while ($row = $db->fetch_assoc($request))
-				{
-					censorText($row['label']);
-
-					$context['choices'][$row['id_choice']] = array(
-						'id' => $row['id_choice'],
-						'number' => $number++,
-						'votes' => $row['votes'],
-						'label' => $row['label'],
-						'is_last' => false
-					);
-				}
-				$db->free_result($request);
+				$context['choices'] = getPollChoices($pollinfo['id_poll']);
 
 				$last_id = max(array_keys($context['choices'])) + 1;
 
@@ -627,20 +518,7 @@ class Poll_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Poll.subs.php');
 
 		// Get the starter and the poll's ID - if it's an edit.
-		$request = $db->query('', '
-			SELECT t.id_member_started, t.id_poll, p.id_member AS poll_starter, p.expire_time
-			FROM {db_prefix}topics AS t
-				LEFT JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-			WHERE t.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
-		if ($db->num_rows($request) == 0)
-			fatal_lang_error('no_board');
-		$bcinfo = $db->fetch_assoc($request);
-		$db->free_result($request);
+		$bcinfo = getPollStarter($topic);
 
 		// Check their adding/editing is valid.
 		if (!$isEdit && !empty($bcinfo['id_poll']))
