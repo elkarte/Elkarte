@@ -3641,17 +3641,18 @@ function setupMenuContext()
 
 	$cacheTime = $modSettings['lastActive'] * 60;
 
+	// Update the Moderation menu items with action item totals
+	if ($context['allow_moderation_center'])
+	{
+		// Get the numbers for the menu ...
+		require_once(SUBSDIR . '/Moderation.subs.php');
+		$menu_count = loadModeratorMenuCounts();
+	}
+	$menu_count['unread_messages'] = $context['user']['unread_messages'];
+
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
-		// Update the Moderation menu items with action item totals
-		if ($context['allow_moderation_center'])
-		{
-			// Get the numbers for the menu ...
-			require_once(SUBSDIR . '/Moderation.subs.php');
-			$mod_count = loadModeratorMenuCounts();
-		}
-
 		$buttons = array(
 
 			// The old "logout" is meh. Not a real word. "Log out" is better.
@@ -3710,7 +3711,7 @@ function setupMenuContext()
 			// Button highlighting works properly too (see current action stuffz).
 			'admin' => array(
 				'title' => $context['allow_admin'] && ($context['current_action'] !== 'moderate') ? $txt['admin'] : $txt['moderate'],
-				'counter' => isset($mod_count) ? $mod_count['total'] : 0,
+				'counter' => 'total',
 				'href' => $context['allow_admin'] ? $scripturl . '?action=admin' : $scripturl . '?action=moderate',
 				'show' => $context['allow_moderation_center'],
 				'sub_buttons' => array(
@@ -3741,13 +3742,13 @@ function setupMenuContext()
 					),
 					'moderate_sub' => array(
 						'title' => $txt['moderate'],
-						'counter' => isset($mod_count) ? $mod_count['total'] : 0,
+						'counter' => 'total',
 						'href' => $scripturl . '?action=moderate',
 						'show' => $context['allow_admin'],
 						'sub_buttons' => array(
 							'reports' => array(
 								'title' => $txt['mc_reported_posts'],
-								'counter' => isset($mod_count) ? $mod_count['reports'] : 0,
+								'counter' => 'reports',
 								'href' => $scripturl . '?action=moderate;area=reports',
 								'show' => !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
 							),
@@ -3758,19 +3759,19 @@ function setupMenuContext()
 							),
 							'attachments' => array(
 								'title' => $txt['mc_unapproved_attachments'],
-								'counter' => isset($mod_count) ? $mod_count['attachments'] : 0,
+								'counter' => 'attachments',
 								'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 							),
 							'poststopics' => array(
 								'title' => $txt['mc_unapproved_poststopics'],
-								'counter' => isset($mod_count) ? $mod_count['postmod'] : 0,
+								'counter' => 'postmod',
 								'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 								'show' => $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 							),
 							'postbyemail' => array(
 								'title' => $txt['mc_emailerror'],
-								'counter' => isset($mod_count) ? $mod_count['emailmod'] : 0,
+								'counter' => 'emailmod',
 								'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 								'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 							),
@@ -3778,13 +3779,13 @@ function setupMenuContext()
 					),
 					'moderate' => array(
 						'title' => $txt['moderate'],
-						'counter' => isset($mod_count) ? $mod_count['total'] : 0,
+						'counter' => 'total',
 						'href' => $scripturl . '?action=moderate',
 						'show' => !$context['allow_admin'],
 					),
 					'reports' => array(
 						'title' => $txt['mc_reported_posts'],
-						'counter' => isset($mod_count) ? $mod_count['reports'] : 0,
+						'counter' => 'reports',
 						'href' => $scripturl . '?action=moderate;area=reports',
 						'show' => !$context['allow_admin'] && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
 					),
@@ -3795,19 +3796,19 @@ function setupMenuContext()
 					),
 					'attachments' => array(
 						'title' => $txt['mc_unapproved_attachments'],
-						'counter' => isset($mod_count) ? $mod_count['attachments'] : 0,
+						'counter' => 'attachments',
 						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 					),
 					'poststopics' => array(
 						'title' => $txt['mc_unapproved_poststopics'],
-						'counter' => isset($mod_count) ? $mod_count['postmod'] : 0,
+						'counter' => 'postmod',
 						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
 						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
 					),
 					'postbyemail' => array(
 						'title' => $txt['mc_emailerror'],
-						'counter' => isset($mod_count) ? $mod_count['emailmod'] : 0,
+						'counter' => 'emailmod',
 						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 						'show' => !$context['allow_admin'] && !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 					),
@@ -3819,7 +3820,7 @@ function setupMenuContext()
 			// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
 			'pm' => array(
 				'title' => $context['allow_pm'] && !$context['allow_edit_profile'] ? $txt['pm_short'] : $txt['account_short'],
-				'counter' => $context['user']['unread_messages'],
+				'counter' => 'unread_messages',
 				'href' => $context['allow_pm'] ? $scripturl . '?action=pm' : $scripturl . '?action=profile',
 				'show' => $context['allow_pm'] || $context['allow_edit_profile'],
 				'sub_buttons' => array(
@@ -3901,7 +3902,7 @@ function setupMenuContext()
 		);
 
 		// Allow editing menu buttons easily.
-		call_integration_hook('integrate_menu_buttons', array(&$buttons));
+		call_integration_hook('integrate_menu_buttons', array(&$buttons, &$menu_count));
 
 		// Now we put the buttons in the context so the theme can use them.
 		$menu_buttons = array();
@@ -3914,11 +3915,11 @@ function setupMenuContext()
 				if (isset($button['action_hook']))
 					$needs_action_hook = true;
 
-				if (!empty($button['counter']))
+				if (isset($button['counter']) && !empty($menu_count[$button['counter']]))
 				{
-					$button['alttitle'] = $button['title'] . ' [' . $button['counter'] . ']';
+					$button['alttitle'] = $button['title'] . ' [' . $menu_count[$button['counter']] . ']';
 					if (!empty($settings['menu_numeric_notice']))
-						$button['title'] .= sprintf($settings['menu_numeric_notice'], $button['counter']);
+						$button['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$button['counter']]);
 				}
 
 				// Go through the sub buttons if there are any.
@@ -3927,11 +3928,11 @@ function setupMenuContext()
 					{
 						if (empty($subbutton['show']))
 							unset($button['sub_buttons'][$key]);
-						elseif (!empty($subbutton['counter']))
+						elseif (isset($subbutton['counter']) && !empty($menu_count[$subbutton['counter']]))
 						{
-							$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $subbutton['counter'] . ']';
+							$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $menu_count[$subbutton['counter']] . ']';
 							if (!empty($settings['menu_numeric_notice']))
-								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'], $subbutton['counter']);
+								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$subbutton['counter']]);
 						}
 
 						// 2nd level sub buttons next...
@@ -3941,11 +3942,11 @@ function setupMenuContext()
 							{
 								if (empty($sub_button2['show']))
 									unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
-								elseif (!empty($sub_button2['counter']))
+								elseif (isset($sub_button2['counter']) && !empty($menu_count[$sub_button2['counter']]))
 								{
-									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $sub_button2['title'] . ' [' . $sub_button2['counter'] . ']';
+									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $sub_button2['title'] . ' [' . $menu_count[$sub_button2['counter']] . ']';
 									if (!empty($settings['menu_numeric_notice']))
-										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'], $sub_button2['counter']);
+										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$sub_button2['counter']]);
 								}
 							}
 						}

@@ -907,10 +907,14 @@ class Admin_Controller extends Action_Controller
 
 		// All the files we need to include.
 		$include_files = array(
-			'ManageFeatures', 'ManageBoards', 'ManageNews', 'ManageAttachments', 'ManageAvatars', 'ManageCalendar', 'ManageMail',
-			'ManagePosts', 'ManageRegistration', 'ManageSearch', 'ManageSearchEngines', 'ManageServer', 'ManageSmileys', 'ManageLanguages',
-			'ManageBBC', 'ManageTopics', 'ManagePaid', 'ManagePermissions', 'CoreFeatures', 'AdminLog', 'ManageDrafts',
-			'AddonSettings', 'ManageSecurity'
+			'AddonSettings.controller', 'AdminLog.controller', 'CoreFeatures.controller',
+			'ManageAttachments.controller', 'ManageAvatars.controller', 'ManageBBC.controller',
+			'ManageBoards.controller', 'ManageCalendar.controller', 'ManageDrafts.controller',
+			'ManageFeatures.controller', 'ManageLanguages.controller', 'ManageMail.controller',
+			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
+			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
+			'ManageSearchEngines.controller', 'ManageSecurity.controller', 'ManageServer.controller',
+			'ManageSmileys.controller', 'ManageTopics.controller',
 		);
 
 		// This is a special array of functions that contain setting data
