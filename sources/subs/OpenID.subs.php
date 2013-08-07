@@ -37,7 +37,7 @@ class OpenID
 	 */
 	function validate($openid_uri, $return = false, $save_fields = array(), $return_action = null)
 	{
-		global $scripturl, $boardurl, $modSettings;
+		global $scripturl, $modSettings;
 
 		$openid_url = $this->canonize($openid_uri);
 
@@ -165,7 +165,7 @@ class OpenID
 	 */
 	function makeAssociation($server)
 	{
-		global $modSettings, $p;
+		global $p;
 
 		$db = database();
 

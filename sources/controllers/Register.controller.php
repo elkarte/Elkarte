@@ -241,7 +241,7 @@ class Register_Controller extends Action_Controller
 	 */
 	function action_register2($verifiedOpenID = false)
 	{
-		global $txt, $modSettings, $context;
+		global $txt, $modSettings, $context, $user_info;
 
 		$db = database();
 

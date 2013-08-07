@@ -143,7 +143,8 @@ class Auth_Controller extends Action_Controller
 		if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			if (($open_id = openID_validate($_POST['openid_identifier'])) !== 'no_data')
+			$open_id = new OpenID();
+			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
 				return $open_id;
 		}
 
