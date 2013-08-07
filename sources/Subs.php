@@ -3740,7 +3740,7 @@ function setupMenuContext()
 			'home' => Positioning_Items::context('home_sub_buttons'),
 			'admin' => Positioning_Items::context('admin_sub_buttons'),
 			'pm' => Positioning_Items::context('pm_sub_buttons'),
-			'moderate_sub' => Positioning_Items::context('moderate_sub_sub_buttons'),
+			'moderate' => Positioning_Items::context('moderate_sub_buttons'),
 			'profile' => Positioning_Items::context('profile_sub_buttons'),
 		);
 
@@ -3760,13 +3760,18 @@ function setupMenuContext()
 					'show' => true,
 				),
 
-				// Will change title correctly if user is either a mod or an admin.
-				// Button highlighting works properly too (see current action stuffz).
 				'admin' => array(
-					'title' => $context['allow_admin'] && ($context['current_action'] !== 'moderate') ? $txt['admin'] : $txt['moderate'],
+					'title' => $txt['admin'],
 					'counter' => 'total',
-					'href' => $context['allow_admin'] ? $scripturl . '?action=admin' : $scripturl . '?action=moderate',
-					'show' => $context['allow_moderation_center'],
+					'href' => $scripturl . '?action=admin',
+					'show' => $context['allow_admin'],
+				),
+
+				'moderate' => array(
+					'title' => $txt['moderate'],
+					'counter' => 'total',
+					'href' => $scripturl . '?action=moderate',
+					'show' => !$context['allow_admin'] && $context['allow_moderation_center'],
 				),
 
 				// Language string needs agreement here. Anything but bloody username, please. :P
@@ -3873,46 +3878,11 @@ function setupMenuContext()
 					'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
 					'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
 				),
-				'moderate_sub' => array(
-					'title' => $txt['moderate'],
-					'counter' => 'total',
-					'href' => $scripturl . '?action=moderate',
-					'show' => $context['allow_admin'],
-				),
 				'moderate' => array(
 					'title' => $txt['moderate'],
 					'counter' => 'total',
 					'href' => $scripturl . '?action=moderate',
-					'show' => !$context['allow_admin'],
-				),
-				'reports' => array(
-					'title' => $txt['mc_reported_posts'],
-					'counter' => 'reports',
-					'href' => $scripturl . '?action=moderate;area=reports',
-					'show' => !$context['allow_admin'] && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
-				),
-				'modlog' => array(
-					'title' => $txt['modlog_view'],
-					'href' => $scripturl . '?action=moderate;area=modlog',
-					'show' => !$context['allow_admin'] && !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
-				),
-				'attachments' => array(
-					'title' => $txt['mc_unapproved_attachments'],
-					'counter' => 'attachments',
-					'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-					'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
-				),
-				'poststopics' => array(
-					'title' => $txt['mc_unapproved_poststopics'],
-					'counter' => 'postmod',
-					'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
-					'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
-				),
-				'postbyemail' => array(
-					'title' => $txt['mc_emailerror'],
-					'counter' => 'emailmod',
-					'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
-					'show' => !$context['allow_admin'] && !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					'show' => $context['allow_admin'],
 				),
 			)
 		);
@@ -3939,7 +3909,7 @@ function setupMenuContext()
 		);
 
 		// Moderation
-		$sub_buttons['moderate_sub']->addBulk(
+		$sub_buttons['moderate']->addBulk(
 			array(
 				'reports' => array(
 					'title' => $txt['mc_reported_posts'],
