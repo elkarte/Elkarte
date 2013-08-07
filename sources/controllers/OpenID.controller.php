@@ -209,7 +209,7 @@ class OpenID_Controller extends Action_Controller
     <Service>
       <Type>http://specs.openid.net/auth/2.0/return_to</Type>
       <URI>', $scripturl, '?action=openidreturn</URI>
-           </Service>
+	</Service>
   </XRD>
 </xrds:XRDS>';
 
