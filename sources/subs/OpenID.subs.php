@@ -415,7 +415,7 @@ class OpenID
 					$response_data[$match[1]] = $href_match[1];
 		}
 
-		if (empty($response_data['erver']))
+		if (empty($response_data['server']))
 			if (empty($response_data['provider']))
 				$response_data['server'] = $openid_url;
 			else
