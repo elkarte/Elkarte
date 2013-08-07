@@ -561,7 +561,7 @@ class ProfileHistory_Controller extends Action_Controller
 				),
 				'ripe' => array(
 					'name' => $txt['whois_ripe'],
-					'url' => 'http://www.db.ripe.net/whois?searchtext=' . $context['ip'],
+					'url' => 'https://apps.db.ripe.net/search/query.html?searchtext=' . $context['ip'],
 					'range' => array(62, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
 						141, 145, 151, 188, 193, 194, 195, 212, 213, 217),
 				),
