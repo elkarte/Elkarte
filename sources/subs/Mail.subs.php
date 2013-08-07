@@ -397,8 +397,6 @@ function AddMailQueue($flush = false, $to_array = array(), $subject = '', $messa
  */
 function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $line_break = "\r\n", $custom_charset = null)
 {
-	global $context;
-
 	$charset = $custom_charset !== null ? $custom_charset : 'UTF-8';
 
 	// This is the fun part....
@@ -413,7 +411,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 		unset($matches);
 
 		if ($simple)
-			$string = preg_replace('~&#(\d{3,8});~e', 'chr(\'$1\')', $string);
+			$string = preg_replace_callback('~&#(\d{3,8});~', create_function('$m', ' return chr("$m[1]");'), $string);
 		else
 		{
 			$string = preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $string);
@@ -426,8 +424,9 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 	// Convert all special characters to HTML entities...just for Hotmail :-\
 	if ($hotmail_fix)
 	{
-		//@todo ... another replaceEntities ?
-		$entityConvert = create_function('$c', '
+		// @todo ... another replaceEntities ?
+		$entityConvert = create_function('$m', '
+			$c = $m[1];
 			if (strlen($c) === 1 && ord($c[0]) <= 0x7F)
 				return $c;
 			elseif (strlen($c) === 2 && ord($c[0]) >= 0xC0 && ord($c[0]) <= 0xDF)
@@ -440,7 +439,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
 				return "";');
 
 		// Convert all 'special' characters to HTML entities.
-		return array($charset, preg_replace('~([\x80-\x{10FFFF}])~eu', '$entityConvert(\'\1\')', $string), '7bit');
+		return array($charset, preg_replace_callback('~([\x80-\x{10FFFF}])~u', $entityConvert, $string), '7bit');
 	}
 
 	// We don't need to mess with the line if no special characters were in it..
