@@ -189,4 +189,30 @@ class OpenID_Controller extends Action_Controller
 			doLogin();
 		}
 	}
+	
+	public function action_xrds()
+	{
+		global $scripturl, $modSettings, $context;
+	
+		ob_end_clean();
+		if (!empty($modSettings['enableCompressedOutput']))
+			@ob_start('ob_gzhandler');
+		else
+			ob_start();
+
+		header('Content-Type: application/xrds+xml');
+		echo '<?xml version="1.0" encoding="', $context['character_set'], '"?' . '>';
+		// Generate the XRDS data for OpenID 2.0, YADIS discovery..
+		echo '
+<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
+  <XRD>
+    <Service>
+      <Type>http://specs.openid.net/auth/2.0/return_to</Type>
+      <URI>', $scripturl, '?action=openidreturn</URI>
+           </Service>
+  </XRD>
+</xrds:XRDS>';
+
+	obExit(false);
+	}
 }

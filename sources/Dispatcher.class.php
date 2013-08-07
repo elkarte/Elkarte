@@ -162,6 +162,7 @@ class Site_Dispatcher
 			'notify' => array('Notify.controller.php', 'Notify_Controller', 'action_notify'),
 			'notifyboard' => array('Notify.controller.php', 'Notify_Controller', 'action_notifyboard'),
 			'openidreturn' => array('OpenID.controller.php', 'OpenID_Controller', 'action_openidreturn'),
+			'xrds' => array('OpenID.controller.php', 'OpenID_Controller', 'action_xrds'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
