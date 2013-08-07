@@ -37,7 +37,7 @@ class OpenID_Controller extends Action_Controller
 	 */
 	function action_openidreturn()
 	{
-		global $user_info, $user_profile, $modSettings, $context, $sc, $user_settings;
+		global $modSettings, $context, $sc, $user_settings;
 
 		// We'll need our subs.
 		require_once(SUBSDIR . '/OpenID.subs.php');
