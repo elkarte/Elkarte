@@ -2564,8 +2564,6 @@ function parsesmileys(&$message)
 	}
 
 	// Replace away!
-	$message = preg_replace($smileyPregSearch, '$smileyPregReplacements[\'$1\']', $message);
-
 	// @todo When support changes to PHP 5.3+, this can be changed this to "use" keyword and simpifly this.
 	$callback = pregReplaceCurry('smileyPregReplaceCallback', 2);
 	$message = preg_replace_callback($smileyPregSearch, $callback($smileyPregReplacements), $message);
