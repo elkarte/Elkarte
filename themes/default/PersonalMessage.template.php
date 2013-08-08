@@ -939,7 +939,7 @@ function template_search_results()
 
 function template_send()
 {
-	global $context, $settings, $scripturl, $options, $modSettings, $txt;
+	global $context, $settings, $scripturl, $modSettings, $txt;
 
 	// Show which messages were sent successfully and which failed.
 	if (!empty($context['send_log']))
