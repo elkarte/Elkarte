@@ -178,7 +178,7 @@ class OpenID_Controller extends Action_Controller
 			// Cleanup on Aisle 5.
 			$_SESSION['openid'] = array(
 				'verified' => true,
-				'openid_uri' => $openid_uri,
+				'openid_uri' => $context['openid_claimed_id'],
 			);
 
 			require_once(CONTROLLERDIR . '/Auth.controller.php');
