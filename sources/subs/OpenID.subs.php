@@ -395,6 +395,7 @@ class OpenID
 
 		// Get the html and parse it for the openid variable which will tell us where to go.
 		$webdata = fetch_web_data($openid_url);
+
 		if (empty($webdata))
 			return false;
 
