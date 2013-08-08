@@ -45,8 +45,8 @@ class OpenID
 		if ($response_data === false)
 			return 'no_data';
 
-		if (($assoc = $this->getAssociation($response_data['server'])) == null)
-			$assoc = $this->makeAssociation($response_data['server']);
+		if (($assoc = $this->getAssociation($response_data['provider'])) == null)
+			$assoc = $this->makeAssociation($response_data['provider']);
 
 		// include file for member existence
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -64,22 +64,32 @@ class OpenID
 			'cookieTime' => $modSettings['cookieTime'],
 		);
 
+		$id_select = 'http://specs.openid.net/auth/2.0/identifier_select';
+		$openid_identity = $id_select;
+		$openid_claimedid = $id_select;
+		if ($openid_url != $response_data['server'])
+		{
+			$openid_identity = urlencode(empty($response_data['delegate']) ? $openid_url : $response_data['delegate']);
+			if (strpos($openid_identity, 'https') === 0)
+				$openid_claimedid = str_replace("http://", "https://", $openid_url);			
+			else
+				$openid_claimedid = $openid_url;
+		}
+
 		$parameters = array(
 			'openid.mode=checkid_setup',
-			'openid.trust_root=' . urlencode($scripturl),
-			'openid.identity=' . urlencode(empty($response_data['delegate']) ? $openid_url : $response_data['delegate']),
+			'openid.realm=' . $scripturl,
+			'openid.ns=http://specs.openid.net/auth/2.0',
+			'openid.identity=' . $openid_identity,
+			'openid.claimed_id=' . $openid_claimedid,
 			'openid.assoc_handle=' . urlencode($assoc['handle']),
 			'openid.return_to=' . urlencode($scripturl . '?action=openidreturn&sa=' . (!empty($return_action) ? $return_action : $_REQUEST['action']) . '&t=' . $request_time . (!empty($save_fields) ? '&sf=' . base64_encode(serialize($save_fields)) : '')),
+			'openid.sreg.required=email',
 		);
 
 		// If they are logging in but don't yet have an account or they are registering, let's request some additional information
 		if (($_REQUEST['action'] == 'login2' && !memberExists($openid_url)) || ($_REQUEST['action'] == 'register' || $_REQUEST['action'] == 'register2'))
-		{
-			// Email is required.
-			$parameters[] = 'openid.sreg.required=email';
-			// The rest is just optional.
 			$parameters[] = 'openid.sreg.optional=nickname,dob,gender';
-		}
 
 		$redir_url = $response_data['server'] . '?' . implode('&', $parameters);
 
@@ -171,6 +181,7 @@ class OpenID
 
 		$parameters = array(
 			'openid.mode=associate',
+			'openid.ns=http://specs.openid.net/auth/2.0',
 		);
 
 		// We'll need to get our keys for the Diffie-Hellman key exchange.
@@ -389,7 +400,14 @@ class OpenID
 			return false;
 
 		$response_data = array();
-
+		// dirty, but .. Yadis response? Let's get the <URI>
+		preg_match('~<URI.*?>(.*)</URI>~', $webdata, $uri);
+		if ($uri)
+		{
+			$response_data['provider'] = $uri[1];
+			$response_data['server'] = $uri[1];
+			return $response_data;
+		}
 		// Some OpenID servers have strange but still valid HTML which makes our job hard.
 		if (preg_match_all('~<link([\s\S]*?)/?>~i', $webdata, $link_matches) == 0)
 			fatal_lang_error('openid_server_bad_response');
@@ -405,11 +423,10 @@ class OpenID
 					$response_data[$match[1]] = $href_match[1];
 		}
 
-		if (empty($response_data['server']))
-			if (empty($response_data['provider']))
-				fatal_lang_error('openid_server_bad_response');
-			else
-				$response_data['server'] = $response_data['provider'];
+		if (empty($response_data['provider']))
+			$response_data['server'] = $openid_url;
+		else
+			$response_data['server'] = $response_data['provider'];
 
 		return $response_data;
 	}
