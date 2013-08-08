@@ -142,7 +142,7 @@ function template_display_child_boards_above()
  */
 function template_pages_and_buttons_above()
 {
-	global $modSettings, $context, $settings, $txt, $options;
+	global $context, $settings, $txt;
 
 	if ($context['no_topic_listing'])
 		return;
