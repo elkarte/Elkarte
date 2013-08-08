@@ -56,9 +56,9 @@ class OpenID_Controller extends Action_Controller
 			fatal_lang_error('openid_not_resolved');
 
 		// this has annoying habit of removing the + from the base64 encoding.  So lets put them back.
-//		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
-//			if (isset($_GET[$key]))
-//				$_GET[$key] = str_replace(' ', '+', $_GET[$key]);
+		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
+			if (isset($_GET[$key]))
+				$_GET[$key] = str_replace(' ', '+', $_GET[$key]);
 
 		$openID = new OpenID();
 
