@@ -399,7 +399,14 @@ class OpenID
 			return false;
 
 		$response_data = array();
-
+		// dirty, but .. Yadis response? Let's get the <URI>
+		preg_match('~<URI.*?>(.*)</URI>~', $webdata, $uri);
+		if ($uri)
+		{
+			$response_data['provider'] = $uri[1];
+			$response_data['server'] = $uri[1];
+			return $response_data;
+		}
 		// Some OpenID servers have strange but still valid HTML which makes our job hard.
 		if (preg_match_all('~<link([\s\S]*?)/?>~i', $webdata, $link_matches) == 0)
 			fatal_lang_error('openid_server_bad_response');
@@ -415,11 +422,10 @@ class OpenID
 					$response_data[$match[1]] = $href_match[1];
 		}
 
-		if (empty($response_data['server']))
-			if (empty($response_data['provider']))
-				$response_data['server'] = $openid_url;
-			else
-				$response_data['server'] = $response_data['provider'];
+		if (empty($response_data['provider']))
+			$response_data['server'] = $openid_url;
+		else
+			$response_data['server'] = $response_data['provider'];
 
 		return $response_data;
 	}
