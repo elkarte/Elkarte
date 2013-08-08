@@ -127,7 +127,7 @@ function template_html_above()
 	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
 	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
 
-	// OpenID enabled? Advertise the location of our endpoint using YADIS protocoll.
+	// OpenID enabled? Advertise the location of our endpoint using YADIS protocol.
 	if ($modSettings['enableOpenID'])
 		echo '
 	<meta http-equiv="x-xrds-location" content="' . $scripturl . '?action=xrds" />';
