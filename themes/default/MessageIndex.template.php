@@ -201,7 +201,7 @@ function template_pages_and_buttons_above()
  */
 function template_main()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
 	if (!$context['no_topic_listing'])
 	{
@@ -220,7 +220,12 @@ function template_main()
 			echo '
 
 				<h3>
-					Sort by: ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], ' / ', $context['topics_headers']['likes'], '
+					Sort by: ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'];
+
+			if (!empty($modSettings['likes_enabled']))
+				echo ' / ' . $context['topics_headers']['likes'];
+
+			echo '
 				</h3>';
 
 			// Show a "select all" box for quick moderation?
@@ -296,7 +301,13 @@ function template_main()
 					<p class="topic_stats">
 					', $topic['replies'], ' ', $txt['replies'], '
 					<br />
-					', $topic['views'], ' ', $txt['views'], ' / ',$topic['likes'], ' ', $txt['likes'], '
+					', $topic['views'], ' ', $txt['views'];
+
+				//Show likes?
+				if (!empty($modSettings['likes_enabled']))
+					echo ' / ',$topic['likes'], ' ', $txt['likes'];
+
+				echo '
 					</p>
 					<p class="topic_lastpost">
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
