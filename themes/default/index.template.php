@@ -396,7 +396,7 @@ function template_body_above()
  */
 function template_body_below()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 		</div>
@@ -444,7 +444,7 @@ function template_html_below()
  */
 function theme_linktree($force_show = false)
 {
-	global $context, $settings, $shown_linktree, $scripturl, $txt;
+	global $context, $settings, $shown_linktree;
 
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
@@ -703,7 +703,7 @@ function template_select_boards($name, $label = '', $extra = '')
  */
 function template_pagesection($button_strip = false, $strip_direction = '', $go = 'go_up', $options = array())
 {
-	global $context, $modSettings, $txt;
+	global $context;
 
 	//if (!isset($options['top_button']))
 	//	$options['top_button'] = !empty($modSettings['topbottomEnable']);
@@ -741,7 +741,7 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
  */
 function template_news_fader()
 {
-	global $settings, $options, $txt, $context;
+	global $settings, $context;
 
 	echo '
 		<ul id="elkFadeScroller">
