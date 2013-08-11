@@ -25,12 +25,33 @@ if (!defined('ELK'))
 class Positioning_Items
 {
 	/**
-	 * Holds the unique identifier of the item (a name).
+	 * Used when adding: it holds the "relative" position of the item added
+	 * (i.e. "before", "after", "end" or "begin")
 	 *
 	 * @var string
-	 * @todo not used?
 	 */
-	private $_name = null;
+	private $_position = null;
+
+	/**
+	 * Known positions the item can be added
+	 *
+	 * @var array
+	 */
+	protected $_known_positions = array();
+
+	/**
+	 * The index of the item after or before which another one should be placed
+	 *
+	 * @var string
+	 */
+	private $_relative = '';
+
+	/**
+	 * Reset or not the position where items as added
+	 *
+	 * @var bool
+	 */
+	private $_reset = false;
 
 	/**
 	 * Holds all the items to add
@@ -125,85 +146,117 @@ class Positioning_Items
 
 		// Just in case, let's initialize all the relevant variables
 		$this->removeAll();
+
+		$this->_known_positions = array('after', 'before', 'end', 'begin');
 	}
 
 	/**
 	 * Add a new item to the pile
 	 *
-	 * @param string $item name of a item
+	 * @param string $key index of a item
+	 * @param string $item the item (usually is an array, but it could be anything)
 	 * @param int $priority an integer defining the priority of the item.
 	 */
 	public function add($key, $item, $priority = null)
 	{
-		$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
-		$this->_items[$key] = $item;
-		$this->_general_highest_priority = max($this->_all_general) + 100;
+		if (is_array($key))
+		{
+			$this->_reset = false;
+			foreach ($key as $k => $v)
+				$this->add($k, $v);
+			$this->_reset = true;
+		}
+		else
+		{
+			// If we know what to do, let's do it
+			if ($this->_position !== null && in_array($this->_position, $this->_known_positions))
+			{
+				$add = $this->_position;
+
+				// after and before are special because the array doesn't need a priority level
+				if ($this->_position === 'after' || $this->_position === 'before')
+					$this->{'_all_' . $add}[$key] = $this->_relative;
+				// Instead end and begin are "normal" and the order is defined by the priority
+				else
+					$this->{'_all_' . $add}[$key] = $priority === null ? $this->{'_' . $add . '_highest_priority'} : (int) $priority;
+			}
+			else
+			{
+				$add = 'general';
+				$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+			}
+
+			// Let's add it (the most important part
+			$this->_items[$key] = $item;
+
+			// If there is a max priority level, then increase it
+			if (isset($this->{'_' . $add . '_highest_priority'}))
+				$this->{'_' . $add . '_highest_priority'} = max($this->{'_all_' . $add}) + 100;
+		}
+
+		if ($this->_reset)
+			$this->_position = null;
 	}
 
 	/**
-	 * Add a new item to the pile
+	 * Do we want to add the item after another one?
+	 */
+	public function after($position)
+	{
+		$this->_position = 'after';
+		$this->_relative = $position;
+
+		return $this;
+	}
+
+	/**
+	 * Or before?
+	 */
+	public function before($position)
+	{
+		$this->_position = 'before';
+		$this->_relative = $position;
+
+		return $this;
+	}
+
+	/**
+	 * Maybe at the end?
+	 */
+	public function end()
+	{
+		$this->_position = 'end';
+		$this->_relative = $position;
+
+		return $this;
+	}
+
+	/**
+	 * Or at the beginning of the pile?
+	 */
+	public function begin()
+	{
+		$this->_position = 'begin';
+		$this->_relative = $position;
+
+		return $this;
+	}
+
+	/**
+	 * Add a bunch of items in one go
 	 *
 	 * @param string $item name of a item
 	 * @param int $priority an integer defining the priority of the item.
 	 */
 	public function addBulk($items)
 	{
+		$this->_reset = false;
+
 		foreach ($items as $key => $item)
-		{
-			$this->_all_general[$key] = $this->_general_highest_priority;
-			$this->_items[$key] = $item;
-			$this->_general_highest_priority = max($this->_all_general) + 100;
-		}
-	}
+			$this->add($key, $item);
 
-	/**
-	 * Add a item to the pile before another existing item
-	 *
-	 * @param string $item the name of a item
-	 * @param string $following the name of the item before which $item must be added
-	 */
-	public function addBefore($key, $item, $following)
-	{
-		$this->_all_before[$key] = $following;
-		$this->_items[$key] = $item;
-	}
-
-	/**
-	 * Add a item to the pile after another existing item
-	 *
-	 * @param string $item the name of a item
-	 * @param string $following the name of the item after which $item must be added
-	 */
-	public function addAfter($key, $item, $previous)
-	{
-		$this->_all_after[$key] = $previous;
-		$this->_items[$key] = $item;
-	}
-
-	/**
-	 * Add a item at the end of the pile
-	 *
-	 * @param string $item name of a item
-	 * @param int $priority an integer defining the priority of the item.
-	 */
-	public function addEnd($key, $item, $priority = null)
-	{
-		$this->_all_end[$key] = $priority === null ? $this->_end_highest_priority : (int) $priority;
-		$this->_items[$key] = $item;
-		$this->_end_highest_priority = max($this->_all_end) + 100;
-	}
-
-	/**
-	 * Add a item at the beginning of the pile
-	 *
-	 * @param string $item name of a item
-	 * @param int $priority an integer defining the priority of the item.
-	 */
-	public function addBegin($key, $item, $priority = null)
-	{
-		$this->_all_begin[$key] = $priority === null ? $this->_begin_highest_priority : (int) -$priority;
-		$this->_items[$key] = $item;
-		$this->_begin_highest_priority = max($this->_all_begin) + 100;
+		$this->_reset = true;
+		$this->_position = null;
 	}
 
 	/**
