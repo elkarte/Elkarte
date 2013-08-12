@@ -487,6 +487,7 @@ h3.catbg a:hover, h4.catbg a:hover, h3.titlebg a:hover, h4.titlebg a:hover {
 }
 h3.catbg .icon {
 	margin: 0 5px 0 0;
+	vertical-align: text-top;
 }
 h4.titlebg .icon {
 	float: left;
@@ -494,7 +495,7 @@ h4.titlebg .icon {
 }
 .category_header .icon {
 	margin: 0 5px 0 0;
-	vertical-align: middle;
+	vertical-align: text-top;
 }
 
 /* Upshrinks in cat and title bars. */
