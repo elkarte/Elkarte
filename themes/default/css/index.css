@@ -637,7 +637,7 @@ div.windowbg, div.windowbg2 {
 }
 .generic_list_wrapper .additional_row {
 	margin: 0;
-	padding: 5px 0;
+	padding: 10px 0 0;
 	border-radius: 0;
 }
 .generic_list_wrapper .information .additional_row {
