@@ -345,7 +345,7 @@ $txt['print'] = 'Print';
 $txt['topic_summary'] = 'Topic Summary';
 $txt['not_applicable'] = 'N/A';
 $txt['message_lowercase'] = 'message'; //Deprecated
-$txt['name_in_use'] = 'This name is already in use by another member.';
+$txt['name_in_use'] = 'The name %1$s is already in use by another member.';
 
 $txt['total_members'] = 'Total Members';
 $txt['total_posts'] = 'Total Posts';

@@ -375,7 +375,7 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
  */
 function resetPassword($memID, $username = null)
 {
-	global $modSettings, $language;
+	global $modSettings, $language, $user_info;
 
 	// Language... and a required file.
 	loadLanguage('Login');
@@ -401,7 +401,14 @@ function resetPassword($memID, $username = null)
 	// Do some checks on the username if needed.
 	if ($username !== null)
 	{
-		validateUsername($memID, $user);
+		$errors = error_context::context('reset_pwd', 0);
+		validateUsername($memID, $user, 'reset_pwd');
+
+		// If there are "important" errors and you are not an admin: log the first error
+		// Otherwise grab all of them and don't log anything
+		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
+		foreach ($errors->prepareErrors($error_severity) as $error)
+			fatal_error($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, array('member_name' => $user, 'passwd' => $newPassword_sha1));
@@ -427,48 +434,37 @@ function resetPassword($memID, $username = null)
  *
  * @param int $memID
  * @param string $username
- * @param boolean $return_error
+ * @param boolean $error_context
  * @param boolean $check_reserved_name
  * @return string Returns null if fine
  */
-function validateUsername($memID, $username, $return_error = false, $check_reserved_name = true)
+function validateUsername($memID, $username, $error_context = 'register', $check_reserved_name = true)
 {
-	global $txt, $user_info;
+	global $txt;
 
-	$errors = array();
+	$errors = error_context::context($error_context, 0);
 
 	// Don't use too long a name.
 	if (Util::strlen($username) > 25)
-		$errors[] = array('lang', 'error_long_name');
+		$errors->addError('error_long_name');
 
 	// No name?!  How can you register with no name?
 	if ($username == '')
-		$errors[] = array('lang', 'need_username');
+		$errors->addError('need_username');
 
 	// Only these characters are permitted.
 	if (in_array($username, array('_', '|')) || preg_match('~[<>&"\'=\\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $username)) != 0 || strpos($username, '[code') !== false || strpos($username, '[/code') !== false)
-		$errors[] = array('lang', 'error_invalid_characters_username');
+		$errors->addError('error_invalid_characters_username');
 
 	if (stristr($username, $txt['guest_title']) !== false)
-		$errors[] = array('lang', 'username_reserved', 'general', array($txt['guest_title']));
+		$errors->addError(array('username_reserved', array($txt['guest_title'])), 1);
 
 	if ($check_reserved_name)
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($username, $memID, false))
-			$errors[] = array('done', '(' . htmlspecialchars($username) . ') ' . $txt['name_in_use']);
+			$errors->addError(array('name_in_use', array(htmlspecialchars($username))));
 	}
-
-	if ($return_error)
-		return $errors;
-	elseif (empty($errors))
-		return null;
-
-	loadLanguage('Errors');
-	$error = $errors[0];
-
-	$message = $error[0] == 'lang' ? (empty($error[3]) ? $txt[$error[1]] : vsprintf($txt[$error[1]], $error[3])) : $error[1];
-	fatal_error($message, empty($error[2]) || $user_info['is_admin'] ? false : $error[2]);
 }
 
 /**
