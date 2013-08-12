@@ -69,18 +69,7 @@ function template_main()
 		// $alternate will either be true or false. If it's true, use "windowbg2" and otherwise use "windowbg".
 		echo '
 						<tr class="windowbg', $alternate ? '2' : '', '">
-							<td>';
-
-		// Guests don't have some information ... and they can't be contacted.
-		if (!$member['is_guest'])
-		{
-			echo '
-								<span class="contact_info floatright">
-									', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '', '
-								</span>';
-		}
-
-		echo '
+							<td>
 								<span class="member', $member['is_hidden'] ? ' hidden' : '', '">
 									', $member['is_guest'] ? $member['name'] : '<a href="' . $member['href'] . '" title="' . $txt['profile_of'] . ' ' . $member['name'] . '"' . (empty($member['color']) ? '' : ' style="color: ' . $member['color'] . '"') . '>' . $member['name'] . '</a>', '
 								</span>';
