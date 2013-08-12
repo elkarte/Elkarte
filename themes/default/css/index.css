@@ -1483,6 +1483,7 @@ div.windowbg, div.windowbg2 {
 	color: #555;
 	font-size: 1em;
 	font-weight: 600;
+	text-align: left;
 }
 /* Trial extra classes, for table_heads that have equal width columns. */
 /* @todo - Not sure how much these will be used. Try them out. */
