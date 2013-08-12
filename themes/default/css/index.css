@@ -251,6 +251,7 @@ input[disabled].input_text {
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	color: #555;
 	box-shadow: 1px 1px 2px #e5e5e5;
+	font-size: .857em;
 }
 .left_submit, .linkbutton_left {
 	float: left;
