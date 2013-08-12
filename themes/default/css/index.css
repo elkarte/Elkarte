@@ -220,6 +220,7 @@ input[disabled].input_text {
 	border: none;
 	background: none;
 	vertical-align: middle;
+	margin-bottom: 4px;
 }
 /* The OpenID login form */
 .openid_login {
@@ -252,6 +253,7 @@ input[disabled].input_text {
 	color: #555;
 	box-shadow: 1px 1px 2px #e5e5e5;
 	font-size: .857em;
+	line-height: 18px;
 }
 .left_submit, .linkbutton_left {
 	float: left;
