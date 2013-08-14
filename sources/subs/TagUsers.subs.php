@@ -11,12 +11,12 @@
  *
  */
 
-if (!defined('ELKARTE'))
+if (!defined('ELK'))
 	die('No access...');
 
 function identifyTaggedUsers(&$body)
 {
-	global $smcFunc, $modSettings;
+	global $modSettings;
 
 	$users = findNotifiedUsers($body);
 
@@ -50,7 +50,6 @@ function identifyTaggedUsers(&$body)
 
 function findNotifiedUsers($body)
 {
-	global $smcFunc;
 	// Valid are:
 	//  - 1st thing in the message (i.e. at the beginning of the string) detected adding a <br /> so it falls into the next,
 	//  - <br />@
@@ -68,13 +67,13 @@ function findNotifiedUsers($body)
 	{
 		if (!isset($lookups[$matches[2][$i] . $matches[3][$i]]))
 			$lookups[$matches[2][$i] . $matches[3][$i]] = array();
-		$lookups[$matches[2][$i] . $matches[3][$i]][] = $smcFunc['substr']($matches[0][$i], strpos($matches[0][$i], '@') + 1);
+		$lookups[$matches[2][$i] . $matches[3][$i]][] = Util::substr($matches[0][$i], strpos($matches[0][$i], '@') + 1);
 
 		if ($matches[3][$i] == ' ')
 		{
 			if (!isset($lookups[$matches[2][$i]]))
 				$lookups[$matches[2][$i]] = array();
-			$lookups[$matches[2][$i]][] = $smcFunc['substr']($matches[0][$i], strpos($matches[0][$i], '@') + 1);
+			$lookups[$matches[2][$i]][] = Util::substr($matches[0][$i], strpos($matches[0][$i], '@') + 1);
 		}
 	}
 
@@ -99,7 +98,7 @@ function findNotifiedUsers($body)
 			// Instead the end of the loop is min_len because the real name can be shorter than what we guessed
 			for ($i = min($name_len, $names_data['max_len']); $i >= $names_data['min_len']; $i--)
 			{
-				$short_name = $smcFunc['substr']($name, 0, $i);
+				$short_name = Util::substr($name, 0, $i);
 				if (isset($names_data['names'][$short_name]))
 				{
 					$to_notify[] = $names_data['names'][$short_name];
@@ -120,9 +119,9 @@ function identifyNewTaggedUsers($body, $previouslyTagged)
 
 function rebuildMembersCache($key)
 {
-	global $smcFunc;
+	$db = database();
 
-	$request = $smcFunc['db_query']('', '
+	$request = $db->query('', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
 		WHERE real_name LIKE {string:abbreviation}',
@@ -135,16 +134,16 @@ function rebuildMembersCache($key)
 		'max_len' => 0,
 		'min_len' => 60,
 	);
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
-		$len = $smcFunc['strlen']($row['real_name']);
+		$len = Util::strlen($row['real_name']);
 		if ($len > $return['max_len'])
 			$return['max_len'] = $len;
 		if ($len < $return['min_len'])
 			$return['min_len'] = $len;
 		$return['names'][$row['real_name']] = $row;
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	cache_put_data('lists_of_members_' . $key, $return, 3600);
 

@@ -1796,7 +1796,6 @@ class Post_Controller extends Action_Controller
 				$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'];
 			else
 				$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.new#new';
-	}
 
 			$context['back_link'] =  $scripturl . '?action=post;msg=' . $msgOptions['id'] . ';topic=' . $topic . ';additionalOptions#postAttachment';
 
