@@ -1595,12 +1595,6 @@ class Post_Controller extends Action_Controller
 			if (empty($approve_has_changed))
 				unset($msgOptions['approved']);
 
-			if (!empty($modSettings['tag_users']))
-			{
-				require_once(SUBSDIR . '/TagUsers.subs.php');
-				$tagged_users = identifyNewTaggedUsers($msgOptions['body'], isset($row['tagged_users']) ? explode(',', $row['tagged_users']) : array());
-			}
-
 			modifyPost($msgOptions, $topicOptions, $posterOptions);
 		}
 		// This is a new topic or an already existing one. Save it.
@@ -1622,18 +1616,8 @@ class Post_Controller extends Action_Controller
 				$posterOptions['update_post_count'] = !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'];
 			}
 
-			if (!empty($modSettings['tag_users']))
-			{
-				require_once(SUBSDIR . '/TagUsers.subs.php');
-				$tagged_users = identifyTaggedUsers($msgOptions['body']);
-			}
 			createPost($msgOptions, $topicOptions, $posterOptions);
 
-		if (!empty($modSettings['tag_users']))
-		{
-			require_once(SUBSDIR . '/TagUsers.subs.php');
-			$tagged_users = identifyTaggedUsers($msgOptions['body']);
-		}
 			if (isset($topicOptions['id']))
 				$topic = $topicOptions['id'];
 
@@ -1758,8 +1742,14 @@ class Post_Controller extends Action_Controller
 				else
 					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
 			}
-			if (!empty($tagged_users))
-				sendMentionNotification($tagged_users);
+
+			if (!empty($modSettings['tag_users']))
+			{
+				require_once(SUBSDIR . '/TagUsers.subs.php');
+				$tagged_users = identifyTaggedUsers($msgOptions['body']);
+				if (!empty($tagged_users))
+					sendMentionNotification($posterOptions['name'], $msgOptions['id'], $tagged_users);
+			}
 		}
 
 		if ($board_info['num_topics'] == 0)

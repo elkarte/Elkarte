@@ -111,12 +111,6 @@ function findNotifiedUsers($body)
 	return $to_notify;
 }
 
-function identifyNewTaggedUsers($body, $previouslyTagged)
-{
-	// @todo detect users tagged when the message is modified
-	return array();
-}
-
 function rebuildMembersCache($key)
 {
 	$db = database();
@@ -150,7 +144,47 @@ function rebuildMembersCache($key)
 	return $return;
 }
 
-function sendMentionNotification($users)
+function sendMentionNotification($mentioner, $message, $users)
 {
-	// @todo send the email/PM/whatever
+	global $scripturl;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT tu.id_mgs, tu.id_member, m.subject, mem.lngfile
+		FROM {db_prefix}tagged_users as tu
+			LEFT JOIN {db_prefix}messages as m ON (tu.id_msg = m.id_msg)
+			LEFT JOIN {db_prefix}members as mem ON (tu.id_member = mem.id_member)
+		WHERE tu.id_msg = {int:current_message}
+			AND tu.id_member IN ({array_int:members})',
+		// @todo maybe LIMIT count($users)?
+		array(
+			'current_message' => $message,
+			'members' => $users,
+		)
+	);
+
+	$mentions = array();
+	while ($row = $smcFunc['db_fetch_row']($request))
+	{
+		$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
+
+		$replacements = array(
+			'MENTIONER' => $mentioner,
+			'TOPICSUBJECT' => $row['subject'],
+			'TOPICLINK' => $scripturl . '?msg=' . $row['id_mgs'],
+		);
+
+		$emaildata = loadEmailTemplate('mention_notification', $replacements, $cur_language);
+
+		$mentions[$cur_language] = array(
+			'subject' => $emaildata['subject'],
+			'body' => $emaildata['body'],
+			'recipients' => array(),
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	foreach ($mentions as $lang => $mail)
+		sendmail($mail['recipients'], $mail['subject'], $mail['body']);
 }

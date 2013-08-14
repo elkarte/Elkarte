@@ -997,6 +997,20 @@ The message they sent you was:
 Reply to this Personal Message (to the sender only) here: {REPLYLINK}';
 
 /**
+	@additional_params: mention_notification
+		MENTIONER: The member that mentioned/tagged someone.
+		TOPICSUBJECT: The subject of the message in which the user is mentioned/tagged.
+		TOPICLINK: A link to the message.
+	@description:
+*/
+$txt['mention_notification_subject'] = '{MENTIONER} has mentioned you in: {TOPICSUBJECT}';
+$txt['mention_notification_body'] = 'You have just been mentioned by {MENTIONER} in the topic {TOPICSUBJECT}
+
+IMPORTANT: Remember, this is just a notification. Please do not reply to this email.
+
+You can read the message here: {TOPICLINK}';
+
+/**
 	@additional_params: happy_birthday
 		REALNAME: The real (display) name of the person receiving the birthday message.
 	@description: A message sent to members on their birthday.
