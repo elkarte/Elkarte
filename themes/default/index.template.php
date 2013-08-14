@@ -362,22 +362,11 @@ function template_body_above()
 	// Requires page refresh when upper section is expanded, to show the fader again. I think this is acceptable, but am open to suggestions.
 	if(!empty($context['random_news_line']))
 	{
-		if (!empty($settings['show_newsfader']) && empty($context['minmax_preferences']['upshrink']))
-		{
-			echo '
+		echo '
 			<div id="news">
 				<h2>', $txt['news'], '</h2>
 				', template_news_fader(), '
 			</div>';
-		}
-		elseif (empty($settings['show_newsfader']) && !empty($settings['enable_news']))
-		{
-			echo '
-			<div id="news">
-				<h2>', $txt['news'], '</h2>
-				<p id="news_line">', $context['random_news_line'], '</p>
-			</div>';
-		}
 	}
 
 	echo '
@@ -577,7 +566,8 @@ function template_menu()
 						oCookieOptions: {
 							bUseCookie: elk_member_id == 0 ? true : false,
 							sCookieName: \'upshrink\'
-						}
+						},
+						funcOnBeforeExpand: function () {startNewsFader();}
 					});
 				// ]]></script>';
 }
@@ -751,12 +741,25 @@ function template_news_fader()
 		</ul>
 	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
 	<script><!-- // --><![CDATA[
+		var newsFaderStarted = false;
 
-		// Create a news fader object.
-		var oNewsFader = new elk_NewsFader({
-			sFaderControlId: \'elkFadeScroller\',
-			sItemTemplate: ', JavaScriptEscape('%1$s'), ',
-			iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
-		});
+		function startNewsFader()
+		{
+			if (newsFaderStarted)
+				return;
+
+			// Create a news fader object.
+			var oNewsFader = new elk_NewsFader({
+				sFaderControlId: \'elkFadeScroller\',
+				sItemTemplate: ', JavaScriptEscape('%1$s'), ',
+				iFadeDelay: ', empty($settings['newsfader_time']) ? 5000 : $settings['newsfader_time'], '
+			});
+			newsFaderStarted = true;
+		}';
+	if (!empty($settings['show_newsfader']) && empty($context['minmax_preferences']['upshrink']))
+		echo '
+		startNewsFader();';
+
+	echo '
 	// ]]></script>';
 }
