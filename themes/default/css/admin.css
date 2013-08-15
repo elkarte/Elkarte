@@ -1032,6 +1032,9 @@ ul.moderation_notes li {
 #taskpad select {
 	margin-top: 1px;
 }
+#taskpad {
+	margin: 8px 8px 0 0;
+}
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
 /*@media screen and (max-width: 85em) {
