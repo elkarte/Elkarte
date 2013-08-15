@@ -905,6 +905,9 @@ ul.moderation_notes li {
 	vertical-align: middle;
 	margin: 0 8px 0 0;
 }
+#errorfile_table {
+	background-color: #FFF;
+}
 
 /* Styles for the Report generation
 ------------------------------------------------- */
