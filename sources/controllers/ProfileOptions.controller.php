@@ -823,6 +823,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$memID = currentMemberID();
 
 		loadTemplate('ProfileOptions');
+		$context['sub_template'] = 'groupMembership';
 
 		$curMember = $user_profile[$memID];
 		$context['primary_group'] = $curMember['id_group'];
