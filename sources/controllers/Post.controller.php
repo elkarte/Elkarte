@@ -268,6 +268,7 @@ class Post_Controller extends Action_Controller
 				}
 
 				// Get the current event information.
+				require_once(SUBSDIR . '/Calendar.subs.php');
 				$event_info = getEventProperties($context['event']['id']);
 
 				// Make sure the user is allowed to edit this event.
