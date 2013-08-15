@@ -228,7 +228,7 @@ function template_notes()
 									<div class="floatleft post_note">
 										<input type="text" name="new_note" value="', $txt['mc_click_add_note'], '" style="width: 95%;" onclick="if (this.value == \'', $txt['mc_click_add_note'], '\') this.value = \'\';" class="input_text" />
 									</div>
-									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="button_submit" />
+									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="button_submit submitgo" />
 								</div>
 							</div>
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -379,7 +379,7 @@ function template_unapproved_posts()
 									<option value="approve">&nbsp;--&nbsp;' . $txt['approve'] . '</option>
 									<option value="delete">&nbsp;--&nbsp;' . $txt['delete'] . '</option>
 								</select>
-								<noscript><input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit" /></noscript>
+								<noscript><input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" /></noscript>
 							</div>';
 
 	template_pagesection(false, false, 'go_up', array('extra' => $quick_mod));
@@ -458,8 +458,8 @@ function template_viewmodreport()
 									'<p>', $comment['member']['link'], ': ', $comment['message'], ' <em class="smalltext">(', $comment['time'], ')</em></p>';
 
 	echo '
-									<textarea rows="2" cols="60" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 60%; min-width: 60%' : 'width: 60%') . ';" name="mod_comment"></textarea>
-									<div>
+									<textarea rows="2" cols="60" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 60%; min-width: 60%' : 'width: 100%') . ';" name="mod_comment"></textarea>
+									<div class="submitbutton">
 										<input type="submit" name="add_comment" value="', $txt['mc_modreport_add_mod_comment'], '" class="button_submit" />
 									</div>
 								</div>
@@ -562,7 +562,6 @@ function template_moderation_settings()
 	if ($context['can_moderate_approvals'])
 	{
 		echo '
-
 						<dt>
 							<strong><label for="mod_notify_approval">', $txt['mc_prefs_notify_approval'], '</label>:</strong>
 						</dt>
@@ -576,7 +575,7 @@ function template_moderation_settings()
 					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['mod-set_token_var'], '" value="', $context['mod-set_token'], '" />
-					<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
 				</div>
 			</div>
 		</form>
@@ -688,12 +687,15 @@ function template_warn_template()
 
 	echo '
 					<hr />
-					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
-					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+					<div class="submitbutton">
+						<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
+						<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['mod-wt_token_var'], '" value="', $context['mod-wt_token'], '" />
+					</div>
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['mod-wt_token_var'], '" value="', $context['mod-wt_token'], '" />
+
 		</form>
 	</div>
 

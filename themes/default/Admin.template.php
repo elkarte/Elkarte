@@ -770,7 +770,7 @@ function template_edit_censored()
 							<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' class="input_check" />
 						</dd>
 					</dl>
-					<input type="submit" name="save_censor" value="', $txt['save'], '" class="button_submit" />
+					<input type="submit" name="save_censor" value="', $txt['save'], '" class="right_submit" />
 				</div>
 			</div>
 			<br />';
@@ -784,10 +784,10 @@ function template_edit_censored()
 			</div>
 			<div class="windowbg">
 				<div class="content">
-					<p class="centertext">
+					<div class="centertext">
 						<input type="text" name="censortest" value="', empty($context['censor_test']) ? '' : $context['censor_test'], '" class="input_text" />
 						<input type="submit" value="', $txt['censor_test_save'], '" class="button_submit" />
-					</p>
+					</div>
 				</div>
 			</div>
 
@@ -833,7 +833,7 @@ function template_not_done()
 
 	echo '
 				<form action="', $scripturl, $context['continue_get_data'], '" method="post" accept-charset="UTF-8" style="margin: 0;" name="autoSubmit" id="autoSubmit">
-					<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="button_submit" />
+					<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="right_submit" />
 					', $context['continue_post_data'], '
 				</form>
 			</div>
@@ -1068,7 +1068,7 @@ function template_show_settings()
 
 	if (empty($context['settings_save_dont_show']))
 		echo '
-					<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' class="button_submit" />';
+					<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' class="right_submit" />';
 
 	if ($is_open)
 		echo '
@@ -1456,7 +1456,7 @@ function template_clean_cache_button_below()
 		<div class="content">
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
-				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="button_submit" /></span>
+				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" /></span>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 			</form>

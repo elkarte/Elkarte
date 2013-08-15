@@ -1159,8 +1159,7 @@ class ModerationCenter_Controller extends Action_Controller
 				array(
 					'position' => 'bottom_of_list',
 					'value' => '
-						<input type="submit" name="delete_selected" value="' . $txt['quickmod_delete_selected'] . '" class="button_submit" />',
-					'align' => 'right',
+						<input type="submit" name="delete_selected" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />',
 				) : array(),
 			),
 		);
@@ -1378,8 +1377,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
+						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -1399,8 +1397,8 @@ class ModerationCenter_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="delete" value="' . $txt['mc_warning_template_delete'] . '" onclick="return confirm(\'' . $txt['mc_warning_template_delete_confirm'] . '\');" class="button_submit" />
-						<input type="submit" name="add" value="' . $txt['mc_warning_template_add'] . '" class="button_submit" />',
+						<input type="submit" name="delete" value="' . $txt['mc_warning_template_delete'] . '" onclick="return confirm(\'' . $txt['mc_warning_template_delete_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="add" value="' . $txt['mc_warning_template_add'] . '" class="right_submit" />',
 				),
 			),
 		);

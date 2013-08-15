@@ -104,7 +104,7 @@ function template_editBuddies()
 					</dt>
 					<dd>
 						<input type="text" name="new_buddy" id="new_buddy" size="30" class="input_text" />
-						<input type="submit" value="', $txt['buddy_add_button'], '" class="button_submit" />
+						<input type="submit" value="', $txt['buddy_add_button'], '" class="button_submit submitgo" />
 					</dd>
 				</dl>';
 
@@ -205,7 +205,7 @@ function template_editIgnoreList()
 					</dt>
 					<dd>
 						<input type="text" name="new_ignore" id="new_ignore" size="25" class="input_text" />
-						<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit" />
+						<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit submitgo" />
 					</dd>
 				</dl>';
 
@@ -418,24 +418,26 @@ function template_edit_options()
 						</dd>
 					</dl>';
 
+	echo '
+				</div>
+			</div>';
+
 	// The button shouldn't say "Change profile" unless we're changing the profile...
 	if (!empty($context['submit_button_text']))
 		echo '
-					<input type="submit" name="save" value="', $context['submit_button_text'], '" class="button_submit" />';
+			<input type="submit" name="save" value="', $context['submit_button_text'], '" class="right_submit" />';
 	else
 		echo '
-					<input type="submit" name="save" value="', $txt['change_profile'], '" class="button_submit" />';
+			<input type="submit" name="save" value="', $txt['change_profile'], '" class="right_submit" />';
 
 	if (!empty($context['token_check']))
 		echo '
-					<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+			<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 	echo '
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="u" value="', $context['id_member'], '" />
-					<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
-				</div>
-			</div>
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="hidden" name="u" value="', $context['id_member'], '" />
+			<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
 		</form>';
 
 	// Some javascript!
@@ -488,82 +490,79 @@ function template_profile_pm_settings()
 	global $context, $modSettings, $txt;
 
 	echo '
-								<dt>
-									<label for="pm_prefs">', $txt['pm_display_mode'], ':</label>
-								</dt>
-								<dd>
-									<select name="pm_prefs" id="pm_prefs" onchange="if (this.value == 2 &amp;&amp; !document.getElementById(\'copy_to_outbox\').checked) alert(\'', $txt['pm_recommend_enable_outbox'], '\');">
-										<option value="0"', $context['display_mode'] == 0 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_all'], '</option>
-										<option value="1"', $context['display_mode'] == 1 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_one'], '</option>
-										<option value="2"', $context['display_mode'] == 2 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_linked'], '</option>
-									</select>
-								</dd>
-								<dt>
-									<label for="view_newest_pm_first">', $txt['recent_pms_at_top'], '</label>
-								</dt>
-								<dd>
-										<input type="hidden" name="default_options[view_newest_pm_first]" value="0" />
-										<input type="checkbox" name="default_options[view_newest_pm_first]" id="view_newest_pm_first" value="1"', !empty($context['member']['options']['view_newest_pm_first']) ? ' checked="checked"' : '', ' class="input_check" />
-								</dd>
+							<dt>
+								<label for="pm_prefs">', $txt['pm_display_mode'], ':</label>
+							</dt>
+							<dd>
+								<select name="pm_prefs" id="pm_prefs" onchange="if (this.value == 2 &amp;&amp; !document.getElementById(\'copy_to_outbox\').checked) alert(\'', $txt['pm_recommend_enable_outbox'], '\');">
+									<option value="0"', $context['display_mode'] == 0 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_all'], '</option>
+									<option value="1"', $context['display_mode'] == 1 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_one'], '</option>
+									<option value="2"', $context['display_mode'] == 2 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_linked'], '</option>
+								</select>
+							</dd>
+							<dt>
+								<label for="view_newest_pm_first">', $txt['recent_pms_at_top'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[view_newest_pm_first]" value="0" />
+								<input type="checkbox" name="default_options[view_newest_pm_first]" id="view_newest_pm_first" value="1"', !empty($context['member']['options']['view_newest_pm_first']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
 						</dl>
-						<hr />
 						<dl>
-								<dt>
-										<label for="pm_receive_from">', $txt['pm_receive_from'], '</label>
-								</dt>
-								<dd>
-										<select name="pm_receive_from" id="pm_receive_from">
-												<option value="0"', empty($context['receive_from']) || (empty($modSettings['enable_buddylist']) && $context['receive_from'] < 3) ? ' selected="selected"' : '', '>', $txt['pm_receive_from_everyone'], '</option>';
+							<dt>
+								<label for="pm_receive_from">', $txt['pm_receive_from'], '</label>
+							</dt>
+							<dd>
+								<select name="pm_receive_from" id="pm_receive_from">
+									<option value="0"', empty($context['receive_from']) || (empty($modSettings['enable_buddylist']) && $context['receive_from'] < 3) ? ' selected="selected"' : '', '>', $txt['pm_receive_from_everyone'], '</option>';
 
 	if (!empty($modSettings['enable_buddylist']))
 		echo '
-												<option value="1"', !empty($context['receive_from']) && $context['receive_from'] == 1 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_ignore'], '</option>
-												<option value="2"', !empty($context['receive_from']) && $context['receive_from'] == 2 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_buddies'], '</option>';
+									<option value="1"', !empty($context['receive_from']) && $context['receive_from'] == 1 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_ignore'], '</option>
+									<option value="2"', !empty($context['receive_from']) && $context['receive_from'] == 2 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_buddies'], '</option>';
 
 	echo '
-												<option value="3"', !empty($context['receive_from']) && $context['receive_from'] > 2 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_admins'], '</option>
-										</select>
-								</dd>
-								<dt>
-										<label for="pm_email_notify">', $txt['email_notify'], '</label>
-								</dt>
-								<dd>
-										<select name="pm_email_notify" id="pm_email_notify">
-												<option value="0"', empty($context['send_email']) ? ' selected="selected"' : '', '>', $txt['email_notify_never'], '</option>
-												<option value="1"', !empty($context['send_email']) && ($context['send_email'] == 1 || (empty($modSettings['enable_buddylist']) && $context['send_email'] > 1)) ? ' selected="selected"' : '', '>', $txt['email_notify_always'], '</option>';
+									<option value="3"', !empty($context['receive_from']) && $context['receive_from'] > 2 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_admins'], '</option>
+								</select>
+							</dd>
+							<dt>
+								<label for="pm_email_notify">', $txt['email_notify'], '</label>
+							</dt>
+							<dd>
+								<select name="pm_email_notify" id="pm_email_notify">
+									<option value="0"', empty($context['send_email']) ? ' selected="selected"' : '', '>', $txt['email_notify_never'], '</option>
+									<option value="1"', !empty($context['send_email']) && ($context['send_email'] == 1 || (empty($modSettings['enable_buddylist']) && $context['send_email'] > 1)) ? ' selected="selected"' : '', '>', $txt['email_notify_always'], '</option>';
 
 	if (!empty($modSettings['enable_buddylist']))
 		echo '
-												<option value="2"', !empty($context['send_email']) && $context['send_email'] > 1 ? ' selected="selected"' : '', '>', $txt['email_notify_buddies'], '</option>';
+										<option value="2"', !empty($context['send_email']) && $context['send_email'] > 1 ? ' selected="selected"' : '', '>', $txt['email_notify_buddies'], '</option>';
 
 	echo '
-										</select>
-								</dd>
-								<dt>
-										<label for="popup_messages">', $txt['popup_messages'], '</label>
-								</dt>
-								<dd>
-										<input type="hidden" name="default_options[popup_messages]" value="0" />
-										<input type="checkbox" name="default_options[popup_messages]" id="popup_messages" value="1"', !empty($context['member']['options']['popup_messages']) ? ' checked="checked"' : '', ' class="input_check" />
-								</dd>
-						</dl>
-						<hr />
-						<dl>
-								<dt>
-										<label for="copy_to_outbox"> ', $txt['copy_to_outbox'], '</label>
-								</dt>
-								<dd>
-										<input type="hidden" name="default_options[copy_to_outbox]" value="0" />
-										<input type="checkbox" name="default_options[copy_to_outbox]" id="copy_to_outbox" value="1"', !empty($context['member']['options']['copy_to_outbox']) ? ' checked="checked"' : '', ' class="input_check" />
-								</dd>
-								<dt>
-										<label for="pm_remove_inbox_label">', $txt['pm_remove_inbox_label'], '</label>
-								</dt>
-								<dd>
-										<input type="hidden" name="default_options[pm_remove_inbox_label]" value="0" />
-										<input type="checkbox" name="default_options[pm_remove_inbox_label]" id="pm_remove_inbox_label" value="1"', !empty($context['member']['options']['pm_remove_inbox_label']) ? ' checked="checked"' : '', ' class="input_check" />
-								</dd>';
-
+								</select>
+							</dd>
+							<dt>
+								<label for="popup_messages">', $txt['popup_messages'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[popup_messages]" value="0" />
+								<input type="checkbox" name="default_options[popup_messages]" id="popup_messages" value="1"', !empty($context['member']['options']['popup_messages']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+					</dl>
+					<dl>
+							<dt>
+								<label for="copy_to_outbox"> ', $txt['copy_to_outbox'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[copy_to_outbox]" value="0" />
+								<input type="checkbox" name="default_options[copy_to_outbox]" id="copy_to_outbox" value="1"', !empty($context['member']['options']['copy_to_outbox']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+							<dt>
+								<label for="pm_remove_inbox_label">', $txt['pm_remove_inbox_label'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[pm_remove_inbox_label]" value="0" />
+								<input type="checkbox" name="default_options[pm_remove_inbox_label]" id="pm_remove_inbox_label" value="1"', !empty($context['member']['options']['pm_remove_inbox_label']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>';
 }
 
 /**
@@ -818,7 +817,7 @@ function template_action_notification()
 						</dd>
 					</dl>
 					<hr />
-					<div>
+					<div class="submitbutton">
 						<input id="notify_submit" type="submit" value="', $txt['notify_save'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['token_check']) ? '
 						<input type="hidden" name="' . $context[$context['token_check'] . '_token_var'] . '" value="' . $context[$context['token_check'] . '_token'] . '" />' : '', '
@@ -872,8 +871,8 @@ function template_groupMembership()
 				</div>
 				<div class="roundframe">
 					', $txt['request_group_membership_desc'], ':
-					<textarea name="reason" rows="4" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%') . ';"></textarea>
-					<div class="righttext" style="margin: 0.5em 0.5% 0 0.5%;">
+					<textarea name="reason" rows="4" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 99%') . ';"></textarea>
+					<div class="submitbutton">
 						<input type="hidden" name="gid" value="', $context['group_request']['id'], '" />
 						<input type="submit" name="req" value="', $txt['submit_request'], '" class="button_submit" />
 					</div>
@@ -926,7 +925,9 @@ function template_groupMembership()
 
 		if ($context['can_edit_primary'])
 			echo '
-			<input type="submit" value="', $txt['make_primary'], '" class="button_submit" />';
+			<div class="submitbutton">
+				<input type="submit" value="', $txt['make_primary'], '" class="button_submit" />
+			</div>';
 
 		// Any groups they can join?
 		if (!empty($context['groups']['available']))
@@ -956,13 +957,13 @@ function template_groupMembership()
 
 				if ($group['type'] == 3)
 					echo '
-							<a href="', $scripturl, '?action=profile;save;u=', $context['id_member'], ';area=groupmembership;', $context['session_var'], '=', $context['session_id'], ';gid=', $group['id'], ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">', $txt['join_group'], '</a>';
+							<a class="linkbutton_right" href="', $scripturl, '?action=profile;save;u=', $context['id_member'], ';area=groupmembership;', $context['session_var'], '=', $context['session_id'], ';gid=', $group['id'], ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">', $txt['join_group'], '</a>';
 				elseif ($group['type'] == 2 && $group['pending'])
 					echo '
 							', $txt['approval_pending'];
 				elseif ($group['type'] == 2)
 					echo '
-							<a href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=groupmembership;request=', $group['id'], '">', $txt['request_group'], '</a>';
+							<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=groupmembership;request=', $group['id'], '">', $txt['request_group'], '</a>';
 // @todo
 //				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
@@ -1176,10 +1177,10 @@ function template_profile_signature_modify()
 
 	if ($context['show_spellchecking'])
 		echo '
-						<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'creator\', \'signature\', false);"  tabindex="', $context['tabindex']++, '" class="button_submit" />';
+						<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'creator\', \'signature\', false);"  tabindex="', $context['tabindex']++, '" class="right_submit" />';
 	if (!empty($context['show_preview_button']))
 		echo '
-						<input type="submit" name="preview_signature" id="preview_button" value="', $txt['preview_signature'], '"  tabindex="', $context['tabindex']++, '" class="button_submit" />';
+						<input type="submit" name="preview_signature" id="preview_button" value="', $txt['preview_signature'], '"  tabindex="', $context['tabindex']++, '" class="right_submit" />';
 
 	if ($context['signature_warning'])
 		echo '

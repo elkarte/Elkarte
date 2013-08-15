@@ -478,7 +478,6 @@ class ManageSmileys_Controller extends Action_Controller
 				'modify' => array(
 					'header' => array(
 						'value' => $txt['smiley_set_modify'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -487,7 +486,6 @@ class ManageSmileys_Controller extends Action_Controller
 								'id' => true,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 				'check' => array(
@@ -510,7 +508,9 @@ class ManageSmileys_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="delete" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="button_submit" /> <a class="linkbutton" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset' . '">' . $txt['smiley_sets_add'] . '</a> ',
+					'value' => '
+						<input type="submit" name="delete" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset' . '">' . $txt['smiley_sets_add'] . '</a> ',
 				),
 			),
 		);
@@ -1020,7 +1020,7 @@ class ManageSmileys_Controller extends Action_Controller
 								<option value="delete">' . $txt['smileys_remove'] . '</option>
 							</select>
 							<noscript>
-								<input type="submit" name="perform_action" value="' . $txt['go'] . '" class="button_submit" />
+								<input type="submit" name="perform_action" value="' . $txt['go'] . '" class="right_submit" />
 							</noscript>',
 						'class' => 'righttext',
 					),
@@ -1275,7 +1275,6 @@ class ManageSmileys_Controller extends Action_Controller
 				'modify' => array(
 					'header' => array(
 						'value' => $txt['smileys_modify'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -1284,7 +1283,6 @@ class ManageSmileys_Controller extends Action_Controller
 								'id_icon' => false,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 				'check' => array(
@@ -1309,7 +1307,9 @@ class ManageSmileys_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="button_submit" /> <a class="button_link" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>',
+					'value' => '
+						<input type="submit" name="delete" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=editicon">' . $txt['icons_add_new'] . '</a>',
 				),
 			),
 		);

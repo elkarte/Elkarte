@@ -149,6 +149,7 @@ class ManageMail_Controller extends Action_Controller
 				'priority' => array(
 					'header' => array(
 						'value' => $txt['mailqueue_priority'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -160,7 +161,7 @@ class ManageMail_Controller extends Action_Controller
 							// But if not, revert to priority 0.
 							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt[\'mq_mpriority_1\'];
 						'),
-						'class' => 'smalltext',
+						'class' => 'centertext smalltext',
 					),
 					'sort' => array(
 						'default' => 'priority',
@@ -185,12 +186,13 @@ class ManageMail_Controller extends Action_Controller
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
 							return \'<input type="checkbox" name="delete[]" value="\' . $rowData[\'id_mail\'] . \'" class="input_check" />\';
 						'),
-						'class' => 'smalltext',
+						'class' => 'centertext',
 					),
 				),
 			),
@@ -202,7 +204,9 @@ class ManageMail_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="button_submit" /><a class="linkbutton" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
+					'value' => '
+						<input type="submit" name="delete_redirects" value="' . $txt['quickmod_delete_selected'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=mailqueue;sa=clear;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mailqueue_clear_list_warning'] . '\');">' . $txt['mailqueue_clear_list'] . '</a> ',
 				),
 			),
 		);

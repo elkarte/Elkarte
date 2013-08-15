@@ -106,8 +106,12 @@ a.help .icon {
 	margin: 0;
 	padding: 3px 4px 0 0;
 }
+h3 a.help .icon {
+	padding: 0 4px 0 0;
+}
+
 .catbg a.help .icon {
-	margin: -4px 0 0 0;
+	margin: 0;
 }
 .table_caption, tr.table_caption td {
 	color: #000;
@@ -197,7 +201,6 @@ legend {
 }
 #admin_main_section .catbg, #admin_main_section .catbg a {
 	color: #444;
-	max-height: 1.5em;
 	overflow: hidden;
 }
 #live_news, #supportVersionsTable {
@@ -638,6 +641,9 @@ dl.settings dd.questions input {
 #manage_maintenance .settings {
 	margin: 16px 0 0 0;
 }
+#manage_maintenance h3 a.help .icon {
+	padding: 8px 0 0;
+}
 
 /* Styles for the manage calendar section.
 ------------------------------------------------- */
@@ -803,7 +809,6 @@ dl.themes_list dd {
 }
 #mod_main_section .catbg, #mod_main_section .catbg a {
 	color: #444;
-	max-height: 1.5em;
 	overflow: hidden;
 }
 #mod_main_section .windowbg {
@@ -830,7 +835,7 @@ dl.themes_list dd {
 }
 .modblock_left #ourAnnouncements {
 	height: 15em;
-	overflow: auto;
+	overflow: visible;
 }
 
 /* Moderation Notes */
@@ -1018,6 +1023,9 @@ ul.moderation_notes li {
 .pagelink, .current_page, .expand_pages {
 	border: 0;
 	background-color: transparent;
+}
+#taskpad select {
+	margin-top: 1px;
 }
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */

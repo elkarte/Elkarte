@@ -118,7 +118,7 @@ function template_email_members()
 					</dl>
 				</div>
 			</div>
-			<div class="righttext">
+			<div class="submitbutton">
 				<input type="submit" value="', $txt['admin_next'], '" class="button_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
@@ -256,22 +256,24 @@ function template_email_members_compose()
 
 	// Show BBC buttons, smileys and textbox.
 	echo '
-				', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+				<div class="editor_wrapper">
+					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
-					echo '
-				<ul>
-					<li><label for="send_pm"><input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '</label></li>
-					<li><label for="send_html"><input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '</label></li>
-					<li><label for="parse_html"><input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" class="input_check" /> ', $txt['email_parsed_html'], '</label></li>
-				</ul>
-				<div class="submitbutton">
-					', template_control_richedit_buttons($context['post_box_name']), '
+	echo '
+					<ul>
+						<li><label for="send_pm"><input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '</label></li>
+						<li><label for="send_html"><input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '</label></li>
+						<li><label for="parse_html"><input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" class="input_check" /> ', $txt['email_parsed_html'], '</label></li>
+					</ul>
+					<div class="submitbutton">
+						', template_control_richedit_buttons($context['post_box_name']), '
+					</div>
 				</div>
-			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="email_force" value="', $context['email_force'], '" />
-			<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
-			<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />';
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="email_force" value="', $context['email_force'], '" />
+				<input type="hidden" name="total_emails" value="', $context['total_emails'], '" />
+				<input type="hidden" name="max_id_member" value="', $context['max_id_member'], '" />
+			</div>';
 
 	foreach ($context['recipients'] as $key => $values)
 		echo '
@@ -326,7 +328,7 @@ function template_email_members_send()
 						<div class="green_percent" style="width: ', $context['percentage_done'], '%;">&nbsp;</div>
 					</div>
 					<hr />
-					<input type="submit" name="cont" value="', $txt['email_continue'], '" class="button_submit" />
+					<input type="submit" name="cont" value="', $txt['email_continue'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="subject" value="', $context['subject'], '" />
 					<input type="hidden" name="message" value="', $context['message'], '" />
