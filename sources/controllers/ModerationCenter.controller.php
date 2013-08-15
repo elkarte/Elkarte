@@ -1302,7 +1302,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Submitting a new one?
 		if (isset($_POST['add']))
-			return action_modifyWarningTemplate();
+			return $this->action_modifyWarningTemplate();
 		// Deleting and existing one
 		elseif (isset($_POST['delete']) && !empty($_POST['deltpl']))
 		{
