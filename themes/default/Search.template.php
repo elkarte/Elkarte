@@ -39,7 +39,7 @@ function template_main()
 						<div id="search_term_input">
 							<strong>', $txt['search_for'], ':</strong>
 							<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />
-							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />
+							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit" />
 						</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -48,10 +48,10 @@ function template_main()
 
 		if ($context['require_verification'])
 			echo '
-						<div class="verification>
+						<div class="verification">
 							<strong>', $txt['search_visual_verification_label'], ':</strong>
 							<br />', template_control_verification($context['visual_verification_id'], 'all'), '<br />
-							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit"/>
+							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit"/>
 						</div>';
 
 		// Show the button to enable advanced search
@@ -194,7 +194,7 @@ function template_main()
 						</div>';
 
 			echo '
-						<div class="submit_buttons_wrap">
+						<div class="submitbutton">
 							<span class="floatleft">
 								<input type="checkbox" name="all" id="check_all" value=""', $context['boards_check_all'] ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'brd\');" class="input_check" />
 								<label for="check_all"><em> ', $txt['check_all'], '</em></label>
@@ -290,7 +290,7 @@ function template_results()
 									<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" />
 								</dd>
 							</dl>
-							<div class="flow_auto" >
+							<div class="submitbutton" >
 								<input type="submit" name="edit_search" value="', $txt['search_adjust_submit'], '" class="button_submit" />
 								<input type="hidden" name="searchtype" value="', !empty($context['search_params']['searchtype']) ? $context['search_params']['searchtype'] : 0, '" />
 								<input type="hidden" name="userspec" value="', !empty($context['search_params']['userspec']) ? $context['search_params']['userspec'] : '', '" />
@@ -447,7 +447,7 @@ function template_results()
 
 			echo '
 							<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search2;params=' . $context['params'], '" />
-							<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit qaction" />
+							<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
 						</div>
 					</div>';
 		}

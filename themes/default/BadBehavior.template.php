@@ -108,7 +108,7 @@ function template_badbehavior_log()
 	template_pagesection();
 
 	echo '
-			<div>
+			<div class="submitbutton">
 				<input type="submit" name="removeSelection" value="' . $txt['badbehaviorlog_remove_selection'] . '" onclick="return confirm(\'' . $txt['badbehaviorlog_remove_selection_confirm'] . '\');" class="button_submit" />
 				<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results_confirm'] : $txt['badbehaviorlog_sure_remove'], '\');" class="button_submit" />
 			</div>
@@ -270,6 +270,6 @@ function template_callback_badbehavior_add_useragent()
 	echo '
 			<dt id="add_more_useragent_placeholder" style="display: none;"></dt>
 			<dd></dd>
-			<dt id="add_more_useragent_div"><a href="#" onclick="addAnotherOption(sUseragentParent, oUseragentOptionsdt, oUseragentOptionsdd); return false;" class="button_link floatleft">', $txt['badbehavior_useragent_wl_add'], '</a></dt>
+			<dt id="add_more_useragent_div"><a href="#" onclick="addAnotherOption(sUseragentParent, oUseragentOptionsdt, oUseragentOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_useragent_wl_add'], '</a></dt>
 			<dd></dd>';
 }

@@ -228,9 +228,11 @@ class ManageBans_Controller extends Action_Controller
 				'num_triggers' => array(
 					'header' => array(
 						'value' => $txt['ban_triggers'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'num_triggers',
+						'class' => 'centertext'
 					),
 					'sort' => array(
 						'default' => 'num_triggers DESC',
@@ -240,7 +242,6 @@ class ManageBans_Controller extends Action_Controller
 				'actions' => array(
 					'header' => array(
 						'value' => $txt['ban_actions'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -249,13 +250,11 @@ class ManageBans_Controller extends Action_Controller
 								'id_ban_group' => false,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -264,7 +263,6 @@ class ManageBans_Controller extends Action_Controller
 								'id_ban_group' => false,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 			),
@@ -274,7 +272,7 @@ class ManageBans_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="removeBans" value="' . $txt['ban_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_confirm'] . '\');" class="button_submit" />',
+					'value' => '<input type="submit" name="removeBans" value="' . $txt['ban_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_confirm'] . '\');" class="right_submit" />',
 				),
 			),
 		);
@@ -349,7 +347,7 @@ class ManageBans_Controller extends Action_Controller
 						'type' => array(
 							'header' => array(
 								'value' => $txt['ban_banned_entity'],
-								'style' => 'width: 60%;text-align: left;',
+								'style' => 'width: 60%;',
 							),
 							'data' => array(
 								'function' => create_function('$ban_item', '
@@ -362,23 +360,22 @@ class ManageBans_Controller extends Action_Controller
 									else
 										return \'<strong>\' . $txt[\'unknown\'] . \':</strong>&nbsp;\' . $ban_item[\'no_bantype_selected\'];
 								'),
-								'style' => 'text-align: left;',
 							),
 						),
 						'hits' => array(
 							'header' => array(
 								'value' => $txt['ban_hits'],
-								'style' => 'width: 15%; text-align: center;',
+								'style' => 'width: 15%;text-align: center',
 							),
 							'data' => array(
 								'db' => 'hits',
-								'style' => 'text-align: center;',
+								'class' => 'centertext'
 							),
 						),
 						'id' => array(
 							'header' => array(
 								'value' => $txt['ban_actions'],
-								'style' => 'width: 15%; text-align: center;',
+								'style' => 'width: 15%;',
 							),
 							'data' => array(
 								'function' => create_function('$ban_item', '
@@ -386,13 +383,12 @@ class ManageBans_Controller extends Action_Controller
 
 									return \'<a href="\' . $scripturl . \'?action=admin;area=ban;sa=edittrigger;bg=\' . $context[\'ban\'][\'id\'] . \';bi=\' . $ban_item[\'id\'] . \'">\' . $txt[\'ban_edit_trigger\'] . \'</a>\';
 								'),
-								'style' => 'text-align: center;',
 							),
 						),
 						'checkboxes' => array(
 							'header' => array(
 								'value' => '<input type="checkbox" onclick="invertAll(this, this.form, \'ban_items\');" class="input_check" />',
-								'style' => 'width: 5%; text-align: center;',
+								'style' => 'width: 5%;',
 							),
 							'data' => array(
 								'sprintf' => array(
@@ -401,7 +397,6 @@ class ManageBans_Controller extends Action_Controller
 										'id' => false,
 									),
 								),
-								'style' => 'text-align: center;',
 							),
 						),
 					),
@@ -412,8 +407,10 @@ class ManageBans_Controller extends Action_Controller
 						array(
 							'position' => 'below_table_data',
 							'value' => '
-							<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="button_submit" /> <a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>',
-							'style' => 'text-align: right;',
+							<div class="submitbutton">
+								<input type="submit" name="remove_selection" value="' . $txt['ban_remove_selected_triggers'] . '" class="button_submit" />
+								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=ban;sa=edittrigger;bg=' . $ban_group_id . '">' . $txt['ban_add_trigger'] . '</a>
+							</div>',
 						),
 						array(
 							'position' => 'below_table_data',
@@ -620,8 +617,8 @@ class ManageBans_Controller extends Action_Controller
 				array(
 					'position' => 'bottom_of_list',
 					'value' => '
-						<input type="submit" name="removeSelected" value="' . $txt['ban_log_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_selected_confirm'] . '\');" class="button_submit" />
-						<input type="submit" name="removeAll" value="' . $txt['ban_log_remove_all'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_all_confirm'] . '\');" class="button_submit" />',
+						<input type="submit" name="removeSelected" value="' . $txt['ban_log_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_selected_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="removeAll" value="' . $txt['ban_log_remove_all'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_all_confirm'] . '\');" class="right_submit" />',
 				),
 			),
 		);
@@ -911,7 +908,6 @@ class ManageBans_Controller extends Action_Controller
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -920,7 +916,6 @@ class ManageBans_Controller extends Action_Controller
 								'id_ban' => false,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 			),
@@ -932,7 +927,7 @@ class ManageBans_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" class="button_submit" />',
+					'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" class="right_submit" />',
 				),
 			),
 			'list_menu' => array(

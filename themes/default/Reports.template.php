@@ -47,7 +47,7 @@ function template_report_type()
 
 	echo '
 						</dl>
-						<input type="submit" name="continue" value="', $txt['generate_reports_continue'], '" class="button_submit" />
+						<input type="submit" name="continue" value="', $txt['generate_reports_continue'], '" class="right_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</div>
 				</div>

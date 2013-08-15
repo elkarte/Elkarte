@@ -84,10 +84,10 @@ function template_modify_weights()
 						</dt>
 						<dd class="large_caption">
 							<span id="weighttotal" class="search_weight"><strong>', $context['relative_weights']['total'], '</strong></span>
-							<span class="search_weight"><strong>100%</strong></span>
+							<span class="search_weight"><strong>&nbsp;&nbsp;&nbsp;&nbsp;100%</strong></span>
 						</dd>
 					</dl>
-					<input type="submit" name="save" value="', $txt['search_weights_save'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $txt['search_weights_save'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-msw_token_var'], '" value="', $context['admin-msw_token'], '" />
 				</div>
@@ -221,9 +221,11 @@ function template_select_search_method()
 						<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
 						<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
 					</fieldset>
-					<input type="submit" name="save" value="', $txt['search_method_save'], '" class="button_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-msmpost_token_var'], '" value="', $context['admin-msmpost_token'], '" />
+					<div class="submitbutton">
+						<input type="submit" name="save" value="', $txt['search_method_save'], '" class="button_submit" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['admin-msmpost_token_var'], '" value="', $context['admin-msmpost_token'], '" />
+					</div>
 				</div>
 			</div>
 		</form>
@@ -258,7 +260,7 @@ function template_create_index()
 						</dd>
 					</dl>
 					<hr />
-					<input type="submit" name="save" value="', $txt['search_create_index_start'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $txt['search_create_index_start'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
@@ -288,7 +290,7 @@ function template_create_index_progress()
 						</div>
 					</div>
 					<hr />
-					<input type="submit" name="cont" value="', $txt['search_create_index_continue'], '" class="button_submit" />
+					<input type="submit" name="cont" value="', $txt['search_create_index_continue'], '" class="right_submit" />
 				</div>
 			</div>
 			<input type="hidden" name="step" value="', $context['step'], '" />
@@ -365,7 +367,7 @@ function template_spider_edit()
 						</dd>
 					</dl>
 					<hr />
-					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $context['page_title'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-ses_token_var'], '" value="', $context['admin-ses_token'], '" />
 				</div>
@@ -397,7 +399,7 @@ function template_show_spider_logs()
 					<p>
 						', sprintf($txt['spider_stats_delete_older'], '<input type="text" name="older" id="older" value="7" size="3" class="input_text" />'), '
 					</p>
-					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" class="button_submit" />
+					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-sl_token_var'], '" value="', $context['admin-sl_token'], '" />
 				</div>
@@ -432,7 +434,7 @@ function template_show_spider_stats()
 					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-ss_token_var'], '" value="', $context['admin-ss_token'], '" />
-					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" class="button_submit" />
+					<input type="submit" name="delete_entries" value="', $txt['spider_logs_delete_submit'], '" onclick="if (document.getElementById(\'older\').value &lt; 1 &amp;&amp; !confirm(\'' . addcslashes($txt['spider_logs_delete_confirm'], "'") . '\')) return false; return true;" class="right_submit" />
 					<br />
 				</div>
 			</div>
@@ -534,12 +536,13 @@ function template_manage_sphinx()
 							<input type="text" name="sphinx_max_results" id="sphinx_max_results_input" value="', isset($modSettings['sphinx_max_results']) ? $modSettings['sphinx_max_results'] : '2000', '" size="4" />
 						</dd>
 					</dl>
-
-					<input type="submit" class="button_submit" name="save" value="', $txt['save'], '"  />
-					<input type="submit" class="button_submit" name="createconfig" value="', $txt['sphinx_create_config'], '" />
-					<input type="submit" class="button_submit" name="checkconnect" value="', $txt['sphinx_test_connection'], '" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mssphinx_token_var'], '" value="', $context['admin-mssphinx_token'], '" />
+					<div class="submitbutton">
+						<input type="submit" class="button_submit" name="createconfig" value="', $txt['sphinx_create_config'], '" />
+						<input type="submit" class="button_submit" name="checkconnect" value="', $txt['sphinx_test_connection'], '" />
+						<input type="submit" class="button_submit" name="save" value="', $txt['save'], '"  />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['admin-mssphinx_token_var'], '" value="', $context['admin-mssphinx_token'], '" />
+					</div>
 				</div>
 			</div>
 		</form>

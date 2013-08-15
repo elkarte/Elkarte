@@ -157,7 +157,7 @@ function template_core_features()
 			<div class="righttext">
 				<input id="core_features_session" type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input id="core_features_token" type="hidden" name="', $context['admin-core_token_var'], '" value="', $context['admin-core_token'], '" />
-				<input id="core_features_submit" type="submit" value="', $txt['save'], '" name="save" class="button_submit" />
+				<input id="core_features_submit" type="submit" value="', $txt['save'], '" name="save" class="right_submit" />
 			</div>
 		</form>
 	</div>';
