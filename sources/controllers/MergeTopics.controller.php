@@ -80,7 +80,7 @@ class MergeTopics_Controller extends Action_Controller
 			$onlyApproved = false;
 
 		// How many topics are on this board?  (used for paging.)
-		require_once(SOURCEDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 		$topiccount = countTopicsByBoard($_REQUEST['targetboard'], $onlyApproved);
 
 		// Make the page list.
