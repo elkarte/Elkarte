@@ -91,7 +91,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$config_vars = $this->_engineSettings->settings();
 
 		// Set up a message.
-		$context['settings_message'] = '<span class="smalltext">' . sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']) . '</span>';
+		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
 
 		// Do some javascript.
 		$javascript_function = '
