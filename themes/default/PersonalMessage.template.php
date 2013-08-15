@@ -649,7 +649,7 @@ function template_subject_list()
 		$extra .= '
 						<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />';
 	}
-	
+
 	$extra .= '
 					</div>';
 
@@ -740,6 +740,12 @@ function template_search()
 				</dt>
 				<dd>',
 					$txt['pm_search_between'], ' <input type="text" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" />&nbsp;', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /> ', $txt['pm_search_between_days'], '
+				</dd>
+				</dd>
+				<dt>
+				</dt>
+				<dd>
+					<a href="', $scripturl, '?action=pm;sa=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['pm_search_simple'], '</a>
 				</dd>
 			</dl>
 			<input type="hidden" name="advanced" value="1" />';
