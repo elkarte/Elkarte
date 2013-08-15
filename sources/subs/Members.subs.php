@@ -1539,7 +1539,7 @@ function getMemberByName($name, $flexible = false)
 		SELECT id_member, id_group
 		FROM {db_prefix}members
 		WHERE real_name = {string:name}' . ($flexible ? '
-			OR member_name = {string:member_name}' : '') . '
+			OR member_name = {string:name}' : '') . '
 		LIMIT 1',
 		array(
 			'name' => $name,
