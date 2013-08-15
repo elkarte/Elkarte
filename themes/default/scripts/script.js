@@ -1194,7 +1194,7 @@ IconList.prototype.initIcons = function ()
 {
 	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
-			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 3px; text-align: center;"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="margin: 0px; padding: ' + (is_ie ? '0px 3px' : '0px 3px') + ';" /></div>');
+			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 0 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: ' + (is_ie ? '0 2px' : '0 2px') + ';" /></div>');
 }
 
 // Event for the mouse hovering over the original icon.
@@ -1202,7 +1202,7 @@ IconList.prototype.onBoxHover = function (oDiv, bMouseOver)
 {
 	oDiv.style.border = bMouseOver ? this.opt.iBoxBorderWidthHover + 'px solid ' + this.opt.sBoxBorderColorHover : '';
 	oDiv.style.background = bMouseOver ? this.opt.sBoxBackgroundHover : this.opt.sBoxBackground;
-	oDiv.style.padding = bMouseOver ? (3 - this.opt.iBoxBorderWidthHover) + 'px' : '3px';
+	oDiv.style.padding = bMouseOver ? (2 - this.opt.iBoxBorderWidthHover) + 'px' : '2px';
 }
 
 // Show the list of icons after the user clicked the original icon.

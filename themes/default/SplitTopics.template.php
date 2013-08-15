@@ -67,7 +67,7 @@ function template_ask()
 							// ]]></script>
 						</p>';
 	echo '
-						<div class="auto_flow">
+						<div class="submitbutton">
 							<input type="submit" value="', $txt['split'], '" class="button_submit" />
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						</div>
@@ -176,7 +176,7 @@ function template_select()
 					<li class="dummy" />
 				</ul>
 			</div>
-			<div class="flow_auto">
+			<div class="submitbutton">
 				<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 				<input type="hidden" name="subname" value="', $context['new_subject'], '" />
 				<input type="hidden" name="move_to_board" value="', $context['move_to_board'], '" />

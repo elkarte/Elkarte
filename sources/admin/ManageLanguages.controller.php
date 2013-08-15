@@ -259,7 +259,9 @@ class ManageLanguages_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" /><input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' class="button_submit" />',
+					'value' => '
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' class="right_submit" />',
 				),
 			),
 			// For highlighting the default.
@@ -273,10 +275,10 @@ class ManageLanguages_Controller extends Action_Controller
 		// Display a warning if we cannot edit the default setting.
 		if (!is_writable(BOARDDIR . '/Settings.php'))
 			$listOptions['additional_rows'][] = array(
-					'position' => 'after_title',
-					'value' => $txt['language_settings_writable'],
-					'class' => 'smalltext alert',
-				);
+				'position' => 'after_title',
+				'value' => $txt['language_settings_writable'],
+				'class' => 'smalltext alert',
+			);
 
 		require_once(SUBSDIR . '/List.subs.php');
 		createList($listOptions);

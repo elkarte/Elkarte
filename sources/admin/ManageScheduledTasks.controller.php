@@ -204,8 +204,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				'enabled' => array(
 					'header' => array(
 						'value' => $txt['scheduled_tasks_enabled'],
-						'style' => 'width: 6%;',
-						'class' => 'centertext',
+						'style' => 'width: 6%;text-align: center;',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -222,8 +221,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				'run_now' => array(
 					'header' => array(
 						'value' => $txt['scheduled_tasks_run_now'],
-						'style' => 'width: 12%;',
-						'class' => 'centertext',
+						'style' => 'width: 12%;text-align: center;',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -244,8 +242,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="save" value="' . $txt['scheduled_tasks_save_changes'] . '" class="button_submit" />
-						<input type="submit" name="run" value="' . $txt['scheduled_tasks_run_now'] . '" class="button_submit" />',
+						<input type="submit" name="save" value="' . $txt['scheduled_tasks_save_changes'] . '" class="right_submit" />
+						<input type="submit" name="run" value="' . $txt['scheduled_tasks_run_now'] . '" class="right_submit" />',
 				),
 				array(
 					'position' => 'after_title',
@@ -419,7 +417,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="removeAll" value="' . $txt['scheduled_log_empty_log'] . '" onclick="return confirm(\'' . $txt['scheduled_log_empty_log_confirm'] . '\');" class="button_submit" />',
+						<input type="submit" name="removeAll" value="' . $txt['scheduled_log_empty_log'] . '" onclick="return confirm(\'' . $txt['scheduled_log_empty_log_confirm'] . '\');" class="right_submit" />',
 				),
 				array(
 					'position' => 'after_title',

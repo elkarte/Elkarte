@@ -323,37 +323,30 @@ class ManagePaid_Controller extends Action_Controller
 					'header' => array(
 						'value' => $txt['paid_pending'],
 						'style' => 'width: 18%;',
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'db_htmlsafe' => 'pending',
-						'class' => 'centertext',
 					),
 				),
 				'finished' => array(
 					'header' => array(
 						'value' => $txt['paid_finished'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'db_htmlsafe' => 'finished',
-						'class' => 'centertext',
 					),
 				),
 				'total' => array(
 					'header' => array(
 						'value' => $txt['paid_active'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'db_htmlsafe' => 'total',
-						'class' => 'centertext',
 					),
 				),
 				'is_active' => array(
 					'header' => array(
 						'value' => $txt['paid_is_active'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -361,7 +354,6 @@ class ManagePaid_Controller extends Action_Controller
 
 							return \'<span style="color: \' . ($rowData[\'active\'] ? \'green\' : \'red\') . \'">\' . ($rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
 						'),
-						'class' => 'centertext',
 					),
 				),
 				'modify' => array(
@@ -391,7 +383,7 @@ class ManagePaid_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="add" value="' . $txt['paid_add_subscription'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="add" value="' . $txt['paid_add_subscription'] . '" class="right_submit" />',
 				),
 			),
 		);
@@ -726,16 +718,16 @@ class ManagePaid_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="add" value="' . $txt['add_subscriber'] . '" class="button_submit" />
-						<input type="submit" name="finished" value="' . $txt['complete_selected'] . '" onclick="return confirm(\'' . $txt['complete_are_sure'] . '\');" class="button_submit" />
-						<input type="submit" name="delete" value="' . $txt['delete_selected'] . '" onclick="return confirm(\'' . $txt['delete_are_sure'] . '\');" class="button_submit" />
+						<input type="submit" name="add" value="' . $txt['add_subscriber'] . '" class="right_submit" />
+						<input type="submit" name="finished" value="' . $txt['complete_selected'] . '" onclick="return confirm(\'' . $txt['complete_are_sure'] . '\');" class="right_submit" />
+						<input type="submit" name="delete" value="' . $txt['delete_selected'] . '" onclick="return confirm(\'' . $txt['delete_are_sure'] . '\');" class="right_submit" />
 					',
 				),
 				array(
 					'position' => 'top_of_list',
 					'value' => '
 						<div class="flow_auto">
-							<input type="submit" name="ssearch" value="' . $txt['search_sub'] . '" class="button_submit" style="margin-top: 3px;" />
+							<input type="submit" name="ssearch" value="' . $txt['search_sub'] . '" class="right_submit" />
 							<input type="text" name="sub_search" value="" class="input_text floatright" />
 						</div>
 					',

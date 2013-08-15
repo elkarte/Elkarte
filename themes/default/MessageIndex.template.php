@@ -17,7 +17,7 @@
 /**
  * Template for the message index page.
  */
- 
+
  /**
  * Used to display child boards.
  */
@@ -82,7 +82,7 @@ function template_display_child_boards_above()
 
 		// @todo - Last post message still needs some work. Probably split the language string into three chunks.
 		// Example:
-		// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk> 
+		// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk>
 		// That should still allow sufficient scope for any language, if done sensibly.
 		if (!empty($board['last_post']['id']))
 			echo '
@@ -376,7 +376,7 @@ function template_main()
 				<span id="quick_mod_jump_to">&nbsp;</span>';
 
 			echo '
-				<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit qaction" />
+				<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
 			</li>';
 		}
 

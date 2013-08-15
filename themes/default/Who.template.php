@@ -39,7 +39,7 @@ function template_main()
 	$extra .= '
 					</select>
 					<noscript>
-						<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit" />
+						<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
 					</noscript>
 				</div>';
 
