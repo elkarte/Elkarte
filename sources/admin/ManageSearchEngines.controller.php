@@ -223,7 +223,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		// Are we adding a new one?
 		if (!empty($_POST['addSpider']))
-			return action_editspiders();
+			return $this->action_editspiders();
 		// User pressed the 'remove selection button'.
 		elseif (!empty($_POST['removeSpiders']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
