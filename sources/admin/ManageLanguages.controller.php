@@ -1018,9 +1018,15 @@ class ManageLanguages_Controller extends Action_Controller
 		$context['save_disabled'] = $settings_not_writable;
 
 		if ($settings_not_writable)
-			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['settings_not_writable'] . '</strong></div><br />';
+		{
+			$context['error_type'] = 'notice';
+			$context['settings_message'] = $txt['settings_not_writable'];
+		}
 		elseif ($settings_backup_fail)
-			$context['settings_message'] = '<div class="centertext"><strong>' . $txt['admin_backup_fail'] . '</strong></div><br />';
+		{
+			$context['error_type'] = 'notice';
+			$context['settings_message'] = $txt['admin_backup_fail'];
+		}
 
 		// Fill the config array in contextual data for the template.
 		$this->_languageSettings->prepare_file();
