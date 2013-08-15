@@ -865,6 +865,7 @@ ul.moderation_notes li {
 }
 #error_log {
 	width: 100%;
+	border-top: 1px solid #ddd;
 }
 #error_log tr.windowbg td, #error_log tr.windowbg2 td {
 	padding: 8px;
