@@ -304,15 +304,15 @@ div.quick_tasks {
 	padding: 6px 12px 12px 12px;
 }
 #support_credits h3.catbg {
-	padding: 12px 6px 6px 6px;
+	margin-top: 4px;
 }
 #support_resources {
 	margin: 16px 0 -24px 0;
 }
 #credits_logo {
 	position: absolute;
-	right: 10px;
-	top: 9px;
+	right: 20px;
+	top: 60px;
 }
 #support_credits .content {
 	padding: 0 18px;
@@ -321,9 +321,6 @@ div.quick_tasks {
 #support_credits .content p {
 	margin: 12px 0 0 0;
 	padding: 0;
-}
-#support_credits img.icon {
-	vertical-align: middle;
 }
 #latestSupport{
 	padding: 0 25px 15px 25px;
