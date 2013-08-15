@@ -3909,9 +3909,10 @@ dl.merge_topic dd {
 /* given that there is supposed to be a separate phone theme.
 /* Am currently inclined to think that just having break points that correlate
 /* to 1024, 800 and 480 at standard font size is probably adequate. */
+/* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
 
 /* This one does 1024 screens at default font size. */
-@media screen and (min-width: 52em) and (max-width: 70em) {
+@media screen and (min-width: 50em) and (max-width: 64em) {
 	.board_latest {
 		min-width: 27em;
 	}
@@ -3923,7 +3924,7 @@ dl.merge_topic dd {
 	}
 }
 /* This one does 800 screens at default font size. */
-@media screen and (min-width: 32em) and (max-width: 52em) {
+@media screen and (min-width: 30em) and (max-width: 50em) {
 	.wrapper {
 		min-width: 98%;
 	}
@@ -3965,7 +3966,7 @@ dl.merge_topic dd {
 	/* End playing silly buggers. */
 }
 /* This one does 480 screens at default font size. */
-@media screen and (max-width: 32em) {
+@media screen and (max-width: 30em) {
 	.frame {
 		min-width: 100%;
 		border-radius: 0;
