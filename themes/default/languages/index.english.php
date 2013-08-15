@@ -145,7 +145,7 @@ $txt['next'] = 'next page';
 $txt['lock_unlock'] = 'Lock/Unlock Topic';
 $txt['post'] = 'Post';
 $txt['error_occurred'] = 'An Error Has Occurred';
-$txt['send_error_occurred'] = 'An error has occurred, please click <a href="{href}">here</a> to try again.';
+$txt['send_error_occurred'] = 'An error has occurred, <a href="{href}">please click here to try again</a>.';
 $txt['require_field'] = 'This is a required field.';
 $txt['at'] = 'at';
 $txt['started_by'] = 'Started by';
@@ -187,7 +187,7 @@ $txt['approve_all'] = 'approve all';
 $txt['awaiting_approval'] = 'Awaiting Approval';
 $txt['attach_awaiting_approve'] = 'Attachments awaiting approval';
 $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a moderator.';
-$txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. Click <a href="%3$s">here</a> to view them all.';
+$txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them all</a>.';
 $txt['send_message'] = 'Send message';
 
 $txt['msg_alert_you_have'] = 'you have'; //Deprecated
@@ -394,8 +394,8 @@ $txt['click'] = 'Click';
 $txt['here'] = 'here';
 $txt['to_view'] = 'to view them.';
 $txt['you_have_no_msg'] = 'You don\'t have any message...';
-$txt['you_have_one_msg'] = 'You\'ve 1 message... Click <a href="%1$s">here</a> to view it';
-$txt['you_have_many_msgs'] = 'You\'ve %2$d messages... Click <a href="%1$s">here</a> to view them';
+$txt['you_have_one_msg'] = 'You\'ve 1 message...<a href="%1$s">Click here to view it</a>';
+$txt['you_have_many_msgs'] = 'You\'ve %2$d messages...<a href="%1$s">Click here to view them</a>';
 
 $txt['total_boards'] = 'Total Boards';
 

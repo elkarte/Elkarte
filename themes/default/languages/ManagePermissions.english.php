@@ -6,7 +6,7 @@ $txt['permissions_modify'] = 'Modify';
 $txt['permissions_view'] = 'View';
 $txt['permissions_allowed'] = 'Allowed';
 $txt['permissions_denied'] = 'Denied';
-$txt['permission_cannot_edit'] = '<strong>Note:</strong> You cannot edit this permission profile as it is a predefined profile included within the forum software by default. If you wish to change the permissions of this profile you must first create a duplicate profile. You can carry out this task by clicking <a href="%1$s">here</a>.';
+$txt['permission_cannot_edit'] = '<strong>Note:</strong> You cannot edit this permission profile as it is a predefined profile included within the forum software by default. If you wish to change the permissions of this profile you must first create a duplicate profile. You can <a href="%1$s">carry out this task by clicking here</a>.';
 
 $txt['permissions_for_profile'] = 'Permissions for Profile';
 $txt['permissions_boards_desc'] = 'The list below shows which set of permissions has been assigned to each board on your forum. You may edit the assigned permission profile by either clicking the board name or select &quot;edit all&quot; from the bottom of the page. To edit the profile itself simply click the profile name.';
