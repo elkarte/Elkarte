@@ -174,9 +174,15 @@ class ManageServer_Controller extends Action_Controller
 			$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 			if ($settings_not_writable)
-				$context['settings_message'] = '<div class="centertext"><strong>' . $txt['settings_not_writable'] . '</strong></div><br />';
+			{
+				$context['settings_message'] = $txt['settings_not_writable'];
+				$context['error_type'] = 'notice';
+			}
 			elseif ($settings_backup_fail)
-				$context['settings_message'] = '<div class="centertext"><strong>' . $txt['admin_backup_fail'] . '</strong></div><br />';
+			{
+				$context['settings_message'] = $txt['admin_backup_fail'];
+				$context['error_type'] = 'notice';
+			}
 
 			$context['settings_not_writable'] = $settings_not_writable;
 		}
@@ -673,6 +679,7 @@ class ManageServer_Controller extends Action_Controller
 		$info_lines = array();
 		$category = $txt['phpinfo_settings'];
 		$pinfo = array();
+
 		// get the data
 		ob_start();
 		phpinfo();

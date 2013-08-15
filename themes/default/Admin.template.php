@@ -1379,8 +1379,8 @@ function template_php_info()
 			<thead>
 			<tr class="table_head three_column">
 				<th scope="col"></th>
-				<th scope="col"><strong>', $area, '</strong></th>
-				<th scope="col"></th>
+				<th class="centertext" scope="col"><strong>', $area, '</strong></th>
+				<th class="centertext" scope="col"></th>
 			</tr>
 			</thead>
 			<tbody>';
@@ -1399,7 +1399,7 @@ function template_php_info()
 					// heading row for the settings section of this categorys settings
 					echo '
 			<tr class="titlebg">
-				<td class="centertext"><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
+				<td><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
 			</tr>';
@@ -1413,7 +1413,7 @@ function template_php_info()
 				foreach ($setting as $key_lm => $value)
 				{
 					echo '
-				<td class="windowbg', $alternate ? '2' : '', '">', $value, '</td>';
+				<td class="windowbg', $alternate ? '2' : '', ' centertext">', $value, '</td>';
 				}
 				echo '
 			</tr>';
