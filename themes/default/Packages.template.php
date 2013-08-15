@@ -498,7 +498,7 @@ function template_list()
 	echo '
 				</ol>
 				<br />
-				<a href="', $scripturl, '?action=admin;area=packages">[ ', $txt['back'], ' ]</a>
+				<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=packages">', $txt['back'], '</a>
 			</div>
 		</div>
 	</div>';
