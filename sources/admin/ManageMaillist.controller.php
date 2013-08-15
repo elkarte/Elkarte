@@ -1328,7 +1328,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Submitting a new one or editing an existing one then pass this request off
 		if (isset($_POST['add']) || isset($_POST['save']) || isset($_REQUEST['tid']))
-			return action_modify_bounce_templates();
+			return $this->action_modify_bounce_templates();
 		// Deleting and existing one
 		elseif (isset($_POST['delete']) && !empty($_POST['deltpl']))
 		{
