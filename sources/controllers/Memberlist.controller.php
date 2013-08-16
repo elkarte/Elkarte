@@ -76,6 +76,7 @@ class Memberlist_Controller extends Action_Controller
 					'down' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
 					'up' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
 				),
+				'class' => 'centertext',
 			),
 			'real_name' => array(
 				'label' => $txt['username'],
@@ -91,6 +92,7 @@ class Memberlist_Controller extends Action_Controller
 					'down' => allowedTo('moderate_forum') ? 'mem.email_address DESC' : 'mem.hide_email DESC, mem.email_address DESC',
 					'up' => allowedTo('moderate_forum') ? 'mem.email_address ASC' : 'mem.hide_email ASC, mem.email_address ASC'
 				),
+				'class' => 'centertext',
 			),
 			'website_url' => array(
 				'label' => $txt['website'],
@@ -99,6 +101,7 @@ class Memberlist_Controller extends Action_Controller
 					'down' => 'LENGTH(mem.website_url) > 0 ASC, IFNULL(mem.website_url, 1=1) DESC, mem.website_url DESC',
 					'up' => 'LENGTH(mem.website_url) > 0 DESC, IFNULL(mem.website_url, 1=1) ASC, mem.website_url ASC'
 				),
+				'class' => 'centertext',
 			),
 			'id_group' => array(
 				'label' => $txt['position'],
