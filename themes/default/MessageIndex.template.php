@@ -288,8 +288,8 @@ function template_main()
 						</h4>
 					</div>
 					<p class="topic_starter">
-						', $txt['started_by'], ' ', $topic['first_post']['member']['link'], '
-						<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">', $topic['pages'], '</span>
+						', $txt['started_by'], ' ', $topic['first_post']['member']['link'], !empty($topic['pages']) ? '
+						<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</span>' : '', '
 					</p>
 				</div>
 				<div class="topic_latest">
