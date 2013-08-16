@@ -1422,6 +1422,19 @@ div.windowbg, div.windowbg2 {
 .small_pagelinks .navPages {
 	padding: 2px 3px 0 3px;
 	font-size: 0.889em;
+	display: block;
+	float: left;
+}
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+	content: '\00AB';
+	float: left;
+	font-size: 1.3em;
+}
+.small_pagelinks:after {
+	content: '\00BB';
+	float: left;
+	font-size: 1.3em;
 }
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
@@ -1874,9 +1887,6 @@ img.new_posts {
 }
 .topic_starter {
 	font-size: 0.929em;
-}
-.small_pagelinks {
-	float: right;
 }
 .topic_latest {
 	display: table-cell;
