@@ -908,6 +908,7 @@ class ManageBans_Controller extends Action_Controller
 				'check' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -916,6 +917,7 @@ class ManageBans_Controller extends Action_Controller
 								'id_ban' => false,
 							),
 						),
+						'class' => 'centertext',
 					),
 				),
 			),

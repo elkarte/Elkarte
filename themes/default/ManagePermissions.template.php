@@ -859,16 +859,16 @@ function template_postmod_permissions()
 				<thead>
 					<tr class="table_head">
 						<th></th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_new_topics'], '
 						</th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_replies_own'], '
 						</th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_replies_any'], '
 						</th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_attachments'], '
 						</th>
 					</tr>
