@@ -1615,7 +1615,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$theme_includes = explode(',', $modSettings['integrate_theme_include']);
 		foreach ($theme_includes as $include)
 		{
-			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
+			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, 'LANGUAGEDIR' => LANGUAGEDIR, 'SUBSDIR' => SUBSDIR, '$themedir' => $settings['theme_dir']));
 			if (file_exists($include))
 				require_once($include);
 		}
