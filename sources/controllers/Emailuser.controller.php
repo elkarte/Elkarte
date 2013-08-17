@@ -93,7 +93,7 @@ class Emailuser_Controller extends Action_Controller
 
 		$result = $this->_sendTopic($row);
 		if ($result !== true)
-			fatal_lang_error($result, false);
+			$context['sendtopic_error'] = $result;
 
 		// Back to the topic!
 		redirectexit('topic=' . $topic . '.0');
@@ -176,10 +176,7 @@ class Emailuser_Controller extends Action_Controller
 		if ($result !== true)
 		{
 			loadLanguage('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt[$result]
-			);
+			$context['xml_data'] = $result;
 			return;
 		}
 
@@ -190,7 +187,7 @@ class Emailuser_Controller extends Action_Controller
 
 	private function _sendTopic($row)
 	{
-		global $scripturl, $topic;
+		global $scripturl, $topic, $txt;
 
 		// This is needed for sendmail().
 		require_once(SUBSDIR . '/Mail.subs.php');
@@ -218,12 +215,16 @@ class Emailuser_Controller extends Action_Controller
 		// Any errors or are we good to go?
 		if (!$validator->validate($_POST))
 		{
-			$context['sendtopic_error'] = array(
-				'errors' => $validator->validation_errors(),
+			$errors = $validator->validation_errors();
+
+			return $context['sendtopic_error'] = array(
+				'errors' => $errors,
 				'type' => 'minor',
 				'title' => $txt['validation_failure'],
+				// And something for ajax
+				'error' => 1,
+				'text' => $errors[0],
 			);
-			return;
 		}
 
 		// Emails don't like entities...
