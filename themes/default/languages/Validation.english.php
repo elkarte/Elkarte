@@ -21,5 +21,6 @@ $txt['_validate_contains'] = 'The %1$s field needs contain one of these values: 
 $txt['_validate_invalid_function'] = 'The specified validation function %1$s does not exist';
 $txt['_validate_without'] = 'The %1$s field may not contain the %2$s character';
 $txt['_validate_notequal'] = 'The %1$s field does not contain a valid value';
+$txt['_validate_isarray'] = 'The %1$s field does not contain a valid array';
 $txt['php_syntax_error'] = 'PHP syntax error: %1$s';
 $txt['validation_failure'] = 'The form has the following error or errors that must be corrected before continuing:';

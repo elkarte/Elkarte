@@ -290,6 +290,22 @@ class Data_Validator
 				// Maybe even a built in php function?
 				elseif (function_exists($rule))
 					$input[$field] = $rule($input[$field]);
+				// Or even a langauge constuct?
+				elseif (in_array($rule, array('empty', 'array', 'isset')))
+				{
+					// could be done as methods instead ...
+					switch ($rule) {
+						case 'empty':
+							$input[$field] = empty($input[$field]);
+							break;
+						case 'array':
+							$input[$field] = array($input[$field]);
+							break;
+						case 'isset':
+							$input[$field] = isset($input[$field]);
+							break;
+					}
+				}
 				else
 				{
 					$input[$field] = $input[$field];
@@ -682,6 +698,33 @@ class Data_Validator
 			return;
 
 		if (!preg_match('~^([-_\p{L}])+$~iu', $input[$field]))
+		{
+			return array(
+				'field' => $field,
+				'input' => $input[$field],
+				'function' => __FUNCTION__,
+				'param' => $validation_parameters
+			);
+		}
+	}
+
+	/**
+	 * isarray ... Determine if the provided value exists and is an array
+	 *
+	 * Usage: '[key]' => 'isarray'
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array or null $validation_parameters
+	 * @return mixed
+	 */
+	protected function _validate_isarray($field, $input, $validation_parameters = null)
+	{
+		if (!isset($input[$field]))
+			return;
+
+		// A character with the Unicode property of letter (any kind of letter from any language)
+		if (!is_array($input[$field]))
 		{
 			return array(
 				'field' => $field,
