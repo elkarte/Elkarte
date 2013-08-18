@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// announce a topic
+/**
+ * announce a topic
+ */
 function template_announce()
 {
 	global $context, $txt, $scripturl;
@@ -62,6 +64,9 @@ function template_announce()
 	<br />';
 }
 
+/**
+ * Send an announcement out
+ */
 function template_announcement_send()
 {
 	global $context, $txt, $scripturl;
