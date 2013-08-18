@@ -10,6 +10,9 @@
  * This template file contains only the sub template badbehavior_log.
  */
 
+/**
+ * Displays the bad behavior 'hit' log
+ */
 function template_badbehavior_log()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -72,12 +75,12 @@ function template_badbehavior_log()
 		if ($entries['member']['session'] !== '')
 			echo '
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=session;value=', $entries['member']['session'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_session'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_session'], '" /></a>', $entries['member']['session'], '<br />';
+
 		echo '
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=valid;value=', $entries['valid']['code'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '" /></a>', $txt['badbehaviorlog_error_valid_response'], ': ', $entries['valid']['response'], '<br />
-
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=valid;value=', $entries['valid']['code'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '" /></a>', $txt['badbehaviorlog_error_valid_log'], ': ', $entries['valid']['log'], '<br />
-
 							<a style="display: table-cell; padding: 4px 0; width: 20px; vertical-align: top;" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=request_uri;value=', $entries['request_uri']['href'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '" /></a><a style="display: table-cell;" href="', $entries['request_uri']['html'], '">', $entries['request_uri']['html'], '</a>';
+
 		echo '
 						</div>
 						<div class="error_where">
@@ -85,7 +88,7 @@ function template_badbehavior_log()
 						</div>
 						<div class="error_where">
 							<a onclick="expandCollapse(\'details', $i, '\', \'icon', $i, '\'); return false;">
-							<img id="icon', $i, '" src="', $settings['images_url'], '/selected.png" alt="*" />&nbsp;<strong>', $txt['badbehaviorlog_details'], '</strong></a><div id="details' , $i, '" class="padding" style="display:none">', $entries['http_headers']['html'], '</div>
+							<img id="icon', $i, '" src="', $settings['images_url'], '/selected.png" alt="*" />&nbsp;<strong>', $txt['badbehaviorlog_details'], '</strong></a><div id="details', $i, '" class="padding" style="display:none">', $entries['http_headers']['html'], '</div>
 						</div>';
 
 		echo '
@@ -124,6 +127,9 @@ function template_badbehavior_log()
 		</form>';
 }
 
+/**
+ * Template to add an IP to the BB whitelist
+ */
 function template_callback_badbehavior_add_ip()
 {
 	global $txt, $context, $scripturl, $settings;
@@ -135,10 +141,10 @@ function template_callback_badbehavior_add_ip()
 		<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_ip_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_ip_wl'], '
 		<dl class="settings">
 			<dt>',
-				$txt['badbehavior_wl_comment'], '
+	$txt['badbehavior_wl_comment'], '
 			</dt>
 			<dd>',
-				$txt['badbehavior_ip_wl_desc'], '
+	$txt['badbehavior_ip_wl_desc'], '
 			</dd>';
 
 	// Show any existing IP's that are on the whitelist
@@ -174,11 +180,14 @@ function template_callback_badbehavior_add_ip()
 			<dd></dd>';
 }
 
+/**
+ * Template to add an URL to the BB whitelist
+ */
 function template_callback_badbehavior_add_url()
 {
 	global $txt, $context, $scripturl, $settings;
 
-	// whitelist by IP
+	// whitelist by URL
 	echo '
 		</dl>
 		<hr />
@@ -224,6 +233,10 @@ function template_callback_badbehavior_add_url()
 			<dd></dd>';
 }
 
+/**
+ * Template to add an User Agent to the BB whitelist, use with CAUTION as this
+ * will allow a user to bypass the checks
+ */
 function template_callback_badbehavior_add_useragent()
 {
 	global $txt, $context, $scripturl, $settings;
