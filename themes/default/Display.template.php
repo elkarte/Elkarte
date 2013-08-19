@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Show a status block above the report to staff page
+ */
 function template_report_sent_above()
 {
 	global $txt;
@@ -25,9 +28,13 @@ function template_report_sent_above()
 		</div>';
 }
 
+/**
+ * The main template for displaying a topic, does it all, its the king, the bomb, the real deal
+ */
 function template_main()
 {
 	global $context, $settings, $options, $txt, $scripturl;
+
 	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
 
@@ -47,7 +54,7 @@ function template_main()
 
 		// Show just numbers...?
 		if ($settings['display_who_viewing'] == 1)
-				echo count($context['view_members']), ' ', count($context['view_members']) == 1 ? $txt['who_member'] : $txt['members'];
+			echo count($context['view_members']), ' ', count($context['view_members']) == 1 ? $txt['who_member'] : $txt['members'];
 		// Or show the actual people viewing the topic?
 		else
 			echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . ((empty($context['view_num_hidden']) || $context['can_moderate_forum']) ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
@@ -89,10 +96,10 @@ function template_main()
 			echo '
 					<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>';
 
-				echo '
+		echo '
 					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 						<div class="keyinfo">
-						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' .  template_build_poster_div($message, $ignoring) . '</ul>' : '');
+						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>' : '');
 
 		if (!empty($context['follow_ups'][$message['id']]))
 		{
@@ -101,13 +108,11 @@ function template_main()
 								<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1">', $txt['follow_ups'], '</a>
 									<ul class="menulevel2">';
 
-				foreach($context['follow_ups'][$message['id']] as $follow_up)
-				{
-					echo '
-										<li class="listlevel2"><a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
-				}
-
+			foreach ($context['follow_ups'][$message['id']] as $follow_up)
 				echo '
+										<li class="listlevel2"><a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
+
+			echo '
 									</ul>
 								</li>
 							</ul>';
@@ -166,7 +171,7 @@ function template_main()
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
-							<li class="listlevel1 subsections" aria-haspopup="true"><a', ($message['can_modify'] && !empty($options['use_click_menu'])) ? ' href="'. $scripturl. '?action=post;msg='. $message['id']. ';topic='. $context['current_topic']. '.'. $context['start']. '"' :'', ' class="linklevel1 post_options">', $txt['post_options'], '</a>';
+							<li class="listlevel1 subsections" aria-haspopup="true"><a', ($message['can_modify'] && !empty($options['use_click_menu'])) ? ' href="' . $scripturl . '?action=post;msg=' . $message['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . '"' : '', ' class="linklevel1 post_options">', $txt['post_options'], '</a>';
 
 		if ($message['can_modify'] || $message['can_remove'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{
@@ -201,12 +206,12 @@ function template_main()
 
 			// Maybe we can unapprove it?
 			if ($message['can_unapprove'])
-						echo '
+				echo '
 									<li class="listlevel2"><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 unapprove_button">', $txt['unapprove'], '</a></li>';
 
 			// Maybe they want to report this post to the moderator(s)?
 			if ($context['can_report_moderator'])
-						echo '
+				echo '
 									<li class="listlevel2"><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a></li>';
 
 			echo '
@@ -219,15 +224,15 @@ function template_main()
 			// Can they like this post?
 			if ($message['can_like'])
 				echo '
-							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 like_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 like_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
 			// Or remove the like they made
 			elseif ($message['can_unlike'])
 				echo '
-							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 unlike_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 unlike_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
 			// Or just view the count
 			else
 				echo '
-							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
 		}
 
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
@@ -238,7 +243,6 @@ function template_main()
 		// Can they quote to a new topic? @todo - This needs rethinking for gui layout.
 		if ($context['can_follow_up'])
 			echo '
-
 							<li class="listlevel1"><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel1 quotetonew_button">', $txt['quote_new'], '</a></li>';
 
 		// Can they reply? Have they turned on quick reply?
@@ -297,15 +301,19 @@ function template_main()
 		</div>';
 }
 
+/**
+ * This is quick realy area below all the message bodys
+ */
 function template_quickreply_below()
 {
 	global $context, $options, $settings, $txt, $modSettings, $scripturl;
+
 	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
 
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
-		echo '
+		echo '<div>this is this</div>
 			<a id="quickreply"></a>
 			<div class="forumposts" id="quickreplybox">
 				<h2 class="category_header">
@@ -523,7 +531,7 @@ function template_quickreply_below()
 							iTopicId: ', $context['current_topic'], ',
 							sSessionId: elk_session_id,
 							sSessionVar: elk_session_var,
-							sAction: "messageicons;board=',  $context['current_board'], '" ,
+							sAction: "messageicons;board=', $context['current_board'], '" ,
 							sLabelIconList: "', $txt['message_icon'], '",
 							sBoxBackground: "transparent",
 							sBoxBackgroundHover: "#ffffff",
@@ -544,7 +552,6 @@ function template_quickreply_below()
 
 	echo '
 				// ]]></script>';
-
 }
 
 /**
@@ -659,8 +666,8 @@ function template_build_poster_div($message, $ignoring)
 
 			// Want to send them a PM, can you? @todo - This seems to be broken and IMO should be dropped anyway, at least if poster div is not hidden.
 			if ($context['can_send_pm'] && !$message['is_message_author'] && !empty($modSettings['onlineEnable']))
-					$poster_div .= '
-											<li><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '"><img src="'. $message['member']['online']['image_href']. '" alt="" /></a></li>';
+				$poster_div .= '
+											<li><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '"><img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
 
 			$poster_div .= '
 										</ol>
@@ -729,7 +736,7 @@ function template_build_poster_div($message, $ignoring)
 	if (empty($options['hide_poster_area']))
 	{
 		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
-		$poster_div .= '
+			$poster_div .= '
 							<li class="listlevel1 avatar">
 								<a class="linklevel1" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
 									' . $message['member']['avatar']['image'] . '
@@ -759,7 +766,7 @@ function template_build_poster_div($message, $ignoring)
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
 			$poster_div .= '
-							<li class="listlevel1 poster_online"><a class="linklevel1'. ($context['user']['unread_messages'] > 0 ? ' new_pm':''). '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">'. $context['user']['unread_messages'] . '</span>' : '')  . '</a></li>';
+							<li class="listlevel1 poster_online"><a class="linklevel1' . ($context['user']['unread_messages'] > 0 ? ' new_pm' : '') . '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">' . $context['user']['unread_messages'] . '</span>' : '') . '</a></li>';
 		}
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{
@@ -831,7 +838,7 @@ function template_display_poll_above()
 			echo '
 						<p><strong>', $txt['poll_total_voters'], ':</strong> ', $context['poll']['total_votes'], '</p>';
 	}
-		// They are allowed to vote! Go to it!
+	// They are allowed to vote! Go to it!
 	else
 	{
 		echo '
@@ -870,7 +877,7 @@ function template_display_poll_above()
 			</div>
 			<div id="pollmoderation">';
 
-		template_button_strip($context['poll_buttons']);
+	template_button_strip($context['poll_buttons']);
 
 	echo '
 			</div>';
@@ -882,6 +889,7 @@ function template_display_poll_above()
 function template_display_calendar_above()
 {
 	global $context, $txt, $settings;
+
 	echo '
 			<div class="linked_events">
 				<div class="title_bar">
@@ -904,6 +912,9 @@ function template_display_calendar_above()
 			</div>';
 }
 
+/**
+ * Used to display items above the page, like page navigation
+ */
 function template_pages_and_buttons_above()
 {
 	global $context;
@@ -916,10 +927,12 @@ function template_pages_and_buttons_above()
 	template_pagesection('normal_buttons', 'right', 'go_down');
 }
 
+/**
+ * Used to display items below the page, like page navigation
+ */
 function template_pages_and_buttons_below()
 {
 	global $context;
-
 
 	// Show the page index... "Pages: [1]".
 	template_pagesection('normal_buttons', 'right');
@@ -934,8 +947,10 @@ function template_pages_and_buttons_below()
 	echo '
 			<div id="display_jump_to">&nbsp;</div>';
 }
+
 /**
  * Used to display attachments
+ *
  * @param array $message
  * @param bool $ignoring
  */
@@ -962,7 +977,7 @@ function template_display_attachments($message, $ignoring)
 
 			if ($context['can_approve'])
 				echo '
-										&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>]';
+										&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>';
 
 			echo '
 									</legend>';
@@ -983,7 +998,7 @@ function template_display_attachments($message, $ignoring)
 				echo '
 											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px"/>';
 
-				echo '
+			echo '
 										</div>';
 		}
 
@@ -993,7 +1008,7 @@ function template_display_attachments($message, $ignoring)
 
 		if (!$attachment['is_approved'] && $context['can_approve'])
 			echo '
-											[<a href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>]&nbsp;|&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>] ';
+											<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
 		echo '
 											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
 										</div>';
