@@ -14,10 +14,17 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Umm, its the main template
+ */
 function template_main()
 {
 }
 
+/**
+ * Shows the screen for the package install / uninstall
+ * Dispalys licnense, readme, and test results
+ */
 function template_view_package()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -396,6 +403,9 @@ function template_view_package()
 	// ]]></script>';
 }
 
+/**
+ * Show after the package has been installed, redirects / permissions
+ */
 function template_extract_package()
 {
 	global $context, $txt, $scripturl;
@@ -475,6 +485,9 @@ function template_extract_package()
 	</div>';
 }
 
+/**
+ * List the files in an addon package
+ */
 function template_list()
 {
 	global $context, $txt, $scripturl;
@@ -504,6 +517,9 @@ function template_list()
 	</div>';
 }
 
+/**
+ * Used to view an individual file from the package
+ */
 function template_examine()
 {
 	global $context, $txt, $scripturl;
@@ -525,6 +541,9 @@ function template_examine()
 	</div>';
 }
 
+/**
+ * Show the listing of addons on the system, installed, uninstalled, etc.
+ */
 function template_browse()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings, $forum_version;
@@ -552,7 +571,7 @@ function template_browse()
 				window.elkForum_sessionid = elk_session_id;
 				window.elkForum_sessionvar = elk_session_var;';
 
-		// Make a list of already installed mods so nothing is listed twice ;).
+		// Make a list of already installed addons so nothing is listed twice ;).
 		echo '
 				window.elkInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
 				window.ourVersion = "', $context['forum_version'], '";
@@ -671,6 +690,9 @@ function template_browse()
 	// ]]></script>';
 }
 
+/**
+ * Show the install options
+ */
 function template_install_options()
 {
 	global $context, $txt, $scripturl;
@@ -728,6 +750,9 @@ function template_install_options()
 	</div>';
 }
 
+/**
+ * Sometimes you have to set file permissions and hope for the best outcome
+ */
 function template_control_chmod()
 {
 	global $context, $txt;
@@ -876,6 +901,9 @@ function template_control_chmod()
 	// ]]></script>';
 }
 
+/**
+ * Show the ftp permissions panel when needed
+ */
 function template_ftp_required()
 {
 	global $txt;
@@ -891,6 +919,9 @@ function template_ftp_required()
 		</fieldset>';
 }
 
+/**
+ * Used to view a specific edit to a file as the xml defines
+ */
 function template_view_operations()
 {
 	global $context, $txt, $settings;
@@ -915,6 +946,9 @@ function template_view_operations()
 </html>';
 }
 
+/**
+ * Show the technocolor permissions screen that can be adusted with FTP
+ */
 function template_file_permissions()
 {
 	global $txt, $scripturl, $context, $settings;
@@ -1243,6 +1277,9 @@ function template_file_permissions()
 	</form><br />';
 }
 
+/**
+ * @todo
+ */
 function template_permission_show_contents($ident, $contents, $level, $has_more = false)
 {
 	global $settings, $txt, $scripturl, $context;
@@ -1328,6 +1365,9 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 	}
 }
 
+/**
+ * Used to show the pause screen when changing permissions
+ */
 function template_pause_action_permissions()
 {
 	global $txt, $scripturl, $context;

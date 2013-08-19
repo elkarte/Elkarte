@@ -38,20 +38,21 @@
 
 /**
  * Initialize the template... mainly little settings.
+ * load any data and set any hardcoded options.
  */
 function template_init()
 {
 	global $settings;
 
 	/* Use images from default theme when using templates from the default theme?
-		if this is 'always', images from the default theme will be used.
-		if this is 'defaults', images from the default theme will only be used with default templates.
-		if this is 'never' or isn't set at all, images from the default theme will not be used. */
+	  if this is 'always', images from the default theme will be used.
+	  if this is 'defaults', images from the default theme will only be used with default templates.
+	  if this is 'never' or isn't set at all, images from the default theme will not be used. */
 	$settings['use_default_images'] = 'never';
 
 	/* What document type definition is being used? (for font size and other issues.)
-		'xhtml' for an XHTML 1.0 document type definition.
-		'html' for an HTML 4.01 document type definition. */
+	  'xhtml' for an XHTML 1.0 document type definition.
+	  'html' for an HTML 4.01 document type definition. */
 	$settings['doctype'] = 'xhtml';
 
 	// The version this template/theme is for. This should probably be the version of the forum it was created for.
@@ -185,7 +186,7 @@ function template_html_above()
 	echo '
 </head>
 <body id="', $context['browser_body_id'], '" class="action_', !empty($context['current_action']) ? htmlspecialchars($context['current_action']) : (!empty($context['current_board']) ?
-		'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')), !empty($context['current_board']) ? ' board_' . htmlspecialchars($context['current_board']) : '', '">';
+					'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')), !empty($context['current_board']) ? ' board_' . htmlspecialchars($context['current_board']) : '', '">';
 }
 
 /**
@@ -273,7 +274,7 @@ function template_body_above()
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
 		echo '
-				<input type="submit" name="search2" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select':'', '" />
+				<input type="submit" name="search2" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select' : '', '" />
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 	}
@@ -286,7 +287,7 @@ function template_body_above()
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/'. $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="ElkArte Community" title="ElkArte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="ElkArte Community" title="ElkArte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	// Show the menu here, according to the menu sub template.
 	echo'
@@ -360,7 +361,7 @@ function template_body_above()
 	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
 	// News fader is nixed when upper section is collapsed, just to save running the javascript all the time when it is not wanted.
 	// Requires page refresh when upper section is expanded, to show the fader again. I think this is acceptable, but am open to suggestions.
-	if(!empty($context['random_news_line']))
+	if (!empty($context['random_news_line']))
 	{
 		echo '
 			<div id="news">
@@ -373,7 +374,7 @@ function template_body_above()
 		</div>';
 
 	// Show the navigation tree.
-		theme_linktree();
+	theme_linktree();
 
 	// The main content should go here. @todo - Skip nav link.
 	echo '
@@ -397,10 +398,13 @@ function template_body_below()
 	<div id="footer_section"><a id="bot"></a>
 		<div class="wrapper">
 			<ul>
-				<li class="copyright">', theme_copyright(), '
+				<li class="copyright">',
+					theme_copyright(), '
 				</li>
-				<li><a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_xhtml'], '"><span>', $txt['xhtml'], '</span></a></li>
-				', !empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
+				<li>
+					<a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_xhtml'], '"><span>', $txt['xhtml'], '</span></a>
+				</li>',
+				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
 				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats'])) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '
 			</ul>';
 
@@ -505,7 +509,7 @@ function template_menu()
 			{
 				echo '
 								<li class="listlevel2', !empty($childbutton['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', '>
-									<a class="linklevel2" href="', $childbutton['href'], '" ' , isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
+									<a class="linklevel2" href="', $childbutton['href'], '" ', isset($childbutton['target']) ? 'target="' . $childbutton['target'] . '"' : '', '>', $childbutton['title'], '</a>';
 
 				// 3rd level menus :)
 				if (!empty($childbutton['sub_buttons']))
@@ -516,7 +520,7 @@ function template_menu()
 					foreach ($childbutton['sub_buttons'] as $grandchildbutton)
 						echo '
 										<li class="listlevel3">
-											<a class="linklevel3" href="', $grandchildbutton['href'], '" ' , isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
+											<a class="linklevel3" href="', $grandchildbutton['href'], '" ', isset($grandchildbutton['target']) ? 'target="' . $grandchildbutton['target'] . '"' : '', '>', $grandchildbutton['title'], '</a>
 										</li>';
 
 					echo '
@@ -574,6 +578,7 @@ function template_menu()
 
 /**
  * Generate a strip of buttons.
+ *
  * @param array $button_strip
  * @param string $direction = ''
  * @param array $strip_options = array()
@@ -605,7 +610,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		return;
 
 	echo '
-							<ul role="menubar" class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
+							<ul role="menubar" class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
 								', implode('', $buttons), '
 							</ul>';
 }
@@ -624,6 +629,7 @@ function template_show_error($error_id)
 
 	echo '
 					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+
 	if (!empty($error['title']))
 		echo '
 						<dl>
@@ -631,6 +637,7 @@ function template_show_error($error_id)
 								<strong id="', $error_id, '_title">', $error['title'], '</strong>
 							</dt>
 							<dd>';
+
 	if (!empty($error['errors']))
 	{
 		echo '
@@ -642,6 +649,7 @@ function template_show_error($error_id)
 		echo '
 								</ul>';
 	}
+
 	if (!empty($error['title']))
 		echo '
 							</dd>
@@ -682,6 +690,7 @@ function template_select_boards($name, $label = '', $extra = '')
 
 /**
  * Another used and abused piece of template that can be found everywhere
+ *
  * @param string $button_strip index of $context to create the button strip
  * @param string $strip_direction direction of the button strip (see template_button_strip for details)
  * @param string $go index of $txt used to label the go up/down button < Deprecated (possible values go_up/go_down, other values can be used as well, though it may result in non working buttons)
@@ -714,16 +723,15 @@ function template_pagesection($button_strip = false, $strip_direction = '', $go 
 
 	// Also, would love to deprecate the old/top bottom buttons for something better (which I already know how to do). < Done. :)
 	// @todo - Just leaving stuff commented for the moment, in preparation for the inevitable bleating and circular motion. :D
-		echo '
+	echo '
 			<div class="pagesection">
 				', $pages;
-		/*	<div class="pagesection">
-				', $options['top_button'] ? '<a id="page' . ($go != 'go_up' ? 'top' : 'bot') . '" href="#' . ($go == 'go_up' ? 'top' : 'bot') . '" class="topbottom floatleft">' . $txt[$go] . '</a>' : '', $pages, '*/
-		echo '
+	/* 	<div class="pagesection">
+	  ', $options['top_button'] ? '<a id="page' . ($go != 'go_up' ? 'top' : 'bot') . '" href="#' . ($go == 'go_up' ? 'top' : 'bot') . '" class="topbottom floatleft">' . $txt[$go] . '</a>' : '', $pages, ' */
+	echo '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
-				$options['extra'], '
+	$options['extra'], '
 			</div>';
-
 }
 
 /**
