@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// This function displays all the stuff you get with a richedit box - BBC, smileys etc.
+/**
+ * This function displays all the stuff you get with a richedit box - BBC, smileys etc.
+ */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {
 	global $context, $settings, $options;
@@ -22,7 +24,6 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
 	echo '
-
 		<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" cols="600" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], '; height: ', $editor_context['height'], '; ', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script><!-- // --><![CDATA[
@@ -136,6 +137,9 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		// ]]></script>';
 }
 
+/**
+ * Shows the buttons that the user can see .. preview, spellcheck, drafts, etcc
+ */
 function template_control_richedit_buttons($editor_id)
 {
 	global $context, $settings, $options, $txt;
@@ -209,7 +213,9 @@ function template_control_richedit_buttons($editor_id)
 	}
 }
 
-// What's this, verification?!
+/**
+ * What's this, verification?!
+ */
 function template_control_verification($verify_id)
 {
 	global $context;
@@ -217,6 +223,7 @@ function template_control_verification($verify_id)
 	$verify_context = &$context['controls']['verification'][$verify_id];
 
 	$i = 0;
+
 	// Loop through each item to show them.
 	foreach ($verify_context['test'] as $key => $verification)
 	{
@@ -230,31 +237,38 @@ function template_control_verification($verify_id)
 
 		echo '
 			</div>';
+
 		$i++;
 	}
 }
 
+/**
+ * Used to show a verification question
+ */
 function template_control_verification_questions($verify_id, $verify_context)
 {
 	global $context;
 
 	foreach ($verify_context as $question)
-			echo '
+		echo '
 				<div class="smalltext">
 					', $question['q'], ':<br />
 					<input type="text" name="', $verify_id, '_vv[q][', $question['id'], ']" size="30" value="', $question['a'], '" ', $question['is_error'] ? ' class="border_error"' : '', ' tabindex="', $context['tabindex']++, '" class="input_text" />
 				</div>';
 }
 
+/**
+ * Used to show one of those easy for robot, hard for human captcha's
+ */
 function template_control_verification_captcha($verify_id, $verify_context)
 {
 	global $context, $txt;
 
-			if ($verify_context['use_graphic_library'])
-				echo '
+	if ($verify_context['use_graphic_library'])
+		echo '
 				<img src="', $verify_context['image_href'], '" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '" />';
-			else
-				echo '
+	else
+		echo '
 				<img src="', $verify_context['image_href'], ';letter=1" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_1" />
 				<img src="', $verify_context['image_href'], ';letter=2" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_2" />
 				<img src="', $verify_context['image_href'], ';letter=3" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_3" />
@@ -262,11 +276,10 @@ function template_control_verification_captcha($verify_id, $verify_context)
 				<img src="', $verify_context['image_href'], ';letter=5" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_5" />
 				<img src="', $verify_context['image_href'], ';letter=6" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_6" />';
 
-			echo '
+	echo '
 				<div class="smalltext" style="margin: 4px 0 8px 0;">
 					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" rel="nofollow">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh">', $txt['visual_verification_request_new'], '</a><br /><br />
 					', $txt['visual_verification_description'], ':<br />
 					<input type="text" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 				</div>';
-
 }
