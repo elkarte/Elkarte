@@ -57,8 +57,8 @@ function template_editsets()
 
 		if (!empty($context['selected_set']))
 			echo '
-
 			changeSet("', $context['selected_set'], '");';
+
 		if (!empty($context['selected_smiley']))
 			echo '
 			loadSmiley(', $context['selected_smiley'], ');';
@@ -95,7 +95,6 @@ function template_modifyset()
 			echo '
 			<div class="information">
 				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-mss_token_var'], '=' ,$context['admin-mss_token'],'">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
-
 			</div>';
 		}
 
@@ -116,18 +115,20 @@ function template_modifyset()
 							', $modSettings['smileys_url'], '/';
 
 		if ($context['current_set']['id'] == 'default')
-			echo '<strong>default</strong><input type="hidden" name="smiley_sets_path" id="smiley_sets_path" value="default" />';
+			echo '
+							<strong>default</strong><input type="hidden" name="smiley_sets_path" id="smiley_sets_path" value="default" />';
 		elseif (empty($context['smiley_set_dirs']))
 			echo '
 							<input type="text" name="smiley_sets_path" id="smiley_sets_path" value="', $context['current_set']['path'], '" class="input_text" /> ';
-
 		else
 		{
 			echo '
 							<select name="smiley_sets_path" id="smiley_sets_path">';
+
 			foreach ($context['smiley_set_dirs'] as $smiley_set_dir)
 				echo '
 								<option value="', $smiley_set_dir['id'], '"', $smiley_set_dir['current'] ? ' selected="selected"' : '', $smiley_set_dir['selectable'] ? '' : ' disabled="disabled"', '>', $smiley_set_dir['id'], '</option>';
+
 			echo '
 							</select> ';
 		}
@@ -204,6 +205,7 @@ function template_modifysmiley()
 							<strong><label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
 						</dt>
 						<dd>';
+
 			if (empty($context['filenames']))
 				echo '
 							<input type="text" name="smiley_filename" id="smiley_filename" value="', $context['current_smiley']['filename'], '" class="input_text" />';
@@ -211,9 +213,11 @@ function template_modifysmiley()
 			{
 				echo '
 							<select name="smiley_filename" id="smiley_filename" onchange="updatePreview();">';
+
 				foreach ($context['filenames'] as $filename)
 					echo '
 								<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
+
 				echo '
 							</select>';
 			}
@@ -309,6 +313,7 @@ function template_addsmiley()
 								<strong><label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
 							</dt>
 							<dd>';
+
 	if (empty($context['filenames']))
 		echo '
 								<input type="text" name="smiley_filename" id="smiley_filename" value="', $context['current_smiley']['filename'], '" onchange="selectMethod(\'existing\');" class="input_text" />';
@@ -319,6 +324,7 @@ function template_addsmiley()
 		foreach ($context['filenames'] as $filename)
 			echo '
 									<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
+
 		echo '
 								</select>';
 	}
@@ -428,6 +434,7 @@ function template_setorder()
 			<div class="windowbg">
 				<div class="content">
 					<strong>', empty($context['move_smiley']) ? $txt['smileys_move_select_smiley'] : $txt['smileys_move_select_destination'], '...</strong><br />';
+
 		foreach ($location['rows'] as $row)
 		{
 			if (!empty($context['move_smiley']))
@@ -445,9 +452,11 @@ function template_setorder()
 			echo '
 					<br />';
 		}
+
 		if (!empty($context['move_smiley']))
 			echo '
 					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $location['last_row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
+
 		echo '
 				</div>
 			</div>

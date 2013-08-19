@@ -25,6 +25,7 @@ function template_registration_agreement()
 		<form action="', $scripturl, '?action=register" method="post" accept-charset="UTF-8" id="registration">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['registration_agreement'];
+
 	if (!empty($context['languages']))
 	{
 		if (count($context['languages']) === 1)
@@ -35,9 +36,11 @@ function template_registration_agreement()
 		{
 			echo '
 				<select onchange="this.form.submit()" class="floatright" name="lngfile">';
+
 			foreach ($context['languages'] as $lang_key => $lang_val)
 				echo '
 					<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>',  $lang_val['name'], '</option>';
+
 			echo '
 				</select>';
 		}
@@ -69,7 +72,6 @@ function template_registration_agreement()
 			</div>
 			<input type="hidden" name="step" value="1" />
 		</form>';
-
 }
 
 /**
@@ -463,6 +465,7 @@ function template_coppa()
 		echo '
 					<p>', $context['coppa']['phone'], '</p>';
 	}
+
 	echo '
 				</div>
 			</div>';
@@ -776,10 +779,12 @@ function template_contact_form()
 		</div>
 		<form id="contact_form" class="windowbg2" action="', $scripturl, '?action=contact" method="post" accept-charset="UTF-8">
 			<div class="content">';
-			if (!empty($context['errors']))
-				echo '
+
+	if (!empty($context['errors']))
+		echo '
 				<div class="errorbox">', $txt['errors_contact_form'], ': <ul><li>', implode('</li><li>', $context['errors']), '</li></ul></div>';
-			echo '
+
+	echo '
 				<dl class="settings">
 					<dt>
 						<label for="emailaddres">', $txt['admin_register_email'], '</label>
@@ -794,18 +799,18 @@ function template_contact_form()
 						<textarea id="contactmessage" name="contactmessage" cols="50" rows="10" tabindex="', $context['tabindex']++, '">', !empty($context['contactmessage']) ? $context['contactmessage'] : '', '</textarea>
 					</dd>';
 
-			if ($context['require_verification'])
-			{
-					echo '
+	if ($context['require_verification'])
+	{
+			echo '
 					<dt>
 							', $txt['verification'], ':
 					</dt>
 					<dd>
 							', template_control_verification($context['visual_verification_id'], 'all'), '
 					</dd>';
-			}
+	}
 
-			echo '
+	echo '
 				</dl>
 				<hr />
 				<div class="submitbutton" >

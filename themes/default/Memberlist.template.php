@@ -55,13 +55,13 @@ function template_main()
 	<div id="memberlist">
 		<h2 class="category_header">
 				<span class="floatleft">', $txt['members_list'], '</span>';
-		if (!isset($context['old_search']))
-				echo '
-				<span class="floatright" letter_links>', $context['letter_links'], '</span>';
+
+	if (!isset($context['old_search']))
 		echo '
-		</h2>';
+				<span class="floatright" letter_links>', $context['letter_links'], '</span>';
 
 	echo '
+		</h2>
 		<table class="table_grid">
 			<thead>
 				<tr class="table_head">';
@@ -82,6 +82,7 @@ function template_main()
 						', $column['link'], '
 					</th>';
 	}
+
 	echo '
 				</tr>
 			</thead>
@@ -95,6 +96,7 @@ function template_main()
 		{
 			echo '
 				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>';
+
 			foreach ($context['columns'] as $column => $values)
 			{
 				if (isset($member[$column]))
@@ -129,7 +131,7 @@ function template_main()
 			echo '
 					</tr>';
 
-				$alternate = !$alternate;
+			$alternate = !$alternate;
 		}
 	}
 	// No members?
@@ -139,7 +141,7 @@ function template_main()
 					<td colspan="', $context['colspan'], '" class="standard_row">', $txt['search_no_results'], '</td>
 				</tr>';
 
-				echo '
+	echo '
 			</tbody>
 		</table>';
 
@@ -155,5 +157,4 @@ function template_main()
 
 	echo '
 	</div>';
-
 }

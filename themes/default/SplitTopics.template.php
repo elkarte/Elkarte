@@ -58,14 +58,16 @@ function template_ask()
 								</dd>
 							</dl>
 						</fieldset>';
+
 	if (!empty($context['can_move']))
 		echo '
 						<p>
-							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ',$txt['splittopic_move'] , '.</label>', template_select_boards('board_list'), '
+							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('board_list'), '
 							<script><!-- // --><![CDATA[
 								document.getElementById(\'board_list\').style.display = \'none\';
 							// ]]></script>
 						</p>';
+	
 	echo '
 						<div class="submitbutton">
 							<input type="submit" value="', $txt['split'], '" class="button_submit" />
@@ -153,7 +155,7 @@ function template_select()
 				</div>
 				<div class="information">
 					', $txt['split_selected_posts_desc'], '
-				</div>', template_pagesection(false, false, '', array('top_button' => false, 'page_index_markup' => '<div id="pageindex_selected">' .$context['selected']['page_index'] . '</div>')), '
+				</div>', template_pagesection(false, false, '', array('top_button' => false, 'page_index_markup' => '<div id="pageindex_selected">' . $context['selected']['page_index'] . '</div>')), '
 				<ul id="messages_selected" class="split_messages smalltext">';
 
 	if (!empty($context['selected']['messages']))
