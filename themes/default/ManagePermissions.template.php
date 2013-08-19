@@ -32,33 +32,33 @@ function template_permission_index()
 	<div id="admin_form_wrapper">
 		<form action="', $scripturl, '?action=admin;area=permissions;sa=quick" method="post" accept-charset="UTF-8" name="permissionForm" id="permissionForm">';
 
-		if (!empty($context['profile']))
-			echo '
+	if (!empty($context['profile']))
+		echo '
 			<div class="title_bar">
 				<h3 class="titlebg">', $txt['permissions_for_profile'], ': &quot;', $context['profile']['name'], '&quot;</h3>
 			</div>';
-		else
-			echo '
+	else
+		echo '
 			<div class="title_bar">
 				<h3 class="titlebg">', $txt['permissions_title'], '</h3>
 			</div>';
 
-		echo '
+	echo '
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
 						<th>', $txt['membergroups_name'], '</th>
 						<th style="width:10%">', $txt['membergroups_members_top'], '</th>';
 
-			if (empty($modSettings['permission_enable_deny']))
-				echo '
+	if (empty($modSettings['permission_enable_deny']))
+		echo '
 						<th style="width:16%">', $txt['membergroups_permissions'], '</th>';
-			else
-				echo '
+	else
+		echo '
 						<th style="width:8%">', $txt['permissions_allowed'], '</th>
 						<th style="width:8%">', $txt['permissions_denied'], '</th>';
 
-			echo '
+	echo '
 						<th class="centertext" style="width:10%; vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
 						<th class="centertext" style="width:4%;vertical-align:middle">
 							', $context['can_modify'] ? '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'group\');" />' : '', '
@@ -94,7 +94,7 @@ function template_permission_index()
 						<td class="centertext" style="width:8%', $group['id'] == 1 || $group['id'] == -1 ? ';font-style:italic"' : (!empty($group['num_permissions']['denied']) ? ';color: red"' : '"'), '>', $group['num_permissions']['denied'], '</td>';
 
 		echo '
-						<td class="centertext">', $group['allow_modify'] ? '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $group['id'] . (empty($context['profile']) ? '' : ';pid=' . $context['profile']['id']) . '">' . ($context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view']). '</a>' : '', '</td>
+						<td class="centertext">', $group['allow_modify'] ? '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $group['id'] . (empty($context['profile']) ? '' : ';pid=' . $context['profile']['id']) . '">' . ($context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view']) . '</a>' : '', '</td>
 						<td class="centertext">', $group['allow_modify'] && $context['can_modify'] ? '<input type="checkbox" name="group[]" value="' . $group['id'] . '" class="input_check" />' : '', '</td>
 					</tr>';
 	}
@@ -272,6 +272,9 @@ function template_permission_index()
 	</div>';
 }
 
+/**
+ * Template for setting permissions by board
+ */
 function template_by_board()
 {
 	global $context, $scripturl, $txt;
@@ -321,8 +324,7 @@ function template_by_board()
 			$alternate = !$alternate;
 
 			echo '
-
-						<li class="flow_hidden' ,' windowbg', $alternate ? '' : '2','">
+						<li class="flow_hidden', ' windowbg', $alternate ? '' : '2', '">
 							<span class="perm_board floatleft">
 								<a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], ';rid=permissions;', $context['session_var'], '=', $context['session_id'], '">', str_repeat('-', $board['child_level']), ' ', $board['name'], '</a>
 							</span>
@@ -374,7 +376,9 @@ function template_by_board()
 	</div>';
 }
 
-// Edit permission profiles (predefined).
+/**
+ * Edit permission profiles (predefined).
+ */
 function template_edit_profiles()
 {
 	global $context, $scripturl, $txt;
@@ -475,6 +479,9 @@ function template_edit_profiles()
 	</div>';
 }
 
+/**
+ * Template for modifying group permissions
+ */
 function template_modify_group()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -522,6 +529,7 @@ function template_modify_group()
 	else
 		echo '
 				', $context['permission_type'] == 'membergroup' ? $txt['permissions_general'] : $txt['permissions_board'], ' - &quot;', $context['group']['name'], '&quot;';
+
 	echo '
 				</h3>
 			</div>
@@ -563,7 +571,9 @@ function template_modify_group()
 	</div>';
 }
 
-// The classic way of looking at permissions.
+/**
+ * The classic way of looking at permissions.
+ */
 function template_modify_group_classic($type)
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -610,6 +620,7 @@ function template_modify_group_classic($type)
 								<th><div>', $txt['permissions_option_on'], '</div></th>
 								<th><div>', $txt['permissions_option_off'], '</div></th>
 								<th><div>', $txt['permissions_option_deny'], '</div></th>';
+
 					echo '
 							</tr>';
 				}
@@ -638,6 +649,7 @@ function template_modify_group_classic($type)
 					else
 						echo '
 									<input type="hidden" name="perm[', $permission_type['id'], '][', $permission['id'], ']" value="', $permission['select'] == 'denied' && !empty($modSettings['permission_enable_deny']) ? 'deny' : $permission['select'], '" />';
+
 					echo '
 								</td>
 							</tr>';
@@ -704,7 +716,7 @@ function template_modify_group_classic($type)
 									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] == 'off' ? ' checked="checked"' : '', ' value="off" class="input_radio" ', $disable_field, '/>
 								</td>
 								<td>
-									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select']== 'denied' ? ' checked="checked"' : '', ' value="deny" id="', $permission['any']['id'], '_deny" onclick="window.elk_usedDeny = true;" class="input_radio" ', $disable_field, '/>
+									<input type="radio" name="perm[', $permission_type['id'], '][', $permission['any']['id'], ']"', $permission['any']['select'] == 'denied' ? ' checked="checked"' : '', ' value="deny" id="', $permission['any']['id'], '_deny" onclick="window.elk_usedDeny = true;" class="input_radio" ', $disable_field, '/>
 								</td>';
 
 						echo '
@@ -745,7 +757,7 @@ function template_modify_group_classic($type)
 								<td colspan="5" style="width:100%"><!--separator--></td>
 							</tr>';
 		}
-	echo '
+		echo '
 						</table>';
 	}
 	echo '
@@ -753,6 +765,9 @@ function template_modify_group_classic($type)
 			</div>';
 }
 
+/**
+ * Show a collapsible box to set a specific permission.
+ */
 function template_inline_permissions()
 {
 	global $context, $txt, $modSettings;
@@ -824,7 +839,9 @@ function template_inline_permissions()
 		// ]]></script>';
 }
 
-// Edit post moderation permissions.
+/**
+ * Edit post moderation permissions.
+ */
 function template_postmod_permissions()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
@@ -898,11 +915,12 @@ function template_postmod_permissions()
 					<tr>
 						<td style="width:40%" class="windowbg">
 							<span ', ($group['color'] ? 'style="color: ' . $group['color'] . '"' : ''), '>', $group['name'], '</span>';
-			if (!empty($group['children']))
-				echo '
+
+		if (!empty($group['children']))
+			echo '
 							<br /><span class="smalltext">', $txt['permissions_includes_inherited'], ': &quot;', implode('&quot;, &quot;', $group['children']), '&quot;</span>';
 
-			echo '
+		echo '
 						</td>
 						<td class="windowbg2 centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="allow" ', $group['new_topic'] == 'allow' ? 'checked="checked"' : '', ' class="input_radio" /></td>
 						<td class="windowbg2 centertext"><input type="radio" name="new_topic[', $group['id'], ']" value="moderate" ', $group['new_topic'] == 'moderate' ? 'checked="checked"' : '', ' class="input_radio" /></td>
