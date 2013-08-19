@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// Generate a strip of buttons, out of buttons.
+/**
+ * Generate a strip of buttons, out of buttons.
+ */
 function template_button_strip($button_strip, $direction = 'top', $strip_options = array())
 {
 	global $context, $txt;
@@ -40,7 +42,7 @@ function template_button_strip($button_strip, $direction = 'top', $strip_options
 	$buttons[count($buttons) - 1] = str_replace('<span>', '<span class="last">', $buttons[count($buttons) - 1]);
 
 	echo '
-		<div class="buttonlist', $direction != 'top' ? '_bottom' : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"': ''), '>
+		<div class="buttonlist', $direction != 'top' ? '_bottom' : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
 			<ul>
 				', implode('', $buttons), '
 			</ul>

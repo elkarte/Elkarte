@@ -127,7 +127,7 @@ function template_credits()
 	foreach ($context['credits'] as $section)
 	{
 		if (isset($section['pretext']))
-		echo '
+			echo '
 		<div class="windowbg">
 			<div class="content">
 				<p>', $section['pretext'], '</p>
@@ -135,7 +135,7 @@ function template_credits()
 		</div>';
 
 		if (isset($section['title']))
-		echo '
+			echo '
 		<div class="cat_bar">
 			<h3 class="catbg">', $section['title'], '</h3>
 		</div>';

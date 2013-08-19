@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/*
+ * Template used to show a list created with createlist
+ */
 function template_show_list($list_id = null)
 {
 	global $context, $settings;
@@ -26,7 +29,6 @@ function template_show_list($list_id = null)
 		echo '
 	<form class="generic_list_wrapper" action="', $cur_list['form']['href'], '" method="post"', empty($cur_list['form']['name']) ? '' : ' name="' . $cur_list['form']['name'] . '" id="' . $cur_list['form']['name'] . '"', ' accept-charset="UTF-8">
 		<div class="generic_list">';
-
 	else
 		echo '
 		<div class="generic_list_wrapper">';
@@ -40,15 +42,19 @@ function template_show_list($list_id = null)
 				</h3>
 			</div>';
 
+	// Show any data right after the title
 	if (isset($cur_list['additional_rows']['after_title']))
 	{
 		echo '
 			<div class="information flow_hidden">';
+
 		template_additional_rows('after_title', $cur_list);
+
 		echo '
 			</div>';
 	}
 
+	// Show some data above this list
 	if (isset($cur_list['additional_rows']['top_of_list']))
 		template_additional_rows('top_of_list', $cur_list);
 
@@ -63,7 +69,7 @@ function template_show_list($list_id = null)
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 			echo '
 				<div class="floatleft">',
-					template_pagesection(false, false, 'go_down', array('page_index_markup' => $cur_list['page_index'], 'top_button' => !empty($cur_list['show_topbot']))), '
+			template_pagesection(false, false, 'go_down', array('page_index_markup' => $cur_list['page_index'], 'top_button' => !empty($cur_list['show_topbot']))), '
 				</div>';
 
 		if (isset($cur_list['additional_rows']['above_column_headers']))
@@ -76,15 +82,17 @@ function template_show_list($list_id = null)
 		if (!$close_div)
 			echo '
 			<div class="flow_auto">';
+
 		$close_div = true;
 
-		template_create_list_menu($cur_list['list_menu'], 'top');
+		template_create_list_menu($cur_list['list_menu']);
 	}
 
 	if ($close_div)
 		echo '
 			</div>';
 
+	// Start of the main table
 	echo '
 			<table class="table_grid" style="width:', !empty($cur_list['width']) ? $cur_list['width'] : '', '">';
 
@@ -100,7 +108,7 @@ function template_show_list($list_id = null)
 		$i = 0;
 		foreach ($cur_list['headers'] as $col_header)
 		{
-			$i ++;
+			$i++;
 			if ($i === 1)
 				$col_header['class'] = empty($col_header['class']) ? '' : $col_header['class'];
 			elseif ($i === $header_count)
@@ -115,7 +123,7 @@ function template_show_list($list_id = null)
 			</thead>';
 	}
 
-		echo '
+	echo '
 			<tbody>';
 
 	// Show a nice message informing there are no items in this list.
@@ -126,7 +134,6 @@ function template_show_list($list_id = null)
 				<tr>
 					<td class="windowbg" colspan="', $cur_list['num_columns'], '" style="text-align:', !empty($cur_list['no_items_align']) ? $cur_list['no_items_align'] : 'center', '"><div class="padding">', $cur_list['no_items_label'], '</div></td>
 				</tr>';
-
 	// Show the list rows.
 	elseif (!empty($cur_list['rows']))
 	{
@@ -152,6 +159,8 @@ function template_show_list($list_id = null)
 			</table>';
 
 	$close_div = false;
+
+	// Do we have multiple pages to show or data to show below the table
 	if ((!empty($cur_list['items_per_page']) && !empty($cur_list['page_index'])) || isset($cur_list['additional_rows']['below_table_data']))
 	{
 		$close_div = true;
@@ -162,7 +171,7 @@ function template_show_list($list_id = null)
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 			echo '
 				<div class="floatleft">',
-					template_pagesection(false, false, 'go_down', array('page_index_markup' => $cur_list['page_index'], 'top_button' => !empty($cur_list['show_topbot']))), '
+			template_pagesection(false, false, 'go_down', array('page_index_markup' => $cur_list['page_index'], 'top_button' => !empty($cur_list['show_topbot']))), '
 				</div>';
 
 		if (isset($cur_list['additional_rows']['below_table_data']))
@@ -175,15 +184,17 @@ function template_show_list($list_id = null)
 		if (!$close_div)
 			echo '
 			<div class="flow_auto">';
+
 		$close_div = true;
 
-		template_create_list_menu($cur_list['list_menu'], 'bottom');
+		template_create_list_menu($cur_list['list_menu']);
 	}
 
 	if ($close_div)
 		echo '
 			</div>';
 
+	// Last chance to show more data, like buttons or add in javascript
 	if (isset($cur_list['additional_rows']['bottom_of_list']))
 		template_additional_rows('bottom_of_list', $cur_list);
 
@@ -197,7 +208,6 @@ function template_show_list($list_id = null)
 		</div>
 	</form>';
 	}
-
 	else
 		echo '
 		</div>';
@@ -209,6 +219,9 @@ function template_show_list($list_id = null)
 	// ]]></script>';
 }
 
+/**
+ * Generic template used to show additonal rows of data (above/below)
+ */
 function template_additional_rows($row_position, $cur_list)
 {
 	foreach ($cur_list['additional_rows'][$row_position] as $row)
@@ -216,35 +229,32 @@ function template_additional_rows($row_position, $cur_list)
 				<div class="additional_row', empty($row['class']) ? '' : ' ' . $row['class'], '"', empty($row['style']) ? '' : ' style="' . $row['style'] . '"', '>', $row['value'], '</div>';
 }
 
-function template_create_list_menu($list_menu, $direction = 'top')
+/**
+ * Used this if you want your generic lists to have navigation menus.
+ * $cur_list['list_menu'] = array(
+ *		// The posisiton of the tabs/buttons.  Left or Right.  By default is set to left.
+ *		'position' => 'left',
+ *		// Links.  This is the core of the array.  It has all the info that we need.
+ *		'links' => array(
+ *			'name' => array(
+ *				// This will tell use were to go when they click it.
+ *				'href' => $scripturl . '?action=theaction',
+ *				// The name that you want to appear for the link.
+ *				'label' => $txt['name'],
+ *				// If we use tabs instead of buttons we highlight the current tab.
+ *				// Must use conditions to determine if its selected or not.
+ *				'is_selected' => isset($_REQUEST['name']),
+ *			),
+ *		),
+ *	);
+ */
+function template_create_list_menu($list_menu)
 {
 	global $settings;
 
-	/**
-		// This is use if you want your generic lists to have tabs.
-		$cur_list['list_menu'] = array(
-			// The posisiton of the tabs/buttons.  Left or Right.  By default is set to left.
-			'position' => 'left',
-			// This gives you the option to show tabs only at the top, bottom or both.
-			// By default they are just shown at the top.
-			'show_on' => 'top',
-			// Links.  This is the core of the array.  It has all the info that we need.
-			'links' => array(
-				'name' => array(
-					// This will tell use were to go when they click it.
-					'href' => $scripturl . '?action=theaction',
-					// The name that you want to appear for the link.
-					'label' => $txt['name'],
-					// If we use tabs instead of buttons we highlight the current tab.
-					// Must use conditions to determine if its selected or not.
-					'is_selected' => isset($_REQUEST['name']),
-				),
-			),
-		);
-	*/
-
 	echo '
 			<div class="float', $list_menu['position'], ' additional_row', empty($list_menu['class']) ? '' : ' ' . $list_menu['class'], '"', empty($list_menu['style']) ? '' : ' style="' . $list_menu['style'] . '"', '>';
+
 	$items = count($list_menu['links']);
 	$count = 0;
 
@@ -252,11 +262,12 @@ function template_create_list_menu($list_menu, $direction = 'top')
 	{
 		$count++;
 		if (!empty($link['href']))
-		echo '
+			echo '
 				<a href="', $link['href'], '">', $link['is_selected'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="&gt;" /> ' : '';
 
 		echo $link['label'], !empty($link['href']) ? '</a>' : '', $items !== $count ? '&nbsp;|&nbsp;' : '';
 	}
+
 	echo '
 			</div>';
 }

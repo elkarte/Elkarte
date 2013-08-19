@@ -62,8 +62,8 @@ function template_maintain_database()
 		echo '
 					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'noticebox', '">
 					', $txt[$context['suggested_method']],
-					$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
-					'</div>';
+		$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
+		'</div>';
 
 	echo '
 					<p>
@@ -72,9 +72,7 @@ function template_maintain_database()
 						<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['maintain_backup_gz'], '</label>
 					</p>
 
-					<input ', $context['use_maintenance'] == 2 ? 'disabled="disabled" ' : '', 'type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" onclick="return document.getElementById(\'struct\').checked || document.getElementById(\'data\').checked;" class="button_submit" />';
-
-	echo '
+					<input ', $context['use_maintenance'] == 2 ? 'disabled="disabled" ' : '', 'type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" onclick="return document.getElementById(\'struct\').checked || document.getElementById(\'data\').checked;" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 				</form>
@@ -134,10 +132,12 @@ function template_maintain_routine()
 				<form action="', $action['url'], '" method="post" accept-charset="UTF-8">
 					<p>', $action['description'], '
 						<input type="submit" value="', $action['submit'], '" class="button_submit" />';
+
 		if (!empty($action['hidden']))
 			foreach ($action['hidden'] as $name => $val)
 				echo '
 						<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
+
 		echo '
 					</p>
 				</form>
@@ -212,7 +212,7 @@ function template_maintain_members()
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
-	echo '
+		echo '
 		<div class="infobox">
 			', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 		</div>';
@@ -384,7 +384,7 @@ function template_maintain_topics()
 						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
 					</p>';
 
-		echo '
+	echo '
 					<p>
 						<a href="#rotLink" onclick="swapRot();"><img src="', $settings['images_url'], '/selected.png" alt="+" id="rotIcon" /></a> <a href="#rotLink" onclick="swapRot();" id="rotText" style="font-weight: bold;">', $txt['maintain_old_all'], '</a>
 					</p>
@@ -513,6 +513,7 @@ function template_convert_msgbody()
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['body_checking_introduction'], '</p>';
+
 	if (!empty($context['exceeding_messages']))
 	{
 		echo '
@@ -522,6 +523,7 @@ function template_convert_msgbody()
 					', implode('</li><li>', $context['exceeding_messages']), '
 					</li>
 				</ul>';
+		
 		if (!empty($context['exceeding_messages_morethan']))
 			echo '
 				<p>', $context['exceeding_messages_morethan'], '</p>';
