@@ -171,8 +171,8 @@ function template_search_members()
 					</thead>
 					<tbody>';
 
-			foreach ($context['membergroups'] as $membergroup)
-				echo '
+	foreach ($context['membergroups'] as $membergroup)
+		echo '
 						<tr class="windowbg2">
 							<td>', $membergroup['name'], '</td>
 							<td class="centertext">
@@ -183,7 +183,7 @@ function template_search_members()
 							</td>
 						</tr>';
 
-			echo '
+	echo '
 						<tr class="windowbg2">
 							<td>
 								<em>', $txt['check_all'], '</em>
@@ -209,8 +209,8 @@ function template_search_members()
 					</thead>
 					<tbody>';
 
-			foreach ($context['postgroups'] as $postgroup)
-				echo '
+	foreach ($context['postgroups'] as $postgroup)
+		echo '
 						<tr class="windowbg2">
 							<td>
 								', $postgroup['name'], '
@@ -220,7 +220,7 @@ function template_search_members()
 							</td>
 						</tr>';
 
-			echo '
+	echo '
 						<tr class="windowbg2">
 							<td>
 								<em>', $txt['check_all'], '</em>

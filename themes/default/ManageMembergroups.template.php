@@ -20,9 +20,10 @@
 function template_regular_membergroups_list()
 {
 	template_show_list('regular_membergroups_list');
-	echo '<br /><br />';
-	template_show_list('post_count_membergroups_list');
 
+	echo '<br /><br />';
+
+	template_show_list('post_count_membergroups_list');
 }
 
 /**
@@ -191,7 +192,6 @@ function template_edit_group()
 
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 		echo '
-
 						<dt id="group_desc_text">
 							<label for="group_desc_input"><strong>', $txt['membergroups_edit_desc'], ':</strong></label>
 						</dt>
@@ -270,7 +270,6 @@ function template_edit_group()
 
 	if ($context['group']['allow_post_group'])
 		echo '
-
 						<dt id="min_posts_text">
 							<label for="min_posts_input"><strong>', $txt['membergroups_min_posts'], ':</strong></label>
 						</dt>
@@ -321,7 +320,9 @@ function template_edit_group()
 							<span class="smalltext">' . $txt['membergroups_new_board_post_groups'] . '</span>' : '', '
 						</dt>
 						<dd>';
+
 		template_add_edit_group_boards_list('groupForm');
+
 		echo '
 						</dd>';
 	}
@@ -375,14 +376,14 @@ function template_edit_group()
 			sItemListContainerId: \'moderator_container\',
 			aListItems: [';
 
-		foreach ($context['group']['moderators'] as $id_member => $member_name)
-			echo '
+	foreach ($context['group']['moderators'] as $id_member => $member_name)
+		echo '
 						{
 							sItemId: ', JavaScriptEscape($id_member), ',
 							sItemName: ', JavaScriptEscape($member_name), '
 						}', $id_member == $context['group']['last_moderator_id'] ? '' : ',';
 
-		echo '
+	echo '
 			]
 		});
 	// ]]></script>';
@@ -418,6 +419,7 @@ function template_edit_group()
 function template_add_edit_group_boards_list($form_id, $collapse = true)
 {
 	global $context, $txt, $modSettings;
+
 	echo '
 							<fieldset id="visible_boards">
 								<legend>', $txt['membergroups_new_board_desc'], '</legend>
@@ -512,7 +514,7 @@ function template_group_members()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : '') , ';sa=members;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" id="view_group">
+		<form action="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" id="view_group">
 			<div class="cat_bar">
 				<h3 class="catbg">', $context['page_title'], '</h3>
 			</div>
@@ -525,14 +527,15 @@ function template_group_members()
 						<dd>
 							<span ', $context['group']['online_color'] ? 'style="color: ' . $context['group']['online_color'] . ';"' : '', '>', $context['group']['name'], '</span> ', $context['group']['icons'], '
 						</dd>';
-	//Any description to show?
+
+	// Any description to show?
 	if (!empty($context['group']['description']))
 		echo '
 						<dt>
 							<strong>' . $txt['membergroups_members_description'] . ':</strong>
 						</dt>
 						<dd>
-							', $context['group']['description'] ,'
+							', $context['group']['description'], '
 						</dd>';
 
 	echo '
@@ -540,8 +543,9 @@ function template_group_members()
 							<strong>', $txt['membergroups_members_top'], ':</strong>
 						</dt>
 						<dd>
-							', $context['total_members'] ,'
+							', $context['total_members'], '
 						</dd>';
+
 	// Any group moderators to show?
 	if (!empty($context['group']['moderators']))
 	{
@@ -554,7 +558,7 @@ function template_group_members()
 							<strong>', $txt['membergroups_members_group_moderators'], ':</strong>
 						</dt>
 						<dd>
-							', implode(', ', $moderators) ,'
+							', implode(', ', $moderators), '
 						</dd>';
 	}
 
@@ -581,10 +585,12 @@ function template_group_members()
 	echo '
 						<th><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=active', $context['sort_by'] == 'active' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['membergroups_members_last_active'], $context['sort_by'] == 'active' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a></th>
 						<th><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=registered', $context['sort_by'] == 'registered' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['date_registered'], $context['sort_by'] == 'registered' ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a></th>
-						<th ', empty($context['group']['assignable']) ? ' colspan="2"' : '', '><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=posts', $context['sort_by'] == 'posts' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['posts'], $context['sort_by'] == 'posts' ? ' <img src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '','</a></th>';
+						<th ', empty($context['group']['assignable']) ? ' colspan="2"' : '', '><a href="', $scripturl, '?action=', $context['current_action'], (isset($context['admin_area']) ? ';area=' . $context['admin_area'] : ''), ';sa=members;start=', $context['start'], ';sort=posts', $context['sort_by'] == 'posts' && $context['sort_direction'] == 'up' ? ';desc' : '', ';group=', $context['group']['id'], '">', $txt['posts'], $context['sort_by'] == 'posts' ? ' <img src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a></th>';
+
 	if (!empty($context['group']['assignable']))
 		echo '
 						<th style="width:4%"><input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" /></th>';
+
 	echo '
 					</tr>
 				</thead>
@@ -603,6 +609,7 @@ function template_group_members()
 		echo '
 					<tr class="', $alternate === true ? 'windowbg' : 'windowbg2', '">
 						<td>', $member['name'], '</td>';
+
 		if ($context['can_send_email'])
 		{
 			echo '
@@ -624,6 +631,7 @@ function template_group_members()
 			else
 				echo '
 								<a href="mailto:', $member['email'], '">', $member['email'], '</a>';
+
 			echo '
 						</td>';
 		}
@@ -632,11 +640,13 @@ function template_group_members()
 						<td>', $member['last_online'], '</td>
 						<td>', $member['registered'], '</td>
 						<td', empty($context['group']['assignable']) ? ' colspan="2"' : '', '>', $member['posts'], '</td>';
+
 		if (!empty($context['group']['assignable']))
 			echo '
 						<td class="centertext" style="width:4%">
 							<input type="checkbox" name="rem[]" value="', $member['id'], '" class="input_check" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
 						</td>';
+
 		echo '
 					</tr>';
 	}
@@ -652,6 +662,7 @@ function template_group_members()
 			</div>';
 
 	template_pagesection();
+
 	echo '
 			<br />';
 

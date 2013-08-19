@@ -41,7 +41,7 @@ function template_email_members()
 						<dd>';
 
 	foreach ($context['groups'] as $group)
-				echo '
+		echo '
 							<label for="groups_', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups_', $group['id'], '" value="', $group['id'], '" checked="checked" class="input_check" /> ', $group['name'], '</label> <em>(', $group['member_count'], ')</em><br />';
 
 	echo '
@@ -90,7 +90,7 @@ function template_email_members()
 						<dd>';
 
 	foreach ($context['groups'] as $group)
-				echo '
+		echo '
 							<label for="exclude_groups_', $group['id'], '"><input type="checkbox" name="exclude_groups[', $group['id'], ']" id="exclude_groups_', $group['id'], '" value="', $group['id'], '" class="input_check" /> ', $group['name'], '</label> <em>(', $group['member_count'], ')</em><br />';
 
 	echo '
@@ -231,7 +231,7 @@ function template_email_members_compose()
 				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
 					<dl>
 						<dt>
-							<strong id="error_serious">', $txt['error_while_submitting'] , '</strong>
+							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
 						</dt>
 						<dd class="error" id="error_list">
 							', empty($context['post_error']['messages']) ? '' : implode('<br />', $context['post_error']['messages']), '
@@ -243,7 +243,7 @@ function template_email_members_compose()
 						<span', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</span>
 					</dt>
 					<dd id="pm_subject">
-						<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="60" maxlength="60"',isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
+						<input type="text" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="60" maxlength="60"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', '/>
 					</dd>
 				</dl>
 				<hr class="clear" />
@@ -258,7 +258,7 @@ function template_email_members_compose()
 	echo '
 				', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
-					echo '
+	echo '
 				<ul>
 					<li><label for="send_pm"><input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '</label></li>
 					<li><label for="send_html"><input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '</label></li>

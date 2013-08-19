@@ -34,6 +34,7 @@ function template_modify_subscription()
 				<span class="alert">', $txt['paid_mod_edit_note'], '</span>
 			</div>
 			';
+
 	echo '
 			<div class="windowbg">
 				<div class="content">
@@ -140,17 +141,17 @@ function template_modify_subscription()
 						<fieldset>';
 
 	/** Removed until implemented
-	if (!empty($sdflsdhglsdjgs))
-		echo '
-							<dl class="settings">
-								<dt>
-									<label for="allow_partial_check">', $txt['paid_mod_allow_partial'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_allow_partial_desc'], '</span>
-								</dt>
-								<dd>
-									<input type="checkbox" name="allow_partial" id="allow_partial_check"', empty($context['sub']['allow_partial']) ? '' : ' checked="checked"', ' class="input_check" />
-								</dd>
-							</dl>';
-	*/
+	  if (!empty($sdflsdhglsdjgs))
+	  echo '
+	  <dl class="settings">
+	  <dt>
+	  <label for="allow_partial_check">', $txt['paid_mod_allow_partial'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_allow_partial_desc'], '</span>
+	  </dt>
+	  <dd>
+	  <input type="checkbox" name="allow_partial" id="allow_partial_check"', empty($context['sub']['allow_partial']) ? '' : ' checked="checked"', ' class="input_check" />
+	  </dd>
+	  </dl>';
+	 */
 	echo '
 							<div class="information">
 								<strong>', $txt['paid_mod_price_breakdown'], '</strong><br />
@@ -198,7 +199,6 @@ function template_modify_subscription()
 			</div>
 		</form>
 	</div>';
-
 }
 
 /**
@@ -225,7 +225,6 @@ function template_delete_subscription()
 			</div>
 		</form>
 	</div>';
-
 }
 
 /**

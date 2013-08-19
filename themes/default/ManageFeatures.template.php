@@ -54,7 +54,7 @@ function template_edit_profile_field()
 		if (isset($txt['custom_option_' . $_GET['msg']]))
 			echo '
 	<div class="errorbox">',
-		$txt['custom_option_' . $_GET['msg']], '
+			$txt['custom_option_' . $_GET['msg']], '
 	</div>';
 	}
 
@@ -181,10 +181,8 @@ function template_edit_profile_field()
 								<div>';
 
 	foreach ($context['field']['options'] as $k => $option)
-	{
 		echo '
 								', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
-	}
 
 	echo '
 								<span id="addopt"></span>
