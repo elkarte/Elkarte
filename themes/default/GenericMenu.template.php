@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// The sidebar menu option. Used for all admin, moderation, profile and PM pages.
+/**
+ * The sidebar menu option. Used for all admin, moderation, profile and PM pages.
+ */
 function template_generic_menu_sidebar_above()
 {
 	global $context;
@@ -63,7 +65,8 @@ function template_generic_menu_sidebar_above()
 			else
 				echo '
 					<a class="linklevel1" href="', isset($area['url']) ? $area['url'] : $menu_context['base_url'] . ';area=' . $i, $menu_context['extra_parameters'], '">', $area['label'], '</a>';
-			// Is there any subsections?
+
+			// Are there any subsections?
 			if (!empty($area['subsections']))
 			{
 				echo '
@@ -85,6 +88,7 @@ function template_generic_menu_sidebar_above()
 				echo '
 					</ul>';
 			}
+
 			echo '
 				</li>';
 		}
@@ -105,7 +109,9 @@ function template_generic_menu_sidebar_above()
 		template_generic_menu_tabs($menu_context);
 }
 
-// Part of the sidebar layer - closes off the main bit.
+/**
+ * Part of the sidebar layer - closes off the main bit.
+ */
 function template_generic_menu_sidebar_below()
 {
 	echo '
@@ -113,7 +119,9 @@ function template_generic_menu_sidebar_below()
 	</div>';
 }
 
-// The drop menu option. Used for all admin, moderation, profile and PM pages.
+/**
+ * The drop menu option. Used for all admin, moderation, profile and PM pages.
+ */
 function template_generic_menu_dropdown_above()
 {
 	global $context;
@@ -130,7 +138,7 @@ function template_generic_menu_dropdown_above()
 	{
 		echo '
 					<li class="listlevel1', !empty($section['areas']) ? ' subsections" aria-haspopup="true"' : '"', '>
-						<a class="linklevel1', !empty($section['selected']) ? ' active ' : '', '" href="', $section['url'], $menu_context['extra_parameters'], '">', $section['title'] , '</a>
+						<a class="linklevel1', !empty($section['selected']) ? ' active ' : '', '" href="', $section['url'], $menu_context['extra_parameters'], '">', $section['title'], '</a>
 						<ul class="menulevel2">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)
@@ -149,7 +157,7 @@ function template_generic_menu_dropdown_above()
 
 			// Is this the current area, or just some area?
 			if (!empty($area['selected']) && empty($context['tabs']))
-					$context['tabs'] = isset($area['subsections']) ? $area['subsections'] : array();
+				$context['tabs'] = isset($area['subsections']) ? $area['subsections'] : array();
 
 			// Are there any subsections?
 			if (!empty($area['subsections']))
@@ -191,18 +199,21 @@ function template_generic_menu_dropdown_above()
 				<div id="admin_content">';
 
 	// It's possible that some pages have their own tabs they wanna force...
-// 	if (!empty($context['tabs']))
-		template_generic_menu_tabs($menu_context);
+	template_generic_menu_tabs($menu_context);
 }
 
-// Part of the admin layer - used with admin_above to close the table started in it.
+/**
+ * Part of the admin layer - used with admin_above to close the table started in it.
+ */
 function template_generic_menu_dropdown_below()
 {
 	echo '
 				</div>';
 }
 
-// Some code for showing a tabbed view.
+/**
+ * Some code for showing a tabbed view.
+ */
 function template_generic_menu_tabs(&$menu_context)
 {
 	global $context, $settings, $scripturl, $txt;
@@ -215,7 +226,8 @@ function template_generic_menu_tabs(&$menu_context)
 		echo '
 					<div class="category_header">';
 
-		// The function is in Admin.template.php, but since this template is used elsewhere too better check if the function is available.
+		// The function is in Admin.template.php, but since this template is used elsewhere,
+		// we need to check if the function is available.
 		if (function_exists('template_admin_quick_search'))
 			template_admin_quick_search();
 
@@ -287,10 +299,8 @@ function template_generic_menu_tabs(&$menu_context)
 						', $tab_context['title'];
 		}
 		else
-		{
 			echo '
 						', $tab_context['title'];
-		}
 
 		echo '
 						</h3>
@@ -311,24 +321,22 @@ function template_generic_menu_tabs(&$menu_context)
 		echo '
 					<ul id="adm_submenus">';
 
-			foreach ($tab_context['tabs'] as $sa => $tab)
-			{
-				if (!empty($tab['disabled']))
-					continue;
+		foreach ($tab_context['tabs'] as $sa => $tab)
+		{
+			if (!empty($tab['disabled']))
+				continue;
 
-				if (!empty($tab['is_selected']))
-				{
-					echo '
+			if (!empty($tab['is_selected']))
+				echo '
 						<li class="listlevel1">
 							<a class="linklevel1 active" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
 						</li>';
-				}
-				else
-					echo '
+			else
+				echo '
 						<li class="listlevel1">
 							<a class="linklevel1" href="', isset($tab['url']) ? $tab['url'] : $menu_context['base_url'] . ';area=' . $menu_context['current_area'] . ';sa=' . $sa, $menu_context['extra_parameters'], isset($tab['add_params']) ? $tab['add_params'] : '', '">', $tab['label'], '</a>
 						</li>';
-			}
+		}
 
 		// the end of tabs
 		echo '
