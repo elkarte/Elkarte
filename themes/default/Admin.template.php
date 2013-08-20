@@ -173,7 +173,7 @@ function template_credits()
 						<div id="support_credits">
 							<div class="cat_bar">
 								<h3 class="catbg">
-									', $txt['support_title'], ' <img src="', $settings['images_url'], '/logo.png" id="credits_logo" alt="" />
+									', $txt['support_title'], ' <img src="', $settings['images_url'], (!empty($context['theme_variant']) ? '/'. $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ), '" id="credits_logo" alt="" />
 								</h3>
 							</div>
 							<div class="windowbg">

@@ -311,8 +311,9 @@ div.quick_tasks {
 }
 #credits_logo {
 	position: absolute;
-	right: 20px;
-	top: 60px;
+	right: 16px;
+	top: 11px;
+	width: 80px;
 }
 #support_credits .content {
 	padding: 0 18px;

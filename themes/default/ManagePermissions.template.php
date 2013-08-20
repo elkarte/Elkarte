@@ -477,7 +477,7 @@ function template_edit_profiles()
 
 function template_modify_group()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Cannot be edited?
 	if (!$context['profile']['can_modify'])

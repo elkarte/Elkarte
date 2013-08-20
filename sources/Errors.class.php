@@ -203,15 +203,15 @@ class error_context
 	{
 		global $txt;
 
+		if (empty($this->_errors))
+			return array();
+
 		// Load the default error language and any other language file needed
-		// @todo: we could load these languages only if really necessary...it just needs a coupld of changes
+		// @todo: we could load these languages only if really necessary...it just needs a couple of changes
 		loadLanguage('Errors');
 		if (!empty($this->_language_files))
 			foreach ($this->_language_files as $language)
 				loadLanguage($language);
-
-		if (empty($this->_errors))
-			return array();
 
 		call_integration_hook('integrate_' . $this->_name . '_errors', array(&$this->_errors, &$this->_severity_levels));
 
