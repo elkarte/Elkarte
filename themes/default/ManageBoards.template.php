@@ -99,8 +99,10 @@ function template_main()
 		// Button to add a new board.
 		echo '
 					</ul>
-					<input type="submit" value="', $txt['mboards_new_board'], '" class="button_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<div class="submitbutton">
+						<input type="submit" value="', $txt['mboards_new_board'], '" class="button_submit" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					</div>
 				</div>
 			</div>
 		</form>';
@@ -167,7 +169,8 @@ function template_modify_category()
 
 	// Table footer.
 	echo '
-					</dl>';
+					</dl>
+					<div class="submitbutton"';
 
 	if (isset($context['category']['is_new']))
 		echo '
@@ -188,6 +191,7 @@ function template_modify_category()
 						<input type="hidden" name="empty" value="1" />';
 
 	echo '
+					</div>
 				</div>
 			</div>
 		</form>
@@ -554,27 +558,29 @@ function template_modify_board()
 		echo '<div class="information">', $txt['mboards_recycle_disabled_delete'], '</div>';
 
 	echo '
-					<input type="hidden" name="rid" value="', $context['redirect_location'], '" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-be-' . $context['board']['id'] . '_token_var'], '" value="', $context['admin-be-' . $context['board']['id'] . '_token'], '" />';
+					<div class="submitbutton">
+						<input type="hidden" name="rid" value="', $context['redirect_location'], '" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['admin-be-' . $context['board']['id'] . '_token_var'], '" value="', $context['admin-be-' . $context['board']['id'] . '_token'], '" />';
 
 	// If this board has no children don't bother with the next confirmation screen.
 	if ($context['board']['no_children'])
 		echo '
-					<input type="hidden" name="no_children" value="1" />';
+						<input type="hidden" name="no_children" value="1" />';
 
 	if (isset($context['board']['is_new']))
 		echo '
-					<input type="hidden" name="cur_cat" value="', $context['board']['category'], '" />
-					<input type="submit" name="add" value="', $txt['mboards_new_board'], '" onclick="return !isEmptyText(this.form.board_name);" class="button_submit" />';
+						<input type="hidden" name="cur_cat" value="', $context['board']['category'], '" />
+						<input type="submit" name="add" value="', $txt['mboards_new_board'], '" onclick="return !isEmptyText(this.form.board_name);" class="button_submit" />';
 	else
 		echo '
-					<input type="submit" name="edit" value="', $txt['modify'], '" onclick="return !isEmptyText(this.form.board_name);" class="button_submit" />';
+						<input type="submit" name="edit" value="', $txt['modify'], '" onclick="return !isEmptyText(this.form.board_name);" class="button_submit" />';
 
 	if (!isset($context['board']['is_new']) && empty($context['board']['is_recycle']))
 		echo '
-					<span', $context['board']['is_recycle'] ? ' style="visibility:hidden">' : '>', '<input type="submit" name="delete" value="', $txt['mboards_delete_board'], '" onclick="return confirm(\'', $txt['boardConfirm'], '\');"', ' class="button_submit" /></span>';
+						<span', $context['board']['is_recycle'] ? ' style="visibility:hidden">' : '>', '<input type="submit" name="delete" value="', $txt['mboards_delete_board'], '" onclick="return confirm(\'', $txt['boardConfirm'], '\');"', ' class="button_submit" /></span>';
 	echo '
+					</div>
 				</div>
 			</div>
 		</form>

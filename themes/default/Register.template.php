@@ -254,7 +254,7 @@ function template_registration_form()
 			}
 			else
 			{
-					echo '
+				echo '
 						<dt>
 							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['label'], ':</strong>';
 
@@ -298,6 +298,7 @@ function template_registration_form()
 						// Is this some code to generate the options?
 						if (!is_array($field['options']))
 							$field['options'] = eval($field['options']);
+
 						// Assuming we now have some!
 						if (is_array($field['options']))
 							foreach ($field['options'] as $value => $name)
@@ -363,15 +364,15 @@ function template_registration_form()
 	// Age restriction in effect?
 	if (!$context['require_agreement'] && $context['show_coppa'])
 		echo '
-				<input type="submit" name="accept_agreement" value="', $context['coppa_agree_above'], '" class="button_submit" /><br /><br />
-				<input type="submit" name="accept_agreement_coppa" value="', $context['coppa_agree_below'], '" class="button_submit" />';
+				<input type="submit" name="accept_agreement" value="', $context['coppa_agree_above'], '" class="right_submit" /><br /><br />
+				<input type="submit" name="accept_agreement_coppa" value="', $context['coppa_agree_below'], '" class="right_submit" />';
 	else
 		echo '
-				<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />';
+				<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />';
 
 	if ($context['show_contact_button'])
 		echo '
-				<input type="submit" name="show_contact" value="', $txt['contact'], '" class="button_submit" />';
+				<input type="submit" name="show_contact" value="', $txt['contact'], '" class="right_submit" />';
 
 	echo '
 			</div>
@@ -627,14 +628,13 @@ function template_admin_register()
 							<input type="checkbox" name="emailActivate" id="emailActivate_check" tabindex="', $context['tabindex']++, '"', !empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? ' checked="checked"' : '', ' onclick="onCheckChange();" class="input_check" />
 						</dd>
 					</dl>
-					<div class="flow_auto">
+					<div class="submitbutton">
 						<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="hidden" name="sa" value="register" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-regc_token_var'], '" value="', $context['admin-regc_token'], '" />
 					</div>
 				</div>
-
 			</form>
 		</div>
 	</div>';
@@ -681,7 +681,7 @@ function template_edit_agreement()
 
 		echo '
 							</select>
-							<div class="righttext">
+							<div class="submitbutton">
 								<input type="hidden" name="sa" value="agreement" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 								<input type="submit" name="change" value="', $txt['admin_agreement_select_language_change'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
@@ -698,7 +698,7 @@ function template_edit_agreement()
 					<p>
 						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" class="input_check" /> ', $txt['admin_agreement'], '.</label>
 					</p>
-					<div class="flow_auto" >
+					<div class="submitbutton" >
 						<input type="submit" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="hidden" name="agree_lang" value="', $context['current_agreement'], '" />
 						<input type="hidden" name="sa" value="agreement" />
@@ -753,7 +753,7 @@ function template_edit_reserved_words()
 						<input type="checkbox" name="matchname" id="matchname" tabindex="', $context['tabindex']++, '" ', $context['reserved_word_options']['match_name'] ? 'checked="checked"' : '', ' class="input_check" />
 					</dd>
 				</dl>
-				<div class="flow_auto" >
+				<div class="submitbutton" >
 					<input type="submit" value="', $txt['save'], '" name="save_reserved_names" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -808,7 +808,7 @@ function template_contact_form()
 			echo '
 				</dl>
 				<hr />
-				<div class="flow_auto" >
+				<div class="submitbutton" >
 					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

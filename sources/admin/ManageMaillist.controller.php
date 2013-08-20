@@ -567,6 +567,7 @@ class ManageMaillist_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['filter_name'],
+						'style' => 'white-space: nowrap;'
 					),
 					'data' => array(
 						'db' => 'filter_name',
@@ -616,6 +617,7 @@ class ManageMaillist_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => $txt['message_action'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -650,7 +652,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="right_submit" />',
 				),
 			),
 		);
@@ -866,6 +868,7 @@ class ManageMaillist_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['parser_name'],
+						'style' => 'white-space: nowrap;'
 					),
 					'data' => array(
 						'db' => 'filter_name',
@@ -902,6 +905,7 @@ class ManageMaillist_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => $txt['message_action'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -936,8 +940,7 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_parser'] . '" class="button_submit" />',
-					'class' => 'righttext',
+					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_parser'] . '" class="right_submit" />',
 				),
 			),
 		);
@@ -1420,8 +1423,8 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-					<input type="submit" name="delete" value="' . $txt['ml_bounce_template_delete'] . '" onclick="return confirm(\'' . $txt['ml_bounce_template_delete_confirm'] . '\');" class="button_submit" />
-					<input type="submit" name="add" value="' . $txt['ml_bounce_template_add'] . '" class="button_submit" />',
+					<input type="submit" name="delete" value="' . $txt['ml_bounce_template_delete'] . '" onclick="return confirm(\'' . $txt['ml_bounce_template_delete_confirm'] . '\');" class="right_submit" />
+					<input type="submit" name="add" value="' . $txt['ml_bounce_template_add'] . '" class="right_submit" />',
 				),
 			),
 		);

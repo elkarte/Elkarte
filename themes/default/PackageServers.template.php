@@ -70,7 +70,7 @@ function template_servers()
 								<input type="text" name="serverurl" size="44" value="http://" class="input_text" />
 							</dd>
 						</dl>
-						<div class="righttext">
+						<div class="submitbutton">
 							<input type="submit" value="' . $txt['add_server'] . '" class="button_submit" />
 							<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 						</div>
@@ -94,7 +94,7 @@ function template_servers()
 								<span class="smalltext">', $txt['package_download_filename_info'], '</span>
 							</dd>
 						</dl>
-						<div class="righttext">
+						<div class="submitbutton">
 							<input type="submit" value="', $txt['download'], '" class="button_submit" />
 						</div>
 					</form>
@@ -365,7 +365,7 @@ function template_upload()
 						</dd>
 					</dl>
 					<hr />
-					<input type="submit" value="' . $txt['package_upload'] . '" class="button_submit" />
+					<input type="submit" value="' . $txt['package_upload'] . '" class="right_submit" />
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 				</form>
 			</div>
@@ -418,7 +418,7 @@ function template_ftp_required()
 							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" style="width: 99%;" class="input_text" />
 						</dd>
 					</dl>
-					<div class="righttext">
+					<div class="submitbutton">
 						<input type="submit" value="', $txt['package_proceed'], '" class="button_submit" />
 					</div>
 				</form>

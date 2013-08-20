@@ -592,7 +592,7 @@ class ManageMembers_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="delete_members" value="' . $txt['admin_delete_members'] . '" onclick="return confirm(\'' . $txt['confirm_delete_members'] . '\');" class="button_submit" />',
+					'value' => '<input type="submit" name="delete_members" value="' . $txt['admin_delete_members'] . '" onclick="return confirm(\'' . $txt['confirm_delete_members'] . '\');" class="right_submit" />',
 				),
 			),
 		);
@@ -933,7 +933,7 @@ class ManageMembers_Controller extends Action_Controller
 						<select name="todo" onchange="onSelectChange();">
 							' . $allowed_actions . '
 						</select>
-						<noscript><input type="submit" value="' . $txt['go'] . '" class="button_submit" /><br class="clear_right" /></noscript>
+						<noscript><input type="submit" value="' . $txt['go'] . '" class="right_submit" /><br class="clear_right" /></noscript>
 					',
 					'class' => 'floatright',
 				),

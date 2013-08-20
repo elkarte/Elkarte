@@ -59,8 +59,8 @@ function template_permission_index()
 						<th style="width:8%">', $txt['permissions_denied'], '</th>';
 
 			echo '
-						<th style="width:10%; vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
-						<th style="width:4%;vertical-align:middle">
+						<th class="centertext" style="width:10%; vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
+						<th class="centertext" style="width:4%;vertical-align:middle">
 							', $context['can_modify'] ? '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'group\');" />' : '', '
 						</th>
 					</tr>
@@ -83,11 +83,11 @@ function template_permission_index()
 
 		echo '
 						</td>
-						<td class="centertext">', $group['can_search'] ? $group['link'] : $group['num_members'], '</td>';
+						<td>', $group['can_search'] ? $group['link'] : $group['num_members'], '</td>';
 
 		if (empty($modSettings['permission_enable_deny']))
 			echo '
-						<td class="centertext" style="width:16%">', $group['num_permissions']['allowed'], '</td>';
+						<td style="width:16%">', $group['num_permissions']['allowed'], '</td>';
 		else
 			echo '
 						<td class="centertext" style="width:8%', $group['id'] == 1 ? ';font-style:italic"' : '"', '>', $group['num_permissions']['allowed'], '</td>
@@ -195,7 +195,7 @@ function template_permission_index()
 							</dd>
 						</dl>
 					</fieldset>
-					<input type="submit" value="', $txt['permissions_set_permissions'], '" onclick="return checkSubmit();" class="button_submit" />
+					<input type="submit" value="', $txt['permissions_set_permissions'], '" onclick="return checkSubmit();" class="right_submit" />
 				</div>
 			</div>';
 
@@ -361,10 +361,10 @@ function template_by_board()
 
 	if ($context['edit_all'])
 		echo '
-				<input type="submit" name="save_changes" value="', $txt['save'], '" class="button_submit" />';
+				<input type="submit" name="save_changes" value="', $txt['save'], '" class="right_submit" />';
 	else
 		echo '
-				<a class="linkbutton" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
+				<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -425,7 +425,7 @@ function template_edit_profiles()
 	echo '
 				</tbody>
 			</table>
-			<div class="flow_auto righttext">
+			<div class="submitbutton">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />';
 
@@ -468,7 +468,7 @@ function template_edit_profiles()
 					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-mpp_token_var'], '" value="', $context['admin-mpp_token'], '" />
-					<input type="submit" name="create" value="', $txt['permissions_profile_new_create'], '" class="button_submit" />
+					<input type="submit" name="create" value="', $txt['permissions_profile_new_create'], '" class="right_submit" />
 				</div>
 			</div>
 		</form>
@@ -554,7 +554,7 @@ function template_modify_group()
 
 	if ($context['profile']['can_modify'])
 		echo '
-			<input type="submit" value="', $txt['permissions_commit'], '" class="button_submit" />';
+			<input type="submit" value="', $txt['permissions_commit'], '" class="right_submit" />';
 
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -842,7 +842,7 @@ function template_postmod_permissions()
 				<div class="information">', $txt['permissions_post_moderation_deny_note'], '</div>';
 
 	echo '
-				<div class="righttext">
+				<div class="submitbutton">
 					', $txt['permissions_post_moderation_select'], ':
 					<select name="pid" onchange="document.forms.postmodForm.submit();">';
 
@@ -854,21 +854,21 @@ function template_postmod_permissions()
 	echo '
 					</select>
 					<input type="submit" value="', $txt['go'], '" class="button_submit" />
-			</div>
-			<table class="table_grid">
+				</div>
+				<table class="table_grid">
 				<thead>
 					<tr class="table_head">
 						<th></th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_new_topics'], '
 						</th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_replies_own'], '
 						</th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_replies_any'], '
 						</th>
-						<th colspan="3">
+						<th class="centertext" colspan="3">
 							', $txt['permissions_post_moderation_attachments'], '
 						</th>
 					</tr>
@@ -922,7 +922,7 @@ function template_postmod_permissions()
 	echo '
 				</tbody>
 			</table>
-			<div class="righttext">
+			<div class="submitbutton">
 				<input type="submit" name="save_changes" value="', $txt['permissions_commit'], '" class="button_submit" />
 				<input type="hidden" name="', $context['admin-mppm_token_var'], '" value="', $context['admin-mppm_token'], '" />
 			</div>

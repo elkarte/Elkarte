@@ -316,7 +316,7 @@ function template_view_package()
 	if (!$context['ftp_needed'] && (!empty($context['actions']) || !empty($context['database_changes'])))
 	{
 		echo '
-			<div class="righttext">
+			<div class="submitbutton">
 				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', !empty($context['has_failure']) ? '(submitThisOnce(this) &amp;&amp; confirm(\'' . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . '\'))' : 'submitThisOnce(this)', ';" class="button_submit" />
 			</div>';
 	}
@@ -331,8 +331,8 @@ function template_view_package()
 				', template_control_chmod(), '
 			</div>';
 	}
-		echo '
 
+	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', (isset($context['form_sequence_number']) && !$context['ftp_needed']) ? '
 			<input type="hidden" name="seqnum" value="' . $context['form_sequence_number'] . '" />' : '', '
 		</form>
@@ -498,7 +498,7 @@ function template_list()
 	echo '
 				</ol>
 				<br />
-				<a href="', $scripturl, '?action=admin;area=packages">[ ', $txt['back'], ' ]</a>
+				<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=packages">', $txt['back'], '</a>
 			</div>
 		</div>
 	</div>';
@@ -611,7 +611,7 @@ function template_browse()
 								<input type="text" name="version_emulate" id="ve" value="', $context['forum_version'], '" size="25" class="input_text" />
 							</dd>
 						</dl>
-						<div class="righttext">
+						<div class="submitbutton">
 							<input type="submit" value="', $txt['package_apply'], '" class="button_submit" />
 						</div>
 					</div>
@@ -719,8 +719,7 @@ function template_install_options()
 							<input type="checkbox" name="package_make_full_backups" id="package_make_full_backups" value="1" class="input_check"', $context['package_make_full_backups'] ? ' checked="checked"' : '', ' />
 						</dd>
 					</dl>
-
-					<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</form>
 			</div>
@@ -798,7 +797,7 @@ function template_control_chmod()
 
 					<div class="righttext" style="margin: 1ex;">
 						<span id="test_ftp_placeholder_full"></span>
-						<input type="submit" value="', $txt['package_proceed'], '" class="button_submit" />
+						<input type="submit" value="', $txt['package_proceed'], '" class="right_submit" />
 					</div>';
 
 	if (!empty($context['package_ftp']['destination']))
@@ -1231,7 +1230,7 @@ function template_file_permissions()
 	echo '
 				<span id="test_ftp_placeholder_full"></span>
 				<input type="hidden" name="action_changes" value="1" />
-				<input type="submit" value="', $txt['package_file_perms_go'], '" name="go" class="button_submit" />
+				<input type="submit" value="', $txt['package_file_perms_go'], '" name="go" class="right_submit" />
 			</div>
 		</div>';
 
@@ -1405,7 +1404,7 @@ function template_pause_action_permissions()
 					<input type="hidden" name="method" value="', $context['method'], '" />
 					<input type="hidden" name="action_changes" value="1" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="submit" name="go" id="cont" value="', $txt['not_done_continue'], '" class="button_submit" />
+					<input type="submit" name="go" id="cont" value="', $txt['not_done_continue'], '" class="right_submit" />
 				</form>
 			</div>
 		</div>

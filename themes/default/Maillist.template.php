@@ -157,7 +157,8 @@ function template_bounce_email()
 
 	echo '
 				</dl>
-				<div class="righttext">
+				<div class="submitbutton">
+					<a class="linkbutton" href="', $scripturl, '?action=admin;area=maillist;sa=emaillist;">', $txt['back'], '</a>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="item" value="', $context['item'], '" />
 					<input type="submit" name="bounce" value="', $txt['bounce_issue'], '" class="button_submit" />
@@ -165,8 +166,7 @@ function template_bounce_email()
 				</div>
 			</div>
 		</div>
-	</form>
-	<div class="centertext"><a href="javascript:history.go(-1)">', $txt['back'], '</a></div><br />';
+	</form>';
 
 	// kick off the javascript.
 	echo '
@@ -393,8 +393,10 @@ function template_bounce_template()
 
 	echo '
 					<hr />
-					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
-					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+					<div class="submitbutton">
+						<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
+						<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+					</div>
 				</div>
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
