@@ -303,9 +303,6 @@ div.quick_tasks {
 	position: relative;
 	padding: 6px 12px 12px 12px;
 }
-#support_credits h3.catbg {
-	padding: 12px 6px 6px 6px;
-}
 #support_resources {
 	margin: 16px 0 -24px 0;
 }
@@ -313,7 +310,7 @@ div.quick_tasks {
 	position: absolute;
 	right: 16px;
 	top: 11px;
-	width: 80px;
+	width: 75px;
 }
 #support_credits .content {
 	padding: 0 18px;
@@ -322,9 +319,6 @@ div.quick_tasks {
 #support_credits .content p {
 	margin: 12px 0 0 0;
 	padding: 0;
-}
-#support_credits img.icon {
-	vertical-align: middle;
 }
 #latestSupport{
 	padding: 0 25px 15px 25px;
