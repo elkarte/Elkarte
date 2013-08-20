@@ -568,8 +568,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
+						'style' => 'width: 4%;text-align: center',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -597,7 +596,7 @@ class ProfileOptions_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="right_submit" />',
 				),
 				array(
 					'position' => 'after_title',
@@ -691,8 +690,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
+						'style' => 'width: 4%;text-align: center',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -719,7 +717,7 @@ class ProfileOptions_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" class="right_submit" />',
 					'align' => 'right',
 				),
 			),
@@ -823,7 +821,6 @@ class ProfileOptions_Controller extends Action_Controller
 		$memID = currentMemberID();
 
 		loadTemplate('ProfileOptions');
-
 		$curMember = $user_profile[$memID];
 		$context['primary_group'] = $curMember['id_group'];
 

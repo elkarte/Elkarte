@@ -250,7 +250,7 @@ class ManageErrors_Controller extends Action_Controller
 			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename)));
 
 		// get the min and max lines
-		$min = $line - 20 <= 0 ? 1 : $line - 20;
+		$min = $line - 16 <= 0 ? 1 : $line - 16;
 		$max = $line + 21; // One additional line to make everything work out correctly
 
 		if ($max <= 0 || $min >= $max)
@@ -261,7 +261,7 @@ class ManageErrors_Controller extends Action_Controller
 		// We don't want to slice off too many so lets make sure we stop at the last one
 		$max = min($max, max(array_keys($file_data)));
 
-		$file_data = array_slice($file_data, $min-1, $max - $min);
+		$file_data = array_slice($file_data, $min - 1, $max - $min);
 
 		$context['file_data'] = array(
 			'contents' => $file_data,

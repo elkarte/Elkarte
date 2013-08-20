@@ -247,6 +247,7 @@ function template_edit_profile_field()
 							</dd>
 						</dl>
 					</fieldset>
+					<div class="submitbutton">
 						<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />';
 
 	if ($context['fid'])
@@ -254,6 +255,7 @@ function template_edit_profile_field()
 						<input type="submit" name="delete" value="', $txt['delete'], '" onclick="return confirm(\'', $txt['custom_edit_delete_sure'], '\');" class="button_submit" />';
 
 	echo '
+					</div>
 				</div>
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

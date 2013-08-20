@@ -83,7 +83,7 @@ function template_merge()
 									<option value="', $board['id'], '"', $board['id'] == $context['target_board'] ? ' selected="selected"' : '', '>', $board['category'], ' - ', $board['name'], '</option>';
 			echo '
 								</select>
-								<input type="submit" value="', $txt['go'], '" class="button_submit" />
+								<input type="submit" value="', $txt['go'], '" class="button_submit submitgo" />
 							</form>
 						</dd>';
 	}
@@ -100,7 +100,7 @@ function template_merge()
 								<input type="hidden" name="topics[]" value="', $context['origin_topic'], '" />
 								<input type="text" name="topics[]" class="input_text" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-								<input type="submit" value="', $txt['merge'], '" class="button_submit" />
+								<input type="submit" value="', $txt['merge'], '" class="button_submit submitgo" />
 							</form>
 						</dd>';
 
@@ -238,7 +238,7 @@ function template_merge_extra_options()
 	}
 
 	echo '
-					<div class="auto_flow">
+					<div class="submitbutton">
 						<input type="submit" value="' . $txt['merge'] . '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="sa" value="execute" />

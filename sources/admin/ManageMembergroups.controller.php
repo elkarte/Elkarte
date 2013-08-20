@@ -184,7 +184,6 @@ class ManageMembergroups_Controller extends Action_Controller
 				'members' => array(
 					'header' => array(
 						'value' => $txt['membergroups_members_top'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -193,7 +192,6 @@ class ManageMembergroups_Controller extends Action_Controller
 							// No explicit members for the moderator group.
 							return $rowData[\'id_group\'] == 3 ? $txt[\'membergroups_guests_na\'] : comma_format($rowData[\'num_members\']);
 						'),
-						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
@@ -203,7 +201,6 @@ class ManageMembergroups_Controller extends Action_Controller
 				'modify' => array(
 					'header' => array(
 						'value' => $txt['modify'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -212,14 +209,13 @@ class ManageMembergroups_Controller extends Action_Controller
 								'id_group' => false,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 			),
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;generalgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;generalgroup">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
@@ -287,11 +283,9 @@ class ManageMembergroups_Controller extends Action_Controller
 				'members' => array(
 					'header' => array(
 						'value' => $txt['membergroups_members_top'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'num_members',
-						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => '1 DESC',
@@ -301,11 +295,9 @@ class ManageMembergroups_Controller extends Action_Controller
 				'required_posts' => array(
 					'header' => array(
 						'value' => $txt['membergroups_min_posts'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'db' => 'min_posts',
-						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'mg.min_posts',
@@ -315,7 +307,6 @@ class ManageMembergroups_Controller extends Action_Controller
 				'modify' => array(
 					'header' => array(
 						'value' => $txt['modify'],
-						'class' => 'centertext',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -324,14 +315,13 @@ class ManageMembergroups_Controller extends Action_Controller
 								'id_group' => false,
 							),
 						),
-						'class' => 'centertext',
 					),
 				),
 			),
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;postgroup">' . $txt['membergroups_add_group'] . '</a>',
+					'value' => '<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=membergroups;sa=add;postgroup">' . $txt['membergroups_add_group'] . '</a>',
 				),
 			),
 		);
