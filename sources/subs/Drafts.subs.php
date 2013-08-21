@@ -232,10 +232,10 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * @param int $topic - if set, load drafts for that specific topic / pm
  * @param int $drafts_keep_days - number of days to consider a draft is still valid
  * @param string $order - optional parameter to order the results
- * @param int $limit - optional parameter to limit the number returned
+ * @param string $limit - optional parameter to limit the number returned 0,15
  * @return array
  */
-function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = 0)
+function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = '')
 {
 	$db = database();
 
@@ -251,7 +251,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 			AND type = {int:draft_type}' . (!empty($drafts_keep_days) ? '
 			AND poster_time > {int:time}' : '') . (!empty($order) ? '
 		ORDER BY {raw:order}' : '') . (!empty($limit) ? '
-		LIMIT {int:limit}' : ''),
+		LIMIT {raw:limit}' : ''),
 		array(
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
