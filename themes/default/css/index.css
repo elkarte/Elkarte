@@ -220,6 +220,7 @@ input[disabled].input_text {
 	border: none;
 	background: none;
 	vertical-align: middle;
+	margin: 0 2px 4px;
 }
 /* The OpenID login form */
 .openid_login {
@@ -242,7 +243,7 @@ input[disabled].input_text {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	padding: 2px 6px;
-	vertical-align: top;
+	vertical-align: middle;
 	border-radius: 2px;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #cfcfcf;
@@ -251,6 +252,8 @@ input[disabled].input_text {
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	color: #555;
 	box-shadow: 1px 1px 2px #e5e5e5;
+	font-size: .857em;
+	line-height: 17px;
 }
 .left_submit, .linkbutton_left {
 	float: left;
@@ -281,8 +284,13 @@ input[disabled].input_text {
 	width: 100%;
 }
 /* @todo - Test this out some more. */
-.submitbutton .button_submit{
-	padding: 4px 8px;
+.submitbutton .button_submit, .submitbutton .linkbutton {
+	padding: 2px 6px;
+	vertical-align: middle;
+}
+/* @todo mostly for those go buttons that don't have a form id*/
+.button_submit.submitgo {
+	margin-bottom: 4px;
 }
 /* May not keep this. Sick of IE silliness. :P */
 #ie #search_form .button_submit, #ie #guest_form .button_submit {
@@ -487,6 +495,7 @@ h3.catbg a:hover, h4.catbg a:hover, h3.titlebg a:hover, h4.titlebg a:hover {
 }
 h3.catbg .icon {
 	margin: 0 5px 0 0;
+	vertical-align: text-top;
 }
 h4.titlebg .icon {
 	float: left;
@@ -494,7 +503,7 @@ h4.titlebg .icon {
 }
 .category_header .icon {
 	margin: 0 5px 0 0;
-	vertical-align: middle;
+	vertical-align: text-top;
 }
 
 /* Upshrinks in cat and title bars. */
@@ -636,7 +645,7 @@ div.windowbg, div.windowbg2 {
 }
 .generic_list_wrapper .additional_row {
 	margin: 0;
-	padding: 5px 0;
+	padding: 10px 0 0;
 	border-radius: 0;
 }
 .generic_list_wrapper .information .additional_row {
@@ -1150,7 +1159,7 @@ div.windowbg, div.windowbg2 {
 /* @todo - Save code by amalgamating common button background declarations. */
 .buttonlist li a {
 	display: block;
-	padding: 2px 8px 1px 8px;
+	padding: 0 6px;
 	font-size: 0.786em;
 	line-height: 2em;
 }
@@ -1368,7 +1377,7 @@ div.windowbg, div.windowbg2 {
 .pagelinks .navPages {
 	display: block;
 	float: left;
-	padding: 2px 5px 1px 5px;
+	padding: 1px 5px;
 	border: 1px solid #afafaf;
 	border-top: 1px solid #bbb;
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
@@ -1387,9 +1396,8 @@ div.windowbg, div.windowbg2 {
 .pagelinks .current_page  {
 	display: block;
 	float: left;
-	padding: 1px 8px 2px 8px;
-	font-weight: bold;
-	font-size: 1.167em;
+	padding: 1px 8px 1px 8px;
+	font-weight: bolder;
 }
 .expand_pages {
 	display: block;
@@ -1414,6 +1422,19 @@ div.windowbg, div.windowbg2 {
 .small_pagelinks .navPages {
 	padding: 2px 3px 0 3px;
 	font-size: 0.889em;
+	display: block;
+	float: left;
+}
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+	content: '\00AB';
+	float: left;
+	font-size: 1.3em;
+}
+.small_pagelinks:after {
+	content: '\00BB';
+	float: left;
+	font-size: 1.3em;
 }
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
@@ -1482,6 +1503,10 @@ div.windowbg, div.windowbg2 {
 	color: #555;
 	font-size: 1em;
 	font-weight: 600;
+	text-align: left;
+}
+.table_head>th.centertext {
+	text-align: center;
 }
 /* Trial extra classes, for table_heads that have equal width columns. */
 /* @todo - Not sure how much these will be used. Try them out. */
@@ -1863,9 +1888,6 @@ img.new_posts {
 .topic_starter {
 	font-size: 0.929em;
 }
-.small_pagelinks {
-	float: right;
-}
 .topic_latest {
 	display: table-cell;
 	vertical-align: top;
@@ -1902,9 +1924,6 @@ img.new_posts {
 	background: #fff;
 	text-align: right;
 	padding: 6px;
-}
-.qaction_row .button_submit {
-	margin: 0;
 }
 .approvetopic_row, .approve_row {
 	background: #fff5cd;
@@ -1957,7 +1976,7 @@ img.new_posts {
 	vertical-align: top;
 }
 #message_index_jump_to .button_submit {
-	margin: 0;
+	margin: 0 0 10px;
 }
 
 
@@ -2504,6 +2523,7 @@ ul.post_options li {
 #post_event fieldset {
 	clear: both;
 	padding: 6px;
+	border: double #ccc;
 }
 #post_event #event_main input {
 	float: left;
@@ -3118,6 +3138,7 @@ dl.merge_topic dd {
 }
 .calendar_table th, .calendar_table td {
 	padding: 2px 0;
+	text-align: center;
 }
 #month_grid .calendar_table {
 	margin-bottom: 12px;
@@ -3167,8 +3188,10 @@ dl.merge_topic dd {
 }
 /* Cheat and match this to the submit button. */
 #calendar_navigation .buttonlist {
-	margin: -5px 0;
 	padding: 0 6px;
+}
+#calendar_navigation select {
+	margin-top: 2px;
 }
 /* See, I told you there was wombatz here. */
 /*
@@ -3430,6 +3453,7 @@ dl.merge_topic dd {
 /* The basic search section. */
 #simple_search, #advanced_search {
 	margin: 4px 0 0 0;
+	padding: 8px 0;
 	text-align: center;
 }
 #search_error {
@@ -3458,14 +3482,14 @@ dl.merge_topic dd {
 #advanced_search dd {
 	float: left;
 	margin: 0 0 0 6px;
-	padding: 2px;
+	padding: 3px 2px;
 	width: 80%;
 	text-align: left;
 }
 
 /* The search results page.
 /* The search results page. @todo - Duplicated in the .table_grid code? */
-@todo - Search results in a table? I'm sure that's deprecated years ago. */
+/* @todo - Search results in a table? I'm sure that's deprecated years ago. */
 .topic_table td blockquote, .topic_table td .quoteheader {
 	margin: 6px;
 }
@@ -3895,9 +3919,10 @@ dl.merge_topic dd {
 /* given that there is supposed to be a separate phone theme.
 /* Am currently inclined to think that just having break points that correlate
 /* to 1024, 800 and 480 at standard font size is probably adequate. */
+/* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
 
 /* This one does 1024 screens at default font size. */
-@media screen and (min-width: 52em) and (max-width: 70em) {
+@media screen and (min-width: 50em) and (max-width: 64em) {
 	.board_latest {
 		min-width: 27em;
 	}
@@ -3909,7 +3934,7 @@ dl.merge_topic dd {
 	}
 }
 /* This one does 800 screens at default font size. */
-@media screen and (min-width: 32em) and (max-width: 52em) {
+@media screen and (min-width: 30em) and (max-width: 50em) {
 	.wrapper {
 		min-width: 98%;
 	}
@@ -3951,7 +3976,7 @@ dl.merge_topic dd {
 	/* End playing silly buggers. */
 }
 /* This one does 480 screens at default font size. */
-@media screen and (max-width: 32em) {
+@media screen and (max-width: 30em) {
 	.frame {
 		min-width: 100%;
 		border-radius: 0;

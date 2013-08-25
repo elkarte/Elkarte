@@ -99,7 +99,7 @@ function template_trackIP()
 						<input type="text" name="searchip" value="', $context['ip'], '" class="input_text" />
 					</dd>
 				</dl>
-				<input type="submit" value="', $txt['trackIP'], '" class="button_submit" />
+				<input type="submit" value="', $txt['trackIP'], '" class="right_submit" />
 			</form>
 		</div>
 	</div>

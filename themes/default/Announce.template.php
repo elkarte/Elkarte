@@ -48,7 +48,7 @@ function template_announce()
 					</ul>
 					<hr />
 					<div id="confirm_buttons">
-						<input type="submit" value="', $txt['post'], '" class="button_submit" />
+						<input type="submit" value="', $txt['post'], '" class="right_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 						<input type="hidden" name="move" value="', $context['move'], '" />
@@ -78,7 +78,7 @@ function template_announcement_send()
 					</div>
 					<hr />
 					<div id="confirm_buttons">
-						<input type="submit" name="b" value="', $txt['announce_continue'], '" class="button_submit" />
+						<input type="submit" name="b" value="', $txt['announce_continue'], '" class="right_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 						<input type="hidden" name="move" value="', $context['move'], '" />

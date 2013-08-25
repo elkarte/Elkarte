@@ -29,7 +29,7 @@ function template_main()
 				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />',$txt['recent_posts'],'
 			</h3>';
 	//template_pagesection(false, false, 'go_down');
-	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too. 
+	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
 	{
 		echo '
@@ -102,7 +102,7 @@ function template_unread()
 
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], ' 
+							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], '
 						</h2>
 						<ul class="topic_listing" id="unread">
 							<li class="topic_sorting_row">
@@ -153,8 +153,8 @@ function template_unread()
 										</h4>
 									</div>
 									<p class="topic_starter">
-										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], '
-										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">', $topic['pages'], '</span>
+										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], !empty($topic['pages']) ? '
+										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</span>' : '', '
 									</p>
 								</div>
 								<div class="topic_latest">
@@ -234,7 +234,7 @@ function template_replies()
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $txt['unread_replies'], ' 
+							', $txt['unread_replies'], '
 						</h2>
 						<ul class="topic_listing" id="unread">
 							<li class="topic_sorting_row">
@@ -286,8 +286,8 @@ function template_replies()
 										</h4>
 									</div>
 									<p class="topic_starter">
-										', $topic['first_post']['started_by'], '
-										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">', $topic['pages'], '</span>
+										', $topic['first_post']['started_by'], !empty($topic['pages']) ? '
+										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</span>' : '', '
 									</p>
 								</div>
 								<div class="topic_latest">

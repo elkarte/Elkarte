@@ -449,7 +449,7 @@ $txt['languages_download_copy'] = 'Copy';
 $txt['languages_download_not_chmod'] = 'You cannot proceed with the installation until all files selected to be copied are writable.';
 $txt['languages_download_illegal_paths'] = 'Package contains illegal paths - please contact ElkArte';
 $txt['languages_download_complete'] = 'Installation Complete';
-$txt['languages_download_complete_desc'] = 'Language pack installed successfully. Please click <a href="%1$s">here</a> to return to the languages page';
+$txt['languages_download_complete_desc'] = 'Language pack installed successfully. Please <a href="%1$s">click here to return to the languages page</a>';
 $txt['languages_delete_confirm'] = 'Are you sure you want to delete this language?';
 
 $txt['setting_frame_security'] = 'Frame Security Options';

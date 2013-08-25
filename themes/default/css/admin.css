@@ -103,11 +103,15 @@ h3.titlebg form {
 	margin-bottom: 0;
 }
 a.help .icon {
-	margin: 0 0 0 0;
+	margin: 0;
+	padding: 3px 4px 0 0;
+}
+h3 a.help .icon {
 	padding: 0 4px 0 0;
 }
+
 .catbg a.help .icon {
-	margin: -4px 0 0 0;
+	margin: 0;
 }
 .table_caption, tr.table_caption td {
 	color: #000;
@@ -197,7 +201,6 @@ legend {
 }
 #admin_main_section .catbg, #admin_main_section .catbg a {
 	color: #444;
-	max-height: 1.5em;
 	overflow: hidden;
 }
 #live_news, #supportVersionsTable {
@@ -300,9 +303,6 @@ div.quick_tasks {
 	position: relative;
 	padding: 6px 12px 12px 12px;
 }
-#support_credits h3.catbg {
-	padding: 12px 6px 6px 6px;
-}
 #support_resources {
 	margin: 16px 0 -24px 0;
 }
@@ -310,7 +310,7 @@ div.quick_tasks {
 	position: absolute;
 	right: 16px;
 	top: 11px;
-	width: 80px;
+	width: 75px;
 }
 #support_credits .content {
 	padding: 0 18px;
@@ -319,9 +319,6 @@ div.quick_tasks {
 #support_credits .content p {
 	margin: 12px 0 0 0;
 	padding: 0;
-}
-#support_credits img.icon {
-	vertical-align: middle;
 }
 #latestSupport{
 	padding: 0 25px 15px 25px;
@@ -639,6 +636,9 @@ dl.settings dd.questions input {
 #manage_maintenance .settings {
 	margin: 16px 0 0 0;
 }
+#manage_maintenance h3 a.help .icon {
+	padding: 4px 0 0;
+}
 
 /* Styles for the manage calendar section.
 ------------------------------------------------- */
@@ -804,7 +804,6 @@ dl.themes_list dd {
 }
 #mod_main_section .catbg, #mod_main_section .catbg a {
 	color: #444;
-	max-height: 1.5em;
 	overflow: hidden;
 }
 #mod_main_section .windowbg {
@@ -831,7 +830,7 @@ dl.themes_list dd {
 }
 .modblock_left #ourAnnouncements {
 	height: 15em;
-	overflow: auto;
+	overflow: visible;
 }
 
 /* Moderation Notes */
@@ -861,6 +860,7 @@ ul.moderation_notes li {
 }
 #error_log {
 	width: 100%;
+	border-top: 1px solid #ddd;
 }
 #error_log tr.windowbg td, #error_log tr.windowbg2 td {
 	padding: 8px;
@@ -901,6 +901,9 @@ ul.moderation_notes li {
 	vertical-align: middle;
 	margin: 0 8px 0 0;
 }
+#errorfile_table {
+	background-color: #FFF;
+}
 
 /* Styles for the Report generation
 ------------------------------------------------- */
@@ -914,7 +917,7 @@ ul.moderation_notes li {
 }
 
 /* Admin menu icons as sprites @todo - Can clean this up some more. */
-/* Use some longhand declarations to cut the length of the entire list. */ 
+/* Use some longhand declarations to cut the length of the entire list. */
 /* ------------------------------------------------- */
 
 /* Admin menu icons as sprites
@@ -1019,6 +1022,12 @@ ul.moderation_notes li {
 .pagelink, .current_page, .expand_pages {
 	border: 0;
 	background-color: transparent;
+}
+#taskpad select {
+	margin-top: 1px;
+}
+#taskpad {
+	margin: 8px 8px 0 0;
 }
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */

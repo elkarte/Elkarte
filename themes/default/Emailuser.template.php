@@ -36,8 +36,8 @@
  * It only needs to send the following fields:
  * 	comment: an additional comment to give the moderator.
  * 	sc: the session id, or $context['session_id'].
-
-*/
+ *
+ */
 
 // This is where we get information about who they want to send the topic to, etc.
 function template_main()
@@ -92,7 +92,7 @@ function template_main()
 							</dd>
 						</dl>
 					</fieldset>
-					<div class="flow_auto">
+					<div class="submitbutton">
 						<input type="submit" name="send" value="', $txt['sendtopic_send'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</div>
@@ -180,7 +180,7 @@ function template_custom_email()
 						</dd>
 					</dl>
 					<hr />
-					<div class="flow_auto">
+					<div class="submitbutton">
 						<input type="submit" name="send" value="', $txt['sendtopic_send'], '" class="button_submit" />
 					</div>
 				</div>
@@ -249,7 +249,7 @@ function template_report()
 
 	echo '
 						</dl>
-						<div class="flow_auto">
+						<div class="submitbutton">
 							<input type="submit" name="save" value="', $txt['rtm10'], '" style="margin-left: 1ex;" class="button_submit" />
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						</div>

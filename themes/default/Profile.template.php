@@ -125,7 +125,7 @@ function template_profile_save()
 					</dl>';
 
 	echo '
-					<div class="righttext">';
+					<div class="submitbutton">';
 
 	if (!empty($context['token_check']))
 		echo '
