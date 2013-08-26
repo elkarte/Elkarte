@@ -124,6 +124,21 @@ class Profile_Controller extends Action_Controller
 							'any' =>  array(),
 						),
 					),
+					'showlikes' => array(
+						'label' => $txt['likes_show'],
+						'file' => '/controllers/Likes.controller.php',
+						'controller' => 'Likes_Controller',
+						'function' => 'action_showProfileLikes',
+						'enabled' => !empty($modSettings['likes_enabled']) && $context['user']['is_owner'],
+						'subsections' => array(
+							'given' => array($txt['likes_given'], array('profile_view_own')),
+							'received' => array($txt['likes_received'], array('profile_view_own')),
+						),
+						'permission' => array(
+							'own' => 'profile_view_own',
+							'any' =>  array(),
+						),
+					),
 					'permissions' => array(
 						'label' => $txt['showPermissions'],
 						'file' => '/controllers/ProfileInfo.controller.php',
