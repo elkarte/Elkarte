@@ -289,7 +289,7 @@ function LikesCount($memberID, $given = true)
 	{
 		$request = $db->query('', '
 			SELECT COUNT(*)
-			FROM smf_message_likes
+			FROM {db_prefix}message_likes
 			WHERE id_poster = {int:id_member}
 			GROUP BY id_msg',
 			array(
