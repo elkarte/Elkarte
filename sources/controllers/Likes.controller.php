@@ -148,15 +148,15 @@ class Likes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
-			$this->action_showReceived();
+			$this->_action_showReceived();
 		else
-			$this->action_showGiven();
+			$this->_action_showGiven();
 	}
 
 	/**
 	 * Shows all posts that they have liked
 	 */
-	private function action_showGiven()
+	private function _action_showGiven()
 	{
 		global $context, $txt, $scripturl;
 
@@ -254,7 +254,7 @@ class Likes_Controller extends Action_Controller
 	/**
 	 * Shows all posts that others have liked of theirs
 	 */
-	private function action_showReceived()
+	private function _action_showReceived()
 	{
 		global $context, $txt, $scripturl;
 
