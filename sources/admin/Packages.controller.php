@@ -1363,12 +1363,6 @@ class Packages_Controller extends Action_Controller
 		$context['sub_template'] = 'browse';
 		$context['default_list'] = 'packages_lists';
 
-		// Empty lists for now.
-		$context['available_mods'] = array();
-		$context['available_avatars'] = array();
-		$context['available_languages'] = array();
-		$context['available_other'] = array();
-		$context['available_all'] = array();
 	}
 
 	/**
