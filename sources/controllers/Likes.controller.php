@@ -147,21 +147,20 @@ class Likes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/List.subs.php');
 		require_once(SUBSDIR . '/Likes.subs.php');
 
-		// May need this
-		$memID = currentMemberID();
-
 		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
-			$this->action_showReceived($memID);
+			$this->action_showReceived();
 		else
-			$this->action_showGiven($memID);
+			$this->action_showGiven();
 	}
 
 	/**
 	 * Shows all posts that they have liked
 	 */
-	private function action_showGiven($memID)
+	private function action_showGiven()
 	{
 		global $context, $txt, $scripturl;
+
+		$memID = currentMemberID();
 
 		// Build the listoption array to display the like data
 		$listOptions = array(
@@ -172,15 +171,16 @@ class Likes_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=given;u=' . $memID,
 			'default_sort_col' => 'subject',
 			'get_items' => array(
-				'function' => 'list_loadLikesPosts',
+				'function' => array($this, 'list_loadLikesPosts'),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getLikesCount',
+				'function' => array($this, 'list_getLikesCount'),
 				'params' => array(
 					$memID,
+					true
 				),
 			),
 			'columns' => array(
@@ -254,11 +254,13 @@ class Likes_Controller extends Action_Controller
 	/**
 	 * Shows all posts that others have liked of theirs
 	 */
-	private function action_showReceived($memID)
+	private function action_showReceived()
 	{
 		global $context, $txt, $scripturl;
 
-		// build the listoption array to display the data
+		$memID = currentMemberID();
+
+		// Build the listoption array to display the data
 		$listOptions = array(
 			'id' => 'view_likes',
 			'title' => $txt['likes'],
@@ -267,13 +269,13 @@ class Likes_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=received;u=' . $memID,
 			'default_sort_col' => 'subject',
 			'get_items' => array(
-				'function' => 'list_loadLikesReceived',
+				'function' => array($this, 'list_loadLikesReceived'),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getLikesCount',
+				'function' => array($this, 'list_getLikesCount'),
 				'params' => array(
 					$memID,
 					false,
@@ -374,13 +376,13 @@ class Likes_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $message,
 			'default_sort_col' => 'member',
 			'get_items' => array(
-				'function' => 'list_loadLikes',
+				'function' => array($this, 'list_loadPostLikers'),
 				'params' => array(
 					$message,
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getMessageLikeCount',
+				'function' => array($this, 'list_getMessageLikeCount'),
 				'params' => array(
 					$message,
 				),
@@ -415,5 +417,74 @@ class Likes_Controller extends Action_Controller
 
 		// Create the list.
 		createList($listOptions);
+	}
+
+	/**
+	 * Callback for createList(),
+	 * Returns the number of likes a member has given if given = true
+	 * else the number of posts (not likes) of theirs that have been liked
+	 *
+	 * @param int $memberID
+	 * @param boolean $given
+	 */
+	public function list_getLikesCount($memberID, $given)
+	{
+	   return likesCount($memberID, $given);
+	}
+
+	/**
+	 * Callback for createList(),
+	 * Returns the number of likes a message has received
+	 *
+	 * @param int $messageID
+	 */
+	public function list_getMessageLikeCount($messageID)
+	{
+	   return MessageLikeCount($messageID);
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns a list of liked posts for a memmber
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 * @param int $memberID
+	 */
+	public function list_loadLikesPosts($start, $items_per_page, $sort, $memberID)
+	{
+		// Get all of our liked posts
+		return LikesPostsGiven($start, $items_per_page, $sort, $memberID);
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns a list of received likes based on posts
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 * @param int $memberID
+	 */
+	public function list_loadLikesReceived($start, $items_per_page, $sort, $memberID)
+	{
+		// Get a list of all posts (of a members) that have been liked
+		return LikesPostsReceived($start, $items_per_page, $sort, $memberID);
+	}
+
+	/**
+	 * Callback for createList()
+	 * Returns a list of members that liked a post
+	 *
+	 * @param int $start
+	 * @param int $items_per_page
+	 * @param string $sort
+	 * @param int $messageID
+	 */
+	public function list_loadPostLikers($start, $items_per_page, $sort, $messageID)
+	{
+		// Get a list of this posts likers
+		return PostLikers($start, $items_per_page, $sort, $messageID);
 	}
 }

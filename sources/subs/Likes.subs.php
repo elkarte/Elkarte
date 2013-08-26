@@ -270,9 +270,13 @@ function increaseTopicLikes($id_topic, $direction)
 }
 
 /**
- * Return how many likes a user has given or received
+ * Return how many likes a user has given or the count of thier posts that
+ * have received a like (not the total likes received)
+ *
+ * @param int $memberID
+ * @param boolean $given
  */
-function list_getLikesCount($memID, $given = true)
+function LikesCount($memberID, $given = true)
 {
 	global $user_profile;
 
@@ -280,7 +284,7 @@ function list_getLikesCount($memID, $given = true)
 
 	// Give is a given, received takes a query so its only the unique messages
 	if ($given === true)
-		$likes = $user_profile[$memID]['likes_given'];
+		$likes = $user_profile[$memberID]['likes_given'];
 	else
 	{
 		$request = $db->query('', '
@@ -289,7 +293,7 @@ function list_getLikesCount($memID, $given = true)
 			WHERE id_poster = {int:id_member}
 			GROUP BY id_msg',
 			array(
-				'id_member' => $memID,
+				'id_member' => $memberID,
 			)
 		);
 		$likes = $db->num_rows($request);
@@ -300,12 +304,16 @@ function list_getLikesCount($memID, $given = true)
 }
 
 /**
- * Callback function for action=profile;area=showlikes;sa=given
+ * Return an array of details based on posts a user has liked
  *
- * Return the posts that a user has liked
- * Creates link to allow for the removal
+ * Used for action=profile;area=showlikes;sa=given
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memberID
  */
-function list_loadLikesPosts($start, $items_per_page, $sort, $memID)
+function LikesPostsGiven($start, $items_per_page, $sort, $memberID)
 {
 	global $scripturl, $context;
 
@@ -324,7 +332,7 @@ function list_loadLikesPosts($start, $items_per_page, $sort, $memID)
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
 		array(
-			'id_member' => $memID,
+			'id_member' => $memberID,
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
@@ -344,12 +352,17 @@ function list_loadLikesPosts($start, $items_per_page, $sort, $memID)
 }
 
 /**
- * Callback function for action=profile;area=showlikes;sa=received
+ * Returns an array of details based on posts that others have liked of this user
+ * Creates links to show the users who liked a post
  *
- * Returns the posts that others have liked of this user
- * Creates links to show the users who approve
+ * Used by action=profile;area=showlikes;sa=received
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memberID
  */
-function list_loadLikesReceived($start, $items_per_page, $sort, $memID)
+function LikesPostsReceived($start, $items_per_page, $sort, $memberID)
 {
 	global $scripturl;
 
@@ -367,7 +380,7 @@ function list_loadLikesReceived($start, $items_per_page, $sort, $memID)
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
 		array(
-			'id_member' => $memID,
+			'id_member' => $memberID,
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
@@ -387,18 +400,21 @@ function list_loadLikesReceived($start, $items_per_page, $sort, $memID)
 }
 
 /**
- * Callback function to loads all of the likers for a messages
+ * Function to load all of the likers of a message
  *
- * @param int $message
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $messageID
  */
-function list_loadLikes($start, $items_per_page, $sort, $message)
+function PostLikers($start, $items_per_page, $sort, $messageID)
 {
 	global $scripturl;
 
 	$db = database();
 	$likes = array();
 
-	if (empty($message))
+	if (empty($messageID))
 		return $likes;
 
 	// Load up the likes for this message
@@ -410,7 +426,7 @@ function list_loadLikes($start, $items_per_page, $sort, $message)
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
 		array(
-			'id_message' => $message,
+			'id_message' => $messageID,
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
@@ -430,11 +446,11 @@ function list_loadLikes($start, $items_per_page, $sort, $message)
 }
 
 /**
- * Callback function to get the number of likes for a message
+ * Function to get the number of likes for a message
  *
  * @param int $message
  */
-function list_getMessageLikeCount($message)
+function MessageLikeCount($message)
 {
 	$db = database();
 	$total = 0;
