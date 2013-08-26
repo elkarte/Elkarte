@@ -13,8 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * This file is here to make it easier for installed mods to have
- * settings and options.
+ * This controller allows to choose the features activated and disactivate them.
  *
  */
 
