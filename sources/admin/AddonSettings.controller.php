@@ -46,7 +46,7 @@ class AddonSettings_Controller extends Action_Controller
 			// Mod authors, once again, if you have a whole section to add do it AFTER this line, and keep a comma at the end.
 		);
 
-		// Make it easier for mods to add new areas.
+		// Make it easier for addons to add new areas.
 		call_integration_hook('integrate_modify_modifications', array(&$subActions));
 
 		// Pick the correct sub-action.
