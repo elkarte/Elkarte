@@ -229,7 +229,7 @@ function cache_get_data($key, $ttl = 120)
 
 	switch ($cache_accelerator)
 	{
-		case 'memcache':
+		case 'memcached':
 			// Okay, let's go for it memcached!
 			if ((function_exists('memcache_get') || function_exists('memcached_get')) && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
 			{
@@ -239,7 +239,7 @@ function cache_get_data($key, $ttl = 120)
 				if (!$memcached)
 					return null;
 
-				$value = (function_exists('memcache_get')) ? memcache_get($cache['connection'], $key) : memcached_get($cache['connection'], $key);
+				$value = (function_exists('memcache_get')) ? memcache_get($memcached, $key) : memcached_get($memcached, $key);
 			}
 			break;
 		case 'eaccelerator':
