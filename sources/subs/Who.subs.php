@@ -137,12 +137,12 @@ function addonsCredits()
 		$request = $db->query('substring', '
 			SELECT version, name, credits
 			FROM {db_prefix}log_packages
-			WHERE install_state = {int:installed_mods}
+			WHERE install_state = {int:installed_adds}
 				AND credits != {string:empty}
 				AND SUBSTRING(filename, 1, 9) != {string:old_patch_name}
 				AND SUBSTRING(filename, 1, 9) != {string:patch_name}',
 			array(
-				'installed_mods' => 1,
+				'installed_adds' => 1,
 				'old_patch_name' => 'smf_patch',
 				'patch_name' => 'elk_patch',
 				'empty' => '',

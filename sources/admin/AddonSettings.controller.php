@@ -73,7 +73,7 @@ class AddonSettings_Controller extends Action_Controller
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['admin_modifications'],
-			'help' => 'modsettings',
+			'help' => 'addonsettings',
 			'description' => $txt['modification_settings_desc'],
 			'tabs' => array(
 				'general' => array(
@@ -108,7 +108,7 @@ class AddonSettings_Controller extends Action_Controller
 
 			Settings_Form::save_db($save_vars);
 
-			redirectexit('action=admin;area=modsettings;sa=general');
+			redirectexit('action=admin;area=addonsettings;sa=general');
 		}
 
 		Settings_Form::prepare_db($config_vars);
@@ -139,7 +139,7 @@ class AddonSettings_Controller extends Action_Controller
 			$context['settings_message'] = '<div class="centertext">' . $txt['modification_no_misc_settings'] . '</div>';
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=modsettings;save;sa=general';
+		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
 		return $this->_addonSettings->settings($config_vars);
@@ -162,7 +162,7 @@ class AddonSettings_Controller extends Action_Controller
 
 	/**
 	 * Generates a list of integration hooks for display
-	 * Accessed through ?action=admin;area=modsettings;sa=hooks;
+	 * Accessed through ?action=admin;area=addonsettings;sa=hooks;
 	 * Allows for removal or disabing of selected hooks
 	 */
 	public function action_hooks()
@@ -207,7 +207,7 @@ class AddonSettings_Controller extends Action_Controller
 					remove_integration_function($_REQUEST['hook'], $function_remove, $file);
 					add_integration_function($_REQUEST['hook'], $function_add, $file);
 
-					redirectexit('action=admin;area=modsettings;sa=hooks' . $context['filter_url']);
+					redirectexit('action=admin;area=addonsettings;sa=hooks' . $context['filter_url']);
 				}
 			}
 		}
@@ -216,7 +216,7 @@ class AddonSettings_Controller extends Action_Controller
 			'id' => 'list_integration_hooks',
 			'title' => $txt['hooks_title_list'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=modsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'base_href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			'default_sort_col' => 'hook_name',
 			'get_items' => array(
 				'function' => array($this, 'list_getIntegrationHooks'),
@@ -281,7 +281,7 @@ class AddonSettings_Controller extends Action_Controller
 							$change_status = array(\'before\' => \'\', \'after\' => \'\');
 							if ($data[\'can_be_disabled\'] && $data[\'status\'] != \'deny\')
 							{
-								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=modsettings;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
+								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
 								$change_status[\'after\'] = \'</a>\';
 							}
 							return $change_status[\'before\'] . \'<img src="\' . $settings[\'images_url\'] . \'/admin/post_moderation_\' . $data[\'status\'] . \'.png" alt="\' . $data[\'img_text\'] . \'" title="\' . $data[\'img_text\'] . \'" />\' . $change_status[\'after\'];
@@ -323,7 +323,7 @@ class AddonSettings_Controller extends Action_Controller
 
 						if (!$data[\'hook_exists\'])
 							return \'
-							<a href="\' . $scripturl . \'?action=admin;area=modsettings;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
+							<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
 								<img src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="\' . $txt[\'hooks_button_remove\'] . \'" title="\' . $txt[\'hooks_button_remove\'] . \'" />
 							</a>\';
 					'),
@@ -331,7 +331,7 @@ class AddonSettings_Controller extends Action_Controller
 				),
 			);
 			$list_options['form'] = array(
-				'href' => $scripturl . '?action=admin;area=modsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'name' => 'list_integration_hooks',
 			);
 		}

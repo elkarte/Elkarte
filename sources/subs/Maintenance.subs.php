@@ -166,7 +166,7 @@ function getExceedingMessages($msg)
 
 /**
  * Lists all the tables from our ElkArte installation.
- * Additional tables from modifications are also included.
+ * Additional tables from addons are also included.
  *
  * @return array
  */

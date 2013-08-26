@@ -59,7 +59,7 @@ $txt['pbe_post_enabled'] = 'Allow posting to the forum by Email';
 $txt['pbe_pm_enabled'] = 'Allow replying to PM\'s by Email';
 $txt['pbe_no_mod_notices'] = 'Turn off moderation notices';
 $txt['pbe_no_mod_notices_desc'] = 'Do not send notifications of moved, locked, deleted, merged, etc.  These consume your email quota with no real purpose';
-$txt['settings_title'] = 'From this page you can choose how you want the post by email modification to behave';
+$txt['settings_title'] = 'From this page you can choose how you want the post by email feature to behave';
 $txt['saved'] = 'Information Saved';
 
 // General Sending Settings

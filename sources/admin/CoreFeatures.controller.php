@@ -228,7 +228,7 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// ih = Integration Hooks Handling.
 			'ih' => array(
-				'url' => 'action=admin;area=modsettings;sa=hooks',
+				'url' => 'action=admin;area=addonsettings;sa=hooks',
 				'settings' => array(
 					'handlinghooks_enabled' => 1,
 				),

@@ -218,12 +218,12 @@ class PackageServers_Controller extends Action_Controller
 
 		// Load the installed packages
 		// We'll figure out if what they select a package they already have installed.
-		$instmods = loadInstalledPackages();
+		$instadds = loadInstalledPackages();
 
-		$installed_mods = array();
+		$installed_adds = array();
 		// Look through the list of installed mods...
-		foreach ($instmods as $installed_mod)
-			$installed_mods[$installed_mod['package_id']] = $installed_mod['version'];
+		foreach ($instadds as $installed_add)
+			$installed_adds[$installed_add['package_id']] = $installed_add['version'];
 
 		// Get default author and email if they exist.
 		if ($listing->exists('default-author'))
@@ -321,9 +321,9 @@ class PackageServers_Controller extends Action_Controller
 					else
 						$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', Util::htmlspecialchars($package['description'])));
 
-					$package['is_installed'] = isset($installed_mods[$package['id']]);
-					$package['is_current'] = $package['is_installed'] && ($installed_mods[$package['id']] == $package['version']);
-					$package['is_newer'] = $package['is_installed'] && ($installed_mods[$package['id']] > $package['version']);
+					$package['is_installed'] = isset($installed_adds[$package['id']]);
+					$package['is_current'] = $package['is_installed'] && ($installed_adds[$package['id']] == $package['version']);
+					$package['is_newer'] = $package['is_installed'] && ($installed_adds[$package['id']] > $package['version']);
 
 					// This package is either not installed, or installed but old.  Is it supported on this version?
 					if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
