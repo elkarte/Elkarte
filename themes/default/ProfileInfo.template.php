@@ -147,6 +147,11 @@ function template_action_summary()
 					<dt>', $modSettings['karmaLabel'], ' </dt>
 					<dd>+', $context['member']['karma']['good'], '/-', $context['member']['karma']['bad'], '</dd>';
 
+	if (!empty($modSettings['likes_enabled']))
+		echo '
+					<dt>', $txt['likes'], ': </dt>
+					<dd>', $txt['likes_profile_given'], ': ', $context['member']['likes']['given'], ' / ', $txt['likes_profile_received'], ': ', $context['member']['likes']['received'], '</dd>';
+
 	if (!isset($context['disabled_fields']['gender']) && !empty($context['member']['gender']['name']))
 		echo '
 					<dt>', $txt['gender'], ': </dt>
