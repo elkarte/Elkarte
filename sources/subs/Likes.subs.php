@@ -19,7 +19,7 @@
  * @param array $liked_message - message array that is being worked on
  * @param type $direction - + for like - for unlike a previous liked one
  */
-function like_post($id_liker, $liked_message, $direction)
+function likePost($id_liker, $liked_message, $direction)
 {
 	// If we have a message, then we have passed all checks ...
 	if (!empty($liked_message))
@@ -28,7 +28,7 @@ function like_post($id_liker, $liked_message, $direction)
 		if ($liked_message['id_member'] == $id_liker)
 			fatal_lang_error('cant_like_yourself', false);
 
-		addlike($id_liker, $liked_message, $direction);
+		updateLike($id_liker, $liked_message, $direction);
 	}
 }
 
@@ -181,7 +181,7 @@ function lastLikeOn($id_liker)
  * @param array $liked_message
  * @param int $direction - options: - or +
  */
-function addLike($id_liker, $liked_message, $direction)
+function updateLike($id_liker, $liked_message, $direction)
 {
 	$db = database();
 

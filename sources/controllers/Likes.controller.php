@@ -62,7 +62,7 @@ class Likes_Controller extends Action_Controller
 		{
 			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
-				like_post($user_info['id'], $liked_message, '+');
+				likePost($user_info['id'], $liked_message, '+');
 		}
 
 		// Back to where we were, in theory
@@ -89,7 +89,7 @@ class Likes_Controller extends Action_Controller
 		{
 			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
-				like_post($user_info['id'], $liked_message, '-');
+				likePost($user_info['id'], $liked_message, '-');
 		}
 
 		// Back we go
