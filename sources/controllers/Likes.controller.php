@@ -70,7 +70,7 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Unlikes a post that you previosly liked ... no negatives though, hurts feelings :'(
+	 * Unlikes a post that you previously liked ... no negatives though, hurts feelings :'(
 	 * It redirects back to the referrer afterward.
 	 * It is accessed via ?action=like,sa=unlikepost.
 	 */
@@ -93,11 +93,15 @@ class Likes_Controller extends Action_Controller
 		}
 
 		// Back we go
-		redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
+		if (!isset($_REQUEST['profile']))
+			redirectexit('topic=' . $topic . '.msg' . $id_liked . '#msg' . $id_liked);
+		else
+			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
 	}
 
 	/**
-	 * Checks that few things are in order (in additon to permissions) for likes.
+	 * Checks that few things are in order (in addition to permissions) for likes.
+	 *
 	 * @param type $id_liked
 	 * @return type
 	 */
@@ -132,5 +136,284 @@ class Likes_Controller extends Action_Controller
 			$check = false;
 
 		return $check;
+	}
+
+	/**
+	 * Dispatch to show all the posts you liked OR all your posts liked
+	 */
+	public function action_showProfileLikes()
+	{
+		// Load in our helper functions
+		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/Likes.subs.php');
+
+		// May need this
+		$memID = currentMemberID();
+
+		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
+			$this->action_showReceived($memID);
+		else
+			$this->action_showGiven($memID);
+	}
+
+	/**
+	 * Shows all posts that they have liked
+	 */
+	private function action_showGiven($memID)
+	{
+		global $context, $txt, $scripturl;
+
+		// Build the listoption array to display the like data
+		$listOptions = array(
+			'id' => 'view_likes',
+			'title' => $txt['likes'],
+			'items_per_page' => 25,
+			'no_items_label' => $txt['likes_none_given'],
+			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=given;u=' . $memID,
+			'default_sort_col' => 'subject',
+			'get_items' => array(
+				'function' => 'list_loadLikesPosts',
+				'params' => array(
+					$memID,
+				),
+			),
+			'get_count' => array(
+				'function' => 'list_getLikesCount',
+				'params' => array(
+					$memID,
+				),
+			),
+			'columns' => array(
+				'subject' => array(
+					'header' => array(
+						'value' => $txt['subject'],
+						'class' => 'lefttext',
+					),
+					'data' => array(
+						'db' => 'subject',
+					),
+					'sort' => array(
+						'default' => 'm.subject DESC',
+						'reverse' => 'm.subject',
+					),
+				),
+				'name' => array(
+					'header' => array(
+						'value' => $txt['board'],
+						'class' => 'lefttext',
+					),
+					'data' => array(
+						'db' => 'name',
+					),
+					'sort' => array(
+						'default' => 'b.name ',
+						'reverse' => 'b.name DESC',
+					),
+				),
+				'poster_name' => array(
+					'header' => array(
+						'value' => $txt['username'],
+						'class' => 'lefttext',
+					),
+					'data' => array(
+						'db' => 'poster_name',
+					),
+					'sort' => array(
+						'default' => 'm.poster_name ',
+						'reverse' => 'm.poster_name DESC',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['delete'],
+					),
+					'data' => array(
+						'function' => create_function('$row', '
+							global $txt, $settings;
+
+							$result = \'<a href="\' . $row[\'delete\'] . \'" onclick="return confirm(\\\'\' . $txt[\'likes_confirm_delete\'] . \'\\\');" title="\' . $txt[\'awards_button_delete\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="" /></a>\';
+
+							return $result;'
+						),
+						'class' => "centertext",
+						'style' => "width: 10%",
+					),
+				),
+			),
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['likes'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'view_likes';
+
+		// Create the list.
+		createList($listOptions);
+	}
+
+	/**
+	 * Shows all posts that others have liked of theirs
+	 */
+	private function action_showReceived($memID)
+	{
+		global $context, $txt, $scripturl;
+
+		// build the listoption array to display the data
+		$listOptions = array(
+			'id' => 'view_likes',
+			'title' => $txt['likes'],
+			'items_per_page' => 25,
+			'no_items_label' => $txt['likes_none_given'],
+			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=received;u=' . $memID,
+			'default_sort_col' => 'subject',
+			'get_items' => array(
+				'function' => 'list_loadLikesReceived',
+				'params' => array(
+					$memID,
+				),
+			),
+			'get_count' => array(
+				'function' => 'list_getLikesCount',
+				'params' => array(
+					$memID,
+					false,
+				),
+			),
+			'columns' => array(
+				'subject' => array(
+					'header' => array(
+						'value' => $txt['subject'],
+						'class' => 'lefttext',
+					),
+					'data' => array(
+						'db' => 'subject',
+					),
+					'sort' => array(
+						'default' => 'm.subject DESC',
+						'reverse' => 'm.subject',
+					),
+				),
+				'name' => array(
+					'header' => array(
+						'value' => $txt['board'],
+						'class' => 'lefttext',
+					),
+					'data' => array(
+						'db' => 'name',
+					),
+					'sort' => array(
+						'default' => 'b.name',
+						'reverse' => 'b.name DESC',
+					),
+				),
+				'likes' => array(
+					'header' => array(
+						'value' => $txt['likes'],
+						'class' => 'lefttext',
+					),
+					'data' => array(
+						'db' => 'likes',
+					),
+					'sort' => array(
+						'default' => 'likes',
+						'reverse' => 'likes DESC',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['show'],
+					),
+					'data' => array(
+						'function' => create_function('$row', '
+							global $txt, $settings;
+
+							$result = \'<a href="\' . $row[\'who\'] . \'" title="\' . $txt[\'likes_show_who\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/members.png" alt="" /></a>\';
+
+							return $result;'
+						),
+						'class' => "centertext",
+						'style' => "width: 10%",
+					),
+				),
+			),
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['likes'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'view_likes';
+
+		// Create the list.
+		createList($listOptions);
+	}
+
+	/**
+	 * Function to return an array of users that liked a particular
+	 * message.  Used in profile so a user can see the full
+	 * list of members, vs the truncated (optional) one shown in message display
+	 *
+	 * @param int $message
+	 */
+	public function action_showWhoLiked($message)
+	{
+		global $context, $txt, $scripturl;
+
+		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/Likes.subs.php');
+		loadLanguage('Profile');
+
+		// Get the message in question
+		$message = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
+
+		// Build the listoption array to display the data
+		$listOptions = array(
+			'id' => 'view_likers',
+			'title' => $txt['likes_by'],
+			'items_per_page' => 25,
+			'no_items_label' => $txt['likes_none_given'],
+			'base_href' => $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $message,
+			'default_sort_col' => 'member',
+			'get_items' => array(
+				'function' => 'list_loadLikes',
+				'params' => array(
+					$message,
+				),
+			),
+			'get_count' => array(
+				'function' => 'list_getMessageLikeCount',
+				'params' => array(
+					$message,
+				),
+			),
+			'columns' => array(
+				'member' => array(
+					'header' => array(
+						'value' => $txt['members'],
+						'class' => 'lefttext',
+					),
+					'data' => array(
+						'db' => 'link',
+					),
+					'sort' => array(
+						'default' => 'm.real_name DESC',
+						'reverse' => 'm.real_name',
+					),
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'below_table_data',
+					'value' => '<a class="linkbutton_right" href="javascript:history.go(-1)">' . $txt['back'] . '</a>',
+				),
+			),
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['likes_by'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'view_likers';
+
+		// Create the list.
+		createList($listOptions);
 	}
 }
