@@ -2126,6 +2126,7 @@ CREATE TABLE {$db_prefix}user_drafts (
 #
 # Table structure for table `log_badbehavior`
 #
+
 CREATE TABLE {$db_prefix}log_badbehavior (
 	id int(10) NOT NULL auto_increment,
 	ip char(19) NOT NULL,
@@ -2147,6 +2148,7 @@ CREATE TABLE {$db_prefix}log_badbehavior (
 #
 # Table structure for table `postby_emails`
 #
+
 CREATE TABLE {$db_prefix}postby_emails (
 	id_email varchar(50) NOT NULL,
 	time_sent int(10) NOT NULL default '0',
@@ -2157,6 +2159,7 @@ CREATE TABLE {$db_prefix}postby_emails (
 #
 # Table structure for table `postby_emails_error`
 #
+
 CREATE TABLE {$db_prefix}postby_emails_error (
 	id_email int(10) NOT NULL auto_increment,
 	error varchar(255) NOT NULL default '',
@@ -2173,6 +2176,7 @@ CREATE TABLE {$db_prefix}postby_emails_error (
 #
 # Table structure for table `postby_emails_filters`
 #
+
 CREATE TABLE {$db_prefix}postby_emails_filters (
 	id_filter int(10) NOT NULL auto_increment,
 	filter_style char(5) NOT NULL default '',
@@ -2203,5 +2207,8 @@ CREATE TABLE {$db_prefix}log_likes (
 CREATE TABLE {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member)
+  id_poster mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member),
+  KEY id_member (id_member),
+  KEY id_poster (id_poster),
 ) ENGINE=MyISAM;
