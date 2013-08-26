@@ -175,6 +175,17 @@ $txt['trackActivity'] = 'Activity';
 $txt['trackIP'] = 'IP Address';
 $txt['trackLogins'] = 'Logins';
 
+$txt['likes_show'] = 'Show Likes';
+$txt['likes_given'] = 'Posts you liked';
+$txt['likes_profile_received'] = 'Likes received';
+$txt['likes_profile_given'] = 'Likes given';
+$txt['likes_received'] = 'Your posts liked by others';
+$txt['likes_none_given'] = 'You have not liked any posts';
+$txt['likes_none_received'] = 'No one has liked any of your posts :\'(';
+$txt['likes_confirm_delete'] = 'Remove this like?';
+$txt['likes_show_who'] = 'Show the members that liked this post';
+$txt['likes_by'] = 'Liked by';
+
 $txt['authentication'] = 'Authentication';
 $txt['change_authentication'] = 'From this section you can change how you login to the forum. You may choose to either use an OpenID account for your authentication, or alternatively switch to use a username and password.';
 
