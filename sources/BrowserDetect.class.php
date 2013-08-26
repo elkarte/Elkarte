@@ -113,7 +113,7 @@ class Browser_Detector
 		else
 			$this->_browsers['possibly_robot'] = false;
 
-		// Fill out the historical array as needed to support old mods that don't use isBrowser
+		// Fill out the historical array as needed to support old addons that don't use isBrowser
 		$this->_fillInformation();
 
 		// Last step ...
@@ -409,7 +409,7 @@ class Browser_Detector
 
 	/**
 	 * Fill out the historical array
-	 *  - needed to support old mods that don't use isBrowser
+	 *  - needed to support old add-ons that don't use isBrowser
 	 */
 	private function _fillInformation()
 	{

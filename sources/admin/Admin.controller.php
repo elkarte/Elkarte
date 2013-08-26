@@ -264,7 +264,7 @@ class Admin_Controller extends Action_Controller
 							'browse' => array($txt['themeadmin_edit_title'], 'enabled' => false),
 						),
 					),
-					'modsettings' => array(
+					'addonsettings' => array(
 						'label' => $txt['admin_modifications'],
 						'file' => 'AddonSettings.controller.php',
 						'controller' => 'AddonSettings_Controller',
@@ -950,7 +950,7 @@ class Admin_Controller extends Action_Controller
 			array('securitySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
 			array('spamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),
 			array('moderationSettings', 'area=securitysettings;sa=moderation', 'ManageSecurity_Controller'),
-			array('settings', 'area=modsettings;sa=general', 'AddonSettings_Controller'),
+			array('settings', 'area=addonsettings;sa=general', 'AddonSettings_Controller'),
 			array('settings', 'area=manageattachments;sa=attachments', 'ManageAttachments_Controller'),
 			array('settings', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),

@@ -573,7 +573,7 @@ function template_browse()
 
 		// Make a list of already installed addons so nothing is listed twice ;).
 		echo '
-				window.elkInstalledPackages = ["', implode('", "', $context['installed_mods']), '"];
+				window.elkInstalledPackages = ["', implode('", "', $context['installed_adds']), '"];
 				window.ourVersion = "', $context['forum_version'], '";
 			// ]]></script>';
 
@@ -590,19 +590,19 @@ function template_browse()
 		</div>';
 	}
 
-	$mods_available = false;
-	foreach ($context['modification_types'] as $type)
+	$adds_available = false;
+	foreach ($context['package_types'] as $type)
 	{
 		if (!empty($context['available_' . $type]))
 		{
 			template_show_list('packages_lists_' . $type);
-			$mods_available = true;
+			$adds_available = true;
 		}
 	}
 
-	if (!$mods_available)
+	if (!$adds_available)
 		echo '
-		<div class="information">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_mods_installed'], '</div>';
+		<div class="information">', $context['sub_action'] == 'browse' ? $txt['no_packages'] : $txt['no_adds_installed'], '</div>';
 
 	// the advanced (emulation) box, collapsed by default
 	echo '

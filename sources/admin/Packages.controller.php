@@ -1240,9 +1240,9 @@ class Packages_Controller extends Action_Controller
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;
 		$installed = $context['sub_action'] == 'installed' ? true : false;
-		$context['modification_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
+		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
 
-		foreach ($context['modification_types'] as $type)
+		foreach ($context['package_types'] as $type)
 		{
 			// Use the standard templates for showing this.
 			$listOptions = array(
@@ -2069,7 +2069,7 @@ class Packages_Controller extends Action_Controller
 	function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
 		global $scripturl, $context, $forum_version;
-		static $instmods, $packages;
+		static $instadds, $packages;
 
 		// Start things up
 		if (!isset($packages[$params]))
@@ -2103,34 +2103,34 @@ class Packages_Controller extends Action_Controller
 		if (isset($_SESSION['single_version_emulate']))
 			unset($_SESSION['single_version_emulate']);
 
-		if (empty($instmods))
+		if (empty($instadds))
 		{
-			$instmods = loadInstalledPackages();
-			$installed_mods = array();
+			$instadds = loadInstalledPackages();
+			$installed_adds = array();
 
 			// Look through the list of installed mods...
-			foreach ($instmods as $installed_mod)
-				$installed_mods[$installed_mod['package_id']] = array(
-					'id' => $installed_mod['id'],
-					'version' => $installed_mod['version'],
+			foreach ($instadds as $installed_add)
+				$installed_adds[$installed_add['package_id']] = array(
+					'id' => $installed_add['id'],
+					'version' => $installed_add['version'],
 				);
 
 			// Get a list of all the ids installed, so the latest packages won't include already installed ones.
-			$context['installed_mods'] = array_keys($installed_mods);
+			$context['installed_adds'] = array_keys($installed_adds);
 		}
 
 		if ($installed)
 		{
 			$sort_id = 1;
-			foreach ($instmods as $installed_mod)
+			foreach ($instadds as $installed_add)
 			{
-				$context['available_modification'][$installed_mod['package_id']] = array(
+				$context['available_modification'][$installed_add['package_id']] = array(
 					'sort_id' => $sort_id++,
 					'can_uninstall' => true,
-					'name' => $installed_mod['name'],
-					'filename' => $installed_mod['filename'],
-					'installed_id' => $installed_mod['id'],
-					'version' => $installed_mod['version'],
+					'name' => $installed_add['name'],
+					'filename' => $installed_add['filename'],
+					'installed_id' => $installed_add['id'],
+					'version' => $installed_add['version'],
 					'is_installed' => true,
 					'is_current' => true,
 				);
@@ -2138,7 +2138,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		if (empty($packages))
-			foreach ($context['modification_types'] as $type)
+			foreach ($context['package_types'] as $type)
 				$packages[$type] = array();
 
 		if ($dir = @opendir(BOARDDIR . '/packages'))
@@ -2157,7 +2157,7 @@ class Packages_Controller extends Action_Controller
 					continue;
 
 				$skip = false;
-				foreach ($context['modification_types'] as $type)
+				foreach ($context['package_types'] as $type)
 					if (isset($context['available_' . $type][md5($package)]))
 						$skip = true;
 
@@ -2190,11 +2190,11 @@ class Packages_Controller extends Action_Controller
 
 				if (!empty($packageInfo))
 				{
-					$packageInfo['installed_id'] = isset($installed_mods[$packageInfo['id']]) ? $installed_mods[$packageInfo['id']]['id'] : 0;
+					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
 					$packageInfo['sort_id'] = $sort_id[$packageInfo['type']];
-					$packageInfo['is_installed'] = isset($installed_mods[$packageInfo['id']]);
-					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] == $packageInfo['version']);
-					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] > $packageInfo['version']);
+					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
+					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
+					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
 					$packageInfo['can_install'] = false;
 					$packageInfo['can_uninstall'] = false;
 					$packageInfo['can_upgrade'] = false;
@@ -2239,7 +2239,7 @@ class Packages_Controller extends Action_Controller
 						{
 							// Even if it is for this ElkArte, is it for the installed version of the mod?
 							if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
-								if (!$upgrade->exists('@from') || matchPackageVersion($installed_mods[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
+								if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
 								{
 									$packageInfo['can_upgrade'] = true;
 									break;
