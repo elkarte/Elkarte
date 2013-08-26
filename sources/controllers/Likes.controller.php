@@ -440,7 +440,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function list_getMessageLikeCount($messageID)
 	{
-	   return MessageLikeCount($messageID);
+	   return messageLikeCount($messageID);
 	}
 
 	/**
@@ -455,7 +455,7 @@ class Likes_Controller extends Action_Controller
 	public function list_loadLikesPosts($start, $items_per_page, $sort, $memberID)
 	{
 		// Get all of our liked posts
-		return LikesPostsGiven($start, $items_per_page, $sort, $memberID);
+		return likesPostsGiven($start, $items_per_page, $sort, $memberID);
 	}
 
 	/**
@@ -470,7 +470,7 @@ class Likes_Controller extends Action_Controller
 	public function list_loadLikesReceived($start, $items_per_page, $sort, $memberID)
 	{
 		// Get a list of all posts (of a members) that have been liked
-		return LikesPostsReceived($start, $items_per_page, $sort, $memberID);
+		return likesPostsReceived($start, $items_per_page, $sort, $memberID);
 	}
 
 	/**
@@ -485,6 +485,6 @@ class Likes_Controller extends Action_Controller
 	public function list_loadPostLikers($start, $items_per_page, $sort, $messageID)
 	{
 		// Get a list of this posts likers
-		return PostLikers($start, $items_per_page, $sort, $messageID);
+		return postLikers($start, $items_per_page, $sort, $messageID);
 	}
 }

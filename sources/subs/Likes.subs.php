@@ -276,7 +276,7 @@ function increaseTopicLikes($id_topic, $direction)
  * @param int $memberID
  * @param boolean $given
  */
-function LikesCount($memberID, $given = true)
+function likesCount($memberID, $given = true)
 {
 	global $user_profile;
 
@@ -313,7 +313,7 @@ function LikesCount($memberID, $given = true)
  * @param string $sort
  * @param int $memberID
  */
-function LikesPostsGiven($start, $items_per_page, $sort, $memberID)
+function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 {
 	global $scripturl, $context;
 
@@ -362,7 +362,7 @@ function LikesPostsGiven($start, $items_per_page, $sort, $memberID)
  * @param string $sort
  * @param int $memberID
  */
-function LikesPostsReceived($start, $items_per_page, $sort, $memberID)
+function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 {
 	global $scripturl;
 
@@ -407,7 +407,7 @@ function LikesPostsReceived($start, $items_per_page, $sort, $memberID)
  * @param string $sort
  * @param int $messageID
  */
-function PostLikers($start, $items_per_page, $sort, $messageID)
+function postLikers($start, $items_per_page, $sort, $messageID)
 {
 	global $scripturl;
 
@@ -450,7 +450,7 @@ function PostLikers($start, $items_per_page, $sort, $messageID)
  *
  * @param int $message
  */
-function MessageLikeCount($message)
+function messageLikeCount($message)
 {
 	$db = database();
 	$total = 0;
