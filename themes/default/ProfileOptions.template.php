@@ -1524,18 +1524,17 @@ function template_authentication_method()
 					</dl>';
 
 	echo '
-					<hr />';
+				</div>';
 
 	if (!empty($context['token_check']))
 		echo '
-					<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 	echo '
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="u" value="', $context['id_member'], '" />
-					<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
-					<input type="submit" value="', $txt['change_profile'], '" class="button_submit" />
-				</div>
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="u" value="', $context['id_member'], '" />
+				<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
+				<input type="submit" value="', $txt['change_profile'], '" class="right_submit" />
 			</div>
 		</form>';
 
