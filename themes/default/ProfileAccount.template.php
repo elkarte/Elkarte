@@ -239,7 +239,7 @@ function template_issueWarning()
 							', !empty($context['warning_data']['body_preview']) ? $context['warning_data']['body_preview'] : '', '
 						</dd>
 					</dl>
-					<hr />
+				<hr />
 				</div>
 				<dl class="settings">
 					<dt>
