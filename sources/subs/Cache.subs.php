@@ -87,7 +87,7 @@ function cache_quick_get($key, $file, $function, $params, $level = 1)
  */
 function cache_put_data($key, $value, $ttl = 120)
 {
-	global $modSettings, $memcached, $cache_hits, $cache_count, $db_show_debug;
+	global $cache_memcached, $memcached, $cache_hits, $cache_count, $db_show_debug;
 	global $cache_accelerator, $cache_enable;
 
 	if (empty($cache_enable))
@@ -107,7 +107,7 @@ function cache_put_data($key, $value, $ttl = 120)
 	{
 		case 'memcached':
 			// The simple yet efficient memcached.
-			if (function_exists('memcached_set') || function_exists('memcache_set') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
+			if (function_exists('memcached_set') || function_exists('memcache_set') && !empty($cache_memcached))
 			{
 				// Not connected yet?
 				if (empty($memcached))
@@ -209,7 +209,7 @@ function cache_put_data($key, $value, $ttl = 120)
  */
 function cache_get_data($key, $ttl = 120)
 {
-	global $modSettings, $memcached, $cache_hits, $cache_count, $db_show_debug;
+	global $cache_memcached, $memcached, $cache_hits, $cache_count, $db_show_debug;
 	global $cache_accelerator, $cache_enable, $expired;
 
 	if (empty($cache_enable))
@@ -229,9 +229,9 @@ function cache_get_data($key, $ttl = 120)
 
 	switch ($cache_accelerator)
 	{
-		case 'memcache':
+		case 'memcached':
 			// Okay, let's go for it memcached!
-			if ((function_exists('memcache_get') || function_exists('memcached_get')) && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
+			if ((function_exists('memcache_get') || function_exists('memcached_get')) && !empty($cache_memcached))
 			{
 				// Not connected yet?
 				if (empty($memcached))
@@ -239,7 +239,7 @@ function cache_get_data($key, $ttl = 120)
 				if (!$memcached)
 					return null;
 
-				$value = (function_exists('memcache_get')) ? memcache_get($cache['connection'], $key) : memcached_get($cache['connection'], $key);
+				$value = (function_exists('memcache_get')) ? memcache_get($memcached, $key) : memcached_get($memcached, $key);
 			}
 			break;
 		case 'eaccelerator':
@@ -349,12 +349,12 @@ function get_memcached_server($level = 3)
  */
 function clean_cache($type = '')
 {
-	global $cache_accelerator, $modSettings, $memcached;
+	global $cache_accelerator, $cache_memcached, $memcached;
 
 	switch ($cache_accelerator)
 	{
 		case 'memcached':
-			if (function_exists('memcache_flush') || function_exists('memcached_flush') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '')
+			if ((function_exists('memcache_flush') || function_exists('memcached_flush')) && !empty($cache_memcached))
 			{
 				// Not connected yet?
 				if (empty($memcached))

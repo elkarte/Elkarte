@@ -114,6 +114,7 @@ class Reports_Controller extends Action_Controller
 			if ($reportTemplates[$_REQUEST['st']]['layers'] !== null)
 			{
 				$template_layers = Template_Layers::getInstance();
+				$template_layers->removeAll();
 				foreach ($reportTemplates[$_REQUEST['st']]['layers'] as $layer)
 					$template_layers->add($layer);
 			}

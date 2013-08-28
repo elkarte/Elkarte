@@ -589,6 +589,7 @@ class Display_Controller
 		$topic_details = getTopicsPostsAndPoster($topic, $limit_settings, $ascending);
 		$messages = $topic_details['messages'];
 		$posters = array_unique($topic_details['all_posters']);
+		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
 		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
@@ -641,7 +642,7 @@ class Display_Controller
 			// Fetch attachments.
 			$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
-				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment');
+				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
 
 			$msg_parameters = array(
 				'message_list' => $messages,
