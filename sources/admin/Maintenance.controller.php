@@ -129,8 +129,6 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $db_type, $modSettings, $maintenance;
 
-		$db = database();
-
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
@@ -481,7 +479,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_optimize_display()
 	{
-		global $db_type, $txt, $context;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 
@@ -816,24 +814,41 @@ class Maintenance_Controller extends Action_Controller
 
 		checkSession();
 
-		// Find the member.
-		require_once(SUBSDIR . '/Auth.subs.php');
-		$members = findMembers($_POST['to']);
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+		$validator->sanitation_rules(array('posts' => 'empty', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
+		$validator->validation_rules(array('from_email' => 'valid_email', 'to' => 'required', 'type' => 'required'));
 
-		if (empty($members))
-			fatal_lang_error('reattribute_cannot_find_member');
+		if ($validator->validate($_POST))
+		{
+			// Find the member.
+			require_once(SUBSDIR . '/Auth.subs.php');
+			$members = findMembers($validator->to);
 
-		$memID = array_shift($members);
-		$memID = $memID['id'];
+			if (empty($members))
+				fatal_lang_error('reattribute_cannot_find_member');
 
-		$email = $_POST['type'] == 'email' ? $_POST['from_email'] : '';
-		$membername = $_POST['type'] == 'name' ? $_POST['from_name'] : '';
+			$memID = array_shift($members);
+			$memID = $memID['id'];
 
-		// Now call the reattribute function.
-		require_once(SUBSDIR . '/Members.subs.php');
-		reattributePosts($memID, $email, $membername, !empty($_POST['posts']));
+			$email = $validator->type == 'email' ? $validator->from_email : '';
+			$membername = $validator->type == 'name' ? $validator->from_name : '';
 
-		$context['maintenance_finished'] = $txt['maintain_reattribute_posts'];
+			// Now call the reattribute function.
+			require_once(SUBSDIR . '/Members.subs.php');
+			reattributePosts($memID, $email, $membername, !$validator->posts);
+
+			$context['maintenance_finished'] = array(
+				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_reattribute_posts'])),
+			);
+		}
+		else
+		{
+			$context['maintenance_finished'] = array(
+				'errors' => $validator->validation_errors(),
+				'type' => 'minor',
+			);
+		}
 	}
 
 	/**
@@ -862,24 +877,38 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$_POST['maxdays'] = empty($_POST['maxdays']) ? 0 : (int) $_POST['maxdays'];
-		if (!empty($_POST['groups']) && $_POST['maxdays'] > 0)
-		{
-			checkSession();
-			validateToken('admin-maint');
+		checkSession();
+		validateToken('admin-maint');
 
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+		$validator->sanitation_rules(array('maxdays' => 'intval'));
+		$validator->validation_rules(array('maxdays' => 'required',	'groups' => 'isarray', 'del_type' => 'required'));
+
+		if ($validator->validate($_POST))
+		{
 			$groups = array();
-			foreach ($_POST['groups'] as $id => $dummy)
+			foreach ($validator->groups as $id => $dummy)
 				$groups[] = (int) $id;
-			$time_limit = (time() - ($_POST['maxdays'] * 24 * 3600));
-			$members = purgeMembers($_POST['type'], $groups, $time_limit);
+			$time_limit = (time() - ($validator->maxdays * 24 * 3600));
+
+			require_once(SUBSDIR . '/Maintenance.subs.php');
+			$members = purgeMembers($validator->type, $groups, $time_limit);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($members);
-		}
 
-		$context['maintenance_finished'] = $txt['maintain_members'];
-		createToken('admin-maint');
+			$context['maintenance_finished'] = array(
+				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_members'])),
+			);
+		}
+		else
+		{
+			$context['maintenance_finished'] = array(
+				'errors' => $validator->validation_errors(),
+				'type' => 'minor',
+			);
+		}
 	}
 
 	/**
@@ -903,7 +932,6 @@ class Maintenance_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		$drafts = getOldDrafts($_POST['draftdays']);
-
 
 		// If we have old drafts, remove them
 		if (count($drafts) > 0)
@@ -1000,7 +1028,7 @@ class Maintenance_Controller extends Action_Controller
 	 * it requires the admin_forum permission.
 	 *
 	 * - recounts all posts for members found in the message table
-	 * - updates the members post count record in the members talbe
+	 * - updates the members post count record in the members table
 	 * - honors the boards post count flag
 	 * - does not count posts in the recyle bin
 	 * - zeros post counts for all members with no posts in the message table

@@ -67,7 +67,6 @@ class Emailuser_Controller extends Action_Controller
 			fatal_lang_error('not_a_topic', false);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
-
 		$row = getTopicInfo($topic, 'message');
 		if (empty($row))
 			fatal_lang_error('not_a_topic', false);
@@ -94,7 +93,7 @@ class Emailuser_Controller extends Action_Controller
 
 		$result = $this->_sendTopic($row);
 		if ($result !== true)
-			fatal_lang_error($result, false);
+			$context['sendtopic_error'] = $result;
 
 		// Back to the topic!
 		redirectexit('topic=' . $topic . '.0');
@@ -177,10 +176,7 @@ class Emailuser_Controller extends Action_Controller
 		if ($result !== true)
 		{
 			loadLanguage('Errors');
-			$context['xml_data'] = array(
-				'error' => 1,
-				'text' => $txt[$result]
-			);
+			$context['xml_data'] = $result;
 			return;
 		}
 
@@ -191,38 +187,53 @@ class Emailuser_Controller extends Action_Controller
 
 	private function _sendTopic($row)
 	{
-		global $scripturl, $topic;
+		global $scripturl, $topic, $txt;
 
 		// This is needed for sendmail().
 		require_once(SUBSDIR . '/Mail.subs.php');
 
-		// Trim the names..
-		$_POST['y_name'] = trim($_POST['y_name']);
-		$_POST['r_name'] = trim($_POST['r_name']);
+		// Time to check and clean what was placed in the form
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+		$validator->sanitation_rules(array(
+			'y_name' => 'trim',
+			'r_name' => 'trim'
+		));
+		$validator->validation_rules(array(
+			'y_name' => 'required|notequal[_]',
+			'y_email' => 'required|valid_email',
+			'r_name' => 'required|notequal[_]',
+			'r_email' => 'required|valid_email'
+		));
+		$validator->text_replacements(array(
+			'y_name' => $txt['sendtopic_sender_name'],
+			'y_email' => $txt['sendtopic_sender_email'],
+			'r_name' => $txt['sendtopic_receiver_name'],
+			'r_email' => $txt['sendtopic_receiver_email']
+		));
 
-		// Make sure they aren't playing "let's use a fake email".
-		if ($_POST['y_name'] == '_' || !isset($_POST['y_name']) || $_POST['y_name'] == '')
-			return 'no_name';
-		if (!isset($_POST['y_email']) || $_POST['y_email'] == '')
-			return 'no_email';
-		if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['y_email']) == 0)
-			return 'email_invalid_character';
+		// Any errors or are we good to go?
+		if (!$validator->validate($_POST))
+		{
+			$errors = $validator->validation_errors();
 
-		// The receiver should be valid to.
-		if ($_POST['r_name'] == '_' || !isset($_POST['r_name']) || $_POST['r_name'] == '')
-			return 'no_name';
-		if (!isset($_POST['r_email']) || $_POST['r_email'] == '')
-			return 'no_email';
-		if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['r_email']) == 0)
-			return 'email_invalid_character';
+			return $context['sendtopic_error'] = array(
+				'errors' => $errors,
+				'type' => 'minor',
+				'title' => $txt['validation_failure'],
+				// And something for ajax
+				'error' => 1,
+				'text' => $errors[0],
+			);
+		}
 
 		// Emails don't like entities...
 		$row['subject'] = un_htmlspecialchars($row['subject']);
 
 		$replacements = array(
 			'TOPICSUBJECT' => $row['subject'],
-			'SENDERNAME' => $_POST['y_name'],
-			'RECPNAME' => $_POST['r_name'],
+			'SENDERNAME' => $validator->y_name,
+			'RECPNAME' => $validator->r_name,
 			'TOPICLINK' => $scripturl . '?topic=' . $topic . '.0',
 		);
 
@@ -235,8 +246,9 @@ class Emailuser_Controller extends Action_Controller
 		}
 
 		$emaildata = loadEmailTemplate($emailtemplate, $replacements);
+
 		// And off we go!
-		sendmail($_POST['r_email'], $emaildata['subject'], $emaildata['body'], $_POST['y_email']);
+		sendmail($validator->r_email, $emaildata['subject'], $emaildata['body'], $validator->y_email);
 
 		return true;
 	}
@@ -308,25 +320,58 @@ class Emailuser_Controller extends Action_Controller
 		// Can we see this person's email address?
 		$context['can_view_receipient_email'] = $context['show_email_address'] == 'yes' || $context['show_email_address'] == 'yes_permission_override';
 
+		// Template
+		$context['sub_template'] = 'custom_email';
+		$context['page_title'] = $txt['send_email'];
+
 		// Are we actually sending it?
 		if (isset($_POST['send']) && isset($_POST['email_body']))
 		{
-			require_once(SUBSDIR . '/Mail.subs.php');
-
 			checkSession();
+
+			// Don't let them send too many!
+			spamProtection('sendmail');
+
+			require_once(SUBSDIR . '/Mail.subs.php');
+			require_once(SUBSDIR . '/DataValidator.class.php');
+
+			// We will need to do some data checking
+			$validator = new Data_Validator();
+			$validator->sanitation_rules(array(
+				'y_name' => 'trim',
+				'email_body' => 'trim',
+				'email_subject' => 'trim'
+			));
+			$validator->validation_rules(array(
+				'y_name' => 'required|notequal[_]',
+				'y_email' => 'required|valid_email',
+				'email_body' => 'required',
+				'email_subject' => 'required'
+			));
+			$validator->text_replacements(array(
+				'y_name' => $txt['sendtopic_sender_name'],
+				'y_email' => $txt['sendtopic_sender_email'],
+				'email_body' => $txt['message'],
+				'email_subject' => $txt['send_email_subject']
+			));
+			$validator->validate($_POST);
 
 			// If it's a guest sort out their names.
 			if ($user_info['is_guest'])
 			{
-				if (empty($_POST['y_name']) || $_POST['y_name'] == '_' || trim($_POST['y_name']) == '')
-					fatal_lang_error('no_name', false);
-				if (empty($_POST['y_email']))
-					fatal_lang_error('no_email', false);
-				if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['y_email']) == 0)
-					fatal_lang_error('email_invalid_character', false);
+				$errors = $validator->validation_errors(array('y_name', 'y_email'));
+				if ($errors)
+				{
+					$context['sendemail_error'] = array(
+						'errors' => $errors,
+						'type' => 'minor',
+						'title' => $txt['validation_failure'],
+					);
+					return;
+				}
 
-				$from_name = trim($_POST['y_name']);
-				$from_email = trim($_POST['y_email']);
+				$from_name = $validator->y_name;
+				$from_email = $validator->y_email;
 			}
 			else
 			{
@@ -335,19 +380,24 @@ class Emailuser_Controller extends Action_Controller
 			}
 
 			// Check we have a body (etc).
-			if (trim($_POST['email_body']) == '' || trim($_POST['email_subject']) == '')
-				fatal_lang_error('email_missing_data');
+			$errors = $validator->validation_errors(array('email_body', 'email_subject'));
+			if (!empty($errors))
+			{
+				$context['sendemail_error'] = array(
+					'errors' => $errors,
+					'type' => 'minor',
+					'title' => $txt['validation_failure'],
+				);
+				return;
+			}
 
 			// We use a template in case they want to customise!
 			$replacements = array(
-				'EMAILSUBJECT' => $_POST['email_subject'],
-				'EMAILBODY' => $_POST['email_body'],
+				'EMAILSUBJECT' => $validator->email_subject,
+				'EMAILBODY' => $validator->email_body,
 				'SENDERNAME' => $from_name,
 				'RECPNAME' => $context['recipient']['name'],
 			);
-
-			// Don't let them send too many!
-			spamProtection('sendmail');
 
 			// Get the template and get out!
 			$emaildata = loadEmailTemplate('send_email', $replacements);
@@ -361,9 +411,6 @@ class Emailuser_Controller extends Action_Controller
 			else
 				redirectexit();
 		}
-
-		$context['sub_template'] = 'custom_email';
-		$context['page_title'] = $txt['send_email'];
 	}
 
 	/**

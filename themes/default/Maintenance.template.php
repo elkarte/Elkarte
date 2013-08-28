@@ -217,11 +217,7 @@ function template_maintain_members()
 	<div id="manage_maintenance">';
 
 	// If maintenance has finished tell the user.
-	if (!empty($context['maintenance_finished']))
-	echo '
-		<div class="infobox">
-			', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
-		</div>';
+	template_show_error('maintenance_finished');
 
 	echo '
 		<div class="cat_bar">

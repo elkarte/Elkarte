@@ -617,13 +617,15 @@ function template_show_error($error_id)
 {
 	global $context;
 
-	if (empty($error_id))
+	if (empty($error_id) || empty($context[$error_id]))
 		return;
 
-	$error = !empty($context[$error_id]) ? $context[$error_id] : null;
+	$error = $context[$error_id];
 
 	echo '
 					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+
+	// Optional title for our results
 	if (!empty($error['title']))
 		echo '
 						<dl>
@@ -631,10 +633,12 @@ function template_show_error($error_id)
 								<strong id="', $error_id, '_title">', $error['title'], '</strong>
 							</dt>
 							<dd>';
+
+	// Everythign that went wrong, or correctly :)
 	if (!empty($error['errors']))
 	{
 		echo '
-								<ul class="error" id="', $error_id, '_list">';
+								<ul', (isset($error['type']) ? ' class="error"' : ''), ' id="', $error_id, '_list">';
 
 		foreach ($error['errors'] as $key => $error)
 			echo '
@@ -642,10 +646,13 @@ function template_show_error($error_id)
 		echo '
 								</ul>';
 	}
+
+	// All done
 	if (!empty($error['title']))
 		echo '
 							</dd>
 						</dl>';
+
 	echo '
 					</div>';
 }

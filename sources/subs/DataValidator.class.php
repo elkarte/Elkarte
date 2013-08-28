@@ -8,40 +8,51 @@
  * @version 1.0 Alpha
  *
  */
-
 if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Class used to validate and transform data
  *
- * Set the rule(s)
- * sanitation_rules()
- *		sanitation_rules(array(
- *			'username'    => 'trim|uppercase',
- *			'email'   	  => 'trim|gmail_normalize',
- *		));
+ * Initiate
+ *		$validation = new Data_Validator();
  *
+ * Set validation rules
  * validation_rules()
- *		validation_rules(array(
- *			'username' => 'required|alpha_numeric|max_length[10]|min_length[6]',
- *			'email'    => 'required|valid_email',
+ * 		$validation->validation_rules(array(
+ * 			'username' => 'required|alpha_numeric|max_length[10]|min_length[6]',
+ * 			'email'    => 'required|valid_email'
+ * 		));
+ *
+ * Set optional sanitation rules
+ * sanitation_rules()
+ * 		$validation->sanitation_rules(array(
+ * 			'username'    => 'trim|uppercase',
+ * 			'email'   	  => 'trim|gmail_normalize'
+ * 		));
+ *
+ * Set Optional variable name substitutions
+ * text_replacements()
+ *		$validation->text_replacements(array(
+ *			'username' => $txt['someThing'],
+ *			'email' => $txt['someEmail']
  *		));
  *
  * Run the validation
- * 		validation_run($data);
- * $data must be an array with keys matching the validation rule e.g. $data['username'], $data['password']
+ * 		$validation->validation_run($data);
+ * $data must be an array with keys matching the validation rule e.g. $data['username'], $data['email']
  *
  * Get the results
- *		validation_errors()
- *		validation_data()
+ * 		$validation->validation_errors(optional array of fields to return errors)
+ * 		$validation->validation_data()
+ *		$validation->username
  *
  * Current validation can be one or a combination of:
- *		max_length[x], min_length[x], length[x],
- *		alpha, alpha_numeric, alpha_dash
- *		numeric, integer, boolean, float,
- *		valid_url, valid_ip, valid_ipv6, valid_email,
- *		php_syntax, contains[x,y,x], required
+ * 		max_length[x], min_length[x], length[x],
+ * 		alpha, alpha_numeric, alpha_dash
+ * 		numeric, integer, boolean, float, notequal[x,y,z]
+ * 		valid_url, valid_ip, valid_ipv6, valid_email,
+ * 		php_syntax, contains[x,y,x], required, without[x,y,z]
  */
 class Data_Validator
 {
@@ -56,6 +67,11 @@ class Data_Validator
 	protected $_sanitation_rules = array();
 
 	/**
+	 * Text substitutions for field names in the error messages
+	 */
+	protected $_replacements = array();
+
+	/**
 	 * Holds validation errors
 	 */
 	protected $_validation_errors = array();
@@ -66,10 +82,20 @@ class Data_Validator
 	protected $_data = array();
 
 	/**
-	 * Stict data processing,
+	 * Strict data processing,
 	 * if true drops data for which no sanitation rule was set
 	 */
 	protected $strict = false;
+
+	/**
+	 * Allow reading otherwise inaccessible data values
+	 *
+	 * @param type $property key name of array value to return
+	 */
+	public function __get($property)
+	{
+		return array_key_exists($property, $this->_data) ? $this->_data[$property] : null;
+	}
 
 	/**
 	 * Set the validation rules that will be run against the data
@@ -113,6 +139,19 @@ class Data_Validator
 	}
 
 	/**
+	 * Field Name Replacements
+	 *
+	 * @return array
+	 */
+	public function text_replacements($replacements = array())
+	{
+		if (!empty($replacements))
+			$this->_replacements = $replacements;
+		else
+			return $this->_replacements;
+	}
+
+	/**
 	 * Run the sanitation and validation on the data
 	 *
 	 * @param array $input
@@ -120,7 +159,7 @@ class Data_Validator
 	 */
 	public function validate($input)
 	{
-		// this won't work, $input[$field] will be undefined
+		// @todo this won't work, $input[$field] will be undefined
 		if (!is_array($input))
 			$input = array($input);
 
@@ -134,11 +173,19 @@ class Data_Validator
 	/**
 	 * Return errors
 	 *
+	 * @param mixed $raw - true returns the raw error array,
+	 *					 - array returns just error messages of those fields
+	 *					 - otherwise all error message(s)
 	 * @return array
 	 */
-	public function validation_errors()
+	public function validation_errors($raw = false)
 	{
-		return $this->_get_error_messages();
+		// Return the array
+		if ($raw === true)
+			return $this->_validation_errors;
+		// Otherwise return the formated text string(s)
+		else
+			return $this->_get_error_messages($raw);
 	}
 
 	/**
@@ -146,9 +193,12 @@ class Data_Validator
 	 *
 	 * @return array
 	 */
-	public function validation_data()
+	public function validation_data($key = null)
 	{
-		return $this->_data;
+		if ($key === null)
+			return $this->_data;
+
+		return isset($this->_data[$key]) ? $this->_data[$key] : null;
 	}
 
 	/**
@@ -215,11 +265,12 @@ class Data_Validator
 		// For each field, run our set of rules against the data
 		foreach ($ruleset as $field => $rules)
 		{
-			// data for which we don't have rules
+			// Data for which we don't have rules
 			if (!array_key_exists($field, $input))
 			{
 				if ($this->strict)
 					unset($input[$field]);
+
 				continue;
 			}
 
@@ -233,13 +284,32 @@ class Data_Validator
 				// Defined method to use?
 				if (is_callable(array($this, $sanitation_method)))
 					$input[$field] = $this->$sanitation_method($input[$field]);
-				// Maybe its a built in php function?
+				// One of our static methods
+				elseif (strpos($rule, '::') !== false && is_callable($rule))
+					$input[$field] = call_user_func($rule, $input[$field]);
+				// Maybe even a built in php function?
 				elseif (function_exists($rule))
 					$input[$field] = $rule($input[$field]);
+				// Or even a langauge constuct?
+				elseif (in_array($rule, array('empty', 'array', 'isset')))
+				{
+					// could be done as methods instead ...
+					switch ($rule) {
+						case 'empty':
+							$input[$field] = empty($input[$field]);
+							break;
+						case 'array':
+							$input[$field] = array($input[$field]);
+							break;
+						case 'isset':
+							$input[$field] = isset($input[$field]);
+							break;
+					}
+				}
 				else
 				{
 					$input[$field] = $input[$field];
-					// @todo fatal_error or other ? being asked to do something we dont know?
+					// @todo fatal_error or other ? being asked to do something we don't know?
 				}
 			}
 		}
@@ -253,7 +323,7 @@ class Data_Validator
 	 * @return array
 	 * @return string
 	 */
-	private function _get_error_messages()
+	private function _get_error_messages($keys)
 	{
 		global $txt;
 
@@ -263,19 +333,28 @@ class Data_Validator
 		loadLanguage('Validation');
 		$result = array();
 
+		// Just want specific errors then it must be an array
+		if (!empty($keys) && !is_array($keys))
+			$keys = array($keys);
+
 		foreach ($this->_validation_errors as $error)
 		{
+			// Field name substitution supplied?
+			$field = isset($this->_replacements[$error['field']]) ? $this->_replacements[$error['field']] : $error['field'];
+
+			// Just want specific field errors returned?
+			if (!empty($keys) && !in_array($error['field'], $keys))
+				continue;
+
 			// Set the error message for this validation failure
 			if (isset($error['error']))
-			{
-					$result[] = sprintf($txt[$error['error']], $error['field'], $error['error_msg']);
-			}
+				$result[] = sprintf($txt[$error['error']], $field, $error['error_msg']);
 			elseif (isset($txt[$error['function']]))
 			{
 				if (!empty($error['param']))
-					$result[] = sprintf($txt[$error['function']], $error['field'], $error['param']);
+					$result[] = sprintf($txt[$error['function']], $field, $error['param']);
 				else
-					$result[] = sprintf($txt[$error['function']], $error['field'], $error['input']);
+					$result[] = sprintf($txt[$error['function']], $field, $error['input']);
 			}
 		}
 
@@ -287,9 +366,9 @@ class Data_Validator
 	//
 
 	/**
-	 * Contains ... Verify that a value is contained within a list
+	 * Contains ... Verify that a value is one of those provided (case insensitive)
 	 *
-	 * Usage: '[key]' => 'contains[value,value,value]'
+	 * Usage: '[key]' => 'contains[value, value, value]'
 	 *
 	 * @param string $field
 	 * @param array $input
@@ -311,6 +390,62 @@ class Data_Validator
 			'param' => implode(',', $validation_parameters)
 		);
 	}
+
+	/**
+	 * NotEqual ... Verify that a value does equal any values in list (case insensitive)
+	 *
+	 * Usage: '[key]' => 'notequal[value, value, value]'
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array or null $validation_parameters
+	 * @return mixed
+	 */
+	protected function _validate_notequal($field, $input, $validation_parameters = null)
+	{
+		$validation_parameters = explode(',', trim(strtolower($validation_parameters)));
+		$value = trim(strtolower($input[$field]));
+
+		if (!in_array($value, $validation_parameters))
+			return;
+
+		return array(
+			'field' => $field,
+			'input' => $input[$field],
+			'function' => __FUNCTION__,
+			'param' => implode(',', $validation_parameters)
+		);
+	}
+
+	/**
+	 * Without ... Verify that a value does contain any characters/values in list
+	 *
+	 * Usage: '[key]' => 'without[value, value, value]'
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array or null $validation_parameters
+	 * @return mixed
+	 */
+	protected function _validate_without($field, $input, $validation_parameters = null)
+	{
+		$validation_parameters = explode(',', $validation_parameters);
+		$value = $input[$field];
+
+		foreach ($validation_parameters as $dummy => $check)
+		{
+			if (strpos($value, $check) !== false)
+				return array(
+					'field' => $field,
+					'input' => $input[$field],
+					'function' => __FUNCTION__,
+					'param' => implode($check)
+				);
+		}
+
+		return;
+	}
+
 
 	/**
 	 * required ... Check if the specified key is present and not empty
@@ -386,6 +521,9 @@ class Data_Validator
 				$valid = false;
 			// domain part length problems (RFC 2821)
 			elseif ($domain_len === 0 || $domain_len > 255)
+				$valid = false;
+			// domain does not have a least two parts
+			elseif (strpos($domain, '.') === false)
 				$valid = false;
 			// character not valid in domain part (RFC 1035)
 			elseif (!preg_match('~^[A-Za-z0-9\\-\\.]+$~', $domain))
@@ -560,6 +698,33 @@ class Data_Validator
 			return;
 
 		if (!preg_match('~^([-_\p{L}])+$~iu', $input[$field]))
+		{
+			return array(
+				'field' => $field,
+				'input' => $input[$field],
+				'function' => __FUNCTION__,
+				'param' => $validation_parameters
+			);
+		}
+	}
+
+	/**
+	 * isarray ... Determine if the provided value exists and is an array
+	 *
+	 * Usage: '[key]' => 'isarray'
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array or null $validation_parameters
+	 * @return mixed
+	 */
+	protected function _validate_isarray($field, $input, $validation_parameters = null)
+	{
+		if (!isset($input[$field]))
+			return;
+
+		// A character with the Unicode property of letter (any kind of letter from any language)
+		if (!is_array($input[$field]))
 		{
 			return array(
 				'field' => $field,
@@ -776,9 +941,10 @@ class Data_Validator
 		{
 			if ($token === '{')
 				$level++;
-			elseif($token === '}')
+			elseif ($token === '}')
 				$level--;
 		}
+
 		if (!empty($level))
 			$result = false;
 		else
@@ -819,7 +985,7 @@ class Data_Validator
 	 * - Gmail user can use @googlemail.com instead of @gmail.com
 	 * - Gmail ignores all characters after a + (plus sign) in the username
 	 * - Gmail ignores all . (dots) in username
-	 * - ahole@gmail.com, a.hole@gmail.com, ahole+big@gmail.com and a.hole+gigantic@googlemail.com are same email address.
+	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email address.
 	 *
 	 * @param string $input
 	 */
