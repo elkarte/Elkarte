@@ -1483,7 +1483,7 @@ function template_authentication_method()
 							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' class="input_radio" /><label for="auth_pass"><strong>', $txt['authenticate_password'], '</strong></label>
 						</dt>
 						<dd>
-							<dl id="auth_openid_div">
+							<dl id="openid_group"">
 								<dt>
 									<em>', $txt['authenticate_openid_url'], ':</em>
 								</dt>
@@ -1491,7 +1491,7 @@ function template_authentication_method()
 									<input type="text" name="openid_identifier" id="openid_url" size="30" tabindex="', $context['tabindex']++, '" value="', $context['member']['openid_uri'], '" class="input_text openid_login" />
 								</dd>
 							</dl>
-							<dl id="auth_pass_div">
+							<dl id="password1_group">
 								<dt>
 									<em>', $txt['choose_pass'], ':</em>
 								</dt>
@@ -1499,6 +1499,8 @@ function template_authentication_method()
 									<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
 									<span id="elk_autov_pwmain_div" style="display: none;"><img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" /></span>
 								</dd>
+							</dl>
+							<dl id="password2_group">
 								<dt>
 									<em>', $txt['verify_pass'], ':</em>
 								</dt>
@@ -1524,18 +1526,17 @@ function template_authentication_method()
 					</dl>';
 
 	echo '
-					<hr />';
+				</div>';
 
 	if (!empty($context['token_check']))
 		echo '
-					<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 	echo '
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="u" value="', $context['id_member'], '" />
-					<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
-					<input type="submit" value="', $txt['change_profile'], '" class="button_submit" />
-				</div>
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="u" value="', $context['id_member'], '" />
+				<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
+				<input type="submit" value="', $txt['change_profile'], '" class="right_submit" />
 			</div>
 		</form>';
 

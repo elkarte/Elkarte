@@ -293,9 +293,11 @@ function updateAuthMethod()
 	if (!document.getElementById('auth_openid'))
 		return true;
 
-	document.forms.registration.openid_url.disabled = currentAuthMethod == 'openid' ? false : true;
-	document.forms.registration.elk_autov_pwmain.disabled = currentAuthMethod == 'passwd' ? false : true;
-	document.forms.registration.elk_autov_pwverify.disabled = currentAuthMethod == 'passwd' ? false : true;
+	currentForm = document.getElementById('auth_openid').form.id;
+	
+	document.forms[currentForm].openid_url.disabled = currentAuthMethod == 'openid' ? false : true;
+	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod == 'passwd' ? false : true;
+	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod == 'passwd' ? false : true;
 	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod == 'passwd' ? '' : 'none';
 	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod == 'passwd' ? '' : 'none';
 
@@ -303,16 +305,16 @@ function updateAuthMethod()
 	{
 		verificationHandle.refreshMainPassword();
 		verificationHandle.refreshVerifyPassword();
-		document.forms.registration.openid_url.style.backgroundColor = '';
+		document.forms[currentForm].openid_url.style.backgroundColor = '';
 		document.getElementById('password1_group').style.display = '';
 		document.getElementById('password2_group').style.display = '';
 		document.getElementById('openid_group').style.display = 'none';
 	}
 	else
 	{
-		document.forms.registration.elk_autov_pwmain.style.backgroundColor = '';
-		document.forms.registration.elk_autov_pwverify.style.backgroundColor = '';
-		document.forms.registration.openid_url.style.backgroundColor = '#FFF0F0';
+		document.forms[currentForm].elk_autov_pwmain.style.backgroundColor = '';
+		document.forms[currentForm].elk_autov_pwverify.style.backgroundColor = '';
+		document.forms[currentForm].openid_url.style.backgroundColor = '#FFF0F0';
 		document.getElementById('password1_group').style.display = 'none';
 		document.getElementById('password2_group').style.display = 'none';
 		document.getElementById('openid_group').style.display = '';

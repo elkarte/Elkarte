@@ -1626,42 +1626,6 @@ function elkSetLatestPackages()
 	tempOldOnload();
 }
 
-function updateAuthMethod()
-{
-	// What authentication method is being used?
-	if (!document.getElementById("auth_openid") || !document.getElementById("auth_openid").checked)
-		currentAuthMethod = "passwd";
-	else
-		currentAuthMethod = "openid";
-
-	// No openID?
-	if (!document.getElementById("auth_openid"))
-		return true;
-
-	document.forms.creator.openid_url.disabled = currentAuthMethod == "openid" ? false : true;
-	document.forms.creator.elk_autov_pwmain.disabled = currentAuthMethod == "passwd" ? false : true;
-	document.forms.creator.elk_autov_pwverify.disabled = currentAuthMethod == "passwd" ? false : true;
-	document.getElementById("elk_autov_pwmain_div").style.display = currentAuthMethod == "passwd" ? "" : "none";
-	document.getElementById("elk_autov_pwverify_div").style.display = currentAuthMethod == "passwd" ? "" : "none";
-
-	if (currentAuthMethod == "passwd")
-	{
-		verificationHandle.refreshMainPassword();
-		verificationHandle.refreshVerifyPassword();
-		document.forms.creator.openid_url.style.backgroundColor = "";
-		document.getElementById("auth_openid_div").style.display = "none";
-		document.getElementById("auth_pass_div").style.display = "";
-	}
-	else
-	{
-		document.forms.creator.elk_autov_pwmain.style.backgroundColor ="";
-		document.forms.creator.elk_autov_pwverify.style.backgroundColor = "";
-		document.forms.creator.openid_url.style.backgroundColor = "#FCE184";
-		document.getElementById("auth_openid_div").style.display = "";
-		document.getElementById("auth_pass_div").style.display = "none";
-	}
-}
-
 function highlightSelected(box)
 {
 	if (prevClass != "")
