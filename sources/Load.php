@@ -2642,7 +2642,7 @@ function doSecurityChecks()
 	if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
 		$context['security_controls']['files']['cache'] = true;
 
-	if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > mktime()))
+	if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 		$context['security_controls']['admin_session'] = true;
 
 }

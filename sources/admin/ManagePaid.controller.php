@@ -509,7 +509,7 @@ class ManagePaid_Controller extends Action_Controller
 					'reminder' => $reminder,
 					'current_subscription' => $context['sub_id'],
 					'name' => $_POST['name'],
-					'description' => $_POST['desc'],
+					'desc' => $_POST['desc'],
 					'length' => $span,
 					'cost' => $cost,
 					'additional_groups' => !empty($addgroups) ? $addgroups : '',
