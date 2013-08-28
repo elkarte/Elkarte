@@ -80,8 +80,8 @@ function template_download_language()
 			</div>
 			<table class="table_grid">
 				<thead>
-					<tr class="catbg">
-						<th class="first_th" scope="col">
+					<tr class="table_head">
+						<th scope="col">
 							', $txt['languages_download_filename'], '
 						</th>
 						<th scope="col" style="width:100">
@@ -90,7 +90,7 @@ function template_download_language()
 						<th scope="col" style="width:100">
 							', $txt['languages_download_exists'], '
 						</th>
-						<th class="last_th centertext" scope="col" style="width:4%">
+						<th scope="col" style="width:4%">
 							', $txt['languages_download_copy'], '
 						</th>
 					</tr>
@@ -189,7 +189,7 @@ function template_download_language()
 
 	// Install?
 	echo '
-			<div class="righttext padding">
+			<div class="submitbutton">
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-dlang_token_var'], '" value="', $context['admin-dlang_token'], '" />
 				<input type="submit" name="do_install" value="', $txt['add_language_elk_install'], '" class="button_submit" />
@@ -206,7 +206,7 @@ function template_download_language()
 	{
 		$count = 0;
 		echo '
-			var oTogglePanel_', $theme, ' = new smc_Toggle({
+			var oTogglePanel_', $theme, ' = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [';
@@ -219,9 +219,9 @@ function template_download_language()
 				aSwapImages: [
 					{
 						sId: \'toggle_image_', $theme, '\',
-						srcExpanded: smf_images_url + \'/sort_down.png\',
+						srcExpanded: elk_images_url + \'/sort_down.png\',
 						altExpanded: \'*\',
-						srcCollapsed: smf_images_url + \'/selected.png\',
+						srcCollapsed: elk_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
 					}
 				]
@@ -300,9 +300,10 @@ function template_modify_language_entries()
 							</dd>
 						</dl>
 					</fieldset>
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
-					<input type="submit" name="save_main" value="', $txt['save'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' class="button_submit" />';
+					<div class="submitbutton">
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
+						<input type="submit" name="save_main" value="', $txt['save'], '"', $context['lang_file_not_writable_message'] || !empty($context['file_entries']) ? ' disabled="disabled"' : '', ' class="button_submit" />';
 
 	// Allow deleting entries.
 	if ($context['lang_id'] != 'english')
@@ -313,38 +314,38 @@ function template_modify_language_entries()
 	}
 
 	echo '
+					</div>
 				</div>
 			</div>
 		</form>
 
 		<form action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], ';entries" id="entry_form" method="post" accept-charset="UTF-8">
 			<div class="title_bar">
-				<h3 class="titlebg">
-					', $txt['edit_language_entries'], '
-				</h3>
-			</div>
-			<div id="taskpad" class="floatright">
-				', $txt['edit_language_entries_file'], ':
-					<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
+				<div id="taskpad" class="floatright">
+					', $txt['edit_language_entries_file'], ':
+						<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
 	foreach ($context['possible_files'] as $id_theme => $theme)
 	{
 		echo '
-						<option value="-1">', $theme['name'], '</option>';
+							<option value="-1">', $theme['name'], '</option>';
 
 		foreach ($theme['files'] as $file)
 		{
 			echo '
-						<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
+							<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
 		}
 	}
 
 	echo '
-					</select>
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
-					<input type="submit" value="', $txt['go'], '" class="button_submit" style="float: none"/>
-			</div>
-			<br class="clear" />';
+						</select>
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
+						<noscript><input type="submit" value="', $txt['go'], '" class="button_submit submitgo" /></noscript>
+				</div>
+				<h3 class="titlebg">
+					', $txt['edit_language_entries'], '
+				</h3>
+			</div>';
 
 	// Is it not writable?
 	// Show an error.
@@ -411,7 +412,7 @@ function template_modify_language_entries()
 
 		echo '
 					</dl>
-					<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="button_submit" />';
+					<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="right_submit" />';
 
 		echo '
 				</div>
@@ -450,12 +451,15 @@ function template_add_language()
 	{
 		// Display a little error box.
 		echo '
-						<div><br /><p class="errorbox">', $txt['add_language_error_' . $context['langfile_error']], '</p></div>';
+						<div>
+							<br />
+							<p class="errorbox">', $txt['add_language_error_' . $context['langfile_error']], '</p>
+						</div>';
 	}
 
 	echo '
 					</fieldset>', isBrowser('is_ie') ? '<input type="text" name="ie_fix" style="display: none;" class="input_text" /> ' : '', '
-					<input type="submit" name="lang_add_sub" value="', $txt['search'], '" class="button_submit" />
+					<input type="submit" name="lang_add_sub" value="', $txt['search'], '" class="right_submit" />
 					<br />
 				</div>
 			</div>

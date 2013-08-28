@@ -85,7 +85,7 @@ QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 
 	// Get the topics current subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=quotefast;quote=" + first_msg_id + ";modify;xml", '', this.onDocReceived_modify_topic);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=quotefast;quote=" + first_msg_id + ";modify;xml", '', this.onDocReceived_modify_topic);
 }
 
 // callback function from the modify_topic ajax call
@@ -159,7 +159,7 @@ QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_ses
 
 	// send in the call to save the updated topic subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements['topic'].value) + ";" + cur_session_var + "=" + cur_session_id + ";xml", x.join("&"), this.modify_topic_done);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements['topic'].value) + ";" + cur_session_var + "=" + cur_session_id + ";xml", x.join("&"), this.modify_topic_done);
 
 	return false;
 }
@@ -176,7 +176,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 		return true;
 	}
 
-	var message = XMLDoc.getElementsByTagName("smf")[0].getElementsByTagName("message")[0];
+	var message = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("message")[0];
 	var subject = message.getElementsByTagName("subject")[0];
 	var error = message.getElementsByTagName("error")[0];
 
@@ -191,7 +191,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 
 	// redo tips if they are on since we just pulled the rug out on this one
 	if ($.isFunction($.fn.SiteTooltip));
-		$('.preview').SiteTooltip().smf_tooltip_off;
+		$('.preview').SiteTooltip().elk_tooltip_off;
 
 	return false;
 }
@@ -200,7 +200,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 QuickModifyTopic.prototype.modify_topic_hide_edit = function (subject)
 {
 	// Re-template the subject!
-	setInnerHTML(this.oCurSubjectDiv, '<a href="' + smf_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' +'/a>');
+	setInnerHTML(this.oCurSubjectDiv, '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' +'/a>');
 }
 
 // keypress event ... like enter or escape
@@ -218,7 +218,7 @@ QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 		}
 		else if (oEvent.keyCode == 13)
 		{
-			this.modify_topic_save(smf_session_id, smf_session_var);
+			this.modify_topic_save(elk_session_id, elk_session_var);
 			if (typeof(oEvent.preventDefault) == "undefined")
 				oEvent.returnValue = false;
 			else
@@ -231,7 +231,7 @@ QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 QuickModifyTopic.prototype.modify_topic_click = function (oEvent)
 {
 	if (this.bInEditMode && !this.bMouseOnDiv)
-		this.modify_topic_save(smf_session_id, smf_session_var);
+		this.modify_topic_save(elk_session_id, elk_session_var);
 }
 
 // Moved out of the editing div
@@ -263,7 +263,7 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 
 	if (this.bCollapsed)
 	{
-		window.location.href = smf_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
+		window.location.href = elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=post;quote=' + iMessageId + ';topic=' + this.opt.iTopicId + '.' + this.opt.iStart;
 		return false;
 	}
 	else
@@ -275,11 +275,11 @@ QuickReply.prototype.quote = function (iMessageId, xDeprecated)
 			if (this.bIsFull)
 				insertQuoteFast(iMessageId);
 			else
-				getXMLDocument(smf_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
+				getXMLDocument(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId + ';xml', this.onQuoteReceived);
 		}
 		// Or with a smart popup!
 		else
-			reqWin(smf_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId, 240, 90);
+			reqWin(elk_prepareScriptUrl(this.opt.sScriptUrl) + 'action=quotefast;quote=' + iMessageId, 240, 90);
 
 		// Move the view to the quick reply box.
 		if (navigator.appName == 'Microsoft Internet Explorer')
@@ -392,7 +392,7 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 
 	// Send out the XMLhttp request to get more info
 	ajax_indicator(true);
-	sendXMLDocument.call(this, smf_prepareScriptUrl(smf_scripturl) + 'action=quotefast;quote=' + iMessageId + ';modify;xml', '', this.onMessageReceived);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + iMessageId + ';modify;xml', '', this.onMessageReceived);
 }
 
 // The callback function used for the XMLhttp request retrieving the message.
@@ -540,7 +540,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);
-	sendXMLDocument.call(this, smf_prepareScriptUrl(this.opt.sScriptUrl) + "action=jsmodify;topic=" + this.opt.iTopicId + ";" + smf_session_var + "=" + smf_session_id + ";xml", x.join("&"), this.onModifyDone);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + "action=jsmodify;topic=" + this.opt.iTopicId + ";" + elk_session_var + "=" + elk_session_id + ";xml", x.join("&"), this.onModifyDone);
 
 	return false;
 }
@@ -552,7 +552,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	ajax_indicator(false);
 
 	// If we didn't get a valid document, just cancel.
-	if (!XMLDoc || !XMLDoc.getElementsByTagName('smf')[0])
+	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
 		// Mozilla will nicely tell us what's wrong.
 		if (XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName == 'parsererror')
@@ -566,7 +566,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		return;
 	}
 
-	var message = XMLDoc.getElementsByTagName('smf')[0].getElementsByTagName('message')[0];
+	var message = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0];
 	var body = message.getElementsByTagName('body')[0];
 	var error = message.getElementsByTagName('error')[0];
 
@@ -672,7 +672,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 
 		// Add the 'remove selected items' button.
 		if (this.opt.bCanRemove)
-			smf_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
+			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
 				sId: this.opt.sSelf + '_remove_button',
 				sText: this.opt.sRemoveButtonLabel,
 				sImage: this.opt.sRemoveButtonImage,
@@ -682,7 +682,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 
 		// Add the 'restore selected items' button.
 		if (this.opt.bCanRestore)
-			smf_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
+			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
 				sId: this.opt.sSelf + '_restore_button',
 				sText: this.opt.sRestoreButtonLabel,
 				sImage: this.opt.sRestoreButtonImage,
@@ -692,7 +692,7 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 
 		// Add the 'split selected items' button.
 		if (this.opt.bCanSplit)
-			smf_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
+			elk_addButton(this.opt.sButtonStrip, this.opt.bUseImageButton, {
 				sId: this.opt.sSelf + '_split_button',
 				sText: this.opt.sSplitButtonLabel,
 				sImage: this.opt.sSplitButtonImage,
@@ -819,7 +819,7 @@ function ignore_toggles(msgids, text)
 	for (i = 0; i < msgids.length; i++)
 	{
 		var msgid = msgids[i];
-		new smc_Toggle({
+		new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: true,
 			aSwappableContainers: [
@@ -839,4 +839,172 @@ function ignore_toggles(msgids, text)
 			]
 		});
 	}
+}
+
+// Open the sendtopic overlay div
+// @todo make these... "things" look nice
+function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
+{
+	// Set up our div details
+	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>';
+	var sIcon = elk_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
+	var sHeader = typeof(sHeader) == 'string' ? sHeader : help_popup_heading_text;
+	var oPopup_body;
+
+	// Load the help page content (we just want the text to show)
+	$.ajax({
+		url: desktopURL,
+		type: "GET",
+		dataType: "html",
+	})
+	.done(function (data) {
+			var $base_obj = $('<div id="temp_help">').html(data).find('#send_topic');
+			var title = '';
+			$base_obj.find('h3').each(function () {
+				title = $(this).text();
+				$(this).remove();
+			});
+			var form = $base_obj.find('form');
+			var url = $base_obj.find('form').attr('action');
+			var this_body, send_comment, recipient_name, recipient_mail;
+
+			// Create the div that we are going to load
+			var oContainer = new smc_Popup({heading: (title != '' ? title : sHeader), content: sAjax_indicator, icon: sIcon});
+			oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
+			oPopup_body.html($base_obj.html());
+
+			sendtopicForm(oPopup_body, url, oContainer);
+	})
+	.fail(function (xhr, textStatus, errorThrown) {
+			oPopup_body.html(textStatus);
+	});
+
+	return false;
+}
+
+function addRequiredElem($this_form, classname, focused)
+{
+	if (typeof(focused) == 'undefined')
+		focused = false;
+
+	$this_form.find('input[name="' + classname + '"]').after($('<span class="requiredfield" />').text(required_field).fadeIn());
+	$this_form.find('input[name="' + classname + '"]').keyup(function () {
+		$this_form.find('.' + classname + ' .requiredfield').fadeOut(function () {
+			$(this).remove();
+		});	});
+	if (!focused)
+	{
+		$this_form.find('input[name="' + classname + '"]').focus();
+		focused = true;
+	}
+}
+
+function sendtopicForm(oPopup_body, url, oContainer)
+{
+	if (typeof(this_body) != 'undefined')
+		oPopup_body.html(this_body);
+
+	var $this_form = $(oPopup_body).find('form');
+
+	if (typeof(send_comment) != 'undefined')
+	{
+		$this_form.find('input[name="comment"]').val(send_comment);
+		$this_form.find('input[name="y_name"]').val(sender_name);
+		$this_form.find('input[name="y_email"]').val(sender_mail);
+		$this_form.find('input[name="r_name"]').val(recipient_name);
+		$this_form.find('input[name="r_email"]').val(recipient_mail);
+	}
+
+	oPopup_body.find('input[name="send"]').bind('click', function (event) {
+		event.preventDefault();
+
+		this_body = $(oPopup_body).html();
+
+		data = $this_form.serialize() + '&send=1';
+
+		send_comment = $this_form.find('input[name="comment"]').val();
+		sender_name = $this_form.find('input[name="y_name"]').val();
+		sender_mail = $this_form.find('input[name="y_email"]').val();
+		recipient_name = $this_form.find('input[name="r_name"]').val();
+		recipient_mail = $this_form.find('input[name="r_email"]').val();
+
+		var missing_elems = false;
+		if (sender_name == '')
+		{
+			addRequiredElem($this_form, 'y_name', missing_elems);
+			missing_elems = true;
+		}
+		if (sender_mail == '')
+		{
+			addRequiredElem($this_form, 'y_email', missing_elems);
+			missing_elems = true;
+		}
+		if (recipient_name == '')
+		{
+			addRequiredElem($this_form, 'r_name', missing_elems);
+			missing_elems = true;
+		}
+		if (recipient_mail == '')
+		{
+			addRequiredElem($this_form, 'r_email', missing_elems);
+			missing_elems = true;
+		}
+
+		if (missing_elems)
+			return;
+
+		$.ajax({
+			type: 'post',
+			url: url + ';api',
+			data: data
+		})
+		.done(function (request) {
+				var oElement = $(request).find('elk')[0];
+				if (oElement.getElementsByTagName('error').length == 0)
+				{
+					var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+
+					text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+					oPopup_body.html(text);
+					oPopup_body.find('input[name="cancel"]').each(function () {
+						$(this).bind('click', function (event) {
+							event.preventDefault();
+							oContainer.hide();
+						});
+					});
+				}
+				else
+				{
+					if (oElement.getElementsByTagName('text').length != 0)
+					{
+						var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+
+						text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+						oPopup_body.html(text);
+						oPopup_body.find('input[name="send"]').each(function () {
+							$(this).bind('click', function (event) {
+								event.preventDefault();
+								data = $(oPopup_body).find('form').serialize() + '&send=1';
+								sendtopicForm(oPopup_body, url, oContainer);
+							});
+						});
+						oPopup_body.find('input[name="cancel"]').each(function () {
+							$(this).bind('click', function (event) {
+								event.preventDefault();
+								oContainer.hide();
+							});
+						});
+					}
+
+					if (oElement.getElementsByTagName('url').length != 0)
+					{
+						var url_redir = oElement.getElementsByTagName('url')[0].firstChild.nodeValue;
+						oPopup_body.html(sendtopic_error.replace('{href}', url_redir));
+					}
+				}
+		})
+		.fail(function() {
+				oPopup_body.html(sendtopic_error.replace('{href}', url));
+		});
+	});
 }

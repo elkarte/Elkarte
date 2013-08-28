@@ -32,15 +32,14 @@ function template_fatal_error()
 			</h3>
 		</div>
 		<div class="windowbg generic_list_wrapper">
-			<div ', $context['error_code'], 'class="padding">', $context['error_message'], '</div>
+			<div ', $context['error_code'], '>', $context['error_message'], '</div>
 		</div>
-	</div>
-	<br class="clear" />';
+	</div>';
 
 	// Show a back button (using javascript.)
 	echo '
 	<div class="centertext">
-		<a class="button_link" style="float:none" href="javascript:history.go(-1)">', $txt['back'], '</a>
+		<a class="linkbutton" href="javascript:history.go(-1)">', $txt['back'], '</a>
 	</div>';
 }
 
@@ -57,11 +56,21 @@ function template_error_log()
 					<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
 				</h3>
 			</div>
-			<div class="floatright" style="margin-top: 1ex">
-				<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" class="button_submit" />
-				<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" class="button_submit" />
-			</div>
-			', template_pagesection(false, false, 'go_down'), '
+
+			<div class="flow_auto">
+				<div class="floatleft">';
+
+	template_pagesection(false, false, 'go_down');
+
+	echo '
+				</div>
+				<div class="additional_row floatright">
+					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" class="button_submit" />
+					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" class="button_submit" />
+				</div>
+			</div>';
+
+			echo '
 			<table class="table_grid" id="error_log">
 				<tr>
 					<td colspan="3" class="windowbg">
@@ -159,16 +168,19 @@ function template_error_log()
 						<input type="checkbox" id="check_all2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all1.checked = this.checked;" class="input_check" />
 					</td>
 				</tr>
-			</table>';
+			</table>
+			<div class="flow_auto">
+				<div class="floatleft">';
 
 	template_pagesection(false, false, 'go_down');
 
 	echo '
-			<div class="floatright" style="margin-top: 1ex">
-				<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" class="button_submit" />
-				<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" class="button_submit" />
-			</div>
-			<br />';
+				</div>
+				<div class="additional_row floatright">
+					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" class="button_submit" />
+					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" class="button_submit" />
+				</div>
+			</div>';
 
 	if ($context['sort_direction'] == 'down')
 		echo '
@@ -192,10 +204,11 @@ function template_show_file()
 	<head>
 		<title>', $context['file_data']['file'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/admin.css?alp21" />
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
 	</head>
 	<body>
-		<table class="errorfile_table">';
+		<table id="errorfile_table" class="table_grid">';
 	foreach ($context['file_data']['contents'] as $index => $line)
 	{
 		$line_num = $index + $context['file_data']['min'];
@@ -223,17 +236,15 @@ function template_attachment_errors()
 				', $txt['attach_error_title'], '
 			</h3>
 		</div>
-		<div class="windowbg">
-			<div class="padding">';
+		<div class="windowbg">';
 
 	foreach ($context['attachment_error_keys'] as $key)
 		template_show_error($key);
 
 	echo
-				!empty($context['back_link']) ? ('<a class="button_link" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '',
-				'
-				<a class="button_link" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
-			</div>
+			!empty($context['back_link']) ? ('<a class="linkbutton" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '','
+			<a class="linkbutton" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
+
 		</div>
 	</div>';
 }

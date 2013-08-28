@@ -94,7 +94,7 @@ $txt['install_settings_url_info'] = 'This is the URL to your forum <strong>witho
 $txt['install_settings_compress'] = 'Gzip Output';
 $txt['install_settings_compress_title'] = 'Compress output to save bandwidth.';
 // In this string, you can translate the word "PASS" to change what it says when the test passes.
-$txt['install_settings_compress_info'] = 'This function does not work properly on all servers, but can save you a lot of bandwidth.<br />Click <a href="install.php?obgz=1&amp;pass_string=PASS" onclick="return reqWin(this.href, 200, 60);" target="_blank">here</a> to test it. (it should just say "PASS".)';
+$txt['install_settings_compress_info'] = 'This function does not work properly on all servers, but can save you a lot of bandwidth.<br /><a href="install.php?obgz=1&amp;pass_string=PASS" onclick="return reqWin(this.href, 200, 60);" target="_blank">Click here to test it</a>. (it should just say "PASS".)';
 $txt['install_settings_dbsession'] = 'Database Sessions';
 $txt['install_settings_dbsession_title'] = 'Use the database for sessions instead of using files.';
 $txt['install_settings_dbsession_info1'] = 'This feature is almost always for the best, as it makes sessions more dependable.';
@@ -107,6 +107,8 @@ $txt['db_settings_type'] = 'Database type';
 $txt['db_settings_type_info'] = 'Multiple supported database types were detected - which do you wish to use.';
 $txt['db_settings_server'] = 'Server name';
 $txt['db_settings_server_info'] = 'This is nearly always localhost - so if you don\'t know, try localhost.';
+$txt['db_settings_port'] = 'Port';
+$txt['db_settings_port_info'] = 'Leave empty if your server is listening on the default port, or you are uncertain.';
 $txt['db_settings_username'] = 'Username';
 $txt['db_settings_username_info'] = 'Fill in the username you need to connect to your database here.<br />If you don\'t know what it is, try the username of your ftp account, most of the time they are the same.';
 $txt['db_settings_password'] = 'Password';

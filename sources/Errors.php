@@ -135,7 +135,7 @@ function fatal_error($error, $log = 'general')
 		die($error);
 
 	if (class_exists('Template_Layers'))
-		Template_Layers::getInstance()->preventReverse();
+		Template_Layers::getInstance()->isError();
 	setup_fatal_error_context($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2) ? log_error($error, $log) : $error, $error);
 }
 
@@ -366,7 +366,7 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $db_connection, $webmaster_email, $db_last_error, $db_error_send;
+	global $webmaster_email, $db_last_error, $db_error_send;
 
 	$db = database();
 
@@ -390,8 +390,7 @@ function display_db_error()
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.
-		$db_error = $db->last_error($db_connection);
-		$db = database();
+		$db_error = $db->last_error($db->connection());
 		@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 	}
 

@@ -128,9 +128,7 @@ function template_poll_edit()
 
 	if (!empty($context['form_url']))
 		echo '
-					<div class="padding flow_auto">
-						<input type="submit" name="post" value="', $txt['save'], '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />
-					</div>
+					<input type="submit" name="post" value="', $txt['save'], '" onclick="return submitThisOnce(this);" accesskey="s" class="right_submit" />
 				</div>
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

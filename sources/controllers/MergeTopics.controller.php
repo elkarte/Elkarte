@@ -63,8 +63,6 @@ class MergeTopics_Controller extends Action_Controller
 		global $txt, $board, $context;
 		global $scripturl, $user_info, $modSettings;
 
-		$db = database();
-
 		if (!isset($_GET['from']))
 			fatal_lang_error('no_access', false);
 		$_GET['from'] = (int) $_GET['from'];
@@ -82,24 +80,13 @@ class MergeTopics_Controller extends Action_Controller
 			$onlyApproved = false;
 
 		// How many topics are on this board?  (used for paging.)
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}topics AS t
-			WHERE t.id_board = {int:id_board}' . ($onlyApproved ? '
-				AND t.approved = {int:is_approved}' : ''),
-			array(
-				'id_board' => $_REQUEST['targetboard'],
-				'is_approved' => 1,
-			)
-		);
-		list ($topiccount) = $db->fetch_row($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/Topic.subs.php');
+		$topiccount = countTopicsByBoard($_REQUEST['targetboard'], $onlyApproved);
 
 		// Make the page list.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=mergetopics;from=' . $_GET['from'] . ';targetboard=' . $_REQUEST['targetboard'] . ';board=' . $board . '.%1$d', $_REQUEST['start'], $topiccount, $modSettings['defaultMaxTopics'], true);
 
 		// Get the topic's subject.
-		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($_GET['from'], 'message');
 
 		// @todo review: double check the logic
@@ -138,43 +125,7 @@ class MergeTopics_Controller extends Action_Controller
 		}
 
 		// Get some topics to merge it with.
-		$request = $db->query('', '
-			SELECT t.id_topic, m.subject, m.id_member, IFNULL(mem.real_name, m.poster_name) AS poster_name
-			FROM {db_prefix}topics AS t
-				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			WHERE t.id_board = {int:id_board}
-				AND t.id_topic != {int:id_topic}' . ($onlyApproved ? '
-				AND t.approved = {int:is_approved}' : '') . '
-			ORDER BY {raw:sort}
-			LIMIT {int:offset}, {int:limit}',
-			array(
-				'id_board' => $_REQUEST['targetboard'],
-				'id_topic' => $_GET['from'],
-				'sort' => (!empty($modSettings['enableStickyTopics']) ? 't.is_sticky DESC, ' : '') . 't.id_last_msg DESC',
-				'offset' => $_REQUEST['start'],
-				'limit' => $modSettings['defaultMaxTopics'],
-				'is_approved' => 1,
-			)
-		);
-		$context['topics'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			censorText($row['subject']);
-
-			$context['topics'][] = array(
-				'id' => $row['id_topic'],
-				'poster' => array(
-					'id' => $row['id_member'],
-					'name' => $row['poster_name'],
-					'href' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
-					'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" target="_blank" class="new_win">' . $row['poster_name'] . '</a>'
-				),
-				'subject' => $row['subject'],
-				'js_subject' => addcslashes(addslashes($row['subject']), '/')
-			);
-		}
-		$db->free_result($request);
+		$context['topics'] = mergeableTopics($_REQUEST['targetboard'], $_GET['from'], $onlyApproved, $_REQUEST['start']);
 
 		if (empty($context['topics']) && count($context['boards']) <= 1)
 			fatal_lang_error('merge_need_more_topics');
@@ -207,6 +158,8 @@ class MergeTopics_Controller extends Action_Controller
 
 		// Check the session.
 		checkSession('request');
+
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Handle URLs from action_mergeIndex.
 		if (!empty($_GET['from']) && !empty($_GET['to']))
@@ -512,17 +465,7 @@ class MergeTopics_Controller extends Action_Controller
 		$db->free_result($request);
 
 		// Obtain all the message ids we are going to affect.
-		$affected_msgs = array();
-		$request = $db->query('', '
-			SELECT id_msg
-			FROM {db_prefix}messages
-			WHERE id_topic IN ({array_int:topic_list})',
-			array(
-				'topic_list' => $topics,
-		));
-		while ($row = $db->fetch_row($request))
-			$affected_msgs[] = $row[0];
-		$db->free_result($request);
+		$affected_msgs = messagesInTopics($topics);
 
 		// Assign the first topic ID to be the merged topic.
 		$id_topic = min($topics);
@@ -591,12 +534,14 @@ class MergeTopics_Controller extends Action_Controller
 			cache_put_data('response_prefix', $context['response_prefix'], 600);
 		}
 
+		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])): '';
+
 		// Change the topic IDs of all messages that will be merged.  Also adjust subjects if 'enforce subject' was checked.
 		$db->query('', '
 			UPDATE {db_prefix}messages
 			SET
 				id_topic = {int:id_topic},
-				id_board = {int:target_board}' . (empty($_POST['enforce_subject']) ? '' : ',
+				id_board = {int:target_board}' . (empty($enforce_subject) ? '' : ',
 				subject = {string:subject}') . '
 			WHERE id_topic IN ({array_int:topic_list})',
 			array(
@@ -786,7 +731,7 @@ class MergeTopics_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Search.subs.php');
 		$searchAPI = findSearchAPI();
 		if (is_callable(array($searchAPI, 'topicMerge')))
-			$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($_POST['enforce_subject']) ? null : array($context['response_prefix'], $target_subject));
+			$searchAPI->topicMerge($id_topic, $topics, $affected_msgs, empty($enforce_subject) ? null : array($context['response_prefix'], $target_subject));
 
 		// Send them to the all done page.
 		redirectexit('action=mergetopics;sa=done;to=' . $id_topic . ';targetboard=' . $target_board);

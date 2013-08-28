@@ -583,12 +583,13 @@ class Display_Controller
 			'messages_per_page' => $context['messages_per_page'],
 			'start' => $start,
 			'offset' => $limit,
- 		);
+		);
 
 		// Get each post and poster in this topic.
 		$topic_details = getTopicsPostsAndPoster($topic, $limit_settings, $ascending);
 		$messages = $topic_details['messages'];
 		$posters = array_unique($topic_details['all_posters']);
+		$all_posters = $topic_details['all_posters'];
 		unset($topic_details);
 
 		call_integration_hook('integrate_display_message_list', array(&$messages, &$posters));
@@ -641,7 +642,7 @@ class Display_Controller
 			// Fetch attachments.
 			$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
-				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment');
+				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
 
 			$msg_parameters = array(
 				'message_list' => $messages,
@@ -809,6 +810,14 @@ class Display_Controller
 		}
 
 		addJavascriptVar('notification_topic_notice', $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic'], true);
+		if ($context['can_send_topic'])
+		{
+			addJavascriptVar('sendtopic_cancel', $txt['modify_cancel'], true);
+			addJavascriptVar('sendtopic_back', $txt['back'], true);
+			addJavascriptVar('sendtopic_close', $txt['find_close'], true);
+			addJavascriptVar('sendtopic_error', $txt['send_error_occurred'], true);
+			addJavascriptVar('required_field', $txt['require_field'], true);
+		}
 
 		// Build the normal button array.
 		$context['normal_buttons'] = array(
@@ -817,7 +826,7 @@ class Display_Controller
 			'notify' => array( 'test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyButton(this);"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'mark_unread' => array('test' => 'can_mark_unread', 'text' => 'mark_unread', 'image' => 'markunread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=topic;t=' . $context['mark_unread_time'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'disregard' => array('test' => 'can_disregard', 'text' => ($context['topic_disregarded'] ? 'un' : '') . 'disregard', 'image' => ($context['topic_disregarded'] ? 'un' : '') . 'disregard.png', 'lang' => true, 'custom' => 'onclick="return disregardButton(this);"', 'url' => $scripturl . '?action=disregardtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_disregarded'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0'),
+			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href);"'),
 			'print' => array('test' => 'can_print', 'text' => 'print', 'image' => 'print.png', 'lang' => true, 'custom' => 'rel="nofollow"', 'class' => 'new_win', 'url' => $scripturl . '?action=topic;sa=printpage;topic=' . $context['current_topic'] . '.0'),
 		);
 
@@ -976,9 +985,9 @@ class Display_Controller
 		// Are you allowed to remove at least a single reply?
 		$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
 
-		// Have you liked this post, can you
-		$message['likes'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
-		$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] !== $user_info['id'];
+		// Have you liked this post, can you?
+		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
+		$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] != $user_info['id'] && (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
@@ -1022,11 +1031,11 @@ class Display_Controller
 			'icon' => $message['icon'],
 			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
 			'subject' => $message['subject'],
-			'time' => relativeTime($message['poster_time']),
+			'time' => '<time datetime="' . htmlTime($message['poster_time']) . '" title="' . standardTime($message['poster_time']) . '">' . relativeTime($message['poster_time']) . '</time>',
 			'timestamp' => forum_time(true, $message['poster_time']),
 			'counter' => $counter,
 			'modified' => array(
-				'time' => relativeTime($message['modified_time']),
+				'time' => '<time datetime="' . htmlTime($message['modified_time']) . '" title="' . standardTime($message['modified_time']) . '">' . relativeTime($message['modified_time']) . '</time>',
 				'timestamp' => forum_time(true, $message['modified_time']),
 				'name' => $message['modified_name']
 			),
@@ -1034,21 +1043,22 @@ class Display_Controller
 			'new' => empty($message['is_read']),
 			'approved' => $message['approved'],
 			'first_new' => isset($context['start_from']) && $context['start_from'] == $counter,
-			'is_ignored' => !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($message['id_member'], $context['user']['ignoreusers']),
+			'is_ignored' => !empty($modSettings['enable_buddylist']) && in_array($message['id_member'], $context['user']['ignoreusers']),
 			'can_approve' => !$message['approved'] && $context['can_approve'],
 			'can_unapprove' => !empty($modSettings['postmod_active']) && $context['can_approve'] && $message['approved'],
 			'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$message['approved'] || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
 			'can_remove' => allowedTo('delete_any') || (allowedTo('delete_replies') && $context['user']['started']) || (allowedTo('delete_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time())),
 			'can_see_ip' => allowedTo('moderate_forum') || ($message['id_member'] == $user_info['id'] && !empty($user_info['id'])),
-			'can_like' => $message['use_likes'] && !$message['likes'],
-			'can_unlike' => $message['use_likes'] && $message['likes'],
-			'like_counter' =>$message['like_count'],
+			'can_like' => $message['use_likes'] && !$message['you_liked'],
+			'can_unlike' => $message['use_likes'] && $message['you_liked'],
+			'like_counter' => $message['like_count'],
+			'likes_enabled' => !empty($modSettings['likes_enabled']) && ($message['use_likes'] || ($message['like_count'] != 0)),
 		);
 
 		// Is this user the message author?
 		$output['is_message_author'] = $message['id_member'] == $user_info['id'];
 		if (!empty($output['modified']['name']))
-			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name']);
+			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], standardTime($output['modified']['timestamp']));
 
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
 

@@ -317,16 +317,13 @@ class MessageIndex_Controller extends Action_Controller
 			// Decide how many pages the topic should have.
 			if ($row['num_replies'] + 1 > $context['messages_per_page'])
 			{
-				$pages = '&#171; ';
-
 				// We can't pass start by reference.
 				$start = -1;
-				$pages .= constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d', $start, $row['num_replies'] + 1, $context['messages_per_page'], true, array('prev_next' => false));
+				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d', $start, $row['num_replies'] + 1, $context['messages_per_page'], true, array('prev_next' => false));
 
 				// If we can use all, show all.
 				if (!empty($modSettings['enableAllMessages']) && $row['num_replies'] + 1 < $modSettings['enableAllMessages'])
 					$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
-				$pages .= ' &#187;';
 			}
 			else
 				$pages = '';
@@ -503,7 +500,7 @@ class MessageIndex_Controller extends Action_Controller
 			call_integration_hook('integrate_quick_mod_actions');
 		}
 
-		if (!empty($context['boards']) && (!empty($options['show_children']) || $context['start'] == 0))
+		if (!empty($context['boards']) && $context['start'] == 0)
 			$template_layers->add('display_child_boards');
 
 		// If there are children, but no topics and no ability to post topics...

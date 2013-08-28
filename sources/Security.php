@@ -42,8 +42,27 @@ function validateSession($type = 'admin')
 	call_integration_hook('integrate_validateSession', array(&$types));
 	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
 
+	// Set the lifetime for our admin session. Default is ten minutes.
+	$refreshTime =  600;
+
+	if (isset($modSettings['admin_session_lifetime']))
+	{
+		// Maybe someone is paranoid or mistakenly misconfigured the param? Give them at least 5 minutes.
+		if ($modSettings['admin_session_lifetime'] < 5)
+			$refreshTime = 300;
+
+		// A whole day should be more than enough..
+		elseif ($modSettings['admin_session_lifetime'] > 14400)
+			$refreshTime = 86400;
+
+		// We are between our internal min and max. Let's keep the board owner's value.
+		else
+			$refreshTime = $modSettings['admin_session_lifetime'] * 60;
+	}
+
 	// If we're using XML give an additional ten minutes grace as an admin can't log on in XML mode.
-	$refreshTime = isset($_GET['xml']) ? 4200 : 3600;
+	if (isset($_GET['xml']))
+		$refreshTime += 600;
 
 	// Is the security option off?
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
@@ -90,7 +109,8 @@ function validateSession($type = 'admin')
 	if (!empty($user_settings['openid_uri']))
 	{
 		require_once(SUBSDIR . '/OpenID.subs.php');
-		openID_revalidate();
+		$openID = new OpenID();
+		$openID->revalidate();
 
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);
@@ -454,6 +474,8 @@ function banPermissions()
 			'remove_own', 'remove_any',
 			'post_unapproved_topics', 'post_unapproved_replies_own', 'post_unapproved_replies_any',
 		);
+		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+
 		call_integration_hook('integrate_post_ban_permissions', array(&$denied_permissions));
 		$user_info['permissions'] = array_diff($user_info['permissions'], $denied_permissions);
 	}
@@ -785,9 +807,10 @@ function createToken($action, $type = 'post')
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
  * @param bool $reset = true
- * @return boolean
+ * @param bool $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
+ * @return boolean except for $action == 'login' where the token is returned
  */
-function validateToken($action, $type = 'post', $reset = true)
+function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 {
 	$type = $type == 'get' || $type == 'request' ? $type : 'post';
 
@@ -830,7 +853,10 @@ function validateToken($action, $type = 'post', $reset = true)
 		// I'm back baby.
 		createToken($action, $type);
 
-		fatal_lang_error('token_verify_fail', false);
+		if ($fatal)
+			fatal_lang_error('token_verify_fail', false);
+		else
+			return false;
 	}
 	// Remove this token as its useless
 	else
@@ -1195,7 +1221,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
  * @param string $error_type used also as a $txt index. (not an actual string.)
  * @return boolean
  */
-function spamProtection($error_type)
+function spamProtection($error_type, $fatal = true)
 {
 	global $modSettings, $user_info;
 
@@ -1242,8 +1268,13 @@ function spamProtection($error_type)
 	if ($db->affected_rows() != 1)
 	{
 		// Spammer!  You only have to wait a *few* seconds!
-		fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
-		return true;
+		if ($fatal)
+		{
+			fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
+			return true;
+		}
+		else
+			return $timeLimit;
 	}
 
 	// They haven't posted within the limit.

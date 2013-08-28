@@ -47,7 +47,7 @@ function template_report_type()
 
 	echo '
 						</dl>
-						<input type="submit" name="continue" value="', $txt['generate_reports_continue'], '" class="button_submit" />
+						<input type="submit" name="continue" value="', $txt['generate_reports_continue'], '" class="right_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</div>
 				</div>
@@ -86,7 +86,7 @@ function template_main()
 		if (!empty($table['title']))
 			echo '
 			<thead>
-				<tr class="catbg">
+				<tr class="table_head">
 					<th scope="col" colspan="', $table['column_count'], '">', $table['title'], '</th>
 				</tr>
 			</thead>
@@ -181,11 +181,11 @@ function template_print()
 	{
 		echo '
 		<div style="overflow: visible;', $table['max_width'] != 'auto' ? ' width:' . $table['max_width'] . 'px;' : '', '">
-			<table style="width:100%" class="table_padding bordercolor">';
+			<table class="table_grid">';
 
 		if (!empty($table['title']))
 			echo '
-				<tr class="catbg">
+				<tr class="table_head">
 					<td colspan="', $table['column_count'], '">
 						', $table['title'], '
 					</td>

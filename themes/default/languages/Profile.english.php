@@ -72,7 +72,7 @@ $txt['secret_ask'] = 'Ask me my question';
 $txt['cant_retrieve'] = 'You can\'t retrieve your password, but you can set a new one by following a link sent to you by email.  You also have the option of setting a new password by answering your secret question.';
 $txt['incorrect_answer'] = 'Sorry, but you did not specify a valid combination of Secret Question and Answer in your profile.  Please click on the back button, and use the default method of obtaining your password.';
 $txt['enter_new_password'] = 'Please enter the answer to your question, and the password you would like to use.  Your password will be changed to the one you select provided you answer the question correctly.';
-$txt['password_success'] = 'Your password was changed successfully.<br />Click <a href="' . $scripturl . '?action=login">here</a> to login.';
+$txt['password_success'] = 'Your password was changed successfully.<br /><a href="' . $scripturl . '?action=login">Click here to login</a>.';
 $txt['secret_why_blank'] = 'why is this blank?';
 
 $txt['authentication_reminder'] = 'Authentication Reminder';
@@ -187,7 +187,7 @@ $txt['notification_info'] = 'This allows you to be notified of replies to posts,
 $txt['groupmembership'] = 'Group Membership';
 $txt['groupMembership_info'] = 'In this section of your profile you can change which groups you belong to.';
 $txt['ignoreboards'] = 'Ignore Boards Options';
-$txt['ignoreboards_info'] = 'This page lets you ignore particular boards.  When a board is ignored, the new post indicator will not show up on the board index.  New posts will not show up using the "unread post" search link (when searching it will not look in those boards) however, ignored boards will still appear on the board index and upon entering will show which topics have new posts.  When using the "unread replies" link, new posts in an ignored board will still be shown.';
+$txt['ignoreboards_info'] = 'This page lets you ignore particular boards.  When a board is ignored, the new post indicator will not show up on the board index.  New posts will not show up using the "unread post" search link (when searching it will not look in those boards). However, ignored boards will still appear on the board index and upon entering will show which topics have new posts.  When using the "unread replies" link, new posts in an ignored board will still be shown.';
 $txt['pmprefs'] = 'Personal Messaging';
 
 $txt['profileAction'] = 'Actions';
@@ -272,7 +272,6 @@ $txt['show_online'] = 'Show others my online status';
 
 $txt['return_to_post'] = 'Return to topics after posting by default.';
 $txt['no_new_reply_warning'] = 'Don\'t warn on new replies made while posting.';
-$txt['posts_apply_ignore_list'] = 'Hide messages posted by members on my ignore list.';
 $txt['recent_posts_at_top'] = 'Show most recent posts at the top.';
 $txt['recent_pms_at_top'] = 'Show most recent personal messages at top.';
 $txt['wysiwyg_default'] = 'Show WYSIWYG editor on post page by default.';
@@ -286,10 +285,8 @@ $txt['timeformat_easy5'] = 'DD-MM-YYYY, HH:MM:SS';
 
 $txt['poster'] = 'Poster';
 
-$txt['board_desc_inside'] = 'Show board descriptions inside boards.';
-$txt['show_children'] = 'Show child boards on every page inside boards, not just the first.';
-$txt['use_sidebar_menu'] = 'Use sidebar menus instead of dropdown menus when possible.';
-$txt['use_click_menu'] = 'Use click-to drop down instead of hover-to drop down menus when possible.';
+$txt['use_sidebar_menu'] = 'Use sidebar menus instead of dropdown menus.';
+$txt['use_click_menu'] = 'Use click instead of hover to open menus.';
 $txt['show_no_avatars'] = 'Don\'t show users\' avatars.';
 $txt['show_no_signatures'] = 'Don\'t show users\' signatures.';
 $txt['show_no_censored'] = 'Leave words uncensored.';

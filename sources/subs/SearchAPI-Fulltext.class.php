@@ -19,7 +19,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SearchAPI-Fulltext.php, Fulltext API, used when an SQL fulltext index is used
+ * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used
  */
 class Fulltext_Search
 {

@@ -40,8 +40,7 @@ function template_merge_done()
 					</ul>
 				</div>
 			</div>
-		</div>
-	<br class="clear" />';
+		</div>';
 }
 
 /**
@@ -84,14 +83,14 @@ function template_merge()
 									<option value="', $board['id'], '"', $board['id'] == $context['target_board'] ? ' selected="selected"' : '', '>', $board['category'], ' - ', $board['name'], '</option>';
 			echo '
 								</select>
-								<input type="submit" value="', $txt['go'], '" class="button_submit" />
+								<input type="submit" value="', $txt['go'], '" class="button_submit submitgo" />
 							</form>
 						</dd>';
 	}
 
 	echo '
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<dl class="settings merge_topic">
 						<dt>
 							<strong>', $txt['merge_to_topic_id'], ': </strong>
@@ -101,7 +100,7 @@ function template_merge()
 								<input type="hidden" name="topics[]" value="', $context['origin_topic'], '" />
 								<input type="text" name="topics[]" class="input_text" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-								<input type="submit" value="', $txt['merge'], '" class="button_submit" />
+								<input type="submit" value="', $txt['merge'], '" class="button_submit submitgo" />
 							</form>
 						</dd>';
 
@@ -147,12 +146,12 @@ function template_merge_extra_options()
 			</div>
 			<table class="bordercolor table_grid">
 				<thead>
-					<tr class="catbg">
-						<th scope="col" class="first_th centertext" style="width:6em">', $txt['merge_check'], '</th>
+					<tr class="table_head">
+						<th scope="col" style="width:6em">', $txt['merge_check'], '</th>
 						<th scope="col" class="lefttext">', $txt['subject'], '</th>
 						<th scope="col" class="lefttext">', $txt['started_by'], '</th>
 						<th scope="col" class="lefttext">', $txt['last_post'], '</th>
-						<th scope="col" class="last_th centertext" style="width:10em">' . $txt['merge_include_notifications'] . '</th>
+						<th scope="col" style="width:10em">' . $txt['merge_include_notifications'] . '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -239,7 +238,7 @@ function template_merge_extra_options()
 	}
 
 	echo '
-					<div class="auto_flow">
+					<div class="submitbutton">
 						<input type="submit" value="' . $txt['merge'] . '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="sa" value="execute" />

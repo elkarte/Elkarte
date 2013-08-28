@@ -46,7 +46,7 @@ function template_ask()
 								<input type="radio" id="selective" name="step2" value="selective" class="input_radio" /> <label for="selective">', $txt['select_split_posts'], '</label>
 							</li>
 						</ul>
-						<hr class="hrcolor" />
+						<hr />
 						<label for="messageRedirect"><input type="checkbox" name="messageRedirect" id="messageRedirect" onclick="document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" class="input_check" /> ', $txt['splittopic_notification'], '.</label>
 						<fieldset id="reasonArea" style="margin-top: 1ex; display: none;', '">
 							<dl class="settings">
@@ -67,7 +67,7 @@ function template_ask()
 							// ]]></script>
 						</p>';
 	echo '
-						<div class="auto_flow">
+						<div class="submitbutton">
 							<input type="submit" value="', $txt['split'], '" class="button_submit" />
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						</div>
@@ -176,8 +176,7 @@ function template_select()
 					<li class="dummy" />
 				</ul>
 			</div>
-			<br class="clear" />
-			<div class="flow_auto">
+			<div class="submitbutton">
 				<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 				<input type="hidden" name="subname" value="', $context['new_subject'], '" />
 				<input type="hidden" name="move_to_board" value="', $context['move_to_board'], '" />
@@ -197,7 +196,7 @@ function template_select()
 		{
 			if (window.XMLHttpRequest)
 			{
-				getXMLDocument(smf_prepareScriptUrl(smf_scripturl) + "action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onDocReceived);
+				getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onDocReceived);
 				return false;
 			}
 			else
@@ -246,7 +245,7 @@ function template_select()
 					newItem = document.createElement("LI");
 					newItem.className = "windowbg2";
 					newItem.id = curSection + "_" + curId;
-					newItem.innerHTML = "<div class=\\"content\\"><div class=\\"message_header\\"><a class=\\"split_icon float" + (curSection == "selected" ? "left" : "right") + "\\" href=\\"" + smf_prepareScriptUrl(smf_scripturl) + "action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=" + (curSection == "selected" ? "up" : "down") + ";msg=" + curId + "\\" onclick=\\"return select(\'" + (curSection == "selected" ? "up" : "down") + "\', " + curId + ");\\"><img src=\\"', $settings['images_url'], '/split_" + (curSection == "selected" ? "de" : "") + "select.png\\" alt=\\"" + (curSection == "selected" ? "&lt;-" : "-&gt;") + "\\" /></a><strong>" + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + "</strong> ', $txt['by'], ' <strong>" + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + "</strong><br /><em>" + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + "</em></div><div class=\\"post\\">" + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + "</div></div>";
+					newItem.innerHTML = "<div class=\\"content\\"><div class=\\"message_header\\"><a class=\\"split_icon float" + (curSection == "selected" ? "left" : "right") + "\\" href=\\"" + elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=" + (curSection == "selected" ? "up" : "down") + ";msg=" + curId + "\\" onclick=\\"return select(\'" + (curSection == "selected" ? "up" : "down") + "\', " + curId + ");\\"><img src=\\"', $settings['images_url'], '/split_" + (curSection == "selected" ? "de" : "") + "select.png\\" alt=\\"" + (curSection == "selected" ? "&lt;-" : "-&gt;") + "\\" /></a><strong>" + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + "</strong> ', $txt['by'], ' <strong>" + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + "</strong><br /><em>" + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + "</em></div><div class=\\"post\\">" + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + "</div></div>";
 
 					// So, where do we insert it?
 					if (typeof sInsertBeforeId == "string")

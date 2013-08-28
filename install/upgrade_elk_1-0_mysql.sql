@@ -34,6 +34,7 @@ INSERT IGNORE INTO {$db_prefix}settings
 VALUES
 	('avatar_default', '0'),
 	('gravatar_rating', 'g'),
+	('admin_session_lifetime', 10),
 	('xmlnews_limit', 5),
 	('visual_verification_num_chars', '6'),
 	('enable_disregard', 0),
@@ -480,7 +481,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
 	email_from varchar(50) NOT NULL default '',
 	message_type char(10) NOT NULL default '',
 	message mediumtext NOT NULL default '',
-	PRIMARY KEY (id_email),
+	PRIMARY KEY (id_email)
 ) ENGINE=MyISAM{$db_collation};
 ---#
 
@@ -492,7 +493,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
 	filter_to varchar(255) NOT NULL default '',
 	filter_from varchar(255) NOT NULL default '',
 	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter),
+	PRIMARY KEY (id_filter)
 ) ENGINE=MyISAM{$db_collation};
 ---#
 
@@ -532,7 +533,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
 CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member) 
+  PRIMARY KEY (id_msg, id_member)
 ) ENGINE=MyISAM;
 ---#
 

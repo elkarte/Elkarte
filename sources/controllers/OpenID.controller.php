@@ -37,7 +37,7 @@ class OpenID_Controller extends Action_Controller
 	 */
 	function action_openidreturn()
 	{
-		global $user_info, $user_profile, $modSettings, $context, $sc, $user_settings;
+		global $modSettings, $context, $user_settings;
 
 		// We'll need our subs.
 		require_once(SUBSDIR . '/OpenID.subs.php');
@@ -60,14 +60,16 @@ class OpenID_Controller extends Action_Controller
 			if (isset($_GET[$key]))
 				$_GET[$key] = str_replace(' ', '+', $_GET[$key]);
 
+		$openID = new OpenID();
+
 		// Did they tell us to remove any associations?
 		if (!empty($_GET['openid_invalidate_handle']))
-			openid_removeAssociation($_GET['openid_invalidate_handle']);
+			$openID->removeAssociation($_GET['openid_invalidate_handle']);
 
-		$server_info = openid_getServerInfo($_GET['openid_identity']);
+		$server_info = $openID->getServerInfo($_GET['openid_identity']);
 
 		// Get the association data.
-		$assoc = openID_getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
+		$assoc = $openID->getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
 		if ($assoc === null)
 			fatal_lang_error('openid_no_assoc');
 
@@ -98,7 +100,7 @@ class OpenID_Controller extends Action_Controller
 
 		// Any save fields to restore?
 		$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
-
+		$context['openid_claimed_id'] = $_GET["openid_claimed_id"];
 		// Is there a user with this OpenID_uri?
 		$result = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
@@ -106,21 +108,21 @@ class OpenID_Controller extends Action_Controller
 			FROM {db_prefix}members
 			WHERE openid_uri = {string:openid_uri}',
 			array(
-				'openid_uri' => $openid_uri,
+				'openid_uri' => $context['openid_claimed_id'],
 			)
 		);
 
 		$member_found = $db->num_rows($result);
 
-		if (!$member_found && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $openid_uri)
+		if (!$member_found && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
 			// Update the member.
-			updateMemberData($user_settings['id_member'], array('openid_uri' => $openid_uri));
+			updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
 
 			unset($_SESSION['new_openid_uri']);
 			$_SESSION['openid'] = array(
 				'verified' => true,
-				'openid_uri' => $openid_uri,
+				'openid_uri' => $context['openid_claimed_id'],
 			);
 
 			// Send them back to profile.
@@ -131,7 +133,7 @@ class OpenID_Controller extends Action_Controller
 			// Store the received openid info for the user when returned to the registration page.
 			$_SESSION['openid'] = array(
 				'verified' => true,
-				'openid_uri' => $openid_uri,
+				'openid_uri' => $context['openid_claimed_id'],
 			);
 			if (isset($_GET['openid_sreg_nickname']))
 				$_SESSION['openid']['nickname'] = $_GET['openid_sreg_nickname'];
@@ -176,7 +178,7 @@ class OpenID_Controller extends Action_Controller
 			// Cleanup on Aisle 5.
 			$_SESSION['openid'] = array(
 				'verified' => true,
-				'openid_uri' => $openid_uri,
+				'openid_uri' => $context['openid_claimed_id'],
 			);
 
 			require_once(CONTROLLERDIR . '/Auth.controller.php');
@@ -186,5 +188,31 @@ class OpenID_Controller extends Action_Controller
 
 			doLogin();
 		}
+	}
+	
+	public function action_xrds()
+	{
+		global $scripturl, $modSettings, $context;
+	
+		ob_end_clean();
+		if (!empty($modSettings['enableCompressedOutput']))
+			@ob_start('ob_gzhandler');
+		else
+			ob_start();
+
+		header('Content-Type: application/xrds+xml');
+		echo '<?xml version="1.0" encoding="', $context['character_set'], '"?' . '>';
+		// Generate the XRDS data for OpenID 2.0, YADIS discovery..
+		echo '
+<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
+  <XRD>
+    <Service>
+      <Type>http://specs.openid.net/auth/2.0/return_to</Type>
+      <URI>', $scripturl, '?action=openidreturn</URI>
+	</Service>
+  </XRD>
+</xrds:XRDS>';
+
+	obExit(false);
 	}
 }

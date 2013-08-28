@@ -542,9 +542,9 @@ class ProfileAccount_Controller extends Action_Controller
 	}
 
 	/**
- 	 * Activate an account.
- 	 * This function is called from the profile account actions area.
- 	 */
+	 * Activate an account.
+	 * This function is called from the profile account actions area.
+	 */
 	function action_activateaccount()
 	{
 		global $context, $user_profile, $modSettings;

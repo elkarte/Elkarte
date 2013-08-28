@@ -1241,25 +1241,44 @@ function updateMembergroupProperties($properties)
 {
 	$db = database();
 
+	$known_properties = array(
+		'max_messages' => array('type' => 'int'),
+		'min_posts' => array('type' => 'int'),
+		'group_type' => array('type' => 'int'),
+		'hidden' => array('type' => 'int'),
+		'id_parent' => array('type' => 'int'),
+		'group_name' => array('type' => 'string'),
+		'online_color' => array('type' => 'string'),
+		'icons' => array('type' => 'string'),
+		'description' => array('type' => 'string'),
+	);
+
+	$values = array('current_group' => $properties['current_group']);
+	$updates = array();
+	foreach ($properties as $name => $value)
+	{
+		if (isset($known_properties[$name]))
+		{
+			$updates[] = $name . '={' . $known_properties[$name]['type'] . ':subs_' . $name . '}';
+			switch ($known_properties[$name]['type'])
+			{
+				case 'string':
+					$values['subs_' . $name] = Util::htmlspecialchars($value);
+					break;
+				default:
+					$values['subs_' . $name] = (int) $value;
+			}
+		}
+	}
+
+	if (empty($values))
+		return;
+
 	$db->query('', '
 		UPDATE {db_prefix}membergroups
-		SET group_name = {string:group_name}, online_color = {string:online_color},
-			max_messages = {int:max_messages}, min_posts = {int:min_posts}, icons = {string:icons},
-			description = {string:group_desc}, group_type = {int:group_type}, hidden = {int:group_hidden},
-			id_parent = {int:group_inherit}
+		SET ' . implode(', ', $updates) . '
 		WHERE id_group = {int:current_group}',
-		array(
-			'max_messages' => $properties['max_messages'],
-			'min_posts' => $properties['min_posts'],
-			'group_type' => $properties['group_type'],
-			'group_hidden' => $properties['group_hidden'],
-			'group_inherit' => $properties['group_inherit'],
-			'current_group' => $properties['current_group'],
-			'group_name' => Util::htmlspecialchars($properties['group_name']),
-			'online_color' => $properties['online_color'],
-			'icons' => $properties['icons'],
-			'group_desc' => $properties['group_desc'],
-		)
+		$values
 	);
 }
 
@@ -1656,4 +1675,88 @@ function prepareMembergroupPermissions()
 	$db->free_result($request);
 
 	return $profile_groups;
+}
+
+/**
+ * Returns the groups that a user could see.
+ * Ask and it will give you.
+ *
+ * @param int the id of a member
+ * @param bool true if hidden groups (that the user can moderate) should be loaded (default false)
+ * @param int minimum number of posts for the group (-1 for non-post based groups)
+ *
+ * @return array
+ */
+function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
+		FROM {db_prefix}membergroups AS mg
+			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
+		WHERE mg.min_posts = {int:min_posts}
+			AND mg.id_group != {int:moderator_group}' . ($show_hidden ? '' : '
+			AND mg.hidden = {int:not_hidden}') . '
+		ORDER BY mg.group_name',
+		array(
+			'current_member' => $id_member,
+			'min_posts' => $min_posts,
+			'moderator_group' => 3,
+			'not_hidden' => 0,
+		)
+	);
+	$groups = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Hide hidden groups!
+		if ($show_hidden && $row['hidden'] && !$row['can_moderate'])
+			continue;
+
+		$groups[$row['id_group']] = $row['group_name'];
+	}
+
+	$db->free_result($request);
+
+	return $groups;
+}
+
+/**
+ * Returns the groups that the current user can see.
+ * uses $user_info and allowedTo().
+ *
+ * @return array
+ */
+function accessibleGroups()
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
+		FROM {db_prefix}membergroups AS mg
+			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
+		WHERE mg.min_posts = {int:min_posts}
+			AND mg.id_group != {int:moderator_group}
+		ORDER BY mg.group_name',
+		array(
+			'current_member' => $user_info['id'],
+			'min_posts' => -1,
+			'moderator_group' => 3,
+		)
+	);
+	$groups = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Hide hidden groups!
+		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups')) 
+			continue;
+
+		$groups[$row['id_group']] = $row['group_name'];
+	}
+
+	$db->free_result($request);
+
+	return $groups;
 }

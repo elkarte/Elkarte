@@ -22,6 +22,8 @@ class Database_MySQL implements Database
 {
 	private static $_db = null;
 
+	private $_connection = null;
+
 	private function __construct()
 	{
 		// Private constructor.
@@ -45,14 +47,21 @@ class Database_MySQL implements Database
 	{
 		global $mysql_set_mode;
 
-		// initialize the instance... if not done already!
+		// Initialize the instance... if not done already!
 		if (self::$_db === null)
 			self::$_db = new self();
 
-		if (!empty($db_options['persist']))
-			$connection = @mysql_pconnect($db_server, $db_user, $db_passwd);
+		// Non-standard port
+		if (!empty($db_options['port']))
+			$db_port = (int) $db_options['port'];
 		else
-			$connection = @mysql_connect($db_server, $db_user, $db_passwd);
+			$db_port = 0;
+
+		// Select the database. Maybe.
+		if (empty($db_options['dont_select_db']))
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name, $db_port);
+		else
+			$connection = @mysqli_connect((!empty($db_options['persist']) ? 'p:' : '') . $db_server, $db_user, $db_passwd, "", $db_port);
 
 		// Something's wrong, show an error if its fatal (which we assume it is)
 		if (!$connection)
@@ -63,16 +72,14 @@ class Database_MySQL implements Database
 				display_db_error();
 		}
 
-		// Select the database, unless told not to
-		if (empty($db_options['dont_select_db']) && !@mysql_select_db($db_name, $connection) && empty($db_options['non_fatal']))
-			display_db_error();
-
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
 		if (isset($mysql_set_mode) && $mysql_set_mode === true)
 			$this->query('', 'SET sql_mode = \'\', AUTOCOMMIT = 1',
 			array(),
 			false
 		);
+
+		self::$_db->_connection = $connection;
 
 		return $connection;
 	}
@@ -106,7 +113,7 @@ class Database_MySQL implements Database
 		list ($values, $connection) = $db_callback;
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
-		if (!is_resource($connection))
+		if (!is_object($connection))
 			display_db_error();
 
 		if ($matches[1] === 'db_prefix')
@@ -136,7 +143,7 @@ class Database_MySQL implements Database
 
 			case 'string':
 			case 'text':
-				return sprintf('\'%1$s\'', mysql_real_escape_string($replacement, $connection));
+				return sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $replacement));
 			break;
 
 			case 'array_int':
@@ -167,7 +174,7 @@ class Database_MySQL implements Database
 						$this->error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
 
 					foreach ($replacement as $key => $value)
-						$replacement[$key] = sprintf('\'%1$s\'', mysql_real_escape_string($value, $connection));
+						$replacement[$key] = sprintf('\'%1$s\'', mysqli_real_escape_string($connection, $value));
 
 					return implode(', ', $replacement);
 				}
@@ -212,13 +219,13 @@ class Database_MySQL implements Database
 	 */
 	function quote($db_string, $db_values, $connection = null)
 	{
-		global $db_callback, $db_connection;
+		global $db_callback;
 
 		// Only bother if there's something to replace.
 		if (strpos($db_string, '{') !== false)
 		{
 			// This is needed by the callback function.
-			$db_callback = array($db_values, $connection === null ? $db_connection : $connection);
+			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
 
 			// Do the quoting and escaping
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
@@ -240,7 +247,7 @@ class Database_MySQL implements Database
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_cache, $db_count, $db_connection, $db_show_debug, $time_start;
+		global $db_cache, $db_count, $db_show_debug, $time_start;
 		global $db_unbuffered, $db_callback, $modSettings;
 
 		// Comments that are allowed in a query are preg_removed.
@@ -258,7 +265,7 @@ class Database_MySQL implements Database
 		);
 
 		// Decide which connection to use.
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// One more query....
 		$db_count = !isset($db_count) ? 1 : $db_count + 1;
@@ -368,9 +375,9 @@ class Database_MySQL implements Database
 		}
 
 		if (empty($db_unbuffered))
-			$ret = @mysql_query($db_string, $connection);
+			$ret = @mysqli_query($connection, $db_string);
 		else
-			$ret = @mysql_unbuffered_query($db_string, $connection);
+			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
 
 		if ($ret === false && empty($db_values['db_error_skip']))
 			$ret = $this->error($db_string, $connection);
@@ -389,9 +396,7 @@ class Database_MySQL implements Database
 	 */
 	function affected_rows($connection = null)
 	{
-		global $db_connection;
-
-		return mysql_affected_rows($connection === null ? $db_connection : $connection);
+		return mysqli_affected_rows($connection === null ? $this->_connection : $connection);
 	}
 
 	/**
@@ -403,12 +408,12 @@ class Database_MySQL implements Database
 	 */
 	function insert_id($table, $field = null, $connection = null)
 	{
-		global $db_connection, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		// MySQL doesn't need the table or field information.
-		return mysql_insert_id($connection === null ? $db_connection : $connection);
+		return mysqli_insert_id($connection === null ? $this->_connection : $connection);
 	}
 
 	/**
@@ -421,7 +426,7 @@ class Database_MySQL implements Database
 	function fetch_row($result, $counter = false)
 	{
 		// Just delegate to MySQL's function
-		return mysql_fetch_row($result);
+		return mysqli_fetch_row($result);
 	}
 
 	/**
@@ -432,7 +437,7 @@ class Database_MySQL implements Database
 	function free_result($result)
 	{
 		// Just delegate to MySQL's function
-		mysql_free_result($result);
+		mysqli_free_result($result);
 	}
 
 	/**
@@ -443,7 +448,7 @@ class Database_MySQL implements Database
 	function num_rows($result)
 	{
 		// simply delegate to the native function
-		return mysql_num_rows($result);
+		return mysqli_num_rows($result);
 	}
 
 	/**
@@ -451,7 +456,7 @@ class Database_MySQL implements Database
 	 */
 	function num_fields($request)
 	{
-		return mysql_num_fields($request);
+		return mysqli_num_fields($request);
 	}
 
 	/**
@@ -463,7 +468,7 @@ class Database_MySQL implements Database
 	function data_seek($request, $counter)
 	{
 		// delegate to native mysql function
-		return mysql_data_seek($request, $counter);
+		return mysqli_data_seek($request, $counter);
 	}
 
 	/**
@@ -474,17 +479,15 @@ class Database_MySQL implements Database
 	 */
 	function db_transaction($type = 'commit', $connection = null)
 	{
-		global $db_connection;
-
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		if ($type == 'begin')
-			return @mysql_query('BEGIN', $connection);
+			return @mysqli_query($connection, 'BEGIN');
 		elseif ($type == 'rollback')
-			return @mysql_query('ROLLBACK', $connection);
+			return @mysqli_query($connection, 'ROLLBACK');
 		elseif ($type == 'commit')
-			return @mysql_query('COMMIT', $connection);
+			return @mysqli_query($connection, 'COMMIT');
 
 		return false;
 	}
@@ -496,7 +499,10 @@ class Database_MySQL implements Database
 	 */
 	function last_error($connection = null)
 	{
-		return mysql_error($connection);
+		// Decide which connection to use
+		$connection = $connection === null ? $this->_connection : $connection;
+
+		return mysqli_error($connection);
 	}
 
 	/**
@@ -509,18 +515,18 @@ class Database_MySQL implements Database
 	function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
-		global $forum_version, $db_connection, $db_last_error, $db_persist;
+		global $forum_version, $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// Get the file and line numbers.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
 		// Decide which connection to use
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// This is the error message...
-		$query_error = mysql_error($connection);
-		$query_errno = mysql_errno($connection);
+		$query_error = mysqli_error($connection);
+		$query_errno = mysqli_errno($connection);
 
 		// Error numbers:
 		//    1016: Can't open file '....MYI'
@@ -614,37 +620,27 @@ class Database_MySQL implements Database
 			// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 			if (in_array($query_errno, array(1205, 1213, 2006, 2013)))
 			{
-				if (in_array($query_errno, array(2006, 2013)) && $db_connection == $connection)
+				if (in_array($query_errno, array(2006, 2013)) && $this->_connection == $connection)
 				{
 					// Are we in SSI mode?  If so try that username and password first
 					if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-					{
-						if (empty($db_persist))
-							$db_connection = @mysql_connect($db_server, $ssi_db_user, $ssi_db_passwd);
-						else
-							$db_connection = @mysql_pconnect($db_server, $ssi_db_user, $ssi_db_passwd);
-					}
-					// Fall back to the regular username and password if need be
-					if (!$db_connection)
-					{
-						if (empty($db_persist))
-							$db_connection = @mysql_connect($db_server, $db_user, $db_passwd);
-						else
-							$db_connection = @mysql_pconnect($db_server, $db_user, $db_passwd);
-					}
+						$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $ssi_db_user, $ssi_db_passwd, $db_name);
 
-					if (!$db_connection || !@mysql_select_db($db_name, $db_connection))
-						$db_connection = false;
+					// Fall back to the regular username and password if need be
+					if (!$new_connection)
+						$new_connection = @mysqli_connect((!empty($db_persist) ? 'p:' : '') . $db_server, $db_user, $db_passwd, $db_name);
 				}
 
-				if ($db_connection)
+				if ($new_connection)
 				{
+					$this->_connection = $new_connection;
+
 					// Try a deadlock more than once more.
 					for ($n = 0; $n < 4; $n++)
 					{
 						$ret = $this->query('', $db_string, false, false);
 
-						$new_errno = mysql_errno($db_connection);
+						$new_errno = mysqli_errno($new_connection);
 						if ($ret !== false || in_array($new_errno, array(1205, 1213)))
 							break;
 					}
@@ -706,9 +702,9 @@ class Database_MySQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_connection, $db_prefix;
+		global $db_prefix;
 
-		$connection = $connection === null ? $db_connection : $connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// With nothing to insert, simply return.
 		if (empty($data))
@@ -1302,7 +1298,7 @@ class Database_MySQL implements Database
 
 	/**
 	 * Fetch next result as association.
-	 * The mysql implementation simply delegates to mysql_fetch_assoc().
+	 * The mysql implementation simply delegates to mysqli_fetch_assoc().
 	 * It ignores $counter parameter.
 	 *
 	 * @param resource $request
@@ -1310,7 +1306,7 @@ class Database_MySQL implements Database
 	 */
 	function fetch_assoc($request, $counter = false)
 	{
-		return mysql_fetch_assoc($request);
+		return mysqli_fetch_assoc($request);
 	}
 
 	/**
@@ -1318,9 +1314,12 @@ class Database_MySQL implements Database
 	 *
 	 * @return string
 	 */
-	function db_server_info()
+	function db_server_info($connection = null)
 	{
-		return mysql_get_server_info();
+		// Decide which connection to use
+		$connection = $connection === null ? $this->_connection : $connection;
+
+		return mysqli_get_server_info($connection);
 	}
 
 	/**
@@ -1349,7 +1348,21 @@ class Database_MySQL implements Database
 	 */
 	function select_db($dbName = null, $connection = null)
 	{
-		return mysql_select_db($dbName, $connection);
+		// Decide which connection to use
+		$connection = $connection === null ? $this->_connection : $connection;
+
+		return mysqli_select_db($connection, $dbName);
+	}
+
+	/**
+	 * Retrieve the connection object
+	 *
+	 * @return mysqli
+	 */
+	function connection()
+	{
+		// find it, find it
+		return $this->_connection;
 	}
 
 	/**

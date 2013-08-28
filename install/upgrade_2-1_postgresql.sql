@@ -341,3 +341,11 @@ if (@$modSettings['smfVersion'] < '2.1')
 }
 ---}
 ---#
+
+/******************************************************************************/
+--- Cleaning up integration hooks
+/******************************************************************************/
+---#
+DELETE FROM {$db_prefix}settings
+WHERE variable LIKE 'integrate_%';
+---#

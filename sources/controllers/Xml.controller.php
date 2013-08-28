@@ -153,8 +153,8 @@ class Xml_Controller extends Action_Controller
 		$validation = validateSession();
 		if (empty($validation))
 		{
-			require_once(ADMINDIR . '/ManageCoreFeatures.php');
-			$controller = new ManageCoreFeatures_Controller();
+			require_once(ADMINDIR . '/CoreFeatures.controller.php');
+			$controller = new CoreFeatures_Controller();
 			$result = $controller->action_index();
 
 			// Load up the core features of the system

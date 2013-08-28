@@ -866,8 +866,6 @@ function markPMsRead($memberID)
  */
 function loadPMs($pm_options, $id_member)
 {
-	global $context, $modSettings;
-
 	$db = database();
 
 	// First work out what messages we need to see - if grouped is a little trickier...
@@ -875,27 +873,27 @@ function loadPMs($pm_options, $id_member)
 	if ($pm_options['display_mode'] === 2)
 	{
 		// On a non-default sort due to PostgreSQL we have to do a harder sort.
-		if ($pm_options['is_postgres'] && $pm_options['sort_by_query'] != 'pm.id_pm')
+		if ($db->db_title() == 'PostgreSQL' && $pm_options['sort_by_query'] != 'pm.id_pm')
 		{
 			$sub_request = $db->query('', '
 				SELECT MAX({raw:sort}) AS sort_param, pm.id_pm_head
-				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
+				FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
 						AND pmr.deleted = {int:not_deleted}
 						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
-				WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
+				WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
 					AND pm.deleted_by_sender = {int:not_deleted}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
 					AND pm.id_pm = {int:id_pm}') . '
 				GROUP BY pm.id_pm_head
 				ORDER BY sort_param' . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 				array(
 					'current_member' => $id_member,
 					'not_deleted' => 0,
-					'id_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+					'id_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
 					'id_pm' => isset($pm_options['pmsg']) ? $pm_options['pmsg'] : '0',
 					'sort' => $pm_options['sort_by_query'],
 				)
@@ -908,7 +906,7 @@ function loadPMs($pm_options, $id_member)
 
 			$request = $db->query('', '
 				SELECT pm.id_pm AS id_pm, pm.id_pm_head
-				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
+				FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
@@ -916,14 +914,14 @@ function loadPMs($pm_options, $id_member)
 						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
 				WHERE ' . (empty($sub_pms) ? '0=1' : 'pm.id_pm IN ({array_int:pm_list})') . '
-				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $context['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
+				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 				array(
 					'current_member' => $id_member,
 					'pm_list' => array_keys($sub_pms),
 					'not_deleted' => 0,
 					'sort' => $pm_options['sort_by_query'],
-					'id_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+					'id_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
 				)
 			);
 		}
@@ -931,24 +929,24 @@ function loadPMs($pm_options, $id_member)
 		{
 			$request = $db->query('pm_conversation_list', '
 				SELECT MAX(pm.id_pm) AS id_pm, pm.id_pm_head
-				FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
+				FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? ($pm_options['sort_by'] == 'name' ? '
 					LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
 						AND pmr.deleted = {int:deleted_by}
 						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:pm_member})') : '') . '
-				WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
+				WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
 					AND pm.deleted_by_sender = {int:deleted_by}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
 					AND pm.id_pm = {int:pmsg}') . '
 				GROUP BY pm.id_pm_head
-				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $context['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
-				LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
+				LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 				array(
 					'current_member' => $id_member,
 					'deleted_by' => 0,
 					'sort' => $pm_options['sort_by_query'],
-					'pm_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+					'pm_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
 					'pmsg' => isset($pm_options['pmsg']) ? (int) $pm_options['pmsg'] : 0,
 				)
 			);
@@ -960,23 +958,23 @@ function loadPMs($pm_options, $id_member)
 		// @todo SLOW This query uses a filesort. (inbox only.)
 		$request = $db->query('', '
 			SELECT pm.id_pm, pm.id_pm_head, pm.id_member_from
-			FROM {db_prefix}personal_messages AS pm' . ($context['folder'] == 'sent' ? '' . ($pm_options['sort_by'] == 'name' ? '
+			FROM {db_prefix}personal_messages AS pm' . ($pm_options['folder'] == 'sent' ? '' . ($pm_options['sort_by'] == 'name' ? '
 				LEFT JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)' : '') : '
 				INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 					AND pmr.id_member = {int:current_member}
 					AND pmr.deleted = {int:is_deleted}
 					' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:pm_member})') : '') . '
-			WHERE ' . ($context['folder'] == 'sent' ? 'pm.id_member_from = {raw:current_member}
+			WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {raw:current_member}
 				AND pm.deleted_by_sender = {int:is_deleted}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
 				AND pm.id_pm = {int:pmsg}') . '
-			ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $context['folder'] != 'sent' ? 'pmr.id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
-			LIMIT ' . $pm_options['start'] . ', ' . $modSettings['defaultMaxMessages'] : ''),
+			ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'pmr.id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (isset($pm_options['pmsg']) ? '
+			LIMIT ' . $pm_options['start'] . ', ' . $pm_options['limit'] : ''),
 			array(
 				'current_member' => $id_member,
 				'is_deleted' => 0,
 				'sort' => $pm_options['sort_by_query'],
-				'pm_member' => $context['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
+				'pm_member' => $pm_options['folder'] == 'sent' ? 'pmr.id_member' : 'pm.id_member_from',
 				'pmsg' => isset($pm_options['pmsg']) ? (int) $pm_options['pmsg'] : 0,
 			)
 		);
@@ -984,7 +982,7 @@ function loadPMs($pm_options, $id_member)
 	// Load the id_pms and initialize recipients.
 	$pms = array();
 	$lastData = array();
-	$posters = $context['folder'] == 'sent' ? array($id_member) : array();
+	$posters = $pm_options['folder'] == 'sent' ? array($id_member) : array();
 	$recipients = array();
 
 	while ($row = $db->fetch_assoc($request))
@@ -1200,6 +1198,8 @@ function loadRules($reload = false)
  */
 function toggleNewPM($id_member, $new = false)
 {
+	global $user_info;
+
 	$db = database();
 	
 	$db->query('', '
@@ -1207,9 +1207,249 @@ function toggleNewPM($id_member, $new = false)
 		SET is_new = ' . ($new ? '{int:new}' : '{int:not_new}') . '
 		WHERE id_member = {int:current_member}',
 		array(
-			'current_member' => $user_info['id'],
+			'current_member' => $id_member,
 			'new' => 1,
 			'not_new' => 0
 		)
 	);
+}
+
+/**
+ * Load the PM limits for each group or for a specified group
+ *
+ * @param int (optional) the id of a membergroup
+ */
+function loadPMLimits($id_group = false)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_group, group_name, max_messages
+		FROM {db_prefix}membergroups' . ($id_group ? '
+		WHERE id_group = {int:id_group}' : ''),
+		array(
+			'id_group' => $id_group,
+		)
+	);
+
+	$groups = array();
+	while ($row = $db->fetch_assoc($request))
+		if ($row['id_group'] != 1)
+			$groups[$row['id_group']] = $row;
+
+	$db->free_result($request);
+
+	return $groups;
+}
+
+/**
+ * Retrieve the discussion one or more PMs belong to
+ */
+function getDiscussions($id_pms)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_pm_head, id_pm
+		FROM {db_prefix}personal_messages
+		WHERE id_pm IN ({array_int:id_pms})',
+		array(
+			'id_pms' => $id_pms,
+		)
+	);
+	$pm_heads = array();
+	while ($row = $db->fetch_assoc($request))
+		$pm_heads[$row['id_pm_head']] = $row['id_pm'];
+	$db->free_result($request);
+
+	return $pm_heads;
+}
+
+/**
+ * Return all the PMs belonging to one or more discussions
+ */
+function getPmsFromDiscussion($pm_heads)
+{
+	$db = database();
+
+	$pms = array();
+	$request = $db->query('', '
+		SELECT id_pm, id_pm_head
+		FROM {db_prefix}personal_messages
+		WHERE id_pm_head IN ({array_int:pm_heads})',
+		array(
+			'pm_heads' => array_keys($pm_heads),
+		)
+	);
+	// Copy the action from the single to PM to the others.
+	while ($row = $db->fetch_assoc($request))
+		$pms[$row['id_pm']] = $row['id_pm_head'];
+	$db->free_result($request);
+
+	return $pms;
+}
+
+function changePMLabels($to_label, $label_type, $user_id)
+{
+	global $options;
+
+	$db = database();
+	$labels = array();
+	$to_update = array();
+
+	// Get information about each message...
+	$request = $db->query('', '
+		SELECT id_pm, labels
+		FROM {db_prefix}pm_recipients
+		WHERE id_member = {int:current_member}
+			AND id_pm IN ({array_int:to_label})
+		LIMIT ' . count($to_label),
+		array(
+			'current_member' => $user_id,
+			'to_label' => array_keys($to_label),
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		$labels = $row['labels'] == '' ? array('-1') : explode(',', trim($row['labels']));
+
+		// Already exists?  Then... unset it!
+		$ID_LABEL = array_search($to_label[$row['id_pm']], $labels);
+		if ($ID_LABEL !== false && $label_type[$row['id_pm']] !== 'add')
+			unset($labels[$ID_LABEL]);
+		elseif ($label_type[$row['id_pm']] !== 'rem')
+			$labels[] = $to_label[$row['id_pm']];
+
+		if (!empty($options['pm_remove_inbox_label']) && $to_label[$row['id_pm']] != '-1' && ($key = array_search('-1', $labels)) !== false)
+			unset($labels[$key]);
+
+		$set = implode(',', array_unique($labels));
+		if ($set == '')
+			$set = '-1';
+
+		$to_update[$row['id_pm']] = $set;
+	}
+	$db->free_result($request);
+
+	if (!empty($to_update))
+		return updatePMLabels($to_update);
+}
+
+function updateLabelsToPM($searchArray, $new_labels, $user_id)
+{
+	$db = database();
+
+	// Now find the messages to change.
+	$request = $db->query('', '
+		SELECT id_pm, labels
+		FROM {db_prefix}pm_recipients
+		WHERE FIND_IN_SET({raw:find_label_implode}, labels) != 0
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $user_id,
+			'find_label_implode' => '\'' . implode('\', labels) != 0 OR FIND_IN_SET(\'', $searchArray) . '\'',
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Do the long task of updating them...
+		$toChange = explode(',', $row['labels']);
+
+		foreach ($toChange as $key => $value)
+			if (in_array($value, $searchArray))
+			{
+				if (isset($new_labels[$value]))
+					$toChange[$key] = $new_labels[$value];
+				else
+					unset($toChange[$key]);
+			}
+
+		if (empty($toChange))
+			$toChange[] = '-1';
+
+		$to_update[$row['id_pm']] = implode(',', array_unique($toChange));
+	}
+	$db->free_result($request);
+
+	if (!empty($to_update))
+		return updatePMLabels($to_update, $user_id);
+}
+
+function updatePMLabels($to_update, $user_id)
+{
+	$db = database();
+
+	$updateErrors = 0;
+
+	foreach ($to_update as $id_pm => $set)
+	{
+		// Check that this string isn't going to be too large for the database.
+		if (strlen($set) > 60)
+		{
+			$updateErrors++;
+			// Make the string as long as possible and update anyway
+			$set = substr($set, 0, 60);
+			$set = substr($set, 0, strrpos($set, ','));
+		}
+
+		$db->query('', '
+			UPDATE {db_prefix}pm_recipients
+			SET labels = {string:labels}
+			WHERE id_pm = {int:id_pm}
+				AND id_member = {int:current_member}',
+			array(
+				'current_member' => $user_id,
+				'id_pm' => $id_pm,
+				'labels' => $set,
+			)
+		);
+	}
+
+	return $updateErrors;
+}
+
+function getPMsOlderThan($user_id, $time)
+{
+	$db = database();
+
+	// Array to store the IDs in.
+	$pm_ids = array();
+
+	// Select all the messages they have sent older than $time.
+	$request = $db->query('', '
+		SELECT id_pm
+		FROM {db_prefix}personal_messages
+		WHERE deleted_by_sender = {int:not_deleted}
+			AND id_member_from = {int:current_member}
+			AND msgtime < {int:msgtime}',
+		array(
+			'current_member' => $user_id,
+			'not_deleted' => 0,
+			'msgtime' => $time,
+		)
+	);
+	while ($row = $db->fetch_row($request))
+		$pm_ids[] = $row[0];
+	$db->free_result($request);
+
+	// This is the inbox
+	$request = $db->query('', '
+		SELECT pmr.id_pm
+		FROM {db_prefix}pm_recipients AS pmr
+			INNER JOIN {db_prefix}personal_messages AS pm ON (pm.id_pm = pmr.id_pm)
+		WHERE pmr.deleted = {int:not_deleted}
+			AND pmr.id_member = {int:current_member}
+			AND pm.msgtime < {int:msgtime}',
+		array(
+			'current_member' => $user_id,
+			'not_deleted' => 0,
+			'msgtime' => $time,
+		)
+	);
+	while ($row = $db->fetch_row($request))
+		$pm_ids[] = $row[0];
+	$db->free_result($request);
+
+	return $pm_ids;
 }

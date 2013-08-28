@@ -113,7 +113,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'modlog' => array(
 						'label' => $txt['modlog_view'],
 						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'admin/Modlog.php',
+						'file' => 'admin/Modlog.controller.php',
 						'controller' => 'Modlog_Controller',
 						'function' => 'action_log',
 					),
@@ -148,7 +148,7 @@ class ModerationCenter_Controller extends Action_Controller
 					'emailmod' => array(
 						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
 						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'admin/ManageMaillist.php',
+						'file' => 'admin/ManageMaillist.controller.php',
 						'function' => 'UnapprovedEmails',
 						'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 					),
@@ -1159,8 +1159,7 @@ class ModerationCenter_Controller extends Action_Controller
 				array(
 					'position' => 'bottom_of_list',
 					'value' => '
-						<input type="submit" name="delete_selected" value="' . $txt['quickmod_delete_selected'] . '" class="button_submit" />',
-					'align' => 'right',
+						<input type="submit" name="delete_selected" value="' . $txt['quickmod_delete_selected'] . '" class="right_submit" />',
 				) : array(),
 			),
 		);
@@ -1302,7 +1301,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Submitting a new one?
 		if (isset($_POST['add']))
-			return action_modifyWarningTemplate();
+			return $this->action_modifyWarningTemplate();
 		// Deleting and existing one
 		elseif (isset($_POST['delete']) && !empty($_POST['deltpl']))
 		{
@@ -1378,8 +1377,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
+						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
@@ -1399,8 +1397,8 @@ class ModerationCenter_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="delete" value="' . $txt['mc_warning_template_delete'] . '" onclick="return confirm(\'' . $txt['mc_warning_template_delete_confirm'] . '\');" class="button_submit" />
-						<input type="submit" name="add" value="' . $txt['mc_warning_template_add'] . '" class="button_submit" />',
+						<input type="submit" name="delete" value="' . $txt['mc_warning_template_delete'] . '" onclick="return confirm(\'' . $txt['mc_warning_template_delete_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="add" value="' . $txt['mc_warning_template_add'] . '" class="right_submit" />',
 				),
 			),
 		);

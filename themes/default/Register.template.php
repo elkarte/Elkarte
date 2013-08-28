@@ -84,7 +84,7 @@ function template_registration_form()
 		<script><!-- // --><![CDATA[
 			function verifyAgree()
 			{
-				if (currentAuthMethod == \'passwd\' && document.forms.registration.smf_autov_pwmain.value != document.forms.registration.smf_autov_pwverify.value)
+				if (currentAuthMethod == \'passwd\' && document.forms.registration.elk_autov_pwmain.value != document.forms.registration.elk_autov_pwverify.value)
 				{
 					alert("', $txt['register_passwords_differ_js'], '");
 					return false;
@@ -125,18 +125,18 @@ function template_registration_form()
 			<div class="windowbg2">
 				<fieldset class="content">
 					<dl class="register_form">
-						<dt><strong><label for="smf_autov_username">', $txt['username'], ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_username">', $txt['username'], ':</label></strong></dt>
 						<dd>
-							<input type="text" name="user" id="smf_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
-							<span id="smf_autov_username_div" style="display: none;">
-								<a id="smf_autov_username_link" href="#">
-									<img id="smf_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
+							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
+							<span id="elk_autov_username_div" style="display: none;">
+								<a id="elk_autov_username_link" href="#">
+									<img id="elk_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
 								</a>
 							</span>
 						</dd>
-						<dt><strong><label for="smf_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label></strong></dt>
 						<dd>
-							<input type="email" name="email" id="smf_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
+							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
 						</dd>
 						<dt><strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong></dt>
 						<dd>
@@ -168,20 +168,20 @@ function template_registration_form()
 
 	echo '
 					<dl class="register_form" id="password1_group">
-						<dt><strong><label for="smf_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_pwmain">', ucwords($txt['choose_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd1" id="smf_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['choose_pass']), '" required="required" />
-							<span id="smf_autov_pwmain_div" style="display: none;">
-								<img id="smf_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['choose_pass']), '" required="required" />
+							<span id="elk_autov_pwmain_div" style="display: none;">
+								<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 							</span>
 						</dd>
 					</dl>
 					<dl class="register_form" id="password2_group">
-						<dt><strong><label for="smf_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
+						<dt><strong><label for="elk_autov_pwverify">', ucwords($txt['verify_pass']), ':</label></strong></dt>
 						<dd>
-							<input type="password" name="passwrd2" id="smf_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['verify_pass']), '" required="required" />
-							<span id="smf_autov_pwverify_div" style="display: none;">
-								<img id="smf_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', ucwords($txt['verify_pass']), '" required="required" />
+							<span id="elk_autov_pwverify_div" style="display: none;">
+								<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 							</span>
 						</dd>
 					</dl>';
@@ -254,7 +254,7 @@ function template_registration_form()
 			}
 			else
 			{
-					echo '
+				echo '
 						<dt>
 							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['label'], ':</strong>';
 
@@ -298,6 +298,7 @@ function template_registration_form()
 						// Is this some code to generate the options?
 						if (!is_array($field['options']))
 							$field['options'] = eval($field['options']);
+
 						// Assuming we now have some!
 						if (is_array($field['options']))
 							foreach ($field['options'] as $value => $name)
@@ -363,15 +364,15 @@ function template_registration_form()
 	// Age restriction in effect?
 	if (!$context['require_agreement'] && $context['show_coppa'])
 		echo '
-				<input type="submit" name="accept_agreement" value="', $context['coppa_agree_above'], '" class="button_submit" /><br /><br />
-				<input type="submit" name="accept_agreement_coppa" value="', $context['coppa_agree_below'], '" class="button_submit" />';
+				<input type="submit" name="accept_agreement" value="', $context['coppa_agree_above'], '" class="right_submit" /><br /><br />
+				<input type="submit" name="accept_agreement_coppa" value="', $context['coppa_agree_below'], '" class="right_submit" />';
 	else
 		echo '
-				<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />';
+				<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="right_submit" />';
 
 	if ($context['show_contact_button'])
 		echo '
-				<input type="submit" name="show_contact" value="', $txt['contact'], '" class="button_submit" />';
+				<input type="submit" name="show_contact" value="', $txt['contact'], '" class="right_submit" />';
 
 	echo '
 			</div>
@@ -391,7 +392,7 @@ function template_registration_form()
 				"password_no_match": "', $txt['registration_password_no_match'], '",
 				"password_valid": "', $txt['registration_password_valid'], '"
 			};
-			var verificationHandle = new smfRegister("registration", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+			var verificationHandle = new elkRegister("registration", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 			// Update the authentication status.
 			updateAuthMethod();
 		// ]]></script>';
@@ -476,7 +477,7 @@ function template_coppa_form()
 
 	// Show the form (As best we can)
 	echo '
-		<table class="tborder centertext" style="width:100%" >
+		<table class="table_grid">
 			<tr>
 				<td class="lefttext">', $context['forum_contacts'], '</td>
 			</tr>
@@ -499,8 +500,7 @@ function template_coppa_form()
 					', $context['coppa_body'], '
 				</td>
 			</tr>
-		</table>
-		<br />';
+		</table>';
 }
 
 /**
@@ -628,18 +628,16 @@ function template_admin_register()
 							<input type="checkbox" name="emailActivate" id="emailActivate_check" tabindex="', $context['tabindex']++, '"', !empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? ' checked="checked"' : '', ' onclick="onCheckChange();" class="input_check" />
 						</dd>
 					</dl>
-					<div class="flow_auto">
+					<div class="submitbutton">
 						<input type="submit" name="regSubmit" value="', $txt['register'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="hidden" name="sa" value="register" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-regc_token_var'], '" value="', $context['admin-regc_token'], '" />
 					</div>
 				</div>
-
 			</form>
 		</div>
-	</div>
-	<br class="clear" />';
+	</div>';
 }
 
 /**
@@ -683,7 +681,7 @@ function template_edit_agreement()
 
 		echo '
 							</select>
-							<div class="righttext">
+							<div class="submitbutton">
 								<input type="hidden" name="sa" value="agreement" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 								<input type="submit" name="change" value="', $txt['admin_agreement_select_language_change'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
@@ -700,7 +698,7 @@ function template_edit_agreement()
 					<p>
 						<label for="requireAgreement"><input type="checkbox" name="requireAgreement" id="requireAgreement"', $context['require_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" class="input_check" /> ', $txt['admin_agreement'], '.</label>
 					</p>
-					<div class="flow_auto" >
+					<div class="submitbutton" >
 						<input type="submit" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="hidden" name="agree_lang" value="', $context['current_agreement'], '" />
 						<input type="hidden" name="sa" value="agreement" />
@@ -755,7 +753,7 @@ function template_edit_reserved_words()
 						<input type="checkbox" name="matchname" id="matchname" tabindex="', $context['tabindex']++, '" ', $context['reserved_word_options']['match_name'] ? 'checked="checked"' : '', ' class="input_check" />
 					</dd>
 				</dl>
-				<div class="flow_auto" >
+				<div class="submitbutton" >
 					<input type="submit" value="', $txt['save'], '" name="save_reserved_names" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -809,8 +807,8 @@ function template_contact_form()
 
 			echo '
 				</dl>
-				<hr class="hrcolor" />
-				<div class="flow_auto" >
+				<hr />
+				<div class="submitbutton" >
 					<input type="submit" value="', $txt['sendtopic_send'], '" name="send" tabindex="', $context['tabindex']++, '" style="margin: 1ex;" class="button_submit" />
 					<input type="hidden" name="sa" value="reservednames" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -833,6 +831,5 @@ function template_contact_form_done()
 		</div>
 		<div class="windowbg2">
 				', $txt['contact_thankyou'], '
-		</div>
-		<br class="clear" />';
+		</div>';
 }

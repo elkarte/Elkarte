@@ -40,12 +40,12 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
- 	* Begin the registration process.
- 	* Accessed by ?action=register
- 	*
- 	* @param array $reg_errors = array()
- 	*/
-	function action_register($reg_errors = array())
+	* Begin the registration process.
+	* Accessed by ?action=register
+	*
+	* @param array $reg_errors = array()
+	*/
+	function action_register()
 	{
 		global $txt, $context, $modSettings, $user_info;
 		global $language, $scripturl, $cur_profile;
@@ -221,12 +221,11 @@ class Register_Controller extends Action_Controller
 			);
 		}
 
-		// @todo Why isn't this a simple set operation?
 		// Were there any errors?
 		$context['registration_errors'] = array();
-		if (!empty($reg_errors))
-			foreach ($reg_errors as $error)
-				$context['registration_errors'][] = $error;
+		$reg_errors = error_context::context('register', 0);
+		if ($reg_errors->hasErrors())
+			$context['registration_errors'] = $reg_errors->prepareErrors();
 
 		createToken('register');
 	}
@@ -241,7 +240,7 @@ class Register_Controller extends Action_Controller
 	 */
 	function action_register2($verifiedOpenID = false)
 	{
-		global $txt, $modSettings, $context;
+		global $txt, $modSettings, $context, $user_info;
 
 		$db = database();
 
@@ -250,6 +249,7 @@ class Register_Controller extends Action_Controller
 
 		// Start collecting together any errors.
 		$reg_errors = array();
+		$reg_errors = error_context::context('register', 0);
 
 		// Did we save some open ID fields?
 		if ($verifiedOpenID && !empty($context['openid_save_fields']))
@@ -296,9 +296,8 @@ class Register_Controller extends Action_Controller
 
 				if (is_array($context['visual_verification']))
 				{
-					loadLanguage('Errors');
 					foreach ($context['visual_verification'] as $error)
-						$reg_errors[] = $txt['error_' . $error];
+						$reg_errors->addError('error_' . $error);
 				}
 			}
 		}
@@ -427,7 +426,7 @@ class Register_Controller extends Action_Controller
 				'is_active' => 1,
 			)
 		);
-		$custom_field_errors = array();
+
 		while ($row = $db->fetch_assoc($request))
 		{
 			// Don't allow overriding of the theme variables.
@@ -446,40 +445,32 @@ class Register_Controller extends Action_Controller
 			{
 				// Is it too long?
 				if ($row['field_length'] && $row['field_length'] < Util::strlen($value))
-					$custom_field_errors[] = array('custom_field_too_long', array($row['field_name'], $row['field_length']));
+					$reg_errors->addError(array('custom_field_too_long', array($row['field_name'], $row['field_length'])));
 
 				// Any masks to apply?
 				if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 				{
 					// @todo We never error on this - just ignore it at the moment...
 					if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
-						$custom_field_errors[] = array('custom_field_invalid_email', array($row['field_name']));
+						$reg_errors->addError(array('custom_field_invalid_email', array($row['field_name'])));
 					elseif ($row['mask'] == 'number' && preg_match('~[^\d]~', $value))
-						$custom_field_errors[] = array('custom_field_not_number', array($row['field_name']));
+						$reg_errors->addError(array('custom_field_not_number', array($row['field_name'])));
 					elseif (substr($row['mask'], 0, 5) == 'regex' && trim($value) !== '' && preg_match(substr($row['mask'], 5), $value) === 0)
-						$custom_field_errors[] = array('custom_field_inproper_format', array($row['field_name']));
+						$reg_errors->addError(array('custom_field_inproper_format', array($row['field_name'])));
 				}
 			}
 
 			// Is this required but not there?
 			if (trim($value) == '' && $row['show_reg'] > 1)
-				$custom_field_errors[] = array('custom_field_empty', array($row['field_name']));
+				$reg_errors->addError(array('custom_field_empty', array($row['field_name'])));
 		}
 		$db->free_result($request);
 
-		// Process any errors.
-		if (!empty($custom_field_errors))
-		{
-			loadLanguage('Errors');
-			foreach ($custom_field_errors as $error)
-				$reg_errors[] = vsprintf($txt['error_' . $error[0]], $error[1]);
-		}
-
 		// Lets check for other errors before trying to register the member.
-		if (!empty($reg_errors))
+		if ($reg_errors->hasErrors())
 		{
 			$_REQUEST['step'] = 2;
-			return $this->action_register($reg_errors);
+			return $this->action_register();
 		}
 
 		// If they're wanting to use OpenID we need to validate them first.
@@ -492,7 +483,8 @@ class Register_Controller extends Action_Controller
 					$save_variables[$k] = $v;
 
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			openID_validate($_POST['openid_identifier'], false, $save_variables);
+			$openID = new OpenID();
+			$openID->validate($_POST['openid_identifier'], false, $save_variables);
 		}
 		// If we've come from OpenID set up some default stuff.
 		elseif ($verifiedOpenID || (!empty($_POST['openid_identifier']) && $_POST['authenticate'] == 'openid'))
@@ -508,14 +500,19 @@ class Register_Controller extends Action_Controller
 
 		$regOptions['ip'] = $user_info['ip'];
 		$regOptions['ip2'] = $req->ban_ip();
-		$memberID = registerMember($regOptions, true);
+		$memberID = registerMember($regOptions, 'register');
+
+		// If there are "important" errors and you are not an admin: log the first error
+		// Otherwise grab all of them and don't log anything
+		$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
+		foreach ($reg_errors->prepareErrors($error_severity) as $error)
+			fatal_error($error, $error_severity === null ? false : 'general');
 
 		// Was there actually an error of some kind dear boy?
-		if (is_array($memberID))
+		if ($reg_errors->hasErrors())
 		{
-			$reg_errors = array_merge($reg_errors, $memberID);
 			$_REQUEST['step'] = 2;
-			return $this->action_register($reg_errors);
+			return $this->action_register();
 		}
 
 		// Do our spam protection now.
@@ -961,9 +958,10 @@ function registerCheckUsername()
 
 	// Clean it up like mother would.
 	$context['checked_username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $context['checked_username']);
+	$errors = error_context::context('valid_username', 0);
 
 	require_once(SUBSDIR . '/Auth.subs.php');
-	$errors = validateUsername(0, $context['checked_username'], true);
+	validateUsername(0, $context['checked_username'], 'valid_username');
 
-	$context['valid_username'] = empty($errors);
+	$context['valid_username'] = $errors->hasErrors();
 }

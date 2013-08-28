@@ -166,7 +166,7 @@ function getMsgMemberID($messageID)
 
 /**
  * Modify the settings and position of a board.
- * Used by ManageBoards.php to change the settings of a board.
+ * Used by ManageBoards.controller.php to change the settings of a board.
  *
  * @param int $board_id
  * @param array &$boardOptions
@@ -948,7 +948,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	if (isset($boardListOptions['ignore']))
 	{
 		$select .= ',' . (!empty($boardListOptions['ignore']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored';
-		$where_parameters['included_boards'] = $boardListOptions['ignore'];
+		$where_parameters['ignore_boards'] = $boardListOptions['ignore'];
 	}
 
 	if (!empty($boardListOptions['ignore_boards']))
@@ -1383,7 +1383,7 @@ function getBoardModerators($idboard, $only_id = false)
 			FROM {db_prefix}moderators
 			WHERE id_board = {int:current_board}',
 			array(
-				'current_board' => $board,
+				'current_board' => $idboard,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
@@ -1584,7 +1584,7 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
  *
  * @todo unify the two queries?
  */
-function fetchBoardsInfo($conditions, $params = array())
+function fetchBoardsInfo($conditions = 'all', $params = array())
 {
 	global $modSettings;
 
@@ -1602,9 +1602,10 @@ function fetchBoardsInfo($conditions, $params = array())
 	else
 		$sort_by = '';
 
+	// if $conditions wasn't set or is 'all', get all boards
 	if (!is_array($conditions) && $conditions == 'all')
 	{
-		// id_board, name, id_profile => used in admin/Reports.php
+		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
 			SELECT ' . (!empty($params['count']) ? 'COUNT(*)' : 'id_board, name, id_profile') . '
 			FROM {db_prefix}boards',
@@ -1613,11 +1614,14 @@ function fetchBoardsInfo($conditions, $params = array())
 	}
 	else
 	{
+		// only some category?
 		if (!empty($conditions['categories']))
 		{
 			$clauses[] = 'id_cat IN ({array_int:category_list})';
 			$clauseParameters['category_list'] = is_array($conditions['categories']) ? $conditions['categories'] : array($conditions['categories']);
 		}
+
+		// only a few boards, perhaps!
 		if (!empty($conditions['boards']))
 		{
 			$clauses[] = 'id_board IN ({array_int:board_list})';

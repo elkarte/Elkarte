@@ -11,7 +11,7 @@ $txt['mc_groups'] = 'Members and groups';
 
 $txt['mc_view_groups'] = 'View Membergroups';
 
-$txt['mc_description'] = 'This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can personalize the layout by clicking <a href="' . $scripturl . '?action=moderate;area=settings">here</a>.';
+$txt['mc_description'] = 'This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can <a href="' . $scripturl . '?action=moderate;area=settings">personalize the layout by clicking here</a>.';
 $txt['mc_group_requests'] = 'Membergroup Requests';
 $txt['mc_unapproved_posts'] = 'Unapproved Posts';
 $txt['mc_watched_users'] = 'Recent Watched Members';

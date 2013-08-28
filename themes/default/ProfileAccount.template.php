@@ -239,7 +239,7 @@ function template_issueWarning()
 							', !empty($context['warning_data']['body_preview']) ? $context['warning_data']['body_preview'] : '', '
 						</dd>
 					</dl>
-					<hr />
+				<hr />
 				</div>
 				<dl class="settings">
 					<dt>
@@ -275,7 +275,7 @@ function template_issueWarning()
 
 	echo '
 				</dl>
-				<div class="righttext">';
+				<div class="submitbutton">';
 
 	if (!empty($context['token_check']))
 		echo '
@@ -384,7 +384,7 @@ function template_deleteAccount()
 					<div>
 						<strong', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '>', $txt['current_password'], ': </strong>
 						<input type="password" name="oldpasswrd" size="20" class="input_password" />&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="submit" value="', $txt['yes'], '" class="button_submit" />';
+						<input type="submit" value="', $txt['yes'], '" class="button_submit submitgo" />';
 
 		if (!empty($context['token_check']))
 			echo '
@@ -419,7 +419,7 @@ function template_deleteAccount()
 						<label for="deleteAccount"><input type="checkbox" name="deleteAccount" id="deleteAccount" value="1" class="input_check" onclick="if (this.checked) return confirm(\'', $txt['deleteAccount_confirm'], '\');" /> ', $txt['deleteAccount_member'], '.</label>
 					</div>
 					<div>
-						<input type="submit" value="', $txt['delete'], '" class="button_submit" />';
+						<input type="submit" value="', $txt['delete'], '" class="right_submit" />';
 
 		if (!empty($context['token_check']))
 			echo '

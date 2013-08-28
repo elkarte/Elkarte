@@ -37,10 +37,6 @@ function template_moderation_center()
 		echo '
 							<div class="modblock_', $alternate ? 'left' : 'right', '">', function_exists($block_function) ? $block_function() : '', '</div>';
 
-		if (!$alternate)
-			echo '
-							<br class="clear" />';
-
 		$alternate = !$alternate;
 	}
 
@@ -73,7 +69,7 @@ function template_latest_news()
 								<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
 								<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
 								<script><!-- // --><![CDATA[
-									var oAdminIndex = new smf_AdminIndex({
+									var oAdminIndex = new elk_AdminIndex({
 										sSelf: \'oAdminCenter\',
 										bLoadAnnouncements: true,
 										sAnnouncementTemplate: ', JavaScriptEscape('
@@ -232,7 +228,7 @@ function template_notes()
 									<div class="floatleft post_note">
 										<input type="text" name="new_note" value="', $txt['mc_click_add_note'], '" style="width: 95%;" onclick="if (this.value == \'', $txt['mc_click_add_note'], '\') this.value = \'\';" class="input_text" />
 									</div>
-									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="button_submit" />
+									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="button_submit submitgo" />
 								</div>
 							</div>
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -278,16 +274,16 @@ function template_reported_posts()
 									', $report['body'], '
 
 									<ul class="quickbuttons">
-										<li>
-											<a href="', $report['report_href'], '" class="details_button">', $txt['mc_reportedp_details'], '</a>
+										<li class="listlevel1">
+											<a href="', $report['report_href'], '" class="linklevel1 details_button">', $txt['mc_reportedp_details'], '</a>
 										</li>
-										<li>
-											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';ignore=', (int) !$report['ignore'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$report['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', ' class="ignore_button">', $report['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';ignore=', (int) !$report['ignore'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$report['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', ' class="linklevel1 ignore_button">', $report['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
 										</li>
-										<li>
-											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
+										<li class="listlevel1">
+											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
 										</li>
-										<li class="inline_mod_check">'
+										<li  class="listlevel1 inline_mod_check">'
 											, !$context['view_closed'] ? '<input type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
 										</li>
 									</ul>
@@ -383,7 +379,7 @@ function template_unapproved_posts()
 									<option value="approve">&nbsp;--&nbsp;' . $txt['approve'] . '</option>
 									<option value="delete">&nbsp;--&nbsp;' . $txt['delete'] . '</option>
 								</select>
-								<noscript><input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit" /></noscript>
+								<noscript><input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" /></noscript>
 							</div>';
 
 	template_pagesection(false, false, 'go_up', array('extra' => $quick_mod));
@@ -462,8 +458,8 @@ function template_viewmodreport()
 									'<p>', $comment['member']['link'], ': ', $comment['message'], ' <em class="smalltext">(', $comment['time'], ')</em></p>';
 
 	echo '
-									<textarea rows="2" cols="60" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 60%; min-width: 60%' : 'width: 60%') . ';" name="mod_comment"></textarea>
-									<div>
+									<textarea rows="2" cols="60" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 60%; min-width: 60%' : 'width: 100%') . ';" name="mod_comment"></textarea>
+									<div class="submitbutton">
 										<input type="submit" name="add_comment" value="', $txt['mc_modreport_add_mod_comment'], '" class="button_submit" />
 									</div>
 								</div>
@@ -566,7 +562,6 @@ function template_moderation_settings()
 	if ($context['can_moderate_approvals'])
 	{
 		echo '
-
 						<dt>
 							<strong><label for="mod_notify_approval">', $txt['mc_prefs_notify_approval'], '</label>:</strong>
 						</dt>
@@ -577,10 +572,10 @@ function template_moderation_settings()
 
 	echo '
 					</dl>
-					<hr class="hrcolor" />
+					<hr />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['mod-set_token_var'], '" value="', $context['mod-set_token'], '" />
-					<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
 				</div>
 			</div>
 		</form>
@@ -691,13 +686,16 @@ function template_warn_template()
 						<br />';
 
 	echo '
-					<hr class="hrcolor" />
-					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
-					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+					<hr />
+					<div class="submitbutton">
+						<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
+						<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['mod-wt_token_var'], '" value="', $context['mod-wt_token'], '" />
+					</div>
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['mod-wt_token_var'], '" value="', $context['mod-wt_token'], '" />
+
 		</form>
 	</div>
 

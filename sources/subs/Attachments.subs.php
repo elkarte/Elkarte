@@ -1255,7 +1255,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	require_once(SUBSDIR . '/Graphics.subs.php');
 	if (!empty($modSettings['avatar_download_png']))
 		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height, 3);
- 	else
+	else
 		$success = resizeImageFile($temporary_path, $tempName, $max_width, $max_height);
 
 	if ($success)
@@ -1484,7 +1484,7 @@ function getAvatarPathID()
  * @param array $messages array of messages ids
  * @param bool $includeUnapproved = false
  */
-function getAttachments($messages, $includeUnapproved = false, $filter = null)
+function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
 	global $modSettings;
 
@@ -1508,7 +1508,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null)
 	$temp = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row)))
+		if (!$row['approved'] && !$includeUnapproved && (empty($filter) || !call_user_func($filter, $row, $all_posters)))
 			continue;
 
 		$temp[$row['id_attach']] = $row;
@@ -2639,9 +2639,9 @@ function approved_attach_sort($a, $b)
  *
  * @param array $attachment_info
  */
-function filter_accessible_attachment($attachment_info)
+function filter_accessible_attachment($attachment_info, $all_posters)
 {
-	global $all_posters, $user_info;
+	global $user_info;
 
 	if (!$attachment_info['approved'] && (!isset($all_posters[$attachment_info['id_msg']]) || $all_posters[$attachment_info['id_msg']] != $user_info['id']))
 		return false;

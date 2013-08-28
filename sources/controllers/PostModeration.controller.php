@@ -443,8 +443,7 @@ class PostModeration_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" checked="checked" />',
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
+						'style' => 'width: 4%;text-align: center',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -476,7 +475,7 @@ class PostModeration_Controller extends Action_Controller
 							<option value="approve">&nbsp;--&nbsp;' . $txt['approve'] . '</option>
 							<option value="delete">&nbsp;--&nbsp;' . $txt['delete'] . '</option>
 						</select>
-						<noscript><input type="submit" name="ml_go" value="' . $txt['go'] . '" class="button_submit" /></noscript>',
+						<noscript><input type="submit" name="ml_go" value="' . $txt['go'] . '" class="right_submit" /></noscript>',
 					'class' => 'floatright',
 				),
 			),
@@ -496,8 +495,8 @@ class PostModeration_Controller extends Action_Controller
 	}
 
 	/**
- 	 * Approve a post, just the one.
- 	 */
+	 * Approve a post, just the one.
+	 */
 	public function action_approve()
 	{
 		global $user_info, $topic, $board;

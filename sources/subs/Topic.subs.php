@@ -303,20 +303,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 	// Reuse the message array if available
 	if (empty($messages))
-	{
-		$messages = array();
-		$request = $db->query('', '
-			SELECT id_msg
-			FROM {db_prefix}messages
-			WHERE id_topic IN ({array_int:topics})',
-			array(
-				'topics' => $topics,
-			)
-		);
-		while ($row = $db->fetch_row($request))
-			$messages[] = $row[0];
-		$db->free_result($request);
-	}
+		$messages = messagesInTopics($topics);
 
 	// Remove all likes now that the topic is gone
 	$db->query('', '
@@ -385,7 +372,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	removeFollowUpsByTopic($topics);
 
 	// Maybe there's an add-on that wants to delete topic related data of its own
- 	call_integration_hook('integrate_remove_topics', array($topics));
+	call_integration_hook('integrate_remove_topics', array($topics));
 
 	// Update the totals...
 	updateStats('message');
@@ -1119,9 +1106,9 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			'board' => (int) $board,
 		);
 
-	$messages_table = !empty($full) && ($full === 'message' || $full === 'all');
-	$follow_ups_table = !empty($full) && ($full === 'follow_up' || $full === 'all');
-	$logs_table = !empty($full) && $full === 'all';
+	$messages_table = $full === 'message' || $full === 'all';
+	$follow_ups_table = $full === 'follow_up' || $full === 'all';
+	$logs_table = $full === 'all';
 
 	// Create the query, taking full and integration in to account
 	$request = $db->query('', '
@@ -1158,7 +1145,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 
 /**
  * So long as you are sure... all old posts will be gone.
- * Used in ManageMaintenance.php to prune old topics.
+ * Used in Maintenance.controller.php to prune old topics.
  */
 function removeOldTopics()
 {
@@ -2487,4 +2474,115 @@ function postersCount($id_topic)
 	$db->free_result($request);
 
 	return $posters;
+}
+
+/**
+ * Counts topics from the given id_board.
+ *
+ * @param int $board
+ * @param bool $approved
+ * @return int
+ */
+function countTopicsByBoard($board, $approved = false)
+{
+	$db = database();
+
+	// How many topics are on this board?  (used for paging.)
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}topics AS t
+		WHERE t.id_board = {int:id_board}' . (empty($approved) ? '
+			AND t.approved = {int:is_approved}' : ''),
+		array(
+			'id_board' => $board,
+			'is_approved' => 1,
+		)
+	);
+	list ($topics) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $topics;
+}
+
+/**
+ * Determines topics which can be merged from a specific board.
+ *
+ * @param int $id_board
+ * @param int $id_topic
+ * @param bool $approved
+ * @param int $offset
+ * @return array
+ */
+function mergeableTopics($id_board, $id_topic, $approved, $offset)
+{
+	global $modSettings, $scripturl;
+
+	$db = database();
+
+	// Get some topics to merge it with.
+	$request = $db->query('', '
+		SELECT t.id_topic, m.subject, m.id_member, IFNULL(mem.real_name, m.poster_name) AS poster_name
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		WHERE t.id_board = {int:id_board}
+			AND t.id_topic != {int:id_topic}' . (empty($approved) ? '
+			AND t.approved = {int:is_approved}' : '') . '
+		ORDER BY {raw:sort}
+		LIMIT {int:offset}, {int:limit}',
+		array(
+			'id_board' => $id_board,
+			'id_topic' => $id_topic,
+			'sort' => (!empty($modSettings['enableStickyTopics']) ? 't.is_sticky DESC, ' : '') . 't.id_last_msg DESC',
+			'offset' => $offset,
+			'limit' => $modSettings['defaultMaxTopics'],
+			'is_approved' => 1,
+		)
+	);
+	$topics = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		censorText($row['subject']);
+
+		$topics[] = array(
+			'id' => $row['id_topic'],
+			'poster' => array(
+				'id' => $row['id_member'],
+				'name' => $row['poster_name'],
+				'href' => empty($row['id_member']) ? '' : $scripturl . '?action=profile;u=' . $row['id_member'],
+				'link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '" target="_blank" class="new_win">' . $row['poster_name'] . '</a>'
+			),
+			'subject' => $row['subject'],
+			'js_subject' => addcslashes(addslashes($row['subject']), '/')
+		);
+	}
+	$db->free_result($request);
+
+	return $topics;
+}
+
+/**
+ * Determines all messages from a given array of topics.
+ *
+ * @param array int $topics
+ * @return array
+ */
+function messagesInTopics($topics)
+{
+	$db = database();
+
+	// Obtain all the message ids we are going to affect.
+	$messages = array();
+	$request = $db->query('', '
+		SELECT id_msg
+		FROM {db_prefix}messages
+		WHERE id_topic IN ({array_int:topic_list})',
+		array(
+			'topic_list' => $topics,
+	));
+	while ($row = $db->fetch_row($request))
+		$messages[] = $row['id_msg'];
+	$db->free_result($request);
+
+	return $messages;
 }

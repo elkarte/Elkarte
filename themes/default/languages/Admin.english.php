@@ -143,7 +143,7 @@ $txt['security_wrong'] = 'Administration login attempt!' . "\n" . 'Referer: %1$s
 $txt['email_preview_warning'] = 'The preview is not 100% accurate. In order to preserve the functionality of the page only the basic html tags are represented';
 $txt['email_as_html'] = 'Send in HTML format.  (with this you can put normal HTML in the email.)';
 $txt['email_parsed_html'] = 'Add &lt;br /&gt;s and &amp;nbsp;s to this message.';
-$txt['email_variables'] = 'In this message you can use a few &quot;variables&quot;.  Click <a href="' . $scripturl . '?action=quickhelp;help=emailmembers" onclick="return reqOverlayDiv(this.href);" class="help">here</a> for more information.';
+$txt['email_variables'] = 'In this message you can use a few &quot;variables&quot;.<a href="' . $scripturl . '?action=quickhelp;help=emailmembers" onclick="return reqOverlayDiv(this.href);" class="help"> Click here for more information</a>.';
 $txt['email_force'] = 'Send this to members even if they have chosen not to receive announcements.';
 $txt['email_as_pms'] = 'Send this to these groups using personal messages.';
 $txt['email_continue'] = 'Continue';
@@ -261,6 +261,7 @@ $txt['errlog_desc'] = 'The error log tracks every error encountered by your foru
 $txt['errlog_no_entries'] = 'There are currently no error log entries.';
 
 $txt['theme_settings'] = 'Theme Settings';
+$txt['theme_edit_settings'] = 'Edit this theme\'s settings';
 $txt['theme_current_settings'] = 'Current Theme';
 
 $txt['dvc_your'] = 'Your Version';
@@ -715,9 +716,11 @@ $txt['permissions_post_moderation'] = 'Post Moderation';
 
 $txt['browse_packages'] = 'Browse Packages';
 $txt['download_packages'] = 'Download Packages';
+$txt['upload_packages'] = 'Upload Package';
 $txt['installed_packages'] = 'Installed Packages';
 $txt['package_file_perms'] = 'File Permissions';
 $txt['package_settings'] = 'Settings';
+$txt['package_servers'] = 'Package Servers';
 $txt['themeadmin_admin_title'] = 'Manage and Install';
 $txt['themeadmin_list_title'] = 'Theme Settings';
 $txt['themeadmin_reset_title'] = 'Member Options';

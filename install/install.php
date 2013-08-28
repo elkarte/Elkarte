@@ -28,15 +28,15 @@ $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
 		'version' => '4.1.0',
-		'version_check' => 'return min(mysql_get_server_info(), mysql_get_client_info());',
-		'supported' => function_exists('mysql_connect'),
-		'default_user' => 'mysql.default_user',
-		'default_password' => 'mysql.default_password',
-		'default_host' => 'mysql.default_host',
-		'default_port' => 'mysql.default_port',
+		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
+		'supported' => function_exists('mysqli_connect'),
+		'default_user' => 'mysqli.default_user',
+		'default_password' => 'mysqli.default_password',
+		'default_host' => 'mysqli.default_host',
+		'default_port' => 'mysqli.default_port',
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysql_get_server_info();',
+		'utf8_version_check' => 'return mysqli_get_server_info($db_connection);',
 		'alter_support' => true,
 		'validate_prefix' => create_function('&$value', '
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
@@ -49,7 +49,6 @@ $databases = array(
 		'function_check' => 'pg_connect',
 		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),
-		'always_has_db' => true,
 		'utf8_support' => true,
 		'utf8_version' => '8.0',
 		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
@@ -105,9 +104,6 @@ foreach ($incontext['steps'] as $num => $step)
 	{
 		// The current weight of this step in terms of overall progress.
 		$incontext['step_weight'] = $step[3];
-
-		// Make sure we reset the skip button.
-		$incontext['skip'] = false;
 
 		// Call the step and if it returns false that means pause!
 		if (function_exists($step[2]) && $step[2]() === false)
@@ -308,7 +304,7 @@ function load_database()
 		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
-			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist), $db_type);
+			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
 	}
 
 	return database();
@@ -644,6 +640,7 @@ function action_databaseSettings()
 
 	// Set up the defaults.
 	$incontext['db']['server'] = 'localhost';
+	$incontext['db']['port'] = '';
 	$incontext['db']['user'] = '';
 	$incontext['db']['name'] = '';
 	$incontext['db']['pass'] = '';
@@ -684,15 +681,12 @@ function action_databaseSettings()
 		$incontext['db']['user'] = $_POST['db_user'];
 		$incontext['db']['name'] = $_POST['db_name'];
 		$incontext['db']['server'] = $_POST['db_server'];
+		$incontext['db']['port'] = !empty($_POST['db_port']) ? $_POST['db_port'] : '';
 		$incontext['db']['prefix'] = $_POST['db_prefix'];
 	}
 	else
 	{
 		$incontext['db']['prefix'] = 'elkarte_';
-
-		// Should we use a non standard port?
-		if (!empty($db_port))
-			$incontext['db']['server'] .= ':' . $db_port;
 	}
 
 	// Are we submitting?
@@ -734,6 +728,7 @@ function action_databaseSettings()
 			'db_user' => $_POST['db_user'],
 			'db_passwd' => isset($_POST['db_passwd']) ? $_POST['db_passwd'] : '',
 			'db_server' => $_POST['db_server'],
+			'db_port' => !empty($_POST['db_port']) ? $_POST['db_port'] : '',
 			'db_prefix' => $db_prefix,
 			// The cookiename is special; we want it to be the same if it ever needs to be reinstalled with the same info.
 			'cookiename' => 'ElkArteCookie' . abs(crc32($_POST['db_name'] . preg_replace('~[^A-Za-z0-9_$]~', '', $_POST['db_prefix'])) % 1000),
@@ -766,8 +761,7 @@ function action_databaseSettings()
 		require_once(SOURCEDIR . '/database/Database.subs.php');
 
 		// Attempt a connection.
-		$needsDB = !empty($databases[$db_type]['always_has_db']);
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 		$db = database();
 
 		// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
@@ -775,7 +769,7 @@ function action_databaseSettings()
 		{
 			$db_error = $db->last_error();
 
-			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => !$needsDB), $db_type);
+			$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 			if ($db_connection != null)
 			{
 				$db_user = $_POST['db_prefix'] . $db_user;
@@ -799,7 +793,7 @@ function action_databaseSettings()
 		}
 
 		// Let's try that database on for size... assuming we haven't already lost the opportunity.
-		if ($db_name != '' && !$needsDB)
+		if ($db_name != '')
 		{
 			$db->query('', "
 				CREATE DATABASE IF NOT EXISTS `$db_name`",
@@ -1033,7 +1027,7 @@ function action_databasePopulation()
 		{
 			// Error 1050: Table already exists!
 			// @todo Needs to be made better!
-			if (($db_type != 'mysql' || mysql_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
+			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*CREATE TABLE ([^\s\n\r]+?)~', $current_statement, $match) == 1)
 			{
 				$exists[] = $match[1];
 				$incontext['sql_results']['table_dups']++;
@@ -1172,10 +1166,6 @@ function action_adminAccount()
 	$incontext['page_title'] = $txt['user_settings'];
 	$incontext['continue'] = 1;
 
-	// Skipping?
-	if (!empty($_POST['skip']))
-		return true;
-
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
 	$db = load_database();
@@ -1190,7 +1180,7 @@ function action_adminAccount()
 
 	$incontext['require_db_confirm'] = empty($db_type);
 
-	// Only allow skipping if we think they already have an account setup.
+	// Only allow create an admin account if they don't have one already.
 	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}members
@@ -1201,8 +1191,9 @@ function action_adminAccount()
 			'admin_group' => 1,
 		)
 	);
+	// Skip the step if an admin already exists
 	if ($db->num_rows($request) != 0)
-		$incontext['skip'] = 1;
+		return true;
 	$db->free_result($request);
 
 	// Trying to create an account?
@@ -1334,7 +1325,7 @@ function action_adminAccount()
  */
 function action_deleteInstall()
 {
-	global $txt, $db_prefix, $db_connection, $HTTP_SESSION_VARS, $cookiename, $incontext;
+	global $txt, $db_prefix, $db_connection, $cookiename, $incontext;
 	global $db_character_set, $mbname, $context, $scripturl, $boardurl;
 	global $current_version, $databases, $forum_version, $modSettings, $user_info, $language, $db_type;
 
@@ -1450,7 +1441,7 @@ function action_deleteInstall()
 	$db->free_result($request);
 
 	// Now is the perfect time to fetch remote files.
-	require_once(SOURCEDIR . '/ScheduledTasks.php');
+	require_once(SUBSDIR . '/ScheduledTask.class.php');
 
 	// Sanity check that they loaded earlier!
 	if (isset($modSettings['recycle_board']))
@@ -1458,7 +1449,8 @@ function action_deleteInstall()
 		// The variable is usually defined in index.php so lets just use our variable to do it for us.
 		$forum_version = $current_version;
 		// Now go get those files!
-		scheduled_fetchFiles();
+		$task = new ScheduledTask();
+		$task->fetchFiles();
 		// We've just installed!
 		$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
 		$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
@@ -2075,7 +2067,7 @@ function template_install_below()
 {
 	global $incontext, $txt;
 
-	if (!empty($incontext['continue']) || !empty($incontext['skip']))
+	if (!empty($incontext['continue']))
 	{
 		echo '
 								<div class="clear">';
@@ -2083,9 +2075,6 @@ function template_install_below()
 		if (!empty($incontext['continue']))
 			echo '
 									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
-		if (!empty($incontext['skip']))
-			echo '
-									<input type="submit" id="skip" name="skip" value="', $txt['upgrade_skip'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
 		echo '
 								</div>';
 	}
@@ -2290,6 +2279,7 @@ function template_database_settings()
 						<option value="', $key, '"', isset($_POST['db_type']) && $_POST['db_type'] == $key ? ' selected="selected"' : '', '>', $db['name'], '</option>';
 
 	echo '
+					</select>
 					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_type_info'], '</div>
 				</td>
 			</tr>';
@@ -2340,7 +2330,7 @@ function template_database_settings()
 			</tr>
 		</table>';
 
-	// Allow the toggling of input boxes for SQLite etc.
+	// Allow the toggling of input boxes for Postgresql
 	echo '
 	<script type="text/javascript"><!-- // --><![CDATA[
 		function validatePgsql()

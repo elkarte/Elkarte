@@ -17,7 +17,7 @@
 /**
  * Template for the message index page.
  */
- 
+
  /**
  * Used to display child boards.
  */
@@ -82,7 +82,7 @@ function template_display_child_boards_above()
 
 		// @todo - Last post message still needs some work. Probably split the language string into three chunks.
 		// Example:
-		// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk> 
+		// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk>
 		// That should still allow sufficient scope for any language, if done sensibly.
 		if (!empty($board['last_post']['id']))
 			echo '
@@ -142,14 +142,14 @@ function template_display_child_boards_above()
  */
 function template_pages_and_buttons_above()
 {
-	global $modSettings, $context, $settings, $txt, $options;
+	global $context, $settings, $txt;
 
 	if ($context['no_topic_listing'])
 		return;
 
 	template_pagesection('normal_buttons', 'right', 'go_down');
 
-	if ((!empty($options['show_board_desc']) && $context['description'] != '') || !empty($context['moderators']))
+	if (!empty($context['description']) || !empty($context['moderators']))
 	{
 		echo '
 		<div id="description_board">
@@ -162,11 +162,11 @@ function template_pages_and_buttons_above()
 			echo '
 			</h2>';
 
-		if (!empty($options['show_board_desc']) && !empty($context['description'])||(!empty($settings['display_who_viewing'])))
+		if (!empty($context['description']) || !empty($settings['display_who_viewing']))
 			echo '
 			<p>';
 
-		if (!empty($options['show_board_desc']) && !empty($context['description']))
+		if (!empty($context['description']))
 			echo '
 			', $context['description'], '&nbsp;';
 
@@ -187,7 +187,7 @@ function template_pages_and_buttons_above()
 			</span>';
 		}
 
-		if (!empty($options['show_board_desc']) && !empty($context['description'])||(!empty($settings['display_who_viewing'])))
+		if (!empty($context['description']) || !empty($settings['display_who_viewing']))
 			echo'
 			</p>';
 
@@ -201,7 +201,7 @@ function template_pages_and_buttons_above()
  */
 function template_main()
 {
-	global $context, $settings, $options, $scripturl, $txt;
+	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
 	if (!$context['no_topic_listing'])
 	{
@@ -220,7 +220,12 @@ function template_main()
 			echo '
 
 				<h3>
-					Sort by: ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'], ' / ', $context['topics_headers']['likes'], '
+					Sort by: ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'];
+
+			if (!empty($modSettings['likes_enabled']))
+				echo ' / ' . $context['topics_headers']['likes'];
+
+			echo '
 				</h3>';
 
 			// Show a "select all" box for quick moderation?
@@ -235,7 +240,7 @@ function template_main()
 		// No topics.... just say, "sorry bub".
 		else
 			echo '
-					<strong>', $txt['msg_alert_none'], '</strong>';
+					<strong>', $txt['topic_alert_none'], '</strong>';
 
 		echo '
 			</li>';
@@ -284,19 +289,25 @@ function template_main()
 
 				echo '
 						<h4>
-							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(empty($settings['message_index_preview_first']) ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
 					</div>
 					<p class="topic_starter">
-						', $txt['started_by'], ' ', $topic['first_post']['member']['link'], '
-						<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">', $topic['pages'], '</span>
+						', $txt['started_by'], ' ', $topic['first_post']['member']['link'], !empty($topic['pages']) ? '
+						<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</span>' : '', '
 					</p>
 				</div>
 				<div class="topic_latest">
 					<p class="topic_stats">
 					', $topic['replies'], ' ', $txt['replies'], '
 					<br />
-					', $topic['views'], ' ', $txt['views'], ' / ',$topic['likes'], ' ', $txt['likes'], '
+					', $topic['views'], ' ', $txt['views'];
+
+				//Show likes?
+				if (!empty($modSettings['likes_enabled']))
+					echo ' / ',$topic['likes'], ' ', $txt['likes'];
+
+				echo '
 					</p>
 					<p class="topic_lastpost">
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
@@ -365,7 +376,7 @@ function template_main()
 				<span id="quick_mod_jump_to">&nbsp;</span>';
 
 			echo '
-				<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit qaction" />
+				<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.quickModForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
 			</li>';
 		}
 

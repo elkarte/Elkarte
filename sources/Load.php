@@ -1384,8 +1384,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$context['user']['name'] = $txt['guest_title'];
 
 	// Set up some additional interface preference context
-	if ($user_info['is_admin'])
-		$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 
 	if (!$user_info['is_guest'])
 		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
@@ -1426,6 +1425,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	detectBrowser();
+
+	if (allowedTo('admin_forum') && !$user_info['is_guest'])
+		doSecurityChecks();
 
 	// Set the top level linktree up.
 	array_unshift($context['linktree'], array(
@@ -1483,7 +1485,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$layers = explode(',', $settings['theme_layers']);
 		else
 			$layers = array('html', 'body');
-		$template_layers = Template_Layers::getInstance();
+		$template_layers = Template_Layers::getInstance(true);
 		foreach ($layers as $layer)
 			$template_layers->addBegin($layer);
 	}
@@ -1557,17 +1559,17 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Default JS variables for use in every theme
 	$context['javascript_vars'] = array(
-		'smf_theme_url' => '"' . $settings['theme_url'] . '"',
-		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'smf_images_url' => '"' . $settings['images_url'] . '"',
-		'smf_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
-		'smf_scripturl' => '"' . $scripturl . '"',
-		'smf_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
-		'smf_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
-		'smf_charset' => '"UTF-8"',
-		'smf_session_id' => '"' . $context['session_id'] . '"',
-		'smf_session_var' => '"' . $context['session_var'] . '"',
-		'smf_member_id' => $context['user']['id'],
+		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
+		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
+		'elk_images_url' => '"' . $settings['images_url'] . '"',
+		'elk_smiley_url' => '"' . $modSettings['smileys_url'] . '"',
+		'elk_scripturl' => '"' . $scripturl . '"',
+		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
+		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
+		'elk_charset' => '"UTF-8"',
+		'elk_session_id' => '"' . $context['session_id'] . '"',
+		'elk_session_var' => '"' . $context['session_var'] . '"',
+		'elk_member_id' => $context['user']['id'],
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
@@ -1583,13 +1585,14 @@ function loadTheme($id_theme = 0, $initialize = true)
 		if (isBrowser('possibly_robot'))
 		{
 			// @todo Maybe move this somewhere better?!
-			require_once(SOURCEDIR . '/ScheduledTasks.php');
+			require_once(CONTROLLERDIR . '/ScheduledTasks.controller.php');
+			$controller = new ScheduledTasks_Controller();
 
 			// What to do, what to do?!
 			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
-				AutoTask();
+				$controller->action_autotask();
 			else
-				ReduceMailQueue();
+				$controller->action_reducemailqueue();
 		}
 		else
 		{
@@ -1597,12 +1600,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
 
 			addInlineJavascript('
-		function smfAutoTask()
+		function elkAutoTask()
 		{
 			var tempImage = new Image();
-			tempImage.src = smf_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
+			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
 		}
-		window.setTimeout("smfAutoTask();", 1);');
+		window.setTimeout("elkAutoTask();", 1);');
 		}
 	}
 
@@ -2481,7 +2484,7 @@ function template_include($filename, $once = false)
  */
 function loadDatabase()
 {
-	global $db_persist, $db_connection, $db_server, $db_user, $db_passwd;
+	global $db_persist, $db_server, $db_user, $db_passwd, $db_port;
 	global $db_type, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix;
 
 	// Database stuffs
@@ -2493,14 +2496,14 @@ function loadDatabase()
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
 	if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
-		$db_connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true), $db_type);
+		$connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 
 	// Either we aren't in SSI mode, or it failed.
-	if (empty($db_connection))
-		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELK == 'SSI'), $db_type);
+	if (empty($connection))
+		$connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELK == 'SSI', 'port' => $db_port), $db_type);
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
-	if (!$db_connection)
+	if (!$connection)
 		display_db_error();
 
 	// If in SSI mode fix up the prefix.
@@ -2612,4 +2615,34 @@ function detectServer()
 
 	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
 	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
+}
+
+function doSecurityChecks()
+{
+	global $modSettings, $context;
+
+	// @todo add a hook here
+	$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+	foreach ($securityFiles as $i => $securityFile)
+	{
+		if (file_exists(BOARDDIR . '/' . $securityFile))
+			$context['security_controls']['files']['to_remove'][] = $securityFile;
+	}
+
+	// We are already checking so many files...just few more doesn't make any difference! :P
+	require_once(SUBSDIR . '/Attachments.subs.php');
+	$path = getAttachmentPath();
+	secureDirectory($path, true);
+	secureDirectory(CACHEDIR);
+
+	// If agreement is enabled, at least the english version shall exists
+	if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
+		$context['security_controls']['files']['agreement'] = true;
+
+	if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
+		$context['security_controls']['files']['cache'] = true;
+
+	if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
+		$context['security_controls']['admin_session'] = true;
+
 }

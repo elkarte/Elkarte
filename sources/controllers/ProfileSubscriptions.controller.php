@@ -48,7 +48,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 		$memID = currentMemberID();
 
 		// Load all of the subscriptions.
-		require_once(SUBSDIR . '/ManagePaid.subs.php');
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		loadSubscriptions();
 		$context['member']['id'] = $memID;
 

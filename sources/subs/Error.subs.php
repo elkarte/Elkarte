@@ -14,7 +14,7 @@ if (!defined('ELK'))
 /**
  * Delete all or some of the errors in the error log.
  * It applies any necessary filters to deletion.
- * This should only be called by ManageErrors::action_log().
+ * This should only be called by ManageErrors.controller::action_log().
  * It attempts to TRUNCATE the table to reset the auto_increment.
  * Redirects back to the error log when done.
  */
@@ -141,8 +141,8 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 				$log['errors'][$row['id_error']]['file'] = array(
 				'file' => $row['file'],
 				'line' => $row['line'],
-				'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;file=' . base64_encode($row['file']) . ';line=' . $row['line'],
-				'link' => $linkfile ? '<a href="' . $scripturl . '?action=admin;area=logs;sa=errorlog;file=' . base64_encode($row['file']) . ';line=' . $row['line'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>' : $row['file'],
+				'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'],
+				'link' => $linkfile ? '<a href="' . $scripturl . '?action=admin;area=logs;sa=errorlog;activity=file;file=' . base64_encode($row['file']) . ';line=' . $row['line'] . '" onclick="return reqWin(this.href, 600, 480, false);">' . $row['file'] . '</a>' : $row['file'],
 				'search' => base64_encode($row['file']),
 			);
 		}

@@ -126,39 +126,10 @@ if ($db->num_rows($request) === 0)
 $subscription_info += $db->fetch_assoc($request);
 $db->free_result($request);
 
-// Is this a refund etc?
+// Is this a refund?
 if ($gatewayClass->isRefund())
 {
-	// If the end time subtracted by current time, is not greater
-	// than the duration (ie length of subscription), then we close it.
-	if ($subscription_info['end_time'] - time() < $subscription_info['length'])
-	{
-		// Delete user subscription.
-		removeSubscription($subscription_id, $member_id);
-		$subscription_act = time();
-		$status = 0;
-	}
-	else
-	{
-		loadSubscriptions();
-		$subscription_act = $subscription_info['end_time'] - $context['subscriptions'][$subscription_id]['num_length'];
-		$status = 1;
-	}
-
-	// Mark it as complete so we have a record.
-	$db->query('', '
-		UPDATE {db_prefix}log_subscribed
-		SET end_time = {int:current_time}
-		WHERE id_subscribe = {int:current_subscription}
-			AND id_member = {int:current_member}
-			AND status = {int:status}',
-		array(
-			'current_time' => $subscription_act,
-			'current_subscription' => $subscription_id,
-			'current_member' => $member_id,
-			'status' => $status,
-		)
-	);
+	handleRefund($subscription_info, $member_id, $context['subscriptions'][$subscription_id]['num_length']);
 
 	// Receipt?
 	if (!empty($modSettings['paid_email']) && $modSettings['paid_email'] == 2)
@@ -201,16 +172,7 @@ elseif ($gatewayClass->isPayment() || $gatewayClass->isSubscription())
 
 		$subscription_info['pending_details'] = empty($real_details) ? '' : serialize($real_details);
 
-		$db->query('', '
-			UPDATE {db_prefix}log_subscribed
-			SET payments_pending = {int:payments_pending}, pending_details = {string:pending_details}
-			WHERE id_sublog = {int:current_subscription_item}',
-			array(
-				'payments_pending' => $subscription_info['payments_pending'],
-				'current_subscription_item' => $subscription_info['id_sublog'],
-				'pending_details' => $subscription_info['pending_details'],
-			)
-		);
+		updateNonrecurrent($subscription_info);
 	}
 
 	// Is this flexible?

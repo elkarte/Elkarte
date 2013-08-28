@@ -28,7 +28,7 @@ function template_main()
 	// If this message has been edited in the past - display when it was.
 	if (isset($context['last_modified']))
 		echo '
-					<div class="padding smalltext">
+					<div class="smalltext">
 						', $context['last_modified_text'], '
 					</div>';
 
@@ -152,10 +152,8 @@ function template_load_drafts_below()
 {
 	global $context, $settings, $txt, $options;
 
-	// If the admin enabled the drafts feature, show a draft selection box
-	if (!empty($options['drafts_show_saved_enabled']))
-	{
-		echo '
+	// Show a draft selection box
+	echo '
 					<h4 id="postDraftOptionsHeader" class="titlebg">
 						<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
 					</h4>
@@ -168,18 +166,18 @@ function template_load_drafts_below()
 								<strong>', $txt['draft_saved_on'], '</strong>
 							</dd>';
 
-		foreach ($context['drafts'] as $draft)
-			echo '
+	foreach ($context['drafts'] as $draft)
+		echo '
 							<dt>', $draft['link'], '</dt>
 							<dd>', $draft['poster_time'], '</dd>';
-		echo '
+	echo '
 						</dl>
 					</div>';
 
-		// Code for showing and hiding drafts
-		echo '
+	// Code for showing and hiding drafts
+	echo '
 		<script><!-- // --><![CDATA[
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -188,9 +186,9 @@ function template_load_drafts_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -204,13 +202,12 @@ function template_load_drafts_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});
 		// ]]></script>';
-	}
 }
 
 function template_topic_replies_below()
@@ -222,7 +219,7 @@ function template_topic_replies_below()
 	{
 		echo '
 		<div id="topic_summary" class="forumposts">
-			<h3 class="catbg">', $txt['topic_summary'], '</h3>
+			<h3 class="category_header">', $txt['topic_summary'], '</h3>
 			<span id="new_replies"></span>';
 
 		$ignored_posts = array();
@@ -234,7 +231,7 @@ function template_topic_replies_below()
 
 			echo '
 			<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', '">
-				<div class="postarea" id="msg', $post['id'], '">
+				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">
 							<span>', $txt['posted_by'], '</span>&nbsp;', $post['poster'], '&nbsp;-&nbsp;', $post['time'], '
@@ -275,7 +272,7 @@ function template_topic_replies_below()
 		foreach ($ignored_posts as $post_id)
 		{
 			echo '
-			aIgnoreToggles[', $post_id, '] = new smc_Toggle({
+			aIgnoreToggles[', $post_id, '] = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [
@@ -447,8 +444,7 @@ function template_postarea_below()
 
 	// Finally, the submit buttons.
 	echo '
-						<br class="clear_right" />
-						<span id="post_confirm_buttons">
+						<div id="post_confirm_buttons" class="submitbutton">
 							', template_control_richedit_buttons($context['post_box_name']);
 
 	// Option to delete an event if user is editing one.
@@ -457,11 +453,10 @@ function template_postarea_below()
 							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
 
 	echo '
-						</span>
+						</div>
 					</div>
 				</div>
-			</div>
-			<br class="clear" />';
+			</div>';
 
 	// Assuming this isn't a new topic pass across the last message id.
 	if (isset($context['topic_last_message']))
@@ -502,7 +497,7 @@ function template_postarea_below()
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsable']))
 		echo '
-			var oSwapAdditionalOptions = new smc_Toggle({
+			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['post']) ? 'false' : 'true', ',
 				funcOnBeforeCollapse: function () {
@@ -517,9 +512,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postMoreExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -533,8 +528,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=post\'
 				},
 			});';
@@ -542,7 +537,7 @@ function template_postarea_below()
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new smc_Toggle({
+			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
 				aSwappableContainers: [
@@ -551,9 +546,9 @@ function template_postarea_below()
 				aSwapImages: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: smf_images_url + \'/collapse.png\',
+						srcExpanded: elk_images_url + \'/collapse.png\',
 						altExpanded: \'-\',
-						srcCollapsed: smf_images_url + \'/expand.png\',
+						srcCollapsed: elk_images_url + \'/expand.png\',
 						altCollapsed: \'+\'
 					}
 				],
@@ -567,8 +562,8 @@ function template_postarea_below()
 				oThemeOptions: {
 					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
 					sOptionName: \'minmax_preferences\',
-					sSessionId: smf_session_id,
-					sSessionVar: smf_session_var,
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});';
@@ -735,7 +730,7 @@ function template_spellcheck()
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
 			<div id="spellview">&nbsp;</div>
-			<table class="table_padding" style="width:100%">
+			<table class="table_grid">
 				<tr class="windowbg">
 					<td style="width:50%;vertical-align:top">
 						', $txt['spellcheck_change_to'], '<br />
@@ -748,7 +743,7 @@ function template_spellcheck()
 					</td>
 				</tr>
 			</table>
-			<div class="righttext" style="padding: 4px;">
+			<div class="submitbutton">
 				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" class="button_submit" />
 				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" class="button_submit" />
 				<input type="button" name="ignore" value="', $txt['spellcheck_ignore'], '" onclick="nextWord(false);" class="button_submit" />
@@ -790,13 +785,13 @@ function template_quotefast()
 
 			if (\'DOMParser\' in window && !(\'opera\' in window))
 			{
-				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_") + "</temp>", "text/xml");
-				quote = xmldoc.childNodes[0].textContent.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_") + "</temp>", "text/xml");
+				quote = xmldoc.childNodes[0].textContent.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 			else if (\'innerText\' in stage)
 			{
-				setInnerHTML(stage, quote.replace(/\n/g, "_SMF-BREAK_").replace(/\t/g, "_SMF-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-				quote = stage.innerText.replace(/_SMF-BREAK_/g, "\n").replace(/_SMF-TAB_/g, "\t");
+				setInnerHTML(stage, quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 
 			if (\'opera\' in window)

@@ -94,7 +94,7 @@ function template_ban_edit()
 		echo '
 				<fieldset>
 					<legend>
-						', $txt['ban_triggers'], '
+						<input type="checkbox" onclick="invertAll(this, this.form, \'ban_suggestion\');" class="input_check"> ', $txt['ban_triggers'], '
 					</legend>
 					<dl class="settings">
 						<dt>
@@ -163,12 +163,14 @@ function template_ban_edit()
 	}
 
 	echo '
-				<input type="submit" name="', $context['ban']['is_new'] ? 'add_ban' : 'modify_ban', '" value="', $context['ban']['is_new'] ? $txt['ban_add'] : $txt['ban_modify'], '" class="button_submit" />
-				<input type="hidden" name="old_expire" value="', $context['ban']['expiration']['days'], '" />
-				<input type="hidden" name="bg" value="', $context['ban']['id'], '" />', isset($context['ban']['from_user']) ? '
-				<input type="hidden" name="u" value="' . $context['ban_suggestions']['member']['id'] . '" />' : '', '
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['admin-bet_token_var'], '" value="', $context['admin-bet_token'], '" />
+				<div class="submitbutton">
+					<input type="submit" name="', $context['ban']['is_new'] ? 'add_ban' : 'modify_ban', '" value="', $context['ban']['is_new'] ? $txt['ban_add'] : $txt['ban_modify'], '" class="button_submit" />
+					<input type="hidden" name="old_expire" value="', $context['ban']['expiration']['days'], '" />
+					<input type="hidden" name="bg" value="', $context['ban']['id'], '" />', isset($context['ban']['from_user']) ? '
+					<input type="hidden" name="u" value="' . $context['ban_suggestions']['member']['id'] . '" />' : '', '
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-bet_token_var'], '" value="', $context['admin-bet_token'], '" />
+				</div>
 			</div>
 		</form>';
 
@@ -196,8 +198,8 @@ function template_ban_edit()
 		echo '
 			var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'user\',
 			sControlId: \'user\',
 			sSearchType: \'member\',
@@ -248,7 +250,7 @@ function template_ban_edit_trigger()
 				<div class="content">
 					<fieldset>
 						<legend>
-							', $txt['ban_triggers'], '
+							<input type="checkbox" onclick="invertAll(this, this.form, \'ban_suggestion\');" class="input_check"> ', $txt['ban_triggers'], '
 						</legend>
 						<dl class="settings">
 							<dt>
@@ -286,7 +288,9 @@ function template_ban_edit_trigger()
 							</dd>
 						</dl>
 					</fieldset>
-					<input type="submit" name="', $context['ban_trigger']['is_new'] ? 'add_new_trigger' : 'edit_trigger', '" value="', $context['ban_trigger']['is_new'] ? $txt['ban_add_trigger_submit'] : $txt['ban_edit_trigger_submit'], '" class="button_submit" />
+					<div class="submitbutton">
+						<input type="submit" name="', $context['ban_trigger']['is_new'] ? 'add_new_trigger' : 'edit_trigger', '" value="', $context['ban_trigger']['is_new'] ? $txt['ban_add_trigger_submit'] : $txt['ban_edit_trigger_submit'], '" class="button_submit" />
+					</div>
 				</div>
 			</div>
 			<input type="hidden" name="bi" value="' . $context['ban_trigger']['id'] . '" />
@@ -300,8 +304,8 @@ function template_ban_edit_trigger()
 	<script><!-- // --><![CDATA[
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
-			sSessionId: smf_session_id,
-			sSessionVar: smf_session_var,
+			sSessionId: elk_session_id,
+			sSessionVar: elk_session_var,
 			sSuggestId: \'username\',
 			sControlId: \'user\',
 			sSearchType: \'member\',

@@ -99,7 +99,7 @@ function template_trackIP()
 						<input type="text" name="searchip" value="', $context['ip'], '" class="input_text" />
 					</dd>
 				</dl>
-				<input type="submit" value="', $txt['trackIP'], '" class="button_submit" />
+				<input type="submit" value="', $txt['trackIP'], '" class="right_submit" />
 			</form>
 		</div>
 	</div>
@@ -113,13 +113,11 @@ function template_trackIP()
 			<div class="title_bar">
 				<h3 class="titlebg">', $txt['whois_title'], ' ', $context['ip'], '</h3>
 			</div>
-			<div class="windowbg2">
-				<div class="padding">';
+			<div class="windowbg2">';
 			foreach ($context['whois_servers'] as $server)
 				echo '
 					<a href="', $server['url'], '" target="_blank" class="new_win"', isset($context['auto_whois_server']) && $context['auto_whois_server']['name'] == $server['name'] ? ' style="font-weight: bold;"' : '', '>', $server['name'], '</a><br />';
 			echo '
-				</div>
 			</div>';
 	}
 
@@ -136,9 +134,9 @@ function template_trackIP()
 		echo '
 		<table class="table_grid">
 			<thead>
-				<tr class="catbg">
-					<th class="first_th" scope="col">', $txt['ip_address'], '</th>
-					<th class="last_th" scope="col">', $txt['display_name'], '</th>
+				<tr class="table_head">
+					<th scope="col">', $txt['ip_address'], '</th>
+					<th scope="col">', $txt['display_name'], '</th>
 				</tr>
 			</thead>
 			<tbody>';

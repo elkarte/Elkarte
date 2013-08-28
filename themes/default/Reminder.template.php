@@ -34,12 +34,11 @@ function template_main()
 					<dt>', $txt['user_email'], ':</dt>
 					<dd><input type="text" name="user" size="30" class="input_text" /></dd>
 				</dl>
-				<input type="submit" value="', $txt['reminder_continue'], '" class="button_submit" />
-				<br class="clear" />
+				<input type="submit" value="', $txt['reminder_continue'], '" class="right_submit" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="', $context['remind_token_var'], '" value="', $context['remind_token'], '" />
 			</div>
 		</div>
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-		<input type="hidden" name="', $context['remind_token_var'], '" value="', $context['remind_token'], '" />
 	</form>';
 }
 
@@ -67,7 +66,7 @@ function template_reminder_pick()
 					<input type="radio" name="reminder_type" id="reminder_type_secret" value="secret" class="input_radio" />
 					<label for="reminder_type_secret">', $txt['authentication_' . $context['account_type'] . '_secret'], '</label>
 				</p>
-				<div class="flow_auto">
+				<div class="submitbutton">
 					<input type="submit" value="', $txt['reminder_continue'], '" class="button_submit" />
 					<input type="hidden" name="uid" value="', $context['current_member']['id'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -114,20 +113,22 @@ function template_set_password()
 				<dl>
 					<dt>', $txt['choose_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd1" id="smf_autov_pwmain" size="22" class="input_password" />
-						<span id="smf_autov_pwmain_div" style="display: none;">
-							<img id="smf_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
+						<span id="elk_autov_pwmain_div" style="display: none;">
+							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
 					<dt>', $txt['verify_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd2" id="smf_autov_pwverify" size="22" class="input_password" />
-						<span id="smf_autov_pwverify_div" style="display: none;">
-							<img id="smf_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
+						<span id="elk_autov_pwverify_div" style="display: none;">
+							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
 				</dl>
-				<p class="align_center"><input type="submit" value="', $txt['save'], '" class="button_submit" /></p>
+				<div class="centertext">
+					<input type="submit" value="', $txt['save'], '" class="button_submit" />
+				</div>
 			</div>
 		</div>
 		<input type="hidden" name="code" value="', $context['code'], '" />
@@ -143,7 +144,7 @@ function template_set_password()
 		"password_no_match": "', $txt['registration_password_no_match'], '",
 		"password_valid": "', $txt['registration_password_valid'], '"
 	};
-	var verificationHandle = new smfRegister("reminder_form", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+	var verificationHandle = new elkRegister("reminder_form", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 // ]]></script>';
 }
 
@@ -174,22 +175,22 @@ function template_ask()
 		echo '
 					<dt>', $txt['choose_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd1" id="smf_autov_pwmain" size="22" class="input_password" />
-						<span id="smf_autov_pwmain_div" style="display: none;">
-							<img id="smf_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
+						<span id="elk_autov_pwmain_div" style="display: none;">
+							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
 					<dt>', $txt['verify_pass'], ': </dt>
 					<dd>
-						<input type="password" name="passwrd2" id="smf_autov_pwverify" size="22" class="input_password" />
-						<span id="smf_autov_pwverify_div" style="display: none;">
-							<img id="smf_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
+						<span id="elk_autov_pwverify_div" style="display: none;">
+							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 						</span>
 					</dd>';
 
 	echo '
 				</dl>
-				<div class="auto_flow">
+				<div class="submitbutton">
 					<input type="submit" value="', $txt['save'], '" class="button_submit" />
 					<input type="hidden" name="uid" value="', $context['remind_user'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -209,7 +210,7 @@ function template_ask()
 		"password_no_match": "', $txt['registration_password_no_match'], '",
 		"password_valid": "', $txt['registration_password_valid'], '"
 	};
-	var verificationHandle = new smfRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 // ]]></script>';
 
 }

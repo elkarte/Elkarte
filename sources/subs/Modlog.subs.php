@@ -314,6 +314,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 	}
 
 	// Do some formatting of the action string.
+	$callback = pregReplaceCurry('list_getModLogEntriesCallback', 3);
 	foreach ($entries as $k => $entry)
 	{
 		// Make any message info links so its easier to go find that message.
@@ -327,11 +328,25 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 
 		if (empty($entries[$k]['action_text']))
 			$entries[$k]['action_text'] = isset($txt['modlog_ac_' . $entry['action']]) ? $txt['modlog_ac_' . $entry['action']] : $entry['action'];
-		$entries[$k]['action_text'] = preg_replace('~\{([A-Za-z\d_]+)\}~ie', 'isset($entries[$k][\'extra\'][\'$1\']) ? $entries[$k][\'extra\'][\'$1\'] : \'\'', $entries[$k]['action_text']);
+		$entries[$k]['action_text'] = preg_replace_callback('~\{([A-Za-z\d_]+)\}~i', $callback($entries, $k), $entries[$k]['action_text']);
 	}
 
 	// Back we go!
 	return $entries;
+}
+
+/**
+ * Mod Log Replacment Callback.
+ *
+ * Our callback that does the actual replacment.
+ *
+ * @param string $entries
+ * @param string $key
+ * @param string $matches
+ */
+function list_getModLogEntriesCallback($entries, $key, $matches)
+{
+    return isset($entries[$key]['extra'][$matches[1]]) ? $entries[$key]['extra'][$matches[1]] : '';
 }
 
 /**
@@ -348,7 +363,7 @@ function deleteLogAction($id_log, $time, $delete = null)
 	$db->query('', '
 		DELETE FROM {db_prefix}log_actions
 		WHERE id_log = {int:moderate_log}
-			' . isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '' . '
+			' . (isset($delete) ? 'AND id_action IN ({array_string:delete_actions})' : '') . '
 			AND log_time < {int:twenty_four_hours_wait}',
 		array(
 			'twenty_four_hours_wait' => time() - $time * 3600,

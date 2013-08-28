@@ -22,7 +22,7 @@ function template_main()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<div id="move_topic" class="lower_padding">
+	<div id="move_topic">
 		<form action="', $scripturl, '?action=movetopic2;current_board=' . $context['current_board'] . ';topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<div class="cat_bar">
 				<h3 class="catbg">', $txt['move_topic'], '</h3>
@@ -78,7 +78,7 @@ function template_main()
 								</dd>
 							</dl>
 						</fieldset>
-						<input type="submit" value="', $txt['move_topic'], '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />
+						<input type="submit" value="', $txt['move_topic'], '" onclick="return submitThisOnce(this);" accesskey="s" class="right_submit" />
 					</div>
 				</div>
 			</div>';

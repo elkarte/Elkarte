@@ -2166,8 +2166,8 @@ INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_r
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (8, 0, 0, 1, 'd', 1, 'birthdayemails');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (9, 0, 0, 1, 'w', 0, 'weekly_maintenance');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (10, 0, 120, 1, 'd', 1, 'paid_subscriptions');
-INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (11, 0, 120, 1, 'd', 1, 'remove_temp_attachments');
-INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (12, 0, 180, 1, 'd', 1, 'remove_topic_redirect');
+INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (11, 0, 120, 1, 'd', 0, 'remove_temp_attachments');
+INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (12, 0, 180, 1, 'd', 0, 'remove_topic_redirect');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (13, 0, 240, 1, 'd', 0, 'remove_old_drafts');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (14, 0, 0, 6, 'h', 0, 'remove_old_followups');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (15, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
@@ -2269,6 +2269,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('registration_method'
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('send_validation_onChange', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('send_welcomeEmail', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_editDisplayName', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('admin_session_lifetime', '10');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_hideOnline', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('guest_hideContacts', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('spamWaitTime', '5');
@@ -2557,7 +2558,6 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'linktree_
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_profile_buttons', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_mark_read', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_stats_index', '1');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_board_desc', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'newsfader_time', '5000');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'allow_no_censored', '0');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'additional_options_collapsable', '1');
@@ -2565,7 +2565,6 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'use_image
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'enable_news', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'forum_width', '90%');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '2');
-INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'posts_apply_ignore_list', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 

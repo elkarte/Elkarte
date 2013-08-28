@@ -483,9 +483,12 @@ class ProfileOptions_Controller extends Action_Controller
 			elseif ($_POST['authenticate'] == 'openid' && !empty($_POST['openid_identifier']))
 			{
 				require_once(SUBSDIR . '/OpenID.subs.php');
-				$_POST['openid_identifier'] = openID_canonize($_POST['openid_identifier']);
+				require_once(SUBSDIR . '/Members.subs.php');
 
-				if (openid_member_exists($_POST['openid_identifier']))
+				$openID = new OpenID();
+				$_POST['openid_identifier'] = $openID->canonize($_POST['openid_identifier']);
+
+				if (memberExists($_POST['openid_identifier']))
 					$post_errors[] = 'openid_in_use';
 				elseif (empty($post_errors))
 				{
@@ -494,7 +497,7 @@ class ProfileOptions_Controller extends Action_Controller
 					{
 						$_SESSION['new_openid_uri'] = $_POST['openid_identifier'];
 
-						openID_validate($_POST['openid_identifier'], false, null, 'change_uri');
+						$openID->validate($_POST['openid_identifier'], false, null, 'change_uri');
 					}
 					else
 						updateMemberData($memID, array('openid_uri' => $_POST['openid_identifier']));
@@ -565,8 +568,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
+						'style' => 'width: 4%;text-align: center',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -594,7 +596,7 @@ class ProfileOptions_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="right_submit" />',
 				),
 				array(
 					'position' => 'after_title',
@@ -688,8 +690,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;',
-						'class' => 'centertext',
+						'style' => 'width: 4%;text-align: center',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -716,7 +717,7 @@ class ProfileOptions_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" class="right_submit" />',
 					'align' => 'right',
 				),
 			),
@@ -820,6 +821,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$memID = currentMemberID();
 
 		loadTemplate('ProfileOptions');
+		$context['sub_template'] = 'groupMembership';
 
 		$curMember = $user_profile[$memID];
 		$context['primary_group'] = $curMember['id_group'];

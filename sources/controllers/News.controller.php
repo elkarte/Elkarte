@@ -341,56 +341,47 @@ class News_Controller extends Action_Controller
 	{
 		global $scripturl;
 
-		$db = database();
-
 		if (!allowedTo('view_mlist'))
 			return array();
 
 		// Find the most recent members.
-		$request = $db->query('', '
-			SELECT id_member, member_name, real_name, date_registered, last_login
-			FROM {db_prefix}members
-			ORDER BY id_member DESC
-			LIMIT {int:limit}',
-			array(
-				'limit' => $_GET['limit'],
-			)
-		);
+		require_once(SUBSDIR . '/Members.subs.php');
+		$members = recentMembers((int)$_GET['limit']);
+
 		$data = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($members as $member)
 		{
 			// Make the data look rss-ish.
 			if ($xml_format == 'rss' || $xml_format == 'rss2')
 				$data[] = array(
-					'title' => cdata_parse($row['real_name']),
-					'link' => $scripturl . '?action=profile;u=' . $row['id_member'],
-					'comments' => $scripturl . '?action=pm;sa=send;u=' . $row['id_member'],
-					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['date_registered']),
-					'guid' => $scripturl . '?action=profile;u=' . $row['id_member'],
+					'title' => cdata_parse($member['real_name']),
+					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
+					'comments' => $scripturl . '?action=pm;sa=send;u=' . $member['id_member'],
+					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member['date_registered']),
+					'guid' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
 			elseif ($xml_format == 'rdf')
 				$data[] = array(
-					'title' => cdata_parse($row['real_name']),
-					'link' => $scripturl . '?action=profile;u=' . $row['id_member'],
+					'title' => cdata_parse($member['real_name']),
+					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
 			elseif ($xml_format == 'atom')
 				$data[] = array(
-					'title' => cdata_parse($row['real_name']),
-					'link' => $scripturl . '?action=profile;u=' . $row['id_member'],
-					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['date_registered']),
-					'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $row['last_login']),
-					'id' => $scripturl . '?action=profile;u=' . $row['id_member'],
+					'title' => cdata_parse($member['real_name']),
+					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
+					'published' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['date_registered']),
+					'updated' => gmstrftime('%Y-%m-%dT%H:%M:%SZ', $member['last_login']),
+					'id' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
 			// More logical format for the data, but harder to apply.
 			else
 				$data[] = array(
-					'name' => cdata_parse($row['real_name']),
-					'time' => htmlspecialchars(strip_tags(standardTime($row['date_registered']))),
-					'id' => $row['id_member'],
-					'link' => $scripturl . '?action=profile;u=' . $row['id_member']
+					'name' => cdata_parse($member['real_name']),
+					'time' => htmlspecialchars(strip_tags(standardTime($member['date_registered']))),
+					'id' => $member['id_member'],
+					'link' => $scripturl . '?action=profile;u=' . $member['id_member']
 				);
 		}
-		$db->free_result($request);
 
 		return $data;
 	}

@@ -24,7 +24,7 @@ define('ELK', 'SSI');
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
 global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
-global $db_connection, $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
+global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 
 // Remember the current configuration so it can be set back.
@@ -322,7 +322,6 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
  */
 function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo', $limit_body = true)
 {
-	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
 	global $modSettings;
 
 	// Excluding certain boards...
@@ -373,7 +372,7 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
  */
 function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $output_method = 'echo')
 {
-	global $user_info, $modSettings;
+	global $modSettings;
 
 	if (empty($post_ids))
 		return;
@@ -409,8 +408,7 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
  */
 function ssi_queryPosts($query_where = '', $query_where_params = array(), $query_limit = 10, $query_order = 'm.id_msg DESC', $output_method = 'echo', $limit_body = false, $override_permissions = false)
 {
-	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings;
+	global $scripturl, $txt, $user_info, $modSettings;
 
 	$db = database();
 
@@ -515,8 +513,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
  */
 function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null, $output_method = 'echo')
 {
-	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings;
+	global $settings, $scripturl, $txt, $user_info, $modSettings;
 
 	$db = database();
 
@@ -653,7 +650,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
  */
 function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 {
-	global $db_prefix, $scripturl;
+	global $scripturl;
 
 	$db = database();
 
@@ -697,7 +694,7 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
  */
 function ssi_topBoards($num_top = 10, $output_method = 'echo')
 {
-	global $context, $settings, $db_prefix, $txt, $scripturl, $user_info, $modSettings;
+	global $txt, $scripturl, $user_info, $modSettings;
 
 	$db = database();
 
@@ -761,7 +758,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
  */
 function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'echo')
 {
-	global $db_prefix, $txt, $scripturl, $user_info, $modSettings, $context;
+	global $txt, $scripturl, $modSettings;
 
 	$db = database();
 
@@ -875,7 +872,7 @@ function ssi_topTopicsViews($num_topics = 10, $output_method = 'echo')
  */
 function ssi_latestMember($output_method = 'echo')
 {
-	global $db_prefix, $txt, $scripturl, $context;
+	global $txt, $context;
 
 	if ($output_method == 'echo')
 		echo '
@@ -997,8 +994,7 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
  */
 function ssi_queryMembers($query_where = null, $query_where_params = array(), $query_limit = '', $query_order = 'id_member DESC', $output_method = 'echo')
 {
-	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
-	global $modSettings, $memberContext;
+	global $memberContext;
 
 	if ($query_where === null)
 		return;
@@ -1069,7 +1065,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
  */
 function ssi_boardStats($output_method = 'echo')
 {
-	global $db_prefix, $txt, $scripturl, $modSettings;
+	global $txt, $scripturl, $modSettings;
 
 	if (!allowedTo('view_stats'))
 		return;
@@ -1119,7 +1115,7 @@ function ssi_boardStats($output_method = 'echo')
  */
 function ssi_whosOnline($output_method = 'echo')
 {
-	global $user_info, $txt, $settings, $modSettings;
+	global $user_info, $txt, $settings;
 
 	require_once(SUBSDIR . '/MembersOnline.subs.php');
 	$membersOnlineOptions = array(
@@ -1184,7 +1180,7 @@ function ssi_logOnline($output_method = 'echo')
  */
 function ssi_login($redirect_to = '', $output_method = 'echo')
 {
-	global $scripturl, $txt, $user_info, $context, $modSettings;
+	global $scripturl, $txt, $user_info, $modSettings;
 
 	if ($redirect_to != '')
 		$_SESSION['login_url'] = $redirect_to;
@@ -1240,7 +1236,7 @@ function ssi_topPoll($output_method = 'echo')
  */
 function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 {
-	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $modSettings;
+	global $txt, $settings, $boardurl, $user_info, $context, $modSettings;
 
 	$boardsAllowed = array_intersect(boardsAllowedTo('poll_view'), boardsAllowedTo('poll_vote'));
 
@@ -1380,7 +1376,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
  */
 function ssi_showPoll($topic = null, $output_method = 'echo')
 {
-	global $db_prefix, $txt, $settings, $boardurl, $user_info, $context, $modSettings;
+	global $txt, $settings, $boardurl, $user_info, $context, $modSettings;
 
 	$boardsAllowed = boardsAllowedTo('poll_view');
 
@@ -1674,7 +1670,7 @@ function ssi_pollVote()
  */
 function ssi_quickSearch($output_method = 'echo')
 {
-	global $scripturl, $txt, $context;
+	global $scripturl, $txt;
 
 	if (!allowedTo('search_posts'))
 		return;
@@ -1847,7 +1843,7 @@ function ssi_todaysCalendar($output_method = 'echo')
  */
 function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $output_method = 'echo')
 {
-	global $scripturl, $db_prefix, $txt, $settings, $modSettings, $context;
+	global $scripturl, $txt, $settings, $modSettings;
 
 	loadLanguage('Stats');
 
@@ -2034,7 +2030,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
  */
 function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 {
-	global $db_prefix, $user_info, $scripturl, $modSettings, $txt, $context;
+	global $user_info, $scripturl, $modSettings, $txt, $context;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 		return;
@@ -2127,8 +2123,6 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
  */
 function ssi_checkPassword($id = null, $password = null, $is_username = false)
 {
-	global $db_prefix;
-
 	// If $id is null, this was most likely called from a query string and should do nothing.
 	if ($id === null)
 		return;
@@ -2159,7 +2153,7 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
  */
 function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(), $output_method = 'echo')
 {
-	global $context, $modSettings, $scripturl, $txt, $settings;
+	global $modSettings, $scripturl, $txt, $settings;
 
 	// We want to make sure that we only get attachments for boards that we can see *if* any.
 	$attachments_boards = boardsAllowedTo('view_attachments');

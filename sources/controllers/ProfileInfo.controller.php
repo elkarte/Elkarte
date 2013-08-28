@@ -526,7 +526,7 @@ class ProfileInfo_Controller extends Action_Controller
 				'topic' => $row['id_topic'],
 				'subject' => $row['subject'],
 				'start' => 'msg' . $row['id_msg'],
-				'time' => relativeTime($row['poster_time']),
+				'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
 				'timestamp' => forum_time(true, $row['poster_time']),
 				'id' => $row['id_msg'],
 				'can_reply' => false,

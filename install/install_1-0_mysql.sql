@@ -1671,8 +1671,8 @@ VALUES
 	(8, 0, 0, 1, 'd', 1, 'birthdayemails'),
 	(9, 0, 0, 1, 'w', 0, 'weekly_maintenance'),
 	(10, 0, 120, 1, 'd', 1, 'paid_subscriptions'),
-	(11, 0, 120, 1, 'd', 1, 'remove_temp_attachments'),
-	(12, 0, 180, 1, 'd', 1, 'remove_topic_redirect'),
+	(11, 0, 120, 1, 'd', 0, 'remove_temp_attachments'),
+	(12, 0, 180, 1, 'd', 0, 'remove_topic_redirect'),
 	(13, 0, 240, 1, 'd', 0, 'remove_old_drafts'),
 	(14, 0, 0, 6, 'h', 0, 'remove_old_followups'),
 	(15, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
@@ -1776,6 +1776,7 @@ VALUES ('elkVersion', '{$current_version}'),
 	('send_validation_onChange', '0'),
 	('send_welcomeEmail', '1'),
 	('allow_editDisplayName', '1'),
+	('admin_session_lifetime', '10'),
 	('allow_hideOnline', '1'),
 	('guest_hideContacts', '1'),
 	('spamWaitTime', '5'),
@@ -2042,7 +2043,6 @@ VALUES (1, 'name', '{$default_theme_name}'),
 	(1, 'show_profile_buttons', '1'),
 	(1, 'show_mark_read', '1'),
 	(1, 'show_stats_index', '1'),
-	(1, 'show_board_desc', '1'),
 	(1, 'newsfader_time', '5000'),
 	(1, 'allow_no_censored', '0'),
 	(1, 'additional_options_collapsable', '1'),
@@ -2051,7 +2051,6 @@ VALUES (1, 'name', '{$default_theme_name}'),
 	(1, 'forum_width', '90%');
 
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '2');
-INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'posts_apply_ignore_list', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 

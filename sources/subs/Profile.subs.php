@@ -597,8 +597,21 @@ function loadProfileFields($force_reload = false)
 						resetPassword($context[\'id_member\'], $value);
 					elseif ($value !== null)
 					{
-						validateUsername($context[\'id_member\'], $value);
-						updateMemberData($context[\'id_member\'], array(\'member_name\' => $value));
+						$errors = error_context::context(\'change_username\', 0);
+
+						validateUsername($context[\'id_member\'], $value, \'change_username\');
+
+						// No errors we can proceed normally
+						if (!$errors->hasErrors())
+							updateMemberData($context[\'id_member\'], array(\'member_name\' => $value));
+						else
+						{
+							// If there are "important" errors and you are not an admin: log the first error
+							// Otherwise grab all of them and do not log anything
+							$error_severity = $errors->hasErrors(1) && !$user_info[\'is_admin\'] ? 1 : null;
+							foreach ($errors->prepareErrors($error_severity) as $error)
+								fatal_error($error, $error_severity === null ? false : \'general\');
+						}
 					}
 				}
 				return false;
@@ -2344,7 +2357,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 				'id' => $row['id_member'],
 				'link' => $row['id_member'] ? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['member_name'] . '</a>') : $row['member_name'],
 			),
-			'time' => standardTime($row['log_time']),
+			'time' => '<time datetime="' . htmlTime($row['log_time']) . '" title="' . standardTime($row['log_time']) . '">' . relativeTime($row['log_time']) . '</time>',
 			'reason' => $row['body'],
 			'counter' => $row['counter'] > 0 ? '+' . $row['counter'] : $row['counter'],
 			'id_notice' => $row['id_notice'],

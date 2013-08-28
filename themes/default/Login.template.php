@@ -47,9 +47,9 @@ function template_login()
 	echo '
 				<dl>
 					<dt>', $txt['username'], ':</dt>
-					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" /></dd>
+					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" placeholder="', $txt['username'], '" /></dd>
 					<dt>', $txt['password'], ':</dt>
-					<dd><input type="password" name="passwrd" value="', $context['default_password'], '" size="20" class="input_password" /></dd>
+					<dd><input type="password" name="passwrd" value="', $context['default_password'], '" size="20" class="input_password" placeholder="', $txt['password'], '" /></dd>
 				</dl>';
 
 	if (!empty($modSettings['enableOpenID']))
@@ -180,7 +180,7 @@ function template_maintenance()
 		</div>
 		<p class="description">
 			<img class="floatleft" src="', $settings['images_url'], '/construction.png" style="width:40px; height:40px" alt="', $txt['in_maintain_mode'], '" />
-			', $context['description'], '<br class="clear" />
+			', $context['description'], '
 		</p>
 		<div class="title_bar">
 			<h4 class="titlebg">', $txt['admin_login'], '</h4>
@@ -197,7 +197,6 @@ function template_maintenance()
 				<dd><input type="checkbox" name="cookieneverexp" class="input_check" /></dd>
 			</dl>
 			<input type="submit" value="', $txt['login'], '" class="button_submit" />
-			<br class="clear" />
 		</div>
 		<input type="hidden" name="hash_passwrd" value="" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -232,11 +231,11 @@ function template_admin_login()
 
 	echo '
 			<strong>', $txt['password'], ':</strong>
-			<input type="password" name="', $context['sessionCheckType'], '_pass" size="24" class="input_password" />
+			<input type="password" name="', $context['sessionCheckType'], '_pass" size="24" class="input_password"  autofocus="autofocus" placeholder="', $txt['password'], '"/>
 			<a href="', $scripturl, '?action=quickhelp;help=securityDisable_why" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a><br />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['admin-login_token_var'], '" value="', $context['admin-login_token'], '" />
-			<input type="submit" style="margin-top: 1em;" value="', $txt['login'], '" class="button_submit" />';
+			<p><input type="submit" value="', $txt['login'], '" class="button_submit" /></p>';
 
 	// Make sure to output all the old post data.
 	echo $context['post_data'], '

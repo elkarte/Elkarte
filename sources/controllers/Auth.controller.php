@@ -143,7 +143,8 @@ class Auth_Controller extends Action_Controller
 		if (!empty($_POST['openid_identifier']) && !empty($modSettings['enableOpenID']))
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			if (($open_id = openID_validate($_POST['openid_identifier'])) !== 'no_data')
+			$open_id = new OpenID();
+			if (($open_id->validate($_POST['openid_identifier'])) !== 'no_data')
 				return $open_id;
 		}
 
@@ -356,17 +357,17 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
- 	* Logs the current user out of their account.
- 	* It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
- 	* It redirects back to $_SESSION['logout_url'], if it exists.
- 	* It is accessed via ?action=logout;session_var=...
- 	*
- 	* @param bool $internal if true, it doesn't check the session
- 	* @param $redirect
- 	*/
+	* Logs the current user out of their account.
+	* It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
+	* It redirects back to $_SESSION['logout_url'], if it exists.
+	* It is accessed via ?action=logout;session_var=...
+	*
+	* @param bool $internal if true, it doesn't check the session
+	* @param $redirect
+	*/
 	public function action_logout($internal = false, $redirect = true)
 	{
-		global $user_info, $user_settings, $context, $modSettings;
+		global $user_info, $user_settings, $context;
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)
@@ -393,6 +394,9 @@ class Auth_Controller extends Action_Controller
 			// If you log out, you aren't online anymore :P.
 			logOnline($user_info['id'], false);
 		}
+
+		// Logout? Let's kill the admin session, too.
+		unset($_SESSION['admin_time']);
 
 		$_SESSION['log_time'] = 0;
 
@@ -430,6 +434,7 @@ class Auth_Controller extends Action_Controller
 
 		loadLanguage('Login');
 		loadTemplate('Login');
+		createToken('login');
 
 		// Never redirect to an attachment
 		if (strpos($_SERVER['REQUEST_URL'], 'dlattach') === false)
@@ -440,16 +445,17 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
- 	* Display a message about the forum being in maintenance mode.
- 	* Displays a login screen with sub template 'maintenance'.
- 	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
- 	*/
+	* Display a message about the forum being in maintenance mode.
+	* Displays a login screen with sub template 'maintenance'.
+	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
+	*/
 	public function action_maintenance_mode()
 	{
 		global $txt, $mtitle, $mmessage, $context;
 
 		loadLanguage('Login');
 		loadTemplate('Login');
+		createToken('login');
 
 		// Send a 503 header, so search engines don't bother indexing while we're in maintenance mode.
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
@@ -468,7 +474,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_salt()
 	{
-		global $user_info, $user_settings, $context;
+		global $user_info, $user_settings, $context, $cookiename;
 
 		// we deal only with logged in folks in here!
 		if (!$user_info['is_guest'])
@@ -497,7 +503,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_check()
 	{
-		global $user_info, $modSettings;
+		global $user_info, $modSettings, $user_settings;
 
 		// Only our members, please.
 		if (!$user_info['is_guest'])
@@ -601,7 +607,6 @@ function doLogin()
 	call_integration_hook('integrate_login', array($user_settings['member_name'], isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) == 40 ? $_POST['hash_passwrd'] : null, $modSettings['cookieTime']));
 
 	// Get ready to set the cookie...
-	$username = $user_settings['member_name'];
 	$user_info['id'] = $user_settings['id_member'];
 
 	// Bam!  Cookie set.  A session too, just in case.
@@ -621,7 +626,10 @@ function doLogin()
 	// An administrator, set up the login so they don't have to type it again.
 	if ($user_info['is_admin'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
 	{
-		$_SESSION['admin_time'] = time();
+		// Let's validate if they really want..
+		if (!empty($modSettings['auto_admin_session']) && $modSettings['auto_admin_session'] == 1)
+			$_SESSION['admin_time'] = time();
+
 		unset($_SESSION['just_registered']);
 	}
 

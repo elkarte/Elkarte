@@ -39,9 +39,9 @@ function template_editsets()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		window.smfForum_scripturl = smf_scripturl;
-		window.smfForum_sessionid = smf_session_id;
-		window.smfForum_sessionvar = smf_session_var;
+		window.elkForum_scripturl = elk_scripturl;
+		window.elkForum_sessionid = elk_session_id;
+		window.elkForum_sessionvar = elk_session_var;
 	// ]]></script>';
 
 	if (empty($modSettings['disable_elk_js']))
@@ -50,10 +50,10 @@ function template_editsets()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		function smfSetLatestSmileys()
+		function elkSetLatestSmileys()
 		{
-			if (typeof(window.smfLatestSmileys) != "undefined")
-				setInnerHTML(document.getElementById("smileysLatest"), window.smfLatestSmileys);';
+			if (typeof(window.elkLatestSmileys) != "undefined")
+				setInnerHTML(document.getElementById("smileysLatest"), window.elkLatestSmileys);';
 
 		if (!empty($context['selected_set']))
 			echo '
@@ -67,7 +67,7 @@ function template_editsets()
 		}';
 
 		echo '
-			smfSetLatestSmileys();';
+			elkSetLatestSmileys();';
 
 		echo '
 	// ]]></script>';
@@ -94,7 +94,8 @@ function template_modifyset()
 		{
 			echo '
 			<div class="information">
-				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
+				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-mss_token_var'], '=' ,$context['admin-mss_token'],'">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
+
 			</div>';
 		}
 
@@ -153,13 +154,13 @@ function template_modifyset()
 
 		echo '
 					</dl>
-					<hr class="hrcolor" />
-					<input type="submit" name="smiley_save" value="', $txt['smiley_sets_save'], '" class="button_submit" />
+					<hr />
+					<input type="submit" name="smiley_save" value="', $txt['smiley_sets_save'], '" class="right_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-mss_token_var'], '" value="', $context['admin-mss_token'], '" />
+					<input type="hidden" name="set" value="', $context['current_set']['id'], '" />
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-mss_token_var'], '" value="', $context['admin-mss_token'], '" />
-			<input type="hidden" name="set" value="', $context['current_set']['id'], '" />
 		</form>
 	</div>';
 }
@@ -242,13 +243,15 @@ function template_modifysmiley()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
-					<input type="submit" name="smiley_save" value="', $txt['smileys_save'], '" class="button_submit" />
-					<input type="submit" name="deletesmiley" value="', $txt['smileys_delete'], '" onclick="return confirm(\'', $txt['smileys_delete_confirm'], '\');" class="button_submit" />
+					<hr />
+					<div class="submitbutton">
+						<input type="submit" name="smiley_save" value="', $txt['smileys_save'], '" class="button_submit" />
+						<input type="submit" name="deletesmiley" value="', $txt['smileys_delete'], '" onclick="return confirm(\'', $txt['smileys_delete_confirm'], '\');" class="button_submit" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="smiley" value="', $context['current_smiley']['id'], '" />
+					</div>
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="smiley" value="', $context['current_smiley']['id'], '" />
 		</form>
 	</div>
 
@@ -393,11 +396,11 @@ function template_addsmiley()
 							</select>
 						</dd>
 					</dl>
-					<hr class="hrcolor" />
-					<input type="submit" name="smiley_save" value="', $txt['smileys_save'], '" class="button_submit" />
+					<hr />
+					<input type="submit" name="smiley_save" value="', $txt['smileys_save'], '" class="right_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>';
 }
@@ -525,8 +528,8 @@ function template_editicon()
 					<input type="hidden" name="icon" value="', $context['icon']['id'], '" />';
 
 	echo '
-					<hr class="hrcolor" />
-					<input type="submit" name="icons_save" value="', $txt['smileys_save'], '" class="button_submit" />
+					<hr />
+					<input type="submit" name="icons_save" value="', $txt['smileys_save'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>

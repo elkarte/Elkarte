@@ -86,7 +86,7 @@ function template_show_list($list_id = null)
 			</div>';
 
 	echo '
-			<table class="table_grid" style="width:', !empty($cur_list['width']) ? $cur_list['width'] : '100%', '">';
+			<table class="table_grid" style="width:', !empty($cur_list['width']) ? $cur_list['width'] : '', '">';
 
 	// Show the column headers.
 	$header_count = count($cur_list['headers']);
@@ -94,7 +94,7 @@ function template_show_list($list_id = null)
 	{
 		echo '
 			<thead>
-				<tr class="catbg">';
+				<tr class="table_head">';
 
 		// Loop through each column and add a table header.
 		$i = 0;
@@ -102,9 +102,9 @@ function template_show_list($list_id = null)
 		{
 			$i ++;
 			if ($i === 1)
-				$col_header['class'] = empty($col_header['class']) ? 'first_th' : 'first_th ' . $col_header['class'];
+				$col_header['class'] = empty($col_header['class']) ? '' : $col_header['class'];
 			elseif ($i === $header_count)
-				$col_header['class'] = empty($col_header['class']) ? 'last_th' : 'last_th ' . $col_header['class'];
+				$col_header['class'] = empty($col_header['class']) ? '' : $col_header['class'];
 
 			echo '
 					<th scope="col" id="header_', $list_id, '_', $col_header['id'], '"', empty($col_header['class']) ? '' : ' class="' . $col_header['class'] . '"', empty($col_header['style']) ? '' : ' style="' . $col_header['style'] . '"', empty($col_header['colspan']) ? '' : ' colspan="' . $col_header['colspan'] . '"', '>', empty($col_header['href']) ? '' : '<a href="' . $col_header['href'] . '" rel="nofollow">', empty($col_header['label']) ? '&nbsp;' : $col_header['label'], empty($col_header['href']) ? '' : (empty($col_header['sort_image']) ? '</a>' : ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $col_header['sort_image'] . '.png" alt="" /></a>'), '</th>';
@@ -119,6 +119,8 @@ function template_show_list($list_id = null)
 			<tbody>';
 
 	// Show a nice message informing there are no items in this list.
+	// @todo - Nasty having styles and aligns still in the markup (IE6 stuffz).
+	// @todo - Should be done via the class.
 	if (empty($cur_list['rows']) && !empty($cur_list['no_items_label']))
 		echo '
 				<tr>
@@ -132,7 +134,7 @@ function template_show_list($list_id = null)
 		foreach ($cur_list['rows'] as $id => $row)
 		{
 			echo '
-				<tr class="windowbg', $alternate ? '2' : '', $row['class'], '"', $row['style'], ' id="list_', $list_id, '_', $id, '">';
+				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row ', $row['class'], '" id="list_', $list_id, '_', $id, '">';
 
 			foreach ($row['data'] as $row_data)
 				echo '

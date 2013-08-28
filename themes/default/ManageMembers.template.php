@@ -163,10 +163,10 @@ function template_search_members()
 			<div class="flow_hidden">
 				<table style="width:49%" class="table_grid floatleft">
 					<thead>
-						<tr class="catbg">
-							<th scope="col" class="first_th">', $txt['membergroups'], '</th>
+						<tr class="table_head">
+							<th scope="col">', $txt['membergroups'], '</th>
 							<th scope="col" class="centertext">', $txt['primary'], '</th>
-							<th scope="col" class="last_th centertext">', $txt['additional'], '</th>
+							<th scope="col" class="centertext">', $txt['additional'], '</th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -200,7 +200,7 @@ function template_search_members()
 
 				<table style="width:49%" class="table_grid floatright">
 					<thead>
-						<tr class="catbg">
+						<tr class="table_head">
 							<th scope="col" class="first_th">
 								', $txt['membergroups_postgroups'], '
 							</th>
@@ -233,7 +233,7 @@ function template_search_members()
 				</table>
 			</div>
 			<br />
-			<input type="submit" value="', $txt['search'], '" class="button_submit" />
+			<input type="submit" value="', $txt['search'], '" class="right_submit" />
 		</form>
 	</div>';
 }
@@ -308,16 +308,16 @@ function template_admin_browse()
 							</select>
 						</dd>
 					</dl>
-					<input type="submit" value="', $txt['admin_browse_outstanding_go'], '" class="button_submit" />
+					<input type="submit" value="', $txt['admin_browse_outstanding_go'], '" class="right_submit" />
 					<input type="hidden" name="type" value="', $context['browse_type'], '" />
 					<input type="hidden" name="sort" value="', $context['approve_list']['sort']['id'], '" />
 					<input type="hidden" name="start" value="', $context['approve_list']['start'], '" />
 					<input type="hidden" name="orig_filter" value="', $context['current_filter'], '" />
 					<input type="hidden" name="sa" value="approve" />', !empty($context['approve_list']['sort']['desc']) ? '
 					<input type="hidden" name="desc" value="1" />' : '', '
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>';
 	}
 

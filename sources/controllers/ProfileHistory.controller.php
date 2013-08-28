@@ -98,14 +98,14 @@ class ProfileHistory_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $memID,
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'list_getUserErrors',
+				'function' => array($this, 'list_getUserErrors'),
 				'params' => array(
 					'le.id_member = {int:current_member}',
 					array('current_member' => $memID),
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getUserErrorCount',
+				'function' => array($this, 'list_getUserErrorCount'),
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $memID),
@@ -362,14 +362,14 @@ class ProfileHistory_Controller extends Action_Controller
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'list_getIPMessages',
+				'function' => array($this, 'list_getIPMessages'),
 				'params' => array(
 					'm.poster_ip ' . $ip_string,
 					array('ip_address' => $ip_var),
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getIPMessageCount',
+				'function' => array($this, 'list_getIPMessageCount'),
 				'params' => array(
 					'm.poster_ip ' . $ip_string,
 					array('ip_address' => $ip_var),
@@ -452,14 +452,14 @@ class ProfileHistory_Controller extends Action_Controller
 			'base_href' => $context['base_url'] . ';searchip=' . $context['ip'],
 			'default_sort_col' => 'date2',
 			'get_items' => array(
-				'function' => 'list_getUserErrors',
+				'function' => array($this, 'list_getUserErrors'),
 				'params' => array(
 					'le.ip ' . $ip_string,
 					array('ip_address' => $ip_var),
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getUserErrorCount',
+				'function' => array($this, 'list_getUserErrorCount'),
 				'params' => array(
 					'ip ' . $ip_string,
 					array('ip_address' => $ip_var),
@@ -561,7 +561,7 @@ class ProfileHistory_Controller extends Action_Controller
 				),
 				'ripe' => array(
 					'name' => $txt['whois_ripe'],
-					'url' => 'http://www.db.ripe.net/whois?searchtext=' . $context['ip'],
+					'url' => 'https://apps.db.ripe.net/search/query.html?searchtext=' . $context['ip'],
 					'range' => array(62, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
 						141, 145, 151, 188, 193, 194, 195, 212, 213, 217),
 				),
@@ -603,14 +603,14 @@ class ProfileHistory_Controller extends Action_Controller
 			'no_items_label' => $txt['trackLogins_none_found'],
 			'base_href' => $context['base_url'],
 			'get_items' => array(
-				'function' => 'list_getLogins',
+				'function' => array($this, 'list_getLogins'),
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $memID),
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getLoginCount',
+				'function' => array($this, 'list_getLoginCount'),
 				'params' => array(
 					'id_member = {int:current_member}',
 					array('current_member' => $memID),
@@ -694,13 +694,13 @@ class ProfileHistory_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $memID,
 			'default_sort_col' => 'time',
 			'get_items' => array(
-				'function' => 'list_getProfileEdits',
+				'function' => array($this, 'list_getProfileEdits'),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_getProfileEditCount',
+				'function' => array($this, 'list_getProfileEditCount'),
 				'params' => array(
 					$memID,
 				),

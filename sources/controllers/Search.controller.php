@@ -1870,8 +1870,7 @@ class Search_Controller extends Action_Controller
 					foreach ($context['key_words'] as $keyword)
 					{
 						$keyword = un_htmlspecialchars($keyword);
-						$keyword = preg_replace('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~e', 'entity_fix__callback', strtr($keyword, array('\\\'' => '\'', '&' => '&amp;')));
-
+						$keyword = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', strtr($keyword, array('\\\'' => '\'', '&' => '&amp;')));
 						if (preg_match('~[\'\.,/@%&;:(){}\[\]_\-+\\\\]$~', $keyword) != 0 || preg_match('~^[\'\.,/@%&;:(){}\[\]_\-+\\\\]~', $keyword) != 0)
 							$force_partial_word = true;
 						$matchString .= strtr(preg_quote($keyword, '/'), array('\*' => '.+?')) . '|';
@@ -1894,7 +1893,7 @@ class Search_Controller extends Action_Controller
 				}
 
 				// Re-fix the international characters.
-				$message['body'] = preg_replace('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~e', 'entity_fix__callback', $message['body']);
+				$message['body'] = preg_replace_callback('~(&amp;#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $message['body']);
 			}
 		}
 		else
@@ -2024,7 +2023,7 @@ class Search_Controller extends Action_Controller
 			$query = trim($query, "\*+");
 			$query = strtr(Util::htmlspecialchars($query), array('\\\'' => '\''));
 
-			$body_highlighted = preg_replace('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/ieu', "'\$2' == '\$1' ? stripslashes('\$1') : '<strong class=\"highlight\">\$1</strong>'", $body_highlighted);
+			$body_highlighted = preg_replace_callback('/((<[^>]*)|' . preg_quote(strtr($query, array('\'' => '&#039;')), '/') . ')/iu', create_function('$m', 'return isset($m[2]) && "$m[2]" == "$m[1]" ? stripslashes("$m[1]") : "<strong class=\"highlight\">$m[1]</strong>";'), $body_highlighted);
 			$subject_highlighted = preg_replace('/(' . preg_quote($query, '/') . ')/iu', '<strong class="highlight">$1</strong>', $subject_highlighted);
 		}
 

@@ -43,7 +43,7 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Likes a post due to its awesomeness
-	 * Pemission checks are done in prepare_likes
+	 * Permission checks are done in prepare_likes
 	 * It redirects back to the referrer afterward.
 	 * It is accessed via ?action=like,sa=likepost
 	 */
@@ -97,7 +97,7 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Check that few things are in order (in additon to permissions) for likes.
+	 * Checks that few things are in order (in additon to permissions) for likes.
 	 * @param type $id_liked
 	 * @return type
 	 */
@@ -128,7 +128,7 @@ class Likes_Controller extends Action_Controller
 		}
 
 		// Past the post threshold?
-		if (!$user_info['is_admin'] && $user_info['posts'] < $modSettings['likeDisplayLimit'])
+		if (!$user_info['is_admin'] && !empty($modSettings['likeMinPosts']) && $user_info['posts'] < $modSettings['likeMinPosts'])
 			$check = false;
 
 		return $check;
