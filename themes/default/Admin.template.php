@@ -102,7 +102,7 @@ function template_admin()
 						</div>
 					</div>';
 
-	// The below functions include all the scripts needed from the elkarte site. The language and format are passed for internationalization.
+	// The below functions include all the scripts needed from the ElkArte site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_elk_js']))
 		echo '
 					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
@@ -218,7 +218,7 @@ function template_credits()
 								</div>
 							</div>';
 
-	// Display latest support questions from simplemachines.org.
+	// Display latest support questions from ElkArte
 	echo '
 							<div class="cat_bar">
 								<h3 class="catbg">
@@ -693,7 +693,7 @@ function template_view_versions()
 						</div>';
 
 	/* Below is the javascript for this. Upon opening the page it checks the current file versions with ones
-	  held at elkarte.net and works out if they are up to date.  If they aren't it colors that files number
+	  held at ElkArte.net and works out if they are up to date.  If they aren't it colors that files number
 	  red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
 	  file categories. (sources, languages, and templates.) */
 	echo '
@@ -1406,7 +1406,7 @@ function template_php_info()
 			{
 				if ($localmaster)
 				{
-					// heading row for the settings section of this categorys settings
+					// heading row for the settings section of this category's settings
 					echo '
 			<tr class="titlebg">
 				<td><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
@@ -1503,7 +1503,7 @@ function template_admin_quick_search()
 }
 
 /**
- * A list of urls and "words separators" for new search engines in the dropdown
+ * A list of URLs and "words separators" for new search engines in the dropdown
  */
 function template_callback_external_search_engines()
 {

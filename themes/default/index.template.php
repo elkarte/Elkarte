@@ -73,7 +73,7 @@ function template_init()
 	// This is used for the color variants.
 	$settings['theme_variants'] = array('light', 'dark', 'basic');
 
-	// If the following variable is set to true, the avatar of the last poster will be displayed on the board index and message index.
+	// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
 	$settings['avatars_on_indexes'] = false;
 
 	// This is used in the main menu, to create a number next to the title of the menu, to indicate unread messages, moderation reports, etc.
@@ -107,7 +107,7 @@ function template_html_above()
 	<title>', $context['page_title_html_safe'], '</title>';
 
 	// Tell IE to render the page in standards not compatibility mode. really for ie >= 8
-	// Note if this is not in the first 4k, its ignored, thats why its here
+	// Note if this is not in the first 4k, its ignored, that's why its here
 	if (isBrowser('ie'))
 		echo '
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
@@ -542,7 +542,7 @@ function template_menu()
 	echo '
 					</ul>';
 
-	// Define the upper_section toggle in JavaScript.
+	// Define the upper_section toggle in javascript.
 	echo '
 				<script><!-- // --><![CDATA[
 					var oMainHeaderToggle = new elk_Toggle({

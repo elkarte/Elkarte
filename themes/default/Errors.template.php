@@ -198,7 +198,7 @@ function template_error_log()
 }
 
 /*
- * Shows the subsection of a file where an error occured
+ * Shows the subsection of a file where an error occurred
  */
 function template_show_file()
 {

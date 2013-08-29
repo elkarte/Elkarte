@@ -269,7 +269,7 @@ function template_registration_form()
 						</dt>
 						<dd>';
 
-				// Want to put something infront of the box?
+				// Want to put something in front of the box?
 				if (!empty($field['preinput']))
 					echo '
 							', $field['preinput'];

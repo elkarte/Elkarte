@@ -31,7 +31,7 @@ function template_main()
 		if (empty($category['boards']) && !$category['is_collapsed'])
 			continue;
 
-		// @todo - Invent nifty class name for board index header bars.
+		// @todo - Invent nifty class name for boardindex header bars.
 		// @todo - Note these are now h2, not the old h3.
 		echo '
 		<div class="forum_category" id="category_', $category['id'], '">
@@ -167,7 +167,7 @@ function template_main()
 }
 
 /**
- * Show information above the board index, like the newsfader
+ * Show information above the boardindex, like the newsfader
  */
 function template_boardindex_outer_above()
 {
@@ -292,7 +292,7 @@ function template_info_center()
 					<a href="', $scripturl, '?action=calendar' . '"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
 				</h3>';
 
-		// Holidays like "Christmas", "Chanukah", and "We Love [Unknown] Day" :P.
+		// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
 		if (!empty($context['calendar_holidays']))
 			echo '
 				<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';

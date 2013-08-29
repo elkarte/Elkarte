@@ -506,7 +506,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 }
 
 /**
- * Templating for viewing the members of a group.
+ * Template for viewing the members of a group.
  */
 function template_group_members()
 {

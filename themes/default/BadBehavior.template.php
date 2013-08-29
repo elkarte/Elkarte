@@ -200,7 +200,7 @@ function template_callback_badbehavior_add_url()
 				$txt['badbehavior_url_wl_desc'], '
 			</dd>';
 
-	// Show any existing url's that are on the whitelist
+	// Show any existing URLs that are on the whitelist
 	foreach ($context['badbehavior_url_wl'] as $key => $data)
 	{
 		$comment = isset($context['badbehavior_url_wl_desc'][$key]) ? $context['badbehavior_url_wl_desc'][$key] : '';

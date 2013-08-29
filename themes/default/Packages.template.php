@@ -23,7 +23,7 @@ function template_main()
 
 /**
  * Shows the screen for the package install / uninstall
- * Dispalys licnense, readme, and test results
+ * Displays license, readme, and test results
  */
 function template_view_package()
 {
@@ -46,7 +46,7 @@ function template_view_package()
 	echo $txt['package_installed_warning3'], '
 		</div>';
 
-	// Do errors exist in the install? If so light them up like a christmas tree.
+	// Do errors exist in the install? If so light them up like a Christmas tree.
 	if ($context['has_failure'])
 	{
 		echo '
@@ -284,7 +284,7 @@ function template_view_package()
 						$operation_num = 1;
 						foreach ($action['operations'] as $operation)
 						{
-							// Determine the possition text.
+							// Determine the position text.
 							$operation_text = $operation['position'] == 'replace' ? 'operation_replace' : ($operation['position'] == 'before' ? 'operation_after' : 'operation_before');
 
 							echo '
@@ -767,6 +767,7 @@ function template_control_chmod()
 				<div id="need_writable_list" class="smalltext">
 					', $txt['package_ftp_why_file_list'], '
 					<ul style="display: inline;">';
+
 		if (!empty($context['notwritable_files']))
 			foreach ($context['notwritable_files'] as $file)
 				echo '
@@ -819,7 +820,6 @@ function template_control_chmod()
 
 	if (empty($context['package_ftp']['form_elements_only']))
 		echo '
-
 					<div class="righttext" style="margin: 1ex;">
 						<span id="test_ftp_placeholder_full"></span>
 						<input type="submit" value="', $txt['package_proceed'], '" class="right_submit" />
@@ -946,7 +946,7 @@ function template_view_operations()
 }
 
 /**
- * Show the technocolor permissions screen that can be adusted with FTP
+ * Show the technicolor permissions screen that can be adjusted with FTP
  */
 function template_file_permissions()
 {

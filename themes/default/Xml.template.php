@@ -157,7 +157,7 @@ function template_post()
 }
 
 /**
- * Returns the PM preivew
+ * Returns the PM preview
  */
 function template_pm()
 {
@@ -189,7 +189,7 @@ function template_pm()
 }
 
 /**
- * Returns additonal statistics when a year/month is expaned
+ * Returns additional statistics when a year/month is expanded
  */
 function template_stats()
 {
@@ -384,7 +384,7 @@ function template_check_username()
 }
 
 /**
- * @todo ... maybe emanule can explain :D
+ * @todo ... maybe emanuele can explain :D
  */
 function template_generic_xml_buttons()
 {

@@ -33,7 +33,7 @@ function template_main()
 					</div>';
 
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
-	if (!empty($settings['additional_options_collapsable']))
+	if (!empty($settings['additional_options_collapsible']))
 		echo '
 					<h4 id="postAdditionalOptionsHeader" class="titlebg">
 						<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a></strong>
@@ -213,7 +213,7 @@ function template_load_drafts_below()
 }
 
 /**
- * Show the topic replys below the post box
+ * Show the topic replies below the post box
  */
 function template_topic_replies_below()
 {
@@ -507,7 +507,7 @@ function template_postarea_below()
 			var txt_on = "', $txt['on'], '";';
 
 	// Code for showing and hiding additional options.
-	if (!empty($settings['additional_options_collapsable']))
+	if (!empty($settings['additional_options_collapsible']))
 		echo '
 			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,

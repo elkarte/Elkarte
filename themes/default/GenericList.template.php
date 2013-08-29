@@ -178,7 +178,7 @@ function template_show_list($list_id = null)
 			template_additional_rows('below_table_data', $cur_list);
 	}
 
-	// Tabs at the bottom.  Usually bottom alligned.
+	// Tabs at the bottom.  Usually bottom aligned.
 	if (isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] == 'both' || $cur_list['list_menu']['show_on'] == 'bottom'))
 	{
 		if (!$close_div)
@@ -220,7 +220,7 @@ function template_show_list($list_id = null)
 }
 
 /**
- * Generic template used to show additonal rows of data (above/below)
+ * Generic template used to show additional rows of data (above/below)
  */
 function template_additional_rows($row_position, $cur_list)
 {
@@ -232,7 +232,7 @@ function template_additional_rows($row_position, $cur_list)
 /**
  * Used this if you want your generic lists to have navigation menus.
  * $cur_list['list_menu'] = array(
- *		// The posisiton of the tabs/buttons.  Left or Right.  By default is set to left.
+ *		// The position of the tabs/buttons.  Left or Right.  By default is set to left.
  *		'position' => 'left',
  *		// Links.  This is the core of the array.  It has all the info that we need.
  *		'links' => array(

@@ -106,7 +106,7 @@ function template_trackIP()
 	<br />
 	<div class="generic_list_wrapper">';
 
-	// The table inbetween the first and second table shows links to the whois server for every region.
+	// The table in between the first and second table shows links to the whois server for every region.
 	if ($context['single_ip'])
 	{
 		echo '

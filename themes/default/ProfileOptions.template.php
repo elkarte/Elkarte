@@ -317,7 +317,7 @@ function template_edit_options()
 						</dt>
 						<dd>';
 
-			// Want to put something infront of the box?
+			// Want to put something in front of the box?
 			if (!empty($field['preinput']))
 				echo '
 							', $field['preinput'];
@@ -738,7 +738,7 @@ function template_profile_theme_settings()
 }
 
 /**
- * Template for setting up how and what you want to be notificed on
+ * Template for setting up how and what you want to be notified about
  */
 function template_action_notification()
 {
@@ -808,7 +808,7 @@ function template_action_notification()
 						<dd>
 							<select name="notify_types" id="notify_types">';
 
-	// Using the mailist functions, then limit the options so they make sense
+	// Using the maillist functions, then limit the options so they make sense
 	if (!empty($modSettings['pbe_no_mod_notices']) && !empty($modSettings['maillist_enabled']))
 	{
 		echo '
@@ -1100,7 +1100,7 @@ function template_profile_group_manage()
 							<dd>
 								<select name="id_group" ', ($context['user']['is_owner'] && $context['member']['group_id'] == 1 ? 'onchange="if (this.value != 1 &amp;&amp; !confirm(\'' . $txt['deadmin_confirm'] . '\')) this.value = 1;"' : ''), '>';
 
-	// Fill the select box with all primary member groups that can be assigned to a member.
+	// Fill the select box with all primary membergroups that can be assigned to a member.
 	foreach ($context['member_groups'] as $member_group)
 		if (!empty($member_group['can_be_primary']))
 			echo '
@@ -1259,7 +1259,7 @@ function template_profile_avatar_select()
 									<div>
 										<select name="cat" id="cat" size="10" onchange="changeSel(\'\');" onfocus="selectRadioByName(document.forms.creator.avatar_choice, \'server_stored\');">';
 
-		// This lists all the file catergories.
+		// This lists all the file categories.
 		foreach ($context['avatars'] as $avatar)
 			echo '
 											<option value="', $avatar['filename'] . ($avatar['is_dir'] ? '/' : ''), '"', ($avatar['checked'] ? ' selected="selected"' : ''), '>', $avatar['name'], '</option>';
@@ -1377,7 +1377,7 @@ function template_profile_avatar_select()
 }
 
 /**
- * Callback for modifying karam.
+ * Callback for modifying karma.
  */
 function template_profile_karma_modify()
 {

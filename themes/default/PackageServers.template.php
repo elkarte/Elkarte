@@ -225,7 +225,7 @@ function template_package_list()
 						echo '
 								<li class="package_section">', $txt['author_website'], ':&nbsp; ', $package['author']['website']['link'], '</li>';
 
-					// Desciption: bleh bleh!
+					// Description: bleh bleh!
 					// Location of file: http://someplace/.
 					echo '
 								<li class="package_section">', $txt['file_location'], ':&nbsp; <a href="', $package['href'], '">', $package['href'], '</a></li>

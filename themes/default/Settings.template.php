@@ -269,8 +269,8 @@ function template_settings()
 			'label' => $txt['admin_bbc'],
 		),
 		array(
-			'id' => 'additional_options_collapsable',
-			'label' => $txt['additional_options_collapsable'],
+			'id' => 'additional_options_collapsible',
+			'label' => $txt['additional_options_collapsible'],
 		),
 	'',
 		array(

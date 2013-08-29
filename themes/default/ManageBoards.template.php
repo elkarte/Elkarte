@@ -133,7 +133,7 @@ function template_modify_category()
 					<div class="content">
 						<dl class="settings">';
 
-	// If this isn't the only category, let the user choose where this category should be positioned down the board index.
+	// If this isn't the only category, let the user choose where this category should be positioned down the boardindex.
 	if (count($context['category_order']) > 1)
 	{
 		echo '
@@ -441,7 +441,7 @@ function template_modify_board()
 							</table>
 						</dd>';
 
-	// Options to choose moderators, specifiy as announcement board and choose whether to count posts here.
+	// Options to choose moderators, specify as announcement board and choose whether to count posts here.
 	echo '
 						<dt>
 							<strong>', $txt['mboards_moderators'], ':</strong><br />

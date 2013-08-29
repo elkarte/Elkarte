@@ -119,7 +119,7 @@ function template_custom_email()
 						</dd>';
 
 	// Can the user see the persons email?
-	if ($context['can_view_receipient_email'])
+	if ($context['can_view_recipient_email'])
 		echo '
 						<dt>
 							<strong>', $txt['sendtopic_receiver_email'], ':</strong>

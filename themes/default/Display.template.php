@@ -240,7 +240,7 @@ function template_main()
 			echo '
 							<li class="listlevel1 quick_edit"><a class="linklevel1"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</a></li>';
 
-		// Can they quote to a new topic? @todo - This needs rethinking for gui layout.
+		// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
 		if ($context['can_follow_up'])
 			echo '
 							<li class="listlevel1"><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel1 quotetonew_button">', $txt['quote_new'], '</a></li>';
@@ -302,7 +302,7 @@ function template_main()
 }
 
 /**
- * This is quick realy area below all the message bodys
+ * This is quick reply area below all the message body's
  */
 function template_quickreply_below()
 {
@@ -943,7 +943,7 @@ function template_pages_and_buttons_below()
 	echo '
 			<div id="moderationbuttons">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
 
-	// Show the jumpto box, or actually...let Javascript do it.
+	// Show the jump-to box, or actually...let Javascript do it.
 	echo '
 			<div id="display_jump_to">&nbsp;</div>';
 }

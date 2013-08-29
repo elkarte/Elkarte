@@ -540,7 +540,7 @@ function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	// @todo - Should really get rid of some of the inline CCS in this table.
+	// @todo - Should really get rid of some of the inline CSS in this table.
 	echo '
 					<table class="table_grid">
 						<thead>
@@ -843,7 +843,7 @@ function template_search_results()
 			</h2>';
 
 	// complete results ?
-	// @todo - Should really get rid of some of the inline CCS in this table.
+	// @todo - Should really get rid of some of the inline CSS in this table.
 	if (empty($context['search_params']['show_complete']) && !empty($context['personal_messages']))
 		echo '
 			<table class="table_grid">
@@ -1013,12 +1013,12 @@ function template_send()
 							<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</span>
 						</dt>';
 
-	// Autosuggest will be added by the JavaScript later on.
+	// Autosuggest will be added by the javascript later on.
 	echo '
 						<dd id="pm_to" class="clear_right">
 							<input type="text" name="to" id="to_control" value="', $context['to_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />';
 
-	// A link to add BCC, only visible with JavaScript enabled.
+	// A link to add BCC, only visible with javascript enabled.
 	echo '
 							<span class="smalltext" id="bcc_link_container" style="display: none;"></span>';
 
@@ -1029,7 +1029,7 @@ function template_send()
 	echo '
 						</dd>';
 
-	// This BCC row will be hidden by default if JavaScript is enabled.
+	// This BCC row will be hidden by default if javascript is enabled.
 	echo '
 						<dt  class="clear_left" id="bcc_div">
 							<span', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</span>
@@ -1071,7 +1071,7 @@ function template_send()
 						', template_control_verification($context['visual_verification_id'], 'all'), '
 					</div>';
 
-	// Send, Preview, spellcheck buttons.
+	// Send, Preview, spellchecker buttons.
 	echo '
 					<p>
 						<label for="outbox"><input type="checkbox" name="outbox" id="outbox" value="1" tabindex="', $context['tabindex']++, '"', $context['copy_to_outbox'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_save_outbox'], '</label>
