@@ -42,7 +42,7 @@ class OpenID
 		$openid_url = $this->canonize($openid_uri);
 
 		$response_data = $this->getServerInfo($openid_url);
-		if ($response_data === false)
+		if ($response_data === false || empty($response_data['provider']))
 			return 'no_data';
 
 		if (($assoc = $this->getAssociation($response_data['provider'])) == null)
