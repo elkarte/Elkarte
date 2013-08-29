@@ -33,7 +33,7 @@ function template_main()
 					</div>';
 
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
-	if (!empty($settings['additional_options_collapsable']))
+	if (!empty($settings['additional_options_collapsible']))
 		echo '
 					<h4 id="postAdditionalOptionsHeader" class="titlebg">
 						<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a></strong>
@@ -67,11 +67,12 @@ function template_main()
 								<input type="hidden" name="attach_del[]" value="0" />
 								', $txt['uncheck_unwatchd_attach'], ':
 							</dd>';
+
 		foreach ($context['current_attachments'] as $attachment)
 			echo '
 							<dd class="smalltext">
 								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''),
-								!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
+			!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
 							</dd>';
 
 		echo '
@@ -150,7 +151,7 @@ function template_main()
 
 function template_load_drafts_below()
 {
-	global $context, $settings, $txt, $options;
+	global $context, $settings, $txt;
 
 	// Show a draft selection box
 	echo '
@@ -170,6 +171,7 @@ function template_load_drafts_below()
 		echo '
 							<dt>', $draft['link'], '</dt>
 							<dd>', $draft['poster_time'], '</dd>';
+
 	echo '
 						</dl>
 					</div>';
@@ -210,6 +212,9 @@ function template_load_drafts_below()
 		// ]]></script>';
 }
 
+/**
+ * Show the topic replies below the post box
+ */
 function template_topic_replies_below()
 {
 	global $context, $txt;
@@ -238,24 +243,20 @@ function template_topic_replies_below()
 						</h5>';
 
 			if ($context['can_quote'])
-			{
 				echo '
 						<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
-							<li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">',$txt['bbc_quote'],'</a></li>
+							<li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a></li>
 						</ul>';
-			}
 
 			echo '
 					</div>';
 
 			if ($ignoring)
-			{
 				echo '
 						<div id="msg_', $post['id'], '_ignored_prompt">
 							', $txt['ignoring_user'], '
 							<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
 						</div>';
-			}
 
 			echo '
 					<div class="inner" id="msg_', $post['id'], '_body">', $post['body'], '</div>
@@ -294,6 +295,10 @@ function template_topic_replies_below()
 	}
 }
 
+/**
+ * The area above the post box,
+ * Typically holds subject, preview, info messages, message icons, etc
+ */
 function template_postarea_above()
 {
 	global $context, $scripturl, $txt, $modSettings;
@@ -415,6 +420,7 @@ function template_postarea_above()
 								</select>
 								<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
 							</dd>';
+
 	if (!empty($context['show_boards_dropdown']))
 		echo '
 							<dt class="clear_left">
@@ -422,10 +428,16 @@ function template_postarea_above()
 							</dt>
 							<dd>', template_select_boards('post_in_board'), '
 							</dd>';
+
 	echo '
 						</dl>';
 }
 
+/**
+ * The area below the postbox
+ * Typically holds our action buttons, save, preivew, drafts, etc
+ * Oh and lots of JS ;)
+ */
 function template_postarea_below()
 {
 	global $context, $txt, $counter, $settings;
@@ -495,7 +507,7 @@ function template_postarea_below()
 			var txt_on = "', $txt['on'], '";';
 
 	// Code for showing and hiding additional options.
-	if (!empty($settings['additional_options_collapsable']))
+	if (!empty($settings['additional_options_collapsible']))
 		echo '
 			var oSwapAdditionalOptions = new elk_Toggle({
 				bToggleEnabled: true,
@@ -574,6 +586,9 @@ function template_postarea_below()
 	template_topic_replies_below();
 }
 
+/**
+ * Area above the poll edit
+ */
 function template_poll_edit_above()
 {
 	echo '
@@ -584,6 +599,9 @@ function template_poll_edit_above()
 					</div>';
 }
 
+/**
+ * Area above the event box
+ */
 function template_make_event_above()
 {
 	global $context, $txt, $modSettings;
@@ -606,7 +624,7 @@ function template_make_event_above()
 
 	echo '
 								</select>
-								', $txt['calendar_month'], '
+									', $txt['calendar_month'], '
 								<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
@@ -616,7 +634,7 @@ function template_make_event_above()
 
 	echo '
 								</select>
-								', $txt['calendar_day'], '
+									', $txt['calendar_day'], '
 								<select name="day" id="day">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.

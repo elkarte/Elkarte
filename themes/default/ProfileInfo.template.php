@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Add settings that will be used in the template
+ */
 function template_ProfileInfo_init()
 {
 	global $settings;
@@ -42,6 +45,7 @@ function template_action_summary()
 				<div class="username"><h4>', $context['member']['name'], ' <span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4></div>
 				', $context['member']['avatar']['image'], '
 				<ul>';
+
 	// @TODO fix the <ul> when no fields are visible
 	// What about if we allow email only via the forum??
 	if ($context['member']['show_email'] === 'yes' || $context['member']['show_email'] === 'no_through_forum' || $context['member']['show_email'] === 'yes_permission_override' && $context['can_send_email'])
@@ -72,9 +76,7 @@ function template_action_summary()
 				<br /><a href="', $scripturl, '?action=buddy;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], '">[', $txt['buddy_' . ($context['member']['is_buddy'] ? 'remove' : 'add')], ']</a>';
 
 	echo '
-				</span>';
-
-	echo '
+				</span>
 				<p id="infolinks">';
 
 	if (!$context['user']['is_owner'] && $context['can_send_pm'])
@@ -244,7 +246,7 @@ function template_action_summary()
 	if ($context['can_see_ip'])
 	{
 		if (!empty($context['member']['ip']))
-		echo '
+			echo '
 					<dt>', $txt['ip'], ': </dt>
 					<dd><a href="', $scripturl, '?action=profile;area=history;sa=ip;searchip=', $context['member']['ip'], ';u=', $context['member']['id'], '">', $context['member']['ip'], '</a></dd>';
 
@@ -276,6 +278,7 @@ function template_action_summary()
 		{
 			if ($field['placement'] != 2 || empty($field['output_html']))
 				continue;
+
 			if (empty($shown))
 			{
 				$shown = true;
@@ -283,11 +286,13 @@ function template_action_summary()
 				<div class="custom_fields_above_signature">
 					<ul class="nolist">';
 			}
+
 			echo '
 						<li>', $field['output_html'], '</li>';
 		}
+
 		if ($shown)
-				echo '
+			echo '
 					</ul>
 				</div>';
 	}
@@ -315,7 +320,7 @@ function template_action_showPosts()
 {
 	global $context, $scripturl, $txt;
 
-		template_pagesection(false, false, 'go_down');
+	template_pagesection(false, false, 'go_down');
 
 	echo '
 		<div class="forumposts">
@@ -401,6 +406,9 @@ function template_action_showPosts()
 	template_pagesection();
 }
 
+/**
+ * Show the individual users permissions
+ */
 function template_action_showPermissions()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -420,7 +428,7 @@ function template_action_showPermissions()
 	else
 	{
 		echo '
-		<p class="description">',$txt['showPermissions_help'],'</p>
+		<p class="description">', $txt['showPermissions_help'], '</p>
 		<div id="permissions" class="flow_hidden">';
 
 		if (!empty($context['no_access_boards']))
@@ -432,11 +440,11 @@ function template_action_showPermissions()
 				<div class="windowbg smalltext">
 					<div class="content">', $txt['showPermissions_restricted_boards_desc'], ':<br />';
 
-				foreach ($context['no_access_boards'] as $no_access_board)
-					echo '
+			foreach ($context['no_access_boards'] as $no_access_board)
+				echo '
 						<a href="', $scripturl, '?board=', $no_access_board['id'], '.0">', $no_access_board['name'], '</a>', $no_access_board['is_last'] ? '' : ', ';
 
-				echo '
+			echo '
 					</div>
 				</div>';
 		}
@@ -471,12 +479,12 @@ function template_action_showPermissions()
 
 				if ($permission['is_denied'])
 					echo '
-									<span class="alert">', $txt['showPermissions_denied'], ':&nbsp;', implode(', ', $permission['groups']['denied']),'</span>';
+									<span class="alert">', $txt['showPermissions_denied'], ':&nbsp;', implode(', ', $permission['groups']['denied']), '</span>';
 				else
 					echo '
 									', $txt['showPermissions_given'], ':&nbsp;', implode(', ', $permission['groups']['allowed']);
 
-					echo '
+				echo '
 								</td>
 							</tr>';
 			}
@@ -537,15 +545,11 @@ function template_action_showPermissions()
 							<td class="windowbg2 smalltext">';
 
 				if ($permission['is_denied'])
-				{
 					echo '
 								<span class="alert">', $txt['showPermissions_denied'], ':&nbsp;', implode(', ', $permission['groups']['denied']), '</span>';
-				}
 				else
-				{
 					echo '
 								', $txt['showPermissions_given'], ': &nbsp;', implode(', ', $permission['groups']['allowed']);
-				}
 
 				echo '
 							</td>
@@ -560,7 +564,7 @@ function template_action_showPermissions()
 			echo '
 			<p class="windowbg2 description">', $txt['showPermissions_none_board'], '</p>';
 
-	echo '
+		echo '
 			</div>
 		</div>';
 	}
@@ -631,7 +635,6 @@ function template_action_statPanel()
 		}
 
 		echo '
-
 					</ul>';
 	}
 
@@ -678,11 +681,11 @@ function template_action_statPanel()
 		echo '
 						</dl>';
 	}
+
 	echo '
 					</div>
 				</div>
-			</div>';
-	echo '
+			</div>
 			<div id="popularactivity">
 				<div class="cat_bar">
 					<h3 class="catbg">
@@ -716,13 +719,12 @@ function template_action_statPanel()
 		echo '
 						</dl>';
 	}
+
 	echo '
 					</div>
 				</div>
 			</div>
-		</div>';
-
-	echo '
+		</div>
 	</div>';
 }
 
@@ -766,9 +768,9 @@ function template_viewWarning()
 						</div>
 					</dd>';
 
-		// There's some impact of this?
-		if (!empty($context['level_effects'][$context['current_level']]))
-			echo '
+	// There's some impact of this?
+	if (!empty($context['level_effects'][$context['current_level']]))
+		echo '
 					<dt>
 						<strong>', $txt['profile_viewwarning_impact'], ':</strong>
 					</dt>
@@ -776,7 +778,7 @@ function template_viewWarning()
 						', $context['level_effects'][$context['current_level']], '
 					</dd>';
 
-		echo '
+	echo '
 				</dl>
 			</div>
 		</div>';

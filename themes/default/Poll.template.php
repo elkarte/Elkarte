@@ -118,6 +118,7 @@ function template_poll_edit()
 								</dd>
 							</dl>
 						</fieldset>';
+
 	// If this is an edit, we can allow them to reset the vote counts.
 	if (!empty($context['is_edit']))
 		echo '

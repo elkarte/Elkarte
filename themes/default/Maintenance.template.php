@@ -64,8 +64,8 @@ function template_maintain_database()
 		echo '
 					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'noticebox', '">
 					', $txt[$context['suggested_method']],
-					$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
-					'</div>';
+		$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
+		'</div>';
 
 	echo '
 					<p>
@@ -140,10 +140,12 @@ function template_maintain_routine()
 					<p>', $action['description'], '</p>
 					<div class="submitbutton">
 						<input type="submit" value="', $action['submit'], '" class="button_submit" />';
+
 		if (!empty($action['hidden']))
 			foreach ($action['hidden'] as $name => $val)
 				echo '
 						<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
+
 		echo '
 					</div>
 				</form>
@@ -218,7 +220,7 @@ function template_maintain_members()
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
-	echo '
+		echo '
 		<div class="infobox">
 			', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 		</div>';
@@ -395,7 +397,7 @@ function template_maintain_topics()
 						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
 					</p>';
 
-		echo '
+	echo '
 					<p>
 						<a href="#rotLink" onclick="swapRot();"><img src="', $settings['images_url'], '/selected.png" alt="+" id="rotIcon" /></a> <a href="#rotLink" onclick="swapRot();" id="rotText" style="font-weight: bold;">', $txt['maintain_old_all'], '</a>
 					</p>
@@ -530,6 +532,7 @@ function template_convert_msgbody()
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['body_checking_introduction'], '</p>';
+
 	if (!empty($context['exceeding_messages']))
 	{
 		echo '
@@ -539,6 +542,7 @@ function template_convert_msgbody()
 					', implode('</li><li>', $context['exceeding_messages']), '
 					</li>
 				</ul>';
+		
 		if (!empty($context['exceeding_messages_morethan']))
 			echo '
 				<p>', $context['exceeding_messages_morethan'], '</p>';

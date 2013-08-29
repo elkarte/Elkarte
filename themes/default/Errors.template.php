@@ -12,14 +12,14 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
- *
- * This template file contains only the sub template fatal_error. It is
- * shown when an error occurs, and should show at least a back button and
- * $context['error_message'].
  */
 
-
-// Show an error message.....
+/**
+ * Show an error message.....
+ *
+ * It is shown when an error occurs, and should show at least a back
+ * button and $context['error_message'].
+ */
 function template_fatal_error()
 {
 	global $context, $txt;
@@ -43,6 +43,10 @@ function template_fatal_error()
 	</div>';
 }
 
+/**
+ * Shows the forum error log in all its detail
+ * Supports filtering for viewing all errors of a 'type'
+ */
 function template_error_log()
 {
 	global $context, $settings, $scripturl, $txt;
@@ -135,7 +139,7 @@ function template_error_log()
 							<a style="display: table-cell; padding: 4px 0; width: 20px; vertical-align: top;" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=message;value=', $error['message']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '" /></a>
 							<span style="display: table-cell;">', $error['message']['html'], '</span>';
 
-			echo '
+		echo '
 						</div>
 
 						<div class="error_where">
@@ -187,14 +191,15 @@ function template_error_log()
 			<input type="hidden" name="desc" value="1" />';
 
 	echo '
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
-
-	echo '
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['admin-el_token_var'], '" value="', $context['admin-el_token'], '" />
 		</form>';
 }
 
+/*
+ * Shows the subsection of a file where an error occurred
+ */
 function template_show_file()
 {
 	global $context, $settings;
@@ -209,22 +214,28 @@ function template_show_file()
 	</head>
 	<body>
 		<table id="errorfile_table" class="table_grid">';
+
 	foreach ($context['file_data']['contents'] as $index => $line)
 	{
 		$line_num = $index + $context['file_data']['min'];
 		$is_target = $line_num == $context['file_data']['target'];
 		echo '
 			<tr>
-				<td', $is_target ? ' class="righttext current">==&gt;' : '>', $line_num , ':</td>
-				<td style="white-space: nowrap;', $is_target ? ' border: 1px solid black;border-width: 1px 1px 1px 0;':'','">', $line, '</td>
+				<td', $is_target ? ' class="righttext current">==&gt;' : '>', $line_num, ':</td>
+				<td style="white-space: nowrap;', $is_target ? ' border: 1px solid black;border-width: 1px 1px 1px 0;' : '', '">', $line, '</td>
 			</tr>';
 	}
+
 	echo '
 		</table>
 	</body>
 </html>';
 }
 
+/*
+ * When an attachment fails to upload, this template will show
+ * all the issues to the user
+ */
 function template_attachment_errors()
 {
 	global $context, $txt;
@@ -242,7 +253,7 @@ function template_attachment_errors()
 		template_show_error($key);
 
 	echo
-			!empty($context['back_link']) ? ('<a class="linkbutton" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '','
+	!empty($context['back_link']) ? ('<a class="linkbutton" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '', '
 			<a class="linkbutton" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
 
 		</div>

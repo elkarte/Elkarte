@@ -133,7 +133,7 @@ function template_modify_category()
 					<div class="content">
 						<dl class="settings">';
 
-	// If this isn't the only category, let the user choose where this category should be positioned down the board index.
+	// If this isn't the only category, let the user choose where this category should be positioned down the boardindex.
 	if (count($context['category_order']) > 1)
 	{
 		echo '
@@ -145,6 +145,7 @@ function template_modify_category()
 		foreach ($context['category_order'] as $order)
 			echo '
 								<option', $order['selected'] ? ' selected="selected"' : '', ' value="', $order['id'], '">', $order['name'], '</option>';
+
 		echo '
 							</select>
 						</dd>';
@@ -179,8 +180,10 @@ function template_modify_category()
 		echo '
 						<input type="submit" name="edit" value="', $txt['modify'], '" onclick="return !isEmptyText(this.form.cat_name);" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="submit" name="delete" value="', $txt['mboards_delete_cat'], '" onclick="return confirm(\'', $txt['catConfirm'], '\');" class="button_submit" />';
+
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
+
 	if (!empty($context['token_check']))
 		echo '
 						<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
@@ -284,10 +287,12 @@ function template_modify_board()
 						</dt>
 						<dd>
 							<select name="new_cat" onchange="if (this.form.order) {this.form.order.disabled = this.options[this.selectedIndex].value != 0; this.form.board_order.disabled = this.options[this.selectedIndex].value != 0 || this.form.order.options[this.form.order.selectedIndex].value == \'\';}">';
-		foreach ($context['categories'] as $category)
-			echo '
-								<option', $category['selected'] ? ' selected="selected"' : '', ' value="', $category['id'], '">', $category['name'], '</option>';
+
+	foreach ($context['categories'] as $category)
 		echo '
+								<option', $category['selected'] ? ' selected="selected"' : '', ' value="', $category['id'], '">', $category['name'], '</option>';
+
+	echo '
 							</select>
 						</dd>';
 
@@ -300,8 +305,8 @@ function template_modify_board()
 						</dt>
 						<dd>';
 
-	// The first select box gives the user the option to position it before, after or as a child of another board.
-	echo '
+		// The first select box gives the user the option to position it before, after or as a child of another board.
+		echo '
 							<select id="order" name="placement" onchange="this.form.board_order.disabled = this.options[this.selectedIndex].value == \'\';">
 								', !isset($context['board']['is_new']) ? '<option value="">(' . $txt['mboards_unchanged'] . ')</option>' : '', '
 								<option value="after">' . $txt['mboards_order_after'] . '...</option>
@@ -309,14 +314,16 @@ function template_modify_board()
 								<option value="before">' . $txt['mboards_order_before'] . '...</option>
 							</select>';
 
-	// The second select box lists all the boards in the category.
-	echo '
+		// The second select box lists all the boards in the category.
+		echo '
 							<select id="board_order" name="board_order" ', isset($context['board']['is_new']) ? '' : 'disabled="disabled"', '>
 								', !isset($context['board']['is_new']) ? '<option value="">(' . $txt['mboards_unchanged'] . ')</option>' : '';
-	foreach ($context['board_order'] as $order)
-		echo '
+
+		foreach ($context['board_order'] as $order)
+			echo '
 								<option', $order['selected'] ? ' selected="selected"' : '', ' value="', $order['id'], '">', $order['name'], '</option>';
-	echo '
+
+		echo '
 							</select>
 						</dd>';
 	}
@@ -434,7 +441,7 @@ function template_modify_board()
 							</table>
 						</dd>';
 
-	// Options to choose moderators, specifiy as announcement board and choose whether to count posts here.
+	// Options to choose moderators, specify as announcement board and choose whether to count posts here.
 	echo '
 						<dt>
 							<strong>', $txt['mboards_moderators'], ':</strong><br />
@@ -473,7 +480,7 @@ function template_modify_board()
 	if (empty($context['board']['is_recycle']) && !empty($context['board']['topics']))
 		echo '
 					<div class="infobox">
-						<strong>', $txt['mboards_redirect'],'</strong><br />
+						<strong>', $txt['mboards_redirect'], '</strong><br />
 						', $txt['mboards_redirect_disabled'], '
 					</div>';
 
@@ -579,6 +586,7 @@ function template_modify_board()
 	if (!isset($context['board']['is_new']) && empty($context['board']['is_recycle']))
 		echo '
 						<span', $context['board']['is_recycle'] ? ' style="visibility:hidden">' : '>', '<input type="submit" name="delete" value="', $txt['mboards_delete_board'], '" onclick="return confirm(\'', $txt['boardConfirm'], '\');"', ' class="button_submit" /></span>';
+
 	echo '
 					</div>
 				</div>

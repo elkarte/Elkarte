@@ -15,10 +15,6 @@
  */
 
 /**
- * Template for the message index page.
- */
-
- /**
  * Used to display child boards.
  */
 function template_display_child_boards_above()
@@ -35,7 +31,7 @@ function template_display_child_boards_above()
 	foreach ($context['boards'] as $board)
 	{
 		echo '
-			<li class="board_row ', (!empty($board['children'])) ? 'parent_board':'', '" id="board_', $board['id'], '">
+			<li class="board_row ', (!empty($board['children'])) ? 'parent_board' : '', '" id="board_', $board['id'], '">
 				<div class="board_info">
 					<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 
@@ -52,7 +48,7 @@ function template_display_child_boards_above()
 			echo '
 						<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'off.png" alt="', $txt['old_posts'], '" title="', $txt['old_posts'], '" />';
 
-			echo '
+		echo '
 					</a>
 					<h3 class="board_name">
 						<a href="', $board['href'], '" id="b', $board['id'], '">', $board['name'], '</a>';
@@ -62,9 +58,9 @@ function template_display_child_boards_above()
 			echo '
 						<a href="', $scripturl, '?action=moderate;area=postmod;sa=', ($board['unapproved_topics'] > 0 ? 'topics' : 'posts'), ';brd=', $board['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', sprintf($txt['unapproved_posts'], $board['unapproved_topics'], $board['unapproved_posts']), '" class="moderation_link">(!)</a>';
 
-			echo '
+		echo '
 					</h3>
-					<p class="board_description">', $board['description'] , '</p>';
+					<p class="board_description">', $board['description'], '</p>';
 
 		// Show the "Moderators: ". Each has name, href, link, and id. (but we're gonna use link_moderators.)
 		if (!empty($board['moderators']))
@@ -72,12 +68,12 @@ function template_display_child_boards_above()
 					<p class="moderators">', count($board['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $board['link_moderators']), '</p>';
 
 		// Show some basic information about the number of posts, etc.
-			echo '
+		echo '
 				</div>
 				<div class="board_latest">
 					<p class="board_stats">
 						', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], '
-						', $board['is_redirect'] ? '' : '<br /> '.comma_format($board['topics']) . ' ' . $txt['board_topics'], '
+						', $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
 					</p>';
 
 		// @todo - Last post message still needs some work. Probably split the language string into three chunks.
@@ -89,7 +85,8 @@ function template_display_child_boards_above()
 					<p class="board_lastpost">
 						', $board['last_post']['last_post_message'], '
 					</p>';
-			echo '
+
+		echo '
 				</div>
 			</li>';
 
@@ -99,8 +96,8 @@ function template_display_child_boards_above()
 			// Sort the links into an array with new boards bold so it can be imploded.
 			$children = array();
 
-			/* Each child in each board's children has:
-				id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post. */
+			// Each child in each board's children has:
+			// id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post.
 			foreach ($board['children'] as $child)
 			{
 				if (!$child['is_redirect'])
@@ -115,9 +112,9 @@ function template_display_child_boards_above()
 				$children[] = $child['link'];
 			}
 
-		// New <li> for child boards (if any). Can be styled to look like part of previous <li>.
-		// Use h4 tag here for better a11y. Use <ul> for list of child boards.
-		// Having child board links in <li>'s will allow "tidy child boards" via easy CSS tweaks. ;)
+			// New <li> for child boards (if any). Can be styled to look like part of previous <li>.
+			// Use h4 tag here for better a11y. Use <ul> for list of child boards.
+			// Having child board links in <li>'s will allow "tidy child boards" via easy CSS tweaks. ;)
 			echo '
 			<li class="childboard_row" id="board_', $board['id'], '_children">
 				<ul class="childboards">
@@ -159,7 +156,7 @@ function template_pages_and_buttons_above()
 			echo '
 			<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
 
-			echo '
+		echo '
 			</h2>';
 
 		if (!empty($context['description']) || !empty($settings['display_who_viewing']))
@@ -218,9 +215,8 @@ function template_main()
 		if (!empty($context['topics']))
 		{
 			echo '
-
-				<h3>
-					Sort by: ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'];
+				<h3>',
+					$txt['sort_by'], ': ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'];
 
 			if (!empty($modSettings['likes_enabled']))
 				echo ' / ' . $context['topics_headers']['likes'];
@@ -231,11 +227,9 @@ function template_main()
 			// Show a "select all" box for quick moderation?
 			if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
 				echo '
-
 				<p>
 					<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
 				</p>';
-
 		}
 		// No topics.... just say, "sorry bub".
 		else
@@ -249,7 +243,6 @@ function template_main()
 		if (!empty($context['unapproved_posts_message']))
 		{
 			echo '
-
 			<li class="basic_row">
 				<div class="noticebox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
 			</li>';
@@ -278,7 +271,7 @@ function template_main()
 				<div class="topic_info">
 					<p class="topic_icons">
 						<img src="', $topic['first_post']['icon_url'], '" alt="" />
-						', $topic['is_posted_in'] ? '<img src="'. $settings['images_url']. '/icons/profile_sm.png" alt="" class="fred" />' : '','
+						', $topic['is_posted_in'] ? '<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="fred" />' : '', '
 					</p>
 					<div class="topic_name" ', (!empty($topic['quick_mod']['modify']) ? 'id="topic_' . $topic['first_post']['id'] . '"  ondblclick="oQuickModifyTopic.modify_topic(\'' . $topic['id'] . '\', \'' . $topic['first_post']['id'] . '\');"' : ''), '>';
 
@@ -287,7 +280,7 @@ function template_main()
 				echo '
 						<a href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
 
-				echo '
+			echo '
 						<h4>
 							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
@@ -303,11 +296,11 @@ function template_main()
 					<br />
 					', $topic['views'], ' ', $txt['views'];
 
-				//Show likes?
-				if (!empty($modSettings['likes_enabled']))
-					echo ' / ',$topic['likes'], ' ', $txt['likes'];
+			// Show likes?
+			if (!empty($modSettings['likes_enabled']))
+				echo ' / ', $topic['likes'], ' ', $txt['likes'];
 
-				echo '
+			echo '
 					</p>
 					<p class="topic_lastpost">
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
@@ -320,7 +313,7 @@ function template_main()
 			if (!empty($context['can_quick_mod']))
 			{
 				echo '
-				<p class="topic_moderation', $options['display_quick_mod'] == 1 ? '':'_alt', '" >';
+				<p class="topic_moderation', $options['display_quick_mod'] == 1 ? '' : '_alt', '" >';
 
 				if ($options['display_quick_mod'] == 1)
 					echo '
@@ -349,15 +342,12 @@ function template_main()
 			}
 
 			echo '
-
 			</li>';
-
 		}
 
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
 		{
 			echo '
-
 			<li class="qaction_row">
 				<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 					<option value="">--------</option>';
@@ -365,7 +355,7 @@ function template_main()
 			foreach ($context['qmod_actions'] as $qmod_action)
 				if ($context['can_' . $qmod_action])
 					echo '
-					<option value="' . $qmod_action . '">' . $txt['quick_mod_'  . $qmod_action] . '</option>';
+					<option value="' . $qmod_action . '">' . $txt['quick_mod_' . $qmod_action] . '</option>';
 
 			echo '
 				</select>';
@@ -415,7 +405,7 @@ function template_pages_and_buttons_below()
 		echo '
 		<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
 			<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
-			'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
+			' . ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
 		</p>
 		<p>
 			<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '

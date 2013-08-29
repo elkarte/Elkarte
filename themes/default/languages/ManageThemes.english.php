@@ -63,7 +63,7 @@ $txt['forum_width_desc'] = 'Set the forum width. Examples: 950px, 80%, 1240px.';
 
 $txt['enable_random_news'] = 'Enable random news line in the forum header';
 $txt['show_group_key'] = 'Show group key on board index';
-$txt['additional_options_collapsable'] = 'Enable collapsible additional post options';
+$txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
 $txt['message_index_preview'] = 'Show post previews on the message index';
 $txt['message_index_preview_off'] = 'Do not show the previews';
 $txt['message_index_preview_first'] = 'Show the text of the first post';

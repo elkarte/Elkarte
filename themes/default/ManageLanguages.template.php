@@ -152,7 +152,7 @@ function template_download_language()
 			</div>
 			<div class="windowbg">
 				<div class="content">
-					<p>', $txt['package_ftp_why'],'</p>
+					<p>', $txt['package_ftp_why'], '</p>
 					<dl class="settings">
 						<dt
 							<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
@@ -210,9 +210,11 @@ function template_download_language()
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [';
+
 		foreach ($group as $file)
 			echo '
 					', JavaScriptEscape($theme . '-' . $count++), ',';
+
 		echo '
 					null
 				],
@@ -324,16 +326,15 @@ function template_modify_language_entries()
 				<div id="taskpad" class="floatright">
 					', $txt['edit_language_entries_file'], ':
 						<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
+
 	foreach ($context['possible_files'] as $id_theme => $theme)
 	{
 		echo '
 							<option value="-1">', $theme['name'], '</option>';
 
 		foreach ($theme['files'] as $file)
-		{
 			echo '
 							<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
-		}
 	}
 
 	echo '
@@ -412,12 +413,11 @@ function template_modify_language_entries()
 
 		echo '
 					</dl>
-					<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="right_submit" />';
-
-		echo '
+					<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="button_submit" />
 				</div>
 			</div>';
 	}
+
 	echo '
 		</form>
 	</div>';
@@ -425,7 +425,6 @@ function template_modify_language_entries()
 
 /**
  * Add a new language
- *
  */
 function template_add_language()
 {

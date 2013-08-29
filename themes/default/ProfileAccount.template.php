@@ -150,7 +150,6 @@ function template_issueWarning()
 
 	echo '
 		}
-
 	// ]]></script>';
 
 	echo '
@@ -233,7 +232,7 @@ function template_issueWarning()
 				<div id="box_preview"', !empty($context['warning_data']['body_preview']) ? '' : ' style="display:none"', '>
 					<dl class="settings">
 						<dt>
-							<strong>', $txt['preview'] , '</strong>
+							<strong>', $txt['preview'], '</strong>
 						</dt>
 						<dd id="body_preview">
 							', !empty($context['warning_data']['body_preview']) ? $context['warning_data']['body_preview'] : '', '
