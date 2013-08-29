@@ -108,7 +108,6 @@ function template_profile_save()
 	global $context, $txt;
 
 	echo '
-
 					<hr class="clear" />';
 
 	// Only show the password box if it's actually needed.
@@ -130,6 +129,7 @@ function template_profile_save()
 	if (!empty($context['token_check']))
 		echo '
 						<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+
 	echo '
 						<input type="submit" value="', $txt['change_profile'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

@@ -14,21 +14,24 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Main template for displaying the list of boards
+ */
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	/* Each category in categories is made up of:
-	id, href, link, name, is_collapsed (is it collapsed?), can_collapse (is it okay if it is?),
-	new (is it new?), collapse_href (href to collapse/expand), collapse_image (up/down image),
-	and boards. (see below.) */
+	// Each category in categories is made up of:
+	// id, href, link, name, is_collapsed (is it collapsed?), can_collapse (is it okay if it is?),
+	// new (is it new?), collapse_href (href to collapse/expand), collapse_image (up/down image),
+	// and boards. (see below.)
 	foreach ($context['categories'] as $category)
 	{
 		// If there are no parent boards we can see, avoid showing an empty category (unless its collapsed).
 		if (empty($category['boards']) && !$category['is_collapsed'])
 			continue;
 
-		// @todo - Invent nifty class name for board index header bars.
+		// @todo - Invent nifty class name for boardindex header bars.
 		// @todo - Note these are now h2, not the old h3.
 		echo '
 		<div class="forum_category" id="category_', $category['id'], '">
@@ -37,7 +40,7 @@ function template_main()
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
 			echo '
-				<a class="collapse" href="', $category['collapse_href'], '" title="' ,$category['is_collapsed'] ? $txt['show'] : $txt['hide'] ,'">', $category['collapse_image'], '</a>';
+				<a class="collapse" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '">', $category['collapse_image'], '</a>';
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '
@@ -47,17 +50,16 @@ function template_main()
 		// Assuming the category hasn't been collapsed...
 		if (!$category['is_collapsed'])
 		{
-
-		echo '
+			echo '
 			<ul class="category_boards" id="category_', $category['id'], '_boards">';
-			/* Each board in each category's boards has:
-			new (is it new?), id, name, description, moderators (see below), link_moderators (just a list.),
-			children (see below.), link_children (easier to use.), children_new (are they new?),
-			topics (# of), posts (# of), link, href, and last_post. (see below.) */
+			// Each board in each category's boards has:
+			// new (is it new?), id, name, description, moderators (see below), link_moderators (just a list.),
+			// children (see below.), link_children (easier to use.), children_new (are they new?),
+			// topics (# of), posts (# of), link, href, and last_post. (see below.)
 			foreach ($category['boards'] as $board)
 			{
 				echo '
-				<li class="board_row ', (!empty($board['children'])) ? 'parent_board':'', '" id="board_', $board['id'], '">
+				<li class="board_row ', (!empty($board['children'])) ? 'parent_board' : '', '" id="board_', $board['id'], '">
 					<div class="board_info">
 						<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 
@@ -86,7 +88,7 @@ function template_main()
 
 				echo '
 						</h3>
-						<p class="board_description">', $board['description'] , '</p>';
+						<p class="board_description">', $board['description'], '</p>';
 
 				// Show the "Moderators: ". Each has name, href, link, and id. (but we're gonna use link_moderators.)
 				if (!empty($board['moderators']))
@@ -94,23 +96,24 @@ function template_main()
 						<p class="moderators">', count($board['moderators']) == 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $board['link_moderators']), '</p>';
 
 				// Show some basic information about the number of posts, etc.
-					echo '
+				echo '
 					</div>
 					<div class="board_latest">
 						<p class="board_stats">
 							', comma_format($board['posts']), ' ', $board['is_redirect'] ? $txt['redirects'] : $txt['posts'], '
-							', $board['is_redirect'] ? '' : '<br /> '.comma_format($board['topics']) . ' ' . $txt['board_topics'], '
+							', $board['is_redirect'] ? '' : '<br /> ' . comma_format($board['topics']) . ' ' . $txt['board_topics'], '
 						</p>';
 
 				// @todo - Last post message still needs some work. Probably split the language string into three chunks.
 				// Example:
-				// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk> 
+				// <chunk>Re: Nunc aliquam justo e...</chunk>  <chunk>by Whoever</chunk> <chunk>Last post: Today at 08:00:37 am</chunk>
 				// That should still allow sufficient scope for any language, if done sensibly.
 				if (!empty($board['last_post']['id']))
 					echo '
 						<p class="board_lastpost">
 							', $board['last_post']['last_post_message'], '
 						</p>';
+
 				echo '
 					</div>
 				</li>';
@@ -120,8 +123,9 @@ function template_main()
 				{
 					// Sort the links into an array with new boards bold so it can be imploded.
 					$children = array();
-					/* Each child in each board's children has:
-							id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post. */
+
+					// Each child in each board's children has:
+					// id, name, description, new (is it new?), topics (#), posts (#), href, link, and last_post.
 					foreach ($board['children'] as $child)
 					{
 						if (!$child['is_redirect'])
@@ -136,11 +140,10 @@ function template_main()
 						$children[] = $child['link'];
 					}
 
-				// New <li> for child boards (if any). Can be styled to look like part of previous <li>.
-				// Use h4 tag here for better a11y. Use <ul> for list of child boards.
-				// Having child board links in <li>'s will allow "tidy child boards" via easy CSS tweaks. ;)
-				echo '
-
+					// New <li> for child boards (if any). Can be styled to look like part of previous <li>.
+					// Use h4 tag here for better a11y. Use <ul> for list of child boards.
+					// Having child board links in <li>'s will allow "tidy child boards" via easy CSS tweaks. ;)
+					echo '
 				<li class="childboard_row" id="board_', $board['id'], '_children">
 					<ul class="childboards">
 						<li>
@@ -151,19 +154,21 @@ function template_main()
 						</li>
 					</ul>
 				</li>';
-
 				}
 			}
 
-	echo '
+			echo '
 			</ul>';
 		}
 
-	echo '
+		echo '
 		</div>';
 	}
 }
 
+/**
+ * Show information above the boardindex, like the newsfader
+ */
 function template_boardindex_outer_above()
 {
 	global $context, $settings, $txt;
@@ -173,11 +178,13 @@ function template_boardindex_outer_above()
 		echo '
 		<div id="index_common_stats">
 			', $txt['members'], ': ', $context['common_stats']['total_members'], ' &nbsp;&#8226;&nbsp; ', $txt['posts_made'], ': ', $context['common_stats']['total_posts'], ' &nbsp;&#8226;&nbsp; ', $txt['topics_made'], ': ', $context['common_stats']['total_topics'], '<br />
-			', $settings['show_latest_member'] ? ' ' . sprintf($txt['welcome_newest_member'], ' <strong>' . $context['common_stats']['latest_member']['link'] . '</strong>') : '' , '
+			', $settings['show_latest_member'] ? ' ' . sprintf($txt['welcome_newest_member'], ' <strong>' . $context['common_stats']['latest_member']['link'] . '</strong>') : '', '
 		</div>';
-
 }
 
+/**
+ * Show information below the boardindex, like stats, infocenter
+ */
 function template_boardindex_outer_below()
 {
 	global $context, $settings, $txt;
@@ -189,11 +196,11 @@ function template_boardindex_outer_below()
 
 	// Show the mark all as read button?
 	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
-	echo '
+		echo '
 			', template_button_strip($context['mark_read_button'], 'right');
 
 	if ($context['user']['is_logged'])
-	echo '
+		echo '
 			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_some.png" alt="" /> ', $txt['new_posts'], '</p>';
 
 	echo '
@@ -204,6 +211,9 @@ function template_boardindex_outer_below()
 	template_info_center();
 }
 
+/**
+ * The infocenter ... stats, recent topics, other important information that never gets seen :P
+ */
 function template_info_center()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
@@ -253,9 +263,9 @@ function template_info_center()
 						<th class="recenttime">', $txt['date'], '</th>
 					</tr>';
 
-			/* Each post in latest_posts has:
-					board (with an id, name, and link.), topic (the topic's id.), poster (with id, name, and link.),
-					subject, short_subject (shortened with...), time, link, and href. */
+			// Each post in latest_posts has:
+			// board (with an id, name, and link.), topic (the topic's id.), poster (with id, name, and link.),
+			// subject, short_subject (shortened with...), time, link, and href.
 			foreach ($context['latest_posts'] as $post)
 				echo '
 					<tr>
@@ -264,9 +274,11 @@ function template_info_center()
 						<td class="recentboard">', $post['board']['link'], '</td>
 						<td class="recenttime"><time datetime="', htmlTime($post['time']), '">', $post['time'], '</time></td>
 					</tr>';
+
 			echo '
 				</table>';
 		}
+
 		echo '
 			</li>';
 	}
@@ -280,7 +292,7 @@ function template_info_center()
 					<a href="', $scripturl, '?action=calendar' . '"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
 				</h3>';
 
-		// Holidays like "Christmas", "Chanukah", and "We Love [Unknown] Day" :P.
+		// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
 		if (!empty($context['calendar_holidays']))
 			echo '
 				<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';
@@ -291,6 +303,7 @@ function template_info_center()
 			echo '
 				<p class="inline">
 					<span class="birthday">', $context['calendar_only_today'] ? $txt['birthdays'] : $txt['birthdays_upcoming'], '</span>';
+
 			// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
 			foreach ($context['calendar_birthdays'] as $member)
 				echo '
@@ -307,10 +320,11 @@ function template_info_center()
 					<span class="event">', $context['calendar_only_today'] ? $txt['events'] : $txt['events_upcoming'], '</span> ';
 
 			// Each event in calendar_events should have:
-			//		title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
+			// title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
 			foreach ($context['calendar_events'] as $event)
 				echo '
 					', $event['can_edit'] ? '<a href="' . $event['modify_href'] . '" title="' . $txt['calendar_edit'] . '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" class="centericon" /></a> ' : '', $event['href'] == '' ? '' : '<a href="' . $event['href'] . '">', $event['is_today'] ? '<strong>' . $event['title'] . '</strong>' : $event['title'], $event['href'] == '' ? '' : '</a>', $event['is_last'] ? '<br />' : ', ';
+
 			echo '
 				</p>';
 		}
@@ -328,7 +342,7 @@ function template_info_center()
 					<a href="', $scripturl, '?action=stats" title="', $txt['more_stats'], '"><img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />', $txt['forum_stats'], '</a>
 				</h3>
 				<p class="inline">
-					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - '. $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
+					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
 					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
 				</p>
 			</li>';
@@ -338,15 +352,17 @@ function template_info_center()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" />', $txt['online_now'], ': 
+					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" />', $txt['online_now'], ':
 					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	// Handle hidden users and buddies.
 	$bracketList = array();
 	if ($context['show_buddies'])
 		$bracketList[] = comma_format($context['num_buddies']) . ' ' . ($context['num_buddies'] == 1 ? $txt['buddy'] : $txt['buddies']);
+
 	if (!empty($context['num_spiders']))
 		$bracketList[] = comma_format($context['num_spiders']) . ' ' . ($context['num_spiders'] == 1 ? $txt['spider'] : $txt['spiders']);
+
 	if (!empty($context['num_users_hidden']))
 		$bracketList[] = comma_format($context['num_users_hidden']) . ' ' . ($context['num_spiders'] == 1 ? $txt['hidden'] : $txt['hidden_s']);
 
@@ -354,7 +370,6 @@ function template_info_center()
 		echo ' (' . implode(', ', $bracketList) . ')';
 
 	echo $context['show_who'] ? '</a>' : '', '
-
 				</h3>';
 
 	// Assuming there ARE users online... each user in users_online has an id, username, name, group, href, and link.
@@ -366,7 +381,7 @@ function template_info_center()
 		// Showing membergroups?
 		if (!empty($settings['show_group_key']) && !empty($context['membergroups']))
 			echo '
-				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']). ']</p>';
+				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
 	}
 
 	echo '

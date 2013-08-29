@@ -14,10 +14,16 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Simple but important :P
+ */
 function template_main()
 {
 }
 
+/**
+ * Template used to manage package servers
+ */
 function template_servers()
 {
 	global $context, $txt, $scripturl;
@@ -104,6 +110,9 @@ function template_servers()
 	</div>';
 }
 
+/**
+ * Show a confirmation dialog
+ */
 function template_package_confirm()
 {
 	global $context, $txt;
@@ -116,12 +125,16 @@ function template_package_confirm()
 		<div class="windowbg">
 			<div class="content">
 				<p>', $context['confirm_message'], '</p>
-				<a href="', $context['proceed_href'], '">[ ', $txt['package_confirm_proceed'], ' ]</a> <a href="JavaScript:history.go(-1);">[ ', $txt['package_confirm_go_back'], ' ]</a>
+				<a href="', $context['proceed_href'], '">[ ', $txt['package_confirm_proceed'], ' ]</a>
+				<a href="JavaScript:history.go(-1);">[ ', $txt['package_confirm_go_back'], ' ]</a>
 			</div>
 		</div>
 	</div>';
 }
 
+/**
+ * Shows all of the addon packs available on the package server
+ */
 function template_package_list()
 {
 	global $context, $settings, $txt;
@@ -174,20 +187,16 @@ function template_package_list()
 							<hr />';
 				// A remote link.
 				elseif ($package['is_remote'])
-				{
 					echo '
 							<strong>', $package['link'], '</strong>';
-				}
 				// A title?
 				elseif ($package['is_heading'] || $package['is_title'])
-				{
 					echo '
 							<strong>', $package['name'], '</strong>';
-				}
 				// Otherwise, it's a package.
 				else
 				{
-					// 1. Some mod [ Download ].
+					// 1. Some addon [ Download ].
 					echo '
 							<strong><img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/collapse.png" alt="*" style="display: none;" /> ', $package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a href="' . $package['download']['href'] . '">[ ' . $txt['download'] . ' ]</a>': $package['name'];
 
@@ -199,7 +208,7 @@ function template_package_list()
 							</strong>
 							<ul id="package_section_', $i, '_pkg_', $id, '" class="package_section">';
 
-					// Show the mod type?
+					// Show the addon type?
 					if ($package['type'] != '')
 						echo '
 								<li class="package_section">', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
@@ -216,7 +225,7 @@ function template_package_list()
 						echo '
 								<li class="package_section">', $txt['author_website'], ':&nbsp; ', $package['author']['website']['link'], '</li>';
 
-					// Desciption: bleh bleh!
+					// Description: bleh bleh!
 					// Location of file: http://someplace/.
 					echo '
 								<li class="package_section">', $txt['file_location'], ':&nbsp; <a href="', $package['href'], '">', $package['href'], '</a></li>
@@ -244,10 +253,9 @@ function template_package_list()
 			<img src="', $settings['images_url'], '/icons/package_installed.png" alt="" class="centericon" style="margin-left: 1ex;" /> ', $txt['package_installed_current'], '
 			<img src="', $settings['images_url'], '/icons/package_old.png" alt="" class="centericon" style="margin-left: 2ex;" /> ', $txt['package_installed_old'], '
 		</div>
-	</div>
+	</div>';
 
-		';
-		// Now go through and turn off all the sections.
+	// Now go through and turn off / collapse all the sections.
 		if (!empty($context['package_list']))
 		{
 			$section_count = count($context['package_list']);

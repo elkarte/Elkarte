@@ -20,6 +20,7 @@
  */
 function template_avatar_settings_above()
 {
+
 }
 
 /**
@@ -144,6 +145,7 @@ function template_maintenance()
 	foreach ($context['attach_dirs'] as $id => $dir)
 		echo '
 								<option value="', $id, '">', $dir, '</option>';
+
 	echo '
 							</select></dd>
 							<dt>', $txt['attachment_transfer_auto'], '</dt>
@@ -156,7 +158,7 @@ function template_maintenance()
 			echo '
 								<option value="', $id, '">', $dir, '</option>';
 	else
-			echo '
+		echo '
 								<option value="0" disabled="disabled">', $txt['attachment_transfer_no_base'], '</option>';
 
 	echo '
@@ -168,6 +170,7 @@ function template_maintenance()
 	foreach ($context['attach_dirs'] as $id => $dir)
 		echo '
 								<option value="', $id, '">', $dir, '</option>';
+
 	echo '
 							</select></dd>';
 
@@ -190,7 +193,7 @@ function template_maintenance()
 						}
 
 						function show_msg() {
-							$(\'#progress_msg\').html(\'<div><img src="', $settings['actual_images_url'], '/loading.gif" alt="loading.gif" style="width:35px; height:35px" />&nbsp; ', $txt['attachment_transfer_progress'] , '<\/div>\');
+							$(\'#progress_msg\').html(\'<div><img src="', $settings['actual_images_url'], '/loading.gif" alt="loading.gif" style="width:35px; height:35px" />&nbsp; ', $txt['attachment_transfer_progress'], '<\/div>\');
 							show_progress();
 						}
 
@@ -226,7 +229,6 @@ function template_attachment_repair()
 		</div>
 	</div>';
 	}
-
 	// What about if no errors were even found?
 	elseif (!$context['errors_found'])
 	{
@@ -259,7 +261,7 @@ function template_attachment_repair()
 		foreach ($context['repair_errors'] as $error => $number)
 		{
 			if (!empty($number))
-			echo '
+				echo '
 					<input type="checkbox" name="to_fix[]" id="', $error, '" value="', $error, '" class="input_check" />
 					<label for="', $error, '">', sprintf($txt['attach_repair_' . $error], $number), '</label><br />';
 		}
@@ -284,9 +286,7 @@ function template_attach_paths()
 	global $modSettings;
 
 	if (!empty($modSettings['attachment_basedirectories']))
-	{
 		template_show_list('base_paths');
-	}
 
 	template_show_list('attach_paths');
 }

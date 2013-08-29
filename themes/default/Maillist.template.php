@@ -11,7 +11,7 @@
  */
 
 /**
- * Shows the details of a failed email for moderation review
+ * Shows the details of a failed post by email for moderation review
  */
 function template_show_email()
 {
@@ -42,13 +42,15 @@ function template_show_email()
 				</dl>
 			</div>
 		</div>
-		<div class="centertext"><a href="' . $boardurl . '/index.php?action=admin;area=maillist;sa=emaillist">', $txt['back'], '</a></div><br />
+		<div class="centertext">
+			<a href="' . $boardurl . '/index.php?action=admin;area=maillist;sa=emaillist">', $txt['back'], '</a>
+		</div><br />
 	</body>
 </html>';
 }
 
 /**
- * Used to select a bounce template and send a bounce message to a email sender
+ * Used to select a reject template and send a bounce message to a email sender
  */
 function template_bounce_email()
 {
@@ -176,7 +178,8 @@ function template_bounce_email()
 }
 
 /**
- * Shows email address to board selections.
+ * Shows email address to board selections, used to determine where to post
+ * a new topic post by email
  */
 function template_callback_maillist_receive_email_list()
 {
@@ -204,7 +207,7 @@ function template_callback_maillist_receive_email_list()
 
 		foreach ($context['boards'] as $board_id => $board_name)
 			echo '
-					<option value="', $board_id, '"', (($data['boardto'] == $board_id) ? ' selected="selected"' : ''), '>', $board_name,  '</option>';
+					<option value="', $board_id, '"', (($data['boardto'] == $board_id) ? ' selected="selected"' : ''), '>', $board_name, '</option>';
 
 		echo '
 				</select>
@@ -227,7 +230,7 @@ function template_callback_maillist_receive_email_list()
 				echo '
 					<option value="', $board_id, '">', $board_name, '</option>';
 
-				echo '
+			echo '
 				</select>
 			</dd>';
 		}
@@ -341,7 +344,7 @@ function template_bounce_template()
 					<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
 						<dl>
 							<dt>
-								<strong id="error_serious">', $txt['error_while_submitting'] , '</strong>
+								<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
 							</dt>
 							<dd class="error" id="error_list">
 								', empty($context['warning_errors']) ? '' : implode('<br />', $context['warning_errors']), '
@@ -351,7 +354,7 @@ function template_bounce_template()
 					<div id="box_preview"', !empty($context['template_preview']) ? '' : ' style="display:none"', '>
 						<dl class="settings">
 							<dt>
-								', $txt['preview'] , '
+								', $txt['preview'], '
 							</dt>
 							<dd id="template_preview">
 								', !empty($context['template_preview']) ? $context['template_preview'] : '', '

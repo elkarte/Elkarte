@@ -12,14 +12,16 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
+ */
+
+/**
+ * This is where we get information about who they want to send the topic to, etc.
  *
- * This template contains two humble sub templates - main. Its job is pretty
- * simple: it collects the information we need to actually send the topic.
- *
- * The main sub template gets shown from:
+ * The template gets shown from:
  * 	'?action=emailuser;sa=sendtopic;topic=##.##'
  * And should submit to:
  * 	'?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.' . $context['start']
+ *
  * It should send the following fields:
  * 	y_name: sender's name.
  * 	y_email: sender's email.
@@ -28,18 +30,7 @@
  * 	r_email: receiver's email address.
  * 	send: this just needs to be set, as by the submit button.
  * 	sc: the session id, or $context['session_id'].
- *
- * The report sub template gets shown from:
- * 	'?action=reporttm;topic=##.##;msg=##'
- * It should submit to:
- * 	'?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
- * It only needs to send the following fields:
- * 	comment: an additional comment to give the moderator.
- * 	sc: the session id, or $context['session_id'].
- *
  */
-
-// This is where we get information about who they want to send the topic to, etc.
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -102,7 +93,9 @@ function template_main()
 	</div>';
 }
 
-// Send an email to a user!
+/**
+ * Send an email to a user!
+ */
 function template_custom_email()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -126,7 +119,7 @@ function template_custom_email()
 						</dd>';
 
 	// Can the user see the persons email?
-	if ($context['can_view_receipient_email'])
+	if ($context['can_view_recipient_email'])
 		echo '
 						<dt>
 							<strong>', $txt['sendtopic_receiver_email'], ':</strong>
@@ -196,6 +189,16 @@ function template_custom_email()
 	</div>';
 }
 
+/**
+ * The report sub template gets shown from:
+ * 	'?action=reporttm;topic=##.##;msg=##'
+ * It should submit to:
+ * 	'?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
+ *
+ * It only needs to send the following fields:
+ * 	comment: an additional comment to give the moderator.
+ * 	sc: the session id, or $context['session_id'].
+ */
 function template_report()
 {
 	global $context, $txt, $scripturl;

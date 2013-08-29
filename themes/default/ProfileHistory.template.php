@@ -106,7 +106,7 @@ function template_trackIP()
 	<br />
 	<div class="generic_list_wrapper">';
 
-	// The table inbetween the first and second table shows links to the whois server for every region.
+	// The table in between the first and second table shows links to the whois server for every region.
 	if ($context['single_ip'])
 	{
 		echo '
@@ -114,10 +114,12 @@ function template_trackIP()
 				<h3 class="titlebg">', $txt['whois_title'], ' ', $context['ip'], '</h3>
 			</div>
 			<div class="windowbg2">';
-			foreach ($context['whois_servers'] as $server)
-				echo '
-					<a href="', $server['url'], '" target="_blank" class="new_win"', isset($context['auto_whois_server']) && $context['auto_whois_server']['name'] == $server['name'] ? ' style="font-weight: bold;"' : '', '>', $server['name'], '</a><br />';
+
+		foreach ($context['whois_servers'] as $server)
 			echo '
+					<a href="', $server['url'], '" target="_blank" class="new_win"', isset($context['auto_whois_server']) && $context['auto_whois_server']['name'] == $server['name'] ? ' style="font-weight: bold;"' : '', '>', $server['name'], '</a><br />';
+
+		echo '
 			</div>';
 	}
 
@@ -126,6 +128,7 @@ function template_trackIP()
 		<div class="title_bar">
 			<h3 class="titlebg">', $txt['members_from_ip'], ' ', $context['ip'], '</h3>
 		</div>';
+
 	if (empty($context['ips']))
 		echo '
 		<p class="windowbg2 description"><em>', $txt['no_members_from_ip'], '</em></p>';
