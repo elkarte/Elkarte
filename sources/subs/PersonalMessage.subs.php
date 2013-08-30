@@ -999,7 +999,7 @@ function loadPMs($pm_options, $id_member)
 		}
 
 		// Keep track of the last message so we know what the head is without another query!
-		if ((empty($pmID) && (empty($options['view_newest_pm_first']) || !isset($lastData))) || empty($lastData) || (!empty($pmID) && $pmID == $row['id_pm']))
+		if ((empty($pm_options['pmid']) && (empty($options['view_newest_pm_first']) || !isset($lastData))) || empty($lastData) || (!empty($pm_options['pmid']) && $pm_options['pmid'] == $row['id_pm']))
 			$lastData = array(
 				'id' => $row['id_pm'],
 				'head' => $row['id_pm_head'],
@@ -1201,7 +1201,7 @@ function toggleNewPM($id_member, $new = false)
 	global $user_info;
 
 	$db = database();
-	
+
 	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
 		SET is_new = ' . ($new ? '{int:new}' : '{int:not_new}') . '
