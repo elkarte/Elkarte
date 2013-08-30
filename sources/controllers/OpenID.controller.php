@@ -100,7 +100,7 @@ class OpenID_Controller extends Action_Controller
 
 		// Any save fields to restore?
 		$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
-		$context['openid_claimed_id'] = $_GET["openid_claimed_id"];
+		$context['openid_claimed_id'] = $_GET['openid_claimed_id'];
 		// Is there a user with this OpenID_uri?
 		$result = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
