@@ -116,9 +116,10 @@ class BoardIndex_Controller extends Action_Controller
 
 			// This is used to show the "how-do-I-edit" help.
 			$context['calendar_can_edit'] = allowedTo('calendar_edit_any');
+			$show_calendar = true;
 		}
 		else
-			$context['show_calendar'] = false;
+			$show_calendar = false;
 
 		$context['page_title'] = sprintf($txt['forum_index'], $context['forum_name']);
 
@@ -130,9 +131,9 @@ class BoardIndex_Controller extends Action_Controller
 		$context['info_center_callbacks'] = array();
 		if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
 			$context['info_center_callbacks'][] = 'recent_posts';
-		if ($context['show_calendar'])
+		if ($show_calendar)
 			$context['info_center_callbacks'][] = 'show_events';
-		if ($settings['show_stats_index'])
+		if (!empty($settings['show_stats_index']))
 			$context['info_center_callbacks'][] = 'show_stats';
 		$context['info_center_callbacks'][] = 'show_users';
 

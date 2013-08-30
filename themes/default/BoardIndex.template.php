@@ -231,7 +231,8 @@ function template_info_center()
 	foreach ($context['info_center_callbacks'] as $callback)
 	{
 		$func = 'template_ic_' . $callback;
-		$func();
+		if (function_exists($func))
+			$func();
 	}
 
 	echo '
@@ -283,11 +284,9 @@ function template_ic_recent_posts()
 {
 	global $context, $txt, $scripturl, $settings;
 
-	if (!empty($settings['number_recent_posts']))
-	{
-		// Show the Recent Posts title, and attach webslices feed to this section
-		// The format requires: hslice, entry-title and entry-content classes.
-		echo '
+	// Show the Recent Posts title, and attach webslices feed to this section
+	// The format requires: hslice, entry-title and entry-content classes.
+	echo '
 			<li class="board_row hslice" id="recent_posts_content">
 				<h3 class="ic_section_header">
 					<a href="', $scripturl, '?action=recent"><img class="icon" src="', $settings['images_url'], '/post/xx.png" alt="" />', $txt['recent_posts'], '</a>
@@ -297,19 +296,19 @@ function template_ic_recent_posts()
 					<a rel="feedurl" href="', $scripturl, '?action=.xml;type=webslice">', $txt['subscribe_webslice'], '</a>
 				</div>';
 
-		// Only show one post.
-		if ($settings['number_recent_posts'] == 1)
-		{
+	// Only show one post.
+	if ($settings['number_recent_posts'] == 1)
+	{
 			// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
 			echo '
 				<p id="infocenter_onepost" class="inline">
 					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;&quot;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'], '&quot;'), ' (<time datetime="', htmlTime($context['latest_post']['timestamp']), '">', $context['latest_post']['time'], '</time>)
 				</p>';
-		}
-		// Show lots of posts. @todo - Although data here is actually tabular, perhaps use faux table for greater responsiveness.
-		elseif (!empty($context['latest_posts']))
-		{
-			echo '
+	}
+	// Show lots of posts. @todo - Although data here is actually tabular, perhaps use faux table for greater responsiveness.
+	elseif (!empty($context['latest_posts']))
+	{
+		echo '
 				<table id="ic_recentposts">
 					<tr>
 						<th class="recentpost">', $txt['message'], '</th>
@@ -318,11 +317,11 @@ function template_ic_recent_posts()
 						<th class="recenttime">', $txt['date'], '</th>
 					</tr>';
 
-			// Each post in latest_posts has:
-			// board (with an id, name, and link.), topic (the topic's id.), poster (with id, name, and link.),
-			// subject, short_subject (shortened with...), time, link, and href.
-			foreach ($context['latest_posts'] as $post)
-				echo '
+		// Each post in latest_posts has:
+		// board (with an id, name, and link.), topic (the topic's id.), poster (with id, name, and link.),
+		// subject, short_subject (shortened with...), time, link, and href.
+		foreach ($context['latest_posts'] as $post)
+			echo '
 					<tr>
 						<td class="recentpost"><strong>', $post['link'], '</strong></td>
 						<td class="recentposter">', $post['poster']['link'], '</td>
@@ -330,13 +329,11 @@ function template_ic_recent_posts()
 						<td class="recenttime"><time datetime="', htmlTime($post['time']), '">', $post['time'], '</time></td>
 					</tr>';
 
-			echo '
-				</table>';
-		}
-
 		echo '
-			</li>';
+				</table>';
 	}
+	echo '
+			</li>';
 }
 
 // Show information about events, birthdays, and holidays on the calendar.
@@ -344,23 +341,21 @@ function template_ic_show_events()
 {
 	global $context, $txt, $scripturl, $settings;
 
-	if ($context['show_calendar'])
-	{
-		echo '
+	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
 					<a href="', $scripturl, '?action=calendar' . '"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
 				</h3>';
 
-		// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
-		if (!empty($context['calendar_holidays']))
-			echo '
+	// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
+	if (!empty($context['calendar_holidays']))
+		echo '
 				<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';
 
-		// People's birthdays. Like mine. And yours, I guess. Kidding.
-		if (!empty($context['calendar_birthdays']))
-		{
-			echo '
+	// People's birthdays. Like mine. And yours, I guess. Kidding.
+	if (!empty($context['calendar_birthdays']))
+	{
+		echo '
 				<p class="inline">
 					<span class="birthday">', $context['calendar_only_today'] ? $txt['birthdays'] : $txt['birthdays_upcoming'], '</span>';
 
@@ -368,14 +363,15 @@ function template_ic_show_events()
 			foreach ($context['calendar_birthdays'] as $member)
 				echo '
 					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
-			echo '
-				</p>';
-		}
 
-		// Events like community get-togethers.
-		if (!empty($context['calendar_events']))
-		{
-			echo '
+		echo '
+				</p>';
+	}
+
+	// Events like community get-togethers.
+	if (!empty($context['calendar_events']))
+	{
+		echo '
 				<p class="inline">
 					<span class="event">', $context['calendar_only_today'] ? $txt['events'] : $txt['events_upcoming'], '</span> ';
 
@@ -385,13 +381,12 @@ function template_ic_show_events()
 				echo '
 					', $event['can_edit'] ? '<a href="' . $event['modify_href'] . '" title="' . $txt['calendar_edit'] . '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" class="centericon" /></a> ' : '', $event['href'] == '' ? '' : '<a href="' . $event['href'] . '">', $event['is_today'] ? '<strong>' . $event['title'] . '</strong>' : $event['title'], $event['href'] == '' ? '' : '</a>', $event['is_last'] ? '<br />' : ', ';
 
-			echo '
-				</p>';
-		}
-
 		echo '
-			</li>';
+				</p>';
 	}
+
+	echo '
+			</li>';
 }
 
 // Show statistical style information...
@@ -399,9 +394,7 @@ function template_ic_show_stats()
 {
 	global $txt, $scripturl, $context, $settings;
 
-	if ($settings['show_stats_index'])
-	{
-		echo '
+	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
 					<a href="', $scripturl, '?action=stats" title="', $txt['more_stats'], '"><img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />', $txt['forum_stats'], '</a>
@@ -411,7 +404,6 @@ function template_ic_show_stats()
 					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
 				</p>
 			</li>';
-	}
 }
 
 function template_ic_show_users()
