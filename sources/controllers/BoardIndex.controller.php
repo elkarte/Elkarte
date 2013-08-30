@@ -93,8 +93,7 @@ class BoardIndex_Controller extends Action_Controller
 			$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
 		}
 
-		$settings['display_recent_bar'] = !empty($settings['number_recent_posts']) ? $settings['number_recent_posts'] : 0;
-		$settings['show_member_bar'] &= allowedTo('view_mlist');
+		// @todo show_stats and show_member_list are not used: are they useful to themers?
 		$context['show_stats'] = allowedTo('view_stats') && !empty($modSettings['trackStats']);
 		$context['show_member_list'] = allowedTo('view_mlist');
 		$context['show_who'] = allowedTo('who_view') && !empty($modSettings['who_enabled']);
