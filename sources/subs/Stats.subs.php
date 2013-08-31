@@ -435,7 +435,7 @@ function topTopicViews()
  */
 function topTopicStarter()
 {
-	global $modSettings, $scripturl, $context;
+	global $modSettings, $scripturl;
 
 	$db = database();
 
@@ -496,9 +496,9 @@ function topTopicStarter()
 	foreach ($top_starters as $i => $topic)
 		{
 			$top_starters[$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);
-			$top_starters[$i]['num_topics'] = comma_format($context['top_starters'][$i]['num_topics']);
+			$top_starters[$i]['num_topics'] = comma_format($top_starters[$i]['num_topics']);
 		}
-	
+
 	return $top_starters;
 }
 

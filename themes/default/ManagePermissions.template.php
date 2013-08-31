@@ -296,9 +296,7 @@ function template_by_board()
 
 	if (!$context['edit_all'])
 		echo '
-					<span class="floatright">
-						<a class="button_link" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
-					</span>';
+					<a class="floatright" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>';
 
 	echo '
 				</h3>
