@@ -812,7 +812,7 @@ function template_display_poll_above()
 		foreach ($context['poll']['options'] as $option)
 		{
 			echo '
-						<dt class="', $option['voted_this'] ? ' voted' : '', '">', $option['option'], '</dt>
+						<dt class="', $option['voted_this'] ? 'voted' : '', '">', $option['option'], '</dt>
 						<dd class="statsbar', $option['voted_this'] ? ' voted' : '', '">';
 
 			if ($context['allow_poll_view'])
