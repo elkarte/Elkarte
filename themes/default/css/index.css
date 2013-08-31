@@ -3915,6 +3915,9 @@ dl.merge_topic dd {
 	.board_latest {
 		min-width: 20em;
 	}
+	.topic_latest {
+		min-width: 17em;
+	}
 	.board_name {
 		margin: 0 0 0 56px;
 	}
