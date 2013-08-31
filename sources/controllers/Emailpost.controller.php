@@ -194,7 +194,7 @@ class Emailpost_Controller extends Action_Controller
 	 */
 	function action_pbe_topic($data = null, $force = false)
 	{
-		global $modSettings, $user_info;
+		global $modSettings, $user_info, $maintenance;
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))

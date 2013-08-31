@@ -57,7 +57,7 @@ class Emailuser_Controller extends Action_Controller
 	 */
 	public function action_sendtopic()
 	{
-		global $topic, $txt, $context, $scripturl, $modSettings;
+		global $topic, $txt, $context, $modSettings;
 
 		// Check permissions...
 		isAllowedTo('send_topic');
