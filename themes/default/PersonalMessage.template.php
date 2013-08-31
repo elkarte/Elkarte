@@ -745,7 +745,7 @@ function template_search()
 				<dt>
 				</dt>
 				<dd>
-					<a href="', $scripturl, '?action=pm;sa=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['pm_search_simple'], '</a>
+					<a href="', $scripturl, '?action=pm;sa=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['pm_search_simple'], '</a>
 				</dd>
 			</dl>
 			<input type="hidden" name="advanced" value="1" />';
