@@ -4019,4 +4019,7 @@ dl.merge_topic dd {
 		clear: both;
 		content:"";
 	}
+	.recentboard, .recentposter {
+		display: none;
+	}
 }
