@@ -2901,7 +2901,7 @@ dl.merge_topic dd {
 
 /* @todo - Buddy section stuff. */
 .add_buddy .roundframe, .add_buddy .title_bar {
-	max-width: 70em;
+	margin-top: 5px;
 	border: none;
 	background: none;
 }
