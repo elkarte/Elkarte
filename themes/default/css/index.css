@@ -3915,8 +3915,19 @@ dl.merge_topic dd {
 	.board_latest {
 		min-width: 20em;
 	}
+	.board_name {
+		margin: 0 0 0 56px;
+	}
 	.board_lastposter {
 		display: block;
+	}
+	.board_name:after {
+		display: block;
+		clear: both;
+		content:"";
+	}
+	.board_description, .moderators, .childboards {
+		margin: 0 0 0 8px;
 	}
 	.board_stats, .topic_stats {
 		display: none;
