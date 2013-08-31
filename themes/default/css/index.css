@@ -4000,6 +4000,13 @@ dl.merge_topic dd {
 	.topic_name h4 {
 		display: block;
 	}
+	#wrapper {
+		padding-left: 2px;
+		padding-right: 22px;
+	}
+	#gobottom, #gotop { 
+		padding-left: 0.25em;
+	}
 }
 
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
