@@ -348,7 +348,7 @@ function template_edit_options()
 					// Is this some code to generate the options?
 					if (!is_array($field['options']))
 						$field['options'] = eval($field['options']);
-					
+
 					// Assuming we now have some!
 					if (is_array($field['options']))
 						foreach ($field['options'] as $value => $name)
@@ -548,7 +548,6 @@ function template_profile_pm_settings()
 										<input type="checkbox" name="default_options[popup_messages]" id="popup_messages" value="1"', !empty($context['member']['options']['popup_messages']) ? ' checked="checked"' : '', ' class="input_check" />
 								</dd>
 						</dl>
-						<hr />
 						<dl>
 								<dt>
 										<label for="copy_to_outbox"> ', $txt['copy_to_outbox'], '</label>

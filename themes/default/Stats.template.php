@@ -218,7 +218,7 @@ function template_main()
 
 		if (!empty($modSettings['hitStats']))
 			echo '
-						<th class="history_head>', $txt['page_views'], '</th>';
+						<th class="history_head">', $txt['page_views'], '</th>';
 
 		echo '
 					</tr>
