@@ -205,11 +205,11 @@ class Register_Controller extends Action_Controller
 			$context['visual_verification'] = false;
 
 		// Are they coming from an OpenID login attempt?
-		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']))
+		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']) )
 		{
 			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] = Util::htmlspecialchars(!empty($_POST['user']) ? $_POST['user'] : $_SESSION['openid']['nickname']);
-			$context['email'] = Util::htmlspecialchars(!empty($_POST['email']) ? $_POST['email'] : $_SESSION['openid']['email']);
+			$context['username'] = !empty($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : $_SESSION['openid']['nickname'];
+			$context['email'] = !empty($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : $_SESSION['openid']['email'];
 		}
 		// See whether we have some prefiled values.
 		else
