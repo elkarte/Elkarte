@@ -2019,6 +2019,7 @@ img.new_posts {
 	padding: 12px 0 12px 25px;
 	border: solid #9999aa;
 	border-width: 1px 0;
+	overflow: auto;
 }
 #poll_options dl.options dt {
 	float: left;
