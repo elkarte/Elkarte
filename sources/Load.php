@@ -2645,4 +2645,6 @@ function doSecurityChecks()
 	if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 		$context['security_controls']['admin_session'] = true;
 
+	if (!empty($context['security_controls']))
+		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
