@@ -3976,11 +3976,29 @@ dl.merge_topic dd {
 		padding-left: 64px;
 		border-left: none;
 	}
+	.topic_latest {
+		min-width: 17em;
+	}
 	.board_description, .moderators {
 		display: none;
 	}
 	.board_stats, .topic_stats {
 		display: none;
+	}
+	.topic_info {
+		display: block;
+		width: 90%;
+		padding: 8px;
+	}
+	.topic_latest, .topic_moderation {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.topic_name, .topic_starter {
+		margin: 0;
+	}
+	.topic_name h4 {
+		display: block;
 	}
 }
 
