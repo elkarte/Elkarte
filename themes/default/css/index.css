@@ -3755,33 +3755,6 @@ dl.merge_topic dd {
 /*
 /* Of course, having comments to map em to px for each query is a good idea too.
 
-/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
-@media screen and (min-width: 320px) and (max-width: 480px) {
-	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
-		display: none;
-	}
-	#wrapper, .frame {
-		width: 100%;
-		min-width: 300px;
-	}
-	#main_content_section {
-		padding: 1px 2px 16px 3px;
-	}
-	.poster .avatar {
-		width: 30px;
-	}
-	.poster {
-		width: 110px;
-		font-size: .8em;
-	}
-	.postarea, .moderatorbar {
-		margin: 0 0 0 110px;
-	}
-	.post {
-		margin: 0 0 0 5px;
-	}
-}
-
 /* Styles for print media.
 ------------------------------------------------------- */
 @media print {
@@ -3942,8 +3915,22 @@ dl.merge_topic dd {
 	.board_latest {
 		min-width: 20em;
 	}
+	.topic_latest {
+		min-width: 17em;
+	}
+	.board_name {
+		margin: 0 0 0 56px;
+	}
 	.board_lastposter {
 		display: block;
+	}
+	.board_name:after {
+		display: block;
+		clear: both;
+		content:"";
+	}
+	.board_description, .moderators, .childboards {
+		margin: 0 0 0 8px;
 	}
 	.board_stats, .topic_stats {
 		display: none;
@@ -3989,7 +3976,78 @@ dl.merge_topic dd {
 		padding-left: 64px;
 		border-left: none;
 	}
+	.topic_latest {
+		min-width: 17em;
+	}
 	.board_description, .moderators {
+		display: none;
+	}
+	.board_stats, .topic_stats {
+		display: none;
+	}
+	.topic_info {
+		display: block;
+		width: 90%;
+		padding: 8px;
+	}
+	.topic_latest, .topic_moderation {
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.topic_name, .topic_starter {
+		margin: 0;
+	}
+	.topic_name h4 {
+		display: block;
+	}
+	#wrapper {
+		padding-left: 2px;
+		padding-right: 22px;
+	}
+	#gobottom, #gotop { 
+		padding-left: 0.25em;
+	}
+}
+
+/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
+@media screen and (min-width: 320px) and (max-width: 480px) {
+	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
+		display: none;
+	}
+	#wrapper, .frame {
+		width: 100%;
+		min-width: 300px;
+	}
+	#main_content_section {
+		padding: 1px 2px 16px 3px;
+	}
+	.poster .avatar {
+		width: 30px;
+	}
+	.poster {
+		width: 110px;
+		font-size: .8em;
+	}
+	.postarea, .moderatorbar {
+		margin: 0 0 0 110px;
+	}
+	.post {
+		margin: 0 0 0 5px;
+	}
+	.childboards {
+		margin: 0 5px;
+	}
+	.board_latest {
+		padding: 0 8px;
+		max-width: 410px;
+		min-width: 250px;
+	}
+	.board_info:after {
+		display: block;
+		clear: both;
+		content:"";
+	}
+	.recentboard, .recentposter {
 		display: none;
 	}
 }

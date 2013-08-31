@@ -775,3 +775,32 @@ body {
 	height: 1.5em;
 	overflow: hidden;
 }
+
+/*	$MEDIA		*/
+/* Experimental media queries.
+/* ------------------------------------------------------- */
+/* NOTE:
+/* When setting break points for media queries, don't set them in pixels.
+/* Use em instead.
+/* Why? Because the point of re-stacking/dropping content is to fit it all
+/* in the available space. This is dependent not just on width in pixels,
+/* but also on the user-selected text size that is set in the browser.
+/*
+/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+/* a user requires text 50% larger than theme default, then their screen is
+/* effectively a lot smaller than its nominal resolution would indicate.
+/* If the break points are set in em, suddenly the media queries become equally
+/* responsive for all users, without any extra code being required.
+/*
+/* Testing em break points is just as easy as testing pixels,
+/* and it will make more people happier. This is cool. :)
+/*
+/* Of course, having comments to map em to px for each query is a good idea too.
+
+/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
+@media screen and (min-width: 320px) and (max-width: 480px) {
+	.board_latest {
+		border-left: 0px;
+	}
+}
+
