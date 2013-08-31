@@ -122,12 +122,18 @@ function template_main()
 							<dd><label for="minage">',
 								$txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 							</dd>
-							</dd>
+							</dd>';
+
+		// If we allow a simple form, show a link to get back to it
+		if (!empty($modSettings['simpleSearch']))
+			echo '
 							<dt>
 							</dt>
 							<dd>
-								<a href="', $scripturl, '?action=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['search_simple'], '</a>
-							</dd>
+								<a href="', $scripturl, '?action=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['search_simple'], '</a>
+							</dd>';
+
+		echo '
 						</dl>
 						<input type="hidden" name="advanced" value="1" />';
 
