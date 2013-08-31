@@ -329,8 +329,6 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		$db = database();
-
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
 		Template_Layers::getInstance()->removeAll();
@@ -343,7 +341,6 @@ class ModerationCenter_Controller extends Action_Controller
 		if (empty($notice))
 			fatal_lang_error('no_access', false);
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
-		$db->free_result($request);
 
 		$context['notice_body'] = parse_bbc($context['notice_body'], false);
 	}
@@ -978,7 +975,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function action_viewWatchedUsers()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt, $scripturl, $user_info;
 
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
@@ -1543,7 +1540,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function block_groupRequests()
 	{
-		global $context, $user_info, $scripturl;
+		global $context, $user_info;
 
 		// Make sure they can even moderate someone!
 		if ($user_info['mod_cache']['gq'] == '0=1')
@@ -1572,7 +1569,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function block_watchedUsers()
 	{
-		global $context, $scripturl, $modSettings;
+		global $context, $scripturl;
 
 		$watched_users = basicWatchedUsers();
 
@@ -1597,8 +1594,6 @@ class ModerationCenter_Controller extends Action_Controller
 	public function block_notes()
 	{
 		global $context, $scripturl, $txt, $user_info;
-
-		$db = database();
 
 		// Are we saving a note?
 		if (isset($_POST['makenote']) && isset($_POST['new_note']))
