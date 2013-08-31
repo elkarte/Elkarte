@@ -185,7 +185,7 @@ function topPosters()
 			'limit_posts' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
 		)
 	);
-	
+
 	$max_num_posts = 1;
 	while ($row_members = $db->fetch_assoc($members_result))
 	{
@@ -435,7 +435,7 @@ function topTopicViews()
  */
 function topTopicStarter()
 {
-	global $modSettings, $scripturl;
+	global $modSettings, $scripturl, $context;
 
 	$db = database();
 
@@ -491,14 +491,14 @@ function topTopicStarter()
 		if ($max_num_topics < $members[$row_members['id_member']])
 			$max_num_topics = $members[$row_members['id_member']];
 	}
+	$db->free_result($members_result);
 
 	foreach ($top_starters as $i => $topic)
 		{
 			$top_starters[$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);
 			$top_starters[$i]['num_topics'] = comma_format($context['top_starters'][$i]['num_topics']);
 		}
-	$db->free_result($members_result);
-
+	
 	return $top_starters;
 }
 

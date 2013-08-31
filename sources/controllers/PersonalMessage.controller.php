@@ -352,6 +352,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'start' => $start,
 			'limit' => $modSettings['defaultMaxMessages'],
 			'folder' => $context['folder'],
+			'pmid' => isset($pmID) ? $pmID : 0,
 		), $user_info['id']);
 
 		// Make sure that we have been given a correct head pm id!

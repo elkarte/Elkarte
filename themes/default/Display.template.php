@@ -313,7 +313,7 @@ function template_quickreply_below()
 
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
-		echo '<div>this is this</div>
+		echo '
 			<a id="quickreply"></a>
 			<div class="forumposts" id="quickreplybox">
 				<h2 class="category_header">
