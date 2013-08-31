@@ -427,12 +427,13 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $memID id_member
 	 * @param bool $saving = false
 	 */
-	public function action_authentication($memID, $saving = false)
+	public function action_authentication($saving = false)
 	{
 		global $context, $cur_profile, $post_errors, $modSettings;
 
-		loadLanguage('Login');
+		$memID = currentMemberID();
 
+		loadLanguage('Login');
 		loadTemplate('ProfileOptions');
 
 		// We are saving?

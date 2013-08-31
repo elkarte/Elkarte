@@ -196,9 +196,9 @@ function template_body_above()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	// Go to top/bottom of page links,and skipnav link for a11y. @todo - Skipnav should have proper text string.
+	// Go to top/bottom of page links and skipnav link for a11y.
 	echo '
-	<a id="top" href="#skipnav">Skip navigation</a>
+	<a id="top" href="#skipnav">', $txt['skip_nav'], '</a>
 	<a href="#top" id="gotop" title="', $txt['go_up'], '">&#8593;</a>
 	<a href="#bot" id="gobottom" title="', $txt['go_down'], '">&#8595;</a>';
 
