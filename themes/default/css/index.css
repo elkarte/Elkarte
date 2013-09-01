@@ -1547,7 +1547,7 @@ div.windowbg, div.windowbg2 {
 .additional_row {
 	padding: 6px 0;
 }
-.sort {
+.sort_by_item .sort, .sort {
 	margin: 0 0 -4px 4px;
 }
 
@@ -1761,8 +1761,18 @@ dl.settings textarea {
 	font-size: 0.857em;
 }
 
-
-
+.topic_sorting:hover #sortby, #sortby:hover {
+	width: 8.4em;
+	left: auto;
+	right: 0px;
+}
+.sort_by_item {
+	width: 7em;
+}
+.topic_sorting>li, .topic_sorting {
+	float: right;
+	padding: 0 3px;
+}
 
 /* -------------------------------------------- */
 /* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
@@ -1820,17 +1830,17 @@ img.new_posts {
 	display: block;
 	font-size: 0.857em;
 }
-.topic_listing {
+.topic_sorting, .topic_listing {
 	background: #e4e4e4;
 	box-shadow: 1px 2px 4px #eee;
 	padding: 1px 0 0 0;
 }
-.topic_listing>li {
+.topic_sorting>li, .topic_listing>li {
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	margin: 1px 0 0 0;
 }
-.topic_listing>.topic_sorting_row {
+.topic_sorting>.topic_sorting_row, .topic_listing>.topic_sorting_row {
 	margin: 0;
 }
 .topic_sorting_row, .basic_row {

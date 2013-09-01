@@ -139,7 +139,7 @@ function template_display_child_boards_above()
  */
 function template_pages_and_buttons_above()
 {
-	global $context, $settings, $txt;
+	global $context, $settings, $txt, $options;
 
 	if ($context['no_topic_listing'])
 		return;
@@ -154,7 +154,28 @@ function template_pages_and_buttons_above()
 
 		if (!empty($context['moderators']))
 			echo '
-			<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
+				<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
+
+		echo '
+				<ul class="topic_sorting" id="sort_by">';
+		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
+			echo '
+					<li class="listlevel1 quickmod_select_all">
+						<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+					</li>';
+		echo '
+					<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': ', $context['topics_headers'][$context['sort_by']]['link'], '
+						<ul class="menulevel2" id="sortby">';
+		foreach ($context['topics_headers'] as $key => $value)
+			echo '
+							<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+		echo '
+						</ul>';
+
+			// Show a "select all" box for quick moderation?
+		echo '
+					</li>
+				</ul>';
 
 		echo '
 			</h2>';
@@ -214,27 +235,11 @@ function template_main()
 		// Are there actually any topics to show?
 		if (!empty($context['topics']))
 		{
-			echo '
-				<h3>',
-					$txt['sort_by'], ': ', $context['topics_headers']['subject'], ' / ', $context['topics_headers']['starter'], ' / ', $context['topics_headers']['last_post'], ' / ', $context['topics_headers']['replies'], ' / ', $context['topics_headers']['views'];
-
-			if (!empty($modSettings['likes_enabled']))
-				echo ' / ' . $context['topics_headers']['likes'];
-
-			echo '
-				</h3>';
-
-			// Show a "select all" box for quick moderation?
-			if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
-				echo '
-				<p>
-					<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
-				</p>';
 		}
 		// No topics.... just say, "sorry bub".
 		else
 			echo '
-					<strong>', $txt['topic_alert_none'], '</strong>';
+				<strong>', $txt['topic_alert_none'], '</strong>';
 
 		echo '
 			</li>';
