@@ -414,7 +414,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
 
 	// Turn notifications on or off
-	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify);
+	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify, $pbe['user_info']['permissions']);
 
 	// Notify members who have notification turned on for this,
 	// but only if it's going to be approved
@@ -576,7 +576,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
 
 	// Notifications on or off
-	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify);
+	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify, $pbe['user_info']['permissions']);
 
 	// Notify members who have notification turned on for this, (if it's approved)
 	if ($becomesApproved)
