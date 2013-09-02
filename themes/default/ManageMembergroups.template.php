@@ -572,7 +572,7 @@ function template_group_members()
 				<h4 class="titlebg">', $txt['membergroups_members_group_members'], '</h4>
 			</div>
 			<br />
-			', template_pagesection(false, false, 'go_down'), '
+			', template_pagesection(), '
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">

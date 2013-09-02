@@ -21,18 +21,16 @@ function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	echo '
 		<div id="recentposts" class="forumposts">';
 
-	//template_pagesection(false, false, 'go_down');
 	echo '
 			<h3 class="catbg">
 				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />', $txt['recent_posts'], '
 			</h3>';
 
-	//template_pagesection(false, false, 'go_down');
 	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
 	{
@@ -94,7 +92,7 @@ function template_unread()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right', 'go_down');
+		template_pagesection('recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
 			echo '
@@ -223,7 +221,7 @@ function template_replies()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right', 'go_down');
+		template_pagesection('recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
 			echo '

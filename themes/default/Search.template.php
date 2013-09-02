@@ -348,7 +348,7 @@ function template_results()
 
 		// was anything even found?
 		if (!empty($context['topics']))
-			template_pagesection(false, false, 'go_down');
+			template_pagesection();
 		else
 			echo '
 					<div class="roundframe">', $txt['find_no_results'], '</div>';
@@ -477,7 +477,7 @@ function template_results()
 						<img class="centericon" src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
 					</h3>
 				</div>';
-		template_pagesection(false, false, 'go_down');
+		template_pagesection();
 
 		if (empty($context['topics']))
 			echo '

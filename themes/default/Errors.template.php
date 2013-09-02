@@ -64,7 +64,7 @@ function template_error_log()
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	echo '
 				</div>
@@ -176,7 +176,7 @@ function template_error_log()
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	echo '
 				</div>

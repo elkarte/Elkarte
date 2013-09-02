@@ -924,7 +924,7 @@ function template_pages_and_buttons_above()
 			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a name="new" id="new"></a>' : '';
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons', 'right', 'go_down');
+	template_pagesection('normal_buttons', 'right');
 }
 
 /**
