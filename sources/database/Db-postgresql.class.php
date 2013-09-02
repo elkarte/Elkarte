@@ -24,6 +24,8 @@ class Database_PostgreSQL implements Database
 
 	private $_connection = null;
 
+	private $_db_last_result = null;
+
 	private function __construct()
 	{
 		// Private constructor.
@@ -43,7 +45,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return resource
 	 */
-	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
+	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		// initialize the instance... if not done already!
 		if (self::$_db === null)
@@ -245,7 +247,7 @@ class Database_PostgreSQL implements Database
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_show_debug, $time_start;
-		global $db_unbuffered, $db_callback, $db_last_result, $db_replace_result, $modSettings;
+		global $db_unbuffered, $db_callback, $db_replace_result, $modSettings;
 
 		// Decide which connection to use.
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -452,31 +454,33 @@ class Database_PostgreSQL implements Database
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 		}
 
-		$db_last_result = @pg_query($connection, $db_string);
+		$this->_db_last_result = @pg_query($connection, $db_string);
 
-		if ($db_last_result === false && empty($db_values['db_error_skip']))
-			$db_last_result = $this->error($db_string, $connection);
+		if ($this->_db_last_result === false && empty($db_values['db_error_skip']))
+			$this->_db_last_result = $this->error($db_string, $connection);
 
 		// Debugging.
 		if (isset($db_show_debug) && $db_show_debug === true)
 			$db_cache[$db_count]['t'] = microtime(true) - $st;
 
-		return $db_last_result;
+		return $this->_db_last_result;
 	}
 
 	/**
 	 * Affected rows from previous operation.
+	 *
+	 * @param result resource $result
 	 */
-	function affected_rows()
+	function affected_rows($result = null)
 	{
-		global $db_last_result, $db_replace_result;
+		global $db_replace_result;
 
 		if ($db_replace_result)
 			return $db_replace_result;
-		elseif ($result === null && !$db_last_result)
+		elseif ($result === null && !$this->_db_last_result)
 			return 0;
 
-		return pg_affected_rows($db_last_result);
+		return pg_affected_rows($result === null ? $this->_db_last_result : $result);
 	}
 
 	/**
