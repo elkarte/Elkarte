@@ -903,7 +903,7 @@ function addSeparator($title = '', $custom_table = null)
 		return;
 
 	// Specific table?
-	if ($custom_table !== null && !isset($context['tables'][$table]))
+	if ($custom_table !== null && !isset($context['tables'][$custom_table]))
 		return false;
 	elseif ($custom_table !== null)
 		$table = $custom_table;
