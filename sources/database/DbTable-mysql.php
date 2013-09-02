@@ -92,7 +92,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
-		global $db_prefix, $db_character_set;
+		global $db_prefix;
 
 		// Strip out the table name, we might not need it in some cases
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -211,7 +211,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $txt, $db_prefix;
+		global $db_prefix;
 
 		// working hard with the db!
 		$db = database();
@@ -232,16 +232,6 @@ class DbTable_MySQL extends DbTable
 				else
 					return false;
 			}
-
-		// Get the specifics...
-		$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-		list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
-
-		// Allow unsigned integers (mysql only)
-		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')) && !empty($column_info['unsigned']) ? 'unsigned ' : '';
-
-		if ($size !== null)
-			$type = $type . '(' . $size . ')';
 
 		// Now add the thing!
 		$query = '
@@ -339,19 +329,9 @@ class DbTable_MySQL extends DbTable
 		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')))
 			$column_info['unsigned'] = '';
 
-		list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
-
-		// Allow for unsigned integers (mysql only)
-		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')) && !empty($column_info['unsigned']) ? 'unsigned ' : '';
-
-		if ($size !== null)
-			$type = $type . '(' . $size . ')';
-
 		$db->query('', '
 			ALTER TABLE ' . $table_name . '
-			CHANGE COLUMN `' . $old_column . '` `' . $column_info['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (empty($column_info['null']) ? 'NOT NULL' : '') . ' ' .
-				(!isset($column_info['default']) ? '' : 'default \'' . $db->escape_string($column_info['default']) . '\'') . ' ' .
-				(empty($column_info['auto']) ? '' : 'auto_increment') . ' ',
+			CHANGE COLUMN `' . $old_column . '` ' . $this->db_create_query_column($column_info),
 			array(
 				'security_override' => true,
 			)
