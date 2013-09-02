@@ -125,7 +125,7 @@ class DbTable_MySQL extends DbTable
 		// Righty - let's do the damn thing!
 		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
 		foreach ($columns as $column)
-			$table_query .= "\n\t" . $this->db_create_query_column($column)  . ',';
+			$table_query .= "\n\t" . $this->_db_create_query_column($column)  . ',';
 
 		// Loop through the indexes next...
 		foreach ($indexes as $index)
@@ -236,7 +236,7 @@ class DbTable_MySQL extends DbTable
 		// Now add the thing!
 		$query = '
 			ALTER TABLE ' . $table_name . '
-			ADD ' . $this->db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
+			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
 
 		$db->query('', $query,
 			array(
@@ -331,7 +331,7 @@ class DbTable_MySQL extends DbTable
 
 		$db->query('', '
 			ALTER TABLE ' . $table_name . '
-			CHANGE COLUMN `' . $old_column . '` ' . $this->db_create_query_column($column_info),
+			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info),
 			array(
 				'security_override' => true,
 			)
@@ -642,7 +642,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $column
 	 * @return type
 	 */
-	function db_create_query_column($column)
+	private function _db_create_query_column($column)
 	{
 		// make sure db is available
 		$db = database();

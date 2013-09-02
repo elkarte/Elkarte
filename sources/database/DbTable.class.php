@@ -152,14 +152,6 @@ abstract class DbTable
 	abstract function db_list_indexes($table_name, $detail = false, $parameters = array());
 
 	/**
-	 * Creates a query for a column
-	 *
-	 * @param array $column
-	 * @return type
-	 */
-	abstract function db_create_query_column($column);
-
-	/**
 	 * Alter table.
 	 *
 	 * @param string $table_name
