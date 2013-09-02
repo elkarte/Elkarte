@@ -144,6 +144,9 @@ class ManageSearch_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_search_settings');
 
+			if (empty($_POST['search_results_per_page']))
+				$_POST['search_results_per_page'] = !empty($modSettings['search_results_per_page']) ? $modSettings['search_results_per_page'] : $modSettings['defaultMaxMessages'];
+
 			$new_engines = array();
 			foreach ($_POST['engine_name'] as $id => $searchengine)
 			{
