@@ -88,7 +88,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 		if ($row['message_type'] === 't')
 			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['id_message'];
 		elseif ($row['message_type'] === 'm')
-			$postemail[$i]['link'] = $boardurl . '?topic=' . $topic_id . '.msg' . $row['id_message'] . '#msg' . $row['id_message'];
+			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['id_message'];
 		elseif ($row['message_type'] === 'p')
 			$postemail[$i]['subject'] = $txt['private'];
 
