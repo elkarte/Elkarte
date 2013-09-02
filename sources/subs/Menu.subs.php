@@ -195,6 +195,7 @@ function createMenu($menuData, $menuOptions = array())
 				}
 
 				// Is this the current section?
+				// @todo why $found_section is not initialized outside one of the loops? (Not sure which one lol)
 				if ($menu_context['current_area'] == $area_id && empty($found_section))
 				{
 					// Only do this once?

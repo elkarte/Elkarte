@@ -237,8 +237,6 @@ function list_integration_hooks_data($start, $per_page, $sort)
  */
 function integration_hooks_count($filter = false)
 {
-	global $context;
-
 	$hooks = get_integration_hooks();
 	$hooks_count = 0;
 
@@ -261,9 +259,9 @@ function integration_hooks_count($filter = false)
 function get_integration_hooks()
 {
 	global $modSettings;
-	static $integration_hooks;
+	static $integration_hooks = null;
 
-	if (!isset($integration_hooks))
+	if ($integration_hooks === null)
 	{
 		$integration_hooks = array();
 		foreach ($modSettings as $key => $value)

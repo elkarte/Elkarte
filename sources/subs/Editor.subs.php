@@ -704,7 +704,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	global $context;
 
 	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
-	static $all_instances;
+	static $all_instances = array();
 
 	// @todo: maybe move the list to $modSettings instead of hooking it?
 	// Used in ManageSecurity_Controller->action_spamSettings_display too
@@ -1331,7 +1331,7 @@ class Control_Verification_Questions implements Control_Verifications
  */
 function convert_urls($text)
 {
-	global $modSettings;
+	global $modSettings, $scripturl;
 
 	// What about URL's - the pain in the ass of the tag world.
 	while (preg_match('~<a\s+([^<>]*)>([^<>]*)</a>~i', $text, $matches) === 1)
@@ -1414,7 +1414,6 @@ function fetchTagAttributes($text)
 {
 	$attribs = array();
 	$key = $value = '';
-	$strpos = 0;
 	$tag_state = 0; // 0 = key, 1 = attribute with no string, 2 = attribute with string
 
 	for ($i = 0; $i < strlen($text); $i++)

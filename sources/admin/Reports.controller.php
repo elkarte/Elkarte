@@ -382,9 +382,6 @@ class Reports_Controller extends Action_Controller
 			// Here cycle through all the detected permissions.
 			foreach ($permissions as $ID_PERM => $perm_info)
 			{
-				// Is this identical to the global?
-				$identicalGlobal = $board == 0 ? false : true;
-
 				// Default data for this row.
 				$curData = array('col' => $perm_info['title']);
 
@@ -438,7 +435,7 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_member_groups()
 	{
-		global $context, $txt, $settings, $modSettings;
+		global $txt, $settings, $modSettings;
 
 		$db = database();
 
@@ -563,7 +560,7 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_group_perms()
 	{
-		global $context, $txt, $modSettings;
+		global $txt, $modSettings;
 
 		$db = database();
 
@@ -668,7 +665,7 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_staff()
 	{
-		global $context, $txt;
+		global $txt;
 
 		$db = database();
 

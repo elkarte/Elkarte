@@ -663,11 +663,10 @@ function approveAllUnapproved()
  * Returns the number of watched users in the system.
  * (used by createList() callbacks).
  *
- * @param string $approve_query
  * @param int $warning_watch
  * @return int
  */
-function watchedUserCount($approve_query, $warning_watch = 0)
+function watchedUserCount($warning_watch = 0)
 {
 	$db = database();
 

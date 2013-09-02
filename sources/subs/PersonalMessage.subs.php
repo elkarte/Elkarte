@@ -86,7 +86,7 @@ function loadPMLabels()
 	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
 }
 
-function getPMCount($descending = false, $pmID = null, $labelQuery)
+function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
 	global $user_info, $context;
 
@@ -429,8 +429,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	require_once(SUBSDIR . '/Mail.subs.php');
 	require_once(SUBSDIR . '/Post.subs.php');
 
-	$onBehalf = $from !== null;
-
 	// Initialize log array.
 	$log = array(
 		'failed' => array(),
@@ -540,7 +538,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		$delete = false;
 		foreach ($criteria as $criterium)
 		{
-			$match = false;
 			if (($criterium['t'] == 'mid' && $criterium['v'] == $from['id']) || ($criterium['t'] == 'gid' && in_array($criterium['v'], $user_info['groups'])) || ($criterium['t'] == 'sub' && strpos($subject, $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($message, $criterium['v']) !== false))
 				$delete = true;
 			// If we're adding and one criteria don't match then we stop!
@@ -866,6 +863,8 @@ function markPMsRead($memberID)
  */
 function loadPMs($pm_options, $id_member)
 {
+	global $options;
+
 	$db = database();
 
 	// First work out what messages we need to see - if grouped is a little trickier...
@@ -1198,8 +1197,6 @@ function loadRules($reload = false)
  */
 function toggleNewPM($id_member, $new = false)
 {
-	global $user_info;
-
 	$db = database();
 
 	$db->query('', '

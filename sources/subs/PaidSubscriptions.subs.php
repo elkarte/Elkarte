@@ -648,9 +648,9 @@ function updateSubscription($update, $ignore_active)
  * Update a non-recurrent subscription
  * (one-time payment)
  *
- * @param array $subscriptionInfo
+ * @param array $subscription_info
  */
-function updateNonrecurrent($subscriptionInfo)
+function updateNonrecurrent($subscription_info)
 {
 	$db = database();
 
@@ -881,7 +881,7 @@ function handleRefund($subscription_info, $member_id, $time)
 	if ($subscription_info['end_time'] - time() < $subscription_info['length'])
 	{
 		// Delete user subscription.
-		removeSubscription($subscription_id, $member_id);
+		removeSubscription($subscription_info['id_subscribe'], $member_id);
 		$subscription_act = time();
 		$status = 0;
 	}
@@ -901,7 +901,7 @@ function handleRefund($subscription_info, $member_id, $time)
 			AND status = {int:status}',
 		array(
 			'current_time' => $subscription_act,
-			'current_subscription' => $subscription_id,
+			'current_subscription' => $subscription_info['id_subscribe'],
 			'current_member' => $member_id,
 			'status' => $status,
 		)

@@ -205,6 +205,7 @@ function getBoardIndex($boardIndexOptions)
 		// Child of a child... just add it on...
 		elseif (!empty($boardIndexOptions['countChildPosts']))
 		{
+			// @todo why this is not initialized outside the loop?
 			if (!isset($parent_map))
 				$parent_map = array();
 

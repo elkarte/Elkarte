@@ -2174,7 +2174,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
-			$context['search_errors']['invalid_search_string'] = true;
+			$context['search_errors']['invalid_search_string' . (!empty($foundBlackListedWords) ? '_blacklist' : '')] = true;
 
 		// Sort out the search query so the user can edit it - if they want.
 		$context['search_params'] = $search_params;
@@ -2323,6 +2323,7 @@ class PersonalMessage_Controller extends Action_Controller
 					'message_list' => $foundMessages,
 				)
 			);
+			$recipients = array();
 			while ($row = $db->fetch_assoc($request))
 			{
 				if ($context['folder'] == 'sent' || empty($row['bcc']))

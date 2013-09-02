@@ -2017,7 +2017,6 @@ function adminNotify($type, $memberID, $member_name = null)
 		$member_name = $member_info['real_name'];
 	}
 
-	$toNotify = array();
 	$groups = array();
 
 	// All membergroups who can approve members.
@@ -2283,7 +2282,7 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings;
+	global $scripturl, $modSettings;
 
 	$db = database();
 

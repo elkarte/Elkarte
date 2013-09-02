@@ -77,10 +77,12 @@ class Util
 	{
 		global $modSettings;
 
+		// @todo not used
 		$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
 
 		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $haystack) : $haystack;
 		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		// @todo not used
 		$haystack_size = count($haystack_arr);
 		if (strlen($needle) === 1)
 		{

@@ -1045,7 +1045,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	private function _initLanguageSettingsForm()
 	{
-		global $txt, $context;
+		global $txt;
 
 		// We'll want to use them someday. That is, right now.
 		require_once(SUBSDIR . '/Settings.class.php');

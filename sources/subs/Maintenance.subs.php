@@ -84,8 +84,6 @@ function flushLogTables()
  */
 function getMessageTableColumns()
 {
-	$db = database();
-
 	$table = db_table();
 	$colData = $table->db_list_columns('{db_prefix}messages', true);
 
@@ -99,8 +97,6 @@ function getMessageTableColumns()
  */
 function resizeMessageTableBody($type)
 {
-	$db = database();
-
 	$table = db_table();
 	$table->db_change_column('{db_prefix}messages', 'body', array('type' => $type));
 }

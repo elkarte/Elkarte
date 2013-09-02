@@ -870,9 +870,8 @@ function pbe_email_attachments($pbe, $email_message)
  *  - Returns the board number in which the new topic should go
  *
  * @param object $email_address
- * @param boolean $check
  */
-function pbe_find_board_number($email_address, $check = false)
+function pbe_find_board_number($email_address)
 {
 	global $modSettings;
 
@@ -912,7 +911,7 @@ function pbe_find_board_number($email_address, $check = false)
  */
 function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
-	global $txt;
+	global $txt, $context;
 
 	loadLanguage('Maillist');
 

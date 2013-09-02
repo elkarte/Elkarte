@@ -129,8 +129,6 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $db_type, $modSettings, $maintenance;
 
-		$db = database();
-
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
@@ -481,7 +479,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_optimize_display()
 	{
-		global $db_type, $txt, $context;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 

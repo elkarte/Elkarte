@@ -96,8 +96,9 @@ class Emailpost_Controller extends Action_Controller
 
 		// Can't find this key in the database, either
 		//   a) spam attempt or b) replying with an expired/consumed key
+		// @todo @Spuds this is for you I think: I replaced $message_type with $email_message->message_type
 		if (empty($key_owner))
-			return pbe_emailError('error_' . ($message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
+			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
 
 		// The key received was not sent to this member ... how we love those email aggregators
 		if (strtolower($key_owner) !== $email_message->email['from'] && !$force)
@@ -190,9 +191,8 @@ class Emailpost_Controller extends Action_Controller
 	 * Accessed through emailtopic.
 	 *
 	 * @param string $data used to supply a full body+headers email
-	 * @param type $force used to override common failure errors
 	 */
-	function action_pbe_topic($data = null, $force = false)
+	function action_pbe_topic($data = null)
 	{
 		global $modSettings, $user_info, $maintenance;
 

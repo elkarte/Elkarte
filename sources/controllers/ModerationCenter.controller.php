@@ -1446,7 +1446,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		return watchedUserCount($approve_query, $modSettings['warning_watch']);
+		return watchedUserCount($modSettings['warning_watch']);
 	}
 
 	/**

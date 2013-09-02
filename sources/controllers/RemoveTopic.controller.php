@@ -404,7 +404,7 @@ class RemoveTopic_Controller extends Action_Controller
  * @param integer $from_topic
  * @param integer $target_topic
  */
-function mergePosts($msgs = array(), $from_topic, $target_topic)
+function mergePosts($msgs, $from_topic, $target_topic)
 {
 	global $modSettings;
 

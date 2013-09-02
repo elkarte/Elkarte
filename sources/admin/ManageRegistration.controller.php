@@ -122,7 +122,7 @@ class ManageRegistration_Controller extends Action_Controller
 	 */
 	public function action_register()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context, $scripturl, $user_info;
 
 		if (!empty($_POST['regSubmit']))
 		{

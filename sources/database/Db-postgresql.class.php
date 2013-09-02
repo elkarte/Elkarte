@@ -704,7 +704,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_replace_result, $db_in_transact, $db_prefix;
+		global $db_in_transact, $db_prefix;
 
 		$connection = $connection === null ? $this->_connection : $connection;
 
@@ -1072,7 +1072,7 @@ class Database_PostgreSQL implements Database
 				'table' => $tableName,
 			)
 		);
-		$indexes = array();
+
 		while ($row = $this->fetch_assoc($result))
 		{
 			if ($row['is_primary'])
