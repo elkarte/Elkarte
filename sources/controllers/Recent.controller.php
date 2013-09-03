@@ -448,6 +448,15 @@ class Recent_Controller extends Action_Controller
 			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
 		}
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
+		// Trick
+		$txt['starter'] = $txt['started_by'];
+
+		foreach ($sort_methods as $key => $val)
+			$context['topics_headers'][$key] = array(
+				'link' => '<a href="' . $scripturl . '?action=unread' . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : '') . '">' . $txt[$key] . ($context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '') . '</a>',
+				'url' => $scripturl . '?action=unread' . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : ''),
+				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '',
+			);
 
 		if (!empty($_REQUEST['c']) && is_array($_REQUEST['c']) && count($_REQUEST['c']) == 1)
 		{

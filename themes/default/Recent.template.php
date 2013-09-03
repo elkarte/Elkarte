@@ -105,26 +105,32 @@ function template_unread()
 
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], '
-						</h2>
-						<ul class="topic_listing" id="unread">
-							<li class="topic_sorting_row">
-								<h3>',
-									$txt['sort_by'], ': ', '
-									<a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] == 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									 / <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] == 'replies' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] == 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									 / <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] == 'last_post' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] == 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-								</h3>';
-
-		// Show a "select all" box for quick moderation?
-		if ($context['showCheckboxes'])
-			echo '
-								<p>
-									<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
-								</p>';
+							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'];
 
 		echo '
-							</li>';
+							<ul class="topic_sorting" id="sort_by">';
+		if ($context['showCheckboxes'])
+			echo '
+								<li class="listlevel1 quickmod_select_all">
+									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+								</li>';
+		echo '
+								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': ', $context['topics_headers'][$context['sort_by']]['link'], '
+									<ul class="menulevel2" id="sortby">';
+		foreach ($context['topics_headers'] as $key => $value)
+			echo '
+										<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+		echo '
+									</ul>';
+
+			// Show a "select all" box for quick moderation?
+		echo '
+								</li>
+							</ul>';
+
+		echo '
+						</h2>
+						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
 		{
@@ -235,26 +241,32 @@ function template_replies()
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $txt['unread_replies'], '
-						</h2>
-						<ul class="topic_listing" id="unread">
-							<li class="topic_sorting_row">
-								<h3>',
-									$txt['sort_by'], '
-									: <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] === 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									 / <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] === 'replies' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] === 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-									 / <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] === 'last_post' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] === 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-								</h3>';
-
-		// Show a "select all" box for quick moderation?
-		if ($context['showCheckboxes'])
-			echo '
-								<p>
-									<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
-								</p>';
+							', $txt['unread_replies'];
 
 		echo '
-							</li>';
+							<ul class="topic_sorting" id="sort_by">';
+		if ($context['showCheckboxes'])
+			echo '
+								<li class="listlevel1 quickmod_select_all">
+									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+								</li>';
+		echo '
+								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': ', $context['topics_headers'][$context['sort_by']]['link'], '
+									<ul class="menulevel2" id="sortby">';
+		foreach ($context['topics_headers'] as $key => $value)
+			echo '
+										<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+		echo '
+									</ul>';
+
+			// Show a "select all" box for quick moderation?
+		echo '
+								</li>
+							</ul>';
+
+		echo '
+						</h2>
+						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
 		{
