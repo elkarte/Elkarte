@@ -114,8 +114,15 @@ function template_unread()
 								<li class="listlevel1 quickmod_select_all">
 									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
 								</li>';
+
+		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
-								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': ', $context['topics_headers'][$context['sort_by']]['link'], '
+								<li class="listlevel1 topic_sorting_row">
+									<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+								</li>';
+
+		echo '
+								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
 									<ul class="menulevel2" id="sortby">';
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
@@ -250,8 +257,15 @@ function template_replies()
 								<li class="listlevel1 quickmod_select_all">
 									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
 								</li>';
+
+		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
-								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': ', $context['topics_headers'][$context['sort_by']]['link'], '
+								<li class="listlevel1 topic_sorting_row">
+									<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+								</li>';
+
+		echo '
+								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
 									<ul class="menulevel2" id="sortby">';
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
