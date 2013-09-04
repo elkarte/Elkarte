@@ -39,7 +39,7 @@ if (!defined('ELK'))
  *		));
  *
  * Run the validation
- * 		$validation->validation_run($data);
+ * 		$validation->validate($data);
  * $data must be an array with keys matching the validation rule e.g. $data['username'], $data['email']
  *
  * Get the results
