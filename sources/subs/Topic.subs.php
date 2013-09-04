@@ -1668,6 +1668,33 @@ function topicAttribute($id_topic, $attribute)
 }
 
 /**
+ * Retrieve some details about the topic
+ *
+ * @param array $topics an array of topic id
+ */
+function topicsDetails($topics)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_topic, id_member_started, id_board, locked, approved, unapproved_posts
+		FROM {db_prefix}topics
+		WHERE id_topic IN ({array_int:topic_ids})
+		LIMIT ' . count($topics),
+		array(
+			'topic_ids' => $topics,
+		)
+	);
+
+	$topics = array();
+	while ($row = $db->fetch_assoc($request))
+		$topics[] = $row;
+	$db->free_result($request);
+
+	return $topics;
+}
+
+/**
  * Toggle sticky status for the passed topics.
  *
  * @param array $topics
