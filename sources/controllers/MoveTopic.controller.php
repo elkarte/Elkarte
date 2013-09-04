@@ -80,6 +80,15 @@ class MoveTopic_Controller extends Action_Controller
 		if (empty($context['categories']) || $context['num_boards'] == 1)
 			fatal_lang_error('moveto_noboards', false);
 
+		// Already used the function, let's set the selected board back to the last
+		$last_moved_to = isset($_SESSION['move_to_topic']) ? (int) $_SESSION['move_to_topic'] : 0;
+		if (!empty($last_moved_to))
+		{
+			foreach ($context['categories'] as $id => $values)
+				if (isset($values['boards'][$last_moved_to]))
+					$context['categories'][$id]['boards'][$last_moved_to]['selected'] = true;
+		}
+
 		$context['page_title'] = $txt['move_topic'];
 
 		$context['linktree'][] = array(
