@@ -74,14 +74,6 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 		foreach ($boards as $board)
 			$markRead[] = array($modSettings['maxMsgID'], $user_info['id'], $board);
 
-		// Update log_mark_read and log_boards.
-		$db->insert('replace',
-			'{db_prefix}log_mark_read',
-			array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-			$markRead,
-			array('id_board', 'id_member')
-		);
-
 		$db->insert('replace',
 			'{db_prefix}log_boards',
 			array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
@@ -103,6 +95,15 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 
 	if ($resetTopics)
 	{
+		// Update log_mark_read and log_boards.
+		if (!empty($markRead))
+			$db->insert('replace',
+				'{db_prefix}log_mark_read',
+				array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
+				$markRead,
+				array('id_board', 'id_member')
+			);
+
 		$result = $db->query('', '
 			SELECT MIN(id_topic)
 			FROM {db_prefix}log_topics
