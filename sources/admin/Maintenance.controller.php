@@ -816,10 +816,13 @@ class Maintenance_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		$validator = new Data_Validator();
-		$validator->sanitation_rules(array('posts' => 'empty', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
-		$validator->validation_rules(array('from_email' => 'valid_email', 'to' => 'required', 'type' => 'required'));
 
-		if ($validator->validate($_POST))
+		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
+		$validator->validation_rules(array('from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]'));
+		$validator->validate($_POST);
+
+		// Do we have a valid set of options to continue?
+		if (($validator->type === 'name' && !empty($validator->from_name)) || ($validator->type === 'email' && !$validator->validation_errors('from_email')))
 		{
 			// Find the member.
 			require_once(SUBSDIR . '/Auth.subs.php');
@@ -844,8 +847,14 @@ class Maintenance_Controller extends Action_Controller
 		}
 		else
 		{
+			// Show them the correct error
+			if ($validator->type === 'name' && empty($validator->from_name))
+				$error = $validator->validation_errors(array('from_name', 'to'));
+			else
+				$error = $validator->validation_errors(array('from_email', 'to'));
+
 			$context['maintenance_finished'] = array(
-				'errors' => $validator->validation_errors(),
+				'errors' => $error,
 				'type' => 'minor',
 			);
 		}
