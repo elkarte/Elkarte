@@ -1761,6 +1761,7 @@ dl.settings textarea {
 	font-size: 0.857em;
 }
 
+.topic_sorting #sortby, #sortby,
 .topic_sorting:hover #sortby, #sortby:hover {
 	width: 8.4em;
 	left: auto;
@@ -1771,6 +1772,8 @@ dl.settings textarea {
 }
 .topic_sorting>li, .topic_sorting {
 	float: right;
+}
+.topic_sorting>li {
 	padding: 0 3px;
 }
 
@@ -1830,12 +1833,15 @@ img.new_posts {
 	display: block;
 	font-size: 0.857em;
 }
-.topic_sorting, .topic_listing {
+.topic_listing {
 	background: #e4e4e4;
 	box-shadow: 1px 2px 4px #eee;
 	padding: 1px 0 0 0;
 }
-.topic_sorting>li, .topic_listing>li {
+.topic_sorting {
+	border: 1px solid #e4e4e4;
+}
+.topic_listing>li {
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	margin: 1px 0 0 0;

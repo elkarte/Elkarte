@@ -239,12 +239,8 @@ function template_main()
 		<ul class="topic_listing" id="messageindex">
 			<li class="topic_sorting_row">';
 
-		// Are there actually any topics to show?
-		if (!empty($context['topics']))
-		{
-		}
 		// No topics.... just say, "sorry bub".
-		else
+		if (empty($context['topics']))
 			echo '
 				<strong>', $txt['topic_alert_none'], '</strong>';
 
