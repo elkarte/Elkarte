@@ -1948,10 +1948,10 @@ img.new_posts {
 	background: #ffffe0;
 }
 .sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
 .locked_row.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
 }
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
 .locked_row, .locked_row.core_posts {
