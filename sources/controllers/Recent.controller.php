@@ -453,7 +453,7 @@ class Recent_Controller extends Action_Controller
 
 		foreach ($sort_methods as $key => $val)
 			$context['topics_headers'][$key] = array(
-				'url' => $scripturl . '?action=unread' . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : ''),
+				'url' => $scripturl . '?action=unread' . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start']) . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : ''),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '',
 			);
 
