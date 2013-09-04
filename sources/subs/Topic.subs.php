@@ -1643,40 +1643,27 @@ function topicAttribute($id_topic, $attribute)
 {
 	$db = database();
 
-	if ($attribute == 'locked')
+	$attributes = array(
+		'locked' => 'locked',
+		'sticky' => 'is_sticky',
+	);
+
+	if (isset($attributes[$attribute]))
 	{
 		// check the lock status
 		$request = $db->query('', '
-			SELECT locked
+			SELECT {raw:attribute}
 			FROM {db_prefix}topics
 			WHERE id_topic = {int:current_topic}
 			LIMIT 1',
 			array(
-				'current_topic' => $id_topic,
+				'attribute' => $attributes[$attribute],
 			)
 		);
-		list ($locked) = $db->fetch_row($request);
+		list ($status) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		return $locked;
-	}
-
-	if  ($attribute == 'sticky')
-	{
-		// Is this topic already stickied, or no?
-		$request = $db->query('', '
-			SELECT is_sticky
-			FROM {db_prefix}topics
-			WHERE id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $id_topic,
-			)
-		);
-		list ($sticky) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		return $sticky;
+		return $status;
 	}
 }
 
