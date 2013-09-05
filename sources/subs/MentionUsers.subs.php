@@ -118,7 +118,8 @@ function rebuildMembersCache($key)
 	$request = $db->query('', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
-		WHERE real_name LIKE {string:abbreviation}',
+		WHERE real_name LIKE {string:abbreviation}
+			AND (is_activated = 1 OR is_activated = 2)',
 		array(
 			'abbreviation' => $key . '%',
 		)
