@@ -981,7 +981,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	require_once(EXTDIR . '/html2Md/html2markdown.php');
+	require_once(EXTDIR . '/html2Md/Html2Markdown.class.php');
 	$mark_down = new Convert_Md($message);
 	$message = $mark_down->get_markdown();
 
