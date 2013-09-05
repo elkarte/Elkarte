@@ -480,6 +480,7 @@ $txt['moved_why'] = 'Please enter a brief description as to<br />why this topic 
 $txt['board'] = 'Board';
 $txt['in'] = 'in';
 $txt['sticky_topic'] = 'Sticky Topic';
+$txt['split_ed'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
 
