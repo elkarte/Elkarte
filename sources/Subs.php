@@ -1581,7 +1581,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'block_level' => true,
 			),
 			array(
-				'tag' => 'tagged',
+				'tag' => 'user',
 				'type' => 'unparsed_equals',
 				'before' => '<a href="$1">@',
 				'after' => '</a>',

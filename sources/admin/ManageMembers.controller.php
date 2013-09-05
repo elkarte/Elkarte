@@ -1035,7 +1035,7 @@ class ManageMembers_Controller extends Action_Controller
 				foreach ($member_info as $member)
 				{
 					// Rebuild the cache now could be quite a pita, let's just make it null
-					if (!empty($modSettings['tag_users']))
+					if (!empty($modSettings['enableUsersMentions']))
 						cache_put_data('lists_of_members_' . substr($member['username'], 0, 2), null, 3600);
 
 					call_integration_hook('integrate_activate', array($member['username']));

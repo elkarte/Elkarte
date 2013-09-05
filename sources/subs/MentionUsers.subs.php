@@ -7,14 +7,14 @@
  *
  * @version 1.0 Alpha
  *
- * This file contains functions that make easier send notifications to tagged users.
+ * This file contains functions that make easier send notifications to mentioned users.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
-function identifyTaggedUsers(&$body)
+function identifyMentionUsers(&$body)
 {
 	global $modSettings;
 
@@ -24,21 +24,21 @@ function identifyTaggedUsers(&$body)
 		return;
 
 	$users_string_array = array();
-	$limit = min(empty($modSettings['max_tagged_members']) ? count($users) : $modSettings['max_tagged_members'], count($users));
+	$limit = min(empty($modSettings['max_mentioned_members']) ? count($users) : $modSettings['max_mentioned_members'], count($users));
 	$notifications = array();
 	for ($i = 0; $i < $limit; $i++)
 	{
-		$notifications[] = preg_quote($users[$i]['real_name']);
+		$notifications[$users[$i]['id_member']] = preg_quote($users[$i]['real_name']);
 		$users_string_array[] = '\'' . addcslashes($users[$i]['real_name'], '\'') . '\' => ' . $users[$i]['id_member'];
 	}
 
-	// Let's make it easier for us to show a member has been tagged with a bbcode
+	// Let's make it easier for us to show a member has been mentioned with a bbcode
 	$new_body = preg_replace_callback(
 		'~(\s|<br />)@(' . implode('|', $notifications) . ')~',
 		create_function('$match', '
 			$members = array(' . implode(', ', $users_string_array) . ');
 			// @todo do we need addcslashes on $match[2]?
-			return $match[1] . \'[tagged=\' . $members[$match[2]] . \']\' . $match[2] . \'[/tagged]\';'
+			return $match[1] . \'[user=\' . $members[$match[2]] . \']\' . $match[2] . \'[/user]\';'
 		),
 		'<br />' . un_htmlspecialchars($body)
 	);
@@ -149,23 +149,27 @@ function sendMentionNotification($mentioner, $message, $users)
 	global $scripturl;
 
 	$db = database();
+	require_once(SUBSDIR . '/Members.subs.php');
 
 	$request = $db->query('', '
-		SELECT tu.id_mgs, tu.id_member, m.subject, mem.lngfile
-		FROM {db_prefix}tagged_users as tu
-			LEFT JOIN {db_prefix}messages as m ON (tu.id_msg = m.id_msg)
-			LEFT JOIN {db_prefix}members as mem ON (tu.id_member = mem.id_member)
-		WHERE tu.id_msg = {int:current_message}
-			AND tu.id_member IN ({array_int:members})',
-		// @todo maybe LIMIT count($users)?
+		SELECT subject
+		FROM {db_prefix}messages
+		WHERE id_msg = {int:current_message}',
 		array(
 			'current_message' => $message,
-			'members' => $users,
 		)
 	);
 
+	// Select the email addresses for this batch.
+	$conditions = array(
+		'activated_status' => 1,
+		'members' => array_keys($users),
+	);
+
+	$data = retrieveMemberData($conditions);
+
 	$mentions = array();
-	while ($row = $smcFunc['db_fetch_row']($request))
+	while ($row = $db->fetch_row($request))
 	{
 		$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 
@@ -183,7 +187,7 @@ function sendMentionNotification($mentioner, $message, $users)
 			'recipients' => array(),
 		);
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	foreach ($mentions as $lang => $mail)
 		sendmail($mail['recipients'], $mail['subject'], $mail['body']);

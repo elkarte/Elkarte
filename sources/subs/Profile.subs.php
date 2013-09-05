@@ -743,7 +743,7 @@ function loadProfileFields($force_reload = false)
 				// If the name if fine, let\'s rebuild the cache for tagging (but only if needed)
 				if (!empty($modSettings[\'tag_users\']))
 				{
-					require_once(SUBSDIR . \'/TagUsers.subs.php\');
+					require_once(SUBSDIR . \'/MentionUsers.subs.php\');
 					rebuildMembersCache(substr($value, 0, 2));
 				}
 				return true;

@@ -542,9 +542,9 @@ class Register_Controller extends Action_Controller
 		}
 		else
 		{
-			if (!empty($modSettings['tag_users']))
+			if (!empty($modSettings['enableUsersMentions']))
 			{
-				require_once(SUBSDIR . '/TagUsers.subs.php');
+				require_once(SUBSDIR . '/MentionUsers.subs.php');
 				rebuildMembersCache(substr($regOptions['username'], 0, 2));
 			}
 			call_integration_hook('integrate_activate', array($regOptions['username']));
@@ -690,9 +690,9 @@ class Register_Controller extends Action_Controller
 			return;
 		}
 
-		if (!empty($modSettings['tag_users']))
+		if (!empty($modSettings['enableUsersMentions']))
 		{
-			require_once(SUBSDIR . '/TagUsers.subs.php');
+			require_once(SUBSDIR . '/MentionUsers.subs.php');
 			rebuildMembersCache(substr($row['member_name'], 0, 2));
 		}
 

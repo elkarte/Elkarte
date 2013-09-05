@@ -1581,6 +1581,12 @@ class Post_Controller extends Action_Controller
 			'update_post_count' => !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'],
 		);
 
+		if (!empty($modSettings['enableUsersMentions']))
+		{
+			require_once(SUBSDIR . '/MentionUsers.subs.php');
+			$mentioned_users = identifyMentionUsers($msgOptions['body']);
+		}
+
 		// This is an already existing message. Edit it.
 		if (!empty($_REQUEST['msg']))
 		{
@@ -1743,13 +1749,8 @@ class Post_Controller extends Action_Controller
 					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
 			}
 
-			if (!empty($modSettings['tag_users']))
-			{
-				require_once(SUBSDIR . '/TagUsers.subs.php');
-				$tagged_users = identifyTaggedUsers($msgOptions['body']);
-				if (!empty($tagged_users))
-					sendMentionNotification($posterOptions['name'], $msgOptions['id'], $tagged_users);
-			}
+			if (!empty($modSettings['enableUsersMentions']) && !empty($mentioned_users))
+					sendMentionNotification($posterOptions['name'], $msgOptions['id'], $mentioned_users);
 		}
 
 		if ($board_info['num_topics'] == 0)

@@ -563,9 +563,9 @@ class ProfileAccount_Controller extends Action_Controller
 				redirectexit();
 			}
 
-			if (!empty($modSettings['tag_users']))
+			if (!empty($modSettings['enableUsersMentions']))
 			{
-				require_once(SUBSDIR . '/TagUsers.subs.php');
+				require_once(SUBSDIR . '/MentionUsers.subs.php');
 				rebuildMembersCache(substr($user_profile[$memID]['member_name'], 0, 2));
 			}
 			// Let the integrations know of the activation.
