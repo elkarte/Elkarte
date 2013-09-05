@@ -678,12 +678,8 @@ function moveTopics($topics, $toBoard)
 
 	if (!empty($isSeen) && !$user_info['is_guest'])
 	{
-		$db->insert('replace',
-			'{db_prefix}log_boards',
-			array('id_board' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
-			array($toBoard, $user_info['id'], $modSettings['maxMsgID']),
-			array('id_board', 'id_member')
-		);
+		require_once(SUBSDIR . '/Boars.subs.php');
+		markBoardsRead($toBoard);
 	}
 
 	// Update the cache?

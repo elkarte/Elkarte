@@ -509,12 +509,10 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Mark recycle board as seen, if it was marked as seen before.
 			if (!empty($isRead) && !$user_info['is_guest'])
-				$db->insert('replace',
-					'{db_prefix}log_boards',
-					array('id_board' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
-					array($modSettings['recycle_board'], $user_info['id'], $modSettings['maxMsgID']),
-					array('id_board', 'id_member')
-				);
+			{
+				require_once(SUBSDIR . '/Boards.subs.php');
+				markBoardsRead($modSettings['recycle_board']);
+			}
 
 			// Add one topic and post to the recycle bin board.
 			$db->query('', '
