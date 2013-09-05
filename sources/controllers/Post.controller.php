@@ -575,6 +575,15 @@ class Post_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
+			if (!empty($board))
+			{
+				foreach ($context['categories'] as $id => $values)
+					if (isset($values['boards'][$board]))
+					{
+						$context['categories'][$id]['boards'][$board]['selected'] = true;
+						break;
+					}
+			}
 		}
 
 		$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
