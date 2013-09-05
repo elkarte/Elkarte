@@ -466,22 +466,40 @@ function deletePollOptions($id_poll, $id_options)
  * for the poll associated with the $id_topic.
  *
  * @param $id_topic
+ * @param $detailed if true returns more info about the starter
  */
-function pollStarters($id_topic)
+function pollStarters($id_topic, $detailed = false)
 {
 	$db = database();
 
-	$pollStarters = array();
-	$request = $db->query('', '
-		SELECT t.id_member_started, p.id_member AS poll_starter
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $id_topic,
-		)
-	);
+	if ($detailed)
+	{
+		$request = $db->query('', '
+			SELECT mem.id_member, m.poster_time, IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_poll
+			FROM {db_prefix}messages AS m
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+				LEFT JOIN {db_prefix}topics as t ON (t.id_first_msg = m.id_msg)
+			WHERE m.id_topic = {int:current_topic}
+			ORDER BY m.id_msg
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+	}
+	else
+	{
+		$request = $db->query('', '
+			SELECT t.id_member_started, p.id_member AS poll_starter
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+			WHERE t.id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+	}
 	if ($db->num_rows($request) != 0)
 		$pollStarters = $db->fetch_row($request);
 	$db->free_result($request);
