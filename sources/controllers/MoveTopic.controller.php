@@ -86,7 +86,10 @@ class MoveTopic_Controller extends Action_Controller
 		{
 			foreach ($context['categories'] as $id => $values)
 				if (isset($values['boards'][$last_moved_to]))
+				{
 					$context['categories'][$id]['boards'][$last_moved_to]['selected'] = true;
+					break;
+				}
 		}
 
 		$context['page_title'] = $txt['move_topic'];
