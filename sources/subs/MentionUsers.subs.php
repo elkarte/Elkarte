@@ -101,7 +101,10 @@ function findNotifiedUsers($body)
 				$short_name = Util::substr($name, 0, $i);
 				if (isset($names_data['names'][$short_name]))
 				{
-					$to_notify[] = $names_data['names'][$short_name];
+					$to_notify[] = array(
+						'id_member' => $names_data['names'][$short_name],
+						'real_name' => $short_name
+					);
 					continue;
 				}
 			}
@@ -136,7 +139,7 @@ function rebuildMembersCache($key)
 			$return['max_len'] = $len;
 		if ($len < $return['min_len'])
 			$return['min_len'] = $len;
-		$return['names'][$row['real_name']] = $row;
+		$return['names'][$row['real_name']] = $row['id_member'];
 	}
 	$db->free_result($request);
 
