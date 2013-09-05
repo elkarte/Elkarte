@@ -28,27 +28,28 @@ class Convert_Md
 	private $_parser;
 
 	/**
-	 * line end character
+	 * Line end character
 	 */
 	public $line_end = "\n";
 
 	/**
-	 * line break character
+	 * Line break character
 	 */
 	public $line_break = "\n\n";
 
 	/**
-	 * wordwrap output, set to 0 to skip wrapping
+	 * Wordwrap output, set to 0 to skip wrapping
 	 */
 	public $body_width = 75;
 
 	/**
-	 * regex to run on plain text to prevent markdown from erroneously converting
+	 * Regex to run on plain text to prevent markdown from erroneously converting
 	 */
 	private $_textEscapeRegex = array();
 
 	/**
 	 * Gets everything started using the built in or external parser
+	 *
 	 * @param type $html
 	 */
 	public function __construct($html)
@@ -99,8 +100,6 @@ class Convert_Md
 	/**
 	 * Loads the html body and sends it to the parsing loop to convert all
 	 * DOM nodes to markup
-	 *
-	 * @return string
 	 */
 	public function get_markdown()
 	{
@@ -114,7 +113,7 @@ class Convert_Md
 		if ($this->_parser)
 		{
 			// Using the internal DOM methods we need to do a little extra work
-			$markdown =  html_entity_decode(htmlspecialchars_decode($markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+			$markdown = html_entity_decode(htmlspecialchars_decode($markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 			if (preg_match('~<body>(.*)</body>~s', $markdown, $body))
 				$markdown = $body[1];
 		}
@@ -139,7 +138,6 @@ class Convert_Md
 	 *  - Prevents converting anything that's inside a code block
 	 *
 	 * @param type $node
-	 * @return boolean
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -164,7 +162,6 @@ class Convert_Md
 	 * Get the nesting level when inside a list
 	 *
 	 * @param type $node
-	 * @return boolean
 	 */
 	private static function _has_parent_list($node, $parser)
 	{
@@ -219,11 +216,11 @@ class Convert_Md
 	 */
 	private function _convert_to_markdown($node)
 	{
-		// html tag and contents
+		// HTML tag and contents
 		$tag = $this->_get_name($node);
-		$value =$this->_get_value($node);
+		$value = $this->_get_value($node);
 
-		// based on the tag, determine how to convert
+		// Based on the tag, determine how to convert
 		switch ($tag)
 		{
 			case 'a':
@@ -314,7 +311,7 @@ class Convert_Md
 				break;
 			case 'root':
 			case 'span':
-				// remove these tags and simply replace with the text inside the tags
+				// Remove these tags and simply replace with the text inside the tags
 				$markdown = $this->_get_innerHTML($node);
 				break;
 			default:
@@ -471,8 +468,6 @@ class Convert_Md
 	 */
 	private function _convert_header($level, $content)
 	{
-		$db = database();
-
 		$level = (int) ltrim($level, 'h');
 
 		if ($level < 3)
@@ -523,7 +518,7 @@ class Convert_Md
 		$value = $this->_get_value($node);
 
 		$loose = rtrim($value) !== $value;
-		$depth = max(0, $this-> _has_parent_list($node, $this->_parser) - 1);
+		$depth = max(0, $this->_has_parent_list($node, $this->_parser) - 1);
 
 		// Unordered lists get a simple bullet
 		if ($list_type === 'ul')
@@ -543,12 +538,9 @@ class Convert_Md
 	 * Have to build top down vs inside out due to needing col numbers and widths
 	 *
 	 * @param object $node
-	 * @return string
 	 */
 	function _convert_table($node)
 	{
-		$db = database();
-
 		$table_heading = $node->getElementsByTagName('th');
 		if ($this->_get_item($table_heading, 0) === null)
 			return;
@@ -558,7 +550,7 @@ class Convert_Md
 		// We only markdown well formed tables ...
 		if ($table_heading && $th_parent === 'tr')
 		{
-			// find out how many columns we are dealing with
+			// Find out how many columns we are dealing with
 			$th_num = $this->_get_length($table_heading);
 			for ($col = 0; $col < $th_num; $col++)
 			{
@@ -575,7 +567,7 @@ class Convert_Md
 
 			// Get all of the rows
 			$table_rows = $node->getElementsByTagName('tr');
-			$num_rows =$this->_get_length($table_rows);
+			$num_rows = $this->_get_length($table_rows);
 			for ($row = 1; $row < $num_rows; $row++)
 			{
 				// Start at row 1 and get all of the td's in this row
@@ -716,7 +708,7 @@ class Convert_Md
 	 * @param string $content
 	 * @param int $max
 	 */
-	private	function _align_row_content($align, $width, $content, $max)
+	private function _align_row_content($align, $width, $content, $max)
 	{
 		switch ($align)
 		{
@@ -741,7 +733,6 @@ class Convert_Md
 	 * Gets the inner html of a node
 	 *
 	 * @param object $node
-	 * @return string
 	 */
 	private function _get_innerHTML($node)
 	{
@@ -764,7 +755,6 @@ class Convert_Md
 	 *    not to be converted later to <strong>stuff</strong>
 	 *
 	 * @param type $value
-	 * @return type
 	 */
 	private function _escape_text($value)
 	{
@@ -800,7 +790,7 @@ class Convert_Md
 			$ticks = '`';
 			rsort($matches[0]);
 
-			// backtick as many as needed so markdown will work
+			// Backtick as many as needed so markdown will work
 			while (true)
 			{
 				if (!in_array($ticks, $matches[0]))
@@ -823,8 +813,6 @@ class Convert_Md
 	 */
 	private function _utf8_wordwrap($string, $width = 75, $break = "\n")
 	{
-		$db = database();
-
 		$lines = array();
 		while (!empty($string))
 		{
@@ -843,7 +831,7 @@ class Convert_Md
 			}
 		}
 
-		// join it all the shortened sections up on our break characters
+		// Join it all the shortened sections up on our break characters
 		return implode($break, $lines);
 	}
 }
