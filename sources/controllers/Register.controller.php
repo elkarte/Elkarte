@@ -242,8 +242,6 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context, $user_info;
 
-		$db = database();
-
 		checkSession();
 		validateToken('register');
 
@@ -418,16 +416,10 @@ class Register_Controller extends Action_Controller
 		$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		$request = $db->query('', '
-			SELECT col_name, field_name, field_type, field_length, mask, show_reg, vieworder
-			FROM {db_prefix}custom_fields
-			WHERE active = {int:is_active}',
-			array(
-				'is_active' => 1,
-			)
-		);
+		require_once(SUBSDIR . '/Themes.subs.php');
+		$request = loadCustomFields(true, true);
 
-		while ($row = $db->fetch_assoc($request))
+		foreach ($request as $row)
 		{
 			// Don't allow overriding of the theme variables.
 			if (isset($regOptions['theme_vars'][$row['col_name']]))
@@ -464,7 +456,6 @@ class Register_Controller extends Action_Controller
 			if (trim($value) == '' && $row['show_reg'] > 1)
 				$reg_errors->addError(array('custom_field_empty', array($row['field_name'])));
 		}
-		$db->free_result($request);
 
 		// Lets check for other errors before trying to register the member.
 		if ($reg_errors->hasErrors())
@@ -558,7 +549,7 @@ class Register_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $scripturl, $language, $user_info;
 
-		$db = database();
+		require_once(SUBSDIR . 'Auth.subs.php');
 
 		// Logged in users should not bother to activate their accounts
 		if (!empty($user_info['id']))
@@ -582,20 +573,16 @@ class Register_Controller extends Action_Controller
 		}
 
 		// Get the code from the database...
-		$request = $db->query('', '
-			SELECT id_member, validation_code, member_name, real_name, email_address, is_activated, passwd, lngfile
-			FROM {db_prefix}members' . (empty($_REQUEST['u']) ? '
+		$row = findUser(empty($_REQUEST['u']) ? '
 			WHERE member_name = {string:email_address} OR email_address = {string:email_address}' : '
-			WHERE id_member = {int:id_member}') . '
-			LIMIT 1',
-			array(
+			WHERE id_member = {int:id_member}', array(
 				'id_member' => isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0,
 				'email_address' => isset($_POST['user']) ? $_POST['user'] : '',
-			)
+			), false
 		);
 
 		// Does this user exist at all?
-		if ($db->num_rows($request) == 0)
+		if (empty($row))
 		{
 			$context['sub_template'] = 'retry_activate';
 			$context['page_title'] = $txt['invalid_userid'];
@@ -603,9 +590,6 @@ class Register_Controller extends Action_Controller
 
 			return;
 		}
-
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
 
 		// Change their email address? (they probably tried a fake one first :P.)
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && sha1(strtolower($row['member_name']) . $_REQUEST['passwd']) == $row['passwd'] && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
@@ -621,19 +605,9 @@ class Register_Controller extends Action_Controller
 			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 			// Ummm... don't even dare try to take someone else's email!!
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE email_address = {string:email_address}
-				LIMIT 1',
-				array(
-					'email_address' => $_POST['new_email'],
-				)
-			);
 			// @todo Separate the sprintf?
-			if ($db->num_rows($request) != 0)
+			if (userByEmail($_POST['new_email']))
 				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'])));
-			$db->free_result($request);
 
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];
