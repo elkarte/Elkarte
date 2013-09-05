@@ -295,12 +295,24 @@ class Template_Layers
 	/**
 	 * Check if at least one layer has been added
 	 *
+	 * @param boolean $base if true will not consider body and html layers in result
 	 * @return bool true if at least one layer has been added
 	 * @todo at that moment _all_after and _all_before are not considered because they may not be "forced"
 	 */
-	public function hasLayers()
+	public function hasLayers($base = false)
 	{
-		return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
+		if (!$base)
+			return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
+		else
+			return array_diff_key(array_merge($this->_all_general, $this->_all_begin, $this->_all_end), array('body' => 0, 'html' => 0));
+	}
+
+	/**
+	 * Return the layers that have been loaded
+	 */
+	public function getLayers()
+	{
+		return array_keys(array_merge($this->_all_general, $this->_all_begin, $this->_all_end, $this->_all_after, $this->_all_before));
 	}
 
 	/**
