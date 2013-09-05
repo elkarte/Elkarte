@@ -604,7 +604,6 @@ class Emailuser_Controller extends Action_Controller
 			// Send it to the moderator.
 			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $user_info['email'], null, false, 2);
 		}
-		$db->free_result($request);
 
 		// Keep track of when the mod reports get updated, that way we know when we need to look again.
 		updateSettings(array('last_mod_report_action' => time()));
