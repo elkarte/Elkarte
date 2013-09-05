@@ -1888,6 +1888,7 @@ VALUES
 	('autoOptMaxOnline', '0'),
 	('autoOptLastOpt', '0'),
 	('enableParticipation', '1'),
+	('enableFollowup', '1'),
 	('recycle_enable', '0'),
 	('recycle_board', '0'),
 	('banLastUpdated', '0'),

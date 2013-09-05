@@ -114,6 +114,7 @@ class ManageTopics_Controller extends Action_Controller
 				// Some simple bools...
 				array('check', 'enableStickyTopics'),
 				array('check', 'enableParticipation'),
+				array('check', 'enableFollowup'),
 			'',
 				// Pagination etc...
 				array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),
@@ -148,6 +149,7 @@ class ManageTopics_Controller extends Action_Controller
 				// Some simple bools...
 				array('check', 'enableStickyTopics'),
 				array('check', 'enableParticipation'),
+				array('check', 'enableFollowup'),
 			'',
 				// Pagination etc...
 				array('int', 'oldTopicDays', 'postinput' => $txt['manageposts_days'], 'subtext' => $txt['oldTopicDays_zero']),

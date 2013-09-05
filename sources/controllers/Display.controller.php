@@ -669,8 +669,12 @@ class Display_Controller
 
 			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
 
-			require_once(SUBSDIR . '/FollowUps.subs.php');
-			$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
+			
+			if (!empty($modSettings['enableFollowup']))
+			{
+				require_once(SUBSDIR . '/FollowUps.subs.php');
+				$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
+			}
 
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
@@ -760,7 +764,7 @@ class Display_Controller
 		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
 
-		$context['can_follow_up'] = boardsallowedto('post_new') !== array();
+		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
 
 		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft') && $context['can_reply'];

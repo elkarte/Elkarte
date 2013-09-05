@@ -1399,6 +1399,11 @@ class ScheduledTask
 	 */
 	function remove_old_followups()
 	{
+		global $modSettings;
+
+		if (empty($modSettings['enableFollowup']))
+			return;
+
 		$db = database();
 
 		$request = $db->query('', '
