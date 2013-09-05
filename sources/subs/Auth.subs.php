@@ -684,7 +684,7 @@ function isFirstLogin($id_member)
 	return !empty($member) && $member['last_login'] == 0;
 }
 
-function findUser($where, $where_params)
+function findUser($where, $where_params, $fatal = true)
 {
 	$db = database();
 
@@ -699,7 +699,7 @@ function findUser($where, $where_params)
 	);
 
 	// Maybe email?
-	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']))
+	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']) && isset($where_params['email_address']))
 	{
 		$db->free_result($request);
 
@@ -712,13 +712,38 @@ function findUser($where, $where_params)
 			))
 		);
 		if ($db->num_rows($request) == 0)
-			fatal_lang_error('no_user_with_email', false);
+		{
+			if ($fatal)
+				fatal_lang_error('no_user_with_email', false);
+			else
+				return false;
+		}
 	}
 
 	$member = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $member;
+}
+
+function userByEmail($email)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}members
+		WHERE email_address = {string:email_address}
+		LIMIT 1',
+		array(
+			'email_address' => $email,
+		)
+	);
+
+	$return = $db->num_rows($request) != 0;
+	$db->free_result($request);
+
+	return $return;
 }
 
 /**
