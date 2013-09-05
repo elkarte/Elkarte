@@ -535,7 +535,7 @@ class Post_Controller extends Action_Controller
 
 			// Get the stuff ready for the form.
 			$form_subject = $message['message']['subject'];
-			$form_message = $message['message']['body'];
+			$form_message = un_preparsecode($message['message']['body']);
 
 			censorText($form_message);
 			censorText($form_subject);
