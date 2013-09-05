@@ -640,16 +640,9 @@ class MessageIndex_Controller extends Action_Controller
 		if (!empty($_REQUEST['actions']))
 		{
 			// Find all topics...
-			$request = $db->query('', '
-				SELECT id_topic, id_member_started, id_board, locked, approved, unapproved_posts
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:action_topic_ids})
-				LIMIT ' . count($_REQUEST['actions']),
-				array(
-					'action_topic_ids' => array_keys($_REQUEST['actions']),
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
+			$topics_info = topicsDetails($_REQUEST['actions']);
+
+			foreach ($topics_info as $row)
 			{
 				if (!empty($board))
 				{
@@ -676,7 +669,6 @@ class MessageIndex_Controller extends Action_Controller
 						unset($_REQUEST['actions'][$row['id_topic']]);
 				}
 			}
-			$db->free_result($request);
 		}
 
 		$stickyCache = array();
