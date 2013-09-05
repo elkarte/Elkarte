@@ -2594,7 +2594,7 @@ function messagesInTopics($topics)
 		array(
 			'topic_list' => $topics,
 	));
-	while ($row = $db->fetch_row($request))
+	while ($row = $db->fetch_assoc($request))
 		$messages[] = $row['id_msg'];
 	$db->free_result($request);
 
