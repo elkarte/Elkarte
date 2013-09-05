@@ -493,8 +493,6 @@ class Poll_Controller extends Action_Controller
 	{
 		global $topic, $board, $user_info;
 
-		$db = database();
-
 		// Sneaking off, are we?
 		if (empty($_POST))
 			redirectexit('action=editpoll;topic=' . $topic . '.0');
@@ -601,23 +599,11 @@ class Poll_Controller extends Action_Controller
 		// If we're editing, let's commit the changes.
 		if ($isEdit)
 		{
-			$db->query('', '
-				UPDATE {db_prefix}polls
-				SET question = {string:question}, change_vote = {int:change_vote},' . (allowedTo('moderate_board') ? '
-					hide_results = {int:hide_results}, expire_time = {int:expire_time}, max_votes = {int:max_votes},
-					guest_vote = {int:guest_vote}' : '
-					hide_results = CASE WHEN expire_time = {int:expire_time_zero} AND {int:hide_results} = 2 THEN 1 ELSE {int:hide_results} END') . '
-				WHERE id_poll = {int:id_poll}',
-				array(
-					'change_vote' => $_POST['poll_change_vote'],
-					'hide_results' => $_POST['poll_hide'],
-					'expire_time' => !empty($_POST['poll_expire']) ? $_POST['poll_expire'] : 0,
-					'max_votes' => !empty($_POST['poll_max_votes']) ? $_POST['poll_max_votes'] : 0,
-					'guest_vote' => $_POST['poll_guest_vote'],
-					'expire_time_zero' => 0,
-					'id_poll' => $bcinfo['id_poll'],
-					'question' => $_POST['question'],
-				)
+			modifyPoll($bcinfo['id_poll'], $_POST['question'],
+				!empty($_POST['poll_max_votes']) ? $_POST['poll_max_votes'] : 0,
+				$_POST['poll_hide'],
+				!empty($_POST['poll_expire']) ? $_POST['poll_expire'] : 0,
+				$_POST['poll_change_vote'], $_POST['poll_guest_vote']
 			);
 		}
 		// Otherwise, let's get our poll going!
@@ -636,6 +622,8 @@ class Poll_Controller extends Action_Controller
 		// Get all the choices.  (no better way to remove all emptied and add previously non-existent ones.)
 		$choices = array_keys(pollOptions($bcinfo['id_poll']));
 
+		$add_options = array();
+		$update_options = array();
 		$delete_options = array();
 		foreach ($_POST['options'] as $k => $option)
 		{
@@ -658,57 +646,16 @@ class Poll_Controller extends Action_Controller
 
 			// If it's already there, update it.  If it's not... add it.
 			if (in_array($k, $choices))
-			{
-				$db->query('', '
-					UPDATE {db_prefix}poll_choices
-					SET label = {string:option_name}
-					WHERE id_poll = {int:id_poll}
-						AND id_choice = {int:id_choice}',
-					array(
-						'id_poll' => $bcinfo['id_poll'],
-						'id_choice' => $k,
-						'option_name' => $option,
-					)
-				);
-			}
+				$update_options[] = array($bcinfo['id_poll'], $k, $option);
 			else
-			{
-				$db->insert('',
-					'{db_prefix}poll_choices',
-					array(
-						'id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255', 'votes' => 'int',
-					),
-					array(
-						$bcinfo['id_poll'], $k, $option, 0,
-					),
-					array()
-				);
-			}
+				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
 		}
+		if (!empty($add_options))
+			insertPollOptions($add_options);
 
 		// I'm sorry, but... well, no one was choosing you. Poor options, I'll put you out of your misery.
 		if (!empty($delete_options))
-		{
-			$db->query('', '
-				DELETE FROM {db_prefix}log_polls
-				WHERE id_poll = {int:id_poll}
-					AND id_choice IN ({array_int:delete_options})',
-				array(
-					'delete_options' => $delete_options,
-					'id_poll' => $bcinfo['id_poll'],
-				)
-			);
-
-			$db->query('', '
-				DELETE FROM {db_prefix}poll_choices
-				WHERE id_poll = {int:id_poll}
-					AND id_choice IN ({array_int:delete_options})',
-				array(
-					'delete_options' => $delete_options,
-					'id_poll' => $bcinfo['id_poll'],
-				)
-			);
-		}
+			deletePollOptions($bcinfo['id_poll'], $delete_options);
 
 		// Shall I reset the vote count, sir?
 		if (isset($_POST['resetVoteCount']))
