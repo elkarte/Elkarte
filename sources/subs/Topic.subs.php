@@ -1107,7 +1107,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 		);
 
 	$messages_table = $full === 'message' || $full === 'all';
-	$follow_ups_table = $full === 'follow_up' || $full === 'all';
+	$follow_ups_table = !empty($modSettings['enableFollowup']) && $full === 'follow_up' || $full === 'all';
 	$logs_table = $full === 'all';
 
 	// Create the query, taking full and integration in to account

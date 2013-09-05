@@ -568,7 +568,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Are we moving a discussion to its own topic?
-		if (!empty($_REQUEST['followup']))
+		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
 		{
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
@@ -1600,7 +1600,7 @@ class Post_Controller extends Action_Controller
 		// This is a new topic or an already existing one. Save it.
 		else
 		{
-			if (!empty($_REQUEST['followup']))
+			if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
 				$original_post = (int) $_REQUEST['followup'];
 
 			// We also have to fake the board:
@@ -1621,7 +1621,8 @@ class Post_Controller extends Action_Controller
 			if (isset($topicOptions['id']))
 				$topic = $topicOptions['id'];
 
-			require_once(SUBSDIR . '/FollowUps.subs.php');
+			if (!empty($modSettings['enableFollowup']))
+				require_once(SUBSDIR . '/FollowUps.subs.php');
 			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// Time to update the original message with a pointer to the new one
