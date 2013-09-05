@@ -192,7 +192,7 @@ function template_main()
 			// What about splitting it off the rest of the topic?
 			if ($context['can_split'] && !empty($context['real_num_replies']))
 				echo '
-									<li class="listlevel2"><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="linklevel2 split_button">', $txt['split'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="linklevel2 split_button">', $$txt['split_topic'], '</a></li>';
 
 			// Can we restore topics?
 			if ($context['can_restore_msg'])
