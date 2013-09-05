@@ -556,7 +556,12 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Remember the last board they moved things to.
 		if (isset($_REQUEST['move_to']))
-			$_SESSION['move_to_topic'] = $_REQUEST['move_to'];
+			$_SESSION['move_to_topic'] = array(
+				'move_to' => $_REQUEST['move_to'],
+				// And remember the last expiry period too.
+				'redirect_topic' => (int) $_REQUEST['redirect_topic'],
+				'redirect_expires' => (int) $_REQUEST['redirect_expires'],
+			);
 
 		// Only a few possible actions.
 		$possibleActions = array();
