@@ -255,7 +255,7 @@ function template_reported_posts()
 						</div>';
 
 	if (!empty($context['reports']))
-		template_pagesection(false, false, 'go_down');
+		template_pagesection();
 
 	foreach ($context['reports'] as $report)
 	{
@@ -308,7 +308,7 @@ function template_reported_posts()
 							</div>
 						</div>';
 	else
-		template_pagesection(false, false, 'go_up', array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="button_submit" />' : ''));
+		template_pagesection(false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="button_submit" />' : ''));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -343,7 +343,7 @@ function template_unapproved_posts()
 							</div>
 						</div>';
 	else
-		template_pagesection(false, false, 'go_down');
+		template_pagesection();
 
 	foreach ($context['unapproved_items'] as $item)
 	{
@@ -389,7 +389,7 @@ function template_unapproved_posts()
 								<noscript><input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" /></noscript>
 							</div>';
 
-	template_pagesection(false, false, 'go_up', array('extra' => $quick_mod));
+	template_pagesection(false, false, array('extra' => $quick_mod));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

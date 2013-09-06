@@ -137,7 +137,7 @@ function automanage_attachments_check_directory()
  */
 function automanage_attachments_create_directory($updir)
 {
-	global $modSettings, $initial_error, $context;
+	global $modSettings, $context;
 
 	$tree = get_directory_tree_elements($updir);
 	$count = count($tree);

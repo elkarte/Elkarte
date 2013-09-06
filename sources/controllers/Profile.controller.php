@@ -592,7 +592,7 @@ class Profile_Controller extends Action_Controller
 			{
 				require_once(CONTROLLERDIR . '/ProfileOptions.controller.php');
 				$controller = new Profileoptions_Controller();
-				$msg = $controller->action_groupMembership2($profile_vars, $post_errors, $memID);
+				$msg = $controller->action_groupMembership2();
 
 				// Whatever we've done, we have nothing else to do here...
 				redirectexit('action=profile' . ($context['user']['is_owner'] ? '' : ';u=' . $memID) . ';area=groupmembership' . (!empty($msg) ? ';msg=' . $msg : ''));
@@ -609,7 +609,7 @@ class Profile_Controller extends Action_Controller
 			else
 			{
 				$force_redirect = true;
-				saveProfileChanges($profile_vars, $post_errors, $memID);
+				saveProfileChanges($profile_vars, $memID);
 			}
 
 			call_integration_hook('integrate_profile_save', array(&$profile_vars, &$post_errors, $memID));

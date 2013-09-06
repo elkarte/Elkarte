@@ -21,6 +21,7 @@ function template_core_features()
 {
 	global $context, $txt, $settings, $scripturl;
 
+	// @todo move all this javascript to a file
 	echo '
 	<script><!-- // --><![CDATA[
 		var token_name,

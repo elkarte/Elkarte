@@ -267,7 +267,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 	else
 		// SMTP protocol it is
-		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $message_id, $line_break, $mime_boundary);
+		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
 
 	// Clear out the stat cache.
 	trackStats();
@@ -291,7 +291,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
 {
-	global $context, $modSettings;
+	global $context;
 
 	$db = database();
 
@@ -475,7 +475,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
  * @param string $message_id
  * @return boolean whether it sent or not.
  */
-function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = null)
+function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $message_id = null)
 {
 	global $modSettings, $webmaster_email, $txt, $scripturl;
 
@@ -625,6 +625,8 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = n
 	// Log each email
 	if (!empty($sent))
 	{
+		$db = database();
+
 		$db->insert('ignore',
 			'{db_prefix}postby_emails',
 			array(
@@ -720,7 +722,7 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  */
 function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true)
 {
-	global $txt, $mbname, $scripturl, $settings, $user_info, $boardurl, $modSettings;
+	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings;
 
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
@@ -1083,7 +1085,7 @@ function updateNextSendTime()
 	);
 	if ($db->affected_rows() == 0)
 		return false;
-	return true;
+	return $delay;
 }
 
 /**
@@ -1158,7 +1160,8 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (!$override_limit)
 	{
 		// Update next send time for our mails queue, if there was something to update. Otherwise bail out :P
-		if (!updateNextSendTime())
+		$delay = updateNextSendTime();
+		if ($delay !== false)
 			return false;
 		$modSettings['mail_next_send'] = time() + $delay;
 	}
@@ -1255,7 +1258,7 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 				@apache_reset_timeout();
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['message_id']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['priority'], $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)

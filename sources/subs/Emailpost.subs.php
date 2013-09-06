@@ -870,9 +870,8 @@ function pbe_email_attachments($pbe, $email_message)
  *  - Returns the board number in which the new topic should go
  *
  * @param object $email_address
- * @param boolean $check
  */
-function pbe_find_board_number($email_address, $check = false)
+function pbe_find_board_number($email_address)
 {
 	global $modSettings;
 
@@ -912,7 +911,7 @@ function pbe_find_board_number($email_address, $check = false)
  */
 function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
-	global $txt;
+	global $txt, $context;
 
 	loadLanguage('Maillist');
 
@@ -1491,7 +1490,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
  * @param int $id_topic
  * @param boolean $auto_notify
  */
-function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
+function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $permissions)
 {
 	$db = database();
 
@@ -1514,7 +1513,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 
 	// If they have topic notification on and not board notification then
 	// add this post to the notification log
-	if (!empty($auto_notify) && (in_array('mark_any_notify', $pbe['user_info']['permissions'])) && !$board_notify)
+	if (!empty($auto_notify) && (in_array('mark_any_notify', $permissions)) && !$board_notify)
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_notify',

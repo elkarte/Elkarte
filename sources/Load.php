@@ -32,6 +32,7 @@ function reloadSettings()
 	$db = database();
 
 	// Most database systems have not set UTF-8 as their default input charset.
+	// @todo is this still necessary? (I mean the if, not the query itself.)
 	if (!empty($db_character_set))
 		$db->query('set_character_set', '
 			SET NAMES ' . $db_character_set,
@@ -1699,12 +1700,12 @@ function loadEssentialThemeData()
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
 	global $context, $settings, $txt, $scripturl, $db_show_debug;
-	static $default_loaded;
+	static $default_loaded = false;
 
 	if (!is_array($style_sheets))
 		$style_sheets = array($style_sheets);
 
-	if (empty($default_loaded))
+	if ($default_loaded === false)
 	{
 		loadCSSFile(array('index.css'));
 		$default_loaded = true;
@@ -2247,7 +2248,7 @@ function getLanguages($use_cache = true)
 function censorText(&$text, $force = false)
 {
 	global $modSettings, $options, $settings;
-	static $censor_vulgar = null, $censor_proper;
+	static $censor_vulgar = null, $censor_proper = null;
 
 	if ((!empty($options['show_no_censored']) && $settings['allow_no_censored'] && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
 		return $text;

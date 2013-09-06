@@ -153,7 +153,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance;
+	global $modSettings, $user_info, $topic, $board_info;
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')

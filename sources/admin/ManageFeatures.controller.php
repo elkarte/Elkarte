@@ -1315,7 +1315,6 @@ class ManageFeatures_Controller extends Action_Controller
 			checkSession();
 
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$limits_to_update = array();
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
 				if (isset($_POST['group'][$group_id]) && $_POST['group'][$group_id] != $group['max_messages'])

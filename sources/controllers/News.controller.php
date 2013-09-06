@@ -25,6 +25,9 @@ if (!defined('ELK'))
  */
 class News_Controller extends Action_Controller
 {
+
+	private $_query_this_board = null;
+
 	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
@@ -54,7 +57,7 @@ class News_Controller extends Action_Controller
 	public function action_showfeed()
 	{
 		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-		global $query_this_board, $forum_version, $cdata_override, $settings;
+		global $forum_version, $cdata_override, $settings;
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
@@ -67,7 +70,7 @@ class News_Controller extends Action_Controller
 		$_GET['limit'] = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
-		$query_this_board = 1;
+		$this->_query_this_board = '1=1';
 		$context['optimize_msg'] = array(
 			'highest' => 'm.id_msg <= b.id_last_msg',
 		);
@@ -89,7 +92,7 @@ class News_Controller extends Action_Controller
 			$boards = array_keys($boards_posts);
 
 			if (!empty($boards))
-				$query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
+				$this->_query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
 
 			// Try to limit the number of messages we look through.
 			if ($total_cat_posts > 100 && $total_cat_posts > $modSettings['totalMessages'] / 15)
@@ -119,7 +122,7 @@ class News_Controller extends Action_Controller
 
 			// @todo: when $boards is empty? If it is empty there is the fatal_lang_error. No?
 			if (!empty($boards))
-				$query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
+				$this->_query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
 
 			// The more boards, the more we're going to look through...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
@@ -132,7 +135,7 @@ class News_Controller extends Action_Controller
 
 			$feed_title = ' - ' . strip_tags($board_info['name']);
 
-			$query_this_board = 'b.id_board = ' . $board;
+			$this->_query_this_board = 'b.id_board = ' . $board;
 
 			// Try to look through just a few messages, if at all possible.
 			if ($boards_data['num_posts'] > 80 && $boards_data['num_posts'] > $modSettings['totalMessages'] / 10)
@@ -140,7 +143,7 @@ class News_Controller extends Action_Controller
 		}
 		else
 		{
-			$query_this_board = '{query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			$this->_query_this_board = '{query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				AND b.id_board != ' . $modSettings['recycle_board'] : '');
 			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $_GET['limit'] * 5);
 		}
@@ -180,7 +183,7 @@ class News_Controller extends Action_Controller
 		foreach (array('board', 'boards', 'c') as $var)
 			if (isset($_REQUEST[$var]))
 				$cachekey[] = $_REQUEST[$var];
-		$cachekey = md5(serialize($cachekey) . (!empty($query_this_board) ? $query_this_board : ''));
+		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
 
 		// Get the associative array representing the xml.
@@ -398,7 +401,7 @@ class News_Controller extends Action_Controller
 	public function action_xmlnews($xml_format)
 	{
 		global $scripturl, $modSettings, $board;
-		global $query_this_board, $context;
+		global $context;
 
 		$db = database();
 
@@ -425,7 +428,7 @@ class News_Controller extends Action_Controller
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				WHERE ' . $query_this_board . (empty($optimize_msg) ? '' : '
+				WHERE ' . $this->_query_this_board . (empty($optimize_msg) ? '' : '
 					AND {raw:optimize_msg}') . (empty($board) ? '' : '
 					AND t.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
 					AND t.approved = {int:is_approved}' : '') . '
@@ -545,7 +548,7 @@ class News_Controller extends Action_Controller
 	 */
 	public function action_xmlrecent($xml_format)
 	{
-		global $scripturl, $modSettings, $board, $query_this_board, $context;
+		global $scripturl, $modSettings, $board, $context;
 
 		$db = database();
 
@@ -559,7 +562,7 @@ class News_Controller extends Action_Controller
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				WHERE ' . $query_this_board . (empty($optimize_msg) ? '' : '
+				WHERE ' . $this->_query_this_board . (empty($optimize_msg) ? '' : '
 					AND {raw:optimize_msg}') . (empty($board) ? '' : '
 					AND m.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
 					AND m.approved = {int:is_approved}' : '') . '

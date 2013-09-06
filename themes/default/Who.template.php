@@ -43,7 +43,7 @@ function template_main()
 					</noscript>
 				</div>';
 
-	template_pagesection(false, false, 'go_down', array('extra' => $extra));
+	template_pagesection(false, false, array('extra' => $extra));
 
 	echo '
 			<div class="topic_table" id="mlist">
@@ -103,7 +103,7 @@ function template_main()
 					</tbody>
 				</table>
 			</div>';
-	template_pagesection(false, false, 'go_down', array('extra' => $extra));
+	template_pagesection(false, false, array('extra' => $extra));
 
 	echo '
 		</form>

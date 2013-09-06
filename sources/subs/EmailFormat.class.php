@@ -130,7 +130,7 @@ class Email_Format
 
 		$this->_real_name = $real_name;
 		$this->_prep_data($data);
-		$this->_fix_body($html);
+		$this->_fix_body();
 		$this->_clean_up($charset);
 
 		return $this->_body;
@@ -188,9 +188,8 @@ class Email_Format
 	 * signature lines and end of paragraphs ... all assuming it can figure or
 	 * best guess those areas.
 	 *
-	 * @param boolean $html
 	 */
-	private function _fix_body($html)
+	private function _fix_body()
 	{
 		// Go line by line and put in line breaks *only* where (we often erroneously assume) they are needed
 		for ($i = 0, $num = count($this->_body_array); $i < $num; $i++)

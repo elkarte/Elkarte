@@ -86,9 +86,9 @@ function template_folder()
 
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		if ($context['display_mode'] == 2)
-			template_pagesection('conversation_buttons', 'right', 'go_down');
+			template_pagesection('conversation_buttons', 'right');
 		else
-			template_pagesection(false, false, 'go_down');
+			template_pagesection();
 
 		echo '
 					<div class="forumposts">';
@@ -280,7 +280,7 @@ function template_folder()
 					</div>';
 
 		if (empty($context['display_mode']))
-			template_pagesection(false, false, 'go_up', array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
+			template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
 			template_pagesection('conversation_buttons', 'right');
@@ -653,7 +653,7 @@ function template_subject_list()
 	$extra .= '
 					</div>';
 
-	template_pagesection(false, false, '', array('top_button' => false, 'extra' => $extra));
+	template_pagesection(false, false, array('top_button' => false, 'extra' => $extra));
 }
 
 /**
@@ -836,7 +836,7 @@ function template_search_results()
 	global $context, $scripturl, $txt;
 
 	echo '
-		', template_pagesection(false, false, 'go_down'), '
+		', template_pagesection(), '
 		<div class="forumposts">
 			<h2 class="category_header">
 				', $txt['pm_search_results'], '
@@ -1747,7 +1747,7 @@ function template_showPMDrafts()
 					', $txt['drafts_show'], '
 			</h3>
 		</div>';
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))

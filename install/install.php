@@ -284,7 +284,7 @@ function load_lang_file()
  */
 function load_database()
 {
-	global $db_prefix, $db_connection, $db_character_set, $language;
+	global $db_prefix, $db_connection, $language;
 	global $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user, $db_persist;
 
 	if (!defined('SOURCEDIR'))
@@ -922,7 +922,7 @@ function action_forumSettings()
  */
 function action_databasePopulation()
 {
-	global $db_character_set, $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
+	global $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 	$incontext['sub_template'] = 'populate_database';
 	$incontext['page_title'] = $txt['db_populate'];

@@ -80,8 +80,7 @@ class Reports_Controller extends Action_Controller
 		foreach ($context['report_types'] as $k => $temp)
 			$context['report_types'][$k] = array(
 				'id' => $k,
-				// @todo what is $type? It is never set!
-				'title' => isset($txt['gr_type_' . $k]) ? $txt['gr_type_' . $k] : $type['id'],
+				'title' => isset($txt['gr_type_' . $k]) ? $txt['gr_type_' . $k] : $k,
 				'description' => isset($txt['gr_type_desc_' . $k]) ? $txt['gr_type_desc_' . $k] : null,
 				'function' => $temp,
 				'is_first' => $is_first++ == 0,
@@ -383,9 +382,6 @@ class Reports_Controller extends Action_Controller
 			// Here cycle through all the detected permissions.
 			foreach ($permissions as $ID_PERM => $perm_info)
 			{
-				// Is this identical to the global?
-				$identicalGlobal = $board == 0 ? false : true;
-
 				// Default data for this row.
 				$curData = array('col' => $perm_info['title']);
 
@@ -439,7 +435,7 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_member_groups()
 	{
-		global $context, $txt, $settings, $modSettings;
+		global $txt, $settings, $modSettings;
 
 		$db = database();
 
@@ -564,7 +560,7 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_group_perms()
 	{
-		global $context, $txt, $modSettings;
+		global $txt, $modSettings;
 
 		$db = database();
 
@@ -669,7 +665,7 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_staff()
 	{
-		global $context, $txt;
+		global $txt;
 
 		$db = database();
 
@@ -904,7 +900,7 @@ function addSeparator($title = '', $custom_table = null)
 		return;
 
 	// Specific table?
-	if ($custom_table !== null && !isset($context['tables'][$table]))
+	if ($custom_table !== null && !isset($context['tables'][$custom_table]))
 		return false;
 	elseif ($custom_table !== null)
 		$table = $custom_table;

@@ -25,7 +25,7 @@ function template_badbehavior_log()
 				<h3 class="titlebg">
 					<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
 				</h3>
-			</div>', template_pagesection(false, false, 'go_down'), '
+			</div>', template_pagesection(), '
 			<table class="table_grid" id="error_log">';
 
 	if ($context['has_filter'])

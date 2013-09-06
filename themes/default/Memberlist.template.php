@@ -43,7 +43,7 @@ function template_main()
 		</ul>
 	</form>';
 
-	template_pagesection('memberlist_buttons', 'right', 'go_down', array('extra' => $extra));
+	template_pagesection('memberlist_buttons', 'right', array('extra' => $extra));
 
 	echo '
 	<script><!-- // --><![CDATA[
@@ -153,7 +153,7 @@ function template_main()
 		$extra = '';
 
 	// Show the page numbers again. (makes 'em easier to find!)
-	template_pagesection(false, false, 'go_up', array('extra' => $extra));
+	template_pagesection(false, false, array('extra' => $extra));
 
 	echo '
 	</div>';

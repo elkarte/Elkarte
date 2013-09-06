@@ -41,10 +41,6 @@ class ProfileHistory_Controller extends Action_Controller
 
 		$context['history_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'activity';
 
-		// @todo what is $types? it is never set so this will never be true
-		if (isset($types[$context['history_area']][1]))
-			require_once(SOURCEDIR . '/' . $types[$context['history_area']][1]);
-
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['history'],

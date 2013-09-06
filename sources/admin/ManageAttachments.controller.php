@@ -2003,6 +2003,9 @@ class ManageAttachments_Controller extends Action_Controller
 				$moved = array();
 				while ($row = $db->fetch_assoc($request))
 				{
+					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
+
 					// Size and file count check
 					if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
 					{
@@ -2038,9 +2041,6 @@ class ManageAttachments_Controller extends Action_Controller
 							}
 						}
 					}
-
-					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
 
 					if (@rename($source, $dest))
 					{

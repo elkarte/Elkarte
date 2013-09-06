@@ -96,8 +96,9 @@ class Emailpost_Controller extends Action_Controller
 
 		// Can't find this key in the database, either
 		//   a) spam attempt or b) replying with an expired/consumed key
+		// @todo @Spuds this is for you I think: I replaced $message_type with $email_message->message_type
 		if (empty($key_owner))
-			return pbe_emailError('error_' . ($message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
+			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
 
 		// The key received was not sent to this member ... how we love those email aggregators
 		if (strtolower($key_owner) !== $email_message->email['from'] && !$force)
@@ -190,9 +191,8 @@ class Emailpost_Controller extends Action_Controller
 	 * Accessed through emailtopic.
 	 *
 	 * @param string $data used to supply a full body+headers email
-	 * @param type $force used to override common failure errors
 	 */
-	function action_pbe_topic($data = null, $force = false)
+	function action_pbe_topic($data = null)
 	{
 		global $modSettings, $user_info, $maintenance;
 
@@ -414,7 +414,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
 
 	// Turn notifications on or off
-	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify);
+	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify, $pbe['user_info']['permissions']);
 
 	// Notify members who have notification turned on for this,
 	// but only if it's going to be approved
@@ -576,7 +576,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
 
 	// Notifications on or off
-	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify);
+	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify, $pbe['user_info']['permissions']);
 
 	// Notify members who have notification turned on for this, (if it's approved)
 	if ($becomesApproved)

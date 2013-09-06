@@ -99,7 +99,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $context, $modSettings;
+		global $txt, $context;
 
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
@@ -695,7 +695,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_upload()
 	{
-		global $txt, $context, $modSettings;
+		global $txt, $context;
 
 		// Set up the upload template, and page title.
 		$context['sub_template'] = 'upload';
@@ -717,7 +717,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function ftp_connect()
 	{
-		global $context;
+		global $context, $modSettings;
 
 		// Try to chmod from PHP first
 		@chmod(BOARDDIR . '/packages', 0777);

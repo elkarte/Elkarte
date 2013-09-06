@@ -50,7 +50,7 @@ function template_showDrafts()
 {
 	global $context, $settings, $scripturl, $txt;
 
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))

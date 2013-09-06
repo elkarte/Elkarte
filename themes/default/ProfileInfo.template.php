@@ -320,7 +320,7 @@ function template_action_showPosts()
 {
 	global $context, $scripturl, $txt;
 
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	echo '
 		<div class="forumposts">
