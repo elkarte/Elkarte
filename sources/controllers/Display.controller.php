@@ -216,7 +216,7 @@ class Display_Controller
 
 		// Create a previous next string if the selected theme has it as a selected option.
 		if ($modSettings['enablePreviousNext'])
-			$context['links'] = array(
+			$context['links'] += array(
 				'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
 				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
 			);

@@ -120,7 +120,7 @@ class Members_Controller extends Action_Controller
 
 			// Determine the navigation context (especially useful for the wireless template).
 			$base_url = $scripturl . '?action=findmember;search=' . urlencode($context['last_search']) . (empty($_REQUEST['u']) ? '' : ';u=' . $_REQUEST['u']) . ';' . $context['session_var'] . '=' . $context['session_id'];
-			$context['links'] = array(
+			$context['links'] += array(
 				'first' => $_REQUEST['start'] >= 7 ? $base_url . ';start=0' : '',
 				'prev' => $_REQUEST['start'] >= 7 ? $base_url . ';start=' . ($_REQUEST['start'] - 7) : '',
 				'next' => $_REQUEST['start'] + 7 < $total_results ? $base_url . ';start=' . ($_REQUEST['start'] + 7) : '',

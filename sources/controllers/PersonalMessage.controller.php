@@ -329,7 +329,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Determine the navigation context (especially useful for the wireless template).
-		$context['links'] = array(
+		$context['links'] += array(
 			'first' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=0' : '',
 			'prev' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=' . ($start - $modSettings['defaultMaxMessages']) : '',
 			'next' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . ($start + $modSettings['defaultMaxMessages']) : '',

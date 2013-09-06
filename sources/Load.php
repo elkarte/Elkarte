@@ -1397,6 +1397,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Some basic information...
 	if (!isset($context['html_headers']))
 		$context['html_headers'] = '';
+	if (!isset($context['links']))
+		$context['links'] = array();
 	if (!isset($context['javascript_files']))
 		$context['javascript_files'] = array();
 	if (!isset($context['css_files']))
