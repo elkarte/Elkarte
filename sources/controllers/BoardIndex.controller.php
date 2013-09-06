@@ -93,8 +93,7 @@ class BoardIndex_Controller extends Action_Controller
 			$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
 		}
 
-		$settings['display_recent_bar'] = !empty($settings['number_recent_posts']) ? $settings['number_recent_posts'] : 0;
-		$settings['show_member_bar'] &= allowedTo('view_mlist');
+		// @todo show_stats and show_member_list are not used: are they useful to themers?
 		$context['show_stats'] = allowedTo('view_stats') && !empty($modSettings['trackStats']);
 		$context['show_member_list'] = allowedTo('view_mlist');
 		$context['show_who'] = allowedTo('who_view') && !empty($modSettings['who_enabled']);
@@ -116,9 +115,10 @@ class BoardIndex_Controller extends Action_Controller
 
 			// This is used to show the "how-do-I-edit" help.
 			$context['calendar_can_edit'] = allowedTo('calendar_edit_any');
+			$show_calendar = true;
 		}
 		else
-			$context['show_calendar'] = false;
+			$show_calendar = false;
 
 		$context['page_title'] = sprintf($txt['forum_index'], $context['forum_name']);
 
@@ -126,6 +126,15 @@ class BoardIndex_Controller extends Action_Controller
 		$context['mark_read_button'] = array(
 			'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markallreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=all;' . $context['session_var'] . '=' . $context['session_id']),
 		);
+
+		$context['info_center_callbacks'] = array();
+		if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
+			$context['info_center_callbacks'][] = 'recent_posts';
+		if ($show_calendar)
+			$context['info_center_callbacks'][] = 'show_events';
+		if (!empty($settings['show_stats_index']))
+			$context['info_center_callbacks'][] = 'show_stats';
+		$context['info_center_callbacks'][] = 'show_users';
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_mark_read_button');

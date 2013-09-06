@@ -208,7 +208,8 @@ function template_boardindex_outer_below()
 			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_redirect.png" alt="" /> ', $txt['redirect_board'], '</p>
 		</div>';
 
-	template_info_center();
+	if (!empty($context['info_center_callbacks']))
+		template_info_center();
 }
 
 /**
@@ -227,165 +228,14 @@ function template_info_center()
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
 
-	// This is the "Recent Posts" bar.
-	if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
+	foreach ($context['info_center_callbacks'] as $callback)
 	{
-		// Show the Recent Posts title, and attach webslices feed to this section
-		// The format requires: hslice, entry-title and entry-content classes.
-		echo '
-			<li class="board_row hslice" id="recent_posts_content">
-				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=recent"><img class="icon" src="', $settings['images_url'], '/post/xx.png" alt="" />', $txt['recent_posts'], '</a>
-				</h3>
-				<div class="entry-title" style="display: none;">', $context['forum_name_html_safe'], ' - ', $txt['recent_posts'], '</div>
-				<div class="entry-content" style="display: none;">
-					<a rel="feedurl" href="', $scripturl, '?action=.xml;type=webslice">', $txt['subscribe_webslice'], '</a>
-				</div>';
-
-		// Only show one post.
-		if ($settings['number_recent_posts'] == 1)
-		{
-			// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
-			echo '
-				<p id="infocenter_onepost" class="inline">
-					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;&quot;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'], '&quot;'), ' (<time datetime="', htmlTime($context['latest_post']['timestamp']), '">', $context['latest_post']['time'], '</time>)
-				</p>';
-		}
-		// Show lots of posts. @todo - Although data here is actually tabular, perhaps use faux table for greater responsiveness.
-		elseif (!empty($context['latest_posts']))
-		{
-			echo '
-				<table id="ic_recentposts">
-					<tr>
-						<th class="recentpost">', $txt['message'], '</th>
-						<th class="recentposter">', $txt['author'], '</th>
-						<th class="recentboard">', $txt['board'], '</th>
-						<th class="recenttime">', $txt['date'], '</th>
-					</tr>';
-
-			// Each post in latest_posts has:
-			// board (with an id, name, and link.), topic (the topic's id.), poster (with id, name, and link.),
-			// subject, short_subject (shortened with...), time, link, and href.
-			foreach ($context['latest_posts'] as $post)
-				echo '
-					<tr>
-						<td class="recentpost"><strong>', $post['link'], '</strong></td>
-						<td class="recentposter">', $post['poster']['link'], '</td>
-						<td class="recentboard">', $post['board']['link'], '</td>
-						<td class="recenttime"><time datetime="', htmlTime($post['time']), '">', $post['time'], '</time></td>
-					</tr>';
-
-			echo '
-				</table>';
-		}
-
-		echo '
-			</li>';
-	}
-
-	// Show information about events, birthdays, and holidays on the calendar.
-	if ($context['show_calendar'])
-	{
-		echo '
-			<li class="board_row">
-				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=calendar' . '"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
-				</h3>';
-
-		// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
-		if (!empty($context['calendar_holidays']))
-			echo '
-				<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';
-
-		// People's birthdays. Like mine. And yours, I guess. Kidding.
-		if (!empty($context['calendar_birthdays']))
-		{
-			echo '
-				<p class="inline">
-					<span class="birthday">', $context['calendar_only_today'] ? $txt['birthdays'] : $txt['birthdays_upcoming'], '</span>';
-
-			// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
-			foreach ($context['calendar_birthdays'] as $member)
-				echo '
-					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
-			echo '
-				</p>';
-		}
-
-		// Events like community get-togethers.
-		if (!empty($context['calendar_events']))
-		{
-			echo '
-				<p class="inline">
-					<span class="event">', $context['calendar_only_today'] ? $txt['events'] : $txt['events_upcoming'], '</span> ';
-
-			// Each event in calendar_events should have:
-			// title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
-			foreach ($context['calendar_events'] as $event)
-				echo '
-					', $event['can_edit'] ? '<a href="' . $event['modify_href'] . '" title="' . $txt['calendar_edit'] . '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" class="centericon" /></a> ' : '', $event['href'] == '' ? '' : '<a href="' . $event['href'] . '">', $event['is_today'] ? '<strong>' . $event['title'] . '</strong>' : $event['title'], $event['href'] == '' ? '' : '</a>', $event['is_last'] ? '<br />' : ', ';
-
-			echo '
-				</p>';
-		}
-
-		echo '
-			</li>';
-	}
-
-	// Show statistical style information...
-	if ($settings['show_stats_index'])
-	{
-		echo '
-			<li class="board_row">
-				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=stats" title="', $txt['more_stats'], '"><img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />', $txt['forum_stats'], '</a>
-				</h3>
-				<p class="inline">
-					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
-					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
-				</p>
-			</li>';
-	}
-
-	// "Users online" - in order of activity.
-	echo '
-			<li class="board_row">
-				<h3 class="ic_section_header">
-					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" />', $txt['online_now'], ':
-					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
-
-	// Handle hidden users and buddies.
-	$bracketList = array();
-	if ($context['show_buddies'])
-		$bracketList[] = comma_format($context['num_buddies']) . ' ' . ($context['num_buddies'] == 1 ? $txt['buddy'] : $txt['buddies']);
-
-	if (!empty($context['num_spiders']))
-		$bracketList[] = comma_format($context['num_spiders']) . ' ' . ($context['num_spiders'] == 1 ? $txt['spider'] : $txt['spiders']);
-
-	if (!empty($context['num_users_hidden']))
-		$bracketList[] = comma_format($context['num_users_hidden']) . ' ' . ($context['num_spiders'] == 1 ? $txt['hidden'] : $txt['hidden_s']);
-
-	if (!empty($bracketList))
-		echo ' (' . implode(', ', $bracketList) . ')';
-
-	echo $context['show_who'] ? '</a>' : '', '
-				</h3>';
-
-	// Assuming there ARE users online... each user in users_online has an id, username, name, group, href, and link.
-	if (!empty($context['users_online']))
-	{
-		echo '
-				<p class="inline">', sprintf($txt['users_active'], $modSettings['lastActive']), ': ', implode(', ', $context['list_users_online']), '</p>';
-
-		// Showing membergroups?
-		if (!empty($settings['show_group_key']) && !empty($context['membergroups']))
-			echo '
-				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
+		$func = 'template_ic_' . $callback;
+		if (function_exists($func))
+			$func();
 	}
 
 	echo '
-			</li>
 		</ul>
 	</div>';
 
@@ -427,4 +277,172 @@ function template_info_center()
 			}
 		});
 	// ]]></script>';
+}
+
+// This is the "Recent Posts" bar.
+function template_ic_recent_posts()
+{
+	global $context, $txt, $scripturl, $settings;
+
+	// Show the Recent Posts title, and attach webslices feed to this section
+	// The format requires: hslice, entry-title and entry-content classes.
+	echo '
+			<li class="board_row hslice" id="recent_posts_content">
+				<h3 class="ic_section_header">
+					<a href="', $scripturl, '?action=recent"><img class="icon" src="', $settings['images_url'], '/post/xx.png" alt="" />', $txt['recent_posts'], '</a>
+				</h3>
+				<div class="entry-title" style="display: none;">', $context['forum_name_html_safe'], ' - ', $txt['recent_posts'], '</div>
+				<div class="entry-content" style="display: none;">
+					<a rel="feedurl" href="', $scripturl, '?action=.xml;type=webslice">', $txt['subscribe_webslice'], '</a>
+				</div>';
+
+	// Only show one post.
+	if ($settings['number_recent_posts'] == 1)
+	{
+			// latest_post has link, href, time, subject, short_subject (shortened with...), and topic. (its id.)
+			echo '
+				<p id="infocenter_onepost" class="inline">
+					<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>&nbsp;&quot;', sprintf($txt['is_recent_updated'], '&quot;' . $context['latest_post']['link'], '&quot;'), ' (<time datetime="', htmlTime($context['latest_post']['timestamp']), '">', $context['latest_post']['time'], '</time>)
+				</p>';
+	}
+	// Show lots of posts. @todo - Although data here is actually tabular, perhaps use faux table for greater responsiveness.
+	elseif (!empty($context['latest_posts']))
+	{
+		echo '
+				<table id="ic_recentposts">
+					<tr>
+						<th class="recentpost">', $txt['message'], '</th>
+						<th class="recentposter">', $txt['author'], '</th>
+						<th class="recentboard">', $txt['board'], '</th>
+						<th class="recenttime">', $txt['date'], '</th>
+					</tr>';
+
+		// Each post in latest_posts has:
+		// board (with an id, name, and link.), topic (the topic's id.), poster (with id, name, and link.),
+		// subject, short_subject (shortened with...), time, link, and href.
+		foreach ($context['latest_posts'] as $post)
+			echo '
+					<tr>
+						<td class="recentpost"><strong>', $post['link'], '</strong></td>
+						<td class="recentposter">', $post['poster']['link'], '</td>
+						<td class="recentboard">', $post['board']['link'], '</td>
+						<td class="recenttime"><time datetime="', htmlTime($post['time']), '">', $post['time'], '</time></td>
+					</tr>';
+
+		echo '
+				</table>';
+	}
+	echo '
+			</li>';
+}
+
+// Show information about events, birthdays, and holidays on the calendar.
+function template_ic_show_events()
+{
+	global $context, $txt, $scripturl, $settings;
+
+	echo '
+			<li class="board_row">
+				<h3 class="ic_section_header">
+					<a href="', $scripturl, '?action=calendar' . '"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
+				</h3>';
+
+	// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
+	if (!empty($context['calendar_holidays']))
+		echo '
+				<p class="inline holiday">', $txt['calendar_prompt'], ' ', implode(', ', $context['calendar_holidays']), '</p>';
+
+	// People's birthdays. Like mine. And yours, I guess. Kidding.
+	if (!empty($context['calendar_birthdays']))
+	{
+		echo '
+				<p class="inline">
+					<span class="birthday">', $context['calendar_only_today'] ? $txt['birthdays'] : $txt['birthdays_upcoming'], '</span>';
+
+			// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
+			foreach ($context['calendar_birthdays'] as $member)
+				echo '
+					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+
+		echo '
+				</p>';
+	}
+
+	// Events like community get-togethers.
+	if (!empty($context['calendar_events']))
+	{
+		echo '
+				<p class="inline">
+					<span class="event">', $context['calendar_only_today'] ? $txt['events'] : $txt['events_upcoming'], '</span> ';
+
+			// Each event in calendar_events should have:
+			// title, href, is_last, can_edit (are they allowed?), modify_href, and is_today.
+			foreach ($context['calendar_events'] as $event)
+				echo '
+					', $event['can_edit'] ? '<a href="' . $event['modify_href'] . '" title="' . $txt['calendar_edit'] . '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" class="centericon" /></a> ' : '', $event['href'] == '' ? '' : '<a href="' . $event['href'] . '">', $event['is_today'] ? '<strong>' . $event['title'] . '</strong>' : $event['title'], $event['href'] == '' ? '' : '</a>', $event['is_last'] ? '<br />' : ', ';
+
+		echo '
+				</p>';
+	}
+
+	echo '
+			</li>';
+}
+
+// Show statistical style information...
+function template_ic_show_stats()
+{
+	global $txt, $scripturl, $context, $settings;
+
+	echo '
+			<li class="board_row">
+				<h3 class="ic_section_header">
+					<a href="', $scripturl, '?action=stats" title="', $txt['more_stats'], '"><img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />', $txt['forum_stats'], '</a>
+				</h3>
+				<p class="inline">
+					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />
+					', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )' : ''), ' - <a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>
+				</p>
+			</li>';
+}
+
+function template_ic_show_users()
+{
+	global $context, $txt, $scripturl, $settings, $modSettings;
+
+	// "Users online" - in order of activity.
+	echo '
+			<li class="board_row">
+				<h3 class="ic_section_header">
+					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" />', $txt['online_now'], ':
+					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
+
+	// Handle hidden users and buddies.
+	$bracketList = array();
+	if ($context['show_buddies'])
+		$bracketList[] = comma_format($context['num_buddies']) . ' ' . ($context['num_buddies'] == 1 ? $txt['buddy'] : $txt['buddies']);
+
+	if (!empty($context['num_spiders']))
+		$bracketList[] = comma_format($context['num_spiders']) . ' ' . ($context['num_spiders'] == 1 ? $txt['spider'] : $txt['spiders']);
+
+	if (!empty($context['num_users_hidden']))
+		$bracketList[] = comma_format($context['num_users_hidden']) . ' ' . ($context['num_spiders'] == 1 ? $txt['hidden'] : $txt['hidden_s']);
+
+	if (!empty($bracketList))
+		echo ' (' . implode(', ', $bracketList) . ')';
+
+	echo $context['show_who'] ? '</a>' : '', '
+				</h3>';
+
+	// Assuming there ARE users online... each user in users_online has an id, username, name, group, href, and link.
+	if (!empty($context['users_online']))
+	{
+		echo '
+				<p class="inline">', sprintf($txt['users_active'], $modSettings['lastActive']), ': ', implode(', ', $context['list_users_online']), '</p>';
+
+		// Showing membergroups?
+		if (!empty($settings['show_group_key']) && !empty($context['membergroups']))
+			echo '
+				<p class="inline membergroups">[' . implode(',&nbsp;', $context['membergroups']) . ']</p>';
+	}
 }
