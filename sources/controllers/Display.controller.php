@@ -123,7 +123,7 @@ class Display_Controller
 			fatal_lang_error('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
-		if (!empty($topicinfo['id_redirect_topic']))
+		if (!empty($topicinfo['id_redirect_topic']) && !isset($_GET['noredir']))
 		{
 			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');

@@ -59,7 +59,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 			SELECT
 				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
 				' . ($id_member == 0 ? '0' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from,
-				t.id_last_msg, t.approved, t.unapproved_posts, ml.poster_time AS last_poster_time,
+				t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic, ml.poster_time AS last_poster_time,
 				ml.id_msg_modified, ml.subject AS last_subject, ml.icon AS last_icon,
 				ml.poster_name AS last_member_name, ml.id_member AS last_id_member, ' . ($indexOptions['include_avatars'] ? 'meml.avatar,' : '') . '
 				IFNULL(meml.real_name, ml.poster_name) AS last_display_name, t.id_first_msg,
