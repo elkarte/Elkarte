@@ -47,6 +47,7 @@ class Recent_Controller extends Action_Controller
 
 		loadTemplate('Recent');
 		$context['page_title'] = $txt['recent_posts'];
+		$context['sub_template'] = 'recent'];
 
 		require_once(SUBSDIR . '/Recent.subs.php');
 
