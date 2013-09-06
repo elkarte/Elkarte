@@ -1458,7 +1458,7 @@ function topicMessages($topic)
 {
 	global $modSettings, $user_info;
 
-	$db => database();
+	$db = database();
 
 	$request = $db->query('', '
 		SELECT subject, poster_time, body, IFNULL(mem.real_name, poster_name) AS poster_name, id_msg
