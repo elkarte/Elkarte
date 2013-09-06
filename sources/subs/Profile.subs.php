@@ -1113,7 +1113,7 @@ function profileValidateEmail($email, $memID = 0)
  * @param array &$post_errors
  * @param int $memID id_member
  */
-function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
+function saveProfileChanges(&$profile_vars, $memID)
 {
 	global $context, $user_profile;
 
@@ -1173,7 +1173,6 @@ function saveProfileChanges(&$profile_vars, &$post_errors, $memID)
 	if ($changeOther)
 	{
 		makeThemeChanges($memID, isset($_POST['id_theme']) ? (int) $_POST['id_theme'] : $old_profile['id_theme']);
-		//makeAvatarChanges($memID, $post_errors);
 		makeNotificationChanges($memID);
 		if (!empty($_REQUEST['sa']))
 			makeCustomFieldChanges($memID, $_REQUEST['sa'], false);

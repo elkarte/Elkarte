@@ -144,7 +144,7 @@ function template_pages_and_buttons_above()
 	if ($context['no_topic_listing'])
 		return;
 
-	template_pagesection('normal_buttons', 'right', 'go_down');
+	template_pagesection('normal_buttons', 'right');
 
 	if (!empty($context['description']) || !empty($context['moderators']))
 	{

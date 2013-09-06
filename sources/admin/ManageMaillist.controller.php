@@ -455,6 +455,7 @@ class ManageMaillist_Controller extends Action_Controller
 				// set the options
 				$_POST['item'] = (int) $temp_email[0]['id_email'];
 				$fullerrortext = $txt[$temp_email[0]['error_code']];
+				// @todo unused?
 				$shorterrortext = $temp_email[0]['error'];
 
 				// Build the template selection area, first the standard ones

@@ -210,7 +210,7 @@ class AdminDebug_Controller extends Action_Controller
 	 */
 	public function action_viewadminfile()
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
 		require_once(SUBSDIR . '/AdminDebug.subs.php');
 

@@ -515,7 +515,7 @@ class Database_MySQL implements Database
 	function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
-		global $forum_version, $db_last_error, $db_persist;
+		global $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// Get the file and line numbers.
@@ -1077,7 +1077,7 @@ class Database_MySQL implements Database
 	 */
 	function db_optimize_table($table)
 	{
-		global $db_name, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 

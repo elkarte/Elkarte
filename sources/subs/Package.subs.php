@@ -523,7 +523,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		 */
 		function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 		{
-			global $txt;
+			global $txt, $package_ftp;
 
 			$restore_files = array();
 			foreach ($_SESSION['pack_ftp']['original_perms'] as $file => $perms)
@@ -540,7 +540,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 				if ($do_change && isset($_POST['restore_files']) && in_array($file, $_POST['restore_files']))
 				{
 					// Use FTP if we have it.
-					// @todo where does $package_ftp get set?
 					if (!empty($package_ftp))
 					{
 						$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));

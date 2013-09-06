@@ -265,7 +265,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $txt, $db_prefix;
+		global $db_prefix;
 
 		// Working with the db
 		$db = database();

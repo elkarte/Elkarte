@@ -844,6 +844,7 @@ function showCodeImage($code)
 					array(0, 0, 0),
 					array(143, 39, 31),
 				);
+				// @todo why this is not initialized outside the loop?
 				if (!isset($last_index))
 					$last_index = -1;
 				$new_index = $last_index;

@@ -536,7 +536,7 @@ class Packages_Controller extends Action_Controller
 				$context['has_failure'] = !($installed_version && $version_check);
 				$thisAction = array(
 					'type' => $txt['package_requires'],
-					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
+					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version_check ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
 				);
 			}
 			elseif (in_array($action['type'], array('require-dir', 'require-file')))

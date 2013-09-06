@@ -917,16 +917,14 @@ class ProfileOptions_Controller extends Action_Controller
 	/**
 	 * This function actually makes all the group changes
 	 *
-	 * @param array $profile_vars
-	 * @param array $post_errors
-	 * @param int $memID id_member
 	 * @return mixed
 	 */
-	function action_groupMembership2($profile_vars, $post_errors, $memID)
+	function action_groupMembership2()
 	{
 		global $context, $user_profile, $modSettings, $scripturl, $language;
 
 		$db = database();
+		$memID = currentMemberID();
 
 		// Let's be extra cautious...
 		if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))

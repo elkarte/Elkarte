@@ -32,7 +32,7 @@ if (!defined('ELK'))
  *
  * @return mixed array with the saved triggers or false on failure
  */
-function saveTriggers($suggestions = array(), $ban_group, $member = 0, $ban_id = 0)
+function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
 {
 	$triggers = array(
 		'main_ip' => '',

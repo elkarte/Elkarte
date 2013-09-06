@@ -3053,7 +3053,7 @@ function template_rawdata()
  */
 function template_header()
 {
-	global $txt, $modSettings, $context, $settings, $user_info, $scripturl;
+	global $context, $settings;
 
 	setupThemeContext();
 
@@ -3078,8 +3078,6 @@ function template_header()
 	else
 		header('Content-Type: text/html; charset=UTF-8');
 
-	$checked_securityFiles = false;
-	$showed_banned = false;
 	foreach (Template_Layers::getInstance()->prepareContext() as $layer)
 		loadSubTemplate($layer . '_above', 'ignore');
 
@@ -3198,11 +3196,6 @@ function template_javascript($do_defered = false)
 				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
 					echo '
 	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
-
-				// If we are loading JQuery and we are set to 'auto' load, put in our remote success or load local check
-				if ($id === 'jquery' && (!isset($modSettings['jquery_source']) || $modSettings['jquery_source'] === 'auto'))
-					// @todo: $loadjquery isn't used anywhere, probably a bug..
-					$loadjquery = true;
 			}
 		}
 	}
@@ -3288,7 +3281,7 @@ function template_css()
  */
 function template_admin_warning_above()
 {
-	global $context, $user_info, $scripturl, $txt, $modSettings;
+	global $context, $user_info, $scripturl, $txt;
 
 	if (!empty($context['security_controls']['files']))
 	{
