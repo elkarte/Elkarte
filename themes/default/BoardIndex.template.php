@@ -392,7 +392,7 @@ function template_ic_show_events()
 // Show statistical style information...
 function template_ic_show_stats()
 {
-	global $txt, $scripturl, $context, $settings;
+	global $txt, $scripturl, $context, $settings, $modSettings;
 
 	echo '
 			<li class="board_row">
