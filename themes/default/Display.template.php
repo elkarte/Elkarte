@@ -31,7 +31,7 @@ function template_report_sent_above()
 /**
  * The main template for displaying a topic, does it all, its the king, the bomb, the real deal
  */
-function template_main()
+function template_messages()
 {
 	global $context, $settings, $options, $txt, $scripturl, $modSettings;
 

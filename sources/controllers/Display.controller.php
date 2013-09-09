@@ -54,6 +54,7 @@ class Display_Controller
 
 		// Load the template
 		loadTemplate('Display');
+		$context['sub_template'] = 'messages';
 
 		// And the topic functions
 		require_once(SUBSDIR . '/Topic.subs.php');
