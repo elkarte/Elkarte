@@ -4023,7 +4023,7 @@ dl.merge_topic dd {
 	#gobottom, #gotop { 
 		padding-left: 0.25em;
 	}
-	#news, #logo {
+	#news, #logo, #top_section_notice {
 		display: none;
 	}
 }
