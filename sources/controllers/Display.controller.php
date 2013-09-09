@@ -1092,6 +1092,7 @@ class Display_Controller
 			'approved' => $message['approved'],
 			'first_new' => isset($context['start_from']) && $context['start_from'] == $counter,
 			'is_ignored' => !empty($modSettings['enable_buddylist']) && in_array($message['id_member'], $context['user']['ignoreusers']),
+			'is_message_author' => $message['id_member'] == $user_info['id'],
 			'can_approve' => !$message['approved'] && $context['can_approve'],
 			'can_unapprove' => !empty($modSettings['postmod_active']) && $context['can_approve'] && $message['approved'],
 			'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$message['approved'] || $message['poster_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
@@ -1103,10 +1104,16 @@ class Display_Controller
 			'likes_enabled' => !empty($modSettings['likes_enabled']) && ($message['use_likes'] || ($message['like_count'] != 0)),
 		);
 
-		// Is this user the message author?
-		$output['is_message_author'] = $message['id_member'] == $user_info['id'];
 		if (!empty($output['modified']['name']))
 			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], standardTime($output['modified']['timestamp']));
+
+		if ($output['member']['karma']['allow'])
+		{
+			$output['member']['karma'] += array(
+				'applaud_url' => $scripturl . '?action=karma;sa=applaud;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'smite_url' => $scripturl . '?action=karma;sa=smite;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id']
+			);
+		}
 
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
 
