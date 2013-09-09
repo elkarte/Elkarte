@@ -1761,7 +1761,9 @@ dl.settings textarea {
 	font-size: 0.857em;
 }
 
-.topic_sorting #sortby, #sortby,
+.topic_sorting #sortby {
+	width: 8.4em;
+}
 .topic_sorting:hover #sortby, #sortby:hover {
 	width: 8.4em;
 	left: auto;
