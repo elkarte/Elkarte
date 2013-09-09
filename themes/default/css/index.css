@@ -4023,6 +4023,9 @@ dl.merge_topic dd {
 	#gobottom, #gotop { 
 		padding-left: 0.25em;
 	}
+	#news, #logo {
+		display: none;
+	}
 }
 
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
