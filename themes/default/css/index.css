@@ -3953,7 +3953,7 @@ dl.merge_topic dd {
 	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
-	position:relative;
+	position: relative;
 	padding: 0 0 0 12px;
 	}
 	#menu_sidebar {
