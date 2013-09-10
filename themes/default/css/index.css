@@ -4130,4 +4130,20 @@ dl.merge_topic dd {
 	select, .input_text {
 		max-width: 12em;
 	}
+	.login {
+		width: 100%;
+	}
+	#main_menu li, .admin_menu li{
+		float: none;
+	}
+	.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
+		left: -4px;
+	}
+	.listlevel2, .listlevel3 {
+		width: 14em;
+	}
+	.menulevel3 {
+		margin: -2em 0 0 4em;
+		max-width: 15em;
+	}
 }
