@@ -23,90 +23,25 @@ if (!defined('ELK'))
  */
 function pbe_email_to_bbc($text, $html)
 {
-	// define the limited HTML we will translate to bbc and strip the rest
+	// define some things that need to be converted, outside normal html or markup
 	$tags = array(
-		// standard html to bbc
-		'~&nbsp;~' => ' ',
-		'~<b(\s(.)*?)*?' . '>~i' => '[b]',
-		'~</b>~i' => '[/b]',
-		'~<i(\s(.)*?)*?' . '>~i' => '[i]',
-		'~</i>~i' => '[/i]',
-		'~<u(\s(.)*?)*?' . '>~i' => '[u]',
-		'~</u>~i' => '[/u]',
-		'~<strong(\s(.)*?)*?' . '>~i' => '[b]',
-		'~</strong>~i' => '[/b]',
-		'~<em(\s(.)*?)*?' . '>~i' => '[i]',
-		'~</em>~i' => '[/i]',
-		'~<s(\s(.)*?)*?' . '>~i' => "[s]",
-		'~</s>~i' => "[/s]",
-		'~<strike(\s(.)*?)*?' . '>~i' => '[s]',
-		'~</strike>~i' => '[/s]',
-		'~<del(\s(.)*?)*?' . '>~i' => '[s]',
-		'~</del>~i' => '[/s]',
-		'~<center(\s(.)*?)*?' . '>~i' => '[center]',
-		'~</center>~i' => '[/center]',
-		'~<pre(\s(.)*?)*?' . '>~i' => '[pre]',
-		'~</pre>~i' => '[/pre]',
-		'~<sub(\s(.)*?)*?' . '>~i' => '[sub]',
-		'~</sub>~i' => '[/sub]',
-		'~<sup(\s(.)*?)*?' . '>~i' => '[sup]',
-		'~</sup>~i' => '[/sup]',
-		'~<tt(\s(.)*?)*?' . '>~i' => '[tt]',
-		'~</tt>~i' => '[/tt]',
-		'~<br(?:\s[^<>]*?)?' . '>~i' => "\n",
-		// some clients do basic tags to take as much space as possible
-		'~<span style="font-style:\s?italic;?">(.*?)</span>~isU' => '[i]$1[/i]',
-		'~\[b\]<span style="font-weight:\s?bold;?">(.*?)</span>\[/b\]~iU' => '[b]$1[/b]',
-		'~<span style="font-weight:\s?bold;?">(.*?)</span>~isU' => '[b]$1[/b]',
-		'~<span style="text-decoration: underline[;]?">(.*)</span>~isU' => '[u]$1[/u]',
-		'~<span dir=\"ltr\">\&lt;(.*)\&gt;</span>~isU' => '$1',
-		'~<span dir=\"ltr\">(.*)</span>~is' => '$1',
-		'~<span class="Apple-style-span" style="font-weight: normal;\s?">(.*)</span>~isU' => '$1',
-		'~<style .*</style>~' => '',
-		// various shapes of rules
-		'~<hr[^<>]*>(\n)?~i' => "[hr]\n$1",
-		// use quotes if we can find them
-		'~<blockquote(\s(.)*?)*?' . '>~i' => "[quote]",
-		'~</blockquote>~i' => "[/quote]",
-		'~<div style="right: auto">~i' => '',
-		'~<div class="gmail_quote">~i' => '',
-		// lists can be nice
-		'~<ul(\s(.)*?)*?' . '>~i' => "[list]\n",
-		'~</ul>~i' => "[/list]\n",
-		'~<ol(\s(.)*?)*?' . '>~i' => "[list type=decimal]\n",
-		'~</ol>~i' => "[/list]\n",
-		'~<li(\s(.)*?)*?' . '>~i' => "[li]",
-		'~</li>~i' => "[/li]\n",
-		// some block elements
-		'~</div>~i' => "\n",
-		'~<p(\s(.)*?)*?' . '>~i' => "\n\n",
-		// tables can be a bit complicated
-		'~<table(\s(.)*?)*?' . '>~i' => '[table]',
-		'~</table>~i' => '[/table]',
-		'~<tr(\s(.)*?)*?' . '>~i' => '[tr]',
-		'~</tr>~i' => '[/tr]',
-		'~<(td|th)\s[^<>]*?colspan="?(\d{1,2})"?.*?' . '>~ie' => 'str_repeat(\'[td][/td]\', $2 - 1) . \'[td]\'',
-		'~<(td|th)(\s(.)*?)*?' . '>~i' => '[td]',
-		'~</(td|th)>~i' => '[/td]',
-		// the ubiquitous "other"
-		'~<\*>~i' => '&lt;*&gt;',
-		'~<title>(.*)</title>~iU' => '',
-		'~(\[b\]){2}From:.*-{36}~s' => 'str_repeat(\'-\', 36)',
 		'~\*\*(.*)\*\*~isUe' => '\'**\'.ltrim(\'$1\').\'**\'',
+		'~<\*>~i' => '&lt;*&gt;',
+		'~-{20,}~' => '<hr>',
+		'~#([0-9a-fA-F]{4,6}\b)~' => '&#35;$1',
 	);
 
-	// We are starting with HTML, our goal is to convert only the best parts of it
-	// to BBC, with email most HTML is unnecessary
+	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	if ($html)
 	{
-		// Some HTML comes in as chunks, separated by line feeds etc, remove the whitespace so we have an html string
-		$text = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $text);
-
 		// Set a gmail flag for special quote processing since its quotes are strange
 		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
 
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
+		require_once (EXTDIR . '/Html2BBC.class.php');
+		$bbc_converter = new Convert_BBC($text);
+		$text = $bbc_converter->get_bbc();
 
 		// Run our parsers to remove the original replied to message before we do any more work
 		$text_save = $text;
@@ -133,23 +68,15 @@ function pbe_email_to_bbc($text, $html)
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
 
 		// Convert this (markup) text to html
+		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(EXTDIR . '/markdown/markdown.php');
 		$text = Markdown($text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		$text = str_replace('</p>', "\n", $text);
-		$text = preg_replace(array_keys($tags), array_values($tags), $text);
+		require_once (EXTDIR . '/Html2BBC.class.php');
+		$bbc_converter = new Convert_BBC($text);
+		$text = $bbc_converter->get_bbc();
 	}
-
-	// Convert (save) any links before we strip out the remaining HTML tags
-	require_once(SUBSDIR . '/Editor.subs.php');
-	$text = convert_urls($text);
-
-	// Now remove any remaining html tags and convert any special tags
-	$text = str_replace('<div>', "\n", $text);
-	$text = strip_tags($text);
-	$text = htmlspecialchars_decode($text, ENT_QUOTES);
-	$text = str_replace('&nbsp;', ' ', $text);
 
 	// Some tags often end up as just empty tags - remove those.
 	$text = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~', '', $text);
