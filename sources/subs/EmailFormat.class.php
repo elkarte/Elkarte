@@ -242,6 +242,11 @@ class Email_Format
 			{
 				$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 			}
+			// Previous line ended in a break already
+			elseif (isset($this->_body_array[$i-1]['content']) && substr(trim($this->_body_array[$i-1]['content']), -4) == '[br]')
+			{
+				$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
+			}
 			// OK, we can't seem to think of other obvious reasons this should not be on the same line
 			// and these numbers are quite frankly subjective, but so is how we got here, final "check"
 			else
@@ -292,6 +297,9 @@ class Email_Format
 		$tag = '(>([^a-zA-Z0-9_\[\s]){0,3}){1}';
 		$this->_body = preg_replace("~\n" . $tag . '~', "\n", $this->_body);
 
+		// Clean up double breaks found between bbc formatting tags, msoffice loves to do this
+		$this->_body = preg_replace('~\]\s*\[br\]\s*\[br\]\s*\[~s', '][br][', $this->_body);
+
 		// Repair the &nbsp; in its various states and any other chaff
 		$this->_body = strtr($this->_body, array(' &nbsp;' => ' ', '&nbsp; ' => ' ', "\xc2\xa0" => ' ', "\xe2\x80\xa8" => "\n", "\xA0" => ' '));
 
@@ -340,7 +348,6 @@ class Email_Format
 	}
 
 	/**
-	 *
 	 * Checks if a string is the start or end of a bbc [quote] line
 	 * Keeps track of the tag depth
 	 *
