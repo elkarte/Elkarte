@@ -4041,6 +4041,31 @@ dl.merge_topic dd {
 	#news, #logo, #top_section_notice {
 		display: none;
 	}
+	ul.poster {
+		display: block;
+	}
+	.avatar>.linklevel1>.avatar {
+		max-width: 20px;
+		max-height: 20px;
+	}
+	.poster_online, .icons img {
+		display: none;
+	}
+	.postarea {
+		display: block;
+		margin: 0;
+	}
+	#forumposts .windowbg {
+		padding: 5px;
+	}
+	#forumposts h2 img {
+		display: none;
+	}
+	h2 .views_text, h2 .nextlinks {
+		display: block;
+		float: none;
+		line-height: 1.2em;
+	}
 }
 
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
@@ -4054,16 +4079,6 @@ dl.merge_topic dd {
 	}
 	#main_content_section {
 		padding: 1px 2px 16px 3px;
-	}
-	.poster .avatar {
-		width: 30px;
-	}
-	.poster {
-		width: 110px;
-		font-size: .8em;
-	}
-	.postarea, .moderatorbar {
-		margin: 0 0 0 110px;
 	}
 	.post {
 		margin: 0 0 0 5px;
