@@ -673,9 +673,6 @@ class Post_Controller extends Action_Controller
 					}
 				}
 
-				if (!empty($context['we_are_history']))
-					$attach_errors->addError($context['we_are_history']);
-
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
 					if (isset($context['ignore_temp_attachments']) || isset($_SESSION['temp_attachments']['post']['files']))
@@ -1489,9 +1486,6 @@ class Post_Controller extends Action_Controller
 		if (empty($ignore_temp) && $context['can_post_attachment'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
 		{
 			$attachIDs = array();
-
-			if (!empty($context['we_are_history']))
-				$attach_errors->addError('temp_attachments_flushed');
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{

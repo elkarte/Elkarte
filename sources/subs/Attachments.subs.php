@@ -334,6 +334,8 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
+	$attach_errors = error_context::context('attachment', 1);
+
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
 		automanage_attachments_check_directory();
@@ -389,7 +391,7 @@ function processAttachments($id_msg = null)
 					unlink($attachment['tmp_name']);
 			}
 
-			$context['we_are_history'] = $txt['error_temp_attachments_flushed'];
+			$attach_errors->addError('temp_attachments_flushed');
 			$_SESSION['temp_attachments'] = array();
 		}
 	}
