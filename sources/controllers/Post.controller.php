@@ -65,6 +65,7 @@ class Post_Controller extends Action_Controller
 
 		$post_errors = error_context::context('post', 1);
 		$attach_errors = error_context::context('attachment', 1);
+		$attach_errors->activate();
 		$first_subject = '';
 
 		// Posting an event?
@@ -1495,6 +1496,8 @@ class Post_Controller extends Action_Controller
 				// If there was an initial error just show that message.
 				if ($attachID == 'initial_error')
 				{
+					// This is a generic error
+					$attach_errors->activate();
 					$attach_errors->addError($txt['attach_no_upload']);
 					$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
 
@@ -1536,12 +1539,12 @@ class Post_Controller extends Action_Controller
 					{
 						if (!is_array($error))
 						{
-							$attach_errors->addError($txt[$error], $attachID);
+							$attach_errors->addError($txt[$error]);
 							if (in_array($error, $log_these))
 								log_error($attachment['name'] . ': ' . $txt[$error], 'critical');
 						}
 						else
-							$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]), $attachID);
+							$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]));
 					}
 
 					if (file_exists($attachment['tmp_name']))

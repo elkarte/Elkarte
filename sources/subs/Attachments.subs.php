@@ -391,7 +391,7 @@ function processAttachments($id_msg = null)
 					unlink($attachment['tmp_name']);
 			}
 
-			$attach_errors->addError('temp_attachments_flushed');
+			$attach_errors->activate()->addError('temp_attachments_flushed');
 			$_SESSION['temp_attachments'] = array();
 		}
 	}
