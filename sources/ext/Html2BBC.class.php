@@ -829,6 +829,6 @@ class Convert_BBC
 		if ($count)
 			$this->_recursive_decode($text);
 
-		return $text;
+		return html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 	}
 }
