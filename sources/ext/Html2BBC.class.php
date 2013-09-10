@@ -426,6 +426,17 @@ class Convert_BBC
 		// Oh a link then
 		else
 		{
+			// If No http(s), then attempt to fix this potential relative URL.
+			if (preg_match('~^https?://~i', $href) === 0 && is_array($parsedURL = parse_url($scripturl)) && isset($parsedURL['host']))
+			{
+				$baseURL = (isset($parsedURL['scheme']) ? $parsedURL['scheme'] : 'http') . '://' . $parsedURL['host'] . (empty($parsedURL['port']) ? '' : ':' . $parsedURL['port']);
+
+				if (substr($href, 0, 1) === '/')
+					$href = $baseURL . $href;
+				else
+					$href = $baseURL . (empty($parsedURL['path']) ? '/' : preg_replace('~/(?:index\\.php)?$~', '', $parsedURL['path'])) . '/' . $href;
+			}
+
 			if (!empty($value))
 				$bbc = '[url=' . $href . ']' . $value . '[/url]';
 			else
