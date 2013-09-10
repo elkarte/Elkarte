@@ -4123,4 +4123,11 @@ dl.merge_topic dd {
 	.lastpost_link, .board_lastposter, .board_lasttime {
 		white-space: normal;
 	}
+	#basicinfo, #detailedinfo {
+		float: none;
+		width: 100%;
+	}
+	select, .input_text {
+		max-width: 12em;
+	}
 }
