@@ -120,26 +120,26 @@ class Convert_BBC
 
 		// Done replacing HTML elements, now get the converted DOM tree back into a string
 		$bbc = ($this->_parser) ? $this->doc->saveHTML() : $this->doc->save();
+		$bbc = $this->_recursive_decode($bbc);
 
 		if ($this->_parser)
 		{
 			// Using the internal DOM methods we need to do a little extra work
-			$bbc = htmlspecialchars_decode($bbc, ENT_QUOTES);
+			$bbc = html_entity_decode(htmlspecialchars_decode($bbc, ENT_QUOTES));
+
 			if (preg_match('~<body>(.*)</body>~s', $bbc, $body))
 				$bbc = $body[1];
 		}
 
-		// Remove scripts, style and comment blocks
-		$body = preg_replace('~<script[^>]*[^/]?' . '>.*?</script>~i', '', $body);
-		$body = preg_replace('~<style[^>]*[^/]?' . '>.*?</style>~i', '', $body);
-		$body = preg_replace('~\\<\\!--.*?-->~i', '', $body);
-		$body = preg_replace('~\\<\\!\\[CDATA\\[.*?\\]\\]\\>~i', '', $body);
+		// Remove comment blocks
+		$bbc = preg_replace('~\\<\\!--.*?-->~i', '', $bbc);
+		$bbc = preg_replace('~\\<\\!\\[CDATA\\[.*?\\]\\]\\>~i', '', $bbc);
 
 		// Remove non breakable spaces that may be hiding in here
 		$bbc = str_replace("\xC2\xA0\x20", ' ', $bbc);
 		$bbc = str_replace("\xC2\xA0", ' ', $bbc);
 
-		// Strip any excess blank lines we may have produced
+		// Strip any excess leading/trailing blank lines we may have produced O:-)
 		$bbc = trim($bbc);
 		$bbc = preg_replace('~^(?:\[br\s*\/?\]\s*)+~', '', $bbc);
 		$bbc = preg_replace('~(?:\[br\s*\/?\]\s*)+$~', '', $bbc);
@@ -235,7 +235,7 @@ class Convert_BBC
 				$bbc = '[quote]' . $this->_get_value($node) . '[/quote]';
 				break;
 			case 'br':
-				$bbc = $this->line_break . $this->line_end;
+				$bbc = $this->line_break;
 				break;
 			case 'center':
 				$bbc = '[center]' . $this->_get_value($node) . '[/center]' . $this->line_end;
@@ -292,7 +292,9 @@ class Convert_BBC
 				$bbc = '[pre]' . $this->_get_value($node) . '[/pre]' . $this->line_end;
 				break;
 			case 'script':
+			case 'style':
 				$bbc = '';
+				break;
 			case 'span':
 				// Convert some basic inline styles to bbc
 				$bbc = $this->_convert_styles($node);
@@ -310,6 +312,7 @@ class Convert_BBC
 				break;
 			case 'title':
 				$bbc = '[size=2]' . $this->_get_value($node) . '[/size]' . $this->line_break;
+				break;
 			case 'table':
 				$bbc = '[table]' . $this->line_end . $this->_get_value($node) . '[/table]' . $this->line_end;
 				break;
@@ -333,8 +336,9 @@ class Convert_BBC
 				$bbc = '[u]' . $this->_get_value($node) . '[/u]';
 				break;
 			case 'root':
+			case 'body':
 				// Remove these tags and simply replace with the text inside the tags
-				$bbc = $this->_get_innerHTML($node);
+				$bbc = '~`skip`~';
 				break;
 			default:
 				// Don't know you, so just preserve whats there, less the tag
@@ -342,14 +346,17 @@ class Convert_BBC
 		}
 
 		// Replace the node with our bbc replacement, or with the node itself if none was found
-		if ($this->_parser)
+		if ($bbc !== '~`skip`~')
 		{
-			// Create a new text node with our bbc tag and replace the original node
-			$bbc_node = $this->doc->createTextNode($bbc);
-			$node->parentNode->replaceChild($bbc_node, $node);
+			if ($this->_parser)
+			{
+				// Create a new text node with our bbc tag and replace the original node
+				$bbc_node = $this->doc->createTextNode($bbc);
+				$node->parentNode->replaceChild($bbc_node, $node);
+			}
+			else
+				$node->outertext = $bbc;
 		}
-		else
-			$node->outertext = $bbc;
 	}
 
 	/**
@@ -383,6 +390,8 @@ class Convert_BBC
 	 */
 	private function _convert_anchor($node)
 	{
+		global $modSettings;
+
 		$href = htmlentities($node->getAttribute('href'));
 		$id = htmlentities($node->getAttribute('id'));
 		$title = $node->getAttribute('title');
@@ -396,7 +405,11 @@ class Convert_BBC
 		// Maybe an email link
 		elseif (substr($href, 0, 7) === "mailto:")
 		{
-			$href = substr($href, 7);
+			if ($href != 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
+				$href = substr($href, 7);
+			else
+				$href = '';
+
 			if (!empty($value))
 				$bbc = '[email=' . $href . ']' . $value . '[/email]';
 			else
@@ -642,9 +655,9 @@ class Convert_BBC
 						break;
 					case 'font-size':
 						// account for formatting issues, decimal in the wrong spot
-						if (preg_match('~(\d)+\.\d+(p[xt])~i', $value, $dec_matches) === 1)
+						if (preg_match('~(\d+)\.\d+(p[xt])~i', $value, $dec_matches) === 1)
 							$value = $dec_matches[1] . $dec_matches[2];
-						$bbc = '[size=' . $value . ']' . $bbc . '[/u]';
+						$bbc = '[size=' . $value . ']' . $bbc . '[/size]';
 						break;
 					case 'color':
 							$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
@@ -803,5 +816,19 @@ class Convert_BBC
 		}
 
 		return $styles;
+	}
+
+	/**
+	 * Looks for double html encoding items and continues to decode until fixed
+	 *
+	 * @param string $text
+	 */
+	private function _recursive_decode($text)
+	{
+		$text = preg_replace('/&amp;([a-zA-Z0-9]{2,7});/', '&$1;', $text, -1, $count);
+		if ($count)
+			$this->_recursive_decode($text);
+
+		return $text;
 	}
 }
