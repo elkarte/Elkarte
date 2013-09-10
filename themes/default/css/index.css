@@ -4006,15 +4006,30 @@ dl.merge_topic dd {
 		width: 90%;
 		padding: 8px;
 	}
-	.topic_latest, .topic_moderation {
-		display: inline-block;
-		vertical-align: middle;
+	.topic_icons {
+		display: none;
+	}
+	.topic_moderation {
+		display: none;
+	}
+	.topic_latest {
+		display: block;
+		padding: 5px;
+		width: 97%;
+	}
+	ul.buttonlist, ul.buttonlist li, .pagelinks {
+		float: none;
+		display: block;
+	}
+	.pagelinks {
+		height: 30px;
 	}
 	.topic_name, .topic_starter {
 		margin: 0;
 	}
 	.topic_name h4 {
 		display: block;
+		font-size: 1.4em;
 	}
 	#wrapper {
 		padding-left: 2px;
