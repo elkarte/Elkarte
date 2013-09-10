@@ -304,7 +304,7 @@ class Emailpost_Controller extends Action_Controller
 		if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >=2)
 		{
 			// Some mobile responses wrap everything in a table structure
-			$text = $email_message->body_plain;
+			$text = $email_message->plain_body;
 			$html = false;
 		}
 		else
@@ -600,7 +600,7 @@ function pbe_load_text($html, $email_message, $pbe)
 	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 	{
 		// Some mobile responses wrap everything in a table structure so use plain text
-		$text = $email_message->body_plain;
+		$text = $email_message->plain_body;
 		$html = false;
 	}
 	else
@@ -619,7 +619,6 @@ function pbe_load_text($html, $email_message, $pbe)
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
-		$text = Util::htmlspecialchars($text, ENT_QUOTES);
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
 	}
