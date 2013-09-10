@@ -3981,6 +3981,19 @@ dl.merge_topic dd {
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {
+	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
+		display: none;
+	}
+	#wrapper, .frame {
+		width: 100%;
+		min-width: 300px;
+	}
+	#main_content_section {
+		padding: 1px 2px 16px 3px;
+	}
+	.post {
+		margin: 0 0 0 5px;
+	}
 	.frame {
 		min-width: 100%;
 		border-radius: 0;
@@ -4072,25 +4085,18 @@ dl.merge_topic dd {
 	.modified {
 		display: none;
 	}
-}
-
-/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
-@media screen and (min-width: 320px) and (max-width: 480px) {
-	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
-		display: none;
-	}
-	#wrapper, .frame {
-		width: 100%;
-		min-width: 300px;
-	}
-	#main_content_section {
-		padding: 1px 2px 16px 3px;
-	}
-	.post {
-		margin: 0 0 0 5px;
-	}
 	.childboards {
 		margin: 0 5px;
+	}
+	.board_info, .board_latest {
+		width: 100%;
+	}
+	.board_info a img {
+		width: 20px;
+		height: 20px;
+	}
+	.board_info h3 a {
+		font-size: 1.3em;
 	}
 	.board_latest {
 		padding: 0 8px;
@@ -4102,7 +4108,19 @@ dl.merge_topic dd {
 		clear: both;
 		content:"";
 	}
+	.board_lastpost {
+		padding-top: 6px;
+	}
+	.icon_anchor {
+		min-width: 0;
+	}
+	.lastpost_link {
+		font-size: 1.1em;
+	}
 	.recentboard, .recentposter {
 		display: none;
+	}
+	.lastpost_link, .board_lastposter, .board_lasttime {
+		white-space: normal;
 	}
 }
