@@ -195,11 +195,11 @@ function template_unread()
 		echo '
 						</ul>';
 
-		template_pagesection('recent_buttons', 'right');
-
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
+
+		template_pagesection('recent_buttons', 'right');
 
 		echo '
 					<div id="topic_icons" class="description">
@@ -341,11 +341,11 @@ function template_replies()
 		echo '
 						</ul>';
 
-		template_pagesection('recent_buttons', 'right');
-
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
+
+		template_pagesection('recent_buttons', 'right');
 
 		echo '
 					<div id="topic_icons" class="description">

@@ -1720,7 +1720,8 @@ function toggleHeaderAJAX(btn, container_id)
 		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 
 		$('#' + container_id + ' .pagesection').remove();
-		$('#' + container_id + ' .topic_table').remove();
+		$('#' + container_id + ' .category_header').remove();
+		$('#' + container_id + ' .topic_listing').remove();
 		$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
 	}
 
@@ -1791,6 +1792,6 @@ function markallreadButton(btn)
 
 function markunreadButton(btn)
 {
-	toggleHeaderAJAX(btn, 'recentposts');
+	toggleHeaderAJAX(btn, 'main_content_section');
 	return false;
 }
