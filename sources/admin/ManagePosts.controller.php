@@ -275,6 +275,8 @@ class ManagePosts_Controller extends Action_Controller
 				// Note show the warning as read if pspell not installed!
 				array('check', 'enableSpellChecking', 'subtext' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : ('<span class="alert">' . $txt['enableSpellChecking_warning'] . '</span>'))),
 				array('check', 'disable_wysiwyg'),
+				array('check', 'enableUsersMentions'),
+				array('int', 'max_mentioned_members', 'subtext' => $txt['enableUsersMentions_desc']),
 			'',
 				// Posting limits...
 				array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),
@@ -309,6 +311,8 @@ class ManagePosts_Controller extends Action_Controller
 				// Note show the warning as read if pspell not installed!
 				array('check', 'enableSpellChecking', 'subtext' => (function_exists('pspell_new') ? $txt['enableSpellChecking_warning'] : ('<span class="alert">' . $txt['enableSpellChecking_warning'] . '</span>'))),
 				array('check', 'disable_wysiwyg'),
+				array('check', 'enableUsersMentions'),
+				array('int', 'max_mentioned_members', 'subtext' => $txt['enableUsersMentions_desc']),
 			'',
 				// Posting limits...
 				array('int', 'max_messageLength', 'subtext' => $txt['max_messageLength_zero'], 'postinput' => $txt['manageposts_characters']),

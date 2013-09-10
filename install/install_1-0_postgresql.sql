@@ -2310,6 +2310,8 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxMessages',
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxTopics', '20');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxMembers', '30');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableParticipation', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableUsersMentions', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('max_mentioned_members', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('recycle_enable', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('recycle_board', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('maxMsgID', '1');

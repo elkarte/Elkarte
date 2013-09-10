@@ -340,13 +340,13 @@ class Register_Controller extends Action_Controller
 		// Needed for isReservedName() and registerMember().
 		require_once(SUBSDIR . '/Members.subs.php');
 
+		// It takes care of include Members.subs.php
+		require_once(SUBSDIR . '/Auth.subs.php');
+
 		// Validation... even if we're not a mall.
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
-		{
-			$_POST['real_name'] = trim(preg_replace('~[\s]~u', ' ', $_POST['real_name']));
-			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
+			if (validateUsername(0, $_POST['real_name'], true, true, 60) === null)
 				$possible_strings[] = 'real_name';
-		}
 
 		// Handle a string as a birthdate...
 		if (isset($_POST['birthdate']) && $_POST['birthdate'] != '')
@@ -542,6 +542,11 @@ class Register_Controller extends Action_Controller
 		}
 		else
 		{
+			if (!empty($modSettings['enableUsersMentions']))
+			{
+				require_once(SUBSDIR . '/MentionUsers.subs.php');
+				rebuildMembersCache(substr($regOptions['username'], 0, 2));
+			}
 			call_integration_hook('integrate_activate', array($regOptions['username']));
 
 			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, sha1(sha1(strtolower($regOptions['username']) . $regOptions['password']) . $regOptions['register_vars']['password_salt']));
@@ -683,6 +688,12 @@ class Register_Controller extends Action_Controller
 			$context['member_id'] = $row['id_member'];
 
 			return;
+		}
+
+		if (!empty($modSettings['enableUsersMentions']))
+		{
+			require_once(SUBSDIR . '/MentionUsers.subs.php');
+			rebuildMembersCache(substr($row['member_name'], 0, 2));
 		}
 
 		// Let the integration know that they've been activated!

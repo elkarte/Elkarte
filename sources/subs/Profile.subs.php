@@ -729,15 +729,22 @@ function loadProfileFields($force_reload = false)
 
 				$value = trim(preg_replace(\'~[\s]~u\', \' \', $value));
 
-				if (trim($value) == \'\')
-					return \'no_name\';
-				elseif (Util::strlen($value) > 60)
-					return \'name_too_long\';
-				elseif ($cur_profile[\'real_name\'] != $value)
+				require_once(SUBSDIR . \'/Auth.subs.php\');
+				$errors = validateUsername($context[\'id_member\'], $value, true, true, 60);
+				if ($errors !== null)
 				{
-					require_once(SUBSDIR . \'/Members.subs.php\');
-					if (isReservedName($value, $context[\'id_member\']))
+					// @todo clean up this
+					// \'done\' is currently only name_taken
+					if ($errors[0] == \'done\')
 						return \'name_taken\';
+					else
+						return $errors[0][1];
+				}
+				// If the name if fine, let\'s rebuild the cache for tagging (but only if needed)
+				if (!empty($modSettings[\'tag_users\']))
+				{
+					require_once(SUBSDIR . \'/MentionUsers.subs.php\');
+					rebuildMembersCache(substr($value, 0, 2));
 				}
 				return true;
 			'),
