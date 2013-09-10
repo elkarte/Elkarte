@@ -217,7 +217,7 @@ function template_boardindex_outer_below()
  */
 function template_info_center()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt;
 
 	// Here's where the "Info Center" starts...
 	echo '
