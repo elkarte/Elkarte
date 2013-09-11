@@ -390,7 +390,7 @@ class Convert_BBC
 	 */
 	private function _convert_anchor($node)
 	{
-		global $modSettings;
+		global $modSettings, $scripturl;
 
 		$href = htmlentities($node->getAttribute('href'));
 		$id = htmlentities($node->getAttribute('id'));
