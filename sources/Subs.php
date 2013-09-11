@@ -864,6 +864,8 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	// If its to long, cut it down to size
 	if (Util::strlen($text) > $len)
 	{
+		$text = html_entity_decode($text);
+
 		if ($cutword)
 		{
 			// Look for len - buffer characters and cut on first word boundary after
@@ -877,6 +879,8 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 		}
 		else
 			$text = Util::substr($text, 0, $len) . '...';
+
+		$text = Util::htmlspecialchars($text);
 	}
 
 	return $text;
