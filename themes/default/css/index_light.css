@@ -126,10 +126,10 @@ body {
 	font-weight: bold;
 }
 .meaction:before {
-	content:"\2620";
+	content: "\2620";
 	font-size: 1.5em;
 	line-height: 1em;
-	vertical-align: middle;
+	vertical-align: top;
 }
 
 
