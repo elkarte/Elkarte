@@ -52,6 +52,12 @@ $(document).ready(function() {
 		if ($(this).height() > 200)
 			$(this).css('height', '20em');
 	});
+
+	// Collapsabile fieldsets, pure candy
+	$('legend').click(function(){
+		$(this).siblings().slideToggle("fast");
+		$(this).parent().toggleClass("collapsed");
+	});
 });
 
 // Toggles the element height and width styles of an image.

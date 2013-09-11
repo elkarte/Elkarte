@@ -132,6 +132,12 @@ fieldset dl {
 legend {
 	font-weight: bold;
 	color: #000;
+    background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+    cursor: pointer;
+    padding-left: 20px;
+}
+.collapsed legend  {
+    background:  url(../images/selected.png) no-repeat scroll left center transparent;
 }
 
 /* Styles for the admin home screen.
