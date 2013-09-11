@@ -3955,7 +3955,7 @@ dl.merge_topic dd {
 	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
-	position:relative;
+	position: relative;
 	padding: 0 0 0 12px;
 	}
 	#menu_sidebar {
@@ -3983,6 +3983,19 @@ dl.merge_topic dd {
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {
+	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
+		display: none;
+	}
+	#wrapper, .frame {
+		width: 100%;
+		min-width: 300px;
+	}
+	#main_content_section {
+		padding: 1px 2px 16px 3px;
+	}
+	.post {
+		margin: 0 0 0 5px;
+	}
 	.frame {
 		min-width: 100%;
 		border-radius: 0;
@@ -4008,15 +4021,30 @@ dl.merge_topic dd {
 		width: 90%;
 		padding: 8px;
 	}
-	.topic_latest, .topic_moderation {
-		display: inline-block;
-		vertical-align: middle;
+	.topic_icons {
+		display: none;
+	}
+	.topic_moderation {
+		display: none;
+	}
+	.topic_latest {
+		display: block;
+		padding: 5px;
+		width: 97%;
+	}
+	ul.buttonlist, ul.buttonlist li, .pagelinks {
+		float: none;
+		display: block;
+	}
+	.pagelinks {
+		height: 30px;
 	}
 	.topic_name, .topic_starter {
 		margin: 0;
 	}
 	.topic_name h4 {
 		display: block;
+		font-size: 1.4em;
 	}
 	#wrapper {
 		padding-left: 2px;
@@ -4025,35 +4053,52 @@ dl.merge_topic dd {
 	#gobottom, #gotop { 
 		padding-left: 0.25em;
 	}
-}
-
-/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
-@media screen and (min-width: 320px) and (max-width: 480px) {
-	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
+	#news, #logo, #top_section_notice {
 		display: none;
 	}
-	#wrapper, .frame {
-		width: 100%;
-		min-width: 300px;
+	ul.poster {
+		display: block;
 	}
-	#main_content_section {
-		padding: 1px 2px 16px 3px;
+	.avatar>.linklevel1>.avatar {
+		max-width: 20px;
+		max-height: 20px;
 	}
-	.poster .avatar {
-		width: 30px;
+	.poster_online, .icons img {
+		display: none;
 	}
-	.poster {
-		width: 110px;
-		font-size: .8em;
+	.postarea {
+		display: block;
+		margin: 0;
 	}
-	.postarea, .moderatorbar {
-		margin: 0 0 0 110px;
+	#forumposts .windowbg {
+		padding: 5px;
 	}
-	.post {
-		margin: 0 0 0 5px;
+	#forumposts h2 img {
+		display: none;
+	}
+	.keyinfo h5 {
+		padding: 3px;
+	}
+	h2 .views_text, h2 .nextlinks {
+		display: block;
+		float: none;
+		line-height: 1.4em;
+	}
+	.modified {
+		display: none;
 	}
 	.childboards {
 		margin: 0 5px;
+	}
+	.board_info, .board_latest {
+		width: 100%;
+	}
+	.board_info a img {
+		width: 20px;
+		height: 20px;
+	}
+	.board_info h3 a {
+		font-size: 1.3em;
 	}
 	.board_latest {
 		padding: 0 8px;
@@ -4065,7 +4110,42 @@ dl.merge_topic dd {
 		clear: both;
 		content:"";
 	}
+	.board_lastpost {
+		padding-top: 6px;
+	}
+	.icon_anchor {
+		min-width: 0;
+	}
+	.lastpost_link {
+		font-size: 1.1em;
+	}
 	.recentboard, .recentposter {
 		display: none;
+	}
+	.lastpost_link, .board_lastposter, .board_lasttime {
+		white-space: normal;
+	}
+	#basicinfo, #detailedinfo {
+		float: none;
+		width: 100%;
+	}
+	select, .input_text {
+		max-width: 12em;
+	}
+	.login {
+		width: 100%;
+	}
+	#main_menu li, .admin_menu li{
+		float: none;
+	}
+	.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
+		left: -4px;
+	}
+	.listlevel2, .listlevel3 {
+		width: 14em;
+	}
+	.menulevel3 {
+		margin: -2em 0 0 4em;
+		max-width: 15em;
 	}
 }
