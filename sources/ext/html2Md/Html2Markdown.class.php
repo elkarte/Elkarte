@@ -64,7 +64,7 @@ class Convert_Md
 			$this->doc = new DOMDocument();
 			$this->doc->preserveWhiteSpace = false;
 
-			// Make it a utf-8 doc always and be silent about those html structure errors
+			// Make it a UTF-8 doc always and be silent about those html structure errors
 			libxml_use_internal_errors(true);
 			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $html);
 			$this->doc->encoding = 'UTF-8';
@@ -137,7 +137,7 @@ class Convert_Md
 	 * For a given node, checks if it is anywhere nested inside of a code block
 	 *  - Prevents converting anything that's inside a code block
 	 *
-	 * @param type $node
+	 * @param object $node
 	 */
 	private static function _has_parent_code($node, $parser)
 	{
@@ -155,6 +155,7 @@ class Convert_Md
 			// Back out another level, until we are done
 			$parent = $parser ? $parent->parentNode : $parent->parentNode();
 		}
+
 		return false;
 	}
 
@@ -216,9 +217,8 @@ class Convert_Md
 	 */
 	private function _convert_to_markdown($node)
 	{
-		// HTML tag and contents
+		// HTML tag we are dealing with
 		$tag = $this->_get_name($node);
-		$value = $this->_get_value($node);
 
 		// Based on the tag, determine how to convert
 		switch ($tag)
@@ -231,7 +231,7 @@ class Convert_Md
 				break;
 			case 'b':
 			case 'strong':
-				$markdown = '**' . $value . '**';
+				$markdown = '**' . $this->_get_value($node) . '**';
 				break;
 			case 'blockquote':
 				$markdown = $this->_convert_blockquote($node);
@@ -240,23 +240,23 @@ class Convert_Md
 				$markdown = '  ' . $this->line_end;
 				break;
 			case 'center':
-				$markdown = $this->line_end . $value . $this->line_end;
+				$markdown = $this->line_end . $this->_get_value($node) . $this->line_end;
 				break;
 			case 'code':
 				$markdown = $this->_convert_code($node);
 				break;
 			case 'dt':
-				$markdown = str_replace(array("\n", "\r", "\n\r"), '', $value) . $this->line_end;
+				$markdown = str_replace(array("\n", "\r", "\n\r"), '', $this->_get_value($node)) . $this->line_end;
 				break;
 			case 'dd':
-				$markdown = ':   ' . $value . $this->line_break;
+				$markdown = ':   ' . $this->_get_value($node) . $this->line_break;
 				break;
 			case 'dl':
-				$markdown = trim($value) . $this->line_break;
+				$markdown = trim($this->_get_value($node)) . $this->line_break;
 				break;
 			case 'em':
 			case 'i':
-				$markdown = '_' . $value . '_';
+				$markdown = '_' . $this->_get_value($node) . '_';
 				break;
 			case 'hr':
 				$markdown = $this->line_end . str_repeat('-', 3) . $this->line_end;
@@ -267,36 +267,36 @@ class Convert_Md
 			case 'h4':
 			case 'h5':
 			case 'h6':
-				$markdown = $this->_convert_header($tag, $value);
+				$markdown = $this->_convert_header($tag, $this->_get_value($node));
 				break;
 			case 'img':
 				$markdown = $this->_convert_image($node);
 				break;
 			case 'ol':
 			case 'ul':
-				$markdown = rtrim($value) . $this->line_break;
+				$markdown = rtrim($this->_get_value($node)) . $this->line_break;
 				break;
 			case 'li':
 				$markdown = $this->_convert_list($node);
 				break;
 			case 'p':
-				$markdown = str_replace("\n", ' ', $value) . $this->line_break;
+				$markdown = str_replace("\n", ' ', $this->_get_value($node)) . $this->line_break;
 				if (!$node->hasChildNodes())
 					$markdown = $this->_escape_text($markdown);
 				break;
 			case 'pre':
-				$markdown = $value . $this->line_break;
+				$markdown = $this->_get_value($node) . $this->line_break;
 				break;
 			case 'div':
-				$markdown = $value . $this->line_end;
+				$markdown = $this->_get_value($node) . $this->line_end;
 				if (!$node->hasChildNodes())
 					$markdown = $this->_escape_text($markdown);
 				break;
 			//case '#text':
-			//	$markdown = $this->_escape_text($value);
+			//	$markdown = $this->_escape_text($this->_get_value($node));
 			//	break;
 			case 'title':
-				$markdown = '# ' . $value . $this->line_break;
+				$markdown = '# ' . $this->_get_value($node) . $this->line_break;
 			case 'table':
 				$markdown = $this->_convert_table($node) . $this->line_break;
 				break;
@@ -311,6 +311,7 @@ class Convert_Md
 				break;
 			case 'root':
 			case 'span':
+			case 'body':
 				// Remove these tags and simply replace with the text inside the tags
 				$markdown = $this->_get_innerHTML($node);
 				break;
@@ -334,10 +335,10 @@ class Convert_Md
 	}
 
 	/**
-	 * 	Converts <abbr> tags to markdown (extra)
+	 * Converts <abbr> tags to markdown (extra)
 	 *
-	 * 	html: <abbr title="Hyper Text Markup Language">HTML</abbr>
-	 * 	md:	*[HTML]: Hyper Text Markup Language
+	 * html: <abbr title="Hyper Text Markup Language">HTML</abbr>
+	 * md:	*[HTML]: Hyper Text Markup Language
 	 *
 	 * @param type $node
 	 */
@@ -378,6 +379,7 @@ class Convert_Md
 
 	/**
 	 * Converts blockquotes to markdown > quote style
+	 *
 	 * html: <blockquote>quote</blockquote>
 	 * md: > quote
 	 *
@@ -406,6 +408,9 @@ class Convert_Md
 	 * Converts code tags to markdown span `code` or block code
 	 * Converts single line code to inline tick mark
 	 * Converts multi line to indented code
+	 *
+	 * html: <code>code</code>
+	 * md: `code`
 	 *
 	 * @param object $node
 	 */
@@ -443,7 +448,7 @@ class Convert_Md
 		// Single line, back tick and move on
 		else
 		{
-			// Account for backticks in the single line
+			// Account for backticks in the single line code itself
 			$ticks = $this->_has_ticks($node, $value);
 			if (!empty($ticks))
 			{
@@ -462,6 +467,13 @@ class Convert_Md
 	/**
 	 * Converts <h1> and <h2> headers to markdown-style headers in setex style,
 	 * all other headers are returned as atx style ### h3
+	 *
+	 * html: <h1>header</h1>
+	 * md: header
+	 *     ======
+	 *
+	 * html: <h3>header</h3>
+	 * md: ###header
 	 *
 	 * @param int $level
 	 * @param string $content
@@ -483,10 +495,10 @@ class Convert_Md
 	}
 
 	/**
-	 * 	Converts <img> tags to markdown
+	 * Converts <img> tags to markdown
 	 *
-	 * 	html: <img src='source' alt='alt' title='title' />
-	 * 	md: ![alt](source 'title')
+	 * html: <img src='source' alt='alt' title='title' />
+	 * md: ![alt](source 'title')
 	 *
 	 * @param object $node
 	 */
@@ -535,7 +547,7 @@ class Convert_Md
 
 	/**
 	 * Converts tables tags to markdown extra table syntax
-	 * Have to build top down vs inside out due to needing col numbers and widths
+	 * Have to build top down vs normal inside out due to needing col numbers and widths
 	 *
 	 * @param object $node
 	 */
@@ -726,6 +738,7 @@ class Convert_Md
 				$content = str_repeat(' ', $left) . $content . str_repeat(' ', $right);
 				break;
 		}
+
 		return $content;
 	}
 
@@ -750,11 +763,11 @@ class Convert_Md
 	}
 
 	/**
-	 * Escapes markup looking text in html to prevent an accidental assignment
-	 *  - <p>*stuff*</p> should not convert to *stuff* but \*stuff\* since its
-	 *    not to be converted later to <strong>stuff</strong>
+	 * Escapes markup looking text in html to prevent accidental assignment
+	 * <p>*stuff*</p> should not convert to *stuff* but \*stuff\* since its not to
+	 * be converted by md to html as <strong>stuff</strong>
 	 *
-	 * @param type $value
+	 * @param string $value
 	 */
 	private function _escape_text($value)
 	{
@@ -767,9 +780,9 @@ class Convert_Md
 
 	/**
 	 * If inline code contains backticks ` as part of its content, we need to wrap them so
-	 * when markdown is run we don't inteprete the ` as additonal code blocks
+	 * when markdown is run we don't interpret the ` as additional code blocks
 	 *
-	 * @param type $node
+	 * @param object $node
 	 * @param string $value
 	 */
 	private function _has_ticks($node, $value)
@@ -816,7 +829,7 @@ class Convert_Md
 		$lines = array();
 		while (!empty($string))
 		{
-			// Get the next #width characts before a break (space, tab etc)
+			// Get the next #width characters before a break (space, tab etc)
 			if (preg_match('~^(.{1,' . $width . '})(?:\s|$)~', $string, $matches))
 			{
 				// Add the #width to the output and set up for the next pass

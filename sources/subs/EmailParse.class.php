@@ -153,7 +153,7 @@ class Email_Parse
 			if (isset($_POST['item']))
 				$this->raw_message = $this->_query_load_email($_POST['item']);
 			// @todo debugging file used for testing
-			elseif (file_exists($location . '/elk-test.eml'))
+			elseif (file_exists($location . '/elk-test.eml') && isAllowedTo('admin_forum'))
 				$this->raw_message = file_get_contents($location . '/elk-test.eml');
 		}
 		else
@@ -224,7 +224,7 @@ class Email_Parse
 	 * Separate the email message headers from the message body
 	 *
 	 * The header is separated from the body by
-	 * 	(1) an empty line or
+	 * 	(1) the first empty line or
 	 *  (2) a line that does not start with a tab, a field name followed by a colon or a space
 	 */
 	private function _split_headers()
@@ -236,8 +236,8 @@ class Email_Parse
 		if (!preg_match('~^[\w-]+:[ ].*?\r?\n~i', $this->raw_message))
 			return;
 
-		// The header block ends base on condition (1) or (2)
-		if (!preg_match('~^(.*?)\r?\n(?!(\t|[\w-]+:|\r?\n|[ ]))(.*)~s', $this->raw_message, $match))
+		// The header block ends based on condition (1) or (2)
+		if (!preg_match('~^(.*?)\r?\n(?:\r?\n|(?!(\t|[\w-]+:|[ ])))(.*)~s', $this->raw_message, $match))
 			return;
 
 		$this->_header_block = $match[1];
@@ -370,6 +370,7 @@ class Email_Parse
 			// The text/plain content type is the generic subtype for plain text. It is the default specified by RFC 822.
 			case 'text/plain':
 				$this->body = $this->_decode_string($this->body, $this->headers['content-transfer-encoding'], $this->headers['x-parameters']['content-type']['charset']);
+				$this->plain_body = $this->body;
 				break;
 			// The text/html content type is an Internet Media Type as well as a MIME content type.
 			case 'text/html':
