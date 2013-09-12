@@ -798,7 +798,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	function list_getSpiders($start, $items_per_page, $sort)
 	{
 		// retrieve spiders within these limits
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		return getSpiders($start, $items_per_page, $sort);
 	}
 
@@ -809,7 +809,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	 */
 	function list_getNumSpiders()
 	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		return getNumSpiders();
 	}
 
@@ -823,7 +823,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	 */
 	function list_getSpiderLogs($start, $items_per_page, $sort)
 	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		return getSpiderLogs($start, $items_per_page, $sort);
 	}
 
@@ -834,7 +834,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	 */
 	function list_getNumSpiderLogs()
 	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		return getNumSpiderLogs();
 	}
 
@@ -848,7 +848,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	 */
 	function list_getSpiderStats($start, $items_per_page, $sort)
 	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		return getSpiderStats($start, $items_per_page, $sort);
 	}
 
@@ -859,7 +859,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 	 */
 	function list_getNumSpiderStats()
 	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
 		return getNumSpiderStats();
 	}
 }
