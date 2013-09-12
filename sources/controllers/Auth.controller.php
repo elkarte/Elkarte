@@ -295,6 +295,9 @@ class Auth_Controller extends Action_Controller
 						$other_passwords[] = sha1(strtolower(mb_convert_encoding($user_settings['member_name'], 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($_POST['passwrd'], 'UTF-8', $modSettings['previousCharacterSet'])));
 				}
 			}
+			// Yet another downgrade .. PHP-Fusion7
+			elseif (strlen($user_settings['passwd']) == 64 && !empty($modSettings['enable_password_conversion']))
+				$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
 
 			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 			if (stripos(PHP_OS, 'win') !== 0)
