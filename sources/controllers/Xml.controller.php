@@ -31,6 +31,7 @@ class Xml_Controller extends Action_Controller
 			'messageicons' => array('action_messageicons'),
 			'groupicons' => array('action_groupicons'),
 			'corefeatures' => array('action_corefeatures', 'admin_forum'),
+			'profileorder' => array('action_profileorder', 'admin_forum'),
 		);
 
 		// Easy adding of xml sub actions
@@ -200,6 +201,95 @@ class Xml_Controller extends Action_Controller
 			'corefeatures' => array(
 				'identifier' => 'corefeature',
 				'children' => $returns,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the custom profile fields from a drag/drop event
+	 */
+	public function action_profileorder()
+	{
+		global $context, $txt;
+
+		// Start off with nothing
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+
+		// Chances are
+		loadLanguage('Errors');
+		loadLanguage('ManageSettings');
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+
+		// You have to be allowed to do this
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// No questions that we are reordering
+			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			{
+				$view_order = 1;
+				$replace = '';
+
+				// The field ids arrive in 1-n view order ...
+				foreach ($_POST['list_custom_profile_fields'] as $id)
+				{
+					$replace .= '
+						WHEN id_field = ' . $id . ' THEN ' . $view_order++;
+				}
+
+				// With the replace set
+				if (!empty($replace))
+					updateProfileFieldOrder($replace);
+				else
+					$errors[] = array('value' => $txt['no_sortable_items']);
+			}
+
+			$order[] = array(
+				'value' => $txt['custom_profile_reordered'],
+			);
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-core_token'],
+					'attributes' => array('type' => 'token_var'),
+				),
+				array(
+					'value' => $context['admin-core_token_var'],
+					'attributes' => array('type' => 'token'),
+				),
+			);
+		}
+		// Failed validation, tough to be you
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
 			),
 			'tokens' => array(
 				'identifier' => 'token',
