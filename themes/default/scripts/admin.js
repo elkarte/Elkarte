@@ -854,22 +854,22 @@ function toggleBaseDir ()
 					dataType: "xml",
 					data: order
 				})
-				.fail(function(error) {
-						$(ajax_infobar).html(error).slideDown('fast');
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					$(ajax_infobar).html(textStatus).slideDown('fast');
 				})
-				.done(function(request) {
-					if ($(request).find("error").length !== 0)
+				.done(function(data, textStatus, jqXHR) {
+					if ($(data).find("error").length !== 0)
 					{
 						// Errors get a modal dialog box
 						$('#errorContainer').append('<p id="errorContent"></p>');
-						$('#errorContent').html($(request).find("error").text());
+						$('#errorContent').html($(data).find("error").text());
 						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
 					}
-					else if ($(request).find("elk").length !== 0)
+					else if ($(data).find("elk").length !== 0)
 					{
 						// Valid responses get the unobtrusive slider
 						$(ajax_infobar).attr('class', 'infobox');
-						$(ajax_infobar).html($(request).find('elk').find('order').text()).slideDown('fast');
+						$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
 						setTimeout(function() {
 							$(ajax_infobar).slideUp();
 						}, 3500);
@@ -878,8 +878,16 @@ function toggleBaseDir ()
 					{
 						// Something "other" happened ...
 						$('#errorContainer').append('<p id="errorContent"></p>')
-						$('#errorContent').html(oSettings.error);
+						$('#errorContent').html(oSettings.error + ' : ' + textStatus);
 						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+					}
+				})
+				.always(function(data, textStatus, jqXHR) {
+					if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
+					{
+						// Reset the token
+						oSettings.token['token_id'] = $(data).find("tokens").find('[type="token"]').text();
+						oSettings.token['token_var'] = $(data).find("tokens").find('[type="token_var"]').text();
 					}
 				});
 			}

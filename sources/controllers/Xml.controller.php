@@ -265,12 +265,12 @@ class Xml_Controller extends Action_Controller
 			createToken('admin-sort', 'post');
 			$tokens = array(
 				array(
-					'value' => $context['admin-core_token'],
-					'attributes' => array('type' => 'token_var'),
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
 				),
 				array(
-					'value' => $context['admin-core_token_var'],
-					'attributes' => array('type' => 'token'),
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
 				),
 			);
 		}
