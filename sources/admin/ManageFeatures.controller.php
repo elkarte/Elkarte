@@ -443,6 +443,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
 				array('int', 'likeWaitCount', 6),
 				array('check', 'likeRestrictAdmins'),
+				array('check', 'likeAllowSelf'),
 			'',
 				array('int', 'likeDisplayLimit', 6)
 		);
@@ -1514,6 +1515,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
 				array('int', 'likeWaitCount', 6),
 				array('check', 'likeRestrictAdmins'),
+				array('check', 'likeAllowSelf'),
 			'',
 				array('int', 'likeDisplayLimit', 6)
 		);
