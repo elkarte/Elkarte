@@ -43,6 +43,27 @@ class Admin_Controller extends Action_Controller
 		loadTemplate('Admin', 'admin');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
 
+		// For now only the Admin functions need Jquery UI ....
+		if (!empty($modSettings['jquery_source']))
+		{
+			switch ($modSettings['jquery_source'])
+			{
+				case 'cdn':
+					$jq_ui = 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
+					break;
+				case 'local':
+					$jq_ui = $settings['default_theme_url'] . '/scripts/jquery-ui--1.10.3.min.js';
+					break;
+				case 'auto':
+					$jq_ui = 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js';
+					$jq_ui_inline = 'window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-1.10.3.min.js"><\/script>\');';
+					break;
+			}
+			loadJavascriptFile($jq_ui, array(), 'jqueryui');
+			if (isset($jq_ui_inline))
+				addInlineJavascript($jq_ui_inline);
+		}
+
 		// No indexing evil stuff.
 		$context['robot_no_index'] = true;
 
