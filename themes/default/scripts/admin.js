@@ -800,3 +800,89 @@ function toggleBaseDir ()
 	else
 		dir_elem.disabled = !sub_dir.checked;
 }
+
+// Drag and drop to reorder items via UI Sortable
+(function($) {
+	'use strict';
+	$.fn.elkSortable = function(oInstanceSettings) {
+		$.fn.elkSortable.oDefaultsSettings = {
+			opacity: 0.7,
+			cursor: 'move',
+			axis: 'y',
+			containment: 'parent',
+			sa: '', // Subaction that the xmlcontroller should know about
+			title: '', // Title of the error box
+			error: '', // What to say when we don't know what happened, like connection error
+			token: '' // Security token if needed
+		};
+
+		// Account for any user options
+		var oSettings = $.extend({}, $.fn.elkSortable.oDefaultsSettings, oInstanceSettings || {});
+
+		// Find all table_grid_sortable tables and attach the UI sortable action
+		$("#table_grid_sortable").sortable({
+			opacity: oSettings.opacity,
+			cursor: oSettings.cursor,
+			axis: oSettings.axis,
+			containment: oSettings.containment,
+			update: function() {
+				var order,
+					ajax_infobar = document.createElement('div'),
+					ajax_errorbox = document.createElement('div');
+
+				// Get all the id's in the sortable table
+				order = $("#table_grid_sortable").sortable("serialize");
+
+				// Add in our security tags, etc
+				order += '&' + elk_session_var + '=' + elk_session_id;
+				order += '&order=reorder';
+
+				if (oSettings.token !== '')
+					order += '&' + oSettings.token['token_var'] + '=' + oSettings.token['token_id'];
+
+				// Prepare the infobar and errorbox divs to confirm valid responses or show an error
+				$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
+				$("body").append(ajax_infobar);
+				$(ajax_infobar).slideUp();
+				$(ajax_errorbox).css({'display': 'none'});
+				$("body").append(ajax_errorbox).attr('id', 'errorContainer');
+
+				// And make the ajax request
+				$.ajax({
+					type: "POST",
+					url: elk_scripturl + "?action=xmlhttp;sa=" + oSettings.sa + ";xml",
+					dataType: "xml",
+					data: order
+				})
+				.fail(function(error) {
+						$(ajax_infobar).html(error).slideDown('fast');
+				})
+				.done(function(request) {
+					if ($(request).find("error").length !== 0)
+					{
+						// Errors get a modal dialog box
+						$('#errorContainer').append('<p id="errorContent"></p>');
+						$('#errorContent').html($(request).find("error").text());
+						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+					}
+					else if ($(request).find("elk").length !== 0)
+					{
+						// Valid responses get the unobtrusive slider
+						$(ajax_infobar).attr('class', 'infobox');
+						$(ajax_infobar).html($(request).find('elk').find('order').text()).slideDown('fast');
+						setTimeout(function() {
+							$(ajax_infobar).slideUp();
+						}, 3500);
+					}
+					else
+					{
+						// Something "other" happened ...
+						$('#errorContainer').append('<p id="errorContent"></p>')
+						$('#errorContent').html(oSettings.error);
+						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+					}
+				});
+			}
+		});
+	};
+})(jQuery);
