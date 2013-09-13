@@ -122,9 +122,8 @@ function template_main()
 				// Any custom fields on display?
 				elseif (!empty($context['custom_profile_fields']['columns']) && isset($context['custom_profile_fields']['columns'][$column]))
 				{
-					foreach ($context['custom_profile_fields']['columns'] as $key => $col)
 						echo '
-							<td>', $member['options'][substr($key, 5)], '</td>';
+							<td>', $member['options'][substr($column, 5)], '</td>';
 				}
 			}
 
