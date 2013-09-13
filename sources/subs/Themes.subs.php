@@ -368,7 +368,7 @@ function updateThemePath($setValues)
 		$setValues,
 		array('id_theme', 'variable', 'id_member')
 	);
-	
+
 }
 
 /**
@@ -440,9 +440,9 @@ function countConfiguredMemberOptions()
 function removeThemeOptions($default_theme, $membergroups, $old_settings)
 {
 	$db = database();
-	
-	// Which theme's option should we clean? 
-	$default = ($default_theme = true ? '=' : '!='); 
+
+	// Which theme's option should we clean?
+	$default = ($default_theme = true ? '=' : '!=');
 
 	// Guest or regular membergroups?
 	if ($membergroups === false )
@@ -454,7 +454,7 @@ function removeThemeOptions($default_theme, $membergroups, $old_settings)
 		$var = 'variable IN ({array_string:old_settings})';
 	else
 		$var = 'variable = {string:old_settings}';
-	
+
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme '. $default . ' {int:default_theme}
@@ -541,8 +541,9 @@ function loadCustomFields()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT col_name
-		FROM {db_prefix}custom_fields',
+		SELECT col_name, vieworder
+		FROM {db_prefix}custom_fields
+		ORDER BY vieworder',
 		array(
 		)
 	);
@@ -566,7 +567,7 @@ function deleteTheme($id)
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
 		fatal_lang_error('no_access', false);
-	
+
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme = {int:current_theme}',

@@ -419,7 +419,7 @@ class Register_Controller extends Action_Controller
 
 		// Check whether we have fields that simply MUST be displayed?
 		$request = $db->query('', '
-			SELECT col_name, field_name, field_type, field_length, mask, show_reg
+			SELECT col_name, field_name, field_type, field_length, mask, show_reg, vieworder
 			FROM {db_prefix}custom_fields
 			WHERE active = {int:is_active}',
 			array(
