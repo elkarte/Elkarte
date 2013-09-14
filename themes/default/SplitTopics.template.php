@@ -26,7 +26,7 @@ function template_ask()
 		<form action="', $scripturl, '?action=splittopics;sa=execute;topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="at" value="', $context['message']['id'], '" />
 			<div class="cat_bar">
-				<h3 class="catbg">', $txt['split'], '</h3>
+				<h3 class="catbg">', $txt['split_topic'], '</h3>
 			</div>
 			<div class="windowbg">
 				<div class="content">
@@ -70,7 +70,7 @@ function template_ask()
 	
 	echo '
 						<div class="submitbutton">
-							<input type="submit" value="', $txt['split'], '" class="button_submit" />
+							<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						</div>
 					</div>
@@ -90,7 +90,7 @@ function template_main()
 	echo '
 	<div id="split_topics">
 		<div class="cat_bar">
-			<h3 class="catbg">', $txt['split'], '</h3>
+			<h3 class="catbg">', $txt['split_topic'], '</h3>
 		</div>
 		<div class="windowbg">
 			<div class="content">
@@ -123,7 +123,7 @@ function template_select()
 		<form action="', $scripturl, '?action=splittopics;sa=splitSelection;board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
 			<div id="not_selected" class="floatleft">
 				<div class="cat_bar">
-					<h3 class="catbg">', $txt['split'], ' - ', $txt['select_split_posts'], '</h3>
+					<h3 class="catbg">', $txt['split_topic'], ' - ', $txt['select_split_posts'], '</h3>
 				</div>
 				<div class="information">
 					', $txt['please_select_split'], '
@@ -183,7 +183,7 @@ function template_select()
 				<input type="hidden" name="subname" value="', $context['new_subject'], '" />
 				<input type="hidden" name="move_to_board" value="', $context['move_to_board'], '" />
 				<input type="hidden" name="reason" value="', $context['reason'], '" />
-				<input type="submit" value="', $txt['split'], '" class="button_submit" />
+				<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
 		</form>

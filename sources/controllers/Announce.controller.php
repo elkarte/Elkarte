@@ -164,7 +164,7 @@ class Announce_Controller extends Action_Controller
 		$announcements = array();
 
 		// Loop through all members that'll receive an announcement in this batch.
-		foreach ($data as $row)
+		foreach ($data['member_info'] as $row)
 		{
 			$cur_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
 

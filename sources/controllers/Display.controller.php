@@ -123,16 +123,25 @@ class Display_Controller
 			fatal_lang_error('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
-		if (!empty($topicinfo['id_redirect_topic']))
+		if (!empty($topicinfo['id_redirect_topic']) && !isset($_GET['noredir']))
 		{
 			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
-			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');
+			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
 		}
 
 		$context['real_num_replies'] = $context['num_replies'] = $topicinfo['num_replies'];
 		$context['topic_first_message'] = $topicinfo['id_first_msg'];
 		$context['topic_last_message'] = $topicinfo['id_last_msg'];
 		$context['topic_disregarded'] = isset($topicinfo['disregarded']) ? $topicinfo['disregarded'] : 0;
+		if (isset($_GET['redirfrom']))
+		{
+			$redir_topics = topicsList(array((int) $_GET['redirfrom']));
+			if (!empty($redir_topics[(int) $_GET['redirfrom']]))
+			{
+				$context['topic_redirected_from'] = $redir_topics[(int) $_GET['redirfrom']];
+				$context['topic_redirected_from']['redir_href'] = $scripturl . '?topic=' . $context['topic_redirected_from']['id_topic'] . '.0;noredir';
+			}
+		}
 
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
@@ -669,8 +678,12 @@ class Display_Controller
 
 			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
 
-			require_once(SUBSDIR . '/FollowUps.subs.php');
-			$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
+			
+			if (!empty($modSettings['enableFollowup']))
+			{
+				require_once(SUBSDIR . '/FollowUps.subs.php');
+				$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
+			}
 
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
@@ -760,7 +773,7 @@ class Display_Controller
 		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
 
-		$context['can_follow_up'] = boardsallowedto('post_new') !== array();
+		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
 
 		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft') && $context['can_reply'];

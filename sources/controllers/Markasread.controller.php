@@ -216,8 +216,6 @@ class MarkRead_Controller extends Action_Controller
 	{
 		global $board, $user_info, $board_info, $modSettings;
 
-		$db = database();
-
 		checkSession('get');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -267,18 +265,7 @@ class MarkRead_Controller extends Action_Controller
 			// Find all boards with the parents in the board list
 			$boards_to_add = accessibleBoards($boards);
 			if (!empty($boards_to_add))
-			{
-				// we've got some!
-				$logBoardInserts = '';
-				foreach ($boards_to_add as $b)
-					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $b['id_board']);
-					$db->insert('replace',
-					'{db_prefix}log_boards',
-					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-					$logBoardInserts,
-					array('id_member', 'id_board')
-				);
-			}
+				markBoardsRead($boards_to_add);
 
 			if (empty($board))
 				return '';

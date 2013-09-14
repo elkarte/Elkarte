@@ -509,12 +509,10 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Mark recycle board as seen, if it was marked as seen before.
 			if (!empty($isRead) && !$user_info['is_guest'])
-				$db->insert('replace',
-					'{db_prefix}log_boards',
-					array('id_board' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
-					array($modSettings['recycle_board'], $user_info['id'], $modSettings['maxMsgID']),
-					array('id_board', 'id_member')
-				);
+			{
+				require_once(SUBSDIR . '/Boards.subs.php');
+				markBoardsRead($modSettings['recycle_board']);
+			}
 
 			// Add one topic and post to the recycle bin board.
 			$db->query('', '
@@ -1057,4 +1055,32 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
 	$db->free_result($request);
 
 	return $return;
+}
+
+/**
+ * Returns an email (and few other things) associated with a message, 
+ * either the member's email or the poster_email (for example in case of guests)
+ *
+ * @todo very similar to posterDetails
+ *
+ * @param int $id_msg, the id of a message
+ * @return array
+ */
+function mailFromMesasge($id_msg)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
+		FROM {db_prefix}messages AS m
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		WHERE m.id_msg = {int:id_msg}',
+		array(
+			'id_msg' => (int) $_REQUEST['msg'],
+		)
+	);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $row;
 }

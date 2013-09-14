@@ -49,8 +49,6 @@ class Stats_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $modSettings, $context;
 
-		$db = database();
-
 		isAllowedTo('view_stats');
 
 		// Page disabled - redirect them out
@@ -76,6 +74,9 @@ class Stats_Controller extends Action_Controller
 				$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
 		}
 
+		// Just a lil' help from our friend :P
+		require_once(SUBSDIR . '/Stats.subs.php');
+
 		// Handle the XMLHttpRequest.
 		if (isset($_REQUEST['xml']))
 		{
@@ -94,9 +95,6 @@ class Stats_Controller extends Action_Controller
 
 		loadLanguage('Stats');
 		loadTemplate('Stats');
-
-		// Just a lil' help from our friend :P
-		require_once(SUBSDIR . '/Stats.subs.php');
 
 		// Build the link tree......
 		$context['linktree'][] = array(
@@ -192,64 +190,7 @@ class Stats_Controller extends Action_Controller
 		$context['top_time_online'] = topTimeOnline();
 
 		// Activity by month.
-		$months_result = $db->query('', '
-			SELECT
-				YEAR(date) AS stats_year, MONTH(date) AS stats_month, SUM(hits) AS hits, SUM(registers) AS registers, SUM(topics) AS topics, SUM(posts) AS posts, MAX(most_on) AS most_on, COUNT(*) AS num_days
-			FROM {db_prefix}log_activity
-			GROUP BY stats_year, stats_month',
-			array()
-		);
-
-		$context['yearly'] = array();
-		while ($row_months = $db->fetch_assoc($months_result))
-		{
-			$ID_MONTH = $row_months['stats_year'] . sprintf('%02d', $row_months['stats_month']);
-			$expanded = !empty($_SESSION['expanded_stats'][$row_months['stats_year']]) && in_array($row_months['stats_month'], $_SESSION['expanded_stats'][$row_months['stats_year']]);
-
-			if (!isset($context['yearly'][$row_months['stats_year']]))
-				$context['yearly'][$row_months['stats_year']] = array(
-					'year' => $row_months['stats_year'],
-					'new_topics' => 0,
-					'new_posts' => 0,
-					'new_members' => 0,
-					'most_members_online' => 0,
-					'hits' => 0,
-					'num_months' => 0,
-					'months' => array(),
-					'expanded' => false,
-					'current_year' => $row_months['stats_year'] == date('Y'),
-				);
-
-			$context['yearly'][$row_months['stats_year']]['months'][(int) $row_months['stats_month']] = array(
-				'id' => $ID_MONTH,
-				'date' => array(
-					'month' => sprintf('%02d', $row_months['stats_month']),
-					'year' => $row_months['stats_year']
-				),
-				'href' => $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $ID_MONTH . '#m' . $ID_MONTH,
-				'link' => '<a href="' . $scripturl . '?action=stats;' . ($expanded ? 'collapse' : 'expand') . '=' . $ID_MONTH . '#m' . $ID_MONTH . '">' . $txt['months'][(int) $row_months['stats_month']] . ' ' . $row_months['stats_year'] . '</a>',
-				'month' => $txt['months'][(int) $row_months['stats_month']],
-				'year' => $row_months['stats_year'],
-				'new_topics' => comma_format($row_months['topics']),
-				'new_posts' => comma_format($row_months['posts']),
-				'new_members' => comma_format($row_months['registers']),
-				'most_members_online' => comma_format($row_months['most_on']),
-				'hits' => comma_format($row_months['hits']),
-				'num_days' => $row_months['num_days'],
-				'days' => array(),
-				'expanded' => $expanded
-			);
-
-			$context['yearly'][$row_months['stats_year']]['new_topics'] += $row_months['topics'];
-			$context['yearly'][$row_months['stats_year']]['new_posts'] += $row_months['posts'];
-			$context['yearly'][$row_months['stats_year']]['new_members'] += $row_months['registers'];
-			$context['yearly'][$row_months['stats_year']]['hits'] += $row_months['hits'];
-			$context['yearly'][$row_months['stats_year']]['num_months']++;
-			$context['yearly'][$row_months['stats_year']]['expanded'] |= $expanded;
-			$context['yearly'][$row_months['stats_year']]['most_members_online'] = max($context['yearly'][$row_months['stats_year']]['most_members_online'], $row_months['most_on']);
-		}
-
-		krsort($context['yearly']);
+		montlyActivity();
 
 		$context['collapsed_years'] = array();
 		foreach ($context['yearly'] as $year => $data)
@@ -290,38 +231,4 @@ class Stats_Controller extends Action_Controller
 		// Custom stats (just add a template_layer to add it to the template!)
 	 	call_integration_hook('integrate_forum_stats');
 	}
-}
-
-/**
- * Loads the statistics on a daily basis in $context.
- * called by action_stats().
- * @param string $condition_string
- * @param array $condition_parameters = array()
- */
-function getDailyStats($condition_string, $condition_parameters = array())
-{
-	global $context;
-
-	$db = database();
-
-	// Activity by day.
-	$days_result = $db->query('', '
-		SELECT YEAR(date) AS stats_year, MONTH(date) AS stats_month, DAYOFMONTH(date) AS stats_day, topics, posts, registers, most_on, hits
-		FROM {db_prefix}log_activity
-		WHERE ' . $condition_string . '
-		ORDER BY stats_day DESC',
-		$condition_parameters
-	);
-	while ($row_days = $db->fetch_assoc($days_result))
-		$context['yearly'][$row_days['stats_year']]['months'][(int) $row_days['stats_month']]['days'][] = array(
-			'day' => sprintf('%02d', $row_days['stats_day']),
-			'month' => sprintf('%02d', $row_days['stats_month']),
-			'year' => $row_days['stats_year'],
-			'new_topics' => comma_format($row_days['topics']),
-			'new_posts' => comma_format($row_days['posts']),
-			'new_members' => comma_format($row_days['registers']),
-			'most_members_online' => comma_format($row_days['most_on']),
-			'hits' => comma_format($row_days['hits'])
-		);
-	$db->free_result($days_result);
 }

@@ -2354,7 +2354,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 	else
 	{
 		// Posting a quoted reply?
-		if ((!empty($topic) && !empty($_REQUEST['quote'])) || !empty($_REQUEST['followup']))
+		if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
 		{
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
