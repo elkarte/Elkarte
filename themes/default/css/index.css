@@ -2103,13 +2103,13 @@ img.new_posts {
 .nextlinks {
 	float: right;
 }
-#whoisviewing {
+#whoisviewing, #redirectfrom {
 	padding: 4px 1em;
 	font-size: 0.857em;
 }
 /* Poster and postarea + moderation area underneath */
 
-#whoisviewing, .forumposts .windowbg, .forumposts .windowbg2,
+#whoisviewing, #redirectfrom, .forumposts .windowbg, .forumposts .windowbg2,
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
