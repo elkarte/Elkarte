@@ -801,7 +801,7 @@ function toggleBaseDir ()
 		dir_elem.disabled = !sub_dir.checked;
 }
 
-// Drag and drop to reorder items via UI Sortable
+// Drag and drop to reorder table TD's via UI Sortable
 (function($) {
 	'use strict';
 	$.fn.elkSortable = function(oInstanceSettings) {
@@ -810,6 +810,8 @@ function toggleBaseDir ()
 			cursor: 'move',
 			axis: 'y',
 			containment: 'parent',
+			tag: '#table_grid_sortable', // ID(s) of the container to work with, single or comma seperated
+			connect: '', // Use to group all related containers with a common CSS class
 			sa: '', // Subaction that the xmlcontroller should know about
 			title: '', // Title of the error box
 			error: '', // What to say when we don't know what happened, like connection error
@@ -819,19 +821,34 @@ function toggleBaseDir ()
 		// Account for any user options
 		var oSettings = $.extend({}, $.fn.elkSortable.oDefaultsSettings, oInstanceSettings || {});
 
+		// Divs to hold our responses
+		var	ajax_infobar = document.createElement('div'),
+			ajax_errorbox = document.createElement('div');
+
+		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
+		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
+		$("body").append(ajax_infobar);
+		$(ajax_infobar).slideUp();
+		$(ajax_errorbox).css({'display': 'none'});
+		$("body").append(ajax_errorbox).attr('id', 'errorContainer');
+
 		// Find all table_grid_sortable tables and attach the UI sortable action
-		$("#table_grid_sortable").sortable({
+		$(oSettings.tag).sortable({
 			opacity: oSettings.opacity,
 			cursor: oSettings.cursor,
 			axis: oSettings.axis,
 			containment: oSettings.containment,
+			connectWith: oSettings.connect,
 			update: function() {
-				var order,
-					ajax_infobar = document.createElement('div'),
-					ajax_errorbox = document.createElement('div');
+				var order = '';
 
-				// Get all the id's in the sortable table
-				order = $("#table_grid_sortable").sortable("serialize");
+				// Get all the id's in all the sortable containers
+				$(oSettings.tag).each(function() {
+					if (order === "")
+					   order += $(this).sortable("serialize");
+					else
+					   order += "&" + $(this).sortable("serialize"); ;
+				});
 
 				// Add in our security tags, etc
 				order += '&' + elk_session_var + '=' + elk_session_id;
@@ -839,13 +856,6 @@ function toggleBaseDir ()
 
 				if (oSettings.token !== '')
 					order += '&' + oSettings.token['token_var'] + '=' + oSettings.token['token_id'];
-
-				// Prepare the infobar and errorbox divs to confirm valid responses or show an error
-				$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
-				$("body").append(ajax_infobar);
-				$(ajax_infobar).slideUp();
-				$(ajax_errorbox).css({'display': 'none'});
-				$("body").append(ajax_errorbox).attr('id', 'errorContainer');
 
 				// And make the ajax request
 				$.ajax({
@@ -855,7 +865,11 @@ function toggleBaseDir ()
 					data: order
 				})
 				.fail(function(jqXHR, textStatus, errorThrown) {
+					$(ajax_infobar).attr('class', 'errorbox');
 					$(ajax_infobar).html(textStatus).slideDown('fast');
+					setTimeout(function() {
+						$(ajax_infobar).slideUp();
+					}, 3500);
 				})
 				.done(function(data, textStatus, jqXHR) {
 					if ($(data).find("error").length !== 0)
