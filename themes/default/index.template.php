@@ -359,8 +359,6 @@ function template_body_above()
 			</div>';
 
 	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
-	// News fader is nixed when upper section is collapsed, just to save running the javascript all the time when it is not wanted.
-	// Requires page refresh when upper section is expanded, to show the fader again. I think this is acceptable, but am open to suggestions.
 	if (!empty($context['random_news_line']))
 	{
 		echo '
