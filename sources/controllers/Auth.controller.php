@@ -276,10 +276,13 @@ class Auth_Controller extends Action_Controller
 				// Maybe they are using a hash from before the password fix.
 				$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
 
-				// BurningBoard3 style of hashing.
 				if (!empty($modSettings['enable_password_conversion']))
+				{
+					// BurningBoard3 style of hashing.
 					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($user_settings['password_salt'] . sha1($_POST['passwrd'])));
-
+					// PunBB 1.4 and later
+					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($_POST['passwrd']));
+				}
 				// Perhaps we converted to UTF-8 and have a valid password being hashed differently.
 				if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
 				{
@@ -292,7 +295,14 @@ class Auth_Controller extends Action_Controller
 						$other_passwords[] = sha1(strtolower(mb_convert_encoding($user_settings['member_name'], 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($_POST['passwrd'], 'UTF-8', $modSettings['previousCharacterSet'])));
 				}
 			}
-
+			elseif (strlen($user_settings['passwd']) == 64 && !empty($modSettings['enable_password_conversion']))
+			{
+				// Yet another downgrade .. PHP-Fusion7
+				$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
+				// Xenforo?
+				$other_passwords[] = sha1(sha1($_POST['passwrd']) . $user_settings['password_salt']);
+				$other_passwords[] = sha256(sha256($_POST['passwrd']) . $user_settings['password_salt']);
+			}
 			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 			if (stripos(PHP_OS, 'win') !== 0)
 			{
