@@ -287,10 +287,6 @@ function template_main()
 			if ($topic['new'] && $context['user']['is_logged'])
 				echo '
 						<a href="', $topic['new_href'], '" id="newicon' . $topic['first_post']['id'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>';
-			// Is this topic a redirect? (assuming they can moderate!)
-			if (!empty($topic['redir_href']) && $context['user']['can_mod'])
-				echo '
-						<a href="', $topic['redir_href'], '" id="no_rediricon' . $topic['first_post']['id'] . '"><span class="new_posts">' . $txt['no_redir'] . '</span></a>';
 
 			echo '
 						<h4>

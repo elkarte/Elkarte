@@ -126,13 +126,22 @@ class Display_Controller
 		if (!empty($topicinfo['id_redirect_topic']) && !isset($_GET['noredir']))
 		{
 			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
-			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');
+			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
 		}
 
 		$context['real_num_replies'] = $context['num_replies'] = $topicinfo['num_replies'];
 		$context['topic_first_message'] = $topicinfo['id_first_msg'];
 		$context['topic_last_message'] = $topicinfo['id_last_msg'];
 		$context['topic_disregarded'] = isset($topicinfo['disregarded']) ? $topicinfo['disregarded'] : 0;
+		if (isset($_GET['redirfrom']))
+		{
+			$redir_topics = topicsList(array((int) $_GET['redirfrom']));
+			if (!empty($redir_topics[(int) $_GET['redirfrom']]))
+			{
+				$context['topic_redirected_from'] = $redir_topics[(int) $_GET['redirfrom']];
+				$context['topic_redirected_from']['redir_href'] = $scripturl . '?topic=' . $context['topic_redirected_from']['id_topic'] . '.0;noredir';
+			}
+		}
 
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))

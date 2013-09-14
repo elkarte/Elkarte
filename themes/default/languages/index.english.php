@@ -294,7 +294,7 @@ $txt['moderators'] = 'Moderators';
 $txt['mark_board_read'] = 'Mark Topics as Read for this Board';
 $txt['views'] = 'Views';
 $txt['new'] = 'New';
-$txt['no_redir'] = 'No redirect';
+$txt['no_redir'] = 'Redirected from %1$s';
 
 $txt['view_all_members'] = 'View All Members';
 $txt['view'] = 'View';
