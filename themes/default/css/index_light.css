@@ -243,7 +243,12 @@ body {
 	color: #bbb;
 }
 
-
+#debug_logging a, #debug_logging strong {
+	color: yellow;
+}
+#debug_logging {
+	color: white;
+}
 
 
 /*	$MENUS		*/
