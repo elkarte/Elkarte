@@ -129,7 +129,7 @@ class SplitTopics_Controller extends Action_Controller
 			'subject' => $messageInfo['subject']
 		);
 		$context['sub_template'] = 'ask';
-		$context['page_title'] = $txt['split'];
+		$context['page_title'] = $txt['split_topic'];
 	}
 
 	/**
@@ -199,7 +199,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $this->_new_topic_subject);
-		$context['page_title'] = $txt['split'];
+		$context['page_title'] = $txt['split_topic'];
 
 		splitAttemptMove($boards, $context['new_topic']);
 	}
@@ -244,7 +244,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
-		$context['page_title'] = $txt['split'];
+		$context['page_title'] = $txt['split_topic'];
 
 		splitAttemptMove($boards, $context['new_topic']);
 	}
@@ -263,7 +263,7 @@ class SplitTopics_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $options;
 
-		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
+		$context['page_title'] = $txt['split_topic'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
 
 		// Haven't selected anything have we?

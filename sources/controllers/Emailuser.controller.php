@@ -264,8 +264,6 @@ class Emailuser_Controller extends Action_Controller
 	{
 		global $context, $modSettings, $user_info, $txt, $scripturl;
 
-		$db = database();
-
 		// Can the user even see this information?
 		if ($user_info['is_guest'] && !empty($modSettings['guest_hideContacts']))
 			fatal_lang_error('no_access', false);
@@ -284,17 +282,8 @@ class Emailuser_Controller extends Action_Controller
 		}
 		elseif (isset($_REQUEST['msg']))
 		{
-			$request = $db->query('', '
-				SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
-				FROM {db_prefix}messages AS m
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				WHERE m.id_msg = {int:id_msg}',
-				array(
-					'id_msg' => (int) $_REQUEST['msg'],
-				)
-			);
-			$row = $db->fetch_assoc($request);
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Messages.subs.php');
+			$row = mailFromMesasge((int) $_REQUEST['msg']);
 
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 		}
@@ -513,8 +502,6 @@ class Emailuser_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $topic, $board, $user_info, $modSettings, $language, $context;
 
-		$db = database();
-
 		// You must have the proper permissions!
 		isAllowedTo('report_any');
 
@@ -573,24 +560,11 @@ class Emailuser_Controller extends Action_Controller
 			return action_reporttm();
 
 		// Get the basic topic information, and make sure they can see it.
-		$msg_id = (int) $_POST['msg'];
+		$msg_id = (int) $_POST['msg']*0;
+		$message = posterDetails($msg_id, $topic);
 
-		$request = $db->query('', '
-			SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
-			FROM {db_prefix}messages AS m
-				LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)
-			WHERE m.id_msg = {int:id_msg}
-				AND m.id_topic = {int:current_topic}
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-				'id_msg' => $msg_id,
-			)
-		);
-		if ($db->num_rows($request) == 0)
+		if (empty($message))
 			fatal_lang_error('no_board', false);
-		$message = $db->fetch_assoc($request);
-		$db->free_result($request);
 
 		$poster_name = un_htmlspecialchars($message['real_name']) . ($message['real_name'] != $message['poster_name'] ? ' (' . $message['poster_name'] . ')' : '');
 		$reporterName = un_htmlspecialchars($user_info['name']) . ($user_info['name'] != $user_info['username'] && $user_info['username'] != '' ? ' (' . $user_info['username'] . ')' : '');
@@ -651,7 +625,6 @@ class Emailuser_Controller extends Action_Controller
 			// Send it to the moderator.
 			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $user_info['email'], null, false, 2);
 		}
-		$db->free_result($request);
 
 		// Keep track of when the mod reports get updated, that way we know when we need to look again.
 		updateSettings(array('last_mod_report_action' => time()));

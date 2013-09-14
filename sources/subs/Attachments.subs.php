@@ -1854,7 +1854,7 @@ function validateAttachments($attachments, $approve_query)
 
 	// double check the attachments array, pick only what is returned from the database
 	$request = $db->query('', '
-		SELECT a.id_attach
+		SELECT a.id_attach, m.id_board, m.id_msg, m.id_topic
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
@@ -2505,6 +2505,40 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
 	$db->free_result($request);
 
 	return $size;
+}
+
+/**
+ * Finds all the attachments of a single message.
+ *
+ * @param int $id_msg
+ * @param bool $unapproved if true returns also the unapproved attachments (default false)
+ *
+ * @todo $unapproved may be superfluous
+ *
+ * @return array
+ */
+function attachmentsOfMessage($id_msg, $unapproved = false)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_attach
+		FROM {db_prefix}attachments
+		WHERE id_msg = {int:id_msg}' . ($unapproved ? '' : '
+			AND approved = {int:is_approved}') . '
+			AND attachment_type = {int:attachment_type}',
+		array(
+			'id_msg' => $id_msg,
+			'is_approved' => 0,
+			'attachment_type' => 0,
+		)
+	);
+	$attachments = array();
+	while ($row = $db->fetch_assoc($request))
+		$attachments[] = $row['id_attach'];
+	$db->free_result($request);
+
+	return $attachments;
 }
 
 /**

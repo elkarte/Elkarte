@@ -1285,3 +1285,36 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 	// Had something to send...
 	return true;
 }
+
+/**
+ * This function finds email address and few other details of the
+ * poster of a certain message.
+ *
+ * @todo very similar to mailFromMesasge
+ *
+ * @param int $id_msg the id of a message
+ * @param int $topic_id the topic the message belongs to
+ * @return array, the poster's details
+ */
+function posterDetails($id_msg, $topic_id)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
+		FROM {db_prefix}messages AS m
+			LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)
+		WHERE m.id_msg = {int:id_msg}
+			AND m.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $topic_id,
+			'id_msg' => $id_msg,
+		)
+	);
+
+	$message = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $message;
+}

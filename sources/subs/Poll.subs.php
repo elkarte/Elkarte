@@ -327,6 +327,44 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
 }
 
 /**
+ * Modify an existing poll
+ *
+ * @param int $id_poll The id of the poll that should be updated
+ * @param string $question The title/question of the poll
+ * @param int $max_votes = 1 The maximum number of votes you can do
+ * @param bool $hide_results = true If the results should be hidden
+ * @param int $expire = 0 The time in days that this poll will expire
+ * @param bool $can_change_vote = false If you can change your vote
+ * @param bool $can_guest_vote = false If guests can vote
+ */
+function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0)
+{
+	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
+
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}polls
+		SET question = {string:question}, change_vote = {int:change_vote},' . (allowedTo('moderate_board') ? '
+			hide_results = {int:hide_results}, expire_time = {int:expire_time}, max_votes = {int:max_votes},
+			guest_vote = {int:guest_vote}' : '
+			hide_results = CASE WHEN expire_time = {int:expire_time_zero} AND {int:hide_results} = 2 THEN 1 ELSE {int:hide_results} END') . '
+		WHERE id_poll = {int:id_poll}',
+		array(
+			'id_poll' => $id_poll,
+			'question' => $question,
+			'max_votes' => $max_votes,
+			'hide_results' => $hide_results,
+			'expire_time' => $expire,
+			'change_vote' => $can_change_vote,
+			'guest_vote' => $can_guest_vote,
+			'expire_time_zero' => 0,
+		)
+	);
+	call_integration_hook('integrate_poll_add_edit', array($id_poll, true));
+}
+
+/**
  * Add options to an already created poll
  *
  * @param int $id_poll The id of the poll you're adding the options to
@@ -350,26 +388,118 @@ function addPollOptions($id_poll, array $options)
 }
 
 /**
+ * Insert some options to an already created poll
+ *
+ * @param array $options An array holding the poll choices
+ */
+function insertPollOptions($options)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}poll_choices',
+		array(
+			'id_poll' => 'int', 'id_choice' => 'int', 'label' => 'string-255', 'votes' => 'int',
+		),
+		$options,
+		array()
+	);
+
+}
+
+/**
+ * Add a single option to an already created poll
+ *
+ * @param array $options An array holding the poll choices
+ */
+function modifyPollOption($options)
+{
+	$db = database();
+
+	foreach ($options as $option)
+		$db->query('', '
+			UPDATE {db_prefix}poll_choices
+			SET label = {string:option_name}
+			WHERE id_poll = {int:id_poll}
+				AND id_choice = {int:id_choice}',
+			array(
+				'id_poll' => $option[0],
+				'id_choice' => $option[1],
+				'option_name' => $option[2],
+			)
+		);
+}
+
+/**
+ * Delete a bunch of options from a poll
+ *
+ * @param int $id_poll The id of the poll you're deleting the options from
+ * @param array $id_options An arrayThe choice id
+ */
+function deletePollOptions($id_poll, $id_options)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_polls
+		WHERE id_poll = {int:id_poll}
+			AND id_choice IN ({array_int:delete_options})',
+		array(
+			'delete_options' => $id_options,
+			'id_poll' => $id_poll,
+		)
+	);
+
+	$db->query('', '
+		DELETE FROM {db_prefix}poll_choices
+		WHERE id_poll = {int:id_poll}
+			AND id_choice IN ({array_int:delete_options})',
+		array(
+			'delete_options' => $id_options,
+			'id_poll' => $id_poll,
+		)
+	);
+}
+
+/**
  * Retrieves the topic and, if different, poll starter
  * for the poll associated with the $id_topic.
  *
  * @param $id_topic
+ * @param $detailed if true returns more info about the starter
  */
-function pollStarters($id_topic)
+function pollStarters($id_topic, $detailed = false)
 {
 	$db = database();
 
-	$pollStarters = array();
-	$request = $db->query('', '
-		SELECT t.id_member_started, p.id_member AS poll_starter
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
-		WHERE t.id_topic = {int:current_topic}
-		LIMIT 1',
-		array(
-			'current_topic' => $id_topic,
-		)
-	);
+	if ($detailed)
+	{
+		$request = $db->query('', '
+			SELECT mem.id_member, m.poster_time, IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_poll
+			FROM {db_prefix}messages AS m
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+				LEFT JOIN {db_prefix}topics as t ON (t.id_first_msg = m.id_msg)
+			WHERE m.id_topic = {int:current_topic}
+			ORDER BY m.id_msg
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+	}
+	else
+	{
+		$request = $db->query('', '
+			SELECT t.id_member_started, p.id_member AS poll_starter
+			FROM {db_prefix}topics AS t
+				INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)
+			WHERE t.id_topic = {int:current_topic}
+			LIMIT 1',
+			array(
+				'current_topic' => $id_topic,
+			)
+		);
+	}
 	if ($db->num_rows($request) != 0)
 		$pollStarters = $db->fetch_row($request);
 	$db->free_result($request);

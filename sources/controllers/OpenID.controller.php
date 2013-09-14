@@ -42,8 +42,6 @@ class OpenID_Controller extends Action_Controller
 		// We'll need our subs.
 		require_once(SUBSDIR . '/OpenID.subs.php');
 
-		$db = database();
-
 		// Is OpenID even enabled?
 		if (empty($modSettings['enableOpenID']))
 			fatal_lang_error('no_access', false);
@@ -101,20 +99,11 @@ class OpenID_Controller extends Action_Controller
 		// Any save fields to restore?
 		$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
 		$context['openid_claimed_id'] = $_GET['openid_claimed_id'];
+
 		// Is there a user with this OpenID_uri?
-		$result = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri
-			FROM {db_prefix}members
-			WHERE openid_uri = {string:openid_uri}',
-			array(
-				'openid_uri' => $context['openid_claimed_id'],
-			)
-		);
+		$member_found = memberByOpenID($context['openid_claimed_id']);
 
-		$member_found = $db->num_rows($result);
-
-		if (!$member_found && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
+		if (empty($member_found) && isset($_GET['sa']) && $_GET['sa'] == 'change_uri' && !empty($_SESSION['new_openid_uri']) && $_SESSION['new_openid_uri'] == $context['openid_claimed_id'])
 		{
 			// Update the member.
 			updateMemberData($user_settings['id_member'], array('openid_uri' => $context['openid_claimed_id']));
@@ -128,7 +117,7 @@ class OpenID_Controller extends Action_Controller
 			// Send them back to profile.
 			redirectexit('action=profile;area=authentication;updated');
 		}
-		elseif (!$member_found)
+		elseif (empty($member_found))
 		{
 			// Store the received openid info for the user when returned to the registration page.
 			$_SESSION['openid'] = array(
@@ -167,8 +156,7 @@ class OpenID_Controller extends Action_Controller
 		}
 		else
 		{
-			$user_settings = $db->fetch_assoc($result);
-			$db->free_result($result);
+			$user_settings = $member_found;
 
 			$user_settings['passwd'] = sha1(strtolower($user_settings['member_name']) . $secret);
 			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);

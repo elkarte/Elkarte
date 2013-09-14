@@ -249,7 +249,7 @@ function displayDebug()
 	ob_clean();
 
 	echo preg_replace('~</body>\s*</html>~', '', $temp), '
-<div class="smalltext" style="text-align: left; margin: 1ex;">
+<div id="debug_logging" class="smalltext" style="text-align: left; margin: 1ex;">
 	', $txt['debug_browser'], $context['browser_body_id'], ' <em>(', implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))), ')</em><br />
 	', $txt['debug_templates'], count($context['debug']['templates']), ': <em>', implode('</em>, <em>', $context['debug']['templates']), '</em>.<br />
 	', $txt['debug_subtemplates'], count($context['debug']['sub_templates']), ': <em>', implode('</em>, <em>', $context['debug']['sub_templates']), '</em>.<br />

@@ -535,7 +535,7 @@ class Post_Controller extends Action_Controller
 
 			// Get the stuff ready for the form.
 			$form_subject = $message['message']['subject'];
-			$form_message = $message['message']['body'];
+			$form_message = un_preparsecode($message['message']['body']);
 
 			censorText($form_message);
 			censorText($form_subject);
@@ -568,13 +568,22 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Are we moving a discussion to its own topic?
-		if (!empty($_REQUEST['followup']))
+		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
 		{
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
+			if (!empty($board))
+			{
+				foreach ($context['categories'] as $id => $values)
+					if (isset($values['boards'][$board]))
+					{
+						$context['categories'][$id]['boards'][$board]['selected'] = true;
+						break;
+					}
+			}
 		}
 
 		$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
@@ -1600,7 +1609,7 @@ class Post_Controller extends Action_Controller
 		// This is a new topic or an already existing one. Save it.
 		else
 		{
-			if (!empty($_REQUEST['followup']))
+			if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
 				$original_post = (int) $_REQUEST['followup'];
 
 			// We also have to fake the board:
@@ -1621,7 +1630,8 @@ class Post_Controller extends Action_Controller
 			if (isset($topicOptions['id']))
 				$topic = $topicOptions['id'];
 
-			require_once(SUBSDIR . '/FollowUps.subs.php');
+			if (!empty($modSettings['enableFollowup']))
+				require_once(SUBSDIR . '/FollowUps.subs.php');
 			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// Time to update the original message with a pointer to the new one

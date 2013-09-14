@@ -294,6 +294,7 @@ $txt['moderators'] = 'Moderators';
 $txt['mark_board_read'] = 'Mark Topics as Read for this Board';
 $txt['views'] = 'Views';
 $txt['new'] = 'New';
+$txt['no_redir'] = 'Redirected from %1$s';
 
 $txt['view_all_members'] = 'View All Members';
 $txt['view'] = 'View';
@@ -480,6 +481,7 @@ $txt['moved_why'] = 'Please enter a brief description as to<br />why this topic 
 $txt['board'] = 'Board';
 $txt['in'] = 'in';
 $txt['sticky_topic'] = 'Sticky Topic';
+$txt['split'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
 
@@ -581,7 +583,7 @@ $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
 
 $txt['merge_to_topic_id'] = 'ID of target topic';
-$txt['split'] = 'Split Topic';
+$txt['split_topic'] = 'Split Topic';
 $txt['merge'] = 'Merge Topics';
 $txt['subject_new_topic'] = 'Subject For New Topic';
 $txt['split_this_post'] = 'Only split this post.';

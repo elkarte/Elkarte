@@ -164,8 +164,6 @@ class Topic_Controller extends Action_Controller
 		global $topic, $txt, $scripturl, $context, $user_info;
 		global $board_info, $modSettings, $settings;
 
-		$db = database();
-
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topic))
 			redirectexit();
@@ -181,83 +179,28 @@ class Topic_Controller extends Action_Controller
 		$context['robot_no_index'] = true;
 
 		// Get the topic starter information.
-		$request = $db->query('', '
-			SELECT mem.id_member, m.poster_time, IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_poll
-			FROM {db_prefix}messages AS m
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				LEFT JOIN {db_prefix}topics as t ON (t.id_first_msg = m.id_msg)
-			WHERE m.id_topic = {int:current_topic}
-			ORDER BY m.id_msg
-			LIMIT 1',
-			array(
-				'current_topic' => $topic,
-			)
-		);
+		$row = pollStarters($topic);
 		// Redirect to the boardindex if no valid topic id is provided.
-		if ($db->num_rows($request) == 0)
+		if (empty($row))
 			redirectexit();
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
 
 		if (!empty($row['id_poll']))
 		{
 			loadLanguage('Post');
+			require_once(SUBSDIR . '/Poll.subs.php');
 
 			// Get the question and if it's locked.
-			$request = $db->query('', '
-				SELECT
-					p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
-					p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name, p.num_guest_voters, p.reset_poll
-				FROM {db_prefix}polls AS p
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = p.id_member)
-				WHERE p.id_poll = {int:id_poll}
-				LIMIT 1',
-				array(
-					'id_poll' => $row['id_poll'],
-				)
-			);
-			$pollinfo = $db->fetch_assoc($request);
-			$db->free_result($request);
-
-			$request = $db->query('', '
-				SELECT COUNT(DISTINCT id_member) AS total
-				FROM {db_prefix}log_polls
-				WHERE id_poll = {int:id_poll}
-					AND id_member != {int:not_guest}',
-				array(
-					'id_poll' => $row['id_poll'],
-					'not_guest' => 0,
-				)
-			);
-			list ($pollinfo['total']) = $db->fetch_row($request);
-			$db->free_result($request);
-
-			// Total voters needs to include guest voters
-			$pollinfo['total'] += $pollinfo['num_guest_voters'];
+			$pollinfo = pollInfo($row['id_poll']);
 
 			// Get all the options, and calculate the total votes.
-			$request = $db->query('', '
-				SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
-				FROM {db_prefix}poll_choices AS pc
-					LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
-				WHERE pc.id_poll = {int:id_poll}',
-				array(
-					'current_member' => $user_info['id'],
-					'id_poll' => $row['id_poll'],
-					'not_guest' => 0,
-				)
-			);
-			$pollOptions = array();
+			$pollOptions = pollOptionsForMember();
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			while ($row = $db->fetch_assoc($request))
+			foreach ($pollOptions as $row)
 			{
-				censorText($row['label']);
-				$pollOptions[$row['id_choice']] = $row;
 				$realtotal += $row['votes'];
 				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
 			}
-			$db->free_result($request);
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
@@ -378,98 +321,16 @@ class Topic_Controller extends Action_Controller
 			$context['parent_boards'][] = $parent['name'];
 
 		// Split the topics up so we can print them.
-		$request = $db->query('', '
-			SELECT subject, poster_time, body, IFNULL(mem.real_name, poster_name) AS poster_name, id_msg
-			FROM {db_prefix}messages AS m
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			WHERE m.id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && !allowedTo('approve_posts') ? '
-				AND (m.approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR m.id_member = {int:current_member}') . ')' : '') . '
-			ORDER BY m.id_msg',
-			array(
-				'current_topic' => $topic,
-				'is_approved' => 1,
-				'current_member' => $user_info['id'],
-			)
-		);
-		$context['posts'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Censor the subject and message.
-			censorText($row['subject']);
-			censorText($row['body']);
+		$context['posts'] = topicMessages($topic);
 
-			$context['posts'][] = array(
-				'subject' => $row['subject'],
-				'member' => $row['poster_name'],
-				'time' => relativeTime($row['poster_time'], false),
-				'timestamp' => forum_time(true, $row['poster_time']),
-				'body' => parse_bbc($row['body'], 'print'),
-				'id_msg' => $row['id_msg'],
-			);
-
-			if (!isset($context['topic_subject']))
-				$context['topic_subject'] = $row['subject'];
-		}
-		$db->free_result($request);
+		if (!isset($context['topic_subject']))
+			$context['topic_subject'] = $context['posts'][count($context['posts']) - 1]['subject'];
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
 		if (isset($_REQUEST['images']) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 		{
-			$messages = array();
-			foreach ($context['posts'] as $temp)
-				$messages[] = $temp['id_msg'];
-
-			// build the request
-			$request = $db->query('', '
-				SELECT
-					a.id_attach, a.id_msg, a.approved, a.width, a.height, a.file_hash, a.filename, a.id_folder, a.mime_type
-				FROM {db_prefix}attachments AS a
-				WHERE a.id_msg IN ({array_int:message_list})
-					AND a.attachment_type = {int:attachment_type}',
-				array(
-					'message_list' => $messages,
-					'attachment_type' => 0,
-					'is_approved' => 1,
-				)
-			);
-			$temp = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$temp[$row['id_attach']] = $row;
-				if (!isset($context['printattach'][$row['id_msg']]))
-					$context['printattach'][$row['id_msg']] = array();
-			}
-			$db->free_result($request);
-			ksort($temp);
-
-			// load them into $context so the template can use them
-			foreach ($temp as $row)
-			{
-				if (!empty($row['width']) && !empty($row['height']))
-				{
-					if (!empty($modSettings['max_image_width']) && (empty($modSettings['max_image_height']) || $row['height'] * ($modSettings['max_image_width'] / $row['width']) <= $modSettings['max_image_height']))
-					{
-						if ($row['width'] > $modSettings['max_image_width'])
-						{
-							$row['height'] = floor($row['height'] * ($modSettings['max_image_width'] / $row['width']));
-							$row['width'] = $modSettings['max_image_width'];
-						}
-					}
-					elseif (!empty($modSettings['max_image_width']))
-					{
-						if ($row['height'] > $modSettings['max_image_height'])
-						{
-							$row['width'] = floor($row['width'] * $modSettings['max_image_height'] / $row['height']);
-							$row['height'] = $modSettings['max_image_height'];
-						}
-					}
-
-					$row['filename'] = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-
-					// save for the template
-					$context['printattach'][$row['id_msg']][] = $row;
-				}
-			}
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$context['printattach'] = messagesAttachments(array_keys($context['posts']));
 		}
 
 		// Set a canonical URL for this page.
