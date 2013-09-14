@@ -94,7 +94,7 @@ class Site_Dispatcher
 			// home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// Reminder: hooks need to account for multiple mods setting this hook.
+				// Reminder: hooks need to account for multiple addons setting this hook.
 				call_integration_hook('integrate_frontpage', array(&$default_action));
 
 				// was it, wasn't it....

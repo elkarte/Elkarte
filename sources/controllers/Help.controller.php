@@ -107,7 +107,7 @@ class Help_Controller extends Action_Controller
 		// Load our template
 		loadTemplate('Help');
 
-		// Allow mods to load their own language file here
+		// Allow addons to load their own language file here.
 	 	call_integration_hook('integrate_quickhelp');
 
 		// Set the page title to something relevant.

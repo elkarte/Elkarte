@@ -140,7 +140,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 
 	foreach ($hooks as $hook => $functions)
 	{
-		$hooks_filters[] = '<option ' . ($context['current_filter'] == $hook ? 'selected="selected" ' : '') . 'onclick="window.location = \'' . $scripturl . '?action=admin;area=modsettings;sa=hooks;filter=' . $hook . '\';">' . $hook . '</option>';
+		$hooks_filters[] = '<option ' . ($context['current_filter'] == $hook ? 'selected="selected" ' : '') . 'onclick="window.location = \'' . $scripturl . '?action=admin;area=addonsettings;sa=hooks;filter=' . $hook . '\';">' . $hook . '</option>';
 		foreach ($functions as $function)
 		{
 			$enabled = strstr($function, ']') === false;
@@ -169,7 +169,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 			hook_name_header.innerHTML += ' . JavaScriptEscape('
 				<select style="margin-left:15px;">
 					<option>---</option>
-					<option onclick="window.location = \'' . $scripturl . '?action=admin;area=modsettings;sa=hooks\';">' . $txt['hooks_reset_filter'] . '</option>' . implode('', $hooks_filters) . '
+					<option onclick="window.location = \'' . $scripturl . '?action=admin;area=addonsettings;sa=hooks\';">' . $txt['hooks_reset_filter'] . '</option>' . implode('', $hooks_filters) . '
 				</select>'). ';', true);
 
 	$temp_data = array();

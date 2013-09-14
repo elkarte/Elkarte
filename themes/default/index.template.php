@@ -112,7 +112,7 @@ function template_html_above()
 		echo '
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />';
 
-	// load in any css from mods or themes so they can overwrite if wanted
+	// load in any css from addons or themes so they can overwrite if wanted
 	template_css();
 
 	// Save some database hits, if a width for multiple wrappers is set in admin.
@@ -171,10 +171,10 @@ function template_html_above()
 		echo '
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
 
-	// load in any javascript files from mods and themes
+	// load in any javascript files from addons and themes
 	template_javascript();
 
-	// Output any remaining HTML headers. (from mods, maybe?)
+	// Output any remaining HTML headers. (from addons, maybe?)
 	echo $context['html_headers'];
 
 	// A little help for our friends

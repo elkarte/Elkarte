@@ -13,8 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * This file is here to make it easier for installed mods to have
- * settings and options.
+ * This controller allows to choose the features activated and disactivate them.
  *
  */
 
@@ -229,7 +228,7 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// ih = Integration Hooks Handling.
 			'ih' => array(
-				'url' => 'action=admin;area=modsettings;sa=hooks',
+				'url' => 'action=admin;area=addonsettings;sa=hooks',
 				'settings' => array(
 					'handlinghooks_enabled' => 1,
 				),

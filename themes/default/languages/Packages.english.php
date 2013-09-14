@@ -26,7 +26,7 @@ $txt['install_mod'] = 'Install Add-on';
 $txt['uninstall_mod'] = 'Uninstall Add-on';
 $txt['sql_file'] = 'The add-on archive has been extracted.  This add-on also comes with a database file containing changes the database needs.  You will need to execute this file for the add-on to function properly.';
 $txt['sql_queries'] = 'SQL Queries';
-$txt['no_mods_installed'] = 'No add-ons currently installed';
+$txt['no_adds_installed'] = 'No add-ons currently installed';
 $txt['browse_installed'] = 'Browse installed add-ons';
 $txt['uninstall'] = 'Uninstall';
 $txt['delete_list'] = 'Delete Add-on List';
@@ -173,7 +173,7 @@ $txt['package_upload'] = 'Upload';
 $txt['package_uploaded_success'] = 'Package uploaded successfully';
 $txt['package_uploaded_successfully'] = 'The package has been uploaded successfully';
 
-$txt['package_modification_malformed'] = 'Malformed or invalid modification file.';
+$txt['package_modification_malformed'] = 'Malformed or invalid add-on file.';
 $txt['package_modification_missing'] = 'The file could not be found.';
 $txt['package_no_zlib'] = 'Sorry, your PHP configuration doesn\'t have support for <strong>zlib</strong>.  Without this, the package manager cannot function.  Please contact your host about this for more information.';
 
@@ -189,7 +189,7 @@ $txt['package_download_by_url'] = 'Download a package by url';
 $txt['package_download_filename'] = 'Name of the file';
 $txt['package_download_filename_info'] = 'Optional value.  Should be used when the url does not end in the filename.  For example: index.php?mod=5';
 
-$txt['package_db_uninstall'] = 'Remove all data associated with this modification.';
+$txt['package_db_uninstall'] = 'Remove all data associated with this add-on.';
 $txt['package_db_uninstall_details'] = 'Details';
 $txt['package_db_uninstall_actions'] = 'Checking this option will result in the following actions';
 $txt['package_db_remove_table'] = 'Drop table &quot;%1$s&quot;';
