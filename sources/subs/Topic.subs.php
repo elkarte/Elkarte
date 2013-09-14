@@ -678,7 +678,7 @@ function moveTopics($topics, $toBoard)
 
 	if (!empty($isSeen) && !$user_info['is_guest'])
 	{
-		require_once(SUBSDIR . '/Boars.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 		markBoardsRead($toBoard);
 	}
 
