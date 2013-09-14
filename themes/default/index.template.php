@@ -359,8 +359,6 @@ function template_body_above()
 			</div>';
 
 	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
-	// News fader is nixed when upper section is collapsed, just to save running the javascript all the time when it is not wanted.
-	// Requires page refresh when upper section is expanded, to show the fader again. I think this is acceptable, but am open to suggestions.
 	if (!empty($context['random_news_line']))
 	{
 		echo '
@@ -660,36 +658,6 @@ function template_show_error($error_id)
 
 	echo '
 					</div>';
-}
-
-/**
- * Allows to select a board
- */
-function template_select_boards($name, $label = '', $extra = '')
-{
-	global $context;
-
-	if (!empty($label))
-		echo '
-	<label for="', $name, '">', $label, ' </label>';
-
-	echo '
-	<select name="', $name, '" id="', $name, '" ', $extra, ' >';
-
-	foreach ($context['categories'] as $category)
-	{
-		echo '
-		<optgroup label="', $category['name'], '">';
-
-		foreach ($category['boards'] as $board)
-			echo '
-			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('==', $board['child_level'] - 1) . '=&gt; ' : '', $board['name'], '</option>';
-		echo '
-		</optgroup>';
-	}
-
-	echo '
-	</select>';
 }
 
 /**

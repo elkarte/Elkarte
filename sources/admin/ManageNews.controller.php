@@ -314,25 +314,43 @@ class ManageNews_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
-		$context['groups'] = array();
 
 		$allgroups = getBasicMembergroupData(array('all'), array(), null, true);
-		$context['groups'] = $allgroups['groups'];
+		$groups = $allgroups['groups'];
 
 		foreach ($allgroups['postgroups'] as $postgroup)
 			$pg[] = $postgroup['id'];
 		foreach ($allgroups['membergroups'] as $membergroup)
 			$mg[] = $membergroup['id'];
 
-		$groups = membersInGroups($pg, $mg, true, true);
+		$mem_groups = membersInGroups($pg, $mg, true, true);
 
-		foreach ($groups as $id_group => $member_count)
+		foreach ($mem_groups as $id_group => $member_count)
 		{
-			if (isset($context['groups'][$id_group]['member_count']))
-				$context['groups'][$id_group]['member_count'] += $member_count;
+			if (isset($groups[$id_group]['member_count']))
+				$groups[$id_group]['member_count'] += $member_count;
 			else
-				$context['groups'][$id_group]['member_count'] = $member_count;
+				$groups[$id_group]['member_count'] = $member_count;
 		}
+
+		foreach ($groups as $group)
+		{
+			$groups[$group['id']]['status'] = 'on';
+			$groups[$group['id']]['is_postgroup'] = in_array($group['id'], $pg);
+		}
+
+		$context['groups'] = array(
+			'select_group' => $txt['admin_newsletters_select_groups'],
+			'member_groups' => $groups,
+		);
+
+		foreach ($groups as $group)
+			$groups[$group['id']]['status'] = 'off';
+
+		$context['exclude_groups'] = array(
+			'select_group' => $txt['admin_newsletters_exclude_groups'],
+			'member_groups' => $groups,
+		);
 
 		$context['can_send_pm'] = allowedTo('pm_send');
 	}
