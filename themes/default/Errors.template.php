@@ -112,7 +112,7 @@ function template_error_log()
 					<td class="centertext" colspan="2">', $txt['errlog_no_entries'], '</td>
 				</tr>';
 
-	// we have some errors, must be some mods installed :P
+	// we have some errors, show them...
 	foreach ($context['errors'] as $error)
 	{
 		echo '
