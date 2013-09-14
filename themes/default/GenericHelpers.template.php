@@ -8,6 +8,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Renders a collapsible list of groups
+ */
 function template_list_groups_collapsible($group = 'default_groups_list')
 {
 	global $context, $txt;
@@ -50,3 +53,32 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 		// ]]></script>';
 }
 
+/**
+ * Dropdown usable to select a board
+ */
+function template_select_boards($name, $label = '', $extra = '')
+{
+	global $context;
+
+	if (!empty($label))
+		echo '
+	<label for="', $name, '">', $label, ' </label>';
+
+	echo '
+	<select name="', $name, '" id="', $name, '" ', $extra, ' >';
+
+	foreach ($context['categories'] as $category)
+	{
+		echo '
+		<optgroup label="', $category['name'], '">';
+
+		foreach ($category['boards'] as $board)
+			echo '
+			<option value="', $board['id'], '"', !empty($board['selected']) ? ' selected="selected"' : '', !empty($context['current_board']) && $board['id'] == $context['current_board'] && $context['boards_current_disabled'] ? ' disabled="disabled"' : '', '>', $board['child_level'] > 0 ? str_repeat('==', $board['child_level'] - 1) . '=&gt; ' : '', $board['name'], '</option>';
+		echo '
+		</optgroup>';
+	}
+
+	echo '
+	</select>';
+}

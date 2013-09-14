@@ -14,6 +14,11 @@
  * @version 1.0 Alpha
  */
 
+function template_Post_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * The main template for the post page.
  */

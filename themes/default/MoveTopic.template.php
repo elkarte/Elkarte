@@ -14,6 +14,11 @@
  * @version 1.0 Alpha
  */
 
+function template_Move_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * Show an interface for selecting which board to move a post to.
  */
