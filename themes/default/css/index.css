@@ -4118,6 +4118,7 @@ dl.merge_topic dd {
 	}
 	.lastpost_link {
 		font-size: 1.1em;
+		display: block;
 	}
 	.recentboard, .recentposter {
 		display: none;
