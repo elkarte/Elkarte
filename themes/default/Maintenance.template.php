@@ -14,6 +14,11 @@
  * @version 1.0 Alpha
  */
 
+function template_Maintenance_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * Template for the database maintenance tasks.
  */

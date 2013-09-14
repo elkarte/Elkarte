@@ -14,6 +14,11 @@
  * @version 1.0 Alpha
  */
 
+function template_ManageSmileys_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * Editing the smiley sets.
  */

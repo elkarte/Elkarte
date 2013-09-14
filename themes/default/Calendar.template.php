@@ -14,6 +14,11 @@
  * @version 1.0 Alpha
  */
 
+function template_Calendar_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * The main calendar - January, for example.
  */
