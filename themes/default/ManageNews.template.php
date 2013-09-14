@@ -16,7 +16,7 @@
 
 function template_ManageNews_init()
 {
-	loadtemplate('Helpers');
+	loadtemplate('GenericHelpers');
 }
 /**
  * Template for the email to members page in admin panel.
