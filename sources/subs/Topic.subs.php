@@ -371,7 +371,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	require_once(SUBSDIR . '/FollowUps.subs.php');
 	removeFollowUpsByTopic($topics);
 
-	// Maybe there's an add-on that wants to delete topic related data of its own
+	// Maybe there's an addon that wants to delete topic related data of its own
 	call_integration_hook('integrate_remove_topics', array($topics));
 
 	// Update the totals...

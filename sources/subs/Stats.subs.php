@@ -10,7 +10,7 @@
  * This file is holds low-level database work used by the Stats.
  * Some functions/queries (or all :P) might be duplicate, along Elk.
  * They'll be here to avoid including many files in action_stats, and
- * perhaps for use of add-ons in a similar way they were using some
+ * perhaps for use of addons in a similar way they were using some
  * SSI functions.
  * The purpose of this file is experimental and might be deprecated in
  * favor of a better solution.

@@ -409,7 +409,7 @@ class Browser_Detector
 
 	/**
 	 * Fill out the historical array
-	 *  - needed to support old add-ons that don't use isBrowser
+	 *  - needed to support old addons that don't use isBrowser
 	 */
 	private function _fillInformation()
 	{

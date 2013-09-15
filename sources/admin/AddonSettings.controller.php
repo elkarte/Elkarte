@@ -30,7 +30,7 @@ class AddonSettings_Controller extends Action_Controller
 	protected $_addonSettings;
 
 	/**
-	 * This, my friend, is for all the authors of add-ons out there.
+	 * This, my friend, is for all the authors of addons out there.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -115,7 +115,7 @@ class AddonSettings_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize the customSettings form with any custom admin settings for or from add-ons.
+	 * Initialize the customSettings form with any custom admin settings for or from addons.
 	 */
 	public function _initAddonSettingsForm()
 	{
@@ -146,7 +146,7 @@ class AddonSettings_Controller extends Action_Controller
 	}
 
 	/**
-	 * Retrieve any custom admin settings for or from add-ons.
+	 * Retrieve any custom admin settings for or from addons.
 	 * This method is used by admin search.
 	 * @deprecated
 	 */
