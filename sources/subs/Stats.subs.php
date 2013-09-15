@@ -572,9 +572,9 @@ function topTimeOnline()
 }
 
 /**
- * Loads the montly statistics in $context.
+ * Loads the monthly statistics in $context.
  */
-function montlyActivity()
+function monthlyActivity()
 {
 	global $context, $scripturl, $txt;
 
