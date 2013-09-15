@@ -684,6 +684,14 @@ function isFirstLogin($id_member)
 	return !empty($member) && $member['last_login'] == 0;
 }
 
+/**
+ * Search for a member by given criterias
+ * 
+ * @param string $where
+ * @param string $where_params
+ * @param bool $fatal
+ * @return boolean
+ */
 function findUser($where, $where_params, $fatal = true)
 {
 	$db = database();
@@ -726,6 +734,12 @@ function findUser($where, $where_params, $fatal = true)
 	return $member;
 }
 
+/**
+ * Find users by their email address.
+ *
+ * @param string $email
+ * @return int
+ */
 function userByEmail($email)
 {
 	$db = database();
