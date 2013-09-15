@@ -7,7 +7,7 @@ $txt['modSettings_desc'] = 'This page allows you to change the settings of featu
 $txt['security_settings_desc'] = 'This page allows you to set options specifically related to the security and moderation of your forum, including anti-spam options.';
 $txt['modification_settings_desc'] = 'This page contains settings added by any modifications to your forum';
 
-$txt['modification_no_misc_settings'] = 'There are no add-ons installed that have added any settings to this area yet.';
+$txt['modification_no_misc_settings'] = 'There are no addons installed that have added any settings to this area yet.';
 
 $txt['pollMode'] = 'Poll mode';
 $txt['disable_polls'] = 'Disable polls';
@@ -369,7 +369,7 @@ $txt['core_settings_item_dr_desc'] = 'Enabling this feature will allow users to 
 $txt['core_settings_item_cp'] = 'Advanced Profile Fields';
 $txt['core_settings_item_cp_desc'] = 'This enables you to hide standard profile fields, add profile fields to registration, and create new profile fields for your forum.';
 $txt['core_settings_item_ih'] = 'Integration Hooks Management';
-$txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disable any integration hooks added by add-ons. Changing hooks can prevent your forum from working properly, so use this feature only if you know what you are doing.';
+$txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disable any integration hooks added by addons. Changing hooks can prevent your forum from working properly, so use this feature only if you know what you are doing.';
 $txt['core_settings_item_k'] = 'Karma';
 $txt['core_settings_item_k_desc'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can \'applaud\' or \'smite\' other members, which is how their popularity is calculated.';
 $txt['core_settings_item_pe'] = 'Post by Email Management';

@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * This class is the administration package manager controller.
  * Its main job is to install/uninstall, allow to browse, packages and package servers.
- * In fact, just about everything related to add-on packages, including FTP connections when necessary.
+ * In fact, just about everything related to addon packages, including FTP connections when necessary.
  */
 class Packages_Controller extends Action_Controller
 {

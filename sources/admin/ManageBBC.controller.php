@@ -85,7 +85,7 @@ class ManageBBC_Controller extends Action_Controller
 			// Work out what is actually disabled!
 			$_POST['disabledBBC'] = implode(',', array_diff($bbcTags, $_POST['disabledBBC_enabledTags']));
 
-			// notify add-ons and integrations
+			// notify addons and integrations
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// save the result

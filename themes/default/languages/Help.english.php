@@ -106,7 +106,7 @@ $helptxt['securitysettings'] = '<strong>Security and Moderation</strong><br />
 	This section contains settings relating to the security and moderation of your forum.';
 
 $helptxt['addonsettings'] = '<strong>Add-Ons Settings</strong><br />
-	This section should contain any settings added by add-ons installed on your forum.';
+	This section should contain any settings added by addons installed on your forum.';
 
 $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	You have the power to adjust how the time and date look for yourself. There are a lot of little letters, but it\'s quite simple.

@@ -78,7 +78,7 @@ class ManageTopics_Controller extends Action_Controller
 			// Security checks
 			checkSession();
 
-			// Notify add-ons and integrations of the settings change.
+			// Notify addons and integrations of the settings change.
 			call_integration_hook('integrate_save_topic_settings', array(&$config_vars));
 
 			// Save the result!
