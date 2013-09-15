@@ -2620,6 +2620,13 @@ function detectServer()
 	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
 }
 
+/**
+ * Do some important security checks:
+ * - checks the existence of critical files e.g. install.php
+ * - checks for an active admin session.
+ * - checks cache directory is writable.
+ * - calls secureDirectory to protect attachments & cache. 
+ */
 function doSecurityChecks()
 {
 	global $modSettings, $context;
