@@ -14,6 +14,11 @@
  * @version 1.0 Alpha
  */
 
+function template_SplitTopics_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * Show an interface to ask the user the options for split topics.
  */

@@ -14,6 +14,10 @@
  * @version 1.0 Alpha
  */
 
+function template_ManageNews_init()
+{
+	loadtemplate('GenericHelpers');
+}
 /**
  * Template for the email to members page in admin panel.
  * It allows to select members and membergroups.
@@ -31,6 +35,11 @@ function template_email_members()
 			<div class="information">
 				', $txt['admin_news_select_recipients'], '
 			</div>
+			<div id="include_panel_header" class="cat_bar">
+				<h3 class="catbg">
+					', $txt['include_these'], '
+				</h3>
+			</div>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -40,31 +49,10 @@ function template_email_members()
 						</dt>
 						<dd>';
 
-	foreach ($context['groups'] as $group)
-		echo '
-							<label for="groups_', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups_', $group['id'], '" value="', $group['id'], '" checked="checked" class="input_check" /> ', $group['name'], '</label> <em>(', $group['member_count'], ')</em><br />';
-
-	echo '
-							<br />
-							<label for="checkAllGroups"><input type="checkbox" id="checkAllGroups" checked="checked" onclick="invertAll(this, this.form, \'groups\');" class="input_check" /> <em>', $txt['check_all'], '</em></label>';
+	template_list_groups_collapsible('groups');
 
 	echo '
 						</dd>
-					</dl>
-				</div>
-			</div>
-			<br />
-
-			<div id="advanced_panel_header" class="cat_bar">
-				<h3 class="catbg">
-					<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
-					<a href="#" id="advanced_panel_link" >', $txt['advanced'], '</a>
-				</h3>
-			</div>
-
-			<div id="advanced_panel_div" class="windowbg2"', empty($context['admin_preferences']['apn']) ? '' : ' style="display: none;"', '>
-				<div class="content">
-					<dl class="settings">
 						<dt>
 							<strong>', $txt['admin_news_select_email'], ':</strong><br />
 							<span class="smalltext">', $txt['admin_news_select_email_desc'], '</span>
@@ -84,19 +72,33 @@ function template_email_members()
 					<hr class="bordercolor" />
 					<dl class="settings">
 						<dt>
+							<label for="email_force"><strong>', $txt['admin_news_select_override_notify'], ':</strong></label><br />
+							<span class="smalltext">', $txt['email_force'], '</span>
+						</dt>
+						<dd>
+							<input type="checkbox" name="email_force" id="email_force" value="1" class="input_check" />
+						</dd>
+					</dl>
+				</div>
+			</div>
+			<div id="exclude_panel_header" class="cat_bar">
+				<h3 class="catbg">
+					<img id="exclude_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
+					<a href="#" id="exclude_panel_link" >', $txt['exclude_these'], '</a>
+				</h3>
+			</div>
+			<div id="exclude_panel_div" class="windowbg">
+				<div class="content">
+					<dl class="settings">
+						<dt>
 							<strong>', $txt['admin_news_select_excluded_groups'], ':</strong><br />
 							<span class="smalltext">', $txt['admin_news_select_excluded_groups_desc'], '</span>
 						</dt>
 						<dd>';
 
-	foreach ($context['groups'] as $group)
-		echo '
-							<label for="exclude_groups_', $group['id'], '"><input type="checkbox" name="exclude_groups[', $group['id'], ']" id="exclude_groups_', $group['id'], '" value="', $group['id'], '" class="input_check" /> ', $group['name'], '</label> <em>(', $group['member_count'], ')</em><br />';
+	template_list_groups_collapsible('exclude_groups');
 
 	echo '
-							<br />
-							<label for="checkAllGroupsExclude"><input type="checkbox" id="checkAllGroupsExclude" onclick="invertAll(this, this.form, \'exclude_groups\');" class="input_check" /> <em>', $txt['check_all'], '</em></label><br />
-						</dd>
 						<dt>
 							<strong>', $txt['admin_news_select_excluded_members'], ':</strong><br />
 							<span class="smalltext">', $txt['admin_news_select_excluded_members_desc'], '</span>
@@ -104,16 +106,6 @@ function template_email_members()
 						<dd>
 							<input type="text" name="exclude_members" id="exclude_members" value="" size="30" class="input_text" />
 							<span id="exclude_members_container"></span>
-						</dd>
-					</dl>
-					<hr class="bordercolor" />
-					<dl class="settings">
-						<dt>
-							<label for="email_force"><strong>', $txt['admin_news_select_override_notify'], ':</strong></label><br />
-							<span class="smalltext">', $txt['email_force'], '</span>
-						</dt>
-						<dd>
-							<input type="checkbox" name="email_force" id="email_force" value="1" class="input_check" />
 						</dd>
 					</dl>
 				</div>
@@ -132,11 +124,11 @@ function template_email_members()
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['apn']) ? 'false' : 'true', ',
 			aSwappableContainers: [
-				\'advanced_panel_div\'
+				\'exclude_panel_div\'
 			],
 			aSwapImages: [
 				{
-					sId: \'advanced_panel_toggle\',
+					sId: \'exclude_panel_toggle\',
 					srcExpanded: elk_images_url + \'/collapse.png\',
 					altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
 					srcCollapsed: elk_images_url + \'/expand.png\',
@@ -145,9 +137,9 @@ function template_email_members()
 			],
 			aSwapLinks: [
 				{
-					sId: \'advanced_panel_link\',
-					msgExpanded: ', JavaScriptEscape($txt['advanced']), ',
-					msgCollapsed: ', JavaScriptEscape($txt['advanced']), '
+					sId: \'exclude_panel_link\',
+					msgExpanded: ', JavaScriptEscape($txt['exclude_these']), ',
+					msgCollapsed: ', JavaScriptEscape($txt['exclude_these']), '
 				}
 			],
 			oThemeOptions: {
