@@ -88,7 +88,7 @@ while (!$is_done)
 		$file_hash = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], true);
 
 		// And we try to move it.
-		rename($old_location, $current_folder . '/' . $row['id_attach'] . '_' . $file_hash);
+		rename($old_location, $current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk');
 
 		// Only update thif if it was successful.
 		if (file_exists($current_folder . '/' . $row['id_attach'] . '_' . $file_hash) && !file_exists($old_location))
