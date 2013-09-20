@@ -1654,6 +1654,12 @@ function retrieveMemberData($conditions)
 				AND id_member IN ({array_int:members})',
 		'member_greater' => '
 				AND id_member > {int:member_greater}',
+		'member_greater_equal' => '
+				AND id_member >= {int:member_greater_equal}',
+		'member_lesser' => '
+				AND id_member < {int:member_lesser}',
+		'member_lesser_equal' => '
+				AND id_member <= {int:member_lesser_equal}',
 		'group_list' => '
 				AND (id_group IN ({array_int:group_list}) OR id_post_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:additional_group_list}, additional_groups) != 0)',
 		'notify_announcements' => '

@@ -821,30 +821,12 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 	// Get the lowest ID we're interested in.
 	$member_id = mt_rand(1, $modSettings['latestMember']);
 
-	$where_query = '
-		id_member >= {int:selected_member}
-		AND is_activated = {int:is_activated}';
-
-	$query_where_params = array(
-		'selected_member' => $member_id,
-		'is_activated' => 1,
-	);
-
-	$result = ssi_queryMembers($where_query, $query_where_params, 1, 'id_member ASC', $output_method);
+	$result = ssi_queryMembers('member_greater_equal', $member_id, 1, 'id_member ASC', $output_method);
 
 	// If we got nothing do the reverse - in case of unactivated members.
 	if (empty($result))
 	{
-		$where_query = '
-			id_member <= {int:selected_member}
-			AND is_activated = {int:is_activated}';
-
-		$query_where_params = array(
-			'selected_member' => $member_id,
-			'is_activated' => 1,
-		);
-
-		$result = ssi_queryMembers($where_query, $query_where_params, 1, 'id_member DESC', $output_method);
+		$result = ssi_queryMembers('member_lesser_equal', $member_id, 1, 'id_member DESC', $output_method);
 	}
 
 	// Just to be sure put the random generator back to something... random.
@@ -868,16 +850,8 @@ function ssi_fetchMember($member_ids = array(), $output_method = 'echo')
 	// Can have more than one member if you really want...
 	$member_ids = is_array($member_ids) ? $member_ids : array($member_ids);
 
-	// Restrict it right!
-	$query_where = '
-		id_member IN ({array_int:member_list})';
-
-	$query_where_params = array(
-		'member_list' => $member_ids,
-	);
-
 	// Then make the query and dump the data.
-	return ssi_queryMembers($query_where, $query_where_params, '', 'id_member', $output_method);
+	return ssi_queryMembers('members', $member_ids, '', 'id_member', $output_method);
 }
 
 /**
@@ -891,16 +865,7 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
 	if ($group_id === null)
 		return;
 
-	$query_where = '
-		id_group = {int:id_group}
-		OR id_post_group = {int:id_group}
-		OR FIND_IN_SET({int:id_group}, additional_groups)';
-
-	$query_where_params = array(
-		'id_group' => $group_id,
-	);
-
-	return ssi_queryMembers($query_where, $query_where_params, '', 'real_name', $output_method);
+	return ssi_queryMembers('group_list', is_array($group_id) ? $group_id : array($group_id), '', 'real_name', $output_method);
 }
 
 /**
@@ -919,20 +884,15 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	if ($query_where === null)
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Members.subs.php');
+	$members_data = retrieveMemberData(array(
+		$query_where => $query_where_params,
+		'limit' => !empty($query_limit) ? (int) $query_limit : 10,
+		'order_by' => $query_order,
+	));
 
-	// Fetch the members in question.
-	$request = $db->query('', '
-		SELECT id_member
-		FROM {db_prefix}members
-		WHERE ' . $query_where . '
-		ORDER BY ' . $query_order . '
-		' . ($query_limit == '' ? '' : 'LIMIT ' . $query_limit),
-		array_merge($query_where_params, array(
-		))
-	);
 	$members = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($members_data as $row)
 		$members[] = $row['id_member'];
 	$db->free_result($request);
 
