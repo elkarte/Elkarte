@@ -313,6 +313,8 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
 /**
  * Recent post list:
  *  [board] Subject by Poster	Date
+ * 
+ * @todo this may use getLastPosts with some modification
  *
  * @param int $num_recent
  * @param array $exclude_boards
@@ -365,6 +367,8 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
  * Fetch a post with a particular ID.
  * By default will only show if you have permission
  *  to the see the board in question - this can be overriden.
+ * 
+ * @todo this may use getRecentPosts with some modification
  *
  * @param array $post_ids
  * @param bool $override_permissions
@@ -397,6 +401,8 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
 /**
  * This removes code duplication in other queries
  *  - don't call it direct unless you really know what you're up to.
+ * 
+ * @todo if ssi_recentPosts and ssi_fetchPosts will use Recent.subs.php this can be removed
  *
  * @param string $query_where
  * @param array $query_where_params
@@ -650,37 +656,16 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
  */
 function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 {
-	global $scripturl;
-
-	$db = database();
-
-	// Find the latest poster.
-	$request = $db->query('', '
-		SELECT id_member, real_name, posts
-		FROM {db_prefix}members
-		ORDER BY posts DESC
-		LIMIT ' . $topNumber,
-		array(
-		)
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-		$return[] = array(
-			'id' => $row['id_member'],
-			'name' => $row['real_name'],
-			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'posts' => $row['posts']
-		);
-	$db->free_result($request);
+	require_once(SUBSDIR . '/Stats.subs.php');
+	$top_posters = topPosters($topNumber);
 
 	// Just return all the top posters.
 	if ($output_method != 'echo')
-		return $return;
+		return $top_posters;
 
 	// Make a quick array to list the links in.
 	$temp_array = array();
-	foreach ($return as $member)
+	foreach ($top_posters as $member)
 		$temp_array[] = $member['link'];
 
 	echo implode(', ', $temp_array);
@@ -696,36 +681,13 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 {
 	global $txt, $scripturl, $user_info, $modSettings;
 
-	$db = database();
+	require_once(SUBSDIR . '/Stats.subs.php');
 
 	// Find boards with lots of posts.
-	$request = $db->query('', '
-		SELECT
-			b.name, b.num_topics, b.num_posts, b.id_board,' . (!$user_info['is_guest'] ? ' 1 AS is_read' : '
-			(IFNULL(lb.id_msg, 0) >= b.id_last_msg) AS is_read') . '
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_board}' : '') . '
-		ORDER BY b.num_posts DESC
-		LIMIT ' . $num_top,
-		array(
-			'current_member' => $user_info['id'],
-			'recycle_board' => (int) $modSettings['recycle_board'],
-		)
-	);
-	$boards = array();
-	while ($row = $db->fetch_assoc($request))
-		$boards[] = array(
-			'id' => $row['id_board'],
-			'num_posts' => $row['num_posts'],
-			'num_topics' => $row['num_topics'],
-			'name' => $row['name'],
-			'new' => empty($row['is_read']),
-			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>'
-		);
-	$db->free_result($request);
+	$boards = topBoards($num_top);
+
+	foreach ($boards as $id => $board)
+		$boards[$id]['new'] = empty($board['is_read']);
 
 	// If we shouldn't output or have nothing to output, just jump out.
 	if ($output_method != 'echo' || empty($boards))
@@ -760,64 +722,22 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 {
 	global $txt, $scripturl, $modSettings;
 
-	$db = database();
+	require_once(SUBSDIR . '/Stats.subs.php');
 
-	if ($modSettings['totalMessages'] > 100000)
-	{
-		// @todo Why don't we use {query(_wanna)_see_board}?
-		$request = $db->query('', '
-			SELECT id_topic
-			FROM {db_prefix}topics
-			WHERE num_' . ($type != 'replies' ? 'views' : 'replies') . ' != 0' . ($modSettings['postmod_active'] ? '
-				AND approved = {int:is_approved}' : '') . '
-			ORDER BY num_' . ($type != 'replies' ? 'views' : 'replies') . ' DESC
-			LIMIT {int:limit}',
-			array(
-				'is_approved' => 1,
-				'limit' => $num_topics > 100 ? ($num_topics + ($num_topics / 2)) : 100,
-			)
-		);
-		$topic_ids = array();
-		while ($row = $db->fetch_assoc($request))
-			$topic_ids[] = $row['id_topic'];
-		$db->free_result($request);
-	}
+	if (function_exists('topTopic' . ucfirst($type)))
+		$function = 'topTopic' . ucfirst($type);
 	else
-		$topic_ids = array();
+		$function = 'topTopicReplies';
 
-	$request = $db->query('', '
-		SELECT m.subject, m.id_topic, t.num_views, t.num_replies
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE {query_wanna_see_board}' . ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '') . (!empty($topic_ids) ? '
-			AND t.id_topic IN ({array_int:topic_list})' : '') . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_enable}' : '') . '
-		ORDER BY t.num_' . ($type != 'replies' ? 'views' : 'replies') . ' DESC
-		LIMIT {int:limit}',
-		array(
-			'topic_list' => $topic_ids,
-			'is_approved' => 1,
-			'recycle_enable' => $modSettings['recycle_board'],
-			'limit' => $num_topics,
-		)
-	);
-	$topics = array();
-	while ($row = $db->fetch_assoc($request))
+	$topics = $function($num_topics);
+
+	foreach ($topics as $topic_id => $row)
 	{
 		censorText($row['subject']);
 
-		$topics[] = array(
-			'id' => $row['id_topic'],
-			'subject' => $row['subject'],
-			'num_replies' => $row['num_replies'],
-			'num_views' => $row['num_views'],
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
-		);
+		$topics[$topic_id]['href'] = $scripturl . '?topic=' . $row['id'] . '.0';
+		$topics[$topic_id]['link'] = '<a href="' . $scripturl . '?topic=' . $row['id'] . '.0">' . $row['subject'] . '</a>';
 	}
-	$db->free_result($request);
 
 	if ($output_method != 'echo' || empty($topics))
 		return $topics;
