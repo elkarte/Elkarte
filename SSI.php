@@ -1730,7 +1730,7 @@ function ssi_todaysCalendar($output_method = 'echo')
  * @param int $length
  * @param string $output_method = 'echo'
  */
-function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $output_method = 'echo')
+function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $preview = 'first', $output_method = 'echo')
 {
 	global $scripturl, $txt, $settings, $modSettings;
 
@@ -1755,7 +1755,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$board = (int) $_GET['board'];
 
 	if ($length === null)
-		$length = isset($_GET['length']) ? (int) $_GET['length'] : 0;
+		$length = isset($_GET['length']) ? (int) $_GET['length'] : 500;
 	else
 		$length = (int) $length;
 
@@ -1789,65 +1789,27 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	foreach ($stable_icons as $icon)
 		$icon_sources[$icon] = 'images_url';
 
-	// Find the post ids.
-	$request = $db->query('', '
-		SELECT t.id_first_msg
-		FROM {db_prefix}topics as t
-		LEFT JOIN {db_prefix}boards as b ON (b.id_board = t.id_board)
-		WHERE t.id_board = {int:current_board}' . ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '') . '
-			AND {query_see_board}
-		ORDER BY t.id_first_msg DESC
-		LIMIT ' . $start . ', ' . $limit,
-		array(
-			'current_board' => $board,
-			'is_approved' => 1,
-		)
-	);
-	$posts = array();
-	while ($row = $db->fetch_assoc($request))
-		$posts[] = $row['id_first_msg'];
-	$db->free_result($request);
-
-	if (empty($posts))
-		return array();
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
 
 	// Find the posts.
-	$request = $db->query('', '
-		SELECT
-			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
-			t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, t.id_last_msg
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE t.id_first_msg IN ({array_int:post_list})
-		ORDER BY t.id_first_msg DESC
-		LIMIT ' . count($posts),
-		array(
-			'post_list' => $posts,
-		)
-	);
+	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', array('only_approved' => true, 'include_sticky' => false, 'ascending' => false, 'include_avatars' => false, 'previews' => $length));
+
+	if (empty($request))
+		return;
+
 	$return = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($request as $row)
 	{
-		// If we want to limit the length of the post.
-		if (!empty($length) && Util::strlen($row['body']) > $length)
-		{
-			$row['body'] = Util::substr($row['body'], 0, $length);
-			$cutoff = false;
+		if (!isset($row[$preview . '_body']))
+			$preview = 'first';
 
-			$last_space = strrpos($row['body'], ' ');
-			$last_open = strrpos($row['body'], '<');
-			$last_close = strrpos($row['body'], '>');
-			if (empty($last_space) || ($last_space == $last_open + 3 && (empty($last_close) || (!empty($last_close) && $last_close < $last_open))) || $last_space < $last_open || $last_open == $length - 6)
-				$cutoff = $last_open;
-			elseif (empty($last_close) || $last_close < $last_open)
-				$cutoff = $last_space;
-
-			if ($cutoff !== false)
-				$row['body'] = Util::substr($row['body'], 0, $cutoff);
-			$row['body'] .= '...';
-		}
+		$row['body'] = $row[$preview . '_body'];
+		$row['id_msg'] = $row['id_' . $preview . '_msg'];
+		$row['icon'] = $row[$preview . '_icon'];
+		$row['id_member'] = $row[$preview . '_id_member'];
+		$row['smileys_enabled'] = $row[$preview . '_smileys'];
+		$row['poster_time'] = $row[$preview . '_poster_time'];
+		$row['poster_name'] = $row[$preview . '_member_name'];
 
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -1882,10 +1844,6 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'is_last' => false
 		);
 	}
-	$db->free_result($request);
-
-	if (empty($return))
-		return $return;
 
 	$return[count($return) - 1]['is_last'] = true;
 
