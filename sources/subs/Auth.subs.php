@@ -774,46 +774,64 @@ function generateValidationCode()
  * name or email.
  *
  * @param string $name
+ * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
  *
  * @return mixed, array or false if nothing is found
  */
-function loadExistingMember($name)
+function loadExistingMember($name, $is_id = false)
 {
 	$db = database();
 
-	// Try to find the user, assuming a member_name was passed...
-	$request = $db->query('', '
-		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-			openid_uri, passwd_flood
-		FROM {db_prefix}members
-		WHERE ' . ($db->db_case_sensitive() ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
-		LIMIT 1',
-		array(
-			'user_name' => $db->db_case_sensitive() ? strtolower($name) : $name,
-		)
-	);
-	// Didn't work. Try it as an email address.
-	if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
+	if ($is_id)
 	{
-		$db->free_result($request);
-
 		$request = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
-			passwd_flood
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+				openid_uri, passwd_flood
 			FROM {db_prefix}members
-			WHERE email_address = {string:user_name}
+			WHERE id_member = {int:id_member}') . '
 			LIMIT 1',
 			array(
-				'user_name' => $name,
+				'id_member' => (int) $name,
 			)
 		);
+	}
+	else
+	{
+		// Try to find the user, assuming a member_name was passed...
+		$request = $db->query('', '
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+				openid_uri, passwd_flood
+			FROM {db_prefix}members
+			WHERE ' . ($db->db_case_sensitive() ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
+			LIMIT 1',
+			array(
+				'user_name' => $db->db_case_sensitive() ? strtolower($name) : $name,
+			)
+		);
+		// Didn't work. Try it as an email address.
+		if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
+		{
+			$db->free_result($request);
+
+			$request = $db->query('', '
+				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
+				passwd_flood
+				FROM {db_prefix}members
+				WHERE email_address = {string:user_name}
+				LIMIT 1',
+				array(
+					'user_name' => $name,
+				)
+			);
+		}
 	}
 
 	// Nothing? Ah the horror...
 	if ($db->num_rows($request) == 0)
-		return false;
+		$user_settings = false;
+	else
+		$user_settings = $db->fetch_assoc($request);
 
-	$user_settings = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $user_settings;
