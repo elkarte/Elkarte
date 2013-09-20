@@ -1882,62 +1882,28 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Calendar.subs.php');
 
 	// Find all events which are happening in the near future that the member can see.
-	$request = $db->query('', '
-		SELECT
-			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, cal.id_topic,
-			cal.id_board, t.id_first_msg, t.approved
-		FROM {db_prefix}calendar AS cal
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = cal.id_board)
-			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = cal.id_topic)
-		WHERE cal.start_date <= {date:current_date}
-			AND cal.end_date >= {date:current_date}
-			AND (cal.id_board = {int:no_board} OR {query_wanna_see_board})
-		ORDER BY cal.start_date DESC
-		LIMIT ' . $max_events,
-		array(
-			'current_date' => strftime('%Y-%m-%d', forum_time(false)),
-			'no_board' => 0,
-		)
-	);
+	$date = strftime('%Y-%m-%d', forum_time(false));
+	$events = getEventRange($date, $date, true, $max_events);
+
 	$return = array();
 	$duplicates = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($events as $date => $day_events)
 	{
-		// Check if we've already come by an event linked to this same topic with the same title... and don't display it if we have.
-		if (!empty($duplicates[$row['title'] . $row['id_topic']]))
-			continue;
+		foreach ($day_events as $row)
+		{
+			// Check if we've already come by an event linked to this same topic with the same title... and don't display it if we have.
+			if (!empty($duplicates[$row['title'] . $row['id_topic']]))
+				continue;
 
-		// Censor the title.
-		censorText($row['title']);
+			$return[$date][] = $row;
 
-		if ($row['start_date'] < strftime('%Y-%m-%d', forum_time(false)))
-			$date = strftime('%Y-%m-%d', forum_time(false));
-		else
-			$date = $row['start_date'];
-
-		// If the topic it is attached to is not approved then don't link it.
-		if (!empty($row['id_first_msg']) && !$row['approved'])
-			$row['id_board'] = $row['id_topic'] = $row['id_first_msg'] = 0;
-
-		$return[$date][] = array(
-			'id' => $row['id_event'],
-			'title' => $row['title'],
-			'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-			'modify_href' => $scripturl . '?action=' . ($row['id_board'] == 0 ? 'calendar;sa=post;' : 'post;msg=' . $row['id_first_msg'] . ';topic=' . $row['id_topic'] . '.0;calendar;') . 'eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'href' => $row['id_board'] == 0 ? '' : $scripturl . '?topic=' . $row['id_topic'] . '.0',
-			'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['title'] . '</a>',
-			'start_date' => $row['start_date'],
-			'end_date' => $row['end_date'],
-			'is_last' => false
-		);
-
-		// Let's not show this one again, huh?
-		$duplicates[$row['title'] . $row['id_topic']] = true;
+			// Let's not show this one again, huh?
+			$duplicates[$row['title'] . $row['id_topic']] = true;
+		}
 	}
-	$db->free_result($request);
 
 	foreach ($return as $mday => $array)
 		$return[$mday][count($array) - 1]['is_last'] = true;
