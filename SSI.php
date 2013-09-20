@@ -950,31 +950,16 @@ function ssi_boardStats($output_method = 'echo')
 	if (!allowedTo('view_stats'))
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Boards.subs.php');
+	require_once(SUBSDIR . '/Stats.subs.php');
 
 	$totals = array(
 		'members' => $modSettings['totalMembers'],
 		'posts' => $modSettings['totalMessages'],
-		'topics' => $modSettings['totalTopics']
+		'topics' => $modSettings['totalTopics'],
+		'boards' => fetchBoardsInfo('all', array('count' => true)),
+		'categories' => numCategories(),
 	);
-
-	$result = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}boards',
-		array(
-		)
-	);
-	list ($totals['boards']) = $db->fetch_row($result);
-	$db->free_result($result);
-
-	$result = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}categories',
-		array(
-		)
-	);
-	list ($totals['categories']) = $db->fetch_row($result);
-	$db->free_result($result);
 
 	if ($output_method != 'echo')
 		return $totals;
