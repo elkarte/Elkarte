@@ -1045,7 +1045,7 @@ function ssi_logOnline($output_method = 'echo')
  */
 function ssi_login($redirect_to = '', $output_method = 'echo')
 {
-	global $scripturl, $txt, $user_info, $modSettings;
+	global $scripturl, $txt, $user_info, $modSettings, $context, $settings;
 
 	if ($redirect_to != '')
 		$_SESSION['login_url'] = $redirect_to;
@@ -1053,32 +1053,56 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	if ($output_method != 'echo' || !$user_info['is_guest'])
 		return $user_info['is_guest'];
 
+	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'])) : '';
+
 	echo '
-		<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8">
-			<table border="0" cellspacing="1" cellpadding="0" class="ssi_table">
-				<tr>
-					<td align="right"><label for="user">', $txt['username'], ':</label>&nbsp;</td>
-					<td><input type="text" id="user" name="user" size="9" value="', $user_info['username'], '" class="input_text" /></td>
-				</tr><tr>
-					<td align="right"><label for="passwrd">', $txt['password'], ':</label>&nbsp;</td>
-					<td><input type="password" name="passwrd" id="passwrd" size="9" class="input_password" /></td>
-				</tr>';
+		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 
-	// Open ID?
+		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+		<div class="tborder login">
+			<div class="roundframe">';
+
+	// Did they make a mistake last time?
+	if (!empty($context['login_errors']))
+		echo '
+			<p class="errorbox">', implode('<br />', $context['login_errors']), '</p><br />';
+
+	// Or perhaps there's some special description for this time?
+	if (isset($context['description']))
+		echo '
+				<p class="description">', $context['description'], '</p>';
+
+	// Now just get the basic information - username, password, etc.
+	echo '
+				<dl>
+					<dt>', $txt['username'], ':</dt>
+					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" placeholder="', $txt['username'], '" /></dd>
+					<dt>', $txt['password'], ':</dt>
+					<dd><input type="password" name="passwrd" value="" size="20" class="input_password" placeholder="', $txt['password'], '" /></dd>
+				</dl>';
+
 	if (!empty($modSettings['enableOpenID']))
-		echo '<tr>
-					<td colspan="2" align="center"><strong>&mdash;', $txt['or'], '&mdash;</strong></td>
-				</tr><tr>
-					<td align="right"><label for="openid_url">', $txt['openid'], ':</label>&nbsp;</td>
-					<td><input type="text" name="openid_identifier" id="openid_url" class="input_text openid_login" size="17" /></td>
-				</tr>';
+		echo '<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
+				<dl>
+					<dt>', $txt['openid'], ':</dt>
+					<dd><input type="text" name="openid_identifier" class="input_text openid_login" size="17" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="centericon" /></a></dd>
+				</dl>';
 
-	echo '<tr>
-					<td><input type="hidden" name="cookielength" value="-1" /></td>
-					<td><input type="submit" value="', $txt['login'], '" class="button_submit" /></td>
-				</tr>
-			</table>
+	echo '
+				<p><input type="submit" value="', $txt['login'], '" class="button_submit" /></p>
+				<p class="smalltext"><a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a></p>
+				<input type="hidden" name="hash_passwrd" value="" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+			</div>
+		</div>
 		</form>';
+
+	// Focus on the correct input - username or password.
+	echo '
+		<script><!-- // --><![CDATA[
+			document.forms.frmLogin.', isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user', '.focus();
+		// ]]></script>';
 
 }
 
