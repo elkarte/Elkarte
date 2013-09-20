@@ -1940,21 +1940,10 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
 	if ($id === null)
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Auth.subs.php');
+	$member = loadExistingMember($id, !$is_username);
 
-	$request = $db->query('', '
-		SELECT passwd, member_name, is_activated
-		FROM {db_prefix}members
-		WHERE ' . ($is_username ? 'member_name' : 'id_member') . ' = {string:id}
-		LIMIT 1',
-		array(
-			'id' => $id,
-		)
-	);
-	list ($pass, $user, $active) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return sha1(strtolower($user) . $password) == $pass && $active == 1;
+	return sha1(strtolower($member['member_name']) . $member['passwd']) == $pass && $member['is_activated'] == 1;
 }
 
 /**
