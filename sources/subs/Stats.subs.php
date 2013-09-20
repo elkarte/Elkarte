@@ -97,7 +97,7 @@ function numCategories()
 
 	$result = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}categories AS c',
+		FROM {db_prefix}categories',
 		array(
 		)
 	);
@@ -166,11 +166,18 @@ function genderRatio()
  *
  * @return array
  */
-function topPosters()
+function topPosters($limit = null)
 {
 	global $scripturl, $modSettings;
 
 	$db = database();
+
+	// If there is a default setting, let's not retrieve something bigger
+	if (isset($modSettings['stats_limit']))
+		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+	// Otherwise, fingers crossed and let's grab what is asked
+	else
+		$limit = empty($limit) ? 10 : $limit;
 
 	$top_posters = array();
 
@@ -182,7 +189,7 @@ function topPosters()
 		LIMIT {int:limit_posts}',
 		array(
 			'no_posts' => 0,
-			'limit_posts' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
+			'limit_posts' => $limit,
 		)
 	);
 
@@ -215,15 +222,24 @@ function topPosters()
  *
  * @return array
  */
-function topBoards()
+function topBoards($limit = null, $read_status = false)
 {
 	global $modSettings, $scripturl;
 
 	$db = database();
 
+	// If there is a default setting, let's not retrieve something bigger
+	if (isset($modSettings['stats_limit']))
+		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+	// Otherwise, fingers crossed and let's grab what is asked
+	else
+		$limit = empty($limit) ? 10 : $limit;
+
 	$boards_result = $db->query('', '
-		SELECT id_board, name, num_posts
-		FROM {db_prefix}boards AS b
+		SELECT b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (!$user_info['is_guest'] ? ' 1 AS is_read' : '
+			(IFNULL(lb.id_msg, 0) >= b.id_last_msg) AS is_read') : '') . '
+		FROM {db_prefix}boards AS b' . ($read_status ? '
+			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})' : '') . '
 		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : '') . '
 			AND b.redirect = {string:blank_redirect}
@@ -232,17 +248,18 @@ function topBoards()
 		array(
 			'recycle_board' => $modSettings['recycle_board'],
 			'blank_redirect' => '',
-			'limit_boards' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
+			'limit_boards' => $limit,
 		)
 	);
 	$top_boards = array();
 	$max_num_posts = 1;
 	while ($row_board = $db->fetch_assoc($boards_result))
 	{
-		$top_boards[] = array(
+		$top_boards[$row_board['id_board']] = array(
 			'id' => $row_board['id_board'],
 			'name' => $row_board['name'],
 			'num_posts' => $row_board['num_posts'],
+			'num_topics' => $row_board['num_topics'],
 			'href' => $scripturl . '?board=' . $row_board['id_board'] . '.0',
 			'link' => '<a href="' . $scripturl . '?board=' . $row_board['id_board'] . '.0">' . $row_board['name'] . '</a>'
 		);
@@ -265,11 +282,18 @@ function topBoards()
  *
  * @return array
  */
-function topTopicReplies()
+function topTopicReplies($limit = null)
 {
 	global $modSettings, $scripturl;
 
 	$db = database();
+
+	// If there is a default setting, let's not retrieve something bigger
+	if (isset($modSettings['stats_limit']))
+		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+	// Otherwise, fingers crossed and let's grab what is asked
+	else
+		$limit = empty($limit) ? 10 : $limit;
 
 	// Are you on a larger forum?  If so, let's try to limit the number of topics we search through.
 	if ($modSettings['totalMessages'] > 100000)
@@ -295,7 +319,7 @@ function topTopicReplies()
 		$topic_ids = array();
 
 	$topic_reply_result = $db->query('', '
-		SELECT m.subject, t.num_replies, t.id_board, t.id_topic, b.name
+		SELECT m.subject, t.num_replies, t.num_views, t.id_board, t.id_topic, b.name
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -309,7 +333,7 @@ function topTopicReplies()
 			'topic_list' => $topic_ids,
 			'recycle_board' => $modSettings['recycle_board'],
 			'is_approved' => 1,
-			'topic_replies' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
+			'topic_replies' => $limit,
 		)
 	);
 	$top_topics_replies = array();
@@ -317,7 +341,7 @@ function topTopicReplies()
 	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
 	{
 		censorText($row_topic_reply['subject']);
-		$top_topics_replies[] = array(
+		$top_topics_replies[$row_topic_reply['id_topic']] = array(
 			'id' => $row_topic_reply['id_topic'],
 			'board' => array(
 				'id' => $row_topic_reply['id_board'],
@@ -327,6 +351,7 @@ function topTopicReplies()
 			),
 			'subject' => $row_topic_reply['subject'],
 			'num_replies' => $row_topic_reply['num_replies'],
+			'num_views' => $row_topic_reply['num_views'],
 			'href' => $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_reply['id_topic'] . '.0">' . $row_topic_reply['subject'] . '</a>'
 		);
@@ -349,11 +374,18 @@ function topTopicReplies()
  *
  * @return array
  */
-function topTopicViews()
+function topTopicViews($limit = null)
 {
 	global $modSettings, $scripturl;
 
 	$db = database();
+
+	// If there is a default setting, let's not retrieve something bigger
+	if (isset($modSettings['stats_limit']))
+		$limit = empty($limit) ? $modSettings['stats_limit'] : ($limit < $modSettings['stats_limit'] ? $limit : $modSettings['stats_limit']);
+	// Otherwise, fingers crossed and let's grab what is asked
+	else
+		$limit = empty($limit) ? 10 : $limit;
 
 	// Large forums may need a bit more prodding...
 	if ($modSettings['totalMessages'] > 100000)
@@ -377,7 +409,7 @@ function topTopicViews()
 		$topic_ids = array();
 
 		$topic_view_result = $db->query('', '
-		SELECT m.subject, t.num_views, t.id_board, t.id_topic, b.name
+		SELECT m.subject, t.num_views, t.num_replies, t.id_board, t.id_topic, b.name
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -391,7 +423,7 @@ function topTopicViews()
 			'topic_list' => $topic_ids,
 			'recycle_board' => $modSettings['recycle_board'],
 			'is_approved' => 1,
-			'topic_views' => isset($modSettings['stats_limit']) ? $modSettings['stats_limit'] : 10,
+			'topic_views' => $limit,
 		)
 	);
 	$top_topics_views = array();
@@ -400,7 +432,7 @@ function topTopicViews()
 	{
 		censorText($row_topic_views['subject']);
 
-		$top_topics_views[] = array(
+		$top_topics_views[$row_topic_views['id_topic']] = array(
 			'id' => $row_topic_views['id_topic'],
 			'board' => array(
 				'id' => $row_topic_views['id_board'],
@@ -409,6 +441,7 @@ function topTopicViews()
 				'link' => '<a href="' . $scripturl . '?board=' . $row_topic_views['id_board'] . '.0">' . $row_topic_views['name'] . '</a>'
 			),
 			'subject' => $row_topic_views['subject'],
+			'num_replies' => $row_topic_views['num_replies'],
 			'num_views' => $row_topic_views['num_views'],
 			'href' => $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row_topic_views['id_topic'] . '.0">' . $row_topic_views['subject'] . '</a>'
