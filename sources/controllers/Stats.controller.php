@@ -190,7 +190,7 @@ class Stats_Controller extends Action_Controller
 		$context['top_time_online'] = topTimeOnline();
 
 		// Activity by month.
-		montlyActivity();
+		monthlyActivity();
 
 		$context['collapsed_years'] = array();
 		foreach ($context['yearly'] as $year => $data)

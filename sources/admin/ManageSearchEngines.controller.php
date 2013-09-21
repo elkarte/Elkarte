@@ -136,7 +136,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			// security checks
 			checkSession();
 
-			// notify the interested add-ons or integrations
+			// notify the interested addons or integrations
 			call_integration_hook('integrate_save_search_engine_settings', array(&$config_vars));
 
 			// save the results!

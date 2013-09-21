@@ -23,7 +23,7 @@ if (!defined('ELK'))
  *   filename=[action].controller.php method=action_[sa]
  *   filename=[action]-Controller.php method=action_[sa]
  *
- * An add-on files to handle custom actions will be called if they follow
+ * An addon files to handle custom actions will be called if they follow
  * any of these patterns.
  */
 class Site_Dispatcher
@@ -231,7 +231,7 @@ class Site_Dispatcher
 			}
 		}
 		// fall back to naming patterns.
-		// add-ons can use any of them, and it should Just Work (tm).
+		// addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
 			// action=drafts => Drafts.php
@@ -251,7 +251,7 @@ class Site_Dispatcher
 				else
 					$this->_function_name = 'action_' . $_GET['action'];
 			}
-			// or... an add-on can do just this!
+			// or... an addon can do just this!
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
 			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))

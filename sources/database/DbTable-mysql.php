@@ -12,7 +12,7 @@
  * @version 1.0 Alpha
  *
  * This class implements functionality related to table structure.
- * Intended in particular for add-ons to change it to suit their needs.
+ * Intended in particular for addons to change it to suit their needs.
  *
  */
 
