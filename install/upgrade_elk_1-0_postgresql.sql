@@ -295,7 +295,8 @@ SET disregarded = 0;
 ---# Adding new columns to boards...
 ---{
 ALTER TABLE {$db_prefix}custom_fields
-ADD COLUMN show_memberlist smallint NOT NULL DEFAULT '0';
+ADD COLUMN show_memberlist smallint NOT NULL DEFAULT '0',
+ADD COLUMN vieworder smallint NOT NULL default '0';
 ---}
 ---#
 
