@@ -32,6 +32,7 @@ class Xml_Controller extends Action_Controller
 			'groupicons' => array('action_groupicons'),
 			'corefeatures' => array('action_corefeatures', 'admin_forum'),
 			'profileorder' => array('action_profileorder', 'admin_forum'),
+			'boardorder' => array('action_boardorder', 'admin_forum'),
 		);
 
 		// Easy adding of xml sub actions
@@ -277,6 +278,143 @@ class Xml_Controller extends Action_Controller
 		// Failed validation, tough to be you
 		else
 		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the boards in response to an ajax sortable request
+	 */
+	public function action_boardorder()
+	{
+		global $context, $txt, $boards;
+
+		// Start off clean
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+		$board_tree = array();
+		$board_moved = null;
+
+		// Chances are we will need these
+		loadLanguage('Errors');
+		loadLanguage('ManageSettings');
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
+
+		// Validating that you can do this is always a good idea
+		$validation_perm = allowedTo('manage_boards');
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+
+		if (empty($validation_session) && $validation_token === true && $validation_perm === true)
+		{
+			// No question that we are doing some board reordering
+			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
+			{
+				$list_order = 0;
+				$order = array();
+
+				// What board was drag and dropped?
+				list(, $board_moved,) = explode(',', $_POST['moved']);
+				$board_moved = (int) $board_moved;
+
+				// The board ids arrive in 1-n view order ...
+				foreach ($_POST['cbp'] as $id)
+				{
+					list($category, $board, $childof) = explode(',', $id);
+
+					$board_tree[] = array(
+						'category' => $category,
+						'parent' => $childof,
+						'order' => $list_order,
+						'id' => $board,
+					);
+
+					// Keep track of where the moved board is in the sort stack
+					if ($board == $board_moved)
+						$moved_key = $list_order;
+
+					$list_order++;
+				}
+
+				// Look both ways so we know how to proceed
+				$board_previous = (isset($board_tree[$moved_key - 1]) && $board_tree[$moved_key - 1]['category'] == $board_tree[$moved_key]['category']) ? $board_tree[$moved_key - 1] : null;
+				$board_next = (isset($board_tree[$moved_key + 1]) && $board_tree[$moved_key + 1]['category'] == $board_tree[$moved_key]['category']) ? $board_tree[$moved_key + 1] : null;
+
+				// Retrieve the current saved state, returned in global $boards
+				getBoardTree();
+
+				$boardOptions = array();
+				$board_current = $boards[$board_moved];
+				$board_new = $board_tree[$moved_key];
+
+				// Move to the order defined
+				if (isset($board_previous) && $board_previous['parent'] == $board_new['parent'])
+					$boardOptions = array(
+						'move_to' => 'after',
+						'target_board' => $board_previous['id'],
+					);
+				elseif (isset($board_next) && $board_next['parent'] == $board_new['parent'])
+					$boardOptions = array(
+						'move_to' => 'before',
+						'target_board' => $board_next['id'],
+					);
+				else
+					$boardOptions = array(
+						'move_to' => 'child',
+						'target_board' => $board_previous['id'],
+					);
+
+				// If we have figured out what to do
+				if (!empty($boardOptions))
+				{
+					modifyBoard($board_moved, $boardOptions);
+					$order[] = array('value' => $board_current['name'] . ' Moved!');
+				}
+			}
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
+				),
+				array(
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
+				),
+			);
+		}
+		// Failed validation, extra work for you I'm afraid
+		else
+		{
+			if (!empty($validation_perm))
+				$errors[] = array('value' => $txt['cannot_admin_forum']);
+
 			if (!empty($validation_session))
 				$errors[] = array('value' => $txt[$validation_session]);
 
