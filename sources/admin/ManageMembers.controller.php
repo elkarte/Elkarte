@@ -237,9 +237,9 @@ class ManageMembers_Controller extends Action_Controller
 					'values' => array('0', '1', '2'),
 				),
 				'activated' => array(
-					'db_fields' => array('CASE WHEN is_activated IN (1, 11) THEN 1 ELSE 0 END'),
+					'db_fields' => array('is_activated'),
 					'type' => 'checkbox',
-					'values' => array('0', '1'),
+					'values' => array('0', '1', '11'),
 				),
 				'membername' => array(
 					'db_fields' => array('member_name', 'real_name'),
