@@ -118,9 +118,9 @@ function formatViewers($id, $type)
 }
 
 /**
- * This function reads from the database the add-ons credits,
+ * This function reads from the database the addons credits,
  * and returns them in an array for display in credits section of the site.
- * The add-ons copyright, license, title informations are those saved from <license>
+ * The addons copyright, license, title informations are those saved from <license>
  * and <credits> tags in package.xml.
  *
  * @return array
@@ -465,7 +465,7 @@ function prepareCreditsData()
 	// Support for addons that use the <credits> tag via the package manager
 	$credits['credits_addons'] = addonsCredits();
 
-	// An alternative for add-ons credits is to use a hook.
+	// An alternative for addons credits is to use a hook.
 	call_integration_hook('integrate_credits');
 
 	// Copyright information

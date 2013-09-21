@@ -184,7 +184,6 @@ function list_integration_hooks_data($start, $per_page, $sort)
 				$enabled = strstr($function, ']') === false;
 				$function = str_replace(']', '', $function);
 				$hook_exists = !empty($hook_status[$hook][$function]['exists']);
-				$file_name = isset($hook_status[$hook][$function]['in_file']) ? $hook_status[$hook][$function]['in_file'] : ((substr($hook, -8) === '_include') ? 'zzzzzzzzz' : 'zzzzzzzza');
 				$sort[] = $$sort_options[0];
 
 				if (strpos($function, '::') !== false)
