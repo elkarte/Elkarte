@@ -152,6 +152,7 @@ function template_search_members()
 								<legend>', $txt['activation_status'], '</legend>
 								<label for="activated-0"><input type="checkbox" name="activated[]" value="1" id="activated-0" checked="checked" class="input_check" /> ', $txt['activated'], '</label>&nbsp;&nbsp;
 								<label for="activated-1"><input type="checkbox" name="activated[]" value="0" id="activated-1" checked="checked" class="input_check" /> ', $txt['not_activated'], '</label>
+								<label for="activated-2"><input type="checkbox" name="activated[]" value="11" id="activated-2" checked="checked" class="input_check" /> ', $txt['is_banned'], '</label>
 							</fieldset>
 						</div>
 					</div>
