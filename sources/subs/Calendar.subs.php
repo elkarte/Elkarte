@@ -99,7 +99,7 @@ function getBirthdayRange($low_date, $high_date)
  * @param bool $use_permissions = true
  * @return array contextual information if use_permissions is true, and an array of the data needed to build that otherwise
  */
-function getEventRange($low_date, $high_date, $use_permissions = true)
+function getEventRange($low_date, $high_date, $use_permissions = true, $limit = null)
 {
 	global $scripturl, $modSettings, $user_info, $context;
 
@@ -120,11 +120,13 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = cal.id_topic)
 		WHERE cal.start_date <= {date:high_date}
 			AND cal.end_date >= {date:low_date}' . ($use_permissions ? '
-			AND (cal.id_board = {int:no_board_link} OR {query_wanna_see_board})' : ''),
+			AND (cal.id_board = {int:no_board_link} OR {query_wanna_see_board})' : '') . (!empty($limit) ? '
+		LIMIT {int:limit}' : ''),
 		array(
 			'high_date' => $high_date,
 			'low_date' => $low_date,
 			'no_board_link' => 0,
+			'limit' => $limit,
 		)
 	);
 	$events = array();
@@ -160,6 +162,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 					'end_date' => $row['end_date'],
 					'is_last' => false,
 					'id_board' => $row['id_board'],
+					'id_topic' => $row['id_topic'],
 					'href' => $row['id_board'] == 0 ? '' : $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['title'] . '</a>',
 					'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
@@ -176,6 +179,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true)
 					'end_date' => $row['end_date'],
 					'is_last' => false,
 					'id_board' => $row['id_board'],
+					'id_topic' => $row['id_topic'],
 					'href' => $row['id_topic'] == 0 ? '' : $scripturl . '?topic=' . $row['id_topic'] . '.0',
 					'link' => $row['id_topic'] == 0 ? $row['title'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['title'] . '</a>',
 					'can_edit' => false,
