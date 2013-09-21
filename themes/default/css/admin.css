@@ -545,26 +545,25 @@ dl.settings dd.questions input {
 }
 
 #manage_boards ul {
-	margin: 0 0 10px;
+	margin: 0 0 12px;
 	max-height: 30em;
 }
 #manage_boards ul:nth-child(n+2) {
-	min-height: 10px;
+	min-height: 12px;
 	padding-left: 30px;
-	margin: 0 0 -10px;
+	margin: 0 0 -12px;
 }
 .ui-state-highlight {
 	background-color: #efe;
-	height: 20px;
+	height: 25px;
 	border: 1px dashed green;
 	cursor: move;
 }
 #manage_boards li, #manage_boards li.windowbg, #manage_boards li.windowbg2 {
 	list-style: none;
 	margin: 0;
-	padding-top: 10px;
+	padding-top: 12px;
 }
-
 #manage_boards li img {
 	vertical-align: middle;
 	padding: 0 6px 3px 6px;
@@ -572,6 +571,16 @@ dl.settings dd.questions input {
 #manage_boards li .floatleft {
 	font-weight: bold;
 	padding: 0 6px;
+	font-size: 1.1em;
+	cursor: move;
+	width: 60%;
+}
+#manage_boards li .floatleft:before {
+	content: "\21f3";
+	padding-right: 5px;
+	font-size: 1.3em;
+	float: left;
+	margin-top: -1px;
 }
 #manage_boards .recycle_board {
 	background-color: #dee;
