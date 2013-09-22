@@ -21,43 +21,42 @@ $(document).ready(function() {
 	else
 		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superfish({delay : 300, speed: 175});
 
-	// Smooth scroll navigation
-	//$('.topbottom').bind('click', function(event) {
-	//	event.preventDefault();
-
-	//	// Position to the id pagetop or pagebot
-	//	var link = $('#page' + this.hash.substring(1)),
-	//		link_y = link.height() + 15;
-
-	//	$('html,body').animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1500);
-	//});
-
-	// Couldn't make sense of that lot, so replaced it with something that works. :P
 	// Smooth scroll to top.
 	$("a[href=#top]").bind("click", function(e) {
-		$("html,body").animate({scrollTop:0}, 1200);
 		e.preventDefault();
+		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
 	// Smooth scroll to bottom.
 	$("a[href=#bot]").bind("click", function(e) {
-		$("html,body").animate({scrollTop:$(document).height()}, 1200);
 		e.preventDefault();
+
+		// Don't scroll all the way down to the footer, just the content bottom
+		var link = $('#bot'),
+		link_y = link.height();
+
+		$("html,body").animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1200);
 	});
 
-	// tooltips
-	$('.preview').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 750, timeout: 50}}); 
+	// Tooltips
+	$('.preview').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 750, timeout: 50}});
 
-	// find all nested linked images and turn off the border
+	// Find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');
 
-	// Set a auto height so small code blocks collaspe, set a height for larger ones
+	// Set an auto height so small code blocks collaspe, set a height for larger ones
 	// and let resize or overflow do its thing as normal
 	$('.bbc_code').each(function()
 	{
 		$(this).height("auto");
 		if ($(this).height() > 200)
 			$(this).css('height', '20em');
+	});
+
+	// Collapsabile fieldsets, pure candy
+	$('legend').click(function(){
+		$(this).siblings().slideToggle("fast");
+		$(this).parent().toggleClass("collapsed");
 	});
 });
 

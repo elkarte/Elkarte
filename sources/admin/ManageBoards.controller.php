@@ -156,6 +156,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		getBoardTree();
 
+		createToken('admin-sort');
 		$context['move_board'] = !empty($_REQUEST['move']) && isset($boards[(int) $_REQUEST['move']]) ? (int) $_REQUEST['move'] : 0;
 
 		$context['categories'] = array();

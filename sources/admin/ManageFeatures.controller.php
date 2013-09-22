@@ -882,7 +882,7 @@ class ManageFeatures_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							$isChecked = $rowData[\'disabled\'] ? \'\' : \' checked="checked"\';
 							$onClickHandler = $rowData[\'can_show_register\'] ? sprintf(\'onclick="document.getElementById(\\\'reg_%1$s\\\').disabled = !this.checked;"\', $rowData[\'id\']) : \'\';
-							return sprintf(\'<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check"%2$s%3$s />\', $rowData[\'id\'], $isChecked, $onClickHandler);
+							return sprintf(\'<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $onClickHandler);
 						'),
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
@@ -897,7 +897,7 @@ class ManageFeatures_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							$isChecked = $rowData[\'on_register\'] && !$rowData[\'disabled\'] ? \' checked="checked"\' : \'\';
 							$isDisabled = $rowData[\'can_show_register\'] ? \'\' : \' disabled="disabled"\';
-							return sprintf(\'<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check"%2$s%3$s />\', $rowData[\'id\'], $isChecked, $isDisabled);
+							return sprintf(\'<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $isDisabled);
 						'),
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
@@ -918,13 +918,15 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 		createList($listOptions);
 
+		$token = createToken('admin-sort');
 		$listOptions = array(
 			'id' => 'custom_profile_fields',
 			'title' => $txt['custom_profile_title'],
 			'base_href' => $scripturl . '?action=admin;area=featuresettings;sa=profile',
-			'default_sort_col' => 'field_name',
+			'default_sort_col' => 'vieworder',
 			'no_items_label' => $txt['custom_profile_none'],
 			'items_per_page' => 25,
+			'sortable' => true,
 			'get_items' => array(
 				'function' => 'list_getProfileFields',
 				'params' => array(
@@ -935,6 +937,19 @@ class ManageFeatures_Controller extends Action_Controller
 				'function' => 'list_getProfileFieldSize',
 			),
 			'columns' => array(
+				'vieworder' => array(
+					'header' => array(
+						'value' => '',
+						'style' => 'display: none',
+					),
+					'data' => array(
+						'db' => 'vieworder',
+						'style' => 'display: none',
+					),
+					'sort' => array(
+						'default' => 'vieworder',
+					),
+				),
 				'field_name' => array(
 					'header' => array(
 						'value' => $txt['custom_profile_fieldname'],
@@ -945,7 +960,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 							return sprintf(\'<a href="%1$s?action=admin;area=featuresettings;sa=profileedit;fid=%2$d">%3$s</a><div class="smalltext">%4$s</div>\', $scripturl, $rowData[\'id_field\'], $rowData[\'field_name\'], $rowData[\'field_desc\']);
 						'),
-						'style' => 'width: 62%;',
+						'style' => 'width: 65%;',
 					),
 					'sort' => array(
 						'default' => 'field_name',
@@ -963,7 +978,7 @@ class ManageFeatures_Controller extends Action_Controller
 							$textKey = sprintf(\'custom_profile_type_%1$s\', $rowData[\'field_type\']);
 							return isset($txt[$textKey]) ? $txt[$textKey] : $textKey;
 						'),
-						'style' => 'width: 15%;',
+						'style' => 'width: 10%;',
 					),
 					'sort' => array(
 						'default' => 'field_type',
@@ -980,7 +995,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 							return $rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\'];
 						'),
-						'style' => 'width: 8%;',
+						'style' => 'width: 5%;',
 					),
 					'sort' => array(
 						'default' => 'active DESC',
@@ -997,7 +1012,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 							return $txt[\'custom_profile_placement_\' . (empty($rowData[\'placement\']) ? \'standard\' : ($rowData[\'placement\'] == 1 ? \'withicons\' : \'abovesignature\'))];
 						'),
-						'style' => 'width: 8%;',
+						'style' => 'width: 5%;',
 					),
 					'sort' => array(
 						'default' => 'placement DESC',
@@ -1012,7 +1027,7 @@ class ManageFeatures_Controller extends Action_Controller
 								'id_field' => false,
 							),
 						),
-						'style' => 'width: 15%;',
+						'style' => 'width: 5%;',
 					),
 				),
 			),
@@ -1026,6 +1041,14 @@ class ManageFeatures_Controller extends Action_Controller
 					'value' => '<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
 				),
 			),
+			'javascript' => '
+				$().elkSortable({
+					sa: "profileorder",
+					error: "' . $txt['admin_order_error'] . '",
+					title: "' . $txt['admin_order_title'] . '",
+					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
+				});
+			',
 		);
 		createList($listOptions);
 	}
@@ -1259,13 +1282,11 @@ class ManageFeatures_Controller extends Action_Controller
 					'bbc' => $bbc,
 					'mask' => $mask,
 					'enclose' => $enclose,
-					'placement' => $placement
+					'placement' => $placement,
+					'vieworder' => list_getProfileFieldSize() + 1,
 				);
 				addProfileField($new_field);
 			}
-
-			// As there's currently no option to priorize certain fields over others, let's order them alphabetically.
-			reorderProfileFields();
 		}
 		// Deleting?
 		elseif (isset($_POST['delete']) && $context['field']['colname'])

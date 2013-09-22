@@ -284,6 +284,7 @@ $txt['pm_posts_per_hour_note'] = '(0 for no limit, moderators are exempt)';
 $txt['custom_profile_title'] = 'Custom Profile Fields';
 $txt['custom_profile_desc'] = 'From this page you can create your own custom profile fields that fit in with your own forums requirements';
 $txt['custom_profile_active'] = 'Active';
+$txt['custom_profile_order'] = 'Field Order';
 $txt['custom_profile_fieldname'] = 'Field Name';
 $txt['custom_profile_fieldtype'] = 'Field Type';
 $txt['custom_profile_make_new'] = 'New Field';
@@ -295,6 +296,7 @@ $txt['custom_profile_type_textarea'] = 'Large Text';
 $txt['custom_profile_type_select'] = 'Select Box';
 $txt['custom_profile_type_radio'] = 'Radio Button';
 $txt['custom_profile_type_check'] = 'Checkbox';
+$txt['custom_profile_reordered'] = 'Profile fields successfully reordered';
 
 $txt['custom_add_title'] = 'Add Profile Field';
 $txt['custom_edit_title'] = 'Edit Profile Field';
