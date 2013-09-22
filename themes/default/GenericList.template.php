@@ -94,7 +94,7 @@ function template_show_list($list_id = null)
 
 	// Start of the main table
 	echo '
-			<table class="table_grid" style="width:', !empty($cur_list['width']) ? $cur_list['width'] : '', '">';
+			<table class="table_grid"', !empty($cur_list['width']) ? ' style="width: ' . $cur_list['width'] . '"' : '', '>';
 
 	// Show the column headers.
 	$header_count = count($cur_list['headers']);
@@ -124,7 +124,7 @@ function template_show_list($list_id = null)
 	}
 
 	echo '
-			<tbody>';
+			<tbody', empty($cur_list['sortable']) ? '' : ' id="table_grid_sortable"', '>';
 
 	// Show a nice message informing there are no items in this list.
 	// @todo - Nasty having styles and aligns still in the markup (IE6 stuffz).

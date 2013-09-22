@@ -179,9 +179,10 @@ function loadCustomFields($memID, $area = 'summary')
 	$request = $db->query('', '
 		SELECT
 			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
-			default_value, bbc, enclose, placement
+			default_value, bbc, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
-		WHERE ' . $where,
+		WHERE ' . $where . '
+		ORDER BY vieworder ASC',
 		array(
 			'area' => $area,
 		)

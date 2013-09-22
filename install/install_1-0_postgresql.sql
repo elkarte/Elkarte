@@ -973,6 +973,7 @@ CREATE TABLE {$db_prefix}custom_fields (
   default_value varchar(255) NOT NULL,
   enclose text NOT NULL,
   placement smallint NOT NULL default '0',
+  vieworder smallint NOT NULL default '0',
   PRIMARY KEY (id_field)
 );
 

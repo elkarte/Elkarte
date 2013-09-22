@@ -800,3 +800,182 @@ function toggleBaseDir ()
 	else
 		dir_elem.disabled = !sub_dir.checked;
 }
+
+// Drag and drop to reorder table TD's via UI Sortable
+(function($) {
+	'use strict';
+	$.fn.elkSortable = function(oInstanceSettings) {
+		$.fn.elkSortable.oDefaultsSettings = {
+			opacity: 0.7,
+			cursor: 'move',
+			axis: 'y',
+			containment: 'parent',
+			delay: 150,
+			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
+			setorder: 'serialize', // how to return the data, really only supports serialize and inorder
+			placeholder: '', // css class used to style the landing zone
+			preprocess: '', // This function is called at the start of the update event (when the item is dropped) must in in global space
+			tag: '#table_grid_sortable', // ID(s) of the container to work with, single or comma separated
+			connect: '', // Use to group all related containers with a common CSS class
+			sa: '', // Subaction that the xmlcontroller should know about
+			title: '', // Title of the error box
+			error: '', // What to say when we don't know what happened, like connection error
+			token: '' // Security token if needed
+		};
+
+		// Account for any user options
+		var oSettings = $.extend({}, $.fn.elkSortable.oDefaultsSettings, oInstanceSettings || {});
+
+		// Divs to hold our responses
+		var	ajax_infobar = document.createElement('div'),
+			ajax_errorbox = document.createElement('div');
+
+		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
+		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
+		$("body").append(ajax_infobar);
+		$(ajax_infobar).slideUp();
+		$(ajax_errorbox).css({'display': 'none'});
+		$("body").append(ajax_errorbox).attr('id', 'errorContainer');
+
+		// Find all table_grid_sortable tables and attach the UI sortable action
+		$(oSettings.tag).sortable({
+			opacity: oSettings.opacity,
+			cursor: oSettings.cursor,
+			axis: oSettings.axis,
+			containment: oSettings.containment,
+			connectWith: oSettings.connect,
+			placeholder: oSettings.placeholder,
+			tolerance: oSettings.tolerance,
+			delay: oSettings.delay,
+			update: function(e, ui) {
+				// Called when an element is dropped in a new location
+				var postdata = '',
+					moved = ui.item.attr('id'),
+					order = [];
+
+				// Calling a pre processing function?
+				if (oSettings.preprocess !== '')
+					window[oSettings.preprocess]();
+
+				// How to post the sorted data
+				if (oSettings.setorder === 'inorder')
+				{
+					// This will get the order in 1-n as shown on the screen
+					$(oSettings.tag).find('li').each(function() {
+						var aid = $(this).attr('id').split('_');
+						order.push({name: aid[0] + '[]', value: aid[1]});
+					});
+					postdata = $.param(order);
+				}
+				else
+				// Get all id's in all the sortable containers
+				{
+					$(oSettings.tag).each(function() {
+					// Serialize will be 1-n of each nesting / connector
+					if (postdata === "")
+					   postdata += $(this).sortable(oSettings.setorder);
+					else
+					   postdata += "&" + $(this).sortable(oSettings.setorder);
+					});
+				}
+
+				// Add in our security tags and additional options
+				postdata += '&' + elk_session_var + '=' + elk_session_id;
+				postdata += '&order=reorder';
+				postdata += '&moved=' + moved;
+
+				if (oSettings.token !== '')
+					postdata += '&' + oSettings.token['token_var'] + '=' + oSettings.token['token_id'];
+
+				// And with the post data prepared, lets make the ajax request
+				$.ajax({
+					type: "POST",
+					url: elk_scripturl + "?action=xmlhttp;sa=" + oSettings.sa + ";xml",
+					dataType: "xml",
+					data: postdata
+				})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					$(ajax_infobar).attr('class', 'errorbox');
+					$(ajax_infobar).html(textStatus).slideDown('fast');
+					setTimeout(function() {
+						$(ajax_infobar).slideUp();
+					}, 3500);
+				})
+				.done(function(data, textStatus, jqXHR) {
+					if ($(data).find("error").length !== 0)
+					{
+						// Errors get a modal dialog box
+						$('#errorContainer').append('<p id="errorContent"></p>');
+						$('#errorContent').html($(data).find("error").text());
+						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+					}
+					else if ($(data).find("elk").length !== 0)
+					{
+						// Valid responses get the unobtrusive slider
+						$(ajax_infobar).attr('class', 'infobox');
+						$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
+						setTimeout(function() {
+							$(ajax_infobar).slideUp();
+						}, 3500);
+					}
+					else
+					{
+						// Something "other" happened ...
+						$('#errorContainer').append('<p id="errorContent"></p>')
+						$('#errorContent').html(oSettings.error + ' : ' + textStatus);
+						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+					}
+				})
+				.always(function(data, textStatus, jqXHR) {
+					if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
+					{
+						// Reset the token
+						oSettings.token['token_id'] = $(data).find("tokens").find('[type="token"]').text();
+						oSettings.token['token_var'] = $(data).find("tokens").find('[type="token_var"]').text();
+					}
+				});
+			}
+		});
+	};
+})(jQuery);
+
+/**
+ * Helper function used in the preprocess call for drag/drop boards
+ * Sets the id of all 'li' elements to cat#,board#,childof# for use in the
+ * $_POST back to the xmlcontroller
+ */
+function setBoardIds() {
+	// For each category of board
+	$("[id^=category_]").each(function() {
+		var cat = $(this).attr('id').split('category_');
+
+		// Every li needs a child ul so we have a "child-of" drop zone
+		$(this).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
+
+		// Get all the ul's in this category div that have children
+		$(this).find('ul:parent').each(function(i, ul) {
+
+			// Get the (li) parent of this ul
+			var parentList = $(this).parent('li').attr('id'),
+				pli = 0;
+
+			// No parent, then its a base node 0, else its a child-of this node
+			if (typeof(parentList) !== "undefined")
+			{
+				pli = parentList.split(",");
+				pli = pli[1];
+			}
+
+			// Now for each li in this ul
+			$(this).find('li').each(function(i, el) {
+				var currentList =  $(el).attr('id');
+				var myid = currentList.split(",");
+
+				// Remove the old id, insert the newly computed cat,brd,childof
+				$(el).removeAttr("id");
+				myid = "cbp_" + cat[1] + "," + myid[1] + "," + pli;
+				$(el).attr('id', myid);
+			});
+		});
+	});
+};

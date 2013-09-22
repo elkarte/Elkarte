@@ -121,6 +121,9 @@ function createList($listOptions)
 	$list_context['num_columns'] = count($listOptions['columns']);
 	$list_context['width'] = isset($listOptions['width']) ? $listOptions['width'] : '0';
 
+	// Maybe we want this one to interact with jquery UI sortable
+	$list_context['sortable'] = isset($listOptions['sortable']) ? true : false;
+
 	// Get the file with the function for the item list.
 	if (isset($listOptions['get_items']['file']))
 		require_once($listOptions['get_items']['file']);

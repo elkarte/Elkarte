@@ -37,11 +37,12 @@ function ml_CustomProfile()
 
 	// Find any custom profile fields that are to be shown for the memberlist?
 	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc, field_type, bbc, enclose
+		SELECT col_name, field_name, field_desc, field_type, bbc, enclose, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
 			AND show_memberlist = {int:show}
-			AND private < {int:private_level}',
+			AND private < {int:private_level}
+		ORDER BY vieworder',
 		array(
 			'active' => 1,
 			'show' => 1,

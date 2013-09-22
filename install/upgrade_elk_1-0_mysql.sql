@@ -212,11 +212,12 @@ SET disregarded = 0;
 ---#
 
 /******************************************************************************/
---- Adding support for custom profile fields on memberlist
+--- Adding support for custom profile fields on the memberlist and ordering
 /******************************************************************************/
 ---# Adding new columns to boards...
 ALTER TABLE {$db_prefix}custom_fields
-ADD COLUMN show_memberlist tinyint(3) NOT NULL DEFAULT '0';
+ADD COLUMN show_memberlist tinyint(3) NOT NULL DEFAULT '0',
+ADD COLUMN vieworder smallint(5) NOT NULL default '0';
 ---#
 
 /******************************************************************************/

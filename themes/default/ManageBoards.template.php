@@ -44,13 +44,17 @@ function template_main()
 		</div>';
 
 	// Loop through every category, listing the boards in each as we go.
+	$sortables = array();
 	foreach ($context['categories'] as $category)
 	{
+		$sortables[] = '#category_' . $category['id'];
+
 		// Link to modify the category.
 		echo '
 			<div class="cat_bar">
 				<h3 class="catbg">
-					<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a> <a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $txt['catModify'], '</a>
+					<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
+					<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $txt['catModify'], '</a>
 				</h3>
 			</div>';
 
@@ -58,26 +62,48 @@ function template_main()
 		echo '
 		<form action="', $scripturl, '?action=admin;area=manageboards;sa=newboard;cat=', $category['id'], '" method="post" accept-charset="UTF-8">
 			<div class="windowbg">
-				<div class="content">
-					<ul id="category_', $category['id'], '" class="nolist">';
+				<div id="category_', $category['id'], '" class="content">
+					<ul class="nolist">';
 
 		if (!empty($category['move_link']))
 			echo '
 						<li><a href="', $category['move_link']['href'], '" title="', $category['move_link']['label'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $category['move_link']['label'], '" /></a></li>';
 
 		$alternate = false;
+		$first = true;
+		$depth = 0;
 
 		// List through every board in the category, printing its name and link to modify the board.
 		foreach ($category['boards'] as $board)
 		{
+			// Going in a level deeper (child board)
+			if ($board['child_level'] > $depth)
+			{
+				echo '
+							<ul class="nolist">';
+			}
+			// Backing up a level to a childs parent
+			elseif ($board['child_level'] < $depth)
+			{
+				for ($i = $board['child_level']; $i < $depth; $i++)
+					echo
+						'
+								</li>
+							</ul>';
+			}
+			// Base node parent but not the first one
+			elseif ($board['child_level'] == 0 && !$first)
+			{
+				echo '
+						</li>';
+			}
 
 			echo '
-						<li', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? ' id="recycle_board"' : ' ', ' class="windowbg', $alternate ? '' : '2', '" style="padding-' . ($context['right_to_left'] ? 'right' : 'left') . ': ', 5 + 30 * $board['child_level'], 'px;', $board['move'] ? 'color: red;' : '', '">
+						<li id="cbp_' . $category['id'] . ',' . $board['id'] . '"', ' class="windowbg', $alternate ? '' : '2', (!empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? ' recycle_board' : ''), '" style="', $board['move'] ? ';color: red;' : '', '">
 							<span class="floatleft"><a href="', $scripturl, '?board=', $board['id'], '">', $board['name'], '</a>', !empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? '<a href="' . $scripturl . '?action=admin;area=manageboards;sa=settings"> <img src="' . $settings['images_url'] . '/post/recycled.png" alt="' . $txt['recycle_board'] . '" /></a></span>' : '</span>', '
 							<span class="floatright">', $context['can_manage_permissions'] ? '<span class="modify_boards"><a href="' . $scripturl . '?action=admin;area=permissions;sa=index;pid=' . $board['permission_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['mboards_permissions'] . '</a></span>' : '', '
 							<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;move=', $board['id'], '">', $txt['mboards_move'], '</a></span>
-							<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />
-						</li>';
+							<span class="modify_boards"><a href="', $scripturl, '?action=admin;area=manageboards;sa=board;boardid=', $board['id'], '">', $txt['mboards_modify'], '</a></span></span><br style="clear: right;" />';
 
 			if (!empty($board['move_links']))
 			{
@@ -93,8 +119,15 @@ function template_main()
 				echo '
 						</li>';
 			}
+
 			$alternate = !$alternate;
+			$depth = $board['child_level'];
+			$first = false;
 		}
+
+		// Done with this category
+		echo '
+						</li>';
 
 		// Button to add a new board.
 		echo '
@@ -109,7 +142,26 @@ function template_main()
 	}
 
 	echo '
-	</div>';
+	</div>
+	<script type="text/javascript">
+		// Start by creating proper ids and ul childs for use
+		setBoardIds();
+
+		// Set up our sortable call
+		$().elkSortable({
+			sa: "boardorder",
+			error: "' . $txt['admin_order_error'] . '",
+			title: "' . $txt['admin_order_title'] . '",
+			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"},
+			tag: "' . implode(' ul,', $sortables) . ' ul",
+			connect: ".nolist",
+			containment: "document",
+			placeholder: "ui-state-highlight",
+			preprocess: "setBoardIds",
+			axis: "",
+			setorder: "inorder"
+		});
+	</script>';
 }
 
 /**
