@@ -96,9 +96,9 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	// Add the button.
 	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0];
 	var oNewButton = document.createElement('li');
-	var z = document.createAttribute('role');
-	z.value = 'menuitem';
-	oNewButton.setAttributeNode(z)
+	var oRole = document.createAttribute('role');
+	oRole.value = 'menuitem';
+	oNewButton.setAttributeNode(oRole)
 
 	if ('sId' in oOptions)
 		oNewButton.id = oOptions.sId;
