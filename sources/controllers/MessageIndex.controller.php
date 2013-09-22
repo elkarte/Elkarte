@@ -646,7 +646,7 @@ class MessageIndex_Controller extends Action_Controller
 		if (!empty($_REQUEST['actions']))
 		{
 			// Find all topics...
-			$topics_info = topicsDetails($_REQUEST['actions']);
+			$topics_info = topicsDetails(array_keys($_REQUEST['actions']));
 
 			foreach ($topics_info as $row)
 			{
