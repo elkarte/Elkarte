@@ -472,6 +472,7 @@ function template_quickreply_below()
 						sSessionVar: elk_session_var,
 						sButtonStrip: \'moderationbuttons\',
 						sButtonStripDisplay: \'moderationbuttons_strip\',
+						sButtonStripClass: \'menuitem\',
 						bUseImageButton: false,
 						bCanRemove: ', $context['can_remove_post'] ? 'true' : 'false', ',
 						sRemoveButtonLabel: \'', $txt['quickmod_delete_selected'], '\',
