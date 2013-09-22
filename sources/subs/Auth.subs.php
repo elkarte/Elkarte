@@ -802,7 +802,7 @@ function loadExistingMember($name, $is_id = false)
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
 				openid_uri, passwd_flood
 			FROM {db_prefix}members
-			WHERE id_member = {int:id_member}') . '
+			WHERE id_member = {int:id_member}
 			LIMIT 1',
 			array(
 				'id_member' => (int) $name,
