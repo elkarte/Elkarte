@@ -298,7 +298,7 @@ class attachment_error_context
 	 */
 	public function activate($id = null)
 	{
-		if (empty($id) || |isset($this->_attachs[$id]))
+		if (empty($id) || isset($this->_attachs[$id]))
 			$this->_active_attach = 'generic';
 		else
 			$this->_active_attach = $id;
