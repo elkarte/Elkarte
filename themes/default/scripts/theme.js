@@ -96,9 +96,13 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	// Add the button.
 	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0];
 	var oNewButton = document.createElement('li');
+	var oRole = document.createAttribute('role');
+	oRole.value = 'menuitem';
+	oNewButton.setAttributeNode(oRole)
+
 	if ('sId' in oOptions)
 		oNewButton.id = oOptions.sId;
-	setInnerHTML(oNewButton, '<a href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
+	setInnerHTML(oNewButton, '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
 
 	oButtonStripList.appendChild(oNewButton);
 }

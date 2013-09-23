@@ -14,7 +14,7 @@
  * @version 1.0 Alpha
  */
 
-function template_Move_init()
+function template_MoveTopic_init()
 {
 	loadTemplate('GenericHelpers');
 }
