@@ -308,7 +308,7 @@ class Xml_Controller extends Action_Controller
 	 */
 	public function action_boardorder()
 	{
-		global $context, $txt, $boards;
+		global $context, $txt, $boards, $cat_tree;
 
 		// Start off clean
 		$context['xml_data'] = array();
@@ -320,7 +320,7 @@ class Xml_Controller extends Action_Controller
 
 		// Chances are we will need these
 		loadLanguage('Errors');
-		loadLanguage('ManageSettings');
+		loadLanguage('ManageBoards');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -346,6 +346,9 @@ class Xml_Controller extends Action_Controller
 				{
 					list($category, $board, $childof) = explode(',', $id);
 
+					if ($board == -1)
+						continue;
+
 					$board_tree[] = array(
 						'category' => $category,
 						'parent' => $childof,
@@ -360,9 +363,27 @@ class Xml_Controller extends Action_Controller
 					$list_order++;
 				}
 
-				// Look both ways so we know how to proceed
-				$board_previous = (isset($board_tree[$moved_key - 1]) && $board_tree[$moved_key - 1]['category'] == $board_tree[$moved_key]['category']) ? $board_tree[$moved_key - 1] : null;
-				$board_next = (isset($board_tree[$moved_key + 1]) && $board_tree[$moved_key + 1]['category'] == $board_tree[$moved_key]['category']) ? $board_tree[$moved_key + 1] : null;
+				// Look behind for the previous board and previous sibling
+				$board_previous = (isset($board_tree[$moved_key - 1]) && $board_tree[$moved_key]['category'] == $board_tree[$moved_key - 1]['category']) ? $board_tree[$moved_key - 1] : null;
+				$board_previous_sibling = null;
+				for ($i = $moved_key - 1; $i >= 0; $i--)
+				{
+					// Sibling must have the same category and same parent tree
+					if ($board_tree[$moved_key]['category'] == $board_tree[$i]['category'])
+					{
+						if ($board_tree[$moved_key]['parent'] == $board_tree[$i]['parent'])
+						{
+							$board_previous_sibling = $board_tree[$i];
+							break;
+						}
+						// Don't go to another parent tree
+						elseif ($board_tree[$i]['parent'] == 0)
+							break;
+					}
+					// Don't go to another category
+					else
+						break;
+				}
 
 				// Retrieve the current saved state, returned in global $boards
 				getBoardTree();
@@ -371,29 +392,40 @@ class Xml_Controller extends Action_Controller
 				$board_current = $boards[$board_moved];
 				$board_new = $board_tree[$moved_key];
 
-				// Move to the order defined
-				if (isset($board_previous) && $board_previous['parent'] == $board_new['parent'])
+				// Dropped on a sibling node, move after that
+				if (isset($board_previous_sibling))
+				{
 					$boardOptions = array(
 						'move_to' => 'after',
-						'target_board' => $board_previous['id'],
+						'target_board' => $board_previous_sibling['id'],
 					);
-				elseif (isset($board_next) && $board_next['parent'] == $board_new['parent'])
-					$boardOptions = array(
-						'move_to' => 'before',
-						'target_board' => $board_next['id'],
-					);
-				else
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_after'] . ' ' . $boards[$board_previous_sibling['id']]['name']);
+				}
+				// no sibling, maybe a new child
+				elseif (isset($board_previous))
+				{
 					$boardOptions = array(
 						'move_to' => 'child',
 						'target_board' => $board_previous['id'],
+						'move_first_child' => true,
 					);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boards[$board_previous['id']]['name']);
+				}
+				// nothing before this board at all, move to the top of the cat
+				elseif (!isset($board_previous))
+				{
+					$boardOptions = array(
+						'move_to' => 'top',
+						'target_category' => $board_new['category'],
+					);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $cat_tree[$board_new['category']]['node']['name']);
+				}
 
 				// If we have figured out what to do
 				if (!empty($boardOptions))
-				{
 					modifyBoard($board_moved, $boardOptions);
-					$order[] = array('value' => $board_current['name'] . ' Moved!');
-				}
+				else
+					$errors[] = array('value' => $txt['mboards_board_error']);
 			}
 
 			// New generic token for use
