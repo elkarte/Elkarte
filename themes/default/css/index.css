@@ -111,7 +111,7 @@ h3.catbg:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after,
 }
 .quickbuttons:after {
 	display: block;
-	clear: right;
+	clear: both;
 	content:"";
 }
 /* @todo */
