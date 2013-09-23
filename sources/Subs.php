@@ -2765,17 +2765,6 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// For session check verification.... don't switch browsers...
 	$_SESSION['USER_AGENT'] = $req->user_agent();
 
-	if (!empty($settings['strict_doctype']))
-	{
-		// The theme author wants to use the STRICT doctype (only God knows why).
-		$temp = ob_get_contents();
-		ob_clean();
-
-		echo strtr($temp, array(
-			'var elk_iso_case_folding' => 'var target_blank = \'_blank\'; var elk_iso_case_folding',
-			'target="_blank"' => 'onclick="this.target=target_blank"'));
-	}
-
 	// Hand off the output to the portal, etc. we're integrated with.
 	call_integration_hook('integrate_exit', array($do_footer));
 
