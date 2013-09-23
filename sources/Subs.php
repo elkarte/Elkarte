@@ -3755,6 +3755,41 @@ function setupMenuContext()
 						'href' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc',
 						'show' => allowedTo('admin_forum') && !empty($modSettings['enableErrorLogging']),
 					),
+					'moderate' => array(
+						'title' => $txt['moderate'],
+						'counter' => 'total',
+						'href' => $scripturl . '?action=moderate',
+						'show' => !$context['allow_admin'],
+					),
+					'reports' => array(
+						'title' => $txt['mc_reported_posts'],
+						'counter' => 'reports',
+						'href' => $scripturl . '?action=moderate;area=reports',
+						'show' => !$context['allow_admin'] && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					),
+					'modlog' => array(
+						'title' => $txt['modlog_view'],
+						'href' => $scripturl . '?action=moderate;area=modlog',
+						'show' => !$context['allow_admin'] && !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
+					),
+					'attachments' => array(
+						'title' => $txt['mc_unapproved_attachments'],
+						'counter' => 'attachments',
+						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'poststopics' => array(
+						'title' => $txt['mc_unapproved_poststopics'],
+						'counter' => 'postmod',
+						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
+						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
+					),
+					'postbyemail' => array(
+						'title' => $txt['mc_emailerror'],
+						'counter' => 'emailmod',
+						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+						'show' => !$context['allow_admin'] && !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					),
 					'moderate_sub' => array(
 						'title' => $txt['moderate'],
 						'counter' => 'total',
@@ -3791,41 +3826,6 @@ function setupMenuContext()
 								'show' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 							),
 						),
-					),
-					'moderate' => array(
-						'title' => $txt['moderate'],
-						'counter' => 'total',
-						'href' => $scripturl . '?action=moderate',
-						'show' => !$context['allow_admin'],
-					),
-					'reports' => array(
-						'title' => $txt['mc_reported_posts'],
-						'counter' => 'reports',
-						'href' => $scripturl . '?action=moderate;area=reports',
-						'show' => !$context['allow_admin'] && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
-					),
-					'modlog' => array(
-						'title' => $txt['modlog_view'],
-						'href' => $scripturl . '?action=moderate;area=modlog',
-						'show' => !$context['allow_admin'] && !empty($modSettings['modlog_enabled']) && !empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1',
-					),
-					'attachments' => array(
-						'title' => $txt['mc_unapproved_attachments'],
-						'counter' => 'attachments',
-						'href' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
-					),
-					'poststopics' => array(
-						'title' => $txt['mc_unapproved_poststopics'],
-						'counter' => 'postmod',
-						'href' => $scripturl . '?action=moderate;area=postmod;sa=posts',
-						'show' => !$context['allow_admin'] && $modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']),
-					),
-					'postbyemail' => array(
-						'title' => $txt['mc_emailerror'],
-						'counter' => 'emailmod',
-						'href' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
-						'show' => !$context['allow_admin'] && !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 					),
 				),
 			),
@@ -3935,6 +3935,7 @@ function setupMenuContext()
 					$button['alttitle'] = $button['title'] . ' [' . $menu_count[$button['counter']] . ']';
 					if (!empty($settings['menu_numeric_notice']))
 						$button['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$button['counter']]);
+					unset($menu_count[$button['counter']]);
 				}
 
 				// Go through the sub buttons if there are any.
@@ -3948,6 +3949,7 @@ function setupMenuContext()
 							$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $menu_count[$subbutton['counter']] . ']';
 							if (!empty($settings['menu_numeric_notice']))
 								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$subbutton['counter']]);
+							unset($menu_count[$subbutton['counter']]);
 						}
 
 						// 2nd level sub buttons next...
@@ -3962,6 +3964,7 @@ function setupMenuContext()
 									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $sub_button2['title'] . ' [' . $menu_count[$sub_button2['counter']] . ']';
 									if (!empty($settings['menu_numeric_notice']))
 										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$sub_button2['counter']]);
+									unset($menu_count[$sub_button2['counter']]);
 								}
 							}
 						}
