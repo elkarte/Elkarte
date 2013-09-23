@@ -768,47 +768,47 @@ function relativeTime($timestamp, $show_today = true, $offset_type = false)
 	if (!$timestamp)
 		return 0;
 
-    $past_time = time() - $timestamp;
+	$past_time = time() - $timestamp;
 
 	// Within the first 60 seconds it is just now.
-    if ($past_time < 60)
-        return $txt['rt_now'];
+	if ($past_time < 60)
+		return $txt['rt_now'];
 
 	// Within the first hour?
-    $past_time = floor($past_time/60);
+	$past_time = round($past_time / 60);
 
-    if ($past_time < 60)
-        return sprintf($past_time > 1 ? $txt['rt_minutes'] : $txt['rt_minute'], $past_time);
+	if ($past_time < 60)
+		return sprintf($past_time > 1 ? $txt['rt_minutes'] : $txt['rt_minute'], $past_time);
 
 	// Some hours but less than a day?
-    $past_time = floor($past_time/60);
+	$past_time = round($past_time / 60);
 
-    if ($past_time < 24)
-        return sprintf($past_time > 1 ? $txt['rt_hours'] : $txt['rt_hour'], $past_time);
+	if ($past_time < 24)
+		return sprintf($past_time > 1 ? $txt['rt_hours'] : $txt['rt_hour'], $past_time);
 
 	// Some days ago but less than a week?
-    $past_time = floor($past_time/24);
+	$past_time = round($past_time / 24);
 
-    if ($past_time < 7)
-        return sprintf($past_time > 1 ? $txt['rt_days'] : $txt['rt_day'], $past_time);
+	if ($past_time < 7)
+		return sprintf($past_time > 1 ? $txt['rt_days'] : $txt['rt_day'], $past_time);
 
 	// Weeks ago but less than a month?
-    if ($past_time < 30)
-    {
-        $past_time = floor($past_time / 7);
-        return sprintf($past_time > 1 ? $txt['rt_weeks'] : $txt['rt_week'], $past_time);
-    }
+	if ($past_time < 30)
+	{
+		$past_time = round($past_time / 7);
+		return sprintf($past_time > 1 ? $txt['rt_weeks'] : $txt['rt_week'], $past_time);
+	}
 
 	// Months ago but less than a year?
-    $past_time = floor($past_time/30);
+	$past_time = round($past_time / 30);
 
-    if ($past_time < 12)
-       return sprintf($past_time > 1 ? $txt['rt_months'] : $txt['rt_month'], $past_time);
+	if ($past_time < 12)
+		return sprintf($past_time > 1 ? $txt['rt_months'] : $txt['rt_month'], $past_time);
 
 	// Oha, we've passed at least a year?
-    $past_time = date('Y', time()) - date('Y', $timestamp);
+	$past_time = date('Y', time()) - date('Y', $timestamp);
 
-    return sprintf($past_time > 1 ? $txt['rt_years'] : $txt['rt_year'], $past_time);
+	return sprintf($past_time > 1 ? $txt['rt_years'] : $txt['rt_year'], $past_time);
 }
 
 /**
