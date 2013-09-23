@@ -326,7 +326,7 @@ function template_ic_recent_posts()
 						<td class="recentpost"><strong>', $post['link'], '</strong></td>
 						<td class="recentposter">', $post['poster']['link'], '</td>
 						<td class="recentboard">', $post['board']['link'], '</td>
-						<td class="recenttime"><time datetime="', htmlTime($post['time']), '">', $post['time'], '</time></td>
+						<td class="recenttime"><time datetime="', htmlTime($post['raw_timestamp']), '">', $post['time'], '</time></td>
 					</tr>';
 
 		echo '
