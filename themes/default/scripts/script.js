@@ -1795,3 +1795,94 @@ function markunreadButton(btn)
 	toggleHeaderAJAX(btn, 'main_content_section');
 	return false;
 }
+
+var relative_time_refresh = 0;
+$(document).ready(function () {
+	// We are not using relative times? Then live with what you have :P
+	if (todayMod > 2)
+		relativeTime();
+	
+});
+
+function relativeTime()
+{
+	// In any other case no more than one hour
+	relative_time_refresh = 3600000;
+	$('time').each(function() {
+		var postdate = new Date($(this).attr('datetime'));
+		var today = new Date();
+		var time_text = '';
+		var past_time = (today - postdate) / 1000;
+
+		// Within the first 60 seconds it is just now.
+		if (past_time < 60)
+		{
+			$(this).text(rt_now);
+			relative_time_refresh = Math.min(relative_time_refresh, 10000);
+			return;
+		}
+
+		// Within the first hour?
+		past_time = Math.round(past_time / 60);
+
+		if (past_time < 60)
+		{
+			time_text = past_time > 1 ? rt_minutes : rt_minute;
+			$(this).text(time_text.replace('%s', past_time));
+			relative_time_refresh = Math.min(relative_time_refresh, 60000);
+			return;
+		}
+
+		// Some hours but less than a day?
+		past_time = Math.round(past_time / 60);
+
+		if (past_time < 24)
+		{
+			time_text = past_time > 1 ? rt_hours : rt_hour;
+			$(this).text(time_text.replace('%s', past_time));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+			return;
+		}
+
+		// Some days ago but less than a week?
+		past_time = Math.round(past_time / 24);
+
+		if (past_time < 7)
+		{
+			time_text = past_time > 1 ? rt_days : rt_day;
+			$(this).text(time_text.replace('%s', past_time));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+			return;
+		}
+
+		// Weeks ago but less than a month?
+		if (past_time < 30)
+		{
+			past_time = Math.round(past_time / 7);
+			time_text = past_time > 1 ? rt_weeks : rt_week;
+			$(this).text(time_text.replace('%s', past_time));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+			return;
+		}
+
+		// Months ago but less than a year?
+		past_time = Math.round(past_time / 30);
+
+		if (past_time < 12)
+		{
+			time_text = past_time > 1 ? rt_months : rt_month;
+			$(this).text(time_text.replace('%s', past_time));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+			return;
+		}
+
+		// Oha, we've passed at least a year?
+		past_time = new Date().getFullYear() - new Date($(this).attr('datetime')).getFullYear();
+
+		time_text = past_time > 1 ? rt_years : rt_year;
+		$(this).text(time_text.replace('%s', past_time));
+		relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		return;
+	});
+	setTimeout('relativeTime()', relative_time_refresh);
+}

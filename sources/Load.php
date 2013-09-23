@@ -1576,8 +1576,26 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
-		'use_click_menu' => (!empty($options['use_click_menu']) ? 'true' : 'false'),
+		'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
+		'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0,
 	);
+
+	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
+		$context['javascript_vars'] += array(
+			'rt_now' => JavaScriptEscape($txt['rt_now']),
+			'rt_minute' => JavaScriptEscape($txt['rt_minute']),
+			'rt_minutes' => JavaScriptEscape($txt['rt_minutes']),
+			'rt_hour' => JavaScriptEscape($txt['rt_hour']),
+			'rt_hours' => JavaScriptEscape($txt['rt_hours']),
+			'rt_day' => JavaScriptEscape($txt['rt_day']),
+			'rt_days' => JavaScriptEscape($txt['rt_days']),
+			'rt_week' => JavaScriptEscape($txt['rt_week']),
+			'rt_weeks' => JavaScriptEscape($txt['rt_weeks']),
+			'rt_month' => JavaScriptEscape($txt['rt_month']),
+			'rt_months' => JavaScriptEscape($txt['rt_months']),
+			'rt_year' => JavaScriptEscape($txt['rt_year']),
+			'rt_years' => JavaScriptEscape($txt['rt_years']),
+		);
 
 	// Queue our Javascript
 	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'theme.js'));
