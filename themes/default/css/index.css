@@ -1823,17 +1823,12 @@ img.new_posts {
 	margin: 0;
 	font-size: 0.765em;
 }
-#description_board>p{
+#description_board>p, #forumposts>p{
 	background: #fff;
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	margin-top: 2px;
 	padding: 4px 12px;
-}
-.whoisviewing {
-	padding: 4px 0;
-	display: block;
-	font-size: 0.857em;
 }
 .topic_listing {
 	background: #e4e4e4;
@@ -2104,12 +2099,14 @@ img.new_posts {
 	float: right;
 }
 #whoisviewing, #redirectfrom {
-	padding: 4px 1em;
+	font-size: 0.857em;
+	padding: 4px 0;
+	display: block;
 	font-size: 0.857em;
 }
 /* Poster and postarea + moderation area underneath */
 
-#whoisviewing, #redirectfrom, .forumposts .windowbg, .forumposts .windowbg2,
+.forumposts .windowbg, .forumposts .windowbg2,
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
