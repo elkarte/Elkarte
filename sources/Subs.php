@@ -4003,8 +4003,6 @@ function setupMenuContext()
 		$current_action = 'moderate';
 	elseif ($context['current_action'] == 'moderate' && !$context['allow_admin'])
 		$current_action = 'admin';
-	elseif ($context['current_action'] == 'moderate' && !$context['allow_admin'])
-		$current_action = 'admin';
 
 	// Not all actions are simple.
 	if (!empty($needs_action_hook))
