@@ -476,69 +476,7 @@ class Recent_Controller extends Action_Controller
 					SUBSTRING(ms.body, 1, 385) AS first_body, ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg';
 
 		if ($context['showing_all_topics'])
-		{
-			if (!empty($board))
-			{
-				$request = $db->query('', '
-					SELECT MIN(id_msg)
-					FROM {db_prefix}log_mark_read
-					WHERE id_member = {int:current_member}
-						AND id_board = {int:current_board}',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-					)
-				);
-				list ($earliest_msg) = $db->fetch_row($request);
-				$db->free_result($request);
-			}
-			else
-			{
-				$request = $db->query('', '
-					SELECT MIN(lmr.id_msg)
-					FROM {db_prefix}boards AS b
-						LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
-					WHERE {query_see_board}',
-					array(
-						'current_member' => $user_info['id'],
-					)
-				);
-				list ($earliest_msg) = $db->fetch_row($request);
-				$db->free_result($request);
-			}
-
-			// This is needed in case of topics marked unread.
-			if (empty($earliest_msg))
-				$earliest_msg = 0;
-			else
-			{
-				// Using caching, when possible, to ignore the below slow query.
-				if (isset($_SESSION['cached_log_time']) && $_SESSION['cached_log_time'][0] + 45 > time())
-					$earliest_msg2 = $_SESSION['cached_log_time'][1];
-				else
-				{
-					// This query is pretty slow, but it's needed to ensure nothing crucial is ignored.
-					$request = $db->query('', '
-						SELECT MIN(id_msg)
-						FROM {db_prefix}log_topics
-						WHERE id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-						)
-					);
-					list ($earliest_msg2) = $db->fetch_row($request);
-					$db->free_result($request);
-
-					// In theory this could be zero, if the first ever post is unread, so fudge it ;)
-					if ($earliest_msg2 == 0)
-						$earliest_msg2 = -1;
-
-					$_SESSION['cached_log_time'] = array(time(), $earliest_msg2);
-				}
-
-				$earliest_msg = min($earliest_msg2, $earliest_msg);
-			}
-		}
+			$earliest_msg = earliest_msg();
 
 		// @todo Add modified_time in for log_time check?
 
