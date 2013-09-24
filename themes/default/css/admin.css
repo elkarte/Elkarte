@@ -1145,7 +1145,7 @@ ul.moderation_notes li {
 	}
 }
 
-#table_grid_sortable td {
+#table_grid_sortable td:nth-child(2) {
     cursor: move;
 }
 
