@@ -891,11 +891,12 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$db->free_result($request);
 	}
 
-	if (!empty($new_loaded_ids) && $set !== 'minimal')
+	// Custom profile fields as well
+	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
 		$request = $db->query('', '
-			SELECT *
-			FROM {db_prefix}themes
+			SELECT id_member, variable, value
+			FROM {db_prefix}custom_fields_data
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
 			array(
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
@@ -2625,7 +2626,7 @@ function detectServer()
  * - checks the existence of critical files e.g. install.php
  * - checks for an active admin session.
  * - checks cache directory is writable.
- * - calls secureDirectory to protect attachments & cache. 
+ * - calls secureDirectory to protect attachments & cache.
  */
 function doSecurityChecks()
 {
