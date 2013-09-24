@@ -1830,17 +1830,8 @@ $(document).ready(function () {
 				ev.preventDefault();
 			}).hover(
 				function() {
-					var $pages = $exp_pages.find('a'),
-						move = 0;
-
-					for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
-						move += $($pages[i]).outerWidth();
-
-					move = ($exp_pages.offset().left + move + $container.find('#pages_scroll_left').outerWidth()) -
-					($container.offset().left + $container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
-
 					$exp_pages.animate({
-						'margin-left': -move
+						'margin-left': 0
 					}, 200 * pages);
 				},
 				function() {
@@ -1869,8 +1860,17 @@ $(document).ready(function () {
 				ev.preventDefault();
 			}).hover(
 				function() {
+					var $pages = $exp_pages.find('a'),
+						move = 0;
+
+					for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
+						move += $($pages[i]).outerWidth();
+
+					move = ($container.offset().left + move + $container.find('#pages_scroll_left').outerWidth()) -
+					($container.offset().left + $container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
+
 					$exp_pages.animate({
-						'margin-left': 0
+						'margin-left': -move
 					}, 200 * pages);
 				},
 				function() {
