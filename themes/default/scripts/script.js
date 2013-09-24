@@ -1798,10 +1798,11 @@ function markunreadButton(btn)
 
 var relative_time_refresh = 0;
 $(document).ready(function () {
-	$('.expand_pages').click(function() {
+	$('.expand_pages').attr('tabindex', 0)
+	.click(function() {
 		$(this).data('expanded', 'true');
 	})
-	.hover(
+	.bind("mouseenter focus",
 		function()
 		{
 			if ($(this).data('expanded') == 'true')
@@ -1900,7 +1901,8 @@ $(document).ready(function () {
 				'height': $(this).prev().outerHeight(),
 				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
 			});
-		},
+		})
+	.bind("mouseleave",
 		function()
 		{
 			$(this).find('#expanded_pages_container').remove();
