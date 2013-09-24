@@ -1233,26 +1233,17 @@ function getBoardNotificationsCount($memID)
 /**
  * Returns all the boards accessible to the current user.
  * If $id_parents is given, return only the child boards of those boards.
+ * If $id_boards is given, filters the boards to only those accessible
  *
  * @param @id_parents
+ * @param $id_boards
  */
-function accessibleBoards($id_parents = null)
+function accessibleBoards($id_parents = null, $id_boards = null)
 {
 	$db = database();
 
 	$boards = array();
-	if (empty($id_parents))
-	{
-		// Find all the boards this user can see.
-		$request = $db->query('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards AS b
-			WHERE {query_see_board}',
-			array(
-			)
-		);
-	}
-	else
+	if (!empty($id_parents))
 	{
 		// Find all boards down from $id_parent
 		$request = $db->query('', '
@@ -1265,6 +1256,64 @@ function accessibleBoards($id_parents = null)
 			)
 		);
 	}
+	elseif (!empty($id_boards))
+	{
+		// Find all the boards this user can see between those selected 
+		$request = $db->query('', '
+			SELECT b.id_board
+			FROM {db_prefix}boards AS b
+			WHERE b.id_board IN ({array_int:board_list})
+				AND {query_see_board}',
+			array(
+				'board_list' => $id_boards,
+			)
+		);
+	}
+	else
+	{
+		// Find all the boards this user can see.
+		$request = $db->query('', '
+			SELECT b.id_board
+			FROM {db_prefix}boards AS b
+			WHERE {query_see_board}',
+			array(
+			)
+		);
+	}
+
+	while ($row = $db->fetch_assoc($request))
+		$boards[] = $row['id_board'];
+	$db->free_result($request);
+
+	return $boards;
+}
+
+/**
+ * Returns the boards the current user wants to see.
+ *
+ * @param string $see_board: one beteen 'query_see_board' and 'query_wanna_see_board'
+ * @param bool $hide_recycle is tru the recycle bin is not returned
+ */
+function wantedBoards($see_board, $hide_recycle = true)
+{
+	global $modSettings, $user_info;
+
+	$db = database();
+	$allowed_see = array(
+		'query_see_board',
+		'query_wanna_see_board'
+	);
+
+	// Find all boards down from $id_parent
+	$request = $db->query('', '
+		SELECT b.id_board
+		FROM {db_prefix}boards AS b
+		WHERE ' . $user_info[in_array($see_board, $allowed_see) ? $see_board : $allowed_see[0]] . ($hide_recycle && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle_board}' : ''),
+		array(
+			'recycle_board' => (int) $modSettings['recycle_board'],
+		)
+	);
 
 	while ($row = $db->fetch_assoc($request))
 		$boards[] = $row['id_board'];
