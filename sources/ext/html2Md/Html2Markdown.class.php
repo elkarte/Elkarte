@@ -74,7 +74,7 @@ class Convert_Md
 		else
 		{
 			$this->_parser = false;
-			require_once(EXTDIR . '/html2Md/simple_html_dom.php');
+			require_once(EXTDIR . '/simple_html_dom.php');
 			$this->doc = str_get_html($html, true, true, 'UTF-8', false);
 		}
 
