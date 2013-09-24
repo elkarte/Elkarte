@@ -1465,9 +1465,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
 					$value = '';
 				elseif ($row['mask'] == 'number')
-				{
 					$value = (int) $value;
-				}
 				elseif (substr($row['mask'], 0, 5) == 'regex' && preg_match(substr($row['mask'], 5), $value) === 0)
 					$value = '';
 			}
@@ -1486,7 +1484,8 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 					'member_affected' => $memID,
 				),
 			);
-			$changes[] = array(1, $row['col_name'], $value, $memID);
+
+			$changes[] = array($row['col_name'], $value, $memID);
 			$user_profile[$memID]['options'][$row['col_name']] = $value;
 		}
 	}
@@ -1498,11 +1497,12 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	if (!empty($changes) && empty($context['password_auth_failed']))
 	{
 		$db->insert('replace',
-			'{db_prefix}themes',
-			array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
+			'{db_prefix}custom_fields_data',
+			array('variable' => 'string-255', 'value' => 'string-65534', 'id_member' => 'int'),
 			$changes,
-			array('id_theme', 'variable', 'id_member')
+			array('variable', 'id_member')
 		);
+
 		if (!empty($log_changes) && !empty($modSettings['modlog_enabled']))
 			logActions($log_changes);
 	}
