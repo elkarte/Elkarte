@@ -73,15 +73,18 @@ function template_main()
 		$first = true;
 		$depth = 0;
 
+		// If there is nothing in a category, add a drop zone
+		if (empty($category['boards']))
+			echo '
+						<li id="cbp_' . $category['id'] . ',-1,"></li>';
+
 		// List through every board in the category, printing its name and link to modify the board.
 		foreach ($category['boards'] as $board)
 		{
 			// Going in a level deeper (child board)
 			if ($board['child_level'] > $depth)
-			{
 				echo '
 							<ul class="nolist">';
-			}
 			// Backing up a level to a childs parent
 			elseif ($board['child_level'] < $depth)
 			{
@@ -93,10 +96,8 @@ function template_main()
 			}
 			// Base node parent but not the first one
 			elseif ($board['child_level'] == 0 && !$first)
-			{
 				echo '
 						</li>';
-			}
 
 			echo '
 						<li id="cbp_' . $category['id'] . ',' . $board['id'] . '"', ' class="windowbg', $alternate ? '' : '2', (!empty($modSettings['recycle_board']) && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board['id'] ? ' recycle_board' : ''), '" style="', $board['move'] ? ';color: red;' : '', '">
@@ -125,9 +126,21 @@ function template_main()
 			$first = false;
 		}
 
-		// Done with this category
-		echo '
+		// All done, backing up to a base node
+		if (!$first)
+		{
+			if ($depth > 0)
+			{
+				for ($i = $depth; $i > 0; $i--)
+					echo
+						'
+								</li>
+							</ul>';
+			}
+
+			echo '
 						</li>';
+		}
 
 		// Button to add a new board.
 		echo '

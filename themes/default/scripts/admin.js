@@ -801,7 +801,7 @@ function toggleBaseDir ()
 		dir_elem.disabled = !sub_dir.checked;
 }
 
-// Drag and drop to reorder table TD's via UI Sortable
+// Drag and drop to reorder ID's via UI Sortable
 (function($) {
 	'use strict';
 	$.fn.elkSortable = function(oInstanceSettings) {
@@ -809,6 +809,7 @@ function toggleBaseDir ()
 			opacity: 0.7,
 			cursor: 'move',
 			axis: 'y',
+			scroll: true,
 			containment: 'parent',
 			delay: 150,
 			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
@@ -847,6 +848,7 @@ function toggleBaseDir ()
 			placeholder: oSettings.placeholder,
 			tolerance: oSettings.tolerance,
 			delay: oSettings.delay,
+			scroll: oSettings.scroll,
 			update: function(e, ui) {
 				// Called when an element is dropped in a new location
 				var postdata = '',
@@ -871,11 +873,11 @@ function toggleBaseDir ()
 				// Get all id's in all the sortable containers
 				{
 					$(oSettings.tag).each(function() {
-					// Serialize will be 1-n of each nesting / connector
-					if (postdata === "")
-					   postdata += $(this).sortable(oSettings.setorder);
-					else
-					   postdata += "&" + $(this).sortable(oSettings.setorder);
+						// Serialize will be 1-n of each nesting / connector
+						if (postdata === "")
+						   postdata += $(this).sortable(oSettings.setorder);
+						else
+						   postdata += "&" + $(this).sortable(oSettings.setorder);
 					});
 				}
 
@@ -947,12 +949,25 @@ function toggleBaseDir ()
 function setBoardIds() {
 	// For each category of board
 	$("[id^=category_]").each(function() {
-		var cat = $(this).attr('id').split('category_');
+		var cat = $(this).attr('id').split('category_'),
+			uls = $(this).find("ul");
 
-		// Every li needs a child ul so we have a "child-of" drop zone
-		$(this).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
+		// First up add drop zones so we can drag and drop to each level
+		if (uls.length === 1)
+		{
+			// A single empty ul in a category, this can happen when a cat is dragged empty
+			if ($(uls).find("li").length === 0)
+				$(uls).append('<li id="cbp_' + cat + ',-1,-1"></li>');
+			// Otherwise the li's need a child ul so we have a "child-of" drop zone
+			else
+				$(uls).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
+		}
+		// All others normally
+		else
+			$(uls).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
 
-		// Get all the ul's in this category div that have children
+		// Next make find all the ul's in this category that have children, update the
+		// id's with information that indicates the 1-n and parent/child info
 		$(this).find('ul:parent').each(function(i, ul) {
 
 			// Get the (li) parent of this ul

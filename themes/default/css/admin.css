@@ -522,13 +522,6 @@ dl.settings dd.questions input {
 #manage_boards .titlebg {
 	border-bottom: 1px solid #bbb;
 }
-#manage_boards .windowbg {
-	background: none;
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
-	border: none;
-	border-radius: 7px 7px 0 0;
-}
 #manage_boards .catbg {
 	padding: 8px 16px 4px 16px;
 	color: #444;
@@ -543,10 +536,17 @@ dl.settings dd.questions input {
 	margin: 0;
 	padding: 0;
 }
-
+#manage_boards .content {
+	background: #efefef;
+	margin: -6px 0 12px 0;
+	padding: 6px 8px 16px 8px;
+	border: 1px solid #ccc;
+	border-top: 0px solid;
+	overflow: auto;
+	border-radius: 0 0 7px 7px;
+}
 #manage_boards ul {
 	margin: 0 0 12px;
-	max-height: 30em;
 }
 #manage_boards ul:nth-child(n+2) {
 	min-height: 12px;

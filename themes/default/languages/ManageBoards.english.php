@@ -20,6 +20,9 @@ $txt['mboards_order_after'] = 'After ';
 $txt['mboards_order_inside'] = 'Inside ';
 $txt['mboards_order_first'] = 'In first place';
 
+$txt['mboards_board_moved'] = 'Successfully moved.';
+$txt['mboards_board_error'] = 'Failed to resolve move location.';
+
 $txt['mboards_new_board'] = 'Add Board';
 $txt['mboards_new_cat_name'] = 'New Category';
 $txt['mboards_add_cat_button'] = 'Add Category';
