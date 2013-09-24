@@ -1781,6 +1781,16 @@ dl.settings textarea {
 .topic_sorting>li {
 	padding: 0 3px;
 }
+#expanded_pages_container {
+	position: absolute;
+	margin-left: -50px;
+}
+#expanded_pages_out_container {
+	position: relative;
+}
+#expanded_pages_container, #expanded_pages {
+	overflow: hidden;
+}
 
 /* -------------------------------------------- */
 /* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
