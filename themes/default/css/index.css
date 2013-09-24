@@ -1772,7 +1772,10 @@ dl.settings textarea {
 .sort_by_item {
 	width: 7em;
 }
-.topic_sorting>li, .topic_sorting {
+.topic_sorting>li {
+	float: right;
+}
+.topic_sorting {
 	float: right;
 }
 .topic_sorting>li {
@@ -1823,20 +1826,20 @@ img.new_posts {
 	margin: 0;
 	font-size: 0.765em;
 }
-#description_board>p, #forumposts>p{
+#description_board .generalinfo, #forumposts .generalinfo {
 	background: #fff;
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	margin-top: 2px;
-	padding: 4px 12px;
+	padding: 4px 4px 4px 12px;
+}
+#description_board .generalinfo .listlevel2 {
+	white-space:nowrap;
 }
 .topic_listing {
 	background: #e4e4e4;
 	box-shadow: 1px 2px 4px #eee;
 	padding: 1px 0 0 0;
-}
-.topic_sorting {
-	border: 1px solid #e4e4e4;
 }
 .topic_listing>li {
 	border: 1px solid #ddd;
@@ -2101,8 +2104,11 @@ img.new_posts {
 #whoisviewing, #redirectfrom {
 	font-size: 0.857em;
 	padding: 4px 0;
-	display: block;
+	display: inline-block;
 	font-size: 0.857em;
+}
+#boarddescription {
+	display: block;
 }
 /* Poster and postarea + moderation area underneath */
 
