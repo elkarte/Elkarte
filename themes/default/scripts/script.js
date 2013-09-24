@@ -1820,25 +1820,6 @@ $(document).ready(function () {
 
 			var aModel = $(this).prev().clone();
 
-			$container.append(aModel.clone().css({
-				'position': 'absolute',
-				'top': 0,
-				'left': 0
-			})
-			.attr('id', 'pages_scroll_left')
-			.attr('href', '#').text('<').click(function(ev) {
-				ev.preventDefault();
-			}).hover(
-				function() {
-					$exp_pages.animate({
-						'margin-left': 0
-					}, 200 * pages);
-				},
-				function() {
-					$exp_pages.stop();
-				}
-			));
-
 			for (var i = firstpage; i < lastpage; i += perpage)
 			{
 				pages++;
@@ -1847,42 +1828,71 @@ $(document).ready(function () {
 				bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perpage + 1);
 				$exp_pages.append(bElem);
 			}
+
+			if (pages > width_elements)
+				$container.append(aModel.clone().css({
+					'position': 'absolute',
+					'top': 0,
+					'left': 0
+				})
+				.attr('id', 'pages_scroll_left')
+				.attr('href', '#').text('<').click(function(ev) {
+					ev.preventDefault();
+				}).hover(
+					function() {
+						$exp_pages.animate({
+							'margin-left': 0
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+					}
+				));
+
 			$container.append($exp_pages);
 			$(this).append($container);
 
-			$container.append(aModel.clone().css({
-				'position': 'absolute',
-				'top': 0,
-				'right': 0
-			})
-			.attr('id', 'pages_scroll_right')
-			.attr('href', '#').text('>').click(function(ev) {
-				ev.preventDefault();
-			}).hover(
-				function() {
-					var $pages = $exp_pages.find('a'),
-						move = 0;
+			if (pages > width_elements)
+				$container.append(aModel.clone().css({
+					'position': 'absolute',
+					'top': 0,
+					'right': 0
+				})
+				.attr('id', 'pages_scroll_right')
+				.attr('href', '#').text('>').click(function(ev) {
+					ev.preventDefault();
+				}).hover(
+					function() {
+						var $pages = $exp_pages.find('a'),
+							move = 0;
 
-					for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
-						move += $($pages[i]).outerWidth();
+						for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
+							move += $($pages[i]).outerWidth();
 
-					move = ($container.offset().left + move + $container.find('#pages_scroll_left').outerWidth()) -
-					($container.offset().left + $container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
+						move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
 
-					$exp_pages.animate({
-						'margin-left': -move
-					}, 200 * pages);
-				},
-				function() {
-					$exp_pages.stop();
-				}
-			));
+						$exp_pages.animate({
+							'margin-left': -move
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+					}
+				));
 
 			$exp_pages.find('a').each(function() {
 				if (width_elements > -1)
 					container_width += $(this).outerWidth();
-				else
-					$container.width(container_width);
+
+				if (width_elements <= 0 || pages >= width_elements)
+				{
+					$container.css({
+						'margin-left': -container_width / 2
+					}).width(container_width);
+				}
+
+				if (width_elements < 0)
+					return false;
 
 				width_elements--;
 			});
