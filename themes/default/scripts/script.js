@@ -1800,89 +1800,153 @@ var relative_time_refresh = 0;
 $(document).ready(function () {
 	// We are not using relative times? Then live with what you have :P
 	if (todayMod > 2)
-		relativeTime();
+		updateRelativeTime();
 	
 });
 
-function relativeTime()
+function updateRelativeTime()
 {
 	// In any other case no more than one hour
 	relative_time_refresh = 3600000;
 	$('time').each(function() {
+		var oRelativeTime = new relativeTime($(this).attr('datetime'));
 		var postdate = new Date($(this).attr('datetime'));
 		var today = new Date();
 		var time_text = '';
 		var past_time = (today - postdate) / 1000;
 
-		// Within the first 60 seconds it is just now.
-		if (past_time < 60)
+		if (oRelativeTime.seconds())
 		{
 			$(this).text(rt_now);
 			relative_time_refresh = Math.min(relative_time_refresh, 10000);
-			return;
 		}
-
-		// Within the first hour?
-		past_time = Math.round(past_time / 60);
-
-		if (past_time < 60)
+		else if (oRelativeTime.minutes())
 		{
-			time_text = past_time > 1 ? rt_minutes : rt_minute;
-			$(this).text(time_text.replace('%s', past_time));
+			time_text = oRelativeTime.deltaTime > 1 ? rt_minutes : rt_minute;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 60000);
-			return;
 		}
-
-		// Some hours but less than a day?
-		past_time = Math.round(past_time / 60);
-
-		if (past_time < 24)
+		else if (oRelativeTime.hours())
 		{
-			time_text = past_time > 1 ? rt_hours : rt_hour;
-			$(this).text(time_text.replace('%s', past_time));
+			time_text = oRelativeTime.deltaTime > 1 ? rt_hours : rt_hour;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
-			return;
 		}
-
-		// Some days ago but less than a week?
-		past_time = Math.round(past_time / 24);
-
-		if (past_time < 7)
+		else if (oRelativeTime.days())
 		{
-			time_text = past_time > 1 ? rt_days : rt_day;
-			$(this).text(time_text.replace('%s', past_time));
+			time_text = oRelativeTime.deltaTime > 1 ? rt_days : rt_day;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
-			return;
 		}
-
-		// Weeks ago but less than a month?
-		if (past_time < 30)
+		else if (oRelativeTime.weeks())
 		{
-			past_time = Math.round(past_time / 7);
-			time_text = past_time > 1 ? rt_weeks : rt_week;
-			$(this).text(time_text.replace('%s', past_time));
+			time_text = oRelativeTime.deltaTime > 1 ? rt_weeks : rt_week;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
-			return;
 		}
-
-		// Months ago but less than a year?
-		past_time = Math.round(past_time / 30);
-
-		if (past_time < 12)
+		else if (oRelativeTime.months())
 		{
-			time_text = past_time > 1 ? rt_months : rt_month;
-			$(this).text(time_text.replace('%s', past_time));
+			time_text = oRelativeTime.deltaTime > 1 ? rt_months : rt_month;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
-			return;
 		}
-
-		// Oha, we've passed at least a year?
-		past_time = new Date().getFullYear() - new Date($(this).attr('datetime')).getFullYear();
-
-		time_text = past_time > 1 ? rt_years : rt_year;
-		$(this).text(time_text.replace('%s', past_time));
-		relative_time_refresh = Math.min(relative_time_refresh, 3600000);
-		return;
+		else if (oRelativeTime.years())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? rt_years : rt_year;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
 	});
-	setTimeout('relativeTime()', relative_time_refresh);
+	setTimeout('updateRelativeTime()', relative_time_refresh);
+}
+
+function relativeTime (sFrom, sTo)
+{
+	if (typeof sTo == 'undefined')
+		this.dateTo = new Date();
+	else
+		this.dateTo = new Date(sTo);
+
+	this.dateFrom = new Date(sFrom);
+
+	this.time_text = '';
+	this.past_time = (this.dateTo - this.dateFrom) / 1000;
+	this.deltaTime = 0;
+}
+
+relativeTime.prototype.seconds = function ()
+{
+	// Within the first 60 seconds it is just now.
+	if (this.past_time < 60)
+	{
+		this.deltaTime = this.past_time;
+		return true;
+	}
+	return false;
+}
+
+relativeTime.prototype.minutes = function ()
+{
+	// Within the first hour?
+	if (this.past_time >= 60 && Math.round(this.past_time / 60) < 60)
+	{
+		this.deltaTime = Math.round(this.past_time / 60);
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.hours = function ()
+{
+	// Some hours but less than a day?
+	if (Math.round(this.past_time / 60) >= 60 && Math.round(this.past_time / 3600) < 24)
+	{
+		this.deltaTime = Math.round(this.past_time / 3600);
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.days = function ()
+{
+	// Some days ago but less than a week?
+	if (Math.round(this.past_time / 3600) >= 24 && Math.round(this.past_time / (24 * 3600)) < 7)
+	{
+		this.deltaTime = Math.round(this.past_time / (24 * 3600));
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.weeks = function ()
+{
+	// Weeks ago but less than a month?
+	if (Math.round(this.past_time / (24 * 3600)) >= 7 && Math.round(this.past_time / (24 * 3600)) < 30)
+	{
+		this.deltaTime = Math.round(this.past_time / (24 * 3600));
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.months = function ()
+{
+	// Months ago but less than a year?
+	if (Math.round(this.past_time / (24 * 3600)) >= 30 && Math.round(this.past_time / (30 * 24 * 3600)) < 12)
+	{
+		this.deltaTime = Math.round(this.past_time / (30 * 24 * 3600));
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.years = function ()
+{
+	// Oha, we've passed at least a year?
+	if (Math.round(this.past_time / (30 * 24 * 3600)) >= 12)
+	{
+		this.deltaTime = this.dateTo.getFullYear() - this.dateFrom.getFullYear();
+		return true;
+	}
+	return false
 }
