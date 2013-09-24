@@ -273,6 +273,25 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 }
 
 /**
+ * Update the custom profile fields active status on/off
+ *
+ * @param array $enabled
+ */
+function updateRenamedProfileStatus($enabled)
+{
+	$db = database();
+
+	// Do the updates
+	$db->query('', '
+		UPDATE {db_prefix}custom_fields
+		SET active = CASE WHEN id_field IN ({array_int:id_cust_enable}) THEN 1 ELSE 0 END',
+		array(
+			'id_cust_enable' => $enabled,
+		)
+	);
+}
+
+/**
  * Update the profile field
  *
  * @param type $field_data

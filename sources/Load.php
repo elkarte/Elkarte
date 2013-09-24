@@ -894,7 +894,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	// Custom profile fields as well
 	if (!empty($new_loaded_ids) && $set !== 'minimal' && (in_array('cp', $context['admin_features'])))
 	{
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, variable, value
 			FROM {db_prefix}custom_fields_data
 			WHERE id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),

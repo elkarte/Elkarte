@@ -990,13 +990,15 @@ class ManageFeatures_Controller extends Action_Controller
 				'cust' => array(
 					'header' => array(
 						'value' => $txt['custom_profile_active'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							$isChecked = $rowData[\'active\'] ? \'\' : \' checked="checked"\';
+							$isChecked = $rowData[\'active\'] ? \' checked="checked"\' :  \'\';
 							return sprintf(\'<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />\', $rowData[\'id_field\'], $isChecked);
 						'),
 						'style' => 'width: 8%;',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'active DESC',
@@ -1040,8 +1042,8 @@ class ManageFeatures_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="button_submit" />
-					<input type="submit" name="onoff" value="' . $txt['save'] . '" class="button_submit" />',
+					'value' => '<input type="submit" name="onoff" value="' . $txt['save'] . '" class="right_submit" />
+					<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
 				),
 			),
 			'javascript' => '
@@ -1118,14 +1120,7 @@ class ManageFeatures_Controller extends Action_Controller
 			foreach ($_POST['cust'] as $id)
 				$enabled[] = (int) $id;
 
-			// Do the updates
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}custom_fields
-				SET active = CASE WHEN id_field IN ({array_int:id_cust_enable}) THEN 0 ELSE 1 END',
-				array(
-					'id_cust_enable' => $enabled,
-				)
-			);
+			updateRenamedProfileStatus($enabled);
 		}
 		// Are we saving?
 		elseif (isset($_POST['save']))
