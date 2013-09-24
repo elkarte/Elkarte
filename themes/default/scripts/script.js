@@ -1798,7 +1798,7 @@ function markunreadButton(btn)
 
 var relative_time_refresh = 0;
 $(document).ready(function () {
-	$('.pagelinks .expand_pages').click(function() {
+	$('.expand_pages').click(function() {
 		$(this).data('expanded', 'true');
 	})
 	.hover(

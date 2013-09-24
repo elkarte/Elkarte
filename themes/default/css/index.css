@@ -1784,6 +1784,9 @@ dl.settings textarea {
 #expanded_pages_container {
 	position: absolute;
 }
+#expanded_pages_container a {
+	background: #fff;
+}
 #expanded_pages_out_container {
 	position: relative;
 }
