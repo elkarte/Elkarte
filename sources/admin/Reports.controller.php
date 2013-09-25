@@ -169,7 +169,7 @@ class Reports_Controller extends Action_Controller
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
 		$groups = array(-1 => $txt['guest_title'], 0 => $txt['full_member']);
 		foreach ($all_groups as $row)
-			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
+			$groups[$row['id']] = empty($row['online_color']) ? $row['name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['name'] . '</span>';
 
 		// All the fields we'll show.
 		$boardSettings = array(

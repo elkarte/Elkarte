@@ -64,9 +64,6 @@ function template_init()
 	// Show sticky and lock status separate from topic icons?
 	$settings['separate_sticky_lock'] = true;
 
-	// Does this theme use the strict doctype?
-	$settings['strict_doctype'] = false;
-
 	// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
 	$settings['require_theme_strings'] = false;
 

@@ -104,6 +104,14 @@ if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt')
 if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
+//this may be SMF 
+if (!file_exists($sourcedir . '/controllers'))
+{
+	$sourcedir = str_replace('/Sources', '/sources', $sourcedir);
+	if (!file_exists($sourcedir . '/controllers') && file_exists($boarddir . '/sources'))
+		$sourcedir = $boarddir . '/sources';
+}
+
 // Check that directories which didn't exist in past releases are initialized.
 if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
 	$cachedir = $boarddir . '/cache';

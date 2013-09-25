@@ -2903,9 +2903,8 @@ function prepareDraftsContext($member_id, $id_pm = false)
 		loadDraft((int) $_REQUEST['id_draft'], 1, true, true);
 
 	// load all the drafts for this user that meet the criteria
-	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
 	$order = 'poster_time DESC';
-	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $drafts_keep_days, $order);
+	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $order);
 
 	// add them to the context draft array for template display
 	foreach ($user_drafts as $draft)
