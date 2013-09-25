@@ -864,7 +864,7 @@ function shorten_text($text, $len = 384, $cutword = false, $buffer = 12)
 	// If its to long, cut it down to size
 	if (Util::strlen($text) > $len)
 	{
-		$text = html_entity_decode($text);
+		$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
 
 		if ($cutword)
 		{
