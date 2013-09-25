@@ -157,6 +157,35 @@ function template_pages_and_buttons_above()
 				<span class="moderators">(', count($context['moderators']) === 1 ? $txt['moderator'] : $txt['moderators'], ': ', implode(', ', $context['link_moderators']), '.)</span>';
 
 		echo '
+			</h2>';
+
+		echo '
+			<div class="generalinfo">';
+
+		if (!empty($context['description']))
+			echo '
+				<span id="boarddescription">
+					', $context['description'], '
+				</span>';
+
+		// @todo - Thought the who is stuff was better here. Presentation still WIP.
+		if (!empty($settings['display_who_viewing']))
+		{
+			echo '
+				<span id="whoisviewing">';
+
+			if ($settings['display_who_viewing'] == 1)
+				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
+			else
+				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
+
+			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
+
+			echo '
+				</span>';
+		}
+
+		echo '
 				<ul class="topic_sorting" id="sort_by">';
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
@@ -184,39 +213,8 @@ function template_pages_and_buttons_above()
 					</li>
 				</ul>';
 
-		echo '
-			</h2>';
-
-		if (!empty($context['description']) || !empty($settings['display_who_viewing']))
-			echo '
-			<p>';
-
-		if (!empty($context['description']))
-			echo '
-			<span id="boarddescription">
-				', $context['description'], '
-			</span>';
-
-		// @todo - Thought the who is stuff was better here. Presentation still WIP.
-		if (!empty($settings['display_who_viewing']))
-		{
-			echo '
-			<span id="whoisviewing">';
-
-			if ($settings['display_who_viewing'] == 1)
-				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
-			else
-				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
-
-			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_board'];
-
-			echo '
-			</span>';
-		}
-
-		if (!empty($context['description']) || !empty($settings['display_who_viewing']))
-			echo'
-			</p>';
+		echo'
+			</div>';
 
 		echo '
 		</div>';

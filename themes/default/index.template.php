@@ -85,7 +85,7 @@ function template_init()
 		'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
 		'current_page' => '<strong class="current_page" role="menuitem">%1$s</strong>',
 		'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
-		'expand_pages' => '<span class="expand_pages" role="menuitem" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
+		'expand_pages' => '<span class="expand_pages" role="menuitem" {custom} onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 		'all' => '<span class="all_pages" role="menuitem">{all_txt}</span>',
 	);
 }
