@@ -137,12 +137,7 @@ class Maintenance_Controller extends Action_Controller
 
 		if ($db_type == 'mysql')
 		{
-			$table = db_table();
-
-			$colData = $table->db_list_columns('{db_prefix}messages', true);
-			foreach ($colData as $column)
-				if ($column['name'] == 'body')
-					$body_type = $column['type'];
+			$body_type = fetchBodyType();
 
 			$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
 			$context['convert_to_suggest'] = ($body_type != 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
