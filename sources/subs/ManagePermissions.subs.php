@@ -758,6 +758,7 @@ function assignPermissionProfileToBoard($profile, $board)
  * @param array $groups
  * @param array $illgeal_permissions
  * @param array $non_guest_permissions
+ * @todo another function with the same name in Membergroups.subs.php
  */
 function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
 {

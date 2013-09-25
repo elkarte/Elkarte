@@ -1626,7 +1626,7 @@ function boardsPosts($boards, $categories, $wanna_see_board = false)
  *              'sort_by' => (string) defines the sorting of the results (allowed: id_board, name)
  *              'count' => (bool) the number of boards found is returned
  *              'selects' => (string) determines what informations are retrieved and returned
- *                           Allowed values: 'name', 'posts', 'detailed', 'permissions';
+ *                           Allowed values: 'name', 'posts', 'detailed', 'permissions', 'reports';
  *                           default: 'name';
  *                           see the function for detailes on the fields associated to each value
  *              'wanna_see_board' => (bool) if true uses {query_wanna_see_board}, otherwise {query_see_board}
@@ -1653,13 +1653,32 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 	else
 		$sort_by = '';
 
+	// @todo: memos for optimization
+	/*
+		id_board    => MergeTopic + MergeTopic + MessageIndex + Search + ScheduledTasks
+		name        => MergeTopic + ScheduledTasks + News
+		count_posts => MessageIndex
+		num_posts   => News
+	*/
+	$known_selects = array(
+		'name' => 'b.id_board, b.name',
+		'posts' => 'b.id_board, b.count_posts, b.num_posts',
+		'detailed' => 'b.id_board, b.name, b.count_posts, b.num_posts',
+		'permissions' => 'b.id_board, b.name, b.member_groups, b.id_profile',
+		'reports' => 'b.id_board, b.name, b.member_groups, b.id_profile, b.deny_member_groups',
+	);
+	if (!empty($params['count']))
+		$select = 'COUNT(*)';
+	else
+		$select = $known_selects[empty($params['selects']) || !isset($known_selects[$params['selects']]) ? 'name' : $params['selects']];
+
 	// if $conditions wasn't set or is 'all', get all boards
 	if (!is_array($conditions) && $conditions == 'all')
 	{
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
-			SELECT ' . (!empty($params['count']) ? 'COUNT(*)' : 'id_board, name, id_profile') . '
-			FROM {db_prefix}boards',
+			SELECT ' . $select . '
+			FROM {db_prefix}boards as b',
 			array()
 		);
 	}
@@ -1678,24 +1697,6 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 			$clauses[] = 'id_board IN ({array_int:board_list})';
 			$clauseParameters['board_list'] = is_array($conditions['boards']) ? $conditions['boards'] : array($conditions['boards']);
 		}
-
-		// @todo: memos for optimization
-		/*
-			id_board    => MergeTopic + MergeTopic + MessageIndex + Search + ScheduledTasks
-			name        => MergeTopic + ScheduledTasks + News
-			count_posts => MessageIndex
-			num_posts   => News
-		*/
-		$known_selects = array(
-			'name' => 'b.id_board, b.name',
-			'posts' => 'b.id_board, b.count_posts, b.num_posts',
-			'detailed' => 'b.id_board, b.name, b.count_posts, b.num_posts',
-			'permissions' => 'b.member_groups, b.id_profile',
-		);
-		if (!empty($params['count']))
-			$select = 'COUNT(*)';
-		else
-			$select = $known_selects[empty($params['selects']) || !isset($known_selects[$params['selects']]) ? 'name' : $params['selects']];
 
 		$request = $db->query('', '
 			SELECT ' . $select . '
