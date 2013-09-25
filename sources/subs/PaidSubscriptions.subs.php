@@ -581,6 +581,8 @@ function insertSubscription($insert)
 		),
 		array('id_subscribe')
 	);
+
+	return $db->insert_id('{db_prefix}subscriptions', 'id_subscribe');
 }
 
 /**

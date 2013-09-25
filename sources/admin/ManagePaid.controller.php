@@ -403,8 +403,6 @@ class ManagePaid_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$db = database();
-
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		$context['sub_id'] = isset($_REQUEST['sid']) ? (int) $_REQUEST['sid'] : 0;
@@ -494,7 +492,7 @@ class ManagePaid_Controller extends Action_Controller
 					'reminder' => $reminder,
 				);
 
-				insertSubscription($insert);
+				$sub_id = insertSubscription($insert);
 			}
 			// Otherwise must be editing.
 			else
@@ -518,7 +516,7 @@ class ManagePaid_Controller extends Action_Controller
 
 				updateSubscription($update, $ignore_active);
 			}
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $db->insert_id('{db_prefix}subscriptions', 'id_subscribe') : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
+			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}
