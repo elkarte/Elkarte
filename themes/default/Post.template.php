@@ -424,7 +424,7 @@ function template_postarea_above()
 
 	echo '
 								</select>
-								<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
+								<img src="', $context['icon_url'], '" name="icons" alt="" />
 							</dd>';
 
 	if (!empty($context['show_boards_dropdown']))

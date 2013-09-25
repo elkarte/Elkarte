@@ -2450,6 +2450,7 @@ dl.send_mail dd {
 }
 #post_header img {
 	vertical-align: middle;
+	padding: 0 0 2px 5px;
 }
 ul.post_options {
 	overflow: auto;
@@ -4050,7 +4051,7 @@ dl.merge_topic dd {
 		padding-left: 2px;
 		padding-right: 22px;
 	}
-	#gobottom, #gotop { 
+	#gobottom, #gotop {
 		padding-left: 0.25em;
 	}
 	#news, #logo, #top_section_notice {
