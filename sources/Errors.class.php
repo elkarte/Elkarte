@@ -276,7 +276,7 @@ class attachment_error_context
 	{
 		if (empty($id) || empty($name))
 		{
-			$this->attach();
+			$this->activate();
 			return false;
 		}
 
@@ -286,7 +286,7 @@ class attachment_error_context
 				'error' => error_context::context($id, 1),
 			);
 
-		$this->attach($id);
+		$this->activate($id);
 
 		return true;
 	}
