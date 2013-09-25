@@ -1762,22 +1762,71 @@ function addChildBoards(&$boards)
  * Increment a board stat field, for example num_posts.
  *
  * @param int $board
- * @param string $stat
+ * @param string $values
  */
-function incrementBoard($board, $stat)
+function incrementBoard($id_board, $values)
 {
-	// @todo refactor it as increment any table perhaps
-	// or update any board fields
-
 	$db = database();
+
+	$knownInts = arra(
+		'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
+		'unapproved_posts', 'unapproved_topics'
+	);
+
+	call_integration_hook('integrate_board_fields', array(&$knownInts));
+
+	$set = array();
+	$params = array('id_board' => $id_board);
+
+	foreach ($values as $key => $val)
+	{
+		if (in_array($val, $knownInts))
+			$set[] = $key . ' = ' . $key . ' + {int:' . $key . '}';
+		$params[$key] = $val;
+	}
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
-		SET ' . $stat . ' = ' . $stat . ' + 1
-		WHERE id_board = {int:board}',
-		array(
-			'board' => $board,
-		)
+		SET
+			' . implode("\n\t\t\t", $set) . '
+		WHERE id_board = {int:id_board}',
+		$params
+	);
+}
+
+/**
+ * Decrement a board stat field, for example num_posts.
+ *
+ * @param int $board
+ * @param string $values
+ */
+function decrementBoard($id_board, $values)
+{
+	$db = database();
+
+	$knownInts = arra(
+		'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
+		'unapproved_posts', 'unapproved_topics'
+	);
+
+	call_integration_hook('integrate_board_fields', array(&$knownInts));
+
+	$set = array();
+	$params = array('id_board' => $id_board);
+
+	foreach ($values as $key => $val)
+	{
+		if (in_array($val, $knownInts))
+			$set[] = $key . ' = CASE WHEN {int:' . $key . '} > ' . $key . ' THEN 0 ELSE ' . $key . ' - {int:' . $key . '} END';
+		$params[$key] = $val;
+	}
+
+	$db->query('', '
+		UPDATE {db_prefix}boards
+		SET
+			' . implode("\n\t\t\t", $set) . '
+		WHERE id_board = {int:id_board}',
+		$params
 	);
 }
 

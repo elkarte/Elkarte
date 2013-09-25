@@ -66,30 +66,32 @@ function removePoll($pollID)
 {
 	$db = database();
 
+	$pollID = is_array($pollID) ? $pollID : array($pollID);
+
 	// Remove votes.
 	$db->query('', '
 		DELETE FROM {db_prefix}log_polls
-		WHERE id_poll = {int:id_poll}',
+		WHERE id_poll IN ({array_int:id_polls})',
 		array(
-			'id_poll' => $pollID,
+			'id_polls' => $pollID,
 		)
 	);
 
 	// Remove the choices associated with this poll.
 	$db->query('', '
 		DELETE FROM {db_prefix}poll_choices
-		WHERE id_poll = {int:id_poll}',
+		WHERE id_poll IN ({array_int:id_polls})',
 		array(
-			'id_poll' => $pollID,
+			'id_polls' => $pollID,
 		)
 	);
 
 	// Remove the poll.
 	$db->query('', '
 		DELETE FROM {db_prefix}polls
-		WHERE id_poll = {int:id_poll}',
+		WHERE id_poll IN ({array_int:id_polls})',
 		array(
-			'id_poll' => $pollID,
+			'id_polls' => $pollID,
 		)
 	);
 }

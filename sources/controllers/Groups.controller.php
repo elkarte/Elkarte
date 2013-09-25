@@ -204,8 +204,6 @@ class Groups_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
-		$db = database();
-
 		$current_group = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
 		// No browsing of guests, membergroup 0 or moderators.

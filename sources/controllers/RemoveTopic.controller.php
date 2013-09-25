@@ -512,18 +512,11 @@ function mergePosts($msgs, $from_topic, $target_topic)
 	$db->free_result($request);
 
 	// We have a new post count for the board.
-	$db->query('', '
-		UPDATE {db_prefix}boards
-		SET
-			num_posts = num_posts + {int:diff_replies},
-			unapproved_posts = unapproved_posts + {int:diff_unapproved_posts}
-		WHERE id_board = {int:target_board}',
-		array(
-			'diff_replies' => $target_topic_data['num_replies'] - $target_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
-			'diff_unapproved_posts' => $target_topic_data['unapproved_posts'] - $target_unapproved_posts,
-			'target_board' => $target_board,
-		)
-	);
+	require_once(SUBSDIR . '/Boards.subs.php');
+	incrementBoard($target_board, array(
+		'num_posts' => $target_topic_data['num_replies'] - $target_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
+		'unapproved_posts' => $target_topic_data['unapproved_posts'] - $target_unapproved_posts,
+	));
 
 	// In some cases we merged the only post in a topic so the topic data is left behind in the topic table.
 	$request = $db->query('', '
@@ -596,18 +589,10 @@ function mergePosts($msgs, $from_topic, $target_topic)
 		);
 
 		// We have a new post count for the source board.
-		$db->query('', '
-			UPDATE {db_prefix}boards
-			SET
-				num_posts = num_posts + {int:diff_replies},
-				unapproved_posts = unapproved_posts + {int:diff_unapproved_posts}
-			WHERE id_board = {int:from_board}',
-			array(
-				'diff_replies' => $source_topic_data['num_replies'] - $from_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
-				'diff_unapproved_posts' => $source_topic_data['unapproved_posts'] - $from_unapproved_posts,
-				'from_board' => $from_board,
-			)
-		);
+		incrementBoard($target_board, array(
+			'num_posts' => $source_topic_data['num_replies'] - $from_replies, // Lets keep in mind that the first message in a topic counts towards num_replies in a board.
+			'unapproved_posts' => $source_topic_data['unapproved_posts'] - $from_unapproved_posts,
+		));
 	}
 
 	// Finally get around to updating the destination topic, now all indexes etc on the source are fixed.
