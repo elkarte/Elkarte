@@ -1761,6 +1761,7 @@ function topicAttribute($id_topic, $attribute)
 			WHERE id_topic = {int:current_topic}
 			LIMIT 1',
 			array(
+				'current_topic' => $id_topic,
 				'attribute' => $attributes[$attribute],
 			)
 		);
