@@ -283,8 +283,8 @@ class Groups_Controller extends Action_Controller
 			checkSession();
 			validateToken('mod-mgm');
 
-			$member_query = array();
-			$member_parameters = array();
+			$member_query = array('and' => array('not_in_group'), 'or' => array());
+			$member_parameters = array('not_in_group' => $current_group);
 
 			// Get all the members to be added... taking into account names can be quoted ;)
 			$_REQUEST['toAdd'] = strtr(Util::htmlspecialchars($_REQUEST['toAdd'], ENT_QUOTES), array('&quot;' => '"'));
@@ -313,34 +313,18 @@ class Groups_Controller extends Action_Controller
 			// Construct the query pelements.
 			if (!empty($member_ids))
 			{
-				$member_query[] = 'id_member IN ({array_int:member_ids})';
+				$member_query['or'][] = 'member_ids';
 				$member_parameters['member_ids'] = $member_ids;
 			}
 
 			if (!empty($member_names))
 			{
-				$member_query[] = 'LOWER(member_name) IN ({array_string:member_names})';
-				$member_query[] = 'LOWER(real_name) IN ({array_string:member_names})';
+				$member_query['or'][] = 'member_names';
 				$member_parameters['member_names'] = $member_names;
 			}
 
-			$members = array();
-			if (!empty($member_query))
-			{
-				$request = $db->query('', '
-					SELECT id_member
-					FROM {db_prefix}members
-					WHERE (' . implode(' OR ', $member_query) . ')
-						AND id_group != {int:id_group}
-						AND FIND_IN_SET({int:id_group}, additional_groups) = 0',
-					array_merge($member_parameters, array(
-						'id_group' => $current_group,
-					))
-				);
-				while ($row = $db->fetch_assoc($request))
-					$members[] = $row['id_member'];
-				$db->free_result($request);
-			}
+			require_once(SUBSDIR . '/Members.subs.php');
+			$members = membersBy($member_query, $member_parameters);
 
 			// @todo Add $_POST['additional'] to templates!
 
@@ -376,23 +360,16 @@ class Groups_Controller extends Action_Controller
 
 		$context['sort_direction'] = isset($_REQUEST['desc']) ? 'down' : 'up';
 
+		require_once(SUBSDIR . '/Members.subs.php');
+
 		// The where on the query is interesting. Non-moderators should only see people who are in this group as primary.
 		if ($context['group']['can_moderate'])
-			$where = $context['group']['is_post_group'] ? 'id_post_group = {int:group}' : 'id_group = {int:group} OR FIND_IN_SET({int:group}, additional_groups) != 0';
+			$where = $context['group']['is_post_group'] ? 'in_post_group' : 'in_group';
 		else
-			$where = $context['group']['is_post_group'] ? 'id_post_group = {int:group}' : 'id_group = {int:group}';
+			$where = $context['group']['is_post_group'] ? 'in_post_group' : 'in_group_no_add';
 
 		// Count members of the group.
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}members
-			WHERE ' . $where,
-			array(
-				'group' => $current_group,
-			)
-		);
-		list ($context['total_members']) = $db->fetch_row($request);
-		$db->free_result($request);
+		$context['total_members'] = countMembersBy(array('or' => array($where)), array($where => $current_group));
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
@@ -400,20 +377,8 @@ class Groups_Controller extends Action_Controller
 		$context['start'] = $_REQUEST['start'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
-		// Load up all members of this group.
-		$request = $db->query('', '
-			SELECT id_member, member_name, real_name, email_address, member_ip, date_registered, last_login,
-				hide_email, posts, is_activated, real_name
-			FROM {db_prefix}members
-			WHERE ' . $where . '
-			ORDER BY ' . $querySort . ' ' . ($context['sort_direction'] == 'down' ? 'DESC' : 'ASC') . '
-			LIMIT ' . $context['start'] . ', ' . $modSettings['defaultMaxMembers'],
-			array(
-				'group' => $current_group,
-			)
-		);
-		$context['members'] = array();
-		while ($row = $db->fetch_assoc($request))
+		$context['members'] = membersBy(array('or' => array($where)), array($where => $current_group), true);
+		foreach ($context['members'] as $id => $row)
 		{
 			$last_online = empty($row['last_login']) ? $txt['never'] : standardTime($row['last_login']);
 
@@ -421,7 +386,7 @@ class Groups_Controller extends Action_Controller
 			if ($row['is_activated'] % 10 != 1)
 				$last_online = '<em title="' . $txt['not_activated'] . '">' . $last_online . '</em>';
 
-			$context['members'][] = array(
+			$context['members'][$id] = array(
 				'id' => $row['id_member'],
 				'name' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 				'email' => $row['email_address'],
@@ -433,7 +398,6 @@ class Groups_Controller extends Action_Controller
 				'is_activated' => $row['is_activated'] % 10 == 1,
 			);
 		}
-		$db->free_result($request);
 
 		// Select the template.
 		$context['sub_template'] = 'group_members';
