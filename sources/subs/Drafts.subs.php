@@ -230,13 +230,14 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * @param int $member_id - user id to get drafts for
  * @param int $draft_type - 0 for post, 1 for pm
  * @param int $topic - if set, load drafts for that specific topic / pm
- * @param int $drafts_keep_days - number of days to consider a draft is still valid
  * @param string $order - optional parameter to order the results
  * @param string $limit - optional parameter to limit the number returned 0,15
  * @return array
  */
-function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = '')
+function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = '', $limit = '')
 {
+	global $modSettings;
+
 	$db = database();
 
 	// Load the drafts that the user has available for the given type & action
@@ -245,10 +246,10 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
 		FROM {db_prefix}user_drafts as ud' . ($draft_type === 0 ? '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
-		WHERE ud.id_member = {int:id_member}' . (($draft_type === 0) ? '
+		WHERE ud.id_member = {int:id_member}' . ($draft_type === 0 ? '
 			AND id_topic = {int:id_topic}' : (!empty($topic) ? '
 			AND id_reply = {int:id_topic}' : '')) . '
-			AND type = {int:draft_type}' . (!empty($drafts_keep_days) ? '
+			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : '') . (!empty($order) ? '
 		ORDER BY {raw:order}' : '') . (!empty($limit) ? '
 		LIMIT {raw:limit}' : ''),
@@ -256,7 +257,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
-			'time' => $drafts_keep_days,
+			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 			'order' => $order,
 			'limit' => $limit,
 		)
@@ -310,8 +311,9 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
  *
  * @param int $member_id
  * @param int $draft_type
+ * @param int $topic
  */
-function draftsCount($member_id, $draft_type)
+function draftsCount($member_id, $draft_type = 0, $topic = false)
 {
 	global $modSettings;
 
@@ -320,13 +322,16 @@ function draftsCount($member_id, $draft_type)
 	$request = $db->query('', '
 		SELECT COUNT(id_draft)
 		FROM {db_prefix}user_drafts
-		WHERE id_member = {int:id_member}
+		WHERE id_member = {int:id_member}' . ($draft_type === 0 ? '
+			AND id_topic = {int:id_topic}' : (!empty($topic) ? '
+			AND id_reply = {int:id_topic}' : '')) . '
 			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : ''),
 		array(
 			'id_member' => $member_id,
+			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
+			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 		)
 	);
 	list ($msgCount) = $db->fetch_row($request);

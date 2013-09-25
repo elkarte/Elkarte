@@ -1492,7 +1492,7 @@ function template_admin_quick_search()
 		echo '
 			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" id="quick_search" class="floatright">
 				<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
-				<input type="text" name="search_term" value="', $txt['admin_search'], '" onclick="if (this.value == \'', $txt['admin_search'], '\') this.value = \'\';" class="input_text" />
+				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="search_type">
 					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
 					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
