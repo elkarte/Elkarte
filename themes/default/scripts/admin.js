@@ -923,7 +923,7 @@ function toggleBaseDir ()
 					else
 					{
 						// Something "other" happened ...
-						$('#errorContainer').append('<p id="errorContent"></p>')
+						$('#errorContainer').append('<p id="errorContent"></p>');
 						$('#errorContent').html(oSettings.error + ' : ' + textStatus);
 						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
 					}
@@ -993,4 +993,4 @@ function setBoardIds() {
 			});
 		});
 	});
-};
+}
