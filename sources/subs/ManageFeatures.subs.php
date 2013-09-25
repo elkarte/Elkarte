@@ -258,7 +258,7 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 	$db = database();
 
 	$db->query('', '
-		UPDATE {db_prefix}themes
+		UPDATE {db_prefix}custom_fields_data
 		SET value = {string:new_value}
 		WHERE variable = {string:current_column}
 			AND value = {string:old_value}
@@ -268,6 +268,25 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 			'new_value' => $newOptions[$key],
 			'current_column' => $name,
 			'old_value' => $option,
+		)
+	);
+}
+
+/**
+ * Update the custom profile fields active status on/off
+ *
+ * @param array $enabled
+ */
+function updateRenamedProfileStatus($enabled)
+{
+	$db = database();
+
+	// Do the updates
+	$db->query('', '
+		UPDATE {db_prefix}custom_fields
+		SET active = CASE WHEN id_field IN ({array_int:id_cust_enable}) THEN 1 ELSE 0 END',
+		array(
+			'id_cust_enable' => $enabled,
 		)
 	);
 }
@@ -344,7 +363,7 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
 	$db = database();
 
 	$db->query('', '
-		DELETE FROM {db_prefix}themes
+		DELETE FROM {db_prefix}custom_fields_data
 		WHERE variable = {string:current_column}
 			AND value NOT IN ({array_string:new_option_values})
 			AND id_member > {int:no_member}',
@@ -396,7 +415,7 @@ function deleteProfileFieldUserData($name)
 
 	// Delete the user data first.
 	$db->query('', '
-		DELETE FROM {db_prefix}themes
+		DELETE FROM {db_prefix}custom_fields_data
 		WHERE variable = {string:current_column}
 			AND id_member > {int:no_member}',
 		array(

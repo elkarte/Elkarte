@@ -853,6 +853,7 @@ class ManageFeatures_Controller extends Action_Controller
 		require_once(SUBSDIR . '/List.subs.php');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
+		// Create a listing for all our standard fields
 		$listOptions = array(
 			'id' => 'standard_profile_fields',
 			'title' => $txt['standard_profile_title'],
@@ -918,6 +919,7 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 		createList($listOptions);
 
+		// And now we do the same for all of our custom ones
 		$token = createToken('admin-sort');
 		$listOptions = array(
 			'id' => 'custom_profile_fields',
@@ -985,17 +987,18 @@ class ManageFeatures_Controller extends Action_Controller
 						'reverse' => 'field_type DESC',
 					),
 				),
-				'active' => array(
+				'cust' => array(
 					'header' => array(
 						'value' => $txt['custom_profile_active'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $txt;
-
-							return $rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\'];
+							$isChecked = $rowData[\'active\'] ? \' checked="checked"\' :  \'\';
+							return sprintf(\'<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />\', $rowData[\'id_field\'], $isChecked);
 						'),
-						'style' => 'width: 5%;',
+						'style' => 'width: 8%;',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'active DESC',
@@ -1034,11 +1037,13 @@ class ManageFeatures_Controller extends Action_Controller
 			'form' => array(
 				'href' => $scripturl . '?action=admin;area=featuresettings;sa=profileedit',
 				'name' => 'customProfileFields',
+				'token' => 'admin-scp',
 			),
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
+					'value' => '<input type="submit" name="onoff" value="' . $txt['save'] . '" class="right_submit" />
+					<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
 				),
 			),
 			'javascript' => '
@@ -1050,6 +1055,7 @@ class ManageFeatures_Controller extends Action_Controller
 				});
 			',
 		);
+
 		createList($listOptions);
 	}
 
@@ -1103,8 +1109,21 @@ class ManageFeatures_Controller extends Action_Controller
 				'placement' => 0,
 			);
 
+		// Are we toggling which ones are active?
+		if (isset($_POST['onoff']))
+		{
+			checkSession();
+			validateToken('admin-scp');
+
+			// Enable and disable custom fields as required.
+			$enabled = array(0);
+			foreach ($_POST['cust'] as $id)
+				$enabled[] = (int) $id;
+
+			updateRenamedProfileStatus($enabled);
+		}
 		// Are we saving?
-		if (isset($_POST['save']))
+		elseif (isset($_POST['save']))
 		{
 			checkSession();
 			validateToken('admin-ecp');
@@ -1300,7 +1319,7 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		// Rebuild display cache etc.
-		if (isset($_POST['delete']) || isset($_POST['save']))
+		if (isset($_POST['delete']) || isset($_POST['save']) || isset($_POST['onoff']))
 		{
 			checkSession();
 
