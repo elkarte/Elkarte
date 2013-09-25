@@ -25,7 +25,7 @@ if (!defined('ELK'))
  */
 function reportsBoardsList()
 {
-	global $context, $txt, $modSettings;
+	global $txt;
 
 	$db = database();
 
@@ -57,7 +57,7 @@ function reportsBoardsList()
  */
 function allMembergroups($group_clause, $query_groups = array())
 {
-	global $context, $txt, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -178,7 +178,7 @@ function allMembergroupsBoardAccess()
  */
 function boardPermissionsByGroup($group_clause, $query_groups)
 {
-	global $txt, $modSettings;
+	global $modSettings;
 
 	$db = database();
 

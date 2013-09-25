@@ -254,7 +254,7 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_board_perms()
 	{
-		global $context, $txt, $modSettings;
+		global $txt;
 
 		// Get as much memory as possible as this can be big.
 		setMemoryLimit('256M');
@@ -514,7 +514,7 @@ class Reports_Controller extends Action_Controller
 		addSeparator($txt['board_perms_permission']);
 
 		// Now the big permission fetch!
-		$perms = boardPermissionsByGroup($clause, isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array());
+		$perms = boardPermissionsByGroup($group_clause, isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array());
 		$lastPermission = null;
 		$curData = array();
 		foreach ($perms as $row)
