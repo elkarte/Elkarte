@@ -91,6 +91,22 @@ function getMessageTableColumns()
 }
 
 /**
+ * Retrieve informations about the body column of the messages table
+ * Used in action_database
+ */
+function fetchBodyType()
+{
+	$table = db_table();
+
+	$colData = $table->db_list_columns('{db_prefix}messages', true);
+	foreach ($colData as $column)
+		if ($column['name'] == 'body')
+			$body_type = $column['type'];
+
+	return $body_type;
+}
+
+/**
  * Resizes the body column from the messages table
  *
  * @param string $type

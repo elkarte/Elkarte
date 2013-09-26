@@ -150,12 +150,11 @@ class Reports_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		$db = database();
-
 		// Load the permission profiles.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(SUBSDIR . '/Reports.subs.php');
 		loadLanguage('ManagePermissions');
 		loadPermissionProfiles();
 
@@ -191,20 +190,9 @@ class Reports_Controller extends Action_Controller
 		setKeys('cols');
 
 		// Go through each board!
-		$request = $db->query('order_by_board_order', '
-			SELECT b.id_board, b.name, b.num_posts, b.num_topics, b.count_posts, b.member_groups, b.override_theme, b.id_profile, b.deny_member_groups,
-				c.name AS cat_name, IFNULL(par.name, {string:text_none}) AS parent_name, IFNULL(th.value, {string:text_none}) AS theme_name
-			FROM {db_prefix}boards AS b
-				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-				LEFT JOIN {db_prefix}boards AS par ON (par.id_board = b.id_parent)
-				LEFT JOIN {db_prefix}themes AS th ON (th.id_theme = b.id_theme AND th.variable = {string:name})',
-			array(
-				'name' => 'name',
-				'text_none' => $txt['none'],
-			)
-		);
-		$boards = array(0 => array('name' => $txt['global_boards']));
-		while ($row = $db->fetch_assoc($request))
+		$boards = reportsBoardsList();
+
+		foreach ($boards as $row)
 		{
 			// Each board has it's own table.
 			newTable($row['name'], '', 'left', 'auto', 'left', 200, 'left');
@@ -254,7 +242,6 @@ class Reports_Controller extends Action_Controller
 			// Next add the main data.
 			addData($boardData);
 		}
-		$db->free_result($request);
 	}
 
 	/**
@@ -267,15 +254,14 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_board_perms()
 	{
-		global $context, $txt, $modSettings;
-
-		$db = database();
+		global $txt;
 
 		// Get as much memory as possible as this can be big.
 		setMemoryLimit('256M');
 
 		// Boards, first.
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		if (isset($_REQUEST['boards']))
 		{
@@ -308,49 +294,24 @@ class Reports_Controller extends Action_Controller
 		else
 			$group_clause = '1=1';
 
+			require_once(SUBSDIR . '/Reports.subs.php');
 		// Get all the possible membergroups, except admin!
-		$request = $db->query('', '
-			SELECT id_group, group_name
-			FROM {db_prefix}membergroups
-			WHERE ' . $group_clause . '
-				AND id_group != {int:admin_group}' . (empty($modSettings['permission_enable_postgroups']) ? '
-				AND min_posts = {int:min_posts}' : '') . '
-			ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-			array(
-				'admin_group' => 1,
-				'min_posts' => -1,
-				'newbie_group' => 4,
-				'groups' => $query_groups,
-			)
-		);
+		$all_groups = allMembergroups($group_clause, $query_groups);
+
 		if (empty($query_groups) || in_array(-1, $query_groups) || in_array(0, $query_groups))
-			$member_groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']);
+			$member_groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
 		else
-			$member_groups = array('col' => '');
-		while ($row = $db->fetch_assoc($request))
-			$member_groups[$row['id_group']] = $row['group_name'];
-		$db->free_result($request);
+			$member_groups = array('col' => '') + $all_groups;
 
 		// Make sure that every group is represented - plus in rows!
 		setKeys('rows', $member_groups);
 
 		// Permissions, last!
+		$boardPermissions = boardPermissions($profiles, $group_clause, $query_groups);
 		$permissions = array();
 		$board_permissions = array();
-		$request = $db->query('', '
-			SELECT id_profile, id_group, add_deny, permission
-			FROM {db_prefix}board_permissions
-			WHERE id_profile IN ({array_int:profile_list})
-				AND ' . $group_clause . (empty($modSettings['permission_enable_deny']) ? '
-				AND add_deny = {int:not_deny}' : '') . '
-			ORDER BY id_profile, permission',
-			array(
-				'profile_list' => $profiles,
-				'not_deny' => 1,
-				'groups' => $query_groups,
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+
+		foreach ($boardPermissions as $row)
 		{
 			foreach ($boards as $id => $board)
 				if ($board['id_profile'] == $row['id_profile'])
@@ -365,7 +326,6 @@ class Reports_Controller extends Action_Controller
 				);
 			}
 		}
-		$db->free_result($request);
 
 		// Now cycle through the board permissions array... lots to do ;)
 		foreach ($board_permissions as $board => $groups)
@@ -437,16 +397,13 @@ class Reports_Controller extends Action_Controller
 	{
 		global $txt, $settings, $modSettings;
 
-		$db = database();
+		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Reports.subs.php');
 
 		// Fetch all the board names.
-		$request = $db->query('', '
-			SELECT id_board, name, member_groups, id_profile, deny_member_groups
-			FROM {db_prefix}boards',
-			array(
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		$raw_boards = fetchBoardsInfo('all', array('selects' => 'reports'));
+		$boards = array();
+		foreach ($raw_boards as $row)
 		{
 			if (trim($row['member_groups']) == '')
 				$groups = array(1);
@@ -466,7 +423,6 @@ class Reports_Controller extends Action_Controller
 				'deny_groups' => $denyGroups,
 			);
 		}
-		$db->free_result($request);
 
 		// Standard settings.
 		$mgSettings = array(
@@ -493,43 +449,7 @@ class Reports_Controller extends Action_Controller
 		addData($mgSettings);
 
 		// Now start cycling the membergroups!
-		$request = $db->query('', '
-			SELECT mg.id_group, mg.group_name, mg.online_color, mg.min_posts, mg.max_messages, mg.icons,
-				CASE WHEN bp.permission IS NOT NULL OR mg.id_group = {int:admin_group} THEN 1 ELSE 0 END AS can_moderate
-			FROM {db_prefix}membergroups AS mg
-				LEFT JOIN {db_prefix}board_permissions AS bp ON (bp.id_group = mg.id_group AND bp.id_profile = {int:default_profile} AND bp.permission = {string:moderate_board})
-			ORDER BY mg.min_posts, CASE WHEN mg.id_group < {int:newbie_group} THEN mg.id_group ELSE 4 END, mg.group_name',
-			array(
-				'admin_group' => 1,
-				'default_profile' => 1,
-				'newbie_group' => 4,
-				'moderate_board' => 'moderate_board',
-			)
-		);
-
-		// Cache them so we get regular members too.
-		$rows = array(
-			array(
-				'id_group' => -1,
-				'group_name' => $txt['membergroups_guests'],
-				'online_color' => '',
-				'min_posts' => -1,
-				'max_messages' => null,
-				'icons' => ''
-			),
-			array(
-				'id_group' => 0,
-				'group_name' => $txt['membergroups_members'],
-				'online_color' => '',
-				'min_posts' => -1,
-				'max_messages' => null,
-				'icons' => ''
-			),
-		);
-		while ($row = $db->fetch_assoc($request))
-			$rows[] = $row;
-		$db->free_result($request);
-
+		$rows = allMembergroupsBoardAccess();
 		foreach ($rows as $row)
 		{
 			$row['icons'] = explode('#', $row['icons']);
@@ -560,46 +480,26 @@ class Reports_Controller extends Action_Controller
 	 */
 	public function action_group_perms()
 	{
-		global $txt, $modSettings;
-
-		$db = database();
+		global $txt;
 
 		if (isset($_REQUEST['groups']))
 		{
 			if (!is_array($_REQUEST['groups']))
 				$_REQUEST['groups'] = explode(',', $_REQUEST['groups']);
-			foreach ($_REQUEST['groups'] as $k => $dummy)
-				$_REQUEST['groups'][$k] = (int) $dummy;
-			$_REQUEST['groups'] = array_diff($_REQUEST['groups'], array(3));
 
-			$clause = 'id_group IN ({array_int:groups})';
+			$query_groups = array_diff(array_map('intval', $_REQUEST['groups']), array(3));
+			$group_clause = 'id_group IN ({array_int:groups})';
 		}
 		else
-			$clause = 'id_group != {int:moderator_group}';
+			$group_clause = 'id_group != {int:moderator_group}';
 
 		// Get all the possible membergroups, except admin!
-		$request = $db->query('', '
-			SELECT id_group, group_name
-			FROM {db_prefix}membergroups
-			WHERE ' . $clause . '
-				AND id_group != {int:admin_group}' . (empty($modSettings['permission_enable_postgroups']) ? '
-				AND min_posts = {int:min_posts}' : '') . '
-			ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-			array(
-				'admin_group' => 1,
-				'min_posts' => -1,
-				'newbie_group' => 4,
-				'moderator_group' => 3,
-				'groups' => isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array(),
-			)
-		);
+		$all_groups = allMembergroups($group_clause, $query_groups);
+
 		if (!isset($_REQUEST['groups']) || in_array(-1, $_REQUEST['groups']) || in_array(0, $_REQUEST['groups']))
-			$groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']);
+			$groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
 		else
-			$groups = array('col' => '');
-		while ($row = $db->fetch_assoc($request))
-			$groups[$row['id_group']] = $row['group_name'];
-		$db->free_result($request);
+			$groups = array('col' => '') + $all_groups;
 
 		// Make sure that every group is represented!
 		setKeys('rows', $groups);
@@ -614,21 +514,10 @@ class Reports_Controller extends Action_Controller
 		addSeparator($txt['board_perms_permission']);
 
 		// Now the big permission fetch!
-		$request = $db->query('', '
-			SELECT id_group, add_deny, permission
-			FROM {db_prefix}permissions
-			WHERE ' . $clause . (empty($modSettings['permission_enable_deny']) ? '
-				AND add_deny = {int:not_denied}' : '') . '
-			ORDER BY permission',
-			array(
-				'not_denied' => 1,
-				'moderator_group' => 3,
-				'groups' => isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array(),
-			)
-		);
+		$perms = boardPermissionsByGroup($group_clause, isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array());
 		$lastPermission = null;
 		$curData = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($perms as $row)
 		{
 			// If this is a new permission flush the last row.
 			if ($row['permission'] != $lastPermission)
@@ -649,7 +538,6 @@ class Reports_Controller extends Action_Controller
 			else
 				$curData[$row['id_group']] = '<span style="color: red;">' . $txt['board_perms_deny'] . '</span>';
 		}
-		$db->free_result($request);
 
 		// Flush the last data!
 		addData($curData);
@@ -667,25 +555,14 @@ class Reports_Controller extends Action_Controller
 	{
 		global $txt;
 
-		$db = database();
-
 		require_once(SUBSDIR . '/Members.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Fetch all the board names.
-		$request = $db->query('', '
-			SELECT id_board, name
-			FROM {db_prefix}boards',
-			array(
-			)
-		);
-		$boards = array();
-		while ($row = $db->fetch_assoc($request))
-			$boards[$row['id_board']] = $row['name'];
-		$db->free_result($request);
-
+		$boards = fetchBoardsInfo('all');
 		$moderators = allBoardModerators();
 		$boards_moderated = array();
+
 		foreach ($moderators as $id_member => $row)
 			$boards_moderated[$id_member][] = $row['id_board'];
 
@@ -758,7 +635,6 @@ class Reports_Controller extends Action_Controller
 			// Next add the main data.
 			addData($staffData);
 		}
-		$db->free_result($request);
 	}
 }
 
