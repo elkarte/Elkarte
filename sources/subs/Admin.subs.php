@@ -389,6 +389,12 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 		}
 }
 
+/**
+ * Callback used in the core features page when the custom profiles
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the profile fields
+ *            (true => enabled, false => disabled)
+ */
 function custom_profiles_toggle_callback($value)
 {
 	$db = database();
@@ -402,6 +408,12 @@ function custom_profiles_toggle_callback($value)
 	}
 }
 
+/**
+ * Callback used in the core features page when the drafts
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the drafts
+ *            (true => enabled, false => disabled)
+ */
 function drafts_toggle_callback($value)
 {
 	$db = database();
@@ -418,6 +430,12 @@ function drafts_toggle_callback($value)
 	);
 }
 
+/**
+ * Callback used in the core features page when the paid subscriptions
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the paid subscriptions
+ *            (true => enabled, false => disabled)
+ */
 function subscriptions_toggle_callback($value)
 {
 	$db = database();

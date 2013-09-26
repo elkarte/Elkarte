@@ -2706,6 +2706,17 @@ function messagesInTopics($topics)
 	return $messages;
 }
 
+/**
+ * Updates all the tables involved when two or more topics are merged
+ *
+ * @param int $first_msg the first message of the new topic
+ * @param array $topics ids of all the topics merged
+ * @param int $id_topic id of the merged topic
+ * @param int $target_board id of the target board where the topic will resides
+ * @param string $target_subject subject of the new topic
+ * @param bool $enforce_subject if true all the messages will be set to the same subject
+ * @param array $notifications array of topics with active notifications
+ */
 function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)
 {
 	global $context;
