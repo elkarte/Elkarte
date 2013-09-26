@@ -2797,5 +2797,13 @@ CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
 CREATE TABLE {$db_prefix}message_likes (
   id_member int NOT NULL default '0',
   id_msg int NOT NULL default '0',
+  id_poster int NOT NULL default '0',
   PRIMARY KEY (id_msg, id_member)
 );
+
+#
+# Indexes for table `message_likes`
+#
+
+CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
+CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
