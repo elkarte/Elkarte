@@ -19,16 +19,18 @@
  * @param array $liked_message - message array that is being worked on
  * @param type $direction - + for like - for unlike a previous liked one
  */
-function like_post($id_liker, $liked_message, $direction)
+function likePost($id_liker, $liked_message, $direction)
 {
+	global $modSettings;
+	
 	// If we have a message, then we have passed all checks ...
 	if (!empty($liked_message))
 	{
 		// You can't like your own stuff, no matter how brilliant you think you are
-		if ($liked_message['id_member'] == $id_liker)
+		if ($liked_message['id_member'] == $id_liker && empty($modSettings['likeAllowSelf']))
 			fatal_lang_error('cant_like_yourself', false);
 
-		addlike($id_liker, $liked_message, $direction);
+		updateLike($id_liker, $liked_message, $direction);
 	}
 }
 
@@ -42,6 +44,7 @@ function like_post($id_liker, $liked_message, $direction)
  */
 function loadLikes($messages, $prepare = true)
 {
+	$db = database();
 	$likes = array();
 
 	if (empty($messages))
@@ -51,7 +54,6 @@ function loadLikes($messages, $prepare = true)
 		$messages = (array((int) $messages));
 
 	// Load up them likes from the db
-	$db = database();
 	$request = $db->query('', '
 		SELECT l.id_member, l.id_msg, m.real_name
 		FROM {db_prefix}message_likes AS l
@@ -102,7 +104,7 @@ function prepareLikes($likes)
 		// If there are a lot of likes for this message, we cull the herd
 		if ($limit > 0 && $like['count'] > $limit)
 		{
-			// Mix up the likers so we don't show the same ones everytime
+			// Mix up the likers so we don't show the same ones every time
 			shuffle($likes[$msg_id]['member']);
 			$likes[$msg_id]['member'] = array_slice($likes[$msg_id]['member'], 0, $you_liked ? $limit - 1 : $limit);
 
@@ -128,8 +130,9 @@ function prepareLikes($likes)
  */
 function clearLikes($likeWaitTime)
 {
-	// Delete all older items from the log
 	$db = database();
+
+	// Delete all older items from the log
 	$db->query('', '
 		DELETE FROM {db_prefix}log_likes
 		WHERE {int:current_time} - log_time > {int:wait_time}',
@@ -143,7 +146,7 @@ function clearLikes($likeWaitTime)
 /**
  * Checks if the member has exceeded the number of like actions they are
  * allowed in a given time period.  The log is maintained to the time period
- * by the clearLikes function so the count is allways current.
+ * by the clearLikes function so the count is always current.
  *
  * returns true if they can like again, or false if they have to wait a bit
  *
@@ -180,10 +183,11 @@ function lastLikeOn($id_liker)
  * @param array $liked_message
  * @param int $direction - options: - or +
  */
-function addLike($id_liker, $liked_message, $direction)
+function updateLike($id_liker, $liked_message, $direction)
 {
-	// See if they already likeyed this message
 	$db = database();
+
+	// See if they already likeyed this message
 	$request = $db->query('', '
 		SELECT id_member
 		FROM {db_prefix}message_likes
@@ -198,14 +202,14 @@ function addLike($id_liker, $liked_message, $direction)
 	$count = $db->num_rows($request);
 	$db->free_result($request);
 
-	// Not previosly liked, and you want to
+	// Not previously liked, and you want to
 	if ($count === 0 && $direction === '+')
 	{
 		$db->insert('',
 			'{db_prefix}message_likes',
-			array('id_member' => 'int', 'id_msg' => 'int'),
-			array($id_liker, $liked_message['id_msg']),
-			array('id_msg', 'id_member')
+			array('id_member' => 'int', 'id_msg' => 'int', 'id_poster' => 'int'),
+			array($id_liker, $liked_message['id_msg'], $liked_message['id_member']),
+			array('id_msg', 'id_member', 'id_poster')
 		);
 
 		// If we are liking the first message in a topic, we are de facto liking the topic
@@ -256,6 +260,7 @@ function addLike($id_liker, $liked_message, $direction)
 function increaseTopicLikes($id_topic, $direction)
 {
 	$db = database();
+
 	$db->query('', '
 		UPDATE {db_prefix}topics
 		SET num_likes = num_likes ' . ($direction === '+' ? '+ 1' : '- 1') . '
@@ -264,4 +269,208 @@ function increaseTopicLikes($id_topic, $direction)
 			'current_topic' => $id_topic,
 		)
 	);
+}
+
+/**
+ * Return how many likes a user has given or the count of thier posts that
+ * have received a like (not the total likes received)
+ *
+ * @param int $memberID
+ * @param boolean $given
+ */
+function likesCount($memberID, $given = true)
+{
+	global $user_profile;
+
+	$db = database();
+
+	// Give is a given, received takes a query so its only the unique messages
+	if ($given === true)
+		$likes = $user_profile[$memberID]['likes_given'];
+	else
+	{
+		$request = $db->query('', '
+			SELECT COUNT(*)
+			FROM {db_prefix}message_likes
+			WHERE id_poster = {int:id_member}
+			GROUP BY id_msg',
+			array(
+				'id_member' => $memberID,
+			)
+		);
+		$likes = $db->num_rows($request);
+		$db->free_result($request);
+	}
+
+	return $likes;
+}
+
+/**
+ * Return an array of details based on posts a user has liked
+ *
+ * Used for action=profile;area=showlikes;sa=given
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memberID
+ */
+function likesPostsGiven($start, $items_per_page, $sort, $memberID)
+{
+	global $scripturl, $context;
+
+	$db = database();
+	$likes = array();
+
+	// Load up what the user likes from the db
+	$request = $db->query('', '
+		SELECT l.id_member, l.id_msg,
+			m.subject, m.poster_name, m.id_board, m.id_topic,
+			b.name
+		FROM {db_prefix}message_likes AS l
+			LEFT JOIN {db_prefix}messages AS m on (m.id_msg = l.id_msg)
+			LEFT JOIN {db_prefix}boards AS b on (b.id_board = m.id_board)
+		WHERE l.id_member = {int:id_member}
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:per_page}',
+		array(
+			'id_member' => $memberID,
+			'sort' => $sort,
+			'start' => $start,
+			'per_page' => $items_per_page,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		$likes[] = array(
+			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+			'poster_name' => $row['poster_name'],
+			'name' => $row['name'],
+			'delete' =>  $scripturl . '?action=likes;sa=unlikepost;profile;msg=' . $row['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+		);
+	}
+
+	return $likes;
+}
+
+/**
+ * Returns an array of details based on posts that others have liked of this user
+ * Creates links to show the users who liked a post
+ *
+ * Used by action=profile;area=showlikes;sa=received
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $memberID
+ */
+function likesPostsReceived($start, $items_per_page, $sort, $memberID)
+{
+	global $scripturl;
+
+	$db = database();
+	$likes = array();
+
+	// Load up what the user likes from the db
+	$request = $db->query('', '
+		SELECT m.subject, m.id_topic, b.name, l.id_msg, COUNT(l.id_msg) AS likes
+		FROM {db_prefix}message_likes AS l
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE l.id_poster = {int:id_member}
+		GROUP BY (l.id_msg)
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:per_page}',
+		array(
+			'id_member' => $memberID,
+			'sort' => $sort,
+			'start' => $start,
+			'per_page' => $items_per_page,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		$likes[] = array(
+			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+			'name' => $row['name'],
+			'who' =>  $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $row['id_msg'],
+			'likes' => $row['likes']
+		);
+	}
+
+	return $likes;
+}
+
+/**
+ * Function to load all of the likers of a message
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param int $messageID
+ */
+function postLikers($start, $items_per_page, $sort, $messageID)
+{
+	global $scripturl;
+
+	$db = database();
+	$likes = array();
+
+	if (empty($messageID))
+		return $likes;
+
+	// Load up the likes for this message
+	$request = $db->query('', '
+		SELECT l.id_member, l.id_msg, m.real_name
+		FROM {db_prefix}message_likes AS l
+			LEFT JOIN {db_prefix}members AS m on (m.id_member = l.id_member)
+		WHERE id_msg = {int:id_message}
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:per_page}',
+		array(
+			'id_message' => $messageID,
+			'sort' => $sort,
+			'start' => $start,
+			'per_page' => $items_per_page,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		$likes[] = array(
+			'real_name' => $row['real_name'],
+			'id_member' => $row['id_member'],
+			'link' =>  '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+		);
+	}
+	$db->free_result($request);
+
+	return $likes;
+}
+
+/**
+ * Function to get the number of likes for a message
+ *
+ * @param int $message
+ */
+function messageLikeCount($message)
+{
+	$db = database();
+	$total = 0;
+
+	if (empty($message))
+		return $total;
+
+	// Count up the likes for this message
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}message_likes
+		WHERE id_msg = {int:id_message}',
+		array(
+			'id_message' => $message,
+		)
+	);
+	list($total) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total;
 }

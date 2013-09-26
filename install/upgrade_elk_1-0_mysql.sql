@@ -566,7 +566,10 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
 CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
+  id_poster mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY (id_msg, id_member)
+  KEY id_member (id_member),
+  KEY id_poster (id_poster),
 ) ENGINE=MyISAM;
 ---#
 
