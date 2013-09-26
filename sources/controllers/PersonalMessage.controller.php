@@ -1995,37 +1995,35 @@ class PersonalMessage_Controller extends Action_Controller
 
 			for ($k = 0, $n = count($possible_users); $k < $n; $k++)
 			{
-				$possible_users[$k] = trim($possible_users[$k]);
+				$possible_users[$k] = addcslashes(trim($possible_users[$k]), '\\\'');
 
 				if (strlen($possible_users[$k]) == 0)
 					unset($possible_users[$k]);
+				else
+					$possible_users[$k] = $db->quote('{string:name}', array('name' => $possible_users[$k]));
+
 			}
 
+			require_once(SUBSDIR . '/Members.subs.php');
 			// Who matches those criteria?
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE real_name LIKE {raw:real_name_implode}',
-				array(
-					'real_name_implode' => '\'' . implode('\' OR real_name LIKE \'', $possible_users) . '\'',
-				)
-			);
+			$members = membersBy('real_name LIKE {raw:real_name_implode}', array('real_name_implode' => implode(" OR real_name LIKE ", $possible_users)));
+
 			// Simply do nothing if there're too many members matching the criteria.
-			if ($db->num_rows($request) > $maxMembersToSearch)
+			if (count($members) > $maxMembersToSearch)
 				$userQuery = '';
-			elseif ($db->num_rows($request) == 0)
+			elseif (count($members) == 0)
 			{
 				if ($context['folder'] === 'inbox')
 					$userQuery = 'AND pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})';
 				else
 					$userQuery = '';
 
-				$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
+				$searchq_parameters['guest_user_name_implode'] = implode(' OR pm.from_name LIKE ', $possible_users);
 			}
 			else
 			{
 				$memberlist = array();
-				while ($row = $db->fetch_assoc($request))
+				foreach ($members as $row)
 					$memberlist[] = $row['id_member'];
 
 				// Use the name as as sent from or sent to
@@ -2034,10 +2032,9 @@ class PersonalMessage_Controller extends Action_Controller
 				else
 					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
 
-				$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
+				$searchq_parameters['guest_user_name_implode'] = implode(' OR pm.from_name LIKE ', $possible_users);
 				$searchq_parameters['member_list'] = $memberlist;
 			}
-			$db->free_result($request);
 		}
 
 		// Setup the sorting variables...

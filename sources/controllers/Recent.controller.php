@@ -296,6 +296,7 @@ class Recent_Controller extends Action_Controller
 
 		// We need... we need... I know!
 		require_once(SUBSDIR . '/Recent.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 
 		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $settings['show_mark_read'];
 		$context['showing_all_topics'] = isset($_GET['all']);
@@ -334,7 +335,6 @@ class Recent_Controller extends Action_Controller
 
 			// The easiest thing is to just get all the boards they can see,
 			// but since we've specified the top of tree we ignore some of them
-			require_once(SUBSDIR . '/Boards.subs.php');
 			addChildBoards($boards);
 
 			if (empty($boards))
@@ -352,23 +352,9 @@ class Recent_Controller extends Action_Controller
 		}
 		elseif (!empty($_REQUEST['boards']))
 		{
-			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
-			foreach ($_REQUEST['boards'] as $i => $b)
-				$_REQUEST['boards'][$i] = (int) $b;
+			$selected_boards = array_map('intval', explode(',', $_REQUEST['boards']));
 
-			$request = $db->query('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE {query_see_board}
-					AND b.id_board IN ({array_int:board_list})',
-				array(
-					'board_list' => $_REQUEST['boards'],
-				)
-			);
-			$boards = array();
-			while ($row = $db->fetch_assoc($request))
-				$boards[] = $row['id_board'];
-			$db->free_result($request);
+			$boards = accessibleBoards($selected_boards);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -397,19 +383,7 @@ class Recent_Controller extends Action_Controller
 			$see_board = isset($_REQUEST['action']) && $_REQUEST['action'] == 'unreadreplies' ? 'query_see_board' : 'query_wanna_see_board';
 
 			// Don't bother to show deleted posts!
-			$request = $db->query('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE ' . $user_info[$see_board] . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-					AND b.id_board != {int:recycle_board}' : ''),
-				array(
-					'recycle_board' => (int) $modSettings['recycle_board'],
-				)
-			);
-			$boards = array();
-			while ($row = $db->fetch_assoc($request))
-				$boards[] = $row['id_board'];
-			$db->free_result($request);
+			$boards = wantedBoards($see_board);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -502,69 +476,7 @@ class Recent_Controller extends Action_Controller
 					SUBSTRING(ms.body, 1, 385) AS first_body, ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg';
 
 		if ($context['showing_all_topics'])
-		{
-			if (!empty($board))
-			{
-				$request = $db->query('', '
-					SELECT MIN(id_msg)
-					FROM {db_prefix}log_mark_read
-					WHERE id_member = {int:current_member}
-						AND id_board = {int:current_board}',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-					)
-				);
-				list ($earliest_msg) = $db->fetch_row($request);
-				$db->free_result($request);
-			}
-			else
-			{
-				$request = $db->query('', '
-					SELECT MIN(lmr.id_msg)
-					FROM {db_prefix}boards AS b
-						LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
-					WHERE {query_see_board}',
-					array(
-						'current_member' => $user_info['id'],
-					)
-				);
-				list ($earliest_msg) = $db->fetch_row($request);
-				$db->free_result($request);
-			}
-
-			// This is needed in case of topics marked unread.
-			if (empty($earliest_msg))
-				$earliest_msg = 0;
-			else
-			{
-				// Using caching, when possible, to ignore the below slow query.
-				if (isset($_SESSION['cached_log_time']) && $_SESSION['cached_log_time'][0] + 45 > time())
-					$earliest_msg2 = $_SESSION['cached_log_time'][1];
-				else
-				{
-					// This query is pretty slow, but it's needed to ensure nothing crucial is ignored.
-					$request = $db->query('', '
-						SELECT MIN(id_msg)
-						FROM {db_prefix}log_topics
-						WHERE id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-						)
-					);
-					list ($earliest_msg2) = $db->fetch_row($request);
-					$db->free_result($request);
-
-					// In theory this could be zero, if the first ever post is unread, so fudge it ;)
-					if ($earliest_msg2 == 0)
-						$earliest_msg2 = -1;
-
-					$_SESSION['cached_log_time'] = array(time(), $earliest_msg2);
-				}
-
-				$earliest_msg = min($earliest_msg2, $earliest_msg);
-			}
-		}
+			$earliest_msg = earliest_msg();
 
 		// @todo Add modified_time in for log_time check?
 

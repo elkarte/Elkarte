@@ -16,7 +16,6 @@ $txt['gr_type_staff'] = 'Staff';
 $txt['gr_type_desc_staff'] = 'This report summarizes all members who currently have positions of authority on the forum.';
 
 $txt['full_member'] = 'Full Member';
-$txt['global_boards'] = 'Global Boards';
 $txt['results'] = 'Results';
 
 // Board permissions
