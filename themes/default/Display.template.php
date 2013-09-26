@@ -54,7 +54,7 @@ function template_main()
 	if (!empty($settings['display_who_viewing']) || !empty($context['topic_redirected_from']))
 	{
 		echo '
-			<p>';
+			<div class="generalinfo">';
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
@@ -78,7 +78,7 @@ function template_main()
 					' . sprintf($txt['no_redir'], '<a href="' . $context['topic_redirected_from']['redir_href'] . '">' . $context['topic_redirected_from']['subject'] . '</a>'), '
 				</span>';
 		echo '
-			</p>';
+			</div>';
 	}
 
 	echo '
