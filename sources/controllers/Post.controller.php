@@ -64,7 +64,8 @@ class Post_Controller extends Action_Controller
 			unset($_REQUEST['poll']);
 
 		$post_errors = error_context::context('post', 1);
-		$attach_errors = error_context::context('attachment', 1);
+		$attach_errors = attachment_error_context::context('attachment', 1);
+		$attach_errors->activate();
 		$first_subject = '';
 
 		// Posting an event?
@@ -370,10 +371,10 @@ class Post_Controller extends Action_Controller
 
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
-		if (isset($_REQUEST['message']) || $post_errors->hasErrors())
+		if (isset($_REQUEST['message']) || $post_errors->hasErrors() || $attach_errors->hasErrors())
 		{
 			// Validate inputs.
-			if (!$post_errors->hasErrors())
+			if (!$post_errors->hasErrors() && !$attach_errors->hasErrors())
 			{
 				// This means they didn't click Post and get an error.
 				$really_previewing = true;
@@ -673,9 +674,6 @@ class Post_Controller extends Action_Controller
 					}
 				}
 
-				if (!empty($context['we_are_history']))
-					$attach_errors->addError($context['we_are_history']);
-
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
 					if (isset($context['ignore_temp_attachments']) || isset($_SESSION['temp_attachments']['post']['files']))
@@ -756,11 +754,19 @@ class Post_Controller extends Action_Controller
 			'title' => $txt['error_while_submitting'],
 		);
 
-		$context['attachment_error'] = array(
-			'errors' => $attach_errors->prepareErrors(),
-			'type' => $attach_errors->getErrorType() == 0 ? 'minor' : 'serious',
-			'title' => $txt['error_while_submitting'],
-		);
+		// If there are attachment errors. Let's show a list to the user.
+		if ($attach_errors->hasErrors())
+		{
+			loadTemplate('Errors');
+
+			$errors = $attach_errors->prepareErrors();
+
+			foreach ($errors as $key => $error)
+			{
+				$context['attachment_error_keys'][] = $key . '_error';
+				$context[$key . '_error'] = $error;
+			}
+		}
 
 		// What are you doing? Posting a poll, modifying, previewing, new post, or reply...
 		if (isset($_REQUEST['poll']))
@@ -1397,7 +1403,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Any mistakes?
-		if ($post_errors->hasErrors())
+		if ($post_errors->hasErrors() || $attach_errors->hasErrors())
 		{
 			// Previewing.
 			$_REQUEST['preview'] = true;
@@ -1490,9 +1496,6 @@ class Post_Controller extends Action_Controller
 		{
 			$attachIDs = array();
 
-			if (!empty($context['we_are_history']))
-				$attach_errors->addError('temp_attachments_flushed');
-
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
 				if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
@@ -1501,9 +1504,6 @@ class Post_Controller extends Action_Controller
 				// If there was an initial error just show that message.
 				if ($attachID == 'initial_error')
 				{
-					$attach_errors->addError($txt['attach_no_upload']);
-					$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
-
 					unset($_SESSION['temp_attachments']);
 					break;
 				}
@@ -1534,22 +1534,6 @@ class Post_Controller extends Action_Controller
 				// We have errors on this file, build out the issues for display to the user
 				else
 				{
-					// Sort out the errors for display and delete any associated files.
-					$attach_errors->addAttach($attachID, $attachment['name']);
-					$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
-
-					foreach ($attachment['errors'] as $error)
-					{
-						if (!is_array($error))
-						{
-							$attach_errors->addError($txt[$error], $attachID);
-							if (in_array($error, $log_these))
-								log_error($attachment['name'] . ': ' . $txt[$error], 'critical');
-						}
-						else
-							$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]), $attachID);
-					}
-
 					if (file_exists($attachment['tmp_name']))
 						unlink($attachment['tmp_name']);
 				}
@@ -1762,37 +1746,6 @@ class Post_Controller extends Action_Controller
 
 		if (!empty($_POST['move']) && allowedTo('move_any'))
 			redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($_REQUEST['goback']) ? '' : ';goback'));
-
-		// If there are attachment errors. Let's show a list to the user.
-		if ($attach_errors->hasErrors())
-		{
-			loadTemplate('Errors');
-			$context['sub_template'] = 'attachment_errors';
-			$context['page_title'] = $txt['error_occurred'];
-
-			$errors = $attach_errors->prepareErrors();
-
-			foreach ($errors as $key => $error)
-			{
-				$context['attachment_error_keys'][] = $key . '_error';
-				$context[$key . '_error'] = $error;
-			}
-
-			$context['linktree'][] = array(
-				'url' => $scripturl . '?topic=' . $topic . '.0',
-				'name' => $_POST['subject'],
-				'extra_before' => !empty($settings['linktree_inline']) ? $txt['topic'] . ': ' : ''
-			);
-
-			if (isset($_REQUEST['msg']))
-				$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'];
-			else
-				$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.new#new';
-
-			$context['back_link'] =  $scripturl . '?action=post;msg=' . $msgOptions['id'] . ';topic=' . $topic . ';additionalOptions#postAttachment';
-
-			obExit(null, true);
-		}
 
 		// Return to post if the mod is on.
 		if (isset($_REQUEST['msg']) && !empty($_REQUEST['goback']))

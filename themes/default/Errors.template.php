@@ -252,10 +252,7 @@ function template_attachment_errors()
 	foreach ($context['attachment_error_keys'] as $key)
 		template_show_error($key);
 
-	echo
-	!empty($context['back_link']) ? ('<a class="linkbutton" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '', '
-			<a class="linkbutton" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
-
+	echo '
 		</div>
 	</div>';
 }
