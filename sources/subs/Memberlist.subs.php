@@ -198,7 +198,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 	// Select the members from the database.
 	$request = $db->query('', '
 		SELECT mem.id_member
-		FROM {db_prefix}members AS mem' . ($sort === 'is_online' ? '
+		FROM {db_prefix}members AS mem' . ($sort === 'online' ? '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)' : ($sort === 'id_group' ? '
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' : '')) . '
 			' . (!empty($context['custom_profile_fields']['join']) ? $context['custom_profile_fields']['join'] : '') . '
