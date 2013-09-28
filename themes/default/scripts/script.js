@@ -1798,11 +1798,6 @@ function markboardreadButton(btn)
 		$(this).parent().remove();
 	});
 
-	$('.board_icon').each(function() {
-		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
-		$(this).attr("src", src);
-	});
-
 	return false;
 }
 
