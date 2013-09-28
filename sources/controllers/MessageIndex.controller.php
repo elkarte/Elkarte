@@ -996,7 +996,7 @@ class MessageIndex_Controller extends Action_Controller
 
 			$markArray = array();
 			foreach ($markCache as $topic)
-				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], $logged_topics[$topic]);
+				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$topic]));
 
 			markTopicsRead($markArray, true);
 		}
