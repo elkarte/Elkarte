@@ -1708,6 +1708,12 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 	return false;
 }
 
+/**
+ * Helper function: displays and remove the ajax indicator and
+ * hides some page elements inside "container_id"
+ * Used by some (one at the moment) ajax buttons
+ * @todo it may be merged into the function if not used anywhere else
+ */
 function toggleHeaderAJAX(btn, container_id)
 {
 	ajax_indicator(true);
@@ -1729,6 +1735,9 @@ function toggleHeaderAJAX(btn, container_id)
 
 }
 
+/**
+ * Ajaxify the "notify" button in Display
+ */
 function notifyButton(btn)
 {
 	if (typeof(notification_topic_notice) != 'undefined' && !confirm(notification_topic_notice))
@@ -1737,6 +1746,9 @@ function notifyButton(btn)
 	return toggleButtonAJAX(btn, 'notification_topic_notice');
 }
 
+/**
+ * Ajaxify the "notify" button in MessageIndex
+ */
 function notifyboardButton(btn)
 {
 	if (typeof(notification_board_notice) != 'undefined' && !confirm(notification_board_notice))
@@ -1746,12 +1758,18 @@ function notifyboardButton(btn)
 	return false;
 }
 
+/**
+ * Ajaxify the "disregard" button in Display
+ */
 function disregardButton(btn)
 {
 	toggleButtonAJAX(btn);
 	return false;
 }
 
+/**
+ * Ajaxify the "mark read" button in MessageIndex
+ */
 function markboardreadButton(btn)
 {
 	toggleButtonAJAX(btn);
@@ -1769,6 +1787,9 @@ function markboardreadButton(btn)
 	return false;
 }
 
+/**
+ * Ajaxify the "mark all messages as read" button in BoardIndex
+ */
 function markallreadButton(btn)
 {
 	toggleButtonAJAX(btn);
@@ -1790,6 +1811,9 @@ function markallreadButton(btn)
 	return false;
 }
 
+/**
+ * Ajaxify the "mark all messages as read" button in Recent
+ */
 function markunreadButton(btn)
 {
 	toggleHeaderAJAX(btn, 'main_content_section');
@@ -1915,6 +1939,9 @@ $(document).ready(function () {
 	
 });
 
+/**
+ * This function changes the relative time around the page real-timeish
+ */
 function updateRelativeTime()
 {
 	// In any other case no more than one hour
@@ -1971,6 +1998,11 @@ function updateRelativeTime()
 	setTimeout('updateRelativeTime()', relative_time_refresh);
 }
 
+/**
+ * Function/object to handle relative times
+ * sTo is optional, if omitted the relative time it 
+ * calculated from sFrom up to "now"
+ */
 function relativeTime (sFrom, sTo)
 {
 	if (typeof sTo == 'undefined')
