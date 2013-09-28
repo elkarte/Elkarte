@@ -1664,6 +1664,9 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 		beforeSend: ajax_indicator(true)
 	})
 	.done(function(request) {
+		if (request == '')
+			return;
+
 		var oElement = $(request).find('elk')[0];
 
 		// No errors
