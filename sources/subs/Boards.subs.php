@@ -96,8 +96,8 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 	if ($resetTopics)
 	{
 		// Update log_mark_read and log_boards.
-		// @todo check this condition
-		if ($unread && !empty($markRead))
+		// @todo check this condition <= I think I did, but better double check
+		if (!$unread && !empty($markRead))
 			$db->insert('replace',
 				'{db_prefix}log_mark_read',
 				array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
