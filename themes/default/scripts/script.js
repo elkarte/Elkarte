@@ -1669,8 +1669,8 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 		// No errors
 		if (oElement.getElementsByTagName('error').length === 0)
 		{
-			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities(),
-				url = oElement.getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities(),
+			var text = oElement.getElementsByTagName('text'),
+				url = oElement.getElementsByTagName('url'),
 				confirm_elem = oElement.getElementsByTagName('confirm');
 
 			// Update the page so button/link/confirm/etc to reflect the new on or off status
@@ -1679,8 +1679,10 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 
 			$('.' + btn.className).each(function() {
 				// @todo: the span should be moved somewhere in themes.js?
-				$(this).html('<span>' + text + '</span>');
-				$(this).attr('href', url);
+				if (text.length === 1)
+					$(this).html('<span>' + text[0].firstChild.nodeValue.removeEntities() + '</span>');
+				if (url.length === 1)
+					$(this).attr('href', url[0].firstChild.nodeValue.removeEntities());
 
 				// Replaces the confirmations message with the new one
 				if (typeof(confirm_text) !== 'undefined')
@@ -1717,21 +1719,35 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 function toggleHeaderAJAX(btn, container_id)
 {
 	ajax_indicator(true);
-
-	var oXMLDoc = getXMLDocument(btn.href + ';xml;api');
 	var text_template = '<div class="cat_bar"><h3 class="catbg centertext">{text}</h3></div>';
 
-	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
-	{
-		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+	$.ajax({
+		type: 'GET',
+		url: btn.href + ';xml;api',
+		context: document.body,
+		beforeSend: ajax_indicator(true)
+	})
+	.done(function(request) {
+		var oElement = $(request).find('elk')[0];
 
-		$('#' + container_id + ' .pagesection').remove();
-		$('#' + container_id + ' .category_header').remove();
-		$('#' + container_id + ' .topic_listing').remove();
-		$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
-	}
+		// No errors
+		if (oElement.getElementsByTagName('error').length === 0)
+		{
+			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 
-	ajax_indicator(false);
+			$('#' + container_id + ' .pagesection').remove();
+			$('#' + container_id + ' .category_header').remove();
+			$('#' + container_id + ' .topic_listing').remove();
+			$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
+		}
+	})
+	.fail(function(){
+		// ajax failure code
+	 })
+	.always(function() {
+		// turn off the indicator
+		ajax_indicator(false);
+	});
 
 }
 
