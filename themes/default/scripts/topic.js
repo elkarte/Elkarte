@@ -601,6 +601,10 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 			if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
 				this.oMsgIcon.style.display = 'none';
 		}
+
+		// Re embed any video links if the feature is available
+		if ($.isFunction($.fn.linkifyvideo))
+			$().linkifyvideo(oEmbedtext, this.sCurMessageId);
 	}
 	else if (error)
 	{
