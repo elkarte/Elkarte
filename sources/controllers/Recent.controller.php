@@ -779,9 +779,9 @@ class Recent_Controller extends Action_Controller
 						LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 					WHERE t.' . $query_this_board . '
 						AND m.id_member = {int:current_member}
-						AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
-						($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-						($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+						AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
+						AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_disregard'] ? '
+						AND IFNULL(lt.disregarded, 0) != 1' : ''),
 					array_merge($query_parameters, array(
 						'current_member' => $user_info['id'],
 						'is_approved' => 1,

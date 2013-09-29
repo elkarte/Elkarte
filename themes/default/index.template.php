@@ -50,11 +50,6 @@ function template_init()
 	  if this is 'never' or isn't set at all, images from the default theme will not be used. */
 	$settings['use_default_images'] = 'never';
 
-	/* What document type definition is being used? (for font size and other issues.)
-	  'xhtml' for an XHTML 1.0 document type definition.
-	  'html' for an HTML 4.01 document type definition. */
-	$settings['doctype'] = 'xhtml';
-
 	// The version this template/theme is for. This should probably be the version of the forum it was created for.
 	$settings['theme_version'] = '1.0';
 
@@ -397,7 +392,7 @@ function template_body_below()
 					theme_copyright(), '
 				</li>
 				<li>
-					<a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_xhtml'], '"><span>', $txt['xhtml'], '</span></a>
+					<a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_html'], '"><span>', $txt['html'], '</span></a>
 				</li>',
 				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
 				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats'])) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '

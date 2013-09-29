@@ -1836,7 +1836,7 @@ function getLoggedTopics($member, $topics)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_topic, disregarded, id_msg
+		SELECT id_topic, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})
 			AND id_member = {int:current_user}',
