@@ -60,7 +60,7 @@ function template_main()
 			{
 				echo '
 				<li class="board_row ', (!empty($board['children'])) ? 'parent_board' : '', '" id="board_', $board['id'], '">
-					<div class="board_info">
+					<div class="board_info', $board['new'] ? ' new' : '', '">
 						<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 
 				// If the board or children is new, show an indicator.

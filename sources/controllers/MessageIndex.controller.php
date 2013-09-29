@@ -991,24 +991,12 @@ class MessageIndex_Controller extends Action_Controller
 
 		if (!empty($markCache))
 		{
-			$request = $db->query('', '
-				SELECT id_topic, disregarded
-				FROM {db_prefix}log_topics
-				WHERE id_topic IN ({array_int:selected_topics})
-					AND id_member = {int:current_user}',
-				array(
-					'selected_topics' => $markCache,
-					'current_user' => $user_info['id'],
-				)
-			);
-			$logged_topics = array();
-			while ($row = $db->fetch_assoc($request))
-				$logged_topics[$row['id_topic']] = $row['disregarded'];
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$logged_topics = getLoggedTopics($user_info['id'], $markCache);
 
 			$markArray = array();
 			foreach ($markCache as $topic)
-				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], $logged_topics[$topic]);
+				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$topic]));
 
 			markTopicsRead($markArray, true);
 		}

@@ -96,8 +96,8 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 	if ($resetTopics)
 	{
 		// Update log_mark_read and log_boards.
-		// @todo check this condition
-		if ($unread && !empty($markRead))
+		// @todo check this condition <= I think I did, but better double check
+		if (!$unread && !empty($markRead))
 			$db->insert('replace',
 				'{db_prefix}log_mark_read',
 				array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
@@ -121,32 +121,55 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 
 		// @todo SLOW This query seems to eat it sometimes.
 		$result = $db->query('', '
-			SELECT lt.id_topic
+			SELECT lt.id_topic, lt.disregarded
 			FROM {db_prefix}log_topics AS lt
 				INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
 					AND t.id_board IN ({array_int:board_list}))
 			WHERE lt.id_member = {int:current_member}
-				AND lt.id_topic >= {int:lowest_topic}
-				AND lt.disregarded != 1',
+				AND lt.id_topic >= {int:lowest_topic}',
 			array(
 				'current_member' => $user_info['id'],
 				'board_list' => $boards,
 				'lowest_topic' => $lowest_topic,
 			)
 		);
-		$topics = array();
+		$delete_topics = array();
+		$update_topics = array();
 		while ($row = $db->fetch_assoc($result))
-			$topics[] = $row['id_topic'];
+		{
+			if (!empty($row['disregarded']))
+				$update_topics[] = array(
+					$user_info['id'],
+					$modSettings['maxMsgID'],
+					$row['id_topic'],
+					1,
+				);
+			else
+				$delete_topics[] = $row['id_topic'];
+		}
 		$db->free_result($result);
 
-		if (!empty($topics))
+		if (!empty($update_topics))
+			$db->insert('replace',
+				'{db_prefix}log_topics',
+				array(
+					'id_member' => 'int',
+					'id_msg' => 'int',
+					'id_topic' => 'int',
+					'disregarded' => 'int'
+				),
+				$update_topics,
+				array('id_topic', 'id_member')
+			);
+
+		if (!empty($delete_topics))
 			$db->query('', '
 				DELETE FROM {db_prefix}log_topics
 				WHERE id_member = {int:current_member}
 					AND id_topic IN ({array_int:topic_list})',
 				array(
 					'current_member' => $user_info['id'],
-					'topic_list' => $topics,
+					'topic_list' => $delete_topics,
 				)
 			);
 	}

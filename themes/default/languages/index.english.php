@@ -705,11 +705,9 @@ $txt['powered_by_mysql'] = 'Powered by MySQL';
 $txt['valid_css'] = 'Valid CSS';
 
 // Current footer strings
-$txt['valid_html'] = 'Valid HTML 4.01';
-$txt['valid_xhtml'] = 'Valid XHTML 1.0';
+$txt['valid_html'] = 'Valid HTML 5';
 $txt['rss'] = 'RSS';
 $txt['atom'] = 'Atom';
-$txt['xhtml'] = 'XHTML';
 $txt['html'] = 'HTML';
 
 $txt['guest'] = 'Guest';

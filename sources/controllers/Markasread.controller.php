@@ -154,7 +154,7 @@ class MarkRead_Controller extends Action_Controller
 
 		$markRead = array();
 		foreach ($topics as $id_topic)
-			$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], $logged_topics[$id_topic]);
+			$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$id_topic]));
 
 		markTopicsRead($markRead, true);
 
