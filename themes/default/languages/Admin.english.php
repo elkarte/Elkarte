@@ -589,6 +589,7 @@ $txt['enableEmbeddedFlash'] = 'Embed flash into posts';
 $txt['enableEmbeddedFlash_warning'] = 'may be a security risk!';
 $txt['enableSpellChecking'] = 'Enable spell checking';
 $txt['enableSpellChecking_warning'] = 'this does not work on all servers.';
+$txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
 $txt['disable_wysiwyg'] = 'Disable WYSIWYG editor';
 $txt['max_messageLength'] = 'Maximum allowed post size';
 $txt['max_messageLength_zero'] = '0 for no max.';
