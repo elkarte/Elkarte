@@ -787,7 +787,7 @@ class Display_Controller
 		loadJavascriptFile('topic.js');
 
 		// Auto video embeding enabled?
-		if (empty($modSettings['enableVideoEmbeding']))
+		if (!empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
 		$(document).ready(function() {

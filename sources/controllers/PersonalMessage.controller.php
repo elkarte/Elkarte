@@ -224,7 +224,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$start = 'new';
 
 		// Auto video embeding enabled?
-		if (empty($modSettings['enableVideoEmbeding']))
+		if (!empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
 		$(document).ready(function() {
