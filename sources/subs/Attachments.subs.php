@@ -334,6 +334,8 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
+	$attach_errors = attachment_error_context::context('attachment', 1);
+
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
 		automanage_attachments_check_directory();
@@ -389,7 +391,7 @@ function processAttachments($id_msg = null)
 					unlink($attachment['tmp_name']);
 			}
 
-			$context['we_are_history'] = $txt['error_temp_attachments_flushed'];
+			$attach_errors->activate()->addError('temp_attachments_flushed');
 			$_SESSION['temp_attachments'] = array();
 		}
 	}
@@ -413,6 +415,11 @@ function processAttachments($id_msg = null)
 	if (!empty($initial_error))
 	{
 		$_SESSION['temp_attachments']['initial_error'] = $initial_error;
+
+		// This is a generic error
+		$attach_errors->activate();
+		$attach_errors->addError($txt['attach_no_upload']);
+		$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
 
 		// And delete the files 'cos they ain't going nowhere.
 		foreach ($_FILES['attachment']['tmp_name'] as $n => $dummy)
@@ -482,6 +489,25 @@ function processAttachments($id_msg = null)
 		// If there's no errors to this pont. We still do need to apply some addtional checks before we are finished.
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
+
+		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
+		{
+			// Sort out the errors for display and delete any associated files.
+			$attach_errors->addAttach($attachID, $_SESSION['temp_attachments'][$attachID]['name']);
+			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
+
+			foreach ($_SESSION['temp_attachments'][$attachID]['errors'] as $error)
+			{
+				if (!is_array($error))
+				{
+					$attach_errors->addError($txt[$error]);
+					if (in_array($error, $log_these))
+						log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
+				}
+				else
+					$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]));
+			}
+		}
 	}
 	// Mod authors, finally a hook to hang an alternate attachment upload system upon
 	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand())

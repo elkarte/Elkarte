@@ -60,7 +60,7 @@ function template_main()
 			{
 				echo '
 				<li class="board_row ', (!empty($board['children'])) ? 'parent_board' : '', '" id="board_', $board['id'], '">
-					<div class="board_info">
+					<div class="board_info', $board['new'] ? ' new' : '', '">
 						<a class="icon_anchor" href="', ($board['is_redirect'] || $context['user']['is_guest'] ? $board['href'] : $scripturl . '?action=unread;board=' . $board['id'] . '.0;children'), '">';
 
 				// If the board or children is new, show an indicator.
@@ -326,7 +326,7 @@ function template_ic_recent_posts()
 						<td class="recentpost"><strong>', $post['link'], '</strong></td>
 						<td class="recentposter">', $post['poster']['link'], '</td>
 						<td class="recentboard">', $post['board']['link'], '</td>
-						<td class="recenttime"><time datetime="', htmlTime($post['time']), '">', $post['time'], '</time></td>
+						<td class="recenttime"><time datetime="', htmlTime($post['raw_timestamp']), '">', $post['time'], '</time></td>
 					</tr>';
 
 		echo '

@@ -355,6 +355,8 @@ function template_postarea_above()
 
 	// If an error occurred, explain what happened.
 	template_show_error('post_error');
+	if (!empty($context['attachment_error_keys']))
+		template_attachment_errors();
 
 	// If this won't be approved let them know!
 	if (!$context['becomes_approved'])

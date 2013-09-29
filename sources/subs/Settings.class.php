@@ -197,7 +197,7 @@ class Settings_Form
 
 				$context['config_vars'][$config_var[1]] = array(
 					'label' => isset($config_var['text_label']) ? $config_var['text_label'] : (isset($txt[$config_var[1]]) ? $txt[$config_var[1]] : (isset($config_var[3]) && !is_array($config_var[3]) ? $config_var[3] : '')),
-					'help' => isset($helptxt[$config_var[1]]) ? $config_var[1] : '',
+					'help' => isset($config_var['helptext']) ? $config_var['helptext'] : (isset($helptxt[$config_var[1]]) ? $config_var[1] : ''),
 					'type' => $config_var[0],
 					'size' => !empty($config_var[2]) && !is_array($config_var[2]) ? $config_var[2] : (in_array($config_var[0], array('int', 'float')) ? 6 : 0),
 					'data' => array(),

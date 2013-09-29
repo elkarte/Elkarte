@@ -388,3 +388,73 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			sendmail($recipient['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 		}
 }
+
+/**
+ * Callback used in the core features page when the custom profiles
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the profile fields
+ *            (true => enabled, false => disabled)
+ */
+function custom_profiles_toggle_callback($value)
+{
+	$db = database();
+
+	if (!$value)
+	{
+		$db->query('', '
+			UPDATE {db_prefix}custom_fields
+			SET active = 0'
+		);
+	}
+}
+
+/**
+ * Callback used in the core features page when the drafts
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the drafts
+ *            (true => enabled, false => disabled)
+ */
+function drafts_toggle_callback($value)
+{
+	$db = database();
+
+	// Set the correct disabled value for the scheduled task.
+	$db->query('', '
+		UPDATE {db_prefix}scheduled_tasks
+		SET disabled = {int:disabled}
+		WHERE task = {string:task}',
+		array(
+			'disabled' => $value ? 0 : 1,
+			'task' => 'remove_old_drafts',
+		)
+	);
+}
+
+/**
+ * Callback used in the core features page when the paid subscriptions
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the paid subscriptions
+ *            (true => enabled, false => disabled)
+ */
+function subscriptions_toggle_callback($value)
+{
+	$db = database();
+
+	// Set the correct disabled value for scheduled task.
+	$db->query('', '
+		UPDATE {db_prefix}scheduled_tasks
+		SET disabled = {int:disabled}
+		WHERE task = {string:task}',
+		array(
+			'disabled' => $value ? 0 : 1,
+			'task' => 'paid_subscriptions',
+		)
+	);
+
+	// Should we calculate next trigger?
+	if ($value)
+	{
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+		calculateNextTrigger('paid_subscriptions');
+	}
+}

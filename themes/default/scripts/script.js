@@ -1664,13 +1664,16 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 		beforeSend: ajax_indicator(true)
 	})
 	.done(function(request) {
+		if (request == '')
+			return;
+
 		var oElement = $(request).find('elk')[0];
 
 		// No errors
 		if (oElement.getElementsByTagName('error').length === 0)
 		{
-			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities(),
-				url = oElement.getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities(),
+			var text = oElement.getElementsByTagName('text'),
+				url = oElement.getElementsByTagName('url'),
 				confirm_elem = oElement.getElementsByTagName('confirm');
 
 			// Update the page so button/link/confirm/etc to reflect the new on or off status
@@ -1679,8 +1682,10 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 
 			$('.' + btn.className).each(function() {
 				// @todo: the span should be moved somewhere in themes.js?
-				$(this).html('<span>' + text + '</span>');
-				$(this).attr('href', url);
+				if (text.length === 1)
+					$(this).html('<span>' + text[0].firstChild.nodeValue.removeEntities() + '</span>');
+				if (url.length === 1)
+					$(this).attr('href', url[0].firstChild.nodeValue.removeEntities());
 
 				// Replaces the confirmations message with the new one
 				if (typeof(confirm_text) !== 'undefined')
@@ -1708,27 +1713,50 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 	return false;
 }
 
+/**
+ * Helper function: displays and remove the ajax indicator and
+ * hides some page elements inside "container_id"
+ * Used by some (one at the moment) ajax buttons
+ * @todo it may be merged into the function if not used anywhere else
+ */
 function toggleHeaderAJAX(btn, container_id)
 {
 	ajax_indicator(true);
-
-	var oXMLDoc = getXMLDocument(btn.href + ';xml;api');
 	var text_template = '<div class="cat_bar"><h3 class="catbg centertext">{text}</h3></div>';
 
-	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
-	{
-		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+	$.ajax({
+		type: 'GET',
+		url: btn.href + ';xml;api',
+		context: document.body,
+		beforeSend: ajax_indicator(true)
+	})
+	.done(function(request) {
+		var oElement = $(request).find('elk')[0];
 
-		$('#' + container_id + ' .pagesection').remove();
-		$('#' + container_id + ' .category_header').remove();
-		$('#' + container_id + ' .topic_listing').remove();
-		$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
-	}
+		// No errors
+		if (oElement.getElementsByTagName('error').length === 0)
+		{
+			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 
-	ajax_indicator(false);
+			$('#' + container_id + ' .pagesection').remove();
+			$('#' + container_id + ' .category_header').remove();
+			$('#' + container_id + ' .topic_listing').remove();
+			$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
+		}
+	})
+	.fail(function(){
+		// ajax failure code
+	 })
+	.always(function() {
+		// turn off the indicator
+		ajax_indicator(false);
+	});
 
 }
 
+/**
+ * Ajaxify the "notify" button in Display
+ */
 function notifyButton(btn)
 {
 	if (typeof(notification_topic_notice) != 'undefined' && !confirm(notification_topic_notice))
@@ -1737,6 +1765,9 @@ function notifyButton(btn)
 	return toggleButtonAJAX(btn, 'notification_topic_notice');
 }
 
+/**
+ * Ajaxify the "notify" button in MessageIndex
+ */
 function notifyboardButton(btn)
 {
 	if (typeof(notification_board_notice) != 'undefined' && !confirm(notification_board_notice))
@@ -1746,12 +1777,18 @@ function notifyboardButton(btn)
 	return false;
 }
 
+/**
+ * Ajaxify the "disregard" button in Display
+ */
 function disregardButton(btn)
 {
 	toggleButtonAJAX(btn);
 	return false;
 }
 
+/**
+ * Ajaxify the "mark read" button in MessageIndex
+ */
 function markboardreadButton(btn)
 {
 	toggleButtonAJAX(btn);
@@ -1761,14 +1798,12 @@ function markboardreadButton(btn)
 		$(this).parent().remove();
 	});
 
-	$('.boardicon').each(function() {
-		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
-		$(this).attr("src", src);
-	});
-
 	return false;
 }
 
+/**
+ * Ajaxify the "mark all messages as read" button in BoardIndex
+ */
 function markallreadButton(btn)
 {
 	toggleButtonAJAX(btn);
@@ -1778,7 +1813,7 @@ function markallreadButton(btn)
 		$(this).parent().remove();
 	});
 
-	$('.boardicon').each(function() {
+	$('.board_icon').each(function() {
 		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
 		$(this).attr("src", src);
 	});
@@ -1790,8 +1825,285 @@ function markallreadButton(btn)
 	return false;
 }
 
+/**
+ * Ajaxify the "mark all messages as read" button in Recent
+ */
 function markunreadButton(btn)
 {
 	toggleHeaderAJAX(btn, 'main_content_section');
 	return false;
+}
+
+var relative_time_refresh = 0;
+$(document).ready(function () {
+	$('.expand_pages').attr('tabindex', 0)
+	.click(function() {
+		$(this).data('expanded', 'true');
+	})
+	.bind("mouseenter focus",
+		function()
+		{
+			if ($(this).data('expanded') == 'true')
+				return;
+
+			var baseurl = eval($(this).data('baseurl')),
+				perpage = $(this).data('perpage'),
+				firstpage = $(this).data('firstpage'),
+				lastpage = $(this).data('lastpage'),
+				$outer_container = $('<div id="expanded_pages_out_container" />'),
+				$container = $('<div id="expanded_pages_container" />'),
+				$exp_pages = $('<div id="expanded_pages" />'),
+				pages = 0,
+				container_width = $(this).outerWidth() * 2,
+				width_elements = 3;
+
+			var aModel = $(this).prev().clone();
+
+			for (var i = firstpage; i < lastpage; i += perpage)
+			{
+				pages++;
+				var bElem = aModel.clone();
+
+				bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perpage + 1);
+				$exp_pages.append(bElem);
+			}
+
+			if (pages > width_elements)
+				$container.append(aModel.clone().css({
+					'position': 'absolute',
+					'top': 0,
+					'left': 0
+				})
+				.attr('id', 'pages_scroll_left')
+				.attr('href', '#').text('<').click(function(ev) {
+					ev.preventDefault();
+				}).hover(
+					function() {
+						$exp_pages.animate({
+							'margin-left': 0
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+					}
+				));
+
+			$container.append($exp_pages);
+			$(this).append($container);
+
+			if (pages > width_elements)
+				$container.append(aModel.clone().css({
+					'position': 'absolute',
+					'top': 0,
+					'right': 0
+				})
+				.attr('id', 'pages_scroll_right')
+				.attr('href', '#').text('>').click(function(ev) {
+					ev.preventDefault();
+				}).hover(
+					function() {
+						var $pages = $exp_pages.find('a'),
+							move = 0;
+
+						for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
+							move += $($pages[i]).outerWidth();
+
+						move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
+
+						$exp_pages.animate({
+							'margin-left': -move
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+					}
+				));
+
+			$exp_pages.find('a').each(function() {
+				if (width_elements > -1)
+					container_width += $(this).outerWidth();
+
+				if (width_elements <= 0 || pages >= width_elements)
+				{
+					$container.css({
+						'margin-left': -container_width / 2
+					}).width(container_width);
+				}
+
+				if (width_elements < 0)
+					return false;
+
+				width_elements--;
+			});
+			$exp_pages.css({
+				'height': $(this).prev().outerHeight(),
+				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
+			});
+		})
+	.bind("mouseleave",
+		function()
+		{
+			$(this).find('#expanded_pages_container').remove();
+		}
+	);
+
+	// We are not using relative times? Then live with what you have :P
+	if (todayMod > 2)
+		updateRelativeTime();
+	
+});
+
+/**
+ * This function changes the relative time around the page real-timeish
+ */
+function updateRelativeTime()
+{
+	// In any other case no more than one hour
+	relative_time_refresh = 3600000;
+	$('time').each(function() {
+		var oRelativeTime = new relativeTime($(this).attr('datetime'));
+		var postdate = new Date($(this).attr('datetime'));
+		var today = new Date();
+		var time_text = '';
+		var past_time = (today - postdate) / 1000;
+
+		if (oRelativeTime.seconds())
+		{
+			$(this).text(rt_now);
+			relative_time_refresh = Math.min(relative_time_refresh, 10000);
+		}
+		else if (oRelativeTime.minutes())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? rt_minutes : rt_minute;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 60000);
+		}
+		else if (oRelativeTime.hours())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? rt_hours : rt_hour;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.days())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? rt_days : rt_day;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.weeks())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? rt_weeks : rt_week;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.months())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? rt_months : rt_month;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.years())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? rt_years : rt_year;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+	});
+	setTimeout('updateRelativeTime()', relative_time_refresh);
+}
+
+/**
+ * Function/object to handle relative times
+ * sTo is optional, if omitted the relative time it 
+ * calculated from sFrom up to "now"
+ */
+function relativeTime (sFrom, sTo)
+{
+	if (typeof sTo == 'undefined')
+		this.dateTo = new Date();
+	else
+		this.dateTo = new Date(sTo);
+
+	this.dateFrom = new Date(sFrom);
+
+	this.time_text = '';
+	this.past_time = (this.dateTo - this.dateFrom) / 1000;
+	this.deltaTime = 0;
+}
+
+relativeTime.prototype.seconds = function ()
+{
+	// Within the first 60 seconds it is just now.
+	if (this.past_time < 60)
+	{
+		this.deltaTime = this.past_time;
+		return true;
+	}
+	return false;
+}
+
+relativeTime.prototype.minutes = function ()
+{
+	// Within the first hour?
+	if (this.past_time >= 60 && Math.round(this.past_time / 60) < 60)
+	{
+		this.deltaTime = Math.round(this.past_time / 60);
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.hours = function ()
+{
+	// Some hours but less than a day?
+	if (Math.round(this.past_time / 60) >= 60 && Math.round(this.past_time / 3600) < 24)
+	{
+		this.deltaTime = Math.round(this.past_time / 3600);
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.days = function ()
+{
+	// Some days ago but less than a week?
+	if (Math.round(this.past_time / 3600) >= 24 && Math.round(this.past_time / (24 * 3600)) < 7)
+	{
+		this.deltaTime = Math.round(this.past_time / (24 * 3600));
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.weeks = function ()
+{
+	// Weeks ago but less than a month?
+	if (Math.round(this.past_time / (24 * 3600)) >= 7 && Math.round(this.past_time / (24 * 3600)) < 30)
+	{
+		this.deltaTime = Math.round(this.past_time / (24 * 3600));
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.months = function ()
+{
+	// Months ago but less than a year?
+	if (Math.round(this.past_time / (24 * 3600)) >= 30 && Math.round(this.past_time / (30 * 24 * 3600)) < 12)
+	{
+		this.deltaTime = Math.round(this.past_time / (30 * 24 * 3600));
+		return true;
+	}
+	return false
+}
+
+relativeTime.prototype.years = function ()
+{
+	// Oha, we've passed at least a year?
+	if (Math.round(this.past_time / (30 * 24 * 3600)) >= 12)
+	{
+		this.deltaTime = this.dateTo.getFullYear() - this.dateFrom.getFullYear();
+		return true;
+	}
+	return false
 }

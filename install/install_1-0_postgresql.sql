@@ -984,6 +984,23 @@ CREATE TABLE {$db_prefix}custom_fields (
 CREATE UNIQUE INDEX {$db_prefix}custom_fields_col_name ON {$db_prefix}custom_fields (col_name);
 
 #
+# Table structure for table `custom_fields_data`
+#
+
+CREATE TABLE {$db_prefix}custom_fields_data (
+  id_member int NOT NULL default '0',
+  variable varchar(255) NOT NULL default '',
+  value text NOT NULL,
+  PRIMARY KEY (id_member, variable),
+);
+
+#
+# Indexes for table `custom_fields_data`
+#
+
+CREATE INDEX {$db_prefix}custom_fields_data_id_member ON {$db_prefix}custom_fields_data (id_member);
+
+#
 # Table structure for table `group_moderators`
 #
 
@@ -2780,5 +2797,13 @@ CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
 CREATE TABLE {$db_prefix}message_likes (
   id_member int NOT NULL default '0',
   id_msg int NOT NULL default '0',
+  id_poster int NOT NULL default '0',
   PRIMARY KEY (id_msg, id_member)
 );
+
+#
+# Indexes for table `message_likes`
+#
+
+CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
+CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);

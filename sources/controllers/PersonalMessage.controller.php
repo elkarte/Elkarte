@@ -223,6 +223,16 @@ class PersonalMessage_Controller extends Action_Controller
 		else
 			$start = 'new';
 
+		// Auto video embeding enabled?
+		if (empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});'
+			);
+		}
+
 		// Set up some basic theme stuff.
 		$context['from_or_to'] = $context['folder'] != 'sent' ? 'from' : 'to';
 		$context['get_pmessage'] = 'preparePMContext_callback';
@@ -1995,37 +2005,35 @@ class PersonalMessage_Controller extends Action_Controller
 
 			for ($k = 0, $n = count($possible_users); $k < $n; $k++)
 			{
-				$possible_users[$k] = trim($possible_users[$k]);
+				$possible_users[$k] = addcslashes(trim($possible_users[$k]), '\\\'');
 
 				if (strlen($possible_users[$k]) == 0)
 					unset($possible_users[$k]);
+				else
+					$possible_users[$k] = $db->quote('{string:name}', array('name' => $possible_users[$k]));
+
 			}
 
+			require_once(SUBSDIR . '/Members.subs.php');
 			// Who matches those criteria?
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE real_name LIKE {raw:real_name_implode}',
-				array(
-					'real_name_implode' => '\'' . implode('\' OR real_name LIKE \'', $possible_users) . '\'',
-				)
-			);
+			$members = membersBy('real_name LIKE {raw:real_name_implode}', array('real_name_implode' => implode(" OR real_name LIKE ", $possible_users)));
+
 			// Simply do nothing if there're too many members matching the criteria.
-			if ($db->num_rows($request) > $maxMembersToSearch)
+			if (count($members) > $maxMembersToSearch)
 				$userQuery = '';
-			elseif ($db->num_rows($request) == 0)
+			elseif (count($members) == 0)
 			{
 				if ($context['folder'] === 'inbox')
 					$userQuery = 'AND pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})';
 				else
 					$userQuery = '';
 
-				$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
+				$searchq_parameters['guest_user_name_implode'] = implode(' OR pm.from_name LIKE ', $possible_users);
 			}
 			else
 			{
 				$memberlist = array();
-				while ($row = $db->fetch_assoc($request))
+				foreach ($members as $row)
 					$memberlist[] = $row['id_member'];
 
 				// Use the name as as sent from or sent to
@@ -2034,10 +2042,9 @@ class PersonalMessage_Controller extends Action_Controller
 				else
 					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
 
-				$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
+				$searchq_parameters['guest_user_name_implode'] = implode(' OR pm.from_name LIKE ', $possible_users);
 				$searchq_parameters['member_list'] = $memberlist;
 			}
-			$db->free_result($request);
 		}
 
 		// Setup the sorting variables...
@@ -2903,9 +2910,8 @@ function prepareDraftsContext($member_id, $id_pm = false)
 		loadDraft((int) $_REQUEST['id_draft'], 1, true, true);
 
 	// load all the drafts for this user that meet the criteria
-	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
 	$order = 'poster_time DESC';
-	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $drafts_keep_days, $order);
+	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $order);
 
 	// add them to the context draft array for template display
 	foreach ($user_drafts as $draft)

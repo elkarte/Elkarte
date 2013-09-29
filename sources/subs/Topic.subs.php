@@ -1761,6 +1761,7 @@ function topicAttribute($id_topic, $attribute)
 			WHERE id_topic = {int:current_topic}
 			LIMIT 1',
 			array(
+				'current_topic' => $id_topic,
 				'attribute' => $attributes[$attribute],
 			)
 		);
@@ -1835,7 +1836,7 @@ function getLoggedTopics($member, $topics)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_topic, disregarded, id_msg
+		SELECT id_topic, disregarded
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})
 			AND id_member = {int:current_user}',
@@ -2703,4 +2704,163 @@ function messagesInTopics($topics)
 	$db->free_result($request);
 
 	return $messages;
+}
+
+/**
+ * Updates all the tables involved when two or more topics are merged
+ *
+ * @param int $first_msg the first message of the new topic
+ * @param array $topics ids of all the topics merged
+ * @param int $id_topic id of the merged topic
+ * @param int $target_board id of the target board where the topic will resides
+ * @param string $target_subject subject of the new topic
+ * @param bool $enforce_subject if true all the messages will be set to the same subject
+ * @param array $notifications array of topics with active notifications
+ */
+function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)
+{
+	global $context;
+
+	$db = database();
+
+	// Delete the remaining topics.
+	$deleted_topics = array_diff($topics, array($id_topic));
+	$db->query('', '
+		DELETE FROM {db_prefix}topics
+		WHERE id_topic IN ({array_int:deleted_topics})',
+		array(
+			'deleted_topics' => $deleted_topics,
+		)
+	);
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_search_subjects
+		WHERE id_topic IN ({array_int:deleted_topics})',
+		array(
+			'deleted_topics' => $deleted_topics,
+		)
+	);
+
+	// Change the topic IDs of all messages that will be merged.  Also adjust subjects if 'enforce subject' was checked.
+	$db->query('', '
+		UPDATE {db_prefix}messages
+		SET
+			id_topic = {int:id_topic},
+			id_board = {int:target_board}' . (empty($enforce_subject) ? '' : ',
+			subject = {string:subject}') . '
+		WHERE id_topic IN ({array_int:topic_list})',
+		array(
+			'topic_list' => $topics,
+			'id_topic' => $id_topic,
+			'target_board' => $target_board,
+			'subject' => $context['response_prefix'] . $target_subject,
+		)
+	);
+
+	// Any reported posts should reflect the new board.
+	$db->query('', '
+		UPDATE {db_prefix}log_reported
+		SET
+			id_topic = {int:id_topic},
+			id_board = {int:target_board}
+		WHERE id_topic IN ({array_int:topics_list})',
+		array(
+			'topics_list' => $topics,
+			'id_topic' => $id_topic,
+			'target_board' => $target_board,
+		)
+	);
+
+	// Change the subject of the first message...
+	$db->query('', '
+		UPDATE {db_prefix}messages
+		SET subject = {string:target_subject}
+		WHERE id_msg = {int:first_msg}',
+		array(
+			'first_msg' => $first_msg,
+			'target_subject' => $target_subject,
+		)
+	);
+
+	// Adjust all calendar events to point to the new topic.
+	$db->query('', '
+		UPDATE {db_prefix}calendar
+		SET
+			id_topic = {int:id_topic},
+			id_board = {int:target_board}
+		WHERE id_topic IN ({array_int:deleted_topics})',
+		array(
+			'deleted_topics' => $deleted_topics,
+			'id_topic' => $id_topic,
+			'target_board' => $target_board,
+		)
+	);
+
+	// Merge log topic entries.
+	// The disregard setting comes from the oldest topic
+	$request = $db->query('', '
+		SELECT id_member, MIN(id_msg) AS new_id_msg, disregarded
+		FROM {db_prefix}log_topics
+		WHERE id_topic IN ({array_int:topics})
+		GROUP BY id_member',
+		array(
+			'topics' => $topics,
+		)
+	);
+
+	if ($db->num_rows($request) > 0)
+	{
+		$replaceEntries = array();
+		while ($row = $db->fetch_assoc($request))
+			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
+
+		markTopicsRead($replaceEntries, true);
+		unset($replaceEntries);
+
+		// Get rid of the old log entries.
+		$db->query('', '
+			DELETE FROM {db_prefix}log_topics
+			WHERE id_topic IN ({array_int:deleted_topics})',
+			array(
+				'deleted_topics' => $deleted_topics,
+			)
+		);
+	}
+	$db->free_result($request);
+
+	if (!empty($notifications))
+	{
+		$request = $db->query('', '
+			SELECT id_member, MAX(sent) AS sent
+			FROM {db_prefix}log_notify
+			WHERE id_topic IN ({array_int:topics_list})
+			GROUP BY id_member',
+			array(
+				'topics_list' => $notifications,
+			)
+		);
+		if ($db->num_rows($request) > 0)
+		{
+			$replaceEntries = array();
+			while ($row = $db->fetch_assoc($request))
+				$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
+
+			$db->insert('replace',
+					'{db_prefix}log_notify',
+					array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'sent' => 'int'),
+					$replaceEntries,
+					array('id_member', 'id_topic', 'id_board')
+				);
+			unset($replaceEntries);
+
+			$db->query('', '
+				DELETE FROM {db_prefix}log_topics
+				WHERE id_topic IN ({array_int:deleted_topics})',
+				array(
+					'deleted_topics' => $deleted_topics,
+				)
+			);
+		}
+		$db->free_result($request);
+	}
 }

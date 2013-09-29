@@ -769,8 +769,13 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	private function _initBoardSettingsForm()
 	{
+		global $txt;
+
 		// instantiate the form
 		$this->_boardSettings = new Settings_Form();
+
+		// We need to borrow a string from here
+		loadLanguage('ManagePermissions');
 
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -783,7 +788,7 @@ class ManageBoards_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
-				array('permissions', 'manage_boards', 'helptext' => ''),
+				array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']),
 			'',
 				// Other board settings.
 				array('check', 'countChildPosts'),
@@ -801,10 +806,16 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	public function settings()
 	{
+		global $txt;
+
+		// We need to borrow a string from here
+		loadLanguage('ManagePermissions');
+
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
+
 		foreach ($boards as $board)
 			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 
@@ -812,7 +823,7 @@ class ManageBoards_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
-				array('permissions', 'manage_boards', 'helptext' => ''),
+				array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']),
 			'',
 				// Other board settings.
 				array('check', 'countChildPosts'),

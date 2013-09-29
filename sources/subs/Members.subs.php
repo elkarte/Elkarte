@@ -1371,6 +1371,146 @@ function isAnotherAdmin($memberID)
 }
 
 /**
+ * This function retrieves a list of member ids based on some conditions
+ *
+ * @param mixed $query_conditions can be an array of "type" of conditions,
+ *              or a string used as raw query
+ * @param array $query_params is an array containing the parameters to be passed
+ *              to the query
+ * @param bool $details if true returns additional member details (name, email, ip, etc.)
+ */
+function membersBy($query, $query_params, $details = false)
+{
+	$allowed_conditions = array(
+		'member_ids' => array('id_member IN ({array_int:member_ids})'),
+		'member_names' => array(
+			'LOWER(member_name) IN ({array_string:member_names})',
+			'LOWER(real_name) IN ({array_string:member_names})',
+		),
+		'not_in_group' => array(
+			'id_group != {int:not_in_group}',
+			'FIND_IN_SET({int:not_in_group}, additional_groups) = 0',
+		),
+		'in_group' => array(
+			'id_group = {int:in_group}',
+			'FIND_IN_SET({int:in_group}, additional_groups) != 0',
+		),
+		'in_group_primary' => array('id_group = {int:in_group_primary}',),
+		'in_post_group' => array('id_post_group = {int:in_post_group}'),
+	);
+
+	if (is_array($query))
+	{
+		$query_parts = array('or' => array(), 'and' => array());
+		foreach ($query as $type => $query_conditions)
+			if (!empty($query_conditions))
+				foreach ($query_conditions as $query_cond)
+					if (isset($allowed_conditions[$query_cond]))
+						$query_parts[$type] = array_merge($query_parts[$type], $allowed_conditions[$query_cond]);
+		if (!empty($query_parts['or']))
+			$query_parts['and'][] = implode('
+			OR ', $query_parts['or']);
+		$query_where =  implode('
+			AND ', $query_parts['and']);
+	}
+	else
+		$query_where = $query;
+
+	if (empty($query_where))
+		return false;
+
+	$db = database();
+
+	$members = array();
+	$request = $db->query('', '
+		SELECT id_member' . ($details ? ', member_name, real_name, email_address, member_ip, date_registered, last_login,
+				hide_email, posts, is_activated, real_name' : '') . '
+		FROM {db_prefix}members
+		WHERE ' . $query_where . (isset($query_params['start']) ? '
+		LIMIT {int:start}, {int:limit}' : '') . (!empty($query_params['order']) ? '
+		ORDER BY {raw:order}' : ''),
+		$query_params
+	);
+
+	if ($details)
+	{
+		while ($row = $db->fetch_assoc($request))
+			$members[$row['id_member']] = $row;
+	}
+	else
+	{
+		while ($row = $db->fetch_assoc($request))
+			$members[] = $row['id_member'];
+	}
+	$db->free_result($request);
+
+	return $members;
+}
+
+/**
+ * Counts the number of members based on conditions
+ *
+ * @param mixed $query_conditions can be an array of "type" of conditions,
+ *              or a string used as raw query
+ * @param array $query_params is an array containing the parameters to be passed
+ *              to the query
+ */
+function countMembersBy($query, $query_params)
+{
+	$allowed_conditions = array(
+		'member_ids' => array('id_member IN ({array_int:member_ids})'),
+		'member_names' => array(
+			'LOWER(member_name) IN ({array_string:member_names})',
+			'LOWER(real_name) IN ({array_string:member_names})',
+		),
+		'not_in_group' => array(
+			'id_group != {int:not_in_group}',
+			'FIND_IN_SET({int:not_in_group}, additional_groups) = 0',
+		),
+		'in_group' => array(
+			'id_group = {int:in_group}',
+			'FIND_IN_SET({int:in_group}, additional_groups) != 0',
+		),
+		'in_group_primary' => array('id_group = {int:in_group_primary}',),
+		'in_post_group' => array('id_post_group = {int:in_post_group}'),
+	);
+
+	if (is_array($query))
+	{
+		$query_parts = array('or' => array(), 'and' => array());
+		foreach ($query as $type => $query_conditions)
+			if (!empty($query_conditions))
+				foreach ($query_conditions as $query_cond)
+					if (isset($allowed_conditions[$query_cond]))
+						$query_parts[$type] = array_merge($query_parts[$type], $allowed_conditions[$query_cond]);
+		if (!empty($query_parts['or']))
+			$query_parts['and'][] = implode('
+			OR ', $query_parts['or']);
+		$query_where =  implode('
+			AND ', $query_parts['and']);
+	}
+	else
+		$query_where = $query;
+
+	if (empty($query_parts))
+		return false;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}members
+		WHERE ' . $query_where,
+		$query_params
+	);
+
+	list ($num_members) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $num_members;
+}
+
+/**
  * Retrieve administrators of the site.
  * The function returns basic information: name, language file.
  * It is used in personal messages reporting.

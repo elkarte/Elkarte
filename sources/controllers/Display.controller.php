@@ -678,7 +678,7 @@ class Display_Controller
 
 			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
 
-			
+
 			if (!empty($modSettings['enableFollowup']))
 			{
 				require_once(SUBSDIR . '/FollowUps.subs.php');
@@ -785,6 +785,16 @@ class Display_Controller
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
+
+		// Auto video embeding enabled?
+		if (empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});'
+			);
+		}
 
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
@@ -1004,7 +1014,7 @@ class Display_Controller
 
 		// Have you liked this post, can you?
 		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
-		$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] != $user_info['id'] && (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
+		$message['use_likes'] = allowedTo('like_posts') && ($message['id_member'] != $user_info['id'] || !empty($modSettings['likeAllowSelf'])) && (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.

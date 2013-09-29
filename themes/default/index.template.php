@@ -50,11 +50,6 @@ function template_init()
 	  if this is 'never' or isn't set at all, images from the default theme will not be used. */
 	$settings['use_default_images'] = 'never';
 
-	/* What document type definition is being used? (for font size and other issues.)
-	  'xhtml' for an XHTML 1.0 document type definition.
-	  'html' for an HTML 4.01 document type definition. */
-	$settings['doctype'] = 'xhtml';
-
 	// The version this template/theme is for. This should probably be the version of the forum it was created for.
 	$settings['theme_version'] = '1.0';
 
@@ -63,9 +58,6 @@ function template_init()
 
 	// Show sticky and lock status separate from topic icons?
 	$settings['separate_sticky_lock'] = true;
-
-	// Does this theme use the strict doctype?
-	$settings['strict_doctype'] = false;
 
 	// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
 	$settings['require_theme_strings'] = false;
@@ -88,7 +80,7 @@ function template_init()
 		'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
 		'current_page' => '<strong class="current_page" role="menuitem">%1$s</strong>',
 		'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
-		'expand_pages' => '<span class="expand_pages" role="menuitem" onclick="{onclick_handler}" onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
+		'expand_pages' => '<span class="expand_pages" role="menuitem" {custom} onmouseover="this.style.cursor=\'pointer\';"><strong> ... </strong></span>',
 		'all' => '<span class="all_pages" role="menuitem">{all_txt}</span>',
 	);
 }
@@ -400,7 +392,7 @@ function template_body_below()
 					theme_copyright(), '
 				</li>
 				<li>
-					<a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_xhtml'], '"><span>', $txt['xhtml'], '</span></a>
+					<a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_html'], '"><span>', $txt['html'], '</span></a>
 				</li>',
 				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
 				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats'])) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '

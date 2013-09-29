@@ -705,11 +705,9 @@ $txt['powered_by_mysql'] = 'Powered by MySQL';
 $txt['valid_css'] = 'Valid CSS';
 
 // Current footer strings
-$txt['valid_html'] = 'Valid HTML 4.01';
-$txt['valid_xhtml'] = 'Valid XHTML 1.0';
+$txt['valid_html'] = 'Valid HTML 5';
 $txt['rss'] = 'RSS';
 $txt['atom'] = 'Atom';
-$txt['xhtml'] = 'XHTML';
 $txt['html'] = 'HTML';
 
 $txt['guest'] = 'Guest';
@@ -883,3 +881,10 @@ $txt['debug_hide_queries'] = '[Hide Queries]';
 $txt['debug_tokens'] = 'Tokens: ';
 $txt['debug_browser'] = 'Browser ID: ';
 $txt['debug_hooks'] = 'Hooks called: ';
+
+$txt['preview_image'] = 'Video Preview Image';
+$txt['ctp_video'] = 'Click to play video, double click to load video';
+$txt['hide_video'] = 'Show/Hide video';
+$txt['youtube'] = 'YouTube video:';
+$txt['vimeo'] = 'Vimeo video:';
+$txt['dailymotion'] = 'Dailymotion video:';

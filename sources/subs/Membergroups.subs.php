@@ -1112,6 +1112,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
  * @param int $id_group
  * @param int $copy_id
  * @param array $illegal_permissions
+ * @todo another function with the same name in ManagePermissions.subs.php
  */
 function copyPermissions($id_group, $copy_from, $illegal_permissions)
 {
