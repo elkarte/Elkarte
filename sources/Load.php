@@ -1581,6 +1581,22 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0,
 	);
 
+	// Auto video embeding enabled, then load the needed JS
+	if (empty($modSettings['enableVideoEmbeding']))
+	{
+		addInlineJavascript('
+		var oEmbedtext = ({
+			preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
+			ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
+			hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
+			youtube : ' . JavaScriptEscape($txt['youtube']) . ',
+			vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
+			dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
+		});');
+
+		loadJavascriptFile('elk_jquery_embed.js');
+	}
+
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		$context['javascript_vars'] += array(
 			'rt_now' => JavaScriptEscape($txt['rt_now']),
