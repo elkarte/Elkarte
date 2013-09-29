@@ -2342,7 +2342,29 @@ img.new_posts {
 .forumposts .post_separator {
 	display: none;
 }
-
+/* Used by video embed JS when autolinking video links */
+.elk_video {
+	display: block;
+	width: 640px;
+	height: auto;
+	max-height: auto;
+	border: #27a348 1px solid;
+	border-top: 0px;
+}
+.elk_video a img, .elk_video embed {
+	margin: 0 auto;
+	display: block;
+}
+.elk_videoheader {
+	padding: 0 4px 0 6px;
+    width: 630px;
+	max-width: 98%;
+	border: #27a348 1px solid;
+}
+.elk_previewvideo {
+	max-width: 640px;
+	height: auto;
+}
 /* Basic stuff for the bottom of Display.template.php. */
 #moderationbuttons {
 	float: left;
@@ -2465,6 +2487,7 @@ dl.send_mail dd {
 }
 #post_header img {
 	vertical-align: middle;
+	padding: 0 0 2px 5px;
 }
 ul.post_options {
 	overflow: auto;
@@ -4065,7 +4088,7 @@ dl.merge_topic dd {
 		padding-left: 2px;
 		padding-right: 22px;
 	}
-	#gobottom, #gotop { 
+	#gobottom, #gotop {
 		padding-left: 0.25em;
 	}
 	#news, #logo, #top_section_notice {

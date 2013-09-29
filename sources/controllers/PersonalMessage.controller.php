@@ -223,6 +223,16 @@ class PersonalMessage_Controller extends Action_Controller
 		else
 			$start = 'new';
 
+		// Auto video embeding enabled?
+		if (empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});'
+			);
+		}
+
 		// Set up some basic theme stuff.
 		$context['from_or_to'] = $context['folder'] != 'sent' ? 'from' : 'to';
 		$context['get_pmessage'] = 'preparePMContext_callback';

@@ -678,7 +678,7 @@ class Display_Controller
 
 			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
 
-			
+
 			if (!empty($modSettings['enableFollowup']))
 			{
 				require_once(SUBSDIR . '/FollowUps.subs.php');
@@ -785,6 +785,16 @@ class Display_Controller
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
+
+		// Auto video embeding enabled?
+		if (empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});'
+			);
+		}
 
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
