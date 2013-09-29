@@ -883,3 +883,10 @@ $txt['debug_hide_queries'] = '[Hide Queries]';
 $txt['debug_tokens'] = 'Tokens: ';
 $txt['debug_browser'] = 'Browser ID: ';
 $txt['debug_hooks'] = 'Hooks called: ';
+
+$txt['preview_image'] = 'Video Preview Image';
+$txt['ctp_video'] = 'Click to play video, double click to load video';
+$txt['hide_video'] = 'Show/Hide video';
+$txt['youtube'] = 'YouTube video:';
+$txt['vimeo'] = 'Vimeo video:';
+$txt['dailymotion'] = 'Dailymotion video:';
