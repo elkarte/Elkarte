@@ -2502,13 +2502,12 @@ ul.post_options li {
 	margin: 1em 0 0 0;
 	background: #fafafa;
 	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
-	border-bottom: 1px solid #ccc;
+	border-bottom: none;
 }
 #postAdditionalOptions, #postDraftOptions {
 	margin: 0 0 1em 0;
 	overflow: auto;
 	border: 1px solid #ccc;
-	border-top: none;
 	border-radius: 0 0 4px 4px;
 	background: #fdfdfd;
 }
