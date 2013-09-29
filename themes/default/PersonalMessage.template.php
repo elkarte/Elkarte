@@ -988,7 +988,7 @@ function template_send()
 	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
 		<div class="forumposts">
 			<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/im_newmsg.png" class="icon" alt="', $txt['new_message'], '" title="', $txt['new_message'], '" />&nbsp;', $txt['new_message'], '
+					<img src="', $settings['images_url'], '/icons/inbox_hd.png" class="icon" alt="', $txt['new_message'], '" title="', $txt['new_message'], '" />&nbsp;', $txt['new_message'], '
 			</h3>';
 
 	echo '
