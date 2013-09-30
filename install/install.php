@@ -450,8 +450,7 @@ function action_checkFilesWritable()
 		'themes',
 		'agreement.txt',
 		'Settings.php',
-		'Settings_bak.php',
-		'db_last_error.php'
+		'Settings_bak.php'
 	);
 	foreach ($incontext['detected_languages'] as $lang => $temp)
 		$extra_files[] = 'themes/default/languages/' . $lang;
