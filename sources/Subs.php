@@ -3208,9 +3208,12 @@ function template_javascript($do_defered = false)
 		echo '
 	<script type="text/javascript"><!-- // --><![CDATA[';
 
+		$output = array();
 		foreach ($context['javascript_vars'] as $key => $value)
-			echo '
-		var ', $key, ' = ', $value, ';';
+			$output[] = $key . ' = ' . $value;
+
+		echo '
+		var ' . implode("\n\t\t\t", $output) . ';';
 
 		echo '
 	// ]]></script>';
