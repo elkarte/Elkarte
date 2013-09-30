@@ -605,6 +605,10 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Re embed any video links if the feature is available
 		if ($.isFunction($.fn.linkifyvideo))
 			$().linkifyvideo(oEmbedtext, this.sCurMessageId);
+
+		// Fix code blocks
+		if (typeof elk_codefix === 'function')
+			elk_codefix();
 	}
 	else if (error)
 	{

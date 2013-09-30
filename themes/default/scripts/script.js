@@ -50,6 +50,20 @@ if (!('getElementsByClassName' in document))
 	}
 }
 
+/**
+ * Sets an auto height so small code blocks collaspe
+ * Sets a height for larger code blocks so and let resize or overflow do its thing as normal
+ */
+function elk_codefix()
+{
+	$('.bbc_code').each(function()
+	{
+		$(this).height("auto");
+		if ($(this).height() > 200)
+			$(this).css('height', '20em');
+	});
+}
+
 // Load an XML document using XMLHttpRequest.
 function getXMLDocument(sUrl, funcCallback)
 {
@@ -1950,7 +1964,7 @@ $(document).ready(function () {
 	// We are not using relative times? Then live with what you have :P
 	if (todayMod > 2)
 		updateRelativeTime();
-	
+
 });
 
 /**
@@ -2014,7 +2028,7 @@ function updateRelativeTime()
 
 /**
  * Function/object to handle relative times
- * sTo is optional, if omitted the relative time it 
+ * sTo is optional, if omitted the relative time it
  * calculated from sFrom up to "now"
  */
 function relativeTime (sFrom, sTo)

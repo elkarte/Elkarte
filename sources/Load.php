@@ -1582,7 +1582,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	);
 
 	// Auto video embeding enabled, then load the needed JS
-	if (empty($modSettings['enableVideoEmbeding']))
+	if (!empty($modSettings['enableVideoEmbeding']))
 	{
 		addInlineJavascript('
 		var oEmbedtext = ({

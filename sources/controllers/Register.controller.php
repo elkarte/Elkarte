@@ -946,5 +946,5 @@ function registerCheckUsername()
 	require_once(SUBSDIR . '/Auth.subs.php');
 	validateUsername(0, $context['checked_username'], 'valid_username');
 
-	$context['valid_username'] = $errors->hasErrors();
+	$context['valid_username'] = !$errors->hasErrors();
 }

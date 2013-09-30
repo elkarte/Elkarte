@@ -44,14 +44,9 @@ $(document).ready(function() {
 	// Find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');
 
-	// Set an auto height so small code blocks collaspe, set a height for larger ones
-	// and let resize or overflow do its thing as normal
-	$('.bbc_code').each(function()
-	{
-		$(this).height("auto");
-		if ($(this).height() > 200)
-			$(this).css('height', '20em');
-	});
+	// Fix code blocks
+	if (typeof elk_codefix === 'function')
+		elk_codefix();
 
 	// Collapsabile fieldsets, pure candy
 	$('legend').click(function(){
