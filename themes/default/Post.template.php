@@ -104,7 +104,7 @@ function template_main()
 							</dt>
 							<dd class="smalltext">
 								', empty($modSettings['attachmentSizeLimit']) ? '' : ('<input type="hidden" name="MAX_FILE_SIZE" value="' . $modSettings['attachmentSizeLimit'] * 1028 . '" />'), '
-								<input type="file" size="60" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
+								<input type="file" multiple="multiple" name="attachment[]" id="attachment1" class="input_file" /> (<a href="javascript:void(0);" onclick="cleanFileInput(\'attachment1\');">', $txt['clean_attach'], '</a>)';
 
 			// Show more boxes if they aren't approaching that limit.
 			if ($context['num_allowed_attachments'] > 1)
@@ -426,7 +426,7 @@ function template_postarea_above()
 
 	echo '
 								</select>
-								<img src="', $context['icon_url'], '" name="icons" hspace="15" alt="" />
+								<img src="', $context['icon_url'], '" id="icons" alt="" />
 							</dd>';
 
 	if (!empty($context['show_boards_dropdown']))

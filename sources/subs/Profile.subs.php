@@ -454,7 +454,7 @@ function loadProfileFields($force_reload = false)
 		'gender' => array(
 			'type' => 'select',
 			'cast_type' => 'int',
-			'options' => 'return array(0 => \'\', 1 => $txt[\'male\'], 2 => $txt[\'female\']);',
+			'options' => 'return array(0 => \' \', 1 => $txt[\'male\'], 2 => $txt[\'female\']);',
 			'label' => $txt['gender'],
 			'permission' => 'profile_extra',
 		),
