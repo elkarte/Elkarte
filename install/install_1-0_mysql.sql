@@ -2224,5 +2224,5 @@ CREATE TABLE {$db_prefix}message_likes (
   id_poster mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY (id_msg, id_member),
   KEY id_member (id_member),
-  KEY id_poster (id_poster),
+  KEY id_poster (id_poster)
 ) ENGINE=MyISAM;
