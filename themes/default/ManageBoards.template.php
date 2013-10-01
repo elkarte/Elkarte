@@ -236,7 +236,7 @@ function template_modify_category()
 	// Table footer.
 	echo '
 					</dl>
-					<div class="submitbutton"';
+					<div class="submitbutton">';
 
 	if (isset($context['category']['is_new']))
 		echo '
