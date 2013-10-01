@@ -265,7 +265,7 @@ class Likes_Controller extends Action_Controller
 			'id' => 'view_likes',
 			'title' => $txt['likes'],
 			'items_per_page' => 25,
-			'no_items_label' => $txt['likes_none_given'],
+			'no_items_label' => $txt['likes_none_received'],
 			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=received;u=' . $memID,
 			'default_sort_col' => 'subject',
 			'get_items' => array(
