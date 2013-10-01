@@ -26,10 +26,10 @@ $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
 		'version' => '4.1.0',
-		'version_check' => 'return min(mysqli_get_server_info(), mysqli_get_client_info());',
+		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'utf8_support' => true,
 		'utf8_version' => '4.1.0',
-		'utf8_version_check' => 'return mysqli_get_server_info();',
+		'utf8_version_check' => 'return mysqli_get_server_info($db_connection);',
 		'alter_support' => true,
 	),
 	'postgresql' => array(
@@ -104,7 +104,7 @@ if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt')
 if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
-//this may be SMF 
+// This may be SMF
 if (!file_exists($sourcedir . '/controllers'))
 {
 	$sourcedir = str_replace('/Sources', '/sources', $sourcedir);
@@ -126,7 +126,6 @@ DEFINE('CACHEDIR', $cachedir);
 DEFINE('EXTDIR', $extdir);
 DEFINE('LANGUAGEDIR', $languagedir);
 DEFINE('SOURCEDIR', $sourcedir);
-
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
@@ -173,7 +172,6 @@ if (isset($_GET['ssi']))
 	require_once(SUBSDIR . '/Cache.subs.php');
 	require_once(SOURCEDIR . '/Security.php');
 	require_once(SUBSDIR . '/Package.subs.php');
-	require_once(SUBSDIR . '/Util.class.php');
 
 	loadUserSettings();
 	loadPermissions();
@@ -825,13 +823,15 @@ function redirectLocation($location, $addForm = true)
 // Load all essential data and connect to the DB as this is pre SSI.php
 function loadEssentialData()
 {
-	global $db_server, $db_user, $db_passwd, $db_name, $db_connection, $db_prefix, $db_character_set, $db_type;
-	global $modSettings, $upcontext;
+	global $db_server, $db_user, $db_passwd, $db_name, $db_connection, $db_prefix, $db_character_set, $db_type, $db_port;
+	global $modSettings;
 
 	// Do the non-SSI stuff...
 	@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
-	define('ELK', 1);
+
+	if (!defined('ELK'))
+		define('ELK', 1);
 
 	// Start the session.
 	if (@ini_get('session.save_handler') == 'user')
@@ -886,6 +886,8 @@ function loadEssentialData()
 	// If they don't have the file, they're going to get a warning anyway so we won't need to clean request vars.
 	if (file_exists(SOURCEDIR . '/QueryString.php'))
 	{
+		require_once(SUBSDIR . '/Util.class.php');
+		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/QueryString.php');
 		cleanRequest();
 	}
@@ -1438,6 +1440,8 @@ function action_databaseChanges()
 	global $db_prefix, $modSettings, $command_line;
 	global $language, $boardurl, $upcontext, $support_js, $db_type;
 
+	$db = database();
+
 	// Have we just completed this?
 	if (!empty($_POST['database_done']))
 		return true;
@@ -1907,9 +1911,12 @@ function action_deleteUpgrade()
 		cli_scheduled_fetchFiles();
 	else
 	{
-		require_once(CONTROLLERDIR . '/ScheduledTasks.controller.php');
 		$forum_version = CURRENT_VERSION;  // The variable is usually defined in index.php so lets just use the constant to do it for us.
-		scheduled_fetchFiles(); // Now go get those files!
+
+		// Now go get those files!
+		require_once(SUBSDIR . '/ScheduledTask.class.php');
+		$task = new ScheduledTask();
+		$task->fetchFiles();
 	}
 
 	// Log what we've done.
@@ -2156,6 +2163,7 @@ function changeSettings($config_vars)
 	}
 	fclose($fp);
 }
+
 function updateLastError()
 {
 	// clear out the db_last_error file
@@ -2172,7 +2180,7 @@ function php_version_check()
 
 function db_version_check()
 {
-	global $db_type, $databases;
+	global $db_type, $databases, $db_connection;
 
 	$curver = eval($databases[$db_type]['version_check']);
 	$curver = preg_replace('~\-.+?$~', '', $curver);
@@ -2518,7 +2526,7 @@ function upgrade_query($string, $unbuffered = false)
 	global $db_name, $db_unbuffered;
 
 	// Retrieve our database
-	$db = database;
+	$db = database();
 
 	// Get the query result - working around some specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
@@ -2964,6 +2972,7 @@ function cmdStep0()
 {
 	global $db_prefix, $language, $modSettings, $start_time, $databases, $db_type, $upcontext;
 	global $language, $is_debug, $txt;
+
 	$start_time = time();
 
 	ob_end_clean();
@@ -3072,11 +3081,11 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 		if (empty($match[1]) || $match[1] != CURRENT_LANG_VERSION)
 			print_error('Error: Language files out of date.', true);
-		if (!file_exists($modSettings['theme_dir'] . 'languages/Install.' . $upcontext['language'] . '.php'))
+		if (!file_exists($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php'))
 			print_error('Error: Install language is missing for selected language.', true);
 
 		// Otherwise include it!
-		require_once($modSettings['theme_dir'] . 'languages/Install.' . $upcontext['language'] . '.php');
+		require_once($modSettings['theme_dir'] . '/languages/Install.' . $upcontext['language'] . '.php');
 	}
 
 	// Make sure we skip the HTML for login.
@@ -3453,9 +3462,9 @@ function template_upgrade_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?alp21" />
-		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/install.css?alp21" />
-				<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?alp10" />
+		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/install.css?alp10" />
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var elk_scripturl = \'', $upgradeurl, '\';
 			var elk_charset = \'UTF-8\';
@@ -3466,83 +3475,104 @@ function template_upgrade_above()
 			{
 				// What out the actual percent.
 				var width = parseInt((current / max) * 100);
-				if (document.getElementById(\'step_progress\'))
+				if (document.getElementById(\'step__progress\'))
 				{
-					document.getElementById(\'step_progress\').style.width = width + "%";
-					setInnerHTML(document.getElementById(\'step_text\'), width + "%");
+					document.getElementById(\'step__progress\').style.width = width + "%";
+					setInnerHTML(document.getElementById(\'step__text\'), width + "%");
 				}
-				if (overall_weight && document.getElementById(\'overall_progress\'))
+
+				if (overall_weight && document.getElementById(\'overall__progress\'))
 				{
 					overall_width = parseInt(startPercent + width * (overall_weight / 100));
-					document.getElementById(\'overall_progress\').style.width = overall_width + "%";
-					setInnerHTML(document.getElementById(\'overall_text\'), overall_width + "%");
+					document.getElementById(\'overall__progress\').style.width = overall_width + "%";
+					setInnerHTML(document.getElementById(\'overall__text\'), overall_width + "%");
 				}
 			}
 		// ]]></script>
 	</head>
 	<body>
-	<div id="header"><div class="frame">
-		<div id="top_section">
+	<div id="header">
+		<div class="frame">
 			<h1 class="forumtitle">', $txt['upgrade_upgrade_utility'], '</h1>
 			<img id="logo" src="', $settings['default_theme_url'], '/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 		</div>
-		<div id="upper_section" class="middletext flow_hidden">
-			<div class="user"></div>
-			<div class="news normaltext">
+	</div>
+	<div id="wrapper">
+		<div id="upper_section">
+			<div id="inner_section">
+				<div id="inner_wrap">';
+
+	if (!empty($incontext['detected_languages']) && count($incontext['detected_languages']) > 1 && $incontext['current_step'] == 0)
+	{
+		echo '
+						<div class="news">
+							<form action="', $upgradeurl, '" method="get">
+								<label for="installer_language">', $txt['installer_language'], ':</label>
+								<select id="installer_language" name="lang_file" onchange="location.href = \'', $upgradeurl, '?lang_file=\' + this.options[this.selectedIndex].value;">';
+
+		foreach ($incontext['detected_languages'] as $lang => $name)
+			echo '
+									<option', isset($_SESSION['installer_temp_lang']) && $_SESSION['installer_temp_lang'] == $lang ? ' selected="selected"' : '', ' value="', $lang, '">', $name, '</option>';
+
+		echo '
+								</select>
+								<noscript><input type="submit" value="', $txt['installer_language_set'], '" class="button_submit" /></noscript>
+							</form>
+						</div>';
+	}
+
+	echo '
+					<hr class="clear" />
+					</div>
+				</div>
 			</div>
-		</div>
-	</div></div>
-	<div id="content_section"><div class="frame">
-		<div id="main_content_section">
-			<div id="main-steps">
-				<h2>', $txt['upgrade_progress'], '</h2>
-				<ul>';
+			<div id="content_section">
+				<div id="main_content_section">
+					<div id="main_steps">
+						<h2>', $txt['upgrade_progress'], '</h2>
+						<ul>';
 
 	foreach ($upcontext['steps'] as $num => $step)
 		echo '
-						<li class="', $num < $upcontext['current_step'] ? 'stepdone' : ($num == $upcontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
+							<li class="', $num < $upcontext['current_step'] ? 'stepdone' : ($num == $upcontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
 
 	echo '
-					</ul>
-			</div>
-			<div style="float: left; width: 40%;">
-				<div style="font-size: 8pt; height: 12pt; border: 1px solid black; background: white; width: 50%; margin: auto;">
-					<div id="overall_text" style="color: #000; position: absolute; margin-left: -5em;">', $upcontext['overall_percent'], '%</div>
-					<div id="overall_progress" style="width: ', $upcontext['overall_percent'], '%; height: 12pt; z-index: 1; background: lime;">&nbsp;</div>
-					<div class="progress">', $txt['upgrade_overall_progress'], '</div>
-				</div>
+						</ul>
+					</div>
+					<div style="float: left; width: 40%;">
+						<div class="progress_bar">
+							<div id="overall__text" class="full_bar">', $upcontext['overall_percent'], '%</div>
+							<div id="overall__progress" class="green_percent" style="width: ', $upcontext['overall_percent'], '%;">&nbsp;</div>
+						</div>
 				';
 
 	if (isset($upcontext['step_progress']))
 		echo '
-				<div style="font-size: 8pt; height: 12pt; border: 1px solid black; background: white; width: 50%; margin: 5px auto; ">
-					<div id="step_text" style="color: #000; position: absolute; margin-left: -5em;">', $upcontext['step_progress'], '%</div>
-					<div id="step_progress" style="width: ', $upcontext['step_progress'], '%; height: 12pt; z-index: 1; background: #ffd000;">&nbsp;</div>
-					<div class="progress">', $txt['upgrade_step_progress'], '</div>
-				</div>
-				';
+						<div class="progress_bar">
+							<div id="step__text" class="full_bar">', $upcontext['step_progress'], '%</div>
+							<div id="step__progress" class="blue_percent" style="width: ', $upcontext['step_progress'], '%;">&nbsp;</div>
+						</div>';
 
 	echo '
-				<div id="substep_bar_div" class="smalltext" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', ':</div>
-				<div id="substep_bar_div2" style="font-size: 8pt; height: 12pt; border: 1px solid black; background: white; width: 50%; margin: 5px auto; display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">
-					<div id="substep_text" style="color: #000; position: absolute; margin-left: -5em;">', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '', '%</div>
-				<div id="substep_progress" style="width: ', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : 0, '%; height: 12pt; z-index: 1; background: #eebaf4;">&nbsp;</div>
-								</div>';
+						<div id="substep_bar_div" class="smalltext" style="display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">', isset($upcontext['substep_progress_name']) ? trim(strtr($upcontext['substep_progress_name'], array('.' => ''))) : '', ':</div>
+						<div id="substep_bar_div2" style="font-size: 8pt; height: 12pt; border: 1px solid black; background: white; width: 50%; margin: 5px auto; display: ', isset($upcontext['substep_progress']) ? '' : 'none', ';">
+							<div id="substep_text" style="color: #000; position: absolute; margin-left: -5em;">', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : '', '%</div>
+							<div id="substep_progress" style="width: ', isset($upcontext['substep_progress']) ? $upcontext['substep_progress'] : 0, '%; height: 12pt; z-index: 1; background: #eebaf4;">&nbsp;</div>
+						</div>';
 
 	// How long have we been running this?
 	$elapsed = time() - $upcontext['started'];
 	$mins = (int) ($elapsed / 60);
 	$seconds = $elapsed - $mins * 60;
 	echo '
-								<div class="smalltext" style="padding: 5px; text-align: center;">', $txt['upgrade_time_elapsed'], ':
-									<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
-								</div>';
+						<div class="smalltext" style="padding: 5px; text-align: center;">', $txt['upgrade_time_elapsed'], ':
+							<span id="mins_elapsed">', $mins, '</span> ', $txt['upgrade_time_mins'], ', <span id="secs_elapsed">', $seconds, '</span> ', $txt['upgrade_time_secs'], '.
+						</div>';
 	echo '
-			</div>
-			<div id="main_screen" class="clear">
-				<h2>', $upcontext['page_title'], '</h2>
-				<div class="panel">
-					<div style="max-height: 360px; overflow: auto;">';
+					</div>
+					<div id="main_screen" class="clear">
+						<h2>', $upcontext['page_title'], '</h2>
+						<div class="panel">';
 }
 
 function template_upgrade_below()
@@ -3560,10 +3590,9 @@ function template_upgrade_below()
 
 	if (!empty($upcontext['custom_warning']))
 		echo '
-								<div style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background: #ffe4e9;">
-									<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+								<div class="noticebox">
 									<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
-									<div style="padding-left: 6ex;">', $upcontext['custom_warning'], '</div>
+									<div>', $upcontext['custom_warning'], '</div>
 								</div>';
 
 	echo '
@@ -3619,8 +3648,8 @@ function template_xml_above()
 {
 	global $upcontext;
 
-	echo '<', '?xml version="1.0" encoding="ISO-8859-1"?', '>
-	<smf>';
+	echo '<', '?xml version="1.0" encoding="UTF-8"?', '>
+	<elk>';
 
 	if (!empty($upcontext['get_data']))
 		foreach ($upcontext['get_data'] as $k => $v)
@@ -3633,7 +3662,7 @@ function template_xml_below()
 	global $upcontext;
 
 	echo '
-		</smf>';
+		</elk>';
 }
 
 function template_error_message()
@@ -3641,10 +3670,8 @@ function template_error_message()
 	global $upcontext;
 
 	echo '
-	<div class="error_message">
-		<div style="color: red;">
-			', $upcontext['error_msg'], '
-		</div>
+	<div class="errorbox">
+		', $upcontext['error_msg'], '
 		<br />
 		<a href="', $_SERVER['PHP_SELF'], '">Click here to try again.</a>
 	</div>';
@@ -3655,10 +3682,10 @@ function template_welcome_message()
 	global $upcontext, $modSettings, $upgradeurl, $disable_security, $settings, $txt;
 
 	echo '
-		<script type="text/javascript" src="http://www.elkarte.net/current-version.js?version=' . CURRENT_VERSION . '"></script>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
-			<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
-	<form action="', $upcontext['form_url'], '" method="post" name="upform" id="upform" ', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($upcontext['login_token']) ? $upcontext['login_token'] : '') . '\');"' : '', '>
+		<script src="http://www.elkarte.net/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
+		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
+		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($upcontext['login_token']) ? $upcontext['login_token'] : '') . '\');"' : '', '>
 		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background: #fbbbe2; display: none;">
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
@@ -3674,10 +3701,9 @@ function template_welcome_message()
 	// For large, SMF pre-1.1 RC2 forums give them a warning about the possible impact of this upgrade!
 	if ($upcontext['is_large_forum'])
 		echo '
-		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background: #ffe4e9;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+		<div class="noticebox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div style="padding-left: 6ex;">
+			<div>
 				', $txt['upgrade_warning_lots_data'], '
 			</div>
 		</div>';
@@ -3685,19 +3711,18 @@ function template_welcome_message()
 	// A warning message?
 	if (!empty($upcontext['warning']))
 		echo '
-		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background: #ffe4e9;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+		<div class="noticebox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div style="padding-left: 6ex;">
+			<div>
 				', $upcontext['warning'], '
 			</div>
 		</div>';
+
 	// Paths are incorrect?
 	echo '
-		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #804840; color: black; background: #fe5a44; ', (file_exists($settings['default_theme_dir'] . '/scripts/script.js') ? 'display: none;' : ''), '" id="js_script_missing_error">
-			<div style="float: left; width: 2ex; font-size: 2em; color: black;">!!</div>
+		<div class="errorbox" style="', (file_exists($settings['default_theme_dir'] . '/scripts/script.js') ? 'display: none' : ''), '" id="js_script_missing_error">
 			<strong style="text-decoration: underline;">', $txt['upgrade_critical_error'], '</strong><br />
-			<div style="padding-left: 6ex;">
+			<div>
 				', $txt['upgrade_error_script_js'], '
 			</div>
 		</div>';
@@ -3722,10 +3747,10 @@ function template_welcome_message()
 			$updated = (int) ($active / 3600) . ' hours';
 
 		echo '
-		<div style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background: #ffe4e9;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
-			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div style="padding-left: 6ex;">
+		<div class="noticebox">
+			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong>
+			<br />
+			<div>
 				&quot;', $upcontext['user']['name'], '&quot; has been running the upgrade script for the last ', $ago, ' - and was last active ', $updated, ' ago.';
 
 		if ($active < 600)
@@ -3807,24 +3832,24 @@ function template_welcome_message()
 			{
 				var ourVer, yourVer;
 
-				if (!(\'ourVersion\' in window))
+				if (!(\'elkVersion\' in window))
 					return;
 
-				window.ourVersion = window.ourVersion.replace(/ElkArte\s?/g, \'\');
+				window.elkVersion = window.elkVersion.replace(/ELKARTE\s?/g, \'\');
 
-				ourVer = document.getElementById(\'ourVersion\');
+				ourVer = document.getElementById(\'elkVersion\');
 				yourVer = document.getElementById(\'yourVersion\');
 
-				setInnerHTML(ourVer, window.ourVersion);
+				setInnerHTML(ourVer, window.elkVersion);
 
 				var currentVersion = getInnerHTML(yourVer);
-				if (currentVersion < window.ourVersion)
+				if (currentVersion < window.elkVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
 			addLoadEvent(ourCurrentVersion);
 
 			// This checks that the script file even exists!
-			if (typeof(ourSelectText) == \'undefined\')
+			if (typeof(elkSelectText) == \'undefined\')
 				document.getElementById(\'js_script_missing_error\').style.display = \'\';
 
 		// ]]></script>';
@@ -4027,10 +4052,10 @@ function template_database_changes()
 
 	// Place for the XML error message.
 	echo '
-		<div id="error_block" style="margin: 2ex; padding: 2ex; border: 2px dashed #cc3344; color: black; background: #ffe4e9; display: ', empty($upcontext['error_message']) ? 'none' : '', ';">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
-			<strong style="text-decoration: underline;">Error!</strong><br />
-			<div style="padding-left: 6ex;" id="error_message">', isset($upcontext['error_message']) ? $upcontext['error_message'] : 'Unknown Error!', '</div>
+		<div id="error_block" class="errorbox" style="display: ', empty($upcontext['error_message']) ? 'none' : '', ';">
+			<strong style="text-decoration: underline;">Error!</strong>
+			<br />
+			<div id="error_message">', isset($upcontext['error_message']) ? $upcontext['error_message'] : 'Unknown Error!', '</div>
 		</div>';
 
 	// We want to continue at some point!
