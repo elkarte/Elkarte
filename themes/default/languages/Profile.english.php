@@ -185,6 +185,7 @@ $txt['likes_none_received'] = 'No one has liked any of your posts :\'(';
 $txt['likes_confirm_delete'] = 'Remove this like?';
 $txt['likes_show_who'] = 'Show the members that liked this post';
 $txt['likes_by'] = 'Liked by';
+$txt['likes_delete'] = 'Delete';
 
 $txt['authentication'] = 'Authentication';
 $txt['change_authentication'] = 'From this section you can change how you login to the forum. You may choose to either use an OpenID account for your authentication, or alternatively switch to use a username and password.';

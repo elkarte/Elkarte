@@ -50,14 +50,13 @@ VALUES
 $request = upgrade_query("
 	SELECT MAX(id_attach)
 	FROM {$db_prefix}attachments");
-list ($step_progress['total']) = $smcFunc['db_fetch_row']($request);
-$smcFunc['db_free_result']($request);
+list ($step_progress['total']) = $db->fetch_row($request);
+$db->free_result($request);
 
 $_GET['a'] = isset($_GET['a']) ? (int) $_GET['a'] : 0;
 $step_progress['name'] = 'Converting legacy attachments';
 $step_progress['current'] = $_GET['a'];
 
-// We may be using multiple attachment directories.
 if (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']))
 	$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 
@@ -69,37 +68,25 @@ while (!$is_done)
 	$request = upgrade_query("
 		SELECT id_attach, id_folder, filename, file_hash
 		FROM {$db_prefix}attachments
-		WHERE file_hash = ''
-		LIMIT $_GET[a], 100");
+		WHERE file_hash != ''
+		LIMIT $_GET[a], 200");
 
 	// Finished?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		$is_done = true;
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
-		// The current folder.
+		// The current folder and name
 		$current_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$row['id_folder']] : $modSettings['attachmentUploadDir'];
+		$current_name = $current_folder . '/' . $row['id_attach'] . '_' . $file_hash;
 
-		// The old location of the file.
-		$old_location = getLegacyAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder']);
-
-		// The new file name.
-		$file_hash = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], true);
-
-		// And we try to move it.
-		rename($old_location, $current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk');
-
-		// Only update thif if it was successful.
-		if (file_exists($current_folder . '/' . $row['id_attach'] . '_' . $file_hash) && !file_exists($old_location))
-			upgrade_query("
-				UPDATE {$db_prefix}attachments
-				SET file_hash = '$file_hash'
-				WHERE id_attach = $row[id_attach]");
+		// And we try to rename it.
+		@rename($current_name, $current_name . '.elk');
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
-	$_GET['a'] += 100;
+	$_GET['a'] += 200;
 	$step_progress['current'] = $_GET['a'];
 }
 
@@ -273,12 +260,12 @@ if (@$modSettings['elkVersion'] < '1.0')
 		FROM {$db_prefix}board_permissions
 		WHERE permission = 'post_unapproved_topics'");
 	$inserts = array();
-	while ($row = mysql_fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], $row[id_profile], 'post_draft', $row[add_deny])";
 		$inserts[] = "($row[id_group], $row[id_profile], 'post_autosave_draft', $row[add_deny])";
 	}
-	mysql_free_result($request);
+	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -293,12 +280,12 @@ if (@$modSettings['elkVersion'] < '1.0')
 		FROM {$db_prefix}permissions
 		WHERE permission = 'pm_send'");
 	$inserts = array();
-	while ($row = mysql_fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], 'pm_draft', $row[add_deny])";
 		$inserts[] = "($row[id_group], 'pm_autosave_draft', $row[add_deny])";
 	}
-	mysql_free_result($request);
+	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -314,7 +301,7 @@ if (@$modSettings['elkVersion'] < '1.0')
 --- Adding support for custom profile fields data
 /******************************************************************************/
 ---# Creating custom profile fields data table
-CREATE TABLE {$db_prefix}custom_fields_data (
+CREATE TABLE IF NOT EXISTS {$db_prefix}custom_fields_data (
   id_member mediumint(8) NOT NULL default '0',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,
@@ -329,15 +316,15 @@ $request = upgrade_query("
 	INSERT INTO {$db_prefix}custom_fields_data
 		(id_member, variable, value)
 	SELECT id_member, variable, value
-	FROM smf_themes
-	WHERE SUBSTRING(variable, 1, 5) = 'cust_'", false);
+	FROM {$db_prefix}themes
+	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
 
 // remove the moved rows from themes
-if (mysql_num_rows($request) != 0)
+if ($db->num_rows($request) != 0)
 {
 	upgrade_query("
 		DELETE FROM {$db_prefix}themes
-		SUBSTRING(variable,1,5) = 'cust_'", false);
+		SUBSTRING(variable,1,5) = 'cust_'");
 }
 ---}
 ---#
@@ -365,7 +352,7 @@ if (@$modSettings['elkVersion'] < '1.0')
 		SELECT id_member, aim, icq, msn, yim
 		FROM {$db_prefix}members");
 	$inserts = array();
-	while ($row = mysql_fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row[aim]))
 			$inserts[] = "($row[id_member], -1, 'cust_aim', $row[aim])";
@@ -379,7 +366,7 @@ if (@$modSettings['elkVersion'] < '1.0')
 		if (!empty($row[yim]))
 			$inserts[] = "($row[id_member], -1, 'cust_yim', $row[yim])";
 	}
-	mysql_free_result($request);
+	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -410,11 +397,11 @@ if (@$modSettings['elkVersion'] < '1.0')
 		FROM {$db_prefix}permissions
 		WHERE permission = 'profile_remote_avatar'");
 	$inserts = array();
-	while ($row = mysql_fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], 'profile_gravatar', $row[add_deny])";
 	}
-	mysql_free_result($request);
+	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -471,11 +458,11 @@ $request = upgrade_query("
 	SELECT id_comment, recipient_name as answer, body as question
 	FROM {$db_prefix}log_comments
 	WHERE comment_type = 'ver_test'");
-if (mysql_num_rows($request) != 0)
+if ($db->num_rows($request) != 0)
 {
 	$values = array();
 	$id_comments = array();
-	while ($row = mysql_fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		upgrade_query("
 			INSERT INTO {$db_prefix}antispam_questions
@@ -538,8 +525,8 @@ ADD COLUMN email smallint(5) unsigned NOT NULL DEFAULT '0';
 
 ---# Adding new columns to mail_queue...
 ALTER TABLE {$db_prefix}mail_queue
-ADD COLUMN message_id int(10)  NOT NULL DEFAULT '0';
- ---#
+ADD COLUMN message_id int(10) NOT NULL DEFAULT '0';
+---#
 
 ---# Updating board profiles...
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
@@ -567,9 +554,9 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
   id_poster mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member)
+  PRIMARY KEY (id_msg, id_member),
   KEY id_member (id_member),
-  KEY id_poster (id_poster),
+  KEY id_poster (id_poster)
 ) ENGINE=MyISAM;
 ---#
 
