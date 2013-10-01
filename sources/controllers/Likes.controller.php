@@ -231,7 +231,7 @@ class Likes_Controller extends Action_Controller
 						'function' => create_function('$row', '
 							global $txt, $settings;
 
-							$result = \'<a href="\' . $row[\'delete\'] . \'" onclick="return confirm(\\\'\' . $txt[\'likes_confirm_delete\'] . \'\\\');" title="\' . $txt[\'awards_button_delete\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="" /></a>\';
+							$result = \'<a href="\' . $row[\'delete\'] . \'" onclick="return confirm(\\\'\' . $txt[\'likes_confirm_delete\'] . \'\\\');" title="\' . $txt[\'likes_delete\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="" /></a>\';
 
 							return $result;'
 						),
