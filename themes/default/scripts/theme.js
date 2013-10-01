@@ -47,6 +47,8 @@ $(document).ready(function() {
 	// Fix code blocks
 	if (typeof elk_codefix === 'function')
 		elk_codefix();
+	
+	$('.expand_pages').relative_time_refresh();
 
 	// Collapsabile fieldsets, pure candy
 	$('legend').click(function(){
