@@ -1619,6 +1619,7 @@ function getGroupModerators($id_group)
 
 /**
  * Lists all groups which inherit permission profiles from the given group.
+ * If no group is specified it will list any group that can be used
  *
  * @param int $id_group
  *
