@@ -894,3 +894,134 @@
 		});
 	}
 })(jQuery);
+
+/**
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Alpha
+ *
+ * Refreshes the page relative time stamp to make it an active value
+ *
+ */
+(function($) {
+	$.fn.relative_time_refresh = function() {
+
+		$('.expand_pages').attr('tabindex', 0)
+		.click(function() {
+			$(this).data('expanded', 'true');
+		})
+		.bind("mouseenter focus",
+			function()
+			{
+				if ($(this).data('expanded') === 'true')
+					return;
+
+				var baseurl = eval($(this).data('baseurl')),
+					perpage = $(this).data('perpage'),
+					firstpage = $(this).data('firstpage'),
+					lastpage = $(this).data('lastpage'),
+					$outer_container = $('<div id="expanded_pages_out_container" />'),
+					$container = $('<div id="expanded_pages_container" />'),
+					$exp_pages = $('<div id="expanded_pages" />'),
+					pages = 0,
+					container_width = $(this).outerWidth() * 2,
+					width_elements = 3;
+
+				var aModel = $(this).prev().clone();
+
+				for (var i = firstpage; i < lastpage; i += perpage)
+				{
+					pages++;
+					var bElem = aModel.clone();
+
+					bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perpage + 1);
+					$exp_pages.append(bElem);
+				}
+
+				if (pages > width_elements)
+					$container.append(aModel.clone().css({
+						'position': 'absolute',
+						'top': 0,
+						'left': 0
+					})
+					.attr('id', 'pages_scroll_left')
+					.attr('href', '#').text('<').click(function(ev) {
+						ev.preventDefault();
+					}).hover(
+						function() {
+							$exp_pages.animate({
+								'margin-left': 0
+							}, 200 * pages);
+						},
+						function() {
+							$exp_pages.stop();
+						}
+					));
+
+				$container.append($exp_pages);
+				$(this).append($container);
+
+				if (pages > width_elements)
+					$container.append(aModel.clone().css({
+						'position': 'absolute',
+						'top': 0,
+						'right': 0
+					})
+					.attr('id', 'pages_scroll_right')
+					.attr('href', '#').text('>').click(function(ev) {
+						ev.preventDefault();
+					}).hover(
+						function() {
+							var $pages = $exp_pages.find('a'),
+								move = 0;
+
+							for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
+								move += $($pages[i]).outerWidth();
+
+							move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
+
+							$exp_pages.animate({
+								'margin-left': -move
+							}, 200 * pages);
+						},
+						function() {
+							$exp_pages.stop();
+						}
+					));
+
+				$exp_pages.find('a').each(function() {
+					if (width_elements > -1)
+						container_width += $(this).outerWidth();
+
+					if (width_elements <= 0 || pages >= width_elements)
+					{
+						$container.css({
+							'margin-left': -container_width / 2
+						}).width(container_width);
+					}
+
+					if (width_elements < 0)
+						return false;
+
+					width_elements--;
+				});
+				$exp_pages.css({
+					'height': $(this).prev().outerHeight(),
+					'padding-left': $container.find('#pages_scroll_left').outerWidth(),
+				});
+			})
+		.bind("mouseleave",
+			function()
+			{
+				$(this).find('#expanded_pages_container').remove();
+			}
+		);
+
+		// We are not using relative times? Then live with what you have :P
+		if (todayMod > 2)
+			updateRelativeTime();
+
+	};
+})(jQuery);

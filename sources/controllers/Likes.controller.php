@@ -226,12 +226,13 @@ class Likes_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => $txt['delete'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$row', '
 							global $txt, $settings;
 
-							$result = \'<a href="\' . $row[\'delete\'] . \'" onclick="return confirm(\\\'\' . $txt[\'likes_confirm_delete\'] . \'\\\');" title="\' . $txt[\'awards_button_delete\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="" /></a>\';
+							$result = \'<a href="\' . $row[\'delete\'] . \'" onclick="return confirm(\\\'\' . $txt[\'likes_confirm_delete\'] . \'\\\');" title="\' . $txt[\'likes_delete\'] . \'"><img src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="" /></a>\';
 
 							return $result;'
 						),
@@ -240,6 +241,12 @@ class Likes_Controller extends Action_Controller
 					),
 				),
 			),
+		);
+
+		// Menu tabs
+		$context[$context['profile_menu_name']]['tab_data'] = array(
+			'title' => $txt['likes_given'],
+			'icon' => 'profile_hd.png',
 		);
 
 		// Set the context values
@@ -265,7 +272,7 @@ class Likes_Controller extends Action_Controller
 			'id' => 'view_likes',
 			'title' => $txt['likes'],
 			'items_per_page' => 25,
-			'no_items_label' => $txt['likes_none_given'],
+			'no_items_label' => $txt['likes_none_received'],
 			'base_href' => $scripturl . '?action=profile;area=showlikes;sa=received;u=' . $memID,
 			'default_sort_col' => 'subject',
 			'get_items' => array(
@@ -324,6 +331,7 @@ class Likes_Controller extends Action_Controller
 				'action' => array(
 					'header' => array(
 						'value' => $txt['show'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -338,6 +346,12 @@ class Likes_Controller extends Action_Controller
 					),
 				),
 			),
+		);
+
+		// Menu tabs
+		$context[$context['profile_menu_name']]['tab_data'] = array(
+			'title' => $txt['likes_received'],
+			'icon' => 'profile_hd.png',
 		);
 
 		// Set the context values

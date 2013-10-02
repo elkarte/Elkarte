@@ -10,7 +10,7 @@ h1.forumtitle {
 	font-size: 2em;
 	font-family: tahoma;
 	margin: 0;
-	padding: 50px 12px 2px 12px;
+	padding: 15px 12px 2px 12px;
 	float: left;
 	font-weight: normal;
 	color: #a85400;
@@ -21,7 +21,7 @@ img#logo {
 	margin: 2px 0 0 0;
 }
 #inner_wrap {
-	min-height: 80px;
+	min-height: 60px;
 }
 #inner_wrap .news {
 	height: 80px;
