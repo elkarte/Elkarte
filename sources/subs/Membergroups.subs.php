@@ -1657,48 +1657,6 @@ function getInheritableGroups($id_group = false)
 }
 
 /**
- * Gets a list of membergroups, parent groups first.
- *
- * @todo: Merge with getBasicMembergroupData();
- * @return groups
- */
-function getExtendedMembergroupData()
-{
-	global $modSettings;
-
-	$db = database();
-
-	$groups = array();
-
-	// Query the database defined membergroups.
-	$query = $db->query('', '
-		SELECT id_group, id_parent, group_name, min_posts, online_color, icons
-		FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
-		WHERE min_posts = {int:min_posts}' : '') . '
-		ORDER BY id_parent = {int:not_inherited} DESC, min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-		array(
-			'min_posts' => -1,
-			'not_inherited' => -2,
-			'newbie_group' => 4,
-		)
-	);
-
-	while ($row = $db->fetch_assoc($query))
-	{
-		$groups[$row['id_group']] = array(
-			'id_group' => $row['id_group'],
-			'id_parent' => $row['id_parent'],
-			'group_name' => $row['group_name'],
-			'min_posts' => $row['min_posts'],
-			'online_color' => $row['online_color'],
-			'icons' => $row['icons'],
-		);
-	}
-
-	return $groups;
-}
-
-/**
  * List all membergroups and prepares them to assign permissions to..
  *
  * @return array
