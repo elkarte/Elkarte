@@ -623,17 +623,17 @@ function cache_getMembergroupList()
  * @param bool $include_hidden
  * @param bool $include_all
  */
-function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false)
+function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false, $aggregate = false, $count_permissions = false, $pid = null)
 {
-	global $scripturl;
+	global $scripturl, $txt, $context;
 
 	$db = database();
 
 	$groups = array();
 
 	$request = $db->query('', '
-		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color, mg.hidden,
-			mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
+		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color,
+			mg.hidden, mg.id_parent, mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
 		WHERE mg.min_posts {raw:min_posts}' . ($include_all ? '' : '
@@ -652,11 +652,56 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	// Start collecting the data.
 	$groups = array();
 	$group_ids = array();
+
+	if ($membergroup_type === 'all')
+	{
+		// Determine the number of ungrouped members.
+		$num_members = countMembersInGroup(0);
+
+		// Fill the context variable with 'Guests' and 'Regular Members'.
+		$groups = array(
+			-1 => array(
+				'id_group' => -1,
+				'group_name' => $txt['membergroups_guests'],
+				'min_posts' => 0,
+				'desc' => '',
+				'num_members' => $txt['membergroups_guests_na'],
+				'icons' => '',
+				'can_search' => false,
+				'num_permissions' => array(
+					'allowed' => 0,
+					'denied' => 0,
+				)
+			),
+			0 => array(
+				'id_group' => 0,
+				'group_name' => $txt['membergroups_members'],
+				'min_posts' => 0,
+				'desc' => '',
+				'num_members' => $num_members,
+				'icons' => '',
+				'can_search' => true,
+				'num_permissions' => array(
+					'allowed' => 0,
+					'denied' => 0,
+				)
+			),
+		);
+	}
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		// We only list the groups they can see.
 		if ($row['hidden'] && !$row['can_moderate'] && !$include_hidden)
 			continue;
+
+		// If it's inherited, just add it as a child.
+		if ($aggregate && $row['id_parent'] != -2)
+		{
+			if (isset($groups[$row['id_parent']]))
+				$groups[$row['id_parent']]['children'][$row['id_group']] = $row['group_name'];
+			continue;
+		}
 
 		$row['icons'] = explode('#', $row['icons']);
 
@@ -670,7 +715,14 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			'num_members' => $row['num_members'],
 			'moderators' => array(),
 			'icons' => $row['icons'],
+			'can_search' => $row['id_group'] != 3,
 		);
+
+		if ($count_permissions)
+			$groups[$row['id_group']]['num_permissions'] = array(
+				'allowed' => $row['id_group'] == 1 ? '(' . $txt['permissions_all'] . ')' : 0,
+				'denied' => $row['id_group'] == 1 ? '(' . $txt['permissions_none'] . ')' : 0,
+			);
 
 		$include_hidden |= $row['can_moderate'];
 		$group_ids[] = $row['id_group'];
@@ -712,6 +764,21 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			$sort_array[] = $group['id_group'] != 3 ? (int) $group['num_members'] : -1;
 
 		array_multisort($sort_array, $sort_ascending ? SORT_ASC : SORT_DESC, SORT_REGULAR, $groups);
+	}
+
+	if ($count_permissions)
+	{
+		// pid = profile id
+		if (empty($pid))
+		{
+			$groups = countPermissions($groups, $context['hidden_permissions']);
+			// Get the "default" profile permissions too.
+			$groups = countBoardPermissions($groups, $context['hidden_permissions'], 1);
+		}
+		else
+		{
+			$groups = countBoardPermissions($groups, null, $pid);
+		}
 	}
 
 	return $groups;
@@ -1557,7 +1624,7 @@ function getGroupModerators($id_group)
  *
  * @return array
  */
-function getInheritableGroups($id_group)
+function getInheritableGroups($id_group = false)
 {
 	global $modSettings;
 
@@ -1568,12 +1635,12 @@ function getInheritableGroups($id_group)
 	$request = $db->query('', '
 		SELECT id_group, group_name
 		FROM {db_prefix}membergroups
-		WHERE id_group != {int:current_group}' .
+		WHERE id_parent = {int:not_inherited}' . ($id_group === false ? '' : '
+			AND id_group != {int:current_group}') .
 			(empty($modSettings['permission_enable_postgroups']) ? '
 			AND min_posts = {int:min_posts}' : '') . (allowedTo('admin_forum') ? '' : '
 			AND group_type != {int:is_protected}') . '
-			AND id_group NOT IN (1, 3)
-			AND id_parent = {int:not_inherited}',
+			AND id_group NOT IN (1, 3)',
 		array(
 			'current_group' => $id_group,
 			'min_posts' => -1,

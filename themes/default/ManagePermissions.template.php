@@ -43,65 +43,12 @@ function template_permission_index()
 				<h3 class="titlebg">', $txt['permissions_title'], '</h3>
 			</div>';
 
-	echo '
-			<table class="table_grid">
-				<thead>
-					<tr class="table_head">
-						<th>', $txt['membergroups_name'], '</th>
-						<th style="width:10%">', $txt['membergroups_members_top'], '</th>';
+	template_show_list('regular_membergroups_list');
 
-	if (empty($modSettings['permission_enable_deny']))
-		echo '
-						<th style="width:16%">', $txt['membergroups_permissions'], '</th>';
-	else
-		echo '
-						<th style="width:8%">', $txt['permissions_allowed'], '</th>
-						<th style="width:8%">', $txt['permissions_denied'], '</th>';
+	if (!empty($context['post_count_membergroups_list']))
+		template_show_list('post_count_membergroups_list');
 
 	echo '
-						<th class="centertext" style="width:10%; vertical-align:middle">', $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'], '</th>
-						<th class="centertext" style="width:4%;vertical-align:middle">
-							', $context['can_modify'] ? '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'group\');" />' : '', '
-						</th>
-					</tr>
-				</thead>
-				<tbody>';
-
-	$alternate = false;
-	foreach ($context['groups'] as $group)
-	{
-		$alternate = !$alternate;
-		echo '
-					<tr class="windowbg', $alternate ? '2' : '', '">
-						<td>
-							', !empty($group['help']) ? ' <a class="help" href="' . $scripturl . '?action=quickhelp;help=' . $group['help'] . '" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="' . $txt['help'] . '" /></a>' : '<img class="icon" src="' . $settings['images_url'] . '/blank.png" alt="' . $txt['help'] . '" />', '&nbsp;<span>', $group['name'], '</span>';
-
-		if (!empty($group['children']))
-			echo '
-							<br />
-							<span class="smalltext">', $txt['permissions_includes_inherited'], ': &quot;', implode('&quot;, &quot;', $group['children']), '&quot;</span>';
-
-		echo '
-						</td>
-						<td>', $group['can_search'] ? $group['link'] : $group['num_members'], '</td>';
-
-		if (empty($modSettings['permission_enable_deny']))
-			echo '
-						<td style="width:16%">', $group['num_permissions']['allowed'], '</td>';
-		else
-			echo '
-						<td class="centertext" style="width:8%', $group['id'] == 1 ? ';font-style:italic"' : '"', '>', $group['num_permissions']['allowed'], '</td>
-						<td class="centertext" style="width:8%', $group['id'] == 1 || $group['id'] == -1 ? ';font-style:italic"' : (!empty($group['num_permissions']['denied']) ? ';color: red"' : '"'), '>', $group['num_permissions']['denied'], '</td>';
-
-		echo '
-						<td class="centertext">', $group['allow_modify'] ? '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $group['id'] . (empty($context['profile']) ? '' : ';pid=' . $context['profile']['id']) . '">' . ($context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view']) . '</a>' : '', '</td>
-						<td class="centertext">', $group['allow_modify'] && $context['can_modify'] ? '<input type="checkbox" name="group[]" value="' . $group['id'] . '" class="input_check" />' : '', '</td>
-					</tr>';
-	}
-
-	echo '
-				</tbody>
-			</table>
 			<br />';
 
 	// Advanced stuff...
@@ -137,12 +84,9 @@ function template_permission_index()
 							<dd>
 								<select name="copy_from">
 									<option value="empty">(', $txt['permissions_select_membergroup'], ')</option>';
-		foreach ($context['groups'] as $group)
-		{
-			if ($group['id'] != 1)
+		foreach ($context['groups'] as $group_id => $group_name)
 				echo '
-									<option value="', $group['id'], '">', $group['name'], '</option>';
-		}
+									<option value="', $group_id, '">', $group_name, '</option>';
 
 		echo '
 								</select>
