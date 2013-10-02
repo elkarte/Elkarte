@@ -107,15 +107,16 @@ function createList($listOptions)
 	// Prepare the headers of the table.
 	$list_context['headers'] = array();
 	foreach ($listOptions['columns'] as $column_id => $column)
-		$list_context['headers'][] = array(
-			'id' => $column_id,
-			'label' => isset($column['header']['eval']) ? eval($column['header']['eval']) : (isset($column['header']['value']) ? $column['header']['value'] : ''),
-			'href' => empty($listOptions['default_sort_col']) || empty($column['sort']) ? '' : $listOptions['base_href'] . ';' . $request_var_sort . '=' . $column_id . ($column_id === $list_context['sort']['id'] && !$list_context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $request_var_desc : '') . (empty($list_context['start']) ? '' : ';' . $list_context['start_var_name'] . '=' . $list_context['start']),
-			'sort_image' => empty($listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $list_context['sort']['id'] ? null : ($list_context['sort']['desc'] ? 'down' : 'up'),
-			'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
-			'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
-			'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
-		);
+		if (!isset($column['evaluate']) || $column['evaluate'] === true)
+			$list_context['headers'][] = array(
+				'id' => $column_id,
+				'label' => isset($column['header']['eval']) ? eval($column['header']['eval']) : (isset($column['header']['value']) ? $column['header']['value'] : ''),
+				'href' => empty($listOptions['default_sort_col']) || empty($column['sort']) ? '' : $listOptions['base_href'] . ';' . $request_var_sort . '=' . $column_id . ($column_id === $list_context['sort']['id'] && !$list_context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $request_var_desc : '') . (empty($list_context['start']) ? '' : ';' . $list_context['start_var_name'] . '=' . $list_context['start']),
+				'sort_image' => empty($listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $list_context['sort']['id'] ? null : ($list_context['sort']['desc'] ? 'down' : 'up'),
+				'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
+				'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
+				'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
+			);
 
 	// We know the amount of columns, might be useful for the template.
 	$list_context['num_columns'] = count($listOptions['columns']);
@@ -139,6 +140,9 @@ function createList($listOptions)
 		$cur_row = array();
 		foreach ($listOptions['columns'] as $column_id => $column)
 		{
+			if (isset($column['evaluate']) && $column['evaluate'] === false)
+				continue;
+
 			$cur_data = array();
 
 			// A value straight from the database?
