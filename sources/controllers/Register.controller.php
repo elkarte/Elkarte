@@ -295,7 +295,7 @@ class Register_Controller extends Action_Controller
 				if (is_array($context['visual_verification']))
 				{
 					foreach ($context['visual_verification'] as $error)
-						$reg_errors->addError('error_' . $error);
+						$reg_errors->addError($error);
 				}
 			}
 		}
