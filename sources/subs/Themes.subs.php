@@ -525,35 +525,6 @@ function addThemeOptions($id_theme, $options, $value)
 }
 
 /**
- * Loads all the custom profile fields.
- *
- * @todo same name as the function in Profile.subs.php, similar function too, but slightly different...
- *
- * @param bool $detailed loads all the columns of the table
- * @param bool $only_active loads only the active fields
- * @return array
- */
-function loadCustomFields($detailed = false, $only_active = false)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT col_name' . ($detailed ? ', field_name, field_type, field_length, mask, show_reg' : '') . '
-		FROM {db_prefix}custom_fields' . ($only_active ? '
-		WHERE active = {int:is_active}' : ''),
-		array(
-			'is_active' => 1,
-		)
-	);
-	$customFields = array();
-	while ($row = $db->fetch_assoc($request))
-		$customFields[] = $row['col_name'];
-	$db->free_result($request);
-
-	return $customFields;
-}
-
-/**
  * Deletes a theme from the database.
  *
  * @param int $id
