@@ -279,7 +279,22 @@ function template_control_verification_captcha($verify_id, $verify_context)
 	echo '
 				<div class="smalltext" style="margin: 4px 0 8px 0;">
 					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" rel="nofollow">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh">', $txt['visual_verification_request_new'], '</a><br /><br />
-					', $txt['visual_verification_description'], ':<br />
+					', $txt['visual_verification_description'], ':
 					<input type="text" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 				</div>';
+}
+
+/**
+ * Display the empty field verificaiton
+ */
+function template_control_verification_emptyfield($verify_id, $verify_context)
+{
+	global $context, $txt;
+
+	// Display an empty field verificaiton
+	echo '
+			<div class="smalltext verification_control_valid">
+				', $txt['visual_verification_hidden'], ':
+				<input type="text" name="', $_SESSION[$verify_id . '_vv']['empty_field'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : '' ), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
+			</div>';
 }
