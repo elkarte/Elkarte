@@ -517,7 +517,7 @@ function template_editicon()
 						<dt>
 							<strong><label for="icon_board_select">', $txt['icons_board'], '</label>: </strong>
 						</dt>
-						<dd>', template_select_boards('icon_board'), '
+						<dd>', template_select_boards('icon_board', '', '', true), '
 						</dd>
 						<dt>
 							<strong><label for="icon_location">', $txt['smileys_location'], '</label>: </strong>

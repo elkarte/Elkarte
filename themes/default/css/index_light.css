@@ -278,6 +278,11 @@ body {
 	color: #555;
 	text-decoration: none;
 }
+.poster li.listlevel1:hover .linklevel1 {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+}
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator {

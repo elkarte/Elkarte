@@ -56,9 +56,9 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 /**
  * Dropdown usable to select a board
  */
-function template_select_boards($name, $label = '', $extra = '')
+function template_select_boards($name, $label = '', $extra = '', $all = false)
 {
-	global $context;
+	global $context, $txt;
 
 	if (!empty($label))
 		echo '
@@ -66,6 +66,9 @@ function template_select_boards($name, $label = '', $extra = '')
 
 	echo '
 	<select name="', $name, '" id="', $name, '" ', $extra, ' >';
+
+	if ($all)
+		echo '<option value="">', $txt['icons_edit_icons_all_boards'], '</option>';
 
 	foreach ($context['categories'] as $category)
 	{
