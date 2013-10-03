@@ -407,20 +407,13 @@ function countConfiguredMemberOptions()
 
 	$themes = array();
 
-	// Need to make sure we don't do custom fields.
-	$customFields = loadCustomFields();
-
-	$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
-
 	$request = $db->query('themes_count', '
 		SELECT COUNT(DISTINCT id_member) AS value, id_theme
 		FROM {db_prefix}themes
 		WHERE id_member > {int:no_member}
-			' . $customFieldsQuery . '
 		GROUP BY id_theme',
 		array(
 			'no_member' => 0,
-			'custom_fields' => empty($customFields) ? array() : $customFields,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
