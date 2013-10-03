@@ -220,6 +220,9 @@ $txt['badbehavior_url_wl_desc'] = 'Example: /subscriptions.php';
 $txt['badbehavior_url_wl_add'] = 'Add another URL';
 $txt['badbehavior_wl_comment'] = 'Comment';
 
+$txt['configure_emptyfield'] = 'Verification Empty Field';
+$txt['configure_emptyfield_desc'] = '<span class="smalltext">Below you can enable the empty field verification method.  This will insert a hidden field that should stay empty, this is used to trick spam bots in to erroneosly posting information. Although this can be used alone, its best enabled with the CAPTCHA verifcation.</span>';
+$txt['enable_emptyfield'] = 'Enable empty field verification';
 $txt['configure_verification_means'] = 'Configure Verification Methods';
 $txt['setting_qa_verification_number'] = 'Number of verification questions user must answer';
 $txt['setting_qa_verification_number_desc'] = '(0 to disable; questions are set below)';

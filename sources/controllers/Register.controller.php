@@ -121,6 +121,16 @@ class Register_Controller extends Action_Controller
 			'name' => $txt['register'],
 		);
 
+		// Prepare the time gate! Done like this to allow later steps to reset the limit for any reason
+		if (!isset($_SESSION['register']))
+			$_SESSION['register'] = array(
+				'timenow' => time(),
+				// minimum number of seconds required on this page for registration
+				'limit' => 8,
+			);
+		else
+			$_SESSION['register']['timenow'] = time();
+
 		// If you have to agree to the agreement, it needs to be fetched from the file.
 		if ($context['require_agreement'])
 		{
@@ -246,7 +256,6 @@ class Register_Controller extends Action_Controller
 		validateToken('register');
 
 		// Start collecting together any errors.
-		$reg_errors = array();
 		$reg_errors = error_context::context('register', 0);
 
 		// Did we save some open ID fields?
@@ -278,9 +287,19 @@ class Register_Controller extends Action_Controller
 			// Are they under age, and under age users are banned?
 			if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 			{
-				// @todo This should be put in Errors, imho.
 				loadLanguage('Login');
 				fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			}
+
+			// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
+			if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
+				redirectexit('action=register');
+
+			// Failing that, check the time limit for exessive speed.
+			if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
+			{
+				loadLanguage('Login');
+				$reg_errors->addError('too_quickly');
 			}
 
 			// Check whether the visual verification code was entered correctly.
@@ -461,6 +480,10 @@ class Register_Controller extends Action_Controller
 		if ($reg_errors->hasErrors())
 		{
 			$_REQUEST['step'] = 2;
+
+			// If they've filled in some details but made an error then they need less time to finish
+			$_SESSION['register']['limit'] = 4;
+
 			return $this->action_register();
 		}
 
