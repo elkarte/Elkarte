@@ -1792,7 +1792,7 @@ function incrementBoard($id_board, $values)
 {
 	$db = database();
 
-	$knownInts = arra(
+	$knownInts = array(
 		'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
 		'unapproved_posts', 'unapproved_topics'
 	);
