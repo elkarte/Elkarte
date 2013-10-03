@@ -185,7 +185,13 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initBasicSettingsForm()
 	{
-		global $txt;
+		global $txt, $modSettings;
+
+		// We need to know if personal text is enabled, and if it's in the registration fields option.
+		// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
+		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
+		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
+		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
 
 		// We need some settings! ..ok, some work with our settings :P
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -204,7 +210,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
-				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note']),
+				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note'], 'disabled' => !$can_personal_text),
 			'',
 				// Javascript and CSS options
 				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
@@ -810,7 +816,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_custom_profile';
 
 		// What about standard fields they can tweak?
-		$standard_fields = array('location', 'gender', 'website', 'posts', 'warning_status');
+		$standard_fields = array('location', 'gender', 'website', 'personal_text', 'posts', 'warning_status');
 
 		// What fields can't you put on the registration page?
 		$context['fields_no_registration'] = array('posts', 'warning_status');

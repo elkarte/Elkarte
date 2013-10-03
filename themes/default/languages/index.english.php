@@ -239,6 +239,7 @@ $txt['notify_deactivate'] = 'Would you like to deactivate notification on this t
 
 $txt['location'] = 'Location';
 $txt['gender'] = 'Gender';
+$txt['personal_text'] = 'Personal Text';
 $txt['date_registered'] = 'Date Registered';
 
 $txt['recent_view'] = 'View all recent posts.';
