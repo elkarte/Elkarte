@@ -50,6 +50,13 @@ function template_showDrafts()
 {
 	global $context, $settings, $scripturl, $txt;
 
+	echo '
+		<div class="cat_bar">
+			<h3 class="catbg">
+				', $txt['drafts'], ' - ', $context['member']['name'], '
+			</h3>
+		</div>',
+			
 	template_pagesection();
 
 	// No drafts? Just show an informative message.
