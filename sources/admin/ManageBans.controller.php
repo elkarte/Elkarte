@@ -308,8 +308,6 @@ class ManageBans_Controller extends Action_Controller
 		createToken('admin-bet');
 		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
 
-		$ban_errors = error_context::context('ban', 1);
-
 		$context['ban_errors'] = array(
 			'errors' => $ban_errors->prepareErrors(),
 			'type' => $ban_errors->getErrorType() == 0 ? 'minor' : 'serious',
