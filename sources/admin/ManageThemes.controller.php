@@ -474,21 +474,13 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-stor', 'request');
 
-			// Don't delete custom fields!!
-			if ($_GET['th'] == 1)
-				$customFields = loadCustomFields();
-
-			$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
-
 			$db->query('', '
 				DELETE FROM {db_prefix}themes
 				WHERE id_member > {int:no_member}
-					AND id_theme = {int:current_theme}
-					' . $customFieldsQuery,
+					AND id_theme = {int:current_theme}',
 				array(
 					'no_member' => 0,
 					'current_theme' => $_GET['th'],
-					'custom_fields' => empty($customFields) ? array() : $customFields,
 				)
 			);
 

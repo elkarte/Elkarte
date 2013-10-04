@@ -271,22 +271,22 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['sub_template'] = 'moderation_center';
 
 		// Load what blocks the user actually can see...
-		$valid_blocks = array(
-			'n' => 'latestNews',
-			'p' => 'notes',
-		);
-
-		if ($context['can_moderate_groups'])
-			$valid_blocks['g'] = 'groupRequests';
+		$valid_blocks['p'] = 'notes';
 
 		if ($context['can_moderate_boards'])
 		{
+			$valid_blocks['a'] = 'actionRequired';
 			$valid_blocks['r'] = 'reportedPosts';
 			$valid_blocks['w'] = 'watchedUsers';
 		}
 
+		if ($context['can_moderate_groups'])
+			$valid_blocks['g'] = 'groupRequests';
+
+		$valid_blocks['n'] = 'latestNews';
+
 		if (empty($user_settings['mod_prefs']))
-			$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wr' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+			$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 		else
 			list (, $user_blocks) = explode('|', $user_settings['mod_prefs']);
 
@@ -298,6 +298,7 @@ class ModerationCenter_Controller extends Action_Controller
 			if (in_array($k, $user_blocks))
 			{
 				$block = 'block_' . $block;
+
 				if (method_exists($this, $block))
 					$context['mod_blocks'][] = $this->{$block}();
 			}
@@ -553,12 +554,13 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			$context['homepage_blocks']['r'] = $txt['mc_reported_posts'];
 			$context['homepage_blocks']['w'] = $txt['mc_watched_users'];
+			$context['homepage_blocks']['a'] = $txt['mc_required'];
 		}
 
 		// Does the user have any settings yet?
 		if (empty($user_settings['mod_prefs']))
 		{
-			$mod_blocks = 'n' . ($context['can_moderate_boards'] ? 'wr' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+			$mod_blocks = 'n' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 			$pref_binary = 5;
 			$show_reports = 1;
 		}
@@ -1586,6 +1588,33 @@ class ModerationCenter_Controller extends Action_Controller
 		}
 
 		return 'watched_users';
+	}
+
+	/**
+	 * Shows a list of items requiring moderation action
+	 * Includes post, topic, attachment and PBE values with links to each
+	 */
+	public function block_actionRequired()
+	{
+		global $context;
+
+		// Get the action totals
+		$mod_totals = loadModeratorMenuCounts();
+
+		// This blocks total is only these fields
+		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'];
+		unset($mod_totals['reports'], $mod_totals['postmod'], $mod_totals['total']);
+		$context['required'] = $mod_totals;
+
+		// Links to the areas
+		$context['links'] = array(
+			'attachments' => '?action=moderate;area=attachmod;sa=attachments',
+			'emailmod' => '?action=admin;area=maillist;sa=emaillist',
+			'topics' => '?action=moderate;area=postmod;sa=topics',
+			'posts' => '?action=moderate;area=postmod;sa=posts',
+		);
+
+		return 'action_required';
 	}
 
 	/**

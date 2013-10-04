@@ -851,6 +851,10 @@ dl.themes_list dd {
 	height: 15em;
 	overflow: visible;
 }
+.modbox img.icon {
+	margin: 3px 5px 0 0;
+	vertical-align: text-top;
+}
 
 /* Moderation Notes */
 ul.moderation_notes {
@@ -858,7 +862,7 @@ ul.moderation_notes {
 	padding: 0;
 	list-style: none;
 	overflow: auto;
-	height: 10.2em;
+	height: auto;
 }
 ul.moderation_notes li {
 	padding: 0.2em;

@@ -6,6 +6,7 @@ global $scripturl, $context;
 // profile
 $txt['drafts_show'] = 'Show Drafts';
 $txt['drafts_autosave_enabled'] = 'Enable automatic saving of drafts.';
+$txt['drafts_show_desc'] = 'This area shows all the drafts you currently have saved. From here you can edit them before posting, or you can delete them';
 
 // misc
 $txt['drafts'] = 'Drafts';

@@ -21,6 +21,11 @@ $txt['mc_latest_news'] = 'Latest News';
 $txt['mc_recent_reports'] = 'Recent Topic Reports';
 $txt['mc_warnings'] = 'Warnings';
 $txt['mc_notes'] = 'Moderator Notes';
+$txt['mc_required'] = 'Items Requiring Approval';
+$txt['mc_attachments'] = 'Attachments needing approval';
+$txt['mc_emailmod'] = 'Email Postings needing approval';
+$txt['mc_topics'] = 'Topics needing approval';
+$txt['mc_posts'] = 'Posts needing approval';
 
 $txt['mc_cannot_connect_sm'] = 'You are unable to connect to ElkArte\'s latest news file.';
 
