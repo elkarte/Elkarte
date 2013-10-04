@@ -374,6 +374,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$known_verifications = array(
 			'captcha',
 			'questions',
+			'emptyfield',
 		);
 		call_integration_hook('integrate_control_verification', array(&$known_verifications));
 
@@ -649,6 +650,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$known_verifications = array(
 			'captcha',
 			'questions',
+			'emptyfield',
 		);
 		call_integration_hook('integrate_control_verification', array(&$known_verifications));
 

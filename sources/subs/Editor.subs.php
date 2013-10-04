@@ -703,7 +703,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 {
 	global $context;
 
-	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
+	// We need to remember this because when failing the page is realoaded and the
+	// code must remain the same (unless it has to change)
 	static $all_instances = array();
 
 	// @todo: maybe move the list to $modSettings instead of hooking it?
@@ -711,6 +712,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	$known_verifications = array(
 		'captcha',
 		'questions',
+		'emptyfield'
 	);
 	call_integration_hook('integrate_control_verification', array(&$known_verifications));
 
@@ -814,7 +816,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 				$error_codes[] = $error;
 
 		return $error_codes;
-		}
+	}
 	// If we had a test that one, make a note.
 	elseif ($do_test)
 		$_SESSION[$verificationOptions['id'] . '_vv']['did_pass'] = true;
@@ -845,13 +847,14 @@ class Control_Verification_Captcha implements Control_Verifications
 	public function __construct($verificationOptions = null)
 	{
 		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
+
 		// Skip I, J, L, O, Q, S and Z.
 		$this->_standard_captcha_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
 
 		if (!empty($verificationOptions))
 			$this->_options = $verificationOptions;
 	}
-		
+
 	public function showVerification($isNew, $force_refresh = true)
 	{
 		global $context, $modSettings, $scripturl;
@@ -860,11 +863,12 @@ class Control_Verification_Captcha implements Control_Verifications
 		if (!isset($context['captcha_js_loaded']))
 		{
 			$context['captcha_js_loaded'] = false;
+
 			// The template
 			loadTemplate('GenericControls');
 		}
 
-		//Some javascript ma'am? (But load it only once)
+		// Some javascript ma'am? (But load it only once)
 		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
 			loadJavascriptFile('captcha.js');
@@ -899,6 +903,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		if ($refresh)
 		{
 			$_SESSION[$this->_options['id'] . '_vv']['code'] = '';
+
 			// Are we overriding the range?
 			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $this->_standard_captcha_range;
 
@@ -1320,7 +1325,131 @@ class Control_Verification_Questions implements Control_Verifications
 			array('id_question')
 		);
 	}
+}
 
+/**
+ * This class shows an anti spam bot box in the form
+ * The proper response is to leave the field empty, bots however will see this
+ * much like a session field and populate it with a value.
+ *
+ * Adding additional catch terms is recommended to keep bots from learning
+ */
+class Control_Verification_EmptyField implements Control_Verifications
+{
+	private $_options = null;
+	private $_empty_field = null;
+	private $_tested = false;
+	private $_user_value = null;
+	private $_hash = null;
+	private $_terms = array('gadget', 'device', 'uid', 'gid', 'guid', 'uuid', 'unique', 'identifier', 'bb2');
+	private $_second_terms = array('hash', 'cipher', 'code', 'key', 'unlock', 'bit', 'value', 'screener');
+
+	public function __construct($verificationOptions = null)
+	{
+		if (!empty($verificationOptions))
+			$this->_options = $verificationOptions;
+	}
+
+	/**
+	 * Returns if we are showing this verification control or not
+	 *
+	 * @param type $isNew
+	 * @param type $force_refresh
+	 */
+	public function showVerification($isNew, $force_refresh = true)
+	{
+		global $modSettings;
+
+		$this->_tested = false;
+
+		if ($isNew)
+		{
+			$this->_empty_field = !empty($this->_options['no_empty_field']) || (!empty($modSettings['enable_emptyfield']) && !isset($this->_option['no_empty_field']));
+			$this->_user_value = '';
+		}
+
+		if ($isNew || $force_refresh)
+			$this->createTest($force_refresh);
+
+		return $this->_empty_field;
+	}
+
+	/**
+	 * Create the name data for the empty field that will be added to the template
+	 *
+	 * @param boolean $refresh
+	 */
+	public function createTest($refresh = true)
+	{
+		if (!$this->_empty_field)
+			return;
+
+		// Building a field with a believable name that will be inserted lives in the template.
+		if ($refresh)
+		{
+			$start = mt_rand(0, 27);
+			$this->_hash = substr(md5(time()), $start, 6);
+			$_SESSION[$this->_options['id'] . '_vv']['empty_field'] = '';
+			$_SESSION[$this->_options['id'] . '_vv']['empty_field'] = $this->_terms[array_rand($this->_terms)] . '-' . $this->_second_terms[array_rand($this->_second_terms)] . '-' . $this->_hash;
+		}
+		else
+			$this->_user_value = !empty($_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']]) ? $_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']] : '';
+	}
+
+	/**
+	 * Values passed to the template inside of GenericControls
+	 * Use the values to adjust how the control does or does not appear
+	 */
+	public function prepareContext()
+	{
+		return array(
+			'template' => 'emptyfield',
+			'values' => array(
+				'is_error' => $this->_tested && !$this->_verifyField(),
+				// Can be used in the template to show the normally hidden field to add some spice to things
+				'show' => !empty($_SESSION[$this->_options['id'] . '_vv']['empty_field']) && (mt_rand(1, 100) > 60),
+				'user_value' => $this->_user_value,
+				// Can be used in the template to randomly add a value to the empty field that needs to be removed when show is on
+				'clear' => (mt_rand(1, 100) > 60),
+			)
+		);
+	}
+
+	/**
+	 * Run the test on the returned value and return pass or fail
+	 */
+	public function doTest()
+	{
+		$this->_tested = true;
+
+		if (!$this->_verifyField())
+			return 'wrong_verification_answer';
+
+		return true;
+	}
+
+	/**
+	 * Test the field, easy, its on, its is set and it is empty
+	 */
+	private function _verifyField()
+	{
+		return $this->_empty_field && !empty($_SESSION[$this->_options['id'] . '_vv']['empty_field']) && empty($_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']]);
+	}
+
+	/**
+	 * Callback for this verification control options, which is on or off
+	 */
+	public function settings()
+	{
+		// Empty field verification.
+		$config_vars = array(
+			array('title', 'configure_emptyfield'),
+			array('desc', 'configure_emptyfield_desc'),
+			array('check', 'enable_emptyfield'),
+		);
+
+		return $config_vars;
+	}
 }
 
 /**
