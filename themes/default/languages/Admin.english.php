@@ -110,6 +110,7 @@ $txt['attachmentdir_size_not_set'] = 'No maximum directory size is currently set
 $txt['attachmentdir_files_not_set'] = 'No directory file limit is currently set';
 $txt['attachment_delete_admin'] = '[attachment deleted by admin]';
 $txt['live'] = 'Latest Software Updates';
+$txt['try_searching'] = 'Don\'t you know where a setting is? Try searching the admin area!';
 $txt['remove_all'] = 'Clear Log';
 $txt['approve_new_members'] = 'Admin must approve all new members';
 $txt['agreement_not_writable'] = 'Warning - agreement.txt is not writable, any changes you make will NOT be saved.';
