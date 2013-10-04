@@ -314,7 +314,7 @@ class Register_Controller extends Action_Controller
 				if (is_array($context['visual_verification']))
 				{
 					foreach ($context['visual_verification'] as $error)
-						$reg_errors->addError('error_' . $error);
+						$reg_errors->addError($error);
 				}
 			}
 		}
@@ -435,45 +435,41 @@ class Register_Controller extends Action_Controller
 		$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		require_once(SUBSDIR . '/Themes.subs.php');
-		$request = loadCustomFields(true, true);
+		require_once(SUBSDIR . '/Profile.subs.php');
+		loadCustomFields(0, 'register');
 
-		foreach ($request as $row)
+		foreach ($context['custom_fields'] as $row)
 		{
 			// Don't allow overriding of the theme variables.
-			if (isset($regOptions['theme_vars'][$row['col_name']]))
-				unset($regOptions['theme_vars'][$row['col_name']]);
-
-			// Not actually showing it then?
-			if (!$row['show_reg'])
-				continue;
+			if (isset($regOptions['theme_vars'][$row['colname']]))
+				unset($regOptions['theme_vars'][$row['colname']]);
 
 			// Prepare the value!
-			$value = isset($_POST['customfield'][$row['col_name']]) ? trim($_POST['customfield'][$row['col_name']]) : '';
+			$value = isset($_POST['customfield'][$row['colname']]) ? trim($_POST['customfield'][$row['colname']]) : '';
 
 			// We only care for text fields as the others are valid to be empty.
-			if (!in_array($row['field_type'], array('check', 'select', 'radio')))
+			if (!in_array($row['type'], array('check', 'select', 'radio')))
 			{
 				// Is it too long?
 				if ($row['field_length'] && $row['field_length'] < Util::strlen($value))
-					$reg_errors->addError(array('custom_field_too_long', array($row['field_name'], $row['field_length'])));
+					$reg_errors->addError(array('custom_field_too_long', array($row['name'], $row['field_length'])));
 
 				// Any masks to apply?
-				if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
+				if ($row['type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 				{
 					// @todo We never error on this - just ignore it at the moment...
 					if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
-						$reg_errors->addError(array('custom_field_invalid_email', array($row['field_name'])));
+						$reg_errors->addError(array('custom_field_invalid_email', array($row['name'])));
 					elseif ($row['mask'] == 'number' && preg_match('~[^\d]~', $value))
-						$reg_errors->addError(array('custom_field_not_number', array($row['field_name'])));
+						$reg_errors->addError(array('custom_field_not_number', array($row['name'])));
 					elseif (substr($row['mask'], 0, 5) == 'regex' && trim($value) !== '' && preg_match(substr($row['mask'], 5), $value) === 0)
-						$reg_errors->addError(array('custom_field_inproper_format', array($row['field_name'])));
+						$reg_errors->addError(array('custom_field_inproper_format', array($row['name'])));
 				}
 			}
 
 			// Is this required but not there?
 			if (trim($value) == '' && $row['show_reg'] > 1)
-				$reg_errors->addError(array('custom_field_empty', array($row['field_name'])));
+				$reg_errors->addError(array('custom_field_empty', array($row['name'])));
 		}
 
 		// Lets check for other errors before trying to register the member.

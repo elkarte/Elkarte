@@ -274,6 +274,9 @@ function loadCustomFields($memID, $area = 'summary')
 			'colname' => $row['col_name'],
 			'value' => $value,
 			'show_reg' => $row['show_reg'],
+			'field_length' => $row['field_length'],
+			'mask' => $row['mask'],
+			'show_reg' => $row['show_reg'],
 		);
 		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}

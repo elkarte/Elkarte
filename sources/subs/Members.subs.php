@@ -553,6 +553,9 @@ function registerMember(&$regOptions, $error_context = 'register')
 		$reg_errors->addError(array('email_in_use', array(htmlspecialchars($regOptions['email']))), 1);
 	$db->free_result($request);
 
+	// Perhaps someone else wants to check this user
+	call_integration_hook('integrate_register_check', array(&$regOptions, &$reg_errors));
+
 	// If there's any errors left return them at once!
 	if ($reg_errors->hasErrors())
 		return false;

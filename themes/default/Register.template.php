@@ -205,11 +205,11 @@ function template_registration_form()
 	if (!empty($context['custom_fields_required']) && !empty($context['custom_fields']))
 	{
 		echo '
-
 					<dl class="register_form">';
 
-		foreach ($context['custom_fields'] as $field)
+		foreach ($context['custom_fields'] as $key => $field)
 			if ($field['show_reg'] > 1)
+			{
 				echo '
 						<dt>
 							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['name'], ':</strong>
@@ -220,6 +220,10 @@ function template_registration_form()
 							return \'<\' . $matches[1] . \' tabindex="\' . $context[\'tabindex\']++ . \'"\';
 						')
 					, $field['input_html']), '</dd>';
+
+				// Drop this one so we don't show the additonal information header unless needed
+				unset($context['custom_fields'][$key]);
+			}
 
 		echo '
 					</dl>';

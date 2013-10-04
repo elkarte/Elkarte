@@ -209,7 +209,11 @@ function template_notes()
 								<h3 class="catbg">', $txt['mc_notes'], '</h3>
 							</div>
 							<div class="windowbg">
-								<div class="content modbox">';
+								<div class="content modbox">
+									<div class="floatleft post_note">
+										<input type="text" name="new_note" placeholder="', $txt['mc_click_add_note'], '" style="width: 95%;" class="input_text" />
+									</div>
+									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="button_submit submitgo" />';
 
 	if (!empty($context['notes']))
 	{
@@ -229,14 +233,46 @@ function template_notes()
 	}
 
 	echo '
-									<div class="floatleft post_note">
-										<input type="text" name="new_note" placeholder="', $txt['mc_click_add_note'], '" style="width: 95%;" class="input_text" />
-									</div>
-									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="button_submit submitgo" />
 								</div>
 							</div>
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						</form>';
+}
+
+/**
+ * Template for viewing users on the watch list
+ */
+function template_action_required()
+{
+	global $context, $txt, $scripturl, $settings;
+
+	echo '
+						<div class="cat_bar">
+							<h3 class="catbg">
+								', $txt['mc_required'], ' : ', $context['mc_required'], '
+							</h3>
+						</div>
+						<div class="windowbg">
+							<div class="content modbox">
+								<ul>';
+
+	foreach ($context['required'] as $area => $total)
+	{
+		echo '
+									<li>';
+
+		echo '
+										<img class="icon" src="', $settings['images_url'], ($total == 0 ? '/icons/field_valid.png"' : '/icons/field_invalid.png"'), 'alt="" />';
+
+		echo '
+										<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total,  '</span></a>
+									</li>';
+	}
+
+	echo '
+								</ul>
+							</div>
+						</div>';
 }
 
 /**

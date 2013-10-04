@@ -271,6 +271,10 @@ function template_body_above()
 			</form>';
 	}
 
+	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
+	if (!isset($context['minmax_preferences']['upshrink']) && isset($_COOKIE['upshrink']))
+		$context['minmax_preferences']['upshrink'] = $_COOKIE['upshrink'];
+
 	echo '
 		</div>
 		<div id="header" class="wrapper"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
