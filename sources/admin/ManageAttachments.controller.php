@@ -270,10 +270,10 @@ class ManageAttachments_Controller extends Action_Controller
 				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
 				// Posting limits
-				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('warning', empty($testPM) ? 'attachment_postsize_warning' : ''),
-				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
+				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 				// Security Items
 			array('title', 'attachment_security_settings'),
