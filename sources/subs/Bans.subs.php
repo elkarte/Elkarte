@@ -45,6 +45,9 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
 	$ban_triggers = array();
 	$ban_errors = error_context::context('ban', 1);
 
+	if (!is_array($suggestions))
+		return false;
+
 	foreach ($suggestions as $key => $value)
 	{
 		if (is_array($value))

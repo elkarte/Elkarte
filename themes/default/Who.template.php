@@ -103,7 +103,22 @@ function template_main()
 					</tbody>
 				</table>
 			</div>';
-	template_pagesection(false, false, array('extra' => $extra));
+
+	$extra_bottom = '
+			<div class="selectbox floatright">' . $txt['who_show1'] . '
+				<select name="show" onchange="document.forms.whoFilter.submit();">';
+	
+	foreach ($context['show_methods'] as $value => $label)
+		$extra_bottom .= '
+					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+	$extra_bottom .= '
+				</select>
+				<noscript>
+					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
+				</noscript>
+			</div>';
+
+	template_pagesection(false, false, array('extra' => $extra_bottom));
 
 	echo '
 		</form>

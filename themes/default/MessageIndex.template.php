@@ -312,7 +312,7 @@ function template_main()
 					</p>
 					<p class="topic_lastpost">
 						<a href="', $topic['last_post']['href'], '"><img src="', $settings['images_url'], '/icons/last_post.png" alt="', $txt['last_post'], '" title="', $txt['last_post'], '" /></a>
-						', $topic['last_post']['time'], '<br />
+						<time datetime="', htmlTime($topic['last_post']['timestamp']), '">', $topic['last_post']['time'], '</time><br />
 						', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 					</p>
 				</div>';

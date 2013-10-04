@@ -682,9 +682,11 @@ class ManageBans_Controller extends Action_Controller
 		}
 
 		if (isset($_POST['ban_suggestions']))
+		{
 			// @TODO: is $_REQUEST['bi'] ever set?
 			$saved_triggers = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
-
+			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
+		}
 		// Something went wrong somewhere... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
@@ -698,7 +700,6 @@ class ManageBans_Controller extends Action_Controller
 
 			return action_edit();
 		}
-		$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 
 		if (isset($_POST['ban_items']))
 		{
