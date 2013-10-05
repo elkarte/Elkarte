@@ -19,7 +19,7 @@
  */
 function template_BoardIndex_init()
 {
-	loadTemplate('BoardsUtils');
+	loadTemplate('GenericBoard');
 }
 
 /**
