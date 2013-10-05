@@ -19,7 +19,7 @@
  */
 function template_Display_init()
 {
-	loadTemplate('PosterUtils');
+	loadTemplate('GenericMessages');
 }
 
 /**

@@ -19,7 +19,7 @@
  */
 function template_MessageIndex_init()
 {
-	loadTemplate('GenericBoard');
+	loadTemplate('GenericBoards');
 }
 
 /**
