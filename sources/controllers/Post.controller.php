@@ -565,7 +565,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Check whether this is a really old post being bumped...
-		if (!empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
+		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
 			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 
 		// Are we moving a discussion to its own topic?
