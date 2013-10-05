@@ -529,6 +529,9 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['sort_direction'] = $descending ? 'down' : 'up';
 		$context['sort_by'] = $sort_by;
 
+		if (!empty($messages_request) && !empty($context['show_delete']))
+			Template_Layers::getInstance()->addEnd('pm_pages_and_buttons');
+
 		// Set up the page index.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;f=' . $context['folder'] . (isset($_REQUEST['l']) ? ';l=' . (int) $_REQUEST['l'] : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
@@ -2548,10 +2551,13 @@ function messageIndexBar($area)
 	// Set the selected item.
 	$current_area = $pm_include_data['current_area'];
 	$context['menu_item_selected'] = $current_area;
+	$template_layers = Template_Layers::getInstance();
+
+	$template_layers->addAfter('subject_list', 'pm');
 
 	// Set the template for this area and add the profile layer.
 	if (!isset($_REQUEST['xml']))
-		Template_Layers::getInstance()->add('pm');
+		$template_layers->add('pm');
 }
 
 /**

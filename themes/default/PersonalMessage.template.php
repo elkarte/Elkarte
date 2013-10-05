@@ -28,9 +28,16 @@ function template_PersonalMessage_init()
  */
 function template_pm_above()
 {
-	global $context, $txt;
+	global $context, $txt, $scripturl;
 
+	// The every helpful javascript!
 	echo '
+					<script><!-- // --><![CDATA[
+						var allLabels = {};
+						var currentLabels = {};
+						var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
+						var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
+					// ]]></script>
 					<div id="personal_messages">';
 
 	// Show the capacity bar, if available. @todo - This needs work.
@@ -50,6 +57,9 @@ function template_pm_above()
 						<div class="infobox">
 							', $txt['pm_sent'], '
 						</div>';
+
+	echo '
+						<form action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
 }
 
 /**
@@ -57,7 +67,11 @@ function template_pm_above()
  */
 function template_pm_below()
 {
+	global $context;
+
 	echo '
+							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						</form>
 					</div>';
 }
 
@@ -68,36 +82,9 @@ function template_folder()
 {
 	global $context, $scripturl, $options, $txt;
 
-	// The every helpful javascript!
-	echo '
-				<script><!-- // --><![CDATA[
-					var allLabels = {};
-					var currentLabels = {};
-					var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
-					var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
-				// ]]></script>';
-
-	echo '
-				<form action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
-
-	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
-	if ($context['display_mode'] != 1)
-	{
-		template_subject_list();
-		echo '
-					<hr class="clear" />';
-	}
-
 	// Got some messages to display?
 	if ($context['get_pmessage']('message', true))
 	{
-
-		// Show a few buttons if we are in conversation mode and outputting the first message.
-		if ($context['display_mode'] == 2)
-			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
-		else
-			template_pagesection();
-
 		echo '
 					<div class="forumposts">';
 
@@ -310,13 +297,57 @@ function template_folder()
 
 		echo '
 					</div>';
+	}
+}
+
+/**
+ * Used to display items above the page, like page navigation
+ */
+function template_pm_pages_and_buttons_above()
+{
+	global $context;
+
+		// Show a few buttons if we are in conversation mode and outputting the first message.
+		if ($context['display_mode'] == 2)
+			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+		else
+			template_pagesection();
+}
+
+/**
+ * Used to display items below the page, like page navigation
+ */
+function template_pm_pages_and_buttons_below()
+{
+	global $context, $txt;
 
 		if (empty($context['display_mode']))
 			template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
 			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
+}
+
+/**
+ * Just list all the personal message subjects - to make templates easier.
+ * Unfortunately a bit ugly at the moment
+ */
+function template_subject_list_above()
+{
+	global $context;
+
+	// If we are not in single display mode show the subjects on the top! @todo - Horrible markup here.
+	if ($context['display_mode'] != 1)
+	{
+		template_subject_list();
+
+		echo '
+					<hr class="clear" />';
 	}
+}
+function template_subject_list_below()
+{
+	global $context;
 
 	// Individual messages = button list!
 	if ($context['display_mode'] == 1)
@@ -326,15 +357,7 @@ function template_folder()
 
 		template_subject_list();
 	}
-
-	echo '
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</form>';
 }
-
-/**
- * Just list all the personal message subjects - to make templates easier.
- */
 function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
