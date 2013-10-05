@@ -239,6 +239,12 @@ function template_messages()
 				echo '
 									<li class="listlevel2"><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a></li>';
 
+			// Anything else added by mods for example?
+			if (!empty($context['additional_drop_buttons']))
+				foreach ($context['additional_drop_buttons'] as $key => $button)
+					echo '
+									<li class="listlevel2"><a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a></li>';
+
 			echo '
 								</ul>';
 		}
@@ -278,6 +284,12 @@ function template_messages()
 		elseif ($context['can_quote'])
 			echo '
 							<li class="listlevel1"><a href="', $scripturl, '?action=post;quote=', $message['id'], ';topic=', $context['current_topic'], '.', $context['start'], ';last_msg=', $context['topic_last_message'], '" class="linklevel1 quote_button">', $txt['quote'], '</a></li>';
+
+		// Anything else added by mods for example?
+		if (!empty($context['additional_quick_buttons']))
+			foreach ($context['additional_quick_buttons'] as $key => $button)
+				echo '
+								<li class="listlevel1"><a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a></li>';
 
 		echo '
 						</ul>';

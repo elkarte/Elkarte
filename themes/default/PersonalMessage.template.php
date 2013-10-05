@@ -168,6 +168,24 @@ function template_folder()
 				echo '
 									<li class="listlevel1 quickmod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
 
+			// Maybe there is something...more :P (this is the more button)
+			if (!empty($context['additional_pm_drop_buttons']))
+			{
+				echo '
+									<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1 post_options">', $txt['post_options'], '</a>
+										<ul class="menulevel2">';
+
+				// Anything else added by mods for example?
+				if (!empty($context['additional_pm_drop_buttons']))
+					foreach ($context['additional_pm_drop_buttons'] as $key => $button)
+						echo '
+											<li class="listlevel2"><a href="' . $button['href'] . '" class="linklevel2 ', $key, '">' . $button['text'] . '</a></li>';
+
+				echo '
+										</ul>
+									</li>';
+			}
+
 			// Remove is always an option
 			echo '
 									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=pmactions;pm_actions%5B', $message['id'], '%5D=delete;f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', addslashes($txt['remove_message']), '?\');" class="linklevel1 remove_button">', $txt['delete'], '</a></li>';
@@ -192,6 +210,12 @@ function template_folder()
 					echo '
 									<li class="listlevel1"><a href="', $scripturl, '?action=pm;sa=send;f=', $context['folder'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';pmsg=', $message['id'], ';quote" class="linklevel1 quote_button">', $txt['reply_quote'], '</a></li>';
 			}
+
+			// Anything else added by mods for example?
+			if (!empty($context['additional_quick_pm_buttons']))
+				foreach ($context['additional_quick_pm_buttons'] as $key => $button)
+					echo '
+									<li class="listlevel1"><a href="' . $button['href'] . '" class="linklevel1 ', $key, '">' . $button['text'] . '</a></li>';
 
 			echo '
 								</ul>';
