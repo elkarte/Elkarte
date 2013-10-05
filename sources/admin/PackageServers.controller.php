@@ -725,6 +725,15 @@ class PackageServers_Controller extends Action_Controller
 
 		$unwritable = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
 
+		// Let's initialize $context
+		$context['package_ftp'] = array(
+			'server' => '',
+			'port' => '',
+			'username' => '',
+			'path' => '',
+			'error' => '',
+		);
+
 		if ($unwritable)
 		{
 			// Are they connecting to their FTP account already?

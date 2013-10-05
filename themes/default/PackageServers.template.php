@@ -40,7 +40,8 @@ function template_servers()
 			<h3 class="catbg">', $txt['package_servers'], '</h3>
 		</div>';
 
-	template_ftp_required();
+	if ($context['package_download_broken'])
+		template_ftp_required();
 
 	echo '
 		<div class="windowbg2">

@@ -34,6 +34,7 @@ function template_admin()
 
 	// Display the "live news"
 	echo '
+							<div id="admin_search_box">', $txt['try_searching'], template_admin_quick_search(), '</div>
 							<div id="live_news" class="floatleft">
 								<div class="cat_bar">
 									<h3 class="catbg">

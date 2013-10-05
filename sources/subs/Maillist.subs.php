@@ -102,8 +102,6 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 /**
  * Counts the number of errors (the user can see) for pagination
  *
- * @param int $id
- * @param int $id
  */
 function list_maillist_count_unapproved()
 {
