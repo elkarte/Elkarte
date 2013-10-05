@@ -26,6 +26,7 @@ global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+global $sourcedir, $boarddir;
 
 // Remember the current configuration so it can be set back.
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
