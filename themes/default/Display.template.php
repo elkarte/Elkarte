@@ -37,14 +37,11 @@ function template_report_sent_above()
 }
 
 /**
- * The main template for displaying a topic, does it all, its the king, the bomb, the real deal
+ * Topic informations, descriptions, etc.
  */
-function template_messages()
+function template_messages_informations_above()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
-
-	// Yeah, I know, though at the moment is the only way...
-	global $removableMessageIDs, $ignoredMsgs;
+	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	// Show the topic information - icon, subject, etc.
 	echo '
@@ -91,6 +88,17 @@ function template_messages()
 
 	echo '
 			<form action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" style="margin: 0;" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
+}
+
+/**
+ * The main template for displaying a topic, does it all, its the king, the bomb, the real deal
+ */
+function template_messages()
+{
+	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+
+	// Yeah, I know, though at the moment is the only way...
+	global $removableMessageIDs, $ignoredMsgs;
 
 	$ignoredMsgs = array();
 	$removableMessageIDs = array();
@@ -332,7 +340,13 @@ function template_messages()
 				</div>
 				<hr class="post_separator" />';
 	}
+}
 
+/**
+ * Closes the topic informations, descriptions, etc. divs and forms
+ */
+function template_messages_informations_below()
+{
 	echo '
 			</form>
 		</div>';

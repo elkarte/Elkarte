@@ -70,6 +70,7 @@ class Display_Controller
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$template_layers = Template_Layers::getInstance();
+		$template_layers->addEnd('messages_informations');
 
 		// Let's do some work on what to search index.
 		if (count($_GET) > 2)
