@@ -11,7 +11,7 @@ CREATE SEQUENCE {$db_prefix}member_logins_seq;
 ---# Creating login history table.
 CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
 	id_login int NOT NULL default nextval('{$db_prefix}member_logins_seq'),
-	id_member mediumint NOT NULL,
+	id_member int NOT NULL,
 	time int NOT NULL,
 	ip varchar(255) NOT NULL default '',
 	ip2 varchar(255) NOT NULL default '',
@@ -261,7 +261,7 @@ VALUES
 INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
-	(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');;
+	(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
 ---#
 
 /******************************************************************************/
@@ -583,9 +583,18 @@ if ($db->num_rows($request) != 0)
 INSERT INTO `{$db_prefix}custom_fields`
 	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
 VALUES
-	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/aim.png" alt="AIM - {INPUT}"></a>', 1),
-	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
-	('cust_msn', 'MSN/Live', 'Your Live Messenger email address', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="msn" href="http://members.msn.com/{INPUT}" target="_blank" title="Live - {INPUT}"><img src="{IMAGES_URL}/msntalk.png" alt="Live - {INPUT}"></a>', 1),
+	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/aim.png" alt="AIM - {INPUT}"></a>', 1);
+INSERT INTO `{$db_prefix}custom_fields`
+	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+VALUES
+	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
+INSERT INTO `{$db_prefix}custom_fields`
+	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+VALUES
+	('cust_msn', 'MSN/Live', 'Your Live Messenger email address', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="msn" href="http://members.msn.com/{INPUT}" target="_blank" title="Live - {INPUT}"><img src="{IMAGES_URL}/msntalk.png" alt="Live - {INPUT}"></a>', 1)
+INSERT INTO `{$db_prefix}custom_fields`
+	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+VALUES
 	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
 ---#
 
@@ -638,16 +647,20 @@ ALTER TABLE `{$db_prefix}members`
 /******************************************************************************/
 ---# Creating postby_emails table
 CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails (
-	id_email varchar(50) NOT NULL,
+	id_email varchar(50) NOT NULL default '',
 	time_sent int NOT NULL default '0',
-	email_to varchar(50) NOT NULL,
+	email_to varchar(50) NOT NULL default '',
 	PRIMARY KEY (id_email)
 );
 ---#
 
+---# Sequence for table `postby_emails_error`
+CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
+---#
+
 ---# Creating postby_emails_error table
 CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
-	id_email int NOT NULL auto_increment,
+	id_email int default nextval('{$db_prefix}postby_emails_error'),
 	error varchar(255) NOT NULL default '',
 	data_id varchar(255) NOT NULL default '0',
 	subject varchar(255) NOT NULL default '',
@@ -688,7 +701,6 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
 ---#
 
----#
 /******************************************************************************/
 --- Adding likes support.
 /******************************************************************************/

@@ -181,12 +181,9 @@ class ManageNews_Controller extends Action_Controller
 					'data' => array(
 						'function' => create_function('$news', '
 
-							if (is_numeric($news[\'id\']))
-								return \'<textarea id="data_\' . $news[\'id\'] . \'" rows="3" cols="50" name="news[]" style="\' . (isBrowser(\'is_ie8\') ? \'width: 635px; max-width: 85%; min-width: 85%\' : \'width 100%;margin 0 5em\') . \';">\' . $news[\'unparsed\'] . \'</textarea>
+							return \'<textarea id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]" style="width 100%;margin 0 5em;">\' . $news[\'unparsed\'] . \'</textarea>
 								<br />
 								<div id="preview_\' . $news[\'id\'] . \'"></div>\';
-							else
-								return $news[\'unparsed\'];
 						'),
 						'style' => 'width: 50%;',
 					),
@@ -233,7 +230,7 @@ class ManageNews_Controller extends Action_Controller
 					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
 					<span id="moreNewsItems_link" style="display: none;">
-						<a class="linkbutton_right" href="javascript:void(0);" onclick="addNewsItem(); return false;">' . $txt['editnews_clickadd'] . '</a>
+						<a class="linkbutton_right" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',
 				),
 			),
@@ -241,6 +238,8 @@ class ManageNews_Controller extends Action_Controller
 			document.getElementById(\'list_news_lists_last\').style.display = "none";
 			document.getElementById("moreNewsItems_link").style.display = "";
 			var last_preview = 0;
+			var txt_preview = ' . javaScriptEscape($txt['preview']) . ';
+			var txt_news_error_no_news = ' . javaScriptEscape($txt['news_error_no_news']) . ';
 
 			$(document).ready(function () {
 				$("div[id ^= \'preview_\']").each(function () {
@@ -250,44 +249,7 @@ class ManageNews_Controller extends Action_Controller
 					make_preview_btn(preview_id);
 				});
 			});
-
-			function make_preview_btn (preview_id)
-			{
-				var $id = $("#preview_" + preview_id);
-				$id.text(\'' . $txt['preview'] . '\').click(function () {
-					$.ajax({
-						type: "POST",
-						url: "' . $scripturl . '?action=xmlpreview;xml",
-						data: {item: "newspreview", news: $("#data_" + preview_id).val()},
-						context: document.body,
-						success: function(request){
-							if ($(request).find("error").text() == \'\')
-								$(document).find("#box_preview_" + preview_id).html($(request).text());
-							else
-								$(document).find("#box_preview_" + preview_id).text(\'' . $txt['news_error_no_news'] . '\');
-						},
-					});
-				});
-				$id.wrap("<a class=\"linkbutton_right\" href=\"javascript:void(0);\"></a>");
-			}
-
-			function addNewsItem ()
-			{
-				last_preview++;
-				$("#list_news_lists_last").before(' . javaScriptEscape('
-				<tr class="windowbg') . ' + (last_preview % 2 == 0 ? \'\' : \'2\') + ' . javaScriptEscape('">
-					<td style="width: 50%;">
-							<textarea id="data_') . ' + last_preview + ' . javaScriptEscape('" rows="3" cols="65" name="news[]" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 85%; min-width: 85%' : 'width: 100%') . ';"></textarea>
-							<br />
-							<div class="floatright" id="preview_') . ' + last_preview + ' . javaScriptEscape('"></div>
-					</td>
-					<td style="width: 45%;">
-						<div id="box_preview_') . ' + last_preview + ' . javaScriptEscape('" style="overflow: auto; width: 100%; height: 10ex;"></div>
-					</td>
-					<td></td>
-				</tr>') . ');
-				make_preview_btn(last_preview);
-			}',
+		',
 		);
 
 		// Create the request list.

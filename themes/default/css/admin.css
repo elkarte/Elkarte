@@ -228,6 +228,9 @@ legend {
 	height: 12em;
 	overflow: auto;
 }
+#admin_search_box {
+	padding: 0.5em 0;
+}
 #live_news div.content, #supportVersionsTable  div.content {
 	padding: 0 4px;
 	font-size: 0.9em;
@@ -277,15 +280,15 @@ div.quick_tasks {
 	border-top: 1px solid #bbb;
 	border-bottom: 1px solid #fff;
 }
-#quick_tasks  li {
+#quick_tasks li {
 	list-style: none;
 	padding: 10px 6px 10px 6px;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #bbb;
 	float: left;
 	width: 50%;
-	height: 6em;
-	overflow: hidden;
+	height: 7em;
+	overflow: auto;
 }
 #quick_tasks  li a  {
 	line-height: 1.6em;
