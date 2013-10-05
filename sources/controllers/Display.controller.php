@@ -909,7 +909,7 @@ class Display_Controller
 			$mgsOptions = basicMessageInfo(min($messages), true);
 
 			$_SESSION['split_selection'][$topic] = $messages;
-			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' .urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' . urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');
