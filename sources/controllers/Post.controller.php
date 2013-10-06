@@ -157,10 +157,6 @@ class Post_Controller extends Action_Controller
 
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
-
-			// Check whether this is a really old post being bumped...
-			if (!empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
-				$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 		}
 		else
 		{
@@ -567,6 +563,10 @@ class Post_Controller extends Action_Controller
 
 			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 		}
+
+		// Check whether this is a really old post being bumped...
+		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
+			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 
 		// Are we moving a discussion to its own topic?
 		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))

@@ -274,7 +274,6 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
-		$context['settings_title'] = $txt['calendar_settings'];
 
 		// Saving the settings?
 		if (isset($_GET['save']))
@@ -317,8 +316,9 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Look, all the calendar settings - of which there are many!
 		$config_vars = array(
+			array('title', 'calendar_settings'),
 			// All the permissions:
-			array('permissions', 'calendar_view', 'help' => 'cal_enabled'),
+			array('permissions', 'calendar_view'),
 			array('permissions', 'calendar_post'),
 			array('permissions', 'calendar_edit_own'),
 			array('permissions', 'calendar_edit_any'),

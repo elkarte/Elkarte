@@ -222,9 +222,6 @@ function onDocSent(XMLDoc)
 		errorList += '<li id="post_error_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
 
-	document.getElementById('post_error').style.display = numErrors == 0 ? 'none' : '';
-	document.getElementById('post_error').className = errors.getAttribute('serious') == 1 ? 'errorbox' : 'noticebox';
-
 	oError_box = $(document.getElementById('post_error'));
 	if ($.trim(oError_box.children("#post_error_list").html()) === '')
 		oError_box.append("<ul id='post_error_list'></ul>");

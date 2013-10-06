@@ -164,7 +164,7 @@ class paypal_payment
 	}
 
 	/**
-	 * Post the IPN data received back to paypal for validaion
+	 * Post the IPN data received back to paypal for validation
 	 * Sends the complete unaltered message back to PayPal. The message must contain the same fields
 	 * in the same order and be encoded in the same way as the original message
 	 * PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or INVALID
@@ -264,7 +264,7 @@ class paypal_payment
 			$this->_findSubscription();
 
 		// Verify the currency!
-		if (strtolower($_POST['mc_currency']) !== $modSettings['paid_currency_code'])
+		if (strtolower($_POST['mc_currency']) !== strtolower($modSettings['paid_currency_code']));
 			exit;
 
 		// Can't exist if it doesn't contain anything.
