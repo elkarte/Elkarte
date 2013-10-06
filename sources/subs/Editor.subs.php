@@ -327,6 +327,10 @@ function create_control_richedit($editorOptions)
 				'code' => 'quote',
 				'description' => $txt['bbc_quote']
 			),
+			array(
+				'code' => 'spoiler',
+				'description' => $txt['bbc_spoiler']
+			),
 			array(),
 			array(
 				'code' => 'image',

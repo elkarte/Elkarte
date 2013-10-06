@@ -1567,6 +1567,12 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				),
 			),
 			array(
+				'tag' => 'spoiler',
+				'before' => '<span class="spoilerheader">' . $txt['spoiler'] . '</span><div class="spoiler"><div class="bbc_spoiler" style="display: none;">',
+				'after' => '</div></div>',
+				'block_level' => true,
+			),
+			array(
 				'tag' => 'sub',
 				'before' => '<sub>',
 				'after' => '</sub>',
