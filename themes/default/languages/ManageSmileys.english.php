@@ -77,9 +77,11 @@ $txt['smileys_confirm'] = 'Are you sure you want to remove these smileys?\\n\\nN
 $txt['smileys_location_form_description'] = 'These smileys will appear above the text area, when posting a new forum message or Personal Message.';
 $txt['smileys_location_popup_description'] = 'These smileys will be shown in a popup, that is shown after a user has clicked \'[more]\'';
 $txt['smileys_move_select_destination'] = 'Select smiley destination';
-$txt['smileys_move_select_smiley'] = 'Select smiley to move';
+$txt['smileys_move_select_smiley'] = 'Select smiley to move or drag it to the location you want';
 $txt['smileys_move_here'] = 'Move smiley to this location';
 $txt['smileys_no_entries'] = 'There are currently no smileys configured.';
+$txt['smileys_moved_done'] = 'Smiley successfully moved';
+$txt['smileys_moved_fail'] = 'Unable to move smiley';
 
 $txt['icons_edit_icons_explain'] = 'From here you can change which message icons are available throughout your board. You can add, edit and remove icons, as well as limit their use to certain boards.';
 $txt['icons_edit_icons_all_boards'] = 'Available in all boards';
