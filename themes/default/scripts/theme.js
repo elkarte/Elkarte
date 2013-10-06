@@ -55,6 +55,10 @@ $(document).ready(function() {
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
 	});
+	// Spoiler
+	$('.spoilerheader').click(function(){
+		$(this).next().children().slideToggle("fast");
+	});
 });
 
 // Toggles the element height and width styles of an image.

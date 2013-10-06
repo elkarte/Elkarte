@@ -271,6 +271,16 @@ $.sceditor.command.set(
 );
 
 $.sceditor.command.set(
+	'spoiler', {
+		exec: function () {
+			this.wysiwygEditorInsertHtml('[spoiler]', '[/spoiler]');
+		},
+		txtExec: ["[spoiler]", "[/spoiler]"],
+		tooltip: 'Spoiler'
+	}
+);
+
+$.sceditor.command.set(
 	'tt', {
 		exec: function () {
 			this.wysiwygEditorInsertHtml('<span class="tt">', '</span>');
