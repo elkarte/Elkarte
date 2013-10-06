@@ -811,6 +811,7 @@ function toggleBaseDir ()
 			scroll: true,
 			containment: 'parent',
 			delay: 150,
+			href: '', // If an error occurs redirect here
 			tolerance: 'intersect', // mode to use for testing whether the item is hovering over another item.
 			setorder: 'serialize', // how to return the data, really only supports serialize and inorder
 			placeholder: '', // css class used to style the landing zone
@@ -837,7 +838,7 @@ function toggleBaseDir ()
 		$(ajax_errorbox).css({'display': 'none'});
 		$("body").append(ajax_errorbox).attr('id', 'errorContainer');
 
-		// Find all table_grid_sortable tables and attach the UI sortable action
+		// Find all oSettings.tag and attach the UI sortable action
 		$(oSettings.tag).sortable({
 			opacity: oSettings.opacity,
 			cursor: oSettings.cursor,
@@ -852,7 +853,8 @@ function toggleBaseDir ()
 				// Called when an element is dropped in a new location
 				var postdata = '',
 					moved = ui.item.attr('id'),
-					order = [];
+					order = [],
+					receiver = ui.item.parent().attr('id');
 
 				// Calling a pre processing function?
 				if (oSettings.preprocess !== '')
@@ -884,6 +886,7 @@ function toggleBaseDir ()
 				postdata += '&' + elk_session_var + '=' + elk_session_id;
 				postdata += '&order=reorder';
 				postdata += '&moved=' + moved;
+				postdata += '&received=' + receiver;
 
 				if (oSettings.token !== '')
 					postdata += '&' + oSettings.token['token_var'] + '=' + oSettings.token['token_id'];
@@ -901,14 +904,28 @@ function toggleBaseDir ()
 					setTimeout(function() {
 						$(ajax_infobar).slideUp();
 					}, 3500);
+					// Reset the interface?
+					if (oSettings.href !== '')
+						setTimeout(function() {
+							window.location.href = elk_scripturl + oSettings.href;
+						}, 1000);
 				})
 				.done(function(data, textStatus, jqXHR) {
 					if ($(data).find("error").length !== 0)
 					{
-						// Errors get a modal dialog box
+						// Errors get a modal dialog box and redirect on close
 						$('#errorContainer').append('<p id="errorContent"></p>');
 						$('#errorContent').html($(data).find("error").text());
-						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+						$('#errorContent').dialog({
+							autoOpen: true,
+							title: oSettings.title,
+							modal: true,
+							close: function(event, ui) {
+								// Redirecting due to the error, thats a good idea
+								if (oSettings.href !== '')
+									window.location.href = elk_scripturl + oSettings.href;
+							}
+						});
 					}
 					else if ($(data).find("elk").length !== 0)
 					{
