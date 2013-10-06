@@ -332,7 +332,6 @@ class ManageNews_Controller extends Action_Controller
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
-
 		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : htmlspecialchars($context['forum_name'] . ': ' . $txt['subject']);
 		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . $txt['regards_team'] . "\n\n" . '{$board_url}');
 
@@ -428,6 +427,7 @@ class ManageNews_Controller extends Action_Controller
 		// We need a couple strings from the email template file
 		loadLanguage('EmailTemplates');
 		require_once(SUBSDIR . '/News.subs.php');
+
 		// Get a list of all full banned users.  Use their Username and email to find them.
 		// Only get the ones that can't login to turn off notification.
 		$context['recipients']['exclude_members'] = excludeBannedMembers();
@@ -447,9 +447,11 @@ class ManageNews_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
+
 		// For progress bar!
 		$context['total_emails'] = count($context['recipients']['emails']);
 		$context['max_id_member'] = maxMemberID();
+
 		// Clean up the arrays.
 		$context['recipients']['members'] = array_unique($context['recipients']['members']);
 		$context['recipients']['exclude_members'] = array_unique($context['recipients']['exclude_members']);
@@ -731,8 +733,6 @@ class ManageNews_Controller extends Action_Controller
 
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
-
-
 			foreach ($recipients as $row)
 			{
 				$last_id_member = $row['id_member'];

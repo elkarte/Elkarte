@@ -153,7 +153,7 @@ $helptxt['registrations'] = '<strong>Registration Management</strong><br />
 		<li>
 			<strong>Edit Registration Agreement</strong><br />
 			This allows you to set the text for the registration agreement displayed when members sign up for your forum.
-			You can add or remove anything from the default registration agreement, which was included.<br /><br />
+			You can add or remove anything from the default registration agreement, which is included with ElkArte.<br /><br />
 		</li>
 		<li>
 			<strong>Set Reserved Names</strong><br />
@@ -213,9 +213,22 @@ $helptxt['smileys'] = '<strong>Smiley Center</strong><br />
 	get confusing for your users using different sets.<br /><br />
 
 	You are also able to edit message icons from here, if you have them enabled on the settings page.';
-$helptxt['calendar'] = '<strong>Manage Calendar</strong><br />
-	Here you can modify the current calendar settings as well as add and remove holidays that appear on the calendar.';
-$helptxt['cal_export'] = 'Exports a text file in the iCal format for importing in to other calendar applications';
+
+$helptxt['calendar'] = '<strong>Manage Calendar</strong><br />Here you can modify the current calendar settings as well as add and remove holidays that appear on the calendar.';
+$helptxt['calendar_settings'] = 'The calendar can be used for showing birthdays, or for showing important moments happening in your community.<br /><br />Remember that usage of the calendar (posting events, viewing events, etc.) is controlled by permissions set on the permissions screen.';
+$helptxt['cal_days_for_index'] = 'Max days in advance on board index:<br />If this is set to 7, the next week\'s worth of events will be shown.';
+$helptxt['cal_showevents'] = 'Enables the highlighting of events on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
+$helptxt['cal_showholidays'] = 'This setting allows you to highlight holidays on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
+$helptxt['cal_showbdays'] = 'This setting allows you to highlight birthdays on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
+$helptxt['cal_export'] = 'Exports a text file in the iCal format for importing in to other calendar applications.';
+$helptxt['cal_daysaslink'] = 'Show days as link to \'Post Event\':<br />This will allow members to post events for that day, when they click on that date.';
+$helptxt['cal_allow_unlinked'] = 'Allow events not linked to posts:<br />Allow members to post events without requiring it to be linked with a post in a board.';
+$helptxt['cal_defaultboard'] = 'Default Board to Post In:<br />Enter the default board to post events in.';
+$helptxt['cal_showInTopic'] = 'Show linked events in topic display:<br />Check to show a link to the event at the top of topic view.';
+$helptxt['cal_allowspan'] = 'Allow events to span multiple days:<br />Check to allow events to span multiple days.';
+$helptxt['cal_maxspan'] = 'Max number of days an event can span:<br />Enter the maximum number of days that a single event can span.';
+$helptxt['cal_minyear'] = 'Minimum year:<br />Select the &quot;first&quot; year on the calendar list.';
+$helptxt['cal_maxyear'] = 'Maximum year:<br />Select the &quot;last&quot; year on the calendar list<br />';
 
 $helptxt['serversettings'] = '<strong>Server Settings</strong><br />
 	Here you can perform the core configuration for your forum. This section includes the database and url settings, as well as other
@@ -278,7 +291,7 @@ $helptxt['disableTemplateEval'] = 'By default, templates are evaluated instead o
 $helptxt['databaseSession_enable'] = 'This option makes use of the database for session storage - it is best for load balanced servers, but helps with all timeout issues and can make the forum faster.';
 $helptxt['databaseSession_loose'] = 'Turning this on will decrease the bandwidth your forum uses, and make it so clicking back will not reload the page - the downside is that the (new) icons won\'t update, among other things. (unless you click to that page instead of going back to it.)';
 $helptxt['databaseSession_lifetime'] = 'This is the number of seconds for sessions to last after they haven\'t been accessed.  If a session is not accessed for too long, it is said to have &quot;timed out&quot;.  Anything higher than 2400 is recommended.';
-$helptxt['cache_enable'] = 'The software performs caching at a variety of levels. The higher the level of caching enabled the more CPU time will be spent retrieving cached information. If caching is available on your machine it is recommended that you try caching at level 1 first.';
+$helptxt['cache_enable'] = 'Elkarte performs caching at a variety of levels. The higher the level of caching enabled the more CPU time will be spent retrieving cached information. If caching is available on your machine it is recommended that you try caching at level 1 first.';
 $helptxt['cache_memcached'] = 'If you are using memcached you need to provide the server details. This should be entered as a comma separated list as shown in the example below:<br /><br/>	&quot;server1,server2,server3:port,server4&quot;<br /><br />Note that if no port is specified the software will use port 11211. The system will also attempt to perform rough/random load balancing across the specified servers.';
 $helptxt['cache_cachedir'] = 'This setting is only for the filesystem based cache system. It specifies the path to the cache directory.  It is recommended that you place this in /tmp/ if you are going to use this, although it will work in any directory';
 $helptxt['enableErrorLogging'] = 'This will log any errors, like a failed login, so you can see what went wrong.';
@@ -297,40 +310,38 @@ $helptxt['simpleSearch'] = 'This will show a simple search form and a link to a 
 $helptxt['search_dropdown'] = 'This will show a search selection dropdown next to the quick search box.  From this you can choose to search the current site, current board (if in a board_, current topic (if in a topic) or search for members.';
 $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted pictures. Pictures smaller than the maximum will not be affected. This also determines how attached images are displayed when a thumbnail is clicked on.';
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP.  PHP doesn\'t support using authentication with SMTP (which many hosts require, now) so if you want that you should select SMTP.  Please note that SMTP can be slower, and some servers will not take usernames and passwords.<br /><br />You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';
-$helptxt['attachment_manager_settings'] = 'Attachments are files that members can upload, and attach to a post.<br /><br />
-		<strong>Check attachment extension</strong>:<br /> Do you want to check the extension of the files?<br />
-		<strong>Allowed attachment extensions</strong>:<br /> You can set the allowed extensions of attached files.<br />
-		<strong>Attachments directory</strong>:<br /> The path to your attachment folder<br />(example: /home/sites/yoursite/www/forum/attachments)<br />
-		<strong>Max attachment directory space</strong> (in KB):<br /> Select how large the attachment folder can be, including all files within it.<br />
-		<strong>Max attachment size per post</strong> (in KB):<br /> Select the maximum filesize of all attachments made per post.  If this is lower than the per-attachment limit, this will be the limit.<br />
-		<strong>Max size per attachment</strong> (in KB):<br /> Select the maximum filesize of each separate attachment.<br />
-		<strong>Max number of attachments per post</strong>:<br /> Select the number of attachments a person can make, per post.<br />
-		<strong>Display attachment as picture in posts</strong>:<br /> If the uploaded file is a picture, this will show it underneath the post.<br />
-		<strong>Resize images when showing under posts</strong>:<br /> If the above option is selected, this will save a separate (smaller) attachment for the thumbnail to decrease bandwidth.<br />
-		<strong>Maximum width and height of thumbnails</strong>:<br /> Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width and height to resize attachments down from.  They will be resized proportionally.';
-$helptxt['attachment_image_paranoid'] = 'Selecting this option will enable very strict security checks on image attachments. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with image re-encoding, in order to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if image re-encoding is not enabled, all attachments failing checks will be rejected.';
-$helptxt['attachment_image_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded image attachments. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static. <br /> This feature is only possible if the GD module is installed on your server.';
+
+$helptxt['attachment_manager_settings'] = 'Here you can configure your Attachment settings with information such as choosing a location to store the uploaded files, maximum visible sizes and limiting file extension use.';
+$helptxt['attachmentEnable'] = 'Enable/Disable the attachment system or disable only new attachments leaving old one available.';
+$helptxt['attachmentRecodeLineEndings'] = 'Enabling this will re-code line endings of text based files (txt, css, html, php, xml) based on your server (Windows, Mac or Unix).';
+$helptxt['automanage_attachments'] = 'This will create a directory structure based on the selected option.  This can be post date (subdividing attachments by year, or by year and month or by year, month and day) or simply adding a new directory when the space limit is reached.  Each directory created will have the same file count and total size restrictions.  This will help prevent directories from reaching a file or size limit and can improve performance by having directories with fewer files.';
+$helptxt['use_sub-directories_for_attachments'] = 'This will create all new directories as sub directory under the main attachment directory.';
+$helptxt['attachmentDirSizeLimit'] = ' Set how large the attachment folder can be.';
+$helptxt['attachmentDirFileLimit'] = 'Set the max number of files an individual attachment directory may contain';
+$helptxt['attachmentPostLimit'] = 'Specify how large a single post\'s upload by a can be in (in KB), this is the total of all attachments made in a post.';
+$helptxt['attachmentSizeLimit'] = 'Specify the largest size a single attachment in a post can be.';
+$helptxt['attachmentNumPerPostLimit'] = 'Select the number of attachments a member can add per post.';
+$helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
+$helptxt['attachmentExtensions'] = 'Specify what attachment types are allowed, for example: jpg,png,gif  Remember to be careful in what you allow as some file extensions can cause a security risk to your website.';
+$helptxt['attachment_image_paranoid'] = 'Selecting this option will enable very strict security checks on image attachments. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with image re-encoding, in order to have ElkArte try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if image re-encoding is not enabled, all attachments failing checks will be rejected.';
+$helptxt['attachmentShowImages'] = 'If the uploaded file is a picture, this will automatically display it underneath the post.';
+$helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller thumbnail image, which when selected will expand to the full sized image.';
+$helptxt['attachment_thumb_png'] = 'When creating thumbnails to display under a post, this will only create them as png files.';
+$helptxt['attachmentThumbWidth'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width to resize attachments down from.  They will be resized proportionally.';
+$helptxt['attachmentThumbHeight'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum height to resize attachments down from.  They will be resized proportionally.';
+$helptxt['attachment_image_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded image attachments. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static.<br />This feature is only possible if the GD module is installed on your server.';
 $helptxt['attachment_thumb_memory'] = 'The larger the source image (size & width x height), the higher the memory requirements are for the system to successfully create a thumbnail image.<br />Checking this option, the system will estimate the required memory and will then request that amount.  If successful, only then will it attempt to create the thumbnail.<br />This will result in fewer white screen errors but may result in fewer thumbnails being created.  Leaving this unchecked the system will always try to create the thumbnail (with a fixed amount of memory).  This may result in more white screen errors.';
-$helptxt['avatar_paranoid'] = 'Selecting this option will enable very strict security checks on avatars. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with avatars re-encoding, in order to try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if re-encoding of avatars is not enabled, all avatars failing checks will be rejected.';
+$helptxt['max_image_height'] = 'The maximum displayed height of an attached image.';
+$helptxt['max_image_width'] = 'The maximum displayed width of an attached image.';
+$helptxt['attachmentUploadDir'] = 'Select where you want the files uploaded to be stored on your server. This can be located outside your public html directory for additional security.';
+
+$helptxt['avatar_paranoid'] = 'Selecting this option will enable very strict security checks on avatars. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with avatars re-encoding, in order to have SMF try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if re-encoding of avatars is not enabled, all avatars failing checks will be rejected.';
 $helptxt['avatar_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded avatars. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static. <br /> This feature is only possible if the GD module is installed on your server.';
 $helptxt['karmaMode'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can
 		\'applaud\' or \'smite\' other members, which is how their popularity is calculated. You can change the
 		number of posts needed to have a &quot;karma&quot;, the time between smites or applauds, and if administrators
 		have to wait this time as well.<br /><br />Whether or not groups of members can smite others is controlled by
 		a permission.  If you have trouble getting this feature to work for everyone, double check your permissions.';
-$helptxt['cal_enabled'] = 'The calendar can be used for showing birthdays, or for showing important moments happening in your community.<br /><br />
-		<strong>Show days as link to \'Post Event\'</strong>:<br />This will allow members to post events for that day, when they click on that date<br />
-		<strong>Max days in advance on board index</strong>:<br />If this is set to 7, the next week\'s worth of events will be shown.<br />
-		<strong>Show holidays on board index</strong>:<br />Show today\'s holidays in a calendar bar on the board index.<br />
-		<strong>Show birthdays on board index</strong>:<br />Show today\'s birthdays in a calendar bar on the board index.<br />
-		<strong>Show events on board index</strong>:<br />Show today\'s events in a calendar bar on the board index.<br />
-		<strong>Default Board to Post In</strong>:<br />What\'s the default board to post events in?<br />
-		<strong>Allow events not linked to posts</strong>:<br />Allow members to post events without requiring it to be linked with a post in a board.<br />
-		<strong>Minimum year</strong>:<br />Select the &quot;first&quot; year on the calendar list.<br />
-		<strong>Maximum year</strong>:<br />Select the &quot;last&quot; year on the calendar list<br />
-		<strong>Allow events to span multiple days</strong>:<br />Check to allow events to span multiple days.<br />
-		<strong>Max number of days an event can span</strong>:<br />Select the maximum days that an event can span.<br /><br />
-		Remember that usage of the calendar (posting events, viewing events, etc.) is controlled by permissions set on the permissions screen.';
 $helptxt['localCookies'] = 'The system uses cookies to store login information on the client computer.
 	Cookies can be stored globally (myserver.com) or locally (myserver.com/path/to/forum).<br />
 	Check this option if you\'re experiencing problems with users getting logged out automatically.<hr />
@@ -469,7 +480,7 @@ $helptxt['password_strength'] = 'This setting determines the strength required f
 		<li><strong>Medium:</strong> The password must be at least eight characters long, and can not be part of a users name or email address.</li>
 		<li><strong>High:</strong> As for medium, except the password must also contain a mixture of upper and lower case letters, and at least one number.</li>
 	</ul>';
-$helptxt['enable_password_conversion'] = 'By enabling this setting, the software will attempt to detect passwords stored in other formats and convert them for use in this software.  Typically this is used for converted forums, but may have other uses as well.  Disabling this prevents a user from logging in using their password after a conversion and would need to reset their password.';
+$helptxt['enable_password_conversion'] = 'By enabling this setting, Elkarte will attempt to detect passwords stored in other formats and convert them for use in this software.  Typically this is used for converted forums, but may have other uses as well.  Disabling this prevents a user from logging in using their password after a conversion and would need to reset their password.';
 
 $helptxt['coppaAge'] = 'The value specified in this box will determine the minimum age that new members must be to be granted immediate access to the forums.
 	On registration they will be prompted to confirm whether they are over this age, and if not will either have their application rejected or suspended awaiting parental approval - dependant on the type of restriction chosen.
@@ -495,7 +506,7 @@ $helptxt['latest_support'] = 'This panel shows you some of the most common probl
 $helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
 $helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>, though.';
 
-$helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that the software will never tell you, or anyone else, what they are.';
+$helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that ElkArte will never tell you, or anyone else, what they are.';
 $helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="%1$s?action=admin;area=manageboards" target="_blank" class="new_win">board management interface</a>.';
 
 $helptxt['permissions'] = 'Permissions are how you either allow groups to, or deny groups from, doing specific things.<br /><br />You can modify multiple boards at once with the checkboxes, or look at the permissions for a specific group by clicking \'Modify.\'';
