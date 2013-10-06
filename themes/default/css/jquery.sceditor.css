@@ -295,6 +295,9 @@
 .sceditor-button-quote div {
 	background: url('../images/bbc/quote.png');
 }
+.sceditor-button-spoiler div {
+	background: url('../images/bbc/spoiler.png');
+}
 .sceditor-button-bulletlist div {
 	background: url('../images/bbc/list.png');
 }
