@@ -1039,6 +1039,14 @@ ul.moderation_notes li {
 .admin_img_smiley {
 	background-position: -448px 0;
 }
+.sortable_smiley li {
+	display: inline;
+	padding: 0 6px;
+}
+.ui-sortable li > a {
+	cursor: move;
+}
+
 .admin_img_support {
 	background-position: -464px 0;
 }

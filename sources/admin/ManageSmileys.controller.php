@@ -1378,9 +1378,6 @@ class ManageSmileys_Controller extends Action_Controller
 			}
 
 			moveSmileyPosition($smiley, $_GET['source']);
-
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
 		}
 
 		$context['smileys'] = getSmileys();
@@ -1417,6 +1414,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 		cache_put_data('parsing_smileys', null, 480);
 		cache_put_data('posting_smileys', null, 480);
+
+		createToken('admin-sort');
 	}
 
 	/**
