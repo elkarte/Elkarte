@@ -1404,6 +1404,8 @@ div.windowbg, div.windowbg2 {
 	float: left;
 	min-width: 1.5em;
 	text-align: center;
+	cursor: pointer;
+	font-weight: 600;
 }
 .next_page, .previous_page {
 	padding: 0 2px;
