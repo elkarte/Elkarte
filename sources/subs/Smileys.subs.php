@@ -160,7 +160,7 @@ function updateSmileyDisplayType($smileys, $display_type)
 }
 
 /**
- * Updates a smiley..
+ * Updates a smiley.
  *
  * @param array $param
  */
@@ -197,7 +197,7 @@ function getSmiley($id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new
+		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
 		FROM {db_prefix}smileys
 		WHERE id_smiley = {int:current_smiley}',
 		array(
