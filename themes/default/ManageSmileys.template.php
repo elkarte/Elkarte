@@ -440,23 +440,35 @@ function template_setorder()
 				<div class="content">
 					<strong>', empty($context['move_smiley']) ? $txt['smileys_move_select_smiley'] : $txt['smileys_move_select_destination'], '...</strong><br />';
 
-		foreach ($location['rows'] as $row)
+		foreach ($location['rows'] as $key => $row)
 		{
 			if (!empty($context['move_smiley']))
 				echo '
 					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $row[0]['row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
 
+			echo '
+					<ul id="smiley_' . $location['id'] . '|' . $key . '" class="sortable_smiley">';
+
 			foreach ($row as $smiley)
 			{
 				if (empty($context['move_smiley']))
-					echo '<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '"><img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" /></a>';
+					echo '
+						<li id="smile_' . $smiley['id'] . '">
+							<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '"><img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" /></a>
+						</li>';
 				else
-					echo '<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" /><a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
+					echo '
+						<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" />
+						<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
 			}
 
 			echo '
-					<br />';
+					</ul>';
 		}
+
+		// Add an empty row for dropping items as a new row
+		echo '
+			<ul id="smiley_' . $location['id'] . '|' . ($key + 1) . '" class="sortable_smiley"><li></li></ul>';
 
 		if (!empty($context['move_smiley']))
 			echo '
@@ -470,7 +482,21 @@ function template_setorder()
 	}
 
 	echo '
-	</div>';
+	</div>
+	<script><!-- // --><![CDATA[
+		$().elkSortable({
+			sa: "smileyorder",
+			error: "' . $txt['admin_order_error'] . '",
+			title: "' . $txt['admin_order_title'] . '",
+			tag: "[id^=smiley_]",
+			connect: ".sortable_smiley",
+			containment: "document",
+			href: "?action=admin;area=smileys;sa=setorder",
+			axis: "",
+			placeholder: "ui-state-highlight",
+			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"}
+		});
+	// ]]></script>';
 }
 
 /**
