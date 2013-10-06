@@ -1,12 +1,11 @@
 /**
- * SCEditor v1.3.7
- * http://www.samclarke.com/2011/07/sceditor/
+ * SCEditor
+ * http://www.ssceditor.com/
  *
- * Copyright (C) 2011, Sam Clarke (samclarke.com)
+ * Copyright (C) 2011-12, Sam Clarke (samclarke.com)
  *
  * SCEditor is licensed under the MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- *
+ *	http://www.opensource.org/licenses/mit-license.php
  */
 
 .sceditor-container {
@@ -26,8 +25,9 @@
 	outline: none;
 	color: #444;
 	padding: 5px;
-	margin: 12px 0;
+	margin: 0 5px 18px;
 	resize: none;
+	display: block;
 }
 /* Necessary for stabilising font-size in source mode! */
 .sceditor-container textarea, .sceditor-container textarea:focus {
@@ -66,6 +66,7 @@
 	background: #fff;
 	color: #444;
 	z-index: 6;
+
 }
 .sceditor-dropdown form {
 	margin: 0;
@@ -211,7 +212,10 @@
 	display: block;
 	height: 15px;
 }
-
+div.sceditor-group {
+	display: inline-block;
+	margin: 0 5px 0 0;
+}
 /* SMF buttons styles */
 .sceditor-button-source div {
 	background: url('../images/bbc/toggle.png');
