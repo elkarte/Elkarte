@@ -22,7 +22,7 @@ if (!defined('ELK'))
  *    - removeAll
  *  it should be extended in order to actually use its functionalities
  */
-class Positioning_Items
+abstract class Positioning_Items
 {
 	/**
 	 * Used when adding: it holds the "relative" position of the item added
@@ -30,7 +30,7 @@ class Positioning_Items
 	 *
 	 * @var string
 	 */
-	private $_position = null;
+	protected $_position = null;
 
 	/**
 	 * Known positions the item can be added
@@ -44,70 +44,70 @@ class Positioning_Items
 	 *
 	 * @var string
 	 */
-	private $_relative = '';
+	protected $_relative = '';
 
 	/**
 	 * Reset or not the position where items as added
 	 *
 	 * @var bool
 	 */
-	private $_reset = false;
+	protected $_reset = false;
 
 	/**
 	 * Holds all the items to add
 	 *
 	 * @var array
 	 */
-	private $_items = null;
+	protected $_items = null;
 
 	/**
 	 * An array containing all the items added
 	 *
 	 * @var string
 	 */
-	private $_all_general = array();
+	protected $_all_general = array();
 
 	/**
 	 * An array containing all the items that should go *after* another one
 	 *
 	 * @var string
 	 */
-	private $_all_after = array();
+	protected $_all_after = array();
 
 	/**
 	 * An array containing all the items that should go *before* another one
 	 *
 	 * @var string
 	 */
-	private $_all_before = array();
+	protected $_all_before = array();
 
 	/**
 	 * An array containing all the items that should go at the end of the list
 	 *
 	 * @var string
 	 */
-	private $_all_end = array();
+	protected $_all_end = array();
 
 	/**
 	 * An array containing all the items that should go at the beginning
 	 *
 	 * @var string
 	 */
-	private $_all_begin = array();
+	protected $_all_begin = array();
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_general
 	 *
 	 * @var string
 	 */
-	private $_general_highest_priority = 0;
+	protected $_general_highest_priority = 0;
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_end
 	 *
 	 * @var string
 	 */
-	private $_end_highest_priority = 10000;
+	protected $_end_highest_priority = 10000;
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_begin
@@ -115,7 +115,7 @@ class Positioning_Items
 	 *
 	 * @var string
 	 */
-	private $_begin_highest_priority = -10000;
+	protected $_begin_highest_priority = -10000;
 
 	/**
 	 * Used in prepareContext to store the items in the order
@@ -124,29 +124,21 @@ class Positioning_Items
 	 *
 	 * @var array
 	 */
-	private $_sorted_items = null;
+	protected $_sorted_items = null;
 
 	/**
 	 * All the child items of the object
 	 *
-	 * @var array paris of strings: the index is the item, the value is an identifier of Positioning_Items, child of another Positioning_Items
+	 * @var array pairs of strings: the index is the item, the value is an identifier of Positioning_Items, child of another Positioning_Items
 	 */
-	private $_children = null;
-
-	/**
-	 * Multiton. This is an array of instances of Positioning_Items.
-	 * All callers use an item id ('profile', 'menu', or 'default' if none chosen).
-	 *
-	 * @var array of Positioning_Items
-	 */
-	private static $_instance = null;
+	protected $_children = null;
 
 	/**
 	 * Create and initialize an instance of the class
 	 *
 	 * @param string an identifier
 	 */
-	private function __construct ($id = 'default')
+	public function __construct ($id = 'default')
 	{
 		if (!empty($id))
 			$this->_name = $id;
@@ -155,6 +147,7 @@ class Positioning_Items
 		$this->removeAll();
 
 		$this->_known_positions = array('after', 'before', 'end', 'begin');
+		return $this;
 	}
 
 	/**
@@ -164,54 +157,7 @@ class Positioning_Items
 	 * @param string $item the item (usually is an array, but it could be anything)
 	 * @param int $priority an integer defining the priority of the item.
 	 */
-	public function add($key, $item = null, $priority = null)
-	{
-		if (is_array($key))
-		{
-			$this->_reset = false;
-			foreach ($key as $k => $v)
-				$this->add($k, $v);
-			$this->_reset = true;
-		}
-		else
-		{
-			// If we know what to do, let's do it
-			if ($this->_position !== null && in_array($this->_position, $this->_known_positions))
-			{
-				$add = $this->_position;
-
-				// after and before are special because the array doesn't need a priority level
-				if ($this->_position === 'after' || $this->_position === 'before')
-					$this->{'_all_' . $add}[$key] = $this->_relative;
-				// Instead end and begin are "normal" and the order is defined by the priority
-				else
-					$this->{'_all_' . $add}[$key] = $priority === null ? $this->{'_' . $add . '_highest_priority'} : (int) $priority;
-			}
-			elseif ($this->_position === 'child')
-			{
-				if (!isset($this->_children[$this->_relative]))
-					$this->_children[$this->_relative] = $key;
-
-				// Always return the valid children of the "current" position
-				return Positioning_Items::context($this->_children[$this->_relative]);
-			}
-			else
-			{
-				$add = 'general';
-				$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
-			}
-
-			// Let's add it (the most important part
-			$this->_items[$key] = $item;
-
-			// If there is a max priority level, then increase it
-			if (isset($this->{'_' . $add . '_highest_priority'}))
-				$this->{'_' . $add . '_highest_priority'} = max($this->{'_all_' . $add}) + 100;
-		}
-
-		if ($this->_reset)
-			$this->_position = null;
-	}
+	abstract public function add($key, $item = null, $priority = null);
 
 	/**
 	 * Do we want to add the item after another one?
@@ -459,21 +405,5 @@ class Positioning_Items
 	public function preventReverse()
 	{
 		$this->_prevent_reversing = true;
-	}
-
-	/**
-	 * Find and return Positioning_Items instance if it exists,
-	 * or create a new instance for $id if it didn't already exist.
-	 *
-	 * @return an instance of the class
-	 */
-	public static function context($id = 'default')
-	{
-		if (self::$_instance === null)
-			self::$_instance = array();
-		if (!array_key_exists($id, self::$_instance))
-			self::$_instance[$id] = new Positioning_Items($id);
-
-		return self::$_instance[$id];
 	}
 }
