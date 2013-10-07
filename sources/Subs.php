@@ -3738,13 +3738,6 @@ function setupMenuContext()
 		require_once(SOURCEDIR . '/Positioning.class.php');
 		// Start things up: this is what we know by default
 		$menu = Positioning_Items::context('main_menu');
-		$sub_buttons = array(
-			'home' => Positioning_Items::context('home_sub_buttons'),
-			'admin' => Positioning_Items::context('admin_sub_buttons'),
-			'pm' => Positioning_Items::context('pm_sub_buttons'),
-			'moderate' => Positioning_Items::context('moderate_sub_buttons'),
-			'profile' => Positioning_Items::context('profile_sub_buttons'),
-		);
 
 		// The main menu
 		$menu->addBulk(
@@ -3822,7 +3815,7 @@ function setupMenuContext()
 
 		// All the submenus of "something"
 		// Home button
-		$sub_buttons['home']->addBulk(
+		$menu->childOf('home')->add('home_sub_buttons')->addBulk(
 			array(
 				'help' => array(
 					'title' => $txt['help'],
@@ -3853,7 +3846,7 @@ function setupMenuContext()
 		);
 
 		// Admin button
-		$sub_buttons['admin']->addBulk(
+		$menu->childOf('admin')->add('admin_sub_buttons')->addBulk(
 			array(
 				'admin_center' => array(
 					'title' => $txt['admin_center'],
@@ -3890,7 +3883,7 @@ function setupMenuContext()
 		);
 
 		// Personal messages
-		$sub_buttons['pm']->addBulk(
+		$menu->childOf('pm')->add('pm_sub_buttons')->addBulk(
 			array(
 				'pm_read' => array(
 					'title' => $txt['pm_menu_read'],
@@ -3910,8 +3903,13 @@ function setupMenuContext()
 			)
 		);
 
-		// Moderation
-		$sub_buttons['moderate']->addBulk(
+		// Moderation (different position depending on admin and mods)
+		if ($context['allow_admin'])
+			$modmenu = Positioning_Items::context('admin_sub_buttons');
+		else
+			$modmenu = $menu;
+
+		$modmenu->childOf('moderate')->add('moderate_sub_buttons')->addBulk(
 			array(
 				'reports' => array(
 					'title' => $txt['mc_reported_posts'],
@@ -3946,7 +3944,7 @@ function setupMenuContext()
 		);
 
 		// Profile
-		$sub_buttons['profile']->addBulk(
+		Positioning_Items::context('pm_sub_buttons')->childOf('profile')->add('profile_sub_buttons')->addBulk(
 			array(
 				'account' => array(
 					'title' => $txt['account'],
@@ -3967,7 +3965,7 @@ function setupMenuContext()
 		);
 
 		// Allow editing menu buttons easily.
-		call_integration_hook('integrate_menu_buttons', array(&$sub_buttons, &$menu_count));
+		call_integration_hook('integrate_menu_buttons', array(&$menu_count));
 
 		// Now we put the buttons in the context so the theme can use them.
 		$menu_buttons = array();
@@ -3988,9 +3986,10 @@ function setupMenuContext()
 				}
 
 				// Go through the sub buttons if there are any.
-				if (isset($sub_buttons[$act]))
+				if (isset($button['children']))
 				{
-					foreach ($sub_buttons[$act]->prepareContext() as $key => $subbutton)
+					$sub_button = Positioning_Items::context($button['children']);
+					foreach ($sub_button->prepareContext() as $key => $subbutton)
 					{
 						$button['sub_buttons'][$key] = $subbutton;
 						if (empty($subbutton['show']))
@@ -4003,18 +4002,20 @@ function setupMenuContext()
 						}
 
 						// 2nd level sub buttons next...
-						if (isset($sub_buttons[$key]))
+						if (isset($subbutton['children']))
 						{
-							foreach ($sub_buttons[$key]->prepareContext() as $key2 => $sub_button2)
+							$sub_button2 = Positioning_Items::context($subbutton['children']);
+							foreach ($sub_button2->prepareContext() as $key2 => $subbutton2)
 							{
-								$button['sub_buttons'][$key]['sub_buttons'][$key2] = $sub_button2;
-								if (empty($sub_button2['show']))
+								$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subbutton2;
+								if (empty($subbutton2['show']))
 									unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
-								elseif (isset($sub_button2['counter']) && !empty($menu_count[$sub_button2['counter']]))
+								elseif (isset($subbutton2['counter']) && !empty($menu_count[$subbutton2['counter']]))
 								{
-									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $sub_button2['title'] . ' [' . $menu_count[$sub_button2['counter']] . ']';
-									if (isset($settings['menu_numeric_notice'][2]))
-										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$sub_button2['counter']]);
+									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $subbutton2['title'] . ' [' . $menu_count[$subbutton2['counter']] . ']';
+									if (!empty($settings['menu_numeric_notice'][2]))
+										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$subbutton2['counter']]);
+									unset($menu_count[$subbutton2['counter']]);
 								}
 							}
 						}

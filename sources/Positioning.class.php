@@ -127,7 +127,14 @@ class Positioning_Items
 	private $_sorted_items = null;
 
 	/**
-	 * Multipleton. This is an array of instances of Positioning_Items.
+	 * All the child items of the object
+	 *
+	 * @var array paris of strings: the index is the item, the value is an identifier of Positioning_Items, child of another Positioning_Items
+	 */
+	private $_children = null;
+
+	/**
+	 * Multiton. This is an array of instances of Positioning_Items.
 	 * All callers use an item id ('profile', 'menu', or 'default' if none chosen).
 	 *
 	 * @var array of Positioning_Items
@@ -157,7 +164,7 @@ class Positioning_Items
 	 * @param string $item the item (usually is an array, but it could be anything)
 	 * @param int $priority an integer defining the priority of the item.
 	 */
-	public function add($key, $item, $priority = null)
+	public function add($key, $item = null, $priority = null)
 	{
 		if (is_array($key))
 		{
@@ -179,6 +186,14 @@ class Positioning_Items
 				// Instead end and begin are "normal" and the order is defined by the priority
 				else
 					$this->{'_all_' . $add}[$key] = $priority === null ? $this->{'_' . $add . '_highest_priority'} : (int) $priority;
+			}
+			elseif ($this->_position === 'child')
+			{
+				if (!isset($this->_children[$this->_relative]))
+					$this->_children[$this->_relative] = $key;
+
+				// Always return the valid children of the "current" position
+				return Positioning_Items::context($this->_children[$this->_relative]);
 			}
 			else
 			{
@@ -257,6 +272,17 @@ class Positioning_Items
 
 		$this->_reset = true;
 		$this->_position = null;
+	}
+
+	/**
+	 * Or at the beginning of the pile?
+	 */
+	public function childOf($parent)
+	{
+		$this->_position = 'child';
+		$this->_relative = $parent;
+
+		return $this;
 	}
 
 	/**
@@ -364,7 +390,11 @@ class Positioning_Items
 		asort($all_items);
 
 		foreach ($all_items as $key => $priority)
+		{
 			$this->_sorted_items[$key] = $this->_items[$key];
+			if ($this->hasChildren($key))
+				$this->_sorted_items[$key]['children'] = $this->_children[$key];
+		}
 
 		return $this->_sorted_items;
 	}
@@ -394,6 +424,36 @@ class Positioning_Items
 	public function hasItems()
 	{
 		return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
+	}
+
+	/**
+	 * Check if the current item has any child
+	 *
+	 * @param string $key the identifier of the menu item
+	 * @return bool true if at least one child is found and this child has items
+	 */
+	public function hasChildren($key)
+	{
+		if (!empty($this->_children) && !empty($this->_children[$key]))
+		{
+			return true;
+			$has_children = false;
+			$children = $this->_children[$key];
+			$instance = Positioning_Items::context($children);
+
+			// If there are children then go and check them (recursion)
+			if ($instance->hasChildren())
+				$has_children = $instance->hasChildren();
+			// No children, means it's the last one, so let's come back to the origin telling if there is at least one item
+			else
+				return $instance->hasItems();
+
+			// If a child is present we can stop here, otherwise we check the next in the pile
+			if ($has_children)
+				return true;
+		}
+		else
+			return false;
 	}
 
 	public function preventReverse()
