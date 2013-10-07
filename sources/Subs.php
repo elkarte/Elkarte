@@ -3683,6 +3683,8 @@ function text2words($text, $max_chars = 20, $encrypt = false)
  * @param boolean $custom = ''
  * @param boolean $force_use = false
  * @return string
+ *
+ * @todo move to template?
  */
 function create_button($name, $alt, $label = '', $custom = '', $force_use = false)
 {
@@ -3796,7 +3798,7 @@ function setupMenuContext()
 				// The old language string made no sense, and was too long.
 				// "New replies" is better, because there are "updated topics"
 				// that the user has never posted in and doesn't care about.
-				'updated' => array(
+				'unreadreplies' => array(
 					'title' => $txt['view_replies_category'],
 					'href' => $scripturl . '?action=unreadreplies',
 					'show' => !$user_info['is_guest'],
@@ -4050,7 +4052,7 @@ function setupMenuContext()
 		$current_action = 'login';
 	elseif ($context['current_action'] == 'groups' && $context['allow_moderation_center'])
 		$current_action = 'moderate';
-	elseif ($context['current_action'] == 'moderate' && !$context['allow_admin'])
+	elseif ($context['current_action'] == 'moderate' && $context['allow_admin'])
 		$current_action = 'admin';
 
 	// Not all actions are simple.
