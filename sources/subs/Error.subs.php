@@ -171,7 +171,6 @@ function fetchErrorsByType($filter = null, $sort = null)
 	$sum = 0;
 	$types = array();
 
-	$db = database();
 	// What type of errors do we have and how many do we have?
 	$request = $db->query('', '
 		SELECT error_type, COUNT(*) AS num_errors
