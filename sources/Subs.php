@@ -3735,9 +3735,9 @@ function setupMenuContext()
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
-		require_once(SOURCEDIR . '/Positioning.class.php');
 		// Start things up: this is what we know by default
-		$menu = Positioning_Items::context('main_menu');
+		$allMenus = Standard_Menu::context();
+		$menu = $allMenus->get('Main_Menu');
 
 		// The main menu
 		$menu->addBulk(
@@ -3846,7 +3846,8 @@ function setupMenuContext()
 		);
 
 		// Admin button
-		$menu->childOf('admin')->add('admin_sub_buttons')->addBulk(
+		$admin_sub_buttons = $menu->childOf('admin')->add('admin_sub_buttons');
+		$admin_sub_buttons->addBulk(
 			array(
 				'admin_center' => array(
 					'title' => $txt['admin_center'],
@@ -3883,7 +3884,8 @@ function setupMenuContext()
 		);
 
 		// Personal messages
-		$menu->childOf('pm')->add('pm_sub_buttons')->addBulk(
+		$pm_sub_buttons = $menu->childOf('pm')->add('pm_sub_buttons');
+		$pm_sub_buttons->addBulk(
 			array(
 				'pm_read' => array(
 					'title' => $txt['pm_menu_read'],
@@ -3905,7 +3907,7 @@ function setupMenuContext()
 
 		// Moderation (different position depending on admin and mods)
 		if ($context['allow_admin'])
-			$modmenu = Positioning_Items::context('admin_sub_buttons');
+			$modmenu = $admin_sub_buttons;
 		else
 			$modmenu = $menu;
 
@@ -3944,7 +3946,7 @@ function setupMenuContext()
 		);
 
 		// Profile
-		Positioning_Items::context('pm_sub_buttons')->childOf('profile')->add('profile_sub_buttons')->addBulk(
+		$pm_sub_buttons->childOf('profile')->add('profile_sub_buttons')->addBulk(
 			array(
 				'account' => array(
 					'title' => $txt['account'],
@@ -3988,8 +3990,7 @@ function setupMenuContext()
 				// Go through the sub buttons if there are any.
 				if (isset($button['children']))
 				{
-					$sub_button = Positioning_Items::context($button['children']);
-					foreach ($sub_button->prepareContext() as $key => $subbutton)
+					foreach ($button['children']->prepareContext() as $key => $subbutton)
 					{
 						$button['sub_buttons'][$key] = $subbutton;
 						if (empty($subbutton['show']))
@@ -4004,8 +4005,7 @@ function setupMenuContext()
 						// 2nd level sub buttons next...
 						if (isset($subbutton['children']))
 						{
-							$sub_button2 = Positioning_Items::context($subbutton['children']);
-							foreach ($sub_button2->prepareContext() as $key2 => $subbutton2)
+							foreach ($subbutton['children']->prepareContext() as $key2 => $subbutton2)
 							{
 								$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subbutton2;
 								if (empty($subbutton2['show']))
@@ -4030,6 +4030,7 @@ function setupMenuContext()
 	}
 
 	$context['menu_buttons'] = $menu_buttons;
+	$allMenus->destroy('Main_Menu');
 
 	// Logging out requires the session id in the url.
 	if (isset($context['menu_buttons']['logout']))

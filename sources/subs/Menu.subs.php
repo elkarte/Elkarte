@@ -21,6 +21,149 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
+ * Singleton class: it contains all the menus of a page
+ */
+class Standard_Menu extends Positioning_Items
+{
+	/**
+	 * This array holds all the menus
+	 *
+	 * @var array of Positioning_Items?
+	 */
+	private $_instances = null;
+
+	/**
+	 * Return a "top level" menu, if it doesn't exists, it creates one
+	 */
+	public function get($id)
+	{
+		if (!isset($this->_instances[$id]))
+			$this->_instances[$id] = new Standard_Menu();
+
+		return $this->_instances[$id];
+	}
+
+	/**
+	 * Add a new item to the pile
+	 *
+	 * @param string $key index of a item
+	 * @param array $item depending on the sub-level of the menu can be different things 
+	 * @param int $priority an integer defining the priority of the item.
+	 */
+	public function add($key, $item = null, $priority = null)
+	{
+		if (is_array($key))
+		{
+			$this->_reset = false;
+			foreach ($key as $k => $v)
+				$this->add($k, $v);
+			$this->_reset = true;
+		}
+		else
+		{
+			// If we know what to do, let's do it
+			if ($this->_position !== null && in_array($this->_position, $this->_known_positions))
+			{
+				$add = $this->_position;
+
+				// after and before are special because the array doesn't need a priority level
+				if ($this->_position === 'after' || $this->_position === 'before')
+					$this->{'_all_' . $add}[$key] = $this->_relative;
+				// Instead end and begin are "normal" and the order is defined by the priority
+				else
+					$this->{'_all_' . $add}[$key] = $priority === null ? $this->{'_' . $add . '_highest_priority'} : (int) $priority;
+			}
+			elseif ($this->_position === 'child')
+			{
+				if (!isset($this->_children[$this->_relative]))
+					$this->_children[$this->_relative] = new Standard_Menu();
+
+				// Always return the valid children of the "current" position
+				return $this->_children[$this->_relative];
+			}
+			else
+			{
+				$add = 'general';
+				$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+			}
+
+			// Let's add it (the most important part
+			$this->_items[$key] = $item;
+
+			// If there is a max priority level, then increase it
+			if (isset($this->{'_' . $add . '_highest_priority'}))
+				$this->{'_' . $add . '_highest_priority'} = max($this->{'_all_' . $add}) + 100;
+		}
+
+		if ($this->_reset)
+			$this->_position = null;
+	}
+
+	/**
+	 * For the moment mostly a wrapper for the function createMenu (see below)
+	 * that will replace when backward compatibility will not be important any more.
+	 *
+	 * At the moment it prepares the $menuData array to be passed to createMenu
+	 */
+	public function createMenu($id, $menuOptions = array())
+	{
+		$menu = $this->_instances[$id];
+		$menuData = array();
+
+		foreach ($menu->prepareContext() as $act => $button)
+		{
+			if (!empty($button))
+			{
+				$button['areas'] = array();
+				// Go through the sub buttons if there are any.
+				if (isset($button['children']))
+				{
+					foreach ($button['children']->prepareContext() as $key => $subbutton)
+					{
+						$button['areas'][$key] = $subbutton;
+
+						// 2nd level sub buttons next...
+						if (isset($subbutton['children']))
+						{
+							foreach ($subbutton['children']->prepareContext() as $key2 => $subbutton2)
+							{
+								$button['areas'][$key]['subsections'][$key2] = $subbutton2;
+							}
+						}
+					}
+				}
+
+				$menuData[$act] = $button;
+			}
+		}
+
+		return createMenu($menuData, $menuOptions);
+	}
+
+	public function destroy($id)
+	{
+		unset($this->_instances[$id]);
+	}
+
+	/**
+	 * Find and return Standard_Menu instance if it exists,
+	 * or create a new instance for $id if it didn't already exist.
+	 *
+	 * @return an instance of the class
+	 */
+	public static function context()
+	{
+		static $instance = null;
+
+		// this is a singleton
+		if($instance === null)
+			$instance = new Standard_Menu();
+
+		return $instance;
+	}
+}
+
+/**
  * Create a menu.
  *
  * @param array $menuData
