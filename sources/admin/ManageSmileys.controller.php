@@ -246,18 +246,19 @@ class ManageSmileys_Controller extends Action_Controller
 		global $modSettings, $context, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
+
 		// Set the right tab to be selected.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
 		$context['sub_template'] = $context['sub_action'];
 
 		// They must've been submitted a form.
-		if (isset($_POST['smiley_save']))
+		if (isset($_POST['smiley_save']) || isset($_POST['delete_set']))
 		{
 			checkSession();
 			validateToken('admin-mss', 'request');
 
 			// Delete selected smiley sets.
-			if (!empty($_POST['delete']) && !empty($_POST['smiley_set']))
+			if (!empty($_POST['delete_set']) && !empty($_POST['smiley_set']))
 			{
 				$set_paths = explode(',', $modSettings['smiley_sets_known']);
 				$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -349,6 +350,7 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['sub_action'] = 'modifyset';
 			$context['sub_template'] = 'modifyset';
 		}
+
 		// If we're modifying or adding a smileyset, some context info needs to be set.
 		if ($context['sub_action'] == 'modifyset')
 		{
@@ -390,6 +392,7 @@ class ManageSmileys_Controller extends Action_Controller
 					}
 
 					$context['current_set']['can_import'] = count($smileys);
+
 					// Setup this string to look nice.
 					$txt['smiley_set_import_multiple'] = sprintf($txt['smiley_set_import_multiple'], $context['current_set']['can_import']);
 				}
@@ -509,7 +512,7 @@ class ManageSmileys_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="delete" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="delete_set" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="right_submit" />
 						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset' . '">' . $txt['smiley_sets_add'] . '</a> ',
 				),
 			),
@@ -775,7 +778,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 				if ($_POST['smiley_action'] == 'delete')
 					deleteSmileys($_POST['checked_smileys']);
-
 				// Changing the status of the smiley?
 				else
 				{
@@ -787,7 +789,6 @@ class ManageSmileys_Controller extends Action_Controller
 					);
 					if (isset($displayTypes[$_POST['smiley_action']]))
 						updateSmileyDisplayType($_POST['checked_smileys'], $displayTypes[$_POST['smiley_action']]);
-
 				}
 			}
 			// Create/modify a smiley.

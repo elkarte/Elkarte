@@ -55,8 +55,6 @@ function validateDuplicateSmiley($code, $current = null)
 {
 	$db = database();
 
-	$db = database();
-
 	$request = $db->query('', '
 		SELECT id_smiley
 		FROM {db_prefix}smileys
