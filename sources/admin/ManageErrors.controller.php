@@ -184,14 +184,12 @@ class ManageErrors_Controller extends Action_Controller
 				$context['filter']['value']['html'] = &$filter['value']['sql'];
 		}
 
-		$context['error_types'] = array();
-
 		$sort = ($context['sort_direction'] == 'down') ? ';desc' : '';
+
 		// What type of errors do we have and how many do we have?
+		$context['error_types'] = array();
 		$context['error_types'] = fetchErrorsByType($filter, $sort);
-		$sum = 0;
-		foreach ($context['error_types'] as $key => $value)
-			$sum += $key;
+		$sum = end(array_keys($context['error_types']));
 
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
