@@ -3292,7 +3292,7 @@ function template_css()
  */
 function template_admin_warning_above()
 {
-	global $context, $user_info, $scripturl, $txt;
+	global $context, $user_info, $scripturl, $txt, $modSettings;
 
 	if (!empty($context['security_controls']['files']))
 	{
@@ -3327,7 +3327,7 @@ function template_admin_warning_above()
 		</p>
 	</div>';
 	}
-	if (!empty($context['security_controls']['admin_session']))
+	if (!empty($context['security_controls']['admin_session']) && empty($modSettings['securityDisable']))
 		echo '<div class="noticebox">', sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])), '</div>';
 
 	// If the user is banned from posting inform them of it.
