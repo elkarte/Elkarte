@@ -109,7 +109,7 @@ function preparsecode(&$message, $previewing = false)
 			if (!$previewing && strpos($parts[$i], '[html]') !== false)
 			{
 				if (allowedTo('admin_forum'))
-					$parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ise', '\'[html]\' . strtr(un_htmlspecialchars(\'$1\'), array("\n" => \'&#13;\', \'  \' => \' &#32;\', \'[\' => \'&#91;\', \']\' => \'&#93;\')) . \'[/html]\'', $parts[$i]);
+					$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', 'return "[html]" . strtr(un_htmlspecialchars("$m[1]"), array("\n" => \'&#13;\', \'  \' => \' &#32;\', \'[\' => \'&#91;\', \']\' => \'&#93;\')) . "[/html]";'), $parts[$i]);
 
 				// We should edit them out, or else if an admin edits the message they will get shown...
 				else
@@ -2391,7 +2391,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 				{
 					// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 					if ($i % 4 == 0)
-						$parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ise', '\'[html]\' . preg_replace(\'~<br\s?/?' . '>~i\', \'&lt;br /&gt;<br />\', \'$1\') . \'[/html]\'', $parts[$i]);
+						$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', ' return "[html]" . preg_replace(\'~<br\s?/?' . '>~i\', \'&lt;br /&gt;<br />\', "$m[1]") . "[/html]";'), $parts[$i]);
 				}
 				$form_message = implode('', $parts);
 			}

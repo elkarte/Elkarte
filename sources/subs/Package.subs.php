@@ -450,7 +450,7 @@ function loadInstalledPackages()
 function getPackageInfo($gzfilename)
 {
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
-	if (strpos($gzfilename, 'http://') !== false)
+	if (preg_match('~^https?://~i', $gzfilename) === 1)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
 	else
 	{
