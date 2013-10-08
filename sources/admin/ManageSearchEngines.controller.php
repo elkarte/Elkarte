@@ -159,10 +159,10 @@ class ManageSearchEngines_Controller extends Action_Controller
 	}
 
 /**
-	 * Initialize the form with configuration settings for search engines
-	 *
-	 * @return array
-	 */
+	* Initialize the form with configuration settings for search engines
+	*
+	* @return array
+	*/
 	function _initEngineSettingsForm()
 	{
 		global $txt;
@@ -231,49 +231,17 @@ class ManageSearchEngines_Controller extends Action_Controller
 			validateToken('admin-ser');
 
 			// Make sure every entry is a proper integer.
-			foreach ($_POST['remove'] as $index => $spider_id)
-				$_POST['remove'][(int) $index] = (int) $spider_id;
+			$toRemove = array_map('intval', $_POST['remove']);
 
 			// Delete them all!
-			$db->query('', '
-				DELETE FROM {db_prefix}spiders
-				WHERE id_spider IN ({array_int:remove_list})',
-				array(
-					'remove_list' => $_POST['remove'],
-				)
-			);
-			$db->query('', '
-				DELETE FROM {db_prefix}log_spider_hits
-				WHERE id_spider IN ({array_int:remove_list})',
-				array(
-					'remove_list' => $_POST['remove'],
-				)
-			);
-			$db->query('', '
-				DELETE FROM {db_prefix}log_spider_stats
-				WHERE id_spider IN ({array_int:remove_list})',
-				array(
-					'remove_list' => $_POST['remove'],
-				)
-			);
+			removeSpiders($toRemove);
 
 			cache_put_data('spider_search', null, 300);
 			recacheSpiderNames();
 		}
 
 		// Get the last seens.
-		$request = $db->query('', '
-			SELECT id_spider, MAX(last_seen) AS last_seen_time
-			FROM {db_prefix}log_spider_stats
-			GROUP BY id_spider',
-			array(
-			)
-		);
-
-		$context['spider_last_seen'] = array();
-		while ($row = $db->fetch_assoc($request))
-			$context['spider_last_seen'][$row['id_spider']] = $row['last_seen_time'];
-		$db->free_result($request);
+		$context['spider_last_seen'] = spidersLastSeen();
 
 		createToken('admin-ser');
 		$listOptions = array(
@@ -502,13 +470,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$deleteTime = time() - (((int) $_POST['older']) * 24 * 60 * 60);
 
 			// Delete the entires.
-			$db->query('', '
-				DELETE FROM {db_prefix}log_spider_hits
-				WHERE log_time < {int:delete_period}',
-				array(
-					'delete_period' => $deleteTime,
-				)
-			);
+			require_once(SUBSDIR . 'SeachEngines.subs.php');
+			removeSpiderOldLogs($deleteTime);
 		}
 
 		$listOptions = array(

@@ -1147,13 +1147,8 @@ class ScheduledTask
 				// Figure out when our cutoff time is.  1 day = 86400 seconds.
 				$t = time() - $modSettings['pruneSpiderHitLog'] * 86400;
 
-				$db->query('', '
-					DELETE FROM {db_prefix}log_spider_hits
-					WHERE log_time < {int:log_time}',
-					array(
-						'log_time' => $t,
-					)
-				);
+				require_once(SUBSDIR . 'SeachEngines.subs.php');
+				removeSpiderOldLogs($t);
 			}
 		}
 

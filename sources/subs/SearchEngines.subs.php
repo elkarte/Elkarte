@@ -441,3 +441,74 @@ function getNumSpiderStats()
 
 	return $numStats;
 }
+
+/**
+ * Remove spider logs older than the passed time
+ *
+ * @param int a time value
+ */
+function removeSpiderOldLogs($time)
+{
+	$db = database();
+
+	// Delete the entires.
+	$db->query('', '
+		DELETE FROM {db_prefix}log_spider_hits
+		WHERE log_time < {int:delete_period}',
+		array(
+			'delete_period' => $time,
+		)
+	);
+}
+
+/**
+ * Remove all the entries connected to a certain spider (description, entries, stats)
+ *
+ * @param array an array of spider ids
+ */
+function removeSpiders($spiders_id)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}spiders
+		WHERE id_spider IN ({array_int:remove_list})',
+		array(
+			'remove_list' => $spiders_id,
+		)
+	);
+	$db->query('', '
+		DELETE FROM {db_prefix}log_spider_hits
+		WHERE id_spider IN ({array_int:remove_list})',
+		array(
+			'remove_list' => $spiders_id,
+		)
+	);
+	$db->query('', '
+		DELETE FROM {db_prefix}log_spider_stats
+		WHERE id_spider IN ({array_int:remove_list})',
+		array(
+			'remove_list' => $spiders_id,
+		)
+	);
+}
+
+function spidersLastSeen()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_spider, MAX(last_seen) AS last_seen_time
+		FROM {db_prefix}log_spider_stats
+		GROUP BY id_spider',
+		array(
+		)
+	);
+
+	$spider_last_seen = array();
+	while ($row = $db->fetch_assoc($request))
+		$spider_last_seen[$row['id_spider']] = $row['last_seen_time'];
+	$db->free_result($request);
+
+	return $spider_last_seen;
+}
