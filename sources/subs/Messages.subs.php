@@ -301,15 +301,6 @@ function removeMessage($message, $decreasePostCount = true)
 			isAllowedTo('approve_posts');
 	}
 
-	// Close any moderation reports for this message.
-	require_once(SUBSDIR . '/Moderation.subs.php');
-	$updated_reports = updateReportsStatus($message, 'close', 1);
-	if ($updated_reports != 0)
-	{
-		updateSettings(array('last_mod_report_action' => time()));
-		recountOpenReports();
-	}
-
 	// Delete the *whole* topic, but only if the topic consists of one message.
 	if ($row['id_first_msg'] == $message)
 	{
@@ -650,6 +641,15 @@ function removeMessage($message, $decreasePostCount = true)
 		updateLastMessages(array($row['id_board'], $modSettings['recycle_board']));
 	else
 		updateLastMessages($row['id_board']);
+
+	// Close any moderation reports for this message.
+	require_once(SUBSDIR . '/Moderation.subs.php');
+	$updated_reports = updateReportsStatus($message, 'close', 1);
+	if ($updated_reports != 0)
+	{
+		updateSettings(array('last_mod_report_action' => time()));
+		recountOpenReports();
+	}
 
 	return false;
 }
