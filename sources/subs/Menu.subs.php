@@ -107,6 +107,9 @@ class Standard_Menu extends Positioning_Items
 	 */
 	public function createMenu($id, $menuOptions = array())
 	{
+		// Allow extend *any* menu with a single hook
+		call_integration_hook('integrate_' . strtolower($id), array(&$menuData));
+
 		$menu = $this->_instances[$id];
 		$menuData = array();
 
@@ -214,10 +217,6 @@ function createMenu($menuData, $menuOptions = array())
 
 	// What is the general action of this menu (i.e. $scripturl?action=XXXX.
 	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
-
-	// Allow extend *any* menu with a single hook
-	if (!empty($menu_context['current_action']))
-		call_integration_hook('integrate_' . $menu_context['current_action'] . '_areas', array(&$menuData));
 
 	// What is the current area selected?
 	if (isset($menuOptions['current_area']) || isset($_GET['area']))
