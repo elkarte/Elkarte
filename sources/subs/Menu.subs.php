@@ -21,19 +21,21 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * A collection of menu entries that can be (easily) positioned
+ * A collection of menu entries that can be (easily?) positioned
  */
 class Menu_Entries extends Positioning_Items
 {
 	/**
 	 * This array holds all the menus
 	 *
-	 * @var array of Positioning_Items?
+	 * @var array of Menu_Entries
 	 */
 	private $_instances = null;
 
 	/**
 	 * Return a "top level" menu, if it doesn't exists, it creates one
+	 *
+	 * @param string a menu identifier
 	 */
 	public function get($id)
 	{
@@ -104,6 +106,19 @@ class Menu_Entries extends Positioning_Items
 	 * that will replace when backward compatibility will not be important any more.
 	 *
 	 * At the moment it prepares the $menuData array to be passed to createMenu
+	 *
+	 * @param string $id a menu identifier
+	 * @param array an array of options that can be used to override some default behaviours.
+	 *              It can accepthave the following indexes:
+	 *               - action => overrides the default action
+	 *               - current_area => overrides the current area
+	 *               - extra_url_parameters => an array or pairs or parameters to be added to the url
+	 *               - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
+	 *               - base_url => an alternative base url
+	 *               - menu_type => alternative menu types?
+	 *               - can_toggle_drop_down => (boolean) if the menu can "toggle"
+	 *               - template_name => an alternative template to load (instead of Generic
+	 *               - layer_name => alternative layer name for the menu
 	 */
 	public function createMenu($id, $menuOptions = array())
 	{
@@ -143,9 +158,15 @@ class Menu_Entries extends Positioning_Items
 		return createMenu($menuData, $menuOptions);
 	}
 
+	/**
+	 * Destroy a menu instance (i.e. unset)
+	 *
+	 * @param string $id, and existing menu identifier
+	 */
 	public function destroy($id)
 	{
-		unset($this->_instances[$id]);
+		if (isset($this->_instances[$id]))
+			unset($this->_instances[$id]);
 	}
 }
 
