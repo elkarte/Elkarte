@@ -2676,7 +2676,6 @@ ul.post_options li {
 }
 .split_topics, .move_topic {
 	margin: auto;
-	width: 710px;
 	text-align: left;
 }
 .split_topics fieldset, .move_topic fieldset {
