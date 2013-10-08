@@ -21,9 +21,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Singleton class: it contains all the menus of a page
+ * A collection of menu entries that can be (easily) positioned
  */
-class Standard_Menu extends Positioning_Items
+class Menu_Entries extends Positioning_Items
 {
 	/**
 	 * This array holds all the menus
@@ -38,7 +38,7 @@ class Standard_Menu extends Positioning_Items
 	public function get($id)
 	{
 		if (!isset($this->_instances[$id]))
-			$this->_instances[$id] = new Standard_Menu();
+			$this->_instances[$id] = new Menu_Entries();
 
 		return $this->_instances[$id];
 	}
@@ -76,7 +76,7 @@ class Standard_Menu extends Positioning_Items
 			elseif ($this->_position === 'child')
 			{
 				if (!isset($this->_children[$this->_relative]))
-					$this->_children[$this->_relative] = new Standard_Menu();
+					$this->_children[$this->_relative] = new Menu_Entries();
 
 				// Always return the valid children of the "current" position
 				return $this->_children[$this->_relative];
@@ -147,7 +147,13 @@ class Standard_Menu extends Positioning_Items
 	{
 		unset($this->_instances[$id]);
 	}
+}
 
+/**
+ * Singleton class: it allows to access to all the menus of a page
+ */
+class Standard_Menu extends Menu_Entries
+{
 	/**
 	 * Find and return Standard_Menu instance if it exists,
 	 * or create a new instance for $id if it didn't already exist.
