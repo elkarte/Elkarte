@@ -4192,4 +4192,37 @@ dl.merge_topic dd {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
 	}
+	/* Playing silly buggers with a sidebar menu option for narrow screens. */
+	#main_container {
+	position: relative;
+	padding: 0 0 0 12px;
+	}
+	#menu_sidebar {
+		position: absolute;
+		left: -0.8em;
+		width: 6px;
+		min-height: 500px;
+		border: 1px solid #aaa;
+		border-radius: 4px;
+		background: #fff;
+		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+		z-index: 90;
+	}
+	#menu_sidebar ul, #menu_sidebar .cat_bar {
+		display: none;
+	}
+	#menu_sidebar:hover {
+		width: 200px;
+		padding: 0.8em 1em 1em 0.6em;
+	}
+	#menu_sidebar:hover ul, #menu_sidebar:hover .cat_bar {
+		display: block;
+	}
+	/* End playing silly buggers. */
+
+	/*	$MODERATE	*/
+	/* ------------------------------------------------------- */
+	.split_topics, .move_topic {
+		
+	}
 }
