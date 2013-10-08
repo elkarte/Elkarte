@@ -354,8 +354,6 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		$db = database();
-
 		loadTemplate('ModerationCenter');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
@@ -425,28 +423,12 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['start'] = $_GET['start'];
 
 		// By George, that means we in a position to get the reports, golly good.
-		$request = $db->query('', '
-			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
-				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
-				IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
-			FROM {db_prefix}log_reported AS lr
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-			WHERE lr.closed = {int:view_closed}
-				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
-			ORDER BY lr.time_updated DESC
-			LIMIT ' . $context['start'] . ', 10',
-			array(
-				'view_closed' => $context['view_closed'],
-			)
-		);
-		$context['reports'] = array();
-		$report_ids = array();
-		for ($i = 0; $row = $db->fetch_assoc($request); $i++)
+		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10);
+		$report_ids = array_keys($context['reports']);
+		foreach ($context['reports'] as $row)
 		{
-			$report_ids[] = $row['id_report'];
 			$context['reports'][$row['id_report']] = array(
 				'id' => $row['id_report'],
-				'alternate' => $i % 2,
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
 				'author' => array(
@@ -465,36 +447,27 @@ class ModerationCenter_Controller extends Action_Controller
 				'ignore' => $row['ignore_all']
 			);
 		}
-		$db->free_result($request);
 
 		// Now get all the people who reported it.
 		if (!empty($report_ids))
 		{
-			$request = $db->query('', '
-				SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment,
-					IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lrc.membername) AS reporter
-				FROM {db_prefix}log_reported_comments AS lrc
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lrc.id_member)
-				WHERE lrc.id_report IN ({array_int:report_list})',
-				array(
-					'report_list' => $report_ids,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
+			$comments = getReportsUserComments($report_ids);
+			foreach ($comments as $id_rep => $rows)
 			{
-				$context['reports'][$row['id_report']]['comments'][] = array(
-					'id' => $row['id_comment'],
-					'message' => $row['comment'],
-					'time' => standardTime($row['time_sent']),
-					'member' => array(
-						'id' => $row['id_member'],
-						'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
-						'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
-						'href' => $row['id_member'] ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-					),
-				);
+				foreach ($rows as $row)
+					$context['reports'][$id_rep]['comments'][] = array(
+						'id' => $row['id_comment'],
+						'message' => $row['comment'],
+						'raw_time' => $row['time_sent'],
+						'time' => standardTime($row['time_sent']),
+						'member' => array(
+							'id' => $row['id_member'],
+							'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
+							'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
+							'href' => $row['id_member'] ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+						),
+					);
 			}
-			$db->free_result($request);
 		}
 	}
 
@@ -707,8 +680,6 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $user_info, $context, $scripturl, $txt;
 
-		$db = database();
-
 		// Have to at least give us something
 		if (empty($_REQUEST['report']))
 			fatal_lang_error('mc_no_modreport_specified');
@@ -734,18 +705,7 @@ class ModerationCenter_Controller extends Action_Controller
 			// In it goes.
 			if (!empty($newComment))
 			{
-				$db->insert('',
-					'{db_prefix}log_comments',
-					array(
-						'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
-						'id_notice' => 'int', 'body' => 'string', 'log_time' => 'int',
-					),
-					array(
-						$user_info['id'], $user_info['name'], 'reportc', '',
-						$report, $newComment, time(),
-					),
-					array('id_comment')
-				);
+				addReportComment($report, $user_info['id'], $user_info['name'], $newComment);
 
 				// Redirect to prevent double submittion.
 				redirectexit($scripturl . '?action=moderate;area=reports;report=' . $report);
@@ -778,17 +738,8 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// So what bad things do the reporters have to say about it?
-		$request = $db->query('', '
-			SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment, lrc.member_ip,
-				IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lrc.membername) AS reporter
-			FROM {db_prefix}log_reported_comments AS lrc
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lrc.id_member)
-			WHERE lrc.id_report = {int:id_report}',
-			array(
-				'id_report' => $context['report']['id'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		$comments = getReportsUserComments($context['report']['id']);
+		foreach ($comments[$context['report']['id']] as $row)
 		{
 			$context['report']['comments'][] = array(
 				'id' => $row['id_comment'],
@@ -803,22 +754,10 @@ class ModerationCenter_Controller extends Action_Controller
 				),
 			);
 		}
-		$db->free_result($request);
 
 		// Hang about old chap, any comments from moderators on this one?
-		$request = $db->query('', '
-			SELECT lc.id_comment, lc.id_notice, lc.log_time, lc.body,
-				IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS moderator
-			FROM {db_prefix}log_comments AS lc
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
-			WHERE lc.id_notice = {int:id_report}
-				AND lc.comment_type = {string:reportc}',
-			array(
-				'id_report' => $context['report']['id'],
-				'reportc' => 'reportc',
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		$mod_comments = getReportModeratorsComments($context['report']['id']);
+		foreach ($mod_comments as $row)
 		{
 			$context['report']['mod_comments'][] = array(
 				'id' => $row['id_comment'],
@@ -832,7 +771,6 @@ class ModerationCenter_Controller extends Action_Controller
 				),
 			);
 		}
-		$db->free_result($request);
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
