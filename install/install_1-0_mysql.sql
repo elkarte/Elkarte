@@ -1842,8 +1842,8 @@ VALUES ('elkVersion', '{$current_version}'),
 	('cookieTime', '60'),
 	('jquery_source', 'local'),
 	('lastActive', '15'),
-	('smiley_sets_known', 'default,aaron,akyhne,fugue'),
-	('smiley_sets_names', '{$default_smileyset_name}\n{$default_aaron_smileyset_name}\n{$default_akyhne_smileyset_name}\n{$default_fugue_smileyset_name}'),
+	('smiley_sets_known', 'default'),
+	('smiley_sets_names', '{$default_smileyset_name}'),
 	('smiley_sets_default', 'default'),
 	('cal_days_for_index', '7'),
 	('requireAgreement', '1'),
@@ -1951,7 +1951,7 @@ VALUES (':)', 'smiley.gif', '{$default_smiley_smiley}', 0, 0),
 	('O0', 'afro.gif', '{$default_afro_smiley}', 18, 1),
 	(':))', 'laugh.gif', '{$default_laugh_smiley}', 19, 1),
 	('C:-)', 'police.gif', '{$default_police_smiley}', 20, 1),
-	('O:-)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
+	('O:)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
 # --------------------------------------------------------
 
 #
