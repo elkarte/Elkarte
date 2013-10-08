@@ -509,6 +509,7 @@ function create_control_richedit($editorOptions)
 
 		// Load smileys - don't bother to run a query if we're not using the database's ones anyhow.
 		if (empty($modSettings['smiley_enable']) && $user_info['smiley_set'] != 'none')
+		{
 			$context['smileys']['postform'][] = array(
 				'smileys' => array(
 					array(
@@ -535,6 +536,11 @@ function create_control_richedit($editorOptions)
 						'code' => '>:(',
 						'filename' => 'angry.gif',
 						'description' => $txt['icon_angry'],
+					),
+					array(
+						'code' => ':))',
+						'filename' => 'laugh.gif',
+						'description' => $txt['icon_laugh'],
 					),
 					array(
 						'code' => ':(',
@@ -587,6 +593,11 @@ function create_control_richedit($editorOptions)
 						'description' => $txt['icon_kiss'],
 					),
 					array(
+						'code' => 'O:)',
+						'filename' => 'angel.gif',
+						'description' => $txt['icon_angel'],
+					),
+					array(
 						'code' => ':\'(',
 						'filename' => 'cry.gif',
 						'description' => $txt['icon_cry'],
@@ -595,6 +606,7 @@ function create_control_richedit($editorOptions)
 				),
 				'isLast' => true,
 			);
+		}
 		elseif ($user_info['smiley_set'] != 'none')
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)

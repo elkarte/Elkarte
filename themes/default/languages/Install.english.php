@@ -42,10 +42,7 @@ $txt['default_karmaLabel'] = 'Karma:';
 $txt['default_karmaSmiteLabel'] = '[smite]';
 $txt['default_karmaApplaudLabel'] = '[applaud]';
 $txt['default_reserved_names'] = 'Admin\nWebmaster\nGuest\nroot';
-$txt['default_smileyset_name'] = 'Alienine\'s Set';
-$txt['default_aaron_smileyset_name'] = 'Aaron\'s Set';
-$txt['default_akyhne_smileyset_name'] = 'Akyhne\'s Set';
-$txt['default_fugue_smileyset_name'] = 'Fugue\'s Set';
+$txt['default_smileyset_name'] = 'Fugue\'s Set';
 $txt['default_theme_name'] = 'ElkArte Default Theme';
 
 $txt['default_administrator_group'] = 'Administrator';
