@@ -465,6 +465,8 @@ class Search_Controller extends Action_Controller
 			$query_boards = array_map('intval', $_REQUEST['brd']);
 		elseif (!empty($_REQUEST['brd']))
 			$query_boards = array_map('intval', explode(',', $_REQUEST['brd']));
+		elseif (!empty($_REQUEST['sd_brd']) && is_array($_REQUEST['sd_brd']))
+			$query_boards = array_map('intval', $_REQUEST['sd_brd']);
 		elseif (isset($_REQUEST['sd_brd']) && (int) $_REQUEST['sd_brd'] !== 0)
 			$query_boards = array((int) $_REQUEST['sd_brd']);
 		else
