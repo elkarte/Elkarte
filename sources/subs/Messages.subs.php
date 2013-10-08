@@ -302,18 +302,10 @@ function removeMessage($message, $decreasePostCount = true)
 	}
 
 	// Close any moderation reports for this message.
-	$db->query('', '
-		UPDATE {db_prefix}log_reported
-		SET closed = {int:is_closed}
-		WHERE id_msg = {int:id_msg}',
-		array(
-			'is_closed' => 1,
-			'id_msg' => $message,
-		)
-	);
-	if ($db->affected_rows() != 0)
+	require_once(SUBSDIR . '/Moderation.subs.php');
+	$updated_reports = updateReportsStatus($message, 'close', 1);
+	if ($updated_reports != 0)
 	{
-		require_once(SUBSDIR . '/Moderation.subs.php');
 		updateSettings(array('last_mod_report_action' => time()));
 		recountOpenReports();
 	}

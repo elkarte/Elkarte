@@ -357,6 +357,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$db = database();
 
 		loadTemplate('ModerationCenter');
+		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Put the open and closed options into tabs, because we can...
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -387,17 +388,10 @@ class ModerationCenter_Controller extends Action_Controller
 			$_GET['rid'] = (int) $_GET['rid'];
 
 			// Update the report...
-			$db->query('', '
-				UPDATE {db_prefix}log_reported
-				SET ' . (isset($_GET['ignore']) ? 'ignore_all = {int:ignore_all}' : 'closed = {int:closed}') . '
-				WHERE id_report = {int:id_report}
-					AND ' . $user_info['mod_cache']['bq'],
-				array(
-					'ignore_all' => isset($_GET['ignore']) ? (int) $_GET['ignore'] : 0,
-					'closed' => isset($_GET['close']) ? (int) $_GET['close'] : 0,
-					'id_report' => $_GET['rid'],
-				)
-			);
+			if (isset($_GET['ignore']))
+				updateReportsStatus((int) $_GET['rid'], 'ignore', (int) $_GET['ignore']);
+			elseif (isset($_GET['close']))
+				updateReportsStatus((int) $_GET['rid'], 'close', (int) $_GET['close']);
 
 			// Time to update.
 			require_once(SUBSDIR . '/Moderation.subs.php');
@@ -415,36 +409,16 @@ class ModerationCenter_Controller extends Action_Controller
 
 			if (!empty($toClose))
 			{
-				$db->query('', '
-					UPDATE {db_prefix}log_reported
-					SET closed = {int:is_closed}
-					WHERE id_report IN ({array_int:report_list})
-						AND ' . $user_info['mod_cache']['bq'],
-					array(
-						'report_list' => $toClose,
-						'is_closed' => 1,
-					)
-				);
+				updateReportsStatus($toClose, 'close', 1);
 
 				// Time to update.
-				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}
 		}
 
 		// How many entries are we viewing?
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}log_reported AS lr
-			WHERE lr.closed = {int:view_closed}
-				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
-			array(
-				'view_closed' => $context['view_closed'],
-			)
-		);
-		list ($context['total_reports']) = $db->fetch_row($request);
-		$db->free_result($request);
+		$context['total_reports'] = totalReports($context['view_closed']);
 
 		// So, that means we can page index, yes?
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : ''), $_GET['start'], $context['total_reports'], 10);

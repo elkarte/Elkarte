@@ -146,6 +146,62 @@ function recountFailedEmails($approve_query = null)
 }
 
 /**
+ * How many entries are we viewing?
+ */
+function totalReports($status = 0)
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_reported AS lr
+		WHERE lr.closed = {int:view_closed}
+			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
+		array(
+			'view_closed' => $status,
+		)
+	);
+	list ($total_reports) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_reports;
+}
+
+/**
+ * Changes a property of all the reports passed (and the user can see)
+ *
+ * @param array an array of report IDs
+ * @param string the property to update ('close' or 'ignore')
+ * @param int the status of the property (mainly: 0 or 1)
+ */
+function updateReportsStatus($reports_id, $property = 'close', $status = 0)
+{
+	global $user_info;
+
+	if (empty($reports_id))
+		return;
+
+	$db = database();
+
+	$reports_id = is_array($reports_id) ? $reports_id : array($reports_id);
+
+	$db->query('', '
+		UPDATE {db_prefix}log_reported
+		SET ignore_all = {int:ignore_all}
+		WHERE id_report IN ({array_int:report_list})
+			AND ' . $user_info['mod_cache']['bq'],
+		array(
+			'report_list' => $reports_id,
+			'is_closed' => 1,
+		)
+	);
+
+	return $db->affected_rows();
+}
+
+/**
  * Loads the number of items awaiting moderation attention
  *  - Only loads the value a given permission level can see
  *  - If supplied a board number will load the values only for that board
