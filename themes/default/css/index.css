@@ -776,6 +776,15 @@ div.windowbg, div.windowbg2 {
 .bbc_tt {
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 }
+div.bbc_footnotes {
+	margin-top: 10px;
+	padding: 4px 8px 4px 0;
+	font-size: small;
+	overflow: auto;
+}
+.footnote_return {
+	font-size: 1.35em;
+}
 
 
 
