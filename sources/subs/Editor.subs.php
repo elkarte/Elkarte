@@ -149,10 +149,9 @@ function getMessageIcons($board_id)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options;
+	global $txt, $modSettings, $options, $context, $settings, $user_info, $scripturl;
 
 	$db = database();
-	global $context, $settings, $user_info, $scripturl;
 
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
@@ -330,6 +329,10 @@ function create_control_richedit($editorOptions)
 			array(
 				'code' => 'spoiler',
 				'description' => $txt['bbc_spoiler']
+			),
+			array(
+				'code' => 'footnote',
+				'description' => $txt['bbc_footnote']
 			),
 			array(),
 			array(
