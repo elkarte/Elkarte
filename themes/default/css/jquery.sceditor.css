@@ -302,6 +302,9 @@ div.sceditor-group {
 .sceditor-button-spoiler div {
 	background: url('../images/bbc/spoiler.png');
 }
+.sceditor-button-footnote div {
+	background: url('../images/bbc/footnote.png');
+}
 .sceditor-button-bulletlist div {
 	background: url('../images/bbc/list.png');
 }
