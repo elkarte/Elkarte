@@ -1828,7 +1828,7 @@ function decrementBoard($id_board, $values)
 {
 	$db = database();
 
-	$knownInts = arra(
+	$knownInts = array(
 		'child_level', 'board_order', 'num_topics', 'num_posts', 'count_posts',
 		'unapproved_posts', 'unapproved_topics'
 	);
@@ -1848,7 +1848,7 @@ function decrementBoard($id_board, $values)
 	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET
-			' . implode("\n\t\t\t", $set) . '
+			' . implode(",\n\t\t\t", $set) . '
 		WHERE id_board = {int:id_board}',
 		$params
 	);
