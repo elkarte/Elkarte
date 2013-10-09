@@ -380,6 +380,171 @@ function countConfiguredGuestOptions()
 	return($themes);
 }
 
+
+/**
+ * Counts the theme options configured for guests
+ * @return array
+ */
+function availableThemes($current_theme, $current_member)
+{
+	global $modSettings, $settings, $user_info, $txt, $language;
+
+	$db = database();
+
+	$available_themes = array();
+	if (!empty($modSettings['knownThemes']))
+	{
+		$request = $db->query('', '
+			SELECT id_theme, variable, value
+			FROM {db_prefix}themes
+			WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url}, {string:disable_user_variant})' . (!allowedTo('admin_forum') ? '
+				AND id_theme IN ({array_string:known_themes})' : '') . '
+				AND id_theme != {int:default_theme}
+				AND id_member = {int:no_member}',
+			array(
+				'default_theme' => 0,
+				'name' => 'name',
+				'no_member' => 0,
+				'theme_url' => 'theme_url',
+				'theme_dir' => 'theme_dir',
+				'images_url' => 'images_url',
+				'disable_user_variant' => 'disable_user_variant',
+				'known_themes' => explode(',', $modSettings['knownThemes']),
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+		{
+			if (!isset($available_themes[$row['id_theme']]))
+				$available_themes[$row['id_theme']] = array(
+					'id' => $row['id_theme'],
+					'selected' => $current_theme == $row['id_theme'],
+					'num_users' => 0
+				);
+			$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
+		}
+		$db->free_result($request);
+	}
+
+	// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
+	if (!isset($available_themes[$modSettings['theme_guests']]))
+	{
+		$available_themes[0] = array(
+			'num_users' => 0
+		);
+		$guest_theme = 0;
+	}
+	else
+		$guest_theme = $modSettings['theme_guests'];
+
+	$request = $db->query('', '
+		SELECT id_theme, COUNT(*) AS the_count
+		FROM {db_prefix}members
+		GROUP BY id_theme
+		ORDER BY id_theme DESC',
+		array(
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Figure out which theme it is they are REALLY using.
+		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',',$modSettings['knownThemes'])))
+			$row['id_theme'] = $guest_theme;
+		elseif (empty($modSettings['theme_allow']))
+			$row['id_theme'] = $guest_theme;
+
+		if (isset($available_themes[$row['id_theme']]))
+			$available_themes[$row['id_theme']]['num_users'] += $row['the_count'];
+		else
+			$available_themes[$guest_theme]['num_users'] += $row['the_count'];
+	}
+	$db->free_result($request);
+
+	// Get any member variant preferences.
+	$variant_preferences = array();
+	if ($current_member > 0)
+	{
+		$request = $db->query('', '
+			SELECT id_theme, value
+			FROM {db_prefix}themes
+			WHERE variable = {string:theme_variant}
+				AND id_member IN ({array_int:id_member})
+			ORDER BY id_member ASC',
+			array(
+				'theme_variant' => 'theme_variant',
+				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $current_member) : array(-1),
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$variant_preferences[$row['id_theme']] = $row['value'];
+		$db->free_result($request);
+	}
+
+	// Save the setting first.
+	$current_images_url = $settings['images_url'];
+	$current_theme_variants = !empty($settings['theme_variants']) ? $settings['theme_variants'] : array();
+
+	foreach ($available_themes as $id_theme => $theme_data)
+	{
+		// Don't try to load the forum or board default theme's data... it doesn't have any!
+		if ($id_theme == 0)
+			continue;
+
+		// The thumbnail needs the correct path.
+		$settings['images_url'] = &$theme_data['images_url'];
+
+		if (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php'))
+			include($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php');
+		elseif (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php'))
+			include($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php');
+		else
+		{
+			$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
+			$txt['theme_description'] = '';
+		}
+
+		$available_themes[$id_theme]['thumbnail_href'] = $txt['theme_thumbnail_href'];
+		$available_themes[$id_theme]['description'] = $txt['theme_description'];
+
+		// Are there any variants?
+		if (file_exists($theme_data['theme_dir'] . '/index.template.php') && (empty($theme_data['disable_user_variant']) || allowedTo('admin_forum')))
+		{
+			$file_contents = implode('', file($theme_data['theme_dir'] . '/index.template.php'));
+			if (preg_match('~\$settings\[\'theme_variants\'\]\s*=(.+?);~', $file_contents, $matches))
+			{
+				$settings['theme_variants'] = array();
+
+				// Fill settings up.
+				eval('global $settings;' . $matches[0]);
+
+				if (!empty($settings['theme_variants']))
+				{
+					loadLanguage('Settings');
+
+					$available_themes[$id_theme]['variants'] = array();
+					foreach ($settings['theme_variants'] as $variant)
+						$available_themes[$id_theme]['variants'][$variant] = array(
+							'label' => isset($txt['variant_' . $variant]) ? $txt['variant_' . $variant] : $variant,
+							'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/thumbnail.png'),
+						);
+
+					$available_themes[$id_theme]['selected_variant'] = isset($_GET['vrt']) ? $_GET['vrt'] : (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
+					if (!isset($available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail']))
+						$available_themes[$id_theme]['selected_variant'] = $settings['theme_variants'][0];
+
+					$available_themes[$id_theme]['thumbnail_href'] = $available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail'];
+					// Allow themes to override the text.
+					$available_themes[$id_theme]['pick_label'] = isset($txt['variant_pick']) ? $txt['variant_pick'] : $txt['theme_pick_variant'];
+				}
+			}
+		}
+	}
+
+	// Then return it.
+	$settings['images_url'] = $current_images_url;
+	$settings['theme_variants'] = $current_theme_variants;
+
+	return array($available_themes, $guest_theme);
+}
 /**
  * Counts the theme options configured for members
  * @return array
