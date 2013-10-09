@@ -283,7 +283,7 @@ $.sceditor.command.set(
 $.sceditor.command.set(
 	'footnote', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('<aside>', '</aside>');
+			this.wysiwygEditorInsertHtml('[footnote]', '[/footnote]');
 		},
 		txtExec: ["[footnote]", "[/footnote]"],
 		tooltip: 'Insert Footnote'
