@@ -282,7 +282,7 @@ function updateAdminPreferences()
 	// Just check we haven't ended up with something theme exclusive somehow.
 	removeThemeOptions('custom', 'all', 'admin_preferences');
 
-	updateThemeOptions(array($user_info['id'], 1, 'admin_preferences', $options['admin_preferences']));
+	updateThemeOptions(array(1, $user_info['id'], 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
 	cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);

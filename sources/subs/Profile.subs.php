@@ -1261,7 +1261,7 @@ function makeThemeChanges($memID, $id_theme)
 			elseif ($opt == 'allow_no_censored')
 				continue;
 
-			$themeSetArray[] = array($memID, $id_theme, $opt, is_array($val) ? implode(',', $val) : $val);
+			$themeSetArray[] = array($id_theme, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
 		}
 	}
 
@@ -1279,7 +1279,7 @@ function makeThemeChanges($memID, $id_theme)
 			elseif ($opt == 'allow_no_censored' && !$user_info['is_admin'] && !$context['user']['is_owner'])
 					continue;
 
-			$themeSetArray[] = array($memID, 1, $opt, is_array($val) ? implode(',', $val) : $val);
+			$themeSetArray[] = array(1, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
 			$erase_options[] = $opt;
 		}
 

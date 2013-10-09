@@ -355,24 +355,6 @@ function get_file_listing($path, $relative)
 }
 
 /**
- * Updates the pathes for a theme. Used to fix invalid pathes.
- * @param array $setValues
- * @todo duplicate of updateThemeOptions
- */
-function updateThemePath($setValues)
-{
-	$db = database();
-
-	$db->insert('replace',
-		'{db_prefix}themes',
-		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-		$setValues,
-		array('id_theme', 'variable', 'id_member')
-	);
-
-}
-
-/**
  * Counts the theme options configured for guests
  * @return array
  */
@@ -494,8 +476,8 @@ function removeThemeOptions($theme, $membergroups, $old_settings = array())
 
 /**
  * Update the default options for our users.
- * @param  array $setValues
- * @todo duplicate of updateThemePath
+ *
+ * @param  array $setValues in the order: id_theme, id_member, variable name, value
  */
 function updateThemeOptions($setValues)
 {
@@ -503,7 +485,7 @@ function updateThemeOptions($setValues)
 
 	$db->insert('replace',
 		'{db_prefix}themes',
-		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 		$setValues,
 		array('id_theme', 'variable', 'id_member')
 	);

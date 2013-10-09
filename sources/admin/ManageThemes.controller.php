@@ -286,7 +286,7 @@ class ManageThemes_Controller extends Action_Controller
 			}
 
 			if (!empty($setValues))
-				updateThemePath($setValues);
+				updateThemeOptions($setValues);
 
 			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -374,14 +374,14 @@ class ManageThemes_Controller extends Action_Controller
 			$setValues = array();
 
 			foreach ($_POST['options'] as $opt => $val)
-				$setValues[] = array(-1, $_GET['th'], $opt, is_array($val) ? implode(',', $val) : $val);
+				$setValues[] = array($_GET['th'], -1, $opt, is_array($val) ? implode(',', $val) : $val);
 
 			$old_settings = array();
 			foreach ($_POST['default_options'] as $opt => $val)
 			{
 				$old_settings[] = $opt;
 
-				$setValues[] = array(-1, 1, $opt, is_array($val) ? implode(',', $val) : $val);
+				$setValues[] = array(1, -1, $opt, is_array($val) ? implode(',', $val) : $val);
 			}
 
 			// If we're actually inserting something..
@@ -621,9 +621,9 @@ class ManageThemes_Controller extends Action_Controller
 			// Set up the sql query.
 			$inserts = array();
 			foreach ($_POST['options'] as $opt => $val)
-				$inserts[] = array(0, $_GET['th'], $opt, is_array($val) ? implode(',', $val) : $val);
+				$inserts[] = array($_GET['th'], 0, $opt, is_array($val) ? implode(',', $val) : $val);
 			foreach ($_POST['default_options'] as $opt => $val)
-				$inserts[] = array(0, 1, $opt, is_array($val) ? implode(',', $val) : $val);
+				$inserts[] = array(1, 0, $opt, is_array($val) ? implode(',', $val) : $val);
 			// If we're actually inserting something..
 			if (!empty($inserts))
 				updateThemeOptions($inserts);
@@ -858,7 +858,7 @@ class ManageThemes_Controller extends Action_Controller
 				$_GET['vrt'] = $_POST['vrt'][$k];
 		}
 
-		// Have we made a desicion, or are we just browsing?
+		// Have we made a decision, or are we just browsing?
 		if (isset($_GET['th']))
 		{
 			checkSession('get');
