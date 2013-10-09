@@ -270,8 +270,6 @@ function updateAdminPreferences()
 {
 	global $options, $context, $settings, $user_info;
 
-	$db = database();
-
 	// This must exist!
 	if (!isset($context['admin_preferences']))
 		return false;

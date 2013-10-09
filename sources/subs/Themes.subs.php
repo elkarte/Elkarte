@@ -357,6 +357,7 @@ function get_file_listing($path, $relative)
 /**
  * Updates the pathes for a theme. Used to fix invalid pathes.
  * @param array $setValues
+ * @todo duplicate of updateThemeOptions
  */
 function updateThemePath($setValues)
 {
@@ -494,6 +495,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = array())
 /**
  * Update the default options for our users.
  * @param  array $setValues
+ * @todo duplicate of updateThemePath
  */
 function updateThemeOptions($setValues)
 {
@@ -664,6 +666,32 @@ function deleteVariants($id)
 			'theme_variant' => 'theme_variant',
 		)
 	);
+}
+
+function loadThemeOptionsInto($theme, $memID, $options = array(), $variables = array())
+{
+	$db = database();
+
+	$variables = is_array($variables) ? $variables : array($variables);
+
+	$request = $db->query('', '
+		SELECT variable, value
+		FROM {db_prefix}themes
+		WHERE id_theme IN (1, {int:current_theme})
+			AND id_member = {int:guest_member}' . (!empty($variables) ? '
+			AND variable IN ({array_string:variables})' : ''),
+		array(
+			'current_theme' => $theme,
+			'guest_member' => $memID,
+			'variables' => $variables,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+		$options[$row['variable']] = $row['value'];
+	$db->free_result($request);
+
+	return $options;
 }
 
 /**

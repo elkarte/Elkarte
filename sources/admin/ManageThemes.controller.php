@@ -330,8 +330,6 @@ class ManageThemes_Controller extends Action_Controller
 		global $txt, $context, $settings, $modSettings;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
-		$db = database();
-
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
 		isAllowedTo('admin_forum');
@@ -480,20 +478,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		if (empty($_REQUEST['who']))
 		{
-			$request = $db->query('', '
-				SELECT variable, value
-				FROM {db_prefix}themes
-				WHERE id_theme IN (1, {int:current_theme})
-					AND id_member = {int:guest_member}',
-				array(
-					'current_theme' => $_GET['th'],
-					'guest_member' => -1,
-				)
-			);
-			$context['theme_options'] = array();
-			while ($row = $db->fetch_assoc($request))
-				$context['theme_options'][$row['variable']] = $row['value'];
-			$db->free_result($request);
+			$context['theme_options'] = loadThemeOptionsInto($_GET['th'], -1, $context['theme_options']);
 
 			$context['theme_options_reset'] = false;
 		}
@@ -1224,30 +1209,8 @@ class ManageThemes_Controller extends Action_Controller
 			$images_url = $boardurl . '/themes/' . basename($theme_dir) . '/images';
 			$theme_dir = realpath($theme_dir);
 
-			// Lets get some data for the new theme.
-			$request = $db->query('', '
-				SELECT variable, value
-				FROM {db_prefix}themes
-				WHERE variable IN ({string:theme_templates}, {string:theme_layers})
-					AND id_member = {int:no_member}
-					AND id_theme = {int:default_theme}',
-				array(
-					'no_member' => 0,
-					'default_theme' => 1,
-					'theme_templates' => 'theme_templates',
-					'theme_layers' => 'theme_layers',
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				if ($row['variable'] == 'theme_templates')
-					$theme_templates = $row['value'];
-				elseif ($row['variable'] == 'theme_layers')
-					$theme_layers = $row['value'];
-				else
-					continue;
-			}
-			$db->free_result($request);
+			// Lets get some data for the new theme (default theme (1), default settings (0)).
+			$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
 
 			// Lets add a theme_info.xml to this theme.
 			$xml_info = '<' . '?xml version="1.0"?' . '>
@@ -1262,9 +1225,9 @@ class ManageThemes_Controller extends Action_Controller
 		<!-- Website... where to get updates and more information. -->
 		<website>http://www.yourdomain.tld/</website>
 		<!-- Template layers to use, defaults to "html,body". -->
-		<layers>' . (empty($theme_layers) ? 'html,body' : $theme_layers) . '</layers>
+		<layers>' . (empty($theme_values['theme_layers']) ? 'html,body' : $theme_values['theme_layers']) . '</layers>
 		<!-- Templates to load on startup. Default is "index". -->
-		<templates>' . (empty($theme_templates) ? 'index' : $theme_templates) . '</templates>
+		<templates>' . (empty($theme_values['theme_templates']) ? 'index' : $theme_values['theme_templates']) . '</templates>
 		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
 		<based-on></based-on>
 	</theme-info>';
