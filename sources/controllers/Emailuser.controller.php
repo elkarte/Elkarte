@@ -560,7 +560,7 @@ class Emailuser_Controller extends Action_Controller
 			return action_reporttm();
 
 		// Get the basic topic information, and make sure they can see it.
-		$msg_id = (int) $_POST['msg']*0;
+		$msg_id = (int) $_POST['msg'];
 		$message = posterDetails($msg_id, $topic);
 
 		if (empty($message))

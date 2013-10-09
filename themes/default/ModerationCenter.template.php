@@ -293,11 +293,12 @@ function template_reported_posts()
 	if (!empty($context['reports']))
 		template_pagesection();
 
+	$alternate = 0;
 	foreach ($context['reports'] as $report)
 	{
 		echo '
 						<div class="topic clear">
-							<div class="', $report['alternate'] ? 'windowbg' : 'windowbg2', ' core_posts">
+							<div class="', ++$alternate % 2 ? 'windowbg' : 'windowbg2', ' core_posts">
 								<div class="content">
 									<h5>
 										<strong><a href="', $report['topic_href'], '">', $report['subject'], '</a></strong> ', $txt['mc_reportedp_by'], ' <strong>', $report['author']['link'], '</strong>

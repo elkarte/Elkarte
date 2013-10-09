@@ -146,6 +146,62 @@ function recountFailedEmails($approve_query = null)
 }
 
 /**
+ * How many entries are we viewing?
+ */
+function totalReports($status = 0)
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_reported AS lr
+		WHERE lr.closed = {int:view_closed}
+			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
+		array(
+			'view_closed' => $status,
+		)
+	);
+	list ($total_reports) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_reports;
+}
+
+/**
+ * Changes a property of all the reports passed (and the user can see)
+ *
+ * @param array an array of report IDs
+ * @param string the property to update ('close' or 'ignore')
+ * @param int the status of the property (mainly: 0 or 1)
+ */
+function updateReportsStatus($reports_id, $property = 'close', $status = 0)
+{
+	global $user_info;
+
+	if (empty($reports_id))
+		return;
+
+	$db = database();
+
+	$reports_id = is_array($reports_id) ? $reports_id : array($reports_id);
+
+	$db->query('', '
+		UPDATE {db_prefix}log_reported
+		SET ignore_all = {int:ignore_all}
+		WHERE id_report IN ({array_int:report_list})
+			AND ' . $user_info['mod_cache']['bq'],
+		array(
+			'report_list' => $reports_id,
+			'is_closed' => 1,
+		)
+	);
+
+	return $db->affected_rows();
+}
+
+/**
  * Loads the number of items awaiting moderation attention
  *  - Only loads the value a given permission level can see
  *  - If supplied a board number will load the values only for that board
@@ -609,6 +665,108 @@ function modReportDetails($id_report)
 }
 
 /**
+ * Get the details for a bunch of open/closed reports
+ *
+ * @param int 0 => show open reports, 1 => closed reports
+ * @param int starting point
+ * @param int the number of reports
+ *
+ * @todo move to createList?
+ */
+function getModReports($status = 0, $start = 0, $limit = 10)
+{
+	global $user_info;
+
+	$db = database();
+
+		$request = $db->query('', '
+			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
+				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
+				IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
+			FROM {db_prefix}log_reported AS lr
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
+			WHERE lr.closed = {int:view_closed}
+				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
+			ORDER BY lr.time_updated DESC
+			LIMIT {int:start}, {int:limit}',
+			array(
+				'view_closed' => $status,
+				'start' => $start,
+				'limit' => $limit,
+			)
+		);
+
+	$reports = array();
+	while ($row = $db->fetch_assoc($request))
+		$reports[$row['id_report']] = $row;
+	$db->free_result($request);
+
+	return $reports;
+}
+
+/**
+ * Grabs all the comments made by the reporters to a set of reports
+ *
+ * @param array an array of report ids
+ */
+function getReportsUserComments($id_reports)
+{
+	$db = database();
+
+	$id_reports = is_array($id_reports) ? $id_reports : array($id_reports);
+
+	$request = $db->query('', '
+		SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment, lrc.member_ip,
+			IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lrc.membername) AS reporter
+		FROM {db_prefix}log_reported_comments AS lrc
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lrc.id_member)
+		WHERE lrc.id_report IN ({array_int:report_list})',
+		array(
+			'report_list' => $id_reports,
+		)
+	);
+
+	$comments = array();
+	while ($row = $db->fetch_assoc($request))
+		$comments[$row['id_report']][] = $row;
+
+	$db->free_result($request);
+
+	return $comments;
+}
+
+/**
+ * Retrieve all the comments made by the moderators to a certain report
+ *
+ * @param int the id of a report
+ */
+function getReportModeratorsComments($id_report)
+{
+	$db = database();
+
+	$request = $db->query('', '
+			SELECT lc.id_comment, lc.id_notice, lc.log_time, lc.body,
+				IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS moderator
+			FROM {db_prefix}log_comments AS lc
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+			WHERE lc.id_notice = {int:id_report}
+				AND lc.comment_type = {string:reportc}',
+		array(
+				'id_report' => $id_report,
+				'reportc' => 'reportc',
+		)
+	);
+
+	$comments = array();
+	while ($row = $db->fetch_assoc($request))
+		$comments[] = $row;
+
+	$db->free_result($request);
+
+	return $comments;
+}
+
+/**
  * This is a helper function: approve everything unapproved.
  * Used from moderation panel.
  */
@@ -1067,6 +1225,25 @@ function addModeratorNote($id_poster, $poster_name, $contents)
 		),
 		array(
 			$id_poster, $poster_name, 'modnote', '', $contents, time(),
+		),
+		array('id_comment')
+	);
+}
+
+function addReportComment($report, $id_poster, $poster_name, $newComment)
+{
+	$db = database();
+
+	// Insert it into the database
+	$db->insert('',
+		'{db_prefix}log_comments',
+		array(
+			'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
+			'id_notice' => 'int', 'body' => 'string', 'log_time' => 'int',
+		),
+		array(
+			$user_info['id'], $user_info['name'], 'reportc', '',
+			$report, $newComment, time(),
 		),
 		array('id_comment')
 	);
