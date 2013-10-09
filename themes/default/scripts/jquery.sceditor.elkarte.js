@@ -204,7 +204,7 @@
 /**
  * ElkArte unique commands to add to the toolbar
  *
- * Adds FTP, Glow, Shadow, Tt, Pre and Move commands
+ * Adds FTP, Glow, Shadow, Tt, Pre, Spoiler, Footnote and Move commands
  */
 $.sceditor.command.set(
 	'ftp', {
@@ -276,7 +276,17 @@ $.sceditor.command.set(
 			this.wysiwygEditorInsertHtml('[spoiler]', '[/spoiler]');
 		},
 		txtExec: ["[spoiler]", "[/spoiler]"],
-		tooltip: 'Spoiler'
+		tooltip: 'Insert Spoiler'
+	}
+);
+
+$.sceditor.command.set(
+	'footnote', {
+		exec: function () {
+			this.wysiwygEditorInsertHtml('<aside>', '</aside>');
+		},
+		txtExec: ["[footnote]", "[/footnote]"],
+		tooltip: 'Insert Footnote'
 	}
 );
 
@@ -474,6 +484,16 @@ $.sceditorBBCodePlugin.bbcode.set(
 		},
 		format: "[move]{0}[/move]",
 		html: '<marquee>{0}</marquee>'
+	}
+);
+
+$.sceditorBBCodePlugin.bbcode.set(
+	'footnote', {
+		tags: {
+			aside: null
+		},
+		format: "[footnote]{0}[/footnote]",
+		html: '<aside>{0}</aside>'
 	}
 );
 
