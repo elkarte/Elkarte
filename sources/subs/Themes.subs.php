@@ -434,9 +434,6 @@ function removeThemeOptions($default_theme, $membergroups, $old_settings)
 {
 	$db = database();
 
-	// Which theme's option should we clean?
-	$default = ($default_theme = true ? '=' : '!=');
-
 	// Guest or regular membergroups?
 	if ($membergroups === false )
 		$mem_param = array('operator' => '=', 'id' => -1);
@@ -450,10 +447,12 @@ function removeThemeOptions($default_theme, $membergroups, $old_settings)
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
-		WHERE id_theme '. $default . ' {int:default_theme}
-			AND id_member ' . $mem_param['operator'] . ' {int:guest_member}
+		WHERE id_theme {raw:comparison} {int:default_theme}
+			AND id_member {raw:member_operator} {int:guest_member}
 			AND ' . $var,
 		array(
+			'comparison' => $default_theme == true ? '=' : '!=',
+			'member_operator' => $mem_param['operator'],
 			'default_theme' => 1,
 			'guest_member' => $mem_param['id'],
 			'old_settings' => $old_settings,
