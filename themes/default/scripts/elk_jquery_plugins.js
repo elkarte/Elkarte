@@ -902,13 +902,14 @@
  *
  * @version 1.0 Alpha
  *
- * Refreshes the page relative time stamp to make it an active value
+ * Expands the ... of the page indexes
  *
  */
-(function($) {
-	$.fn.relative_time_refresh = function() {
+;(function($) {
+	$.fn.expand_pages = function() {
+		var $container;
 
-		$('.expand_pages').attr('tabindex', 0)
+		this.attr('tabindex', 0)
 		.click(function() {
 			$(this).data('expanded', 'true');
 		})
@@ -922,14 +923,14 @@
 					perpage = $(this).data('perpage'),
 					firstpage = $(this).data('firstpage'),
 					lastpage = $(this).data('lastpage'),
-					$outer_container = $('<div id="expanded_pages_out_container" />'),
-					$container = $('<div id="expanded_pages_container" />'),
-					$exp_pages = $('<div id="expanded_pages" />'),
+					$exp_pages = $('<li id="expanded_pages" />'),
 					pages = 0,
 					container_width = $(this).outerWidth() * 2,
 					width_elements = 3;
 
 				var aModel = $(this).prev().clone();
+
+				$container = $('<ul id="expanded_pages_container" />');
 
 				for (var i = firstpage; i < lastpage; i += perpage)
 				{
@@ -941,7 +942,7 @@
 				}
 
 				if (pages > width_elements)
-					$container.append(aModel.clone().css({
+					$container.append($('<li />').append(aModel.clone().css({
 						'position': 'absolute',
 						'top': 0,
 						'left': 0
@@ -958,13 +959,13 @@
 						function() {
 							$exp_pages.stop();
 						}
-					));
+					)));
 
 				$container.append($exp_pages);
 				$(this).append($container);
 
 				if (pages > width_elements)
-					$container.append(aModel.clone().css({
+					$container.append($('<li />').append(aModel.clone().css({
 						'position': 'absolute',
 						'top': 0,
 						'right': 0
@@ -989,7 +990,7 @@
 						function() {
 							$exp_pages.stop();
 						}
-					));
+					)));
 
 				$exp_pages.find('a').each(function() {
 					if (width_elements > -1)
@@ -1011,11 +1012,12 @@
 					'height': $(this).prev().outerHeight(),
 					'padding-left': $container.find('#pages_scroll_left').outerWidth(),
 				});
+				
 			})
 		.bind("mouseleave",
 			function()
 			{
-				$(this).find('#expanded_pages_container').remove();
+				$container.remove();
 			}
 		);
 

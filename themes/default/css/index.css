@@ -1789,9 +1789,6 @@ dl.settings textarea {
 #expanded_pages_container a {
 	background: #fff;
 }
-#expanded_pages_out_container {
-	position: relative;
-}
 #expanded_pages_container, #expanded_pages {
 	overflow: hidden;
 }
