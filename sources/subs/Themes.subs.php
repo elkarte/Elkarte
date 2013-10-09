@@ -634,7 +634,9 @@ function removeThemeOptions($theme, $membergroups, $old_settings = array())
 			AND id_theme {raw:theme_operator} {int:theme}'),
 		array_merge(
 			$query_param,
-			$old_settings
+			array(
+				'old_settings' => $old_settings
+			)
 		)
 	);
 }
