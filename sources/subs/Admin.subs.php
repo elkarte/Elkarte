@@ -279,24 +279,12 @@ function updateAdminPreferences()
 	// This is what we'll be saving.
 	$options['admin_preferences'] = serialize($context['admin_preferences']);
 
-	// Just check we haven't ended up with something theme exclusive somehow.
-	$db->query('', '
-		DELETE FROM {db_prefix}themes
-		WHERE id_theme != {int:default_theme}
-		AND variable = {string:admin_preferences}',
-		array(
-			'default_theme' => 1,
-			'admin_preferences' => 'admin_preferences',
-		)
-	);
+	require_once(SUBSDIR . '/Themes.subs.php');
 
-	// Update the themes table.
-	$db->insert('replace',
-		'{db_prefix}themes',
-		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-		array($user_info['id'], 1, 'admin_preferences', $options['admin_preferences']),
-		array('id_member', 'id_theme', 'variable')
-	);
+	// Just check we haven't ended up with something theme exclusive somehow.
+	removeThemeOptions('custom', 'all', 'admin_preferences');
+
+	updateThemeOptions(array($user_info['id'], 1, 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
 	cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);

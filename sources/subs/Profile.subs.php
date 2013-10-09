@@ -1286,30 +1286,12 @@ function makeThemeChanges($memID, $id_theme)
 	// If themeSetArray isn't still empty, send it to the database.
 	if (empty($context['password_auth_failed']))
 	{
+		require_once(SUBSDIR . '/Themes.subs.php');
 		if (!empty($themeSetArray))
-		{
-			$db->insert('replace',
-				'{db_prefix}themes',
-				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-				$themeSetArray,
-				array('id_member', 'id_theme', 'variable')
-			);
-		}
+			updateThemeOptions($themeSetArray);
 
 		if (!empty($erase_options))
-		{
-			$db->query('', '
-				DELETE FROM {db_prefix}themes
-				WHERE id_theme != {int:id_theme}
-					AND variable IN ({array_string:erase_variables})
-					AND id_member = {int:id_member}',
-				array(
-					'id_theme' => 1,
-					'id_member' => $memID,
-					'erase_variables' => $erase_options
-				)
-			);
-		}
+			removeThemeOptions('custom', $memID, $erase_options);
 
 		$themes = explode(',', $modSettings['knownThemes']);
 		foreach ($themes as $t)

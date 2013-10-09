@@ -391,7 +391,7 @@ class ManageThemes_Controller extends Action_Controller
 			{
 				// Are there options in non-default themes set that should be cleared?
 				if (!empty($old_settings))
-					removeThemeOptions(false, false, $old_settings);
+					removeThemeOptions('custom', 'guests', $old_settings);
 
 				updateThemeOptions($setValues);
 			}
@@ -419,28 +419,18 @@ class ManageThemes_Controller extends Action_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					removeThemeOptions(true, false, $opt);
+					removeThemeOptions('default', 'guests', $opt);
 					addThemeOptions(1, $opt, $val);
 
 					$old_settings[] = $opt;
 				}
 				elseif ($_POST['default_options_master'][$opt] == 2)
-				{
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE variable = {string:option_name}
-							AND id_member > {int:no_member}',
-						array(
-							'no_member' => 0,
-							'option_name' => $opt,
-						)
-					);
-				}
+					removeThemeOptions('all', 'members', $opt);
 			}
 
 			// Delete options from other themes.
 			if (!empty($old_settings))
-				removeThemeOptions(false, true, $old_settings);
+				removeThemeOptions('custom', 'members', $old_settings);
 
 			foreach ($_POST['options'] as $opt => $val)
 			{
@@ -449,21 +439,11 @@ class ManageThemes_Controller extends Action_Controller
 				elseif ($_POST['options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility - again!
-					$db->query('substring', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:current_theme}
-							AND id_member != {int:no_member}
-							AND variable = SUBSTRING({string:option}, 1, 255)',
-						array(
-							'current_theme' => $_GET['th'],
-							'no_member' => 0,
-							'option' => $opt,
-						)
-					);
+					removeThemeOptions($_GET['th'], 'non_default', $opt);
 					addThemeOptions($_GET['th'], $opt, $val);
 				}
 				elseif ($_POST['options_master'][$opt] == 2)
-					removeThemeOption($_GET['th'], $opt);
+					removeThemeOptions($_GET['th'], 'all', $opt);
 
 			}
 
@@ -474,15 +454,7 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-stor', 'request');
 
-			$db->query('', '
-				DELETE FROM {db_prefix}themes
-				WHERE id_member > {int:no_member}
-					AND id_theme = {int:current_theme}',
-				array(
-					'no_member' => 0,
-					'current_theme' => $_GET['th'],
-				)
-			);
+			removeThemeOptions($_GET['th'], 'members');
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}

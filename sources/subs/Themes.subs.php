@@ -426,59 +426,67 @@ function countConfiguredMemberOptions()
 /**
  * Deletes all outdated options from the themes table
  *
- * @param bool $default_theme -> true is default, false for all custom themes
- * @param bool $membergroups -> true is for members, false for guests
- * @param array $old_settings
+ * @param mixed $theme: if int to remove option from a specific theme,
+ *              if string it can be:
+ *               - 'default' => to remove from the default theme
+ *               - 'custom' => to remove from all the custom themes
+ *               - 'all' => to remove from both default and custom
+ * @param mixed $membergroups: if int a specific member
+ *              if string a "group" of members and it can assume the following values:
+ *               - 'guests' => obviously guests,
+ *               - 'members' => all members with custom settings (i.e. id_member > 0)
+ *               - 'non_default' => guests and members with custom settings (i.e. id_member != 0)
+ *               - 'all' => any record
+ * @param mixed $old_settings can be a string or an array of strings. If empty deletes all settings.
  */
-function removeThemeOptions($default_theme, $membergroups, $old_settings)
+function removeThemeOptions($theme, $membergroups, $old_settings = array())
 {
 	$db = database();
 
-	// Guest or regular membergroups?
-	if ($membergroups === false )
-		$mem_param = array('operator' => '=', 'id' => -1);
-	else
-		$mem_param = array('operator' => '>', 'id' => 0);
+	// The default theme is 1 (id_theme = 1)
+	if ($theme === 'default')
+		$query_param = array('theme_operator' => '=', 'theme' => 1);
+	// All the themes that are not the default one (id_theme != 1)
+	// @todo 'non_default' would be more esplicative, though it could be confused with the one in $membergroups
+	elseif ($theme === 'custom')
+		$query_param = array('theme_operator' => '!=', 'theme' => 1);
+	// If numeric means a specific theme
+	elseif (is_numeric($theme))
+		$query_param = array('theme_operator' => '=', 'theme' => (int) $theme);
 
+	// Guests means id_member = 1
+	if ($membergroups === 'guests' )
+		$query_param += array('member_operator' => '=', 'member' => -1);
+	// Members means id_member > 0
+	elseif ($membergroups === 'members')
+		$query_param += array('member_operator' => '>', 'member' => 0);
+	// Non default settings id_member != 0 (that is different from id_member > 0)
+	elseif ($membergroups === 'non_default')
+		$query_param += array('member_operator' => '!=', 'member' => 0);
+	// all it's all
+	elseif ($membergroups === 'all')
+		$query_param += array('member_operator' => '', 'member' => 0);
+	// If it is a number, then it means a specific member (id_member = (int))
+	elseif (is_numeric($membergroups))
+		$query_param += array('member_operator' => '=', 'member' => (int) $membergroups);
+
+	// If array or string set up the query accordingly
 	if (is_array($old_settings))
 		$var = 'variable IN ({array_string:old_settings})';
-	else
+	elseif (!empty($old_settings))
 		$var = 'variable = {string:old_settings}';
+	// If empty then means any setting
+	else
+		$var = '1=1';
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
-		WHERE id_theme {raw:comparison} {int:default_theme}
-			AND id_member {raw:member_operator} {int:guest_member}
-			AND ' . $var,
-		array(
-			'comparison' => $default_theme == true ? '=' : '!=',
-			'member_operator' => $mem_param['operator'],
-			'default_theme' => 1,
-			'guest_member' => $mem_param['id'],
-			'old_settings' => $old_settings,
-		)
-	);
-}
-
-/**
- * Remove a specific option from the themes table
- *
- * @param int $theme
- * @param string $options
- */
-function removeThemeOption($theme, $options)
-{
-	$db = database();
-
-	$db->query('', '
-		DELETE FROM {db_prefix}themes
-		WHERE variable = {string:option}
-			AND id_member > {int:no_member}
-			AND id_theme = {int:current_theme}',
-		array(
-			'no_member' => 0,
-			'current_theme' => $theme,
-			'option' => $options,
+		WHERE ' . $var . ($membergroups === 'all' ? '' : '
+			AND id_member {raw:member_operator} {int:member}') . ($theme === 'all' ? '' : '
+			AND id_theme {raw:theme_operator} {int:theme}'),
+		array_merge(
+			$query_param,
+			$old_settings
 		)
 	);
 }
