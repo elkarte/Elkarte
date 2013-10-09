@@ -1094,6 +1094,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			  require_children, if it is set the listed tags will not be
 			  parsed inside the tag.
 
+		   	disallow_parents: similar to, but very different from,
+			  require_parents, if it is set the listed tags will not be
+			  parsed inside the tag.
+
 			parsed_tags_allowed: an array restricting what BBC can be in the
 			  parsed_equals parameter, if desired.
 		*/
@@ -1265,6 +1269,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$data[0] = \'http://\' . $data[0];
 				'),
 				'disabled_content' => '<a href="$1" target="_blank" class="new_win">$1</a>',
+			),
+			array(
+				'tag' => 'footnote',
+				'before' => '<sup class="bbc_footnotes">%fn%',
+				'after' => '%fn%</sup>',
+				'disallow_parents' => array('quote', 'anchor', 'url', 'iurl'),
+				'disallow_before' => '',
+				'disallow_after' => '',
 			),
 			array(
 				'tag' => 'font',
@@ -2058,6 +2070,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			// If this is in the list of disallowed child tags, don't parse it.
 			elseif (isset($inside['disallow_children']) && in_array($possible['tag'], $inside['disallow_children']))
 				continue;
+			// Not allowed in this parent, replace the tags or show it like regular text
+			elseif (isset($possible['disallow_parents']) && ($inside !== null && in_array($inside['tag'], $possible['disallow_parents'])))
+			{
+				if (!isset($possible['disabled_before'], $possible['disabled_after']))
+					continue;
+				$possible['before'] = isset($possible['disallow_before']) ? $tag['disallow_before'] : $possible['before'];
+				$possible['after'] = isset($possible['disallow_after']) ? $tag['disallow_after'] : $possible['after'];
+			}
 
 			$pos1 = $pos + 1 + $pt_strlen + 1;
 
@@ -2464,6 +2484,28 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 	// Cleanup whitespace.
 	$message = strtr($message, array('  ' => ' &nbsp;', "\r" => '', "\n" => '<br />', '<br /> ' => '<br />&nbsp;', '&#13;' => "\n"));
+
+	// Finish footnotes if we have any.
+	if (strpos($message, '%fn%'))
+	{
+		global $fn_num, $fn_content, $fn_count;
+		static $fn_total;
+
+		$fn_num = 0;
+		$fn_content = array();
+		$fn_count = isset($fn_total) ? $fn_total : 0;
+
+		$message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', create_function('$m', '
+			global $fn_num, $fn_content, $fn_count;
+
+			$fn_num++;
+			$fn_content[] = "<sup id=\"fn$fn_num" . "_" . "$fn_count\">$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a>";
+			return "<a href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
+
+		$fn_total += $fn_num;
+		if (!empty($fn_num))
+			$message .= '<div class="bbc_footnotes">' . implode('<br>', $fn_content) . '</div>';
+	}
 
 	// Allow addons access to what parse_bbc created
 	call_integration_hook('integrate_post_parsebbc', array(&$message, &$smileys, &$cache_id, &$parse_tags));
