@@ -103,7 +103,6 @@ function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')
 
 	$bb_entries = array();
 
-	$db = database();
 	$request = $db->query('', '
 		SELECT id, ip, date, request_method, request_uri, server_protocol, http_headers, user_agent, request_entity, valid, id_member, session
 		FROM {db_prefix}log_badbehavior' . (!empty($filter) ? '

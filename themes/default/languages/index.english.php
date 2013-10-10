@@ -288,6 +288,7 @@ $txt['icon_lips'] = 'Lips sealed';
 $txt['icon_undecided'] = 'Undecided';
 $txt['icon_kiss'] = 'Kiss';
 $txt['icon_cry'] = 'Cry';
+$txt['icon_angel'] = 'Innocent';
 
 $txt['moderator'] = 'Moderator';
 $txt['moderators'] = 'Moderators';

@@ -190,8 +190,6 @@ function getElkTables()
 
 	$tables = array();
 
-	$db = database();
-
 	// Only optimize the tables related to this installation, not all the tables in the db
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
@@ -212,7 +210,6 @@ function optimizeTable($tablename)
 {
 	$db = database();
 
-	$db = database();
 	$db->db_optimize_table($tablename);
 }
 

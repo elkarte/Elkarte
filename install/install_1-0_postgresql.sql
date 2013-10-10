@@ -2339,8 +2339,8 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('time_offset', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cookieTime', '60');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('jquery_source', 'local');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('lastActive', '15');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_known', 'default,aaron,akyhne,fugue');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_names', '{$default_smileyset_name}\n{$default_aaron_smileyset_name}\n{$default_akyhne_smileyset_name}\n{$default_fugue_smileyset_name}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_known', 'default');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_names', '{$default_smileyset_name}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_default', 'default');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cal_days_for_index', '7');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('requireAgreement', '1');
@@ -2452,7 +2452,7 @@ INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidd
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('O0', 'afro.gif', '{$default_afro_smiley}', 18, 1);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':))', 'laugh.gif', '{$default_laugh_smiley}', 19, 1);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('C:-)', 'police.gif', '{$default_police_smiley}', 20, 1);
-INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('O:-)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
+INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('O:)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
 # --------------------------------------------------------
 
 #
