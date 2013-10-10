@@ -2661,10 +2661,11 @@ function detectServer()
  * - checks for an active admin session.
  * - checks cache directory is writable.
  * - calls secureDirectory to protect attachments & cache.
+ * - checks if the forum is in maintance mode.
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context;
+	global $modSettings, $context, $maintenance;
 
 	// @todo add a hook here
 	$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
@@ -2689,6 +2690,9 @@ function doSecurityChecks()
 
 	if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 		$context['security_controls']['admin_session'] = true;
+	
+	if (!empty($maintenance))
+		$context['security_controls']['maintenance'] = true;
 
 	if (!empty($context['security_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');

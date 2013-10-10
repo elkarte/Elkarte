@@ -335,7 +335,7 @@ function getSpiderDetails($spider_id)
 			'current_spider' => $spider_id,
 		)
 	);
-	$spider = $db->fetch_assoc($request))
+	$spider = $db->fetch_assoc($request);
 
 	$db->free_result($request);
 
@@ -461,7 +461,7 @@ function getNumSpiderStats($time = null)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_spider_stats' . ($time === null ? '' : '
-		WHERE stat_date < {date:date_being_viewed}',
+		WHERE stat_date < {date:date_being_viewed}'),
 		array(
 			'date_being_viewed' => $time,
 		)
