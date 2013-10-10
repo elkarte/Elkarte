@@ -2668,39 +2668,46 @@ function detectServer()
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context, $maintenance;
+	global $modSettings, $context, $maintenance, $user_info;
 
-	// @todo add a hook here
-	$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
-	foreach ($securityFiles as $i => $securityFile)
+	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
-		if (file_exists(BOARDDIR . '/' . $securityFile))
-			$context['security_controls']['files']['to_remove'][] = $securityFile;
+		// @todo add a hook here
+		$securityFiles = array('install.php', 'webinstall.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+		foreach ($securityFiles as $i => $securityFile)
+		{
+			if (file_exists(BOARDDIR . '/' . $securityFile))
+				$context['security_controls']['files']['to_remove'][] = $securityFile;
+		}
+
+		// We are already checking so many files...just few more doesn't make any difference! :P
+		require_once(SUBSDIR . '/Attachments.subs.php');
+		$path = getAttachmentPath();
+		secureDirectory($path, true);
+		secureDirectory(CACHEDIR);
+
+		// If agreement is enabled, at least the english version shall exists
+		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
+			$context['security_controls']['files']['agreement'] = true;
+
+		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
+			$context['security_controls']['files']['cache'] = true;
+
+		if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
+			$context['security_controls']['admin_session'] = true;
+	
+		if (!empty($maintenance))
+			$context['security_controls']['maintenance'] = true;
 	}
-
-	// We are already checking so many files...just few more doesn't make any difference! :P
-	require_once(SUBSDIR . '/Attachments.subs.php');
-	$path = getAttachmentPath();
-	secureDirectory($path, true);
-	secureDirectory(CACHEDIR);
-
-	// If agreement is enabled, at least the english version shall exists
-	if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
-		$context['security_controls']['files']['agreement'] = true;
-
-	if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
-		$context['security_controls']['files']['cache'] = true;
-
-	if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
-		$context['security_controls']['admin_session'] = true;
-
-	if (!empty($maintenance))
-		$context['security_controls']['maintenance'] = true;
 
 	if (!empty($_SESSION['query_command_denied']))
 	{
-		foreach ($_SESSION['query_command_denied'] as $command => $error)
-			$context['security_controls']['query'][$command] = Util::htmlspecialchars($error);
+		if ($user_info['is_admin'])
+			foreach ($_SESSION['query_command_denied'] as $command => $error)
+				$context['security_controls']['query'][$command] = Util::htmlspecialchars($error);
+		else
+			foreach ($_SESSION['query_command_denied'] as $command => $error)
+				$context['security_controls']['query'][$command] = Util::htmlspecialchars($command);
 	}
 
 	if (!empty($context['security_controls']))

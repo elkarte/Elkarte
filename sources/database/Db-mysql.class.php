@@ -545,7 +545,6 @@ class Database_MySQL implements Database
 			$command = substr(trim($db_string), 0, 6);
 			if ($command == 'DELETE' || $command == 'UPDATE' || $command == 'INSERT')
 			{
-// 			_debug($_SESSION['query_command_denied']);
 				// @todo log something somewhere?
 				// We can try to ignore it (warning the admin though it's a thing to do)
 				// and serve the page just SELECTing
