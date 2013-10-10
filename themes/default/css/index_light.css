@@ -136,11 +136,17 @@ body {
 	cursor: pointer;
 	font-size: 0.85em;
 }
-
 .spoiler {
 	border: 1px solid #ccc;
 	padding: 0.3em;
 	background-color: #eee;
+}
+div.bbc_footnotes {
+	border-top: 1px solid #bfbfbf;
+}
+sup.bbc_footnotes, sup.bbc_footnotes a {
+	color: #50aa3a;
+	font-weight: 700;
 }
 
 
