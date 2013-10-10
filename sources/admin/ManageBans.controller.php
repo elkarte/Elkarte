@@ -837,6 +837,9 @@ class ManageBans_Controller extends Action_Controller
 		{
 			checkSession();
 
+			// Make sure every entry is a proper integer.
+			array_map('intval', $_POST['remove']);
+
 			removeBanTriggers($_POST['remove']);
 
 			// Rehabilitate some members.

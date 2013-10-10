@@ -756,7 +756,7 @@ function upgradeExit($fallThrough = false)
 			template_upgrade_above();
 		else
 		{
-			header('Content-Type: text/xml; charset=ISO-8859-1');
+			header('Content-Type: text/xml; charset=UTF-8');
 			// Sadly we need to retain the $_GET data thanks to the old upgrade scripts.
 			$upcontext['get_data'] = array();
 			foreach ($_GET as $k => $v)
@@ -986,7 +986,7 @@ function action_welcomeLogin()
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
-	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
+	if (empty($match[1]) || trim($match[1]) != CURRENT_VERSION)
 		return throw_error('The upgrader found some old or outdated files.<br /><br />Please make certain you uploaded the new versions of all the files included in the package.');
 
 	// What absolutely needs to be writable?
@@ -994,9 +994,6 @@ function action_welcomeLogin()
 		BOARDDIR . '/Settings.php',
 		BOARDDIR . '/Settings_bak.php',
 	);
-
-	require_once(SOURCEDIR . '/Security.php');
-	$upcontext += createToken('login');
 
 	// Check the cache directory.
 	$CACHEDIR_temp = !defined('CACHEDIR') ? BOARDDIR . '/cache' : CACHEDIR;
@@ -1051,6 +1048,9 @@ function action_welcomeLogin()
 	// Either we're logged in or we're going to present the login.
 	if (checkLogin())
 		return true;
+
+	require_once(SOURCEDIR . '/Security.php');
+	$upcontext += createToken('login');
 
 	return false;
 }
@@ -1126,8 +1126,10 @@ function checkLogin()
 				// Figure out the password using our encryption - if what they typed is right.
 				if (isset($_REQUEST['hash_passwrd']) && strlen($_REQUEST['hash_passwrd']) == 40)
 				{
+					require_once(SOURCEDIR . '/Security.php');
+					$tk = validateToken('login');
 					// Challenge passed.
-					if ($_REQUEST['hash_passwrd'] == sha1($password . $upcontext['rid']))
+					if ($_REQUEST['hash_passwrd'] == sha1($password . $upcontext['rid'] . $tk))
 						$sha_passwd = $password;
 				}
 				else
