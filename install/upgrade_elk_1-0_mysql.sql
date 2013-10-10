@@ -500,7 +500,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
 	id_board smallint(5) NOT NULL default '0',
 	email_from varchar(50) NOT NULL default '',
 	message_type char(10) NOT NULL default '',
-	message mediumtext NOT NULL default '',
+	message mediumtext NOT NULL,
 	PRIMARY KEY (id_email)
 ) ENGINE=MyISAM{$db_collation};
 ---#

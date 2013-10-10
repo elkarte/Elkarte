@@ -273,7 +273,7 @@ function automanage_attachments_by_space()
  * @param type $directory
  * @return boolean on fail else array of directory names
  */
-function get_directory_tree_elements ($directory)
+function get_directory_tree_elements($directory)
 {
 	/*
 		In Windows server both \ and / can be used as directory separators in paths
@@ -302,7 +302,7 @@ function get_directory_tree_elements ($directory)
  * @param int $count
  * @return boolean
  */
-function attachments_init_dir (&$tree, &$count)
+function attachments_init_dir(&$tree, &$count)
 {
 	$directory = '';
 	// If on Windows servers the first part of the path is the drive (e.g. "C:")
