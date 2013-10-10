@@ -24,15 +24,15 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
 	echo '
-		<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" cols="600" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], '; height: ', $editor_context['height'], '; ', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '" required="required">', $editor_context['value'], '</textarea>
+		<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], '; height: ', $editor_context['height'], '; ', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script><!-- // --><![CDATA[
 			$(document).ready(function(){',
 			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.default.css",
-					width: "', $editor_context['width'], '",
-					height: "', $editor_context['height'], '",
+					width: "100%",
+					height: "100%",
 					resizeWidth: false,
 					resizeMaxHeight: -1,
 					emoticonsCompat: true,', !empty($editor_context['locale']) ? 'locale: \'' . $editor_context['locale'] . '\',' : '', '

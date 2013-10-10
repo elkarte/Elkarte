@@ -3369,8 +3369,24 @@ function template_admin_warning_above()
 		</p>
 	</div>';
 	}
-	if (!empty($context['security_controls']['admin_session']) && empty($modSettings['securityDisable']))
-		echo '<div class="noticebox">', sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])), '</div>';
+
+	// Any special notices to remind the admin about?
+	if (!empty($context['security_controls']['admin_session']) || !empty($context['security_controls']['maintenance']))
+	{
+		echo '
+			<div class="noticebox">';
+
+		if (!empty($context['security_controls']['admin_session']) && empty($modSettings['securityDisable']))
+			echo
+				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br>';
+
+		if (!empty($context['security_controls']['maintenance']))
+			echo
+				sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
+
+		echo '
+			</div>';
+	}
 
 	// If the user is banned from posting inform them of it.
 	if (isset($_SESSION['ban']['cannot_post']))
