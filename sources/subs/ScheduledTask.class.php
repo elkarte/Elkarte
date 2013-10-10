@@ -254,9 +254,6 @@ class ScheduledTask
 		// First clean out the cache.
 		clean_cache();
 
-		// We're working with databases here (do we)
-		$db = database();
-
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
 		list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
 		if ($modSettings['warning_decrement'])
@@ -373,13 +370,11 @@ class ScheduledTask
 	{
 		global $modSettings, $db_prefix;
 
+		// we're working with them databases but we shouldn't :P
 		$db = database();
 
 		// By default do it now!
 		$delay = false;
-
-		// we're working with them databases but we shouldn't :P
-		$db = database();
 
 		// As a kind of hack, if the server load is too great delay, but only by a bit!
 		if (!empty($modSettings['load_average']) && !empty($modSettings['loadavg_auto_opt']) && $modSettings['load_average'] >= $modSettings['loadavg_auto_opt'])

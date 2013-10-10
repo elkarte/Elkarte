@@ -88,7 +88,6 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	$db = database();
 
-	$db = database();
 	// Find and sort out the errors.
 	$request = $db->query('', '
 		SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
