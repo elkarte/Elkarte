@@ -218,7 +218,7 @@ function create_control_richedit($editorOptions)
 		'disable_smiley_box' => !empty($editorOptions['disable_smiley_box']),
 		'columns' => isset($editorOptions['columns']) ? $editorOptions['columns'] : 60,
 		'rows' => isset($editorOptions['rows']) ? $editorOptions['rows'] : 18,
-		'width' => isset($editorOptions['width']) ? $editorOptions['width'] : '70%',
+		'width' => isset($editorOptions['width']) ? $editorOptions['width'] : '100%',
 		'height' => isset($editorOptions['height']) ? $editorOptions['height'] : '250px',
 		'form' => isset($editorOptions['form']) ? $editorOptions['form'] : 'postmodify',
 		'bbc_level' => !empty($editorOptions['bbc_level']) ? $editorOptions['bbc_level'] : 'full',
