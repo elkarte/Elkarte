@@ -1430,9 +1430,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Detect the browser. This is separated out because it's also used in attachment downloads
 	detectBrowser();
 
-	if (allowedTo('admin_forum') && !$user_info['is_guest'])
-		doSecurityChecks();
-
 	// Set the top level linktree up.
 	array_unshift($context['linktree'], array(
 		'url' => $scripturl,

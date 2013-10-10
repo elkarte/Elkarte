@@ -3094,7 +3094,10 @@ function template_rawdata()
  */
 function template_header()
 {
-	global $context, $settings;
+	global $context, $settings, $user_info;
+
+	if (allowedTo('admin_forum') && !$user_info['is_guest'])
+		doSecurityChecks();
 
 	setupThemeContext();
 
