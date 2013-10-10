@@ -233,6 +233,7 @@ $txt['welcome_member'] = 'Please welcome'; //Deprecated
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
 $txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
+$txt['admin_maintenance_active'] = 'Your forum is currently in maintenance mode, only admins can log in.  Remember to <strong><a class="strong" href="%1$s">exit maintenance</a></strong> once you have finished your administrative tasks.';
 $txt['last_edit'] = 'Last Edit'; //Deprecated
 $txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
