@@ -3344,15 +3344,15 @@ function template_admin_warning_above()
 	<div class="errorbox">
 		<p class="alert">!!</p>
 		<h3>', $context['user']['is_admin'] ? $txt['query_command_denied'] : $txt['query_command_denied_guests'], '</h3>
-		<p>';
+		<ul>';
 
 		foreach ($context['security_controls']['query'] as $error)
 		{
 			echo '
-			<pre>', $context['user']['is_admin'] ? $error : sprintf($txt['query_command_denied_guests_msg'], $error), '</pre>';
+			<li><pre>', $context['user']['is_admin'] ? $error : sprintf($txt['query_command_denied_guests_msg'], $error), '</pre></li>';
 		}
 		echo '
-		</p>
+		</ul>
 	</div>';
 	}
 
