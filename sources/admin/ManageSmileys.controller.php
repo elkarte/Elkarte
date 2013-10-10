@@ -1661,7 +1661,7 @@ class ManageSmileys_Controller extends Action_Controller
 	 *
 	 * @param string $smileyPath
 	 */
-	private function importSmileys($smileyPath)
+	public function importSmileys($smileyPath)
 	{
 		global $modSettings;
 
