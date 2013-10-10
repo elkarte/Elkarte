@@ -533,10 +533,29 @@ class Database_MySQL implements Database
 		//    1030: Got error ??? from table handler.
 		//    1034: Incorrect key file for table.
 		//    1035: Old key file for table.
+		//    1142: Command denied
 		//    1205: Lock wait timeout exceeded.
 		//    1213: Deadlock found.
 		//    2006: Server has gone away.
 		//    2013: Lost connection to server during query.
+
+		// We cannot do something, try to find out what and act accordingly
+		if ($query_errno == 1142)
+		{
+			$command = substr(trim($db_string), 0, 6);
+			if ($command == 'DELETE' || $command == 'UPDATE' || $command == 'INSERT')
+			{
+// 			_debug($_SESSION['query_command_denied']);
+				// @todo log something somewhere?
+				// We can try to ignore it (warning the admin though it's a thing to do)
+				// and serve the page just SELECTing
+				$_SESSION['query_command_denied'][$command] = $query_error;
+				return false;
+			}
+			// If we can't SELECT (?) there is not much we can do at all...
+// 			else
+// 				return false;
+		}
 
 		// Log the error.
 		if ($query_errno != 1213 && $query_errno != 1205 && function_exists('log_error'))

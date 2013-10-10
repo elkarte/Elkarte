@@ -3338,6 +3338,25 @@ function template_css()
 function template_admin_warning_above()
 {
 	global $context, $user_info, $scripturl, $txt, $modSettings;
+	
+	if (!empty($context['security_controls']['query']))
+	{
+		echo '
+	<div class="errorbox">
+		<p class="alert">!!</p>
+		<h3>', $txt['query_command_denied'], '</h3>
+		<p>';
+
+		foreach ($context['security_controls']['query'] as $error)
+		{
+			echo '
+			<pre>', $error, '</pre>';
+		}
+		echo '
+		</p>
+	</div>';
+	}
+
 
 	if (!empty($context['security_controls']['files']))
 	{

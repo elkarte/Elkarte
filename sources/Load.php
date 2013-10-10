@@ -2697,6 +2697,12 @@ function doSecurityChecks()
 	if (!empty($maintenance))
 		$context['security_controls']['maintenance'] = true;
 
+	if (!empty($_SESSION['query_command_denied']))
+	{
+		foreach ($_SESSION['query_command_denied'] as $command => $error)
+			$context['security_controls']['query'][$command] = Util::htmlspecialchars($error);
+	}
+
 	if (!empty($context['security_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
