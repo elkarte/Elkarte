@@ -68,8 +68,13 @@ function template_init()
 	// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
 	$settings['avatars_on_indexes'] = false;
 
-	// This is used in the main menu, to create a number next to the title of the menu, to indicate unread messages, moderation reports, etc.
-	$settings['menu_numeric_notice'] = ' <span class="pm_indicator">%1$s</span>';
+	// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
+	// moderation reports, etc. You can style each menu level indicator as desired.
+	$settings['menu_numeric_notice'] = array(
+		0 => ' <span class="pm_indicator">%1$s</span>',
+		1 => ' <span class="pm_indicator">%1$</span>',
+		2 => ' <span>[%1$s]</span>',
+	);
 
 	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
 	// Oh no you don't. :D This slightly less complex array now has cleaner markup. :P
