@@ -286,7 +286,6 @@ class ManageMembers_Controller extends Action_Controller
 			$search_url_params = isset($search_params) ? base64_encode(serialize($search_params)) : null;
 
 			// @todo Validate a little more.
-
 			// Loop through every field of the form.
 			$query_parts = array();
 			$where_params = array();
@@ -362,9 +361,10 @@ class ManageMembers_Controller extends Action_Controller
 					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
 					if ($db->db_case_sensitive())
-						$query_parts[] = '(LOWER(' . implode( ') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
+						$query_parts[] = '(LOWER(' . implode(') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
 					else
-						$query_parts[] = '(' . implode( ' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
+						$query_parts[] = '(' . implode(' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
+
 					$where_params[$param_name . '_normal'] = '%' . $parameter . '%';
 				}
 			}
@@ -620,8 +620,8 @@ class ManageMembers_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Get a list of all the membergroups and postgroups that can be selected.
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
 		$context['membergroups'] = $groups['membergroups'];
@@ -636,7 +636,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * List all members who are awaiting approval / activation, sortable on different columns.
 	 * It allows instant approval or activation of (a selection of) members.
 	 * Called by ?action=admin;area=viewmembers;sa=browse;type=approve
-	 *  or ?action=admin;area=viewmembers;sa=browse;type=activate.
+	 *		  or ?action=admin;area=viewmembers;sa=browse;type=activate.
 	 * The form submits to ?action=admin;area=viewmembers;sa=approve.
 	 * Requires the moderate_forum permission.
 	 *
@@ -1005,9 +1005,7 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Are we dealing with members who have been waiting for > set amount of time?
 		if (isset($_POST['time_passed']))
-		{
 			$conditions['time_before'] = time() - 86400 * (int) $_POST['time_passed'];
-		}
 		// Coming from checkboxes - validate the members passed through to us.
 		else
 		{
@@ -1017,7 +1015,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		$data = retrieveMemberData($conditions);
-		if($data['member_count'] == 0)
+		if ($data['member_count'] == 0)
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 
 		$member_info = $data['member_info'];
@@ -1052,6 +1050,9 @@ class ManageMembers_Controller extends Action_Controller
 					sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 				}
 			}
+
+			// Update the menu action cache so its forced to refresh
+			cache_put_data('num_menu_errors', null, 900);
 		}
 		// Maybe we're sending it off for activation?
 		elseif ($_POST['todo'] == 'require_activation')

@@ -210,6 +210,7 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
  *  - Unapproved attachments
  *  - Failed emails
  *  - Reported posts
+ *  - Members awaiting approval (activation, deletion, group requests)
  *
  * @param int $brd
  */
@@ -237,8 +238,8 @@ function loadModeratorMenuCounts($brd = null)
 	else
 		$approve_query = ' AND 1=0';
 
-	// Set up the cache key for this one
-	$cache_key = md5($user_info['query_see_board'] . $approve_query);
+	// Set up the cache key for this permissions level
+	$cache_key = md5($user_info['query_see_board'] . $approve_query . $user_info['mod_cache']['bq'] . $user_info['mod_cache']['gq'] . $user_info['mod_cache']['mq'] . allowedTo('approve_emails'));
 
 	// If its been cached, guess what, thats right use it!
 	$temp = cache_get_data('num_menu_errors', 900);
@@ -246,6 +247,8 @@ function loadModeratorMenuCounts($brd = null)
 	{
 		// Starting out with nothing is a good start
 		$menu_errors[$cache_key] = array(
+			'memberreq' => 0,
+			'groupreq' => 0,
 			'attachments' => 0,
 			'reports' => 0,
 			'emailmod' => 0,
@@ -279,8 +282,30 @@ function loadModeratorMenuCounts($brd = null)
 		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
 			$menu_errors[$cache_key]['emailmod'] = recountFailedEmails($approve_query);
 
-		// Grand Totals for the top most menu
-		$menu_errors[$cache_key]['total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
+		// Group requests
+		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['gq'] != '0=1')
+			$menu_errors[$cache_key]['groupreq'] = count(groupRequests());
+
+		// Member requests
+		if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			$awaiting_activation = 0;
+			$activation_numbers = countInactiveMembers();
+
+			// 5 = COPPA, 4 = Awaiting Deletion, 3 = Awaiting Approval
+			foreach ($activation_numbers as $activation_type => $total_members)
+			{
+				if (in_array($activation_type, array(3, 4, 5)))
+					$awaiting_activation += $total_members;
+			}
+			$menu_errors[$cache_key]['memberreq'] = $awaiting_activation;
+		}
+
+		// Grand Totals for the top most menus
+		$menu_errors[$cache_key]['pt_total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
+		$menu_errors[$cache_key]['mg_total'] = $menu_errors[$cache_key]['memberreq'] + $menu_errors[$cache_key]['groupreq'];
+		$menu_errors[$cache_key]['grand_total'] = $menu_errors[$cache_key]['pt_total'] + $menu_errors[$cache_key]['mg_total'];
 
 		// Add this key in to the array, technically this resets the cache time for all keys
 		// done this way as the entire thing needs to go null once *any* moderation action is taken
@@ -1048,7 +1073,7 @@ function groupRequests()
 
 	// Make sure they can even moderate someone!
 	if ($user_info['mod_cache']['gq'] == '0=1')
-		return 'group_requests_block';
+		return array();
 
 	// What requests are outstanding?
 	$request = $db->query('', '

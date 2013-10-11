@@ -72,7 +72,7 @@ function template_init()
 	// moderation reports, etc. You can style each menu level indicator as desired.
 	$settings['menu_numeric_notice'] = array(
 		0 => ' <span class="pm_indicator">%1$s</span>',
-		1 => ' <span class="pm_indicator">%1$</span>',
+		1 => ' <span class="pm_indicator">%1$s</span>',
 		2 => ' <span>[%1$s]</span>',
 	);
 
