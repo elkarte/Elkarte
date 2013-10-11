@@ -76,9 +76,11 @@ class AdminDebug_Controller extends Action_Controller
 		<style type="text/css">
 			body {
 				margin: 1ex;
+				color: #bbb;
+				background: #222;
 			}
 			body, td, th, .normaltext {
-				font-size: x-small;
+				font-size: small;
 			}
 			.smalltext {
 				font-size: xx-small;

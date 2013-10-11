@@ -262,7 +262,14 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: yellow;
 }
 #debug_logging {
-	color: white;
+	color: #bbb;
+	background: #222;
+    margin: 0 auto;
+    max-width: 90em;
+    width: 90%;
+}
+#debug_logging_wrapper {
+	background: #222;
 }
 
 
