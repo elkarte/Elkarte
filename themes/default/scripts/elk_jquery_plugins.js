@@ -863,10 +863,10 @@
 							top: positionY + 'px'
 						},
 						{
-                            duration:o.speed,
-                            easing:o.easing,
-                            step:function(){o.afterEachAnimation.call(draggable, Ev)}
-                        });
+							duration:o.speed,
+							easing:o.easing,
+							step:function(){o.afterEachAnimation.call(draggable, Ev)}
+						});
 					}
 					lastX = Ev.pageX;
 					lastY = Ev.pageY;
@@ -903,6 +903,7 @@
  * @version 1.0 Alpha
  *
  * Expands the ... of the page indexes
+ * @todo not exactly a plugin and still very bound to the theme structure
  *
  */
 ;(function($) {
@@ -919,16 +920,19 @@
 				if ($(this).data('expanded') === 'true')
 					return;
 
-				var baseurl = eval($(this).data('baseurl')),
+				var $expanded_pages_li = $(this),
+					baseurl = eval($(this).data('baseurl')),
 					perpage = $(this).data('perpage'),
 					firstpage = $(this).data('firstpage'),
 					lastpage = $(this).data('lastpage'),
 					$exp_pages = $('<li id="expanded_pages" />'),
 					pages = 0,
 					container_width = $(this).outerWidth() * 2,
-					width_elements = 3;
+					width_elements = 3,
+					$scroll_left = null,
+					$scroll_right = null;
 
-				var aModel = $(this).prev().clone();
+				var aModel = $(this).prev().children().first().clone();
 
 				$container = $('<ul id="expanded_pages_container" />');
 
@@ -942,6 +946,7 @@
 				}
 
 				if (pages > width_elements)
+				{
 					$container.append($('<li />').append(aModel.clone().css({
 						'position': 'absolute',
 						'top': 0,
@@ -949,6 +954,7 @@
 					})
 					.attr('id', 'pages_scroll_left')
 					.attr('href', '#').text('<').click(function(ev) {
+						ev.stopPropagation();
 						ev.preventDefault();
 					}).hover(
 						function() {
@@ -960,11 +966,21 @@
 							$exp_pages.stop();
 						}
 					)));
+				}
 
 				$container.append($exp_pages);
+				$(this).parent().superfish({
+					delay : 300,
+					speed: 175,
+					onHide: function () {
+						$container.remove();
+					}
+				});
+
 				$(this).append($container);
 
 				if (pages > width_elements)
+				{
 					$container.append($('<li />').append(aModel.clone().css({
 						'position': 'absolute',
 						'top': 0,
@@ -972,6 +988,7 @@
 					})
 					.attr('id', 'pages_scroll_right')
 					.attr('href', '#').text('>').click(function(ev) {
+						ev.stopPropagation();
 						ev.preventDefault();
 					}).hover(
 						function() {
@@ -991,9 +1008,10 @@
 							$exp_pages.stop();
 						}
 					)));
+				}
 
 				$exp_pages.find('a').each(function() {
-					if (width_elements > -1)
+										if (width_elements > -1)
 						container_width += $(this).outerWidth();
 
 					if (width_elements <= 0 || pages >= width_elements)
@@ -1007,23 +1025,14 @@
 						return false;
 
 					width_elements--;
+				}).click(function (ev) {
+					$expanded_pages_li.attr('onclick', '').unbind('click');
 				});
 				$exp_pages.css({
-					'height': $(this).prev().outerHeight(),
+					'height': $(this).outerHeight(),
 					'padding-left': $container.find('#pages_scroll_left').outerWidth(),
 				});
 				
-			})
-		.bind("mouseleave",
-			function()
-			{
-				$container.remove();
-			}
-		);
-
-		// We are not using relative times? Then live with what you have :P
-		if (todayMod > 2)
-			updateRelativeTime();
-
+			});
 	};
 })(jQuery);
