@@ -286,7 +286,7 @@ class ManageThemes_Controller extends Action_Controller
 			}
 
 			if (!empty($setValues))
-				updateThemePath($setValues);
+				updateThemeOptions($setValues);
 
 			redirectexit('action=admin;area=theme;sa=list;' . $context['session_var'] . '=' . $context['session_id']);
 		}
@@ -330,8 +330,6 @@ class ManageThemes_Controller extends Action_Controller
 		global $txt, $context, $settings, $modSettings;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
-		$db = database();
-
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
 		isAllowedTo('admin_forum');
@@ -376,14 +374,14 @@ class ManageThemes_Controller extends Action_Controller
 			$setValues = array();
 
 			foreach ($_POST['options'] as $opt => $val)
-				$setValues[] = array(-1, $_GET['th'], $opt, is_array($val) ? implode(',', $val) : $val);
+				$setValues[] = array($_GET['th'], -1, $opt, is_array($val) ? implode(',', $val) : $val);
 
 			$old_settings = array();
 			foreach ($_POST['default_options'] as $opt => $val)
 			{
 				$old_settings[] = $opt;
 
-				$setValues[] = array(-1, 1, $opt, is_array($val) ? implode(',', $val) : $val);
+				$setValues[] = array(1, -1, $opt, is_array($val) ? implode(',', $val) : $val);
 			}
 
 			// If we're actually inserting something..
@@ -391,7 +389,7 @@ class ManageThemes_Controller extends Action_Controller
 			{
 				// Are there options in non-default themes set that should be cleared?
 				if (!empty($old_settings))
-					removeThemeOptions(false, false, $old_settings);
+					removeThemeOptions('custom', 'guests', $old_settings);
 
 				updateThemeOptions($setValues);
 			}
@@ -419,28 +417,18 @@ class ManageThemes_Controller extends Action_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					removeThemeOptions(true, false, $opt);
+					removeThemeOptions('default', 'guests', $opt);
 					addThemeOptions(1, $opt, $val);
 
 					$old_settings[] = $opt;
 				}
 				elseif ($_POST['default_options_master'][$opt] == 2)
-				{
-					$db->query('', '
-						DELETE FROM {db_prefix}themes
-						WHERE variable = {string:option_name}
-							AND id_member > {int:no_member}',
-						array(
-							'no_member' => 0,
-							'option_name' => $opt,
-						)
-					);
-				}
+					removeThemeOptions('all', 'members', $opt);
 			}
 
 			// Delete options from other themes.
 			if (!empty($old_settings))
-				removeThemeOptions(false, true, $old_settings);
+				removeThemeOptions('custom', 'members', $old_settings);
 
 			foreach ($_POST['options'] as $opt => $val)
 			{
@@ -449,21 +437,11 @@ class ManageThemes_Controller extends Action_Controller
 				elseif ($_POST['options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility - again!
-					$db->query('substring', '
-						DELETE FROM {db_prefix}themes
-						WHERE id_theme = {int:current_theme}
-							AND id_member != {int:no_member}
-							AND variable = SUBSTRING({string:option}, 1, 255)',
-						array(
-							'current_theme' => $_GET['th'],
-							'no_member' => 0,
-							'option' => $opt,
-						)
-					);
+					removeThemeOptions($_GET['th'], 'non_default', $opt);
 					addThemeOptions($_GET['th'], $opt, $val);
 				}
 				elseif ($_POST['options_master'][$opt] == 2)
-					removeThemeOption($_GET['th'], $opt);
+					removeThemeOptions($_GET['th'], 'all', $opt);
 
 			}
 
@@ -474,15 +452,7 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-stor', 'request');
 
-			$db->query('', '
-				DELETE FROM {db_prefix}themes
-				WHERE id_member > {int:no_member}
-					AND id_theme = {int:current_theme}',
-				array(
-					'no_member' => 0,
-					'current_theme' => $_GET['th'],
-				)
-			);
+			removeThemeOptions($_GET['th'], 'members');
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=reset');
 		}
@@ -508,20 +478,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		if (empty($_REQUEST['who']))
 		{
-			$request = $db->query('', '
-				SELECT variable, value
-				FROM {db_prefix}themes
-				WHERE id_theme IN (1, {int:current_theme})
-					AND id_member = {int:guest_member}',
-				array(
-					'current_theme' => $_GET['th'],
-					'guest_member' => -1,
-				)
-			);
-			$context['theme_options'] = array();
-			while ($row = $db->fetch_assoc($request))
-				$context['theme_options'][$row['variable']] = $row['value'];
-			$db->free_result($request);
+			$context['theme_options'] = loadThemeOptionsInto($_GET['th'], -1, $context['theme_options']);
 
 			$context['theme_options_reset'] = false;
 		}
@@ -664,9 +621,9 @@ class ManageThemes_Controller extends Action_Controller
 			// Set up the sql query.
 			$inserts = array();
 			foreach ($_POST['options'] as $opt => $val)
-				$inserts[] = array(0, $_GET['th'], $opt, is_array($val) ? implode(',', $val) : $val);
+				$inserts[] = array($_GET['th'], 0, $opt, is_array($val) ? implode(',', $val) : $val);
 			foreach ($_POST['default_options'] as $opt => $val)
-				$inserts[] = array(0, 1, $opt, is_array($val) ? implode(',', $val) : $val);
+				$inserts[] = array(1, 0, $opt, is_array($val) ? implode(',', $val) : $val);
 			// If we're actually inserting something..
 			if (!empty($inserts))
 				updateThemeOptions($inserts);
@@ -874,7 +831,6 @@ class ManageThemes_Controller extends Action_Controller
 		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
-		$db = database();
 
 		loadLanguage('Profile');
 		loadTemplate('ManageThemes');
@@ -884,6 +840,7 @@ class ManageThemes_Controller extends Action_Controller
 			'url' => $scripturl . '?action=theme;sa=pick;u=' . (!empty($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0),
 			'name' => $txt['theme_pick'],
 		);
+		$context['default_theme_id'] = $modSettings['theme_default'];
 
 		$_SESSION['id_theme'] = 0;
 
@@ -901,7 +858,7 @@ class ManageThemes_Controller extends Action_Controller
 				$_GET['vrt'] = $_POST['vrt'][$k];
 		}
 
-		// Have we made a desicion, or are we just browsing?
+		// Have we made a decision, or are we just browsing?
 		if (isset($_GET['th']))
 		{
 			checkSession('get');
@@ -978,19 +935,19 @@ class ManageThemes_Controller extends Action_Controller
 		if (!isset($_REQUEST['u']) || !allowedTo('admin_forum'))
 		{
 			$context['current_member'] = $user_info['id'];
-			$context['current_theme'] = $user_info['theme'];
+			$current_theme = $user_info['theme'];
 		}
 		// Everyone can't chose just one.
 		elseif ($_REQUEST['u'] == '0')
 		{
 			$context['current_member'] = 0;
-			$context['current_theme'] = 0;
+			$current_theme = 0;
 		}
 		// Guests and such...
 		elseif ($_REQUEST['u'] == '-1')
 		{
 			$context['current_member'] = -1;
-			$context['current_theme'] = $modSettings['theme_guests'];
+			$current_theme = $modSettings['theme_guests'];
 		}
 		// Someones else :P.
 		else
@@ -1000,160 +957,11 @@ class ManageThemes_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Members.subs.php');
 			$member = getBasicMemberData($context['current_member']);
 
-			$context['current_theme'] = $member['id_theme'];
+			$current_theme = $member['id_theme'];
 		}
 
 		// Get the theme name and descriptions.
-		$context['available_themes'] = array();
-		if (!empty($modSettings['knownThemes']))
-		{
-			$request = $db->query('', '
-				SELECT id_theme, variable, value
-				FROM {db_prefix}themes
-				WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url}, {string:disable_user_variant})' . (!allowedTo('admin_forum') ? '
-					AND id_theme IN ({array_string:known_themes})' : '') . '
-					AND id_theme != {int:default_theme}
-					AND id_member = {int:no_member}',
-				array(
-					'default_theme' => 0,
-					'name' => 'name',
-					'no_member' => 0,
-					'theme_url' => 'theme_url',
-					'theme_dir' => 'theme_dir',
-					'images_url' => 'images_url',
-					'disable_user_variant' => 'disable_user_variant',
-					'known_themes' => explode(',', $modSettings['knownThemes']),
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				if (!isset($context['available_themes'][$row['id_theme']]))
-					$context['available_themes'][$row['id_theme']] = array(
-						'id' => $row['id_theme'],
-						'selected' => $context['current_theme'] == $row['id_theme'],
-						'num_users' => 0
-					);
-				$context['available_themes'][$row['id_theme']][$row['variable']] = $row['value'];
-			}
-			$db->free_result($request);
-		}
-
-		// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
-		if (!isset($context['available_themes'][$modSettings['theme_guests']]))
-		{
-			$context['available_themes'][0] = array(
-				'num_users' => 0
-			);
-			$guest_theme = 0;
-		}
-		else
-			$guest_theme = $modSettings['theme_guests'];
-
-		$request = $db->query('', '
-			SELECT id_theme, COUNT(*) AS the_count
-			FROM {db_prefix}members
-			GROUP BY id_theme
-			ORDER BY id_theme DESC',
-			array(
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Figure out which theme it is they are REALLY using.
-			if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',',$modSettings['knownThemes'])))
-				$row['id_theme'] = $guest_theme;
-			elseif (empty($modSettings['theme_allow']))
-				$row['id_theme'] = $guest_theme;
-
-			if (isset($context['available_themes'][$row['id_theme']]))
-				$context['available_themes'][$row['id_theme']]['num_users'] += $row['the_count'];
-			else
-				$context['available_themes'][$guest_theme]['num_users'] += $row['the_count'];
-		}
-		$db->free_result($request);
-
-		// Get any member variant preferences.
-		$variant_preferences = array();
-		if ($context['current_member'] > 0)
-		{
-			$request = $db->query('', '
-				SELECT id_theme, value
-				FROM {db_prefix}themes
-				WHERE variable = {string:theme_variant}
-					AND id_member IN ({array_int:id_member})
-				ORDER BY id_member ASC',
-				array(
-					'theme_variant' => 'theme_variant',
-					'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $context['current_member']) : array(-1),
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$variant_preferences[$row['id_theme']] = $row['value'];
-			$db->free_result($request);
-		}
-
-		// Save the setting first.
-		$current_images_url = $settings['images_url'];
-		$current_theme_variants = !empty($settings['theme_variants']) ? $settings['theme_variants'] : array();
-
-		foreach ($context['available_themes'] as $id_theme => $theme_data)
-		{
-			// Don't try to load the forum or board default theme's data... it doesn't have any!
-			if ($id_theme == 0)
-				continue;
-
-			// The thumbnail needs the correct path.
-			$settings['images_url'] = &$theme_data['images_url'];
-
-			if (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php'))
-				include($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php');
-			elseif (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php'))
-				include($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php');
-			else
-			{
-				$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
-				$txt['theme_description'] = '';
-			}
-
-			$context['available_themes'][$id_theme]['thumbnail_href'] = $txt['theme_thumbnail_href'];
-			$context['available_themes'][$id_theme]['description'] = $txt['theme_description'];
-
-			// Are there any variants?
-			if (file_exists($theme_data['theme_dir'] . '/index.template.php') && empty($theme_data['disable_user_variant']))
-			{
-				$file_contents = implode('', file($theme_data['theme_dir'] . '/index.template.php'));
-				if (preg_match('~\$settings\[\'theme_variants\'\]\s*=(.+?);~', $file_contents, $matches))
-				{
-					$settings['theme_variants'] = array();
-
-					// Fill settings up.
-					eval('global $settings;' . $matches[0]);
-
-					if (!empty($settings['theme_variants']))
-					{
-						loadLanguage('Settings');
-
-						$context['available_themes'][$id_theme]['variants'] = array();
-						foreach ($settings['theme_variants'] as $variant)
-							$context['available_themes'][$id_theme]['variants'][$variant] = array(
-								'label' => isset($txt['variant_' . $variant]) ? $txt['variant_' . $variant] : $variant,
-								'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/thumbnail.png'),
-							);
-
-						$context['available_themes'][$id_theme]['selected_variant'] = isset($_GET['vrt']) ? $_GET['vrt'] : (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
-						if (!isset($context['available_themes'][$id_theme]['variants'][$context['available_themes'][$id_theme]['selected_variant']]['thumbnail']))
-							$context['available_themes'][$id_theme]['selected_variant'] = $settings['theme_variants'][0];
-
-						$context['available_themes'][$id_theme]['thumbnail_href'] = $context['available_themes'][$id_theme]['variants'][$context['available_themes'][$id_theme]['selected_variant']]['thumbnail'];
-						// Allow themes to override the text.
-						$context['available_themes'][$id_theme]['pick_label'] = isset($txt['variant_pick']) ? $txt['variant_pick'] : $txt['theme_pick_variant'];
-					}
-				}
-			}
-		}
-		// Then return it.
-		$settings['images_url'] = $current_images_url;
-		$settings['theme_variants'] = $current_theme_variants;
+		list($context['available_themes'], $guest_theme) = availableThemes($current_theme, $context['current_member']);
 
 		// As long as we're not doing the default theme...
 		if (!isset($_REQUEST['u']) || $_REQUEST['u'] >= 0)
@@ -1163,7 +971,7 @@ class ManageThemes_Controller extends Action_Controller
 
 			$context['available_themes'][0]['id'] = 0;
 			$context['available_themes'][0]['name'] = $txt['theme_forum_default'];
-			$context['available_themes'][0]['selected'] = $context['current_theme'] == 0;
+			$context['available_themes'][0]['selected'] = $current_theme == 0;
 			$context['available_themes'][0]['description'] = $txt['theme_global_description'];
 		}
 
@@ -1252,30 +1060,8 @@ class ManageThemes_Controller extends Action_Controller
 			$images_url = $boardurl . '/themes/' . basename($theme_dir) . '/images';
 			$theme_dir = realpath($theme_dir);
 
-			// Lets get some data for the new theme.
-			$request = $db->query('', '
-				SELECT variable, value
-				FROM {db_prefix}themes
-				WHERE variable IN ({string:theme_templates}, {string:theme_layers})
-					AND id_member = {int:no_member}
-					AND id_theme = {int:default_theme}',
-				array(
-					'no_member' => 0,
-					'default_theme' => 1,
-					'theme_templates' => 'theme_templates',
-					'theme_layers' => 'theme_layers',
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				if ($row['variable'] == 'theme_templates')
-					$theme_templates = $row['value'];
-				elseif ($row['variable'] == 'theme_layers')
-					$theme_layers = $row['value'];
-				else
-					continue;
-			}
-			$db->free_result($request);
+			// Lets get some data for the new theme (default theme (1), default settings (0)).
+			$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
 
 			// Lets add a theme_info.xml to this theme.
 			$xml_info = '<' . '?xml version="1.0"?' . '>
@@ -1290,9 +1076,9 @@ class ManageThemes_Controller extends Action_Controller
 		<!-- Website... where to get updates and more information. -->
 		<website>http://www.yourdomain.tld/</website>
 		<!-- Template layers to use, defaults to "html,body". -->
-		<layers>' . (empty($theme_layers) ? 'html,body' : $theme_layers) . '</layers>
+		<layers>' . (empty($theme_values['theme_layers']) ? 'html,body' : $theme_values['theme_layers']) . '</layers>
 		<!-- Templates to load on startup. Default is "index". -->
-		<templates>' . (empty($theme_templates) ? 'index' : $theme_templates) . '</templates>
+		<templates>' . (empty($theme_values['theme_templates']) ? 'index' : $theme_values['theme_templates']) . '</templates>
 		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
 		<based-on></based-on>
 	</theme-info>';
@@ -1469,8 +1255,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $settings, $user_info, $options;
 
-		$db = database();
-
 		// Check the session id.
 		checkSession('get');
 
@@ -1541,12 +1325,8 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// Update the option.
-		$db->insert('replace',
-			'{db_prefix}themes',
-			array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-			array($settings['theme_id'], $user_info['id'], $_GET['var'], is_array($_GET['val']) ? implode(',', $_GET['val']) : $_GET['val']),
-			array('id_theme', 'id_member', 'variable')
-		);
+		require_once(SUBSDIR . '/Themes.subs.php');
+		updateThemeOptions(array($settings['theme_id'], $user_info['id'], $_GET['var'], is_array($_GET['val']) ? implode(',', $_GET['val']) : $_GET['val']));
 
 		cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
 
