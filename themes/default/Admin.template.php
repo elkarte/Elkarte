@@ -1391,8 +1391,8 @@ function template_php_info()
 			<thead>
 			<tr class="table_head three_column">
 				<th scope="col"></th>
-				<th class="centertext" scope="col"><strong>', $area, '</strong></th>
-				<th class="centertext" scope="col"></th>
+				<th scope="col" class="centertext"><strong>', $area, '</strong></th>
+				<th scope="col" class="centertext"></th>
 			</tr>
 			</thead>
 			<tbody>';

@@ -928,7 +928,7 @@ function template_browse()
 		<table class="table_grid tborder">
 		<thead>
 			<tr class="table_head">
-				<th class="lefttext" scope="col" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
+				<th scope="col" class="lefttext" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>
 				<th scope="col" style="width:35%">', $txt['themeadmin_edit_modified'], '</th>
 				<th scope="col" style="width:15%">', $txt['themeadmin_edit_size'], '</th>
 			</tr>
