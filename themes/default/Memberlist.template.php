@@ -25,7 +25,7 @@ function template_main()
 	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
 		<ul class="floatright">
 			<li>
-				<input onfocus="toggle_mlsearch_opt();" onblur="toggle_mlsearch_opt();" type="text" name="search" value="" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
+				<input id="mlsearch_input" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
 				<input type="submit" name="search2" value="' . $txt['search'] . '" class="button_submit" />
 				<ul id="mlsearch_options">';
 
@@ -49,7 +49,17 @@ function template_main()
 	<script><!-- // --><![CDATA[
 		function toggle_mlsearch_opt()
 		{
-			$("#mlsearch_options").slideToggle("fast");
+			$(\'body\').on(\'click\', mlsearch_opt_hide);
+			$(\'#mlsearch_options\').slideToggle(\'fast\');
+
+		}
+		function mlsearch_opt_hide(ev)
+		{
+			if (ev.target.id == \'mlsearch_options\' || ev.target.id == \'mlsearch_input\')
+				return;
+
+			$(\'body\').off(\'click\', mlsearch_opt_hide);
+			$(\'#mlsearch_options\').slideToggle(\'fast\');
 		}
 	// ]]></script>
 	<div id="memberlist">
