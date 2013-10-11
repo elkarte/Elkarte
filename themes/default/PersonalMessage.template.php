@@ -653,7 +653,7 @@ function template_subject_list()
 	$extra .= '
 					</div>';
 
-	template_pagesection(false, false, array('top_button' => false, 'extra' => $extra));
+	template_pagesection(false, false, array('extra' => $extra));
 }
 
 /**
