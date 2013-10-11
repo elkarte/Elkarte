@@ -86,7 +86,7 @@ function template_folder()
 
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		if ($context['display_mode'] == 2)
-			template_pagesection('conversation_buttons', 'right');
+			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
 		else
 			template_pagesection();
 
@@ -283,7 +283,7 @@ function template_folder()
 			template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
 		// Show a few buttons if we are in conversation mode and outputting the first message.
 		elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
-			template_pagesection('conversation_buttons', 'right');
+			template_pagesection('conversation_buttons', 'right', array('page_index' => false));
 	}
 
 	// Individual messages = button list!
