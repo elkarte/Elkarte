@@ -76,12 +76,12 @@ function template_init()
 	// @todo - God it's still ugly though. Can't we just have links where we need them, without all those spans?
 	// How do we get anchors only, where they will work? Spans and strong only where necessary?
 	$settings['page_index_template'] = array(
-		'base_link' => '<a class="navPages" href="{base_link}" role="menuitem">%2$s</a>',
+		'base_link' => '<li><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
 		'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
 		'current_page' => '<strong class="current_page" role="menuitem">%1$s</strong>',
 		'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
-		'expand_pages' => '<span class="expand_pages" role="menuitem" {custom}> ... </span>',
-		'all' => '<span class="all_pages" role="menuitem">{all_txt}</span>',
+		'expand_pages' => '<li class="expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
+		'all' => '<li class="all_pages" role="menuitem">{all_txt}</li>',
 	);
 }
 
@@ -677,12 +677,12 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 	if (!empty($options['page_index_markup']))
 	// Hmmm. I'm a tad wary of having floatleft here but anyway............
 	// @todo - Try using table-cell display here. Should do auto rtl support. Less markup, less css. :)
-		$pages = '<div class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</div>';
+		$pages = '<ul class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</ul>';
 	else
 	{
 		if (!isset($options['page_index']))
 			$options['page_index'] = 'page_index';
-		$pages = empty($context[$options['page_index']]) ? '' : '<div class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</div>';
+		$pages = empty($context[$options['page_index']]) ? '' : '<ul class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</ul>';
 	}
 
 	if (!isset($options['extra']))
