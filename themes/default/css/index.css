@@ -1372,6 +1372,10 @@ div.bbc_footnotes {
 .pagesection .floatright input, .pagesection .floatright select {
 	margin-top: 3px;
 }
+/* Necessary for some browsers to keep the pages all on the same line */
+.pagelinks {
+	min-width: 35em;
+}
 .selectbox, .pagelinks {
 	margin: 5px 0 0 0;
 	color: #555;
@@ -1415,6 +1419,7 @@ div.bbc_footnotes {
 	text-align: center;
 	cursor: pointer;
 	font-weight: 600;
+	padding: 2px 0;
 }
 .next_page, .previous_page {
 	padding: 0 2px;
@@ -4085,8 +4090,15 @@ dl.merge_topic dd {
 		float: none;
 		display: block;
 	}
+	ul.buttonlist:before {
+		display: block;
+		clear: both;
+		content:"";
+	}
 	.pagelinks {
 		height: 30px;
+		/* Necessary for some browsers to keep the pages all on the same line */
+		min-width: 100%;
 	}
 	.topic_name, .topic_starter {
 		margin: 0;
