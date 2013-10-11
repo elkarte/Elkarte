@@ -1861,7 +1861,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
 {
-	global $settings, $context;
+	global $settings, $context, $db_show_debug;
 
 	if (empty($filenames))
 		return;
@@ -1918,6 +1918,9 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 			// Add it to the array for use in the template
 			if (!empty($filename))
 				$context['css_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+
+			if ($db_show_debug === true)
+				$context['debug']['sheets'][] = $params['basename'] . '(' . basename($params['url']) . ')';
 		}
 
 		// Save this build
@@ -1944,7 +1947,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  */
 function loadJavascriptFile($filenames, $params = array(), $id = '')
 {
-	global $settings, $context;
+	global $settings, $context, $db_show_debug;
 
 	if (empty($filenames))
 		return;
@@ -1999,6 +2002,9 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 			// Add it to the array for use in the template
 			if (!empty($filename)) {
 				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
+
+			if ($db_show_debug === true)
+				$context['debug']['javascript'][] = $params['basename'] . '(' . basename($params['dir']) . ')';
 			}
 		}
 
@@ -2690,7 +2696,7 @@ function doSecurityChecks()
 
 	if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 		$context['security_controls']['admin_session'] = true;
-	
+
 	if (!empty($maintenance))
 		$context['security_controls']['maintenance'] = true;
 

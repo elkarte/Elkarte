@@ -3998,8 +3998,8 @@ function setupMenuContext()
 				if (isset($button['counter']) && !empty($menu_count[$button['counter']]))
 				{
 					$button['alttitle'] = $button['title'] . ' [' . $menu_count[$button['counter']] . ']';
-					if (!empty($settings['menu_numeric_notice']))
-						$button['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$button['counter']]);
+					if (!empty($settings['menu_numeric_notice'][0]))
+						$button['title'] .= sprintf($settings['menu_numeric_notice'][0], $menu_count[$button['counter']]);
 					unset($menu_count[$button['counter']]);
 				}
 
@@ -4012,8 +4012,8 @@ function setupMenuContext()
 						elseif (isset($subbutton['counter']) && !empty($menu_count[$subbutton['counter']]))
 						{
 							$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $menu_count[$subbutton['counter']] . ']';
-							if (!empty($settings['menu_numeric_notice']))
-								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$subbutton['counter']]);
+							if (!empty($settings['menu_numeric_notice'][1]))
+								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'][1], $menu_count[$subbutton['counter']]);
 							unset($menu_count[$subbutton['counter']]);
 						}
 
@@ -4027,8 +4027,8 @@ function setupMenuContext()
 								elseif (isset($sub_button2['counter']) && !empty($menu_count[$sub_button2['counter']]))
 								{
 									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $sub_button2['title'] . ' [' . $menu_count[$sub_button2['counter']] . ']';
-									if (!empty($settings['menu_numeric_notice']))
-										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'], $menu_count[$sub_button2['counter']]);
+									if (isset($settings['menu_numeric_notice'][2]))
+										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$sub_button2['counter']]);
 									unset($menu_count[$sub_button2['counter']]);
 								}
 							}

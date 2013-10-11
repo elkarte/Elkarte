@@ -206,23 +206,21 @@
  *
  * Adds FTP, Glow, Shadow, Tt, Pre, Spoiler, Footnote and Move commands
  */
-$.sceditor.command.set(
-	'ftp', {
+$.sceditor.command
+	.set('ftp', {
 		exec: function (caller) {
-			var	editor  = this,
-			content = $(this._('<form><div><label for="link">{0}</label> <input type="text" id="link" value="ftp://" /></div>' +
-					'<div><label for="des">{1}</label> <input type="text" id="des" value="" /></div></form>',
+			var	editor = this,
+				content = $(this._('<form><div><label for="link">{0}</label> <input type="text" id="link" value="ftp://" /></div>' +
+					'<div><label for="des">{1}</label> <input type="text" id="des" value="" /></div></form>' +
+					'<div><input type="button" class="button" value="{2}" /></div>',
 				this._("URL:"),
-				this._("Description (optional):")
-			))
-			.submit(function () {return false;});
+				this._("Description (optional):"),
+				this._("Insert")
+			));
 
-			content.append($(
-				this._('<div><input type="button" class="button" value="{0}" /></div>',
-					this._("Insert")
-				)).click(function (e) {
-				var val = $(this).parent("form").find("#link").val(),
-					description = $(this).parent("form").find("#des").val();
+			content.find('.button').click(function (e) {
+				var val = content.find("#link").val(),
+					description = content.find("#des").val();
 
 				if(val !== "" && val !== "ftp://") {
 					// needed for IE to reset the last range
@@ -241,107 +239,76 @@ $.sceditor.command.set(
 
 				editor.closeDropDown(true);
 				e.preventDefault();
-			}));
+			});
 
 			editor.createDropDown(caller, "insertlink", content);
 		},
 		txtExec: ["[ftp]", "[/ftp]"],
 		tooltip: 'Insert FTP Link'
-	}
-);
-
-$.sceditor.command.set(
-	'glow',	{
+	})
+	.set('glow', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('[glow=red,2,300]', '[/glow]');
+			this.insert('[glow=red,2,300]', '[/glow]');
 		},
 		txtExec: ["[glow=red,2,300]", "[/glow]"],
 		tooltip: 'Glow'
-	}
-);
-
-$.sceditor.command.set(
-	'shadow', {
+	})
+	.set('shadow', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('[shadow=red,left]', '[/shadow]');
+			this.insert('[shadow=red,left]', '[/shadow]');
 		},
 		txtExec: ["[shadow=red,left]", "[/shadow]"],
 		tooltip: 'Shadow'
-	}
-);
-
-$.sceditor.command.set(
-	'spoiler', {
+	})
+	.set('spoiler', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('[spoiler]', '[/spoiler]');
+			this.insert('[spoiler]', '[/spoiler]');
 		},
 		txtExec: ["[spoiler]", "[/spoiler]"],
 		tooltip: 'Insert Spoiler'
-	}
-);
-
-$.sceditor.command.set(
-	'footnote', {
+	})
+	.set('footnote', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('[footnote]', '[/footnote]');
+			this.insert('[footnote]', '[/footnote]');
 		},
 		txtExec: ["[footnote]", "[/footnote]"],
 		tooltip: 'Insert Footnote'
-	}
-);
-
-$.sceditor.command.set(
-	'tt', {
+	})
+	.set('tt', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('<span class="tt">', '</span>');
+			this.insert('<span class="tt">', '</span>', false);
 		},
 		txtExec: ["[tt]", "[/tt]"],
 		tooltip: 'Teletype'
-	}
-);
-
-$.sceditor.command.set(
-	'pre', {
+	})
+	.set('pre', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('<pre>', '</pre>');
+			this.insert('<pre>', '</pre>', false);
 		},
 		txtExec: ["[pre]", "[/pre]"],
 		tooltip: 'Preformatted Text'
-	}
-);
-
-$.sceditor.command.set(
-	'move', {
+	})
+	.set('move', {
 		exec: function () {
-			this.wysiwygEditorInsertHtml('<marquee>', '</marquee>');
+			this.insert('<marquee>', '</marquee>', false);
 		},
 		txtExec: ["[move]", "[/move]"],
 		tooltip: 'Move'
-	}
-);
-
-/**
- * ElkArte modifications to existing commands so they display as we like
- *
- * Makes changes to the text inserted for Bulletlist, OrderedList and Table
- */
-$.sceditor.command.set(
-	'bulletlist', {
+	})
+	/*
+	 * ElkArte modifications to existing commands so they display as we like
+	 *
+	 * Makes changes to the text inserted for Bulletlist, OrderedList and Table
+	 */
+	.set('bulletlist', {
 		txtExec: ["[list]\n[li]", "[/li]\n[li][/li]\n[/list]"]
-	}
-);
-
-$.sceditor.command.set(
-	'orderedlist', {
+	})
+	.set('orderedlist', {
 		txtExec:  ["[list type=decimal]\n[li]", "[/li]\n[li][/li]\n[/list]"]
-	}
-);
-
-$.sceditor.command.set(
-	'table', {
+	})
+	.set('table', {
 		txtExec: ["[table]\n[tr]\n[td]", "[/td]\n[/tr]\n[/table]"]
-	}
-);
+	});
 
 /**
  * ElkArte custom bbc tags added to provide for the existing user experience
@@ -349,8 +316,8 @@ $.sceditor.command.set(
  * Adds BBC codes Abbr, Acronym, Bdo, List, Tt, Pre, Php, Move
  * Adds bbc colors Black, Red, Blue, Green, White
  */
-$.sceditorBBCodePlugin.bbcode.set(
-	'abbr', {
+$.sceditor.plugins.bbcode.bbcode
+	.set('abbr', {
 		tags: {
 			abbr: {
 				title: null
@@ -365,11 +332,8 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 			return '<abbr title="' + attrs.defaultattr + '">' + content + '</abbr>';
 		}
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'acronym', {
+	})
+	.set('acronym', {
 		tags: {
 			acronym: {
 				title: null
@@ -384,11 +348,8 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 			return '<acronym title="' + attrs.defaultattr + '">' + content + '</acronym>';
 		}
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'bdo', {
+	})
+	.set('bdo', {
 		tags: {
 			bdo: {
 				dir: null
@@ -405,106 +366,73 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 			return '<bdo dir="' + attrs.defaultattr + '">' + content + '</bdo>';
 		}
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'black', {
+	})
+	.set('black', {
 		isInline: true,
 		format: '[black]{0}[/black]',
 		html: '<font color="black">{0}</font>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'blue', {
+	})
+	.set('blue', {
 		isInline: true,
 		format: '[blue]{0}[/blue]',
 		html: '<font color="blue">{0}</font>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'green', {
+	})
+	.set('green', {
 		isInline: true,
 		format: '[green]{0}[/green]',
 		html: '<font color="green">{0}</font>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'red', {
+	})
+	.set('red', {
 		isInline: true,
 		format: '[red]{0}[/red]',
 		html: '<font color="red">{0}</font>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'white', {
+	})
+	.set('white', {
 		isInline: true,
 		format: '[white]{0}[/white]',
 		html: '<font color="white">{0}</font>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'tt', {
+	})
+	.set('tt', {
 		tags: {
 			tt: null
 		},
 		format: "[tt]{0}[/tt]",
 		html: '<span class="tt">{0}</span>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'php', {
+	})
+	.set('php', {
 		isInline: false,
 		format: "[php]{0}[/php]",
 		html: '<code class="php">{0}</code>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'pre', {
+	})
+	.set('pre', {
 		tags: {
 			pre: null
 		},
 		isInline: false,
 		format: "[pre]{0}[/pre]",
 		html: "<pre>{0}</pre>\n"
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'move', {
+	})
+	.set('move', {
 		tags: {
 			marquee: null
 		},
 		format: "[move]{0}[/move]",
 		html: '<marquee>{0}</marquee>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'footnote', {
+	})
+	.set('footnote', {
 		tags: {
 			aside: null
 		},
 		format: "[footnote]{0}[/footnote]",
 		html: '<aside>{0}</aside>'
-	}
-);
-
-/**
- * ElkArte modified tags, modified so they support the existing paradigm
- *
- * Changes the way existing editor tags work
- * Modifies code, quote, list, ul, ol, li
- */
-$.sceditorBBCodePlugin.bbcode.set(
-	'code', {
+	})
+	/*
+	 * ElkArte modified tags, modified so they support the existing paradigm
+	 *
+	 * Changes the way existing editor tags work
+	 * Modifies code, quote, list, ul, ol, li
+	 */
+	.set('code', {
 		tags: {
 			code: null
 		},
@@ -542,16 +470,12 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 			return '<code>' + from + content.replace('[', '&#91;') + '</code>';
 		}
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'quote', {
+	})
+	.set('quote', {
 		tags: {
 			blockquote: null,
 			cite: null
 		},
-		breakBefore: false,
 		isInline: false,
 		format: function(element, content) {
 			var author = '',
@@ -618,11 +542,8 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 			return content;
 		}
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'img', {
+	})
+	.set('img', {
 		tags: {
 			img: {
 				src: null
@@ -660,11 +581,8 @@ $.sceditorBBCodePlugin.bbcode.set(
 
 			return '<img' + attribs + ' src="' + content + '" />';
 		}
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'list', {
+	})
+	.set('list', {
 		breakStart: true,
 		isInline: false,
 		skipLastLineBreak: true,
@@ -677,17 +595,11 @@ $.sceditorBBCodePlugin.bbcode.set(
 				style = 'style="list-style-type: ' + attrs.type + '"';
 			return '<' + code + ' ' + style + '>' + content + '</' + code + '>';
 		}
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'li', {
+	})
+	.set('li', {
 		breakAfter: true
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'ul', {
+	})
+	.set('ul', {
 		tags: {
 			ul: null
 		},
@@ -701,11 +613,8 @@ $.sceditorBBCodePlugin.bbcode.set(
 		isInline: false,
 		skipLastLineBreak: true,
 		html: '<ul>{0}</ul>'
-	}
-);
-
-$.sceditorBBCodePlugin.bbcode.set(
-	'ol', {
+	})
+	.set('ol', {
 		tags: {
 			ol: null
 		},

@@ -242,8 +242,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="save" value="' . $txt['scheduled_tasks_save_changes'] . '" class="right_submit" />
-						<input type="submit" name="run" value="' . $txt['scheduled_tasks_run_now'] . '" class="right_submit" />',
+						<input type="submit" name="run" value="' . $txt['scheduled_tasks_run_now'] . '" class="right_submit" />
+						<input type="submit" name="save" value="' . $txt['scheduled_tasks_save_changes'] . '" class="right_submit" />',
 				),
 				array(
 					'position' => 'after_title',
