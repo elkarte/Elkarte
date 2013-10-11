@@ -167,7 +167,6 @@ class PackageServers_Controller extends Action_Controller
 			if ($token !== true)
 			{
 				$context['sub_template'] = 'package_confirm';
-
 				$context['page_title'] = $txt['package_servers'];
 				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute']));
 				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
@@ -220,8 +219,8 @@ class PackageServers_Controller extends Action_Controller
 		// We'll figure out if what they select a package they already have installed.
 		$instadds = loadInstalledPackages();
 
-		$installed_adds = array();
 		// Look through the list of installed mods...
+		$installed_adds = array();
 		foreach ($instadds as $installed_add)
 			$installed_adds[$installed_add['package_id']] = $installed_add['version'];
 
@@ -439,12 +438,14 @@ class PackageServers_Controller extends Action_Controller
 				{
 					$installs = $packageInfo['xml']->set('install');
 					foreach ($installs as $install)
+					{
 						if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
 						{
 							// Okay, this one is good to go.
 							$context['package_list'][$ps_id]['items'][$i]['can_install'] = true;
 							break;
 						}
+					}
 				}
 			}
 		}
@@ -528,7 +529,7 @@ class PackageServers_Controller extends Action_Controller
 		if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
-		// You just downloaded a mod from SERVER_NAME_GOES_HERE.
+		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
 		$context['package_server'] = $server;
 
 		$context['package'] = getPackageInfo($package_name);
@@ -565,7 +566,6 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_template'] = 'downloaded';
 
 		// @todo Use FTP if the packages directory is not writable.
-
 		// Check the file was even sent!
 		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
 			fatal_lang_error('package_upload_error_nofile');
@@ -583,6 +583,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// Setup the destination and throw an error if the file is already there!
 		$destination = BOARDDIR . '/packages/' . $packageName;
+
 		// @todo Maybe just roll it like we do for downloads?
 		if (file_exists($destination))
 			fatal_lang_error('package_upload_error_exists');
