@@ -84,6 +84,7 @@ class ManageRegistration_Controller extends Action_Controller
 		// Loading, always loading.
 		loadLanguage('Login');
 		loadTemplate('Register');
+		loadJavascriptFile('register.js');
 
 		// Next create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
