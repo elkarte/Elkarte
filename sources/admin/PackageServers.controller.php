@@ -527,7 +527,7 @@ class PackageServers_Controller extends Action_Controller
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
