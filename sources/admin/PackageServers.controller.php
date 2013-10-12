@@ -707,6 +707,15 @@ class PackageServers_Controller extends Action_Controller
 		// Check if we will be able to write new archives in /packages folder.
 		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
 
+		// Let's initialize ftp context
+		$context['package_ftp'] = array(
+			'server' => '',
+			'port' => '',
+			'username' => '',
+			'path' => '',
+			'error' => '',
+		);
+
 		// Give FTP a chance...
 		if ($context['package_download_broken'])
 			$this->ftp_connect();
