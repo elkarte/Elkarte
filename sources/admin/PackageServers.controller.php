@@ -498,6 +498,24 @@ class PackageServers_Controller extends Action_Controller
 		else
 			$package_name = basename($_REQUEST['package']);
 
+		// Is this a "master" package from github or bitbucket?
+		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $_REQUEST['package'], $matches) == 1)
+		{
+			// @todo maybe use the name/version in the package instead, although the link will be cleaner
+			// Name this master.zip based on repo name in the link
+			$path_parts = pathinfo($matches[4]);
+			list(, $newname, ) = explode('/', $path_parts['dirname']);
+
+			// Just to be safe, no invalid file characters
+			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
+			$package_name = str_replace($invalid, '_', $newname) . $matches[6];
+
+			// We could read the package info and see if we have a duplicate id & version, however that is
+			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
+			// and do the save.
+			$_REQUEST['auto'] = true;
+		}
+
 		if (isset($_REQUEST['conflict']) || (isset($_REQUEST['auto']) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
@@ -522,7 +540,7 @@ class PackageServers_Controller extends Action_Controller
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
 
-		// Use FTP if necessary.
+		// Save the package to disk, use FTP if necessary
 		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
 
@@ -533,6 +551,7 @@ class PackageServers_Controller extends Action_Controller
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
 		$context['package_server'] = $server;
 
+		// Read in the newly saved package information
 		$context['package'] = getPackageInfo($package_name);
 
 		if (!is_array($context['package']))
