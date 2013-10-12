@@ -254,7 +254,8 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 	$return = array();
 
 	// Get all the basic zip file info since we are here
-	$zip_info = unpack('vdisks/vrecords/vfiles/Vsize/Voffset/vcomment_length/', $data_ecr[1]);
+	$zip_info = unpack('vdisknum/vdisks/vrecords/vfiles/Vsize/Voffset/vcomment_length', $data_ecr[1]);
+	$zip_info['comment'] = substr($data_ecr[1], 18, $zip_info['comment_length']);
 
 	// Cut file at the central directory file header signature -- 0x02014b50, use unpack if you want any of the data, we don't
 	$file_sections = explode("\x50\x4b\x01\x02", $data);
