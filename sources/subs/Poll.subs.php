@@ -436,7 +436,7 @@ function modifyPollOption($options)
  * Delete a bunch of options from a poll
  *
  * @param int $id_poll The id of the poll you're deleting the options from
- * @param array $id_options An arrayThe choice id
+ * @param array $id_options An array holding the choice id
  */
 function deletePollOptions($id_poll, $id_options)
 {
@@ -649,7 +649,7 @@ function increaseGuestVote($id_poll)
  *
  * @param int $id_member
  * @param int $id_poll
- * @return type
+ * @return array
  */
 function determineVote($id_member, $id_poll)
 {
@@ -761,7 +761,7 @@ function getPollChoices($id_poll)
 /**
  * Get the poll starter from a given poll.
  *
- * @param int$id_topic
+ * @param int $id_topic
  * @return array
  */
 function getPollStarter($id_topic)

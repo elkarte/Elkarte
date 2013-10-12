@@ -152,7 +152,7 @@ function template_view_package()
 					<th scope="col" style="width:30px"></th>
 					<th scope="col" class="lefttext">', $txt['package_install_type'], '</th>
 					<th scope="col" class="lefttext" style="width:50%">', $txt['package_install_action'], '</th>
-					<th class="lefttext" scope="col" style="width:20%">', $txt['package_install_desc'], '</th>
+					<th scope="col" class="lefttext" style="width:20%">', $txt['package_install_desc'], '</th>
 				</tr>
 			</thead>
 			<tbody>';

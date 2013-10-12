@@ -681,8 +681,8 @@ function template_search()
 		echo '
 		<fieldset id="simple_search">
 			<div id="search_term_input">
-				<strong>', $txt['pm_search_text'], ':</strong>
-				<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
+				<label for="search"><strong>', $txt['pm_search_text'], ':</strong>
+				<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" /></label>
 				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />
 			</div>
 			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=search;advanced" onclick="elk_setThemeOption(\'minmax_preferences\', \'1\', null, elk_session_id, elk_session_var, \';minmax_key=pmsearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);">', $txt['pm_search_advanced'], '</a>
@@ -696,7 +696,7 @@ function template_search()
 		<fieldset id="advanced_search">
 			<dl class="settings" id="search_options">
 				<dt>
-					<strong>', $txt['pm_search_text'], ':</strong>
+					<label for="search"><strong>', $txt['pm_search_text'], ':</strong></label>
 				</dt>
 				<dd>
 					<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" class="input_text" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
@@ -705,17 +705,17 @@ function template_search()
 						<option value="2"', !empty($context['search_params']['searchtype']) ? ' selected="selected"' : '', '>', $txt['pm_search_match_any'], '</option>
 					</select>
 				</dd>
-				<dt>',
-					$txt['pm_search_user'], ':
+				<dt>
+					<label for="userspec">', $txt['pm_search_user'], ':</label>
 				</dt>
 				<dd>
 					<input type="text" name="userspec" value="', empty($context['search_params']['userspec']) ? '*' : $context['search_params']['userspec'], '" size="40" class="input_text" />
 				</dd>
-				<dt>',
-					$txt['pm_search_order'], ':
+				<dt>
+					<label for="sort">', $txt['pm_search_order'], ':</label>
 				</dt>
 				<dd>
-					<select name="sort">
+					<select name="sort" id="sort">
 						<option value="relevance|desc">', $txt['pm_search_orderby_relevant_first'], '</option>
 						<option value="id_pm|desc">', $txt['pm_search_orderby_recent_first'], '</option>
 						<option value="id_pm|asc">', $txt['pm_search_orderby_old_first'], '</option>
@@ -738,9 +738,8 @@ function template_search()
 				<dt class="between">',
 					$txt['pm_search_post_age'], ':
 				</dt>
-				<dd>',
-					$txt['pm_search_between'], ' <input type="text" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" />&nbsp;', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /> ', $txt['pm_search_between_days'], '
-				</dd>
+				<dd>
+					<label for="minage">', $txt['pm_search_between'], ' <input type="text" id="minage" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" /></label>&nbsp;<label for="maxage">', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /></label> ', $txt['pm_search_between_days'], '
 				</dd>
 				<dt>
 				</dt>

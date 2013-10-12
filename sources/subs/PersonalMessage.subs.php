@@ -24,6 +24,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Loads information about the users message limit.
+ */
 function loadMessageLimit()
 {
 	global $user_info, $context;
@@ -52,6 +55,9 @@ function loadMessageLimit()
 	}
 }
 
+/**
+ * Loads the list of PM labels.
+ */
 function loadPMLabels()
 {
 	global $user_info, $context;
@@ -86,6 +92,14 @@ function loadPMLabels()
 	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
 }
 
+/**
+ * Get the number of PMs.
+ *
+ * @param bool $descending
+ * @param int $pmID
+ * @param int $labelQuery
+ * @return int
+ */
 function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
 	global $user_info, $context;
@@ -1286,6 +1300,14 @@ function getPmsFromDiscussion($pm_heads)
 	return $pms;
 }
 
+/**
+ * Determines the PMs which need an updated label.
+ *
+ * @param array $to_label
+ * @param string $label_type
+ * @param int $user_id
+ * @return updatePMLabels
+ */
 function changePMLabels($to_label, $label_type, $user_id)
 {
 	global $options;
@@ -1333,6 +1355,14 @@ function changePMLabels($to_label, $label_type, $user_id)
 		return updatePMLabels($to_update);
 }
 
+/**
+ * Detects personal messages which need  a new label.
+ *
+ * @param array $searchArray
+ * @param array $new_labels
+ * @param int $user_id
+ * @return updatePMLabels
+ */
 function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
 	$db = database();
@@ -1373,6 +1403,13 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 		return updatePMLabels($to_update, $user_id);
 }
 
+/**
+ * Updates PMs with their new label.
+ *
+ * @param array $to_update
+ * @param int $user_id
+ * @return int
+ */
 function updatePMLabels($to_update, $user_id)
 {
 	$db = database();
@@ -1406,6 +1443,13 @@ function updatePMLabels($to_update, $user_id)
 	return $updateErrors;
 }
 
+/**
+ * Gets PMs older than a specific date.
+ *
+ * @param int $user_id the user's id.
+ * @param int $time timestamp with a specific date
+ * @return array
+ */
 function getPMsOlderThan($user_id, $time)
 {
 	$db = database();

@@ -679,7 +679,7 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
  */
 function ssi_topBoards($num_top = 10, $output_method = 'echo')
 {
-	global $txt, $scripturl, $user_info, $modSettings;
+	global $txt;
 
 	require_once(SUBSDIR . '/Stats.subs.php');
 
@@ -720,7 +720,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
  */
 function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'echo')
 {
-	global $txt, $scripturl, $modSettings;
+	global $txt, $scripturl;
 
 	require_once(SUBSDIR . '/Stats.subs.php');
 
@@ -894,7 +894,6 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	$members = array();
 	foreach ($members_data as $row)
 		$members[] = $row['id_member'];
-	$db->free_result($request);
 
 	if (empty($members))
 		return array();
@@ -1877,7 +1876,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
  */
 function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 {
-	global $user_info, $scripturl, $modSettings, $txt, $context;
+	global $modSettings, $txt;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 		return;
@@ -1943,7 +1942,7 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
 	require_once(SUBSDIR . '/Auth.subs.php');
 	$member = loadExistingMember($id, !$is_username);
 
-	return sha1(strtolower($member['member_name']) . $member['passwd']) == $pass && $member['is_activated'] == 1;
+	return sha1(strtolower($member['member_name']) . $member['passwd']) == $password && $member['is_activated'] == 1;
 }
 
 /**
