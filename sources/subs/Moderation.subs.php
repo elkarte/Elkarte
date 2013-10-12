@@ -1091,7 +1091,7 @@ function groupRequests()
  */
 function basicWatchedUsers()
 {
-	global $scripturl, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -1126,7 +1126,7 @@ function basicWatchedUsers()
  */
 function reportedPosts()
 {
-	global $user_info, $scripturl;
+	global $user_info;
 
 	$db = database();
 
@@ -1232,6 +1232,8 @@ function addModeratorNote($id_poster, $poster_name, $contents)
 
 function addReportComment($report, $id_poster, $poster_name, $newComment)
 {
+	global $user_info;
+
 	$db = database();
 
 	// Insert it into the database

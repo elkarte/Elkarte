@@ -324,7 +324,7 @@ function template_body_above()
 
 		if (!empty($modSettings['enableOpenID']))
 			echo '
-					<br /><input type="text" name="openid_identifier" size="25" class="input_text openid_login" />';
+					<br /><input type="text" name="openid_identifier" size="25" class="input_text openid_login" placeholder="', $txt['openid'], '" />';
 
 		echo '
 					<input type="hidden" name="hash_passwrd" value="" />

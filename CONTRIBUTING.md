@@ -1,6 +1,6 @@
-**Elkarte development repository**
+**ElkArte development repository**
 
-Elkarte is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
+ElkArte is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
 
 Documentation is licensed under [CC-by-SA 3](http://creativecommons.org/licenses/by-sa/3.0).
 

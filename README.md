@@ -1,7 +1,7 @@
-This is the **Elkarte** development repository.
+This is the **ElkArte** development repository.
 
 
-Elkarte is a modified version of the SMF forum software.
+ElkArte is a modified version of the SMF forum software.
 
 The software is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
 
