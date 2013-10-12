@@ -492,6 +492,7 @@ class PackageServers_Controller extends Action_Controller
 			$url = '';
 		}
 
+		// Entered a url and name to download?
 		if (isset($_REQUEST['byurl']) && !empty($_POST['filename']))
 			$package_name = basename($_REQUEST['filename']);
 		else
@@ -609,6 +610,7 @@ class PackageServers_Controller extends Action_Controller
 		{
 			while ($package = readdir($dir))
 			{
+				// No need to check these
 				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
 					continue;
 
@@ -617,12 +619,12 @@ class PackageServers_Controller extends Action_Controller
 				if (!is_array($packageInfo))
 					continue;
 
-				// If it was already uploaded, don't upload it again.
+				// If it was already uploaded under another name don't upload it again.
 				if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
 				{
 					@unlink($destination);
 					loadLanguage('Errors');
-					fatal_lang_error('package_upload_error_exists');
+					fatal_lang_error('package_upload_already_exists', 'general', $package);
 				}
 			}
 			closedir($dir);
