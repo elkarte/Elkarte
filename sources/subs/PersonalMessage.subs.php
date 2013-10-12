@@ -24,6 +24,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Loads information about the users message limit.
+ */
 function loadMessageLimit()
 {
 	global $user_info, $context;
@@ -52,6 +55,9 @@ function loadMessageLimit()
 	}
 }
 
+/**
+ * Loads the list of PM labels.
+ */
 function loadPMLabels()
 {
 	global $user_info, $context;
@@ -86,6 +92,14 @@ function loadPMLabels()
 	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
 }
 
+/**
+ * Get the number of PMs.
+ *
+ * @param bool $descending
+ * @param int $pmID
+ * @param int $labelQuery
+ * @return int
+ */
 function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
 	global $user_info, $context;
