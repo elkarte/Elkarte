@@ -747,7 +747,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// we'll need this
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Find humungous attachments.
 		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $_POST['size']), 'messages', true);
