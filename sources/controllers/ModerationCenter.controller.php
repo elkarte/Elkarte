@@ -82,7 +82,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// This is the menu structure - refer to subs/Menu.subs.php for the details.
 		$allMenus = Standard_Menu::context();
 		$moderation_menu = $allMenus->get('Moderation_Menu');
-		$moderation_menu->add('moderation_menu');
+
 		$moderation_menu->addBulk(
 			array(
 				'main' => array(

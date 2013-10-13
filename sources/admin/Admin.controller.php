@@ -55,7 +55,7 @@ class Admin_Controller extends Action_Controller
 		// Define the menu structure - see subs/Menu.subs.php for details!
 		$allMenus = Standard_Menu::context();
 		$admin_menu = $allMenus->get('Admin_Menu');
-		$admin_menu->add('admin_menu');
+
 		$admin_menu->addBulk(
 			array(
 				'forum' => array(
