@@ -2780,6 +2780,12 @@ function filter_accessible_attachment($attachment_info, $all_posters)
 	return true;
 }
 
+/**
+ * Counts attachments for the given folder.
+ *
+ * @param id $id_folder
+ * @return int
+ */
 function countAttachmentsInFolders($id_folder)
 {
 	$db = database();
