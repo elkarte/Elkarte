@@ -1848,9 +1848,11 @@ function attachment_folder($attach_id, $folder_id = null)
 }
 
 /**
- * Get max attachment ID with a thumbnail.
+ * Get the last attachment ID without a thumbnail.
+ *
+ * @return int
  */
-function maxThumbnails()
+function maxNoThumb()
 {
 	$db = database();
 
@@ -1869,10 +1871,55 @@ function maxThumbnails()
 }
 
 /**
+ * Get the max attachment ID which is a thumbnail.
+ *
+ * @return int
+ */
+function getMaxThumbnail()
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT MAX(id_attach)
+		FROM {db_prefix}attachments
+		WHERE attachment_type = {int:thumbnail}',
+		array(
+			'thumbnail' => 3,
+		)
+	);
+	list ($thumbnail) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $thumbnail;
+}
+
+/**
+ * Get the max attachment ID.
+ *
+ * @return int
+ */
+function maxAttachment()
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT MAX(id_attach)
+		FROM {db_prefix}attachments',
+		array(
+		)
+	);
+	list ($attachment) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $attachment;
+}
+
+/**
  * Check multiple attachments IDs against the database.
  *
  * @param array $attachments
  * @param string $approve_query
+ * @return array
  */
 function validateAttachments($attachments, $approve_query)
 {
@@ -1902,6 +1949,32 @@ function validateAttachments($attachments, $approve_query)
 
 	return $attachments;
 }
+
+/**
+ * Checks an attachments id
+ *
+ * @param int $id_attach
+ * @return boolean
+ */
+function validateAttachID($id_attach)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_attach
+		FROM {db_prefix}attachments
+		WHERE id_attach = {int:attachment_id}
+		LIMIT 1',
+		array(
+			'attachment_id' => $id_attach,
+		)
+	);
+	if ($db->num_rows($request) == 0)
+		return false;
+
+	return true;
+}
+
 
 /**
  * Callback function for action_unapproved_attachments
@@ -2705,4 +2778,30 @@ function filter_accessible_attachment($attachment_info, $all_posters)
 		return false;
 
 	return true;
+}
+
+/**
+ * Counts attachments for the given folder.
+ *
+ * @param id $id_folder
+ * @return int
+ */
+function countAttachmentsInFolders($id_folder)
+{
+	$db = database();
+
+	// Let's not try to delete a path with files in it.
+	$request = $db->query('', '
+		SELECT COUNT(id_attach) AS num_attach
+		FROM {db_prefix}attachments
+		WHERE id_folder = {int:id_folder}',
+		array(
+			'id_folder' => $id_folder,
+		)
+	);
+
+	list ($num_attach) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $num_attach;
 }
