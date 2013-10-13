@@ -318,6 +318,9 @@ function template_reported_posts()
 									', $report['body'], '
 
 									<ul class="quickbuttons">
+										<li class="listlevel1 quickmod_check">', !$context['view_closed'] ? '
+											<input class="input_check" type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
+										</li>
 										<li class="listlevel1">
 											<a href="', $report['report_href'], '" class="linklevel1 details_button">', $txt['mc_reportedp_details'], '</a>
 										</li>
@@ -326,9 +329,6 @@ function template_reported_posts()
 										</li>
 										<li class="listlevel1">
 											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
-										</li>
-										<li  class="listlevel1 inline_mod_check">', !$context['view_closed'] ? '
-											<input type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
 										</li>
 									</ul>
 								</div>
@@ -345,7 +345,7 @@ function template_reported_posts()
 							</div>
 						</div>';
 	else
-		template_pagesection(false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="button_submit" />' : ''));
+		template_pagesection(false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
