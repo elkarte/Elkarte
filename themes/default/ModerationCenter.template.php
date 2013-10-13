@@ -367,10 +367,6 @@ function template_unapproved_posts()
 							<h3 class="catbg">', $txt['mc_unapproved_posts'], '</h3>
 						</div>';
 
-	// Make up some buttons
-	$approve_button = create_button('approve.png', 'approve', 'approve', 'class="centericon"');
-	$remove_button = create_button('delete.png', 'remove_message', 'remove', 'class="centericon"');
-
 	// No posts?
 	if (empty($context['unapproved_items']))
 		echo '
@@ -396,19 +392,19 @@ function template_unapproved_posts()
 									<div class="list_posts">
 										<div class="post">', $item['body'], '</div>
 									</div>
-									<span class="floatright">
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';approve=', $item['id'], '">', $approve_button, '</a>';
-
-		if ($item['can_delete'])
-			echo '
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $remove_button, '</a>';
+									<ul class="quickbuttons">';
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
-										<input type="checkbox" name="item[]" value="', $item['id'], '" checked="checked" class="input_check" /> ';
-
+										<li class="listlevel1 quickmod_check"><input type="checkbox" name="item[]" value="', $item['id'], '" class="input_check" /></li>';
 		echo '
-									</span>
+										<li class="listlevel1"><a class="linklevel1 approve_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';approve=', $item['id'], '">', $txt['approve'], '</a></li>';
+
+		if ($item['can_delete'])
+			echo '
+										<li class="listlevel1"><a class="linklevel1 unapprove_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $txt['delete'], '</a></li>';
+		echo '
+									</ul>
 								</div>
 							</div>
 						</div>';
