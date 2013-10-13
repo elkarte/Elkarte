@@ -889,16 +889,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Get stranded thumbnails.
 		if ($_GET['step'] <= 0)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments
-				WHERE attachment_type = {int:thumbnail}',
-				array(
-					'thumbnail' => 3,
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = getMaxThumbnail();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
@@ -959,7 +950,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Find parents which think they have thumbnails, but actually, don't.
 		if ($_GET['step'] <= 1)
 		{
-			$thumbnails = maxThumbnails();
+			$thumbnails = maxNoThumb();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
@@ -1189,14 +1180,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// What about attachments, who are missing a message :'(
 		if ($_GET['step'] <= 4)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments',
-				array(
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = maxAttachment();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
@@ -1289,16 +1273,7 @@ class ManageAttachments_Controller extends Action_Controller
 								$attachID = (int) substr($file, 0, strpos($file, '_'));
 								if (!empty($attachID))
 								{
-									$request = $db->query('', '
-										SELECT  id_attach
-										FROM {db_prefix}attachments
-										WHERE id_attach = {int:attachment_id}
-										LIMIT 1',
-										array(
-											'attachment_id' => $attachID,
-										)
-									);
-									if ($db->num_rows($request) == 0)
+									if (!validateAttachID($attachID))
 									{
 										if ($fix_errors && in_array('files_without_attachment', $to_fix))
 										{
@@ -1310,7 +1285,7 @@ class ManageAttachments_Controller extends Action_Controller
 											$to_fix[] = 'files_without_attachment';
 										}
 									}
-									$db->free_result($request);
+									
 								}
 							}
 							elseif ($file != 'index.php')
@@ -1398,7 +1373,6 @@ class ManageAttachments_Controller extends Action_Controller
 					}
 
 					// OK, so let's try to create it then.
-					require_once(SUBSDIR . '/Attachments.subs.php');
 					if (automanage_attachments_create_directory($path))
 						$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
 					else
@@ -1449,18 +1423,8 @@ class ManageAttachments_Controller extends Action_Controller
 					else
 					{
 						// Let's not try to delete a path with files in it.
-						$request = $db->query('', '
-							SELECT COUNT(id_attach) AS num_attach
-							FROM {db_prefix}attachments
-							WHERE id_folder = {int:id_folder}',
-							array(
-								'id_folder' => (int) $id,
-							)
-						);
-
-						list ($num_attach) = $db->fetch_row($request);
-						$db->free_result($request);
-
+						$num_attach = countAttachmentsInFolders($id);
+					
 						// A check to see if it's a used base dir.
 						if (!empty($modSettings['attachment_basedirectories']))
 						{
