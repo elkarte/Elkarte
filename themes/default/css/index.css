@@ -1388,7 +1388,7 @@ div.bbc_footnotes {
 /* Specifically, the section titled "The enormous drawback". */
 /* @todo - Save code by amalgamating common button background declarations. */
 .pagelinks .navPages {
-	display: none;
+	display: block;
 	float: left;
 	padding: 1px 5px;
 	border: 1px solid #afafaf;
