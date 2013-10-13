@@ -438,6 +438,7 @@ class ModerationCenter_Controller extends Action_Controller
 		foreach ($context['reports'] as $row)
 		{
 			$context['reports'][$row['id_report']] = array(
+				'board' => $row['id_board'],
 				'id' => $row['id_report'],
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
@@ -456,6 +457,21 @@ class ModerationCenter_Controller extends Action_Controller
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all']
 			);
+		}
+
+		// Get the names of boards these topics are in.
+		if (!empty($report_ids))
+		{
+			$board_names = array();
+			$report_boards_ids = array_unique(array_map(function($element){return $element['board'];}, $context['reports']));
+
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$board_names = getBoardList(array('included_boards' => $report_boards_ids), true);
+
+			// Add the board name to the report array
+			foreach ($context['reports'] as $id_report => $report)
+				if (!empty($board_names[$report['board']]))
+					$context['reports'][$id_report]['board_name'] = $board_names[$report['board']]['board_name'];
 		}
 
 		// Now get all the people who reported it.
