@@ -26,26 +26,6 @@ if (!defined('ELK'))
 class Menu_Entries extends Positioning_Items
 {
 	/**
-	 * This array holds all the menus
-	 *
-	 * @var array of Menu_Entries
-	 */
-	private $_instances = null;
-
-	/**
-	 * Return a "top level" menu, if it doesn't exists, it creates one
-	 *
-	 * @param string a menu identifier
-	 */
-	public function get($id)
-	{
-		if (!isset($this->_instances[$id]))
-			$this->_instances[$id] = new Menu_Entries();
-
-		return $this->_instances[$id];
-	}
-
-	/**
 	 * Add a new item to the pile
 	 *
 	 * @param string $key index of a item
@@ -63,42 +43,77 @@ class Menu_Entries extends Positioning_Items
 		}
 		else
 		{
-			// If we know what to do, let's do it
-			if ($this->_position !== null && in_array($this->_position, $this->_known_positions))
+			if (!isset($this->_items[$key]))
 			{
-				$add = $this->_position;
+				// If we know what to do, let's do it
+				if ($this->_position !== null && in_array($this->_position, $this->_known_positions))
+				{
+					$add = $this->_position;
 
-				// after and before are special because the array doesn't need a priority level
-				if ($this->_position === 'after' || $this->_position === 'before')
-					$this->{'_all_' . $add}[$key] = $this->_relative;
-				// Instead end and begin are "normal" and the order is defined by the priority
+					// after and before are special because the array doesn't need a priority level
+					if ($this->_position === 'after' || $this->_position === 'before')
+						$this->{'_all_' . $add}[$key] = $this->_relative;
+					// Instead end and begin are "normal" and the order is defined by the priority
+					else
+						$this->{'_all_' . $add}[$key] = $priority === null ? $this->{'_' . $add . '_highest_priority'} : (int) $priority;
+				}
+				elseif ($this->_position === 'child')
+				{
+					if (!isset($this->_children[$this->_relative]))
+						$this->_children[$this->_relative] = new Menu_Entries();
+
+					// Always return the valid children of the "current" position
+					return $this->_children[$this->_relative];
+				}
 				else
-					$this->{'_all_' . $add}[$key] = $priority === null ? $this->{'_' . $add . '_highest_priority'} : (int) $priority;
+				{
+					$add = 'general';
+					$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+				}
 			}
-			elseif ($this->_position === 'child')
-			{
-				if (!isset($this->_children[$this->_relative]))
-					$this->_children[$this->_relative] = new Menu_Entries();
 
-				// Always return the valid children of the "current" position
-				return $this->_children[$this->_relative];
-			}
+			// If it already exists, update the existing
+			if (isset($this->_items[$key]))
+				$this->_items[$key] = array_merge($this->_items[$key], $item);
+			// Otherwise let's add it (the most important part)
 			else
 			{
-				$add = 'general';
-				$this->_all_general[$key] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+				$this->_items[$key] = $item;
+
+				// If there is a max priority level, then increase it
+				if (isset($this->{'_' . $add . '_highest_priority'}))
+					$this->{'_' . $add . '_highest_priority'} = max($this->{'_all_' . $add}) + 100;
 			}
-
-			// Let's add it (the most important part
-			$this->_items[$key] = $item;
-
-			// If there is a max priority level, then increase it
-			if (isset($this->{'_' . $add . '_highest_priority'}))
-				$this->{'_' . $add . '_highest_priority'} = max($this->{'_all_' . $add}) + 100;
 		}
 
 		if ($this->_reset)
 			$this->_position = null;
+	}
+}
+
+/**
+ * Singleton class: it allows to access to all the menus of a page
+ */
+class Standard_Menu extends Menu_Entries
+{
+	/**
+	 * This array holds all the menus
+	 *
+	 * @var array of Menu_Entries
+	 */
+	private $_instances = null;
+
+	/**
+	 * Return a "top level" menu, if it doesn't exists, it creates one
+	 *
+	 * @param string a menu identifier
+	 */
+	public function get($id)
+	{
+		if (!isset($this->_instances[$id]))
+			$this->_instances[$id] = new Menu_Entries();
+
+		return $this->_instances[$id];
 	}
 
 	/**
@@ -168,13 +183,7 @@ class Menu_Entries extends Positioning_Items
 		if (isset($this->_instances[$id]))
 			unset($this->_instances[$id]);
 	}
-}
 
-/**
- * Singleton class: it allows to access to all the menus of a page
- */
-class Standard_Menu extends Menu_Entries
-{
 	/**
 	 * Find and return Standard_Menu instance if it exists,
 	 * or create a new instance for $id if it didn't already exist.
