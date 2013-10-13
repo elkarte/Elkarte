@@ -107,6 +107,7 @@ class Packages_Controller extends Action_Controller
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
 			redirectexit('action=admin;area=packages');
+
 		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
 
 		// Do we have an existing id, for uninstalls and the like.
@@ -809,6 +810,7 @@ class Packages_Controller extends Action_Controller
 			'require-file' => array(),
 			'require-dir' => array(),
 		);
+
 		if (!empty($_POST['theme_changes']))
 		{
 			foreach ($_POST['theme_changes'] as $change)
@@ -826,8 +828,10 @@ class Packages_Controller extends Action_Controller
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($context['filename']);
+
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
+
 		$packageInfo['filename'] = $context['filename'];
 
 		// Set the type of extraction...
@@ -1362,7 +1366,6 @@ class Packages_Controller extends Action_Controller
 
 		$context['sub_template'] = 'browse';
 		$context['default_list'] = 'packages_lists';
-
 	}
 
 	/**
@@ -1855,6 +1858,7 @@ class Packages_Controller extends Action_Controller
 					// Nothing to see here?
 					if ($status === 'no_change')
 						continue;
+
 					$legal = false;
 					foreach ($legal_roots as $root)
 						if (substr($path, 0, strlen($root)) == $root)
@@ -1954,7 +1958,6 @@ class Packages_Controller extends Action_Controller
 
 					return $count;
 				}
-
 				foreach ($context['file_tree'] as $path => $data)
 				{
 					if (is_dir($path))
@@ -2083,9 +2086,7 @@ class Packages_Controller extends Action_Controller
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
 		if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array($the_brand => '')) == $the_version)
-		{
 			unset($_SESSION['version_emulate']);
-		}
 		elseif (isset($_GET['version_emulate']))
 		{
 			if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === $forum_version) && isset($_SESSION['version_emulate']))
@@ -2507,7 +2508,6 @@ function fetchPerms__recursive($path, &$data, $level)
 /**
  * Function called to briefly pause execution of directory/file chmod actions
  * Called by action_perms_save().
- *
  */
 function pausePermsSave()
 {

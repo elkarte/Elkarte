@@ -356,12 +356,17 @@ function template_upload()
 			<h3 class="catbg">', $txt['upload_new_package'], '</h3>
 		</div>';
 
-	template_ftp_required();
+	if ($context['package_download_broken'])
+	{
+		template_ftp_required();
 
-	echo '
+		echo '
 		<div class="cat_bar">
 			<h3 class="catbg">' . $txt['package_upload_title'] . '</h3>
-		</div>
+		</div>';
+	}
+
+	echo '
 		<div class="windowbg">
 			<div class="content">
 				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">

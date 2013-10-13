@@ -1030,9 +1030,9 @@
 				});
 				$exp_pages.css({
 					'height': $(this).outerHeight(),
-					'padding-left': $container.find('#pages_scroll_left').outerWidth(),
+					'padding-left': $container.find('#pages_scroll_left').outerWidth()
 				});
-				
+
 			});
 	};
 })(jQuery);

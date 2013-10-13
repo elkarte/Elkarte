@@ -3791,7 +3791,7 @@ function setupMenuContext()
 			// Button highlighting works properly too (see current action stuffz).
 			'admin' => array(
 				'title' => $context['allow_admin'] && ($context['current_action'] !== 'moderate') ? $txt['admin'] : $txt['moderate'],
-				'counter' => 'total',
+				'counter' => 'grand_total',
 				'href' => $context['allow_admin'] ? $scripturl . '?action=admin' : $scripturl . '?action=moderate',
 				'show' => $context['allow_moderation_center'],
 				'sub_buttons' => array(
@@ -3822,7 +3822,7 @@ function setupMenuContext()
 					),
 					'moderate' => array(
 						'title' => $txt['moderate'],
-						'counter' => 'total',
+						'counter' => 'grand_total',
 						'href' => $scripturl . '?action=moderate',
 						'show' => !$context['allow_admin'],
 					),
@@ -3857,7 +3857,7 @@ function setupMenuContext()
 					),
 					'moderate_sub' => array(
 						'title' => $txt['moderate'],
-						'counter' => 'total',
+						'counter' => 'grand_total',
 						'href' => $scripturl . '?action=moderate',
 						'show' => $context['allow_admin'],
 						'sub_buttons' => array(
@@ -4000,7 +4000,6 @@ function setupMenuContext()
 					$button['alttitle'] = $button['title'] . ' [' . $menu_count[$button['counter']] . ']';
 					if (!empty($settings['menu_numeric_notice'][0]))
 						$button['title'] .= sprintf($settings['menu_numeric_notice'][0], $menu_count[$button['counter']]);
-					unset($menu_count[$button['counter']]);
 				}
 
 				// Go through the sub buttons if there are any.
@@ -4014,7 +4013,6 @@ function setupMenuContext()
 							$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $menu_count[$subbutton['counter']] . ']';
 							if (!empty($settings['menu_numeric_notice'][1]))
 								$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'][1], $menu_count[$subbutton['counter']]);
-							unset($menu_count[$subbutton['counter']]);
 						}
 
 						// 2nd level sub buttons next...
@@ -4029,7 +4027,6 @@ function setupMenuContext()
 									$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $sub_button2['title'] . ' [' . $menu_count[$sub_button2['counter']] . ']';
 									if (isset($settings['menu_numeric_notice'][2]))
 										$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$sub_button2['counter']]);
-									unset($menu_count[$sub_button2['counter']]);
 								}
 							}
 						}

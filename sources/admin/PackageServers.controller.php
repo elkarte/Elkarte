@@ -167,7 +167,6 @@ class PackageServers_Controller extends Action_Controller
 			if ($token !== true)
 			{
 				$context['sub_template'] = 'package_confirm';
-
 				$context['page_title'] = $txt['package_servers'];
 				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute']));
 				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
@@ -220,8 +219,8 @@ class PackageServers_Controller extends Action_Controller
 		// We'll figure out if what they select a package they already have installed.
 		$instadds = loadInstalledPackages();
 
-		$installed_adds = array();
 		// Look through the list of installed mods...
+		$installed_adds = array();
 		foreach ($instadds as $installed_add)
 			$installed_adds[$installed_add['package_id']] = $installed_add['version'];
 
@@ -439,12 +438,14 @@ class PackageServers_Controller extends Action_Controller
 				{
 					$installs = $packageInfo['xml']->set('install');
 					foreach ($installs as $install)
+					{
 						if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
 						{
 							// Okay, this one is good to go.
 							$context['package_list'][$ps_id]['items'][$i]['can_install'] = true;
 							break;
 						}
+					}
 				}
 			}
 		}
@@ -491,10 +492,29 @@ class PackageServers_Controller extends Action_Controller
 			$url = '';
 		}
 
+		// Entered a url and name to download?
 		if (isset($_REQUEST['byurl']) && !empty($_POST['filename']))
 			$package_name = basename($_REQUEST['filename']);
 		else
 			$package_name = basename($_REQUEST['package']);
+
+		// Is this a "master" package from github or bitbucket?
+		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $_REQUEST['package'], $matches) == 1)
+		{
+			// @todo maybe use the name/version in the package instead, although the link will be cleaner
+			// Name this master.zip based on repo name in the link
+			$path_parts = pathinfo($matches[4]);
+			list(, $newname, ) = explode('/', $path_parts['dirname']);
+
+			// Just to be safe, no invalid file characters
+			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
+			$package_name = str_replace($invalid, '_', $newname) . $matches[6];
+
+			// We could read the package info and see if we have a duplicate id & version, however that is
+			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
+			// and do the save.
+			$_REQUEST['auto'] = true;
+		}
 
 		if (isset($_REQUEST['conflict']) || (isset($_REQUEST['auto']) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
@@ -520,17 +540,18 @@ class PackageServers_Controller extends Action_Controller
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
 
-		// Use FTP if necessary.
+		// Save the package to disk, use FTP if necessary
 		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
-		// You just downloaded a mod from SERVER_NAME_GOES_HERE.
+		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
 		$context['package_server'] = $server;
 
+		// Read in the newly saved package information
 		$context['package'] = getPackageInfo($package_name);
 
 		if (!is_array($context['package']))
@@ -565,7 +586,6 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_template'] = 'downloaded';
 
 		// @todo Use FTP if the packages directory is not writable.
-
 		// Check the file was even sent!
 		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
 			fatal_lang_error('package_upload_error_nofile');
@@ -583,6 +603,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// Setup the destination and throw an error if the file is already there!
 		$destination = BOARDDIR . '/packages/' . $packageName;
+
 		// @todo Maybe just roll it like we do for downloads?
 		if (file_exists($destination))
 			fatal_lang_error('package_upload_error_exists');
@@ -608,6 +629,7 @@ class PackageServers_Controller extends Action_Controller
 		{
 			while ($package = readdir($dir))
 			{
+				// No need to check these
 				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
 					continue;
 
@@ -616,12 +638,12 @@ class PackageServers_Controller extends Action_Controller
 				if (!is_array($packageInfo))
 					continue;
 
-				// If it was already uploaded, don't upload it again.
+				// If it was already uploaded under another name don't upload it again.
 				if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
 				{
 					@unlink($destination);
 					loadLanguage('Errors');
-					fatal_lang_error('package_upload_error_exists');
+					fatal_lang_error('package_upload_already_exists', 'general', $package);
 				}
 			}
 			closedir($dir);
@@ -703,6 +725,15 @@ class PackageServers_Controller extends Action_Controller
 
 		// Check if we will be able to write new archives in /packages folder.
 		$context['package_download_broken'] = !is_writable(BOARDDIR . '/packages') || !is_writable(BOARDDIR . '/packages/installed.list');
+
+		// Let's initialize ftp context
+		$context['package_ftp'] = array(
+			'server' => '',
+			'port' => '',
+			'username' => '',
+			'path' => '',
+			'error' => '',
+		);
 
 		// Give FTP a chance...
 		if ($context['package_download_broken'])

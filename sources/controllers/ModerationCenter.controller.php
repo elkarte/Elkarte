@@ -130,7 +130,7 @@ class ModerationCenter_Controller extends Action_Controller
 				),
 			),
 			'posts' => array(
-				'title' => $txt['mc_posts'] . (!empty($mod_counts['total']) ? ' [' . $mod_counts['total'] . ']' : ''),
+				'title' => $txt['mc_posts'] . (!empty($mod_counts['pt_total']) ? ' [' . $mod_counts['pt_total'] . ']' : ''),
 				'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
 				'areas' => array(
 					'postmod' => array(
@@ -173,7 +173,7 @@ class ModerationCenter_Controller extends Action_Controller
 				),
 			),
 			'groups' => array(
-				'title' => $txt['mc_groups'],
+				'title' => $txt['mc_groups'] . (!empty($mod_counts['mg_total']) ? ' [' . $mod_counts['mg_total'] . ']' : ''),
 				'enabled' => $context['can_moderate_groups'],
 				'areas' => array(
 					'userwatch' => array(
@@ -187,11 +187,19 @@ class ModerationCenter_Controller extends Action_Controller
 						),
 					),
 					'groups' => array(
-						'label' => $txt['mc_group_requests'],
+						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
 						'file' => 'controllers/Groups.controller.php',
 						'controller' => 'Groups_Controller',
 						'function' => 'action_requests',
 						'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
+					),
+					'members' => array(
+						'enabled' => allowedTo('moderate_forum'),
+						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
+						'file' => 'controllers/ManageMembers.controller.php',
+						'controller' => 'ManageMembers_Controller',
+						'function' => 'action_approve',
+						'custom_url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
 					),
 					'viewgroups' => array(
 						'label' => $txt['mc_view_groups'],
@@ -277,11 +285,13 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			$valid_blocks['a'] = 'actionRequired';
 			$valid_blocks['r'] = 'reportedPosts';
-			$valid_blocks['w'] = 'watchedUsers';
 		}
 
 		if ($context['can_moderate_groups'])
 			$valid_blocks['g'] = 'groupRequests';
+
+		if ($context['can_moderate_boards'])
+			$valid_blocks['w'] = 'watchedUsers';
 
 		$valid_blocks['n'] = 'latestNews';
 
@@ -428,6 +438,7 @@ class ModerationCenter_Controller extends Action_Controller
 		foreach ($context['reports'] as $row)
 		{
 			$context['reports'][$row['id_report']] = array(
+				'board' => $row['id_board'],
 				'id' => $row['id_report'],
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
@@ -446,6 +457,21 @@ class ModerationCenter_Controller extends Action_Controller
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all']
 			);
+		}
+
+		// Get the names of boards these topics are in.
+		if (!empty($report_ids))
+		{
+			$board_names = array();
+			$report_boards_ids = array_unique(array_map(function($element){return $element['board'];}, $context['reports']));
+
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$board_names = getBoardList(array('included_boards' => $report_boards_ids), true);
+
+			// Add the board name to the report array
+			foreach ($context['reports'] as $id_report => $report)
+				if (!empty($board_names[$report['board']]))
+					$context['reports'][$id_report]['board_name'] = $board_names[$report['board']]['board_name'];
 		}
 
 		// Now get all the people who reported it.
@@ -507,7 +533,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Does the user have any settings yet?
 		if (empty($user_settings['mod_prefs']))
 		{
-			$mod_blocks = 'n' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+			$mod_blocks = 'np' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 			$pref_binary = 5;
 			$show_reports = 1;
 		}
@@ -1504,7 +1530,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 	/**
 	 * Shows a list of items requiring moderation action
-	 * Includes post, topic, attachment and PBE values with links to each
+	 * Includes post, topic, attachment, group, member and PBE values with links to each
 	 */
 	public function block_actionRequired()
 	{
@@ -1514,8 +1540,8 @@ class ModerationCenter_Controller extends Action_Controller
 		$mod_totals = loadModeratorMenuCounts();
 
 		// This blocks total is only these fields
-		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'];
-		unset($mod_totals['reports'], $mod_totals['postmod'], $mod_totals['total']);
+		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'] + $mod_totals['memberreq'] + $mod_totals['groupreq'];
+		unset($mod_totals['reports'], $mod_totals['postmod'], $mod_totals['pt_total'], $mod_totals['mg_total'], $mod_totals['grand_total']);
 		$context['required'] = $mod_totals;
 
 		// Links to the areas
@@ -1524,6 +1550,8 @@ class ModerationCenter_Controller extends Action_Controller
 			'emailmod' => '?action=admin;area=maillist;sa=emaillist',
 			'topics' => '?action=moderate;area=postmod;sa=topics',
 			'posts' => '?action=moderate;area=postmod;sa=posts',
+			'memberreq' => '?action=admin;area=viewmembers;sa=browse;type=approve',
+			'groupreq' => '?action=moderate;area=groups;sa=requests',
 		);
 
 		return 'action_required';
