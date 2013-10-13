@@ -293,10 +293,10 @@ function template_main()
 							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
 					</div>
-					<p class="topic_starter">
+					<div class="topic_starter">
 						', $txt['started_by'], ' ', $topic['first_post']['member']['link'], !empty($topic['pages']) ? '
-						<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menu">' . $topic['pages'] . '</span>' : '', '
-					</p>
+						<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</sulpan>' : '', '
+					</div>
 				</div>
 				<div class="topic_latest">
 					<p class="topic_stats">

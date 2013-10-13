@@ -301,7 +301,7 @@ function template_reported_posts()
 							<div class="', ++$alternate % 2 ? 'windowbg' : 'windowbg2', ' core_posts">
 								<div class="content">
 									<h5>
-										<strong><a href="', $report['topic_href'], '">', $report['subject'], '</a></strong> ', $txt['mc_reportedp_by'], ' <strong>', $report['author']['link'], '</strong>
+										<strong>', !empty($report['board_name']) ? '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a>' : '??', ' / <a href="', $report['topic_href'], '">', $report['subject'], '</a></strong> ', $txt['mc_reportedp_by'], ' <strong>', $report['author']['link'], '</strong>
 									</h5>
 									<div class="smalltext">
 										', $txt['mc_reportedp_last_reported'], ': ', $report['last_updated'], '&nbsp;-&nbsp;';

@@ -553,6 +553,14 @@ class Auth_Controller extends Action_Controller
 
 /**
  * Check activation status of the current user.
+ * 
+ * > 10 Banned with activation status as value - 10
+ * 5 = Awaiting COPPA concent
+ * 4 = Awaiting Deletion approval
+ * 3 = Awaiting Admin approval
+ * 2 = Awaiting reactivation from email change
+ * 1 = Approved and active
+ * 0 = Not active
  */
 function checkActivation()
 {
