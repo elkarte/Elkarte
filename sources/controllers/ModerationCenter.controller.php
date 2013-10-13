@@ -80,135 +80,151 @@ class ModerationCenter_Controller extends Action_Controller
 		$mod_counts = loadModeratorMenuCounts();
 
 		// This is the menu structure - refer to subs/Menu.subs.php for the details.
-		$moderation_areas = array(
-			'main' => array(
-				'title' => $txt['mc_main'],
-				'areas' => array(
-					'index' => array(
-						'label' => $txt['moderation_center'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_moderationHome',
-					),
-					'settings' => array(
-						'label' => $txt['mc_settings'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_moderationSettings',
-					),
-					'modlogoff' => array(
-						'label' => $txt['mc_logoff'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_modEndSession',
-						'enabled' => empty($modSettings['securityDisable_moderate']),
-					),
-					'notice' => array(
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_showNotice',
-						'select' => 'index'
+		$allMenus = Standard_Menu::context();
+		$moderation_menu = $allMenus->get('Moderation_Menu');
+		$moderation_menu->add('moderation_menu');
+		$moderation_menu->addBulk(
+			array(
+				'main' => array(
+					'title' => $txt['mc_main'],
+				),
+				'logs' => array(
+					'title' => $txt['mc_logs'],
+				),
+				'posts' => array(
+					'title' => $txt['mc_posts'] . (!empty($mod_counts['pt_total']) ? ' [' . $mod_counts['pt_total'] . ']' : ''),
+					'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
+				),
+				'groups' => array(
+					'title' => $txt['mc_groups'] . (!empty($mod_counts['mg_total']) ? ' [' . $mod_counts['mg_total'] . ']' : ''),
+					'enabled' => $context['can_moderate_groups'],
+				),
+			)
+		);
+
+		$moderation_menu->childOf('main')->add('main_areas')->addBulk(
+			array(
+				'index' => array(
+					'label' => $txt['moderation_center'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_moderationHome',
+				),
+				'settings' => array(
+					'label' => $txt['mc_settings'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_moderationSettings',
+				),
+				'modlogoff' => array(
+					'label' => $txt['mc_logoff'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_modEndSession',
+					'enabled' => empty($modSettings['securityDisable_moderate']),
+				),
+				'notice' => array(
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_showNotice',
+					'select' => 'index'
+				),
+			)
+		);
+		$moderation_menu->childOf('logs')->add('logs_areas')->addBulk(
+			array(
+				'modlog' => array(
+					'label' => $txt['modlog_view'],
+					'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
+					'file' => 'admin/Modlog.controller.php',
+					'controller' => 'Modlog_Controller',
+					'function' => 'action_log',
+				),
+				'warnings' => array(
+					'label' => $txt['mc_warnings'],
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_viewWarnings',
+					'subsections' => array(
+						'log' => array($txt['mc_warning_log']),
+						'templates' => array($txt['mc_warning_templates'], 'issue_warning'),
 					),
 				),
-			),
-			'logs' => array(
-				'title' => $txt['mc_logs'],
-				'areas' => array(
-					'modlog' => array(
-						'label' => $txt['modlog_view'],
-						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'admin/Modlog.controller.php',
-						'controller' => 'Modlog_Controller',
-						'function' => 'action_log',
-					),
-					'warnings' => array(
-						'label' => $txt['mc_warnings'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_viewWarnings',
-						'subsections' => array(
-							'log' => array($txt['mc_warning_log']),
-							'templates' => array($txt['mc_warning_templates'], 'issue_warning'),
-						),
+			)
+		);
+
+		$moderation_menu->childOf('posts')->add('posts_areas')->addBulk(
+			array(
+				'postmod' => array(
+					'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
+					'enabled' => $context['can_moderate_approvals'],
+					'file' => 'controllers/PostModeration.controller.php',
+					'controller' => 'PostModeration_Controller',
+					'function' => 'action_index',
+					'custom_url' => $scripturl . '?action=moderate;area=postmod',
+					'subsections' => array(
+						'posts' => array($txt['mc_unapproved_replies']),
+						'topics' => array($txt['mc_unapproved_topics']),
 					),
 				),
-			),
-			'posts' => array(
-				'title' => $txt['mc_posts'] . (!empty($mod_counts['pt_total']) ? ' [' . $mod_counts['pt_total'] . ']' : ''),
-				'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
-				'areas' => array(
-					'postmod' => array(
-						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
-						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'controllers/PostModeration.controller.php',
-						'controller' => 'PostModeration_Controller',
-						'function' => 'action_index',
-						'custom_url' => $scripturl . '?action=moderate;area=postmod',
-						'subsections' => array(
-							'posts' => array($txt['mc_unapproved_replies']),
-							'topics' => array($txt['mc_unapproved_topics']),
-						),
-					),
-					'emailmod' => array(
-						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
-						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'admin/ManageMaillist.controller.php',
-						'function' => 'UnapprovedEmails',
-						'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
-					),
-					'attachmod' => array(
-						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
-						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'controllers/PostModeration.controller.php',
-						'controller' => 'PostModeration_Controller',
-						'function' => 'action_index',
-						'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-					),
-					'reports' => array(
-						'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
-						'enabled' => $context['can_moderate_boards'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_reportedPosts',
-						'subsections' => array(
-							'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
-							'closed' => array($txt['mc_reportedp_closed']),
-						),
+				'emailmod' => array(
+					'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
+					'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					'file' => 'admin/ManageMaillist.controller.php',
+					'function' => 'UnapprovedEmails',
+					'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+				),
+				'attachmod' => array(
+					'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
+					'enabled' => $context['can_moderate_approvals'],
+					'file' => 'controllers/PostModeration.controller.php',
+					'controller' => 'PostModeration_Controller',
+					'function' => 'action_index',
+					'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+				),
+				'reports' => array(
+					'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
+					'enabled' => $context['can_moderate_boards'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_reportedPosts',
+					'subsections' => array(
+						'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
+						'closed' => array($txt['mc_reportedp_closed']),
 					),
 				),
-			),
-			'groups' => array(
-				'title' => $txt['mc_groups'] . (!empty($mod_counts['mg_total']) ? ' [' . $mod_counts['mg_total'] . ']' : ''),
-				'enabled' => $context['can_moderate_groups'],
-				'areas' => array(
-					'userwatch' => array(
-						'label' => $txt['mc_watched_users_title'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_viewWatchedUsers',
-						'subsections' => array(
-							'member' => array($txt['mc_watched_users_member']),
-							'post' => array($txt['mc_watched_users_post']),
-						),
-					),
-					'groups' => array(
-						'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
-						'file' => 'controllers/Groups.controller.php',
-						'controller' => 'Groups_Controller',
-						'function' => 'action_requests',
-						'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
-					),
-					'members' => array(
-						'enabled' => allowedTo('moderate_forum'),
-						'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
-						'file' => 'controllers/ManageMembers.controller.php',
-						'controller' => 'ManageMembers_Controller',
-						'function' => 'action_approve',
-						'custom_url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
-					),
-					'viewgroups' => array(
-						'label' => $txt['mc_view_groups'],
-						'file' => 'controllers/Groups.controller.php',
-						'controller' => 'Groups_Controller',
-						'function' => 'action_list',
+			)
+		);
+
+		$moderation_menu->childOf('groups')->add('groups_areas')->addBulk(
+			array(
+				'userwatch' => array(
+					'label' => $txt['mc_watched_users_title'],
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_viewWatchedUsers',
+					'subsections' => array(
+						'member' => array($txt['mc_watched_users_member']),
+						'post' => array($txt['mc_watched_users_post']),
 					),
 				),
-			),
+				'groups' => array(
+					'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
+					'file' => 'controllers/Groups.controller.php',
+					'controller' => 'Groups_Controller',
+					'function' => 'action_requests',
+					'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
+				),
+				'members' => array(
+					'enabled' => allowedTo('moderate_forum'),
+					'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
+					'file' => 'controllers/ManageMembers.controller.php',
+					'controller' => 'ManageMembers_Controller',
+					'function' => 'action_approve',
+					'custom_url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
+				),
+				'viewgroups' => array(
+					'label' => $txt['mc_view_groups'],
+					'file' => 'controllers/Groups.controller.php',
+					'controller' => 'Groups_Controller',
+					'function' => 'action_list',
+				),
+			)
 		);
 
 		// Make sure the administrator has a valid session...
@@ -220,8 +236,8 @@ class ModerationCenter_Controller extends Action_Controller
 			'disable_url_session_check' => true,
 		);
 
-		$mod_include_data = createMenu($moderation_areas, $menuOptions);
-		unset($moderation_areas);
+		$mod_include_data = $allMenus->createMenu('Moderation_Menu', $menuOptions);
+		$allMenus->destroy('Moderation_Menu');
 
 		// We got something - didn't we? DIDN'T WE!
 		if ($mod_include_data == false)

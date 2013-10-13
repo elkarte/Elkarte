@@ -3757,14 +3757,14 @@ function setupMenuContext()
 
 				'admin' => array(
 					'title' => $txt['admin'],
-					'counter' => 'total',
+					'counter' => 'grand_total',
 					'href' => $scripturl . '?action=admin',
 					'show' => $context['allow_admin'],
 				),
 
 				'moderate' => array(
 					'title' => $txt['moderate'],
-					'counter' => 'total',
+					'counter' => 'grand_total',
 					'href' => $scripturl . '?action=moderate',
 					'show' => !$context['allow_admin'] && $context['allow_moderation_center'],
 				),
@@ -3876,7 +3876,7 @@ function setupMenuContext()
 				),
 				'moderate' => array(
 					'title' => $txt['moderate'],
-					'counter' => 'total',
+					'counter' => $context['allow_admin'] ? '' : 'grand_total',
 					'href' => $scripturl . '?action=moderate',
 					'show' => $context['allow_admin'],
 				),
