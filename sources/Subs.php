@@ -3096,6 +3096,8 @@ function template_header()
 {
 	global $context, $settings;
 
+	doSecurityChecks();
+
 	setupThemeContext();
 
 	// Print stuff to prevent caching of pages (except on attachment errors, etc.)
@@ -3335,6 +3337,25 @@ function template_css()
 function template_admin_warning_above()
 {
 	global $context, $user_info, $scripturl, $txt, $modSettings;
+
+	if (!empty($context['security_controls']['query']))
+	{
+		echo '
+	<div class="errorbox">
+		<p class="alert">!!</p>
+		<h3>', $context['user']['is_admin'] ? $txt['query_command_denied'] : $txt['query_command_denied_guests'], '</h3>
+		<ul>';
+
+		foreach ($context['security_controls']['query'] as $error)
+		{
+			echo '
+			<li><pre>', $context['user']['is_admin'] ? $error : sprintf($txt['query_command_denied_guests_msg'], $error), '</pre></li>';
+		}
+		echo '
+		</ul>
+	</div>';
+	}
+
 
 	if (!empty($context['security_controls']['files']))
 	{
