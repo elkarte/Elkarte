@@ -255,8 +255,8 @@ function createMenu($menuData, $menuOptions = array())
 	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
 
 	// What is the current area selected?
-	if (isset($menuOptions['current_area']) || isset($_GET['area']))
-		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_GET['area'];
+	if (isset($menuOptions['current_area']) || isset($_REQUEST['area']))
+		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_REQUEST['area'];
 
 	// Build a list of additional parameters that should go in the URL.
 	$menu_context['extra_parameters'] = '';
@@ -381,6 +381,7 @@ function createMenu($menuData, $menuOptions = array())
 
 					// Update the context if required - as we can have areas pretending to be others. ;)
 					$menu_context['current_section'] = $section_id;
+					// @todo 'select' seems useless
 					$menu_context['current_area'] = isset($area['select']) ? $area['select'] : $area_id;
 
 					// This will be the data we return.

@@ -135,6 +135,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 			// Should we show a custom message?
 			$context['activate_message'] = isset($txt['account_activate_method_' . $context['member']['is_activated'] % 10]) ? $txt['account_activate_method_' . $context['member']['is_activated'] % 10] : $txt['account_not_activated'];
+			$context['activate_url'] = $scripturl . '?action=profile;save;area=activateaccount;u=' . $memID . ';' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['profile-aa' . $memID . '_token_var'] . '=' . $context['profile-aa' . $memID . '_token'];
 		}
 
 		// Is the signature even enabled on this forum?
@@ -410,7 +411,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : '') . (!empty($board) ? ';board=' . $board : ''), $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : ';sa=messages') . (!empty($board) ? ';board=' . $board : ''), $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		// Reverse the query if we're past 50% of the pages for better performance.
