@@ -1801,13 +1801,19 @@ function incrementBoard($id_board, $values)
 
 	$set = array();
 	$params = array('id_board' => $id_board);
+	$values = is_array($values) ? $values : array($values => 1);
 
 	foreach ($values as $key => $val)
 	{
-		if (in_array($val, $knownInts))
+		if (in_array($key, $knownInts))
+		{
 			$set[] = $key . ' = ' . $key . ' + {int:' . $key . '}';
-		$params[$key] = $val;
+			$params[$key] = $val;
+		}
 	}
+
+	if (empty($set))
+		return;
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
