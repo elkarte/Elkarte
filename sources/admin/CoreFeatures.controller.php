@@ -55,6 +55,8 @@ class CoreFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
 
+		require_once(SUBSDIR . '/Admin.subs.php');
+
 		loadTemplate('CoreFeatures');
 
 		$core_features = $this->settings();
