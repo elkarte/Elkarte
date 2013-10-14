@@ -1786,7 +1786,7 @@ function addChildBoards(&$boards)
  * Increment a board stat field, for example num_posts.
  *
  * @param int $board
- * @param string $values
+ * @param mixed $values an array of index => value of a string representing the index to increment
  */
 function incrementBoard($id_board, $values)
 {
@@ -1801,18 +1801,25 @@ function incrementBoard($id_board, $values)
 
 	$set = array();
 	$params = array('id_board' => $id_board);
+	$values = is_array($values) ? $values : array($values => 1);
 
 	foreach ($values as $key => $val)
 	{
-		if (in_array($val, $knownInts))
+		if (in_array($key, $knownInts))
+		{
 			$set[] = $key . ' = ' . $key . ' + {int:' . $key . '}';
-		$params[$key] = $val;
+			$params[$key] = $val;
+		}
 	}
+
+	if (empty($set))
+		return;
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET
-			' . implode("\n\t\t\t", $set) . '
+			' . implode(',
+			', $set) . '
 		WHERE id_board = {int:id_board}',
 		$params
 	);
@@ -1822,7 +1829,7 @@ function incrementBoard($id_board, $values)
  * Decrement a board stat field, for example num_posts.
  *
  * @param int $board
- * @param string $values
+ * @param mixed $values an array of index => value of a string representing the index to decrement
  */
 function decrementBoard($id_board, $values)
 {
@@ -1837,18 +1844,25 @@ function decrementBoard($id_board, $values)
 
 	$set = array();
 	$params = array('id_board' => $id_board);
+	$values = is_array($values) ? $values : array($values => 1);
 
 	foreach ($values as $key => $val)
 	{
 		if (in_array($val, $knownInts))
+		{
 			$set[] = $key . ' = CASE WHEN {int:' . $key . '} > ' . $key . ' THEN 0 ELSE ' . $key . ' - {int:' . $key . '} END';
-		$params[$key] = $val;
+			$params[$key] = $val;
+		}
 	}
+
+	if (empty($set))
+		return;
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET
-			' . implode(",\n\t\t\t", $set) . '
+			' . implode(',
+			', $set) . '
 		WHERE id_board = {int:id_board}',
 		$params
 	);
