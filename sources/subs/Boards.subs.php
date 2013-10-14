@@ -1818,7 +1818,8 @@ function incrementBoard($id_board, $values)
 	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET
-			' . implode("\n\t\t\t", $set) . '
+			' . implode(',
+			', $set) . '
 		WHERE id_board = {int:id_board}',
 		$params
 	);
@@ -1843,18 +1844,25 @@ function decrementBoard($id_board, $values)
 
 	$set = array();
 	$params = array('id_board' => $id_board);
+	$values = is_array($values) ? $values : array($values => 1);
 
 	foreach ($values as $key => $val)
 	{
 		if (in_array($val, $knownInts))
+		{
 			$set[] = $key . ' = CASE WHEN {int:' . $key . '} > ' . $key . ' THEN 0 ELSE ' . $key . ' - {int:' . $key . '} END';
-		$params[$key] = $val;
+			$params[$key] = $val;
+		}
 	}
+
+	if (empty($set))
+		return;
 
 	$db->query('', '
 		UPDATE {db_prefix}boards
 		SET
-			' . implode(",\n\t\t\t", $set) . '
+			' . implode(',
+			', $set) . '
 		WHERE id_board = {int:id_board}',
 		$params
 	);
