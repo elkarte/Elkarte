@@ -1786,7 +1786,7 @@ function addChildBoards(&$boards)
  * Increment a board stat field, for example num_posts.
  *
  * @param int $board
- * @param string $values
+ * @param mixed $values an array of index => value of a string representing the index to increment
  */
 function incrementBoard($id_board, $values)
 {
@@ -1829,7 +1829,7 @@ function incrementBoard($id_board, $values)
  * Decrement a board stat field, for example num_posts.
  *
  * @param int $board
- * @param string $values
+ * @param mixed $values an array of index => value of a string representing the index to decrement
  */
 function decrementBoard($id_board, $values)
 {
