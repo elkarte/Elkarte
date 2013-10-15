@@ -57,19 +57,7 @@ function template_main()
 
 		// Assuming the category hasn't been collapsed...
 		if (!$category['is_collapsed'])
-		{
-			echo '
-			<ul class="category_boards" id="category_', $category['id'], '_boards">';
-			// Each board in each category's boards has:
-			// new (is it new?), id, name, description, moderators (see below), link_moderators (just a list.),
-			// children (see below.), link_children (easier to use.), children_new (are they new?),
-			// topics (# of), posts (# of), link, href, and last_post. (see below.)
-			foreach ($category['boards'] as $board)
-				template_list_boards($board);
-
-			echo '
-			</ul>';
-		}
+			template_list_boards($category['boards']);
 
 		echo '
 		</div>';

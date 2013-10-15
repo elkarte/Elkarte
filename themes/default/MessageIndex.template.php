@@ -36,8 +36,7 @@ function template_display_child_boards_above()
 		</h2>
 		<ul class="category_boards" id="board_', $context['current_board'], '_children">';
 
-	foreach ($context['boards'] as $board)
-		template_list_boards($board);
+	template_list_boards($context['boards']);
 
 	echo '
 		</ul>
