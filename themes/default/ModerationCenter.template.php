@@ -318,6 +318,9 @@ function template_reported_posts()
 									', $report['body'], '
 
 									<ul class="quickbuttons">
+										<li class="listlevel1 quickmod_check">', !$context['view_closed'] ? '
+											<input class="input_check" type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
+										</li>
 										<li class="listlevel1">
 											<a href="', $report['report_href'], '" class="linklevel1 details_button">', $txt['mc_reportedp_details'], '</a>
 										</li>
@@ -326,9 +329,6 @@ function template_reported_posts()
 										</li>
 										<li class="listlevel1">
 											<a href="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';close=', (int) !$report['closed'], ';rid=', $report['id'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], '" class="linklevel1 close_button">', $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
-										</li>
-										<li  class="listlevel1 inline_mod_check">', !$context['view_closed'] ? '
-											<input type="checkbox" name="close[]" value="' . $report['id'] . '" />' : '', '
 										</li>
 									</ul>
 								</div>
@@ -345,7 +345,7 @@ function template_reported_posts()
 							</div>
 						</div>';
 	else
-		template_pagesection(false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="button_submit" />' : ''));
+		template_pagesection(false, false, array('extra' => !$context['view_closed'] ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -366,10 +366,6 @@ function template_unapproved_posts()
 						<div class="cat_bar">
 							<h3 class="catbg">', $txt['mc_unapproved_posts'], '</h3>
 						</div>';
-
-	// Make up some buttons
-	$approve_button = create_button('approve.png', 'approve', 'approve', 'class="centericon"');
-	$remove_button = create_button('delete.png', 'remove_message', 'remove', 'class="centericon"');
 
 	// No posts?
 	if (empty($context['unapproved_items']))
@@ -396,19 +392,19 @@ function template_unapproved_posts()
 									<div class="list_posts">
 										<div class="post">', $item['body'], '</div>
 									</div>
-									<span class="floatright">
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';approve=', $item['id'], '">', $approve_button, '</a>';
-
-		if ($item['can_delete'])
-			echo '
-										<a href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $remove_button, '</a>';
+									<ul class="quickbuttons">';
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
-										<input type="checkbox" name="item[]" value="', $item['id'], '" checked="checked" class="input_check" /> ';
-
+										<li class="listlevel1 quickmod_check"><input type="checkbox" name="item[]" value="', $item['id'], '" class="input_check" /></li>';
 		echo '
-									</span>
+										<li class="listlevel1"><a class="linklevel1 approve_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';approve=', $item['id'], '">', $txt['approve'], '</a></li>';
+
+		if ($item['can_delete'])
+			echo '
+										<li class="listlevel1"><a class="linklevel1 unapprove_button" href="', $scripturl, '?action=moderate;area=postmod;sa=', $context['current_view'], ';start=', $context['start'], ';', $context['session_var'], '=', $context['session_id'], ';delete=', $item['id'], '">', $txt['delete'], '</a></li>';
+		echo '
+									</ul>
 								</div>
 							</div>
 						</div>';
@@ -449,30 +445,20 @@ function template_viewmodreport()
 									', sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']), '
 								</h3>
 							</div>
-							<div class="title_bar">
-								<h3 class="titlebg">
-									<span class="floatleft">
-										', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '
-									</span>
-									<span class="floatright">';
-
-	// Make the buttons.
-	$close_button = create_button('close.png', $context['report']['closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close', $context['report']['closed'] ? 'mc_reportedp_open' : 'mc_reportedp_close', 'class="centericon"');
-	$ignore_button = create_button('ignore.png', 'mc_reportedp_ignore', 'mc_reportedp_ignore', 'class="centericon"');
-	$unignore_button = create_button('ignore.png', 'mc_reportedp_unignore', 'mc_reportedp_unignore', 'class="centericon"');
-
-	echo '
-										<a href="', $scripturl, '?action=moderate;area=reports;ignore=', (int) !$context['report']['ignore'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$context['report']['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', '>', $context['report']['ignore'] ? $unignore_button : $ignore_button, '</a>
-										<a href="', $scripturl, '?action=moderate;area=reports;close=', (int) !$context['report']['closed'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $close_button, '</a>
-									</span>
-								</h3>
-							</div>
 							<div class="windowbg2">
+								<p class="noticebox">', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '</p>
 								<div class="content">
 									', $context['report']['body'], '
 								</div>
+								<ul class="quickbuttons">
+									<li class="listlevel1">
+										<a class="linklevel1 close_button" href="', $scripturl, '?action=moderate;area=reports;close=', (int) !$context['report']['closed'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['report']['closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
+									</li>
+									<li class="listlevel1">
+										<a class="linklevel1 ignore_button" href="', $scripturl, '?action=moderate;area=reports;ignore=', (int) !$context['report']['ignore'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$context['report']['ignore'] ? 'onclick="return confirm(\'' . $txt['mc_reportedp_ignore_confirm'] . '\');"' : '', '>', $context['report']['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
+									</li>
+								</ul>
 							</div>
-							<br />
 							<div class="cat_bar">
 								<h3 class="catbg">', $txt['mc_modreport_whoreported_title'], '</h3>
 							</div>';
@@ -487,7 +473,6 @@ function template_viewmodreport()
 							</div>';
 
 	echo '
-							<br />
 							<div class="cat_bar">
 								<h3 class="catbg">', $txt['mc_modreport_mod_comments'], '</h3>
 							</div>
@@ -496,9 +481,7 @@ function template_viewmodreport()
 
 	if (empty($context['report']['mod_comments']))
 		echo '
-								<div class="information">
-									<p class="centertext">', $txt['mc_modreport_no_mod_comment'], '</p>
-								</div>';
+									<p class="infobox">', $txt['mc_modreport_no_mod_comment'], '</p>';
 
 	foreach ($context['report']['mod_comments'] as $comment)
 		echo
@@ -510,8 +493,7 @@ function template_viewmodreport()
 										<input type="submit" name="add_comment" value="', $txt['mc_modreport_add_mod_comment'], '" class="button_submit" />
 									</div>
 								</div>
-							</div>
-							<br />';
+							</div>';
 
 	template_show_list('moderation_actions_list');
 

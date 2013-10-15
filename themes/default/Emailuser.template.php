@@ -240,7 +240,7 @@ function template_report()
 								<label for="report_comment">', $txt['enter_comment'], '</label>:
 							</dt>
 							<dd>
-								<textarea type="text" id="report_comment" name="comment" style="width: 70%" rows="5">', $context['comment_body'], '</textarea>
+								<textarea type="text" id="report_comment" name="comment">', $context['comment_body'], '</textarea>
 							</dd>';
 
 	if ($context['require_verification'])
