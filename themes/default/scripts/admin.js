@@ -584,13 +584,13 @@ function make_preview_btn (preview_id)
 			type: "POST",
 			url: elk_scripturl + "?action=xmlpreview;xml",
 			data: {item: "newspreview", news: $("#data_" + preview_id).val()},
-			context: document.body,
-			success: function(request){
-				if ($(request).find("error").text() == '')
-					$(document).find("#box_preview_" + preview_id).html($(request).text());
-				else
-					$(document).find("#box_preview_" + preview_id).text(txt_news_error_no_news);
-			},
+			context: document.body
+		})
+		.done(function(request) {
+			if ($(request).find("error").text() == '')
+				$(document).find("#box_preview_" + preview_id).html($(request).text());
+			else
+				$(document).find("#box_preview_" + preview_id).text(txt_news_error_no_news);
 		});
 	});
 	if (!$id.parent().hasClass('linkbutton_right'))
