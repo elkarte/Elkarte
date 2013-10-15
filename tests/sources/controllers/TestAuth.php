@@ -27,9 +27,9 @@ class TestAuth extends WebTestCase
 	function testLogin()
 	{
 		$this->get($this->scripturl);
-		$this->click('Login');
-		$this->assertTitle('Login');
-		$this->assertText('Login');
+		$this->click('Log in');
+		$this->assertTitle('Log in');
+		$this->assertText('Log in');
 
 		// Lets login!
 		$this->setField('user', 'test');
@@ -37,7 +37,7 @@ class TestAuth extends WebTestCase
 
 		// Set some hidden fields or not
 
-		$this->click("Login");
+		$this->click("Log in");
 
 		// Nope, huh? I hope :P
 		$this->assertTitle('An Error Has Occurred');
