@@ -53,7 +53,7 @@ class error_context
 	private $_language_files = array();
 
 	/**
-	 * Multipleton. This is an array of instances of error_context.
+	 * Multiton. This is an array of instances of error_context.
 	 * All callers use an error context ('post', 'attach', or 'default' if none chosen).
 	 *
 	 * @var array of error_context
