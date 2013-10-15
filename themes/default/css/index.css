@@ -1243,6 +1243,9 @@ div.bbc_footnotes {
 	margin-top: -12px;
 	content:"";
 }
+.quickmod_check {
+	left: 3px;
+}
 /* The rest of them. */
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	background-repeat: no-repeat;
@@ -2710,6 +2713,11 @@ ul.post_options li {
 #report_topic dl.settings dd {
 	width: 79%;
 }
+#report_comment {
+	width: 75%;
+	height: 10em;
+	padding: 5px;
+}
 
 /* The split topic section. */
 #selected, #not_selected {
@@ -3127,7 +3135,10 @@ dl.merge_topic dd {
 /* ------------------------------------------------------- */
 
 #personal_messages .labels {
-	margin: 11px 0 0;
+	padding: 11px 0 0;
+}
+#personal_messages .signature {
+	overflow: visible;
 }
 #personal_messages .capacity_bar {
 	display: block;

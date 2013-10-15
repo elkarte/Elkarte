@@ -813,6 +813,16 @@ dl.themes_list dd {
 #modcenter {
 	display: block;
 	width: 100%;
+    background: none repeat scroll 0 0 #DEEDDA;
+    border-radius: 5px 5px 0 0;
+    box-shadow: 1px 2px 3px #EEEEEE;
+}
+#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
+	overflow: visible;
+	margin: 4px 0 0 0;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	background: #fff;
 }
 #modcenter .content {
 	padding: 12px;

@@ -206,9 +206,8 @@ class PostModeration_Controller extends Action_Controller
 		);
 
 		// Update the tabs with the correct number of actions to account for brd filtering
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' (' . $context['total_unapproved_posts'] . ')';
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label']. ' (' . $context['total_unapproved_topics'] . ')';
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['reports']['subsections']['open']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['reports']['subsections']['open']['label']. ' (' . $context['total_unapproved_topics'] . ')';
+		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' [' . $context['total_unapproved_posts'] . ']';
+		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label']. ' [' . $context['total_unapproved_topics'] . ']';
 
 		// If we are filtering some boards out then make sure to send that along with the links.
 		if (isset($_REQUEST['brd']))

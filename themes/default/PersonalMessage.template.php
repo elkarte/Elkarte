@@ -158,7 +158,7 @@ function template_folder()
 			// Showing all then give a remove item checkbox
 			if (empty($context['display_mode']))
 				echo '
-									<li class="listlevel1 inline_mod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
+									<li class="listlevel1 quickmod_check"><input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" /></li>';
 
 			// Remove is always an option
 			echo '
