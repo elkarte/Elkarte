@@ -222,19 +222,19 @@ function template_list_themes()
 	foreach ($context['themes'] as $theme)
 	{
 		echo '
-			<div class="title_bar">
+			<div class="theme_', $theme['id'], ' title_bar">
 				<h3 class="titlebg">
 					', $theme['name'], '', !empty($theme['version']) ? ' <em>(' . $theme['version'] . ')</em>' : '';
 
 			// You *cannot* delete the default theme. It's important!
 			if ($theme['id'] != 1)
 				echo '
-					<span class="floatright"><a href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '" onclick="return confirm(\'', $txt['theme_remove_confirm'], '\');"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" /></a></span>';
+					<span class="floatright"><a class="delete_theme" data-theme_id="', $theme['id'], '" href="', $scripturl, '?action=admin;area=theme;sa=remove;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-tr_token_var'], '=', $context['admin-tr_token'], '"><img src="', $settings['images_url'], '/icons/delete.png" alt="', $txt['theme_remove'], '" title="', $txt['theme_remove'], '" /></a></span>';
 
 			echo '
 				</h3>
 			</div>
-			<div class="windowbg">
+			<div class="theme_', $theme['id'], ' windowbg">
 				<div class="content">
 					<dl class="settings themes_list">
 						<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
@@ -290,30 +290,35 @@ function template_list_themes()
 							$.ajax({
 								type: "GET",
 								url: base_url + ";api;xml",
-								success: function(request){
-									if ($(request).find("error").length == 0)
-									{
-										var new_token = $(request).find("token").text(),
-											new_token_var = $(request).find("token_var").text();
-										$("#theme_" + theme_id).slideToggle("fals", function () {
-											$(this).remove();
-										});
+								beforeSend: ajax_indicator(true)
+							})
+							.done(function(request) {
+								if ($(request).find("error").length == 0)
+								{
+									var new_token = $(request).find("token").text(),
+										new_token_var = $(request).find("token_var").text();
+									$(".theme_" + theme_id).slideToggle("slow", function () {
+										$(this).remove();
+									});
 
-										$(".delete_theme").each(function () {
-											var a1 = $(this).attr("href");
-											$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
-										});
-									}
-									// @todo improve error handling
-									else
-									{
-										alert($(request).find("text").text());
-										window.location = base_url;
-									}
-								},
-								error: function(request){
+									$(".delete_theme").each(function () {
+										var a1 = $(this).attr("href");
+										$(this).attr("href", $(this).attr("href").replace(token_var + "=" + token, new_token_var + "=" + new_token));
+									});
+								}
+								// @todo improve error handling
+								else
+								{
+									alert($(request).find("text").text());
 									window.location = base_url;
 								}
+							})
+							.fail(function(request) {
+								window.location = base_url;
+							})
+							.always(function() {
+								// turn off the indicator
+								ajax_indicator(false);
 							});
 						}
 					});
@@ -617,7 +622,7 @@ function template_set_settings()
 		elseif ($setting['type'] == 'checkbox')
 		{
 			echo '
-						<dt>
+						<dt id="dt_', $setting['id'], '">
 							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
@@ -626,7 +631,7 @@ function template_set_settings()
 
 			echo '
 						</dt>
-						<dd>
+						<dd id="dd_', $setting['id'], '">
 							<input type="hidden" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" value="0" />
 							<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
 						</dd>';
@@ -635,7 +640,7 @@ function template_set_settings()
 		elseif ($setting['type'] == 'list')
 		{
 			echo '
-						<dt>
+						<dt id="dt_', $setting['id'], '">
 							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
@@ -644,7 +649,7 @@ function template_set_settings()
 
 			echo '
 						</dt>
-						<dd>
+						<dd id="dd_', $setting['id'], '">
 							<select name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
 
 			foreach ($setting['options'] as $value => $label)
@@ -659,7 +664,7 @@ function template_set_settings()
 		else
 		{
 			echo '
-						<dt>
+						<dt id="dt_', $setting['id'], '">
 							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
@@ -668,7 +673,7 @@ function template_set_settings()
 
 			echo '
 						</dt>
-						<dd>
+						<dd id="dd_', $setting['id'], '">
 							<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
 						</dd>';
 		}

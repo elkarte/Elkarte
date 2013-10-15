@@ -453,11 +453,11 @@ function prepareCreditsData()
 		),
 		'software' => array(
 			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="http://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
-			'<a href="http://jquery.org/">JQuery</a> | &copy; John Resig | Licensed under <a href="http://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt">The MIT License (MIT)</a>',
+			'<a href="http://jquery.org/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://github.com/jquery/jquery/blob/53021dad7f6c7f5c5a1c0d7b0493dd2ceee31166/MIT-LICENSE.txt">The MIT License (MIT)</a>',
+			'<a href="http://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://github.com/jquery/jquery-ui/blob/83cbf979788f22ba3bd1668507623c0dd6b57041/MIT-LICENSE.txt">The MIT License (MIT)</a>',
 			'<a href="http://cherne.net/brian/resources/jquery.hoverIntent.html">hoverIntent</a> | &copy; Brian Cherne | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="http://users.tpg.com.au/j_birch/plugins/superfish/">Superfish</a> | &copy; Joel Birch | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="http://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
-			'<a href="http://wayfarerweb.com/jquery/plugins/animadrag/">animaDrag</a> | &copy; Abel Mohler | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 		),
 	);
 
