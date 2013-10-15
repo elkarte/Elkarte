@@ -61,15 +61,6 @@ VALUES
 	('jquery_source', 'local');
 ---#
 
----# Updating news setting...
----{
-if (!empty($modSettings['news_fader']) && !empty($modSettings['enable_news']))
-	upgrade_query("
-		UPDATE {$db_prefix}settings
-		SET news_fader = 2");
----}
----#
-
 /******************************************************************************/
 --- Updating legacy attachments...
 /******************************************************************************/
