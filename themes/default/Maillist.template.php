@@ -420,27 +420,27 @@ function template_bounce_template()
 				type: "POST",
 				url: "' . $scripturl . '?action=xmlpreview;xml",
 				data: {item: "bounce_preview", title: $("#template_title").val(), body: $("#template_body").val()},
-				context: document.body,
-				success: function(request){
-					$("#box_preview").css({display:""});
-					$("#template_preview").html($(request).find(\'body\').text());
-					if ($(request).find("error").text() !== \'\')
-					{
-						$("#errors").css({display:""});
-						var errors_html = \'\';
-						var errors = $(request).find(\'error\').each(function() {
-							errors_html += $(this).text() + \'<br />\';
-						});
+				context: document.body
+			})
+			.done(function(request) {
+				$("#box_preview").css({display:""});
+				$("#template_preview").html($(request).find(\'body\').text());
+				if ($(request).find("error").text() !== \'\')
+				{
+					$("#errors").css({display:""});
+					var errors_html = \'\';
+					var errors = $(request).find(\'error\').each(function() {
+						errors_html += $(this).text() + \'<br />\';
+					});
 
-						$(document).find("#error_list").html(errors_html);
-					}
-					else
-					{
-						$("#errors").css({display:"none"});
-						$("#error_list").html(\'\');
-					}
-				return false;
-				},
+					$(document).find("#error_list").html(errors_html);
+				}
+				else
+				{
+					$("#errors").css({display:"none"});
+					$("#error_list").html(\'\');
+				}
+			return false;
 			});
 			return false;
 		}
