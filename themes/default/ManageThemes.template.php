@@ -622,7 +622,7 @@ function template_set_settings()
 		elseif ($setting['type'] == 'checkbox')
 		{
 			echo '
-						<dt>
+						<dt id="dt_', $setting['id'], '">
 							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
@@ -631,7 +631,7 @@ function template_set_settings()
 
 			echo '
 						</dt>
-						<dd>
+						<dd id="dd_', $setting['id'], '">
 							<input type="hidden" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" value="0" />
 							<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
 						</dd>';
@@ -640,7 +640,7 @@ function template_set_settings()
 		elseif ($setting['type'] == 'list')
 		{
 			echo '
-						<dt>
+						<dt id="dt_', $setting['id'], '">
 							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
@@ -649,7 +649,7 @@ function template_set_settings()
 
 			echo '
 						</dt>
-						<dd>
+						<dd id="dd_', $setting['id'], '">
 							<select name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '">';
 
 			foreach ($setting['options'] as $value => $label)
@@ -664,7 +664,7 @@ function template_set_settings()
 		else
 		{
 			echo '
-						<dt>
+						<dt id="dt_', $setting['id'], '">
 							<label for="', $setting['id'], '">', $setting['label'], '</label>:';
 
 			if (isset($setting['description']))
@@ -673,7 +673,7 @@ function template_set_settings()
 
 			echo '
 						</dt>
-						<dd>
+						<dd id="dd_', $setting['id'], '">
 							<input type="text" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '" value="', $setting['value'], '"', $setting['type'] == 'number' ? ' size="5"' : (empty($setting['size']) ? ' size="40"' : ' size="' . $setting['size'] . '"'), ' class="input_text" />
 						</dd>';
 		}

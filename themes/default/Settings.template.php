@@ -197,18 +197,21 @@ function template_settings()
 		),
 		array(
 			'id' => 'enable_news',
-			'label' => $txt['enable_random_news'],
-		),
-	'',
-		array(
-			'id' => 'show_newsfader',
-			'label' => $txt['news_fader'],
+			'label' => $txt['enable_news'],
+			'options' => array(
+				0 => $txt['enable_news_off'],
+				1 => $txt['enable_news_random'],
+				2 => $txt['enable_news_fader'],
+			),
+			'type' => 'number',
+			'description' => $txt['enable_news_desc'],
 		),
 		array(
 			'id' => 'newsfader_time',
 			'label' => $txt['admin_fader_delay'],
 			'type' => 'number',
 		),
+	'',
 		array(
 			'id' => 'number_recent_posts',
 			'label' => $txt['number_recent_posts'],
@@ -283,4 +286,17 @@ function template_settings()
 			),
 		),
 	);
+
+	addInlineJavascript('
+		function toggleNewsFaderTime(val)
+		{
+			if (val == 2)
+				$("#dt_newsfader_time, #dd_newsfader_time").fadeIn();
+			else
+				$("#dt_newsfader_time, #dd_newsfader_time").fadeOut();
+		}
+		toggleNewsFaderTime($("#enable_news").val());
+		$("#enable_news").on("change", function() {
+			toggleNewsFaderTime($(this).val());
+		});', true);
 }

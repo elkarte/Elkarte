@@ -360,7 +360,7 @@ function template_body_above()
 			</div>';
 
 	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
-	if (!empty($context['random_news_line']))
+	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
 	{
 		echo '
 			<div id="news">
@@ -707,7 +707,7 @@ function template_news_fader()
 	echo '
 		<ul id="elkFadeScroller">
 			<li>
-				', implode('</li><li>', $context['news_lines']), '
+				', $settings['enable_news'] == 2 ? implode('</li><li>', $context['news_lines']) : $context['random_news_line'], '
 			</li>
 		</ul>
 	<script src="', $settings['default_theme_url'], '/scripts/fader.js"></script>
@@ -727,7 +727,7 @@ function template_news_fader()
 			});
 			newsFaderStarted = true;
 		}';
-	if (!empty($settings['show_newsfader']) && empty($context['minmax_preferences']['upshrink']))
+	if ($settings['enable_news'] == 2 && empty($context['minmax_preferences']['upshrink']))
 		echo '
 		startNewsFader();';
 
