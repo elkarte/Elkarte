@@ -315,28 +315,28 @@ function template_issueWarning()
 				type: "POST",
 				url: "' . $scripturl . '?action=xmlpreview;xml",
 				data: {item: "warning_preview", title: $("#warn_sub").val(), body: $("#warn_body").val(), issuing: true},
-				context: document.body,
-				success: function(request){
-					$("#box_preview").show();
-					$("#body_preview").html($(request).find(\'body\').text());
-					if ($(request).find("error").text() != \'\')
-					{
-						$("#profile_error").show();
-						var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors">\';
-						var errors = $(request).find(\'error\').each(function() {
-							errors_html += \'<li>\' + $(this).text() + \'</li>\';
-						});
-						errors_html += \'</ul>\';
+				context: document.body
+			})
+			.done(function(request) {
+				$("#box_preview").show();
+				$("#body_preview").html($(request).find(\'body\').text());
+				if ($(request).find("error").text() != \'\')
+				{
+					$("#profile_error").show();
+					var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors">\';
+					var errors = $(request).find(\'error\').each(function() {
+						errors_html += \'<li>\' + $(this).text() + \'</li>\';
+					});
+					errors_html += \'</ul>\';
 
-						$("#profile_error").html(errors_html);
-					}
-					else
-					{
-						$("#profile_error").hide();
-						$("#error_list").html(\'\');
-					}
-				return false;
-				},
+					$("#profile_error").html(errors_html);
+				}
+				else
+				{
+					$("#profile_error").hide();
+					$("#error_list").html(\'\');
+				}
+			return false;
 			});
 			return false;
 		}';

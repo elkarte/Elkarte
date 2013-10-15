@@ -73,41 +73,45 @@ function template_core_features()
 
 					// The type of data that is getting returned.
 					data: data,
-					error: function(error){
-							$(ajax_infobar).html(error).slideDown(\'fast\');
-					},
-
-					success: function(request){
-						if ($(request).find("errors").find("error").length !== 0)
-						{
-							$(ajax_infobar).attr(\'class\', \'errorbox\');
-							$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
-						}
-						else if ($(request).find("elk").length !== 0)
-						{
-							$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
-							cc.attr({
-								"src": imgs[new_state ? 1 : 0],
-								"title": new_state ? feature_on_text : feature_off_text,
-								"alt": new_state ? feature_on_text : feature_off_text
-							});
-							$("#feature_link_" + cf).fadeOut().fadeIn();
-							$(ajax_infobar).attr(\'class\', \'infobox\');
-							var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
-							$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown(\'fast\');
-							setTimeout(function() {
-								$(ajax_infobar).slideUp();
-							}, 5000);
-
-							token_name = $(request).find("tokens").find(\'[type="token"]\').text();
-							token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
-						}
-						else
-						{
-							$(ajax_infobar).attr(\'class\', \'errorbox\');
-							$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
-						}
+					beforeSend: ajax_indicator(true)
+				})
+				.done(function(request) {
+					if ($(request).find("errors").find("error").length !== 0)
+					{
+						$(ajax_infobar).attr(\'class\', \'errorbox\');
+						$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
 					}
+					else if ($(request).find("elk").length !== 0)
+					{
+						$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
+						cc.attr({
+							"src": imgs[new_state ? 1 : 0],
+							"title": new_state ? feature_on_text : feature_off_text,
+							"alt": new_state ? feature_on_text : feature_off_text
+						});
+						$("#feature_link_" + cf).fadeOut().fadeIn();
+						$(ajax_infobar).attr(\'class\', \'infobox\');
+						var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
+						$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown(\'fast\');
+						setTimeout(function() {
+							$(ajax_infobar).slideUp();
+						}, 5000);
+
+						token_name = $(request).find("tokens").find(\'[type="token"]\').text();
+						token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
+					}
+					else
+					{
+						$(ajax_infobar).attr(\'class\', \'errorbox\');
+						$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
+					}
+				})
+				.fail(function(error) {
+						$(ajax_infobar).html(error).slideDown(\'fast\');
+				})
+				.always(function() {
+					// turn off the indicator
+					ajax_indicator(false);
 				});
 			});
 		});
@@ -143,7 +147,7 @@ function template_core_features()
 				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
 				<div class="features_switch" id="js_feature_', $id, '">
 					<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
-					<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="margin-top: 1.3em;display:none" />
+					<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="display:none" />
 				</div>
 				<h4 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h4>
 				<p>', $feature['desc'], '</p>
