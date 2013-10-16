@@ -688,7 +688,7 @@ function loadProfileFields($force_reload = false)
 
 				$context[\'display_mode\'] = $cur_profile[\'pm_prefs\'] & 3;
 				$context[\'send_email\'] = $cur_profile[\'pm_email_notify\'];
-				$context[\'receive_from\'] = !empty($cur_profile[\'pm_receive_from\']) ? $cur_profile[\'pm_receive_from\'] : 0;
+				$context[\'receive_from\'] = !empty($cur_profile[\'receive_from\']) ? $cur_profile[\'receive_from\'] : 0;
 
 				return true;
 			'),
@@ -699,7 +699,7 @@ function loadProfileFields($force_reload = false)
 				$value = max(min($value, 2), 0);
 
 				$cur_profile[\'pm_email_notify\'] = $profile_vars[\'pm_email_notify\'] = max(min((int) $_POST[\'pm_email_notify\'], 2), 0);
-				$cur_profile[\'pm_receive_from\'] = $profile_vars[\'pm_receive_from\'] = max(min((int) $_POST[\'pm_receive_from\'], 4), 0);
+				$cur_profile[\'receive_from\'] = $profile_vars[\'receive_from\'] = max(min((int) $_POST[\'receive_from\'], 4), 0);
 
 				return true;
 			'),

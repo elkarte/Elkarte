@@ -1767,7 +1767,7 @@ CREATE TABLE {$db_prefix}members (
   ignore_boards text NOT NULL,
   warning smallint NOT NULL default '0',
   passwd_flood varchar(12) NOT NULL default '',
-  pm_receive_from smallint NOT NULL default '1',
+  receive_from smallint NOT NULL default '1',
   PRIMARY KEY (id_member)
 );
 

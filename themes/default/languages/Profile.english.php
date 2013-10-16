@@ -462,11 +462,11 @@ $txt['email_notify_never'] = 'Never';
 $txt['email_notify_buddies'] = 'From Buddies Only';
 $txt['email_notify_always'] = 'Always';
 
-$txt['pm_receive_from'] = 'Receive personal messages from:';
-$txt['pm_receive_from_everyone'] = 'All members';
-$txt['pm_receive_from_ignore'] = 'All members, except those on my ignore list';
-$txt['pm_receive_from_admins'] = 'Administrators only';
-$txt['pm_receive_from_buddies'] = 'Buddies and Administrators only';
+$txt['receive_from'] = 'Members allowed to contact me:';
+$txt['receive_from_everyone'] = 'All members';
+$txt['receive_from_ignore'] = 'All members, except those on my ignore list';
+$txt['receive_from_admins'] = 'Administrators only';
+$txt['receive_from_buddies'] = 'Buddies and Administrators only';
 
 $txt['popup_messages'] = 'Show a popup when I receive new messages.';
 $txt['pm_remove_inbox_label'] = 'Remove the inbox label when applying another label';

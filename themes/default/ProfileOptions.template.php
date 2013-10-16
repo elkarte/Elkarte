@@ -510,19 +510,19 @@ function template_profile_pm_settings()
 						</dl>
 						<dl>
 							<dt>
-								<label for="pm_receive_from">', $txt['pm_receive_from'], '</label>
+								<label for="receive_from">', $txt['receive_from'], '</label>
 							</dt>
 							<dd>
-								<select name="pm_receive_from" id="pm_receive_from">
-									<option value="0"', empty($context['receive_from']) || (empty($modSettings['enable_buddylist']) && $context['receive_from'] < 3) ? ' selected="selected"' : '', '>', $txt['pm_receive_from_everyone'], '</option>';
+								<select name="receive_from" id="receive_from">
+									<option value="0"', empty($context['receive_from']) || (empty($modSettings['enable_buddylist']) && $context['receive_from'] < 3) ? ' selected="selected"' : '', '>', $txt['receive_from_everyone'], '</option>';
 
 	if (!empty($modSettings['enable_buddylist']))
 		echo '
-									<option value="1"', !empty($context['receive_from']) && $context['receive_from'] == 1 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_ignore'], '</option>
-									<option value="2"', !empty($context['receive_from']) && $context['receive_from'] == 2 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_buddies'], '</option>';
+									<option value="1"', !empty($context['receive_from']) && $context['receive_from'] == 1 ? ' selected="selected"' : '', '>', $txt['receive_from_ignore'], '</option>
+									<option value="2"', !empty($context['receive_from']) && $context['receive_from'] == 2 ? ' selected="selected"' : '', '>', $txt['receive_from_buddies'], '</option>';
 
 	echo '
-									<option value="3"', !empty($context['receive_from']) && $context['receive_from'] > 2 ? ' selected="selected"' : '', '>', $txt['pm_receive_from_admins'], '</option>
+									<option value="3"', !empty($context['receive_from']) && $context['receive_from'] > 2 ? ' selected="selected"' : '', '>', $txt['receive_from_admins'], '</option>
 								</select>
 							</dd>
 							<dt>

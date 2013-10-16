@@ -297,6 +297,10 @@ class Emailuser_Controller extends Action_Controller
 		if ($context['show_email_address'] === 'no')
 			fatal_lang_error('no_access', false);
 
+		// Does the user want to be contacted at all by you?
+		if (!canContact($row['id_member']))
+			fatal_lang_error('no_access', false);
+
 		// Setup the context!
 		$context['recipient'] = array(
 			'id' => $row['id_member'],
