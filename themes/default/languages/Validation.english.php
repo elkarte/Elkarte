@@ -3,8 +3,8 @@
 
 $txt['_validate_required'] = 'The %1$s field is required';
 $txt['_validate_valid_email'] = 'The %1$s field is required to be a valid email address';
-$txt['_validate_max_length'] = 'The %1$s field needs to be shorter than %2$s character';
-$txt['_validate_min_length'] = 'The %1$s field needs to be longer than %2$s character';
+$txt['_validate_max_length'] = 'The %1$s field can hold a maximum of %2$s characters';
+$txt['_validate_min_length'] = 'The %1$s field needs to be a minimun of %2$s characters';
 $txt['_validate_length'] = 'The %1$s field needs to be exactly %2$s character in length';
 $txt['_validate_alpha'] = 'The %1$s field may only contain alpha characters(a-z)';
 $txt['_validate_alpha_numeric'] = 'The %1$s field may only contain alpha-numeric characters';
@@ -22,5 +22,5 @@ $txt['_validate_invalid_function'] = 'The specified validation function %1$s doe
 $txt['_validate_without'] = 'The %1$s field may not contain the %2$s character';
 $txt['_validate_notequal'] = 'The %1$s field does not contain a valid value';
 $txt['_validate_isarray'] = 'The %1$s field does not contain a valid array';
-$txt['php_syntax_error'] = 'PHP syntax error: %1$s';
+$txt['_validate_php_syntax'] = 'PHP syntax error: %1$s';
 $txt['validation_failure'] = 'The form has the following error or errors that must be corrected before continuing:';
