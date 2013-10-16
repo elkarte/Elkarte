@@ -568,7 +568,7 @@ class Register_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $scripturl, $language, $user_info;
 
-		require_once(SUBSDIR . 'Auth.subs.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// Logged in users should not bother to activate their accounts
 		if (!empty($user_info['id']))
