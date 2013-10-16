@@ -544,6 +544,9 @@ class Post_Controller extends Action_Controller
 			// Set the destination.
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = $txt['save'];
+
+			// The smiley popup may take advantage of Jquery UI ....
+			$modSettings['jquery_include_ui'] = true;
 		}
 		// Posting...
 		else
@@ -560,6 +563,9 @@ class Post_Controller extends Action_Controller
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 
 			$context['submit_label'] = $txt['post'];
+
+			// The smiley popup may take advantage of Jquery UI ....
+			$modSettings['jquery_include_ui'] = true;
 
 			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 		}

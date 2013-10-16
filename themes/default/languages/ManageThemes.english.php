@@ -61,7 +61,22 @@ $txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace
 $txt['forum_width'] = 'Forum width';
 $txt['forum_width_desc'] = 'Set the forum width. Examples: 950px, 80%, 1240px.';
 
-$txt['enable_random_news'] = 'Enable random news line in the forum header';
+$txt['enable_news'] = 'News line in the forum header';
+$txt['enable_news_off'] = 'Off';
+$txt['enable_news_random'] = 'Random';
+$txt['enable_news_fader'] = 'Fader';
+$txt['enable_news_desc'] = '<ul>
+	<li>
+		<strong>Off</strong>: no news shown
+	</li>
+	<li>
+		<strong>Random</strong>: one news shown chosen at random
+	</li>
+	<li>
+		<strong>Fader</strong>: all the news are displayed sequentially
+	</li>
+</ul>';
+
 $txt['show_group_key'] = 'Show group key on board index';
 $txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
 $txt['message_index_preview'] = 'Show post previews on the message index';
@@ -82,7 +97,6 @@ $txt['last_modification'] = 'Show last modification date on modified posts';
 $txt['user_avatars'] = 'Show user avatars in message view';
 $txt['user_text'] = 'Show personal text in message view';
 $txt['gender_images'] = 'Show gender images in message view';
-$txt['news_fader'] = 'Show news fader on board index';
 $txt['member_list_bar'] = 'Show members list bar on board index';
 $txt['current_pos_text_img'] = 'Show current position in forum as link instead of text';
 $txt['show_view_profile_button'] = 'Show view profile button under post';

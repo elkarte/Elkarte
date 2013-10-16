@@ -348,17 +348,17 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 	// Load the help page content (we just want the text to show)
 	$.ajax({
 		url: desktopURL,
-        type: "GET",
-        dataType: "html",
+		type: "GET",
+		dataType: "html",
 		beforeSend: function () {
-		},
-		success: function (data, textStatus, xhr) {
-			var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
-			oPopup_body.html(help_content);
-		},
-		error: function (xhr, textStatus, errorThrown) {
-			oPopup_body.html(textStatus);
 		}
+	})
+	.done(function (data, textStatus, xhr) {
+		var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
+		oPopup_body.html(help_content);
+	})
+	.fail(function (xhr, textStatus, errorThrown) {
+		oPopup_body.html(textStatus);
 	});
 	return false;
 }
