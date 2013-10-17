@@ -329,6 +329,14 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 
+	$db->query('', '
+		DELETE FROM {db_prefix}log_notifications
+		WHERE id_member IN ({array_int:users})',
+		array(
+			'users' => $users,
+		)
+	);
+
 	// Delete personal messages.
 	require_once(SUBSDIR . '/PersonalMessage.subs.php');
 	deleteMessages(null, null, $users);

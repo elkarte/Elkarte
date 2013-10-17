@@ -1619,12 +1619,14 @@ class Post_Controller extends Action_Controller
 				$topic = $topicOptions['id'];
 
 			if (!empty($modSettings['enableFollowup']))
+			{
 				require_once(SUBSDIR . '/FollowUps.subs.php');
-			require_once(SUBSDIR . '/Messages.subs.php');
+				require_once(SUBSDIR . '/Messages.subs.php');
 
-			// Time to update the original message with a pointer to the new one
-			if (!empty($original_post) && canAccessMessage($original_post))
-				linkMessages($original_post, $topic);
+				// Time to update the original message with a pointer to the new one
+				if (!empty($original_post) && canAccessMessage($original_post))
+					linkMessages($original_post, $topic);
+			}
 		}
 
 		// If we had a draft for this, its time to remove it since it was just posted
@@ -1740,6 +1742,20 @@ class Post_Controller extends Action_Controller
 				else
 					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
 			}
+		}
+
+		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		{
+			require_once(CONTROLLERDIR . '/Notification.controller.php');
+			$notify = new Notification_Controller();
+			$notify->setData($msgOptions['id'], 'men', $_REQUEST['uid']);
+			$notify->setData(array(
+				'uid' => $_REQUEST['uid'],
+				'type' => 'men',
+				'msg' => $msgOptions['id'],
+				'status' => $becomesApproved ? 'new' : 'unapproved',
+			));
+			$notify->action_add();
 		}
 
 		if ($board_info['num_topics'] == 0)

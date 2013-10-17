@@ -49,7 +49,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likepost()
 	{
-		global $user_info, $topic;
+		global $user_info, $topic, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
@@ -62,7 +62,21 @@ class Likes_Controller extends Action_Controller
 		{
 			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
+			{
 				likePost($user_info['id'], $liked_message, '+');
+
+				if (!empty($modSettings['notifications_enabled']))
+				{
+					require_once(CONTROLLERDIR . '/Notification.controller.php');
+					$notify = new Notification_Controller();
+					$notify->setData(array(
+						'uid' => $liked_message['id_member'],
+						'type' => 'like',
+						'msg' => $id_liked,
+					));
+					$notify->action_add();
+				}
+			}
 		}
 
 		// Back to where we were, in theory
@@ -76,7 +90,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic;
+		global $user_info, $topic, $modSettings;
 
 		$id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
 
@@ -89,7 +103,21 @@ class Likes_Controller extends Action_Controller
 		{
 			$liked_message = basicMessageInfo($id_liked, true, true);
 			if ($liked_message)
+			{
 				likePost($user_info['id'], $liked_message, '-');
+
+				if (!empty($modSettings['notifications_enabled']))
+				{
+					require_once(CONTROLLERDIR . '/Notification.controller.php');
+					$notify = new Notification_Controller();
+					$notify->setData(array(
+						'uid' => $liked_message['id_member'],
+						'type' => 'rlike',
+						'msg' => $id_liked,
+					));
+					$notify->action_add();
+				}
+			}
 		}
 
 		// Back we go
