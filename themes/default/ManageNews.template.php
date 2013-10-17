@@ -130,9 +130,9 @@ function template_email_members()
 				{
 					sId: \'exclude_panel_toggle\',
 					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
+					altExpanded: ', JavaScriptEscape($txt['hide']), ',
 					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
+					altCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			aSwapLinks: [

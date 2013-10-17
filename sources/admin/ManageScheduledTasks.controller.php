@@ -155,6 +155,11 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					logTask($task_id, $total_time);
 				}
 			}
+
+			// Things go as expected?  If not save the error in session
+			if (!empty($context['scheduled_errors']))
+				$_SESSION['st_error'] = $context['scheduled_errors'];
+
 			redirectexit('action=admin;area=scheduledtasks;done');
 		}
 
@@ -257,8 +262,14 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		createList($listOptions);
 
 		$context['sub_template'] = 'view_scheduled_tasks';
-
 		$context['tasks_were_run'] = isset($_GET['done']);
+
+		// If we had any errors, place them in context as well
+		if (isset($_SESSION['st_error']))
+		{
+			$context['scheduled_errors'] = $_SESSION['st_error'];
+			unset ($_SESSION['st_error']);
+		}
 	}
 
 	/**

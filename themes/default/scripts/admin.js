@@ -803,24 +803,26 @@ function toggleCache ()
  */
 function toggleSubDir ()
 {
-	var auto_attach = document.getElementById('automanage_attachments');
-	var use_sub_dir = document.getElementById('use_subdirectories_for_attachments');
-	var dir_elem = document.getElementById('basedirectory_for_attachments');
+	var auto_attach = document.getElementById('automanage_attachments'),
+		use_sub_dir = document.getElementById('use_subdirectories_for_attachments'),
+		dir_elem = document.getElementById('basedirectory_for_attachments');
 
 	use_sub_dir.disabled = !Boolean(auto_attach.selectedIndex);
 	if (use_sub_dir.disabled)
 	{
-		use_sub_dir.style.display = "none";
-		document.getElementById('setting_use_subdirectories_for_attachments').parentNode.style.display = "none";
-		dir_elem.style.display = "none";
-		document.getElementById('setting_basedirectory_for_attachments').parentNode.style.display = "none";
+		$(use_sub_dir).slideUp();
+		$('#setting_use_subdirectories_for_attachments').parent().slideUp();
+
+		$(dir_elem).slideUp();
+		$('#setting_basedirectory_for_attachments').parent().slideUp();
 	}
 	else
 	{
-		use_sub_dir.style.display = "";
-		document.getElementById('setting_use_subdirectories_for_attachments').parentNode.style.display = "";
-		dir_elem.style.display = "";
-		document.getElementById('setting_basedirectory_for_attachments').parentNode.style.display = "";
+		$(use_sub_dir).slideDown();
+		$('#setting_use_subdirectories_for_attachments').parent().slideDown();
+
+		$(dir_elem).slideDown();
+		$('#setting_basedirectory_for_attachments').parent().slideDown();
 	}
 		toggleBaseDir();
 }

@@ -825,7 +825,7 @@ class ScheduledTask
 	 */
 	function fetchFiles()
 	{
-		global $txt, $language, $forum_version, $modSettings;
+		global $txt, $language, $forum_version, $modSettings, $context;
 
 		$db = database();
 
@@ -869,6 +869,7 @@ class ScheduledTask
 			// If we are tossing errors - give up - the site might be down.
 			if ($file_data === false && $errors++ > 2)
 			{
+				$context['scheduled_errors']['fetchFiles'][] = sprintf($txt['st_cannot_retrieve_file'], $url);
 				log_error(sprintf($txt['st_cannot_retrieve_file'], $url));
 				return false;
 			}
@@ -1268,13 +1269,24 @@ class ScheduledTask
 	 */
 	function remove_temp_attachments()
 	{
+		global $context, $txt;
+
 		// We need to know where this thing is going.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$attach_dirs = attachmentPaths();
 
 		foreach ($attach_dirs as $attach_dir)
 		{
-			$dir = @opendir($attach_dir) or fatal_lang_error('cant_access_upload_path', 'critical');
+		    $dir = @opendir($attach_dir);
+		    if (!$dir)
+		    {
+				loadEssentialThemeData();
+				loadLanguage('Post');
+				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
+				log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
+				return false;
+		    }
+
 			while ($file = readdir($dir))
 			{
 				if ($file == '.' || $file == '..')
@@ -1289,6 +1301,8 @@ class ScheduledTask
 			}
 			closedir($dir);
 		}
+
+		return true;
 	}
 
 	/**

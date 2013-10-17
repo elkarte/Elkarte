@@ -504,6 +504,10 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_cookie_settings');
 
+		    // Its either local or global cookies
+		    if (!empty($_POST['localCookies']) && empty($_POST['globalCookies']))
+				unset ($_POST['globalCookies']);
+
 			if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
 				fatal_lang_error('invalid_cookie_domain', false);
 
@@ -529,6 +533,41 @@ class ManageServer_Controller extends Action_Controller
 			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id']. ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
+		addInlineJavascript('
+		function hideGlobalCookies()
+		{
+			var usingLocal = $("#localCookies").prop("checked"),
+				usingGlobal = !usingLocal && $("#globalCookies").prop("checked");
+
+			// Show/Hide the areas based on what they have chosen
+			if (!usingLocal)
+			{
+				$("#setting_globalCookies").parent().slideDown();
+				$("#globalCookies").parent().slideDown();
+			}
+			else
+			{
+				$("#setting_globalCookies").parent().slideUp();
+				$("#globalCookies").parent().slideUp();
+			}
+
+			if (usingGlobal)
+			{
+				$("#setting_globalCookiesDomain").closest("dt").slideDown();
+				$("#globalCookiesDomain").closest("dd").slideDown();
+			}
+			else
+			{
+				$("#setting_globalCookiesDomain").closest("dt").slideUp();
+				$("#globalCookiesDomain").closest("dd").slideUp();
+			}
+		};
+		hideGlobalCookies();
+
+		$("#localCookies, #globalCookies").click(function() {
+			hideGlobalCookies();
+		});', true);
+
 		// Fill the config array.
 		$this->_cookieSettingsForm->prepare_file();
 	}
@@ -546,11 +585,11 @@ class ManageServer_Controller extends Action_Controller
 		$this->_initCacheSettingsForm();
 
 		// some javascript to enable / disable certain settings if the option is not selected
-		$context['settings_post_javascript'] = '
+		addInlineJavascript('
 			var cache_type = document.getElementById(\'cache_accelerator\');
 			createEventListener(cache_type);
 			cache_type.addEventListener("change", toggleCache);
-			toggleCache();';
+			toggleCache();', true);
 
 		call_integration_hook('integrate_modify_cache_settings');
 

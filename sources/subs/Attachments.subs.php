@@ -1275,7 +1275,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 	// The destination filename will depend on whether custom dir for avatars has been set
 	$destName = getAvatarPath() . '/' . $destName;
 	$path = getAttachmentPath();
-	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash;
+	$destName = empty($avatar_hash) ? $destName : $path . '/' . $attachID . '_' . $avatar_hash . '.elk';
 
 	// Resize it.
 	require_once(SUBSDIR . '/Graphics.subs.php');
