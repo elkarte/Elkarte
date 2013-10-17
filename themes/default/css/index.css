@@ -2419,7 +2419,7 @@ img.new_posts {
 	width: 60em;
 	max-width: 97%;
 }
-#quickReplyOptions form textarea {
+#quickReplyOptions form .quickreply {
 	min-width: 100%;
 	max-width: 100%;
 	width: 635px;

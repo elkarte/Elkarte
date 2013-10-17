@@ -372,7 +372,7 @@ function template_quickreply_below()
 		{
 			echo '
 							<div class="quickReplyContent">
-								<textarea cols="600" rows="7" name="message" tabindex="', $context['tabindex']++, '"></textarea>
+								<textarea cols="600" rows="7" class="quickreply" name="message" tabindex="', $context['tabindex']++, '"></textarea>
 							</div>';
 		}
 		else
