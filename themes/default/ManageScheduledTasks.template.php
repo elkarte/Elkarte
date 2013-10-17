@@ -23,10 +23,31 @@ function template_view_scheduled_tasks()
 
 	// We completed some tasks?
 	if (!empty($context['tasks_were_run']))
-		echo '
+	{
+		if (empty($context['scheduled_errors']))
+		{
+			echo '
 	<div id="task_completed" class="infobox">
 		', $txt['scheduled_tasks_were_run'], '
 	</div>';
+		}
+		else
+		{
+			echo '
+	<div id="errors" class="errorbox">
+		', $txt['scheduled_tasks_were_run_errors'], '<br>';
+
+		foreach ($context['scheduled_errors'] as $task => $errors)
+		{
+			echo
+				isset($txt['scheduled_task_' . $task]) ? $txt['scheduled_task_' . $task] : $task, '
+				<ul><li>', implode('</li><li>', $errors), '</li></ul>';
+		}
+
+			echo '
+	</div>';
+		}
+	}
 
 	template_show_list('scheduled_tasks');
 }

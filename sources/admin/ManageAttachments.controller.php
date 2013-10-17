@@ -118,15 +118,15 @@ class ManageAttachments_Controller extends Action_Controller
 
 		$config_vars = $this->_attachSettingsForm->settings();
 
-		$context['settings_post_javascript'] = '
-	var storing_type = document.getElementById(\'automanage_attachments\');
-	var base_dir = document.getElementById(\'use_subdirectories_for_attachments\');
+		addInlineJavascript('
+	var storing_type = document.getElementById(\'automanage_attachments\'),
+		base_dir = document.getElementById(\'use_subdirectories_for_attachments\');
 
 	createEventListener(storing_type)
 	storing_type.addEventListener("change", toggleSubDir, false);
 	createEventListener(base_dir)
 	base_dir.addEventListener("change", toggleSubDir, false);
-	toggleSubDir();';
+	toggleSubDir();', true);
 
 		call_integration_hook('integrate_modify_attachment_settings');
 
@@ -1285,7 +1285,7 @@ class ManageAttachments_Controller extends Action_Controller
 											$to_fix[] = 'files_without_attachment';
 										}
 									}
-									
+
 								}
 							}
 							elseif ($file != 'index.php')
@@ -1424,7 +1424,7 @@ class ManageAttachments_Controller extends Action_Controller
 					{
 						// Let's not try to delete a path with files in it.
 						$num_attach = countAttachmentsInFolders($id);
-					
+
 						// A check to see if it's a used base dir.
 						if (!empty($modSettings['attachment_basedirectories']))
 						{
