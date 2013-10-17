@@ -339,7 +339,7 @@ class ManageRegistration_Controller extends Action_Controller
 		$context['settings_title'] = $txt['settings'];
 
 		// Define some javascript for COPPA.
-		$context['settings_post_javascript'] = '
+		addInlineJavascript('
 			function checkCoppa()
 			{
 				var coppaDisabled = document.getElementById(\'coppaAge\').value == 0;
@@ -350,7 +350,7 @@ class ManageRegistration_Controller extends Action_Controller
 				document.getElementById(\'coppaFax\').disabled = disableContacts;
 				document.getElementById(\'coppaPhone\').disabled = disableContacts;
 			}
-			checkCoppa();';
+			checkCoppa();', true);
 
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';

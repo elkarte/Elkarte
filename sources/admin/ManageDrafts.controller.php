@@ -83,7 +83,7 @@ class ManageDrafts_Controller extends Action_Controller
 		}
 
 		// some javascript to enable / disable the frequency input box
-		$context['settings_post_javascript'] = '
+		addInlineJavascript('
 			var autosave = document.getElementById(\'drafts_autosave_enabled\');
 			createEventListener(autosave)
 			autosave.addEventListener(\'change\', toggle);
@@ -93,8 +93,7 @@ class ManageDrafts_Controller extends Action_Controller
 			{
 				var select_elem = document.getElementById(\'drafts_autosave_frequency\');
 				select_elem.disabled = !autosave.checked;
-			}
-		';
+			}', true);
 
 		// Final settings...
 		$context['post_url'] = $scripturl . '?action=admin;area=managedrafts;save';

@@ -585,11 +585,11 @@ class ManageServer_Controller extends Action_Controller
 		$this->_initCacheSettingsForm();
 
 		// some javascript to enable / disable certain settings if the option is not selected
-		$context['settings_post_javascript'] = '
+		addInlineJavascript('
 			var cache_type = document.getElementById(\'cache_accelerator\');
 			createEventListener(cache_type);
 			cache_type.addEventListener("change", toggleCache);
-			toggleCache();';
+			toggleCache();', true);
 
 		call_integration_hook('integrate_modify_cache_settings');
 

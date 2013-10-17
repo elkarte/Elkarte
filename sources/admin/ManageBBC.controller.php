@@ -57,8 +57,8 @@ class ManageBBC_Controller extends Action_Controller
 		$config_vars = $this->_bbcSettings->settings();
 
 		// Make sure a nifty javascript will enable/disable checkboxes, according to BBC globally set or not.
-		$context['settings_post_javascript'] = '
-			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');';
+		addInlineJavascript('
+			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
 
 		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 

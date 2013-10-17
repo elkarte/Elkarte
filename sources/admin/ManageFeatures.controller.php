@@ -478,7 +478,8 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Disable the max smileys option if we don't allow smileys at all!
-		$context['settings_post_javascript'] = 'document.getElementById(\'signature_max_smileys\').disabled = !document.getElementById(\'signature_allow_smileys\').checked;';
+		addInlineJavascript('
+			document.getElementById(\'signature_max_smileys\').disabled = !document.getElementById(\'signature_allow_smileys\').checked;', true);
 
 		// Load all the signature settings.
 		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
