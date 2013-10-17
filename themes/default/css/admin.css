@@ -1200,6 +1200,11 @@ ul.moderation_notes li {
     display: table;
 }
 
+/* Scheduled tasks */
+.errorbox ul {
+	margin-left: 5em;
+}
+
 /* jQuery Dialog */
 .ui-dialog {
 	padding: 0;
