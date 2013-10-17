@@ -3757,6 +3757,7 @@ function setupMenuContext()
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
 		// Start things up: this is what we know by default
+		require_once(SUBSDIR . '/Menu.subs.php');
 		$allMenus = Standard_Menu::context();
 		$menu = $allMenus->get('Main_Menu');
 
