@@ -191,8 +191,9 @@
 		setInnerHTML(this.opts._oCurDraftDiv, this.opts._sLastSaved);
 
 		// Hide the saved draft infobox in the event they pressed the save draft button at some point
-		if (this.opts.sType === 'post')
-			document.getElementById('draft_section').style.display = 'none';
+		var draft_section = document.getElementById('draft_section');
+		if (draft_section)
+			draft_section.style.display = 'none';
 
 		// Thank you sir, may I have another
 		this.opts._bInDraftMode = false;
