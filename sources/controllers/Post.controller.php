@@ -1748,7 +1748,6 @@ class Post_Controller extends Action_Controller
 		{
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
 			$notify = new Notification_Controller();
-			$notify->setData($msgOptions['id'], 'men', $_REQUEST['uid']);
 			$notify->setData(array(
 				'uid' => $_REQUEST['uid'],
 				'type' => 'men',

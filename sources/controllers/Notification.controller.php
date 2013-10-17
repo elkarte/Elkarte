@@ -91,7 +91,7 @@ class Notification_Controller extends Action_Controller
 			'columns' => array(
 				'id_member_from' => array(
 					'header' => array(
-						'value' => $txt['id_member_from'],
+						'value' => $txt['notification_from'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -119,7 +119,7 @@ class Notification_Controller extends Action_Controller
 				),
 				'type' => array(
 					'header' => array(
-						'value' => $txt['notif_what'],
+						'value' => $txt['notification_what'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -131,8 +131,8 @@ class Notification_Controller extends Action_Controller
 								\'{subject}\',
 							),
 							array(
-								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
-								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \'#msg\' . $row[\'id_msg\'],
+								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;from=\' . $row[\'id_member_from\'] . \';type=\' . $row[\'type\'] . \';time=\' . $row[\'log_time\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
+								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;from=\' . $row[\'id_member_from\'] . \';type=\' . $row[\'type\'] . \';time=\' . $row[\'log_time\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
 							), $txt[\'notification_\' . $row[\'type\']]);
 						')
@@ -144,7 +144,7 @@ class Notification_Controller extends Action_Controller
 				),
 				'log_time' => array(
 					'header' => array(
-						'value' => $txt['log_time'],
+						'value' => $txt['notification_when'],
 					),
 					'data' => array(
 						'db' => 'log_time',
@@ -156,9 +156,52 @@ class Notification_Controller extends Action_Controller
 					),
 				),
 			),
+			'list_menu' => array(
+				'show_on' => 'top',
+				'links' => array(
+					array(
+						'href' => $scripturl . '?action=notification' . (!empty($this->_all) ? ';all' : ''),
+						'is_selected' => empty($this->_type),
+						'label' => $txt['notification_type_all']
+					),
+					array(
+						'href' => $scripturl . '?action=notification;type=men' . (!empty($this->_all) ? ';all' : ''),
+						'is_selected' => $this->_type === 'men',
+						'label' => $txt['notification_type_men']
+					),
+					array(
+						'href' => $scripturl . '?action=notification;type=like' . (!empty($this->_all) ? ';all' : ''),
+						'is_selected' => $this->_type === 'like',
+						'label' => $txt['notification_type_like']
+					),
+					array(
+						'href' => $scripturl . '?action=notification;type=rlike' . (!empty($this->_all) ? ';all' : ''),
+						'is_selected' => $this->_type === 'rlike',
+						'label' => $txt['notification_type_rlike']
+					),
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'top_of_list',
+					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=notification' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['notification_unread'] : $txt['notification_all']) . '</a>',
+				),
+			),
 		);
 
 		createList($list_options);
+
+		$context['page_title'] = $txt['my_notifications'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_notifications_pages'], $this->_page) : '');
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=notification',
+			'name' => $txt['my_notifications'],
+		);
+
+		if (!empty($this->_type))
+			$context['linktree'][] = array(
+				'url' => $scripturl . '?action=notification;type=' . $this->_type,
+				'name' => $txt['notification_type_' . $this->_type],
+			);
 	}
 
 	/**
@@ -216,7 +259,7 @@ class Notification_Controller extends Action_Controller
 	/**
 	 * Did you read the notification? Then let's move it to the graveyard.
 	 */
-	public function action_markread()
+	public function action_markread($noredir = false)
 	{
 		global $user_info;
 
@@ -228,7 +271,8 @@ class Notification_Controller extends Action_Controller
 
 		markNotificationAsRead($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time);
 
-		redirectexit('action=notifications;sa=list' . $this->_url_param);
+		if (!$noredir)
+			redirectexit('action=notifications;sa=list' . $this->_url_param);
 	}
 
 	/**
@@ -243,6 +287,7 @@ class Notification_Controller extends Action_Controller
 	{
 		$this->_all = isset($_REQUEST['all']);
 		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_notifications) ? $_REQUEST['type'] : '';
+		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
 	}
