@@ -435,7 +435,7 @@ class Profile_Controller extends Action_Controller
 		Template_Layers::getInstance()->add('profile');
 
 		// All the subactions that require a user password in order to validate.
-		$check_password = $context['user']['is_owner'] && !empty($profile_include_data['permission']);
+		$check_password = $context['user']['is_owner'] && !empty($profile_include_data['password']);
 		$context['require_password'] = $check_password && empty($user_settings['openid_uri']);
 
 		// These will get populated soon!
