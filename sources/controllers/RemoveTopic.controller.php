@@ -323,7 +323,7 @@ class RemoveTopic_Controller extends Action_Controller
 
 		if (!empty($topics_to_restore))
 		{
-			require_once(SUBSDIR . 'Boards.subs.php');
+			require_once(SUBSDIR . '/Boards.subs.php');
 
 			// Lets get the data for these topics.
 			$request = $db->query('', '
