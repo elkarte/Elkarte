@@ -349,7 +349,7 @@ function get_memcached_server($level = 3)
  */
 function clean_cache($type = '')
 {
-	global $cache_accelerator, $cache_memcached, $memcached;
+	global $cache_accelerator, $cache_uid, $cache_password, $cache_memcached, $memcached;
 
 	switch ($cache_accelerator)
 	{
@@ -362,7 +362,7 @@ function clean_cache($type = '')
 				if (!$memcached)
 					return;
 
-				// clear it out
+				// clear it out, really invalidate whats there
 				if (function_exists('memcache_flush'))
 					memcache_flush($memcached);
 				else
@@ -407,13 +407,17 @@ function clean_cache($type = '')
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
 			{
-				// @todo interface !!!
-				//$_SERVER["PHP_AUTH_USER"] = 'userid';
-				//$_SERVER["PHP_AUTH_PW"] = 'password'; /* not the md5 one in the .ini but the real password */
+				// xcache may need auth credentials, depending on how its been set up
+				if (!empty($cache_uid) && !empty($cache_password))
+				{
+					$_SERVER["PHP_AUTH_USER"] = $cache_uid;
+					$_SERVER["PHP_AUTH_PW"] = $cache_password;
+				}
 
 				// Get the counts so we clear each instance
 				$pcnt = xcache_count(XC_TYPE_PHP);
 				$vcnt = xcache_count(XC_TYPE_VAR);
+
 				// Time to clear the user vars and/or the opcache
 				if ($type === '' || $type === 'user')
 				{
