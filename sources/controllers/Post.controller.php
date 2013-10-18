@@ -842,6 +842,13 @@ class Post_Controller extends Action_Controller
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 
+		if (!empty($modSettings['notifications_enabled']))
+		{
+			$context['notifications_enabled'] = true;
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
+			loadCSSFile('jquery.atwho.css');
+		}
+
 		// Build a list of drafts that they can load into the editor
 		if (!empty($context['drafts_save']))
 		{
@@ -1749,9 +1756,9 @@ class Post_Controller extends Action_Controller
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
 			$notify = new Notification_Controller();
 			$notify->setData(array(
-				'uid' => $_REQUEST['uid'],
+				'id_member' => $_REQUEST['uid'],
 				'type' => 'men',
-				'msg' => $msgOptions['id'],
+				'id_msg' => $msgOptions['id'],
 				'status' => $becomesApproved ? 'new' : 'unapproved',
 			));
 			$notify->action_add();

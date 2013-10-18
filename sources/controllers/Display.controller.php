@@ -796,6 +796,13 @@ class Display_Controller
 		if (!empty($context['drafts_autosave']))
 			loadJavascriptFile('drafts.js');
 
+		if (!empty($modSettings['notifications_enabled']))
+		{
+			$context['notifications_enabled'] = true;
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
+			loadCSSFile('jquery.atwho.css');
+		}
+
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
 
