@@ -202,7 +202,6 @@ class ManageServer_Controller extends Action_Controller
 		$this->_databaseSettingsForm = new Settings_Form();
 
 		// initialize settings
-
 		$config_vars = array(
 			array('db_server', $txt['database_server'], 'file', 'text'),
 			array('db_user', $txt['database_user'], 'file', 'text'),
@@ -330,6 +329,8 @@ class ManageServer_Controller extends Action_Controller
 			array('', $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected),
+			array('cache_uid', $txt['cache_uid'], 'file', 'text', $txt['cache_uid'], 'cache_uid'),
+			array('cache_password', $txt['cache_password'], 'file', 'password', $txt['cache_password'], 'cache_password'),
 			array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
 			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
 		);
@@ -886,6 +887,8 @@ class ManageServer_Controller extends Action_Controller
 			array('', $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected),
+			array('cache_uid', $txt['cache_uid'], 'file', 'text', $txt['cache_uid'], 'cache_uid'),
+			array('cache_password', $txt['cache_password'], 'file', 'password', $txt['cache_password'], 'cache_password'),
 			array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached'),
 			array('cachedir', $txt['cachedir'], 'file', 'text', 36, 'cache_cachedir'),
 		);

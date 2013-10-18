@@ -792,10 +792,52 @@ function select_in_category(cat_id, elem, brd_list)
 */
 function toggleCache ()
 {
-	var memcache = document.getElementById('cache_memcached');
-	var cachedir = document.getElementById('cachedir');
-	memcache.disabled = cache_type.value !== "memcached";
-	cachedir.disabled = cache_type.value !== "filebased";
+	var memcache = document.getElementById('cache_memcached'),
+		cachedir = document.getElementById('cachedir'),
+		cacheuid = document.getElementById('cache_uid'),
+		cachepassword = document.getElementById('cache_password');
+
+	// Show the memcache server box only if memcache has been selected
+	if (cache_type.value !== "memcached")
+	{
+		$(memcache).slideUp();
+		$(memcache).parent().prev().slideUp(100);
+	}
+	else
+	{
+		$(memcache).slideDown();
+		$(memcache).parent().prev().slideDown(100);
+	}
+
+	// don't show the directory if its not filebased
+	if (cache_type.value === "filebased")
+	{
+		$(cachedir).slideDown();
+		$(cachedir).parent().prev().slideDown(100);
+	}
+	else
+	{
+		$(cachedir).slideUp(100);
+		$(cachedir).parent().prev().slideUp(100);
+	}
+
+	// right now only xcache needs the uid/password
+	if (cache_type.value === "xcache")
+	{
+		$(cacheuid).slideDown(100);
+		$(cacheuid).parent().prev().slideDown(100);
+		$(cachepassword).slideDown(100);
+		$(cachepassword).parent().slideDown(100);
+		$(cachepassword).parent().prev().slideDown(100);
+	}
+	else
+	{
+		$(cacheuid).slideUp(100);
+		$(cacheuid).parent().prev().slideUp(100);
+		$(cachepassword).slideUp(100);
+		$(cachepassword).parent().slideUp(100);
+		$(cachepassword).parent().prev().slideUp(100);
+	}
 }
 
 /*

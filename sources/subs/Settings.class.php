@@ -352,6 +352,7 @@ class Settings_Form
 		$config_passwords = array(
 			'db_passwd',
 			'ssi_db_passwd',
+			'cache_password',
 		);
 
 		// All the strings to write.
@@ -361,7 +362,7 @@ class Settings_Form
 			'cookiename',
 			'webmaster_email',
 			'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
-			'cache_accelerator', 'cache_memcached',
+			'cache_accelerator', 'cache_memcached', 'cache_uid',
 		);
 
 		// All the numeric variables.
