@@ -911,9 +911,11 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
-			AND ') . '(real_name LIKE {string:check_name} OR member_name LIKE {string:check_name})
+			AND ') . '(raw:real_name LIKE {string:check_name} OR {raw:member_name} LIKE {string:check_name})
 		LIMIT 1',
 		array(
+			'real_name' => $db->db_case_sensitive() ? 'LOWER(real_name)' : 'real_name',
+			'member_name' => $db->db_case_sensitive() ? 'LOWER(member_name)' : 'member_name',
 			'current_member' => $current_ID_MEMBER,
 			'check_name' => $checkName,
 		)
@@ -928,9 +930,10 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	$request = $db->query('', '
 		SELECT id_group
 		FROM {db_prefix}membergroups
-		WHERE group_name LIKE {string:check_name}
+		WHERE {raw:group_name} LIKE {string:check_name}
 		LIMIT 1',
 		array(
+			'group_name' => $db->db_case_sensitive() ? 'LOWER(group_name)' : 'group_name',
 			'check_name' => $checkName,
 		)
 	);
@@ -1705,11 +1708,12 @@ function getMember($search, $buddies = array())
 	$request = $db->query('', '
 		SELECT id_member, real_name
 		FROM {db_prefix}members
-		WHERE real_name LIKE {string:search}' . (!empty($buddies) ? '
+		WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN (1, 11)
 		LIMIT ' . (Util::strlen($search) <= 2 ? '100' : '800'),
 		array(
+			'real_name' => $db->db_case_sensitive() ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $buddies,
 			'search' => $search,
 		)
