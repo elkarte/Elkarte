@@ -72,7 +72,7 @@ class Notification_Controller extends Action_Controller
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=notification;sa=list' . $this->_url_param,
 			'default_sort_col' => 'log_time',
-			'default_sort_dir' => 'reverse',
+			'default_sort_dir' => 'default',
 			'no_items_label' => $this->_all ? $txt['no_notifications_yet'] : $txt['no_new_notifications'],
 			'get_items' => array(
 				'function' => 'getUserNotifications',
@@ -151,8 +151,8 @@ class Notification_Controller extends Action_Controller
 						'timeformat' => true,
 					),
 					'sort' =>  array(
-						'default' => 'n.log_time',
-						'reverse' => 'n.log_time DESC',
+						'default' => 'n.log_time DESC',
+						'reverse' => 'n.log_time',
 					),
 				),
 			),
