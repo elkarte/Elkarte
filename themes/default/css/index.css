@@ -4065,6 +4065,9 @@ dl.merge_topic dd {
 	#main_content_section {
 		padding: 1px 2px 16px 3px;
 	}
+	#search_form .input_text {
+		width: 7em;
+	}
 	.post {
 		margin: 0 0 0 5px;
 	}
@@ -4214,6 +4217,9 @@ dl.merge_topic dd {
 	}
 	.login {
 		width: 100%;
+	}
+	.views_text, .nextlinks {
+		display: none !important;
 	}
 	#main_menu li, .admin_menu li{
 		float: none;
