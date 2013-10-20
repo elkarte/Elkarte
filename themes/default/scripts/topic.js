@@ -15,7 +15,13 @@
  * Quick Modify, Quick Reply, In Topic Moderation, thumbnail expansion etc
  */
 
-// *** QuickModifyTopic object.
+/**
+ * *** QuickModifyTopic object.
+ * Used to quick edit a topic subject by double clicking next to the subject name
+ * in a topic listing
+ *
+ * @param {object} oOptions
+ */
 function QuickModifyTopic(oOptions)
 {
 	this.opt = oOptions;
@@ -31,23 +37,14 @@ function QuickModifyTopic(oOptions)
 	this.init();
 }
 
-// @todo Determine if this is even needed anymore opera meh
 // Ajax supported?
 QuickModifyTopic.prototype.isXmlHttpCapable = function ()
 {
 	if (typeof(window.XMLHttpRequest) == 'undefined')
 		return false;
 
-	// Opera didn't always support POST requests. So test it first.
-	if ('opera' in window)
-	{
-		var oTest = new XMLHttpRequest();
-		if (!('setRequestHeader' in oTest))
-			return false;
-	}
-
 	return true;
-}
+};
 
 // Used to initialise the object event handlers
 QuickModifyTopic.prototype.init = function ()
@@ -60,7 +57,7 @@ QuickModifyTopic.prototype.init = function ()
 
 	// Used to detect when we've stopped editing.
 	this.oTopicModHandle.onclick = function (oEvent) {return this.instanceRef.modify_topic_click(oEvent);};
-}
+};
 
 // called from the double click in the div
 QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
@@ -86,7 +83,7 @@ QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 	// Get the topics current subject
 	ajax_indicator(true);
 	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=quotefast;quote=" + first_msg_id + ";modify;xml", '', this.onDocReceived_modify_topic);
-}
+};
 
 // callback function from the modify_topic ajax call
 QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
@@ -108,7 +105,7 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 	// Show we are in edit mode and allow the edit
 	ajax_indicator(false);
 	this.modify_topic_show_edit(XMLDoc.getElementsByTagName("subject")[0].childNodes[0].nodeValue);
-}
+};
 
 // Cancel out of an edit and return things to back to what they were
 QuickModifyTopic.prototype.modify_topic_cancel = function ()
@@ -118,7 +115,7 @@ QuickModifyTopic.prototype.modify_topic_cancel = function ()
 	this.bInEditMode = false;
 
 	return false;
-}
+};
 
 // Simply restore/show any hidden bits during topic editing.
 QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
@@ -128,7 +125,7 @@ QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 		if (document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substr(4)) != null)
 			document.getElementById(this.aHidePrefixes[i] + this.sCurMessageId.substr(4)).style.display = set_style;
 	}
-}
+};
 
 // For templating, shown that an inline edit is being made.
 QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
@@ -140,7 +137,7 @@ QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 	this.oCurSubjectDiv.instanceRef = this;
 	this.oCurSubjectDiv.onmouseout = function (oEvent) {return this.instanceRef.modify_topic_mouseout(oEvent);};
 	this.oCurSubjectDiv.onmouseover = function (oEvent) {return this.instanceRef.modify_topic_mouseover(oEvent);};
-}
+};
 
 // Yup thats right, save it
 QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_session_var)
@@ -162,7 +159,7 @@ QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_ses
 	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements['topic'].value) + ";" + cur_session_var + "=" + cur_session_id + ";xml", x.join("&"), this.modify_topic_done);
 
 	return false;
-}
+};
 
 // done with the edit, if all went well show the new topic title
 QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
@@ -194,14 +191,14 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 		$('.preview').SiteTooltip().elk_tooltip_off;
 
 	return false;
-}
+};
 
 // Done with the edit, put in new subject and link.
 QuickModifyTopic.prototype.modify_topic_hide_edit = function (subject)
 {
 	// Re-template the subject!
 	setInnerHTML(this.oCurSubjectDiv, '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' +'/a>');
-}
+};
 
 // keypress event ... like enter or escape
 QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
@@ -225,26 +222,26 @@ QuickModifyTopic.prototype.modify_topic_keypress = function (oEvent)
 				oEvent.preventDefault();
 		}
 	}
-}
+};
 
 // A click event to signal the finish of the edit
 QuickModifyTopic.prototype.modify_topic_click = function (oEvent)
 {
 	if (this.bInEditMode && !this.bMouseOnDiv)
 		this.modify_topic_save(elk_session_id, elk_session_var);
-}
+};
 
 // Moved out of the editing div
 QuickModifyTopic.prototype.modify_topic_mouseout = function (oEvent)
 {
 	this.bMouseOnDiv = false;
-}
+};
 
 // Moved back over the editing div
 QuickModifyTopic.prototype.modify_topic_mouseover = function (oEvent)
 {
 	this.bMouseOnDiv = true;
-}
+};
 
 // *** QuickReply object.
 function QuickReply(oOptions)
@@ -313,7 +310,12 @@ QuickReply.prototype.swap = function ()
 	this.bCollapsed = !this.bCollapsed;
 }
 
-// *** QuickModify object.
+/**
+ *  *** QuickModify object.
+ *  This will allow for the quick editing of a post via ajax
+ *
+ * @param {object} oOptions
+ */
 function QuickModify(oOptions)
 {
 	this.opt = oOptions;
@@ -345,16 +347,8 @@ QuickModify.prototype.isXmlHttpCapable = function ()
 	if (typeof(window.XMLHttpRequest) == 'undefined')
 		return false;
 
-	// Opera didn't always support POST requests. So test it first.
-	if ('opera' in window)
-	{
-		var oTest = new XMLHttpRequest();
-		if (!('setRequestHeader' in oTest))
-			return false;
-	}
-
 	return true;
-}
+};
 
 // Function called when a user presses the edit button.
 QuickModify.prototype.modifyMsg = function (iMessageId)
@@ -393,7 +387,7 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 	// Send out the XMLhttp request to get more info
 	ajax_indicator(true);
 	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=quotefast;quote=' + iMessageId + ';modify;xml', '', this.onMessageReceived);
-}
+};
 
 // The callback function used for the XMLhttp request retrieving the message.
 QuickModify.prototype.onMessageReceived = function (XMLDoc)
@@ -458,7 +452,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	location.hash = '#info_' + this.sCurMessageId.substr(this.sCurMessageId.lastIndexOf("_") + 1);
 
 	return true;
-}
+};
 
 // Function in case the user presses cancel (or other circumstances cause it).
 QuickModify.prototype.modifyCancel = function ()
@@ -503,7 +497,7 @@ QuickModify.prototype.modifyCancel = function ()
 	}
 
 	return false;
-}
+};
 
 // The function called after a user wants to save his precious message.
 QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
@@ -543,7 +537,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 	sendXMLDocument.call(this, elk_prepareScriptUrl(this.opt.sScriptUrl) + "action=jsmodify;topic=" + this.opt.iTopicId + ";" + elk_session_var + "=" + elk_session_id + ";xml", x.join("&"), this.onModifyDone);
 
 	return false;
-}
+};
 
 // Callback function of the XMLhttp request sending the modified message.
 QuickModify.prototype.onModifyDone = function (XMLDoc)
@@ -606,7 +600,12 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		if ($.isFunction($.fn.linkifyvideo))
 			$().linkifyvideo(oEmbedtext, this.sCurMessageId);
 
-		// Fix code blocks
+		// Hello, Sweetie
+		$('#' + this.sCurMessageId + ' .spoilerheader').click(function(){
+			$(this).next().children().slideToggle("fast");
+		});
+
+		// Re-Fix code blocks
 		if (typeof elk_codefix === 'function')
 			elk_codefix();
 	}
@@ -618,7 +617,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		document.forms.quickModForm.message.style.border = error.getAttribute('in_body') == '1' ? this.opt.sErrorBorderStyle : '';
 		document.forms.quickModForm.subject.style.border = error.getAttribute('in_subject') == '1' ? this.opt.sErrorBorderStyle : '';
 	}
-}
+};
 
 function InTopicModeration(oOptions)
 {
