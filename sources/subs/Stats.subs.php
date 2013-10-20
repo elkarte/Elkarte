@@ -706,3 +706,263 @@ function getDailyStats($condition_string, $condition_parameters = array())
 		);
 	$db->free_result($days_result);
 }
+
+/**
+ * Returns the number of topics a user has started, including ones on boards
+ * they may no longer have access on.
+ * Does not count topics that are in the recycle board
+ *
+ * @param int $memID
+ */
+function UserStatsTopicsStarted($memID)
+{
+	global $modSettings;
+
+	$db = database();
+
+	// Number of topics started.
+	$result = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}topics
+		WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND id_board != {int:recycle_board}' : ''),
+		array(
+			'current_member' => $memID,
+			'recycle_board' => $modSettings['recycle_board'],
+		)
+	);
+	list ($num_topics) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $num_topics;
+}
+
+/**
+ * Returns the number of polls a user has started, including ones on boards
+ * they may no longer have access on.
+ * Does not count topics that are in the recycle board
+ *
+ * @param int $memID
+ */
+function UserStatsPollsStarted($memID)
+{
+	global $modSettings;
+
+	$db = database();
+
+	// Number polls started.
+	$result = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}topics
+		WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND id_board != {int:recycle_board}' : '') . '
+			AND id_poll != {int:no_poll}',
+		array(
+			'current_member' => $memID,
+			'recycle_board' => $modSettings['recycle_board'],
+			'no_poll' => 0,
+		)
+	);
+	list ($num_polls) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $num_polls;
+}
+
+/**
+ * Returns the number of polls a user has voted in, including ones on boards
+ * they may no longer have access on.
+ *
+ * @param int $memID
+ */
+function UserStatsPollsVoted($memID)
+{
+	$db = database();
+
+	// Number polls voted in.
+	$result = $db->query('distinct_poll_votes', '
+		SELECT COUNT(DISTINCT id_poll)
+		FROM {db_prefix}log_polls
+		WHERE id_member = {int:current_member}',
+		array(
+			'current_member' => $memID,
+		)
+	);
+	list ($num_votes) = $db->fetch_row($result);
+	$db->free_result($result);
+
+	return $num_votes;
+}
+
+/**
+ * Finds the 1-N list of boards that a user posts in most often
+ * Returns array with some basic stats of post percent per board
+ *
+ * @param int $memID
+ * @param int $limit
+ */
+function UserStatsMostPostedBoard($memID, $limit = 10)
+{
+	global $scripturl, $user_profile;
+
+	$db = database();
+
+	// Find the board this member spammed most often.
+	$result = $db->query('', '
+		SELECT
+			b.id_board, MAX(b.name) AS name, MAX(b.num_posts) AS num_posts, COUNT(*) AS message_count
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE m.id_member = {int:current_member}
+			AND b.count_posts = {int:count_enabled}
+			AND {query_see_board}
+		GROUP BY b.id_board
+		ORDER BY message_count DESC
+		LIMIT (int:limit}',
+		array(
+			'current_member' => $memID,
+			'count_enabled' => 0,
+			'limit'	=> (int) $limit,
+		)
+	);
+	$popular_boards = array();
+	while ($row = $db->fetch_assoc($result))
+	{
+		$popular_boards[$row['id_board']] = array(
+			'id' => $row['id_board'],
+			'posts' => $row['message_count'],
+			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+			'posts_percent' => $user_profile[$memID]['posts'] == 0 ? 0 : ($row['message_count'] * 100) / $user_profile[$memID]['posts'],
+			'total_posts' => $row['num_posts'],
+			'total_posts_member' => $user_profile[$memID]['posts'],
+		);
+	}
+	$db->free_result($result);
+
+	return $popular_boards;
+}
+
+/**
+ * Finds the 1-N list of boards that a user participates in most often
+ * Returns array with some basic stats of post percent per board as a percent of board activity
+ *
+ * @param int $memID
+ * @param int $limit
+ */
+function UserStatsMostActiveBoard($memID, $limit = 10)
+{
+	global $scripturl;
+
+	$db = database();
+
+	// Find the board this member spammed most often.
+	$result = $db->query('profile_board_stats', '
+		SELECT
+			b.id_board, MAX(b.name) AS name, b.num_posts, COUNT(*) AS message_count,
+			CASE WHEN COUNT(*) > MAX(b.num_posts) THEN 1 ELSE COUNT(*) / MAX(b.num_posts) END * 100 AS percentage
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE m.id_member = {int:current_member}
+			AND {query_see_board}
+		GROUP BY b.id_board, b.num_posts
+		ORDER BY percentage DESC
+		LIMIT {int:limit}',
+		array(
+			'current_member' => $memID,
+			'limit' => (int) $limit,
+		)
+	);
+	$board_activity = array();
+	while ($row = $db->fetch_assoc($result))
+	{
+		$board_activity[$row['id_board']] = array(
+			'id' => $row['id_board'],
+			'posts' => $row['message_count'],
+			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
+			'percent' => comma_format((float) $row['percentage'], 2),
+			'posts_percent' => (float) $row['percentage'],
+			'total_posts' => $row['num_posts'],
+		);
+	}
+	$db->free_result($result);
+
+	return $board_activity;
+}
+
+/**
+ * Finds the users posting activity by time of day
+ * Returns array with some basic stats of post percent per hour
+ *
+ * @param int $memID
+ */
+function UserStatsPostingTime($memID)
+{
+	global $user_info;
+
+	$db = database();
+
+	// Find the times when the users posts
+	$result = $db->query('user_activity_by_time', '
+		SELECT
+			HOUR(FROM_UNIXTIME(poster_time + {int:time_offset})) AS hour,
+			COUNT(*) AS post_count
+		FROM {db_prefix}messages
+		WHERE id_member = {int:current_member}' . ($modSettings['totalMessages'] > 100000 ? '
+			AND id_topic > {int:top_ten_thousand_topics}' : '') . '
+		GROUP BY hour',
+		array(
+			'current_member' => $memID,
+			'top_ten_thousand_topics' => $modSettings['totalTopics'] - 10000,
+			'time_offset' => (($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
+		)
+	);
+	$maxPosts = 0;
+	$realPosts = 0;
+	$posts_by_time = array();
+	while ($row = $db->fetch_assoc($result))
+	{
+		// Cast as an integer to remove the leading 0.
+		$row['hour'] = (int) $row['hour'];
+
+		$maxPosts = max($row['post_count'], $maxPosts);
+		$realPosts += $row['post_count'];
+
+		$posts_by_time[$row['hour']] = array(
+			'hour' => $row['hour'],
+			'hour_format' => stripos($user_info['time_format'], '%p') === false ? $row['hour'] : date('g a', mktime($row['hour'])),
+			'posts' => $row['post_count'],
+			'posts_percent' => 0,
+			'is_last' => $row['hour'] == 23,
+		);
+	}
+	$db->free_result($result);
+
+	// Clean it up some more
+	if ($maxPosts > 0)
+	{
+		for ($hour = 0; $hour < 24; $hour++)
+		{
+			if (!isset($posts_by_time[$hour]))
+				$posts_by_time[$hour] = array(
+					'hour' => $hour,
+					'hour_format' => stripos($user_info['time_format'], '%p') === false ? $hour : date('g a', mktime($hour)),
+					'posts' => 0,
+					'posts_percent' => 0,
+					'relative_percent' => 0,
+					'is_last' => $hour == 23,
+				);
+			else
+			{
+				$posts_by_time[$hour]['posts_percent'] = round(($posts_by_time[$hour]['posts'] * 100) / $realPosts);
+				$posts_by_time[$hour]['relative_percent'] = round(($posts_by_time[$hour]['posts'] * 100) / $maxPosts);
+			}
+		}
+	}
+
+	// Put it in the right order.
+	ksort($posts_by_time);
+
+	return $posts_by_time;
+}

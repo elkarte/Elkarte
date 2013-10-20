@@ -441,9 +441,9 @@ em {
 	font-size: 1.2em;
 }
 .catbg select {
-	margin-top: -1px;
+	margin-top: 1px;
 	padding: 1px;
-	height: 2em;
+	height: 1.8em;
 	font-size: 0.857em;
 }
 /* Styles for main headers. */

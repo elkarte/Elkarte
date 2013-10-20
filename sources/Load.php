@@ -1917,7 +1917,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 				$context['css_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 
 			if ($db_show_debug === true)
-				$context['debug']['sheets'][] = $params['basename'] . '(' . basename($params['url']) . ')';
+				$context['debug']['sheets'][] = $params['basename'] . (!empty($params['url']) ? '(' . basename($params['url']) . ')' : '');
 		}
 
 		// Save this build
@@ -2695,7 +2695,7 @@ function doSecurityChecks()
 
 		if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 			$context['security_controls']['admin_session'] = true;
-	
+
 		if (!empty($maintenance))
 			$context['security_controls']['maintenance'] = true;
 	}

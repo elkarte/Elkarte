@@ -2011,12 +2011,12 @@ class PersonalMessage_Controller extends Action_Controller
 					unset($possible_users[$k]);
 				else
 					$possible_users[$k] = $db->quote('{string:name}', array('name' => $possible_users[$k]));
-
 			}
 
 			require_once(SUBSDIR . '/Members.subs.php');
+
 			// Who matches those criteria?
-			$members = membersBy('real_name LIKE {raw:real_name_implode}', array('real_name_implode' => implode(" OR real_name LIKE ", $possible_users)));
+			$members = membersBy('real_name LIKE {raw:real_name_implode}', array('real_name_implode' => implode(" OR real_name LIKE ", $possible_users), 'real_name' => $db->db_case_sensitive() ? 'LOWER(real_name)' : 'real_name'));
 
 			// Simply do nothing if there're too many members matching the criteria.
 			if (count($members) > $maxMembersToSearch)
@@ -2024,25 +2024,29 @@ class PersonalMessage_Controller extends Action_Controller
 			elseif (count($members) == 0)
 			{
 				if ($context['folder'] === 'inbox')
-					$userQuery = 'AND pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})';
+				{
+					$userQuery = 'AND pm.id_member_from = 0 AND ({raw:pm_from_name} LIKE {raw:guest_user_name_implode})';
+					$searchq_parameters['pm_from_name'] = $db->db_case_sensitive() ? 'LOWER(pm.from_name)' : 'pm.from_name';
+				}
 				else
 					$userQuery = '';
 
-				$searchq_parameters['guest_user_name_implode'] = implode(' OR pm.from_name LIKE ', $possible_users);
+				$searchq_parameters['guest_user_name_implode'] = implode('\' OR ' . ($db->db_case_sensitive() ? 'LOWER(pm.from_name)' : 'pm.from_name') . ' LIKE ', $possible_users);
 			}
 			else
 			{
 				$memberlist = array();
-				foreach ($members as $row)
-					$memberlist[] = $row['id_member'];
+				foreach ($members as $id)
+					$memberlist[] = $id;
 
 				// Use the name as as sent from or sent to
 				if ($context['folder'] === 'inbox')
-					$userQuery = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})))';
+					$userQuery = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND ({raw:pm_from_name} LIKE {raw:guest_user_name_implode})))';
 				else
 					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
 
-				$searchq_parameters['guest_user_name_implode'] = implode(' OR pm.from_name LIKE ', $possible_users);
+				$searchq_parameters['guest_user_name_implode'] = implode('\' OR ' . ($db->db_case_sensitive() ? 'LOWER(pm.from_name)' : 'pm.from_name') . ' LIKE ', $possible_users);
+				$searchq_parameters['pm_from_name'] = $db->db_case_sensitive() ? 'LOWER(pm.from_name)' : 'pm.from_name';
 				$searchq_parameters['member_list'] = $memberlist;
 			}
 		}
