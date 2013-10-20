@@ -570,6 +570,8 @@ function spidersLastSeen()
  */
 function spidersStatsDates()
 {
+	global $txt;
+
 	$db = database();
 
 	// Get the earliest and latest dates.
