@@ -763,7 +763,7 @@ function showCodeImage($code)
 			$loaded_fonts[$font_index] = imageloadfont($settings['default_theme_dir'] . '/fonts/' . $font_list[$font_index]);
 
 	// Determine the dimensions of each character.
-	$total_width = $character_spacing * strlen($code) + 20;
+	$total_width = $character_spacing * strlen($code) + 50;
 	$max_height = 0;
 	foreach ($characters as $char_index => $character)
 	{
@@ -771,9 +771,9 @@ function showCodeImage($code)
 		{
 			// GD2 handles font size differently.
 			if ($fontSizeRandom)
-				$font_size = $gd2 ? mt_rand(19, 21) : mt_rand(25, 32);
+				$font_size = $gd2 ? mt_rand(17, 19) : mt_rand(25, 27);
 			else
-				$font_size = $gd2 ? 24 : 30;
+				$font_size = $gd2 ? 17 : 27;
 
 			$img_box = imagettfbbox($font_size, 0, $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[$character['font']], $character['id']);
 
@@ -787,7 +787,7 @@ function showCodeImage($code)
 		}
 
 		$max_height = max($characters[$char_index]['height'] + 5, $max_height);
-		$total_width += $characters[$char_index]['width'];
+		$total_width += $characters[$char_index]['width'] + 2;
 	}
 
 	// Create an image.
