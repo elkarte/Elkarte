@@ -1981,6 +1981,7 @@ function profileValidateSignature(&$value)
  * @todo argh, the avatar here. Take this out of here!
  *
  * @param array &$value
+ * @return mixed
  */
 function profileSaveAvatarData(&$value)
 {
@@ -1992,9 +1993,8 @@ function profileSaveAvatarData(&$value)
 	if (empty($memID) && !empty($context['password_auth_failed']))
 		return false;
 
-	require_once(SUBSDIR . '/Attachments.subs.php');
-
 	// We need to know where we're going to be putting it..
+	require_once(SUBSDIR . '/Attachments.subs.php');
 	$uploadDir = getAvatarPath();
 	$id_folder = getAvatarPathID();
 
@@ -2009,13 +2009,15 @@ function profileSaveAvatarData(&$value)
 		$url = parse_url($_POST['userpicpersonal']);
 		$contents = fetch_web_data('http://' . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
 
-		if ($contents != false && $tmpAvatar = fopen($uploadDir . '/avatar_tmp_' . $memID, 'wb'))
+		if ($contents != false)
 		{
-			fwrite($tmpAvatar, $contents);
-			fclose($tmpAvatar);
-
-			$downloadedExternalAvatar = true;
-			$_FILES['attachment']['tmp_name'] = $uploadDir . '/avatar_tmp_' . $memID;
+			// Create a hashed name to save
+			$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
+			if (file_put_contents($new_avatar_name, $contents) !== false)
+			{
+				$downloadedExternalAvatar = true;
+				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
+			}
 		}
 	}
 
@@ -2109,29 +2111,36 @@ function profileSaveAvatarData(&$value)
 				if (!is_writable($uploadDir))
 					fatal_lang_error('attachments_no_write', 'critical');
 
-				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadDir . '/avatar_tmp_' . $memID))
+				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
+				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 					fatal_lang_error('attach_timeout', 'critical');
 
-				$_FILES['attachment']['tmp_name'] = $uploadDir . '/avatar_tmp_' . $memID;
+				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
 			}
 
+			// If there is no size, then it's probably not a valid pic, so lets remove it.
 			$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
-
-			// No size, then it's probably not a valid pic.
 			if ($sizes === false)
+			{
+				@unlink($_FILES['attachment']['tmp_name']);
 				return 'bad_avatar';
+			}
 			// Check whether the image is too large.
 			elseif ((!empty($modSettings['avatar_max_width_upload']) && $sizes[0] > $modSettings['avatar_max_width_upload']) || (!empty($modSettings['avatar_max_height_upload']) && $sizes[1] > $modSettings['avatar_max_height_upload']))
 			{
 				if (!empty($modSettings['avatar_resize_upload']))
 				{
 					// Attempt to chmod it.
-					@chmod($uploadDir . '/avatar_tmp_' . $memID, 0644);
+					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
 					// @todo remove this require when appropriate
 					require_once(SUBSDIR . '/Attachments.subs.php');
-					if (!saveAvatar($uploadDir . '/avatar_tmp_' . $memID, $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
+					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
+					{
+						// Something went wrong, so lets delete this offender
+						@unlink($_FILES['attachment']['tmp_name']);
 						return 'bad_avatar';
+					}
 
 					// Reset attachment avatar data.
 					$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
@@ -2139,7 +2148,10 @@ function profileSaveAvatarData(&$value)
 					$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
 				}
 				else
+				{
+					@unlink($_FILES['attachment']['tmp_name']);
 					return 'bad_avatar';
+				}
 			}
 			elseif (is_array($sizes))
 			{
@@ -2149,12 +2161,20 @@ function profileSaveAvatarData(&$value)
 				{
 					// It's bad. Try to re-encode the contents?
 					if (empty($modSettings['avatar_reencode']) || (!reencodeImage($_FILES['attachment']['tmp_name'], $sizes[2])))
+					{
+						@unlink($_FILES['attachment']['tmp_name']);
 						return 'bad_avatar';
+					}
+
 					// We were successful. However, at what price?
 					$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
+
 					// Hard to believe this would happen, but can you bet?
 					if ($sizes === false)
+					{
+						@unlink($_FILES['attachment']['tmp_name']);
 						return 'bad_avatar';
+					}
 				}
 
 				$extensions = array(
@@ -2204,8 +2224,8 @@ function profileSaveAvatarData(&$value)
 			$profile_vars['avatar'] = '';
 
 			// Delete any temporary file.
-			if (file_exists($uploadDir . '/avatar_tmp_' . $memID))
-				@unlink($uploadDir . '/avatar_tmp_' . $memID);
+			if (file_exists($_FILES['attachment']['tmp_name']))
+				@unlink($_FILES['attachment']['tmp_name']);
 		}
 		// Selected the upload avatar option and had one already uploaded before or didn't upload one.
 		else
