@@ -1844,20 +1844,20 @@ function markunreadButton(btn)
 	return false;
 }
 
-var relative_time_refresh = 0;
 /**
  * This function changes the relative time around the page real-timeish
  */
+var relative_time_refresh = 0;
 function updateRelativeTime()
 {
 	// In any other case no more than one hour
 	relative_time_refresh = 3600000;
 	$('time').each(function() {
-		var oRelativeTime = new relativeTime($(this).attr('datetime'));
-		var postdate = new Date($(this).attr('datetime'));
-		var today = new Date();
-		var time_text = '';
-		var past_time = (today - postdate) / 1000;
+		var oRelativeTime = new relativeTime($(this).attr('datetime')),
+			postdate = new Date($(this).attr('datetime')),
+			today = new Date(),
+			time_text = '',
+			past_time = (today - postdate) / 1000;
 
 		if (oRelativeTime.seconds())
 		{
@@ -1901,6 +1901,7 @@ function updateRelativeTime()
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
 		}
 	});
+
 	setTimeout('updateRelativeTime()', relative_time_refresh);
 }
 
@@ -1932,7 +1933,7 @@ relativeTime.prototype.seconds = function ()
 		return true;
 	}
 	return false;
-}
+};
 
 relativeTime.prototype.minutes = function ()
 {
@@ -1942,8 +1943,8 @@ relativeTime.prototype.minutes = function ()
 		this.deltaTime = Math.round(this.past_time / 60);
 		return true;
 	}
-	return false
-}
+	return false;
+};
 
 relativeTime.prototype.hours = function ()
 {
@@ -1953,8 +1954,8 @@ relativeTime.prototype.hours = function ()
 		this.deltaTime = Math.round(this.past_time / 3600);
 		return true;
 	}
-	return false
-}
+	return false;
+};
 
 relativeTime.prototype.days = function ()
 {
@@ -1964,8 +1965,8 @@ relativeTime.prototype.days = function ()
 		this.deltaTime = Math.round(this.past_time / (24 * 3600));
 		return true;
 	}
-	return false
-}
+	return false;
+};
 
 relativeTime.prototype.weeks = function ()
 {
@@ -1975,8 +1976,8 @@ relativeTime.prototype.weeks = function ()
 		this.deltaTime = Math.round(this.past_time / (24 * 3600));
 		return true;
 	}
-	return false
-}
+	return false;
+};
 
 relativeTime.prototype.months = function ()
 {
@@ -1986,8 +1987,8 @@ relativeTime.prototype.months = function ()
 		this.deltaTime = Math.round(this.past_time / (30 * 24 * 3600));
 		return true;
 	}
-	return false
-}
+	return false;
+};
 
 relativeTime.prototype.years = function ()
 {
@@ -1997,5 +1998,5 @@ relativeTime.prototype.years = function ()
 		this.deltaTime = this.dateTo.getFullYear() - this.dateFrom.getFullYear();
 		return true;
 	}
-	return false
-}
+	return false;
+};
