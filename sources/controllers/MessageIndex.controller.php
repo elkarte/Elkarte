@@ -261,7 +261,7 @@ class MessageIndex_Controller extends Action_Controller
 		$indexOptions = array(
 			'include_sticky' => !empty($modSettings['enableStickyTopics']),
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
-			'previews' => empty($modSettings['preview_characters']) ? 0 : $modSettings['preview_characters'],
+			'previews' => !empty($settings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? 128 : $modSettings['preview_characters']) : 0,
 			'include_avatars' => !empty($settings['avatars_on_indexes']),
 			'ascending' => $ascending,
 			'fake_ascending' => $fake_ascending
@@ -281,7 +281,7 @@ class MessageIndex_Controller extends Action_Controller
 			$topic_ids[] = $row['id_topic'];
 
 			// Does the theme support message previews?
-			if (!empty($settings['message_index_preview']) && !empty($modSettings['preview_characters']))
+			if (!empty($settings['message_index_preview']))
 			{
 				// Limit them to $modSettings['preview_characters'] characters
 				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
