@@ -2112,6 +2112,13 @@ function assignGroupsToMember($member, $primary_group, $additional_groups)
 	);
 }
 
+/**
+ * Get a list of members from a membergroups request.
+ *
+ * @param array $groups
+ * @param string $where
+ * @return mixed
+ */
 function getConcernedMembers($groups, $where)
 {
 	global $modSettings, $language;
