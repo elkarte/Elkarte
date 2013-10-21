@@ -58,11 +58,18 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt, $scripturl, $modSettings;
+
+		// Only registered members can be notified
+		is_not_guest();
 
 		require_once(SUBSDIR . '/Notification.subs.php');
 		require_once(SUBSDIR . '/List.subs.php');
 		loadLanguage('Notification');
+
+		// I'm not sure this is needed, though better have it. :P
+		if (empty($modSettings['notifications_enabled']))
+			return false;
 
 		$this->_buildUrl();
 
