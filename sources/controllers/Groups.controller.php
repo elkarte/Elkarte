@@ -602,6 +602,7 @@ class Groups_Controller extends Action_Controller
 
 		// We're going to want this for making our list.
 		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// This is all the information required for a group listing.
 		$listOptions = array(
@@ -715,81 +716,6 @@ class Groups_Controller extends Action_Controller
 
 		$context['default_list'] = 'group_request_list';
 	}
-}
-
-/**
- * Callback function for createList().
- *
- * @param string $where
- * @param string $where_parameters
- * @return int, the count of group requests
- */
-function list_getGroupRequestCount($where, $where_parameters)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}log_group_requests AS lgr
-		WHERE ' . $where,
-		array_merge($where_parameters, array(
-		))
-	);
-	list ($totalRequests) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $totalRequests;
-}
-
-/**
- * Callback function for createList()
- *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @param string $where
- * @param string $where_parameters
- * @return array, an array of group requests
- * Each group request has:
- * 		'id'
- * 		'member_link'
- * 		'group_link'
- * 		'reason'
- * 		'time_submitted'
- */
-function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
-{
-	global $scripturl;
-
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
-			mem.member_name, mg.group_name, mg.online_color, mem.real_name
-		FROM {db_prefix}log_group_requests AS lgr
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
-			INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
-		WHERE ' . $where . '
-		ORDER BY {raw:sort}
-		LIMIT ' . $start . ', ' . $items_per_page,
-		array_merge($where_parameters, array(
-			'sort' => $sort,
-		))
-	);
-	$group_requests = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$group_requests[] = array(
-			'id' => $row['id_request'],
-			'member_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
-			'reason' => censorText($row['reason']),
-			'time_submitted' => standardTime($row['time_applied']),
-		);
-	}
-	$db->free_result($request);
-
-	return $group_requests;
 }
 
 /**
