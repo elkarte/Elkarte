@@ -47,7 +47,7 @@ $(document).ready(function() {
 	// Fix code blocks
 	if (typeof elk_codefix === 'function')
 		elk_codefix();
-	
+
 	$('.expand_pages').expand_pages();
 
 	// Collapsabile fieldsets, pure candy
@@ -55,6 +55,7 @@ $(document).ready(function() {
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
 	});
+
 	// Spoiler
 	$('.spoilerheader').click(function(){
 		$(this).next().children().slideToggle("fast");
