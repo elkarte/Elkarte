@@ -541,16 +541,8 @@ class Groups_Controller extends Action_Controller
 								if ($value == 0 || trim($value) == '')
 									unset($groups['add'][$key]);
 
-							$db->query('', '
-								UPDATE {db_prefix}members
-								SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-								WHERE id_member = {int:selected_member}',
-								array(
-									'primary_group' => $groups['primary'],
-									'selected_member' => $id,
-									'additional_groups' => implode(',', $groups['add']),
-								)
-							);
+							require_once(SUBSDIR . '/Members.subs.php');
+							assignGroupsToMember($id, $groups['primary'], $groups['add']);
 						}
 
 						$lastLng = $user_info['language'];

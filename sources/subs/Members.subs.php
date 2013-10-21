@@ -2088,3 +2088,26 @@ function recentMembers($limit)
 
 	return $members;
 }
+
+/**
+ * Assign membergroups to members.
+ *
+ * @param int $member
+ * @param int $primary_group
+ * @param string $additional_groups
+ */
+function assignGroupsToMember($member, $primary_group, $additional_groups)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}members
+		SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
+		WHERE id_member = {int:selected_member}',
+		array(
+			'primary_group' => $primary_group,
+			'selected_member' => $member,
+			'additional_groups' => implode(',', $additional_groups),
+		)
+	);
+}
