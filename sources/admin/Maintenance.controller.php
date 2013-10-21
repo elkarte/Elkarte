@@ -320,6 +320,8 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		require_once(SUBSDIR . '/Cache.subs.php');
+
 		checkSession();
 		validateToken('admin-maint');
 
