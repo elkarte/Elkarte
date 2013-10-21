@@ -216,6 +216,14 @@ CHANGE body body mediumtext NOT NULL;
 ---#
 
 /******************************************************************************/
+--- Fixing floodcontrol for long types
+/******************************************************************************/
+---# Altering the floodcontrol table...
+ALTER TABLE {$db_prefix}log_floodcontrol
+CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
+---#
+
+/******************************************************************************/
 --- Name changes
 /******************************************************************************/
 ---# Altering the membergroup stars to icons
