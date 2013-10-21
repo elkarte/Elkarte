@@ -207,6 +207,10 @@ class AddonSettings_Controller extends Action_Controller
 					remove_integration_function($_REQUEST['hook'], $function_remove, $file);
 					add_integration_function($_REQUEST['hook'], $function_add, $file);
 
+					// clean the cache.
+					require_once(SUBSDIR . '/Cache.subs.php');
+					clean_cache();
+
 					redirectexit('action=admin;area=addonsettings;sa=hooks' . $context['filter_url']);
 				}
 			}
