@@ -408,9 +408,7 @@ class Groups_Controller extends Action_Controller
 	 */
 	public function action_requests()
 	{
-		global $txt, $context, $scripturl, $user_info, $modSettings, $language;
-
-		$db = database();
+		global $txt, $context, $scripturl, $user_info, $modSettings;
 
 		// Set up the template stuff...
 		$context['page_title'] = $txt['mc_group_requests'];
@@ -456,68 +454,7 @@ class Groups_Controller extends Action_Controller
 			else
 			{
 				// Get the details of all the members concerned...
-				$request = $db->query('', '
-					SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
-						mem.additional_groups AS additional_groups, mem.lngfile, mem.member_name, mem.notify_types,
-						mg.hidden, mg.group_name
-					FROM {db_prefix}log_group_requests AS lgr
-						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
-						INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
-					WHERE ' . $where . '
-						AND lgr.id_request IN ({array_int:request_list})
-					ORDER BY mem.lngfile',
-					array(
-						'request_list' => $_POST['groupr'],
-					)
-				);
-				$email_details = array();
-				$group_changes = array();
-				while ($row = $db->fetch_assoc($request))
-				{
-					$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
-
-					// If we are approving work out what their new group is.
-					if ($_POST['req_action'] == 'approve')
-					{
-						// For people with more than one request at once.
-						if (isset($group_changes[$row['id_member']]))
-						{
-							$row['additional_groups'] = $group_changes[$row['id_member']]['add'];
-							$row['primary_group'] = $group_changes[$row['id_member']]['primary'];
-						}
-						else
-							$row['additional_groups'] = explode(',', $row['additional_groups']);
-
-						// Don't have it already?
-						if ($row['primary_group'] == $row['id_group'] || in_array($row['id_group'], $row['additional_groups']))
-							continue;
-
-						// Should it become their primary?
-						if ($row['primary_group'] == 0 && $row['hidden'] == 0)
-							$row['primary_group'] = $row['id_group'];
-						else
-							$row['additional_groups'][] = $row['id_group'];
-
-						// Add them to the group master list.
-						$group_changes[$row['id_member']] = array(
-							'primary' => $row['primary_group'],
-							'add' => $row['additional_groups'],
-						);
-					}
-
-					// Add required information to email them.
-					if ($row['notify_types'] != 4)
-						$email_details[] = array(
-							'rid' => $row['id_request'],
-							'member_id' => $row['id_member'],
-							'member_name' => $row['member_name'],
-							'group_id' => $row['id_group'],
-							'group_name' => $row['group_name'],
-							'email' => $row['email_address'],
-							'language' => $row['lngfile'],
-						);
-				}
-				$db->free_result($request);
+				$concerned = getConcernedMembers($_POST['groupr'], $where);
 
 				// Cleanup old group requests..
 				require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -526,7 +463,7 @@ class Groups_Controller extends Action_Controller
 				// Ensure everyone who is online gets their changes right away.
 				updateSettings(array('settings_updated' => time()));
 
-				if (!empty($email_details))
+				if (!empty($concerned['email_details']))
 				{
 					require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -534,7 +471,7 @@ class Groups_Controller extends Action_Controller
 					if ($_POST['req_action'] == 'approve')
 					{
 						// Make the group changes.
-						foreach ($group_changes as $id => $groups)
+						foreach ($concerned['group_changes'] as $id => $groups)
 						{
 							// Sanity check!
 							foreach ($groups['add'] as $key => $value)
@@ -546,7 +483,7 @@ class Groups_Controller extends Action_Controller
 						}
 
 						$lastLng = $user_info['language'];
-						foreach ($email_details as $email)
+						foreach ($concerned['email_details'] as $email)
 						{
 							$replacements = array(
 								'USERNAME' => $email['member_name'],
@@ -563,7 +500,7 @@ class Groups_Controller extends Action_Controller
 					{
 						// Same as for approving, kind of.
 						$lastLng = $user_info['language'];
-						foreach ($email_details as $email)
+						foreach ($concerned['email_details'] as $email)
 						{
 							$custom_reason = isset($_POST['groupreason']) && isset($_POST['groupreason'][$email['rid']]) ? $_POST['groupreason'][$email['rid']] : '';
 

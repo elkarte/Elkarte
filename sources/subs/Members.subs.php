@@ -2111,3 +2111,80 @@ function assignGroupsToMember($member, $primary_group, $additional_groups)
 		)
 	);
 }
+
+function getConcernedMembers($groups, $where)
+{
+	global $modSettings, $language;
+
+	$db = database();
+
+		// Get the details of all the members concerned...
+	$request = $db->query('', '
+		SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
+			mem.additional_groups AS additional_groups, mem.lngfile, mem.member_name, mem.notify_types,
+			mg.hidden, mg.group_name
+		FROM {db_prefix}log_group_requests AS lgr
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
+			INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
+		WHERE ' . $where . '
+			AND lgr.id_request IN ({array_int:request_list})
+		ORDER BY mem.lngfile',
+		array(
+			'request_list' => $groups,
+		)
+	);
+
+	$email_details = array();
+	$group_changes = array();
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
+
+		// If we are approving work out what their new group is.
+		if ($_POST['req_action'] == 'approve')
+		{
+			// For people with more than one request at once.
+			if (isset($group_changes[$row['id_member']]))
+			{
+				$row['additional_groups'] = $group_changes[$row['id_member']]['add'];
+				$row['primary_group'] = $group_changes[$row['id_member']]['primary'];
+			}
+			else
+				$row['additional_groups'] = explode(',', $row['additional_groups']);
+				// Don't have it already?
+			if ($row['primary_group'] == $row['id_group'] || in_array($row['id_group'], $row['additional_groups']))
+				continue;
+				// Should it become their primary?
+			if ($row['primary_group'] == 0 && $row['hidden'] == 0)
+				$row['primary_group'] = $row['id_group'];
+			else
+				$row['additional_groups'][] = $row['id_group'];
+				// Add them to the group master list.
+			$group_changes[$row['id_member']] = array(
+				'primary' => $row['primary_group'],
+				'add' => $row['additional_groups'],
+			);
+		}
+
+		// Add required information to email them.
+		if ($row['notify_types'] != 4)
+			$email_details[] = array(
+				'rid' => $row['id_request'],
+				'member_id' => $row['id_member'],
+				'member_name' => $row['member_name'],
+				'group_id' => $row['id_group'],
+				'group_name' => $row['group_name'],
+				'email' => $row['email_address'],
+				'language' => $row['lngfile'],
+			);
+	}
+	$db->free_result($request);
+
+	$output = array(
+		'email_details' => $email_details,
+		'group_changes' => $group_changes
+	);
+
+	return $output;
+}
