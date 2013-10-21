@@ -1862,3 +1862,17 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 
 	return $group_requests;
 }
+
+function deleteGroupRequests($groups)
+{
+	$db = database();
+
+	// Remove the evidence...
+	$db->query('', '
+		DELETE FROM {db_prefix}log_group_requests
+		WHERE id_request IN ({array_int:request_list})',
+		array(
+			'request_list' => $groups,
+		)
+	);
+}

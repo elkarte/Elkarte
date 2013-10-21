@@ -519,14 +519,9 @@ class Groups_Controller extends Action_Controller
 				}
 				$db->free_result($request);
 
-				// Remove the evidence...
-				$db->query('', '
-					DELETE FROM {db_prefix}log_group_requests
-					WHERE id_request IN ({array_int:request_list})',
-					array(
-						'request_list' => $_POST['groupr'],
-					)
-				);
+				// Cleanup old group requests..
+				require_once(SUBSDIR . '/Membergroups.subs.php');
+				deleteGroupRequests($_POST['groupr']);
 
 				// Ensure everyone who is online gets their changes right away.
 				updateSettings(array('settings_updated' => time()));
