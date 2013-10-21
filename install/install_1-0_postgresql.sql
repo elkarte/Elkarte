@@ -1231,7 +1231,7 @@ CREATE INDEX {$db_prefix}log_errors_ip ON {$db_prefix}log_errors (ip);
 CREATE TABLE {$db_prefix}log_floodcontrol (
   ip char(16) NOT NULL default '                ',
   log_time int NOT NULL default '0',
-  log_type varchar(8) NOT NULL default 'post',
+  log_type varchar(10) NOT NULL default 'post',
   PRIMARY KEY (ip, log_type)
 );
 

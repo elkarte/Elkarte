@@ -161,6 +161,17 @@ ADD COLUMN credits varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
+--- Fixing floodcontrol for long types
+/******************************************************************************/
+---# Altering the floodcontrol table...
+---{
+upgrade_query("
+	ALTER TABLE {$db_prefix}log_floodcontrol
+	ALTER COLUMN log_type type varchar(20);");
+---}
+---# 
+
+/******************************************************************************/
 --- Adding more space for session ids
 /******************************************************************************/
 ---# Altering the session_id columns...
