@@ -642,34 +642,3 @@ class Groups_Controller extends Action_Controller
 		$context['default_list'] = 'group_request_list';
 	}
 }
-
-/**
- * Act as an entrance for all group related activity.
- *
- * @todo Where is this used? Did a function name get missed in a refactoring?
- */
-function ModerateGroups()
-{
-	global $context, $user_info;
-
-	// You need to be allowed to moderate groups...
-	if ($user_info['mod_cache']['gq'] == '0=1')
-		isAllowedTo('manage_membergroups');
-
-	// Load the group templates.
-	loadTemplate('ModerationCenter');
-
-	// Setup the subactions...
-	$subactions = array(
-		'requests' => 'action_requests',
-		'view' => 'action_members',
-	);
-
-	if (!isset($_GET['sa']) || !isset($subactions[$_GET['sa']]))
-		$_GET['sa'] = 'view';
-	$context['sub_action'] = $_GET['sa'];
-
-	// Call the relevant method.
-	$controller = new Groups_Controller();
-	$controller->subactions[$context['sub_action']]();
-}
