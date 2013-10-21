@@ -454,6 +454,7 @@ class Groups_Controller extends Action_Controller
 			else
 			{
 				// Get the details of all the members concerned...
+				require_once(SUBSDIR . '/Members.subs.php');
 				$concerned = getConcernedMembers($_POST['groupr'], $where);
 
 				// Cleanup old group requests..
