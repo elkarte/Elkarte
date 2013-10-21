@@ -1863,6 +1863,11 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 	return $group_requests;
 }
 
+/**
+ * Deletes old group requests.
+ *
+ * @param array $groups
+ */
 function deleteGroupRequests($groups)
 {
 	$db = database();
