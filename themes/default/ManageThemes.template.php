@@ -106,7 +106,7 @@ function template_main()
 				</div>
 			</form>';
 
-	// Link to simplemachines.org for latest themes and info!
+	// Link to some server for latest themes and info!
 	echo '
 			<br />
 			<div class="cat_bar">

@@ -1450,8 +1450,8 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['filename'] = $base_name;
 
 			// Check that the smiley is from simplemachines.org, for now... maybe add mirroring later.
-			if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['set_gz']) == 0 || strpos($_REQUEST['set_gz'], 'dlattach') !== false)
-				fatal_lang_error('not_on_simplemachines');
+			if (!isAuthorizedServer($_REQUEST['set_gz']) == 0)
+				fatal_lang_error('not_valid_server');
 
 			$destination = BOARDDIR . '/packages/' . $base_name;
 

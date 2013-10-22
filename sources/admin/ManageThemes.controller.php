@@ -1094,9 +1094,8 @@ class ManageThemes_Controller extends Action_Controller
 				$extracted = read_tgz_file($_FILES['theme_gz']['tmp_name'], BOARDDIR . '/themes/' . $theme_name, false, true);
 			elseif (isset($_REQUEST['theme_gz']))
 			{
-				// Check that the theme is from simplemachines.org, for now... maybe add mirroring later.
-				if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['theme_gz']) == 0 || strpos($_REQUEST['theme_gz'], 'dlattach') !== false)
-					fatal_lang_error('not_on_simplemachines');
+				if (!isAuthorizedServer($_REQUEST['theme_gz']))
+					fatal_lang_error('not_valid_server');
 
 				$extracted = read_tgz_file($_REQUEST['theme_gz'], BOARDDIR . '/themes/' . $theme_name, false, true);
 			}
