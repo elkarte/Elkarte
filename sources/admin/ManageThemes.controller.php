@@ -1065,32 +1065,7 @@ class ManageThemes_Controller extends Action_Controller
 			$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
 
 			// Lets add a theme_info.xml to this theme.
-			$xml_info = '<' . '?xml version="1.0"?' . '>
-	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:elk="http://www.simplemachines.org/">
-		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
-		<version>' . $modSettings['elkVersion'] . '</version>
-		<!-- Theme name, used purely for aesthetics. -->
-		<name>' . $_REQUEST['copy'] . '</name>
-		<!-- Author: your email address or contact information. The name attribute is optional. -->
-		<author name="Your Name">info@youremailaddress.tld</author>
-		<!-- Website... where to get updates and more information. -->
-		<website>http://www.yourdomain.tld/</website>
-		<!-- Template layers to use, defaults to "html,body". -->
-		<layers>' . (empty($theme_values['theme_layers']) ? 'html,body' : $theme_values['theme_layers']) . '</layers>
-		<!-- Templates to load on startup. Default is "index". -->
-		<templates>' . (empty($theme_values['theme_templates']) ? 'index' : $theme_values['theme_templates']) . '</templates>
-		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
-		<based-on></based-on>
-	</theme-info>';
-
-			// Now write it.
-			$fp = @fopen($theme_dir . '/theme_info.xml', 'w+');
-			if ($fp)
-			{
-				fwrite($fp, $xml_info);
-				fclose($fp);
-			}
+			write_theme_info($_REQUEST['copy'], $modSettings['elkVersion'], $theme_dir, $theme_values);
 		}
 		elseif (isset($_REQUEST['theme_dir']) && $method == 'path')
 		{

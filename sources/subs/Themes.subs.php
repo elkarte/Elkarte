@@ -849,6 +849,36 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 	return $options;
 }
 
+function write_theme_info($name, $version, $theme_dir, $theme_values)
+{
+	$xml_info = '<' . '?xml version="1.0"?' . '>
+	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:elk="http://www.simplemachines.org/">
+		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
+		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
+		<version>' . $version . '</version>
+		<!-- Theme name, used purely for aesthetics. -->
+		<name>' . $name . '</name>
+		<!-- Author: your email address or contact information. The name attribute is optional. -->
+		<author name="Your Name">info@youremailaddress.tld</author>
+		<!-- Website... where to get updates and more information. -->
+		<website>http://www.yourdomain.tld/</website>
+		<!-- Template layers to use, defaults to "html,body". -->
+		<layers>' . (empty($theme_values['theme_layers']) ? 'html,body' : $theme_values['theme_layers']) . '</layers>
+		<!-- Templates to load on startup. Default is "index". -->
+		<templates>' . (empty($theme_values['theme_templates']) ? 'index' : $theme_values['theme_templates']) . '</templates>
+		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
+		<based-on></based-on>
+	</theme-info>';
+
+	// Now write it.
+	$fp = @fopen($theme_dir . '/theme_info.xml', 'w+');
+	if ($fp)
+	{
+		fwrite($fp, $xml_info);
+		fclose($fp);
+	}
+}
+
 /**
  * Possibly the simplest and best example of how to use the template system.
  *  - allows the theme to take care of actions.
