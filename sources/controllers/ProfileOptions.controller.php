@@ -1188,36 +1188,12 @@ function loadThemeOptions($memID)
 	}
 	else
 	{
-		$request = $db->query('', '
-			SELECT id_member, variable, value
-			FROM {db_prefix}themes
-			WHERE id_theme IN (1, {int:member_theme})
-				AND id_member IN (-1, {int:selected_member})',
-			array(
-				'member_theme' => (int) $cur_profile['id_theme'],
-				'selected_member' => $memID,
-			)
-		);
-		$temp = array();
-		while ($row = $db->fetch_assoc($request))
+		require_once(SUBSDIR . '/Themes.subs.php');
+		$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $memID), $context['member']['options']);
+		if (isset($_POST['options']))
 		{
-			if ($row['id_member'] == -1)
-			{
-				$temp[$row['variable']] = $row['value'];
-				continue;
-			}
-
-			if (isset($_POST['options'][$row['variable']]))
-				$row['value'] = $_POST['options'][$row['variable']];
-			$context['member']['options'][$row['variable']] = $row['value'];
-		}
-		$db->free_result($request);
-
-		// Load up the default theme options for any missing.
-		foreach ($temp as $k => $v)
-		{
-			if (!isset($context['member']['options'][$k]))
-				$context['member']['options'][$k] = $v;
+			foreach ($_POST['options'] as $var => $val)
+				$context['member']['options'][$var] = $val;
 		}
 	}
 }

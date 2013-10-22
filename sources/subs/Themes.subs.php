@@ -817,20 +817,26 @@ function deleteVariants($id)
 	);
 }
 
-function loadThemeOptionsInto($theme, $memID, $options = array(), $variables = array())
+function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {
 	$db = database();
 
 	$variables = is_array($variables) ? $variables : array($variables);
 
+	// @todo the ORDER BY may or may not be necessary:
+	// I have the feeling that *sometimes* the default order may be a bit messy,
+	// and considering this function is not use in frequently accessed areas the
+	// overhead for an ORDER BY should be acceptable
 	$request = $db->query('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
-		WHERE id_theme IN (1, {int:current_theme})
-			AND id_member = {int:guest_member}' . (!empty($variables) ? '
-			AND variable IN ({array_string:variables})' : ''),
+		WHERE id_theme IN ({array_int:current_theme})' . ($memID === null ? '' : (is_array($memID) ? '
+			AND id_member IN ({array_int:guest_member})' : '
+			AND id_member = {int:guest_member}')) . (!empty($variables) ? '
+			AND variable IN ({array_string:variables})' : '') . '
+		ORDER BY id_theme ASC' . ($memID === null ? '' : ', id_member ASC'),
 		array(
-			'current_theme' => $theme,
+			'current_theme' => is_array($theme) ? $theme : array($theme),
 			'guest_member' => $memID,
 			'variables' => $variables,
 		)

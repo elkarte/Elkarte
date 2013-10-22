@@ -478,7 +478,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		if (empty($_REQUEST['who']))
 		{
-			$context['theme_options'] = loadThemeOptionsInto($_GET['th'], -1, $context['theme_options']);
+			$context['theme_options'] = loadThemeOptionsInto(array(1, $_GET['th']), -1, $context['theme_options']);
 
 			$context['theme_options_reset'] = false;
 		}
@@ -1027,6 +1027,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		if (!empty($_REQUEST['copy']) && $method == 'copy')
 		{
+		
 			// Hopefully the themes directory is writable, or we might have a problem.
 			if (!is_writable(BOARDDIR . '/themes'))
 				fatal_lang_error('theme_install_write_error', 'critical');
@@ -1751,37 +1752,25 @@ class ManageThemes_Controller extends Action_Controller
 
 		isAllowedTo('admin_forum');
 		loadTemplate('ManageThemes');
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'edit';
 
-		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+		$context['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
-		$request = $db->query('', '
-			SELECT th1.value, th1.id_theme, th2.value
-			FROM {db_prefix}themes AS th1
-				LEFT JOIN {db_prefix}themes AS th2 ON (th2.variable = {string:base_theme_dir} AND th2.id_theme = {int:current_theme})
-			WHERE th1.variable = {string:theme_dir}
-				AND th1.id_theme = {int:current_theme}
-			LIMIT 1',
-			array(
-				'current_theme' => $_GET['th'],
-				'base_theme_dir' => 'base_theme_dir',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		list ($theme_dir, $context['theme_id'], $base_theme_dir) = $db->fetch_row($request);
-		$db->free_result($request);
+		$theme_dirs = array();
+		$theme_dirs = loadThemeOptionsInto($context['theme_id'], null, $theme_dirs, array('base_theme_dir', 'theme_dir'));
 
 		if (isset($_REQUEST['template']) && preg_match('~[\./\\\\:\0]~', $_REQUEST['template']) == 0)
 		{
-			if (!empty($base_theme_dir) && file_exists($base_theme_dir . '/' . $_REQUEST['template'] . '.template.php'))
-				$filename = $base_theme_dir . '/' . $_REQUEST['template'] . '.template.php';
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php'))
+				$filename = $theme_dirs['base_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php';
 			elseif (file_exists($settings['default_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php'))
 				$filename = $settings['default_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php';
 			else
 				fatal_lang_error('no_access', false);
 
-			$fp = fopen($theme_dir . '/' . $_REQUEST['template'] . '.template.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/' . $_REQUEST['template'] . '.template.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -1789,14 +1778,14 @@ class ManageThemes_Controller extends Action_Controller
 		}
 		elseif (isset($_REQUEST['lang_file']) && preg_match('~^[^\./\\\\:\0]\.[^\./\\\\:\0]$~', $_REQUEST['lang_file']) != 0)
 		{
-			if (!empty($base_theme_dir) && file_exists($base_theme_dir . '/languages/' . $_REQUEST['lang_file'] . '.php'))
-				$filename = $base_theme_dir . '/languages/' . $_REQUEST['template'] . '.php';
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/languages/' . $_REQUEST['lang_file'] . '.php'))
+				$filename = $theme_dirs['base_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php';
 			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php'))
 				$filename = $settings['default_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php';
 			else
 				fatal_lang_error('no_access', false);
 
-			$fp = fopen($theme_dir . '/languages/' . $_REQUEST['lang_file'] . '.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $_REQUEST['lang_file'] . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -1822,9 +1811,9 @@ class ManageThemes_Controller extends Action_Controller
 		}
 		$dir->close();
 
-		if (!empty($base_theme_dir))
+		if (!empty($theme_dirs['base_theme_dir']))
 		{
-			$dir = dir($base_theme_dir);
+			$dir = dir($theme_dirs['base_theme_dir']);
 			while ($entry = $dir->read())
 			{
 				if (substr($entry, -13) == '.template.php' && !in_array(substr($entry, 0, -13), $templates))
@@ -1832,9 +1821,9 @@ class ManageThemes_Controller extends Action_Controller
 			}
 			$dir->close();
 
-			if (file_exists($base_theme_dir . '/languages'))
+			if (file_exists($theme_dirs['base_theme_dir'] . '/languages'))
 			{
-				$dir = dir($base_theme_dir . '/languages');
+				$dir = dir($theme_dirs['base_theme_dir'] . '/languages');
 				while ($entry = $dir->read())
 				{
 					if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && !in_array($matches[1], $lang_files))
@@ -1853,7 +1842,7 @@ class ManageThemes_Controller extends Action_Controller
 				'filename' => $template . '.template.php',
 				'value' => $template,
 				'already_exists' => false,
-				'can_copy' => is_writable($theme_dir),
+				'can_copy' => is_writable($theme_dirs['theme_dir']),
 			);
 		$context['available_language_files'] = array();
 		foreach ($lang_files as $file)
@@ -1861,29 +1850,29 @@ class ManageThemes_Controller extends Action_Controller
 				'filename' => $file . '.php',
 				'value' => $file,
 				'already_exists' => false,
-				'can_copy' => file_exists($theme_dir . '/languages') ? is_writable($theme_dir . '/languages') : is_writable($theme_dir),
+				'can_copy' => file_exists($theme_dirs['theme_dir'] . '/languages') ? is_writable($theme_dirs['theme_dir'] . '/languages') : is_writable($theme_dirs['theme_dir']),
 			);
 
-		$dir = dir($theme_dir);
+		$dir = dir($theme_dirs['theme_dir']);
 		while ($entry = $dir->read())
 		{
 			if (substr($entry, -13) == '.template.php' && isset($context['available_templates'][substr($entry, 0, -13)]))
 			{
 				$context['available_templates'][substr($entry, 0, -13)]['already_exists'] = true;
-				$context['available_templates'][substr($entry, 0, -13)]['can_copy'] = is_writable($theme_dir . '/' . $entry);
+				$context['available_templates'][substr($entry, 0, -13)]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/' . $entry);
 			}
 		}
 		$dir->close();
 
-		if (file_exists($theme_dir . '/languages'))
+		if (file_exists($theme_dirs['theme_dir'] . '/languages'))
 		{
-			$dir = dir($theme_dir . '/languages');
+			$dir = dir($theme_dirs['theme_dir'] . '/languages');
 			while ($entry = $dir->read())
 			{
 				if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && isset($context['available_language_files'][$matches[1]]))
 				{
 					$context['available_language_files'][$matches[1]]['already_exists'] = true;
-					$context['available_language_files'][$matches[1]]['can_copy'] = is_writable($theme_dir . '/languages/' . $entry);
+					$context['available_language_files'][$matches[1]]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/languages/' . $entry);
 				}
 			}
 			$dir->close();
