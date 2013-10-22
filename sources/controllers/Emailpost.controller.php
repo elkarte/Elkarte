@@ -453,10 +453,6 @@ function pbe_create_pm($pbe, $email_message)
 	if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
 		$text .= "\n\n" . $txt['error_no_pm_attach'] . "\n";
 
-	// We need how they have their PM options are set up
-	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], array());
-	$copy_to_outbox = isset($theme_settings['copy_to_outbox']) ? true : false;
-
 	// For sending the message...
 	$from = array(
 		'id' => $pbe['profile']['id_member'],
@@ -468,7 +464,7 @@ function pbe_create_pm($pbe, $email_message)
 
 	// send/save the actual PM.
 	require_once(SUBSDIR . '/PersonalMessage.subs.php');
-	$pm_result = sendpm(array('to' => array($pm_info['id_member_from']), 'bcc' => array()), $pm_info['subject'], $text, $copy_to_outbox, $from, $pm_info['id_pm_head']);
+	$pm_result = sendpm(array('to' => array($pm_info['id_member_from']), 'bcc' => array()), $pm_info['subject'], $text, true, $from, $pm_info['id_pm_head']);
 
 	// Assuming all went well, mark this as read, replied to and update the unread counter
 	if (!empty($pm_result))

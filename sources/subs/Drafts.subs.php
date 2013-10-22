@@ -26,7 +26,6 @@ function create_pm_draft($draft, $recipientList)
 		'subject' => 'string-255',
 		'body' => 'string-65534',
 		'to_list' => 'string-255',
-		'outbox' => 'int',
 	);
 	$draft_parameters = array(
 		$draft['reply_id'],
@@ -36,7 +35,6 @@ function create_pm_draft($draft, $recipientList)
 		$draft['subject'],
 		$draft['body'],
 		serialize($recipientList),
-		$draft['outbox'],
 	);
 	$db->insert('',
 		'{db_prefix}user_drafts',
@@ -71,7 +69,6 @@ function modify_pm_draft($draft, $recipientList)
 			subject = {string:subject},
 			body = {string:body},
 			to_list = {string:to_list},
-			outbox = {int:outbox}
 		WHERE id_draft = {int:id_pm_draft}
 		LIMIT 1',
 		array(
@@ -82,7 +79,6 @@ function modify_pm_draft($draft, $recipientList)
 			'body' => $draft['body'],
 			'id_pm_draft' => $draft['id_pm_draft'],
 			'to_list' => serialize($recipientList),
-			'outbox' => $draft['outbox'],
 		)
 	);
 }
@@ -551,7 +547,6 @@ function savePMDraft($recipientList)
 	// Prepare the data
 	$draft['id_pm_draft'] = $id_pm_draft;
 	$draft['reply_id'] = empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'];
-	$draft['outbox'] = empty($_POST['outbox']) ? 0 : 1;
 	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 	$draft['id_member'] = $user_info['id'];
@@ -645,7 +640,6 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 		elseif ($type === 1)
 		{
 			// One of those pm drafts? then set it up like we have an error
-			$_REQUEST['outbox'] = !empty($draft_info['outbox']);
 			$_REQUEST['subject'] = !empty($draft_info['subject']) ? $draft_info['subject'] : '';
 			$_REQUEST['message'] = !empty($draft_info['body']) ? $draft_info['body'] : '';
 			$_REQUEST['replied_to'] = !empty($draft_info['id_reply']) ? $draft_info['id_reply'] : 0;

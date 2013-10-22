@@ -494,7 +494,7 @@ function template_profile_pm_settings()
 								<label for="pm_prefs">', $txt['pm_display_mode'], ':</label>
 							</dt>
 							<dd>
-								<select name="pm_prefs" id="pm_prefs" onchange="if (this.value == 2 &amp;&amp; !document.getElementById(\'copy_to_outbox\').checked) alert(\'', $txt['pm_recommend_enable_outbox'], '\');">
+								<select name="pm_prefs" id="pm_prefs">
 									<option value="0"', $context['display_mode'] == 0 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_all'], '</option>
 									<option value="1"', $context['display_mode'] == 1 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_one'], '</option>
 									<option value="2"', $context['display_mode'] == 2 ? ' selected="selected"' : '', '>', $txt['pm_display_mode_linked'], '</option>
@@ -549,13 +549,6 @@ function template_profile_pm_settings()
 								</dd>
 						</dl>
 						<dl>
-								<dt>
-										<label for="copy_to_outbox"> ', $txt['copy_to_outbox'], '</label>
-								</dt>
-								<dd>
-										<input type="hidden" name="default_options[copy_to_outbox]" value="0" />
-										<input type="checkbox" name="default_options[copy_to_outbox]" id="copy_to_outbox" value="1"', !empty($context['member']['options']['copy_to_outbox']) ? ' checked="checked"' : '', ' class="input_check" />
-								</dd>
 								<dt>
 										<label for="pm_remove_inbox_label">', $txt['pm_remove_inbox_label'], '</label>
 								</dt>

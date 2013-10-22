@@ -169,7 +169,7 @@ upgrade_query("
 	ALTER TABLE {$db_prefix}log_floodcontrol
 	ALTER COLUMN log_type type varchar(20);");
 ---}
----# 
+---#
 
 /******************************************************************************/
 --- Adding more space for session ids
@@ -300,7 +300,6 @@ CREATE TABLE {$db_prefix}user_drafts (
 	locked smallint NOT NULL default '0',
 	is_sticky smallint NOT NULL default '0',
 	to_list varchar(255) NOT NULL default '',
-	outbox smallint NOT NULL default '0',
 	PRIMARY KEY (id_draft)
 );
 ---#

@@ -1072,9 +1072,6 @@ function template_send()
 
 	// Send, Preview, spellchecker buttons.
 	echo '
-					<p>
-						<label for="outbox"><input type="checkbox" name="outbox" id="outbox" value="1" tabindex="', $context['tabindex']++, '"', $context['copy_to_outbox'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_save_outbox'], '</label>
-					</p>
 					<div class="submitbutton">
 						', template_control_richedit_buttons($context['post_box_name']), '
 					</div>
