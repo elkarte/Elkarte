@@ -380,12 +380,17 @@ $.sceditor.plugins.bbcode.bbcode
 	})
 	.set('tt', {
 		tags: {
-			tt: null
+			tt: null,
+			span: {'class': ['tt']}
 		},
-		format: "[tt]{0}[/tt]",
+		format: '[tt]{0}[/tt]',
 		html: '<span class="tt">{0}</span>'
 	})
 	.set('php', {
+		tags: {
+			php: null,
+			span: {'class': ['php']}
+		},
 		isInline: false,
 		format: "[php]{0}[/php]",
 		html: '<code class="php">{0}</code>'
