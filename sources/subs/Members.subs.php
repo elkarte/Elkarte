@@ -911,7 +911,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
-			AND ') . '(raw:real_name LIKE {string:check_name} OR {raw:member_name} LIKE {string:check_name})
+			AND ') . '({raw:real_name} LIKE {string:check_name} OR {raw:member_name} LIKE {string:check_name})
 		LIMIT 1',
 		array(
 			'real_name' => $db->db_case_sensitive() ? 'LOWER(real_name)' : 'real_name',
