@@ -494,16 +494,8 @@ class Search_Controller extends Action_Controller
 				$search_params['brd'][$k] = (int) $v;
 
 			// If we've selected all boards, this parameter can be left empty.
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}boards
-				WHERE redirect = {string:empty_string}',
-				array(
-					'empty_string' => '',
-				)
-			);
-			list ($num_boards) = $db->fetch_row($request);
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$num_boards = countBoards();
 
 			if (count($search_params['brd']) == $num_boards)
 				$boardQuery = '';

@@ -1942,3 +1942,26 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 
 	return $notification_boards;
 }
+
+/**
+ * Count all boards, redirect boards excluded.
+ *
+ * @return int
+ */
+function countBoards()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}boards
+		WHERE redirect = {string:empty_string}',
+		array(
+			'empty_string' => '',
+		)
+	);
+	list ($num_boards) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $num_boards;
+}
