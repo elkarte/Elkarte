@@ -182,17 +182,45 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			checkSession();
 
-			// Sort out the currency stuff.
-			if ($_POST['paid_currency'] != 'other')
+			// Check that the entered email addresses are valid
+			if (!empty($_POST['paid_email_to']))
 			{
-				$_POST['paid_currency_code'] = $_POST['paid_currency'];
-				$_POST['paid_currency_symbol'] = $txt[$_POST['paid_currency'] . '_symbol'];
+				require_once(SUBSDIR . '/DataValidator.class.php');
+				$validator = new Data_Validator();
+
+				// Some cleaning and some rules
+				$validator->sanitation_rules(array('paid_email_to' => 'trim'));
+				$validator->validation_rules(array('paid_email_to' => 'valid_email'));
+				$validator->input_processing(array('paid_email_to' => 'csv'));
+				$validator->text_replacements(array('paid_email_to' => $txt['paid_email_to']));
+
+				if ($validator->validate($_POST))
+					$_POST['paid_email_to'] = $validator->paid_email_to;
+				else
+				{
+					// Thats not an email, lets set it back in the form to be fixed and let them know its wrong
+					$config_vars[1]['value'] = $_POST['paid_email_to'];
+					$context['error_type'] = 'minor';
+					$context['settings_message'] = array();
+					foreach ($validator->validation_errors() as $id => $error)
+						$context['settings_message'][] = $error;
+				}
 			}
-			unset($config_vars['dummy_currency']);
 
-			Settings_Form::save_db($config_vars);
+			// No errors, then save away
+			if (empty($context['error_type']))
+			{
+				// Sort out the currency stuff.
+				if ($_POST['paid_currency'] != 'other')
+				{
+					$_POST['paid_currency_code'] = $_POST['paid_currency'];
+					$_POST['paid_currency_symbol'] = $txt[$_POST['paid_currency'] . '_symbol'];
+				}
 
-			redirectexit('action=admin;area=paidsubscribe;sa=settings');
+				unset($config_vars['dummy_currency']);
+				Settings_Form::save_db($config_vars);
+				redirectexit('action=admin;area=paidsubscribe;sa=settings');
+			}
 		}
 
 		// Prepare the settings...
