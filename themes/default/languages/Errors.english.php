@@ -8,8 +8,8 @@ $txt['wireless_error_notyet'] = 'Sorry, this section isn\'t available for wirele
 $txt['not_guests'] = 'Sorry, this action is not available to guests.';
 
 $txt['mods_only'] = 'Only Moderators can use the direct remove function, please remove this message through the modify feature.';
-$txt['no_name'] = 'You didn\'t fill the name field out. We can\'t let you without a name, sorry.';
-$txt['no_email'] = 'You didn\'t fill the email field out. We can\'t let you without an email, sorry.';
+$txt['no_name'] = 'You didn\'t fill the name field out. We can\'t let you continue without a name, sorry.';
+$txt['no_email'] = 'You didn\'t fill the email field out. We can\'t let you continue without an email, sorry.';
 $txt['topic_locked'] = 'This topic is locked, you are not allowed to post or modify messages...';
 $txt['no_password'] = 'Password field empty';
 $txt['already_a_user'] = 'The username you tried to use already exists.';
