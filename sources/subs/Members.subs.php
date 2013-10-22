@@ -487,7 +487,8 @@ function registerMember(&$regOptions, $error_context = 'register')
 	$regOptions['username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $regOptions['username']);
 
 	// @todo Separate the sprintf?
-	if (empty($regOptions['email']) || preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $regOptions['email']) === 0 || strlen($regOptions['email']) > 255)
+	require_once(SUBSDIR . '/DataValidator.class.php');
+	if (!Data_Validator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
 		$reg_errors->addError(array('valid_email_needed', array(Util::htmlspecialchars($regOptions['username']))));
 
 	validateUsername(0, $regOptions['username'], $error_context, !empty($regOptions['check_reserved_name']));

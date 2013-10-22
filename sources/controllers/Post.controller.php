@@ -1299,11 +1299,9 @@ class Post_Controller extends Action_Controller
 				// Only check if they changed it!
 				if (!isset($msgInfo) || $msgInfo['poster_email'] != $_POST['email'])
 				{
-					if (!allowedTo('moderate_forum') && (!isset($_POST['email']) || $_POST['email'] == ''))
-						$post_errors->addError('no_email');
-
-					if (!allowedTo('moderate_forum') && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['email']) == 0)
-						$post_errors->addError('bad_email');
+					require_once(SUBSDIR . '/DataValidator.class.php');
+					if (!allowedTo('moderate_forum') && !Data_Validator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
+						empty($_POST['email']) ? $post_errors->addError('no_email') : $post_errors->addError('bad_email');
 				}
 
 				// Now make sure this email address is not banned from posting.

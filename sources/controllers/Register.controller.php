@@ -617,7 +617,8 @@ class Register_Controller extends Action_Controller
 				fatal_lang_error('no_access', false);
 
 			// @todo Separate the sprintf?
-			if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['new_email']) == 0)
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			if (!Data_Validator::is_valid($_POST, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
 				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'])), false);
 
 			// Make sure their email isn't banned.

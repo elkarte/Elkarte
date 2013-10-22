@@ -1084,13 +1084,13 @@ function profileValidateEmail($email, $memID = 0)
 {
 	$db = database();
 
-	$email = strtr($email, array('&#039;' => '\''));
-
 	// Check the name and email for validity.
-	if (trim($email) == '')
-		return 'no_email';
-	if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $email) == 0)
-		return 'bad_email';
+	require_once(SUBSDIR . '/DataValidator.class.php');
+	$check['email'] = strtr($email, array('&#039;' => '\''));
+	if (Data_Validator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
+ 		$email = $check['email'];
+	else
+		return empty($check['email']) ? 'no_email' : 'bad_email';
 
 	// Email addresses should be and stay unique.
 	$request = $db->query('', '

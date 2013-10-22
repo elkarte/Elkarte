@@ -528,11 +528,9 @@ class Emailuser_Controller extends Action_Controller
 		// Guests need to provide their address!
 		if ($user_info['is_guest'])
 		{
-			$_POST['email'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
-			if ($_POST['email'] === '')
-				$report_errors->addError('no_email');
-			elseif (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['email']) == 0)
-				$report_errors->addError('bad_email');
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			if (!Data_Validator::is_valid($_POST, array('email' => 'valid_email'), array('email' => 'trim')))
+				empty($_POST['email']) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 
 			isBannedEmail($_POST['email'], 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
@@ -557,7 +555,7 @@ class Emailuser_Controller extends Action_Controller
 
 		// Any errors?
 		if ($report_errors->hasErrors())
-			return action_reporttm();
+			return $this->action_reporttm();
 
 		// Get the basic topic information, and make sure they can see it.
 		$msg_id = (int) $_POST['msg'];
