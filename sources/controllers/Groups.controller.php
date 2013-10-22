@@ -408,9 +408,7 @@ class Groups_Controller extends Action_Controller
 	 */
 	public function action_requests()
 	{
-		global $txt, $context, $scripturl, $user_info, $modSettings, $language;
-
-		$db = database();
+		global $txt, $context, $scripturl, $user_info, $modSettings;
 
 		// Set up the template stuff...
 		$context['page_title'] = $txt['mc_group_requests'];
@@ -456,82 +454,17 @@ class Groups_Controller extends Action_Controller
 			else
 			{
 				// Get the details of all the members concerned...
-				$request = $db->query('', '
-					SELECT lgr.id_request, lgr.id_member, lgr.id_group, mem.email_address, mem.id_group AS primary_group,
-						mem.additional_groups AS additional_groups, mem.lngfile, mem.member_name, mem.notify_types,
-						mg.hidden, mg.group_name
-					FROM {db_prefix}log_group_requests AS lgr
-						INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
-						INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
-					WHERE ' . $where . '
-						AND lgr.id_request IN ({array_int:request_list})
-					ORDER BY mem.lngfile',
-					array(
-						'request_list' => $_POST['groupr'],
-					)
-				);
-				$email_details = array();
-				$group_changes = array();
-				while ($row = $db->fetch_assoc($request))
-				{
-					$row['lngfile'] = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
+				require_once(SUBSDIR . '/Members.subs.php');
+				$concerned = getConcernedMembers($_POST['groupr'], $where);
 
-					// If we are approving work out what their new group is.
-					if ($_POST['req_action'] == 'approve')
-					{
-						// For people with more than one request at once.
-						if (isset($group_changes[$row['id_member']]))
-						{
-							$row['additional_groups'] = $group_changes[$row['id_member']]['add'];
-							$row['primary_group'] = $group_changes[$row['id_member']]['primary'];
-						}
-						else
-							$row['additional_groups'] = explode(',', $row['additional_groups']);
-
-						// Don't have it already?
-						if ($row['primary_group'] == $row['id_group'] || in_array($row['id_group'], $row['additional_groups']))
-							continue;
-
-						// Should it become their primary?
-						if ($row['primary_group'] == 0 && $row['hidden'] == 0)
-							$row['primary_group'] = $row['id_group'];
-						else
-							$row['additional_groups'][] = $row['id_group'];
-
-						// Add them to the group master list.
-						$group_changes[$row['id_member']] = array(
-							'primary' => $row['primary_group'],
-							'add' => $row['additional_groups'],
-						);
-					}
-
-					// Add required information to email them.
-					if ($row['notify_types'] != 4)
-						$email_details[] = array(
-							'rid' => $row['id_request'],
-							'member_id' => $row['id_member'],
-							'member_name' => $row['member_name'],
-							'group_id' => $row['id_group'],
-							'group_name' => $row['group_name'],
-							'email' => $row['email_address'],
-							'language' => $row['lngfile'],
-						);
-				}
-				$db->free_result($request);
-
-				// Remove the evidence...
-				$db->query('', '
-					DELETE FROM {db_prefix}log_group_requests
-					WHERE id_request IN ({array_int:request_list})',
-					array(
-						'request_list' => $_POST['groupr'],
-					)
-				);
+				// Cleanup old group requests..
+				require_once(SUBSDIR . '/Membergroups.subs.php');
+				deleteGroupRequests($_POST['groupr']);
 
 				// Ensure everyone who is online gets their changes right away.
 				updateSettings(array('settings_updated' => time()));
 
-				if (!empty($email_details))
+				if (!empty($concerned['email_details']))
 				{
 					require_once(SUBSDIR . '/Mail.subs.php');
 
@@ -539,27 +472,19 @@ class Groups_Controller extends Action_Controller
 					if ($_POST['req_action'] == 'approve')
 					{
 						// Make the group changes.
-						foreach ($group_changes as $id => $groups)
+						foreach ($concerned['group_changes'] as $id => $groups)
 						{
 							// Sanity check!
 							foreach ($groups['add'] as $key => $value)
 								if ($value == 0 || trim($value) == '')
 									unset($groups['add'][$key]);
 
-							$db->query('', '
-								UPDATE {db_prefix}members
-								SET id_group = {int:primary_group}, additional_groups = {string:additional_groups}
-								WHERE id_member = {int:selected_member}',
-								array(
-									'primary_group' => $groups['primary'],
-									'selected_member' => $id,
-									'additional_groups' => implode(',', $groups['add']),
-								)
-							);
+							require_once(SUBSDIR . '/Members.subs.php');
+							assignGroupsToMember($id, $groups['primary'], $groups['add']);
 						}
 
 						$lastLng = $user_info['language'];
-						foreach ($email_details as $email)
+						foreach ($concerned['email_details'] as $email)
 						{
 							$replacements = array(
 								'USERNAME' => $email['member_name'],
@@ -576,7 +501,7 @@ class Groups_Controller extends Action_Controller
 					{
 						// Same as for approving, kind of.
 						$lastLng = $user_info['language'];
-						foreach ($email_details as $email)
+						foreach ($concerned['email_details'] as $email)
 						{
 							$custom_reason = isset($_POST['groupreason']) && isset($_POST['groupreason'][$email['rid']]) ? $_POST['groupreason'][$email['rid']] : '';
 
@@ -602,6 +527,7 @@ class Groups_Controller extends Action_Controller
 
 		// We're going to want this for making our list.
 		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// This is all the information required for a group listing.
 		$listOptions = array(
@@ -715,110 +641,4 @@ class Groups_Controller extends Action_Controller
 
 		$context['default_list'] = 'group_request_list';
 	}
-}
-
-/**
- * Callback function for createList().
- *
- * @param string $where
- * @param string $where_parameters
- * @return int, the count of group requests
- */
-function list_getGroupRequestCount($where, $where_parameters)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}log_group_requests AS lgr
-		WHERE ' . $where,
-		array_merge($where_parameters, array(
-		))
-	);
-	list ($totalRequests) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return $totalRequests;
-}
-
-/**
- * Callback function for createList()
- *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @param string $where
- * @param string $where_parameters
- * @return array, an array of group requests
- * Each group request has:
- * 		'id'
- * 		'member_link'
- * 		'group_link'
- * 		'reason'
- * 		'time_submitted'
- */
-function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
-{
-	global $scripturl;
-
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
-			mem.member_name, mg.group_name, mg.online_color, mem.real_name
-		FROM {db_prefix}log_group_requests AS lgr
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
-			INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
-		WHERE ' . $where . '
-		ORDER BY {raw:sort}
-		LIMIT ' . $start . ', ' . $items_per_page,
-		array_merge($where_parameters, array(
-			'sort' => $sort,
-		))
-	);
-	$group_requests = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$group_requests[] = array(
-			'id' => $row['id_request'],
-			'member_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
-			'reason' => censorText($row['reason']),
-			'time_submitted' => standardTime($row['time_applied']),
-		);
-	}
-	$db->free_result($request);
-
-	return $group_requests;
-}
-
-/**
- * Act as an entrance for all group related activity.
- *
- * @todo Where is this used? Did a function name get missed in a refactoring?
- */
-function ModerateGroups()
-{
-	global $context, $user_info;
-
-	// You need to be allowed to moderate groups...
-	if ($user_info['mod_cache']['gq'] == '0=1')
-		isAllowedTo('manage_membergroups');
-
-	// Load the group templates.
-	loadTemplate('ModerationCenter');
-
-	// Setup the subactions...
-	$subactions = array(
-		'requests' => 'action_requests',
-		'view' => 'action_members',
-	);
-
-	if (!isset($_GET['sa']) || !isset($subactions[$_GET['sa']]))
-		$_GET['sa'] = 'view';
-	$context['sub_action'] = $_GET['sa'];
-
-	// Call the relevant method.
-	$controller = new Groups_Controller();
-	$controller->subactions[$context['sub_action']]();
 }
