@@ -360,7 +360,7 @@ class Register_Controller extends Action_Controller
 		// Validation... even if we're not a mall.
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
 		{
-			$_POST['real_name'] = trim(preg_replace('~[\s]~u', ' ', $_POST['real_name']));
+			$_POST['real_name'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $_POST['real_name']));
 			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
 				$possible_strings[] = 'real_name';
 		}
@@ -389,6 +389,30 @@ class Register_Controller extends Action_Controller
 		}
 		else
 			unset($_POST['lngfile']);
+
+		// Some of these fields we may not want.
+		if (!empty($modSettings['registration_fields']))
+		{
+			// But we might want some of them if the admin asks for them.
+			$standard_fields = array('location', 'gender');
+			$reg_fields = explode(',', $modSettings['registration_fields']);
+
+			$exclude_fields = array_diff($standard_fields, $reg_fields);
+
+			// Website is a little different
+			if (!in_array('website', $reg_fields))
+				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
+
+			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
+			$exclude_fields[] = 'signature';
+		}
+		else
+			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
+
+		$possible_strings = array_diff($possible_strings, $exclude_fields);
+		$possible_ints = array_diff($possible_ints, $exclude_fields);
+		$possible_floats = array_diff($possible_floats, $exclude_fields);
+		$possible_bools = array_diff($possible_bools, $exclude_fields);
 
 		// Set the options needed for registration.
 		$regOptions = array(
@@ -960,7 +984,8 @@ function registerCheckUsername()
 	$context['valid_username'] = true;
 
 	// Clean it up like mother would.
-	$context['checked_username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $context['checked_username']);
+	$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
+
 	$errors = error_context::context('valid_username', 0);
 
 	require_once(SUBSDIR . '/Auth.subs.php');

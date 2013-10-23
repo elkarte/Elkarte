@@ -1486,11 +1486,11 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 }
 
 /**
-* This sets the X-Frame-Options header.
-*
-* @param string $option the frame option, defaults to deny.
-* @return void.
-*/
+ * This sets the X-Frame-Options header.
+ *
+ * @param string $option the frame option, defaults to deny.
+ * @return void.
+ */
 function frameOptionsHeader($override = null)
 {
 	global $modSettings;
@@ -1507,4 +1507,24 @@ function frameOptionsHeader($override = null)
 
 	// Finally set it.
 	header('X-Frame-Options: ' . $option);
+}
+
+/**
+ * This adds additonal security headers that may prevent browsers from doing something they should not
+ *
+ * X-XSS-Protection header - This header enables the Cross-site scripting (XSS) filter
+ * built into most recent web browsers. It's usually enabled by default, so the role of this
+ * header is to re-enable the filter for this particular website if it was disabled by the user.
+ *
+ * X-Content-Type-Options header - It prevents the browser from doing MIME-type sniffing,
+ * only IE and Chrome are honoring this header. This reduces exposure to drive-by download attacks
+ * and sites serving user uploaded content that could be treated as executable or dynamic HTML files.
+ */
+function securityOptionsHeader($override = null)
+{
+	if ($override !== true)
+	{
+		header('X-XSS-Protection: 1; mode=block');
+		header('X-Content-Type-Options: nosniff');
+	}
 }

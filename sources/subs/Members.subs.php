@@ -431,8 +431,7 @@ function deleteMembers($users, $check_not_admin = false)
 /**
  * Registers a member to the forum.
  * Allows two types of interface: 'guest' and 'admin'. The first
- * includes hammering protection, the latter can perform the
- * registration silently.
+ * includes hammering protection, the latter can perform the registration silently.
  * The strings used in the options array are assumed to be escaped.
  * Allows to perform several checks on the input, e.g. reserved names.
  * The function will adjust member statistics.
@@ -484,12 +483,12 @@ function registerMember(&$regOptions, $error_context = 'register')
 	}
 
 	// Spaces and other odd characters are evil...
-	$regOptions['username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $regOptions['username']);
+	$regOptions['username'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $regOptions['username']));
 
-	// @todo Separate the sprintf?
+	// Valid emails only
 	require_once(SUBSDIR . '/DataValidator.class.php');
 	if (!Data_Validator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
-		$reg_errors->addError(array('valid_email_needed', array(Util::htmlspecialchars($regOptions['username']))));
+		$reg_errors->addError('bad_email');
 
 	validateUsername(0, $regOptions['username'], $error_context, !empty($regOptions['check_reserved_name']));
 
@@ -519,7 +518,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	}
 
 	// Now perform hard password validation as required.
-	if (!empty($regOptions['check_password_strength']))
+	if (!empty($regOptions['check_password_strength']) && $regOptions['password'] != '')
 	{
 		$passwordError = validatePassword($regOptions['password'], $regOptions['username'], array($regOptions['email']));
 

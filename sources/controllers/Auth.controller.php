@@ -412,6 +412,12 @@ class Auth_Controller extends Action_Controller
 		// Empty the cookie! (set it in the past, and for id_member = 0)
 		setLoginCookie(-3600, 0);
 
+		// And some other housekeeping while we're at it.
+		session_destroy();
+		if (!empty($user_info['id']))
+			updateMemberData($user_info['id'], array('password_salt' => substr(md5(mt_rand()), 0, 4)));
+
+
 		// Off to the merry board index we go!
 		if ($redirect)
 		{
@@ -553,7 +559,7 @@ class Auth_Controller extends Action_Controller
 
 /**
  * Check activation status of the current user.
- * 
+ *
  * > 10 Banned with activation status as value - 10
  * 5 = Awaiting COPPA concent
  * 4 = Awaiting Deletion approval
