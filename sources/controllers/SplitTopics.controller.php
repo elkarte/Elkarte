@@ -41,7 +41,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * requires the split_any permission.
 	 * is accessed with ?action=splittopics.
 	 */
-	function action_splittopics()
+	public function action_splittopics()
 	{
 		global $topic;
 
@@ -81,7 +81,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * the first message of a topic.
 	 * shows the user three ways to split the current topic.
 	 */
-	function action_splitIndex()
+	public function action_splitIndex()
 	{
 		global $txt, $topic, $context, $modSettings;
 
@@ -142,7 +142,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * (3) select topics to split (redirects to action_splitSelectTopics()).
 	 * uses splitTopic function to do the actual splitting.
 	 */
-	function action_splitExecute()
+	public function action_splitExecute()
 	{
 		global $txt, $context, $topic;
 
@@ -210,7 +210,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * uses the main SplitTopics template.
 	 * uses splitTopic function to do the actual splitting.
 	 */
-	function action_splitSelection()
+	public function action_splitSelection()
 	{
 		global $txt, $topic, $context;
 
@@ -259,7 +259,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * shows two independent page indexes for both the selected and
 	 * not-selected messages (;topic=1.x;start2=y).
 	 */
-	function action_splitSelectTopics()
+	public function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $options;
 

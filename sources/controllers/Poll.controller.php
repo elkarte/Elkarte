@@ -46,7 +46,7 @@ class Poll_Controller extends Action_Controller
 	 *
 	 * @uses Post language file.
 	 */
-	function action_vote()
+	public function action_vote()
 	{
 		global $topic, $user_info, $modSettings;
 
@@ -187,7 +187,7 @@ class Poll_Controller extends Action_Controller
 	 * Upon successful completion of action will direct user back to topic.
 	 * Accessed via ?action=lockvoting.
 	 */
-	function action_lockvoting()
+	public function action_lockvoting()
 	{
 		global $topic, $user_info;
 		
@@ -237,7 +237,7 @@ class Poll_Controller extends Action_Controller
 	 * @uses Post language file.
 	 * @uses Poll template, main sub-template.
 	 */
-	function action_editpoll()
+	public function action_editpoll()
 	{
 		global $txt, $user_info, $context, $topic, $board, $scripturl;
 
@@ -489,7 +489,7 @@ class Poll_Controller extends Action_Controller
 	 * Upon successful completion of action will direct user back to topic.
 	 * Accessed via ?action=editpoll2.
 	 */
-	function action_editpoll2()
+	public function action_editpoll2()
 	{
 		global $topic, $board, $user_info;
 
@@ -675,7 +675,7 @@ class Poll_Controller extends Action_Controller
 	 * Upon successful completion of action will direct user back to topic.
 	 * Accessed via ?action=removepoll.
 	 */
-	function action_removepoll()
+	public function action_removepoll()
 	{
 		global $topic, $user_info;
 

@@ -2864,3 +2864,39 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 		$db->free_result($request);
 	}
 }
+
+/**
+ * Load the subject from a given topic id.
+ *
+ * @param int $id_topic
+ * @return string
+ */
+function getSubject($id_topic)
+{
+	global $modSettings;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT ms.subject
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
+		WHERE t.id_topic = {int:search_topic_id}
+			AND {query_see_board}' . ($modSettings['postmod_active'] ? '
+			AND t.approved = {int:is_approved_true}' : '') . '
+		LIMIT 1',
+		array(
+			'is_approved_true' => 1,
+			'search_topic_id' => $id_topic,
+		)
+	);
+
+	if ($db->num_rows($request) == 0)
+		fatal_lang_error('topic_gone', false);
+
+	list ($subject) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $subject;
+}

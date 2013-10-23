@@ -53,8 +53,6 @@ class Search_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $modSettings, $user_info, $context;
 
-		$db = database();
-
 		// Is the load average too high to allow searching just now?
 		if (!empty($context['load_average']) && !empty($modSettings['loadavg_search']) && $context['load_average'] >= $modSettings['loadavg_search'])
 			fatal_lang_error('loadavg_search_disabled', false);
@@ -166,27 +164,8 @@ class Search_Controller extends Action_Controller
 				'href' => $scripturl . '?topic=' . $context['search_params']['topic'] . '.0',
 			);
 
-			$request = $db->query('', '
-				SELECT ms.subject
-				FROM {db_prefix}topics AS t
-					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-					INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
-				WHERE t.id_topic = {int:search_topic_id}
-					AND {query_see_board}' . ($modSettings['postmod_active'] ? '
-					AND t.approved = {int:is_approved_true}' : '') . '
-				LIMIT 1',
-				array(
-					'is_approved_true' => 1,
-					'search_topic_id' => $context['search_params']['topic'],
-				)
-			);
-
-			if ($db->num_rows($request) == 0)
-				fatal_lang_error('topic_gone', false);
-
-			list ($context['search_topic']['subject']) = $db->fetch_row($request);
-			$db->free_result($request);
-
+			require_once(SUBSDIR . '/Topic.subs.php');
+			$context['search_topic']['subject'] = getSubject($context['search_params']['topic']);
 			$context['search_topic']['link'] = '<a href="' . $context['search_topic']['href'] . '">' . $context['search_topic']['subject'] . '</a>';
 		}
 
@@ -515,16 +494,8 @@ class Search_Controller extends Action_Controller
 				$search_params['brd'][$k] = (int) $v;
 
 			// If we've selected all boards, this parameter can be left empty.
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}boards
-				WHERE redirect = {string:empty_string}',
-				array(
-					'empty_string' => '',
-				)
-			);
-			list ($num_boards) = $db->fetch_row($request);
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$num_boards = countBoards();
 
 			if (count($search_params['brd']) == $num_boards)
 				$boardQuery = '';
