@@ -48,7 +48,7 @@
 .sceditor-grip {
 	overflow: hidden;
 	height: 22px;
-	cursor: pointer;
+	cursor: n-resize;
 	position: absolute;
 	bottom: 0;
 	left: 0;
