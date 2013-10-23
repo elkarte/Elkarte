@@ -312,6 +312,15 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
+--- PM_Prefs changes
+/******************************************************************************/
+---# Altering the defalut pm layout to conversation
+upgrade_query("
+	ALTER TABLE {$db_prefix}members
+	CHANGE `pm_prefs` `pm_prefs` int NOT NULL default '2'");
+---#
+
+/******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating drafts table.

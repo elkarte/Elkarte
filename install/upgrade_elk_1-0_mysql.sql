@@ -232,6 +232,17 @@ CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
+--- PM_Prefs changes
+/******************************************************************************/
+---# Altering the defalut pm layout to conversation
+ALTER TABLE {$db_prefix}members
+CHANGE `pm_prefs` `pm_prefs` mediumint(8) NOT NULL default '2';
+---#
+
+ALTER TABLE {$db_prefix}smileys
+CHANGE COLUMN smileyOrder smileyOrder smallint(5) unsigned NOT NULL default '0';
+
+/******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating draft table
