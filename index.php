@@ -165,6 +165,7 @@ function elk_main()
 
 	// We should set our security headers now.
 	frameOptionsHeader();
+	securityOptionsHeader();
 
 	// Load the user's cookie (or set as guest) and load their settings.
 	loadUserSettings();
