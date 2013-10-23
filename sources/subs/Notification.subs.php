@@ -31,7 +31,7 @@ function countUserNotifications($all = false, $type = '')
 		WHERE id_member = {int:current_user}' . ($all ? '
 			AND status != {int:is_not_deleted}' : '
 			AND status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND type = {string:current_type}'),
+			AND notif_type = {string:current_type}'),
 		array(
 			'current_user' => $user_info['id'],
 			'current_type' => $type,
@@ -67,7 +67,7 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT n.id_msg, n.id_member_from, n.log_time, n.type,
+		SELECT n.id_msg, n.id_member_from, n.log_time, n.notif_type,
 			m.subject, m.id_topic, m.id_board,
 			IFNULL(men.real_name, m.poster_name) as mentioner, men.avatar, men.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
@@ -78,7 +78,7 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 		WHERE n.id_member = {int:current_user}' . ($all ? '
 			AND n.status != {int:is_not_deleted}' : '
 			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND n.type = {string:current_type}') . '
+			AND n.notif_type = {string:current_type}') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
 		array(
@@ -139,10 +139,10 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 			'status' => 'int',
 			'id_member_from' => 'int',
 			'log_time' => 'int',
-			'type' => 'string-5',
+			'notif_type' => 'string-5',
 		),
 		$inserts,
-		array('id_member', 'id_msg', 'id_member_from', 'log_time', 'type')
+		array('id_member', 'id_msg', 'id_member_from', 'log_time', 'notif_type')
 	);
 }
 
@@ -164,14 +164,14 @@ function markNotificationAsRead($id_member, $msg, $type, $id_member_from, $log_t
 		SET status = 1
 		WHERE id_member = {int:member}
 			AND id_msg = {string:msg}
-			AND type = {string:type}
+			AND notif_type = {string:notif_type}
 			AND id_member_from = {int:member_from}
 			AND log_time = {int:log_time}
 		LIMIT 1',
 		array(
 			'member' => $id_member,
 			'msg' => $msg,
-			'type' => $type,
+			'notif_type' => $type,
 			'member_from' => $id_member_from,
 			'log_time' => $log_time,
 		)
@@ -200,14 +200,14 @@ function deleteNotification($id_member, $msg, $type, $id_member_from, $log_time)
 		SET status = 2
 		WHERE id_member = {int:member}
 			AND id_msg = {string:msg}
-			AND type = {string:type}
+			AND notif_type = {string:notif_type}
 			AND id_member_from = {int:member_from}
 			AND log_time = {int:log_time}
 		LIMIT 1',
 		array(
 			'member' => $id_member,
 			'msg' => $msg,
-			'type' => $type,
+			'notif_type' => $type,
 			'member_from' => $id_member_from,
 			'log_time' => $log_time,
 		)

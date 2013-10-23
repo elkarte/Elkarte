@@ -2240,3 +2240,18 @@ CREATE TABLE {$db_prefix}message_likes (
   KEY id_member (id_member),
   KEY id_poster (id_poster)
 ) ENGINE=MyISAM;
+
+#
+# Table structure for table `log_notifications`
+#
+
+CREATE TABLE IF NOT EXISTS `smf_log_notifications` (
+  id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
+  id_msg int(10) unsigned NOT NULL DEFAULT '0',
+  status tinyint(1) NOT NULL DEFAULT '0',
+  id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
+  log_time int(10) unsigned NOT NULL DEFAULT '0',
+  type varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (id_member,id_msg,id_member_from,log_time,type),
+  KEY id_member (id_member,status)
+) ENGINE=MyISAM;

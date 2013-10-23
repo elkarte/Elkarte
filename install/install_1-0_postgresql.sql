@@ -2837,3 +2837,23 @@ CREATE TABLE {$db_prefix}message_likes (
 
 CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
 CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
+
+#
+# Table structure for table `log_notifications`
+#
+
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
+  id_member int NOT NULL DEFAULT '0',
+  id_msg int NOT NULL DEFAULT '0',
+  status int NOT NULL DEFAULT '0',
+  id_member_from int NOT NULL DEFAULT '0',
+  log_time int NOT NULL DEFAULT '0',
+  notif_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_member, id_msg, id_member_from, log_time, notif_type)
+);
+
+#
+# Indexes for table `log_notifications`
+#
+
+CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
