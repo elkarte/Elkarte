@@ -134,7 +134,7 @@ class Data_Validator
 		if (!empty($sanitation_rules))
 			$data = array_replace($data, $validator->validation_data());
 
-		// return true or false on valid data
+		// Return true or false on valid data
 		return $result;
 	}
 
@@ -388,15 +388,25 @@ class Data_Validator
 				$rules = explode('|', $rules);
 				foreach ($rules as $rule)
 				{
-					// Set the method
-					$sanitation_method = '_sanitation_' . $rule;
+					$sanitation_method = null;
+					$sanitation_parameters = null;
+
+					// Were any parameters provided for the rule, e.g. Util::htmlspecialchars[ENT_QUOTES]
+					if (preg_match('~(.*)\[(.*)\]~', $rule, $match))
+					{
+						$sanitation_method = '_sanitation_' . $match[1];
+						$sanitation_parameters = $match[2];
+					}
+					// Or just a predefined rule e.g. trim
+					else
+						$sanitation_method = '_sanitation_' . $rule;
 
 					// Defined method to use?
 					if (is_callable(array($this, $sanitation_method)))
-						$input[$field] = $this->$sanitation_method($input[$field]);
+						$input[$field] = $this->$sanitation_method($input[$field], $sanitation_parameters);
 					// One of our static methods
 					elseif (strpos($rule, '::') !== false && is_callable($rule))
-						$input[$field] = call_user_func($rule, $input[$field]);
+						$input[$field] = call_user_func($rule, $input[$field], $sanitation_parameters);
 					// Maybe even a built in php function like strtoupper, intval, etc?
 					elseif (function_exists($rule))
 						$input[$field] = $rule($input[$field]);
@@ -1123,7 +1133,7 @@ class Data_Validator
 	 *
 	 * @param string $input
 	 */
-	protected function _sanitation_gmail_normalize($input)
+	protected function _sanitation_gmail_normalize($input, $sanitation_parameters = null)
 	{
 		if (!isset($input))
 			return;

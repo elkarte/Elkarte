@@ -1159,14 +1159,14 @@ class ManageMaillist_Controller extends Action_Controller
 
 			$email_error = false;
 			$board_error = false;
-			$valid_email_regex = '~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~';
 
 			// Basic checking of the email addresses
-			if (preg_match($valid_email_regex, $_POST['maillist_sitename_address']) == 0)
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			if (!Data_Validator::is_valid($_POST, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
 				$email_error = $_POST['maillist_sitename_address'];
-			if (!$email_error && !(empty($_POST['maillist_sitename_help'])) && preg_match($valid_email_regex, $_POST['maillist_sitename_help']) == 0)
+			if (!Data_Validator::is_valid($_POST, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
 				$email_error = $_POST['maillist_sitename_help'];
-			if (!$email_error && !(empty($_POST['maillist_mail_from'])) && preg_match($valid_email_regex, $_POST['maillist_mail_from']) == 0)
+			if (!Data_Validator::is_valid($_POST, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
 				$email_error = $_POST['maillist_mail_from'];
 
 			// Inbound email set up then we need to check for both valid email and valid board
@@ -1182,14 +1182,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 				foreach ($addresstocheck as $key => $checkme)
 				{
-					$checkme = trim($checkme);
-
-					// Nada?
-					if (empty($checkme))
-						continue;
-
 					// Valid email syntax
-					if (preg_match($valid_email_regex, $checkme) == 0)
+					if (!Data_Validator::is_valid($addresstocheck, array($key => 'valid_email'), array($key => 'trim')))
 					{
 						$email_error = $checkme;
 						$context['error_type'] = 'notice';

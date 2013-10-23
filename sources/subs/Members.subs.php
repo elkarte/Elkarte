@@ -487,7 +487,8 @@ function registerMember(&$regOptions, $error_context = 'register')
 	$regOptions['username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $regOptions['username']);
 
 	// @todo Separate the sprintf?
-	if (empty($regOptions['email']) || preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $regOptions['email']) === 0 || strlen($regOptions['email']) > 255)
+	require_once(SUBSDIR . '/DataValidator.class.php');
+	if (!Data_Validator::is_valid($regOptions, array('email' => 'valid_email|required|max_length[255]'), array('email' => 'trim')))
 		$reg_errors->addError(array('valid_email_needed', array(Util::htmlspecialchars($regOptions['username']))));
 
 	validateUsername(0, $regOptions['username'], $error_context, !empty($regOptions['check_reserved_name']));
@@ -911,7 +912,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE ' . (empty($current_ID_MEMBER) ? '' : 'id_member != {int:current_member}
-			AND ') . '(raw:real_name LIKE {string:check_name} OR {raw:member_name} LIKE {string:check_name})
+			AND ') . '({raw:real_name} LIKE {string:check_name} OR {raw:member_name} LIKE {string:check_name})
 		LIMIT 1',
 		array(
 			'real_name' => $db->db_case_sensitive() ? 'LOWER(real_name)' : 'real_name',
