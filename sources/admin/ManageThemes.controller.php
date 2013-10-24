@@ -992,8 +992,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $boardurl, $txt, $context, $settings, $modSettings;
 
-		$db = database();
-
 		checkSession('request');
 
 		isAllowedTo('admin_forum');
@@ -1115,6 +1113,7 @@ class ManageThemes_Controller extends Action_Controller
 				'theme_dir' => $theme_dir,
 				'name' => $theme_name
 			);
+			$explicit_images = false;
 
 			if (file_exists($theme_dir . '/theme_info.xml'))
 			{
@@ -1162,30 +1161,7 @@ class ManageThemes_Controller extends Action_Controller
 				{
 					$install_info['based_on'] = preg_replace('~[^A-Za-z0-9\-_ ]~', '', $install_info['based_on']);
 
-					$request = $db->query('', '
-						SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
-						FROM {db_prefix}themes AS th
-							INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
-								AND th2.id_member = {int:no_member}
-								AND th2.variable = {string:theme_url})' . (!empty($explicit_images) ? '' : '
-							INNER JOIN {db_prefix}themes AS th3 ON (th3.id_theme = th.id_theme
-								AND th3.id_member = {int:no_member}
-								AND th3.variable = {string:images_url})') . '
-						WHERE th.id_member = {int:no_member}
-							AND (th.value LIKE {string:based_on} OR th.value LIKE {string:based_on_path})
-							AND th.variable = {string:theme_dir}
-						LIMIT 1',
-						array(
-							'no_member' => 0,
-							'theme_url' => 'theme_url',
-							'images_url' => 'images_url',
-							'theme_dir' => 'theme_dir',
-							'based_on' => '%/' . $install_info['based_on'],
-							'based_on_path' => '%' . "\\" . $install_info['based_on'],
-						)
-					);
-					$temp = $db->fetch_assoc($request);
-					$db->free_result($request);
+					$temp = loadBasedOnTheme($install_info['based_on'], $explicit_images);
 
 					// @todo An error otherwise?
 					if (is_array($temp))
@@ -1721,8 +1697,6 @@ class ManageThemes_Controller extends Action_Controller
 	public function action_copy()
 	{
 		global $context, $settings;
-
-		$db = database();
 
 		isAllowedTo('admin_forum');
 		loadTemplate('ManageThemes');

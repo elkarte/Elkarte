@@ -849,6 +849,42 @@ function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variab
 	return $options;
 }
 
+/**
+ * @todo needs documentation
+ * @todo may be merged with something else?
+ */
+function loadBasedOnTheme($based_on, $explicit_images = false)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
+		FROM {db_prefix}themes AS th
+			INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
+				AND th2.id_member = {int:no_member}
+				AND th2.variable = {string:theme_url})' . (!empty($explicit_images) ? '' : '
+			INNER JOIN {db_prefix}themes AS th3 ON (th3.id_theme = th.id_theme
+				AND th3.id_member = {int:no_member}
+				AND th3.variable = {string:images_url})') . '
+		WHERE th.id_member = {int:no_member}
+			AND (th.value LIKE {string:based_on} OR th.value LIKE {string:based_on_path})
+			AND th.variable = {string:theme_dir}
+		LIMIT 1',
+		array(
+			'no_member' => 0,
+			'theme_url' => 'theme_url',
+			'images_url' => 'images_url',
+			'theme_dir' => 'theme_dir',
+			'based_on' => '%/' . $based_on,
+			'based_on_path' => '%' . "\\" . $based_on,
+		)
+	);
+	$temp = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $temp;
+}
+
 function write_theme_info($name, $version, $theme_dir, $theme_values)
 {
 	$xml_info = '<' . '?xml version="1.0"?' . '>
