@@ -1566,3 +1566,25 @@ function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
 		array('id_rule')
 	);
 }
+
+function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doDelete, $isOr)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_rules
+		SET rule_name = {string:rule_name}, criteria = {string:criteria}, actions = {string:actions},
+			delete_pm = {int:delete_pm}, is_or = {int:is_or}
+		WHERE id_rule = {int:id_rule}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'delete_pm' => $doDelete,
+			'is_or' => $isOr,
+			'id_rule' => $id_rule,
+			'rule_name' => $ruleName,
+			'criteria' => $criteria,
+			'actions' => $actions,
+		)
+	);
+}

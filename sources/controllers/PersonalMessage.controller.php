@@ -1781,22 +1781,7 @@ class PersonalMessage_Controller extends Action_Controller
 			if (empty($context['rid']))
 				addPMRule($user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 			else
-				$db->query('', '
-					UPDATE {db_prefix}pm_rules
-					SET rule_name = {string:rule_name}, criteria = {string:criteria}, actions = {string:actions},
-						delete_pm = {int:delete_pm}, is_or = {int:is_or}
-					WHERE id_rule = {int:id_rule}
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'delete_pm' => $doDelete,
-						'is_or' => $isOr,
-						'id_rule' => $context['rid'],
-						'rule_name' => $ruleName,
-						'criteria' => $criteria,
-						'actions' => $actions,
-					)
-				);
+				updatePMRule($user_info['id'], $context['rid'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 
 			redirectexit('action=pm;sa=manrules');
 		}
