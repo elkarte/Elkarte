@@ -1779,17 +1779,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Create the rule?
 			if (empty($context['rid']))
-				$db->insert('',
-					'{db_prefix}pm_rules',
-					array(
-						'id_member' => 'int', 'rule_name' => 'string', 'criteria' => 'string', 'actions' => 'string',
-						'delete_pm' => 'int', 'is_or' => 'int',
-					),
-					array(
-						$user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr,
-					),
-					array('id_rule')
-				);
+				addPMRule($user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 			else
 				$db->query('', '
 					UPDATE {db_prefix}pm_rules

@@ -1539,3 +1539,30 @@ function updatePMRule($id_rule, $id_member, $actions)
 		)
 	);
 }
+
+/**
+ * Add a new PM rule to the database.
+ *
+ * @param int $id_member
+ * @param string $ruleName
+ * @param string $criteria
+ * @param string $actions
+ * @param int $doDelete
+ * @param int $isOr
+ */
+function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}pm_rules',
+		array(
+			'id_member' => 'int', 'rule_name' => 'string', 'criteria' => 'string', 'actions' => 'string',
+			'delete_pm' => 'int', 'is_or' => 'int',
+		),
+		array(
+			$id_member, $ruleName, $criteria, $actions, $doDelete, $isOr,
+		),
+		array('id_rule')
+	);
+}
