@@ -429,7 +429,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * @param int $pm_head - the ID of the chain being replied to - if any.
  * @return array, an array with log entries telling how many recipients were successful and which recipients it failed to send to.
  */
-function sendpm($recipients, $subject, $message, $store_outbox = false, $from = null, $pm_head = 0)
+function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
 {
 	global $scripturl, $txt, $user_info, $language;
 	global $modSettings, $webmaster_email;

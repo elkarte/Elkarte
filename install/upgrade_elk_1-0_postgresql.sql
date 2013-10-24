@@ -312,6 +312,15 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
+--- PM_Prefs changes
+/******************************************************************************/
+---# Altering the defalut pm layout to conversation
+upgrade_query("
+	ALTER TABLE {$db_prefix}members
+	CHANGE `pm_prefs` `pm_prefs` int NOT NULL default '2'");
+---#
+
+/******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating drafts table.
@@ -330,7 +339,6 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 	locked smallint NOT NULL default '0',
 	is_sticky smallint NOT NULL default '0',
 	to_list varchar(255) NOT NULL default '',
-	outbox smallint NOT NULL default '0',
 	PRIMARY KEY (id_draft)
 );
 ---#

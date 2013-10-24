@@ -1296,7 +1296,7 @@ CREATE TABLE {$db_prefix}members (
   new_pm tinyint(3) unsigned NOT NULL default '0',
   buddy_list text NOT NULL,
   pm_ignore_list varchar(255) NOT NULL default '',
-  pm_prefs mediumint(8) NOT NULL default '0',
+  pm_prefs mediumint(8) NOT NULL default '2',
   mod_prefs varchar(20) NOT NULL default '',
   message_labels text NOT NULL,
   passwd varchar(64) NOT NULL default '',
@@ -2146,7 +2146,6 @@ CREATE TABLE {$db_prefix}user_drafts (
   locked tinyint(4) NOT NULL default '0',
   is_sticky tinyint(4) NOT NULL default '0',
   to_list varchar(255) NOT NULL default '',
-  outbox tinyint(4) NOT NULL default '0',
   PRIMARY KEY (id_draft),
   UNIQUE id_member (id_member, id_draft, type)
 ) ENGINE=MyISAM;

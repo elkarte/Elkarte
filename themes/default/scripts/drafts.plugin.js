@@ -120,10 +120,6 @@
 			elk_session_var + '=' + elk_session_id
 		];
 
-		// Saving a copy in the outbox?
-		if (document.getElementById('outbox'))
-			aSections[aSections.length] = 'outbox=' + parseInt(document.getElementById('outbox').value);
-
 		// Account for wysiwyg
 		if (this.opts.sType && this.opts.sType === 'post')
 			aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');

@@ -765,7 +765,6 @@ class PersonalMessage_Controller extends Action_Controller
 		// Set the defaults...
 		$context['subject'] = $form_subject;
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
-		$context['copy_to_outbox'] = !empty($options['copy_to_outbox']);
 
 		// And build the link tree.
 		$context['linktree'][] = array(
@@ -1068,7 +1067,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Do the actual sending of the PM.
 		if (!empty($recipientList['to']) || !empty($recipientList['bcc']))
-			$context['send_log'] = sendpm($recipientList, $_REQUEST['subject'], $_REQUEST['message'], !empty($_REQUEST['outbox']), null, !empty($_REQUEST['pm_head']) ? (int) $_REQUEST['pm_head'] : 0);
+			$context['send_log'] = sendpm($recipientList, $_REQUEST['subject'], $_REQUEST['message'], true, null, !empty($_REQUEST['pm_head']) ? (int) $_REQUEST['pm_head'] : 0);
 		else
 			$context['send_log'] = array(
 				'sent' => array(),
@@ -2794,7 +2793,6 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	// Set everything up like before....
 	$context['subject'] = isset($_REQUEST['subject']) ? Util::htmlspecialchars($_REQUEST['subject']) : '';
 	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'])) : '';
-	$context['copy_to_outbox'] = !empty($_REQUEST['outbox']);
 	$context['reply'] = !empty($_REQUEST['replied_to']);
 
 	if ($context['reply'])
