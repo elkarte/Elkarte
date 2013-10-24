@@ -1567,6 +1567,17 @@ function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
 	);
 }
 
+/**
+ * Updates a personal messaging rule for the given member.
+ *
+ * @param int $id_member
+ * @param int $id_rule
+ * @param string $ruleName
+ * @param string $criteria
+ * @param string $actions
+ * @param int $doDelete
+ * @param int $isOr
+ */
 function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doDelete, $isOr)
 {
 	$db = database();
@@ -1585,6 +1596,28 @@ function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doD
 			'rule_name' => $ruleName,
 			'criteria' => $criteria,
 			'actions' => $actions,
+		)
+	);
+}
+
+/**
+ * Used to set a replied statur for a given PM.
+ *
+ * @param int $id_member
+ * @param int $replied_to
+ */
+function setRepliedStatus($id_member, $replied_to)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_recipients
+		SET is_read = is_read | 2
+		WHERE id_pm = {int:replied_to}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'replied_to' => $replied_to,
 		)
 	);
 }
