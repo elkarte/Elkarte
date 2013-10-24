@@ -776,3 +776,28 @@ ADD COLUMN likes_received int NOT NULL default '0';
 ALTER TABLE {$db_prefix}ban_items
 CHANGE pm_receive_from receive_from receive_from tinyint(4) unsigned NOT NULL default '1';
 ---#
+
+/******************************************************************************/
+--- Adding notifications support.
+/******************************************************************************/
+
+---# Creating notifications log  table...
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
+  id_member int NOT NULL DEFAULT '0',
+  id_msg int NOT NULL DEFAULT '0',
+  status int NOT NULL DEFAULT '0',
+  id_member_from int NOT NULL DEFAULT '0',
+  log_time int NOT NULL DEFAULT '0',
+  notif_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_member, id_msg, id_member_from, log_time, notif_type)
+);
+---#
+
+---# Creating notifications log index ...
+CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
+---#
+
+---# Adding new columns to members...
+ALTER TABLE {$db_prefix}members
+ADD COLUMN notifications smallint NOT NULL default '0';
+---#

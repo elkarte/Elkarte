@@ -601,3 +601,26 @@ ADD COLUMN likes_received mediumint(5) unsigned  NOT NULL default '0';
 ALTER TABLE {$db_prefix}ban_items
 CHANGE pm_receive_from receive_from receive_from tinyint(4) unsigned NOT NULL default '1';
 ---#
+
+/******************************************************************************/
+--- Adding notifications support.
+/******************************************************************************/
+
+---# Creating notifications log  table...
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
+  id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
+  id_msg int(10) unsigned NOT NULL DEFAULT '0',
+  status tinyint(1) NOT NULL DEFAULT '0',
+  id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
+  log_time int(10) unsigned NOT NULL DEFAULT '0',
+  type varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (id_member,id_msg,id_member_from,log_time,type),
+  KEY id_member (id_member,status)
+) ENGINE=MyISAM;
+---#
+
+---# Adding new columns to members...
+ALTER TABLE {$db_prefix}members
+ADD COLUMN notifications smallint(5) NOT NULL default '0';
+---#
+

@@ -1291,8 +1291,9 @@ CREATE TABLE {$db_prefix}members (
   lngfile varchar(255) NOT NULL default '',
   last_login int(10) unsigned NOT NULL default '0',
   real_name varchar(255) NOT NULL default '',
-  instant_messages smallint(5) NOT NULL default 0,
-  unread_messages smallint(5) NOT NULL default 0,
+  instant_messages smallint(5) NOT NULL default '0',
+  notifications smallint(5) NOT NULL default '0',
+  unread_messages smallint(5) NOT NULL default '0',
   new_pm tinyint(3) unsigned NOT NULL default '0',
   buddy_list text NOT NULL,
   pm_ignore_list varchar(255) NOT NULL default '',
@@ -2245,7 +2246,7 @@ CREATE TABLE {$db_prefix}message_likes (
 # Table structure for table `log_notifications`
 #
 
-CREATE TABLE IF NOT EXISTS `smf_log_notifications` (
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
   id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
   id_msg int(10) unsigned NOT NULL DEFAULT '0',
   status tinyint(1) NOT NULL DEFAULT '0',
