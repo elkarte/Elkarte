@@ -69,19 +69,19 @@ class ModerateAttachments_Controller extends Action_Controller
 		// Now we have some ID's cleaned and ready to approve, but first - let's check we have permission!
 		$allowed_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
-		// Validate the attachments exist and are the right approval state.
-		$attachments = validateAttachments($attachments);
-		foreach ($attachments as $row)
-		{
-			// We can only add it if we can approve in this board!
-			if ($allowed_boards == array(0) || in_array($row['id_board'], $allowed_boards))
-			{
-				$attachments[] = $row['id_attach'];
+		if ($allowed_boards == array(0))
+			$approve_query = '';
+		elseif (!empty($allowed_boards))
+			$approve_query = ' AND m.id_board IN (' . implode(',', $allowed_boards) . ')';
+		else
+			$approve_query = ' AND 0';
 
-				// Also come up with the redirection URL.
-				$redirect = 'topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'];
-			}
-		}
+		// Validate the attachments exist and have the right approval state.
+		$attachments = validateAttachments($attachments, $approve_query);
+
+		// Set up a return link based off one of the attachments for this message
+		$attach_home = attachmentBelongsTo($attachments[0]);
+		$redirect = 'topic=' . $attach_home['id_topic'] . '.msg' . $attach_home['id_msg'] . '#msg' . $attach_home['id_msg'];
 
 		if (empty($attachments))
 			fatal_lang_error('no_access', false);
@@ -94,6 +94,9 @@ class ModerateAttachments_Controller extends Action_Controller
 		}
 		else
 			removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
+
+		// We approved or removed, either way we reset those numbers
+		cache_put_data('num_menu_errors', null, 900);
 
 		// Return to the topic....
 		redirectexit($redirect);
