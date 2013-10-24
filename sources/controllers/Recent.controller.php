@@ -100,26 +100,12 @@ class Recent_Controller extends Action_Controller
 			foreach ($_REQUEST['boards'] as $i => $b)
 				$_REQUEST['boards'][$i] = (int) $b;
 
-			$request = $db->query('', '
-				SELECT b.id_board, b.num_posts
-				FROM {db_prefix}boards AS b
-				WHERE b.id_board IN ({array_int:board_list})
-					AND {query_see_board}
-				LIMIT {int:limit}',
-				array(
-					'board_list' => $_REQUEST['boards'],
-					'limit' => count($_REQUEST['boards']),
-				)
-			);
-			$total_posts = 0;
-			$boards = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$boards[] = $row['id_board'];
-				$total_posts += $row['num_posts'];
-			}
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
 
+			$boards_posts = boardsPosts($_REQUEST['boards'], array());
+			$total_posts = array_sum($boards_posts);
+			$boards = array_keys($boards_posts);
+			
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
 
