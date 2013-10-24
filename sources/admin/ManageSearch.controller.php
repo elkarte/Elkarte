@@ -305,11 +305,10 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $context, $modSettings, $db_prefix;
+		global $txt, $context, $modSettings;
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
-		$db = database();
 		require_once(SUBSDIR . '/ManageSearch.subs.php');
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
@@ -352,15 +351,7 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
-			if (!empty($tables))
-			{
-				$db_search->search_query('drop_words_table', '
-					DROP TABLE {db_prefix}log_search_words',
-					array(
-					)
-				);
-			}
+			drop_log_search_words();
 
 			updateSettings(array(
 				'search_custom_index_config' => '',

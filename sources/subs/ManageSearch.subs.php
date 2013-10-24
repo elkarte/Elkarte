@@ -266,22 +266,14 @@ function alterFullTextIndex($table, $indexes, $add = false)
  */
 function createSearchIndex($start, $messages_per_batch, $column_definition, $index_settings)
 {
-	global $modSettings, $db_prefix;
+	global $modSettings;
 
 	$db = database();
 	$db_search = db_search();
 
 	if ($start === 0)
 	{
-		$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
-		if (!empty($tables))
-		{
-			$db_search->search_query('drop_words_table', '
-				DROP TABLE {db_prefix}log_search_words',
-				array(
-				)
-			);
-		}
+		drop_log_search_words();
 
 		$db_search->create_word_search($column_definition);
 
@@ -430,4 +422,21 @@ function removeCommonWordsFromIndex($start, $column_definition)
 	}
 
 	return array($start, $step);
+}
+
+function drop_log_search_words()
+{
+	global $db_prefix;
+
+	$db = database();
+
+	$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
+	if (!empty($tables))
+	{
+		$db_search->search_query('drop_words_table', '
+			DROP TABLE {db_prefix}log_search_words',
+			array(
+			)
+		);
+	}
 }
