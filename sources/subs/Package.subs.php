@@ -3390,3 +3390,20 @@ function setPackagesAsUninstalled()
 		)
 	);
 }
+
+function isAuthorizedServer($remote_url)
+{
+	global $modSettings;
+
+	// Check that the theme is from simplemachines.org, for now... maybe add mirroring later.
+	$servers = @unserialize($modSettings['authorized_package_servers']);
+	if (empty($servers))
+		return false;
+
+	$valid_server = false;
+	foreach ($servers as $server)
+		if (preg_match('~^' . preg_quote($server) . '~', $remote_url) == 0)
+			return true;
+
+	return false;
+}

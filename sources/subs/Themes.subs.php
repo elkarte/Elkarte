@@ -817,20 +817,26 @@ function deleteVariants($id)
 	);
 }
 
-function loadThemeOptionsInto($theme, $memID, $options = array(), $variables = array())
+function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
 {
 	$db = database();
 
 	$variables = is_array($variables) ? $variables : array($variables);
 
+	// @todo the ORDER BY may or may not be necessary:
+	// I have the feeling that *sometimes* the default order may be a bit messy,
+	// and considering this function is not use in frequently accessed areas the
+	// overhead for an ORDER BY should be acceptable
 	$request = $db->query('', '
 		SELECT variable, value
 		FROM {db_prefix}themes
-		WHERE id_theme IN (1, {int:current_theme})
-			AND id_member = {int:guest_member}' . (!empty($variables) ? '
-			AND variable IN ({array_string:variables})' : ''),
+		WHERE id_theme IN ({array_int:current_theme})' . ($memID === null ? '' : (is_array($memID) ? '
+			AND id_member IN ({array_int:guest_member})' : '
+			AND id_member = {int:guest_member}')) . (!empty($variables) ? '
+			AND variable IN ({array_string:variables})' : '') . '
+		ORDER BY id_theme ASC' . ($memID === null ? '' : ', id_member ASC'),
 		array(
-			'current_theme' => $theme,
+			'current_theme' => is_array($theme) ? $theme : array($theme),
 			'guest_member' => $memID,
 			'variables' => $variables,
 		)
@@ -841,6 +847,72 @@ function loadThemeOptionsInto($theme, $memID, $options = array(), $variables = a
 	$db->free_result($request);
 
 	return $options;
+}
+
+/**
+ * @todo needs documentation
+ * @todo may be merged with something else?
+ */
+function loadBasedOnTheme($based_on, $explicit_images = false)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
+		FROM {db_prefix}themes AS th
+			INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
+				AND th2.id_member = {int:no_member}
+				AND th2.variable = {string:theme_url})' . (!empty($explicit_images) ? '' : '
+			INNER JOIN {db_prefix}themes AS th3 ON (th3.id_theme = th.id_theme
+				AND th3.id_member = {int:no_member}
+				AND th3.variable = {string:images_url})') . '
+		WHERE th.id_member = {int:no_member}
+			AND (th.value LIKE {string:based_on} OR th.value LIKE {string:based_on_path})
+			AND th.variable = {string:theme_dir}
+		LIMIT 1',
+		array(
+			'no_member' => 0,
+			'theme_url' => 'theme_url',
+			'images_url' => 'images_url',
+			'theme_dir' => 'theme_dir',
+			'based_on' => '%/' . $based_on,
+			'based_on_path' => '%' . "\\" . $based_on,
+		)
+	);
+	$temp = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $temp;
+}
+
+function write_theme_info($name, $version, $theme_dir, $theme_values)
+{
+	$xml_info = '<' . '?xml version="1.0"?' . '>
+	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:elk="http://www.simplemachines.org/">
+		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
+		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
+		<version>' . $version . '</version>
+		<!-- Theme name, used purely for aesthetics. -->
+		<name>' . $name . '</name>
+		<!-- Author: your email address or contact information. The name attribute is optional. -->
+		<author name="Your Name">info@youremailaddress.tld</author>
+		<!-- Website... where to get updates and more information. -->
+		<website>http://www.yourdomain.tld/</website>
+		<!-- Template layers to use, defaults to "html,body". -->
+		<layers>' . (empty($theme_values['theme_layers']) ? 'html,body' : $theme_values['theme_layers']) . '</layers>
+		<!-- Templates to load on startup. Default is "index". -->
+		<templates>' . (empty($theme_values['theme_templates']) ? 'index' : $theme_values['theme_templates']) . '</templates>
+		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
+		<based-on></based-on>
+	</theme-info>';
+
+	// Now write it.
+	$fp = @fopen($theme_dir . '/theme_info.xml', 'w+');
+	if ($fp)
+	{
+		fwrite($fp, $xml_info);
+		fclose($fp);
+	}
 }
 
 /**

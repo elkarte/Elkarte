@@ -478,7 +478,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		if (empty($_REQUEST['who']))
 		{
-			$context['theme_options'] = loadThemeOptionsInto($_GET['th'], -1, $context['theme_options']);
+			$context['theme_options'] = loadThemeOptionsInto(array(1, $_GET['th']), -1, $context['theme_options']);
 
 			$context['theme_options_reset'] = false;
 		}
@@ -992,8 +992,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $boardurl, $txt, $context, $settings, $modSettings;
 
-		$db = database();
-
 		checkSession('request');
 
 		isAllowedTo('admin_forum');
@@ -1027,6 +1025,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		if (!empty($_REQUEST['copy']) && $method == 'copy')
 		{
+		
 			// Hopefully the themes directory is writable, or we might have a problem.
 			if (!is_writable(BOARDDIR . '/themes'))
 				fatal_lang_error('theme_install_write_error', 'critical');
@@ -1064,32 +1063,7 @@ class ManageThemes_Controller extends Action_Controller
 			$theme_values = loadThemeOptionsInto(1, 0, array(), array('theme_templates', 'theme_layers'));
 
 			// Lets add a theme_info.xml to this theme.
-			$xml_info = '<' . '?xml version="1.0"?' . '>
-	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:elk="http://www.simplemachines.org/">
-		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
-		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $_REQUEST['copy'])) . '</id>
-		<version>' . $modSettings['elkVersion'] . '</version>
-		<!-- Theme name, used purely for aesthetics. -->
-		<name>' . $_REQUEST['copy'] . '</name>
-		<!-- Author: your email address or contact information. The name attribute is optional. -->
-		<author name="Your Name">info@youremailaddress.tld</author>
-		<!-- Website... where to get updates and more information. -->
-		<website>http://www.yourdomain.tld/</website>
-		<!-- Template layers to use, defaults to "html,body". -->
-		<layers>' . (empty($theme_values['theme_layers']) ? 'html,body' : $theme_values['theme_layers']) . '</layers>
-		<!-- Templates to load on startup. Default is "index". -->
-		<templates>' . (empty($theme_values['theme_templates']) ? 'index' : $theme_values['theme_templates']) . '</templates>
-		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
-		<based-on></based-on>
-	</theme-info>';
-
-			// Now write it.
-			$fp = @fopen($theme_dir . '/theme_info.xml', 'w+');
-			if ($fp)
-			{
-				fwrite($fp, $xml_info);
-				fclose($fp);
-			}
+			write_theme_info($_REQUEST['copy'], $modSettings['elkVersion'], $theme_dir, $theme_values);
 		}
 		elseif (isset($_REQUEST['theme_dir']) && $method == 'path')
 		{
@@ -1118,9 +1092,8 @@ class ManageThemes_Controller extends Action_Controller
 				$extracted = read_tgz_file($_FILES['theme_gz']['tmp_name'], BOARDDIR . '/themes/' . $theme_name, false, true);
 			elseif (isset($_REQUEST['theme_gz']))
 			{
-				// Check that the theme is from simplemachines.org, for now... maybe add mirroring later.
-				if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['theme_gz']) == 0 || strpos($_REQUEST['theme_gz'], 'dlattach') !== false)
-					fatal_lang_error('not_on_simplemachines');
+				if (!isAuthorizedServer($_REQUEST['theme_gz']))
+					fatal_lang_error('not_valid_server');
 
 				$extracted = read_tgz_file($_REQUEST['theme_gz'], BOARDDIR . '/themes/' . $theme_name, false, true);
 			}
@@ -1140,6 +1113,7 @@ class ManageThemes_Controller extends Action_Controller
 				'theme_dir' => $theme_dir,
 				'name' => $theme_name
 			);
+			$explicit_images = false;
 
 			if (file_exists($theme_dir . '/theme_info.xml'))
 			{
@@ -1187,30 +1161,7 @@ class ManageThemes_Controller extends Action_Controller
 				{
 					$install_info['based_on'] = preg_replace('~[^A-Za-z0-9\-_ ]~', '', $install_info['based_on']);
 
-					$request = $db->query('', '
-						SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
-						FROM {db_prefix}themes AS th
-							INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
-								AND th2.id_member = {int:no_member}
-								AND th2.variable = {string:theme_url})' . (!empty($explicit_images) ? '' : '
-							INNER JOIN {db_prefix}themes AS th3 ON (th3.id_theme = th.id_theme
-								AND th3.id_member = {int:no_member}
-								AND th3.variable = {string:images_url})') . '
-						WHERE th.id_member = {int:no_member}
-							AND (th.value LIKE {string:based_on} OR th.value LIKE {string:based_on_path})
-							AND th.variable = {string:theme_dir}
-						LIMIT 1',
-						array(
-							'no_member' => 0,
-							'theme_url' => 'theme_url',
-							'images_url' => 'images_url',
-							'theme_dir' => 'theme_dir',
-							'based_on' => '%/' . $install_info['based_on'],
-							'based_on_path' => '%' . "\\" . $install_info['based_on'],
-						)
-					);
-					$temp = $db->fetch_assoc($request);
-					$db->free_result($request);
+					$temp = loadBasedOnTheme($install_info['based_on'], $explicit_images);
 
 					// @todo An error otherwise?
 					if (is_array($temp))
@@ -1747,41 +1698,27 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $settings;
 
-		$db = database();
-
 		isAllowedTo('admin_forum');
 		loadTemplate('ManageThemes');
+		require_once(SUBSDIR . '/Themes.subs.php');
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'edit';
 
-		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
+		$context['theme_id'] = isset($_GET['th']) ? (int) $_GET['th'] : (int) $_GET['id'];
 
-		$request = $db->query('', '
-			SELECT th1.value, th1.id_theme, th2.value
-			FROM {db_prefix}themes AS th1
-				LEFT JOIN {db_prefix}themes AS th2 ON (th2.variable = {string:base_theme_dir} AND th2.id_theme = {int:current_theme})
-			WHERE th1.variable = {string:theme_dir}
-				AND th1.id_theme = {int:current_theme}
-			LIMIT 1',
-			array(
-				'current_theme' => $_GET['th'],
-				'base_theme_dir' => 'base_theme_dir',
-				'theme_dir' => 'theme_dir',
-			)
-		);
-		list ($theme_dir, $context['theme_id'], $base_theme_dir) = $db->fetch_row($request);
-		$db->free_result($request);
+		$theme_dirs = array();
+		$theme_dirs = loadThemeOptionsInto($context['theme_id'], null, $theme_dirs, array('base_theme_dir', 'theme_dir'));
 
 		if (isset($_REQUEST['template']) && preg_match('~[\./\\\\:\0]~', $_REQUEST['template']) == 0)
 		{
-			if (!empty($base_theme_dir) && file_exists($base_theme_dir . '/' . $_REQUEST['template'] . '.template.php'))
-				$filename = $base_theme_dir . '/' . $_REQUEST['template'] . '.template.php';
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php'))
+				$filename = $theme_dirs['base_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php';
 			elseif (file_exists($settings['default_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php'))
 				$filename = $settings['default_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php';
 			else
 				fatal_lang_error('no_access', false);
 
-			$fp = fopen($theme_dir . '/' . $_REQUEST['template'] . '.template.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/' . $_REQUEST['template'] . '.template.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -1789,14 +1726,14 @@ class ManageThemes_Controller extends Action_Controller
 		}
 		elseif (isset($_REQUEST['lang_file']) && preg_match('~^[^\./\\\\:\0]\.[^\./\\\\:\0]$~', $_REQUEST['lang_file']) != 0)
 		{
-			if (!empty($base_theme_dir) && file_exists($base_theme_dir . '/languages/' . $_REQUEST['lang_file'] . '.php'))
-				$filename = $base_theme_dir . '/languages/' . $_REQUEST['template'] . '.php';
+			if (!empty($theme_dirs['base_theme_dir']) && file_exists($theme_dirs['base_theme_dir'] . '/languages/' . $_REQUEST['lang_file'] . '.php'))
+				$filename = $theme_dirs['base_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php';
 			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php'))
 				$filename = $settings['default_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php';
 			else
 				fatal_lang_error('no_access', false);
 
-			$fp = fopen($theme_dir . '/languages/' . $_REQUEST['lang_file'] . '.php', 'w');
+			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $_REQUEST['lang_file'] . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
@@ -1822,9 +1759,9 @@ class ManageThemes_Controller extends Action_Controller
 		}
 		$dir->close();
 
-		if (!empty($base_theme_dir))
+		if (!empty($theme_dirs['base_theme_dir']))
 		{
-			$dir = dir($base_theme_dir);
+			$dir = dir($theme_dirs['base_theme_dir']);
 			while ($entry = $dir->read())
 			{
 				if (substr($entry, -13) == '.template.php' && !in_array(substr($entry, 0, -13), $templates))
@@ -1832,9 +1769,9 @@ class ManageThemes_Controller extends Action_Controller
 			}
 			$dir->close();
 
-			if (file_exists($base_theme_dir . '/languages'))
+			if (file_exists($theme_dirs['base_theme_dir'] . '/languages'))
 			{
-				$dir = dir($base_theme_dir . '/languages');
+				$dir = dir($theme_dirs['base_theme_dir'] . '/languages');
 				while ($entry = $dir->read())
 				{
 					if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && !in_array($matches[1], $lang_files))
@@ -1853,7 +1790,7 @@ class ManageThemes_Controller extends Action_Controller
 				'filename' => $template . '.template.php',
 				'value' => $template,
 				'already_exists' => false,
-				'can_copy' => is_writable($theme_dir),
+				'can_copy' => is_writable($theme_dirs['theme_dir']),
 			);
 		$context['available_language_files'] = array();
 		foreach ($lang_files as $file)
@@ -1861,29 +1798,29 @@ class ManageThemes_Controller extends Action_Controller
 				'filename' => $file . '.php',
 				'value' => $file,
 				'already_exists' => false,
-				'can_copy' => file_exists($theme_dir . '/languages') ? is_writable($theme_dir . '/languages') : is_writable($theme_dir),
+				'can_copy' => file_exists($theme_dirs['theme_dir'] . '/languages') ? is_writable($theme_dirs['theme_dir'] . '/languages') : is_writable($theme_dirs['theme_dir']),
 			);
 
-		$dir = dir($theme_dir);
+		$dir = dir($theme_dirs['theme_dir']);
 		while ($entry = $dir->read())
 		{
 			if (substr($entry, -13) == '.template.php' && isset($context['available_templates'][substr($entry, 0, -13)]))
 			{
 				$context['available_templates'][substr($entry, 0, -13)]['already_exists'] = true;
-				$context['available_templates'][substr($entry, 0, -13)]['can_copy'] = is_writable($theme_dir . '/' . $entry);
+				$context['available_templates'][substr($entry, 0, -13)]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/' . $entry);
 			}
 		}
 		$dir->close();
 
-		if (file_exists($theme_dir . '/languages'))
+		if (file_exists($theme_dirs['theme_dir'] . '/languages'))
 		{
-			$dir = dir($theme_dir . '/languages');
+			$dir = dir($theme_dirs['theme_dir'] . '/languages');
 			while ($entry = $dir->read())
 			{
 				if (preg_match('~^([^\.]+\.[^\.]+)\.php$~', $entry, $matches) && isset($context['available_language_files'][$matches[1]]))
 				{
 					$context['available_language_files'][$matches[1]]['already_exists'] = true;
-					$context['available_language_files'][$matches[1]]['can_copy'] = is_writable($theme_dir . '/languages/' . $entry);
+					$context['available_language_files'][$matches[1]]['can_copy'] = is_writable($theme_dirs['theme_dir'] . '/languages/' . $entry);
 				}
 			}
 			$dir->close();
