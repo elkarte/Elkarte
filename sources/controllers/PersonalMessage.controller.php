@@ -1406,17 +1406,7 @@ class PersonalMessage_Controller extends Action_Controller
 				foreach ($rule_changes as $k => $id)
 					if (!empty($context['rules'][$id]['actions']))
 					{
-						$db->query('', '
-							UPDATE {db_prefix}pm_rules
-							SET actions = {string:actions}
-							WHERE id_rule = {int:id_rule}
-								AND id_member = {int:current_member}',
-							array(
-								'current_member' => $user_info['id'],
-								'id_rule' => $id,
-								'actions' => serialize($context['rules'][$id]['actions']),
-							)
-						);
+						updatePMRule($id, $user_info['id'], $context['rules'][$id]['actions']);
 						unset($rule_changes[$k]);
 					}
 

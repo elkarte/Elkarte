@@ -1515,3 +1515,27 @@ function deletePMRules($id_member, $rule_changes)
 		)
 	);
 }
+
+/**
+ * Updates a personal messaging rule for the given member.
+ *
+ * @param int $id_rule
+ * @param int $id_member
+ * @param array $actions
+ */
+function updatePMRule($id_rule, $id_member, $actions)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_rules
+		SET actions = {string:actions}
+		WHERE id_rule = {int:id_rule}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'id_rule' => $id_rule,
+			'actions' => serialize($actions),
+		)
+	);
+}
