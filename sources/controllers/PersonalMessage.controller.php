@@ -1273,6 +1273,8 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
+
 		$db = database();
 
 		// Build the link tree elements...
@@ -1420,15 +1422,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 				// Anything left here means it's lost all actions...
 				if (!empty($rule_changes))
-					$db->query('', '
-						DELETE FROM {db_prefix}pm_rules
-						WHERE id_rule IN ({array_int:rule_list})
-								AND id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-							'rule_list' => $rule_changes,
-						)
-					);
+					deletePMRules($user_info['id'], $rule_changes);
 			}
 
 			// Make sure we're not caching this!

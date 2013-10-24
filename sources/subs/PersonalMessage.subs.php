@@ -1494,3 +1494,24 @@ function getPMsOlderThan($user_id, $time)
 
 	return $pm_ids;
 }
+
+/**
+ * Used to delete PM rules from the given member.
+ *
+ * @param int $id_member
+ * @param array $rule_changes
+ */
+function deletePMRules($id_member, $rule_changes)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}pm_rules
+		WHERE id_rule IN ({array_int:rule_list})
+		AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'rule_list' => $rule_changes,
+		)
+	);
+}
