@@ -1517,13 +1517,13 @@ function deletePMRules($id_member, $rule_changes)
 }
 
 /**
- * Updates a personal messaging rule for the given member.
+ * Updates a personal messaging rule action for the given member.
  *
  * @param int $id_rule
  * @param int $id_member
  * @param array $actions
  */
-function updatePMRule($id_rule, $id_member, $actions)
+function updatePMRuleAction($id_rule, $id_member, $actions)
 {
 	$db = database();
 

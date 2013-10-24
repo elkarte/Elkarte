@@ -1406,7 +1406,7 @@ class PersonalMessage_Controller extends Action_Controller
 				foreach ($rule_changes as $k => $id)
 					if (!empty($context['rules'][$id]['actions']))
 					{
-						updatePMRule($id, $user_info['id'], $context['rules'][$id]['actions']);
+						updatePMRuleAction($id, $user_info['id'], $context['rules'][$id]['actions']);
 						unset($rule_changes[$k]);
 					}
 
