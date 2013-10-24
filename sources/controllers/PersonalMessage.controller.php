@@ -1646,6 +1646,8 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
+
 		$db = database();
 
 		// The link tree - gotta have this :o
@@ -1817,15 +1819,7 @@ class PersonalMessage_Controller extends Action_Controller
 				$toDelete[] = (int) $k;
 
 			if (!empty($toDelete))
-				$db->query('', '
-					DELETE FROM {db_prefix}pm_rules
-					WHERE id_rule IN ({array_int:delete_list})
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'delete_list' => $toDelete,
-					)
-				);
+				deletePMRules($user_info['id'], $toDelete);
 
 			redirectexit('action=pm;sa=manrules');
 		}
