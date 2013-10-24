@@ -1275,8 +1275,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
-		$db = database();
-
 		// Build the link tree elements...
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=pm;sa=manlabels',
