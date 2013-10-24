@@ -434,11 +434,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	function action_create()
 	{
-		global $modSettings, $context, $db_prefix, $txt;
-
-		// Get hang of db_search
-		$db_search = db_search();
-		$db = database();
+		global $modSettings, $context, $txt;
 
 		// Scotty, we need more time...
 		@set_time_limit(600);
@@ -494,118 +490,14 @@ class ManageSearch_Controller extends Action_Controller
 		if ($context['step'] === 0)
 			$context['sub_template'] = 'create_index';
 
+		require_once(SUBSDIR . '/ManageSearch.subs.php');
+
 		// Step 1: insert all the words.
 		if ($context['step'] === 1)
 		{
 			$context['sub_template'] = 'create_index_progress';
 
-			if ($context['start'] === 0)
-			{
-				$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
-				if (!empty($tables))
-				{
-					$db_search->search_query('drop_words_table', '
-						DROP TABLE {db_prefix}log_search_words',
-						array(
-						)
-					);
-				}
-
-				$db_search->create_word_search($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
-
-				// Temporarily switch back to not using a search index.
-				if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
-					updateSettings(array('search_index' => ''));
-
-				// Don't let simultanious processes be updating the search index.
-				if (!empty($modSettings['search_custom_index_config']))
-					updateSettings(array('search_custom_index_config' => ''));
-			}
-
-			$num_messages = array(
-				'done' => 0,
-				'todo' => 0,
-			);
-
-			$request = $db->query('', '
-				SELECT id_msg >= {int:starting_id} AS todo, COUNT(*) AS num_messages
-				FROM {db_prefix}messages
-				GROUP BY todo',
-				array(
-					'starting_id' => $context['start'],
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
-
-			if (empty($num_messages['todo']))
-			{
-				$context['step'] = 2;
-				$context['percentage'] = 80;
-				$context['start'] = 0;
-			}
-			else
-			{
-				// Number of seconds before the next step.
-				$stop = time() + 3;
-				while (time() < $stop)
-				{
-					$inserts = array();
-					$request = $db->query('', '
-						SELECT id_msg, body
-						FROM {db_prefix}messages
-						WHERE id_msg BETWEEN {int:starting_id} AND {int:ending_id}
-						LIMIT {int:limit}',
-						array(
-							'starting_id' => $context['start'],
-							'ending_id' => $context['start'] + $messages_per_batch - 1,
-							'limit' => $messages_per_batch,
-						)
-					);
-					$forced_break = false;
-					$number_processed = 0;
-					while ($row = $db->fetch_assoc($request))
-					{
-						// In theory it's possible for one of these to take friggin ages so add more timeout protection.
-						if ($stop < time())
-						{
-							$forced_break = true;
-							break;
-						}
-
-						$number_processed++;
-						foreach (text2words($row['body'], $context['index_settings']['bytes_per_word'], true) as $id_word)
-						{
-							$inserts[] = array($id_word, $row['id_msg']);
-						}
-					}
-					$num_messages['done'] += $number_processed;
-					$num_messages['todo'] -= $number_processed;
-					$db->free_result($request);
-
-					$context['start'] += $forced_break ? $number_processed : $messages_per_batch;
-
-					if (!empty($inserts))
-						$db->insert('ignore',
-							'{db_prefix}log_search_words',
-							array('id_word' => 'int', 'id_msg' => 'int'),
-							$inserts,
-							array('id_word', 'id_msg')
-						);
-
-					if ($num_messages['todo'] === 0)
-					{
-						$context['step'] = 2;
-						$context['start'] = 0;
-						break;
-					}
-					else
-						updateSettings(array('search_custom_index_resume' => serialize(array_merge($context['index_settings'], array('resume_at' => $context['start'])))));
-				}
-
-				// Since there are still two steps to go, 80% is the maximum here.
-				$context['percentage'] = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 3) * 80;
-			}
+			list($context['start'], $context['step'], $context['percentage']) = createSearchIndex($context['start'], $messages_per_batch, $index_properties[$context['index_settings']['bytes_per_word']]['column_definition'], $context['index_settings']);
 		}
 		// Step 2: removing the words that occur too often and are of no use.
 		elseif ($context['step'] === 2)
@@ -614,47 +506,9 @@ class ManageSearch_Controller extends Action_Controller
 				$context['step'] = 3;
 			else
 			{
-				$stop_words = $context['start'] === 0 || empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
-				$stop = time() + 3;
+				list($context['start'], $context['step']) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]['step_size']);
+
 				$context['sub_template'] = 'create_index_progress';
-				$max_messages = ceil(60 * $modSettings['totalMessages'] / 100);
-
-				while (time() < $stop)
-				{
-					$request = $db->query('', '
-						SELECT id_word, COUNT(id_word) AS num_words
-						FROM {db_prefix}log_search_words
-						WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
-						GROUP BY id_word
-						HAVING COUNT(id_word) > {int:minimum_messages}',
-						array(
-							'starting_id' => $context['start'],
-							'ending_id' => $context['start'] + $index_properties[$context['index_settings']['bytes_per_word']]['step_size'] - 1,
-							'minimum_messages' => $max_messages,
-						)
-					);
-					while ($row = $db->fetch_assoc($request))
-						$stop_words[] = $row['id_word'];
-					$db->free_result($request);
-
-					updateSettings(array('search_stopwords' => implode(',', $stop_words)));
-
-					if (!empty($stop_words))
-						$db->query('', '
-							DELETE FROM {db_prefix}log_search_words
-							WHERE id_word in ({array_int:stop_words})',
-							array(
-								'stop_words' => $stop_words,
-							)
-						);
-
-					$context['start'] += $index_properties[$context['index_settings']['bytes_per_word']]['step_size'];
-					if ($context['start'] > $index_properties[$context['index_settings']['bytes_per_word']]['max_size'])
-					{
-						$context['step'] = 3;
-						break;
-					}
-				}
 
 				$context['percentage'] = 80 + round($context['start'] / $index_properties[$context['index_settings']['bytes_per_word']]['max_size'], 3) * 20;
 			}
@@ -666,13 +520,7 @@ class ManageSearch_Controller extends Action_Controller
 			$context['sub_template'] = 'create_index_done';
 
 			updateSettings(array('search_index' => 'custom', 'search_custom_index_config' => serialize($context['index_settings'])));
-			$db->query('', '
-				DELETE FROM {db_prefix}settings
-				WHERE variable = {string:search_custom_index_resume}',
-				array(
-					'search_custom_index_resume' => 'search_custom_index_resume',
-				)
-			);
+			removeSetting('search_custom_index_resume');
 		}
 	}
 
