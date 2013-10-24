@@ -19,6 +19,18 @@ class DbSearch_MySQL implements DbSearch
 	private static $_search = null;
 
 	/**
+	 * This method will tell you whether this database type supports this search type.
+	 *
+	 * @param string $search_type
+	 */
+	function search_support($search_type)
+	{
+		$supported_types = array('fulltext');
+
+		return in_array($search_type, $supported_types);
+	}
+
+	/**
 	 * Execute the appropriate query for the search.
 	 *
 	 * @param string $identifier
@@ -35,15 +47,76 @@ class DbSearch_MySQL implements DbSearch
 	}
 
 	/**
-	 * This method will tell you whether this database type supports this search type.
-	 *
-	 * @param string $search_type
+	 * Returns some basic info about the {db_prefix}messages table
+	 * Used in ManageSearch.controller.php in the page to select the index method
 	 */
-	function search_support($search_type)
+	public function membersTableInfo()
 	{
-		$supported_types = array('fulltext');
+		global $db_prefix;
 
-		return in_array($search_type, $supported_types);
+		$db = database();
+
+		$table_info = array();
+
+		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
+			$request = $db->query('', '
+				SHOW TABLE STATUS
+				FROM {string:database_name}
+				LIKE {string:table_name}',
+				array(
+					'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
+					'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
+				)
+			);
+		else
+			$request = $db->query('', '
+				SHOW TABLE STATUS
+				LIKE {string:table_name}',
+				array(
+					'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
+				)
+			);
+
+		if ($request !== false && $db->num_rows($request) == 1)
+		{
+			// Only do this if the user has permission to execute this query.
+			$row = $db->fetch_assoc($request);
+			$table_info['data_length'] = $row['Data_length'];
+			$table_info['index_length'] = $row['Index_length'];
+			$table_info['fulltext_length'] = $row['Index_length'];
+			$db->free_result($request);
+		}
+
+		// Now check the custom index table, if it exists at all.
+		if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
+			$request = $db->query('', '
+				SHOW TABLE STATUS
+				FROM {string:database_name}
+				LIKE {string:table_name}',
+				array(
+					'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
+					'table_name' => str_replace('_', '\_', $match[2]) . 'log_search_words',
+				)
+			);
+		else
+			$request = $db->query('', '
+				SHOW TABLE STATUS
+				LIKE {string:table_name}',
+				array(
+					'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
+				)
+			);
+
+		if ($request !== false && $db->num_rows($request) == 1)
+		{
+			// Only do this if the user has permission to execute this query.
+			$row = $db->fetch_assoc($request);
+			$table_info['index_length'] += $row['Data_length'] + $row['Index_length'];
+			$table_info['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
+			$db->free_result($request);
+		}
+
+		return $table_info;
 	}
 
 	/**

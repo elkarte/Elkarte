@@ -305,7 +305,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $context, $modSettings, $db_type, $db_prefix;
+		global $txt, $context, $modSettings, $db_prefix;
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
@@ -385,7 +385,7 @@ class ManageSearch_Controller extends Action_Controller
 			));
 		}
 
-		$context['table_info'] = array(
+		$table_info_defaults = array(
 			'data_length' => 0,
 			'index_length' => 0,
 			'fulltext_length' => 0,
@@ -393,114 +393,8 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Get some info about the messages table, to show its size and index size.
-		if ($db_type == 'mysql')
-		{
-			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					FROM {string:database_name}
-					LIKE {string:table_name}',
-					array(
-						'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
-						'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
-					)
-				);
-			else
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					LIKE {string:table_name}',
-					array(
-						'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
-					)
-				);
-
-			if ($request !== false && $db->num_rows($request) == 1)
-			{
-				// Only do this if the user has permission to execute this query.
-				$row = $db->fetch_assoc($request);
-				$context['table_info']['data_length'] = $row['Data_length'];
-				$context['table_info']['index_length'] = $row['Index_length'];
-				$context['table_info']['fulltext_length'] = $row['Index_length'];
-				$db->free_result($request);
-			}
-
-			// Now check the custom index table, if it exists at all.
-			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					FROM {string:database_name}
-					LIKE {string:table_name}',
-					array(
-						'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
-						'table_name' => str_replace('_', '\_', $match[2]) . 'log_search_words',
-					)
-				);
-			else
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					LIKE {string:table_name}',
-					array(
-						'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
-					)
-				);
-
-			if ($request !== false && $db->num_rows($request) == 1)
-			{
-				// Only do this if the user has permission to execute this query.
-				$row = $db->fetch_assoc($request);
-				$context['table_info']['index_length'] += $row['Data_length'] + $row['Index_length'];
-				$context['table_info']['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
-				$db->free_result($request);
-			}
-		}
-		elseif ($db_type == 'postgresql')
-		{
-			// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
-			$temp_tables = $db->db_list_tables();
-			foreach ($temp_tables as $table)
-				if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
-					$db->db_optimize_table($table);
-
-			// PostGreSql has some hidden sizes.
-			$request = $db->query('', '
-				SELECT relname, relpages * 8 *1024 AS "KB" FROM pg_class
-				WHERE relname = {string:messages} OR relname = {string:log_search_words}
-				ORDER BY relpages DESC',
-				array(
-					'messages' => $db_prefix. 'messages',
-					'log_search_words' => $db_prefix. 'log_search_words',
-				)
-			);
-
-			if ($request !== false && $db->num_rows($request) > 0)
-			{
-				while ($row = $db->fetch_assoc($request))
-				{
-					if ($row['relname'] == $db_prefix . 'messages')
-					{
-						$context['table_info']['data_length'] = (int) $row['KB'];
-						$context['table_info']['index_length'] = (int) $row['KB'];
-
-						// Doesn't support fulltext
-						$context['table_info']['fulltext_length'] = $txt['not_applicable'];
-					}
-					elseif ($row['relname'] == $db_prefix. 'log_search_words')
-					{
-						$context['table_info']['index_length'] = (int) $row['KB'];
-						$context['table_info']['custom_index_length'] = (int) $row['KB'];
-					}
-				}
-				$db->free_result($request);
-			}
-			else
-				// Didn't work for some reason...
-				$context['table_info'] = array(
-					'data_length' => $txt['not_applicable'],
-					'index_length' => $txt['not_applicable'],
-					'fulltext_length' => $txt['not_applicable'],
-					'custom_index_length' => $txt['not_applicable'],
-				);
-		}
+		if (method_exists($db_search, 'membersTableInfo'))
+			$context['table_info'] = array_merge($table_info_defaults, $db_search->membersTableInfo());
 		else
 			// Here may be wolves.
 			$context['table_info'] = array(
