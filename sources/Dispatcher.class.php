@@ -197,7 +197,7 @@ class Site_Dispatcher
 			'xmlpreview' => array('Xmlpreview.controller.php', 'XmlPreview_Controller', 'action_index'),
 		);
 
-		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
+		$adminActions = array ('admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
 
 		// allow to extend or change $actionArray through a hook
 		call_integration_hook('integrate_actions', array(&$actionArray));

@@ -25,13 +25,13 @@ if (!defined('ELK'))
 
 /**
  * Check and create a directory automatically.
- *
  */
 function automanage_attachments_check_directory()
 {
 	global $modSettings, $context;
 
-	// Not pretty, but since we don't want folders created for every post. It'll do unless a better solution can be found.
+	// Not pretty, but since we don't want folders created for every post.
+	// It'll do unless a better solution can be found.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin')
 		$doit = true;
 	elseif (empty($modSettings['automanage_attachments']))
@@ -53,7 +53,7 @@ function automanage_attachments_check_directory()
 	if (!isset($doit))
 		return;
 
-	// get our date and random numbers for the directory choices
+	// Get our date and random numbers for the directory choices
 	$year = date('Y');
 	$month = date('m');
 
@@ -82,7 +82,8 @@ function automanage_attachments_check_directory()
 	}
 
 	$basedirectory = (!empty($modSettings['use_subdirectories_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
-	//Just to be sure: I don't want directory separators at the end
+
+	// Just to be sure: I don't want directory separators at the end
 	$sep = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '\/' : DIRECTORY_SEPARATOR;
 	$basedirectory = rtrim($basedirectory, $sep);
 
@@ -109,6 +110,7 @@ function automanage_attachments_check_directory()
 
 	if (!is_array($modSettings['attachmentUploadDir']))
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
 	if (!in_array($updir, $modSettings['attachmentUploadDir']) && !empty($updir))
 		$outputCreation = automanage_attachments_create_directory($updir);
 	elseif (in_array($updir, $modSettings['attachmentUploadDir']))
@@ -133,7 +135,6 @@ function automanage_attachments_check_directory()
  * Places an .htaccess in new directories for security
  *
  * @param type $updir
- * @return boolean
  */
 function automanage_attachments_create_directory($updir)
 {
@@ -171,7 +172,7 @@ function automanage_attachments_create_directory($updir)
 		$count--;
 	}
 
-	// try to make it writable
+	// Try to make it writable
 	if (!is_writable($directory))
 	{
 		chmod($directory, 0755);
@@ -218,8 +219,6 @@ function automanage_attachments_create_directory($updir)
  * Determines the current base directory and attachment directory
  * Increments the above directory to the next availble slot
  * Uses automanage_attachments_create_directory to create the incremental directory
- *
- * @return boolean
  */
 function automanage_attachments_by_space()
 {
@@ -246,6 +245,7 @@ function automanage_attachments_by_space()
 	// Get the last attachment directory for that base directory
 	if (empty($modSettings['last_attachments_directory'][$base_dir]))
 		$modSettings['last_attachments_directory'][$base_dir] = 0;
+
 	// And increment it.
 	$modSettings['last_attachments_directory'][$base_dir]++;
 
@@ -291,6 +291,7 @@ function get_directory_tree_elements($directory)
 
 		$tree = explode(DIRECTORY_SEPARATOR, trim($directory, DIRECTORY_SEPARATOR));
 	}
+
 	return $tree;
 }
 
@@ -300,11 +301,11 @@ function get_directory_tree_elements($directory)
  *
  * @param array $tree
  * @param int $count
- * @return boolean
  */
 function attachments_init_dir(&$tree, &$count)
 {
 	$directory = '';
+
 	// If on Windows servers the first part of the path is the drive (e.g. "C:")
 	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 	{
@@ -327,8 +328,8 @@ function attachments_init_dir(&$tree, &$count)
  * Loops through $_FILES['attachment'] array and saves each file to the current attachments folder.
  * Validates the save location actually exists.
  *
- * @param $id_msg = null id of the message with attachments, if any. If null, this is an upload in progress for a new post.
- *
+ * @param $id_msg = null id of the message with attachments, if any.
+ *					If null, this is an upload in progress for a new post.
  */
 function processAttachments($id_msg = null)
 {
@@ -372,6 +373,7 @@ function processAttachments($id_msg = null)
 	{
 		// Let's try to keep them. But...
 		$ignore_temp = true;
+
 		// If new files are being added. We can't ignore those
 		foreach ($_FILES['attachment']['tmp_name'] as $dummy)
 		{
@@ -486,6 +488,7 @@ function processAttachments($id_msg = null)
 			if (file_exists($_FILES['attachment']['tmp_name'][$n]))
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 		}
+
 		// If there's no errors to this pont. We still do need to apply some addtional checks before we are finished.
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
@@ -509,6 +512,7 @@ function processAttachments($id_msg = null)
 			}
 		}
 	}
+
 	// Mod authors, finally a hook to hang an alternate attachment upload system upon
 	// Upload to the current attachment folder with the file name $attachID or 'post_tmp_' . $user_info['id'] . '_' . md5(mt_rand())
 	// Populate $_SESSION['temp_attachments'][$attachID] with the following:
@@ -582,6 +586,7 @@ function attachmentChecks($attachID)
 				$_SESSION['temp_attachments'][$attachID]['errors'][] = 'bad_attachment';
 				return false;
 			}
+
 			// Success! However, successes usually come for a price:
 			// we might get a new format for our image...
 			$old_format = $size[2];
@@ -694,6 +699,7 @@ function attachmentChecks($attachID)
 			$context['dir_size'] -= $_SESSION['temp_attachments'][$attachID]['size'];
 		if (isset($context['dir_files']))
 			$context['dir_files']--;
+
 		$context['attachments']['total_size'] -= $_SESSION['temp_attachments'][$attachID]['size'];
 		$context['attachments']['quantity']--;
 		return false;
@@ -838,6 +844,7 @@ function createAttachment(&$attachmentOptions)
 					}
 				}
 			}
+
 			// If a new folder has been already created. Gotta move this thumb there then.
 			if ($modSettings['currentAttachmentUploadDir'] != $attachmentOptions['id_folder'])
 			{
@@ -876,6 +883,7 @@ function createAttachment(&$attachmentOptions)
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -885,7 +893,6 @@ function createAttachment(&$attachmentOptions)
  * from the database.
  *
  * @param int $id_attach
- * @return array, the avatar data as array
 */
 function getAvatar($id_attach)
 {
@@ -907,7 +914,6 @@ function getAvatar($id_attach)
 				'blank_id_member' => 0,
 			)
 		);
-
 		$avatarData = array();
 		if ($db->num_rows($request) != 0)
 			$avatarData = $db->fetch_row($request);
@@ -932,7 +938,6 @@ function getAttachmentFromTopic($id_attach, $id_topic)
 	$db = database();
 
 	// Make sure this attachment is on this board.
-
 	$request = $db->query('', '
 		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.attachment_type, a.mime_type, a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
@@ -1350,6 +1355,7 @@ function url_image_size($url)
 	// Can we pull this from the cache... please please?
 	if (($temp = cache_get_data('url_image_size-' . md5($url), 240)) !== null)
 		return $temp;
+
 	$t = microtime(true);
 
 	// Get the host to pester...
@@ -1357,13 +1363,9 @@ function url_image_size($url)
 
 	// Can't figure it out, just try the image size.
 	if ($url == '' || $url == 'http://' || $url == 'https://')
-	{
 		return false;
-	}
 	elseif (!isset($match[1]))
-	{
 		$size = @getimagesize($url);
-	}
 	else
 	{
 		// Try to connect to the server... give it half a second.
@@ -1752,6 +1754,7 @@ function removeOrphanAttachments($attach_ids)
 			'to_remove' => $attach_ids,
 		)
 	);
+
 	$db->query('', '
 		UPDATE {db_prefix}attachments
 			SET id_thumb = {int:no_thumb}
@@ -1849,8 +1852,6 @@ function attachment_folder($attach_id, $folder_id = null)
 
 /**
  * Get the last attachment ID without a thumbnail.
- *
- * @return int
  */
 function maxNoThumb()
 {
@@ -1872,8 +1873,6 @@ function maxNoThumb()
 
 /**
  * Get the max attachment ID which is a thumbnail.
- *
- * @return int
  */
 function getMaxThumbnail()
 {
@@ -1895,8 +1894,6 @@ function getMaxThumbnail()
 
 /**
  * Get the max attachment ID.
- *
- * @return int
  */
 function maxAttachment()
 {
@@ -1919,7 +1916,6 @@ function maxAttachment()
  *
  * @param array $attachments
  * @param string $approve_query
- * @return array
  */
 function validateAttachments($attachments, $approve_query)
 {
@@ -1951,6 +1947,35 @@ function validateAttachments($attachments, $approve_query)
 }
 
 /**
+ * Finds an attachments parent topic/message and returns the values in an array
+ *
+ * @param array $attachments
+ */
+function attachmentBelongsTo($attachment)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT a.id_attach, m.id_board, m.id_msg, m.id_topic
+		FROM {db_prefix}attachments AS a
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+		WHERE a.id_attach = ({int:attachment})
+			AND a.attachment_type = {int:attachment_type}
+			AND {query_see_board}
+		LIMIT 1',
+		array(
+			'attachment' => $attachment,
+			'attachment_type' => 0,
+		)
+	);
+	$attachment = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $attachment;
+}
+
+/**
  * Checks an attachments id
  *
  * @param int $id_attach
@@ -1969,10 +1994,10 @@ function validateAttachID($id_attach)
 			'attachment_id' => $id_attach,
 		)
 	);
-	if ($db->num_rows($request) == 0)
-		return false;
+	$count = $db->num_rows($request);
+	$db->free_result($request);
 
-	return true;
+	return ($count == 0) ? false : true;
 }
 
 
@@ -2018,7 +2043,6 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'approve_query' => $approve_query,
 		)
 	);
-
 	$unapproved_items = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -2109,7 +2133,6 @@ function list_getAttachDirs()
 			'type' => 1,
 		)
 	);
-
 	$expected_files = array();
 	$expected_size = array();
 	while ($row = $db->fetch_assoc($request))
@@ -2220,8 +2243,8 @@ function list_getBaseDirs()
 	if (empty($modSettings['attachment_basedirectories']))
 		return;
 
-	$basedirs = array();
 	// Get a list of the base directories.
+	$basedirs = array();
 	foreach ($modSettings['attachment_basedirectories'] as $id => $dir)
 	{
 		// Loop through the attach directory array to count any sub-directories
@@ -2367,8 +2390,6 @@ function list_getFiles($start, $items_per_page, $sort, $browse_type)
 
 /**
  * Return the overall attachments size
- *
- * @return string
  */
 function overallAttachmentsSize()
 {
@@ -2388,13 +2409,12 @@ function overallAttachmentsSize()
 
 	// Divide it into kilobytes.
 	$attachmentDirSize /= 1024;
+
 	return comma_format($attachmentDirSize, 2);
 }
 
 /**
  * Get files and size from the current attachments dir
- *
- * @return int
  */
 function currentAttachDirProperties()
 {
@@ -2553,9 +2573,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 
 			// Do we need to remove an old thumbnail?
 			if (!empty($old_id_thumb))
-			{
 				removeAttachments(array('id_attach' => $old_id_thumb), '', false, false);
-			}
 		}
 	}
 
@@ -2567,8 +2585,6 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
  *
  * @param int $id_msg
  * @param bool $include_count = true if true, it also returns the attachments count
- *
- * @return array
  */
 function attachmentsSizeForMessage($id_msg, $include_count = true)
 {
@@ -2767,8 +2783,6 @@ function approved_attach_sort($a, $b)
  * This function returns false when:
  *  - the attachment is unapproved, and
  *  - the viewer is not the poster of the message where the attachment is
- *
- * @param array $attachment_info
  */
 function filter_accessible_attachment($attachment_info, $all_posters)
 {
@@ -2784,7 +2798,6 @@ function filter_accessible_attachment($attachment_info, $all_posters)
  * Counts attachments for the given folder.
  *
  * @param id $id_folder
- * @return int
  */
 function countAttachmentsInFolders($id_folder)
 {
@@ -2799,7 +2812,6 @@ function countAttachmentsInFolders($id_folder)
 			'id_folder' => $id_folder,
 		)
 	);
-
 	list ($num_attach) = $db->fetch_row($request);
 	$db->free_result($request);
 
