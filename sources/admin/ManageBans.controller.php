@@ -666,13 +666,13 @@ class ManageBans_Controller extends Action_Controller
 			$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($_POST['cannot_login']) ? 0 : 1;
 
 			// Adding a new ban group
-			if (empty($_REQUEST['bg']))
+			if (empty($ban_info['id']))
 				$ban_group_id = insertBanGroup($ban_info);
 			// Editing an existing ban group
 			else
 				$ban_group_id = updateBanGroup($ban_info);
 
-			if (is_numeric($ban_group_id))
+			if ($ban_group_id !== false)
 			{
 				$ban_info['id'] = $ban_group_id;
 				$ban_info['is_new'] = false;
