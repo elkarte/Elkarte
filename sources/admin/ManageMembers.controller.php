@@ -167,8 +167,6 @@ class ManageMembers_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info;
 
-		$db = database();
-
 		// Set the current sub action.
 		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';
 
@@ -360,7 +358,7 @@ class ManageMembers_Controller extends Action_Controller
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
 					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
-					if ($db->db_case_sensitive())
+					if (defined('DB_CASE_SENSITIVE'))
 						$query_parts[] = '(LOWER(' . implode(') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
 					else
 						$query_parts[] = '(' . implode(' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';

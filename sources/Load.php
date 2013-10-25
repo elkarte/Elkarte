@@ -2539,6 +2539,10 @@ function loadDatabase()
 	$db = database();
 	if (ELK == 'SSI')
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
+	
+	// Case sensitive database? Let's define a constant.
+	if ($db->db_case_sensitive())
+		DEFINE('DB_CASE_SENSITIVE', '1');
 }
 
 /**

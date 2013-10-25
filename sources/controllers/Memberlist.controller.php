@@ -350,8 +350,6 @@ class Memberlist_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
-		$db = database();
-
 		$context['page_title'] = $txt['mlist_search'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
@@ -425,7 +423,7 @@ class Memberlist_Controller extends Action_Controller
 			else
 				$condition = '';
 
-			if ($db->db_case_sensitive())
+			if (defined('DB_CASE_SENSITIVE'))
 			{
 				foreach ($fields as $key => $field)
 					$fields[$key] = 'LOWER(' . $field . ')';
@@ -446,7 +444,7 @@ class Memberlist_Controller extends Action_Controller
 				}
 			}
 
-			$query = $_POST['search'] == '' ? '= {string:blank_string}' : ($db->db_case_sensitive() ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
+			$query = $_POST['search'] == '' ? '= {string:blank_string}' : (defined('DB_CASE_SENSITIVE') ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 			// Find the members from the database.
