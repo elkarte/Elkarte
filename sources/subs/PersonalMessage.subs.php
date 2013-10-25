@@ -1494,3 +1494,130 @@ function getPMsOlderThan($user_id, $time)
 
 	return $pm_ids;
 }
+
+/**
+ * Used to delete PM rules from the given member.
+ *
+ * @param int $id_member
+ * @param array $rule_changes
+ */
+function deletePMRules($id_member, $rule_changes)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}pm_rules
+		WHERE id_rule IN ({array_int:rule_list})
+		AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'rule_list' => $rule_changes,
+		)
+	);
+}
+
+/**
+ * Updates a personal messaging rule action for the given member.
+ *
+ * @param int $id_rule
+ * @param int $id_member
+ * @param array $actions
+ */
+function updatePMRuleAction($id_rule, $id_member, $actions)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_rules
+		SET actions = {string:actions}
+		WHERE id_rule = {int:id_rule}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'id_rule' => $id_rule,
+			'actions' => serialize($actions),
+		)
+	);
+}
+
+/**
+ * Add a new PM rule to the database.
+ *
+ * @param int $id_member
+ * @param string $ruleName
+ * @param string $criteria
+ * @param string $actions
+ * @param int $doDelete
+ * @param int $isOr
+ */
+function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}pm_rules',
+		array(
+			'id_member' => 'int', 'rule_name' => 'string', 'criteria' => 'string', 'actions' => 'string',
+			'delete_pm' => 'int', 'is_or' => 'int',
+		),
+		array(
+			$id_member, $ruleName, $criteria, $actions, $doDelete, $isOr,
+		),
+		array('id_rule')
+	);
+}
+
+/**
+ * Updates a personal messaging rule for the given member.
+ *
+ * @param int $id_member
+ * @param int $id_rule
+ * @param string $ruleName
+ * @param string $criteria
+ * @param string $actions
+ * @param int $doDelete
+ * @param int $isOr
+ */
+function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doDelete, $isOr)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_rules
+		SET rule_name = {string:rule_name}, criteria = {string:criteria}, actions = {string:actions},
+			delete_pm = {int:delete_pm}, is_or = {int:is_or}
+		WHERE id_rule = {int:id_rule}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'delete_pm' => $doDelete,
+			'is_or' => $isOr,
+			'id_rule' => $id_rule,
+			'rule_name' => $ruleName,
+			'criteria' => $criteria,
+			'actions' => $actions,
+		)
+	);
+}
+
+/**
+ * Used to set a replied status for a given PM.
+ *
+ * @param int $id_member
+ * @param int $replied_to
+ */
+function ssetPMRepliedStatus($id_member, $replied_to)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_recipients
+		SET is_read = is_read | 2
+		WHERE id_pm = {int:replied_to}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'replied_to' => $replied_to,
+		)
+	);
+}

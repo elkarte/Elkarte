@@ -1076,18 +1076,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Mark the message as "replied to".
 		if (!empty($context['send_log']['sent']) && !empty($_REQUEST['replied_to']) && isset($_REQUEST['f']) && $_REQUEST['f'] == 'inbox')
-		{
-			$db->query('', '
-				UPDATE {db_prefix}pm_recipients
-				SET is_read = is_read | 2
-				WHERE id_pm = {int:replied_to}
-					AND id_member = {int:current_member}',
-				array(
-					'current_member' => $user_info['id'],
-					'replied_to' => (int) $_REQUEST['replied_to'],
-				)
-			);
-		}
+			setPMRepliedStatus($user_info['id'], (int) $_REQUEST['replied_to'] );
 
 		// If one or more of the recipient were invalid, go back to the post screen with the failed usernames.
 		if (!empty($context['send_log']['failed']))
@@ -1272,7 +1261,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
-		$db = database();
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Build the link tree elements...
 		$context['linktree'][] = array(
@@ -1403,31 +1392,13 @@ class PersonalMessage_Controller extends Action_Controller
 				foreach ($rule_changes as $k => $id)
 					if (!empty($context['rules'][$id]['actions']))
 					{
-						$db->query('', '
-							UPDATE {db_prefix}pm_rules
-							SET actions = {string:actions}
-							WHERE id_rule = {int:id_rule}
-								AND id_member = {int:current_member}',
-							array(
-								'current_member' => $user_info['id'],
-								'id_rule' => $id,
-								'actions' => serialize($context['rules'][$id]['actions']),
-							)
-						);
+						updatePMRuleAction($id, $user_info['id'], $context['rules'][$id]['actions']);
 						unset($rule_changes[$k]);
 					}
 
 				// Anything left here means it's lost all actions...
 				if (!empty($rule_changes))
-					$db->query('', '
-						DELETE FROM {db_prefix}pm_rules
-						WHERE id_rule IN ({array_int:rule_list})
-								AND id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-							'rule_list' => $rule_changes,
-						)
-					);
+					deletePMRules($user_info['id'], $rule_changes);
 			}
 
 			// Make sure we're not caching this!
@@ -1661,7 +1632,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
-		$db = database();
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// The link tree - gotta have this :o
 		$context['linktree'][] = array(
@@ -1792,34 +1763,9 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Create the rule?
 			if (empty($context['rid']))
-				$db->insert('',
-					'{db_prefix}pm_rules',
-					array(
-						'id_member' => 'int', 'rule_name' => 'string', 'criteria' => 'string', 'actions' => 'string',
-						'delete_pm' => 'int', 'is_or' => 'int',
-					),
-					array(
-						$user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr,
-					),
-					array('id_rule')
-				);
+				addPMRule($user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 			else
-				$db->query('', '
-					UPDATE {db_prefix}pm_rules
-					SET rule_name = {string:rule_name}, criteria = {string:criteria}, actions = {string:actions},
-						delete_pm = {int:delete_pm}, is_or = {int:is_or}
-					WHERE id_rule = {int:id_rule}
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'delete_pm' => $doDelete,
-						'is_or' => $isOr,
-						'id_rule' => $context['rid'],
-						'rule_name' => $ruleName,
-						'criteria' => $criteria,
-						'actions' => $actions,
-					)
-				);
+				updatePMRule($user_info['id'], $context['rid'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 
 			redirectexit('action=pm;sa=manrules');
 		}
@@ -1832,15 +1778,7 @@ class PersonalMessage_Controller extends Action_Controller
 				$toDelete[] = (int) $k;
 
 			if (!empty($toDelete))
-				$db->query('', '
-					DELETE FROM {db_prefix}pm_rules
-					WHERE id_rule IN ({array_int:delete_list})
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'delete_list' => $toDelete,
-					)
-				);
+				deletePMRules($user_info['id'], $toDelete);
 
 			redirectexit('action=pm;sa=manrules');
 		}
