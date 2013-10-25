@@ -474,17 +474,17 @@ function updatePersonalMessagesCounter()
 
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
-			MAX(mem.instant_messages) AS instant_messages
+			MAX(mem.personal_messages) AS personal_messages
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}pm_recipients AS pmr ON (mem.id_member = pmr.id_member AND pmr.deleted = {int:is_not_deleted})
 		GROUP BY mem.id_member
-		HAVING COUNT(pmr.id_pm) != MAX(mem.instant_messages)',
+		HAVING COUNT(pmr.id_pm) != MAX(mem.personal_messages)',
 		array(
 			'is_not_deleted' => 0,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		updateMemberData($row['id_member'], array('instant_messages' => $row['real_num']));
+		updateMemberData($row['id_member'], array('personal_messages' => $row['real_num']));
 
 	$db->free_result($request);
 

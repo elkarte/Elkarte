@@ -213,9 +213,9 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['is_read'])
-				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : 'instant_messages - ' . $row['num_deleted_messages']));
+				updateMemberData($row['id_member'], array('personal_messages' => $where == '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages']));
 			else
-				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : 'instant_messages - ' . $row['num_deleted_messages'], 'unread_messages' => $where == '' ? 0 : 'unread_messages - ' . $row['num_deleted_messages']));
+				updateMemberData($row['id_member'], array('personal_messages' => $where == '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages'], 'unread_messages' => $where == '' ? 0 : 'unread_messages - ' . $row['num_deleted_messages']));
 
 			// If this is the current member we need to make their message count correct.
 			if ($user_info['id'] == $row['id_member'])
@@ -610,7 +610,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	$request = $db->query('', '
 		SELECT
 			member_name, real_name, id_member, email_address, lngfile,
-			pm_email_notify, instant_messages,' . (allowedTo('moderate_forum') ? ' 0' : '
+			pm_email_notify, personal_messages,' . (allowedTo('moderate_forum') ? ' 0' : '
 			(receive_from = {int:admins_only}' . (empty($modSettings['enable_buddylist']) ? '' : ' OR
 			(receive_from = {int:buddies_only} AND FIND_IN_SET({string:from_id}, buddy_list) = 0) OR
 			(receive_from = {int:not_on_ignore_list} AND FIND_IN_SET({string:from_id}, pm_ignore_list) != 0)') . ')') . ' AS ignored,
@@ -652,7 +652,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 					$message_limit = $message_limit_cache[$id];
 			}
 
-			if ($message_limit > 0 && $message_limit <= $row['instant_messages'])
+			if ($message_limit > 0 && $message_limit <= $row['personal_messages'])
 			{
 				$log['failed'][$row['id_member']] = sprintf($txt['pm_error_data_limit_reached'], $row['real_name']);
 				unset($all_to[array_search($row['id_member'], $all_to)]);
@@ -833,7 +833,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 
 	if (!empty($all_to))
-		updateMemberData($all_to, array('instant_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
+		updateMemberData($all_to, array('personal_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
 
 	return $log;
 }

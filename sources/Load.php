@@ -353,7 +353,7 @@ function loadUserSettings()
 			'id_attach' => isset($user_settings['id_attach']) ? $user_settings['id_attach'] : 0
 		),
 		'smiley_set' => isset($user_settings['smiley_set']) ? $user_settings['smiley_set'] : '',
-		'messages' => empty($user_settings['instant_messages']) ? 0 : $user_settings['instant_messages'],
+		'messages' => empty($user_settings['personal_messages']) ? 0 : $user_settings['personal_messages'],
 		'notifications' => empty($user_settings['notifications']) ? 0 : $user_settings['notifications'],
 		'unread_messages' => empty($user_settings['unread_messages']) ? 0 : $user_settings['unread_messages'],
 		'total_time_logged_in' => empty($user_settings['total_time_logged_in']) ? 0 : $user_settings['total_time_logged_in'],

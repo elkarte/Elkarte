@@ -624,3 +624,9 @@ ALTER TABLE {$db_prefix}members
 ADD COLUMN notifications smallint(5) NOT NULL default '0';
 ---#
 
+--- Fixing personal messages column name
+/******************************************************************************/
+---# Adding new columns to log_packages ..
+ALTER TABLE {$db_prefix}members
+CHANGE `instant_messages` `personal_messages` smallint(5) NOT NULL default 0;
+---#

@@ -528,7 +528,7 @@ class Maintenance_Controller extends Action_Controller
 	 * Totals recounted:
 	 * - fixes for topics with wrong num_replies.
 	 * - updates for num_posts and num_topics of all boards.
-	 * - recounts instant_messages but not unread_messages.
+	 * - recounts personal_messages but not unread_messages.
 	 * - repairs messages pointing to boards with topics pointing to other boards.
 	 * - updates the last message posted in boards and children.
 	 * - updates member count, latest member, topic count, and message count.
