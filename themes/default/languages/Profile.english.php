@@ -199,7 +199,7 @@ $txt['groupmembership'] = 'Group Membership';
 $txt['groupMembership_info'] = 'In this section of your profile you can change which groups you belong to.';
 $txt['ignoreboards'] = 'Ignore Boards Options';
 $txt['ignoreboards_info'] = 'This page lets you ignore particular boards.  When a board is ignored, the new post indicator will not show up on the board index.  New posts will not show up using the "unread post" search link (when searching it will not look in those boards). However, ignored boards will still appear on the board index and upon entering will show which topics have new posts.  When using the "unread replies" link, new posts in an ignored board will still be shown.';
-$txt['pmprefs'] = 'Personal Messaging';
+$txt['contactprefs'] = 'Messaging';
 
 $txt['profileAction'] = 'Actions';
 $txt['deleteAccount'] = 'Delete this account';
@@ -467,6 +467,7 @@ $txt['receive_from_everyone'] = 'All members';
 $txt['receive_from_ignore'] = 'All members, except those on my ignore list';
 $txt['receive_from_admins'] = 'Administrators only';
 $txt['receive_from_buddies'] = 'Buddies and Administrators only';
+$txt['receive_from_description'] = 'This setting applies to both Personal Messages and emails (if the option to email members is enabled)';
 
 $txt['popup_messages'] = 'Show a popup when I receive new messages.';
 $txt['pm_remove_inbox_label'] = 'Remove the inbox label when applying another label';

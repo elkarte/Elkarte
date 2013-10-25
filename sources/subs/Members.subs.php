@@ -2210,7 +2210,7 @@ function canContact($who)
 	$request = $db->query('', '
 		SELECT receive_from, buddy_list, ignore_list
 		FROM {db_prefix}members
-		WHERE id_member = {int:member}'
+		WHERE id_member = {int:member}',
 		array(
 			'member' => $who,
 		)
@@ -2244,8 +2244,8 @@ function canContact($who)
 	else
 	{
 		if ($user_info['is_admin'])
-			return true:
+			return true;
 		else
-			return false:
+			return false;
 	}
 }
