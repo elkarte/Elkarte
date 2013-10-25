@@ -1601,12 +1601,12 @@ function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doD
 }
 
 /**
- * Used to set a replied statur for a given PM.
+ * Used to set a replied status for a given PM.
  *
  * @param int $id_member
  * @param int $replied_to
  */
-function setRepliedStatus($id_member, $replied_to)
+function ssetPMRepliedStatus($id_member, $replied_to)
 {
 	$db = database();
 
