@@ -1870,7 +1870,6 @@ img.new_posts {
 	border-bottom: 1px solid #ccc;
 	margin-top: 2px;
 	padding: 4px 4px 4px 12px;
-	overflow: auto;
 }
 #description_board .generalinfo .listlevel2 {
 	white-space:nowrap;
@@ -2145,10 +2144,6 @@ img.new_posts {
 	padding: 4px 0;
 	display: inline-block;
 	font-size: 0.857em;
-}
-#boarddescription {
-	display: block;
-	float: left;
 }
 /* Poster and postarea + moderation area underneath */
 
