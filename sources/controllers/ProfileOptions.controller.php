@@ -386,7 +386,9 @@ class ProfileOptions_Controller extends Action_Controller
 
 		setupProfileContext(
 			array(
-				'pm_prefs',
+				'receive_from',
+				'hr',
+				'pm_settings',
 			)
 		);
 	}

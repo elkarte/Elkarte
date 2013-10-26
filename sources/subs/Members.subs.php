@@ -2195,3 +2195,57 @@ function getConcernedMembers($groups, $where)
 
 	return $output;
 }
+
+/**
+ * Determine if the current user ($user_info) can contact another user ($who)
+ *
+ * @param int The id of the user to contact
+ */
+function canContact($who)
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT receive_from, buddy_list, ignore_list
+		FROM {db_prefix}members
+		WHERE id_member = {int:member}',
+		array(
+			'member' => $who,
+		)
+	);
+	list($receive_from, $buddies, $ignore) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	$buddy_list = array_map('intval', explode(',', $buddies));
+	$ignore_list = array_map('intval', explode(',', $ignore));
+
+	// 0 = all members
+	if ($receive_from == 0)
+		return true;
+	// 1 = all except ignore
+	elseif ($receive_from == 1)
+	{
+		if (!empty($ignore_list) && in_array($user_info['id'], $ignore_list))
+			return false;
+		else
+			return true;
+	}
+	// 2 = buddies and admin
+	elseif ($receive_from == 2)
+	{
+		if ($user_info['is_admin'] || (!empty($buddy_list) && in_array($user_info['id'], $buddy_list)))
+			return true;
+		else
+			return false;
+	}
+	// 3 = admin only
+	else
+	{
+		if ($user_info['is_admin'])
+			return true;
+		else
+			return false;
+	}
+}

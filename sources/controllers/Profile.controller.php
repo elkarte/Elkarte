@@ -227,8 +227,8 @@ class Profile_Controller extends Action_Controller
 					'permission' => $context['user']['is_owner'] ? array('profile_extra_any', 'profile_extra_own') : array('profile_extra_any'),
 				),
 				// Without profile_extra_own, settings are accessible from the PM section.
-				'pmprefs' => array(
-					'label' => $txt['pmprefs'],
+				'contactprefs' => array(
+					'label' => $txt['contactprefs'],
 					'file' => '/controllers/ProfileOptions.controller.php',
 					'controller' => 'ProfileOptions_Controller',
 					'function' => 'action_pmprefs',
