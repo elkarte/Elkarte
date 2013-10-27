@@ -818,7 +818,7 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 			AND {query_see_board}
 		GROUP BY b.id_board
 		ORDER BY message_count DESC
-		LIMIT (int:limit}',
+		LIMIT {int:limit}',
 		array(
 			'current_member' => $memID,
 			'count_enabled' => 0,
