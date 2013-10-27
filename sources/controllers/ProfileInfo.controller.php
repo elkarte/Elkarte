@@ -78,7 +78,7 @@ class ProfileInfo_Controller extends Action_Controller
 				'active' => true,
 			),
 			'recent' => array(
-				'name' => $txt['recent_activity'],
+				'name' => $txt['profile_recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
 				'active' => true,
 			),
@@ -93,12 +93,20 @@ class ProfileInfo_Controller extends Action_Controller
 		call_integration_hook('integrate_profile_summary', array($memID));
 
 		// Go forward with whats left
+		$summary_areas = '';
 		foreach ($context['summarytabs'] as $id => $tab)
 		{
 			// If the tab is active we add it
 			if ($tab['active'] !== true)
 				unset ($context['summarytabs'][$id]);
+			else
+			{
+				// All the active templates, used to prevent processing data we don't need
+				foreach ($tab['templates'] as $template)
+					$summary_areas .= is_array($template) ? implode(',', $template) : ',' . $template;
+			}
 		}
+		$summary_areas = explode(',', $summary_areas);
 
 		// See if they have broken any warning levels...
 		if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $context['member']['warning'])
@@ -185,7 +193,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Load up the most recent attachments for this user for use in profile views etc.
 		$context['thumbs'] = array();
-		if (!empty($modSettings['attachmentEnable']) && !empty($settings['attachments_on_summary']))
+		if (!empty($modSettings['attachmentEnable']) && !empty($settings['attachments_on_summary']) && in_array('attachments', $summary_areas))
 		{
 			$boardsAllowed = boardsAllowedTo('view_attachments');
 			if (empty($boardsAllowed))
@@ -235,7 +243,7 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 
 		// Would you be mine? Could you be mine? Be my buddy :D
-		if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'] && !empty($user_info['buddies']))
+		if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'] && !empty($user_info['buddies']) && in_array('buddies', $summary_areas))
 		{
 			$context['buddies'] = array();
 			loadMemberData($user_info['buddies'], false, 'profile');
@@ -249,98 +257,104 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 
 		// How about thier most recent posts?
+		if (in_array('posts', $summary_areas))
 		{
-			// Is the load average too high just now?
+			// Is the load average too high just now, then let them know
 			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
-				fatal_lang_error('loadavg_show_posts_disabled', false);
-
-			// Set up to get the last 10 psots of this member
-			$msgCount = count_user_posts($memID);
-			$range_limit = '';
-			$maxIndex = 10;
-
-			// If they are a frequent poster, we guess the range to help minimize what the query work
-			if ($msgCount > 1000)
+				$context['loadaverage'] = true;
+			else
 			{
-				list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($memID);
-				$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
-				$range_limit = 'm.id_msg > ' . ($max_msg_member - $margin);
-			}
+				// Set up to get the last 10 psots of this member
+				$msgCount = count_user_posts($memID);
+				$range_limit = '';
+				$maxIndex = 10;
 
-			// Find this user's most recent posts
-			$rows = load_user_posts($memID, 0, $maxIndex, $range_limit);
-			$context['posts'] = array();
-			foreach ($rows as $row)
-			{
-				// Censor....
-				censorText($row['body']);
-				censorText($row['subject']);
+				// If they are a frequent poster, we guess the range to help minimize what the query work
+				if ($msgCount > 1000)
+				{
+					list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($memID);
+					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+					$range_limit = 'm.id_msg > ' . ($max_msg_member - $margin);
+				}
 
-				// Do the code.
-				$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-				$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
-				$preview = shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
-				$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+				// Find this user's most recent posts
+				$rows = load_user_posts($memID, 0, $maxIndex, $range_limit);
+				$context['posts'] = array();
+				foreach ($rows as $row)
+				{
+					// Censor....
+					censorText($row['body']);
+					censorText($row['subject']);
 
-				// And the array...
-				$context['posts'][] = array(
-					'body' => $preview,
-					'board' => array(
-						'name' => $row['bname'],
-						'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
-					),
-					'subject' => $row['subject'],
-					'short_subject' => $short_subject,
-					'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
-					'timestamp' => forum_time(true, $row['poster_time']),
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
-				);
+					// Do the code.
+					$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
+					$preview = shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
+					$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+
+					// And the array...
+					$context['posts'][] = array(
+						'body' => $preview,
+						'board' => array(
+							'name' => $row['bname'],
+							'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+						),
+						'subject' => $row['subject'],
+						'short_subject' => $short_subject,
+						'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+						'timestamp' => forum_time(true, $row['poster_time']),
+						'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+					);
+				}
 			}
 		}
 
 		// How about the most recent topics that they started?
+		if (in_array('topics', $summary_areas))
 		{
-			// Is the load average too high just now?
+			// Is the load average still too high?
 			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
-				fatal_lang_error('loadavg_show_posts_disabled', false);
-
-			// Set up to get the last 10 topics of this member
-			$msgCount = count_user_topics($memID);
-			$range_limit = '';
-			$maxIndex = 10;
-
-			// If they are a frequent topic starter, we guess the range to help the query
-			if ($msgCount > 1000)
+				$context['loadaverage'] = true;
+			else
 			{
-				$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
-				$margin *= 5;
-				$range_limit = 't.id_first_msg > ' . ($max_msg_member - $margin);
-			}
+				// Set up to get the last 10 topics of this member
+				$msgCount = count_user_topics($memID);
+				$range_limit = '';
+				$maxIndex = 10;
 
-			// Find this user's most recent topics
-			$rows = load_user_topics($memID, 0, $maxIndex, $range_limit);
-			$context['topics'] = array();
-			foreach ($rows as $row)
-			{
-				// Censor....
-				censorText($row['body']);
-				censorText($row['subject']);
+				// If they are a frequent topic starter, we guess the range to help the query
+				if ($msgCount > 1000)
+				{
+					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+					$margin *= 5;
+					$range_limit = 't.id_first_msg > ' . ($max_msg_member - $margin);
+				}
 
-				// Do the code.
-				$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+				// Find this user's most recent topics
+				$rows = load_user_topics($memID, 0, $maxIndex, $range_limit);
+				$context['topics'] = array();
+				foreach ($rows as $row)
+				{
+					// Censor....
+					censorText($row['body']);
+					censorText($row['subject']);
 
-				// And the array...
-				$context['topics'][] = array(
-					'board' => array(
-						'name' => $row['bname'],
-						'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
-					),
-					'subject' => $row['subject'],
-					'short_subject' => $short_subject,
-					'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
-					'timestamp' => forum_time(true, $row['poster_time']),
-					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
-				);
+					// Do the code.
+					$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+
+					// And the array...
+					$context['topics'][] = array(
+						'board' => array(
+							'name' => $row['bname'],
+							'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+						),
+						'subject' => $row['subject'],
+						'short_subject' => $short_subject,
+						'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+						'timestamp' => forum_time(true, $row['poster_time']),
+						'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+					);
+				}
 			}
 		}
 
