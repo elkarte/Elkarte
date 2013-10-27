@@ -139,9 +139,9 @@ class Notification_Controller extends Action_Controller
 							),
 							array(
 								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;from=\' . $row[\'id_member_from\'] . \';type=\' . $row[\'type\'] . \';time=\' . $row[\'log_time\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
-								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;from=\' . $row[\'id_member_from\'] . \';type=\' . $row[\'type\'] . \';time=\' . $row[\'log_time\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
+								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;from=\' . $row[\'id_member_from\'] . \';type=\' . $row[\'notif_type\'] . \';time=\' . $row[\'log_time\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
-							), $txt[\'notification_\' . $row[\'type\']]);
+							), $txt[\'notification_\' . $row[\'notif_type\']]);
 						')
 					),
 					'sort' =>  array(
