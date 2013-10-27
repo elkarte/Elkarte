@@ -1479,6 +1479,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
+	global $modSettings;
+
 	$db = database();
 
 	if (!is_array($msgs))
@@ -1680,6 +1682,12 @@ function approvePosts($msgs, $approve = true)
 			$msgInserts,
 			array('id_msg')
 		);
+	}
+
+	if (!empty($modSettings['notifications_enabled']))
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
+		toggleNotificationsApproval($msgs, $approve);
 	}
 
 	// Update the last messages on the boards...

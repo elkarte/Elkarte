@@ -220,3 +220,91 @@ errorbox_handler.prototype.removeError = function (error_box, error_elem)
 		});
 	}
 }
+
+var all_elk_mentions = [];
+function add_elk_mention(selector, oOptions)
+{
+	if (all_elk_mentions.hasOwnProperty(selector))
+		return;
+
+	if (typeof oOptions == 'undefined')
+		oOptions = {};
+	oOptions.selector = selector;
+	var index = all_elk_mentions.length;
+	all_elk_mentions[index] = {};
+	all_elk_mentions[index].selector = selector;
+	all_elk_mentions[index].oOptions = oOptions;
+}
+
+$(document).ready(function () {
+	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+		all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions)
+});
+
+function elk_mentions(oOptions)
+{
+	this.last_call = 0,
+	this.last_query = '',
+	this.names = [],
+	this.cached_names = [],
+	this.mentioned,
+	this.$atwho;
+
+	this.opt = oOptions;
+	this.init();
+}
+
+elk_mentions.prototype.init = function ()
+{
+	this_mention = this;
+	this_mention.$atwho = $(this.opt.selector);
+	this_mention.$atwho.atwho({
+		at: "@",
+		limit: 7 ,
+		tpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
+		callbacks: {
+			filter: function (query, items, search_key) {
+				var current_call = parseInt(new Date().getTime() / 1000);
+
+				if (this_mention.last_call != 0 && this_mention.last_call + 1 > current_call)
+					return this_mention.names;
+
+				if (typeof this_mention.cached_names[query] != 'undefined')
+					return this_mention.cached_names[query];
+
+				this_mention.names = [];
+				$.ajax({
+					url: elk_scripturl + "?action=suggest;suggest_type=member;search=" + query.php_to8bit().php_urlencode() + ";" + elk_session_var + "=" + elk_session_id + ";xml;time=" + current_call,
+					type: "get",
+					async: false
+				})
+				.done(function(request) {
+					$(request).find('item').each(function (idx, item) {
+						if (typeof this_mention.names[this_mention.names.length] == 'undefined')
+							this_mention.names[this_mention.names.length] = {};
+						this_mention.names[this_mention.names.length - 1].id = $(item).attr('id');
+						this_mention.names[this_mention.names.length - 1].name = $(item).text();
+					});
+				});
+				this_mention.last_call = current_call;
+				this_mention.last_query = query;
+				this_mention.cached_names[query] = this_mention.names;
+				return this_mention.names;
+			},
+			before_insert: function (value, $li) {
+				if (typeof this_mention.mentioned == 'undefined')
+				{
+					this_mention.mentioned = $('<div style="display:none" />');
+					this_mention.$atwho.after(this_mention.mentioned);
+				}
+				this_mention.mentioned.append($('<input type="hidden" name="uid[]" />').val($li.data('id')));
+				return value;
+			}
+		}
+	});
+}
+
+function revalidateMentions()
+{
+	
+}

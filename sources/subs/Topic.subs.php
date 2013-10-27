@@ -314,6 +314,15 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		)
 	);
 
+	// Remove all notifications now that the topic is gone
+	$db->query('', '
+		DELETE FROM {db_prefix}log_notifications
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+		)
+	);
+
 	// Delete messages in each topic.
 	$db->query('', '
 		DELETE FROM {db_prefix}messages

@@ -576,6 +576,15 @@ function removeMessage($message, $decreasePostCount = true)
 			)
 		);
 
+		// Remove the notifications!
+		$db->query('', '
+			DELETE FROM {db_prefix}log_notifications
+			WHERE id_msg = {int:id_msg}',
+			array(
+				'id_msg' => $message,
+			)
+		);
+
 		// Remove the message!
 		$db->query('', '
 			DELETE FROM {db_prefix}messages

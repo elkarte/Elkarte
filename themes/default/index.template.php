@@ -88,6 +88,9 @@ function template_init()
 		'expand_pages' => '<li class="expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
 		'all' => '<li class="all_pages" role="menuitem">{all_txt}</li>',
 	);
+
+	// @todo find a better place if we are going to create a notifications template
+	$settings['notifications']['notifier_template'] = '<a href="{mem_url}" class="notifavatar">{avatar_img}{mem_name}</a>';
 }
 
 /**

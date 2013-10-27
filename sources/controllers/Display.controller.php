@@ -222,6 +222,19 @@ class Display_Controller
 				$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
 			}
 		}
+		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
+		{
+			require_once(CONTROLLERDIR . '/Notification.controller.php');
+			$notify = new Notification_Controller();
+			$notify->setData(array(
+				'id_member' => $user_info['id'],
+				'type' => $_REQUEST['type'],
+				'id_msg' => $virtual_msg,
+				'id_member_from' => $_REQUEST['from'],
+				'log_time' => $_REQUEST['time'],
+			));
+			$notify->action_markread(true);
+		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
 		if ($modSettings['enablePreviousNext'])
@@ -782,6 +795,13 @@ class Display_Controller
 			loadLanguage('Drafts');
 		if (!empty($context['drafts_autosave']))
 			loadJavascriptFile('drafts.js');
+
+		if (!empty($modSettings['notifications_enabled']))
+		{
+			$context['notifications_enabled'] = true;
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
+			loadCSSFile('jquery.atwho.css');
+		}
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
