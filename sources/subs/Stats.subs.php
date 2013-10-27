@@ -224,7 +224,7 @@ function topPosters($limit = null)
  */
 function topBoards($limit = null, $read_status = false)
 {
-	global $modSettings, $scripturl;
+	global $modSettings, $scripturl, $user_info;
 
 	$db = database();
 
