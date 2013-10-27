@@ -218,7 +218,7 @@ function loadModeratorMenuCounts($brd = null)
 {
 	global $modSettings, $user_info;
 
-	$menu_errors = array();
+	static $menu_errors = array();
 
 	// Work out what boards they can work in!
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -239,7 +239,10 @@ function loadModeratorMenuCounts($brd = null)
 		$approve_query = ' AND 1=0';
 
 	// Set up the cache key for this permissions level
-	$cache_key = md5($user_info['query_see_board'] . $approve_query . $user_info['mod_cache']['bq'] . $user_info['mod_cache']['gq'] . $user_info['mod_cache']['mq'] . allowedTo('approve_emails'));
+	$cache_key = md5($user_info['query_see_board'] . $approve_query . $user_info['mod_cache']['bq'] . $user_info['mod_cache']['gq'] . $user_info['mod_cache']['mq'] . (int) allowedTo('approve_emails') . '_' . (int) allowedTo('moderate_forum'));
+
+	if (isset($menu_errors[$cache_key]))
+		return $menu_errors[$cache_key];
 
 	// If its been cached, guess what, thats right use it!
 	$temp = cache_get_data('num_menu_errors', 900);
@@ -287,7 +290,7 @@ function loadModeratorMenuCounts($brd = null)
 			$menu_errors[$cache_key]['groupreq'] = count(groupRequests());
 
 		// Member requests
-		if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
+		if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
 			$awaiting_activation = 0;

@@ -43,15 +43,14 @@ function currentMemberID($fatal = true, $reload_id = false)
 		$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
 	// If it was just ?action=profile, edit your own profile.
 	else
-	{
-	    // Members only...
-	    is_not_guest();
 		$memberResult = loadMemberData($user_info['id'], false, 'profile');
-	  }
 
 	// Check if loadMemberData() has returned a valid result.
 	if (!is_array($memberResult))
 	{
+		// Members only...
+		is_not_guest('', $fatal);
+
 		if ($fatal)
 			fatal_lang_error('not_a_user', false);
 		else

@@ -374,7 +374,7 @@ function template_postarea_above()
 							', $txt['topic_locked_no_reply'], '
 						</p>';
 
-	if (!empty($modSettings['drafts_post_enabled']))
+	if (!empty($context['drafts_autosave']))
 		echo '
 						<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
 							sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '

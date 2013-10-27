@@ -818,11 +818,11 @@ function UserStatsMostPostedBoard($memID, $limit = 10)
 			AND {query_see_board}
 		GROUP BY b.id_board
 		ORDER BY message_count DESC
-		LIMIT (int:limit}',
+		LIMIT {int:limit}',
 		array(
 			'current_member' => $memID,
 			'count_enabled' => 0,
-			'limit'	=> (int) $limit,
+			'limit' => (int) $limit,
 		)
 	);
 	$popular_boards = array();
@@ -899,7 +899,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
  */
 function UserStatsPostingTime($memID)
 {
-	global $user_info;
+	global $user_info, $modSettings;
 
 	$db = database();
 

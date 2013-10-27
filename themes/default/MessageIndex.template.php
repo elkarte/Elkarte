@@ -164,9 +164,9 @@ function template_pages_and_buttons_above()
 
 		if (!empty($context['description']))
 			echo '
-				<span id="boarddescription">
+				<div id="boarddescription">
 					', $context['description'], '
-				</span>';
+				</div>';
 
 		// @todo - Thought the who is stuff was better here. Presentation still WIP.
 		if (!empty($settings['display_who_viewing']))

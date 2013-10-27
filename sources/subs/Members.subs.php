@@ -681,7 +681,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	// Right, now let's prepare for insertion.
 	$knownInts = array(
-		'date_registered', 'posts', 'id_group', 'last_login', 'instant_messages', 'unread_messages',
+		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages',
 		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',

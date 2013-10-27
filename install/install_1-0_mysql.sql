@@ -1291,7 +1291,7 @@ CREATE TABLE {$db_prefix}members (
   lngfile varchar(255) NOT NULL default '',
   last_login int(10) unsigned NOT NULL default '0',
   real_name varchar(255) NOT NULL default '',
-  instant_messages smallint(5) NOT NULL default '0',
+  personal_messages smallint(5) NOT NULL default '0',
   notifications smallint(5) NOT NULL default '0',
   unread_messages smallint(5) NOT NULL default '0',
   new_pm tinyint(3) unsigned NOT NULL default '0',

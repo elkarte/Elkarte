@@ -574,7 +574,7 @@ function updateBanGroup($ban_info = array())
 		$ban_errors->addError('ban_id_empty');
 
 	if ($ban_errors->hasErrors())
-		return;
+		return false;
 
 	$request = $db->query('', '
 		SELECT id_ban_group
@@ -616,6 +616,7 @@ function updateBanGroup($ban_info = array())
 		)
 	);
 
+	return $ban_info['id'];
 }
 
 /**
@@ -638,7 +639,7 @@ function insertBanGroup($ban_info = array())
 		$ban_errors->addError('ban_unknown_restriction_type');
 
 	if ($ban_errors->hasErrors())
-		return;
+		return false;
 
 	// Check whether a ban with this name already exists.
 	$request = $db->query('', '
@@ -651,6 +652,7 @@ function insertBanGroup($ban_info = array())
 		)
 	);
 
+	// @todo shouldn't be an error here?
 	if ($db->num_rows($request) == 1)
 	{
 		list($id_ban) = $db->fetch_row($request);
