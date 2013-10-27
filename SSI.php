@@ -546,7 +546,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$icon_sources[$icon] = 'images_url';
 
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
-	$request = $db->query('substring', '
+	$request = $db->query('', '
 		SELECT
 			t.id_topic, b.id_board, b.name AS board_name
 		FROM {db_prefix}topics AS t
