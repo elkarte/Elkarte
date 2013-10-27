@@ -651,7 +651,7 @@ function template_profile_block_summary()
 
 	// Some links to this users fine work
 	echo '
-						<dt>', $txt['recent_activity'], ': </dt>
+						<dt>', $txt['profile_activity'], ': </dt>
 						<dd>
 							<a href="', $scripturl, '?action=profile;area=showposts;u=', $context['id_member'], '">', $txt['showPosts'], '</a>
 							<br />';
@@ -1280,7 +1280,7 @@ function template_profile_block_posts()
 	else
 		echo '
 				<tr>
-					<td colspan="4">', $txt['profile_posts_no'], '</td>
+					<td colspan="4">', (isset($context['loadaverage']) ? $txt['profile_loadavg'] : $txt['profile_posts_no']), '</td>
 				</tr>';
 
 	// All done
