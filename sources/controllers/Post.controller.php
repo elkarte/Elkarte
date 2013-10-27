@@ -1439,6 +1439,16 @@ class Post_Controller extends Action_Controller
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
+		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		{
+			$query['and'][] = 'member_ids';
+			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+			require_once(SUBSDIR . '/Members.subs.php');
+			$mentioned_members = membersBy($query, $query_params, true);
+			foreach ($mentioned_members as $member)
+				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message']);
+		}
+
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
 		{
