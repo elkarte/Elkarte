@@ -15,8 +15,18 @@ $txt['profile_moderation'] = 'Moderation Information';
 $txt['profile_more'] = 'Signature';
 $txt['profile_attachments'] = 'Recent Attachments';
 $txt['profile_attachments_no'] = 'There are no Attachments from this member';
+$txt['profile_posts'] = 'Recent Posts';
+$txt['profile_posts_no'] = 'There are no posts from this member';
+$txt['profile_topics'] = 'Recent Topics';
+$txt['profile_topics_no'] = 'There are no topics from this member';
 $txt['profile_buddies_no'] = 'You have not set any buddies';
 $txt['profile_user_info'] = 'User Info';
+$txt['profile_contact_no'] = 'There is no contact informatin for this member';
+$txt['profile_signature_no'] = 'There is no signature for this member';
+$txt['profile_additonal_no'] = 'There is no additonal information for this member';
+$txt['profile_user_summary'] = 'Summary';
+$txt['profile_action'] = 'Currently';
+$txt['recent_activity'] = 'Recent Activity';
 
 $txt['change_profile'] = 'Change profile';
 $txt['preview_signature'] = 'Preview signature';
@@ -358,13 +368,13 @@ $txt['posts_per_day'] = 'per day';
 
 $txt['buddy_ignore_desc'] = 'This area allows you to maintain your buddy and ignore lists for this forum. Adding members to these lists will, amongst other things, help control mail and PM traffic, depending on your preferences.';
 
-$txt['buddy_add'] = 'Add To Buddy List';
-$txt['buddy_remove'] = 'Remove From Buddy List';
+$txt['buddy_add'] = 'Add to buddy list';
+$txt['buddy_remove'] = 'Remove from buddy list';
 $txt['buddy_add_button'] = 'Add';
 $txt['no_buddies'] = 'Your buddy list is currently empty';
 
-$txt['ignore_add'] = 'Add To Ignore List';
-$txt['ignore_remove'] = 'Remove From Ignore List';
+$txt['ignore_add'] = 'Add to ignore list';
+$txt['ignore_remove'] = 'Remove from ignore list';
 $txt['ignore_add_button'] = 'Add';
 $txt['no_ignore'] = 'Your ignore list is currently empty';
 
