@@ -1067,7 +1067,7 @@ class ProfileInfo_Controller extends Action_Controller
 	{
 		// @todo tweak this method to use $context, etc,
 		// then call subs function with params set.
-		profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID);
+		return profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID);
 	}
 
 	/**
