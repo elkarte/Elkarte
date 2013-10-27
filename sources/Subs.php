@@ -481,6 +481,35 @@ function updateSettings($changeArray, $update = false, $debug = false)
 }
 
 /**
+ * Deletes one setting from the settings table and takes care of $modSettings as well
+ *
+ * @param string the setting
+ */
+function removeSetting($toRemove)
+{
+	global $modSettings;
+
+	$db = database();
+
+	if (empty($toRemove))
+		return;
+
+	$db->query('', '
+		DELETE FROM {db_prefix}settings
+		WHERE variable = {string:setting_name}',
+		array(
+			'setting_name' => $toRemove,
+		)
+	);
+
+	if (isset($modSettings[$toRemove]))
+		unset($modSettings[$toRemove]);
+
+	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
+	cache_put_data('modSettings', null, 90);
+}
+
+/**
  * Constructs a page list.
  *
  * - builds the page list, e.g. 1 ... 6 7 [8] 9 10 ... 15.
