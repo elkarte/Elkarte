@@ -62,10 +62,32 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Menu tab
-		$context[$context['profile_menu_name']]['tab_data'] = array(
-			'title' => $txt['summary'],
-			'icon' => 'profile_hd.png'
+		$context[$context['profile_menu_name']]['tab_data'] = array();
+
+		// Tab information for use in the summary page, follow the tabs-1, tabs-2  etc convention
+		// Each tab array defines a div, the value of which are the template(s) to load in that div
+		// Templates are named template_profile_block_YOURNAME
+		$context['summarytabs'] = array(
+			'tabs-1' => array (
+				'name' => $txt['summary'],
+				'templates' => array(
+					array('summary', 'user_info'),
+					array('contact', 'other_info'),
+					array('user_customprofileinfo', 'moderation'),
+				),
+			),
+			'tabs-2' => array(
+				'name' => $txt['recent_activity'],
+				'templates' => array('posts', 'topics', 'attachments'),
+			),
+			'tabs-3' => array(
+				'name' => $txt['buddies'],
+				'templates' => array('buddies'),
+			),
 		);
+		
+		// Let addons add or remove to the tabs array
+		call_integration_hook('integrate_profile_summary', array($memID));
 
 		// See if they have broken any warning levels...
 		if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $context['member']['warning'])
