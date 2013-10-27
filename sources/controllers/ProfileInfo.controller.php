@@ -85,7 +85,7 @@ class ProfileInfo_Controller extends Action_Controller
 				'templates' => array('buddies'),
 			),
 		);
-		
+
 		// Let addons add or remove to the tabs array
 		call_integration_hook('integrate_profile_summary', array($memID));
 
@@ -336,6 +336,11 @@ class ProfileInfo_Controller extends Action_Controller
 		// To finish this off, custom profile fields.
 		require_once(SUBSDIR . '/Profile.subs.php');
 		loadCustomFields($memID);
+
+		// To make tabs work, we need jQueryUI
+		$modSettings['jquery_include_ui'] = true;
+		addInlineJavascript('
+		$(function() {$( "#tabs" ).tabs();});', true);
 	}
 
 	/**
