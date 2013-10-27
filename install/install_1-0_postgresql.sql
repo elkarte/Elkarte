@@ -2022,8 +2022,8 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_v
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_view_any');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_read');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_send');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_draft');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_autosave_draft');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_draft');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_autosave_draft');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'calendar_view');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'view_stats');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'who_view');
