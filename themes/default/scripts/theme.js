@@ -60,6 +60,7 @@ $(document).ready(function() {
 	$('.spoilerheader').click(function(){
 		$(this).next().children().slideToggle("fast");
 	});
+	updateRelativeTime();
 });
 
 // Toggles the element height and width styles of an image.
