@@ -327,20 +327,18 @@ class Register_Controller extends Action_Controller
 
 		// Collect all extra registration fields someone might have filled in.
 		$possible_strings = array(
-			'website_url', 'website_title',
-			'location', 'birthdate',
+			'birthdate',
 			'time_format',
 			'buddy_list',
 			'pm_ignore_list',
 			'smiley_set',
-			'signature', 'personal_text', 'avatar',
+			'personal_text', 'avatar',
 			'lngfile',
 			'secret_question', 'secret_answer',
 		);
 		$possible_ints = array(
 			'pm_email_notify',
 			'notify_types',
-			'gender',
 			'id_theme',
 		);
 		$possible_floats = array(
