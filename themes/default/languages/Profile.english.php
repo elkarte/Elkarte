@@ -26,7 +26,9 @@ $txt['profile_signature_no'] = 'There is no signature for this member';
 $txt['profile_additonal_no'] = 'There is no additonal information for this member';
 $txt['profile_user_summary'] = 'Summary';
 $txt['profile_action'] = 'Currently';
-$txt['recent_activity'] = 'Recent Activity';
+$txt['profile_recent_activity'] = 'Recent Activity';
+$txt['profile_activity'] = 'Activity';
+$txt['profile_loadavg'] = 'Please try again later.  This information is not currently available due to high demand on the site.';
 
 $txt['change_profile'] = 'Change profile';
 $txt['preview_signature'] = 'Preview signature';
