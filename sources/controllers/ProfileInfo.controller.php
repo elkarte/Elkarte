@@ -265,6 +265,52 @@ class ProfileInfo_Controller extends Action_Controller
 			}
 		}
 
+		// How about the most recent topics that they started?
+		{
+			// Is the load average too high just now?
+			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
+				fatal_lang_error('loadavg_show_posts_disabled', false);
+
+			// Set up to get the last 10 topics of this member
+			$msgCount = count_user_topics($memID);
+			$range_limit = '';
+			$maxIndex = 10;
+
+			// If they are a frequent topic starter, we guess the range to help the query
+			if ($msgCount > 1000)
+			{
+				$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+				$margin *= 5;
+				$range_limit = 't.id_first_msg > ' . ($max_msg_member - $margin);
+			}
+
+			// Find this user's most recent topics
+			$rows = load_user_topics($memID, 0, $maxIndex, $range_limit);
+			$context['topics'] = array();
+			foreach ($rows as $row)
+			{
+				// Censor....
+				censorText($row['body']);
+				censorText($row['subject']);
+
+				// Do the code.
+				$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+
+				// And the array...
+				$context['topics'][] = array(
+					'board' => array(
+						'name' => $row['bname'],
+						'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+					),
+					'subject' => $row['subject'],
+					'short_subject' => $short_subject,
+					'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+					'timestamp' => forum_time(true, $row['poster_time']),
+					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+				);
+			}
+		}
+
 		// To finish this off, custom profile fields.
 		require_once(SUBSDIR . '/Profile.subs.php');
 		loadCustomFields($memID);
