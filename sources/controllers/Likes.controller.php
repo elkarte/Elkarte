@@ -70,9 +70,9 @@ class Likes_Controller extends Action_Controller
 					require_once(CONTROLLERDIR . '/Notification.controller.php');
 					$notify = new Notification_Controller();
 					$notify->setData(array(
-						'uid' => $liked_message['id_member'],
+						'id_member' => $liked_message['id_member'],
 						'type' => 'like',
-						'msg' => $id_liked,
+						'id_msg' => $id_liked,
 					));
 					$notify->action_add();
 				}
