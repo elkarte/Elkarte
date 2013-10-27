@@ -215,6 +215,56 @@ class ProfileInfo_Controller extends Action_Controller
 			}
 		}
 
+		// How about thier most recent posts?
+		{
+			// Is the load average too high just now?
+			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
+				fatal_lang_error('loadavg_show_posts_disabled', false);
+
+			// Set up to get the last 10 psots of this member
+			$msgCount = count_user_posts($memID);
+			$range_limit = '';
+			$maxIndex = 10;
+
+			// If they are a frequent poster, we guess the range to help minimize what the query work
+			if ($msgCount > 1000)
+			{
+				list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($memID);
+				$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+				$range_limit = 'm.id_msg > ' . ($max_msg_member - $margin);
+			}
+
+			// Find this user's most recent posts
+			$rows = load_user_posts($memID, 0, $maxIndex, $range_limit);
+			$context['posts'] = array();
+			foreach ($rows as $row)
+			{
+				// Censor....
+				censorText($row['body']);
+				censorText($row['subject']);
+
+				// Do the code.
+				$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+				$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
+				$preview = shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
+				$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+
+				// And the array...
+				$context['posts'][] = array(
+					'body' => $preview,
+					'board' => array(
+						'name' => $row['bname'],
+						'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+					),
+					'subject' => $row['subject'],
+					'short_subject' => $short_subject,
+					'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+					'timestamp' => forum_time(true, $row['poster_time']),
+					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+				);
+			}
+		}
+
 		// To finish this off, custom profile fields.
 		require_once(SUBSDIR . '/Profile.subs.php');
 		loadCustomFields($memID);
