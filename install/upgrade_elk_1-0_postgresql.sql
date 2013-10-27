@@ -773,7 +773,7 @@ ADD COLUMN likes_received int NOT NULL default '0';
 /******************************************************************************/
 
 ---# Renaming column that stores the PM receiving setting...
-ALTER TABLE {$db_prefix}ban_items
+ALTER TABLE {$db_prefix}members
 CHANGE pm_receive_from receive_from tinyint(4) unsigned NOT NULL default '1';
 ---#
 
