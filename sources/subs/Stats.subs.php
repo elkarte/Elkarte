@@ -899,7 +899,7 @@ function UserStatsMostActiveBoard($memID, $limit = 10)
  */
 function UserStatsPostingTime($memID)
 {
-	global $user_info;
+	global $user_info, $modSettings;
 
 	$db = database();
 
