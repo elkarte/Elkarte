@@ -64,30 +64,41 @@ class ProfileInfo_Controller extends Action_Controller
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array();
 
-		// Tab information for use in the summary page, follow the tabs-1, tabs-2  etc convention
-		// Each tab array defines a div, the value of which are the template(s) to load in that div
+		// Tab information for use in the summary page
+		// Each tab template defines a div, the value of which are the template(s) to load in that div
 		// Templates are named template_profile_block_YOURNAME
 		$context['summarytabs'] = array(
-			'tabs-1' => array (
+			'summary' => array (
 				'name' => $txt['summary'],
 				'templates' => array(
 					array('summary', 'user_info'),
 					array('contact', 'other_info'),
 					array('user_customprofileinfo', 'moderation'),
 				),
+				'active' => true,
 			),
-			'tabs-2' => array(
+			'recent' => array(
 				'name' => $txt['recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
+				'active' => true,
 			),
-			'tabs-3' => array(
+			'buddies' => array(
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
+				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
 			),
 		);
 
 		// Let addons add or remove to the tabs array
 		call_integration_hook('integrate_profile_summary', array($memID));
+
+		// Go forward with whats left
+		foreach ($context['summarytabs'] as $id => $tab)
+		{
+			// If the tab is active we add it
+			if ($tab['active'] !== true)
+				unset ($context['summarytabs'][$id]);
+		}
 
 		// See if they have broken any warning levels...
 		if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $context['member']['warning'])

@@ -41,6 +41,7 @@ function template_action_summary()
 	{
 		// All the tab names
 		$tabs = array_keys($context['summarytabs']);
+		$tab_num = 0;
 
 		// Start with the naviagtion ul, its converted to the tab navigation by jquery
 		echo '
@@ -48,19 +49,25 @@ function template_action_summary()
 				<div id="tabs">
 					<ul>';
 
+		// A link for every tab
 		foreach ($tabs as $tab)
+		{
+			$tab_num++;
 			echo '
-						<li><a href="#', $tab, '">', $context['summarytabs'][$tab]['name'], '</a></li>';
+						<li><a href="#tab_', $tab_num, '">', $context['summarytabs'][$tab]['name'], '</a></li>';
+		}
 
 		echo '
 					</ul>';
 
 		// Now output the content divs and call the templates as defined by the tabs
+		$tab_num = 0;
 		foreach ($tabs as $tab)
 		{
 			// Start a tab
+			$tab_num++;
 			echo '
-					<div id="', $tab, '">';
+					<div id="tab_', $tab_num, '">';
 
 			// Each template in the tab gets placed in a container
 			foreach ($context['summarytabs'][$tab]['templates'] as $templates)
