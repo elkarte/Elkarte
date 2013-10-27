@@ -239,7 +239,7 @@ function loadModeratorMenuCounts($brd = null)
 		$approve_query = ' AND 1=0';
 
 	// Set up the cache key for this permissions level
-	$cache_key = md5($user_info['query_see_board'] . $approve_query . $user_info['mod_cache']['bq'] . $user_info['mod_cache']['gq'] . $user_info['mod_cache']['mq'] . allowedTo('approve_emails'));
+	$cache_key = md5($user_info['query_see_board'] . $approve_query . $user_info['mod_cache']['bq'] . $user_info['mod_cache']['gq'] . $user_info['mod_cache']['mq'] . (int) allowedTo('approve_emails') . '_' . (int) allowedTo('moderate_forum'));
 
 	if (isset($menu_errors[$cache_key]))
 		return $menu_errors[$cache_key];
