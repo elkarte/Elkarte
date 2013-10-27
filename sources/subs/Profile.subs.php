@@ -2874,33 +2874,6 @@ function load_user_topics($memID, $start, $count, $range_limit = '', $reverse = 
 }
 
 /**
- * Get a simple list of boards that this member can see
- * @todo move to boards.subs ?
- *
- * @param int $memID
- */
-function getBoardList($memID)
-{
-	$db = database();
-
-	$request = $db->query('order_by_board_order', '
-		SELECT b.id_board, b.name, b.id_profile, b.member_groups, IFNULL(mods.id_member, 0) AS is_mod
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})
-		WHERE {query_see_board}',
-		array(
-			'current_member' => $memID,
-		)
-	);
-	$boards = array();
-	while ($row = $db->fetch_assoc($request))
-		$boards[] = $row;
-	$db->free_result($request);
-
-	return $boards;
-}
-
-/**
  * Loads the permissions that are given to a member group or set of groups
  *
  * @param type $curGroups

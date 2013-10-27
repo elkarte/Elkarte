@@ -942,26 +942,33 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		trigger_error('getBoardList(): Setting both excluded_boards and included_boards is not allowed.', E_USER_ERROR);
 
 	$where = array();
+	$join = array();
 	$select = '';
 	$where_parameters = array();
+
+	// Any boards to exclude
 	if (isset($boardListOptions['excluded_boards']))
 	{
 		$where[] = 'b.id_board NOT IN ({array_int:excluded_boards})';
 		$where_parameters['excluded_boards'] = $boardListOptions['excluded_boards'];
 	}
 
+	// Get list of boards to which they have specific permissions
 	if (isset($boardListOptions['allowed_to']))
 	{
 		$boardListOptions['included_boards'] = boardsAllowedTo($boardListOptions['allowed_to']);
 		if (in_array(0, $boardListOptions['included_boards']))
 			unset($boardListOptions['included_boards']);
 	}
+
+	// Just want to include certain boards in the query
 	if (isset($boardListOptions['included_boards']))
 	{
 		$where[] = 'b.id_board IN ({array_int:included_boards})';
 		$where_parameters['included_boards'] = $boardListOptions['included_boards'];
 	}
 
+	// Determine if they can access a given board and return yea or nay in the results array
 	if (isset($boardListOptions['access']))
 	{
 		$select .= ',
@@ -970,10 +977,20 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		$where_parameters['current_group'] = $boardListOptions['access'];
 	}
 
+	// Leave out the boards that the user may be ignoring
 	if (isset($boardListOptions['ignore']))
 	{
 		$select .= ',' . (!empty($boardListOptions['ignore']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored';
 		$where_parameters['ignore_boards'] = $boardListOptions['ignore'];
+	}
+
+	// Want to check if the member is a moderators for any boards
+	if (isset($boardListOptions['moderator']))
+	{
+		$join[] = '
+			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})';
+		$select .= ', b.id_profile, b.member_groups, IFNULL(mods.id_member, 0) AS is_mod';
+		$where_parameters['current_member'] = $boardListOptions['moderator'];
 	}
 
 	if (!empty($boardListOptions['ignore_boards']))
@@ -988,15 +1005,17 @@ function getBoardList($boardListOptions = array(), $simple = false)
 		$where_parameters['blank_redirect'] = '';
 	}
 
+	// Bring all the options together and make the query
 	$request = $db->query('messageindex_fetch_boards', '
 		SELECT c.name AS cat_name, c.id_cat, b.id_board, b.name AS board_name, b.child_level' . $select . '
 		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' . (empty($where) ? '' : '
+			LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' . (empty($join) ? '' : implode(' ', $join)) . (empty($where) ? '' : '
 		WHERE ' . implode('
 			AND ', $where)),
 		$where_parameters
 	);
 
+	// Build our output arrays, simple or complete
 	if ($simple)
 	{
 		$return_value = array();
@@ -1009,6 +1028,23 @@ function getBoardList($boardListOptions = array(), $simple = false)
 				'board_name' => $row['board_name'],
 				'child_level' => $row['child_level'],
 			);
+
+			// Do we want access informations?
+			if (!empty($boardListOptions['access']))
+				$return_value[$row['id_board']] += array(
+					'allow' => !(empty($row['can_access']) || $row['can_access'] == 'f'),
+					'deny' => !(empty($row['cannot_access']) || $row['cannot_access'] == 'f'),
+				);
+
+			// Do we want moderation information?
+			if (!empty($boardListOptions['moderator']))
+			{
+				$return_value[$row['id_board']] += array(
+					'id_profile' => $row['id_profile'],
+					'member_groups' => $row['member_groups'],
+					'is_mod' => $row['is_mod'],
+				);
+			}
 		}
 	}
 	else
@@ -1053,6 +1089,16 @@ function getBoardList($boardListOptions = array(), $simple = false)
 				// If a board wasn't checked that probably should have been ensure the board selection is selected, yo!
 				if (!empty($return_value['categories'][$row['id_cat']]['boards'][$row['id_board']]['selected']) && (empty($modSettings['recycle_enable']) || $row['id_board'] != $modSettings['recycle_board']))
 					$return_value['boards_check_all'] = false;
+			}
+
+			// Do we want moderation information?
+			if (!empty($boardListOptions['moderator']))
+			{
+				$return_value['categories'][$row['id_cat']]['boards'][$row['id_board']] += array(
+					'id_profile' => $row['id_profile'],
+					'member_groups' => $row['member_groups'],
+					'is_mod' => $row['is_mod'],
+				);
 			}
 		}
 	}
@@ -1281,7 +1327,7 @@ function accessibleBoards($id_parents = null, $id_boards = null)
 	}
 	elseif (!empty($id_boards))
 	{
-		// Find all the boards this user can see between those selected 
+		// Find all the boards this user can see between those selected
 		$request = $db->query('', '
 			SELECT b.id_board
 			FROM {db_prefix}boards AS b

@@ -685,7 +685,6 @@ class ProfileInfo_Controller extends Action_Controller
 
 	/**
 	 * Show all the disregarded topics.
-	 *
 	 */
 	public function action_showDisregarded()
 	{
@@ -860,7 +859,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['posts_by_time'] = UserStatsPostingTime($memID);
 
 		// Custom stats (just add a template_layer to add it to the template!)
-	 	call_integration_hook('integrate_profile_stats', array($memID));
+		call_integration_hook('integrate_profile_stats', array($memID));
 	}
 
 	/**
@@ -901,7 +900,9 @@ class ProfileInfo_Controller extends Action_Controller
 		$curGroups[] = $user_profile[$memID]['id_post_group'];
 
 		// Load a list of boards for the jump box - except the defaults.
-		$board_list = getBoardList($memID);
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$board_list = getBoardList(array('moderator' => $memID, 'use_permissions' => true), true);
+
 		$context['boards'] = array();
 		$context['no_access_boards'] = array();
 		foreach ($board_list as $row)
@@ -909,13 +910,13 @@ class ProfileInfo_Controller extends Action_Controller
 			if (count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0 && !$row['is_mod'])
 				$context['no_access_boards'][] = array(
 					'id' => $row['id_board'],
-					'name' => $row['name'],
+					'name' => $row['board_name'],
 					'is_last' => false,
 				);
 			elseif ($row['id_profile'] != 1 || $row['is_mod'])
 				$context['boards'][$row['id_board']] = array(
 					'id' => $row['id_board'],
-					'name' => $row['name'],
+					'name' => $row['board_name'],
 					'selected' => $board == $row['id_board'],
 					'profile' => $row['id_profile'],
 					'profile_name' => $context['profiles'][$row['id_profile']]['name'],
@@ -1061,7 +1062,6 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param array $boardsAllowed
 	 * @param int $memID
-	 * @return array
 	 */
 	public function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 	{
@@ -1075,7 +1075,6 @@ class ProfileInfo_Controller extends Action_Controller
 	 *
 	 * @param type $boardsAllowed
 	 * @param type $memID
-	 * @return int
 	 */
 	public function list_getNumAttachments($boardsAllowed, $memID)
 	{
@@ -1092,7 +1091,6 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID
-	 * @return array
 	 */
 	function list_getDisregarded($start, $items_per_page, $sort, $memID)
 	{
@@ -1104,7 +1102,6 @@ class ProfileInfo_Controller extends Action_Controller
 	 * Callback for createList()
 	 *
 	 * @param int $memID
-	 * @return int
 	 */
 	public function list_getNumDisregarded($memID)
 	{
