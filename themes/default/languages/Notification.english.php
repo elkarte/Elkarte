@@ -2,13 +2,14 @@
 // Version: 1.0; notifications
 
 $txt['my_notifications'] = 'My notifications';
+$txt['my_unread_notifications'] = 'My unread notifications';
 $txt['my_notifications_pages'] = 'page %1$d';
 $txt['no_notifications_yet'] = 'No notifications';
 $txt['no_new_notifications'] = 'No new notifications';
 
 $txt['notification_from'] = 'Member';
 $txt['notification_when'] = 'When';
-$txt['notification_what'] = 'What';
+$txt['notification_what'] = 'Mention';
 $txt['notification_all'] = 'Show all';
 $txt['notification_unread'] = 'Show unread';
 

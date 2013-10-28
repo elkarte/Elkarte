@@ -11,6 +11,9 @@
  *
  */
 
+if (!defined('ELK'))
+	die('No access...');
+
 class Notification_Controller extends Action_Controller
 {
 	private $_known_notifications = array();
@@ -18,6 +21,9 @@ class Notification_Controller extends Action_Controller
 	private $_validator = null;
 	private $_data = null;
 
+	/**
+	 * Start things up, what else does a contructor do
+	 */
 	public function __construct()
 	{
 		$this->_known_notifications = array(
@@ -33,6 +39,11 @@ class Notification_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Set up the data for the notification based on what was requested
+	 * This function is called before the flow is redirected to action_index().
+	 *
+	 */
 	public function pre_dispatch()
 	{
 		$this->_data = array(
@@ -50,15 +61,24 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		global $modSettings;
+
+		// I'm not sure this is needed, though better have it. :P
+		if (empty($modSettings['notifications_enabled']))
+			return false;
+
 		// default action to execute
 		$this->action_list();
 	}
 
 	/**
+	 * Creates a list of notificaitons for the user
+	 * Allows them to mark them read or unread
+	 * Can sort the various forms of notificaions, likes or mentions
 	 */
 	public function action_list()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $scripturl;
 
 		// Only registered members can be notified
 		is_not_guest();
@@ -67,29 +87,25 @@ class Notification_Controller extends Action_Controller
 		require_once(SUBSDIR . '/List.subs.php');
 		loadLanguage('Notification');
 
-		// I'm not sure this is needed, though better have it. :P
-		if (empty($modSettings['notifications_enabled']))
-			return false;
-
 		$this->_buildUrl();
 
 		$list_options = array(
 			'id' => 'list_notifications',
-			'title' => $txt['my_notifications'],
+			'title' => empty($this->_all) ? $txt['my_unread_notifications'] : $txt['my_notifications'],
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=notification;sa=list' . $this->_url_param,
 			'default_sort_col' => 'log_time',
 			'default_sort_dir' => 'default',
 			'no_items_label' => $this->_all ? $txt['no_notifications_yet'] : $txt['no_new_notifications'],
 			'get_items' => array(
-				'function' => 'getUserNotifications',
+				'function' => array($this, 'list_loadNotifications'),
 				'params' => array(
 					$this->_all,
 					$this->_type,
 				),
 			),
 			'get_count' => array(
-				'function' => 'countUserNotifications',
+				'function' => array($this, 'list_getNotificationCount'),
 				'params' => array(
 					$this->_all,
 					$this->_type,
@@ -119,7 +135,7 @@ class Notification_Controller extends Action_Controller
 									$settings[\'notifications\'][\'notifier_template\']);
 						')
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'n.id_member_from',
 						'reverse' => 'n.id_member_from DESC',
 					),
@@ -144,9 +160,9 @@ class Notification_Controller extends Action_Controller
 							), $txt[\'notification_\' . $row[\'notif_type\']]);
 						')
 					),
-					'sort' =>  array(
-						'default' => 'n.type',
-						'reverse' => 'n.type DESC',
+					'sort' => array(
+						'default' => 'n.notif_type',
+						'reverse' => 'n.notif_type DESC',
 					),
 				),
 				'log_time' => array(
@@ -157,7 +173,7 @@ class Notification_Controller extends Action_Controller
 						'db' => 'log_time',
 						'timeformat' => true,
 					),
-					'sort' =>  array(
+					'sort' => array(
 						'default' => 'n.log_time DESC',
 						'reverse' => 'n.log_time',
 					),
@@ -212,6 +228,33 @@ class Notification_Controller extends Action_Controller
 	}
 
 	/**
+	 * Callback for createList(),
+	 * Returns the number of notificaitons of $type that a member has
+	 *
+	 * @param bool $all : if true counts all the notifications, otherwise only the unread
+	 * @param string $type : the type of the notification
+	 */
+	public function list_getNotificationCount($all, $type)
+	{
+	   return countUserNotifications($all, $type);
+	}
+
+	/**
+	 * Callback for createList(),
+	 * Returns the notifications of a give type (like/mention) & (unread or all)
+	 *
+	 * @param int $start start list number
+	 * @param int $items_per_page how many to show on a page
+	 * @param string $sort which direction are we showing this
+	 * @param bool $all : if true load all the notifications or type, otherwise only the unread
+	 * @param string $type : the type of the notification
+	 */
+	public function list_loadNotifications($start, $limit, $sort, $all, $type)
+	{
+	   return getUserNotifications($start, $limit, $sort, $all, $type);
+	}
+
+	/**
 	 * We will we will notify you
 	 */
 	public function action_add()
@@ -231,6 +274,11 @@ class Notification_Controller extends Action_Controller
 		addNotifications($user_info['id'], $id_target, $this->_validator->msg, $this->_validator->type, $this->_validator->log_time, $this->_data['status']);
 	}
 
+	/**
+	 * Sets the specifics of a notification call in this instance
+	 *
+	 * @param array $data must contain uid, type and msg at a minimum
+	 */
 	public function setData($data)
 	{
 		$this->_data = array(
@@ -239,8 +287,10 @@ class Notification_Controller extends Action_Controller
 			'msg' => $data['id_msg'],
 			'status' => isset($data['status']) && in_array($data['status'], $this->_known_status) ? $this->_known_status[$data['status']] : 0,
 		);
+
 		if (isset($data['id_member_from']))
 			$this->_data['id_member_from'] = $data['id_member_from'];
+
 		if (isset($data['log_time']))
 			$this->_data['log_time'] = $data['log_time'];
 	}
@@ -252,7 +302,7 @@ class Notification_Controller extends Action_Controller
 	{
 		global $user_info;
 
-		// Can we 
+		// Can we
 		if (!$this->_isValid())
 			return;
 
@@ -287,9 +337,12 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function action_settings()
 	{
-	
+
 	}
 
+	/**
+	 * Builds the link back so you return to the right list of notifications
+	 */
 	private function _buildUrl()
 	{
 		$this->_all = isset($_REQUEST['all']);
@@ -306,13 +359,6 @@ class Notification_Controller extends Action_Controller
 	 */
 	private function _isValid()
 	{
-		global $modSettings;
-
-		// If it is disabled simply go back
-		// It should not be necessary, but let's add it
-		if (empty($modSettings['notifications_enabled']))
-			return false;
-
 		// @todo almost useless
 		call_integration_hook('integrate_add_notification', array(&$this->_known_notifications));
 
@@ -327,6 +373,8 @@ class Notification_Controller extends Action_Controller
 			'uid' => 'isarray',
 			'msg' => 'required|notequal[0]',
 		);
+
+		// Any optional fields we need to check?
 		if (isset($this->_data['id_member_from']))
 		{
 			$sanitization['id_member_from'] = 'intval';
@@ -339,7 +387,6 @@ class Notification_Controller extends Action_Controller
 		}
 
 		$this->_validator->sanitation_rules($sanitization);
-
 		$this->_validator->validation_rules();
 
 		if (!$this->_validator->validate($this->_data))
@@ -348,6 +395,7 @@ class Notification_Controller extends Action_Controller
 		// If everything is fine, let's include our helper functions and prepare for the fun!
 		require_once(SUBSDIR . '/Notification.subs.php');
 		loadLanguage('Notification');
+
 		return true;
 	}
 }
