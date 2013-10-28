@@ -1852,6 +1852,7 @@ function updateRelativeTime()
 {
 	// In any other case no more than one hour
 	relative_time_refresh = 3600000;
+
 	$('time').each(function() {
 		var oRelativeTime = new relativeTime($(this).attr('datetime')),
 			postdate = new Date($(this).attr('datetime')),
@@ -1861,42 +1862,42 @@ function updateRelativeTime()
 
 		if (oRelativeTime.seconds())
 		{
-			$(this).text(rt_now);
+			$(this).text(oRttime.now);
 			relative_time_refresh = Math.min(relative_time_refresh, 10000);
 		}
 		else if (oRelativeTime.minutes())
 		{
-			time_text = oRelativeTime.deltaTime > 1 ? rt_minutes : rt_minute;
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.minutes : oRttime.minute;
 			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 60000);
 		}
 		else if (oRelativeTime.hours())
 		{
-			time_text = oRelativeTime.deltaTime > 1 ? rt_hours : rt_hour;
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.hours : oRttime.hour;
 			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
 		}
 		else if (oRelativeTime.days())
 		{
-			time_text = oRelativeTime.deltaTime > 1 ? rt_days : rt_day;
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.days : oRttime.day;
 			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
 		}
 		else if (oRelativeTime.weeks())
 		{
-			time_text = oRelativeTime.deltaTime > 1 ? rt_weeks : rt_week;
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.weeks : oRttime.week;
 			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
 		}
 		else if (oRelativeTime.months())
 		{
-			time_text = oRelativeTime.deltaTime > 1 ? rt_months : rt_month;
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.months : oRttime.month;
 			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
 		}
 		else if (oRelativeTime.years())
 		{
-			time_text = oRelativeTime.deltaTime > 1 ? rt_years : rt_year;
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.years : oRttime.year;
 			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
 			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
 		}
