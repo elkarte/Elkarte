@@ -5,12 +5,14 @@ a:link, a:hover, a:visited {
 #wrapper, .frame {
 	width: 90%;
 	max-width: 1140px;
+	margin: 0 auto;
+	padding-top: 12px;
 }
 h1.forumtitle {
 	font-size: 2em;
 	font-family: tahoma;
 	margin: 0;
-	padding: 15px 12px 2px 12px;
+	padding: 35px 0 0 15px;
 	float: left;
 	font-weight: normal;
 	color: #a85400;
@@ -18,10 +20,11 @@ h1.forumtitle {
 }
 /* Tweak the logo */
 img#logo {
-	margin: 2px 0 0 0;
+	margin: 12px 12px 0 0;
 }
 #inner_wrap {
 	min-height: 60px;
+	border-bottom: 1px solid #ccc;
 }
 #inner_wrap .news {
 	height: 80px;
