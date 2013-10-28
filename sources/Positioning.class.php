@@ -10,7 +10,7 @@
  */
 
 if (!defined('ELK'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  *  This class is an experiment for the job of handling positioning of items.
@@ -20,7 +20,7 @@ if (!defined('ELK'))
  *    - addAfter
  *    - remove
  *    - removeAll
- *  it should be extended in order to actually use its functionalities
+ *  it should be extended in order to actually use its functionality
  */
 abstract class Positioning_Items
 {
@@ -138,7 +138,7 @@ abstract class Positioning_Items
 	 *
 	 * @param string an identifier
 	 */
-	public function __construct ($id = 'default')
+	public function __construct($id = 'default')
 	{
 		if (!empty($id))
 			$this->_name = $id;
@@ -282,11 +282,7 @@ abstract class Positioning_Items
 		asort($this->_all_end);
 
 		// The easy ones: just merge
-		$all_items = array_merge(
-			$this->_all_begin,
-			$this->_all_general,
-			$this->_all_end
-		);
+		$all_items = array_merge($this->_all_begin, $this->_all_general, $this->_all_end);
 
 		// Now the funny part, let's start with some cleanup: collecting all the items we know and pruning those that cannot be placed somewhere
 		$all_known = array_merge(array_keys($all_items), array_keys($this->_all_after), array_keys($this->_all_before));
@@ -312,10 +308,12 @@ abstract class Positioning_Items
 					continue;
 
 				foreach ($all[$where] as $item => $reference)
+				{
 					if (isset($all_items[$reference]))
 					{
 						$priority_threshold = $all_items[$reference];
 						foreach ($all_items as $key => $val)
+						{
 							switch ($where)
 							{
 								case 'after':
@@ -327,9 +325,11 @@ abstract class Positioning_Items
 										$all_items[$key] -= $inc;
 									break;
 							}
+						}
 						unset($all[$where][$item]);
 						$all_items[$item] = $priority_threshold;
 					}
+				}
 			}
 		}
 

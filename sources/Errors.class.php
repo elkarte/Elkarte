@@ -10,7 +10,7 @@
  */
 
 if (!defined('ELK'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  *  This class is an experiment for the job of handling errors.
@@ -414,5 +414,4 @@ class attachment_error_context
 
 		return self::$_context;
 	}
-
 }
