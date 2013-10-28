@@ -27,7 +27,7 @@ $GLOBALS['required_php_version'] = '5.1.0';
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.1.0',
+		'version' => '4.1.13',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'supported' => function_exists('mysqli_connect'),
 		'default_user' => 'mysqli.default_user',
@@ -1999,6 +1999,7 @@ function template_install_above()
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
 		<link rel="stylesheet" type="text/css" href="themes/default/css/index.css?alp10" />
+		<link rel="stylesheet" type="text/css" href="themes/default/css/index_light.css?alp10" />
 		<link rel="stylesheet" type="text/css" href="themes/default/css/install.css?alp10" />
 		<script type="text/javascript" src="themes/default/scripts/script.js"></script>
 	</head>
@@ -2009,7 +2010,7 @@ function template_install_above()
 				<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
-		<div id="wrapper">
+		<div id="wrapper" class="wrapper">
 			<div id="upper_section">
 				<div id="inner_section">
 					<div id="inner_wrap">';
