@@ -380,7 +380,6 @@ function countConfiguredGuestOptions()
 	return($themes);
 }
 
-
 /**
  * Counts the theme options configured for guests
  * @return array

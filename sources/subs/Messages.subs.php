@@ -632,7 +632,6 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 		}
 
-
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
 	}

@@ -2043,7 +2043,6 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 	return $members;
 }
 
-
 /**
  * Check if the OpenID URI is already registered for an existing member
  *
