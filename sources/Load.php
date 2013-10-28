@@ -1584,21 +1584,23 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
-		$context['javascript_vars'] += array(
-			'rt_now' => JavaScriptEscape($txt['rt_now']),
-			'rt_minute' => JavaScriptEscape($txt['rt_minute']),
-			'rt_minutes' => JavaScriptEscape($txt['rt_minutes']),
-			'rt_hour' => JavaScriptEscape($txt['rt_hour']),
-			'rt_hours' => JavaScriptEscape($txt['rt_hours']),
-			'rt_day' => JavaScriptEscape($txt['rt_day']),
-			'rt_days' => JavaScriptEscape($txt['rt_days']),
-			'rt_week' => JavaScriptEscape($txt['rt_week']),
-			'rt_weeks' => JavaScriptEscape($txt['rt_weeks']),
-			'rt_month' => JavaScriptEscape($txt['rt_month']),
-			'rt_months' => JavaScriptEscape($txt['rt_months']),
-			'rt_year' => JavaScriptEscape($txt['rt_year']),
-			'rt_years' => JavaScriptEscape($txt['rt_years']),
-		);
+		addInlineJavascript('
+		var oRttime = ({
+			now : ' . JavaScriptEscape($txt['rt_now']) . ',
+			minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
+			minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
+			hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
+			hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
+			day : ' . JavaScriptEscape($txt['rt_day']) . ',
+			days : ' . JavaScriptEscape($txt['rt_days']) . ',
+			week : ' . JavaScriptEscape($txt['rt_week']) . ',
+			weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
+			month : ' . JavaScriptEscape($txt['rt_month']) . ',
+			months : ' . JavaScriptEscape($txt['rt_months']) . ',
+			year : ' . JavaScriptEscape($txt['rt_year']) . ',
+			years : ' . JavaScriptEscape($txt['rt_years']) . ',
+		});
+		updateRelativeTime();', true);
 
 	// Queue our Javascript
 	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'theme.js'));
@@ -2540,7 +2542,7 @@ function loadDatabase()
 	$db = database();
 	if (ELK == 'SSI')
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
-	
+
 	// Case sensitive database? Let's define a constant.
 	if ($db->db_case_sensitive())
 		DEFINE('DB_CASE_SENSITIVE', '1');
