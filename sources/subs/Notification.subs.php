@@ -16,8 +16,8 @@ if (!defined('ELK'))
  * Count the notifications of the current user
  * callback for createList in action_list of Notification_Controller
  *
- * @param bool $all: if true counts all the notifications, otherwise only the unread
- * @param string $type: the type of the notification
+ * @param bool $all : if true counts all the notifications, otherwise only the unread
+ * @param string $type : the type of the notification
  */
 function countUserNotifications($all = false, $type = '')
 {
@@ -54,11 +54,11 @@ function countUserNotifications($all = false, $type = '')
  * for the current user
  * callback for createList in action_list of Notification_Controller
  *
- * @param int Query starts sending results from here
- * @param int Number of notifications returned
- * @param string Sorting
- * @param bool if show all notifications or only unread ones
- * @param string $type: the type of the notification
+ * @param int $start Query starts sending results from here
+ * @param int $limit Number of notifications returned
+ * @param string $sort Sorting
+ * @param bool $all if show all notifications or only unread ones
+ * @param string $type : the type of the notification
  */
 function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 {
@@ -91,7 +91,6 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			'sort' => $sort,
 		)
 	);
-
 	$notifications = array();
 	while ($row = $db->fetch_assoc($request))
 	{
@@ -106,10 +105,12 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 /**
  * Inserts a new notification
  *
- * @param int the id of the member notifying
- * @param array an array of ids of the members notified
- * @param int the id of the message involved in the notification
- * @param string the type of notification
+ * @param int $member_from the id of the member notifying
+ * @param array $members_to an array of ids of the members notified
+ * @param int $msg the id of the message involved in the notification
+ * @param string $type the type of notification
+ * @param string $time optional value to set the time of the notification, defaults to now
+ * @param string $status optional value to set a status, defaults to 0
  */
 function addNotifications($member_from, $members_to, $msg, $type, $time = null, $status = null)
 {
@@ -149,11 +150,11 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 /**
  * Mark a notification for a certain member as read
  *
- * @param int the notified member
- * @param int the message the member was notified for
- * @param string the type of notification
- * @param int id member that notified
- * @param int the time it was notified
+ * @param int $id_member the notified member
+ * @param int $msg the message the member was notified for
+ * @param string $type the type of notification
+ * @param int $id_member_from id of member that notified
+ * @param int $log_time the time it was notified
  */
 function markNotificationAsRead($id_member, $msg, $type, $id_member_from, $log_time)
 {
@@ -185,11 +186,11 @@ function markNotificationAsRead($id_member, $msg, $type, $id_member_from, $log_t
  * I'm using a "soft-delete" because otherwise anyway we have to remember
  * when a user was already notified for a certain message (e.g. in case of editing)
  *
- * @param int the notified member
- * @param int the message the member was notified for
- * @param string the type of notification
- * @param int id member that notified
- * @param int the time it was notified
+ * @param int $id_member the notified member
+ * @param int $msg the message the member was notified for
+ * @param string $type the type of notification, mentions or like
+ * @param int $id_member_from id member that notified
+ * @param int $log_time the time it was notified
  */
 function deleteNotification($id_member, $msg, $type, $id_member_from, $log_time)
 {
@@ -216,6 +217,12 @@ function deleteNotification($id_member, $msg, $type, $id_member_from, $log_time)
 	return $db->affected_rows() != 0;
 }
 
+/**
+ * Toggles a notification on/off
+ *
+ * @param array $msgs array of messages that you want to toggle
+ * @param type $approved direction of the toggle read / unread
+ */
 function toggleNotificationsApproval($msgs, $approved)
 {
 	$db = database();
