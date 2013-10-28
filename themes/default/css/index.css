@@ -895,7 +895,7 @@ div.bbc_footnotes {
 	margin: 0 5px 5px 0;
 }
 /* No more huge avatars up top. YAY! */
-#upper_section .avatar img {
+#upper_section .avatar img, .notifavatar .avatar {
 	width: auto;
 	height: auto;
 	max-width: 60px;
