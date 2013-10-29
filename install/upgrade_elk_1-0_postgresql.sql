@@ -632,7 +632,7 @@ if (@$modSettings['ourVersion'] < '1.0')
 		SELECT id_member, aim, icq, msn, yim
 		FROM {$db_prefix}members");
 	$inserts = array();
-	while ($row = mysql_fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row[aim]))
 			$inserts[] = "($row[id_member], -1, 'cust_aim', $row[aim])";
@@ -646,7 +646,7 @@ if (@$modSettings['ourVersion'] < '1.0')
 		if (!empty($row[yim]))
 			$inserts[] = "($row[id_member], -1, 'cust_yim', $row[yim])";
 	}
-	mysql_free_result($request);
+	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
