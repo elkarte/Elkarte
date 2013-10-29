@@ -1449,7 +1449,7 @@ while ($_GET['m'] < $totalActions)
 		SELECT id_error, message, file, line
 		FROM {$db_prefix}log_errors
 		LIMIT $_GET[m], 500");
-	while($row = mysql_fetch_assoc($request))
+	while ($row = mysql_fetch_assoc($request))
 	{
 		preg_match('~<br />(%1\$s: )?([\w\. \\\\/\-_:]+)<br />(%2\$s: )?([\d]+)~', $row['message'], $matches);
 		if (!empty($matches[2]) && !empty($matches[4]) && empty($row['file']) && empty($row['line']))
@@ -2567,7 +2567,7 @@ foreach ($nameChanges as $table_name => $table)
 		SHOW FIELDS
 		FROM `{$db_prefix}$table_name`");
 	$tinytextColumns = array();
-	while($row = mysql_fetch_assoc($request))
+	while ($row = mysql_fetch_assoc($request))
 	{
 		// Tinytext detected so store column name.
 		if ($row['Type'] == 'tinytext')

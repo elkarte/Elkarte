@@ -198,7 +198,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 			'style' => $style
 		)
 	);
-	while($row = $db->fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$email_filters[$i] = array(
 			'id_filter' => $row['id_filter'],
