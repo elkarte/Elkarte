@@ -1203,7 +1203,7 @@ LANGUAGE 'sql';
 ---# Creating operator bool_not_eq_int()
 ---{
 $result = upgrade_query("SELECT oprname FROM pg_operator WHERE oprcode='bool_not_eq_int'::regproc");
-if($smcFunc['db_num_rows']($result) == 0)
+if ($smcFunc['db_num_rows']($result) == 0)
 {
 	upgrade_query("
 		CREATE OPERATOR != (PROCEDURE = bool_not_eq_int, LEFTARG = boolean, RIGHTARG = integer)");

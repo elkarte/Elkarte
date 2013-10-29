@@ -132,7 +132,7 @@ class MessageIndex_Controller extends Action_Controller
 		if (!empty($board_info['moderators']))
 		{
 			foreach ($board_info['moderators'] as $mod)
-				$context['link_moderators'][] ='<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
+				$context['link_moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
 
 			$context['linktree'][count($context['linktree']) - 1]['extra_after'] = '<span class="board_moderators"> (' . (count($context['link_moderators']) == 1 ? $txt['moderator'] : $txt['moderators']) . ': ' . implode(', ', $context['link_moderators']) . ')</span>';
 		}

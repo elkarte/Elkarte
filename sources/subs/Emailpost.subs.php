@@ -39,7 +39,7 @@ function pbe_email_to_bbc($text, $html)
 
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
-		require_once (SUBSDIR . '/Html2BBC.class.php');
+		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Convert_BBC($text);
 		$text = $bbc_converter->get_bbc();
 
@@ -73,7 +73,7 @@ function pbe_email_to_bbc($text, $html)
 		$text = Markdown($text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		require_once (SUBSDIR . '/Html2BBC.class.php');
+		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Convert_BBC($text);
 		$text = $bbc_converter->get_bbc();
 	}
@@ -957,7 +957,7 @@ function query_load_user_info($email)
 			'act' => 1,
 		)
 	);
-	list($id_member) = $db->fetch_row($request);
+	list ($id_member) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// No user found ... back we go
@@ -1138,7 +1138,7 @@ function query_key_owner($key)
 			'database_id' => $key
 		)
 	);
-	list($email_to) = $db->fetch_row($request);
+	list ($email_to) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $email_to;
@@ -1203,7 +1203,7 @@ function query_load_subject($message_id, $message_type, $email)
 		// Found them, now we find the PM to them with this ID
 		if ($db->num_rows($request) !== 0)
 		{
-			list($id_member) = $db->fetch_row($request);
+			list ($id_member) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Now find this PM ID and make sure it was sent to this member
@@ -1224,7 +1224,7 @@ function query_load_subject($message_id, $message_type, $email)
 	// if we found the message, topic or PM, return the subject
 	if ($db->num_rows($request) != 0)
 	{
-		list($subject) = $db->fetch_row($request);
+		list ($subject) = $db->fetch_row($request);
 		$subject = pbe_clean_email_subject($subject);
 	}
 	$db->free_result($request);
@@ -1325,7 +1325,7 @@ function query_load_board($message_id)
 		)
 	);
 
-	list($board_id) = $db->fetch_row($request);
+	list ($board_id) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $board_id === '' ? 0 : $board_id;
@@ -1345,7 +1345,7 @@ function query_load_board_details($board_id, $pbe)
 	// To post a NEW Topic, we need certain board details
 	$request = $db->query('', '
 		SELECT b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
-		FROM {db_prefix}boards as b
+		FROM {db_prefix}boards AS b
 		WHERE {raw:query_see_board} AND id_board = {int:id_board}',
 		array(
 			'id_board' => $board_id,

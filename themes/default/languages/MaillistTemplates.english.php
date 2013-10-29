@@ -54,7 +54,7 @@ Posting Information: More topics may be posted, but you won\'t receive more emai
 	@description: A member wants to be notified of the first new post in a topic on a board they have subscribed to
 */
 $txt['pbe_notify_boards_once_subject'] = '[{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notify_boards_once_body'] ='A new topic, \'{TOPICSUBJECT}\', has been started in \'{BOARDNAME}\'.
+$txt['pbe_notify_boards_once_body'] = 'A new topic, \'{TOPICSUBJECT}\', has been started in \'{BOARDNAME}\'.
 
 You can see it at
     {TOPICLINK}

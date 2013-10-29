@@ -178,7 +178,7 @@ function template_ban_edit()
 	{
 		echo '
 		<br />';
-		
+
 		template_show_list('ban_items');
 	}
 

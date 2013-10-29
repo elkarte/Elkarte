@@ -188,7 +188,7 @@ class Email_Parse
 				'id' => $id
 			)
 		);
-		list($message) = $db->fetch_row($request);
+		list ($message) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		return $message;

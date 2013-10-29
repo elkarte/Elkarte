@@ -115,7 +115,7 @@ class BadBehavior_Controller extends Action_Controller
 		$context['bb_entries'] = getBadBehaviorLogEntries($start, $modSettings['defaultMaxMessages'], $sort, $filter);
 
 		$members = array();
-		foreach($context['bb_entries'] as $member)
+		foreach ($context['bb_entries'] as $member)
 			$members[] = $member['member']['id'];
 
 		// Load the member data so we have more information available

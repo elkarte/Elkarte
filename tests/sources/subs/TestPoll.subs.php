@@ -83,7 +83,7 @@ class TestPoll extends UnitTestCase
 
 		// get some values from it
 		$pollinfo = pollInfoForTopic($this->id_topic);
-		
+
 		$this->assertEqual($pollinfo['id_member_started'], 1);
 		$this->assertEqual($pollinfo['question'], $question);
 		$this->assertEqual($pollinfo['max_votes'], 1); // the default value
@@ -93,7 +93,6 @@ class TestPoll extends UnitTestCase
 		list($topic_starter, $poll_starter) = pollStarters($this->id_topic);
 		$this->assertEqual($topic_starter, 1);
 		$this->assertEqual($poll_starter, 0);
-		
 	}
 
 	/**
@@ -115,7 +114,7 @@ class TestPoll extends UnitTestCase
 
 		$id_poll = associatedPoll($this->id_topic);
 		$this->assertTrue(!empty($id_poll)); // extra-test, just in case.
-		
+
 		$options = array(
 			'Ema, is that even a question?',
 			'Ant. He broke error log. (no, he didn\'t, but we\'ll say he did.)',
@@ -150,7 +149,7 @@ class TestPoll extends UnitTestCase
 		// Link the poll to the topic.
 		associatedPoll($this->id_topic, $id_poll);
 		$this->assertTrue($this->id_topic > 2); // extra-test just to double-check
-		
+
 		$id_poll = associatedPoll($this->id_topic);
 
 		// we have something, right?

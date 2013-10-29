@@ -2082,7 +2082,7 @@ class Packages_Controller extends Action_Controller
 		if (!@is_writable(BOARDDIR . '/packages'))
 			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
 
-		list($the_brand, $the_version) = explode(' ', $forum_version, 2);
+		list ($the_brand, $the_version) = explode(' ', $forum_version, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
 		if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array($the_brand => '')) == $the_version)

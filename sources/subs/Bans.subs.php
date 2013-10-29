@@ -655,7 +655,7 @@ function insertBanGroup($ban_info = array())
 	// @todo shouldn't be an error here?
 	if ($db->num_rows($request) == 1)
 	{
-		list($id_ban) = $db->fetch_row($request);
+		list ($id_ban) = $db->fetch_row($request);
 		$db->free_result($request);
 		return $id_ban;
 	}
@@ -1342,7 +1342,7 @@ function list_getNumBanItems()
 			'current_ban' => $ban_group_id,
 		)
 	);
-	list($banNumber) = $db->fetch_row($request);
+	list ($banNumber) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $banNumber;

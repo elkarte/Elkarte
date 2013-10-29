@@ -56,7 +56,7 @@ function template_showDrafts()
 				', $txt['drafts'], ' - ', $context['member']['name'], '
 			</h3>
 		</div>',
-			
+
 	template_pagesection();
 
 	// No drafts? Just show an informative message.

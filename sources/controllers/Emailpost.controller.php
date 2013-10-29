@@ -301,7 +301,7 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->load_key();
 
 		// Any reason to avoid using the html version since it helps with formatting
-		if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >=2)
+		if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 		{
 			// Some mobile responses wrap everything in a table structure
 			$text = $email_message->plain_body;

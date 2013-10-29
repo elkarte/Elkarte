@@ -52,7 +52,7 @@ function elkCaptcha(imageURL, uniqueID, useLibrary, letterCount)
 
 		// Quick and dirty way of converting decimal to hex
 		var hexstr = "0123456789abcdef";
-		for(var i=0; i < 32; i++)
+		for (var i=0; i < 32; i++)
 			new_url = new_url + hexstr.substr(Math.floor(Math.random() * 16), 1);
 
 		if (useLibrary && document.getElementById("verification_image" + uniqueID))

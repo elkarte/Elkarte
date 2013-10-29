@@ -187,7 +187,7 @@ function showAvatar()
 {
 	if (file.selectedIndex === -1)
 		return;
-	
+
 	oAvatar = document.getElementById("avatar");
 
 	oAvatar.src = avatardir + file.options[file.selectedIndex].value;

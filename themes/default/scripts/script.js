@@ -391,7 +391,7 @@ smc_Popup.prototype.show = function ()
 		if ($('#' + popup_instance.popup_id).has(e.target).length === 0)
 			popup_instance.hide();
 	}).keyup(function(e){
-		if(e.keyCode == 27)
+		if (e.keyCode == 27)
 			popup_instance.hide();
 	});
 	$('#' + this.popup_id).find('.hide_popup').click(function (){ return popup_instance.hide(); });

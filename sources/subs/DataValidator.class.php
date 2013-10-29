@@ -321,7 +321,7 @@ class Data_Validator
 		if ($this->_datatype[$field] === 'array')
 		{
 			// Convert the array to individual values, they all use the same rules
-			foreach($input[$field] as $key => $value)
+			foreach ($input[$field] as $key => $value)
 			{
 				$validation_rules[$key] = $rules;
 				$fields[$key] = $value;
@@ -332,7 +332,7 @@ class Data_Validator
 		{
 			// Blow it up!
 			$temp = explode(',', $input[$field]);
-			foreach($temp as $key => $value)
+			foreach ($temp as $key => $value)
 			{
 				$validation_rules[$key] = $rules;
 				$fields[$key] = $value;
@@ -453,7 +453,7 @@ class Data_Validator
 		if ($this->_datatype[$field] === 'array')
 		{
 			// Convert the array to individual values, they all use the same rules
-			foreach($input[$field] as $key => $value)
+			foreach ($input[$field] as $key => $value)
 			{
 				$sanitation_rules[$key] = $rules;
 				$fields[$key] = $value;
@@ -470,7 +470,7 @@ class Data_Validator
 		{
 			// Break up the CSV data so we have an array
 			$temp = explode(',', $input[$field]);
-			foreach($temp as $key => $value)
+			foreach ($temp as $key => $value)
 			{
 				$sanitation_rules[$key] = $rules;
 				$fields[$key] = $value;

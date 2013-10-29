@@ -240,7 +240,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 	$user_drafts = array();
 	$request = $db->query('', '
 		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
-		FROM {db_prefix}user_drafts as ud' . ($draft_type === 0 ? '
+		FROM {db_prefix}user_drafts AS ud' . ($draft_type === 0 ? '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
 		WHERE ud.id_member = {int:id_member}' . ($draft_type === 0 ? ($topic !== false ? '
 			AND id_topic = {int:id_topic}' : '') : (!empty($topic) ? '

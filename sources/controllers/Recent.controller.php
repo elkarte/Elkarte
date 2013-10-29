@@ -105,7 +105,7 @@ class Recent_Controller extends Action_Controller
 			$boards_posts = boardsPosts($_REQUEST['boards'], array());
 			$total_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);
-			
+
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
 
@@ -205,7 +205,7 @@ class Recent_Controller extends Action_Controller
 			return;
 		}
 
-		list($context['posts'], $board_ids) = getRecentPosts($messages, $_REQUEST['start']);
+		list ($context['posts'], $board_ids) = getRecentPosts($messages, $_REQUEST['start']);
 
 		// There might be - and are - different permissions between any and own.
 		$permissions = array(

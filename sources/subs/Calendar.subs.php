@@ -1116,7 +1116,7 @@ function list_getNumHolidays()
 		array(
 		)
 	);
-	list($num_items) = $db->fetch_row($request);
+	list ($num_items) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return (int) $num_items;
