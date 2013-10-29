@@ -101,7 +101,7 @@
 			content = $('<div class="sceditor-insertemoticon" />'),
 			line = $('<div id="sceditor-smileycontainer" />');
 
-			for(smiley_popup in this.opts.emoticons.popup)
+			for (smiley_popup in this.opts.emoticons.popup)
 			{
 				popup_exists = true;
 				break;
@@ -505,7 +505,7 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 
 			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
-			for(var key in attrs)
+			for (var key in attrs)
 			{
 				if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key))
 				{
