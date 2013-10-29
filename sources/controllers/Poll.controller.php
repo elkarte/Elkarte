@@ -190,7 +190,7 @@ class Poll_Controller extends Action_Controller
 	public function action_lockvoting()
 	{
 		global $topic, $user_info;
-		
+
 		require_once(SUBSDIR . '/Poll.subs.php');
 
 		checkSession('get');

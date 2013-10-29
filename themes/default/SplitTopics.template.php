@@ -72,7 +72,7 @@ function template_ask()
 								document.getElementById(\'board_list\').style.display = \'none\';
 							// ]]></script>
 						</p>';
-	
+
 	echo '
 						<div class="submitbutton">
 							<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />

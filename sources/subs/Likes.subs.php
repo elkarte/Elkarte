@@ -22,7 +22,7 @@
 function likePost($id_liker, $liked_message, $direction)
 {
 	global $modSettings;
-	
+
 	// If we have a message, then we have passed all checks ...
 	if (!empty($liked_message))
 	{

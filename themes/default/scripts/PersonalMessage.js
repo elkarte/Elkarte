@@ -220,7 +220,7 @@ function rebuildRuleDesc()
 				hadBuddy = true;
 			}
 		}
-		
+
 		if (document.forms.addrule.elements[i].id.substr(0, 7) == "acttype")
 		{
 			if (foundAction)
@@ -267,7 +267,7 @@ function addCriteriaOption()
 				criteriaNum++;
 	}
 	criteriaNum++;
-	
+
 	// group selections
 	var group_option = '';
 	for (var index in groups)
@@ -285,7 +285,7 @@ function addActionOption()
 				actionNum++;
 	}
 	actionNum++;
-	
+
 	// Label selections
 	var label_option = '';
 	for (var index in labels)

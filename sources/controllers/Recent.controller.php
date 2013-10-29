@@ -105,7 +105,7 @@ class Recent_Controller extends Action_Controller
 			$boards_posts = boardsPosts($_REQUEST['boards'], array());
 			$total_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);
-			
+
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
 

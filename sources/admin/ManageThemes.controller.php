@@ -1025,7 +1025,6 @@ class ManageThemes_Controller extends Action_Controller
 
 		if (!empty($_REQUEST['copy']) && $method == 'copy')
 		{
-		
 			// Hopefully the themes directory is writable, or we might have a problem.
 			if (!is_writable(BOARDDIR . '/themes'))
 				fatal_lang_error('theme_install_write_error', 'critical');

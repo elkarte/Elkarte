@@ -16,7 +16,7 @@ class TestInstall extends WebTestCase
 		// it'd be kinda difficult without this :P
 		$this->scripturl = $scripturl;
 	}
-	
+
 	function testWelcome()
 	{
 		$this->get(substr($this->scripturl, 0, -9) . '/install.php');

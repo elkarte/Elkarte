@@ -107,7 +107,7 @@ function template_main()
 	$extra_bottom = '
 			<div class="selectbox floatright">' . $txt['who_show1'] . '
 				<select name="show" onchange="document.forms.whoFilter.submit();">';
-	
+
 	foreach ($context['show_methods'] as $value => $label)
 		$extra_bottom .= '
 					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';

@@ -70,7 +70,7 @@ function detectFulltextIndex()
 		while ($row = $db->fetch_assoc($request))
 			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
 				$context['cannot_create_fulltext'] = true;
-			
+
 		$db->free_result($request);
 	}
 }

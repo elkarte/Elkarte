@@ -12,7 +12,7 @@ class TestLogging extends UnitTestCase
 	{
 		// remove useless data
 	}
-	
+
 	function testLogLoginHistory()
 	{
 		logLoginHistory(1, '10.100.10.100', '11.111.100.10');
