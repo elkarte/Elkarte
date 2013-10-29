@@ -51,7 +51,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 		SELECT e.id_email, e.error, e.data_id, e.subject, e.id_message, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
-		WHERE id_email' . ($id === 0 ? '> {int:id}' : '= {int:id}') . '
+		WHERE id_email' . ($id === 0 ? ' > {int:id}' : ' = {int:id}') . '
 			AND ({query_see_board}
 				' . $approve_query . ')
 			OR e.id_board = -1
@@ -109,7 +109,7 @@ function list_maillist_count_unapproved()
 
 	$db = database();
 
-	$total= 0;
+	$total = 0;
 
 	// Where can they approve items?
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');

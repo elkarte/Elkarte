@@ -94,7 +94,7 @@
 				this.toggleSourceMode();
 		},
 		createPermanentDropDown: function() {
-			var	emoticons	= $.extend({}, this.opts.emoticons.dropdown),
+			var emoticons = $.extend({}, this.opts.emoticons.dropdown),
 				popup_exists = false;
 
 			base = this;

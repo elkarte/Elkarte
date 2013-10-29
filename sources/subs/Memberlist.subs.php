@@ -223,7 +223,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  * @param int $limit
  * @param string $sort
  */
-function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limit = 0)
+function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $limit = 0)
 {
 	global $modSettings;
 
