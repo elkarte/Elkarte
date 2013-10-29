@@ -294,7 +294,7 @@ function template_body_above()
 			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="ElkArte Community" title="ElkArte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
 
 	// Show the menu here, according to the menu sub template.
-	echo'
+	echo '
 		</div>';
 
 	// WAI-ARIA a11y tweaks have been applied here.
@@ -359,7 +359,7 @@ function template_body_above()
 				</ul>';
 	}
 
-	echo'
+	echo '
 			</div>';
 
 	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)

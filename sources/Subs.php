@@ -3309,7 +3309,7 @@ function template_javascript($do_defered = false)
 			foreach ($context['javascript_inline']['defer'] as $js_code)
 				echo $js_code;
 
-			echo'
+			echo '
 	// ]]></script>';
 		}
 
@@ -3321,7 +3321,7 @@ function template_javascript($do_defered = false)
 			foreach ($context['javascript_inline']['standard'] as $js_code)
 				echo $js_code;
 
-			echo'
+			echo '
 	// ]]></script>';
 		}
 	}

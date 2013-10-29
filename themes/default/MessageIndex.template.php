@@ -213,7 +213,7 @@ function template_pages_and_buttons_above()
 					</li>
 				</ul>';
 
-		echo'
+		echo '
 			</div>';
 
 		echo '
