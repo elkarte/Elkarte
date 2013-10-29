@@ -1058,7 +1058,7 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
 }
 
 /**
- * Returns an email (and few other things) associated with a message, 
+ * Returns an email (and few other things) associated with a message,
  * either the member's email or the poster_email (for example in case of guests)
  *
  * @todo very similar to posterDetails

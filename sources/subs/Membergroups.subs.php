@@ -1777,7 +1777,7 @@ function accessibleGroups()
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Hide hidden groups!
-		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups')) 
+		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
 			continue;
 
 		$groups[$row['id_group']] = $row['group_name'];

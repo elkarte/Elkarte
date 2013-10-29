@@ -71,7 +71,7 @@ class OpenID
 		{
 			$openid_identity = urlencode(empty($response_data['delegate']) ? $openid_url : $response_data['delegate']);
 			if (strpos($openid_identity, 'https') === 0)
-				$openid_claimedid = str_replace("http://", "https://", $openid_url);			
+				$openid_claimedid = str_replace("http://", "https://", $openid_url);
 			else
 				$openid_claimedid = $openid_url;
 		}

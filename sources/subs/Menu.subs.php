@@ -29,7 +29,7 @@ class Menu_Entries extends Positioning_Items
 	 * Add a new item to the pile
 	 *
 	 * @param string $key index of a item
-	 * @param array $item depending on the sub-level of the menu can be different things 
+	 * @param array $item depending on the sub-level of the menu can be different things
 	 * @param int $priority an integer defining the priority of the item.
 	 */
 	public function add($key, $item = null, $priority = null)

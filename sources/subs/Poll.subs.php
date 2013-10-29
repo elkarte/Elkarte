@@ -610,7 +610,7 @@ function increaseVoteCounter($id_poll, $options)
 
 /**
  * Add a vote to a poll.
- * 
+ *
  * @param array $insert
  */
 function addVote($insert)
@@ -740,7 +740,7 @@ function getPollChoices($id_poll)
 		)
 	);
 
-	$choices = array();	
+	$choices = array();
 	$number = 1;
 	while ($row = $db->fetch_assoc($request))
 	{
