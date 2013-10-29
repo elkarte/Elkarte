@@ -39,7 +39,7 @@ function pbe_email_to_bbc($text, $html)
 
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
-		require_once (SUBSDIR . '/Html2BBC.class.php');
+		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Convert_BBC($text);
 		$text = $bbc_converter->get_bbc();
 
@@ -73,7 +73,7 @@ function pbe_email_to_bbc($text, $html)
 		$text = Markdown($text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		require_once (SUBSDIR . '/Html2BBC.class.php');
+		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Convert_BBC($text);
 		$text = $bbc_converter->get_bbc();
 	}
