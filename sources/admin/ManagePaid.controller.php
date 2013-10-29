@@ -822,7 +822,7 @@ class ManagePaid_Controller extends Action_Controller
 				if (empty($member))
 					fatal_lang_error('error_member_not_found');
 
-				if(alreadySubscribed($context['sub_id'], $member['id_member']))
+				if (alreadySubscribed($context['sub_id'], $member['id_member']))
 					fatal_lang_error('member_already_subscribed');
 
 				// Actually put the subscription in place.

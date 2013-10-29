@@ -2007,7 +2007,7 @@ while ($_GET['m'] < $totalActions)
 		else
 			$topic_id = '0';
 
-		if(!empty($row['extra']['message']))
+		if (!empty($row['extra']['message']))
 		{
 			$msg_id = (int) $row['extra']['message'];
 			unset($row['extra']['message']);

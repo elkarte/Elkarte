@@ -33,19 +33,19 @@
 		InsertText: function(text, bClear) {
 			var bIsSource = this.inSourceMode();
 
-			if(!bIsSource)
+			if (!bIsSource)
 				this.toggleSourceMode();
 
 			var current_value = bClear ? text + "\n" : this.getSourceEditorValue(false) + "\n" + text + "\n";
 			this.setSourceEditorValue(current_value);
 
-			if(!bIsSource)
+			if (!bIsSource)
 				this.toggleSourceMode();
 		},
 		getText: function(filter) {
 			var current_value = '';
 
-			if(this.inSourceMode())
+			if (this.inSourceMode())
 				current_value = this.getSourceEditorValue(false);
 			else
 				current_value  = this.getWysiwygEditorValue(filter);
@@ -53,7 +53,7 @@
 			return current_value;
 		},
 		appendEmoticon: function (code, emoticon) {
-			if(emoticon === '')
+			if (emoticon === '')
 				line.append($('<br />'));
 			else
 				line.append($('<img />')
@@ -66,13 +66,13 @@
 						var	start = '',
 							end = '';
 
-						if(base.opts.emoticonsCompat)
+						if (base.opts.emoticonsCompat)
 						{
 							start = '<span>';
 							end   = ' </span>';
 						}
 
-						if(base.inSourceMode())
+						if (base.inSourceMode())
 							base.sourceEditorInsertText(' ' + $(this).attr('alt') + ' ');
 						else
 							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") + '" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
@@ -81,7 +81,7 @@
 					})
 				);
 
-			if(line.children().length > 0)
+			if (line.children().length > 0)
 				content.append(line);
 
 			$(".sceditor-toolbar").append(content);
@@ -90,7 +90,7 @@
 			this.wasSource = this.inSourceMode();
 		},
 		setTextMode: function () {
-			if(!this.inSourceMode())
+			if (!this.inSourceMode())
 				this.toggleSourceMode();
 		},
 		createPermanentDropDown: function() {
@@ -108,13 +108,13 @@
 			}
 
 			// For any smileys that go in the more popup
-			if(popup_exists)
+			if (popup_exists)
 			{
 				this.opts.emoticons.more = this.opts.emoticons.popup;
 				moreButton = $('<div class="sceditor-more" />').text(this._('More')).click(function () {
 					var popup_box = $('.sceditor-smileyPopup');
 
-					if(popup_box.length > 0)
+					if (popup_box.length > 0)
 						popup_box.fadeIn('fast');
 					else
 					{
@@ -130,18 +130,18 @@
 						popupContent.append(titlebar);
 
 						$.each(emoticons, base.appendEmoticon);
-						if(line.children().length > 0)
+						if (line.children().length > 0)
 							popupContent.append(line);
 
 						closeButton = $('<span />').text('[' + base._('Close') + ']').click(function () {
 							$(".sceditor-smileyPopup").fadeOut('fast');
 						});
-						if(typeof closeButton !== "undefined")
+						if (typeof closeButton !== "undefined")
 							popupContent.append(closeButton);
 
 						// IE needs unselectable attr to stop it from unselecting the text in the editor.
 						// The editor can cope if IE does unselect the text it's just not nice.
-						if(base.ieUnselectable !== false) {
+						if (base.ieUnselectable !== false) {
 							content = $(content);
 							content.find(':not(input,textarea)').filter(function() {return this.nodeType === 1;}).attr('unselectable', 'on');
 						}
@@ -179,7 +179,7 @@
 			$.each(emoticons, base.appendEmoticon);
 
 			// Show the more button on the editor if we have more
-			if(typeof moreButton !== "undefined")
+			if (typeof moreButton !== "undefined")
 				content.append(moreButton);
 		}
 	};
@@ -208,13 +208,13 @@ $.sceditor.command
 				var val = content.find("#link").val(),
 					description = content.find("#des").val();
 
-				if(val !== "" && val !== "ftp://") {
+				if (val !== "" && val !== "ftp://") {
 					// needed for IE to reset the last range
 					editor.focus();
 
-					if(!editor.getRangeHelper().selectedHtml() || description)
+					if (!editor.getRangeHelper().selectedHtml() || description)
 					{
-						if(!description)
+						if (!description)
 							description = val;
 
 						editor.wysiwygEditorInsertHtml('<a href="' + val + '">' + description + '</a>');
@@ -313,7 +313,7 @@ $.sceditor.plugins.bbcode.bbcode
 			return '[abbr=' + element.attr('title') + ']' + content + '[/abbr]';
 		},
 		html: function(element, attrs, content) {
-			if(typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
+			if (typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
 				return content;
 
 			return '<abbr title="' + attrs.defaultattr + '">' + content + '</abbr>';
@@ -329,7 +329,7 @@ $.sceditor.plugins.bbcode.bbcode
 			return '[acronym=' + element.attr('title') + ']' + content + '[/acronym]';
 		},
 		html: function(element, attrs, content) {
-			if(typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
+			if (typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
 				return content;
 
 			return '<acronym title="' + attrs.defaultattr + '">' + content + '</acronym>';
@@ -345,9 +345,9 @@ $.sceditor.plugins.bbcode.bbcode
 			return '[bdo=' + element.attr('dir') + ']' + content + '[/bdo]';
 		},
 		html: function(element, attrs, content) {
-			if(typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
+			if (typeof attrs.defaultattr === "undefined" || attrs.defaultattr.length === 0)
 				return content;
-			if(attrs.defaultattr !== 'rtl' && attrs.defaultattr !== 'ltr')
+			if (attrs.defaultattr !== 'rtl' && attrs.defaultattr !== 'ltr')
 				return '[bdo=' + attrs.defaultattr + ']' + content + '[/bdo]';
 
 			return '<bdo dir="' + attrs.defaultattr + '">' + content + '</bdo>';
@@ -432,10 +432,10 @@ $.sceditor.plugins.bbcode.bbcode
 		format: function(element, content) {
 			var from = '';
 
-			if($(element[0]).hasClass('php'))
+			if ($(element[0]).hasClass('php'))
 				return '[php]' + content.replace('&#91;', '[') + '[/php]';
 
-			if($(element).children("cite:first").length === 1)
+			if ($(element).children("cite:first").length === 1)
 			{
 				from = $(element).children("cite:first").text();
 				$(element).attr({'from': from.php_htmlspecialchars()});
@@ -446,7 +446,7 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 			else
 			{
-				if(typeof $(element).attr('from') !== "undefined")
+				if (typeof $(element).attr('from') !== "undefined")
 				{
 					from = '=' + $(element).attr('from').php_unhtmlspecialchars();
 				}
@@ -456,7 +456,7 @@ $.sceditor.plugins.bbcode.bbcode
 		},
 		html: function(element, attrs, content) {
 			var from = '';
-			if(typeof attrs.defaultattr !== "undefined")
+			if (typeof attrs.defaultattr !== "undefined")
 				from = '<cite>' + attrs.defaultattr + '</cite>';
 
 			return '<code>' + from + content.replace('[', '&#91;') + '</code>';
@@ -474,14 +474,14 @@ $.sceditor.plugins.bbcode.bbcode
 				link = '',
 				$elm  = $(element);
 
-			if(element[0].tagName.toLowerCase() === 'cite')
+			if (element[0].tagName.toLowerCase() === 'cite')
 				return '';
 
-			if($elm.attr('author'))
+			if ($elm.attr('author'))
 				author = ' author=' + $elm.attr('author').php_unhtmlspecialchars();
-			if($elm.attr('date'))
+			if ($elm.attr('date'))
 				date = ' date=' + $elm.attr('date');
-			if($elm.attr('link'))
+			if ($elm.attr('link'))
 				link = ' link=' + $elm.attr('link');
 
 			return '[quote' + author + date + link + ']' + content + '[/quote]';
@@ -498,7 +498,7 @@ $.sceditor.plugins.bbcode.bbcode
 				sLink = '';
 
 			// Author tag in the quote ?
-			if(typeof attrs.author !== "undefined")
+			if (typeof attrs.author !== "undefined")
 			{
 				attr_author = attrs.author;
 				sAuthor = bbc_quote_from + ': ' + attr_author;
@@ -507,7 +507,7 @@ $.sceditor.plugins.bbcode.bbcode
 			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
 			for(var key in attrs)
 			{
-				if(key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key))
+				if (key.substr(0, 4) === 'link' && attrs.hasOwnProperty(key))
 				{
 					attr_link = key.length > 4 ? key.substr(5) + '=' + attrs[key] : attrs[key];
 
@@ -517,14 +517,14 @@ $.sceditor.plugins.bbcode.bbcode
 			}
 
 			// A date perhaps
-			if(typeof attrs.date !== "undefined")
+			if (typeof attrs.date !== "undefined")
 			{
 				attr_date = attrs.date;
 				sDate = '<date timestamp="' + attr_date + '">' + new Date(attrs.date * 1000) + '</date>';
 			}
 
 			// build the blockquote up with the data
-			if(sAuthor === '' && sDate === '')
+			if (sAuthor === '' && sDate === '')
 				sAuthor = bbc_quote;
 			else
 				sAuthor += sDate !== '' ? ' ' + bbc_search_on : '';
@@ -549,13 +549,13 @@ $.sceditor.plugins.bbcode.bbcode
 				};
 
 			// check if this is an emoticon image
-			if(typeof element.attr('data-sceditor-emoticon') !== "undefined")
+			if (typeof element.attr('data-sceditor-emoticon') !== "undefined")
 				return content;
 
 			// only add width and height if one is specified
-			if(element.attr('width') || style('width'))
+			if (element.attr('width') || style('width'))
 				attribs += " width=" + $(element).width();
-			if(element.attr('height') || style('height'))
+			if (element.attr('height') || style('height'))
 				attribs += " height=" + $(element).height();
 
 			return '[img' + attribs + ']' + element.attr('src') + '[/img]';
@@ -565,9 +565,9 @@ $.sceditor.plugins.bbcode.bbcode
 				attribs = '';
 
 			// handle [img width=340 height=240]url[/img]
-			if(typeof attrs.width !== "undefined")
+			if (typeof attrs.width !== "undefined")
 				attribs += ' width="' + attrs.width + '"';
-			if(typeof attrs.height !== "undefined")
+			if (typeof attrs.height !== "undefined")
 				attribs += ' height="' + attrs.height + '"';
 
 			return '<img' + attribs + ' src="' + content + '" />';
@@ -582,7 +582,7 @@ $.sceditor.plugins.bbcode.bbcode
 			var style = '',
 				code = 'ul';
 
-			if(attrs.type)
+			if (attrs.type)
 				style = 'style="list-style-type: ' + attrs.type + '"';
 			return '<' + code + ' ' + style + '>' + content + '</' + code + '>';
 		}
@@ -596,7 +596,7 @@ $.sceditor.plugins.bbcode.bbcode
 		},
 		breakStart: true,
 		format: function(element, content) {
-			if($(element[0]).css('list-style-type') === 'disc')
+			if ($(element[0]).css('list-style-type') === 'disc')
 				return '[list]' + content + '[/list]';
 			else
 				return '[list type=' + $(element[0]).css('list-style-type') + ']' + content + '[/list]';

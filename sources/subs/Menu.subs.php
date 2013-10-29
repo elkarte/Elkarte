@@ -195,7 +195,7 @@ class Standard_Menu extends Menu_Entries
 		static $instance = null;
 
 		// this is a singleton
-		if($instance === null)
+		if ($instance === null)
 			$instance = new Standard_Menu();
 
 		return $instance;

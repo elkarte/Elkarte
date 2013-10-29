@@ -147,7 +147,7 @@ elk_StatsCenter.prototype.init = function ()
 			oCurYear.oToggle.opt.aSwappableContainers[oCurYear.oToggle.opt.aSwappableContainers.length] = aRows[i].id;
 		}
 
-		else if((aResults = this.opt.reDayPattern.exec(aRows[i].id)) != null)
+		else if ((aResults = this.opt.reDayPattern.exec(aRows[i].id)) != null)
 		{
 			oCurMonth.oToggle.opt.aSwappableContainers[oCurMonth.oToggle.opt.aSwappableContainers.length] = aRows[i].id;
 			oCurYear.oToggle.opt.aSwappableContainers[oCurYear.oToggle.opt.aSwappableContainers.length] = aRows[i].id;

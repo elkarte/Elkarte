@@ -705,7 +705,7 @@ function create_control_richedit($editorOptions)
 		(function () {
 			var editor = $("#' . $editorOptions['id'] . '").data("sceditor");
 			var editor_val = \'\';
-			if(editor.inSourceMode())
+			if (editor.inSourceMode())
 				editor_val = editor.getText();
 			else
 				editor_val = editor.getText();

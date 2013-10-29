@@ -507,7 +507,7 @@ class ManageFeatures_Controller extends Action_Controller
 				$changes = array();
 				$update_sigs =  getSignatureFromMembers($applied_sigs);
 
-				if(empty($update_sigs))
+				if (empty($update_sigs))
 					$done = true;
 
 				foreach($update_sigs as $row)
