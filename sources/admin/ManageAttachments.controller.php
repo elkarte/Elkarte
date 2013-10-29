@@ -2061,8 +2061,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance#transfer');
 	}
-
 }
+
 /**
  * Function called in-between each round of attachments and avatar repairs.
  * Called by repairAttachments().

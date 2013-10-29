@@ -2000,7 +2000,6 @@ function validateAttachID($id_attach)
 	return ($count == 0) ? false : true;
 }
 
-
 /**
  * Callback function for action_unapproved_attachments
  * retrieve all the attachments waiting for approval the approver can approve

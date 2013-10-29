@@ -3385,7 +3385,6 @@ function template_admin_warning_above()
 	</div>';
 	}
 
-
 	if (!empty($context['security_controls']['files']))
 	{
 		echo '
