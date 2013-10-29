@@ -71,7 +71,7 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			m.subject, m.id_topic, m.id_board,
 			IFNULL(men.real_name, m.poster_name) as mentioner, men.avatar, men.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
-		FROM {db_prefix}log_notifications as n
+		FROM {db_prefix}log_notifications AS n
 			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}members AS men ON (n.id_member_from = men.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = men.id_member)

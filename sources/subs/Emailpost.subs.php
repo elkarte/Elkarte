@@ -1345,7 +1345,7 @@ function query_load_board_details($board_id, $pbe)
 	// To post a NEW Topic, we need certain board details
 	$request = $db->query('', '
 		SELECT b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
-		FROM {db_prefix}boards as b
+		FROM {db_prefix}boards AS b
 		WHERE {raw:query_see_board} AND id_board = {int:id_board}',
 		array(
 			'id_board' => $board_id,

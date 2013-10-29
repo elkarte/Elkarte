@@ -480,7 +480,7 @@ function pollStarters($id_topic, $detailed = false)
 			SELECT mem.id_member, m.poster_time, IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_poll
 			FROM {db_prefix}messages AS m
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				LEFT JOIN {db_prefix}topics as t ON (t.id_first_msg = m.id_msg)
+				LEFT JOIN {db_prefix}topics AS t ON (t.id_first_msg = m.id_msg)
 			WHERE m.id_topic = {int:current_topic}
 			ORDER BY m.id_msg
 			LIMIT 1',

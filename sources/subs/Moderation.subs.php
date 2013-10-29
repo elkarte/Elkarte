@@ -130,7 +130,7 @@ function recountFailedEmails($approve_query = null)
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}postby_emails_error as m
+		FROM {db_prefix}postby_emails_error AS m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_see_board}
 			' . $approve_query . '

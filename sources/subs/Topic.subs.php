@@ -732,7 +732,7 @@ function moveTopicConcurrence()
 	{
 		$request = $db->query('', '
 			SELECT m.subject, b.name
-			FROM {db_prefix}topics as t
+			FROM {db_prefix}topics AS t
 				LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 				LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
 			WHERE t.id_topic = {int:topic_id}

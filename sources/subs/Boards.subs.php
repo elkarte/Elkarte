@@ -1747,7 +1747,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 		// id_board, name, id_profile => used in admin/Reports.controller.php
 		$request = $db->query('', '
 			SELECT ' . $select . '
-			FROM {db_prefix}boards as b',
+			FROM {db_prefix}boards AS b',
 			array()
 		);
 	}

@@ -57,7 +57,7 @@ function loadLikes($messages, $prepare = true)
 	$request = $db->query('', '
 		SELECT l.id_member, l.id_msg, m.real_name
 		FROM {db_prefix}message_likes AS l
-			LEFT JOIN {db_prefix}members AS m on (m.id_member = l.id_member)
+			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)
 		WHERE id_msg IN ({array_int:id_messages})',
 		array(
 			'id_messages' => $messages,
@@ -328,8 +328,8 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 			m.subject, m.poster_name, m.id_board, m.id_topic,
 			b.name
 		FROM {db_prefix}message_likes AS l
-			LEFT JOIN {db_prefix}messages AS m on (m.id_msg = l.id_msg)
-			LEFT JOIN {db_prefix}boards AS b on (b.id_board = m.id_board)
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE l.id_member = {int:id_member}
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
@@ -423,7 +423,7 @@ function postLikers($start, $items_per_page, $sort, $messageID)
 	$request = $db->query('', '
 		SELECT l.id_member, l.id_msg, m.real_name
 		FROM {db_prefix}message_likes AS l
-			LEFT JOIN {db_prefix}members AS m on (m.id_member = l.id_member)
+			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)
 		WHERE id_msg = {int:id_message}
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',

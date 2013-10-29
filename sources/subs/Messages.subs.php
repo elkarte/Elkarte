@@ -980,7 +980,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 			m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
 			m.id_msg_modified < {int:new_from} AS is_read
 			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
-		FROM {db_prefix}messages as m
+		FROM {db_prefix}messages AS m
 			' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
 		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
