@@ -273,7 +273,6 @@ function template_topic_replies_below()
 		echo '
 		</div>
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '";
 			var aIgnoreToggles = new Array();';
 
 		foreach ($ignored_posts as $post_id)
