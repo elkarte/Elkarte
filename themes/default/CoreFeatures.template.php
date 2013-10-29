@@ -26,8 +26,8 @@ function template_core_features()
 	<script><!-- // --><![CDATA[
 		var token_name,
 			token_value,
-			feature_on_text =  ', JavaScriptEscape($txt['core_settings_switch_off']), ',
-			feature_off_text =', JavaScriptEscape($txt['core_settings_switch_on']), ';
+			feature_on_text = ', JavaScriptEscape($txt['core_settings_switch_off']), ',
+			feature_off_text = ', JavaScriptEscape($txt['core_settings_switch_on']), ';
 
 		$(document).ready(function() {
 			$(".core_features_hide").css(\'display\', \'none\');
