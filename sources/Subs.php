@@ -1469,6 +1469,15 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => '<br />',
 			),
 			array(
+				'tag' => 'member',
+				'type' => 'unparsed_equals',
+				'test' => '[\d*]',
+				'before' => '<span class="bbc_mention"><a href="' . $scripturl . '?action=profile;u=$1">@',
+				'after' => '</a></span>',
+				'disabled_before' => '@',
+				'disabled_after' => '',
+			),
+			array(
 				'tag' => 'move',
 				'before' => '<marquee>',
 				'after' => '</marquee>',
