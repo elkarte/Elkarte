@@ -344,7 +344,7 @@ function template_quickreply_below()
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
-						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['notifications_enabled']) ? 'revalidateMentions(this);': ''), '" >
+						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['notifications_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');': ''), '" >
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />
@@ -372,7 +372,7 @@ function template_quickreply_below()
 		{
 			echo '
 							<div class="quickReplyContent">
-								<textarea cols="600" rows="7" class="quickreply" name="message" tabindex="', $context['tabindex']++, '"></textarea>
+								<textarea cols="600" rows="7" class="quickreply" name="message" id="message" tabindex="', $context['tabindex']++, '"></textarea>
 							</div>';
 		}
 		else
@@ -452,9 +452,9 @@ function template_quickreply_below()
 
 	echo '
 				<script><!-- // --><![CDATA[';
-	if (!empty($modSettings['notifications_enabled']))
+	if (!empty($modSettings['notifications_enabled']) && empty($options['use_editor_quick_reply']))
 		echo '
-					add_elk_mention(\'#quickReplyOptions textarea\');';
+					add_elk_mention(\'#message\');';
 
 	if (!empty($options['display_quick_reply']))
 		echo '
