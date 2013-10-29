@@ -469,7 +469,7 @@ function messageLikeCount($message)
 			'id_message' => $message,
 		)
 	);
-	list($total) = $db->fetch_row($request);
+	list ($total) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $total;

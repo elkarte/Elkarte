@@ -120,7 +120,7 @@ function ml_memberCache($cache_step_size)
 	for ($i = 0, $n = $db->num_rows($request); $i < $n; $i += $cache_step_size)
 	{
 		$db->data_seek($request, $i);
-		list($memberlist_cache['index'][$i]) = $db->fetch_row($request);
+		list ($memberlist_cache['index'][$i]) = $db->fetch_row($request);
 	}
 
 	// Set the last one

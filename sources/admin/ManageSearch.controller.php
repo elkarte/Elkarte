@@ -488,7 +488,7 @@ class ManageSearch_Controller extends Action_Controller
 		{
 			$context['sub_template'] = 'create_index_progress';
 
-			list($context['start'], $context['step'], $context['percentage']) = createSearchIndex($context['start'], $messages_per_batch, $index_properties[$context['index_settings']['bytes_per_word']]['column_definition'], $context['index_settings']);
+			list ($context['start'], $context['step'], $context['percentage']) = createSearchIndex($context['start'], $messages_per_batch, $index_properties[$context['index_settings']['bytes_per_word']]['column_definition'], $context['index_settings']);
 		}
 		// Step 2: removing the words that occur too often and are of no use.
 		elseif ($context['step'] === 2)
@@ -497,7 +497,7 @@ class ManageSearch_Controller extends Action_Controller
 				$context['step'] = 3;
 			else
 			{
-				list($context['start'], $context['step']) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]['step_size']);
+				list ($context['start'], $context['step']) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]['step_size']);
 
 				$context['sub_template'] = 'create_index_progress';
 

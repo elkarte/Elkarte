@@ -339,13 +339,13 @@ class Xml_Controller extends Action_Controller
 				$order = array();
 
 				// What board was drag and dropped?
-				list(, $board_moved,) = explode(',', $_POST['moved']);
+				list (, $board_moved,) = explode(',', $_POST['moved']);
 				$board_moved = (int) $board_moved;
 
 				// The board ids arrive in 1-n view order ...
 				foreach ($_POST['cbp'] as $id)
 				{
-					list($category, $board, $childof) = explode(',', $id);
+					list ($category, $board, $childof) = explode(',', $id);
 
 					if ($board == -1)
 						continue;
@@ -502,7 +502,7 @@ class Xml_Controller extends Action_Controller
 			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
 			{
 				// Get the details on the moved smile
-				list(, $smile_moved) = explode('_', $_POST['moved']);
+				list (, $smile_moved) = explode('_', $_POST['moved']);
 				$smile_moved = (int) $smile_moved;
 				$smile_moved_details = getSmiley($smile_moved);
 
@@ -515,7 +515,7 @@ class Xml_Controller extends Action_Controller
 						'postform' => 0,
 						'popup' => 2
 					);
-					list($smile_received_location, $smile_received_row) = explode('|', $_POST['received']);
+					list ($smile_received_location, $smile_received_row) = explode('|', $_POST['received']);
 					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
 				}
 

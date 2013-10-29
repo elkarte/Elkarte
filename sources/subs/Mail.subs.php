@@ -158,17 +158,17 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$no_html_message = un_htmlspecialchars(strip_tags(strtr($orig_message, array('</title>' => $line_break))));
 
 		// But, then, dump it and use a plain one for dinosaur clients.
-		list(, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);
+		list (, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);
 		$message = $plain_message . $line_break . '--' . $mime_boundary . $line_break;
 
 		// This is the plain text version.  Even if no one sees it, we need it for spam checkers.
-		list($charset, $plain_charset_message, $encoding) = mimespecialchars($no_html_message, false, false, $line_break);
+		list ($charset, $plain_charset_message, $encoding) = mimespecialchars($no_html_message, false, false, $line_break);
 		$message .= 'Content-Type: text/plain; charset=' . $charset . $line_break;
 		$message .= 'Content-Transfer-Encoding: ' . $encoding . $line_break . $line_break;
 		$message .= $plain_charset_message . $line_break . '--' . $mime_boundary . $line_break;
 
 		// This is the actual HTML message, prim and proper.  If we wanted images, they could be inlined here (with multipart/related, etc.)
-		list($charset, $html_message, $encoding) = mimespecialchars($orig_message, false, $hotmail_fix, $line_break);
+		list ($charset, $html_message, $encoding) = mimespecialchars($orig_message, false, $hotmail_fix, $line_break);
 		$message .= 'Content-Type: text/html; charset=' . $charset . $line_break;
 		$message .= 'Content-Transfer-Encoding: ' . ($encoding == '' ? '7bit' : $encoding) . $line_break . $line_break;
 		$message .= $html_message . $line_break . '--' . $mime_boundary . '--';
@@ -177,7 +177,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	else
 	{
 		// Send a plain message first, for the older web clients.
-		list(, $plain_message) = mimespecialchars($orig_message, false, true, $line_break);
+		list (, $plain_message) = mimespecialchars($orig_message, false, true, $line_break);
 		$message = $plain_message . $line_break . '--' . $mime_boundary . $line_break;
 
 		// Now add an encoded message using the forum's character set.

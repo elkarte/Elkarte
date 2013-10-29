@@ -40,7 +40,7 @@ function countUserNotifications($all = false, $type = '')
 		)
 	);
 
-	list($count) = $db->fetch_row($request);
+	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Counts as maintenance! :P

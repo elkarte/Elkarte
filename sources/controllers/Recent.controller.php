@@ -205,7 +205,7 @@ class Recent_Controller extends Action_Controller
 			return;
 		}
 
-		list($context['posts'], $board_ids) = getRecentPosts($messages, $_REQUEST['start']);
+		list ($context['posts'], $board_ids) = getRecentPosts($messages, $_REQUEST['start']);
 
 		// There might be - and are - different permissions between any and own.
 		$permissions = array(

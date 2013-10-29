@@ -4163,7 +4163,7 @@ function call_integration_hook($hook, $parameters = array())
 			$call = explode('::', $function);
 			if (strpos($call[1], ':') !== false)
 			{
-				list($func, $file) = explode(':', $call[1]);
+				list ($func, $file) = explode(':', $call[1]);
 				if (empty($settings['theme_dir']))
 					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
 				else
@@ -4178,7 +4178,7 @@ function call_integration_hook($hook, $parameters = array())
 			$call = $function;
 			if (strpos($function, ':') !== false)
 			{
-				list($func, $file) = explode(':', $function);
+				list ($func, $file) = explode(':', $function);
 				if (empty($settings['theme_dir']))
 					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
 				else
@@ -4225,7 +4225,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 				'variable' => $hook,
 			)
 		);
-		list($current_functions) = $db->fetch_row($request);
+		list ($current_functions) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		if (!empty($current_functions))
@@ -4279,7 +4279,7 @@ function remove_integration_function($hook, $function, $file = '')
 			'variable' => $hook,
 		)
 	);
-	list($current_functions) = $db->fetch_row($request);
+	list ($current_functions) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	if (!empty($current_functions))

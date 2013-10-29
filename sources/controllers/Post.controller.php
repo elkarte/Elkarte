@@ -567,7 +567,7 @@ class Post_Controller extends Action_Controller
 			// The smiley popup may take advantage of Jquery UI ....
 			$modSettings['jquery_include_ui'] = true;
 
-			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
+			list ($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 		}
 
 		// Check whether this is a really old post being bumped...

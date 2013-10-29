@@ -109,7 +109,7 @@ class Attachment_Controller extends Action_Controller
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
 		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 		{
-			list($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
+			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
 				ob_end_clean();

@@ -872,7 +872,7 @@ function recordReport($message, $poster_comment)
 	);
 
 	if ($db->num_rows($request) != 0)
-		list($id_report, $ignore_all) = $db->fetch_row($request);
+		list ($id_report, $ignore_all) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	if (!empty($ignore_all))

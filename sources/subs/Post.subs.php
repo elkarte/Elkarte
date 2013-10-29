@@ -594,7 +594,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 				'id_msg' => $row['id_last_msg'],
 			)
 		);
-		list($num_attachments) = $db->fetch_row($request);
+		list ($num_attachments) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		// Using the maillist function or the standard style

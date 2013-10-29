@@ -2222,7 +2222,7 @@ function canContact($who)
 			'member' => $who,
 		)
 	);
-	list($receive_from, $buddies, $ignore) = $db->fetch_row($request);
+	list ($receive_from, $buddies, $ignore) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$buddy_list = array_map('intval', explode(',', $buddies));

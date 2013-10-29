@@ -581,7 +581,7 @@ function list_getNumSmileys()
 		array(
 		)
 	);
-	list($numSmileys) = $db->fetch_row($request);
+	list ($numSmileys) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numSmileys;

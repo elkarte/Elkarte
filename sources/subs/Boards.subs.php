@@ -1783,7 +1783,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
 
 	if (!empty($params['count']))
 	{
-		list($return) = $db->fetch_row($request);
+		list ($return) = $db->fetch_row($request);
 	}
 	else
 	{

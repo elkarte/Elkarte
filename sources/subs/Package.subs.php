@@ -1509,7 +1509,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
-	list($the_brand,) = explode(' ', $forum_version, 2);
+	list ($the_brand,) = explode(' ', $forum_version, 2);
 	if ($the_brand == 'ElkArte')
 		$the_version = '1' . $the_version;
 
@@ -3335,7 +3335,7 @@ function checkPackageDependency($id)
 		)
 	);
 	while ($row = $db->fetch_row($request));
-		list($version) = $row;
+		list ($version) = $row;
 	$db->free_result($request);
 
 	return $version;

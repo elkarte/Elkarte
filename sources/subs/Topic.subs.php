@@ -741,7 +741,7 @@ function moveTopicConcurrence()
 				'topic_id' => $topic,
 			)
 		);
-		list($topic_subject, $board_name) = $db->fetch_row($request);
+		list ($topic_subject, $board_name) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$board_link = '<a href="' . $scripturl . '?board=' . $board . '.0">' . $board_name . '</a>';

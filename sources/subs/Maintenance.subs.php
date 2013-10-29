@@ -33,7 +33,7 @@ function countMessages()
 		FROM {db_prefix}messages',
 		array()
 	);
-	list($messages) = $db->fetch_row($request);
+	list ($messages) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $messages;

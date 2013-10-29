@@ -961,7 +961,7 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// Get the theme name and descriptions.
-		list($context['available_themes'], $guest_theme) = availableThemes($current_theme, $context['current_member']);
+		list ($context['available_themes'], $guest_theme) = availableThemes($current_theme, $context['current_member']);
 
 		// As long as we're not doing the default theme...
 		if (!isset($_REQUEST['u']) || $_REQUEST['u'] >= 0)

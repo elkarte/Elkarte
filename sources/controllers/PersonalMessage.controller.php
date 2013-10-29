@@ -352,7 +352,7 @@ class PersonalMessage_Controller extends Action_Controller
 		);
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
-		list($pms, $posters, $recipients, $lastData) = loadPMs(array(
+		list ($pms, $posters, $recipients, $lastData) = loadPMs(array(
 			'sort_by_query' => $sort_by_query,
 			'display_mode' => $context['display_mode'],
 			'sort_by' => $sort_by,
