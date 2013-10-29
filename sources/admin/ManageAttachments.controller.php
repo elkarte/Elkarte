@@ -237,7 +237,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// A bit of razzle dazzle with the $txt strings. :)
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
-		$txt['basedirectory_for_attachments_path']= isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
+		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
 		$txt['attachmentUploadDir_multiple_configure'] = '<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">[' . $txt['attachmentUploadDir_multiple_configure'] . ']</a>';
 		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
@@ -339,7 +339,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// A bit of razzle dazzle with the $txt strings. :)
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
-		$txt['basedirectory_for_attachments_path']= isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
+		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
 		$txt['attachmentUploadDir_multiple_configure'] = '<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">[' . $txt['attachmentUploadDir_multiple_configure'] . ']</a>';
 		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
@@ -2061,8 +2061,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance#transfer');
 	}
-
 }
+
 /**
  * Function called in-between each round of attachments and avatar repairs.
  * Called by repairAttachments().

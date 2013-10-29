@@ -170,7 +170,6 @@ class ManageRegistration_Controller extends Action_Controller
 			}
 		}
 
-
 		// Load the assignable member groups.
 		if (allowedTo('manage_membergroups'))
 		{

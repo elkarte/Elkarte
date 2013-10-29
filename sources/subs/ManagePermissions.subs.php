@@ -390,7 +390,7 @@ function loadAllPermissions()
 {
 	global $context, $txt, $modSettings;
 
-	// List of all the groups 
+	// List of all the groups
 	// Note to Mod authors - you don't need to stick your permission group here if you don't mind having it as the last group of the page.
 	$permissionGroups = array(
 		'membergroup' => array(

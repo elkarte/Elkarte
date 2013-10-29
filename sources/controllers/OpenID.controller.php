@@ -177,11 +177,11 @@ class OpenID_Controller extends Action_Controller
 			doLogin();
 		}
 	}
-	
+
 	public function action_xrds()
 	{
 		global $scripturl, $modSettings, $context;
-	
+
 		ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
 			@ob_start('ob_gzhandler');

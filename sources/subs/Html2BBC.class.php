@@ -819,7 +819,7 @@ class Convert_BBC
 			foreach ($matches as $match)
 			{	if (strpos($match[0], ':'))
 				{
-					list($key, $value) = explode(':', trim($match[0], ';'));
+					list ($key, $value) = explode(':', trim($match[0], ';'));
 					$key = trim($key);
 					$styles[$key] = trim($value);
 				}

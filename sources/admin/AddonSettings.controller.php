@@ -340,7 +340,6 @@ class AddonSettings_Controller extends Action_Controller
 			);
 		}
 
-
 		require_once(SUBSDIR . '/List.subs.php');
 		createList($list_options);
 

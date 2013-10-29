@@ -74,7 +74,7 @@ function themeDirectory($id_theme)
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	list($themeDirectory) = $db->fetch_row($request);
+	list ($themeDirectory) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $themeDirectory;
@@ -379,7 +379,6 @@ function countConfiguredGuestOptions()
 
 	return($themes);
 }
-
 
 /**
  * Counts the theme options configured for guests

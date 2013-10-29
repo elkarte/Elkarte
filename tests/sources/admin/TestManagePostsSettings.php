@@ -24,10 +24,10 @@ class TestManagePostsSettings extends UnitTestCase
 	{
 		// trick
 		loadLanguage('Admin');
-		
+
 		$controller = new ManagePosts_Controller();
 		$settings = $controller->settings();
-		
+
 		// Lets see some hardcoded setting for posts management...
 		$this->assertNotNull($settings);
 		$this->assertTrue(in_array(array('check', 'removeNestedQuotes'), $settings));

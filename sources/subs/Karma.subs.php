@@ -12,7 +12,7 @@
  */
 
 /**
- * Remove old karma from the log 
+ * Remove old karma from the log
  *
  * @param int $karmaWaitTime
  */

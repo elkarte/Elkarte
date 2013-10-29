@@ -1091,7 +1091,7 @@ class ProfileOptions_Controller extends Action_Controller
 					// Check whether they are interested.
 					if (!empty($member['mod_prefs']))
 					{
-						list(,, $pref_binary) = explode('|', $member['mod_prefs']);
+						list (,, $pref_binary) = explode('|', $member['mod_prefs']);
 						if (!($pref_binary & 4))
 							continue;
 					}

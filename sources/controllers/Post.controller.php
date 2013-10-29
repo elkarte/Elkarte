@@ -567,7 +567,7 @@ class Post_Controller extends Action_Controller
 			// The smiley popup may take advantage of Jquery UI ....
 			$modSettings['jquery_include_ui'] = true;
 
-			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
+			list ($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 		}
 
 		// Check whether this is a really old post being bumped...
@@ -1438,6 +1438,16 @@ class Post_Controller extends Action_Controller
 		// At this point, we want to make sure the subject isn't too long.
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
+
+		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		{
+			$query['and'][] = 'member_ids';
+			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+			require_once(SUBSDIR . '/Members.subs.php');
+			$mentioned_members = membersBy($query, $query_params, true);
+			foreach ($mentioned_members as $member)
+				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message']);
+		}
 
 		// Make the poll...
 		if (isset($_REQUEST['poll']))

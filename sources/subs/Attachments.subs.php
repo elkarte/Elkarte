@@ -1788,7 +1788,7 @@ function attachment_filesize($attach_id, $filesize = null)
 		);
 		if (!empty($result))
 		{
-			list($filesize) = $db->fetch_row($result);
+			list ($filesize) = $db->fetch_row($result);
 			$db->free_result($result);
 			return $filesize;
 		}
@@ -1830,7 +1830,7 @@ function attachment_folder($attach_id, $folder_id = null)
 		);
 		if (!empty($result))
 		{
-			list($folder_id) = $db->fetch_row($result);
+			list ($folder_id) = $db->fetch_row($result);
 			$db->free_result($result);
 			return $folder_id;
 		}
@@ -1999,7 +1999,6 @@ function validateAttachID($id_attach)
 
 	return ($count == 0) ? false : true;
 }
-
 
 /**
  * Callback function for action_unapproved_attachments

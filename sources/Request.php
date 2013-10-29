@@ -171,7 +171,6 @@ class Request
 				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
 
-
 		// Some final checking.
 		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $this->_ban_ip) === 0 || !isValidIPv6($this->_ban_ip))
 			$this->_ban_ip = '';

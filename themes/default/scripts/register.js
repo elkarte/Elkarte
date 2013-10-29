@@ -294,7 +294,7 @@ function updateAuthMethod()
 		return true;
 
 	currentForm = document.getElementById('auth_openid').form.id;
-	
+
 	document.forms[currentForm].openid_url.disabled = currentAuthMethod == 'openid' ? false : true;
 	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod == 'passwd' ? false : true;
 	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod == 'passwd' ? false : true;

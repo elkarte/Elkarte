@@ -368,7 +368,6 @@ class InlinePermissions_Form
 	}
 }
 
-
 /**
  * Show a collapsible box to set a specific permission.
  * The function is called by templates to show a list of permissions settings.

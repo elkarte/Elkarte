@@ -1469,6 +1469,15 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => '<br />',
 			),
 			array(
+				'tag' => 'member',
+				'type' => 'unparsed_equals',
+				'test' => '[\d*]',
+				'before' => '<span class="bbc_mention"><a href="' . $scripturl . '?action=profile;u=$1">@',
+				'after' => '</a></span>',
+				'disabled_before' => '@',
+				'disabled_after' => '',
+			),
+			array(
 				'tag' => 'move',
 				'before' => '<marquee>',
 				'after' => '</marquee>',
@@ -3309,7 +3318,7 @@ function template_javascript($do_defered = false)
 			foreach ($context['javascript_inline']['defer'] as $js_code)
 				echo $js_code;
 
-			echo'
+			echo '
 	// ]]></script>';
 		}
 
@@ -3321,7 +3330,7 @@ function template_javascript($do_defered = false)
 			foreach ($context['javascript_inline']['standard'] as $js_code)
 				echo $js_code;
 
-			echo'
+			echo '
 	// ]]></script>';
 		}
 	}
@@ -3384,7 +3393,6 @@ function template_admin_warning_above()
 		</ul>
 	</div>';
 	}
-
 
 	if (!empty($context['security_controls']['files']))
 	{
@@ -4164,7 +4172,7 @@ function call_integration_hook($hook, $parameters = array())
 			$call = explode('::', $function);
 			if (strpos($call[1], ':') !== false)
 			{
-				list($func, $file) = explode(':', $call[1]);
+				list ($func, $file) = explode(':', $call[1]);
 				if (empty($settings['theme_dir']))
 					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
 				else
@@ -4179,7 +4187,7 @@ function call_integration_hook($hook, $parameters = array())
 			$call = $function;
 			if (strpos($function, ':') !== false)
 			{
-				list($func, $file) = explode(':', $function);
+				list ($func, $file) = explode(':', $function);
 				if (empty($settings['theme_dir']))
 					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
 				else
@@ -4226,7 +4234,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
 				'variable' => $hook,
 			)
 		);
-		list($current_functions) = $db->fetch_row($request);
+		list ($current_functions) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		if (!empty($current_functions))
@@ -4280,7 +4288,7 @@ function remove_integration_function($hook, $function, $file = '')
 			'variable' => $hook,
 		)
 	);
-	list($current_functions) = $db->fetch_row($request);
+	list ($current_functions) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	if (!empty($current_functions))

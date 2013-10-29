@@ -1449,7 +1449,7 @@ while ($_GET['m'] < $totalActions)
 		SELECT id_error, message, file, line
 		FROM {$db_prefix}log_errors
 		LIMIT $_GET[m], 500");
-	while($row = mysql_fetch_assoc($request))
+	while ($row = mysql_fetch_assoc($request))
 	{
 		preg_match('~<br />(%1\$s: )?([\w\. \\\\/\-_:]+)<br />(%2\$s: )?([\d]+)~', $row['message'], $matches);
 		if (!empty($matches[2]) && !empty($matches[4]) && empty($row['file']) && empty($row['line']))
@@ -2000,14 +2000,14 @@ while ($_GET['m'] < $totalActions)
 					WHERE id_topic=$topic_id
 					LIMIT 1");
 				if (mysql_num_rows($trequest))
-					list($board_id) = mysql_fetch_row($trequest);
+					list ($board_id) = mysql_fetch_row($trequest);
 				mysql_free_result($trequest);
 			}
 		}
 		else
 			$topic_id = '0';
 
-		if(!empty($row['extra']['message']))
+		if (!empty($row['extra']['message']))
 		{
 			$msg_id = (int) $row['extra']['message'];
 			unset($row['extra']['message']);
@@ -2019,7 +2019,7 @@ while ($_GET['m'] < $totalActions)
 					WHERE id_msg=$msg_id
 					LIMIT 1");
 				if (mysql_num_rows($trequest))
-					list($board_id, $topic_id) = mysql_fetch_row($trequest);
+					list ($board_id, $topic_id) = mysql_fetch_row($trequest);
 				mysql_free_result($trequest);
 			}
 		}
@@ -2567,7 +2567,7 @@ foreach ($nameChanges as $table_name => $table)
 		SHOW FIELDS
 		FROM `{$db_prefix}$table_name`");
 	$tinytextColumns = array();
-	while($row = mysql_fetch_assoc($request))
+	while ($row = mysql_fetch_assoc($request))
 	{
 		// Tinytext detected so store column name.
 		if ($row['Type'] == 'tinytext')

@@ -632,7 +632,6 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 		}
 
-
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
 	}
@@ -873,7 +872,7 @@ function recordReport($message, $poster_comment)
 	);
 
 	if ($db->num_rows($request) != 0)
-		list($id_report, $ignore_all) = $db->fetch_row($request);
+		list ($id_report, $ignore_all) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	if (!empty($ignore_all))
@@ -981,7 +980,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 			m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
 			m.id_msg_modified < {int:new_from} AS is_read
 			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
-		FROM {db_prefix}messages as m
+		FROM {db_prefix}messages AS m
 			' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
 		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
@@ -1059,7 +1058,7 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
 }
 
 /**
- * Returns an email (and few other things) associated with a message, 
+ * Returns an email (and few other things) associated with a message,
  * either the member's email or the poster_email (for example in case of guests)
  *
  * @todo very similar to posterDetails

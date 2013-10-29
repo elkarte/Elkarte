@@ -686,7 +686,7 @@ function isFirstLogin($id_member)
 
 /**
  * Search for a member by given criterias
- * 
+ *
  * @param string $where
  * @param string $where_params
  * @param bool $fatal

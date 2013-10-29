@@ -306,7 +306,7 @@ function template_callback_maillist_receive_email_list()
 			newInput.setAttribute("class", "input_select");
 
 			// add in the options as childen of the newInput select box
-			for(i = 0; i < boardname.length; i++)
+			for (i = 0; i < boardname.length; i++)
 			{
 				opt = createNamedElement("option", "option");
 				opt.value = boardid[i];

@@ -49,7 +49,6 @@ function reportsBoardsList()
 	return $boards;
 }
 
-
 /**
  * Fetch membergroups names and ids
  * @param string $group_clause a string used as WHERE cluase in the query

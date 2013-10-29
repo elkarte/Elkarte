@@ -114,7 +114,7 @@ function bb2_db_rows($result)
 	$db = database();
 
 	$temp = array();
-	while($row = $db->fetch_assoc($result))
+	while ($row = $db->fetch_assoc($result))
 		$temp[] = $row;
 	$db->free_result($result);
 

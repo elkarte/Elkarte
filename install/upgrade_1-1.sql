@@ -1886,7 +1886,7 @@ if ($upgradeLogTable)
 	$request = upgrade_query("
 		SELECT MAX(ID_MSG)
 		FROM {$db_prefix}messages");
-	list($maxMsg) = mysql_fetch_row($request);
+	list ($maxMsg) = mysql_fetch_row($request);
 	mysql_free_result($request);
 
 	if (empty($maxMsg))
@@ -1910,7 +1910,7 @@ if ($upgradeLogTable)
 			SELECT posterTime
 			FROM {$db_prefix}messages
 			WHERE ID_MSG = $maxMsg");
-		list($maxPosterTime) = mysql_fetch_row($request);
+		list ($maxPosterTime) = mysql_fetch_row($request);
 		mysql_free_result($request);
 
 		if (empty($maxPosterTime))
@@ -1943,7 +1943,7 @@ if ($upgradeLogTable)
 			SELECT MAX(posterTime) + 1
 			FROM {$db_prefix}messages
 			WHERE ID_MSG < $_GET[m]");
-		list($lower_limit) = mysql_fetch_row($request);
+		list ($lower_limit) = mysql_fetch_row($request);
 		mysql_free_result($request);
 
 		if (empty($lower_limit))

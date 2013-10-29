@@ -2043,7 +2043,6 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 	return $members;
 }
 
-
 /**
  * Check if the OpenID URI is already registered for an existing member
  *
@@ -2223,7 +2222,7 @@ function canContact($who)
 			'member' => $who,
 		)
 	);
-	list($receive_from, $buddies, $ignore) = $db->fetch_row($request);
+	list ($receive_from, $buddies, $ignore) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	$buddy_list = array_map('intval', explode(',', $buddies));

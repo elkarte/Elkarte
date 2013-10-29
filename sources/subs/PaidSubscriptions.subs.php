@@ -102,7 +102,6 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 	return $subscribers;
 }
 
-
 /**
  * Reapplies all subscription rules for each of the users.
  *
@@ -178,7 +177,6 @@ function reapplySubscriptions($users)
 		);
 	}
 }
-
 
 /**
  * Add or extend a subscription of a user.

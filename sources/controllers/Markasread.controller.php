@@ -197,7 +197,7 @@ class MarkRead_Controller extends Action_Controller
 			$earlyMsg = 0;
 		else
 		{
-			list($earlyMsg) = messageAt((int) $_REQUEST['start'], $topic);
+			list ($earlyMsg) = messageAt((int) $_REQUEST['start'], $topic);
 			$earlyMsg--;
 		}
 

@@ -972,7 +972,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	$db = database();
 
 	//No $includes parameters given? Let's set some default values
-	if(empty($includes))
+	if (empty($includes))
 		$includes = array('globalmod', 'member', 'postgroups');
 
 	$groups = array();
@@ -1021,7 +1021,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	);
 
 	// Include the default membergroup? the ones with id_member = 0
-	if(in_array('member', $includes) && !isset($split))
+	if (in_array('member', $includes) && !isset($split))
 		$groups[] = array(
 			'id' => 0,
 			'name' => $txt['membergroups_members']
@@ -1777,7 +1777,7 @@ function accessibleGroups()
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Hide hidden groups!
-		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups')) 
+		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
 			continue;
 
 		$groups[$row['id_group']] = $row['group_name'];

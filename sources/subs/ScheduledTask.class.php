@@ -145,7 +145,7 @@ class ScheduledTask
 			// Check whether they are interested.
 			if (!empty($row['mod_prefs']))
 			{
-				list(,, $pref_binary) = explode('|', $row['mod_prefs']);
+				list (,, $pref_binary) = explode('|', $row['mod_prefs']);
 				if (!($pref_binary & 4))
 					continue;
 			}
@@ -1412,8 +1412,8 @@ class ScheduledTask
 
 		$request = $db->query('', '
 			SELECT fu.derived_from
-			FROM {db_prefix}follow_ups as fu
-				LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)
+			FROM {db_prefix}follow_ups AS fu
+				LEFT JOIN {db_prefix}messages AS m ON (fu.derived_from = m.id_msg)
 			WHERE m.id_msg IS NULL
 			LIMIT {int:limit}',
 			array(

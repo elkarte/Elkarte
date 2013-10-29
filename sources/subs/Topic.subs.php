@@ -732,7 +732,7 @@ function moveTopicConcurrence()
 	{
 		$request = $db->query('', '
 			SELECT m.subject, b.name
-			FROM {db_prefix}topics as t
+			FROM {db_prefix}topics AS t
 				LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 				LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
 			WHERE t.id_topic = {int:topic_id}
@@ -741,7 +741,7 @@ function moveTopicConcurrence()
 				'topic_id' => $topic,
 			)
 		);
-		list($topic_subject, $board_name) = $db->fetch_row($request);
+		list ($topic_subject, $board_name) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		$board_link = '<a href="' . $scripturl . '?board=' . $board . '.0">' . $board_name . '</a>';

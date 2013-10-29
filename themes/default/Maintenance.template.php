@@ -543,7 +543,7 @@ function template_convert_msgbody()
 					', implode('</li><li>', $context['exceeding_messages']), '
 					</li>
 				</ul>';
-		
+
 		if (!empty($context['exceeding_messages_morethan']))
 			echo '
 				<p>', $context['exceeding_messages_morethan'], '</p>';

@@ -222,9 +222,12 @@ class Display_Controller
 				$_REQUEST['start'] = empty($options['view_newest_first']) ? $context['start_from'] : $context['total_visible_posts'] - $context['start_from'] - 1;
 			}
 		}
+
+		// Mark the notification as read if requested
 		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
 		{
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
+
 			$notify = new Notification_Controller();
 			$notify->setData(array(
 				'id_member' => $user_info['id'],

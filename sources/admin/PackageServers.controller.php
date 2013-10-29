@@ -504,7 +504,7 @@ class PackageServers_Controller extends Action_Controller
 			// @todo maybe use the name/version in the package instead, although the link will be cleaner
 			// Name this master.zip based on repo name in the link
 			$path_parts = pathinfo($matches[4]);
-			list(, $newname, ) = explode('/', $path_parts['dirname']);
+			list (, $newname, ) = explode('/', $path_parts['dirname']);
 
 			// Just to be safe, no invalid file characters
 			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));

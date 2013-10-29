@@ -179,7 +179,7 @@ class Stats_Controller extends Action_Controller
 
 		// Topic replies top 10.
 		$context['top_topics_replies'] = topTopicReplies();
-	
+
 		// Topic views top 10.
 		$context['top_topics_views'] = topTopicViews();
 

@@ -2572,11 +2572,11 @@ function getDisregardedBy($start, $items_per_page, $sort, $memID)
 	// Get the list of topics we can see
 	$request = $db->query('', '
 		SELECT lt.id_topic
-		FROM {db_prefix}log_topics as lt
-			LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
-			LEFT JOIN {db_prefix}boards as b ON (t.id_board = b.id_board)
-			LEFT JOIN {db_prefix}messages as m ON (t.id_first_msg = m.id_msg)' . (in_array($sort, array('mem.real_name', 'mem.real_name DESC', 'mem.poster_time', 'mem.poster_time DESC')) ? '
-			LEFT JOIN {db_prefix}members as mem ON (m.id_member = mem.id_member)' : '') . '
+		FROM {db_prefix}log_topics AS lt
+			LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
+			LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
+			LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)' . (in_array($sort, array('mem.real_name', 'mem.real_name DESC', 'mem.poster_time', 'mem.poster_time DESC')) ? '
+			LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)' : '') . '
 		WHERE lt.id_member = {int:current_member}
 			AND disregarded = 1
 			AND {query_see_board}
@@ -2630,9 +2630,9 @@ function getNumDisregardedBy($memID)
 	// Get the total number of attachments they have posted.
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}log_topics as lt
-		LEFT JOIN {db_prefix}topics as t ON (lt.id_topic = t.id_topic)
-		LEFT JOIN {db_prefix}boards as b ON (t.id_board = b.id_board)
+		FROM {db_prefix}log_topics AS lt
+		LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
+		LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 		WHERE id_member = {int:current_member}
 			AND disregarded = 1
 			AND {query_see_board}',

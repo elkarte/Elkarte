@@ -60,7 +60,6 @@ $(document).ready(function() {
 	$('.spoilerheader').click(function(){
 		$(this).next().children().slideToggle("fast");
 	});
-	updateRelativeTime();
 });
 
 // Toggles the element height and width styles of an image.
@@ -231,10 +230,11 @@ function add_elk_mention(selector, oOptions)
 	if (typeof oOptions == 'undefined')
 		oOptions = {};
 	oOptions.selector = selector;
-	var index = all_elk_mentions.length;
-	all_elk_mentions[index] = {};
-	all_elk_mentions[index].selector = selector;
-	all_elk_mentions[index].oOptions = oOptions;
+
+	all_elk_mentions[all_elk_mentions.length] = {
+		selector: selector,
+		oOptions: oOptions
+	};
 }
 
 $(document).ready(function () {
@@ -248,7 +248,8 @@ function elk_mentions(oOptions)
 	this.last_query = '',
 	this.names = [],
 	this.cached_names = [],
-	this.mentioned,
+	this.queries = [],
+	this.mentions,
 	this.$atwho;
 
 	this.opt = oOptions;
@@ -259,6 +260,8 @@ elk_mentions.prototype.init = function ()
 {
 	this_mention = this;
 	this_mention.$atwho = $(this.opt.selector);
+	this_mention.mentions = $('<div style="display:none" />');
+	this_mention.$atwho.after(this_mention.mentions);
 	this_mention.$atwho.atwho({
 		at: "@",
 		limit: 7 ,
@@ -290,22 +293,73 @@ elk_mentions.prototype.init = function ()
 				this_mention.last_call = current_call;
 				this_mention.last_query = query;
 				this_mention.cached_names[query] = this_mention.names;
+				this_mention.queries[this_mention.queries.length] = query;
 				return this_mention.names;
 			},
 			before_insert: function (value, $li) {
-				if (typeof this_mention.mentioned == 'undefined')
-				{
-					this_mention.mentioned = $('<div style="display:none" />');
-					this_mention.$atwho.after(this_mention.mentioned);
-				}
-				this_mention.mentioned.append($('<input type="hidden" name="uid[]" />').val($li.data('id')));
+				this_mention.mentions.append($('<input type="hidden" name="uid[]" />').val($li.data('id')).attr('data-name', $li.data('value')));
 				return value;
 			}
 		}
 	});
 }
 
-function revalidateMentions()
+function revalidateMentions(sForm, sInput)
 {
-	
+	var cached_names, cached_queries, body, mentions;
+
+	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+	{
+		if (all_elk_mentions[i].selector == sInput || all_elk_mentions[i].selector == '#' + sInput)
+		{
+			if (all_elk_mentions[i].oOptions.isPlugin)
+			{
+				var $editor = $('#' + all_elk_mentions[i].selector).data("sceditor");
+				cached_names = $editor.opts.mentionOptions.cache.names;
+				cached_queries = $editor.opts.mentionOptions.cache.queries;
+				body = $editor.getText().replace(/\u00a0/g, ' ');
+				mentions = $($editor.opts.mentionOptions.cache.mentions);
+			}
+			else
+			{
+				cached_names = all_elk_mentions[i].oMention.cached_names;
+				cached_queries = all_elk_mentions[i].oMention.queries;
+				body = document.forms[sForm][sInput].value.replace(/\u00a0/g, ' ');
+				mentions = $(all_elk_mentions[i].oMention.mentions);
+			}
+
+			// First check if all those in the list are really mentioned
+			$(mentions).find('input').each(function (idx, elem) {
+				var name = $(elem).data('name');
+
+				var next_char, prev_char, index = body.indexOf(name);
+				if (index === -1)
+					$(elem).remove();
+				else
+				{
+					next_char = body.charAt(index + name.length);
+					prev_char = body.charAt(index - 1);
+
+					if (next_char != '' && next_char.localeCompare(" ") != 0)
+						$(elem).remove();
+					else if (prev_char != '' && prev_char.localeCompare(" ") != 0)
+						$(elem).remove();
+				}
+			});
+
+			for (var k = 0, ccount = cached_queries.length; k < ccount; k++)
+			{
+				names = cached_names[cached_queries[k]];
+				for (var l = 0, ncount = names.length; l < ncount; l++)
+					if (body.indexOf(' @' + names[l].name + ' ') !== -1)
+						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+					else if (body.indexOf('@' + names[l].name + ' ') === 0)
+						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+					else if (body.indexOf(' @' + names[l].name) === (body.length - (' @' + names[l].name).length))
+						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+					else if (body.indexOf('@' + names[l].name) === (body.length - (' @' + names[l].name).length))
+						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+			}
+		}
+	}
 }
