@@ -67,7 +67,7 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT n.id_msg, n.id_member_from, n.log_time, n.notif_type,
+		SELECT n.id_msg, n.id_member_from, n.log_time, n.notif_type, n.status,
 			m.subject, m.id_topic, m.id_board,
 			IFNULL(men.real_name, m.poster_name) as mentioner, men.avatar, men.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
@@ -148,21 +148,24 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 }
 
 /**
- * Mark a notification for a certain member as read
+ * Changes a specific notification status for a member
+ * Can be used to mark as read, new, deleted, etc
+ * @todo combine with deleteNotification?
  *
  * @param int $id_member the notified member
  * @param int $msg the message the member was notified for
  * @param string $type the type of notification
  * @param int $id_member_from id of member that notified
  * @param int $log_time the time it was notified
+ * @param int $status status to update, 'new' => 0,	'read' => 1, 'deleted' => 2, 'unapproved' => 3
  */
-function markNotificationAsRead($id_member, $msg, $type, $id_member_from, $log_time)
+function changeNotificationStatus($id_member, $msg, $type, $id_member_from, $log_time, $status = 1)
 {
 	$db = database();
 
 	$db->query('', '
 		UPDATE {db_prefix}log_notifications
-		SET status = 1
+		SET status = {int:status}
 		WHERE id_member = {int:member}
 			AND id_msg = {string:msg}
 			AND notif_type = {string:notif_type}
@@ -175,6 +178,7 @@ function markNotificationAsRead($id_member, $msg, $type, $id_member_from, $log_t
 			'notif_type' => $type,
 			'member_from' => $id_member_from,
 			'log_time' => $log_time,
+			'status' => $status,
 		)
 	);
 
