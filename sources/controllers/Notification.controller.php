@@ -56,7 +56,7 @@ class Notification_Controller extends Action_Controller
 	}
 
 	/**
-	 * The default action is to download an attachment.
+	 * The default action is to show the list of notifications
 	 * This allows ?action=notification to be forwarded to action_list()
 	 */
 	public function action_index()
@@ -176,6 +176,25 @@ class Notification_Controller extends Action_Controller
 					'sort' => array(
 						'default' => 'n.log_time DESC',
 						'reverse' => 'n.log_time',
+					),
+				),
+				'action' => array(
+					'header' => array(
+						'value' => $txt['notification_action'],
+					),
+					'data' => array(
+						'function' => create_function('$row', '
+							global $txt, $settings, $context;
+
+							$opts = \'\';
+
+							if (empty($row[\'status\']))
+								$opts = \'<a href="?action=notification;sa=updatestatus;mark=read;item=\' . $row[\'id_msg\'] . \';type=\' . $row[\'notif_type\'] . \';from=\' . $row[\'id_member_from\'] . \';time=\' . $row[\'log_time\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+							else
+								$opts = \'<a href="?action=notification;sa=updatestatus;mark=unread;item=\' . $row[\'id_msg\'] . \';type=\' . $row[\'notif_type\'] . \';from=\' . $row[\'id_member_from\'] . \';time=\' . $row[\'log_time\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+
+							return $opts . \'<a href="?action=notification;sa=updatestatus;mark=delete;item=\' . $row[\'id_msg\'] . \';type=\' . $row[\'notif_type\'] . \';from=\' . $row[\'id_member_from\'] . \';time=\' . $row[\'log_time\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
+						'),
 					),
 				),
 			),
@@ -310,7 +329,7 @@ class Notification_Controller extends Action_Controller
 
 		deleteNotification($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time);
 
-		redirectexit('action=notifications;sa=list' . $this->_url_param);
+		redirectexit('action=notification;sa=list' . $this->_url_param);
 	}
 
 	/**
@@ -326,18 +345,123 @@ class Notification_Controller extends Action_Controller
 
 		$this->_buildUrl();
 
-		markNotificationAsRead($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time);
+		changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time);
 
 		if (!$noredir)
-			redirectexit('action=notifications;sa=list' . $this->_url_param);
+			redirectexit('action=notification;sa=list' . $this->_url_param);
+	}
+
+	/**
+	 * Updating the status from the listing?
+	 */
+	public function action_updatestatus()
+	{
+		global $user_info;
+
+		checkSession('request');
+
+		$this->setData(array(
+			'id_member' => $user_info['id'],
+			'type' => $_REQUEST['type'],
+			'id_msg' => $_REQUEST['item'],
+			'id_member_from' => $_REQUEST['from'],
+			'log_time' => $_REQUEST['time'],
+		));
+
+		// Make sure its all good
+		if (!$this->_isValid())
+			return;
+
+		$this->_buildUrl();
+
+		switch ($_REQUEST['mark'])
+		{
+			case 'read':
+				changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time, $this->_known_status['read']);
+				break;
+			case 'unread':
+				changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time, $this->_known_status['new']);
+				break;
+			case 'delete':
+				changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time, $this->_known_status['deleted']);
+				break;
+		}
+
+		redirectexit('action=notification;sa=list' . $this->_url_param);
 	}
 
 	/**
 	 * @todo dunno (yet) what should go in this method
+	 * @todo this should not be in this controller but admin with permission checks and not bound by the master setting
+	 *
 	 */
 	public function action_settings()
 	{
+		global $context, $txt, $scripturl;
 
+		loadTemplate('Admin');
+		loadLanguage('Notification');
+
+		// initialize the form
+		$this->_initNotificationSettingsForm();
+
+		$config_vars = $this->_notificationSettings->settings();
+
+		// Get the settings template fired up.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		// Get the final touches in place.
+		$context['post_url'] = $scripturl . '?action=admin;area=notification;save;sa=settings';
+
+		// Saving the settings?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+			Settings_Form::save_db($config_vars);
+
+			redirectexit('action=admin;area=notification;sa=settings');
+		}
+
+		// Prepare the settings...
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Retrieve and return all admin settings for the calendar.
+	 */
+	private function _initNotificationSettingsForm()
+	{
+		global $txt, $context;
+
+		// instantiate the form
+		require_once(SUBSDIR . '/Settings.class.php');
+		$this->_notificationSettings = new Settings_Form();
+
+		// The notification settings
+		$config_vars = array(
+			array('title', 'notification_settings'),
+			array('check', 'enable_notifications'),
+		);
+
+		// Some important context stuff
+		$context['page_title'] = $txt['notification_settings'];
+		$context['sub_template'] = 'show_settings';
+
+		return $this->_notificationSettings->settings($config_vars);
+	}
+
+	/**
+	 * Retrieve and return all admin settings for the calendar.
+	 * @todo is this still need by admin search ???
+	 */
+	public function settings()
+	{
+		$config_vars = array(
+			array('title', 'notification_settings'),
+			array('check', 'enable_notifications'),
+		);
+
+		return $config_vars;
 	}
 
 	/**
