@@ -12,6 +12,14 @@ $txt['notification_when'] = 'When';
 $txt['notification_what'] = 'Mention';
 $txt['notification_all'] = 'Show all';
 $txt['notification_unread'] = 'Show unread';
+$txt['notification_action'] = 'Actions';
+$txt['notification_delete_warning'] = 'Are you sure you want to delete this entry?';
+$txt['notification_markread'] = 'Mark as read';
+$txt['notification_markunread'] = 'Mark as unread';
+
+$txt['notification_settings'] = 'Notification Settings';
+$txt['enable_notifications'] = 'Enable site notificaitons';
+
 
 $txt['notification_men'] = 'Mentioned you in the message {msg_link}';
 $txt['notification_like'] = 'Liked your message {msg_link}';
