@@ -16,9 +16,33 @@ if (!defined('ELK'))
 
 class Notification_Controller extends Action_Controller
 {
+	/**
+	 * Will hold all available notification types
+	 *
+	 * @var array
+	 */
 	private $_known_notifications = array();
+
+	/**
+	 * Will hold all available notification status
+	 * 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3,
+	 *
+	 * @var array
+	 */
 	private $_known_status = array();
+
+	/**
+	 * Holds the instance of the data validation class
+	 *
+	 * @var object
+	 */
 	private $_validator = null;
+
+	/**
+	 * Holds the passed data for this instance, is passed through the validator
+	 *
+	 * @var array
+	 */
 	private $_data = null;
 
 	/**
@@ -42,7 +66,6 @@ class Notification_Controller extends Action_Controller
 	/**
 	 * Set up the data for the notification based on what was requested
 	 * This function is called before the flow is redirected to action_index().
-	 *
 	 */
 	public function pre_dispatch()
 	{
