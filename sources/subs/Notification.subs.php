@@ -150,7 +150,9 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 /**
  * Changes a specific notification status for a member
  * Can be used to mark as read, new, deleted, etc
- * @todo combine with deleteNotification?
+ *
+ * note that delete is a "soft-delete" because otherwise anyway we have to remember
+ * when a user was already notified for a certain message (e.g. in case of editing)
  *
  * @param int $id_member the notified member
  * @param int $msg the message the member was notified for
@@ -179,42 +181,6 @@ function changeNotificationStatus($id_member, $msg, $type, $id_member_from, $log
 			'member_from' => $id_member_from,
 			'log_time' => $log_time,
 			'status' => $status,
-		)
-	);
-
-	return $db->affected_rows() != 0;
-}
-
-/**
- * Delete a certain notification for a certain member
- * I'm using a "soft-delete" because otherwise anyway we have to remember
- * when a user was already notified for a certain message (e.g. in case of editing)
- *
- * @param int $id_member the notified member
- * @param int $msg the message the member was notified for
- * @param string $type the type of notification, mentions or like
- * @param int $id_member_from id member that notified
- * @param int $log_time the time it was notified
- */
-function deleteNotification($id_member, $msg, $type, $id_member_from, $log_time)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}log_notifications
-		SET status = 2
-		WHERE id_member = {int:member}
-			AND id_msg = {string:msg}
-			AND notif_type = {string:notif_type}
-			AND id_member_from = {int:member_from}
-			AND log_time = {int:log_time}
-		LIMIT 1',
-		array(
-			'member' => $id_member,
-			'msg' => $msg,
-			'notif_type' => $type,
-			'member_from' => $id_member_from,
-			'log_time' => $log_time,
 		)
 	);
 
