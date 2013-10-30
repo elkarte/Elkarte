@@ -1102,9 +1102,9 @@ function action_databaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_elk_') === false && $modSettings['smfVersion'] < $file[1])
+			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_elk_') === false && version_compare($modSettings['smfVersion'], $file[1]) < 0)
 				$upcontext['file_count']++;
-			elseif (!isset($modSettings['elkVersion']) || (strpos($file[0], '_elk_') !== false && $modSettings['elkVersion'] < $file[1]))
+			elseif ((!isset($modSettings['elkVersion']) && strpos($file[0], '_elk_') !== false) || (strpos($file[0], '_elk_') !== false && version_compare($modSettings['elkVersion'], $file[1]) < 0))
 				$upcontext['file_count']++;
 		}
 	}
@@ -1461,6 +1461,8 @@ function changeSettings($config_vars)
 
 	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
 	{
+		if (trim($settingsArray[$i]) === '?>')
+			$settingsArray[$i] = '';
 		// Don't trim or bother with it if it's not a variable.
 		if (substr($settingsArray[$i], 0, 1) == '$')
 		{
@@ -2043,6 +2045,7 @@ function protected_alter($change, $substep, $is_test = false)
 	global $db_prefix;
 
 	$table = db_table();
+	$db = database();
 
 	// Firstly, check whether the current index/column exists.
 	$found = false;
@@ -2276,7 +2279,7 @@ function checkChange(&$change)
 				'table' => $change['table'],
 		));
 		// Mayday!
-		if ($db->num_rows == 0)
+		if ($db->num_rows() == 0)
 			return;
 
 		// Oh where, oh where has my little field gone. Oh where can it be...
@@ -2759,6 +2762,14 @@ function loadEssentialFunctions()
 {
 	if (!function_exists('ip2range'))
 		require_once(SOURCEDIR . '/Subs.php');
+
+	if (!function_exists('cache_put_data'))
+	{
+		function cache_put_data($val)
+		{
+		
+		}
+	}
 
 	if (!function_exists('un_htmlspecialchars'))
 	{
@@ -4315,116 +4326,6 @@ function template_database_xml()
 	if (!empty($upcontext['error_message']))
 		echo '
 	<error>', $upcontext['error_message'], '</error>';
-}
-
-/**
- * Do they want to upgrade their templates?
- */
-function template_upgrade_templates()
-{
-	global $upcontext;
-
-	echo '
-	<h3>There have been numerous language and template changes since the previous version of ElkArte. On this step the upgrader can attempt to automatically make these changes in your templates to save you from doing so manually.</h3>
-	<form action="', $upcontext['form_url'], '&amp;ssi=1', $upcontext['is_test'] ? '' : ';forreal=1', '" name="upform" id="upform" method="post">';
-
-	// Any files need to be writable?
-	$upcontext['chmod_in_form'] = true;
-	template_chmod();
-
-	// Language/Template files need an update?
-	if ($upcontext['temp_progress'] == 0 && !$upcontext['is_test'] && (!empty($upcontext['languages']) || !empty($upcontext['themes'])))
-	{
-		echo '
-		The following template files will be updated to ensure they are compatible with this version of ElkArte. Note that this can only fix a limited number of compatibility issues and in general you should seek out the latest version of these themes/language files.
-		<table style="width: 90%; margin: 1em 0; border-collapse:collapse; border-spacing: 1; padding: 2px; text-align:center; background: black;">
-			<tr style="background: #eeeeee;">
-				<td style="width:80%"><strong>Area</strong></td>
-				<td style="width:20% text-align:center"><strong>Changes Required</strong></td>
-			</tr>';
-
-		foreach ($upcontext['languages'] as $language)
-		{
-			echo '
-				<tr style="background: #ccc;">
-					<td style="width:80%">
-						&quot;', $language['name'], '&quot; Language Pack
-						<div class="smalltext">(';
-
-			foreach ($language['files'] as $k => $file)
-				echo $file['name'], $k + 1 != count($language['files']) ? ', ' : ')';
-
-			echo '
-						</div>
-					</td>
-					<td style="width:20% text-align:center">', $language['edit_count'] == 0 ? 1 : $language['edit_count'], '</td>
-				</tr>';
-		}
-
-		foreach ($upcontext['themes'] as $theme)
-		{
-			echo '
-				<tr style="background: #ccc;">
-					<td style="width:80%">
-						&quot;', $theme['name'], '&quot; Theme
-						<div class="smalltext">(';
-
-			foreach ($theme['files'] as $k => $file)
-				echo $file['name'], $k + 1 != count($theme['files']) ? ', ' : ')';
-
-			echo '
-						</div>
-					</td>
-					<td style="width:20% text-align:center">', $theme['edit_count'] == 0 ? 1 : $theme['edit_count'], '</td>
-				</tr>';
-		}
-
-		echo '
-		</table>';
-	}
-	else
-	{
-		$langFiles = 0;
-		$themeFiles = 0;
-
-		if (!empty($upcontext['languages']))
-			foreach ($upcontext['languages'] as $lang)
-				$langFiles += count($lang['files']);
-
-		if (!empty($upcontext['themes']))
-			foreach ($upcontext['themes'] as $theme)
-				$themeFiles += count($theme['files']);
-		echo sprintf('Found <strong>%d</strong> language files and <strong>%d</strong> templates requiring an update so far.', $langFiles, $themeFiles) . '<br />';
-
-		// What we're currently doing?
-		if (!empty($upcontext['current_message']))
-			echo '
-				', $upcontext['current_message'];
-	}
-
-	echo '
-		<input type="hidden" name="uptempdone" value="1" />';
-
-	if (!empty($upcontext['languages']))
-		echo '
-		<input type="hidden" name="languages" value="', base64_encode(serialize($upcontext['languages'])), '" />';
-
-	if (!empty($upcontext['themes']))
-		echo '
-		<input type="hidden" name="themes" value="', base64_encode(serialize($upcontext['themes'])), '" />';
-
-	if (!empty($upcontext['writable_files']))
-		echo '
-		<input type="hidden" name="writable_files" value="', base64_encode(serialize($upcontext['writable_files'])), '" />';
-
-	// Offer them the option to upgrade from YaBB SE?
-	if (!empty($upcontext['can_upgrade_yabbse']))
-		echo '
-		<br /><label for="conv"><input type="checkbox" name="conv" id="conv" value="1" class="input_check" /> Convert the existing YaBB SE template and set it as default.</label><br />';
-
-	// We'll want a continue button... assuming chmod is OK (Otherwise let them use connect!)
-	if (empty($upcontext['chmod']['files']) || $upcontext['is_test'])
-		$upcontext['continue'] = 1;
 }
 
 /**
