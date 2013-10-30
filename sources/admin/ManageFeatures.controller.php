@@ -57,6 +57,12 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_signatureSettings;
 
 	/**
+	 * Notifications settings form
+	 * @var Settings_Form
+	 */
+	protected $_notificationSettings;
+
+	/**
 	 * This function passes control through to the relevant tab.
 	 * @see Action_Controller::action_index()
 	 */
@@ -87,6 +93,9 @@ class ManageFeatures_Controller extends Action_Controller
 				'controller' => $this,
 				'function' => 'action_likesSettings_display',
 				'enabled' => in_array('l', $context['admin_features'])),
+			'notification' => array(
+				'controller' => $this,
+				'function' => 'action_notificationSettings_display'),
 			'sig' => array(
 				'controller' => $this,
 				'function' => 'action_signatureSettings_display'),
@@ -457,6 +466,58 @@ class ManageFeatures_Controller extends Action_Controller
 		call_integration_hook('integrate_likes_settings', array(&$config_vars));
 
 		return $this->_likesSettings->settings($config_vars);
+	}
+
+	/**
+	 * Initializes the notification settings admin page.
+	 */
+	public function action_notificationSettings_display()
+	{
+		global $context, $scripturl;
+
+		// initialize the form
+		$this->_initNotificationSettingsForm();
+		$config_vars = $this->_notificationSettings->settings();
+
+		// Saving the settings?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=featuresettings;sa=notification');
+		}
+
+		// Prepare the settings for display
+		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=notification';
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Retrieve and return all admin settings for notifications.
+	 */
+	private function _initNotificationSettingsForm()
+	{
+		global $txt, $context;
+
+		// We're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		loadLanguage('Notification');
+
+		// instantiate the form
+		$this->_notificationSettings = new Settings_Form();
+
+		// The notification settings
+		$config_vars = array(
+			array('title', 'notification_settings'),
+			array('check', 'enable_notifications'),
+		);
+
+		// Some context stuff
+		$context['page_title'] = $txt['notification_settings'];
+		$context['sub_template'] = 'show_settings';
+
+		return $this->_notificationSettings->settings($config_vars);
 	}
 
 	/**
@@ -1567,6 +1628,20 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 
 		call_integration_hook('integrate_likes_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return notification settings.
+	 * Used in admin center search.
+	 */
+	public function NotificationSettings()
+	{
+		$config_vars = array(
+			array('title', 'notification_settings'),
+			array('check', 'enable_notifications'),
+		);
 
 		return $config_vars;
 	}
