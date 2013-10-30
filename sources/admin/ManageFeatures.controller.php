@@ -139,6 +139,9 @@ class ManageFeatures_Controller extends Action_Controller
 				),
 				'likes' => array(
 				),
+				'notification' => array(
+					'description' => $txt['notification_settings_desc'],
+				),
 				'sig' => array(
 					'description' => $txt['signature_settings_desc'],
 				),
