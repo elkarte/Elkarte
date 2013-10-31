@@ -323,9 +323,13 @@ upgrade_query("
 /******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
+---# Creating sequence for user_drafts.
+CREATE SEQUENCE {$db_prefix}user_drafts_seq;
+---#
+
 ---# Creating drafts table.
 CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
-	id_draft int NOT NULL auto_increment,
+  id_draft int default nextval('{$db_prefix}user_drafts_seq'),
 	id_topic int NOT NULL default '0',
 	id_board smallint NOT NULL default '0',
 	id_reply int NOT NULL default '0',
@@ -561,15 +565,26 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
 --- Updating antispam questions.
 /******************************************************************************/
 
+---# Creating sequence for antispam_questions table...
+CREATE SEQUENCE {$db_prefix}antispam_questions_seq;
+---#
+
 ---# Creating antispam questions table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
-  id_question tinyint NOT NULL auto_increment,
+	id_question int default nextval('{$db_prefix}antispam_questions_seq'),
   question text NOT NULL default '',
   answer text NOT NULL default '',
   language varchar(50) NOT NULL default '',
-  PRIMARY KEY (id_question),
-  KEY language (language(30))
+  PRIMARY KEY (id_question)
 );
+---#
+
+#
+# Indexes for table `ban_items`
+#
+
+---# Creating index for antispam_questions table...
+CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
 ---#
 
 ---# Move existing values...
