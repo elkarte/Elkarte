@@ -17,7 +17,8 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_user = 'postgres';
 		$this->_passwd = '';
 		$this->_prefix = 'elkarte_';
-		$this->_db = Database_PostgreSQL::initiate($this->_server, $this->_name, $this->_user, $this->_passwd, $this->_prefix);
+		$connection = Database_PostgreSQL::initiate($this->_server, $this->_name, $this->_user, $this->_passwd, $this->_prefix);
+		$this->_db = Database_PostgreSQL::db();
 
 		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
 		$this->fix_query_string();

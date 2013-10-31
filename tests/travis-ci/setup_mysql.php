@@ -17,9 +17,10 @@ Class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_user = 'root';
 		$this->_passwd = '';
 		$this->_prefix = 'elkarte_';
-		$this->_db = Database_MySQL::initiate($this->_server, $this->_name, $this->_user, $this->_passwd, $this->_prefix);
+		$connection = Database_MySQL::initiate($this->_server, $this->_name, $this->_user, $this->_passwd, $this->_prefix);
+		$this->_db = Database_MySQL::db();
 
-		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
+		$this->load_queries(BOARDDIR . '/install/install_1-0_mysql.sql');
 		$this->run_queries();
 		$this->prepare_settings();
 	}
