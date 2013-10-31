@@ -179,18 +179,25 @@ INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, d
 # --------------------------------------------------------
 
 #
+# Sequence for table `antispam_questions`
+#
+
+CREATE SEQUENCE {$db_prefix}antispam_questions_seq;
+
+#
 # Table structure for table `antispam_questions`
 #
 
 CREATE TABLE {$db_prefix}antispam_questions (
-  id_question integer primary key,
+  id_question int default nextval('{$db_prefix}antispam_questions_seq'),
   question text NOT NULL,
   answer text NOT NULL,
-  language varchar(50) NOT NULL
+  language varchar(50) NOT NULL,
+  PRIMARY KEY (id_question)
 );
 
 #
-# Indexes for table `admin_info_files`
+# Indexes for table `antispam_questions`
 #
 
 CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
@@ -987,36 +994,36 @@ CREATE UNIQUE INDEX {$db_prefix}custom_fields_col_name ON {$db_prefix}custom_fie
 # Dumping data for table `custom_fields`
 #
 
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
 
@@ -1028,7 +1035,7 @@ CREATE TABLE {$db_prefix}custom_fields_data (
   id_member int NOT NULL default '0',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,
-  PRIMARY KEY (id_member, variable),
+  PRIMARY KEY (id_member, variable)
 );
 
 #
@@ -2770,13 +2777,13 @@ CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
 # Table structure for table `postby_emails_error`
 #
 
-CREATE TABLE {$db_prefix}postby_emails_error
+CREATE TABLE {$db_prefix}postby_emails_error (
 	id_email int default nextval('{$db_prefix}postby_emails_error'),
 	error varchar(255) NOT NULL default '',
 	data_id varchar(255) NOT NULL default '0',
 	subject varchar(255) NOT NULL default '',
 	id_message int NOT NULL default '0',
-	id_board smallint(5) NOT NULL default '0',
+	id_board smallint NOT NULL default '0',
 	email_from varchar(50) NOT NULL default '',
 	message_type char(10) NOT NULL default '',
 	message text NOT NULL,
@@ -2793,7 +2800,7 @@ CREATE SEQUENCE {$db_prefix}postby_emails_filter_seq;
 # Table structure for table `postby_emails_filter`
 #
 
-CREATE TABLE {$db_prefix}postby_emails_filter
+CREATE TABLE {$db_prefix}postby_emails_filter (
 	id_filter int default nextval('{$db_prefix}postby_emails_filter'),
 	filter_style char(5) NOT NULL default '',
 	filter_type varchar(255) NOT NULL default '',

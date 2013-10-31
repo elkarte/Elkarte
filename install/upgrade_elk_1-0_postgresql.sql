@@ -323,15 +323,19 @@ upgrade_query("
 /******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
+---# Creating sequence for user_drafts.
+CREATE SEQUENCE {$db_prefix}user_drafts_seq;
+---#
+
 ---# Creating drafts table.
 CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
-	id_draft int unsigned NOT NULL auto_increment,
-	id_topic int unsigned NOT NULL default '0',
-	id_board smallint unsigned NOT NULL default '0',
-	id_reply int unsigned NOT NULL default '0',
+  id_draft int default nextval('{$db_prefix}user_drafts_seq'),
+	id_topic int NOT NULL default '0',
+	id_board smallint NOT NULL default '0',
+	id_reply int NOT NULL default '0',
 	type smallint NOT NULL default '0',
-	poster_time int unsigned NOT NULL default '0',
-	id_member int unsigned NOT NULL default '0',
+	poster_time int NOT NULL default '0',
+	id_member int NOT NULL default '0',
 	subject varchar(255) NOT NULL default '',
 	smileys_enabled smallint NOT NULL default '1',
 	body text NOT NULL,
@@ -399,7 +403,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}custom_fields_data (
   id_member int NOT NULL default '0',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,
-  PRIMARY KEY (id_member, variable),
+  PRIMARY KEY (id_member, variable)
 );
 ---#
 
@@ -430,36 +434,36 @@ if ($db->num_rows($request) != 0)
 --- Messenger fields
 /******************************************************************************/
 ---# Insert new fields
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
 ---#
@@ -561,15 +565,26 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
 --- Updating antispam questions.
 /******************************************************************************/
 
+---# Creating sequence for antispam_questions table...
+CREATE SEQUENCE {$db_prefix}antispam_questions_seq;
+---#
+
 ---# Creating antispam questions table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
-  id_question tinyint(4) unsigned NOT NULL auto_increment,
+	id_question int default nextval('{$db_prefix}antispam_questions_seq'),
   question text NOT NULL default '',
   answer text NOT NULL default '',
   language varchar(50) NOT NULL default '',
-  PRIMARY KEY (id_question),
-  KEY language (language(30))
+  PRIMARY KEY (id_question)
 );
+---#
+
+#
+# Indexes for table `ban_items`
+#
+
+---# Creating index for antispam_questions table...
+CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
 ---#
 
 ---# Move existing values...
@@ -604,20 +619,20 @@ if ($db->num_rows($request) != 0)
 --- Messenger fields
 /******************************************************************************/
 ---# Insert new fields
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/aim.png" alt="AIM - {INPUT}"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_msn', 'MSN/Live', 'Your Live Messenger email address', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="msn" href="http://members.msn.com/{INPUT}" target="_blank" title="Live - {INPUT}"><img src="{IMAGES_URL}/msntalk.png" alt="Live - {INPUT}"></a>', 1)
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
 VALUES
 	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
 ---#
@@ -711,8 +726,8 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
 
 ---# Adding new columns to log_activity...
 ALTER TABLE {$db_prefix}log_activity
-ADD COLUMN pm smallint unsigned NOT NULL DEFAULT '0',
-ADD COLUMN email smallint unsigned NOT NULL DEFAULT '0';
+ADD COLUMN pm smallint NOT NULL DEFAULT '0',
+ADD COLUMN email smallint NOT NULL DEFAULT '0';
 ---#
 
 ---# Adding new columns to mail_queue...
@@ -774,7 +789,7 @@ ADD COLUMN likes_received int NOT NULL default '0';
 
 ---# Renaming column that stores the PM receiving setting...
 ALTER TABLE {$db_prefix}members
-CHANGE pm_receive_from receive_from tinyint(4) unsigned NOT NULL default '1';
+CHANGE pm_receive_from receive_from tinyint NOT NULL default '1';
 ---#
 
 /******************************************************************************/
@@ -806,5 +821,5 @@ ADD COLUMN notifications smallint NOT NULL default '0';
 /******************************************************************************/
 ---# Adding new columns to log_packages ..
 ALTER TABLE {$db_prefix}members
-CHANGE `instant_messages` `personal_messages` smallint(5) NOT NULL default 0;
+CHANGE `instant_messages` `personal_messages` smallint NOT NULL default 0;
 ---#
