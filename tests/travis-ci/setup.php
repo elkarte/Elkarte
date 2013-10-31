@@ -38,8 +38,16 @@ Class Elk_Testing_Setup
 
 	public function load_queries($file)
 	{
-		$this->_queries = str_replace('{$db_prefix}', 'elk_', file_get_contents($file));
+		$this->_queries = str_replace('{$db_prefix}', $this->_prefix, file_get_contents($file));
 		$this->_queries_parts = explode("\n", $this->_queries);
+		$this->fix_query_string();
+	}
+
+	public function fix_query_string()
+	{
+		foreach ($this->_queries_parts as $line)
+			if (!empty($line[0]) && $line[0] != '#')
+				$this->_clean_queries_parts[] = str_replace(array('{$current_time}', '{$sched_task_offset}'), array(time(), '1'), $line);
 	}
 
 	public function prepare_settings()

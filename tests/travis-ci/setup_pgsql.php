@@ -21,16 +21,8 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_db = Database_PostgreSQL::db();
 
 		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
-		$this->fix_query_string();
 		$this->run_queries();
 		$this->prepare_settings();
-	}
-
-	public function fix_query_string()
-	{
-		foreach ($this->_queries_parts as $line)
-			if (!empty($line[0]) && $line[0] != '#')
-				$this->_clean_queries_parts[] = str_replace(array('{$current_time}', '{$sched_task_offset}'), array(time(), '1'), $line);
 	}
 }
 
