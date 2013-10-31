@@ -23,8 +23,10 @@ Class Elk_Testing_Setup
 		{
 			if (substr($part, -1) == ';')
 			{
-				echo $query . "\n" . $part . "\n";
-				$this->_db->query($query . "\n" . $part);
+				$result = $this->_db->query($query . "\n" . $part);
+				if ($result === false)
+					echo 'Query failed: ' . "\n" . $query . "\n" . $part . "\n";
+
 				$query = '';
 			}
 			else
