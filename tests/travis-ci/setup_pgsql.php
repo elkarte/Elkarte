@@ -1,10 +1,14 @@
 <?php
 define('TESTDIR', dirname(__FILE__));
 
-global $testing_db, $db_dsn, $db_user;
+global $testing_db, $db_server, $db_name, $db_user, $db_passwd, $db_prefix;
 
-$db_dsn = 'pgsql:dbname=hello_world_test;host=localhost';
+$db_server = 'localhost';
+$db_name = 'hello_world_test';
 $db_user = 'postgres';
+$db_passwd = '';
+$db_prefix = 'elk_';
+
 $testing_db = 'postgresql';
 
 function fix_query_string($string)
