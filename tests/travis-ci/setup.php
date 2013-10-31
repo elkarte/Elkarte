@@ -79,15 +79,28 @@ Class Elk_Testing_Setup
 
 	public function update()
 	{
-		global $settings, $context, $modSettings, $boardurl, $txt, $db_type;
+		global $settings, $db_type;
+		global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
+		global $boardurl, $webmaster_email, $cookiename;
+		global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
+		global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
+		global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+		global $sourcedir, $boarddir;
 
-		require_once(BOARDDIR . '/Settings.php');
+		define('SUBSDIR', BOARDDIR . '/sources/subs');
+
+		require(BOARDDIR . '/Settings.php');
+		require(BOARDDIR . '/sources/Subs.php');
+		require(BOARDDIR . '/sources/Load.php');
+		require_once(SUBSDIR . '/Util.class.php');
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
 
 		// Create a member
-		$request = $this->_db->insert('',
+		$db = database();
+
+		$request = $db->insert('',
 			'{db_prefix}members',
 			array(
 				'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
@@ -109,6 +122,20 @@ Class Elk_Testing_Setup
 			),
 			array('id_member')
 		);
+
+		$server_offset = mktime(0, 0, 0, 1, 1, 1970);
+		$timezone_id = 'Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600);
+		if (date_default_timezone_set($timezone_id))
+			$db->insert('',
+				$db_prefix . 'settings',
+				array(
+					'variable' => 'string-255', 'value' => 'string-65534',
+				),
+				array(
+					'default_timezone', $timezone_id,
+				),
+				array('variable')
+			);
 
 		updateStats('member');
 		updateStats('message');
