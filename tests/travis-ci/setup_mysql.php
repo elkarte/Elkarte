@@ -23,6 +23,7 @@ Class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->load_queries(BOARDDIR . '/install/install_1-0_mysql.sql');
 		$this->run_queries();
 		$this->prepare_settings();
+		$this->update();
 	}
 }
 

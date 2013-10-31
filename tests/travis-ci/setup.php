@@ -72,4 +72,44 @@ Class Elk_Testing_Setup
 
 		file_put_contents(BOARDDIR . '/Settings.php', $file);
 	}
+
+	public function update()
+	{
+		global $settings, $context, $modSettings, $boardurl, $txt;
+
+		require_once(BOARDDIR . '/Settings.php');
+
+		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
+		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
+
+		// Create a member
+		$request = $this->_db->insert('',
+			'{db_prefix}members',
+			array(
+				'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
+				'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
+				'password_salt' => 'string', 'lngfile' => 'string', 'personal_text' => 'string', 'avatar' => 'string',
+				'member_ip' => 'string', 'member_ip2' => 'string', 'buddy_list' => 'string', 'pm_ignore_list' => 'string',
+				'message_labels' => 'string', 'website_title' => 'string', 'website_url' => 'string', 'location' => 'string',
+				'signature' => 'string', 'usertitle' => 'string', 'secret_question' => 'string',
+				'additional_groups' => 'string', 'ignore_boards' => 'string', 'openid_uri' => 'string',
+			),
+			array(
+				'test_admin', 'test_admin', sha1(strtolower(stripslashes('test_admin')) . stripslashes('test_admin_pwd')), 'email@testadmin.tld',
+				1, 0, time(), 0,
+				substr(md5(mt_rand()), 0, 4), '', '', '',
+				'123.123.123.123', '123.123.123.123', '', '',
+				'', '', '', '',
+				'', '', '',
+				'', '', '',
+			),
+			array('id_member')
+		);
+
+		updateStats('member');
+		updateStats('message');
+		updateStats('topic');
+		loadLanguage('Install');
+		updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
+	}
 }
