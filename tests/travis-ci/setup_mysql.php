@@ -4,8 +4,8 @@ define('BOARDDIR', dirname(__FILE__) . '/../..');
 define('ELK', 1);
 
 require_once(TESTDIR . '/setup.php');
-require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/database/Db-mysql.class.php');
+require_once(BOARDDIR . '/sources/database/Db-mysql.subs.php');
 
 Class Elk_Testing_mysql extends Elk_Testing_Setup
 {

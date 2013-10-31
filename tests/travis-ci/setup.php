@@ -1,4 +1,8 @@
 <?php
+require_once(BOARDDIR . '/sources/database/Db.php');
+require_once(BOARDDIR . '/sources/Errors.php');
+require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
+require_once(BOARDDIR . '/sources/database/Database.subs.php');
 
 Class Elk_Testing_Setup
 {
@@ -23,9 +27,9 @@ Class Elk_Testing_Setup
 		{
 			if (substr($part, -1) == ';')
 			{
-				$result = $this->_db->query('', $query . "\n" . $part, array('security_override' => true));
+				$result = $this->_db->query('', $query . "\n" . substr($part, 0, -1), array('security_override' => true));
 				if ($result === false)
-					echo 'Query failed: ' . "\n" . $query . "\n" . $part . "\n";
+					echo 'Query failed: ' . "\n" . $query . "\n" . substr($part, 0, -1) . "\n";
 
 				$query = '';
 			}
@@ -75,7 +79,7 @@ Class Elk_Testing_Setup
 
 	public function update()
 	{
-		global $settings, $context, $modSettings, $boardurl, $txt;
+		global $settings, $context, $modSettings, $boardurl, $txt, $db_type;
 
 		require_once(BOARDDIR . '/Settings.php');
 
