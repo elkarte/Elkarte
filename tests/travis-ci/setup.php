@@ -23,7 +23,7 @@ Class Elk_Testing_Setup
 		{
 			if (substr($part, -1) == ';')
 			{
-				$result = $this->_db->query($query . "\n" . $part);
+				$result = $this->_db->query('', $query . "\n" . $part, array('security_override' => true));
 				if ($result === false)
 					echo 'Query failed: ' . "\n" . $query . "\n" . $part . "\n";
 
