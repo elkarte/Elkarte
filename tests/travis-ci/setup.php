@@ -14,6 +14,8 @@ Class Elk_Testing_Setup
 
 	public function run_queries()
 	{
+		$query = '';
+
 		if (empty($this->_clean_queries_parts))
 			$this->_clean_queries_parts = $this->_queries_parts;
 
@@ -40,7 +42,23 @@ Class Elk_Testing_Setup
 
 	public function prepare_settings()
 	{
-		$fh = fopen(BOARDDIR . '/Settings.php', 'a');
-		fwrite($fh, "\n" . '$test_enabled = 1;');
+		$file = file_get_contents(BOARDDIR . '/Settings.php');
+		$file = str_replace(array(
+			'$boardurl = \'http://127.0.0.1/elkarte\';',
+			'$db_type = \'mysql\';',
+			'$db_name = \'elkarte\';',
+			'$db_user = \'root\';',
+			'$db_prefix = \'elkarte_\';'
+		),
+		array(
+			'$boardurl = \'http://127.0.0.1\';',
+			'$db_type = \'' . $this->_type . '\';',
+			'$db_name = \'' . $this->_name . '\';',
+			'$db_user = \'' . $this->_user . '\';',
+			'$db_prefix = \'' . $this->_prefix . '\';'
+		),
+		$file);
+		$file .= "\n" . '$test_enabled = 1;';
+		file_put_contents(BOARDDIR . '/Settings.php', $file);
 	}
 }
