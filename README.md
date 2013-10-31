@@ -16,6 +16,8 @@ by signing off your contributions, you acknowledge that you can and do license y
 
 Please see [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) for information on how to contribute to the development process.
 
+[![Build Status](https://travis-ci.org/elkarte/Elkarte.png?branch=master)](https://travis-ci.org/emanuele45/Dialogo)
+
 Site and IRC
 ===
 Join us on IRC, on #elkarte channel on freenode.
