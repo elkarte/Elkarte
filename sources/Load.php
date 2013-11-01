@@ -2556,7 +2556,7 @@ function loadDatabase()
  */
 function determineAvatar($profile)
 {
-	global $modSettings, $scripturl;
+	global $modSettings, $scripturl, $settings;
 
 	// If we're always html resizing, assume it's too large.
 	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
@@ -2621,8 +2621,8 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => '',
-			'image' => '<img src="' . $modSettings['avatar_url'] . '/default_avatar.png' . '" alt="" class="avatar" />',
-			'href' => $modSettings['avatar_url'] . '/default_avatar.png',
+			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" />',
+			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);
 	}
