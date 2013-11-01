@@ -18,6 +18,9 @@ if (!defined('ELK'))
  * If the email is plain text it will convert it to html based on markdown text
  * conventions and then that will be converted to bbc.
  *
+ * requires Html2BBC.class.php for the html to bbc conversion
+ * requires markdown.php for text to html convesions
+ *
  * @param string $text
  * @param boolean $html
  */
@@ -75,7 +78,7 @@ function pbe_email_to_bbc($text, $html)
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
-		$bbc_converter = new Convert_BBC($text);
+		$bbc_converter = new Convert_BBC($text, false);
 		$text = $bbc_converter->get_bbc();
 	}
 
@@ -96,6 +99,8 @@ function pbe_email_to_bbc($text, $html)
  *  - Fixes quotes and quote levels
  *  - Re-flows (unfolds) an email using the EmailFormat.class
  *  - Attempts to remove any exposed email address
+ *
+ * requires: EmailFormat.class.php
  *
  * @param string $body
  * @param boolean $html
@@ -123,6 +128,9 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 
 	// Remove multiple sequential blank lines, again
 	$body = preg_replace('~(\n){3,}~si', "\n\n", $body);
+
+	// Check for blank quotes
+	$body = preg_replace('~(\[quote(.*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
 	require_once(SUBSDIR . '/EmailFormat.class.php');
@@ -442,8 +450,9 @@ function pbe_clean_email_subject($text, $check = false)
 }
 
 /**
- * Used if the original email could not be removed from the message
+ * Used if the original email could not be removed from the message (top of post)
  *  - Tries to quote the original message instead by using a loose original message search
+ *  - Looks for email client oringinal message tags and converts them to bbc quotes
  *
  * @param string $body
  */
@@ -452,7 +461,7 @@ function pbe_fix_client_quotes($body)
 	global $txt;
 
 	// Define some common quote markers (from the original messages)
-	// @todo ACP for this? ... not sure really since this is really damage repair
+	// @todo ACP for this? ... not sure
 	$regex = array();
 
 	// On mon, jan 12, 2004 at 10:10 AM, John Smith wrote: [quote]
@@ -470,8 +479,14 @@ function pbe_fix_client_quotes($body)
 	// quoting: John Smith on stuffz at 10:10:23 AM
 	$regex[] = "~" . $txt['email_quotefrom'] . ": (.*) " . $txt['email_on'] . " .* " . $txt['email_at'] . " \d{1,2}:\d{1,2}:\d{1,2} [AP]M~";
 
-	// quoting Joe Blow <johnsmith@tardis.com>
+	// quoting John Smith <johnsmith@tardis.com>
 	$regex[] = "~" . $txt['email_quoting'] . " (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i";
+
+	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
+	$regex[] = "~---\s.*?\"(.*)\"\s+" . $txt['email_wrote'] . ":\s(\[quote\])?~i";
+
+	// --- in some@group.name John Smith wrote
+	$regex[] = "~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s" . $txt['email_wrote'] . ":?~i";
 
 	// For each one see if we can do a nice [quote author=john smith]
 	foreach ($regex as $reg)
