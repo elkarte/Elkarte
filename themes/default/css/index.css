@@ -2272,16 +2272,31 @@ img.new_posts {
 }
 /* End nifty new flyout. */
 
-.postarea {
-	display: table-cell;
-	vertical-align: top;
+.poster {
+	float: left;
+}
+.post_wrapper {
+	display: block;
 	width: 100%;
+	clear: both;
+}
+.postarea {
+	display: block;
+	vertical-align: top;
+	margin: 0 0 0 180px;
 	padding: 0 1em 0 0;
+	max-width: 100%;
 }
 .postarea2 {
 	display: block;
 	padding: 0 1em;
 }
+
+#ie8 .bbc_code, #ie9 .bbc_code {
+white-space: pre-wrap;
+}
+
+
 #topic_summary .postarea2 {
 	font-size: 0.857em;
 }
@@ -4247,6 +4262,7 @@ dl.merge_topic dd {
 	}
 	ul.poster {
 		display: block;
+		clear: both;
 	}
 	.avatar>.linklevel1>.avatar {
 		max-width: 20px;
