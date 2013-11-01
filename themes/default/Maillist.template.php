@@ -7,7 +7,7 @@
  *
  * @version 1.0 Alpha
  *
- * Templates for the maillist function
+ * Templates for the PBE maillist function
  */
 
 /**
@@ -50,7 +50,7 @@ function template_show_email()
 }
 
 /**
- * Used to select a reject template and send a bounce message to a email sender
+ * Used to select a bounce template and send a failed message to a email sender
  */
 function template_bounce_email()
 {
@@ -332,8 +332,16 @@ function template_bounce_template()
 
 	echo '
 	<div id="modcenter">
-		<form action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
+			<div id="box_preview" class="forumposts"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
+				<h3 class="catbg">
+					<span id="preview_subject">', $txt['preview'], '</span>
+				</h3>
+				<div class="post" id="template_preview">
+					', empty($context['template_preview']) ? '<br />' : $context['template_preview'], '
+				</div>
+			</div>
+			<div class="forumposts">
 				<h3 class="catbg">', $context['page_title'], '</h3>
 			</div>
 			<div class="information">
@@ -348,16 +356,6 @@ function template_bounce_template()
 							</dt>
 							<dd class="error" id="error_list">
 								', empty($context['warning_errors']) ? '' : implode('<br />', $context['warning_errors']), '
-							</dd>
-						</dl>
-					</div>
-					<div id="box_preview"', !empty($context['template_preview']) ? '' : ' style="display:none"', '>
-						<dl class="settings">
-							<dt>
-								', $txt['preview'], '
-							</dt>
-							<dd id="template_preview">
-								', !empty($context['template_preview']) ? $context['template_preview'] : '', '
 							</dd>
 						</dl>
 					</div>
@@ -399,11 +397,11 @@ function template_bounce_template()
 					<div class="submitbutton">
 						<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
 						<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['mod-mlt_token_var'], '" value="', $context['mod-mlt_token'], '" />
 					</div>
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['mod-mlt_token_var'], '" value="', $context['mod-mlt_token'], '" />
 		</form>
 	</div>
 
@@ -414,7 +412,7 @@ function template_bounce_template()
 			});
 		});
 
-		function ajax_getTemplatePreview ()
+		function ajax_getTemplatePreview()
 		{
 			$.ajax({
 				type: "POST",
@@ -440,7 +438,7 @@ function template_bounce_template()
 					$("#errors").css({display:"none"});
 					$("#error_list").html(\'\');
 				}
-			return false;
+				return false;
 			});
 			return false;
 		}
