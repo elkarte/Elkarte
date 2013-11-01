@@ -53,6 +53,8 @@ class ManageMaillist_Controller extends Action_Controller
 			'emailparser' => array($this, 'action_list_parsers', 'permission' => 'admin_forum'),
 			'editparser' => array($this, 'action_edit_parsers', 'permission' => 'admin_forum'),
 			'deleteparser' => array($this, 'action_delete_parsers', 'permission' => 'admin_forum'),
+			'sortparsers' => array($this, 'action_sort_parsers', 'permission' => 'admin_forum'),
+			'sortfilters' => array($this, 'action_sort_filters', 'permission' => 'admin_forum'),
 		);
 
 		// Set up the action class
@@ -72,7 +74,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Create the title area for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['ml_admin_configuration'],
-			'help' => $txt['maillist_help_short'],
+			'help' => 'maillist_help_short',
 			'description' => $txt['ml_configuration_desc'],
 		);
 
@@ -643,8 +645,9 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="right_submit" />',
-				),
+					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=maillist;sa=sortfilters">' . $txt['sort_filter'] . '</a>',
+					),
 			),
 		);
 
@@ -652,6 +655,121 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['filters'];
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'email_filter';
+
+		// Create the list.
+		require_once(SUBSDIR . '/List.subs.php');
+		createList($listOptions);
+	}
+
+	/**
+	 * Show a full list of all the filters in the system for drag/drop sorting
+	 */
+	public function action_sort_filters()
+	{
+		global $context, $scripturl, $txt;
+
+		$id = 0;
+		$token = createToken('admin-sort');
+
+		// build the listoption array to display the data
+		$listOptions = array(
+			'id' => 'sort_email_fp',
+			'title' => $txt['sort_filter'],
+			'sortable' => true,
+			'items_per_page' => 0,
+			'no_items_label' => $txt['no_filters'],
+			'base_href' => $scripturl . '?action=admin;area=maillist;sa=sortfilters',
+			'get_items' => array(
+				'function' => array($this, 'load_filter_parser'),
+				'params' => array(
+					$id,
+					'filter'
+				),
+			),
+			'get_count' => array(
+				'function' => array($this, 'count_filter_parser'),
+				'params' => array(
+					$id,
+					'filter'
+				),
+			),
+			'columns' => array(
+				'filterorder' => array(
+					'header' => array(
+						'value' => '',
+						'style' => 'display: none',
+					),
+					'data' => array(
+						'db' => 'filter_order',
+						'style' => 'display: none',
+					),
+				),
+				'name' => array(
+					'header' => array(
+						'value' => $txt['filter_name'],
+						'style' => 'white-space: nowrap;width: 10em'
+					),
+					'data' => array(
+						'db' => 'filter_name',
+					),
+				),
+				'from' => array(
+					'header' => array(
+						'value' => $txt['filter_from'],
+					),
+					'data' => array(
+						'db' => 'filter_from',
+					),
+				),
+				'to' => array(
+					'header' => array(
+						'value' => $txt['filter_to'],
+						'style' => 'width:10em;',
+					),
+					'data' => array(
+						'db' => 'filter_to',
+					),
+				),
+				'type' => array(
+					'header' => array(
+						'value' => $txt['filter_type'],
+					),
+					'data' => array(
+						'db' => 'filter_type',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=maillist;sa=sortfilters',
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'after_title',
+					'value' => $txt['filter_sort_description'],
+					'class' => 'windowbg',
+				),
+			),
+			'javascript' => '
+				$().elkSortable({
+					sa: "parserorder",
+					placeholder: "ui-state-highlight",
+					containment: "#sort_email_fp",
+					error: "' . $txt['admin_order_error'] . '",
+					title: "' . $txt['admin_order_title'] . '",
+					href: "?action=admin;;area=maillist;sa=sortfilters",
+					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
+				});
+			',
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['filters'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'sort_email_fp';
+		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Create the list.
 		require_once(SUBSDIR . '/List.subs.php');
@@ -855,14 +973,13 @@ class ManageMaillist_Controller extends Action_Controller
 
 		$id = 0;
 
-		// build the listoption array to display the data
+		// Build the listoption array to display the data
 		$listOptions = array(
 			'id' => 'email_parser',
 			'title' => $txt['parsers'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_parsers'],
 			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailparser',
-			'default_sort_col' => 'name',
 			'get_items' => array(
 				'function' => array($this, 'load_filter_parser'),
 				'params' => array(
@@ -923,10 +1040,10 @@ class ManageMaillist_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<img title="' . $txt['modify'] . '"src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
+										<img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
 									</a>
 									<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<img title="' . $txt['delete'] . '"  src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
+										<img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
 									</a>',
 							'params' => array(
 								'id_filter' => true,
@@ -953,8 +1070,10 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_parser'] . '" class="right_submit" />',
-				),
+					'value' => '
+						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=maillist;sa=sortparsers">' . $txt['sort_parser'] . '</a>',
+					),
 			),
 		);
 
@@ -962,6 +1081,112 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['parsers'];
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'email_parser';
+
+		// Create the list.
+		require_once(SUBSDIR . '/List.subs.php');
+		createList($listOptions);
+	}
+
+	/**
+	 * Show a full list of all the parsers in the system for drag/drop sorting
+	 */
+	public function action_sort_parsers()
+	{
+		global $context, $scripturl, $txt;
+
+		$id = 0;
+		$token = createToken('admin-sort');
+
+		// build the listoption array to display the data
+		$listOptions = array(
+			'id' => 'sort_email_fp',
+			'title' => $txt['sort_parser'],
+			'sortable' => true,
+			'items_per_page' => 0,
+			'no_items_label' => $txt['no_parsers'],
+			'base_href' => $scripturl . '?action=admin;area=maillist;sa=sortparsers',
+			'get_items' => array(
+				'function' => array($this, 'load_filter_parser'),
+				'params' => array(
+					$id,
+					'parser'
+				),
+			),
+			'get_count' => array(
+				'function' => array($this, 'count_filter_parser'),
+				'params' => array(
+					$id,
+					'parser'
+				),
+			),
+			'columns' => array(
+				'filterorder' => array(
+					'header' => array(
+						'value' => '',
+						'style' => 'display: none',
+					),
+					'data' => array(
+						'db' => 'filter_order',
+						'style' => 'display: none',
+					),
+				),
+				'name' => array(
+					'header' => array(
+						'value' => $txt['parser_name'],
+						'style' => 'white-space: nowrap;width: 10em'
+					),
+					'data' => array(
+						'db' => 'filter_name',
+					),
+				),
+				'from' => array(
+					'header' => array(
+						'value' => $txt['parser_from'],
+					),
+					'data' => array(
+						'db' => 'filter_from',
+					),
+				),
+				'type' => array(
+					'header' => array(
+						'value' => $txt['parser_type'],
+					),
+					'data' => array(
+						'db' => 'filter_type',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=maillist;sa=sortparsers',
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'after_title',
+					'value' => $txt['parser_sort_description'],
+					'class' => 'windowbg',
+				),
+			),
+			'javascript' => '
+				$().elkSortable({
+					sa: "parserorder",
+					placeholder: "ui-state-highlight",
+					containment: "#sort_email_fp",
+					error: "' . $txt['admin_order_error'] . '",
+					title: "' . $txt['admin_order_title'] . '",
+					href: "?action=admin;;area=maillist;sa=sortparsers",
+					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
+				});
+			',
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['parsers'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'sort_email_fp';
+		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// Create the list.
 		require_once(SUBSDIR . '/List.subs.php');
