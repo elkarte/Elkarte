@@ -212,6 +212,8 @@ class ProfileInfo_Controller extends Action_Controller
 				$context['thumbs'][$i] = array(
 					'url' => $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'],
 					'img' => '',
+					'filename' => $attachments[$i]['filename'],
+					'downloads' => $attachments[$i]['downloads'],
 				);
 
 				// Show a thumbnail image as well?
