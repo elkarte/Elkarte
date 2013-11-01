@@ -60,6 +60,11 @@ class Convert_BBC
 	public $block_elements = array('p', 'div', 'ol', 'ul', 'pre', 'table', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
 
 	/**
+	 * Used to strip newlines inside of 'p' and 'div' elements
+	 */
+	public $strip_newlines = null;
+
+	/**
 	 * Holds any html tags that would normally be convert to bbc but are instead skipped
 	 */
 	protected $_skip_tags = array();
@@ -69,10 +74,11 @@ class Convert_BBC
 	 *
 	 * @param type $html
 	 */
-	public function __construct($html)
+	public function __construct($html, $strip = true)
 	{
 		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
+		$this->strip_newlines = $strip;
 
 		// Using PHP built in functions ...
 		if (class_exists('DOMDocument'))
@@ -278,7 +284,7 @@ class Convert_BBC
 				 $bbc = trim($this->_get_value($node)) . $this->line_break;
 				break;
 			case 'div':
-				$bbc = str_replace("\n", ' ', $this->_convert_styles($node));
+				$bbc = $this->strip_newlines ? str_replace("\n", ' ', $this->_convert_styles($node)) : $this->_convert_styles($node);
 				break;
 			case 'em':
 			case 'i':
@@ -311,7 +317,7 @@ class Convert_BBC
 				$bbc = '[li]' . $this->_get_value($node) . '[/li]' . $this->line_end;
 				break;
 			case 'p':
-				$bbc = str_replace("\n", ' ', $this->_convert_styles($node));
+				$bbc = $this->strip_newlines ? str_replace("\n", ' ', $this->_convert_styles($node)) : $this->_convert_styles($node);
 				break;
 			case 'pre':
 				$bbc = '[pre]' . $this->_get_value($node) . '[/pre]';
