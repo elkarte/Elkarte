@@ -2292,11 +2292,6 @@ img.new_posts {
 	padding: 0 1em;
 }
 
-#ie8 .bbc_code, #ie9 .bbc_code {
-white-space: pre-wrap;
-}
-
-
 #topic_summary .postarea2 {
 	font-size: 0.857em;
 }
