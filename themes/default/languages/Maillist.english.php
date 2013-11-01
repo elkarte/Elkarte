@@ -167,6 +167,7 @@ $txt['email_failure'] = 'Failure Reason';
 // Filters
 $txt['filters'] = 'Email Filters';
 $txt['add_filter'] = 'Add Filter';
+$txt['sort_filter'] = 'Sort Filters';
 $txt['edit_filter'] = 'Edit Existing Filter';
 $txt['no_filters'] = 'You have not defined any filters';
 $txt['error_no_filter'] = 'Unable to find/load specified filter';
@@ -183,14 +184,17 @@ $txt['filters_title'] = 'From this area you can add, edit or remove email filter
 $txt['filter_invalid'] = 'The definition is not valid and could not be saved';
 $txt['error_no_id_filter'] = 'The filter id is not valid';
 $txt['saved_filter'] = 'The filter was saved successfully';
+$txt['filter_sort_description'] = 'Filters are executed in the order shown, to change this drag and drop an item to a new location in the list.';
 
 // Parsers
 $txt['saved_parser'] = 'The parser was saved successfully';
+$txt['parser_reordered'] = 'The fields were successfully reordered';
 $txt['error_no_id_parser'] = 'The parser id is not valid';
 $txt['add_parser'] = 'Add Parser';
+$txt['sort_parser'] = 'Sort Parsers';
 $txt['edit_parser'] = 'Edit Existing Parser';
 $txt['parsers'] = 'Email Parsers';
-$txt['parser_from'] = 'Find Original Email';
+$txt['parser_from'] = 'Search term in Original Email';
 $txt['parser_from_desc'] = 'Enter the starting id of the original email, the system will cut the message at this point leaving only the new message (if possible).  If using a regular expression it must be properly delimited';
 $txt['parser_type'] = 'Type';
 $txt['parser_type_desc'] = 'Standard will find the exact phase and cut the email at that point.  Regular Expression is the wildcard option of Standard, but must in in regex format.';
@@ -202,6 +206,7 @@ $txt['option_standard'] = 'Standard';
 $txt['option_regex'] = 'Regular Expression';
 $txt['button_edit'] = 'Edit';
 $txt['button_delete'] = 'Delete';
+$txt['parser_sort_description'] = 'Parsers are executed in the order shown, to change this drag and drop an item to a new location in the list.';
 
 // Bounce
 $txt['bounce_subject'] = 'Failure';
@@ -290,7 +295,6 @@ $txt['notifications_update'] = 'Unnotify';
 
 // Help
 $txt['maillist_help'] = 'For help in setting up the maillist feature, please visit the maillist section on the <a href="https://github.com/elkarte/Elkarte/wiki/Maillist-Feature">ElkArte Wiki</a>';
-$txt['maillist_help_short'] = 'This feature allows users of your forum to reply to the sites email notifications and have those replies post on the forum.  Please visit the Wiki for full instructions';
 
 // Email bounce templates
 $txt['ml_bounce_templates_title'] = 'Custom bounce email templates';
