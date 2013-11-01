@@ -901,6 +901,13 @@ div.bbc_footnotes {
 	max-width: 60px;
 	max-height: 60px;
 }
+.modtask {
+	margin: 1em 0 0 0;
+}
+
+.modtask a {
+	font-weight: bold;
+}
 /* The content section */
 #main_content_section {
 	padding: 1em 0 0 0;
