@@ -175,7 +175,6 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 	$db = database();
 
 	// Init
-	$i = 0;
 	if (empty($sort))
 		$sort = 'id_filter ASC';
 
@@ -184,11 +183,11 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 
 	// Load all the email_filters, we need lots of these :0
 	$request = $db->query('', '
-		SELECT *
+		SELECT id_filter, filter_style, filter_type, filter_to, filter_from, filter_name, filter_order
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
-		ORDER BY {raw:sort}
+		ORDER BY {raw:sort}, filter_order ASC
 		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'offset' => $start,
@@ -200,15 +199,15 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		$email_filters[$i] = array(
+		$email_filters[$row['id_filter']] = array(
 			'id_filter' => $row['id_filter'],
 			'filter_type' => $row['filter_type'],
 			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
 			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
 			'filter_name' => Util::htmlspecialchars($row['filter_name']),
+			'filter_order' => $row['filter_order'],
 		);
-		$i++;
-	};
+	}
 	$db->free_result($request);
 
 	return $email_filters;
@@ -405,5 +404,27 @@ function log_email($sent)
 		),
 		$sent,
 		array('id_email')
+	);
+}
+
+/**
+ * Updates the processing order for the parser and filter fields
+ * Done as a CASE WHEN one two three ELSE 0 END in place of many updates\
+ * Called by Xmlcontroller as part of drag sort event
+ *
+ * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param array $filters list of ids in the WHEN clause to keep from updating the entire table
+ */
+function updateParserFilterOrder($replace, $filters)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}postby_emails_filters
+		SET filter_order = CASE ' . $replace . ' ELSE filter_order END
+		WHERE id_filter IN ({array_int:filters})',
+		array(
+			'filters' => $filters,
+		)
 	);
 }
