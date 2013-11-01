@@ -471,6 +471,10 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #fff;
 	text-decoration: none;
 }
+.linktree_last span a {
+	color: #dfdfdf;
+	text-decoration: none;
+}
 .linktree:before {
 	border-left: 0.75em solid #ccc;
 }
