@@ -184,7 +184,7 @@ $txt['filters_title'] = 'From this area you can add, edit or remove email filter
 $txt['filter_invalid'] = 'The definition is not valid and could not be saved';
 $txt['error_no_id_filter'] = 'The filter id is not valid';
 $txt['saved_filter'] = 'The filter was saved successfully';
-$txt['filter_sort_description'] = 'Filters are executed in the order shown, to change this drag and drop an item to a new location in the list.';
+$txt['filter_sort_description'] = 'Filters are executed in the order shown, regex grouping first, then the standard grouping, to change this drag and drop an item to a new location in the list (However you can not force a standard filter to run before a regex filter).';
 
 // Parsers
 $txt['saved_parser'] = 'The parser was saved successfully';

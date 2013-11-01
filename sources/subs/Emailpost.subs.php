@@ -314,7 +314,8 @@ function pbe_parse_email_message(&$body)
 	$request = $db->query('', '
 		SELECT filter_from, filter_type
 		FROM {db_prefix}postby_emails_filters
-		WHERE filter_style = {string:filter_style}',
+		WHERE filter_style = {string:filter_style}
+		ORDER BY filter_order ASC',
 		array(
 			'filter_style' => 'parser'
 		)
@@ -371,12 +372,12 @@ function pbe_filter_email_message($text)
 {
 	$db = database();
 
-	// load up the text filters from the database, regex first and ordered by id number
+	// load up the text filters from the database, regex first and ordered by the filter order ...
 	$request = $db->query('', '
 		SELECT filter_from, filter_to, filter_type
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}
-		ORDER BY id_filter ASC, filter_type ASC',
+		ORDER BY filter_type ASC, filter_order ASC',
 		array(
 			'filter_style' => 'filter'
 		)

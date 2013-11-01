@@ -187,7 +187,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
-		ORDER BY {raw:sort}, filter_order ASC
+		ORDER BY {raw:sort}, filter_type ASC, filter_order ASC
 		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'offset' => $start,
