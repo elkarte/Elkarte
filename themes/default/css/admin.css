@@ -1173,11 +1173,20 @@ ul.moderation_notes li {
 	}
 }
 
-#table_grid_sortable td:nth-child(2) {
+/* Drag sort lists show the move cursor and up/down arrow content */
+#sort_email_fp td {
     cursor: move;
 }
-
-#table_grid_sortable td:nth-child(2):before {
+#sort_email_fp td:nth-child(2):before {
+	content: "\21f3";
+	padding-right: 5px;
+	font-size: 1.8em;
+	float: left;
+}
+#custom_profile_fields td:nth-child(2) {
+    cursor: move;
+}
+#custom_profile_fields td:nth-child(2):before {
 	content: "\21f3";
 	padding-right: 5px;
 	font-size: 1.8em;
