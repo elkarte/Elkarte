@@ -2876,19 +2876,31 @@ dl.merge_topic dd {
 	content: "\20\7C\20";
 }
 .profile_attachments {
-	padding: 0;
 	border: 0;
-	border-collapse: collapse;
-	border-spacing: 0;
+	border-spacing: 1em;
 	width: 95%;
 	table-layout:fixed;
 	font-size: 0.857em;
 	margin: 0 auto;
 }
 .profile_attachments td, .profile_attachments th {
-	padding: 2px 4px;
+	padding: 5px 4px;
 	vertical-align: top;
 	text-align: center;
+}
+
+.profile_attachment a img {
+	max-width: 120px;
+	max-height: 120px;
+}
+.vcard .avatar {
+	max-width: 40px;
+	max-height: 40px;
+}
+.attach_title {
+	width: 100%;
+	display: block;
+	margin-bottom: 4px;
 }
 /* The basic user info on the left */
 #basicinfo {
