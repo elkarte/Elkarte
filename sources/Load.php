@@ -2695,16 +2695,20 @@ function doSecurityChecks()
 		if ($modSettings['requireAgreement'] && !file_exists(BOARDDIR . '/agreement.txt'))
 			$context['security_controls']['files']['agreement'] = true;
 
+		// Cache directory writeable?
 		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
 			$context['security_controls']['files']['cache'] = true;
 
+		// Active admin session?
 		if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 			$context['security_controls']['admin_session'] = true;
 
+		// Maintenance mode enabled?
 		if (!empty($maintenance))
 			$context['security_controls']['maintenance'] = true;
 	}
 
+	// Check for database errors.
 	if (!empty($_SESSION['query_command_denied']))
 	{
 		if ($user_info['is_admin'])
@@ -2715,6 +2719,7 @@ function doSecurityChecks()
 				$context['security_controls']['query'][$command] = Util::htmlspecialchars($command);
 	}
 
+	// Finally, let's show the layer.
 	if (!empty($context['security_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
