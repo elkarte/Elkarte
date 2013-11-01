@@ -343,11 +343,7 @@ function template_body_above()
 			echo '
 				<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
 		echo '
-				<ul>
-					<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
-
-		echo '
-				</ul>';
+				<span class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></span>';
 	}
 
 	echo '
@@ -377,7 +373,6 @@ function template_body_above()
 	if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
 		echo '
 		<div class="modtask noticebox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
-
 
 	// The main content should go here. @todo - Skip nav link.
 	echo '
