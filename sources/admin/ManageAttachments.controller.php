@@ -75,10 +75,10 @@ class ManageAttachments_Controller extends Action_Controller
 			'transfer' => array ($this, 'action_transfer'),
 		);
 
+		call_integration_hook('integrate_manage_attachments', array(&$subActions));
+
 		$action = new Action();
 		$action->initialize($subActions);
-
-		call_integration_hook('integrate_manage_attachments', array(&$subActions));
 
 		// Pick the correct sub-action.
 		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
