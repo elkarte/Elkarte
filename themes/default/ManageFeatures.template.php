@@ -61,11 +61,7 @@ function template_edit_profile_field()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<fieldset>
