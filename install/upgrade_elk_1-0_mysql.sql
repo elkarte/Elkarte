@@ -1,4 +1,4 @@
-/* ATTENTION: You don't need to run or use this file!  The upgrade.php script does everything for you! */
+/* ATTENTION: You don't need to run or use this file! The upgrade.php script does everything for you! */
 
 /******************************************************************************/
 --- Adding new settings...
@@ -247,22 +247,22 @@ CHANGE COLUMN smileyOrder smileyOrder smallint(5) unsigned NOT NULL default '0';
 /******************************************************************************/
 ---# Creating draft table
 CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
-  id_draft int(10) unsigned NOT NULL auto_increment,
-  id_topic mediumint(8) unsigned NOT NULL default '0',
-  id_board smallint(5) unsigned NOT NULL default '0',
-  id_reply int(10) unsigned NOT NULL default '0',
-  type tinyint(4) NOT NULL default '0',
-  poster_time int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  subject varchar(255) NOT NULL default '',
-  smileys_enabled tinyint(4) NOT NULL default '1',
-  body mediumtext NOT NULL,
-  icon varchar(16) NOT NULL default 'xx',
-  locked tinyint(4) NOT NULL default '0',
-  is_sticky tinyint(4) NOT NULL default '0',
-  to_list varchar(255) NOT NULL default '',
-  PRIMARY KEY id_draft(id_draft),
-  UNIQUE id_member (id_member, id_draft, type)
+	id_draft int(10) unsigned NOT NULL auto_increment,
+	id_topic mediumint(8) unsigned NOT NULL default '0',
+	id_board smallint(5) unsigned NOT NULL default '0',
+	id_reply int(10) unsigned NOT NULL default '0',
+	type tinyint(4) NOT NULL default '0',
+	poster_time int(10) unsigned NOT NULL default '0',
+	id_member mediumint(8) unsigned NOT NULL default '0',
+	subject varchar(255) NOT NULL default '',
+	smileys_enabled tinyint(4) NOT NULL default '1',
+	body mediumtext NOT NULL,
+	icon varchar(16) NOT NULL default 'xx',
+	locked tinyint(4) NOT NULL default '0',
+	is_sticky tinyint(4) NOT NULL default '0',
+	to_list varchar(255) NOT NULL default '',
+	PRIMARY KEY id_draft(id_draft),
+	UNIQUE id_member (id_member, id_draft, type)
 ) ENGINE=MyISAM{$db_collation};
 ---#
 
@@ -320,11 +320,11 @@ if (@$modSettings['elkVersion'] < '1.0')
 /******************************************************************************/
 ---# Creating custom profile fields data table
 CREATE TABLE IF NOT EXISTS {$db_prefix}custom_fields_data (
-  id_member mediumint(8) NOT NULL default '0',
-  variable varchar(255) NOT NULL default '',
-  value text NOT NULL,
-  PRIMARY KEY (id_member, variable(30)),
-  KEY id_member (id_member)
+	id_member mediumint(8) NOT NULL default '0',
+	variable varchar(255) NOT NULL default '',
+	value text NOT NULL,
+	PRIMARY KEY (id_member, variable(30)),
+	KEY id_member (id_member)
 ) ENGINE=MyISAM;{$db_collation};
 ---#
 
@@ -451,9 +451,9 @@ WHERE url = 'http://custom.simplemachines.org/packages/mods';
 
 ---# Creating follow-up table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
-  follow_up int(10) NOT NULL default '0',
-  derived_from int(10) NOT NULL default '0',
-  PRIMARY KEY (follow_up, derived_from)
+	follow_up int(10) NOT NULL default '0',
+	derived_from int(10) NOT NULL default '0',
+	PRIMARY KEY (follow_up, derived_from)
 ) ENGINE=MyISAM;
 ---#
 
@@ -463,12 +463,12 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
 
 ---# Creating antispam questions table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
-  id_question tinyint(4) unsigned NOT NULL auto_increment,
-  question text NOT NULL,
-  answer text NOT NULL,
-  language varchar(50) NOT NULL default '',
-  PRIMARY KEY (id_question),
-  KEY language (language(30))
+	id_question tinyint(4) unsigned NOT NULL auto_increment,
+	question text NOT NULL,
+	answer text NOT NULL,
+	language varchar(50) NOT NULL default '',
+	PRIMARY KEY (id_question),
+	KEY language (language(30))
 ) ENGINE=MyISAM;
 ---#
 
@@ -493,7 +493,7 @@ if ($db->num_rows($request) != 0)
 				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "', '" . $language . "')");
 		upgrade_query("
 			DELETE FROM {$db_prefix}log_comments
-			WHERE id_comment  = " . $row['id_comment'] . "
+			WHERE id_comment = " . $row['id_comment'] . "
 			LIMIT 1");
 	}
 }
@@ -560,25 +560,25 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 --- Adding likes support.
 /******************************************************************************/
 
----# Creating likes log  table...
+---# Creating likes log table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
-  action char(1) NOT NULL default '0',
-  id_target mediumint(8) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  log_time int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member),
-  KEY log_time (log_time)
+	action char(1) NOT NULL default '0',
+	id_target mediumint(8) unsigned NOT NULL default '0',
+	id_member mediumint(8) unsigned NOT NULL default '0',
+	log_time int(10) unsigned NOT NULL default '0',
+	PRIMARY KEY (id_target, id_member),
+	KEY log_time (log_time)
 ) ENGINE=MyISAM;
 ---#
 
----# Creating likes message  table...
+---# Creating likes message table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_msg mediumint(8) unsigned NOT NULL default '0',
-  id_poster mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member),
-  KEY id_member (id_member),
-  KEY id_poster (id_poster)
+	id_member mediumint(8) unsigned NOT NULL default '0',
+	id_msg mediumint(8) unsigned NOT NULL default '0',
+	id_poster mediumint(8) unsigned NOT NULL default '0',
+	PRIMARY KEY (id_msg, id_member),
+	KEY id_member (id_member),
+	KEY id_poster (id_poster)
 ) ENGINE=MyISAM;
 ---#
 
@@ -589,8 +589,8 @@ ADD COLUMN num_likes int(10) unsigned NOT NULL default '0';
 
 ---# Adding new columns to members...
 ALTER TABLE {$db_prefix}members
-ADD COLUMN likes_given mediumint(5) unsigned  NOT NULL default '0',
-ADD COLUMN likes_received mediumint(5) unsigned  NOT NULL default '0';
+ADD COLUMN likes_given mediumint(5) unsigned NOT NULL default '0',
+ADD COLUMN likes_received mediumint(5) unsigned NOT NULL default '0';
 ---#
 
 /******************************************************************************/
@@ -606,16 +606,17 @@ CHANGE pm_receive_from receive_from tinyint(4) unsigned NOT NULL default '1';
 --- Adding notifications support.
 /******************************************************************************/
 
----# Creating notifications log  table...
+---# Creating notifications log table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-  id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
-  id_msg int(10) unsigned NOT NULL DEFAULT '0',
-  status tinyint(1) NOT NULL DEFAULT '0',
-  id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
-  log_time int(10) unsigned NOT NULL DEFAULT '0',
-  type varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  PRIMARY KEY (id_member,id_msg,id_member_from,log_time,type),
-  KEY id_member (id_member,status)
+	id_notification int(10) NOT NULL auto_increment,
+	id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
+	id_msg int(10) unsigned NOT NULL DEFAULT '0',
+	status tinyint(1) NOT NULL DEFAULT '0',
+	id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
+	log_time int(10) unsigned NOT NULL DEFAULT '0',
+	type varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+	PRIMARY KEY (id_notification),
+	KEY id_member (id_member,status)
 ) ENGINE=MyISAM;
 ---#
 

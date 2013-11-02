@@ -2791,17 +2791,17 @@ CREATE TABLE {$db_prefix}postby_emails_error (
 );
 
 #
-# Sequence for table `postby_emails_filter`
+# Sequence for table `postby_emails_filters`
 #
 
-CREATE SEQUENCE {$db_prefix}postby_emails_filter_seq;
+CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
 
 #
-# Table structure for table `postby_emails_filter`
+# Table structure for table `postby_emails_filters`
 #
 
-CREATE TABLE {$db_prefix}postby_emails_filter (
-	id_filter int default nextval('{$db_prefix}postby_emails_filter_seq'),
+CREATE TABLE {$db_prefix}postby_emails_filters (
+	id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
 	filter_style char(5) NOT NULL default '',
 	filter_type varchar(255) NOT NULL default '',
 	filter_to varchar(255) NOT NULL default '',
