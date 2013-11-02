@@ -668,7 +668,7 @@ function template_profile_block_user_info()
 	echo '
 		<div class="profileblock_right">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/stats_info_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
+				<img src="', $settings['images_url'], '/icons/stats_info_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
 			</h3>
 			<div class="profileblock">
 					<dl>';
@@ -874,11 +874,9 @@ function template_profile_block_other_info()
 
 	echo '
 		<div class="profileblock_right">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/write_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<img src="', $settings['images_url'], '/icons/write_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
+			</h3>
 			<div class="profileblock">';
 
 	// Are there any custom profile fields for the above signature area?
