@@ -200,10 +200,10 @@ function template_notes()
 							<h3 class="category_header">', $txt['mc_notes'], '</h3>
 							<div class="windowbg">
 								<div class="content modbox">
-									<div class="floatleft post_note">
-										<input type="text" name="new_note" placeholder="', $txt['mc_click_add_note'], '" style="width: 95%;" class="input_text" />
-									</div>
-									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="button_submit submitgo" />';
+									<div class="flow_auto">
+										<input type="text" name="new_note" placeholder="', $txt['mc_click_add_note'], '" style="width: 89%" class="floatleft input_text" />
+										<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="right_submit submitgo" />
+									</div>';
 
 	if (!empty($context['notes']))
 	{
@@ -245,12 +245,8 @@ function template_action_required()
 	foreach ($context['required'] as $area => $total)
 	{
 		echo '
-									<li>';
-
-		echo '
-										<img class="icon" src="', $settings['images_url'], ($total == 0 ? '/icons/field_valid.png"' : '/icons/field_invalid.png"'), 'alt="" />';
-
-		echo '
+									<li>
+										<img class="icon" src="', $settings['images_url'], ($total == 0 ? '/icons/field_valid.png"' : '/icons/field_invalid.png"'), 'alt="" />
 										<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total,  '</span></a>
 									</li>';
 	}
