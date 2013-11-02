@@ -36,9 +36,7 @@ function template_servers()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['package_servers'], '</h3>
-		</div>';
+		<h2 class="category_header">', $txt['package_servers'], '</h2>';
 
 	if ($context['package_download_broken'])
 		template_ftp_required();
@@ -120,9 +118,7 @@ function template_package_confirm()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $context['page_title'], '</h3>
-		</div>
+		<h2 class="category_header">', $context['page_title'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $context['confirm_message'], '</p>
@@ -142,9 +138,7 @@ function template_package_list()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">' . $context['page_title'] . '</h3>
-		</div>
+		<h2 class="category_header">' . $context['page_title'] . '</h2>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -318,9 +312,7 @@ function template_downloaded()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $context['page_title'], '</h3>
-		</div>
+		<h2 class="category_header">', $context['page_title'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', (empty($context['package_server']) ? $txt['package_uploaded_successfully'] : $txt['package_downloaded_successfully']), '</p>
@@ -352,18 +344,14 @@ function template_upload()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['upload_new_package'], '</h3>
-		</div>';
+		<h3 class="category_header">', $txt['upload_new_package'], '</h3>';
 
 	if ($context['package_download_broken'])
 	{
 		template_ftp_required();
 
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">' . $txt['package_upload_title'] . '</h3>
-		</div>';
+			<h3 class="category_header">' . $txt['package_upload_title'] . '</h3>';
 	}
 
 	echo '
@@ -396,9 +384,7 @@ function template_ftp_required()
 	global $context, $txt, $scripturl;
 
 	echo '
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['package_ftp_necessary'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['package_ftp_necessary'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<p>
