@@ -39,6 +39,10 @@ class ManageMaillist_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		// Template & language
+		loadTemplate('Maillist');
+		loadLanguage('Maillist');
+
 		// All the functions available
 		$subActions = array(
 			'emaillist' => array($this, 'action_unapproved_email', 'permission' => 'approve_emails'),
@@ -56,16 +60,8 @@ class ManageMaillist_Controller extends Action_Controller
 			'deleteparser' => array($this, 'action_delete_parsers', 'permission' => 'admin_forum'),
 		);
 
-		// Set up the action class
-		$action = new Action();
-		$action->initialize($subActions, 'emaillist');
-
 		// Default to sub action 'emaillist' if none was given
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']][1])) ? $_REQUEST['sa'] : 'emaillist';
-
-		// Template & language
-		loadTemplate('Maillist');
-		loadLanguage('Maillist');
 
 		// Create the title area for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -74,7 +70,12 @@ class ManageMaillist_Controller extends Action_Controller
 			'description' => $txt['ml_configuration_desc'],
 		);
 
+		$context['page_title'] = $txt['ml_admin_configuration'];
+		$context['sub_action'] = $subAction;
+
 		// If you have the permissions, then go Play
+		$action = new Action();
+		$action->initialize($subActions, 'emaillist');
 		$action->dispatch($subAction);
 	}
 

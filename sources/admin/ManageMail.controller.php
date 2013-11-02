@@ -41,28 +41,25 @@ class ManageMail_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// You need to be an admin to edit settings!
-		isAllowedTo('admin_forum');
-
 		loadLanguage('Help');
 		loadLanguage('ManageMail');
 
 		// We'll need the utility functions from here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		$context['page_title'] = $txt['mailqueue_title'];
-
 		$subActions = array(
-			'browse' => array($this, 'action_browse'),
-			'clear' => array($this, 'action_clear'),
-			'settings' => array($this, 'action_mailSettings_display'),
+			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
+			'clear' => array($this, 'action_clear', 'permission' => 'admin_forum'),
+			'settings' => array($this, 'action_mailSettings_display', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_mail', array(&$subActions));
 
 		// By default we want to browse
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
+
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['mailqueue_title'];
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

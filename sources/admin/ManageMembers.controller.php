@@ -41,6 +41,10 @@ class ManageMembers_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
+		// Load the essentials.
+		loadLanguage('ManageMembers');
+		loadTemplate('ManageMembers');
+
 		$subActions = array(
 			'all' => array(
 				'controller' => $this,
@@ -74,10 +78,6 @@ class ManageMembers_Controller extends Action_Controller
 
 		// You can't pass!
 		$action->isAllowedTo($subAction);
-
-		// Load the essentials.
-		loadLanguage('ManageMembers');
-		loadTemplate('ManageMembers');
 
 		// Get counts on every type of activation - for sections and filtering alike.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -150,6 +150,9 @@ class ManageMembers_Controller extends Action_Controller
 				$context['tabs']['search']['is_last'] = true;
 			unset($context['tabs']['approve']);
 		}
+
+		$context['page_title'] = $txt['admin_members'];
+		$context['sub_action'] = $subAction;
 
 		$action->dispatch($subAction);
 	}

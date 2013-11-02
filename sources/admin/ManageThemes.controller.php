@@ -64,22 +64,19 @@ class ManageThemes_Controller extends Action_Controller
 		// No guests in here.
 		is_not_guest();
 
-		// Default the page title to Theme Administration by default.
-		$context['page_title'] = $txt['themeadmin_title'];
-
 		// Theme administration, removal, choice, or installation...
 		$subActions = array(
-			'admin' => array($this, 'action_admin'),
-			'list' => array($this, 'action_list'),
-			'reset' => array($this, 'action_options'),
-			'options' => array($this, 'action_options'),
-			'install' => array($this, 'action_install'),
-			'remove' => array($this, 'action_remove'),
-			'pick' => array($this, 'action_pick'),
-			'edit' => array($this, 'action_edit'),
-			'copy' => array($this, 'action_copy'),
-			'themelist' => array($this, 'action_themelist'),
-			'browse' => array($this, 'action_browse'),
+			'admin' => array($this, 'action_admin', 'permission' => 'admin_forum'),
+			'list' => array($this, 'action_list', 'permission' => 'admin_forum'),
+			'reset' => array($this, 'action_options', 'permission' => 'admin_forum'),
+			'options' => array($this, 'action_options', 'permission' => 'admin_forum'),
+			'install' => array($this, 'action_install', 'permission' => 'admin_forum'),
+			'remove' => array($this, 'action_remove', 'permission' => 'admin_forum'),
+			'pick' => array($this, 'action_pick'),  // @todo ugly having that in this controller
+			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'copy' => array($this, 'action_copy', 'permission' => 'admin_forum'),
+			'themelist' => array($this, 'action_themelist', 'permission' => 'admin_forum'),
+			'browse' => array($this, 'action_browse', 'permission' => 'admin_forum'),
 		);
 
 		// @todo Layout Settings?
@@ -113,11 +110,13 @@ class ManageThemes_Controller extends Action_Controller
 		}
 
 		// Follow the sa or just go to administration.
-		if (isset($_GET['sa']) && !empty($subActions[$_GET['sa']]))
-			$subAction = $_GET['sa'];
-		else
-			$subAction = 'admin';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'admin';
 
+		// Default the page title to Theme Administration by default.
+		$context['page_title'] = $txt['themeadmin_title'];
+		$context['sub_action'] = $subAction;
+
+		// Go to the action, if you have permissions
 		$action = new Action();
 		$action->initialize($subActions, 'admin');
 		$action->dispatch($subAction);
@@ -188,7 +187,6 @@ class ManageThemes_Controller extends Action_Controller
 		global $context, $modSettings;
 
 		loadLanguage('Admin');
-		isAllowedTo('admin_forum');
 
 		// If we aren't submitting - that is, if we are about to...
 		if (!isset($_POST['save']))
@@ -253,7 +251,6 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		loadLanguage('Admin');
-		isAllowedTo('admin_forum');
 
 		if (isset($_REQUEST['th']))
 			return $this->action_setthemesettings();
@@ -331,8 +328,6 @@ class ManageThemes_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 		$_GET['th'] = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
-
-		isAllowedTo('admin_forum');
 
 		if (empty($_GET['th']) && empty($_GET['id']))
 		{
@@ -545,7 +540,6 @@ class ManageThemes_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
 
 		loadLanguage('Admin');
-		isAllowedTo('admin_forum');
 
 		// Validate inputs/user.
 		if (empty($_GET['th']))
@@ -711,8 +705,6 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		checkSession('get');
-
-		isAllowedTo('admin_forum');
 		validateToken('admin-tr', 'request');
 
 		// The theme's ID must be an integer.
@@ -992,9 +984,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $boardurl, $txt, $context, $settings, $modSettings;
 
-		checkSession('request');
-
-		isAllowedTo('admin_forum');
 		checkSession('request');
 
 		require_once(SUBSDIR . '/Themes.subs.php');
@@ -1299,7 +1288,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context;
 
-		isAllowedTo('admin_forum');
 		loadTemplate('ManageThemes');
 
 		// We'll work hard with them themes!
@@ -1580,7 +1568,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $scripturl;
 
-		isAllowedTo('admin_forum');
 		loadTemplate('ManageThemes');
 
 		// We'll work hard with them themes!
@@ -1645,7 +1632,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context;
 
-		isAllowedTo('admin_forum');
 		loadTemplate('ManageThemes');
 
 		// We'll work hard with them themes!
@@ -1697,7 +1683,6 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context, $settings;
 
-		isAllowedTo('admin_forum');
 		loadTemplate('ManageThemes');
 		require_once(SUBSDIR . '/Themes.subs.php');
 

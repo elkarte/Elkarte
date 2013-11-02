@@ -42,6 +42,8 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		loadTemplate('ManageNews');
+
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = array(
 			'editnews' => array(
@@ -71,15 +73,6 @@ class ManageNews_Controller extends Action_Controller
 		// Default to sub action 'main' or 'settings' depending on permissions.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
-		loadTemplate('ManageNews');
-
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['news_title'],
@@ -97,11 +90,16 @@ class ManageNews_Controller extends Action_Controller
 			),
 		);
 
+		$context['page_title'] = $txt['news_title'];
+		$context['sub_action'] = $subAction;
+
 		// Force the right area...
 		if (substr($subAction, 0, 7) == 'mailing')
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 

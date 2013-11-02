@@ -42,27 +42,21 @@ class ManageSearchEngines_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		loadLanguage('Search');
 		loadTemplate('ManageSearch');
 
 		$subActions = array(
-			'editspiders' => array($this, 'action_editspiders'),
-			'logs' => array($this, 'action_logs'),
-			'settings' => array($this, 'action_engineSettings_display'),
-			'spiders' => array($this, 'action_spiders'),
-			'stats' => array($this, 'action_stats'),
+			'editspiders' => array($this, 'action_editspiders', 'permission' => 'admin_forum'),
+			'logs' => array($this, 'action_logs', 'permission' => 'admin_forum'),
+			'settings' => array($this, 'action_engineSettings_display', 'permission' => 'admin_forum'),
+			'spiders' => array($this, 'action_spiders', 'permission' => 'admin_forum'),
+			'stats' => array($this, 'action_stats', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_search_engines', array(&$subActions));
 
 		// Ensure we have a valid subaction.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'stats';
-
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
 
 		// Some contextual data for the template.
 		$context['sub_action'] = $subAction;
@@ -75,6 +69,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 

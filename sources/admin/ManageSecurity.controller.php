@@ -57,13 +57,14 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$context['page_title'] = $txt['admin_security_moderation'];
+		loadLanguage('Help');
+		loadLanguage('ManageSettings');
 
 		$subActions = array(
-			'general' => array($this, 'action_securitySettings_display'),
-			'spam' => array($this, 'action_spamSettings_display'),
-			'badbehavior' => array($this, 'action_bbSettings_display'),
-			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => in_array('w', $context['admin_features'])),
+			'general' => array($this, 'action_securitySettings_display', 'permission' => 'admin_forum'),
+			'spam' => array($this, 'action_spamSettings_display', 'permission' => 'admin_forum'),
+			'badbehavior' => array($this, 'action_bbSettings_display', 'permission' => 'admin_forum'),
+			'moderation' => array($this, 'action_moderationSettings_display', 'enabled' => in_array('w', $context['admin_features']), 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_modify_security', array(&$subActions));
@@ -71,24 +72,12 @@ class ManageSecurity_Controller extends Action_Controller
 		// @FIXME
 		// loadGeneralSettingParameters($subActions, 'general');
 
-		// You need to be an admin to edit settings!
-		isAllowedTo('admin_forum');
-
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
-
-		$context['sub_template'] = 'show_settings';
-
 		// By default do the basic settings.
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
-		$context['sub_action'] = $_REQUEST['sa'];
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
 
-		// trick you
-		$subAction = $context['sub_action'];
-
-		// Set up action stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'general');
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['admin_security_moderation'];
+		$context['sub_template'] = 'show_settings';
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -110,6 +99,8 @@ class ManageSecurity_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 

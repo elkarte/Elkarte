@@ -30,21 +30,24 @@ class ManageTopics_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// Only admins are allowed around here.
-		isAllowedTo('admin_forum');
+		global $context, $txt;
 
 		$subActions = array(
 			'display' => array (
 				'controller' => $this,
-				'function' => 'action_topicSettings_display'));
+				'function' => 'action_topicSettings_display',
+				'permission' => 'admin_forum')
+		);
 
 		$subAction = 'display';
+
+		// Only one option I'm afraid
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['manageposts_topic_settings'];
 
 		// Set up action/subaction stuff.
 		$action = new Action();
 		$action->initialize($subActions, 'display');
-
-		// lets just do it!
 		$action->dispatch($subAction);
 	}
 
@@ -69,7 +72,6 @@ class ManageTopics_Controller extends Action_Controller
 		call_integration_hook('integrate_modify_topic_settings');
 
 		// Setup the template.
-		$context['page_title'] = $txt['manageposts_topic_settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
