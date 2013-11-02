@@ -270,6 +270,7 @@ class ProfileInfo_Controller extends Action_Controller
 				$msgCount = count_user_posts($memID);
 				$range_limit = '';
 				$maxIndex = 10;
+				$start = (int) $_REQUEST['start'];
 
 				// If they are a frequent poster, we guess the range to help minimize what the query work
 				if ($msgCount > 1000)
