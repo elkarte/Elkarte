@@ -25,9 +25,7 @@ function template_report_type()
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=reports" method="post" accept-charset="', $context['character_set'], '">
 			<div id="generate_reports_type">
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['generate_reports_type'], '</h3>
-				</div>
+				<h2 class="category_header">', $txt['generate_reports_type'], '</h2>
 				<div class="windowbg">
 					<div class="content">
 						<dl class="generate_report">';
@@ -66,9 +64,7 @@ function template_main()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['results'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['results'], '</h2>
 		<div id="report_buttons">';
 
 	if (!empty($context['report_buttons']))
