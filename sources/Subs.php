@@ -3486,30 +3486,9 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 {
 	global $modSettings;
 
-	$db = database();
-
 	// Just make up a nice hash...
 	if ($new)
 		return sha1(md5($filename . time()) . mt_rand());
-
-	// Grab the file hash if it wasn't added.
-	// @todo: Locate all places that don't call a hash and fix that.
-	if ($file_hash === '')
-	{
-		$request = $db->query('', '
-			SELECT file_hash
-			FROM {db_prefix}attachments
-			WHERE id_attach = {int:id_attach}',
-			array(
-				'id_attach' => (int) $attachment_id,
-		));
-
-		if ($db->num_rows($request) === 0)
-			return false;
-
-		list ($file_hash) = $db->fetch_row($request);
-		$db->free_result($request);
-	}
 
 	// In case of files from the old system, do a legacy call.
 	if (empty($file_hash))
