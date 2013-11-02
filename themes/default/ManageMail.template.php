@@ -24,9 +24,7 @@ function template_mail_queue()
 	echo '
 	<div id="manage_mail">
 		<div id="mailqueue_stats">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['mailqueue_stats'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['mailqueue_stats'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
