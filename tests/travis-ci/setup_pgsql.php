@@ -22,6 +22,7 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 
 		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
 		$this->fix_query_string();
+		$this->run_queries();
 		$this->prepare_settings();
 	}
 
