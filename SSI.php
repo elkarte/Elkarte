@@ -72,7 +72,7 @@ DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
-$ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
+$ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
 	false:	Default, will just load the error sub template and die - not putting any theme layers around it.
 	true:	Will load the error sub template AND put the template layers around it (Not useful if on total custom pages).
