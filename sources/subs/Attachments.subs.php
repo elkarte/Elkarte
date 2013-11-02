@@ -2687,6 +2687,7 @@ function loadAttachmentContext($id_msg)
 				'link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename']) . '</a>',
 				'is_image' => !empty($attachment['width']) && !empty($attachment['height']) && !empty($modSettings['attachmentShowImages']),
 				'is_approved' => $attachment['approved'],
+				'file_hash' => $attachment['file_hash'],
 			);
 
 			// If something is unapproved we'll note it so we can sort them.
@@ -2707,7 +2708,7 @@ function loadAttachmentContext($id_msg)
 				// A proper thumb doesn't exist yet? Create one! Or, it needs update.
 				if (empty($attachment['id_thumb']) || $attachment['thumb_width'] > $modSettings['attachmentThumbWidth'] || $attachment['thumb_height'] > $modSettings['attachmentThumbHeight'] || ($attachment['thumb_width'] < $modSettings['attachmentThumbWidth'] && $attachment['thumb_height'] < $modSettings['attachmentThumbHeight']))
 				{
-					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
+					$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']);
 					$attachment = array_merge($attachment, updateAttachmentThumbnail($filename, $attachment['id_attach'], $id_msg, $attachment['id_thumb']));
 				}
 
@@ -2815,4 +2816,47 @@ function countAttachmentsInFolders($id_folder)
 	$db->free_result($request);
 
 	return $num_attach;
+}
+
+/**
+ * Older attachments may still use this function.
+ *
+ * @param $filename
+ * @param $attachment_id
+ * @param $dir
+ * @param $new
+ */
+function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
+{
+	global $modSettings;
+
+	$clean_name = $filename;
+
+	// Sorry, no spaces, dots, or anything else but letters allowed.
+	$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
+
+	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
+	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
+
+	if ($attachment_id == false || ($new && empty($modSettings['attachmentEncryptFilenames'])))
+		return $clean_name;
+	elseif ($new)
+		return $enc_name;
+
+	// Are we using multiple directories?
+	if (!empty($modSettings['currentAttachmentUploadDir']))
+	{
+		if (!is_array($modSettings['attachmentUploadDir']))
+			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+		$path = $modSettings['attachmentUploadDir'][$dir];
+	}
+	else
+		$path = $modSettings['attachmentUploadDir'];
+
+	if (file_exists($path . '/' . $enc_name))
+		$filename = $path . '/' . $enc_name;
+	else
+		$filename = $path . '/' . $clean_name;
+
+	return $filename;
 }

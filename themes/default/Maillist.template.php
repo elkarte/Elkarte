@@ -18,35 +18,24 @@ function template_show_email()
 	global $txt, $context, $boardurl;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['show_notice'], '</h3>
-		</div>
-		<div class="title_bar">
-			<h3 class="titlebg">', $context['notice_subject'], '</h3>
-		</div>
-		<div class="title_bar">
-			<h3 class="titlebg">', $context['notice_from'], '</h3>
-		</div>
-		<div class="title_bar">
-			<h3 class="titlebg">', $context['to'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['show_notice'], '</h3>
+		<h3 class="category_header">', $context['notice_subject'], '</h3>
+		<h3 class="category_header">', $context['notice_from'], '</h3>
+		<h3 class="category_header">', $context['to'], '</h3>
 		<div class="noticebox">', $txt['email_failure'], ': ', $context['error_code'], '</div>
-			<div class="content">
-				<dl>
-					<dt>
-						<strong>', $txt['show_notice_text'], ':</strong>
-					</dt>
-					<dd>
-						', $context['body'], '
-					</dd>
-				</dl>
-			</div>
+		<div class="content">
+			<dl>
+				<dt>
+					<strong>', $txt['show_notice_text'], ':</strong>
+				</dt>
+				<dd>
+					', $context['body'], '
+				</dd>
+			</dl>
 		</div>
 		<div class="centertext">
 			<a href="' . $boardurl . '/index.php?action=admin;area=maillist;sa=emaillist">', $txt['back'], '</a>
-		</div><br />
-	</body>
-</html>';
+		</div>';
 }
 
 /**
@@ -91,12 +80,10 @@ function template_bounce_email()
 	// ]]></script>';
 
 	echo '
-	<form action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/icons/mail_hd.png" alt="" class="icon" />', $txt['show_notice'], '
-			</h3>
-		</div>';
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
+		<h3 class="category_header">
+			<img src="', $settings['images_url'], '/icons/mail_hd.png" alt="" class="icon" />', $txt['show_notice'], '
+		</h3>';
 
 	// Any special messages?
 	if (!empty($context['settings_message']))
@@ -105,9 +92,7 @@ function template_bounce_email()
 
 	// The main body
 	echo '
-		<div class="title_bar">
-			<h3 class="titlebg">', $context['notice_to'], '</h3>
-		</div>
+		<h3 class="category_header">', $context['notice_to'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<dl class="settings">
@@ -155,9 +140,7 @@ function template_bounce_email()
 					</dt>
 					<dd>
 						<textarea name="warn_body" id="warn_body" cols="40" rows="8">', $context['warning_data']['notify_body'], '</textarea>
-					</dd>';
-
-	echo '
+					</dd>
 				</dl>
 				<div class="submitbutton">
 					<a class="linkbutton" href="', $scripturl, '?action=admin;area=maillist;sa=emaillist;">', $txt['back'], '</a>
@@ -237,7 +220,8 @@ function template_callback_maillist_receive_email_list()
 	}
 
 	echo '
-		<dt id="add_more_email_placeholder" style="display: none;"></dt><dd></dd>
+		<dt id="add_more_email_placeholder" style="display: none;"></dt>
+		<dd></dd>
 		<dt id="add_more_board_div" style="display: none;">
 			<a href="#" onclick="addAnotherEmail(); return false;">&#171; ', $txt['reply_add_more'], ' &#187;</a>
 		</dt>
@@ -246,8 +230,8 @@ function template_callback_maillist_receive_email_list()
 	// Build our board id and name arrays for use in the javascript
 	$i = 0;
 	$script = '
-		var boardname = new Array();
-		var boardid = new Array();';
+		var boardname = new Array(),
+			boardid = new Array();';
 
 	foreach ($context['boards'] as $board_id => $board_name)
 		$script = $script . '
@@ -292,6 +276,7 @@ function template_callback_maillist_receive_email_list()
 			var newDT = document.createElement("dt");
 
 			var newInput = createNamedElement("input", "emailfrom[]");
+
 			newInput.type = "text";
 			newInput.className = "input_text";
 			newInput.size = "50";
@@ -334,17 +319,16 @@ function template_bounce_template()
 	<div id="modcenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
 			<div id="box_preview" class="forumposts"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
-				<h3 class="catbg">
+				<h3 class="category_header">
 					<span id="preview_subject">', $txt['preview'], '</span>
 				</h3>
 				<div class="post" id="template_preview">
 					', empty($context['template_preview']) ? '<br />' : $context['template_preview'], '
 				</div>
 			</div>
-			<div class="forumposts">
-				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
-			<div class="information">
+			<h3 class="category_header">', $context['page_title'], '</h3>
+
+<div class="information">
 				', $txt['ml_bounce_template_desc'], '
 			</div>
 			<div class="windowbg">
@@ -389,11 +373,9 @@ function template_bounce_template()
 							', $txt['ml_bounce_template_personal'], '
 						</label>
 						<br />
-						<span class="smalltext">', $txt['ml_bounce_template_personal_desc'], '</span>
-						<br />';
+						<span class="smalltext">', $txt['ml_bounce_template_personal_desc'], '</span>';
 
 	echo '
-					<hr />
 					<div class="submitbutton">
 						<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
 						<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />

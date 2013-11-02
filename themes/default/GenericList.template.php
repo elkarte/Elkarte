@@ -94,7 +94,7 @@ function template_show_list($list_id = null)
 
 	// Start of the main table
 	echo '
-			<table class="table_grid"', !empty($cur_list['width']) ? ' style="width: ' . $cur_list['width'] . '"' : '', '>';
+			<table id="' . $list_id . '" class="table_grid"', !empty($cur_list['width']) ? ' style="width: ' . $cur_list['width'] . '"' : '', '>';
 
 	// Show the column headers.
 	$header_count = count($cur_list['headers']);
@@ -158,15 +158,12 @@ function template_show_list($list_id = null)
 			</tbody>
 			</table>';
 
-	$close_div = false;
+	echo '
+			<div class="flow_auto">';
 
 	// Do we have multiple pages to show or data to show below the table
 	if ((!empty($cur_list['items_per_page']) && !empty($cur_list['page_index'])) || isset($cur_list['additional_rows']['below_table_data']))
 	{
-		$close_div = true;
-		echo '
-			<div class="flow_auto">';
-
 		// Show the page index (if this list doesn't intend to show all items).
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 			echo '
@@ -180,21 +177,12 @@ function template_show_list($list_id = null)
 
 	// Tabs at the bottom.  Usually bottom aligned.
 	if (isset($cur_list['list_menu'], $cur_list['list_menu']['show_on']) && ($cur_list['list_menu']['show_on'] == 'both' || $cur_list['list_menu']['show_on'] == 'bottom'))
-	{
-		if (!$close_div)
-			echo '
-			<div class="flow_auto">';
-
-		$close_div = true;
-
 		template_create_list_menu($cur_list['list_menu']);
-	}
 
-	if ($close_div)
-		echo '
+	echo '
 			</div>';
 
-	// Last chance to show more data, like buttons or add in javascript
+	// Last chance to show more data, like buttons and links
 	if (isset($cur_list['additional_rows']['bottom_of_list']))
 		template_additional_rows('bottom_of_list', $cur_list);
 
@@ -211,12 +199,6 @@ function template_show_list($list_id = null)
 	else
 		echo '
 		</div>';
-
-	if (isset($cur_list['javascript']))
-		echo '
-	<script><!-- // --><![CDATA[
-		', $cur_list['javascript'], '
-	// ]]></script>';
 }
 
 /**

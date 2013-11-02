@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
+ *
  */
 
 /**
@@ -29,20 +31,23 @@ class Action
 	 *  or
 	 *    'sub_action name' => array (
 	 *  	'controller' => 'controller name',
-	 *  	'function' => 'method name'
-	 *  	'enabled' => true/false),
+	 *  	'function' => 'method name',
+	 *  	'enabled' => true/false,
+	 * 		'permission' => area),
 	 *  or
 	 *    'sub_action name' => array (
 	 *  	'controller object, i.e. $this',
 	 *  	'method name',
-	 *  	'enabled' => true/false),
+	 *  	'enabled' => true/false
+	 * 		'permission' => area),
 	 *  or
 	 *    'sub_action name' => array (
 	 *  	'file' => 'file name',
-	 *		'dir' => 'controller file location', if not set ADMINDIR is assumed
+	 * 		'dir' => 'controller file location', if not set ADMINDIR is assumed
 	 *  	'controller' => 'controller name',
 	 *  	'function' => 'method name',
-	 *  	'enabled' => true/false)
+	 *  	'enabled' => true/false,
+	 * 		'permission' => area)
 	 * @var array
 	 */
 	protected $_subActions;

@@ -1556,8 +1556,8 @@ class ModerationCenter_Controller extends Action_Controller
 		$mod_totals = loadModeratorMenuCounts();
 
 		// This blocks total is only these fields
-		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'] + $mod_totals['memberreq'] + $mod_totals['groupreq'];
-		unset($mod_totals['reports'], $mod_totals['postmod'], $mod_totals['pt_total'], $mod_totals['mg_total'], $mod_totals['grand_total']);
+		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'] + $mod_totals['memberreq'] + $mod_totals['groupreq'] + + $mod_totals['reports'];
+		unset($mod_totals['postmod'], $mod_totals['pt_total'], $mod_totals['mg_total'], $mod_totals['grand_total']);
 		$context['required'] = $mod_totals;
 
 		// Links to the areas
@@ -1568,6 +1568,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'posts' => '?action=moderate;area=postmod;sa=posts',
 			'memberreq' => '?action=admin;area=viewmembers;sa=browse;type=approve',
 			'groupreq' => '?action=moderate;area=groups;sa=requests',
+			'reports' => '?action=moderate;area=reports;sa=open',
 		);
 
 		return 'action_required';

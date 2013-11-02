@@ -555,6 +555,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		// Prepare the dates for the drop down.
 		$date_choices = spidersStatsDates();
+		end($date_choices);
+		$max_date = key($date_choices);
 
 		// What are we currently viewing?
 		$current_date = isset($_REQUEST['new_date']) && isset($date_choices[$_REQUEST['new_date']]) ? $_REQUEST['new_date'] : $max_date;
