@@ -26,17 +26,24 @@ class ManageAvatars_Controller extends Action_Controller
 
 	public function action_index()
 	{
+		global $context, $txt;
+
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		$subActions = array(
-			'display' => array ($this, 'action_avatarSettings_display'));
+			'display' => array ($this, 'action_avatarSettings_display')
+		);
+
+		// this is hardcoded now, to be fixed
+		$subAction = 'display';
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['avatar_settings'];
 
 		// call the action handler
-		// this is hardcoded now, to be fixed
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch('display');
+		$action->initialize($subActions, 'display');
+		$action->dispatch($subAction);
 	}
 
 	/**
