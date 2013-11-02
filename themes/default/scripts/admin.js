@@ -932,6 +932,20 @@ function toggleBaseDir ()
 			tolerance: oSettings.tolerance,
 			delay: oSettings.delay,
 			scroll: oSettings.scroll,
+			helper: function(e, ui) {
+				// Create a clone of the element being dragged, add it to the body, and hide it
+				$('body').append('<div id="clone" class="' + oSettings.placeholder + '">' + ui.html() + '</div>');
+				$('#clone').hide();
+
+				// Now append the clone element to the container we are working in and show it
+				setTimeout(function() {
+					$('#clone').appendTo(ui.parent());
+					$("#clone").show();
+				}, 1);
+
+				// This process allows page scrolls to work
+				return $("#clone");
+			},
 			update: function(e, ui) {
 				// Called when an element is dropped in a new location
 				var postdata = '',
