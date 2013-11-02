@@ -24,12 +24,10 @@ function template_search_members()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=viewmembers" method="post" accept-charset="UTF-8" id="admin_form_wrapper">
-			<div class="cat_bar">
-				<h3 class="catbg">
+			<h2 class="category_header">
 					<span class="floatleft">', $txt['search_for'], '</span>
 					<span class="smalltext floatright">', $txt['wild_cards_allowed'], '</span>
-				</h3>
-			</div>
+			</h2>
 			<input type="hidden" name="sa" value="query" />
 			<div class="windowbg">
 				<div class="content">
@@ -158,9 +156,7 @@ function template_search_members()
 					</div>
 				</div>
 			</div>
-			<div class="title_bar">
-				<h3 class="titlebg">', $txt['member_part_of_these_membergroups'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['member_part_of_these_membergroups'], '</h3>
 			<div class="flow_hidden">
 				<table style="width:49%" class="table_grid floatleft">
 					<thead>
@@ -257,9 +253,7 @@ function template_admin_browse()
 		echo '
 		<br />
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=viewmembers" method="post" accept-charset="UTF-8" name="postFormOutstanding" id="postFormOutstanding" onsubmit="return onOutstandingSubmit();">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['admin_browse_outstanding'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['admin_browse_outstanding'], '</h2>
 			<script><!-- // --><![CDATA[
 				function onOutstandingSubmit()
 				{
