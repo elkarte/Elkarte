@@ -333,7 +333,7 @@ class AddonSettings_Controller extends Action_Controller
 			);
 		}
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($list_options);
 
 		$context['page_title'] = $txt['hooks_title_list'];

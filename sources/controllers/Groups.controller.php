@@ -81,7 +81,7 @@ class Groups_Controller extends Action_Controller
 		);
 
 		// Making a list is not hard with this beauty.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// Use the standard templates for showing this.
 		$listOptions = array(
@@ -526,7 +526,7 @@ class Groups_Controller extends Action_Controller
 		}
 
 		// We're going to want this for making our list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// This is all the information required for a group listing.

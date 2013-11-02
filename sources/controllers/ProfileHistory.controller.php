@@ -163,7 +163,7 @@ class ProfileHistory_Controller extends Action_Controller
 		);
 
 		// Create the list for viewing.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// @todo cache this
@@ -346,7 +346,7 @@ class ProfileHistory_Controller extends Action_Controller
 		ksort($context['ips']);
 
 		// Gonna want this for the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// Start with the user messages.
 		$listOptions = array(
@@ -585,7 +585,7 @@ class ProfileHistory_Controller extends Action_Controller
 		global $scripturl, $txt, $context;
 
 		// Gonna want this for the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		if ($memID == 0)
 			$context['base_url'] = $scripturl . '?action=trackip';
@@ -664,7 +664,7 @@ class ProfileHistory_Controller extends Action_Controller
 
 		$db = database();
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// Get the names of any custom fields.
 		$request = $db->query('', '

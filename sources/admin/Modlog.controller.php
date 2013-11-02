@@ -154,7 +154,7 @@ class Modlog_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(

@@ -107,7 +107,7 @@ class Notification_Controller extends Action_Controller
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Notification.subs.php');
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		loadLanguage('Notification');
 
 		$this->_buildUrl();

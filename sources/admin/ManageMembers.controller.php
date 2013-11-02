@@ -602,7 +602,7 @@ class ManageMembers_Controller extends Action_Controller
 		if (!allowedTo('profile_remove_any'))
 			unset($listOptions['cols']['check'], $listOptions['form'], $listOptions['additional_rows']);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -968,7 +968,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		// Now that we have all the options, create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
