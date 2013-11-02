@@ -471,6 +471,10 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #fff;
 	text-decoration: none;
 }
+.linktree_last span a {
+	color: #dfdfdf;
+	text-decoration: none;
+}
 .linktree:before {
 	border-left: 0.75em solid #ccc;
 }
@@ -695,8 +699,17 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /* End alternative layouts. Back to standard stuff. */
 /* ------------------------------------------------ */
 
+/* $PROFILE	*/
+/* ------------------------------------------------------- */
+/* Profile colors */
 
-
+.vcard, .profile_attachment {
+	border: 1px solid #ccc;
+	border-radius: 6px;
+}
+.attachment_title {
+	border-bottom: 1px solid #ccc;
+}
 
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */

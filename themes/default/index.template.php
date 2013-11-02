@@ -343,20 +343,7 @@ function template_body_above()
 			echo '
 				<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
 		echo '
-				<ul>
-					<li class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></li>';
-
-		// Are there any members waiting for approval?
-		if (!empty($context['unapproved_members']))
-			echo '
-					<li>', $context['unapproved_members_text'], '</li>';
-
-		if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
-			echo '
-					<li><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></li>';
-
-		echo '
-				</ul>';
+				<span class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></span>';
 	}
 
 	echo '
@@ -377,6 +364,15 @@ function template_body_above()
 
 	// Show the navigation tree.
 	theme_linktree();
+
+	// Are there any members waiting for approval?
+	if (!empty($context['unapproved_members']))
+		echo '
+		<div class="modtask noticebox">', $context['unapproved_members_text'], '</div>';
+
+	if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
+		echo '
+		<div class="modtask noticebox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
 
 	// The main content should go here. @todo - Skip nav link.
 	echo '

@@ -1126,7 +1126,7 @@ function template_profile_block_buddies()
 					<tr>';
 
 				echo '
-						<td>
+						<td class="vcard">
 							', $data['avatar']['image'], '<br />
 							<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br />
 							<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png' . '" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>';
@@ -1193,7 +1193,6 @@ function template_profile_block_attachments()
 	<div class="windowbg">
 		<div class="content">
 			<table class="profile_attachments">';
-
 	// Show the thumbnails
 	if (!empty($context['thumbs']))
 	{
@@ -1204,8 +1203,9 @@ function template_profile_block_attachments()
 				<tr>';
 
 			echo '
-					<td>
-						<a href="', $picture['url'], '">', $picture['img'], '</a>
+					<td class="profile_attachment">
+						<span class="attach_title">', $picture['filename'], '</span>
+						<a href="', $picture['url'], '">', $picture['img'], '</a>				
 					</td>';
 
 			if (++$i % $per_line === 0)

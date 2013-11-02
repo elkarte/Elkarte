@@ -224,8 +224,9 @@ input[disabled].input_text {
 }
 /* The OpenID login form */
 .openid_login {
-	padding-left: 18px;
+	padding-left: 20px;
 	background: white url(../images/openid.png) no-repeat;
+	background-position: 2% 50%;
 }
 
 /* Common button styling. */
@@ -900,6 +901,13 @@ div.bbc_footnotes {
 	height: auto;
 	max-width: 60px;
 	max-height: 60px;
+}
+.modtask {
+	margin: 1em 0 0 0;
+}
+
+.modtask a {
+	font-weight: bold;
 }
 /* The content section */
 #main_content_section {
@@ -2272,16 +2280,26 @@ img.new_posts {
 }
 /* End nifty new flyout. */
 
-.postarea {
-	display: table-cell;
-	vertical-align: top;
+.poster {
+	float: left;
+}
+.post_wrapper {
+	display: block;
 	width: 100%;
+	clear: both;
+}
+.postarea {
+	display: block;
+	vertical-align: top;
+	margin: 0 0 0 180px;
 	padding: 0 1em 0 0;
+	max-width: 100%;
 }
 .postarea2 {
 	display: block;
 	padding: 0 1em;
 }
+
 #topic_summary .postarea2 {
 	font-size: 0.857em;
 }
@@ -2858,19 +2876,31 @@ dl.merge_topic dd {
 	content: "\20\7C\20";
 }
 .profile_attachments {
-	padding: 0;
 	border: 0;
-	border-collapse: collapse;
-	border-spacing: 0;
+	border-spacing: 1em;
 	width: 95%;
 	table-layout:fixed;
 	font-size: 0.857em;
 	margin: 0 auto;
 }
 .profile_attachments td, .profile_attachments th {
-	padding: 2px 4px;
+	padding: 5px 4px;
 	vertical-align: top;
 	text-align: center;
+}
+
+.profile_attachment a img {
+	max-width: 120px;
+	max-height: 120px;
+}
+.vcard .avatar {
+	max-width: 40px;
+	max-height: 40px;
+}
+.attach_title {
+	width: 100%;
+	display: block;
+	margin-bottom: 4px;
 }
 /* The basic user info on the left */
 #basicinfo {
@@ -4247,6 +4277,7 @@ dl.merge_topic dd {
 	}
 	ul.poster {
 		display: block;
+		clear: both;
 	}
 	.avatar>.linklevel1>.avatar {
 		max-width: 20px;
