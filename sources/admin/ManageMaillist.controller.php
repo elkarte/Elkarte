@@ -63,7 +63,7 @@ class ManageMaillist_Controller extends Action_Controller
 		);
 
 		// Default to sub action 'emaillist' if none was given
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']][1])) ? $_REQUEST['sa'] : 'emaillist';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']]['permission']) || allowedTo($subActions[$_REQUEST['sa']]['permission'])) ? $_REQUEST['sa'] : 'emaillist';
 
 		// Helper is needed in most places, so load it up front
 		require_once(SUBSDIR . '/Maillist.subs.php');
@@ -299,7 +299,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 					// Read/parse this message for viewing
 					require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-					$controller = Emailpost_Controller();
+					$controller = new Emailpost_Controller();
 					$result = $controller->action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
