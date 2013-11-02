@@ -567,11 +567,8 @@ function template_group_members()
 					</dl>
 				</div>
 			</div>
-
 			<br />
-			<div class="title_bar">
-				<h4 class="titlebg">', $txt['membergroups_members_group_members'], '</h4>
-			</div>
+			<h3 class="category_header">', $txt['membergroups_members_group_members'], '</h3>
 			<br />
 			', template_pagesection(), '
 			<table class="table_grid">
@@ -668,9 +665,7 @@ function template_group_members()
 	if (!empty($context['group']['assignable']))
 	{
 		echo '
-			<div class="cat_bar cat_bar_odd">
-				<h3 class="catbg catbg_odd">', $txt['membergroups_members_add_title'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['membergroups_members_add_title'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
