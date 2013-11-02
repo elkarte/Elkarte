@@ -47,20 +47,18 @@ class ManageSearch_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		loadLanguage('Search');
 		loadTemplate('ManageSearch');
 
 		$subActions = array(
-			'settings' => array($this, 'action_searchSettings_display'),
-			'weights' => array($this, 'action_weight'),
-			'method' => array($this, 'action_edit'),
-			'createfulltext' => array($this, 'action_edit'),
-			'removecustom' => array($this, 'action_edit'),
-			'removefulltext' => array($this, 'action_edit'),
-			'createmsgindex' => array($this, 'action_create'),
-			'managesphinx' => array($this, 'action_managesphinx'),
+			'settings' => array($this, 'action_searchSettings_display', 'permission' => 'admin_forum'),
+			'weights' => array($this, 'action_weight', 'permission' => 'admin_forum'),
+			'method' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'createfulltext' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'removecustom' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'removefulltext' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'createmsgindex' => array($this, 'action_create', 'permission' => 'admin_forum'),
+			'managesphinx' => array($this, 'action_managesphinx', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_search', array(&$subActions));
@@ -68,11 +66,8 @@ class ManageSearch_Controller extends Action_Controller
 		// Default the sub-action to 'edit search settings'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'weights';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['search_settings_title'];
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -93,6 +88,8 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 

@@ -45,25 +45,24 @@ class ManagePosts_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// Make sure you can be here.
-		isAllowedTo('admin_forum');
-
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		$subActions = array(
 			'posts' => array(
-				$this, 'action_postSettings_display'),
+				$this, 'action_postSettings_display', 'permission' => 'admin_forum'),
 			'bbc' => array(
 				'function' => 'action_index',
 				'file' => 'ManageBBC.controller.php',
-				'controller' => 'ManageBBC_Controller'),
+				'controller' => 'ManageBBC_Controller',
+				'permission' => 'admin_forum'),
 			'censor' => array(
-				$this, 'action_censor'),
+				$this, 'action_censor', 'permission' => 'admin_forum'),
 			'topics' => array(
 				'function' => 'action_index',
 				'file' => 'ManageTopics.controller.php',
-				'controller' => 'ManageTopics_Controller'),
+				'controller' => 'ManageTopics_Controller',
+				'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_posts', array(&$subActions));
@@ -72,6 +71,7 @@ class ManagePosts_Controller extends Action_Controller
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'posts';
 
 		$context['page_title'] = $txt['manageposts_title'];
+		$context['sub_action'] = $subAction;
 
 		// Tabs for browsing the different post functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -96,7 +96,7 @@ class ManagePosts_Controller extends Action_Controller
 
 		// Call the right function for this sub-action.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'posts');
 		$action->dispatch($subAction);
 	}
 

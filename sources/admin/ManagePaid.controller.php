@@ -77,14 +77,8 @@ class ManagePaid_Controller extends Action_Controller
 		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
 		$context['page_title'] = $txt['paid_subscriptions'];
+		$context['sub_action'] = $subAction;
 
 		// Tabs for browsing the different subscription functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -102,6 +96,8 @@ class ManagePaid_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 

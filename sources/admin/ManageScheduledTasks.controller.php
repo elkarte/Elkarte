@@ -37,28 +37,22 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		loadLanguage('ManageScheduledTasks');
 		loadTemplate('ManageScheduledTasks');
 
 		$subActions = array(
-			'taskedit' => array($this, 'action_edit'),
-			'tasklog' => array($this, 'action_log'),
-			'tasks' => array($this, 'action_tasks'),
+			'taskedit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'tasklog' => array($this, 'action_log', 'permission' => 'admin_forum'),
+			'tasks' => array($this, 'action_tasks', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_scheduled_tasks', array(&$subActions));
 
 		// We need to find what's the action.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'tasks';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'tasks';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'tasks');
+		$context['page_title'] = $txt['maintain_info'];
+		$context['sub_action'] = $subAction;
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -74,10 +68,10 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				),
 			),
 		);
-		// @todo is this useless?
-		$context['sub_action'] = $subAction;
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'tasks');
 		$action->dispatch($subAction);
 	}
 

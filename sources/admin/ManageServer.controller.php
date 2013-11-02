@@ -119,8 +119,12 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		// The settings are in here, I swear!
+		loadLanguage('ManageSettings');
+
 		// This is just to keep the database password more secure.
 		isAllowedTo('admin_forum');
+		checkSession('request');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -129,27 +133,19 @@ class ManageServer_Controller extends Action_Controller
 			'description' => $txt['admin_basic_settings'],
 		);
 
-		checkSession('request');
-
-		// The settings are in here, I swear!
-		loadLanguage('ManageSettings');
-
-		$context['page_title'] = $txt['admin_server_settings'];
-		$context['sub_template'] = 'show_settings';
-
 		$subActions = array(
 			'general' => array(
-				$this, 'action_generalSettings_display'),
+				$this, 'action_generalSettings_display', 'permission' => 'admin_forum'),
 			'database' => array(
-				$this, 'action_databaseSettings_display'),
+				$this, 'action_databaseSettings_display', 'permission' => 'admin_forum'),
 			'cookie' => array(
-				$this, 'action_cookieSettings_display'),
+				$this, 'action_cookieSettings_display', 'permission' => 'admin_forum'),
 			'cache' => array(
-				$this, 'action_cacheSettings_display'),
+				$this, 'action_cacheSettings_display', 'permission' => 'admin_forum'),
 			'loads' => array(
-				$this, 'action_balancingSettings_display'),
+				$this, 'action_balancingSettings_display', 'permission' => 'admin_forum'),
 			'phpinfo' => array(
-				$this, 'action_phpinfo'),
+				$this, 'action_phpinfo', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_server_settings', array(&$subActions));
@@ -157,11 +153,9 @@ class ManageServer_Controller extends Action_Controller
 		// By default we're editing the core settings
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['admin_server_settings'];
+		$context['sub_template'] = 'show_settings';
 
 		// Any messages to speak of?
 		$context['settings_message'] = (isset($_REQUEST['msg']) && isset($txt[$_REQUEST['msg']])) ? $txt[$_REQUEST['msg']] : '';
@@ -188,6 +182,8 @@ class ManageServer_Controller extends Action_Controller
 		}
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 

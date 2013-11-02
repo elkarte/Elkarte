@@ -70,42 +70,56 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $context, $txt, $settings;
 
-		// You need to be an admin around here.
-		isAllowedTo('admin_forum');
-
-		$context['page_title'] = $txt['modSettings_title'];
-
+		// All the actions we know about
 		$subActions = array(
 			'basic' => array(
 				'controller' => $this,
-				'function' => 'action_basicSettings_display'),
+				'function' => 'action_basicSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'layout' => array(
 				'controller' => $this,
-				'function' => 'action_layoutSettings_display'),
+				'function' => 'action_layoutSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'karma' => array(
 				'controller' => $this,
 				'function' => 'action_karmaSettings_display',
-				'enabled' => in_array('k', $context['admin_features'])),
+				'enabled' => in_array('k', $context['admin_features']),
+				'permission' => 'admin_forum'
+			),
 			'pmsettings' => array(
 				'controller' => $this,
-				'function' => 'action_pmsettings'),
+				'function' => 'action_pmsettings',
+				'permission' => 'admin_forum'
+			),
 			'likes' => array(
 				'controller' => $this,
 				'function' => 'action_likesSettings_display',
-				'enabled' => in_array('l', $context['admin_features'])),
+				'enabled' => in_array('l', $context['admin_features']),
+				'permission' => 'admin_forum'
+			),
 			'notification' => array(
 				'controller' => $this,
-				'function' => 'action_notificationSettings_display'),
+				'function' => 'action_notificationSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'sig' => array(
 				'controller' => $this,
-				'function' => 'action_signatureSettings_display'),
+				'function' => 'action_signatureSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'profile' => array(
 				'controller' => $this,
 				'function' => 'action_profile',
-				'enabled' => in_array('cp', $context['admin_features'])),
+				'enabled' => in_array('cp', $context['admin_features']),
+				'permission' => 'admin_forum'
+			),
 			'profileedit' => array(
 				'controller' => $this,
-				'function' => 'action_profileedit'),
+				'function' => 'action_profileedit',
+				'permission' => 'admin_forum'
+			),
 		);
 
 		call_integration_hook('integrate_modify_features', array(&$subActions));
@@ -113,15 +127,12 @@ class ManageFeatures_Controller extends Action_Controller
 		// By default do the basic settings.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'basic');
-
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['modSettings_title'];
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -152,6 +163,8 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'basic');
 		$action->dispatch($subAction);
 	}
 

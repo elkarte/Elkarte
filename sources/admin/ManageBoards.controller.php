@@ -46,7 +46,7 @@ class ManageBoards_Controller extends Action_Controller
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// Format: 'sub-action' => array('function', 'permission')
+		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = array(
 			'board' => array(
 				'controller' => $this,
@@ -91,13 +91,6 @@ class ManageBoards_Controller extends Action_Controller
 		// Default to sub-action 'main' or 'settings' depending on permissions.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_boards') ? 'main' : 'settings');
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['boards_and_cats'],
@@ -113,8 +106,11 @@ class ManageBoards_Controller extends Action_Controller
 				),
 			),
 		);
+		$context['sub_action'] = $subAction;
 
-		// Call the right function for this sub-action.
+		// You way will end here if you don't have permission.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 

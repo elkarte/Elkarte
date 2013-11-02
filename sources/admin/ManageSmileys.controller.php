@@ -46,23 +46,21 @@ class ManageSmileys_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		isAllowedTo('manage_smileys');
-
 		loadLanguage('ManageSmileys');
 		loadTemplate('ManageSmileys');
 
 		$subActions = array(
-			'addsmiley' => array($this, 'action_addsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'editicon' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable'])),
-			'editicons' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable'])),
-			'editsets' => array($this, 'action_edit'),
-			'editsmileys' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'import' => array($this, 'action_edit'),
-			'modifyset' => array($this, 'action_edit'),
-			'modifysmiley' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'setorder' => array($this, 'action_setorder', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'settings' => array($this, 'action_smileySettings_display'),
-			'install' => array($this, 'action_install')
+			'addsmiley' => array($this, 'action_addsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'editicon' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable']), 'permission' => 'manage_smileys'),
+			'editicons' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable']), 'permission' => 'manage_smileys'),
+			'editsets' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'editsmileys' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'import' => array($this, 'action_edit', 'permission' => 'manage_smileys'),
+			'modifyset' => array($this, 'action_edit', 'permission' => 'manage_smileys'),
+			'modifysmiley' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'setorder' => array($this, 'action_setorder', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'settings' => array($this, 'action_smileySettings_display', 'permission' => 'manage_smileys'),
+			'install' => array($this, 'action_install', 'permission' => 'manage_smileys')
 		);
 
 		call_integration_hook('integrate_manage_smileys', array(&$subActions));
@@ -73,13 +71,9 @@ class ManageSmileys_Controller extends Action_Controller
 		// Default the sub-action to 'edit smiley settings'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'editsets';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'editsets');
-
 		// Set up template stuff
 		$context['page_title'] = $txt['smileys_manage'];
-		$context['sub_action'] = $action->subaction($subAction);
+		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -120,6 +114,8 @@ class ManageSmileys_Controller extends Action_Controller
 		}
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'editsets');
 		$action->dispatch($subAction);
 	}
 

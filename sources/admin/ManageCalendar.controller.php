@@ -38,8 +38,6 @@ class ManageCalendar_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		// Everything's gonna need this.
 		loadLanguage('ManageCalendar');
 
@@ -51,14 +49,14 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Little short on the ground of functions here... but things can and maybe will change...
 		$subActions = array(
-			'editholiday' => array($this, 'action_editholiday'),
-			'holidays' => array($this, 'action_holidays'),
-			'settings' => array($this, 'action_calendarSettings_display')
+			'editholiday' => array($this, 'action_editholiday', 'permission' => 'admin_forum'),
+			'holidays' => array($this, 'action_holidays', 'permission' => 'admin_forum'),
+			'settings' => array($this, 'action_calendarSettings_display', 'permission' => 'admin_forum')
 		);
 
 		call_integration_hook('integrate_manage_calendar', array(&$subActions));
 
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'holidays';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'settings';
 
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -74,9 +72,10 @@ class ManageCalendar_Controller extends Action_Controller
 				),
 			),
 		);
+		$context['sub_action'] = $subAction;
 
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 

@@ -46,17 +46,12 @@ class ManageLanguages_Controller extends Action_Controller
 		loadTemplate('ManageLanguages');
 		loadLanguage('ManageSettings');
 
-		$context['page_title'] = $txt['edit_languages'];
-		$context['sub_template'] = 'show_settings';
-
 		$subActions = array(
-			'edit' => array ($this, 'action_edit'),
-			'add' => array ($this, 'action_add'),
-			'settings' => array(
-				$this, 'action_languageSettings_display'
-			),
-			'downloadlang' => array ($this, 'action_downloadlang'),
-			'editlang' => array ($this, 'action_editlang'),
+			'edit' => array ($this, 'action_edit', 'permission' => 'admin_forum'),
+			'add' => array ($this, 'action_add', 'permission' => 'admin_forum'),
+			'settings' => array($this, 'action_languageSettings_display', 'permission' => 'admin_forum'),
+			'downloadlang' => array ($this, 'action_downloadlang', 'permission' => 'admin_forum'),
+			'editlang' => array ($this, 'action_editlang', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_languages', array(&$subActions));
@@ -64,6 +59,8 @@ class ManageLanguages_Controller extends Action_Controller
 		// By default we're managing languages.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['edit_languages'];
+		$context['sub_template'] = 'show_settings';
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

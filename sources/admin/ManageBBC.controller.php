@@ -25,17 +25,27 @@ class ManageBBC_Controller extends Action_Controller
 
 	public function action_index()
 	{
-		isAllowedTo('admin_forum');
+		global $context, $txt;
 
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		$subActions = array(
-			'display' => array ($this, 'action_bbcSettings_display'));
+			'display' => array(
+				'controller' => $this,
+				'function' => 'action_bbcSettings_display',
+				'permission' => 'admin_forum')
+		);
 
+		// Only one option I'm afraid
+		$subAction = 'display';
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
+
+		// Initiate and call
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch('display');
+		$action->initialize($subActions, 'display');
+		$action->dispatch($subAction);
 	}
 
 	/**

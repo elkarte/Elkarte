@@ -44,6 +44,10 @@ class ManageMembergroups_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		// Language and template stuff, the usual.
+		loadLanguage('ManageMembers');
+		loadTemplate('ManageMembergroups');
+
 		$subActions = array(
 			'add' => array(
 				'controller' => $this,
@@ -78,16 +82,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		// Default to sub action 'index' or 'settings' depending on permissions.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
 
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
-		// Language and template stuff, the usual.
-		loadLanguage('ManageMembers');
-		loadTemplate('ManageMembergroups');
-
 		// Setup the admin tabs.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['membergroups_title'],
@@ -95,7 +89,12 @@ class ManageMembergroups_Controller extends Action_Controller
 			'description' => $txt['membergroups_description'],
 		);
 
+		$context['page_title'] = $txt['membergroups_title'];
+		$context['sub_action'] = $subAction;
+
 		// Call the right function.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 

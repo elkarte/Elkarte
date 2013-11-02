@@ -32,22 +32,17 @@ class ManageBans_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		isAllowedTo('manage_bans');
-
 		loadTemplate('ManageBans');
 		require_once(SUBSDIR . '/Bans.subs.php');
 
 		$subActions = array(
-			'add' => array($this, 'action_edit'),
-			'browse' => array($this, 'action_browse'),
-			'edittrigger' => array($this, 'action_edittrigger'),
-			'edit' => array($this, 'action_edit'),
-			'list' => array($this, 'action_list'),
-			'log' => array($this, 'action_log'),
+			'add' => array($this, 'action_edit', 'permission' => 'manage_bans'),
+			'browse' => array($this, 'action_browse', 'permission' => 'manage_bans'),
+			'edittrigger' => array($this, 'action_edittrigger', 'permission' => 'manage_bans'),
+			'edit' => array($this, 'action_edit', 'permission' => 'manage_bans'),
+			'list' => array($this, 'action_list', 'permission' => 'manage_bans'),
+			'log' => array($this, 'action_log', 'permission' => 'manage_bans'),
 		);
-
-		$action = new Action();
-		$action->initialize($subActions);
 
 		call_integration_hook('integrate_manage_bans', array(&$subActions));
 
@@ -88,6 +83,8 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 

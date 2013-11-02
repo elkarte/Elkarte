@@ -19,6 +19,7 @@ if (!defined('ELK'))
  *  - handles maillist configuration
  *  - handles the showing, repairing, deleting and bouncing failed emails
  *  - handles the adding / editing / removing of both filters and parsers
+ *
  */
 class ManageMaillist_Controller extends Action_Controller
 {
@@ -37,6 +38,10 @@ class ManageMaillist_Controller extends Action_Controller
 	public function action_index()
 	{
 		global $context, $txt;
+
+		// Template & language
+		loadTemplate('Maillist');
+		loadLanguage('Maillist');
 
 		// All the functions available
 		$subActions = array(
@@ -57,16 +62,8 @@ class ManageMaillist_Controller extends Action_Controller
 			'sortfilters' => array($this, 'action_sort_filters', 'permission' => 'admin_forum'),
 		);
 
-		// Set up the action class
-		$action = new Action();
-		$action->initialize($subActions, 'emaillist');
-
 		// Default to sub action 'emaillist' if none was given
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']][1])) ? $_REQUEST['sa'] : 'emaillist';
-
-		// Template & language
-		loadTemplate('Maillist');
-		loadLanguage('Maillist');
 
 		// Helper is needed in most places, so load it up front
 		require_once(SUBSDIR . '/Maillist.subs.php');
@@ -78,7 +75,12 @@ class ManageMaillist_Controller extends Action_Controller
 			'description' => $txt['ml_configuration_desc'],
 		);
 
+		$context['page_title'] = $txt['ml_admin_configuration'];
+		$context['sub_action'] = $subAction;
+
 		// If you have the permissions, then go Play
+		$action = new Action();
+		$action->initialize($subActions, 'emaillist');
 		$action->dispatch($subAction);
 	}
 

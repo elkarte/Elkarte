@@ -38,34 +38,25 @@ class AddonSettings_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$context['page_title'] = $txt['admin_modifications'];
+		loadLanguage('Help');
+		loadLanguage('ManageSettings');
 
 		$subActions = array(
-			'general' => array($this, 'action_addonSettings_display'),
-			'hooks' => array($this, 'action_hooks'),
+			'general' => array($this, 'action_addonSettings_display', 'permission' => 'admin_forum'),
+			'hooks' => array($this, 'action_hooks', 'permission' => 'admin_forum'),
 			// Mod authors, once again, if you have a whole section to add do it AFTER this line, and keep a comma at the end.
+			// And SET the permission level
 		);
 
 		// Make it easier for addons to add new areas.
 		call_integration_hook('integrate_modify_modifications', array(&$subActions));
 
 		// Pick the correct sub-action.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'general';
-
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
 
 		// @FIXME
 		// $this->loadGeneralSettingParameters($subActions, 'general');
-		isAllowedTo('admin_forum');
-
-		loadLanguage('Help');
-		loadLanguage('ManageSettings');
-
+		$context['page_title'] = $txt['admin_modifications'];
 		$context['sub_template'] = 'show_settings';
 		$context['sub_action'] = $subAction;
 		// END $this->loadGeneralSettingParameters();
@@ -84,6 +75,8 @@ class AddonSettings_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 

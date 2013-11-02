@@ -50,6 +50,11 @@ class ManageRegistration_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		// Loading, always loading.
+		loadLanguage('Login');
+		loadTemplate('Register');
+		loadJavascriptFile('register.js');
+
 		$subActions = array(
 			'register' => array(
 				'controller' => $this,
@@ -74,17 +79,8 @@ class ManageRegistration_Controller extends Action_Controller
 		// Work out which to call...
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'register';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'register');
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
-		// Loading, always loading.
-		loadLanguage('Login');
-		loadTemplate('Register');
-		loadJavascriptFile('register.js');
+		$context['page_title'] = $txt['maintain_title'];
+		$context['sub_action'] = $subAction;
 
 		// Next create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -106,10 +102,10 @@ class ManageRegistration_Controller extends Action_Controller
 				)
 			)
 		);
-		// @todo is this useless?
-		$context['sub_action'] = $subAction;
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'register');
 		$action->dispatch($subAction);
 	}
 
