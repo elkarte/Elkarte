@@ -247,8 +247,7 @@ function template_edit_options()
 				', $txt['profile'];
 
 	echo '
-			</h2>
-		</div>';
+			</h2>';
 
 	// Have we some description?
 	if ($context['page_desc'])
