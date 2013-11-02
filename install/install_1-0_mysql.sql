@@ -2221,12 +2221,12 @@ CREATE TABLE {$db_prefix}postby_emails_filters (
 #
 
 CREATE TABLE {$db_prefix}log_likes (
-  action char(1) NOT NULL default '0',
-  id_target mediumint(8) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  log_time int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member),
-  KEY log_time (log_time)
+	action char(1) NOT NULL default '0',
+	id_target mediumint(8) unsigned NOT NULL default '0',
+	id_member mediumint(8) unsigned NOT NULL default '0',
+	log_time int(10) unsigned NOT NULL default '0',
+	PRIMARY KEY (id_target, id_member),
+	KEY log_time (log_time)
 ) ENGINE=MyISAM;
 
 #
@@ -2234,12 +2234,12 @@ CREATE TABLE {$db_prefix}log_likes (
 #
 
 CREATE TABLE {$db_prefix}message_likes (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_msg mediumint(8) unsigned NOT NULL default '0',
-  id_poster mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member),
-  KEY id_member (id_member),
-  KEY id_poster (id_poster)
+	id_member mediumint(8) unsigned NOT NULL default '0',
+	id_msg mediumint(8) unsigned NOT NULL default '0',
+	id_poster mediumint(8) unsigned NOT NULL default '0',
+	PRIMARY KEY (id_msg, id_member),
+	KEY id_member (id_member),
+	KEY id_poster (id_poster)
 ) ENGINE=MyISAM;
 
 #
@@ -2247,12 +2247,13 @@ CREATE TABLE {$db_prefix}message_likes (
 #
 
 CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-  id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
-  id_msg int(10) unsigned NOT NULL DEFAULT '0',
-  status tinyint(1) NOT NULL DEFAULT '0',
-  id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
-  log_time int(10) unsigned NOT NULL DEFAULT '0',
-  type varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  PRIMARY KEY (id_member,id_msg,id_member_from,log_time,type),
-  KEY id_member (id_member,status)
+	id_notification int(10) NOT NULL auto_increment,
+	id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
+	id_msg int(10) unsigned NOT NULL DEFAULT '0',
+	status tinyint(1) NOT NULL DEFAULT '0',
+	id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
+	log_time int(10) unsigned NOT NULL DEFAULT '0',
+	type varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+	PRIMARY KEY (id_notification),
+	KEY id_member (id_member,status)
 ) ENGINE=MyISAM;

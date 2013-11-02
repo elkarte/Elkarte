@@ -67,7 +67,7 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT n.id_msg, n.id_member_from, n.log_time, n.notif_type, n.status,
+		SELECT n.id_notification, n.id_msg, n.id_member_from, n.log_time, n.notif_type, n.status,
 			m.subject, m.id_topic, m.id_board,
 			IFNULL(men.real_name, m.poster_name) as mentioner, men.avatar, men.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
@@ -116,23 +116,43 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 {
 	$inserts = array();
 
+	$db = database();
+
+	// $time is not checked because it's useless
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}log_notifications
+		WHERE id_member IN ({array_int:members_to})
+			AND notif_type = {string:type}
+			AND id_member_from = {int:member_from}
+			AND id_msg = {int:msg}',
+		array(
+			'members_to' => $members_to,
+			'type' => $type,
+			'member_from' => $member_from,
+			'msg' => $msg,
+		)
+	);
+	$existing = array();
+	while ($row = $db->fetch_assoc($request))
+		$existing[] = $row['id_member'];
+	$db->free_result($request);
+
 	foreach ($members_to as $id_member)
-		$inserts[] = array(
-			$id_member,
-			$msg,
-			$status === null ? 0 : $status,
-			$member_from,
-			$time === null ? time() : $time,
-			$type
-		);
+		if (!in_array($id_member, $existing))
+			$inserts[] = array(
+				$id_member,
+				$msg,
+				$status === null ? 0 : $status,
+				$member_from,
+				$time === null ? time() : $time,
+				$type
+			);
 
 	if (empty($inserts))
 		return;
 
-	$db = database();
-
-	// @todo 'ignore' so that if a notification already exists is not added again...hopefully
-	$db->insert('ignore',
+	$db->insert('',
 		'{db_prefix}log_notifications',
 		array(
 			'id_member' => 'int',
@@ -143,7 +163,7 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 			'notif_type' => 'string-5',
 		),
 		$inserts,
-		array('id_member', 'id_msg', 'id_member_from', 'log_time', 'notif_type')
+		array('id_notification')
 	);
 }
 
@@ -161,25 +181,16 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
  * @param int $log_time the time it was notified
  * @param int $status status to update, 'new' => 0,	'read' => 1, 'deleted' => 2, 'unapproved' => 3
  */
-function changeNotificationStatus($id_member, $msg, $type, $id_member_from, $log_time, $status = 1)
+function changeNotificationStatus($id_notification, $status = 1)
 {
 	$db = database();
 
 	$db->query('', '
 		UPDATE {db_prefix}log_notifications
 		SET status = {int:status}
-		WHERE id_member = {int:member}
-			AND id_msg = {string:msg}
-			AND notif_type = {string:notif_type}
-			AND id_member_from = {int:member_from}
-			AND log_time = {int:log_time}
-		LIMIT 1',
+		WHERE id_notification = {int:id_notification}',
 		array(
-			'member' => $id_member,
-			'msg' => $msg,
-			'notif_type' => $type,
-			'member_from' => $id_member_from,
-			'log_time' => $log_time,
+			'id_notification' => $id_notification,
 			'status' => $status,
 		)
 	);
@@ -189,6 +200,7 @@ function changeNotificationStatus($id_member, $msg, $type, $id_member_from, $log
 
 /**
  * Toggles a notification on/off
+ * This is used to turn notifications on when a message is approved
  *
  * @param array $msgs array of messages that you want to toggle
  * @param type $approved direction of the toggle read / unread
@@ -206,4 +218,54 @@ function toggleNotificationsApproval($msgs, $approved)
 			'status' => $approved ? 0 : 3,
 		)
 	);
+}
+
+/**
+ * Provided a notification id and a member id,
+ * checks if the notification belongs to that user
+ *
+ * @param integer $id_notification the id of an existing notification
+ * @param integer $id_member id of a member
+ * @return bool true if the notification belongs to the member, false otherwise
+ */
+function findMemberNotification($id_notification, $id_member)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_notification
+		FROM {db_prefix}log_notifications
+		WHERE id_notification = {int:id_notification}
+			AND id_member = {int:id_member}
+		LIMIT 1',
+		array(
+			'id_notification' => $id_notification,
+			'id_member' => $id_member,
+		)
+	);
+	$return = $db->num_rows($request);
+	$db->free_result($request);
+
+	return !empty($return);
+}
+
+/**
+ * To validate access to read/unread/delete notifications we need
+ */
+function validate_ownnotification($field, $input, $validation_parameters = null)
+{
+	global $user_info;
+
+	if (!isset($input[$field]))
+		return;
+
+	if (!findMemberNotification($input[$field], $user_info['id']))
+	{
+		return array(
+			'field' => $field,
+			'input' => $input[$field],
+			'function' => __FUNCTION__,
+			'param' => $validation_parameters
+		);
+	}
 }

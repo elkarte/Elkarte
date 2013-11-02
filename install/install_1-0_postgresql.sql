@@ -2734,7 +2734,7 @@ CREATE SEQUENCE {$db_prefix}log_badbehavior_seq;
 #
 
 CREATE TABLE {$db_prefix}log_badbehavior (
-	id int default nextval('{$db_prefix}log_badbehavior'),
+	id int default nextval('{$db_prefix}log_badbehavior_seq'),
 	ip char NOT NULL,
 	date int NOT NULL default '0',
 	request_method varchar(255) NOT NULL,
@@ -2778,7 +2778,7 @@ CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
 #
 
 CREATE TABLE {$db_prefix}postby_emails_error (
-	id_email int default nextval('{$db_prefix}postby_emails_error'),
+	id_email int default nextval('{$db_prefix}postby_emails_error_seq'),
 	error varchar(255) NOT NULL default '',
 	data_id varchar(255) NOT NULL default '0',
 	subject varchar(255) NOT NULL default '',
@@ -2801,7 +2801,7 @@ CREATE SEQUENCE {$db_prefix}postby_emails_filter_seq;
 #
 
 CREATE TABLE {$db_prefix}postby_emails_filter (
-	id_filter int default nextval('{$db_prefix}postby_emails_filter'),
+	id_filter int default nextval('{$db_prefix}postby_emails_filter_seq'),
 	filter_style char(5) NOT NULL default '',
 	filter_type varchar(255) NOT NULL default '',
 	filter_to varchar(255) NOT NULL default '',
@@ -2815,11 +2815,11 @@ CREATE TABLE {$db_prefix}postby_emails_filter (
 #
 
 CREATE TABLE {$db_prefix}log_likes (
-  action char(1) NOT NULL default '0',
-  id_target int NOT NULL default '0',
-  id_member int NOT NULL default '0',
-  log_time int NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member)
+	action char(1) NOT NULL default '0',
+	id_target int NOT NULL default '0',
+	id_member int NOT NULL default '0',
+	log_time int NOT NULL default '0',
+	PRIMARY KEY (id_target, id_member)
 );
 
 #
@@ -2833,10 +2833,10 @@ CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
 #
 
 CREATE TABLE {$db_prefix}message_likes (
-  id_member int NOT NULL default '0',
-  id_msg int NOT NULL default '0',
-  id_poster int NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member)
+	id_member int NOT NULL default '0',
+	id_msg int NOT NULL default '0',
+	id_poster int NOT NULL default '0',
+	PRIMARY KEY (id_msg, id_member)
 );
 
 #
@@ -2847,17 +2847,24 @@ CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (i
 CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
 
 #
+# Sequence for table `log_notifications`
+#
+
+CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+
+#
 # Table structure for table `log_notifications`
 #
 
 CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-  id_member int NOT NULL DEFAULT '0',
-  id_msg int NOT NULL DEFAULT '0',
-  status int NOT NULL DEFAULT '0',
-  id_member_from int NOT NULL DEFAULT '0',
-  log_time int NOT NULL DEFAULT '0',
-  notif_type varchar(5) NOT NULL DEFAULT '',
-  PRIMARY KEY (id_member, id_msg, id_member_from, log_time, notif_type)
+	id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+	id_member int NOT NULL DEFAULT '0',
+	id_msg int NOT NULL DEFAULT '0',
+	status int NOT NULL DEFAULT '0',
+	id_member_from int NOT NULL DEFAULT '0',
+	log_time int NOT NULL DEFAULT '0',
+	notif_type varchar(5) NOT NULL DEFAULT '',
+	PRIMARY KEY (id_notification)
 );
 
 #

@@ -169,7 +169,7 @@ class Notification_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$row', '
-							global $txt, $scripturl;
+							global $txt, $scripturl, $context;
 
 							return str_replace(array(
 								\'{msg_link}\',
@@ -177,8 +177,8 @@ class Notification_Controller extends Action_Controller
 								\'{subject}\',
 							),
 							array(
-								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;from=\' . $row[\'id_member_from\'] . \';type=\' . $row[\'notif_type\'] . \';time=\' . $row[\'log_time\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
-								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;from=\' . $row[\'id_member_from\'] . \';type=\' . $row[\'notif_type\'] . \';time=\' . $row[\'log_time\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
+								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
+								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
 							), $txt[\'notification_\' . $row[\'notif_type\']]);
 						')
@@ -212,11 +212,11 @@ class Notification_Controller extends Action_Controller
 							$opts = \'\';
 
 							if (empty($row[\'status\']))
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=read;item=\' . $row[\'id_msg\'] . \';type=\' . $row[\'notif_type\'] . \';from=\' . $row[\'id_member_from\'] . \';time=\' . $row[\'log_time\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=notification;sa=updatestatus;mark=read;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
 							else
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=unread;item=\' . $row[\'id_msg\'] . \';type=\' . $row[\'notif_type\'] . \';from=\' . $row[\'id_member_from\'] . \';time=\' . $row[\'log_time\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=notification;sa=updatestatus;mark=unread;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
 
-							return $opts . \'<a href="?action=notification;sa=updatestatus;mark=delete;item=\' . $row[\'id_msg\'] . \';type=\' . $row[\'notif_type\'] . \';from=\' . $row[\'id_member_from\'] . \';time=\' . $row[\'log_time\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
+							return $opts . \'<a href="?action=notification;sa=updatestatus;mark=delete;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
 					),
 				),
@@ -323,55 +323,41 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function setData($data)
 	{
-		$this->_data = array(
-			'uid' => is_array($data['id_member']) ? $data['id_member'] : array($data['id_member']),
-			'type' => $data['type'],
-			'msg' => $data['id_msg'],
-			'status' => isset($data['status']) && in_array($data['status'], $this->_known_status) ? $this->_known_status[$data['status']] : 0,
-		);
+		if (isset($data['id_member']))
+		{
+			$this->_data = array(
+				'uid' => is_array($data['id_member']) ? $data['id_member'] : array($data['id_member']),
+				'type' => $data['type'],
+				'msg' => $data['id_msg'],
+				'status' => isset($data['status']) && in_array($data['status'], $this->_known_status) ? $this->_known_status[$data['status']] : 0,
+			);
 
-		if (isset($data['id_member_from']))
-			$this->_data['id_member_from'] = $data['id_member_from'];
+			if (isset($data['id_member_from']))
+				$this->_data['id_member_from'] = $data['id_member_from'];
 
-		if (isset($data['log_time']))
-			$this->_data['log_time'] = $data['log_time'];
-	}
-
-	/**
-	 * Don't you like your notifications? :(
-	 */
-	public function action_remove()
-	{
-		global $user_info;
-
-		// Can we
-		if (!$this->_isValid())
-			return;
-
-		$this->_buildUrl();
-
-		changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time, $this->_known_status['deleted']);
-
-		redirectexit('action=notification;sa=list' . $this->_url_param);
+			if (isset($data['log_time']))
+				$this->_data['log_time'] = $data['log_time'];
+		}
+		else
+			$this->_data = $data;
 	}
 
 	/**
 	 * Did you read the notification? Then let's move it to the graveyard.
+	 * Used in Display.controller.php, it may be merged to action_updatestatus
+	 * though that would require to add an optional parameter to avoid the redirect
 	 */
-	public function action_markread($noredir = false)
+	public function action_markread()
 	{
-		global $user_info;
+		checkSession('request');
 
 		// Common checks to determine if we can go on
-		if (!$this->_isValid())
+		if (!$this->_isAccessible())
 			return;
 
 		$this->_buildUrl();
 
-		changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time);
-
-		if (!$noredir)
-			redirectexit('action=notification;sa=list' . $this->_url_param);
+		changeNotificationStatus($this->_validator->id_notification, $this->_known_status['read']);
 	}
 
 	/**
@@ -379,35 +365,30 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function action_updatestatus()
 	{
-		global $user_info;
-
 		checkSession('request');
 
 		$this->setData(array(
-			'id_member' => $user_info['id'],
-			'type' => $_REQUEST['type'],
-			'id_msg' => $_REQUEST['item'],
-			'id_member_from' => $_REQUEST['from'],
-			'log_time' => $_REQUEST['time'],
+			'id_notification' => $_REQUEST['item'],
+			'mark' => $_REQUEST['mark'],
 		));
 
 		// Make sure its all good
-		if (!$this->_isValid())
-			return;
-
-		$this->_buildUrl();
-
-		switch ($_REQUEST['mark'])
+		if ($this->_isAccessible())
 		{
-			case 'read':
-				changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time, $this->_known_status['read']);
-				break;
-			case 'unread':
-				changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time, $this->_known_status['new']);
-				break;
-			case 'delete':
-				changeNotificationStatus($user_info['id'], $this->_validator->msg, $this->_validator->type, $this->_validator->id_member_from, $this->_validator->log_time, $this->_known_status['deleted']);
-				break;
+			$this->_buildUrl();
+
+			switch ($this->_validator->mark)
+			{
+				case 'read':
+					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['read']);
+					break;
+				case 'unread':
+					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['new']);
+					break;
+				case 'delete':
+					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['deleted']);
+					break;
+			}
 		}
 
 		redirectexit('action=notification;sa=list' . $this->_url_param);
@@ -426,9 +407,34 @@ class Notification_Controller extends Action_Controller
 	}
 
 	/**
+	 * Check if the user can access the notification
+	 */
+	private function _isAccessible()
+	{
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		require_once(SUBSDIR . '/Notification.subs.php');
+
+		$this->_validator = new Data_Validator();
+		$sanitization = array(
+			'id_notification' => 'intval',
+			'mark' => 'trim',
+		);
+		$validation = array(
+			'id_notification' => 'validate_ownnotification',
+			'mark' => 'trim|contains[read,unread,delete]',
+		);
+
+		$this->_validator->sanitation_rules($sanitization);
+		$this->_validator->validation_rules($validation);
+
+		if (!$this->_validator->validate($this->_data))
+			return false;
+
+		return true;
+	}
+
+	/**
 	 * Check if the user can do what he is supposed to do, and validates the input
-	 *
-	 * @param boolean true if 'uid' should be validated too (i.e. add a notification)
 	 */
 	private function _isValid()
 	{
@@ -460,7 +466,7 @@ class Notification_Controller extends Action_Controller
 		}
 
 		$this->_validator->sanitation_rules($sanitization);
-		$this->_validator->validation_rules();
+		$this->_validator->validation_rules($validation);
 
 		if (!$this->_validator->validate($this->_data))
 			return false;
