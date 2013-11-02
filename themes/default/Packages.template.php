@@ -31,9 +31,7 @@ function template_view_package()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt[($context['uninstalling'] ? 'un' : '') . 'install_mod'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt[($context['uninstalling'] ? 'un' : '') . 'install_mod'], '</h2>
 		<div class="information">';
 
 	if ($context['is_installed'])
@@ -61,9 +59,7 @@ function template_view_package()
 	if (isset($context['package_readme']))
 	{
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['package_' . ($context['uninstalling'] ? 'un' : '') . 'install_readme'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['package_' . ($context['uninstalling'] ? 'un' : '') . 'install_readme'], '</h3>
 			<div class="windowbg2">
 				<div class="content">
 					', $context['package_readme'], '
@@ -83,9 +79,7 @@ function template_view_package()
 	if (isset($context['package_license']))
 	{
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['package_install_license'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['package_install_license'], '</h3>
 			<div class="windowbg2">
 				<div class="content">
 					', $context['package_license'], '
@@ -225,11 +219,9 @@ function template_view_package()
 		{
 			echo '
 			<br />
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['uninstalling'] ? $txt['package_other_themes_uninstall'] : $txt['package_other_themes'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $context['uninstalling'] ? $txt['package_other_themes_uninstall'] : $txt['package_other_themes'], '
+			</h3>
 			<div id="custom_changes">
 				<div class="information">
 					', $txt['package_other_themes_desc'], '
@@ -331,9 +323,8 @@ function template_view_package()
 	elseif ($context['ftp_needed'])
 	{
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['package_ftp_necessary'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['package_ftp_necessary'], '</h3>
+
 			<div>
 				', template_control_chmod(), '
 			</div>';
@@ -429,9 +420,7 @@ function template_extract_package()
 	if (empty($context['redirect_url']))
 	{
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['uninstalling'] ? $txt['uninstall'] : $txt['extracting'], '</h3>
-			</div>
+			<h3 class="category_header">', $context['uninstalling'] ? $txt['uninstall'] : $txt['extracting'], '</h3>
 			<div class="information">', $txt['package_installed_extract'], '</div>';
 	}
 	else
@@ -494,12 +483,8 @@ function template_list()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['list_file'], '</h3>
-		</div>
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['files_archive'], ' ', $context['filename'], ':</h3>
-		</div>
+		<h2 class="category_header">', $txt['list_file'], '</h2>
+		<h3 class="category_header">', $txt['files_archive'], ' ', $context['filename'], ':</h3>
 		<div class="windowbg">
 			<div class="content">
 				<ol>';
@@ -526,12 +511,8 @@ function template_examine()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['package_examine_file'], '</h3>
-		</div>
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
-		</div>
+		<h2 class="category_header">', $txt['package_examine_file'], '</h2>
+		<h3 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
 		<div class="windowbg">
 			<div class="content">
 				<pre class="file_content">', $context['filedata'], '</pre>
@@ -555,11 +536,9 @@ function template_browse()
 	{
 		echo '
 		<div id="admin_form_wrapper">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="', $scripturl, '?action=quickhelp;help=latest_packages" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['packages_latest'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=latest_packages" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['packages_latest'], '
+			</h2>
 			<div class="windowbg2">
 				<div class="content">
 					<div id="packagesLatest">', $txt['packages_latest_fetch'], '</div>
@@ -608,12 +587,10 @@ function template_browse()
 	echo '
 		<form action="', $scripturl, '?action=admin;area=packages;sa=', $context['sub_action'], '" method="get">
 			<div id="advanced_box" >
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '.png" alt="*" />
-						<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
-					</h3>
-				</div>
+				<h3 class="category_header">
+					<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '.png" alt="*" />
+					<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
+				</h3>
 				<div id="advanced_panel_div" class="windowbg"', empty($context['admin_preferences']['pkg']) ? '' : ' style="display: none;"', '>
 					<div class="content">
 						<p>
@@ -699,13 +676,10 @@ function template_install_options()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['package_install_options'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['package_install_options'], '</h2>
 		<div class="information">
 			', $txt['package_install_options_ftp_why'], '
 		</div>
-
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=packages;sa=options" method="post" accept-charset="UTF-8">
@@ -1223,9 +1197,7 @@ function template_file_permissions()
 			</tbody>
 		</table>
 		<br />
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['package_file_perms_change'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['package_file_perms_change'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<fieldset>
@@ -1376,9 +1348,7 @@ function template_pause_action_permissions()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['package_file_perms_applying'], '</h3>
-		</div>';
+		<h2 class="category_header">', $txt['package_file_perms_applying'], '</h2>';
 
 	if (!empty($context['skip_ftp']))
 		echo '
