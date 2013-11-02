@@ -24,9 +24,7 @@ function template_trackActivity()
 	// The first table shows IP information about the user.
 	echo '
 		<div class="generic_list_wrapper">
-			<div class="title_bar">
-				<h3 class="titlebg"><strong>', $txt['view_ips_by'], ' ', $context['member']['name'], '</strong></h3>
-			</div>';
+			<h3 class="category_header"><strong>', $txt['view_ips_by'], ' ', $context['member']['name'], '</strong></h3>';
 
 	// The last IP the user used.
 	echo '
@@ -110,9 +108,7 @@ function template_trackIP()
 	if ($context['single_ip'])
 	{
 		echo '
-			<div class="title_bar">
-				<h3 class="titlebg">', $txt['whois_title'], ' ', $context['ip'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['whois_title'], ' ', $context['ip'], '</h3>
 			<div class="windowbg2">';
 
 		foreach ($context['whois_servers'] as $server)
@@ -125,9 +121,7 @@ function template_trackIP()
 
 	// The second table lists all the members who have been logged as using this IP address.
 	echo '
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['members_from_ip'], ' ', $context['ip'], '</h3>
-		</div>';
+		<h3 class="category_header">', $txt['members_from_ip'], ' ', $context['ip'], '</h3>';
 
 	if (empty($context['ips']))
 		echo '
