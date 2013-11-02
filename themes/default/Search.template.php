@@ -280,11 +280,7 @@ function template_results()
 	{
 		echo '
 				<div id="search_results">
-					<div class="cat_bar">
-						<h3 class="catbg">
-							', $txt['search_adjust_query'], '
-						</h3>
-					</div>
+					<h2 class="category_header">', $txt['search_adjust_query'], '</h2>
 					<div class="roundframe">';
 
 		// Did they make any typos or mistakes, perhaps?
@@ -332,19 +328,17 @@ function template_results()
 				<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm">';
 
 		echo '
-					<div class="cat_bar">
-						<h3 class="catbg">
-							<span class="floatright">';
+					<h3 class="category_header">
+						<span class="floatright">';
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
-								<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />';
+							<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />';
 
 		echo '
-							</span>
-							<img src="' . $settings['images_url'] . '/buttons/search.png" alt="?" class="centericon" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
-						</h3>
-					</div>';
+						</span>
+						<img src="' . $settings['images_url'] . '/buttons/search.png" alt="?" class="centericon" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
+					</h3>';
 
 		// was anything even found?
 		if (!empty($context['topics']))
@@ -472,11 +466,9 @@ function template_results()
 	else
 	{
 		echo '
-				<div class="cat_bar">
-					<h3 class="catbg">
+				<h3 class="category_header">
 						<img class="centericon" src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
-					</h3>
-				</div>';
+				</h3>';
 		template_pagesection();
 
 		if (empty($context['topics']))
