@@ -34,20 +34,20 @@ CREATE OR REPLACE FUNCTION IFNULL (int, boolean) RETURNS int AS
   'SELECT COALESCE($1, CAST($2 AS int)) AS result'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION INET_ATON(text) RETURNS bigint AS
-  'SELECT
-	CASE WHEN
-		$1 !~ ''^[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?$'' THEN 0
-	ELSE
-		split_part($1, ''.'', 1)::int8 * (256 * 256 * 256) +
-		split_part($1, ''.'', 2)::int8 * (256 * 256) +
-		split_part($1, ''.'', 3)::int8 * 256 +
-		split_part($1, ''.'', 4)::int8
-	END AS result'
+CREATE OR REPLACE FUNCTION INET_ATON(text) RETURNS bigint AS '
+  SELECT
+  CASE WHEN
+    $1 !~ ''^[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?$'' THEN 0
+  ELSE
+    split_part($1, ''.'', 1)::int8 * (256 * 256 * 256) +
+    split_part($1, ''.'', 2)::int8 * (256 * 256) +
+    split_part($1, ''.'', 3)::int8 * 256 +
+    split_part($1, ''.'', 4)::int8
+  END AS result'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION INET_NTOA(bigint) RETURNS text AS
-  'SELECT
+CREATE OR REPLACE FUNCTION INET_NTOA(bigint) RETURNS text AS '
+  SELECT
     (($1 >> 24) & 255::int8) || ''.'' ||
     (($1 >> 16) & 255::int8) || ''.'' ||
     (($1 >> 8) & 255::int8) || ''.'' ||
@@ -55,30 +55,30 @@ CREATE OR REPLACE FUNCTION INET_NTOA(bigint) RETURNS text AS
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION FIND_IN_SET(needle text, haystack text) RETURNS integer AS '
-	SELECT i AS result
-	FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-	WHERE  (string_to_array($2,'',''))[i] = $1
-		UNION ALL
-	SELECT 0
-	LIMIT 1'
+  SELECT i AS result
+  FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+  WHERE (string_to_array($2,'',''))[i] = $1
+    UNION ALL
+  SELECT 0
+  LIMIT 1'
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION FIND_IN_SET(needle integer, haystack text) RETURNS integer AS '
-	SELECT i AS result
-	FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-	WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
-		UNION ALL
-	SELECT 0
-	LIMIT 1'
+  SELECT i AS result
+  FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+  WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
+    UNION ALL
+  SELECT 0
+  LIMIT 1'
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION FIND_IN_SET(needle smallint, haystack text) RETURNS integer AS '
-	SELECT i AS result
-	FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-	WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
-		UNION ALL
-	SELECT 0
-	LIMIT 1'
+  SELECT i AS result
+  FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+  WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
+    UNION ALL
+  SELECT 0
+  LIMIT 1'
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION LEFT (text, int4) RETURNS text AS
@@ -109,8 +109,8 @@ CREATE OR REPLACE FUNCTION HOUR (timestamp) RETURNS integer AS
   'SELECT CAST (EXTRACT(HOUR FROM $1) AS integer) AS result'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION DATE_FORMAT (timestamp, text) RETURNS text AS
-  'SELECT
+CREATE OR REPLACE FUNCTION DATE_FORMAT (timestamp, text) RETURNS text AS '
+  SELECT
     REPLACE(
         REPLACE($2, ''%m'', to_char($1, ''MM'')),
     ''%d'', to_char($1, ''DD'')) AS result'
@@ -201,8 +201,6 @@ CREATE TABLE {$db_prefix}antispam_questions (
 #
 
 CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
-
-# --------------------------------------------------------
 
 #
 # Table structure for table `approval_queue`
@@ -1120,6 +1118,39 @@ CREATE TABLE {$db_prefix}log_activity (
 CREATE INDEX {$db_prefix}log_activity_most_on ON {$db_prefix}log_activity (most_on);
 
 #
+# Sequence for table `log_badbehavior`
+#
+
+CREATE SEQUENCE {$db_prefix}log_badbehavior_seq;
+
+#
+# Table structure for table `log_badbehavior`
+#
+
+CREATE TABLE {$db_prefix}log_badbehavior (
+  id int default nextval('{$db_prefix}log_badbehavior_seq'),
+  ip char NOT NULL,
+  date int NOT NULL default '0',
+  request_method varchar(255) NOT NULL,
+  request_uri varchar(255) NOT NULL,
+  server_protocol varchar(255) NOT NULL,
+  http_headers text NOT NULL,
+  user_agent varchar(255) NOT NULL,
+  request_entity varchar(255) NOT NULL,
+  valid varchar(255) NOT NULL,
+  id_member int NOT NULL,
+  session char(64) NOT NULL default '',
+  PRIMARY KEY (id)
+);
+
+#
+# Indexes for table `log_badbehavior`
+#
+
+CREATE INDEX {$db_prefix}ip ON {$db_prefix}log_badbehavior (ip);
+CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);
+
+#
 # Sequence for table `log_banned`
 #
 
@@ -1286,6 +1317,24 @@ CREATE TABLE {$db_prefix}log_karma (
 CREATE INDEX {$db_prefix}log_karma_log_time ON {$db_prefix}log_karma (log_time);
 
 #
+# Table structure for table `log_likes`
+#
+
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target int NOT NULL default '0',
+  id_member int NOT NULL default '0',
+  log_time int NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member)
+);
+
+#
+# Indexes for table `log_likes`
+#
+
+CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
+
+#
 # Table structure for table `log_mark_read`
 #
 
@@ -1312,6 +1361,33 @@ CREATE TABLE {$db_prefix}log_member_notices (
   body text NOT NULL,
   PRIMARY KEY (id_notice)
 );
+
+#
+# Sequence for table `log_notifications`
+#
+
+CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+
+#
+# Table structure for table `log_notifications`
+#
+
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
+  id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+  id_member int NOT NULL DEFAULT '0',
+  id_msg int NOT NULL DEFAULT '0',
+  status int NOT NULL DEFAULT '0',
+  id_member_from int NOT NULL DEFAULT '0',
+  log_time int NOT NULL DEFAULT '0',
+  notif_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_notification)
+);
+
+#
+# Indexes for table `log_notifications`
+#
+
+CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
 
 #
 # Table structure for table `log_notify`
@@ -1869,6 +1945,24 @@ INSERT INTO {$db_prefix}message_icons (filename, title, icon_order) VALUES ('pol
 # --------------------------------------------------------
 
 #
+# Table structure for table `message_likes`
+#
+
+CREATE TABLE {$db_prefix}message_likes (
+	id_member int NOT NULL default '0',
+	id_msg int NOT NULL default '0',
+	id_poster int NOT NULL default '0',
+	PRIMARY KEY (id_msg, id_member)
+);
+
+#
+# Indexes for table `message_likes`
+#
+
+CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
+CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
+
+#
 # Sequence for table `messages`
 #
 
@@ -2185,6 +2279,60 @@ CREATE TABLE {$db_prefix}poll_choices (
   label varchar(255) NOT NULL,
   votes smallint NOT NULL default '0',
   PRIMARY KEY (id_poll, id_choice)
+);
+
+#
+# Table structure for table `postby_emails`
+#
+
+CREATE TABLE {$db_prefix}postby_emails (
+  id_email varchar(50)  NOT NULL default '',
+  time_sent int NOT NULL default '0',
+  email_to varchar(50) NOT NULL default '',
+  PRIMARY KEY (id_email)
+);
+
+#
+# Sequence for table `postby_emails_error`
+#
+
+CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
+
+#
+# Table structure for table `postby_emails_error`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_error (
+  id_email int default nextval('{$db_prefix}postby_emails_error_seq'),
+  error varchar(255) NOT NULL default '',
+  data_id varchar(255) NOT NULL default '0',
+  subject varchar(255) NOT NULL default '',
+  id_message int NOT NULL default '0',
+  id_board smallint NOT NULL default '0',
+  email_from varchar(50) NOT NULL default '',
+  message_type char(10) NOT NULL default '',
+  message text NOT NULL,
+  PRIMARY KEY (id_email)
+);
+
+#
+# Sequence for table `postby_emails_filters`
+#
+
+CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
+
+#
+# Table structure for table `postby_emails_filters`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_filters (
+  id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
+  filter_style char(5) NOT NULL default '',
+  filter_type varchar(255) NOT NULL default '',
+  filter_to varchar(255) NOT NULL default '',
+  filter_from varchar(255) NOT NULL default '',
+  filter_name varchar(255) NOT NULL default '',
+  PRIMARY KEY (id_filter)
 );
 
 #
@@ -2549,6 +2697,8 @@ INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VA
 INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VALUES (25, 'Yandex (Video)', 'YandexVideo', '');
 INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VALUES (26, 'Yandex (Blogs)', 'YandexBlogs', '');
 INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VALUES (27, 'Yandex (Media)', 'YandexMedia', '');
+# --------------------------------------------------------
+
 #
 # Sequence for table `subscriptions`
 #
@@ -2629,7 +2779,6 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'forum_wid
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '2');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'posts_apply_ignore_list', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
-
 # --------------------------------------------------------
 
 #
@@ -2721,154 +2870,3 @@ CREATE TABLE {$db_prefix}user_drafts (
 #
 
 CREATE UNIQUE INDEX {$db_prefix}id_member ON {$db_prefix}user_drafts (id_member, id_draft, type);
-# --------------------------------------------------------
-
-#
-# Sequence for table `log_badbehavior`
-#
-
-CREATE SEQUENCE {$db_prefix}log_badbehavior_seq;
-
-#
-# Table structure for table `log_badbehavior`
-#
-
-CREATE TABLE {$db_prefix}log_badbehavior (
-	id int default nextval('{$db_prefix}log_badbehavior_seq'),
-	ip char NOT NULL,
-	date int NOT NULL default '0',
-	request_method varchar(255) NOT NULL,
-	request_uri varchar(255) NOT NULL,
-	server_protocol varchar(255) NOT NULL,
-	http_headers text NOT NULL,
-	user_agent varchar(255) NOT NULL,
-	request_entity varchar(255) NOT NULL,
-	valid varchar(255) NOT NULL,
-	id_member int NOT NULL,
-	session char(64) NOT NULL default '',
-	PRIMARY KEY (id)
-);
-
-#
-# Indexes for table `log_badbehavior`
-#
-
-CREATE INDEX {$db_prefix}ip ON {$db_prefix}log_badbehavior (ip);
-CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);
-
-#
-# Table structure for table `postby_emails`
-#
-
-CREATE TABLE {$db_prefix}postby_emails (
-	id_email varchar(50)  NOT NULL default '',
-	time_sent int NOT NULL default '0',
-	email_to varchar(50) NOT NULL default '',
-	PRIMARY KEY (id_email)
-);
-
-#
-# Sequence for table `postby_emails_error`
-#
-
-CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
-
-#
-# Table structure for table `postby_emails_error`
-#
-
-CREATE TABLE {$db_prefix}postby_emails_error (
-	id_email int default nextval('{$db_prefix}postby_emails_error_seq'),
-	error varchar(255) NOT NULL default '',
-	data_id varchar(255) NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	id_message int NOT NULL default '0',
-	id_board smallint NOT NULL default '0',
-	email_from varchar(50) NOT NULL default '',
-	message_type char(10) NOT NULL default '',
-	message text NOT NULL,
-	PRIMARY KEY (id_email)
-);
-
-#
-# Sequence for table `postby_emails_filters`
-#
-
-CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
-
-#
-# Table structure for table `postby_emails_filters`
-#
-
-CREATE TABLE {$db_prefix}postby_emails_filters (
-	id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
-	filter_style char(5) NOT NULL default '',
-	filter_type varchar(255) NOT NULL default '',
-	filter_to varchar(255) NOT NULL default '',
-	filter_from varchar(255) NOT NULL default '',
-	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter)
-);
-
-#
-# Table structure for table `log_likes`
-#
-
-CREATE TABLE {$db_prefix}log_likes (
-	action char(1) NOT NULL default '0',
-	id_target int NOT NULL default '0',
-	id_member int NOT NULL default '0',
-	log_time int NOT NULL default '0',
-	PRIMARY KEY (id_target, id_member)
-);
-
-#
-# Indexes for table `log_likes`
-#
-
-CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
-
-#
-# Table structure for table `message_likes`
-#
-
-CREATE TABLE {$db_prefix}message_likes (
-	id_member int NOT NULL default '0',
-	id_msg int NOT NULL default '0',
-	id_poster int NOT NULL default '0',
-	PRIMARY KEY (id_msg, id_member)
-);
-
-#
-# Indexes for table `message_likes`
-#
-
-CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
-CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
-
-#
-# Sequence for table `log_notifications`
-#
-
-CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
-
-#
-# Table structure for table `log_notifications`
-#
-
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-	id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
-	id_member int NOT NULL DEFAULT '0',
-	id_msg int NOT NULL DEFAULT '0',
-	status int NOT NULL DEFAULT '0',
-	id_member_from int NOT NULL DEFAULT '0',
-	log_time int NOT NULL DEFAULT '0',
-	notif_type varchar(5) NOT NULL DEFAULT '',
-	PRIMARY KEY (id_notification)
-);
-
-#
-# Indexes for table `log_notifications`
-#
-
-CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
