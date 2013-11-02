@@ -295,7 +295,8 @@ class ManageMaillist_Controller extends Action_Controller
 			{
 				if ($temp_email[0]['type'] !== 'p' && allowedTo('approve_emails'))
 				{
-					$data = (int) $temp_email[0]['body'];
+					// The raw email that failed
+					$data = $temp_email[0]['body'];
 
 					// Read/parse this message for viewing
 					require_once(CONTROLLERDIR . '/Emailpost.controller.php');
