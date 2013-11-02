@@ -25,11 +25,9 @@ function template_editBuddies()
 
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
-		<div class="title_bar">
-			<h3 class="titlebg">
-				<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />', $txt['editBuddies'], '
-			</h3>
-		</div>
+		<h2 class="category_header">
+			<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />', $txt['editBuddies'], '
+		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
 				<th scope="col" style="width:20%">', $txt['name'], '</th>
@@ -94,9 +92,7 @@ function template_editBuddies()
 	echo '
 	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=buddies" method="post" accept-charset="UTF-8">
 		<div class="tborder add_buddy">
-			<div class="title_bar">
-				<h3 class="titlebg">', $txt['buddy_add'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['buddy_add'], '</h3>
 			<div class="roundframe">
 				<dl class="settings">
 					<dt>
@@ -142,11 +138,9 @@ function template_editIgnoreList()
 
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
-		<div class="title_bar">
-			<h3 class="titlebg">
-				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['editIgnoreList'], '
-			</h3>
-		</div>
+		<h2 class="category_header">
+			<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['editIgnoreList'], '
+		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
 				<th scope="col" style="width:20%">', $txt['name'], '</th>
@@ -195,9 +189,7 @@ function template_editIgnoreList()
 	echo '
 	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore" method="post" accept-charset="UTF-8">
 		<div class="tborder add_buddy">
-			<div class="title_bar">
-				<h3 class="titlebg">', $txt['ignore_add'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['ignore_add'], '</h2>
 			<div class="roundframe">
 				<dl class="settings">
 					<dt>
@@ -243,21 +235,20 @@ function template_edit_options()
 	// The main header!
 	echo '
 		<form action="', (!empty($context['profile_custom_submit_url']) ? $context['profile_custom_submit_url'] : $scripturl . '?action=profile;area=' . $context['menu_item_selected'] . ';u=' . $context['id_member']), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data" onsubmit="return checkProfileSubmit();">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />';
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />';
 
 	// Don't say "Profile" if this isn't the profile...
 	if (!empty($context['profile_header_text']))
 		echo '
-					', $context['profile_header_text'];
+				', $context['profile_header_text'];
 	else
 		echo '
-					', $txt['profile'];
+				', $txt['profile'];
 
 	echo '
-				</h3>
-			</div>';
+			</h2>
+		</div>';
 
 	// Have we some description?
 	if ($context['page_desc'])
@@ -723,11 +714,9 @@ function template_action_notification()
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=notification;save" method="post" accept-charset="UTF-8" id="notify_options" class="flow_hidden">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
+			</h2>
 			<p class="description">', $txt['notification_info'], '</p>
 			<div class="windowbg2">
 				<div class="content">
@@ -831,11 +820,9 @@ function template_groupMembership()
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=groupmembership;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
+			</h2>
 			<p class="description">', $txt['groupMembership_info'], '</p>';
 
 	// Do we have an update message?
@@ -850,9 +837,7 @@ function template_groupMembership()
 	{
 		echo '
 			<div class="groupmembership">
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['request_group_membership'], '</h3>
-				</div>
+				<h3 class="category_header">', $txt['request_group_membership'], '</h3>
 				<div class="roundframe">
 					', $txt['request_group_membership_desc'], ':
 					<textarea name="reason" rows="4" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 99%') . ';"></textarea>
@@ -996,11 +981,9 @@ function template_ignoreboards()
 	// The main containing header.
 	echo '
 	<form action="', $scripturl, '?action=profile;area=ignoreboards;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
-			</h3>
-		</div>
+		<h2 class="category_header">
+			<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
+		</h2>
 		<p class="description">', $txt['ignoreboards_info'], '</p>
 		<div class="windowbg2">
 			<div class="content flow_hidden">
@@ -1463,11 +1446,9 @@ function template_authentication_method()
 	echo '
 		<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 		<form action="', $scripturl, '?action=profile;area=authentication;save" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['authentication'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['authentication'], '
+			</h3>
 			<p class="description">', $txt['change_authentication'], '</p>
 			<div class="windowbg2">
 				<div class="content">
