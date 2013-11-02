@@ -3501,7 +3501,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 			FROM {db_prefix}attachments
 			WHERE id_attach = {int:id_attach}',
 			array(
-				'id_attach' => $attachment_id,
+				'id_attach' => (int) $attachment_id,
 		));
 
 		if ($db->num_rows($request) === 0)
@@ -3513,7 +3513,10 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 
 	// In case of files from the old system, do a legacy call.
 	if (empty($file_hash))
+	{
+		require_once(SUBSDIR . '/Attachments.subs.php');
 		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
+	}
 
 	// Are we using multiple directories?
 	if (!empty($modSettings['currentAttachmentUploadDir']))
@@ -3526,49 +3529,6 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 		$path = $modSettings['attachmentUploadDir'];
 
 	return $path . '/' . $attachment_id . '_' . $file_hash . '.elk';
-}
-
-/**
- * Older attachments may still use this function.
- *
- * @param $filename
- * @param $attachment_id
- * @param $dir
- * @param $new
- */
-function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $new = false)
-{
-	global $modSettings;
-
-	$clean_name = $filename;
-
-	// Sorry, no spaces, dots, or anything else but letters allowed.
-	$clean_name = preg_replace(array('/\s/', '/[^\w_\.\-]/'), array('_', ''), $clean_name);
-
-	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
-	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
-
-	if ($attachment_id == false || ($new && empty($modSettings['attachmentEncryptFilenames'])))
-		return $clean_name;
-	elseif ($new)
-		return $enc_name;
-
-	// Are we using multiple directories?
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = $modSettings['attachmentUploadDir'][$dir];
-	}
-	else
-		$path = $modSettings['attachmentUploadDir'];
-
-	if (file_exists($path . '/' . $enc_name))
-		$filename = $path . '/' . $enc_name;
-	else
-		$filename = $path . '/' . $clean_name;
-
-	return $filename;
 }
 
 /**
