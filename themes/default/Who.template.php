@@ -25,9 +25,7 @@ function template_main()
 	echo '
 	<div id="whos_online">
 		<form action="', $scripturl, '?action=who" method="post" id="whoFilter" accept-charset="UTF-8">
-			<div class="title_bar">
-				<h4 class="titlebg margin_lower">', $txt['who_title'], '</h4>
-			</div>';
+			<h2 class="category_header">', $txt['who_title'], '</h2>';
 
 	$extra = '
 				<div class="selectbox floatright">' . $txt['who_show1'] . '
@@ -135,9 +133,7 @@ function template_credits()
 	// The most important part - the credits :P.
 	echo '
 	<div id="credits">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits'], '</h3>
-		</div>';
+		<h2 class="category_header">', $txt['credits'], '</h2>';
 
 	foreach ($context['credits'] as $section)
 	{
@@ -151,9 +147,7 @@ function template_credits()
 
 		if (isset($section['title']))
 			echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $section['title'], '</h3>
-		</div>';
+			<h3 class="category_header">', $section['title'], '</h3>';
 
 		echo '
 		<div class="windowbg2">
@@ -198,9 +192,7 @@ function template_credits()
 	if (!empty($context['credits_software_graphics']))
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_software_graphics'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['credits_software_graphics'], '</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -220,9 +212,7 @@ function template_credits()
 	if (!empty($context['credits_addons']))
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_addons'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['credits_addons'], '</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -239,9 +229,7 @@ function template_credits()
 
 	// ElkArte !
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_copyright'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['credits_copyright'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<dl>

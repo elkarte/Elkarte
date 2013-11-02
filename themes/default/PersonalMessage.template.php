@@ -28,7 +28,7 @@ function template_pm_above()
 	// Show the capacity bar, if available. @todo - This needs work.
 	if (!empty($context['limit_bar']))
 		echo '
-						<h3 class="titlebg">
+						<h3 class="category_header">
 							<span class="floatleft">', $txt['pm_capacity'], ':</span>
 							<span class="floatleft capacity_bar">
 								<span class="', $context['limit_bar']['percent'] > 85 ? 'full' : ($context['limit_bar']['percent'] > 40 ? 'filled' : 'empty'), '" style="width: ', $context['limit_bar']['percent'] / 10, 'em;"></span>
@@ -952,7 +952,7 @@ function template_send()
 	{
 		echo '
 			<div class="forumposts">
-				<h3 class="catbg">', $txt['pm_send_report'], '</h3>
+				<h3 class="category_header">', $txt['pm_send_report'], '</h3>
 				<div class="windowbg">
 					<div class="content">';
 
@@ -974,7 +974,7 @@ function template_send()
 	// Show the preview of the personal message.
 	echo '
 		<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-			<h3 class="catbg">
+			<h3 class="category_header">
 				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 			</h3>
 			<div class="post" id="preview_body">
@@ -986,7 +986,7 @@ function template_send()
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
 		<div class="forumposts">
-			<h3 class="catbg">
+			<h3 class="category_header">
 					<img src="', $settings['images_url'], '/icons/inbox_hd.png" class="icon" alt="', $txt['new_message'], '" title="', $txt['new_message'], '" />&nbsp;', $txt['new_message'], '
 			</h3>';
 
@@ -1163,7 +1163,7 @@ function template_send()
 		echo '
 
 	<div class="forumposts">
-		<h3 class="catbg">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h3>
+		<h3 class="category_header">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<div class="clear">
@@ -1230,9 +1230,7 @@ function template_ask_delete()
 	global $context, $scripturl, $txt;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', ($context['delete_all'] ? $txt['delete_message'] : $txt['delete_all']), '</h3>
-		</div>
+		<h2 class="category_header">', ($context['delete_all'] ? $txt['delete_message'] : $txt['delete_all']), '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['delete_all_confirm'], '</p><br />
@@ -1250,9 +1248,7 @@ function template_prune()
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['pm_prune'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['pm_prune'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['pm_prune_desc1'], ' <input type="text" name="age" size="3" value="14" class="input_text" /> ', $txt['pm_prune_desc2'], '</p>
@@ -1272,9 +1268,7 @@ function template_labels()
 
 	echo '
 	<form class="flow_auto" action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['pm_manage_labels'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['pm_manage_labels'], '</h2>
 		<div class="description">
 			', $txt['pm_labels_desc'], '
 		</div>
@@ -1339,9 +1333,7 @@ function template_labels()
 	</form>
 	<br />
 	<form class="flow_auto" action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8" style="margin-top: 1ex;">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['pm_label_add_new'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['pm_label_add_new'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<dl class="settings">
@@ -1371,9 +1363,7 @@ function template_report_message()
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=report;l=', $context['current_label_id'], '" method="post" accept-charset="UTF-8">
 		<input type="hidden" name="pmsg" value="', $context['pm_id'], '" />
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['pm_report_title'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['pm_report_title'], '</h2>
 		<div class="description">
 			', $txt['pm_report_desc'], '
 		</div>
@@ -1427,9 +1417,7 @@ function template_report_message_complete()
 	global $context, $txt, $scripturl;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['pm_report_title'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['pm_report_title'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['pm_report_done'], '</p>
@@ -1445,9 +1433,7 @@ function template_rules()
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=manrules" method="post" accept-charset="UTF-8" name="manRules" id="manrules">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['pm_manage_rules'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['pm_manage_rules'], '</h2>
 		<div class="description">
 			', $txt['pm_manage_rules_desc'], '
 		</div>
@@ -1570,9 +1556,7 @@ function template_add_rule()
 
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=manrules;save;rid=', $context['rid'], '" method="post" accept-charset="UTF-8" name="addrule" id="addrule" class="flow_hidden">
-		<div class="cat_bar">
-			<h3 class="catbg">', $context['rid'] == 0 ? $txt['pm_add_rule'] : $txt['pm_edit_rule'], '</h3>
-		</div>
+		<h2 class="category_header">', $context['rid'] == 0 ? $txt['pm_add_rule'] : $txt['pm_edit_rule'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<dl class="addrules">
@@ -1686,10 +1670,7 @@ function template_add_rule()
 					<a href="#" onclick="addActionOption(); return false;" id="addonjs2" style="display: none;">(', $txt['pm_rule_add_action'], ')</a>
 				</fieldset>
 			</div>
-
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['pm_rule_description'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['pm_rule_description'], '</h3>
 			<div class="information">
 				<div id="ruletext">', $txt['pm_rule_js_disabled'], '</div>
 			</div>
@@ -1737,12 +1718,10 @@ function template_showPMDrafts()
 	global $context, $settings, $scripturl, $txt;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/message_sm.png" alt="" class="icon" />
-					', $txt['drafts_show'], '
-			</h3>
-		</div>';
+		<h2 class="category_header">
+			<img src="', $settings['images_url'], '/message_sm.png" alt="" class="icon" />
+				', $txt['drafts_show'], '
+		</h2>';
 	template_pagesection();
 
 	// No drafts? Just show an informative message.
