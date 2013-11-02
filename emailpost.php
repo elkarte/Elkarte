@@ -8,9 +8,11 @@
  *
  * @version 1.0 Alpha
  *
+ * Note the shebang #!/usr/local/bin/php -q need to point to the installed location of
+ * php, this is the typical location but yours may be different
  */
 
-// Only do anything for a pipe and direct calling
+// Only do something for a pipe and direct calling
 if (!defined('STDIN'))
 	return;
 

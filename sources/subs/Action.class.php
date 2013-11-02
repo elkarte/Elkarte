@@ -60,7 +60,7 @@ class Action
 	 *
 	 * @param array $subactions
 	 */
-	function initialize($subactions, $default = '')
+	public function initialize($subactions, $default = '')
 	{
 		$this->_subActions = array();
 
@@ -79,7 +79,7 @@ class Action
 	 *
 	 * @param string $sa
 	 */
-	function dispatch($sa)
+	public function dispatch($sa)
 	{
 		// for our sanity...
 		if (!key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
@@ -180,7 +180,7 @@ class Action
 	 *
 	 * @param string $sa
 	 */
-	function isAllowedTo($sa)
+	public function isAllowedTo($sa)
 	{
 		if (is_array($this->_subActions) && key_exists($sa, $this->_subActions))
 		{

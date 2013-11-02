@@ -28,8 +28,6 @@ exit(0);
  * Grabs unread messages from an imap account and saves them as .eml files
  * Passes any new messages found to the postby email function for processing
  * Called by a scheduled task or cronjob
- *
- * @return
  */
 function postbyemail_imap()
 {
@@ -46,7 +44,7 @@ function postbyemail_imap()
 	$mailbox = !empty($modSettings['maillist_imap_mailbox']) ? $modSettings['maillist_imap_mailbox'] : 'INBOX';
 	$type = !empty($modSettings['maillist_imap_connection']) ? $modSettings['maillist_imap_connection'] : '';
 
-	// Based on the type selected get/set the additonal connection details
+	// Based on the type selected get/set the additional connection details
 	$connection = port_type($type);
 	$hostname .= (strpos($hostname, ':') === false) ? ':' . $connection['port'] : '';
 	$mailbox = '{' . $hostname . '/' . $connection['protocol'] . $connection['flags'] . '}' . $mailbox;
@@ -62,14 +60,12 @@ function postbyemail_imap()
 	// If emails are returned, cycle through each...
 	if ($emails)
 	{
-		// You've got mail
+		// You've got mail, so initialize Emailpost controller
 		require_once(CONTROLLERDIR . '/Emailpost.controller.php');
+		$controller = new Emailpost_Controller();
 
 		// Make sure we work from the oldest to the newest message
 		sort($emails);
-
-		// Initialize Emailpost controller
-		$controller = new Emailpost_Controller();
 
 		// For every email...
 		foreach ($emails as $email_number)
@@ -106,7 +102,6 @@ function postbyemail_imap()
 
 /**
  * Sets port and connection flags based on the chosen protocol
- *
  */
 function port_type($type)
 {

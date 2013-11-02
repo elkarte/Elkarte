@@ -7,7 +7,6 @@
  *
  * @version 1.0 Alpha
  *
- * Take an email and parse the headers and body section in to an associative array
  */
 
 if (!defined('ELK'))
@@ -714,7 +713,7 @@ class Email_Parse
 			$this->headers['subject'] = '';
 
 		// Change it to a readable form ...
-		$this->subject = htmlspecialchars($this->_decode_header($this->headers['subject']));
+		$this->subject = htmlspecialchars($this->_decode_header($this->headers['subject']), ENT_COMPAT, 'UTF-8');
 
 		return $this->subject;
 	}

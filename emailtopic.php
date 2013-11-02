@@ -8,13 +8,15 @@
  *
  * @version 1.0 Alpha
  *
+ * Note the shebang #!/usr/local/bin/php -q need to point to the installed location of
+ * php, this is the typical location but yours may be different
  */
 
-// Only do anything for a pipe and direct calling
+// Only work for a pipe and direct calling
 if (!defined('STDIN'))
 	return;
 
-// Any output here is not good
+// Any output here is not good, it will be bounced as email
 error_reporting(0);
 
 // Need SSI to do much
