@@ -61,6 +61,7 @@ Class Elk_Testing_Setup
 		),
 		$file);
 		$file .= "\n" . '$test_enabled = 1;';
+
 		file_put_contents(BOARDDIR . '/Settings.php', $file);
 	}
 }
