@@ -125,10 +125,10 @@ class ManageMaillist_Controller extends Action_Controller
 				'id_email' => array(
 					'header' => array(
 						'value' => $txt['id'],
+						'style' => 'white-space: nowrap;',
 					),
 					'data' => array(
 						'db' => 'id_email',
-						'style' => 'width: 2.2em;',
 					),
 					'sort' => array(
 						'default' => 'id_email ',
