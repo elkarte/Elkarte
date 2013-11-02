@@ -22,11 +22,9 @@ function template_main()
 	global $context, $settings, $txt, $scripturl;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $txt['notify'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $txt['notify'], '
+		</h3>
 		<div class="roundframe centertext">
 			<p>', $context['notification_set'] ? $txt['notify_deactivate'] : $txt['notify_request'], '</p>
 			<p>
@@ -43,11 +41,9 @@ function template_notify_board()
 	global $context, $settings, $txt, $scripturl;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $txt['notify'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $txt['notify'], '
+		</h3>
 		<div class="roundframe centertext">
 			<p>', $context['notification_set'] ? $txt['notifyboard_turnoff'] : $txt['notifyboard_turnon'], '</p>
 			<p>

@@ -23,9 +23,7 @@ function template_merge_done()
 
 	echo '
 		<div id="merge_topics">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['merge'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['merge'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>', $txt['merge_successful'], '</p>
@@ -52,9 +50,7 @@ function template_merge()
 
 	echo '
 		<div id="merge_topics">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['merge'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['merge'], '</h2>
 			<div class="information">
 				', $txt['merge_desc'], '
 			</div>
@@ -110,9 +106,8 @@ function template_merge()
 					</dl>
 				</div>
 			</div><br />
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['target_topic'], '</h3>
-			</div>', template_pagesection(), '
+			<h3 class="category_header">', $txt['target_topic'], '</h3>
+			', template_pagesection(), '
 			<div class="windowbg2">
 				<div class="content">
 					<ul class="merge_topics">';
@@ -143,9 +138,7 @@ function template_merge_extra_options()
 	echo '
 	<div id="merge_topics">
 		<form action="', $scripturl, '?action=mergetopics;sa=execute;" method="post" accept-charset="UTF-8">
-			<div class="title_bar">
-				<h3 class="titlebg">', $txt['merge_topic_list'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['merge_topic_list'], '</h2>
 			<table class="bordercolor table_grid">
 				<thead>
 					<tr class="table_head">

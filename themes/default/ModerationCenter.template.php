@@ -53,11 +53,9 @@ function template_latest_news()
 	global $settings, $txt, $scripturl;
 
 	echo '
-								<div class="cat_bar">
-									<h3 class="catbg">
-										<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['mc_latest_news'], '
-									</h3>
-								</div>
+								<h3 class="category_header">
+									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['mc_latest_news'], '
+								</h3>
 								<div class="windowbg">
 									<div class="content">
 										<div id="ourAnnouncements" class="smalltext">', $txt['mc_cannot_connect_sm'], '</div>
@@ -96,11 +94,9 @@ function template_group_requests_block()
 	global $context, $txt, $scripturl;
 
 	echo '
-								<div class="cat_bar">
-									<h3 class="catbg">
-										<a href="', $scripturl, '?action=groups;sa=requests">', $txt['mc_group_requests'], '</a>
-									</h3>
-								</div>
+								<h3 class="category_header">
+									<a href="', $scripturl, '?action=groups;sa=requests">', $txt['mc_group_requests'], '</a>
+								</h3>
 								<div class="windowbg">
 									<div class="content modbox">
 										<ul>';
@@ -132,11 +128,9 @@ function template_reported_posts_block()
 	global $context, $txt, $scripturl;
 
 	echo '
-								<div class="cat_bar">
-									<h3 class="catbg">
-										<a href="', $scripturl, '?action=moderate;area=reports">', $txt['mc_recent_reports'], '</a>
-									</h3>
-								</div>
+								<h3 class="category_header">
+									<a href="', $scripturl, '?action=moderate;area=reports">', $txt['mc_recent_reports'], '</a>
+								</h3>
 								<div class="windowbg">
 									<div class="content modbox">
 										<ul>';
@@ -168,11 +162,9 @@ function template_watched_users()
 	global $context, $txt, $scripturl;
 
 	echo '
-						<div class="cat_bar">
-							<h3 class="catbg">
-								<a href="', $scripturl, '?action=moderate;area=userwatch">', $txt['mc_watched_users'], '</a>
-							</h3>
-						</div>
+						<h3 class="category_header">
+							<a href="', $scripturl, '?action=moderate;area=userwatch">', $txt['mc_watched_users'], '</a>
+						</h3>
 						<div class="windowbg">
 							<div class="content modbox">
 								<ul>';
@@ -205,9 +197,7 @@ function template_notes()
 
 	echo '
 						<form action="', $scripturl, '?action=moderate;area=index" method="post">
-							<div class="cat_bar">
-								<h3 class="catbg">', $txt['mc_notes'], '</h3>
-							</div>
+							<h3 class="category_header">', $txt['mc_notes'], '</h3>
 							<div class="windowbg">
 								<div class="content modbox">
 									<div class="floatleft post_note">
@@ -247,11 +237,7 @@ function template_action_required()
 	global $context, $txt, $scripturl, $settings;
 
 	echo '
-						<div class="cat_bar">
-							<h3 class="catbg">
-								', $txt['mc_required'], ' : ', $context['mc_required'], '
-							</h3>
-						</div>
+						<h3 class="category_header">', $txt['mc_required'], ' : ', $context['mc_required'], '</h3>
 						<div class="windowbg">
 							<div class="content modbox">
 								<ul>';
@@ -284,11 +270,9 @@ function template_reported_posts()
 
 	echo '
 					<form id="reported_posts" action="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';start=', $context['start'], '" method="post" accept-charset="UTF-8">
-						<div class="cat_bar">
-							<h3 class="catbg">
-								', $context['view_closed'] ? $txt['mc_reportedp_closed'] : $txt['mc_reportedp_active'], '
-							</h3>
-						</div>';
+						<h3 class="category_header">
+							', $context['view_closed'] ? $txt['mc_reportedp_closed'] : $txt['mc_reportedp_active'], '
+						</h3>';
 
 	if (!empty($context['reports']))
 		template_pagesection();
@@ -363,9 +347,7 @@ function template_unapproved_posts()
 	echo '
 					<div id="modcenter">
 					<form action="', $scripturl, '?action=moderate;area=postmod;start=', $context['start'], ';sa=', $context['current_view'], '" method="post" accept-charset="UTF-8">
-						<div class="cat_bar">
-							<h3 class="catbg">', $txt['mc_unapproved_posts'], '</h3>
-						</div>';
+						<h3 class="category_header">', $txt['mc_unapproved_posts'], '</h3>';
 
 	// No posts?
 	if (empty($context['unapproved_items']))
@@ -440,11 +422,9 @@ function template_viewmodreport()
 	echo '
 					<div id="modcenter">
 						<form action="', $scripturl, '?action=moderate;area=reports;report=', $context['report']['id'], '" method="post" accept-charset="UTF-8">
-							<div class="cat_bar">
-								<h3 class="catbg">
-									', sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']), '
-								</h3>
-							</div>
+							<h3 class="category_header">
+								', sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']), '
+							</h3>
 							<div class="windowbg2">
 								<p class="noticebox">', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '</p>
 								<div class="content">
@@ -459,9 +439,7 @@ function template_viewmodreport()
 									</li>
 								</ul>
 							</div>
-							<div class="cat_bar">
-								<h3 class="catbg">', $txt['mc_modreport_whoreported_title'], '</h3>
-							</div>';
+							<h3 class="category_header">', $txt['mc_modreport_whoreported_title'], '</h3>';
 
 	foreach ($context['report']['comments'] as $comment)
 		echo '
@@ -473,9 +451,7 @@ function template_viewmodreport()
 							</div>';
 
 	echo '
-							<div class="cat_bar">
-								<h3 class="catbg">', $txt['mc_modreport_mod_comments'], '</h3>
-							</div>
+							<h3 class="category_header">', $txt['mc_modreport_mod_comments'], '</h3>
 							<div class="windowbg2">
 								<div class="content">';
 
@@ -626,12 +602,8 @@ function template_show_notice()
 		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
 	</head>
 	<body>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['show_notice'], '</h3>
-		</div>
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['show_notice_subject'], ': ', $context['notice_subject'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['show_notice'], '</h2>
+		<h3 class="category_header">', $txt['show_notice_subject'], ': ', $context['notice_subject'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<dl>
@@ -658,9 +630,7 @@ function template_warn_template()
 	echo '
 	<div id="modcenter">
 		<form action="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="information">
 				', $txt['mc_warning_template_desc'], '
 			</div>

@@ -29,14 +29,12 @@ function template_email_members()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=news;sa=mailingcompose" method="post" id="admin_newsletters" class="flow_hidden" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['admin_newsletters'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['admin_newsletters'], '</h2>
 			<div class="information">
 				', $txt['admin_news_select_recipients'], '
 			</div>
-			<div id="include_panel_header" class="cat_bar">
-				<h3 class="catbg">
+			<div id="include_panel_header">
+				<h3 class="category_header">
 					', $txt['include_these'], '
 				</h3>
 			</div>
@@ -81,8 +79,8 @@ function template_email_members()
 					</dl>
 				</div>
 			</div>
-			<div id="exclude_panel_header" class="cat_bar">
-				<h3 class="catbg">
+			<div id="exclude_panel_header">
+				<h3 class="category_header">
 					<img id="exclude_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
 					<a href="#" id="exclude_panel_link" >', $txt['exclude_these'], '</a>
 				</h3>
@@ -194,11 +192,9 @@ function template_email_members_compose()
 
 	echo '
 		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
+			</h3>
 			<div class="windowbg">
 				<div class="content">
 					<div class="post" id="preview_body">
@@ -211,11 +207,9 @@ function template_email_members_compose()
 	echo '
 	<div id="admincenter">
 		<form name="newsmodify" action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['admin_newsletters'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['admin_newsletters'], '
+			</h3>
 			<div class="information">
 				', $txt['email_variables'], '
 			</div>
@@ -308,11 +302,9 @@ function template_email_members_send()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['admin_newsletters'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['admin_newsletters'], '
+			</h3>
 			<div class="windowbg">
 				<div class="content">
 					<div class="progress_bar">

@@ -25,9 +25,7 @@ function template_modify_weights()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_weights'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['search_weights'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -106,17 +104,13 @@ function template_select_search_method()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['search_method'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['search_method'], '</h2>
 		<div class="information">
 			<div class="smalltext" style="font-weight: normal;"><a href="', $scripturl, '?action=quickhelp;help=search_why_use_index" onclick="return reqOverlayDiv(this.href);">', $txt['search_create_index_why'], '</a></div>
 		</div>
 
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=method" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_method'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['search_method'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -245,9 +239,7 @@ function template_create_index()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" method="post" accept-charset="UTF-8" name="create_index">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_create_index'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['search_create_index'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -281,9 +273,7 @@ function template_create_index_progress()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" name="autoSubmit" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_create_index'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['search_create_index'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<div>
@@ -319,9 +309,7 @@ function template_create_index_done()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['search_create_index'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['search_create_index'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['search_create_index_done'], '</p>
@@ -343,9 +331,7 @@ function template_spider_edit()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=editspiders;sid=', $context['spider']['id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="information">
 				', $txt['add_spider_desc'], '
 			</div>
@@ -399,9 +385,7 @@ function template_show_spider_logs()
 
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=logs" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['spider_logs_delete'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['spider_logs_delete'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>
@@ -431,9 +415,7 @@ function template_show_spider_stats()
 
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=stats" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['spider_logs_delete'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['spider_logs_delete'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>
@@ -460,11 +442,7 @@ function template_manage_sphinx()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=managesphinx;save=1" method="post"  accept-charset="UTF-8" name="create_index">
-			<div class="cat_bar">
-				<h3 class="catbg">',
-					$context['page_title'], '
-				</h3>
-			</div>';
+			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	// any results to show?
 	if (!empty($context['settings_message']))
