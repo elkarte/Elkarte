@@ -94,9 +94,7 @@ function template_main()
 
 	echo '
 	<div id="split_topics">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['split_topic'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['split_topic'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['split_successful'], '</p>
@@ -127,9 +125,7 @@ function template_select()
 	<div id="split_topics">
 		<form action="', $scripturl, '?action=splittopics;sa=splitSelection;board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
 			<div id="not_selected" class="floatleft">
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['split_topic'], ' - ', $txt['select_split_posts'], '</h3>
-				</div>
+				<h2 class="category_header">', $txt['split_topic'], ' - ', $txt['select_split_posts'], '</h2>
 				<div class="information">
 					', $txt['please_select_split'], '
 				</div>', template_pagesection(false, false, array('page_index_markup' => '<div id="pageindex_not_selected">' . $context['not_selected']['page_index'] . '</div>')), '
@@ -153,11 +149,9 @@ function template_select()
 				</ul>
 			</div>
 			<div id="selected" class="floatright">
-				<div class="cat_bar">
-					<h3 class="catbg">
+				<h3 class="category_header">
 						', $txt['split_selected_posts'], ' (<a href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=reset;msg=0" onclick="return select(\'reset\', 0);">', $txt['split_reset_selection'], '</a>)
-					</h3>
-				</div>
+				</h3>
 				<div class="information">
 					', $txt['split_selected_posts_desc'], '
 				</div>', template_pagesection(false, false, array('page_index_markup' => '<div id="pageindex_selected">' . $context['selected']['page_index'] . '</div>')), '
