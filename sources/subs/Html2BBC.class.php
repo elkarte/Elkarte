@@ -21,7 +21,7 @@ if (!defined('ELK'))
  *
  * Override
  *		$bbc_converter->skip_tags(array())
- *		will prevent the conversion of certain tags to bbc
+ *		will prevent the conversion of certain html tags to bbc
  *
  * Convert
  *		$bbc = $bbc_converter->get_bbc();
@@ -55,6 +55,16 @@ class Convert_BBC
 	public $sizes_equivalence = array(1 => '8pt', '10pt', '12pt', '14pt', '18pt', '24pt', '36pt');
 
 	/**
+	 * Holds block elements, its intentionally not complete and is used to prevent adding extra br's
+	 */
+	public $block_elements = array('p', 'div', 'ol', 'ul', 'pre', 'table', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
+
+	/**
+	 * Used to strip newlines inside of 'p' and 'div' elements
+	 */
+	public $strip_newlines = null;
+
+	/**
 	 * Holds any html tags that would normally be convert to bbc but are instead skipped
 	 */
 	protected $_skip_tags = array();
@@ -64,10 +74,11 @@ class Convert_BBC
 	 *
 	 * @param type $html
 	 */
-	public function __construct($html)
+	public function __construct($html, $strip = true)
 	{
 		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
+		$this->strip_newlines = $strip;
 
 		// Using PHP built in functions ...
 		if (class_exists('DOMDocument'))
@@ -143,9 +154,16 @@ class Convert_BBC
 		$bbc = trim($bbc);
 		$bbc = preg_replace('~^(?:\[br\s*\/?\]\s*)+~', '', $bbc);
 		$bbc = preg_replace('~(?:\[br\s*\/?\]\s*)+$~', '', $bbc);
+		$bbc = str_replace('[hr][br]', '[hr]', $bbc);
 
-		// And say goodbye to any tags we left behind
-		$bbc = strip_tags($bbc);
+		// Remove any html tags we left behind ( outside of code tags that is )
+		$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $bbc, -1, PREG_SPLIT_DELIM_CAPTURE);
+		for ($i = 0, $n = count($parts); $i < $n; $i++)
+		{
+			if ($i % 4 == 0)
+				$parts[$i] = strip_tags($parts[$i]);
+		}
+		$bbc = implode('', $parts);
 
 		return $bbc;
 	}
@@ -208,14 +226,27 @@ class Convert_BBC
 	 */
 	private function _convert_to_bbc($node)
 	{
-		// HTML tag and contents
+		// HTML tag names
 		$tag = $this->_get_name($node);
+		$parent = $this->_get_name($this->_parser ? $node->parentNode : $node->parentNode());
+		$next_tag = $this->_get_name($this->_parser ? $node->nextSibling : $node->next_sibling());
+
+		// Looking around, do we need to add any breaks here?
+		$needs_leading_break = in_array($tag, $this->block_elements);
+		$needs_trailing_break = !in_array($next_tag, $this->block_elements) && $needs_leading_break;
+
+		// Flip things around inside li element, it looks better
+		if ($parent == 'li' && $needs_leading_break)
+		{
+			$needs_trailing_break = true;
+			$needs_leading_break = false;
+		}
 
 		// Skipping over this tag?
 		if (in_array($tag, $this->_skip_tags))
 			$tag = '';
 
-		// Based on the tag, determine how to convert
+		// Based on the current tag, determine how to convert
 		switch ($tag)
 		{
 			case 'a':
@@ -235,7 +266,7 @@ class Convert_BBC
 				$bbc = '[quote]' . $this->_get_value($node) . '[/quote]';
 				break;
 			case 'br':
-				$bbc = $this->line_break;
+				$bbc = $this->line_break . $this->line_end;
 				break;
 			case 'center':
 				$bbc = '[center]' . $this->_get_value($node) . '[/center]' . $this->line_end;
@@ -250,10 +281,10 @@ class Convert_BBC
 				$bbc = ':   ' . $this->_get_value($node) . $this->line_break;
 				break;
 			case 'dl':
-				$bbc = trim($this->_get_value($node)) . $this->line_break;
+				 $bbc = trim($this->_get_value($node)) . $this->line_break;
 				break;
 			case 'div':
-				$bbc = str_replace("\n", ' ', $this->_convert_styles($node)) . $this->line_break . $this->line_end;
+				$bbc = $this->strip_newlines ? str_replace("\n", ' ', $this->_convert_styles($node)) : $this->_convert_styles($node);
 				break;
 			case 'em':
 			case 'i':
@@ -263,7 +294,7 @@ class Convert_BBC
 				$bbc = $this->_convert_font($node);
 				break;
 			case 'hr':
-				$bbc = '[hr]' . $this->line_end;
+				$bbc = '[hr]';
 				break;
 			case 'h1':
 			case 'h2':
@@ -271,25 +302,25 @@ class Convert_BBC
 			case 'h4':
 			case 'h5':
 			case 'h6':
-				$bbc = $this->_convert_header($tag, $this->_get_value($node)) . $this->line_end;
+				$bbc = $this->_convert_header($tag, $this->_get_value($node));
 				break;
 			case 'img':
 				$bbc = $this->_convert_image($node);
 				break;
 			case 'ol':
-				$bbc = '[list type=decimal]' . $this->line_end . $this->_get_value($node) . '[/list]' . $this->line_end;
+				$bbc = '[list type=decimal]' . $this->line_end . $this->_get_value($node) . '[/list]';
 				break;
 			case 'ul':
-				$bbc = '[list]' . $this->line_end . $this->_get_value($node) . '[/list]' . $this->line_end;
+				$bbc = '[list]' . $this->line_end . $this->_get_value($node) . '[/list]';
 				break;
 			case 'li':
 				$bbc = '[li]' . $this->_get_value($node) . '[/li]' . $this->line_end;
 				break;
 			case 'p':
-				$bbc = $this->line_break . str_replace("\n", ' ', $this->_convert_styles($node)) . $this->line_break . $this->line_end;
+				$bbc = $this->strip_newlines ? str_replace("\n", ' ', $this->_convert_styles($node)) : $this->_convert_styles($node);
 				break;
 			case 'pre':
-				$bbc = '[pre]' . $this->_get_value($node) . '[/pre]' . $this->line_end;
+				$bbc = '[pre]' . $this->_get_value($node) . '[/pre]';
 				break;
 			case 'script':
 			case 'style':
@@ -311,10 +342,10 @@ class Convert_BBC
 				$bbc = '[sup]' . $this->_get_value($node) . '[/sup]';
 				break;
 			case 'title':
-				$bbc = '[size=2]' . $this->_get_value($node) . '[/size]' . $this->line_break;
+				$bbc = '[size=2]' . $this->_get_value($node) . '[/size]';
 				break;
 			case 'table':
-				$bbc = '[table]' . $this->line_end . $this->_get_value($node) . '[/table]' . $this->line_end;
+				$bbc = '[table]' . $this->line_end . $this->_get_value($node) . '[/table]';
 				break;
 			case 'th':
 			case 'td':
@@ -348,6 +379,8 @@ class Convert_BBC
 		// Replace the node with our bbc replacement, or with the node itself if none was found
 		if ($bbc !== '~`skip`~')
 		{
+			$bbc = $needs_leading_break ? $this->line_break . $this->line_end . $bbc : $bbc;
+			$bbc = $needs_trailing_break ? $bbc . $this->line_break . $this->line_end : $bbc;
 			if ($this->_parser)
 			{
 				// Create a new text node with our bbc tag and replace the original node

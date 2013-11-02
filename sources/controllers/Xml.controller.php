@@ -25,30 +25,33 @@ class Xml_Controller extends Action_Controller
 	public function action_index()
 	{
 		loadTemplate('Xml');
+		require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
-			'jumpto' => array('action_jumpto'),
-			'messageicons' => array('action_messageicons'),
-			'groupicons' => array('action_groupicons'),
-			'corefeatures' => array('action_corefeatures', 'admin_forum'),
-			'profileorder' => array('action_profileorder', 'admin_forum'),
-			'smileyorder' => array('action_smileyorder', 'manage_smileys'),
-			'boardorder' => array('action_boardorder', 'admin_forum'),
+			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),
+			'messageicons' => array('controller' => $this, 'function' => 'action_messageicons'),
+			'groupicons' => array('controller' => $this, 'function' => 'action_groupicons'),
+			'corefeatures' => array('controller' => $this, 'function' => 'action_corefeatures', 'permission' => 'admin_forum'),
+			'profileorder' => array('controller' => $this, 'function' => 'action_profileorder', 'permission' => 'admin_forum'),
+			'smileyorder' => array('controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'),
+			'boardorder' => array('controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'),
+			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
 		);
 
 		// Easy adding of xml sub actions
 	 	call_integration_hook('integrate_xmlhttp', array(&$subActions));
 
+		$action = new Action();
+		$action->initialize($subActions);
+
 		// Valid action?
 		if (!isset($_REQUEST['sa'], $subActions[$_REQUEST['sa']]))
 			fatal_lang_error('no_access', false);
+		else
+			$subAction = $_REQUEST['sa'];
 
-		// Permissions check in the subAction?
-		if (isset($subActions[$_REQUEST['sa']][1]))
-			isAllowedTo($subActions[$_REQUEST['sa']][1]);
-
-		// Off we go then
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		// Off we go then, (it will check permissions)
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -326,11 +329,10 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Validating that you can do this is always a good idea
-		$validation_perm = allowedTo('manage_boards');
 		$validation_token = validateToken('admin-sort', 'post', true, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true && $validation_perm === true)
+		if (empty($validation_session) && $validation_token === true)
 		{
 			// No question that we are doing some board reordering
 			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
@@ -445,9 +447,6 @@ class Xml_Controller extends Action_Controller
 		// Failed validation, extra work for you I'm afraid
 		else
 		{
-			if (!empty($validation_perm))
-				$errors[] = array('value' => $txt['cannot_admin_forum']);
-
 			if (!empty($validation_session))
 				$errors[] = array('value' => $txt[$validation_session]);
 
@@ -609,6 +608,97 @@ class Xml_Controller extends Action_Controller
 		}
 
 		// Return the response, whatever it is
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the PBE parsers or filters from a drag/drop event
+	 */
+	public function action_parserorder()
+	{
+		global $context, $txt;
+
+		// Start off with nothing
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+
+		// Chances are
+		loadLanguage('Errors');
+		loadLanguage('Maillist');
+		require_once(SUBSDIR . '/Maillist.subs.php');
+
+		// You have to be allowed to do this
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// No questions that we are reordering
+			if (isset($_POST['order'], $_POST['list_sort_email_fp']) && $_POST['order'] == 'reorder')
+			{
+				$filters = array();
+				$filter_order = 1;
+				$replace = '';
+
+				// The field ids arrive in 1-n view order ...
+				foreach ($_POST['list_sort_email_fp'] as $id)
+				{
+					$filters[] = $id;
+					$replace .= '
+						WHEN id_filter = ' . $id . ' THEN ' . $filter_order++;
+				}
+
+				// With the replace set
+				if (!empty($replace))
+					updateParserFilterOrder($replace, $filters);
+				else
+					$errors[] = array('value' => $txt['no_sortable_items']);
+			}
+
+			$order[] = array(
+				'value' => $txt['parser_reordered'],
+			);
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
+				),
+				array(
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
+				),
+			);
+		}
+		// Failed validation, tough to be you
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response
 		$context['sub_template'] = 'generic_xml';
 		$context['xml_data'] = array(
 			'orders' => array(

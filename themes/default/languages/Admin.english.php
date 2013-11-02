@@ -774,4 +774,3 @@ $txt['words_sep'] = 'Words separator';
 
 $txt['admin_order_title'] = 'Ordering Error';
 $txt['admin_order_error'] = 'An unknown error occurred while processing your request';
-$txt['no_sortable_items'] = 'No sortable items were found';

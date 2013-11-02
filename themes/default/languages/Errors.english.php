@@ -437,3 +437,6 @@ $txt['error_invalid_dir'] = 'The directory you entered is invalid.';
 
 // Admin/dispatching strings
 $txt['error_sa_not_set'] = 'Sub-action not set';
+
+// Drag / Drop sort errors
+$txt['no_sortable_items'] = 'No sortable items were found';
