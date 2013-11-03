@@ -49,9 +49,7 @@ function template_manual()
 	global $context, $scripturl, $txt;
 
 	echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['manual_elkarte_user_help'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['manual_elkarte_user_help'], '</h2>
 			<div id="help_container">
 				<div id="helpmain" class="windowbg2 content">
 					<p>', sprintf($txt['manual_welcome'], $context['forum_name']), '</p>
