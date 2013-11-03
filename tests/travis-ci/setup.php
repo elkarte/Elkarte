@@ -42,7 +42,7 @@ Class Elk_Testing_Setup
 
 	public function load_queries($file)
 	{
-		$this->_queries = str_replace('{$db_prefix}', $this->_prefix, file_get_contents($file));
+		$this->_queries = str_replace('{$db_prefix}', $this->_db_prefix, file_get_contents($file));
 		$this->_queries_parts = explode("\n", $this->_queries);
 		$this->fix_query_string();
 	}
@@ -51,7 +51,17 @@ Class Elk_Testing_Setup
 	{
 		foreach ($this->_queries_parts as $line)
 			if (!empty($line[0]) && $line[0] != '#')
-				$this->_clean_queries_parts[] = str_replace(array('{$current_time}', '{$sched_task_offset}'), array(time(), '1'), $line);
+				$this->_clean_queries_parts[] = str_replace(
+					array(
+						'{$current_time}', '{$sched_task_offset}',
+						'{BOARDDIR}', '{$boardurl}'
+					),
+					array(
+						time(), '1',
+						BOARDDIR, $this->_boardurl
+					),
+					$line
+				);
 	}
 
 	public function prepare_settings()
@@ -62,16 +72,20 @@ Class Elk_Testing_Setup
 			'$db_type = \'mysql\';',
 			'$db_name = \'elkarte\';',
 			'$db_user = \'root\';',
-			'$db_prefix = \'elkarte_\';'
+			'$db_prefix = \'elkarte_\';',
+			'$db_passwd = \'\';',
 		),
 		array(
-			'$boardurl = \'http://127.0.0.1\';',
-			'$db_type = \'' . $this->_type . '\';',
-			'$db_name = \'' . $this->_name . '\';',
-			'$db_user = \'' . $this->_user . '\';',
-			'$db_prefix = \'' . $this->_prefix . '\';'
+			'$boardurl = \'' . $this->_boardurl . '\';',
+			'$db_type = \'' . $this->_db_type . '\';',
+			'$db_name = \'' . $this->_db_name . '\';',
+			'$db_user = \'' . $this->_db_user . '\';',
+			'$db_prefix = \'' . $this->_db_prefix . '\';',
+			'$db_passwd = \'' . $this->_db_passwd . '\';',
 		),
 		$file);
+		if (strpos($file, 'if (file_exist') !== false)
+			$file = substr($file, 0, strpos($file, 'if (file_exist'));
 		$file .= "\n" . '$test_enabled = 1;';
 
 		file_put_contents(BOARDDIR . '/Settings.php', $file);
@@ -123,7 +137,7 @@ Class Elk_Testing_Setup
 			array('id_member')
 		);
 
-		$server_offset = mktime(0, 0, 0, 1, 1, 1970);
+		$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
 		$timezone_id = 'Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600);
 		if (date_default_timezone_set($timezone_id))
 			$db->insert('',
