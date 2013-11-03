@@ -913,9 +913,7 @@ function template_display_calendar_above()
 
 	echo '
 			<div class="linked_events">
-				<div class="title_bar">
-					<h3 class="titlebg">', $txt['calendar_linked_events'], '</h3>
-				</div>
+				<h3 class="category_header">', $txt['calendar_linked_events'], '</h3>
 				<div class="windowbg">
 					<div class="content">
 						<ul>';
