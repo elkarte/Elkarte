@@ -230,13 +230,10 @@ class Display_Controller
 
 			$notify = new Notification_Controller();
 			$notify->setData(array(
-				'id_member' => $user_info['id'],
-				'type' => $_REQUEST['type'],
-				'id_msg' => $virtual_msg,
-				'id_member_from' => $_REQUEST['from'],
-				'log_time' => $_REQUEST['time'],
+				'id_notification' => $_REQUEST['item'],
+				'mark' => $_REQUEST['mark'],
 			));
-			$notify->action_markread(true);
+			$notify->action_markread();
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.

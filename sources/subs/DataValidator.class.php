@@ -286,8 +286,15 @@ class Data_Validator
 
 					// Time to validate
 					$result = array();
+					// Defined method to use?
 					if (is_callable(array($this, $validation_method)))
 						$result = $this->$validation_method($field, $input, $validation_parameters);
+					// One of our static methods
+					elseif (strpos($rule, '::') !== false && is_callable($rule))
+						$result = call_user_func($rule, $input[$field], $validation_parameters);
+					// Maybe even a function?
+					elseif (function_exists($rule))
+						$result = $rule($input[$field], $validation_parameters);
 					else
 						$result = array(
 							'field' => $validation_method,

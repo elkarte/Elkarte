@@ -1,4 +1,4 @@
-/* ATTENTION: You don't need to run or use this file!  The upgrade.php script does everything for you! */
+/* ATTENTION: You don't need to run or use this file! The upgrade.php script does everything for you! */
 
 /******************************************************************************/
 --- Adding new settings...
@@ -329,7 +329,7 @@ CREATE SEQUENCE {$db_prefix}user_drafts_seq;
 
 ---# Creating drafts table.
 CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
-  id_draft int default nextval('{$db_prefix}user_drafts_seq'),
+	id_draft int default nextval('{$db_prefix}user_drafts_seq'),
 	id_topic int NOT NULL default '0',
 	id_board smallint NOT NULL default '0',
 	id_reply int NOT NULL default '0',
@@ -400,10 +400,10 @@ if (@$modSettings['elkVersion'] < '1.0')
 /******************************************************************************/
 ---# Creating custom profile fields data table
 CREATE TABLE IF NOT EXISTS {$db_prefix}custom_fields_data (
-  id_member int NOT NULL default '0',
-  variable varchar(255) NOT NULL default '',
-  value text NOT NULL,
-  PRIMARY KEY (id_member, variable)
+	id_member int NOT NULL default '0',
+	variable varchar(255) NOT NULL default '',
+	value text NOT NULL,
+	PRIMARY KEY (id_member, variable)
 );
 ---#
 
@@ -555,9 +555,9 @@ WHERE url = 'http://custom.simplemachines.org/packages/mods';
 
 ---# Creating follow-up table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
-  follow_up int NOT NULL default '0',
-  derived_from int NOT NULL default '0',
-  PRIMARY KEY (follow_up, derived_from)
+	follow_up int NOT NULL default '0',
+	derived_from int NOT NULL default '0',
+	PRIMARY KEY (follow_up, derived_from)
 );
 ---#
 
@@ -572,10 +572,10 @@ CREATE SEQUENCE {$db_prefix}antispam_questions_seq;
 ---# Creating antispam questions table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
 	id_question int default nextval('{$db_prefix}antispam_questions_seq'),
-  question text NOT NULL default '',
-  answer text NOT NULL default '',
-  language varchar(50) NOT NULL default '',
-  PRIMARY KEY (id_question)
+	question text NOT NULL default '',
+	answer text NOT NULL default '',
+	language varchar(50) NOT NULL default '',
+	PRIMARY KEY (id_question)
 );
 ---#
 
@@ -608,7 +608,7 @@ if ($db->num_rows($request) != 0)
 				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "', '" . $language . "')");
 		upgrade_query("
 			DELETE FROM {$db_prefix}log_comments
-			WHERE id_comment  = " . $row['id_comment'] . "
+			WHERE id_comment = " . $row['id_comment'] . "
 			LIMIT 1");
 	}
 }
@@ -699,7 +699,7 @@ CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
 
 ---# Creating postby_emails_error table
 CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
-	id_email int default nextval('{$db_prefix}postby_emails_error'),
+	id_email int default nextval('{$db_prefix}postby_emails_error_seq'),
 	error varchar(255) NOT NULL default '',
 	data_id varchar(255) NOT NULL default '0',
 	subject varchar(255) NOT NULL default '',
@@ -712,9 +712,13 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
 );
 ---#
 
+---# Sequence for table `postby_emails_filter`
+CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
+---#
+
 ---# Creating postby_emails_filters table
 CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
-	id_filter int NOT NULL auto_increment,
+	id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
 	filter_style char(5) NOT NULL default '',
 	filter_type varchar(255) NOT NULL default '',
 	filter_to varchar(255) NOT NULL default '',
@@ -732,7 +736,7 @@ ADD COLUMN email smallint NOT NULL DEFAULT '0';
 
 ---# Adding new columns to mail_queue...
 ALTER TABLE {$db_prefix}mail_queue
-ADD COLUMN message_id int  NOT NULL DEFAULT '0';
+ADD COLUMN message_id int NOT NULL DEFAULT '0';
 ---#
 
 ---# Updating board profiles...
@@ -744,13 +748,13 @@ INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VAL
 --- Adding likes support.
 /******************************************************************************/
 
----# Creating likes log  table...
+---# Creating likes log table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
-  action char(1) NOT NULL default '0',
-  id_target int NOT NULL default '0',
-  id_member int NOT NULL default '0',
-  log_time int NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member)
+	action char(1) NOT NULL default '0',
+	id_target int NOT NULL default '0',
+	id_member int NOT NULL default '0',
+	log_time int NOT NULL default '0',
+	PRIMARY KEY (id_target, id_member)
 );
 ---#
 
@@ -758,12 +762,12 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
 CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
 ---#
 
----# Creating likes message  table...
+---# Creating likes message table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
-  id_member int NOT NULL default '0',
-  id_msg int NOT NULL default '0',
-  id_poster int NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member)
+	id_member int NOT NULL default '0',
+	id_msg int NOT NULL default '0',
+	id_poster int NOT NULL default '0',
+	PRIMARY KEY (id_msg, id_member)
 );
 ---#
 
@@ -796,15 +800,20 @@ CHANGE pm_receive_from receive_from tinyint NOT NULL default '1';
 --- Adding notifications support.
 /******************************************************************************/
 
----# Creating notifications log  table...
+---# Creating notifications log index ...
+CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+---#
+
+---# Creating notifications log table...
 CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-  id_member int NOT NULL DEFAULT '0',
-  id_msg int NOT NULL DEFAULT '0',
-  status int NOT NULL DEFAULT '0',
-  id_member_from int NOT NULL DEFAULT '0',
-  log_time int NOT NULL DEFAULT '0',
-  notif_type varchar(5) NOT NULL DEFAULT '',
-  PRIMARY KEY (id_member, id_msg, id_member_from, log_time, notif_type)
+	id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+	id_member int NOT NULL DEFAULT '0',
+	id_msg int NOT NULL DEFAULT '0',
+	status int NOT NULL DEFAULT '0',
+	id_member_from int NOT NULL DEFAULT '0',
+	log_time int NOT NULL DEFAULT '0',
+	notif_type varchar(5) NOT NULL DEFAULT '',
+	PRIMARY KEY (id_notification)
 );
 ---#
 
