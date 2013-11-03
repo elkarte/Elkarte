@@ -88,7 +88,7 @@ class AdminDebug_Controller extends Action_Controller
 		</style>
 	</head>
 	<body id="help_popup">
-		<div class="tborder windowbg description">';
+		<div class="windowbg description">';
 
 		// db work...
 		$db = database();

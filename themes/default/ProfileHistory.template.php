@@ -83,7 +83,7 @@ function template_trackIP()
 	// This function always defaults to the last IP used by a member but can be set to track any IP.
 	// The first table in the template gives an input box to allow the admin to enter another IP to track.
 	echo '
-	<div class="tborder">
+	<div>
 		<h3 class="category_header">', $txt['trackIP'], '</h3>
 		<div class="roundframe">
 			<form action="', $context['base_url'], '" method="post" accept-charset="UTF-8">

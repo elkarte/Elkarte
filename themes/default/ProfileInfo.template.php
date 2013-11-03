@@ -243,7 +243,7 @@ function template_action_showPermissions()
 
 		// General Permissions section.
 		echo '
-				<div class="tborder">
+				<div>
 					<h4 class="category_header">', $txt['showPermissions_general'], '</h4>';
 
 		if (!empty($context['member']['permissions']['general']))
@@ -290,7 +290,7 @@ function template_action_showPermissions()
 
 		// Board permission section.
 		echo '
-			<div class="tborder">
+			<div>
 				<form action="' . $scripturl . '?action=profile;u=', $context['id_member'], ';area=permissions#board_permissions" method="post" accept-charset="UTF-8">
 					<h4 class="category_header">
 						<a id="board_permissions"></a>', $txt['showPermissions_select'], ':

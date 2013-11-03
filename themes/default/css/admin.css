@@ -394,9 +394,6 @@ div.quick_tasks {
 /* Styles for the package manager.
 /* Haven't got here yet. :P
 ------------------------------------------------- */
-#package_list .tborder {
-	margin: .25em 0 .25em 26px;
-}
 #package_list ol, #package_list ol li {
 	list-style: decimal;
 	margin-left: 50px;

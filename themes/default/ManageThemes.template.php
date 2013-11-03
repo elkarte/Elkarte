@@ -890,7 +890,7 @@ function template_browse()
 
 	echo '
 	<div id="admincenter">
-		<table class="table_grid tborder">
+		<table class="table_grid">
 		<thead>
 			<tr class="table_head">
 				<th scope="col" class="lefttext" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>

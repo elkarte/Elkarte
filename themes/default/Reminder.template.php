@@ -24,7 +24,7 @@ function template_main()
 	echo '
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=picktype" method="post" accept-charset="UTF-8">
-		<div class="tborder login">
+		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="roundframe">
 				<p class="smalltext centertext">', $txt['password_reminder_desc'], '</p>
@@ -50,7 +50,7 @@ function template_reminder_pick()
 	echo '
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=picktype" method="post" accept-charset="UTF-8">
-		<div class="tborder login">
+		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="roundframe">
 				<p><strong>', $txt['authentication_options'], ':</strong></p>
@@ -82,7 +82,7 @@ function template_sent()
 
 	echo '
 		<br />
-		<div class="tborder login" id="reminder_sent">
+		<div class="login" id="reminder_sent">
 			<h2 class="category_header">' . $context['page_title'] . '</h2>
 			<p class="information">' . $context['description'] . '</p>
 		</div>';
@@ -99,7 +99,7 @@ function template_set_password()
 	<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=setpassword2" name="reminder_form" id="reminder_form" method="post" accept-charset="UTF-8">
-		<div class="tborder login">
+		<div class="login">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="roundframe">
 				<dl>
@@ -151,7 +151,7 @@ function template_ask()
 	<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 	<br />
 	<form action="', $scripturl, '?action=reminder;sa=secret2" method="post" accept-charset="UTF-8" name="creator" id="creator">
-		<div class="tborder login">
+		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="roundframe">
 				<p class="smalltext">', $context['account_type'] == 'password' ? $txt['enter_new_password'] : $txt['openid_secret_reminder'], '</p>
