@@ -423,9 +423,7 @@ function template_extract_package()
 	}
 	else
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['package_installed_redirecting'], '</h3>
-			</div>';
+			<h3 class="category_header">', $txt['package_installed_redirecting'], '</h3>';
 
 	echo '
 		<div class="windowbg">
