@@ -1368,9 +1368,6 @@ class ManageMaillist_Controller extends Action_Controller
 		loadLanguage('Admin');
 		loadTemplate('Admin', 'admin');
 
-		// Get the board selection list for the template
-		$context['boards'] = maillist_board_list();
-
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = array();
 		$data = (!empty($modSettings['maillist_receiving_address'])) ? unserialize($modSettings['maillist_receiving_address']) : array();
@@ -1464,6 +1461,25 @@ class ManageMaillist_Controller extends Action_Controller
 			}
 		}
 
+		// Javascript vars for the "add more" buttons in the receive_email callback
+		$board_list = maillist_board_list();
+		$script = '';
+		$i = 0;
+
+		// Create the board selection list
+		foreach ($board_list as $board_id => $board_name)
+			$script .= $i++ . ': {id:' . $board_id . ', name:' . JavaScriptEscape($board_name) . '},';
+
+		addInlineJavascript('
+		var sEmailParent = \'add_more_email_placeholder\',
+			oEmailOptionsdt = {size: \'50\', name: \'emailfrom[]\', class: \'input_text\'},
+			oEmailOptionsdd = {size: \'1\', type: \'select\', name: \'boardto[]\', class: \'input_select\'},
+			oEmailSelectData = {' . $script . '};
+
+			document.getElementById(\'add_more_board_div\').style.display = \'\';', true
+		);
+
+		$context['boards'] = $board_list;
 		$context['settings_title'] = $txt['ml_emailsettings'];
 		$context['page_title'] = $txt['ml_emailsettings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
