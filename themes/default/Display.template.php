@@ -819,11 +819,9 @@ function template_display_poll_above()
 	global $settings, $context, $txt, $scripturl;
 	echo '
 			<div id="poll">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '
-					</h3>
-				</div>
+				<h3 class="category_header">
+					<img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '
+				</h3>
 				<div class="windowbg">
 					<div class="content" id="poll_options">
 						<h4 id="pollquestion">
