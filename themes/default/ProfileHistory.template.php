@@ -84,9 +84,7 @@ function template_trackIP()
 	// The first table in the template gives an input box to allow the admin to enter another IP to track.
 	echo '
 	<div class="tborder">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['trackIP'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['trackIP'], '</h3>
 		<div class="roundframe">
 			<form action="', $context['base_url'], '" method="post" accept-charset="UTF-8">
 				<dl class="settings">
