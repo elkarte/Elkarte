@@ -26,3 +26,8 @@ before_script:
   - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS hello_world_test;" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then sudo php /var/www/tests/travis-ci/setup_mysql.php; fi
   - if [[ "$DB" == "postgres" ]]; then sudo php /var/www/tests/travis-ci/setup_pgsql.php; fi
+
+matrix:
+  allow_failures:
+    - php: "5.3"
+    - env: DB=postgres
