@@ -54,9 +54,7 @@ function template_maintenance()
 
 	echo '
 	<div id="manage_attachments">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['attachment_stats'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['attachment_stats'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<dl class="settings">
@@ -71,10 +69,7 @@ function template_maintenance()
 				</dl>
 			</div>
 		</div>
-
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['attachment_integrity_check'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['attachment_integrity_check'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=repair;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
@@ -85,10 +80,7 @@ function template_maintenance()
 				</form>
 			</div>
 		</div>
-
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['attachment_pruning'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['attachment_pruning'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=manageattachments" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['attachment_pruning_warning'], '\');" style="margin: 0 0 2ex 0;">
@@ -123,88 +115,92 @@ function template_maintenance()
 	</div>';
 
 	echo '
-			<div id="transfer" class="cat_bar">
-				<h3 class="catbg">', $txt['attachment_transfer'], '</h3>
-			</div>';
+	<h3 id="transfer" class="category_header">', $txt['attachment_transfer'], '</h3>';
 
 	if (!empty($context['results']))
 		echo '
-			<div class="noticebox">', $context['results'], '</div>';
+	<div class="noticebox">', $context['results'], '</div>';
 
 	echo '
-			<div class="windowbg">
-				<div class="content">
-					<form action="', $scripturl, '?action=admin;area=manageattachments;sa=transfer" method="post" accept-charset="UTF-8">
-						<p>', $txt['attachment_transfer_desc'], '</p>
-						<hr />
-						<dl class="settings">
-							<dt>', $txt['attachment_transfer_from'], '</dt>
-							<dd><select name="from">
-								<option value="0">', $txt['attachment_transfer_select'], '</option>';
+	<div class="windowbg">
+		<div class="content">
+			<form action="', $scripturl, '?action=admin;area=manageattachments;sa=transfer" method="post" accept-charset="UTF-8">
+				<p>', $txt['attachment_transfer_desc'], '</p>
+				<hr />
+				<dl class="settings">
+					<dt>', $txt['attachment_transfer_from'], '</dt>
+					<dd>
+						<select name="from">
+							<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
 		echo '
-								<option value="', $id, '">', $dir, '</option>';
+							<option value="', $id, '">', $dir, '</option>';
 
 	echo '
-							</select></dd>
-							<dt>', $txt['attachment_transfer_auto'], '</dt>
-							<dd><select name="auto">
-								<option value="0">', $txt['attachment_transfer_auto_select'], '</option>
-								<option value="-1">', $txt['attachment_transfer_forum_root'], '</option>';
+						</select>
+					</dd>
+					<dt>', $txt['attachment_transfer_auto'], '</dt>
+					<dd>
+						<select name="auto">
+							<option value="0">', $txt['attachment_transfer_auto_select'], '</option>
+							<option value="-1">', $txt['attachment_transfer_forum_root'], '</option>';
 
 	if (!empty($context['base_dirs']))
 		foreach ($context['base_dirs'] as $id => $dir)
 			echo '
-								<option value="', $id, '">', $dir, '</option>';
+							<option value="', $id, '">', $dir, '</option>';
 	else
 		echo '
-								<option value="0" disabled="disabled">', $txt['attachment_transfer_no_base'], '</option>';
+							<option value="0" disabled="disabled">', $txt['attachment_transfer_no_base'], '</option>';
 
 	echo '
-							</select></dd>
-							<dt>', $txt['attachment_transfer_to'], '</dt>
-							<dd><select name="to">
-								<option value="0">', $txt['attachment_transfer_select'], '</option>';
+						</select>
+					</dd>
+					<dt>', $txt['attachment_transfer_to'], '</dt>
+					<dd>
+						<select name="to">
+							<option value="0">', $txt['attachment_transfer_select'], '</option>';
 
 	foreach ($context['attach_dirs'] as $id => $dir)
 		echo '
-								<option value="', $id, '">', $dir, '</option>';
+							<option value="', $id, '">', $dir, '</option>';
 
 	echo '
-							</select></dd>';
+						</select>
+					</dd>';
 
 	if (!empty($modSettings['attachmentDirFileLimit']))
 		echo '
-							<dt>', $txt['attachment_transfer_empty'], '</dt>
-							<dd><input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' /></dd>';
+					<dt>', $txt['attachment_transfer_empty'], '</dt>
+					<dd><input type="checkbox" name="empty_it"', $context['checked'] ? ' checked="checked"' : '', ' /></dd>';
 	echo '
-						</dl>
-						<hr />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="submit" onclick="start_progress()" name="transfer" value="', $txt['attachment_transfer_now'], '" class="right_submit" />
-						<div id="progress_msg"></div>
-						<div id="show_progress"></div>
-						<br class="clear_right" />
-					</form>
-					<script><!-- // --><![CDATA[
-						function start_progress() {
-							setTimeout(\'show_msg()\', 1000);
-						}
+				</dl>
+				<hr />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="submit" onclick="start_progress()" name="transfer" value="', $txt['attachment_transfer_now'], '" class="right_submit" />
+				<div id="progress_msg"></div>
+				<div id="show_progress"></div>
+				<br class="clear_right" />
+			</form>
+			<script><!-- // --><![CDATA[
+				function start_progress() {
+					setTimeout(\'show_msg()\', 1000);
+				}
 
-						function show_msg() {
-							$(\'#progress_msg\').html(\'<div><img src="', $settings['actual_images_url'], '/loading.gif" alt="loading.gif" style="width:35px; height:35px" />&nbsp; ', $txt['attachment_transfer_progress'], '<\/div>\');
-							show_progress();
-						}
+				function show_msg() {
+					$(\'#progress_msg\').html(\'<div><img src="', $settings['actual_images_url'], '/loading.gif" alt="loading.gif" style="width:35px; height:35px" />&nbsp; ', $txt['attachment_transfer_progress'], '<\/div>\');
+					show_progress();
+				}
 
-						function show_progress() {
-							$(\'#show_progress\').load("progress.php");
-							setTimeout(\'show_progress()\', 1500);
-						}
+				function show_progress() {
+					$(\'#show_progress\').load("progress.php");
+					setTimeout(\'show_progress()\', 1500);
+				}
 
-					// ]]></script>
-				</div>
-			</div>';
+			// ]]></script>
+		</div>
+	</div>';
 }
 
 /**
@@ -219,9 +215,7 @@ function template_attachment_repair()
 	{
 		echo '
 	<div id="manage_attachments">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['repair_attachments_complete'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['repair_attachments_complete'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				', $txt['repair_attachments_complete_desc'], '
@@ -234,9 +228,7 @@ function template_attachment_repair()
 	{
 		echo '
 	<div id="manage_attachments">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['repair_attachments_complete'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['repair_attachments_complete'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				', $txt['repair_attachments_no_errors'], '
@@ -250,9 +242,7 @@ function template_attachment_repair()
 		echo '
 	<div id="manage_attachments">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=manageattachments;sa=repair;fixErrors=1;step=0;substep=0;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['repair_attachments'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['repair_attachments'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>', $txt['repair_attachments_error_desc'], '</p>';

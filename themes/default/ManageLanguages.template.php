@@ -26,11 +26,7 @@ function template_download_language()
 	{
 		echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $txt['languages_download_complete'], '
-			</h3>
-		</div>
+		<h2 class="category_header">', $txt['languages_download_complete'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				', $context['install_complete'], '
@@ -51,11 +47,7 @@ function template_download_language()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=languages;sa=downloadlang;did=', $context['download_id'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['languages_download'], '
-				</h3>
-			</div>
+			<h2 class="category_header">', $txt['languages_download'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>
@@ -73,11 +65,7 @@ function template_download_language()
 	// Now, all the images and the likes, hidden via javascript 'cause there are so fecking many.
 	echo '
 			<br />
-			<div class="title_bar">
-				<h3 class="titlebg">
-					', $txt['languages_download_theme_files'], '
-				</h3>
-			</div>
+			<h3 class="category_header">', $txt['languages_download_theme_files'], '</h3>
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
@@ -145,10 +133,7 @@ function template_download_language()
 			</div>';
 
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['package_ftp_necessary'], '
-				</h3>
+			<h3 class="category_header">', $txt['package_ftp_necessary'], '</h3>
 			</div>
 			<div class="windowbg">
 				<div class="content">
@@ -244,10 +229,7 @@ function template_modify_language_entries()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['edit_languages'], '
-				</h3>
+			<h2 class="category_header">', $txt['edit_languages'], '</h2>
 			</div>
 			<div class="information">
 				', $txt['edit_language_entries_primary'], '
@@ -433,11 +415,7 @@ function template_add_language()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper"action="', $scripturl, '?action=admin;area=languages;sa=add;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['add_language'], '
-				</h3>
-			</div>
+			<h2 class="category_header">', $txt['add_language'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<fieldset>

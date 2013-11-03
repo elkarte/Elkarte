@@ -36,11 +36,7 @@ function template_generic_menu_sidebar_above()
 	{
 		// Show the section header - and pump up the line spacing for readability.
 		echo '
-			<div class="cat_bar">
-				<h4 class="catbg">
-					', $section['title'], '
-				</h4>
-			</div>
+			<h3 class="category_header">', $section['title'], '</h3>
 			<ul class="sidebar_menu">';
 
 		// For every area of this section show a link to that area (bold if it's currently selected.)

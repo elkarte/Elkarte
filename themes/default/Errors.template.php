@@ -26,11 +26,7 @@ function template_fatal_error()
 
 	echo '
 	<div id="fatal_error">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $context['error_title'], '
-			</h3>
-		</div>
+		<h2 class="category_header">', $context['error_title'], '</h2>
 		<div class="windowbg generic_list_wrapper">
 			<div ', $context['error_code'], '>', $context['error_message'], '</div>
 		</div>
@@ -52,15 +48,10 @@ function template_error_log()
 	global $context, $settings, $scripturl, $txt;
 
 	echo '
-		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">';
-
-	echo '
-			<div class="title_bar clear_right">
-				<h3 class="titlebg">
-					<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
-				</h3>
-			</div>
-
+		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">
+			<h2 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
+			</h2>
 			<div class="flow_auto">
 				<div class="floatleft">';
 
@@ -242,11 +233,9 @@ function template_attachment_errors()
 
 	echo '
 	<div>
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $txt['attach_error_title'], '
-			</h3>
-		</div>
+		<h2 class="category_header">
+			', $txt['attach_error_title'], '
+		</h2>
 		<div class="windowbg">';
 
 	foreach ($context['attachment_error_keys'] as $key)

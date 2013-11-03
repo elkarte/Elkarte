@@ -30,9 +30,7 @@ function template_ask()
 	<div id="split_topics">
 		<form action="', $scripturl, '?action=splittopics;sa=execute;topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="at" value="', $context['message']['id'], '" />
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['split_topic'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['split_topic'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<div class="split_topics">

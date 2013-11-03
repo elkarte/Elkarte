@@ -97,11 +97,9 @@ function template_view_package()
 
 	echo '
 		<form action="', $context['post_url'], '" onsubmit="submitonce(this);" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['package_install_actions'], ' &quot;', $context['package_name'], '&quot;
-				</h3>
-			</div>';
+			<h3 class="category_header">
+				', $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['package_install_actions'], ' &quot;', $context['package_name'], '&quot;
+			</h3>';
 
 	// Are there data changes to be removed?
 	if ($context['uninstalling'] && !empty($context['database_changes']))
@@ -425,9 +423,7 @@ function template_extract_package()
 	}
 	else
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['package_installed_redirecting'], '</h3>
-			</div>';
+			<h3 class="category_header">', $txt['package_installed_redirecting'], '</h3>';
 
 	echo '
 		<div class="windowbg">

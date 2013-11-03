@@ -3239,13 +3239,13 @@ function template_javascript($do_defered = false)
 				echo '
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js id="jqueryui"></script>' : '');
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'local':
 				echo '
 	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js id="jqueryui"></script>' : '');
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'auto':
 				echo '

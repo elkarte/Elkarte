@@ -87,11 +87,7 @@ function template_event_post()
 	// Start the main table.
 	echo '
 		<div id="post_event">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>';
+			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	if (!empty($context['post_error']['messages']))
 	{

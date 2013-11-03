@@ -946,7 +946,7 @@ class ProfileHistory_Controller extends Action_Controller
 			WHERE ' . $where .'
 			ORDER BY time DESC',
 			array(
-				'id_member' => $where_vars['current_member'],
+				'current_member' => $where_vars['current_member'],
 			)
 		);
 		$logins = array();

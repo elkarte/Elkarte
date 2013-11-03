@@ -1732,7 +1732,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 function toggleHeaderAJAX(btn, container_id)
 {
 	ajax_indicator(true);
-	var text_template = '<div class="cat_bar"><h3 class="catbg centertext">{text}</h3></div>';
+	var text_template = '<h3 class="category_header centertext">{text}</h3>';
 
 	$.ajax({
 		type: 'GET',

@@ -35,9 +35,7 @@ function template_maintain_database()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_optimize'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['maintain_optimize'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=optimize" method="post" accept-charset="UTF-8">
@@ -50,13 +48,9 @@ function template_maintain_database()
 				</form>
 			</div>
 		</div>
-
-		<div class="cat_bar">
-			<h3 class="catbg">
+		<h3 class="category_header">
 			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_backup'], '
-			</h3>
-		</div>
-
+		</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">
@@ -93,9 +87,7 @@ function template_maintain_database()
 	if (isset($context['convert_to']))
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt[$context['convert_to'] . '_title'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt[$context['convert_to'] . '_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
@@ -136,9 +128,7 @@ function template_maintain_routine()
 	foreach ($context['routine_actions'] as $action)
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $action['title'], '</h3>
-		</div>
+		<h3 class="category_header">', $action['title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $action['url'], '" method="post" accept-charset="UTF-8">
@@ -227,9 +217,7 @@ function template_maintain_members()
 	template_show_error('maintenance_finished');
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_reattribute_posts'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['maintain_reattribute_posts'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=reattribute" method="post" accept-charset="UTF-8">
@@ -268,11 +256,9 @@ function template_maintain_members()
 				</form>
 			</div>
 		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<a href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_members'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			<a href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_members'], '
+		</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=purgeinactive" method="post" accept-charset="UTF-8" id="membersForm">
@@ -300,9 +286,7 @@ function template_maintain_members()
 				</form>
 			</div>
 		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_recountposts'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['maintain_recountposts'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=recountposts" method="post" accept-charset="UTF-8" id="membersRecountForm">
@@ -374,9 +358,7 @@ function template_maintain_topics()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_old'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['maintain_old'], '</h2>
 		<div class="windowbg">
 			<div class="content flow_auto">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=pruneold" method="post" accept-charset="UTF-8">';
@@ -443,10 +425,7 @@ function template_maintain_topics()
 				</form>
 			</div>
 		</div>
-
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_old_drafts'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['maintain_old_drafts'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=olddrafts" method="post" accept-charset="UTF-8">
@@ -459,9 +438,7 @@ function template_maintain_topics()
 				</form>
 			</div>
 		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['move_topics_maintenance'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['move_topics_maintenance'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove" method="post" accept-charset="UTF-8">
@@ -492,9 +469,7 @@ function template_optimize()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_optimize'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['maintain_optimize'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>
@@ -527,9 +502,7 @@ function template_convert_msgbody()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt[$context['convert_to'] . '_title'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt[$context['convert_to'] . '_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['body_checking_introduction'], '</p>';

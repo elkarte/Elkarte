@@ -91,7 +91,7 @@ function template_editBuddies()
 	// Add a new buddy?
 	echo '
 	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=buddies" method="post" accept-charset="UTF-8">
-		<div class="tborder add_buddy">
+		<div class="add_buddy">
 			<h3 class="category_header">', $txt['buddy_add'], '</h3>
 			<div class="roundframe">
 				<dl class="settings">
@@ -188,7 +188,7 @@ function template_editIgnoreList()
 	// Add to the ignore list?
 	echo '
 	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=lists;sa=ignore" method="post" accept-charset="UTF-8">
-		<div class="tborder add_buddy">
+		<div class="add_buddy">
 			<h2 class="category_header">', $txt['ignore_add'], '</h2>
 			<div class="roundframe">
 				<dl class="settings">

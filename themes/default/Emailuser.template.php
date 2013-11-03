@@ -40,11 +40,9 @@ function template_main()
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=sendtopic;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
+			</h2>
 			<div class="windowbg2">
 				<div class="content">
 					<fieldset id="sender" class="send_topic">
@@ -107,11 +105,9 @@ function template_custom_email()
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=email" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
+			</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings send_mail">
@@ -211,9 +207,7 @@ function template_report()
 	<div id="report_topic">
 		<form action="', $scripturl, '?action=reporttm;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="msg" value="' . $context['message_id'] . '" />
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['report_to_mod'], '</h3>
-				</div>
+				<h2 class="category_header">', $txt['report_to_mod'], '</h2>
 				<div class="windowbg">
 					<div class="content">';
 

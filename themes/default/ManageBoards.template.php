@@ -24,9 +24,7 @@ function template_main()
 	// Table header.
 	echo '
 	<div id="manage_boards">
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['boardsEdit'], '</h3>
-		</div>';
+		<h2 class="category_header">', $txt['boardsEdit'], '</h2>';
 
 	if (!empty($context['move_board']))
 		echo '
@@ -51,12 +49,10 @@ function template_main()
 
 		// Link to modify the category.
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
-					<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $txt['catModify'], '</a>
-				</h3>
-			</div>';
+			<h3 class="category_header">
+				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
+				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $txt['catModify'], '</a>
+			</h3>';
 
 		// Boards table header.
 		echo '
@@ -189,11 +185,9 @@ function template_modify_category()
 	<div id="manage_boards">
 		<form action="', $scripturl, '?action=admin;area=manageboards;sa=cat2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="cat" value="', $context['category']['id'], '" />
-				<div class="title_bar">
-					<h3 class="titlebg">
+				<h3 class="category_header">
 					', isset($context['category']['is_new']) ? $txt['mboards_new_cat_name'] : $txt['catEdit'], '
-					</h3>
-				</div>
+				</h3>
 				<div class="windowbg">
 					<div class="content">
 						<dl class="settings">';
@@ -278,9 +272,7 @@ function template_confirm_category_delete()
 	<div id="manage_boards">
 		<form action="', $scripturl, '?action=admin;area=manageboards;sa=cat2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="cat" value="', $context['category']['id'], '" />
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['mboards_delete_cat'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['mboards_delete_cat'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>', $txt['mboards_delete_cat_contains'], ':</p>
@@ -294,9 +286,7 @@ function template_confirm_category_delete()
 					</ul>
 				</div>
 			</div>
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['mboards_delete_what_do'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['mboards_delete_what_do'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<p>
@@ -334,10 +324,9 @@ function template_modify_board()
 	<div id="manage_boards">
 		<form action="', $scripturl, '?action=admin;area=manageboards;sa=board2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="boardid" value="', $context['board']['id'], '" />
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', isset($context['board']['is_new']) ? $txt['mboards_new_board_name'] : $txt['boardsEdit'], '
-				</h3>
+			<h2 class="category_header">
+				', isset($context['board']['is_new']) ? $txt['mboards_new_board_name'] : $txt['boardsEdit'], '
+			</h2>
 			</div>
 			<div class="windowbg">
 				<div class="content">
@@ -729,10 +718,7 @@ function template_confirm_board_delete()
 	<div id="manage_boards">
 		<form action="', $scripturl, '?action=admin;area=manageboards;sa=board2" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="boardid" value="', $context['board']['id'], '" />
-
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['mboards_delete_board'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['mboards_delete_board'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>', $txt['mboards_delete_board_contains'], '</p>
@@ -746,9 +732,7 @@ function template_confirm_board_delete()
 						</ul>
 				</div>
 			</div>
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['mboards_delete_what_do'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['mboards_delete_what_do'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<p>

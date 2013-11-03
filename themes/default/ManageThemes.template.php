@@ -32,11 +32,7 @@ function template_main()
 		</div>
 		<div id="admin_form_wrapper">
 			<form action="', $scripturl, '?action=admin;area=theme;sa=admin" method="post" accept-charset="UTF-8">
-				<div class="cat_bar">
-					<h3 class="catbg">',
-						$txt['settings'], '
-					</h3>
-				</div>
+				<h3 class="category_header">', $txt['settings'], '</h3>
 				<div class="windowbg2">
 					<div class="content">
 						<dl class="settings">
@@ -894,7 +890,7 @@ function template_browse()
 
 	echo '
 	<div id="admincenter">
-		<table class="table_grid tborder">
+		<table class="table_grid">
 		<thead>
 			<tr class="table_head">
 				<th scope="col" class="lefttext" style="width:50%">', $txt['themeadmin_edit_filename'], '</th>

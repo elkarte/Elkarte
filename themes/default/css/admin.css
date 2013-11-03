@@ -375,7 +375,7 @@ div.quick_tasks {
 .features_switch {
 	float: right;
 }
-.features h4 {
+.features h3 {
 	padding: 0;
 	margin: 0 6px 0 105px;
 	font-size: 1.1em;
@@ -394,9 +394,6 @@ div.quick_tasks {
 /* Styles for the package manager.
 /* Haven't got here yet. :P
 ------------------------------------------------- */
-#package_list .tborder {
-	margin: .25em 0 .25em 26px;
-}
 #package_list ol, #package_list ol li {
 	list-style: decimal;
 	margin-left: 50px;
@@ -833,9 +830,6 @@ dl.themes_list dd {
 #admin_main_section {
 	margin: 12px 0 0 0;
 	padding: 8px 12px 4px 12px;
-}
-#mod_main_section .cat_bar {
-	background: none;
 }
 #mod_main_section .catbg, #mod_main_section .catbg a {
 	color: #444;
