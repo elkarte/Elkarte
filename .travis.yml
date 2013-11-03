@@ -9,7 +9,7 @@ env:
   - DB=mysql
   - DB=postgres
 
-script: php /var/www/tests/all_tests.php
+script: php /var/www/tests/run_tests.php
 
 before_script:
   - cp ./install/Settings* ./
