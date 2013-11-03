@@ -2332,6 +2332,7 @@ CREATE TABLE {$db_prefix}postby_emails_filters (
   filter_to varchar(255) NOT NULL default '',
   filter_from varchar(255) NOT NULL default '',
   filter_name varchar(255) NOT NULL default '',
+  filter_order int NOT NULL default '0',
   PRIMARY KEY (id_filter)
 );
 

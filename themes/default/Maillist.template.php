@@ -223,89 +223,9 @@ function template_callback_maillist_receive_email_list()
 		<dt id="add_more_email_placeholder" style="display: none;"></dt>
 		<dd></dd>
 		<dt id="add_more_board_div" style="display: none;">
-			<a href="#" onclick="addAnotherEmail(); return false;">&#171; ', $txt['reply_add_more'], ' &#187;</a>
+			<a href="#" onclick="addAnotherOption(sEmailParent, oEmailOptionsdt, oEmailOptionsdd, oEmailSelectData); return false;" class="linkbutton_left">', $txt['reply_add_more'], '</a>
 		</dt>
 		<dd></dd>';
-
-	// Build our board id and name arrays for use in the javascript
-	$i = 0;
-	$script = '
-		var boardname = new Array(),
-			boardid = new Array();';
-
-	foreach ($context['boards'] as $board_id => $board_name)
-		$script = $script . '
-		boardid[' . $i . ']=' . $board_id . ';
-		boardname[' . $i++ . ']="' . $board_name . '";';
-
-	// The javascript needs to go at the end but we'll put it in this template for looks.
-	if (empty($context['settings_post_javascript']))
-		$context['settings_post_javascript'] = '';
-
-	$context['settings_post_javascript'] .= '
-		function createNamedElement(type, name, customFields)
-		{
-			var element = null;
-
-			if (!customFields)
-				customFields = "";
-
-			// Try the IE way; this fails on standards-compliant browsers
-			try
-			{
-				element = document.createElement("<" + type + \' name="\' + name + \'" \' + customFields + ">");
-			}
-			catch (e)
-			{
-			}
-			if (!element || element.nodeName != type.toUpperCase())
-			{
-				// Non-IE browser; use canonical method to create named element
-				element = document.createElement(type);
-				element.name = name;
-			}
-
-			return element;
-		}
-
-		var placeHolder = document.getElementById(\'add_more_email_placeholder\');
-		var opt = null;' . $script . '
-
-		function addAnotherEmail()
-		{
-			var newDT = document.createElement("dt");
-
-			var newInput = createNamedElement("input", "emailfrom[]");
-
-			newInput.type = "text";
-			newInput.className = "input_text";
-			newInput.size = "50";
-			newInput.setAttribute("class", "input_text");
-			newDT.appendChild(newInput);
-
-			var newDD = document.createElement("dd");
-
-			newInput = createNamedElement("select", "boardto[]");
-			newInput.type = "select";
-			newInput.size = "1";
-			newInput.setAttribute("class", "input_select");
-
-			// add in the options as childen of the newInput select box
-			for (i = 0; i < boardname.length; i++)
-			{
-				opt = createNamedElement("option", "option");
-				opt.value = boardid[i];
-				opt.innerHTML = boardname[i];
-				newInput.appendChild(opt);
-			}
-
-			newDD.appendChild(newInput);
-
-			placeHolder.parentNode.insertBefore(newDT, placeHolder);
-			placeHolder.parentNode.insertBefore(newDD, placeHolder);
-		}
-		document.getElementById(\'add_more_board_div\').style.display = \'\';
-	';
 }
 
 /**
@@ -316,77 +236,73 @@ function template_bounce_template()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<div id="modcenter">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
-			<div id="box_preview" class="forumposts"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
-				<h3 class="category_header">
-					<span id="preview_subject">', $txt['preview'], '</span>
-				</h3>
-				<div class="post" id="template_preview">
-					', empty($context['template_preview']) ? '<br />' : $context['template_preview'], '
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
+		<div id="box_preview" class="forumposts"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
+			<h3 class="category_header">
+				<span id="preview_subject">', $txt['preview'], '</span>
+			</h3>
+			<div class="post" id="template_preview">
+				', empty($context['template_preview']) ? '<br />' : $context['template_preview'], '
+			</div>
+		</div>
+		<h3 class="category_header">', $context['page_title'], '</h3>
+		<div class="information">
+			', $txt['ml_bounce_template_desc'], '
+		</div>
+		<div class="windowbg">
+			<div class="content">
+				<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
+					<dl>
+						<dt>
+							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
+						</dt>
+						<dd class="error" id="error_list">
+							', empty($context['warning_errors']) ? '' : implode('<br />', $context['warning_errors']), '
+						</dd>
+					</dl>
 				</div>
-			</div>
-			<h3 class="category_header">', $context['page_title'], '</h3>
-
-<div class="information">
-				', $txt['ml_bounce_template_desc'], '
-			</div>
-			<div class="windowbg">
-				<div class="content">
-					<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
-						<dl>
-							<dt>
-								<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
-							</dt>
-							<dd class="error" id="error_list">
-								', empty($context['warning_errors']) ? '' : implode('<br />', $context['warning_errors']), '
-							</dd>
-						</dl>
-					</div>
-					<dl class="settings">
-						<dt>
-							<label for="template_title">', $txt['ml_bounce_template_title'], '</label>:<br />
-							<span class="smalltext">', $txt['ml_bounce_template_title_desc'], '</span>
-						</dt>
-						<dd>
-							<input type="text" id="template_title" name="template_title" value="', $context['template_data']['title'], '" size="60" class="input_text" />
-						</dd>
-						<dt>
-							<label>', $txt['subject'], '</label>:<br />
-						</dt>
-						<dd>
-							', $txt['ml_bounce_template_subject_default'], '
-						</dd>
-						<dt>
-							<label for="template_body">', $txt['ml_bounce_template_body'], '</label>:<br />
-							<span class="smalltext">', $txt['ml_bounce_template_body_desc'], '</span>
-						</dt>
-						<dd>
-							<textarea id="template_body" name="template_body" rows="10" cols="65">', $context['template_data']['body'], '</textarea>
-						</dd>
-					</dl>';
+				<dl class="settings">
+					<dt>
+						<label for="template_title">', $txt['ml_bounce_template_title'], '</label>:<br />
+						<span class="smalltext">', $txt['ml_bounce_template_title_desc'], '</span>
+					</dt>
+					<dd>
+						<input type="text" id="template_title" name="template_title" value="', $context['template_data']['title'], '" size="60" class="input_text" />
+					</dd>
+					<dt>
+						<label>', $txt['subject'], '</label>:<br />
+					</dt>
+					<dd>
+						', $txt['ml_bounce_template_subject_default'], '
+					</dd>
+					<dt>
+						<label for="template_body">', $txt['ml_bounce_template_body'], '</label>:<br />
+						<span class="smalltext">', $txt['ml_bounce_template_body_desc'], '</span>
+					</dt>
+					<dd>
+						<textarea id="template_body" name="template_body" rows="10" cols="65">', $context['template_data']['body'], '</textarea>
+					</dd>
+				</dl>';
 
 	if ($context['template_data']['can_edit_personal'])
 		echo '
-					<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' class="input_check" />
-						<label for="make_personal">
-							', $txt['ml_bounce_template_personal'], '
-						</label>
-						<br />
-						<span class="smalltext">', $txt['ml_bounce_template_personal_desc'], '</span>';
+				<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' class="input_check" />
+					<label for="make_personal">
+						', $txt['ml_bounce_template_personal'], '
+					</label>
+					<br />
+					<span class="smalltext">', $txt['ml_bounce_template_personal_desc'], '</span>';
 
 	echo '
-					<div class="submitbutton">
-						<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
-						<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['mod-mlt_token_var'], '" value="', $context['mod-mlt_token'], '" />
-					</div>
+				<div class="submitbutton">
+					<input type="submit" name="preview" id="preview_button" value="', $txt['preview'], '" class="button_submit" />
+					<input type="submit" name="save" value="', $context['page_title'], '" class="button_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['mod-mlt_token_var'], '" value="', $context['mod-mlt_token'], '" />
 				</div>
 			</div>
-		</form>
-	</div>
-
+		</div>
+	</form>
 	<script><!-- // --><![CDATA[
 		$(document).ready(function() {
 			$("#preview_button").click(function() {
@@ -420,8 +336,10 @@ function template_bounce_template()
 					$("#errors").css({display:"none"});
 					$("#error_list").html(\'\');
 				}
+				
 				return false;
 			});
+
 			return false;
 		}
 	// ]]></script>';

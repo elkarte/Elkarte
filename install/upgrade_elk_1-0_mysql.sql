@@ -539,6 +539,19 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
 ) ENGINE=MyISAM{$db_collation};
 ---#
 
+---# Adding new columns to postby_emails_filters...
+ALTER TABLE {$db_prefix}postby_emails_filters
+ADD COLUMN filter_order int(10) NOT NULL default '0';
+---#
+
+---# Set the default values so the order is set / maintained
+---{
+$request = upgrade_query("
+	UPDATE {$db_prefix}postby_emails_filters
+	SET filter_order = id_filter");
+---}
+---#
+
 ---# Adding new columns to log_activity...
 ALTER TABLE {$db_prefix}log_activity
 ADD COLUMN pm smallint(5) unsigned NOT NULL DEFAULT '0',
