@@ -21,11 +21,10 @@ function template_badbehavior_log()
 		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">';
 
 	echo '
-			<div class="title_bar clear_right">
-				<h3 class="titlebg">
-					<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
-				</h3>
-			</div>', template_pagesection(), '
+			<h2 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
+			</h2>
+			', template_pagesection(), '
 			<table class="table_grid" id="error_log">';
 
 	if ($context['has_filter'])
