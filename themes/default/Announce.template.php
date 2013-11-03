@@ -24,9 +24,7 @@ function template_announce()
 	echo '
 	<div id="announcement">
 		<form action="', $scripturl, '?action=announce;sa=send" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['announce_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['announce_title'], '</h2>
 			<div class="information">
 				', $txt['announce_desc'], '
 			</div>
