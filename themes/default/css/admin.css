@@ -834,9 +834,6 @@ dl.themes_list dd {
 	margin: 12px 0 0 0;
 	padding: 8px 12px 4px 12px;
 }
-#mod_main_section .cat_bar {
-	background: none;
-}
 #mod_main_section .catbg, #mod_main_section .catbg a {
 	color: #444;
 	overflow: hidden;
