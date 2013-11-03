@@ -527,7 +527,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$memID = currentMemberID();
 
 		// Gonna want this for the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 

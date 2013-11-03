@@ -269,7 +269,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'view_email_errors';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -660,7 +660,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'email_filter';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -775,7 +775,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -1086,7 +1086,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'email_parser';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -1192,7 +1192,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -1665,7 +1665,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['ml_bounce_templates_title'];
 		createToken('mod-mlt');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// Show the list
