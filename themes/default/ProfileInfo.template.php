@@ -941,11 +941,9 @@ function template_profile_block_user_customprofileinfo()
 
 	echo '
 		<div class="profileblock_left">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/plus_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<img src="', $settings['images_url'], '/icons/plus_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
+			</h3>
 			<div class="profileblock">';
 
 	// Any custom fields for standard placement?
@@ -998,11 +996,9 @@ function template_profile_block_moderation()
 	{
 		echo '
 		<div class="profileblock_right">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/moderation_hd.png" alt="" class="icon"/>', $txt['profile_moderation'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<img src="', $settings['images_url'], '/icons/moderation_hd.png" alt="" class="icon"/>', $txt['profile_moderation'], '
+			</h3>
 			<div class="profileblock">';
 
 		// Can they view/issue a warning?
@@ -1083,11 +1079,9 @@ function template_profile_block_buddies()
 	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'])
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/icons/buddies_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
-			</h3>
-		</div>
+		<h3 class="category_header">
+			<img src="', $settings['images_url'], '/icons/buddies_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
+		</h3>
 		<div class="windowbg">
 			<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px"' : ''), '>
 				<table class="profile_attachments">';
@@ -1161,11 +1155,9 @@ function template_profile_block_attachments()
 
 	// The attachment div
 	echo '
-	<div class="cat_bar">
-		<h3 class="catbg">
-			<img src="', $settings['images_url'], '/icons/attachments_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=attach;u=', $context['member']['id'], '">', $txt['profile_attachments'], '</a>
-		</h3>
-	</div>
+	<h3 class="category_header">
+		<img src="', $settings['images_url'], '/icons/attachments_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=attach;u=', $context['member']['id'], '">', $txt['profile_attachments'], '</a>
+	</h3>
 	<div class="windowbg">
 		<div class="content">
 			<table class="profile_attachments">';
@@ -1224,11 +1216,9 @@ function template_profile_block_posts()
 
 	// The posts block
 	echo '
-	<div class="cat_bar">
-		<h3 class="catbg">
-			<img src="', $settings['images_url'], '/icons/posts_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_posts'], '</a>
-		</h3>
-	</div>
+	<h3 class="category_header">
+		<img src="', $settings['images_url'], '/icons/posts_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_posts'], '</a>
+	</h3>
 	<div class="windowbg">
 		<div class="content">
 			<table id="ps_recentposts">';
@@ -1277,11 +1267,9 @@ function template_profile_block_topics()
 
 	// The topics block
 	echo '
-	<div class="cat_bar">
-		<h3 class="catbg">
-			<img src="', $settings['images_url'], '/icons/topics_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=topics;u=', $context['member']['id'], '">', $txt['profile_topics'], '</a>
-		</h3>
-	</div>
+	<h3 class="category_header">
+		<img src="', $settings['images_url'], '/icons/topics_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=topics;u=', $context['member']['id'], '">', $txt['profile_topics'], '</a>
+	</h3>
 	<div class="windowbg">
 		<div class="content">
 			<table id="ps_recenttopics">';
