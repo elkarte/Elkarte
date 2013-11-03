@@ -25,12 +25,10 @@ function template_login()
 		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
-		<div class="tborder login">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/login_hd.png" alt="" class="icon" /> ', $txt['login'], '
-				</h3>
-			</div>
+		<div class="login">
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/icons/login_hd.png" alt="" class="icon" /> ', $txt['login'], '
+			</h2>
 			<div class="roundframe">';
 
 	// Did they make a mistake last time?
@@ -102,10 +100,8 @@ function template_kick_guest()
 	echo '
 	<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 	<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
-		<div class="tborder login">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['warning'], '</h3>
-			</div>';
+		<div class="login">
+			<h2 class="category_header">', $txt['warning'], '</h2>';
 
 	// Show the message or default message.
 	echo '
@@ -120,11 +116,9 @@ function template_kick_guest()
 
 	// And now the login information.
 	echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/icons/login_hd.png" alt="" class="icon" /> ', $txt['login'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				<img src="', $settings['images_url'], '/icons/login_hd.png" alt="" class="icon" /> ', $txt['login'], '
+			</h3>
 			<div class="roundframe">
 				<dl>
 					<dt>', $txt['username'], ':</dt>
@@ -176,17 +170,13 @@ function template_maintenance()
 	echo '
 <script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 <form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
-	<div class="tborder login" id="maintenance_mode">
-		<div class="cat_bar">
-			<h3 class="catbg">', $context['title'], '</h3>
-		</div>
+	<div class="login" id="maintenance_mode">
+		<h2 class="category_header">', $context['title'], '</h2>
 		<p class="description">
 			<img class="floatleft" src="', $settings['images_url'], '/construction.png" style="width:40px; height:40px" alt="', $txt['in_maintain_mode'], '" />
 			', $context['description'], '
 		</p>
-		<div class="title_bar">
-			<h4 class="titlebg">', $txt['admin_login'], '</h4>
-		</div>
+		<h3 class="category_header">', $txt['admin_login'], '</h3>
 		<div class="roundframe">
 			<dl>
 				<dt>', $txt['username'], ':</dt>
@@ -219,12 +209,10 @@ function template_admin_login()
 <script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 
 <form action="', $scripturl, $context['get_data'], '" method="post" accept-charset="UTF-8" name="frmLogin" id="frmLogin" onsubmit="hash', ucfirst($context['sessionCheckType']), 'Password(this, \'', $context['user']['username'], '\', \'', $context['session_id'], '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');">
-	<div class="tborder login" id="admin_login">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/icons/login_hd.png" alt="" class="icon" /> ', $txt['login'], '
-			</h3>
-		</div>
+	<div class="login" id="admin_login">
+		<h2 class="category_header">
+			<img src="', $settings['images_url'], '/icons/login_hd.png" alt="" class="icon" /> ', $txt['login'], '
+		</h2>
 		<div class="roundframe centertext">';
 
 	if (!empty($context['incorrect_password']))
@@ -263,9 +251,7 @@ function template_retry_activate()
 	// Just ask them for their code so they can try it again...
 	echo '
 		<form action="', $scripturl, '?action=activate;u=', $context['member_id'], '" method="post" accept-charset="UTF-8">
-			<div class="title_bar">
-				<h3 class="titlebg">', $context['page_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="roundframe">';
 
 	// You didn't even have an ID?
@@ -294,9 +280,7 @@ function template_resend()
 	// Just ask them for their code so they can try it again...
 	echo '
 		<form action="', $scripturl, '?action=activate;sa=resend" method="post" accept-charset="UTF-8">
-			<div class="title_bar">
-				<h3 class="titlebg">', $context['page_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="roundframe">
 				<dl>
 					<dt>', $txt['invalid_activation_username'], ':</dt>
