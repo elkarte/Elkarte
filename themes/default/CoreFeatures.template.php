@@ -121,11 +121,9 @@ function template_core_features()
 	if ($context['is_new_install'])
 	{
 		echo '
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $txt['core_settings_welcome_msg'], '
-				</h3>
-			</div>
+			<h2 id="section_header" class="category_header">
+				', $txt['core_settings_welcome_msg'], '
+			</h2>
 			<div class="information">
 				', $txt['core_settings_welcome_msg_desc'], '
 			</div>';
@@ -149,7 +147,7 @@ function template_core_features()
 					<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
 					<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="display:none" />
 				</div>
-				<h4 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h4>
+				<h3 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h3>
 				<p>', $feature['desc'], '</p>
 
 				<hr />
