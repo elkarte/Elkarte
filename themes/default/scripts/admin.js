@@ -436,33 +436,6 @@ function addOption()
 	startOptID++;
 }
 
-
-//Create a named element dynamically - thanks to: http://www.thunderguy.com/semicolon/2005/05/23/setting-the-name-attribute-in-internet-explorer/
-function createNamedElement(type, name, customFields)
-{
-	var element = null;
-
-	if (!customFields)
-		customFields = "";
-
-	// Try the IE way; this fails on standards-compliant browsers
-	try
-	{
-		element = document.createElement("<" + type + ' name="' + name + '" ' + customFields + ">");
-	}
-	catch (e)
-	{
-	}
-	if (!element || element.nodeName !== type.toUpperCase())
-	{
-		// Non-IE browser; use canonical method to create named element
-		element = document.createElement(type);
-		element.name = name;
-	}
-
-	return element;
-}
-
 function addAnotherQuestion()
 {
 	var placeHolder = document.getElementById('add_more_question_placeholder');
@@ -485,37 +458,47 @@ function addAnotherAnswer(elem, question_name)
 
 function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 {
-	var placeHolder = document.getElementById('add_more_searches');
+	var placeHolder = document.getElementById('add_more_searches'),
+		newDT = document.createElement("dt"),
+		newInput = document.createElement("input"),
+		newLabel = document.createElement("label"),
+		newDD = document.createElement("dd");
 
-	var newDT = document.createElement("dt");
-	var newInput = createNamedElement("input", "engine_name[]");
+	newInput.name = "engine_name[]";
 	newInput.type = "text";
 	newInput.className = "input_text";
 	newInput.size = "50";
 	newInput.setAttribute("class", "verification_question");
-	var newLabel = document.createElement("label");
+
+	// Add the label and input box to the DOM
 	newLabel.textContent = txt_name + ': ';
 	newLabel.appendChild(newInput);
 	newDT.appendChild(newLabel);
 
-	var newDD = document.createElement("dd");
-	newInput = createNamedElement("input", "engine_url[]");
+	// Next input box
+	newInput = document.createElement("input");
+	newInput.name = "engine_url[]";
 	newInput.type = "text";
 	newInput.className = "input_text";
 	newInput.size = "35";
 	newInput.setAttribute("class", "input_text verification_answer");
-	var newLabel = document.createElement("label");
+
+	// Add the new label and input box
+	newLabel = document.createElement("label");
 	newLabel.textContent = txt_url + ': ';
 	newLabel.appendChild(newInput);
 	newDD.appendChild(newLabel);
 	newDD.appendChild(document.createElement("br"));
 
-	newInput = createNamedElement("input", "engine_separator[]");
+	// Rinse and repeat
+	newInput = document.createElement("input");
+	newInput.name = "engine_separator[]";
 	newInput.type = "text";
 	newInput.className = "input_text";
 	newInput.size = "5";
 	newInput.setAttribute("class", "input_text verification_answer");
-	var newLabel = document.createElement("label");
+
+	newLabel = document.createElement("label");
 	newLabel.textContent = txt_word_sep + ': ';
 	newLabel.appendChild(newInput);
 	newDD.appendChild(newLabel);
@@ -524,8 +507,18 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
 
-// Add a new dt/dd pair above a parent selector
-function addAnotherOption(parent, oDtName, oDdName)
+/**
+ * Add a new dt/dd pair above a parent selector
+ * Called most often as a callback option in config options
+ * If oData is supplied, will create a select list, populated with that data
+ * otherwise a standard input box.
+ *
+ * @param {string} parent id of the parent "add more button: we will place this before
+ * @param {object} oDtName object of dt element options (type, class, size)
+ * @param {object} oDdName object of the dd element options (type, clase size)
+ * @param {object} oData optional select box object, 1:{id:value,name:display name}, ...
+ */
+function addAnotherOption(parent, oDtName, oDdName, oData)
 {
 	// Some defaults to use if none are passed
 	oDtName['type'] = oDtName['type'] || 'text';
@@ -535,25 +528,55 @@ function addAnotherOption(parent, oDtName, oDdName)
 	oDdName['type'] = oDdName['type'] || 'text';
 	oDdName['class'] = oDdName['class'] || 'input_text';
 	oDdName['size'] = oDdName['size'] || '20';
+	oData = oData || '';
 
-	// our new <dt> element
-	var newDT = document.createElement('dt');
-	var newInput = createNamedElement('input', oDtName['name']);
+	// Our new <dt> element
+	var newDT = document.createElement('dt'),
+		newInput = document.createElement('input');
+
+	newInput.name = oDtName['name'];
 	newInput.type = oDtName['type'];
 	newInput.setAttribute('class', oDtName['class']);
 	newInput.size = oDtName['size'];
 	newDT.appendChild(newInput);
 
-	// and its matching <dd>
+	// And its matching <dd>
 	var newDD = document.createElement('dd');
-	newInput = createNamedElement('input', oDdName['name']);
+
+	// If we have data for this field make it a select
+	if (oData === '')
+		newInput = document.createElement('input');
+	else
+		newInput = document.createElement('select');
+
+	newInput.name = oDdName['name'];
 	newInput.type = oDdName['type'];
 	newInput.size = oDdName['size'];
 	newInput.setAttribute('class', oDdName['class']);
 	newDD.appendChild(newInput);
 
-	// place the new dt/dd pair before our parent
+	// If its a select box we add in the options
+	if (oData !== '')
+	{
+		// The options are childen of the newInput select box
+		var opt = null,
+			key = null,
+			obj = {};
+
+		for (key in oData)
+		{
+			obj = oData[key];
+			opt = document.createElement("option");
+			opt.name = "option";
+			opt.value = obj.id;
+			opt.innerHTML = obj.name;
+			newInput.appendChild(opt);
+		}
+	}
+
+	// Place the new dt/dd pair before our parent
 	var placeHolder = document.getElementById(parent);
+
 	placeHolder.parentNode.insertBefore(newDT, placeHolder);
 	placeHolder.parentNode.insertBefore(newDD, placeHolder);
 }
