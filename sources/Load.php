@@ -1990,11 +1990,12 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 			}
 
 			// Add it to the array for use in the template
-			if (!empty($filename)) {
+			if (!empty($filename))
+			{
 				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 
-			if ($db_show_debug === true)
-				$context['debug']['javascript'][] = $params['basename'] . '(' . basename($params['dir']) . ')';
+				if ($db_show_debug === true)
+					$context['debug']['javascript'][] = $params['basename'] . '(' . basename($params['dir']) . ')';
 			}
 		}
 

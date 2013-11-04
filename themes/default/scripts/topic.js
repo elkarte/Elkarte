@@ -335,9 +335,8 @@ function QuickModify(oOptions)
 	if (this.bXmlHttpCapable)
 	{
 		var aShowQuickModify = document.getElementsByClassName(this.opt.sClassName);
-		for (var i = 0, length = aShowQuickModify.length; i < length; i++) {
+		for (var i = 0, length = aShowQuickModify.length; i < length; i++)
 			aShowQuickModify[i].style.display = "inline";
-		}
 	}
 }
 

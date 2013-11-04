@@ -1311,7 +1311,8 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 	else
 	{
 		$fh = @fopen($path . '/.htaccess', 'w');
-		if ($fh) {
+		if ($fh)
+		{
 			fwrite($fh, '<Files *>
 	Order Deny,Allow
 	Deny from all' . $close);
@@ -1325,7 +1326,8 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 	else
 	{
 		$fh = @fopen($path . '/index.php', 'w');
-		if ($fh) {
+		if ($fh)
+		{
 			fwrite($fh, '<?php
 
 /**
@@ -1341,8 +1343,7 @@ if (file_exists(dirname(dirname(__FILE__)) . \'/Settings.php\'))
 }
 // Can\'t find it... just forget it.
 else
-	exit;
-');
+	exit;');
 			fclose($fh);
 		}
 		$errors[] = 'index-php_cannot_create_file';
