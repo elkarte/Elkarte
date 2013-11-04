@@ -4125,7 +4125,7 @@ a.help .icon {
 /* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
 
 /* This one does 1024 screens at default font size. */
-@media screen and (min-width: 50em) and (max-width: 64em) {
+@media screen (max-width: 64em) {
 	.board_latest {
 		min-width: 27em;
 	}
@@ -4137,15 +4137,12 @@ a.help .icon {
 	}
 }
 /* This one does 800 screens at default font size. */
-@media screen and (min-width: 30em) and (max-width: 50em) {
+@media screen (max-width: 50em) {
 	.wrapper {
 		min-width: 98%;
 	}
 	.board_latest {
 		min-width: 20em;
-	}
-	.topic_latest {
-		min-width: 17em;
 	}
 	.board_name {
 		margin: 0 0 0 56px;
@@ -4161,13 +4158,10 @@ a.help .icon {
 	.board_description, .moderators, .childboards {
 		margin: 0 0 0 8px;
 	}
-	.board_stats, .topic_stats {
-		display: none;
-	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
-	position: relative;
-	padding: 0 0 0 12px;
+		position: relative;
+		padding: 0 0 0 12px;
 	}
 	#menu_sidebar {
 		position: absolute;
@@ -4221,13 +4215,7 @@ a.help .icon {
 		padding-left: 64px;
 		border-left: none;
 	}
-	.topic_latest {
-		min-width: 17em;
-	}
 	.board_description, .moderators {
-		display: none;
-	}
-	.board_stats, .topic_stats {
 		display: none;
 	}
 	.topic_info {
@@ -4377,33 +4365,6 @@ a.help .icon {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
 	}
-	/* Playing silly buggers with a sidebar menu option for narrow screens. */
-	#main_container {
-	position: relative;
-	padding: 0 0 0 12px;
-	}
-	#menu_sidebar {
-		position: absolute;
-		left: -0.8em;
-		width: 6px;
-		min-height: 500px;
-		border: 1px solid #aaa;
-		border-radius: 4px;
-		background: #fff;
-		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
-		z-index: 90;
-	}
-	#menu_sidebar ul, #menu_sidebar .category_header {
-		display: none;
-	}
-	#menu_sidebar:hover {
-		width: 200px;
-		padding: 0.8em 1em 1em 0.6em;
-	}
-	#menu_sidebar:hover ul, #menu_sidebar:hover .category_header {
-		display: block;
-	}
-	/* End playing silly buggers. */
 
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */
