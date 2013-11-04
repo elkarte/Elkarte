@@ -15,21 +15,6 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Callback for preg_replace_callback on the query.
- * It allows to replace on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
- * their current values from $user_info.
- * In addition, it performs checks and sanitization on the values sent to the database.
- *
- * @param $matches
- */
-function elk_db_replacement__callback($matches)
-{
-	$db = database();
-
-	return $db->replacement__callback($matches);
-}
-
-/**
  * Database error!
  * Backtrace, log, try to fix.
  *

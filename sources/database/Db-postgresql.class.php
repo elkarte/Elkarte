@@ -226,7 +226,7 @@ class Database_PostgreSQL implements Database
 			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
 
 			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// Clear this global variable.
 			$db_callback = array();
@@ -372,7 +372,7 @@ class Database_PostgreSQL implements Database
 			$db_callback = array($db_values, $connection);
 
 			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// This shouldn't be residing in global space any longer.
 			$db_callback = array();
