@@ -49,27 +49,27 @@ class SplitTopics_Controller extends Action_Controller
 		if (empty($topic))
 			fatal_lang_error('numbers_one_to_nine', false);
 
-		// Are you allowed to split topics?
-		isAllowedTo('split_any');
-
 		// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
 		if (!isset($_REQUEST['xml']))
 			loadTemplate('SplitTopics');
+
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
-			'selectTopics' => 'action_splitSelectTopics',
-			'execute' => 'action_splitExecute',
-			'index' => 'action_splitIndex',
-			'splitSelection' => 'action_splitSelection',
+			'selectTopics' => array($this, 'action_splitSelectTopics', 'permission' => 'split_any'),
+			'execute' => array($this, 'action_splitExecute', 'permission' => 'split_any'),
+			'index' => array($this, 'action_splitIndex', 'permission' => 'split_any'),
+			'splitSelection' => array($this, 'action_splitSelection', 'permission' => 'split_any'),
 		);
 
 		// ?action=splittopics;sa=LETSBREAKIT won't work, sorry.
-		if (empty($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-			$this->action_splitIndex();
-		else
-			$this->{$subActions[$_REQUEST['sa']]}();
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'index';
+
+		$action = new Action();
+		$action->initialize($subActions, 'index');
+		$action->dispatch($subAction);
 	}
 
 	/**

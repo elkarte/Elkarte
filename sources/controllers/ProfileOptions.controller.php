@@ -62,7 +62,8 @@ class ProfileOptions_Controller extends Action_Controller
 			'ignore' => array('action_editIgnoreList', $txt['editIgnoreList']),
 		);
 
-		$context['list_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'buddies';
+		// Set a subaction
+		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'buddies';
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -76,7 +77,7 @@ class ProfileOptions_Controller extends Action_Controller
 		);
 
 		// Pass on to the actual function.
-		$this->{$subActions[$context['list_area']][0]}($memID);
+		$this->{$subActions[$subAction][0]}($memID);
 	}
 
 	/**

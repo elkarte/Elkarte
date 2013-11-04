@@ -154,6 +154,7 @@ class News_Controller extends Action_Controller
 		// @todo Birthdays?
 
 		// List all the different types of data they can pull.
+		// @todo what are the the [1] values used for in this array?
 		$subActions = array(
 			'recent' => array('action_xmlrecent', 'recent-post'),
 			'news' => array('action_xmlnews', 'article'),
@@ -164,11 +165,10 @@ class News_Controller extends Action_Controller
 		// Easy adding of sub actions
 	 	call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
-		if (empty($_GET['sa']) || !isset($subActions[$_GET['sa']]))
-			$_GET['sa'] = 'recent';
+		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'recent';
 
 		// @todo Temp - webslices doesn't do everything yet. (only recent posts)
-		if ($xml_format == 'webslice' && $_GET['sa'] != 'recent')
+		if ($xml_format == 'webslice' && $subAction != 'recent')
 			$xml_format = 'rss2';
 		// If this is webslices we kinda cheat - we allow a template that we call direct for the HTML, and we override the CDATA.
 		elseif ($xml_format == 'webslice')
@@ -179,7 +179,7 @@ class News_Controller extends Action_Controller
 		}
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $_GET['action'], $_GET['limit'], $_GET['sa']);
+		$cachekey = array($xml_format, $_GET['action'], $_GET['limit'], $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
 			if (isset($_REQUEST[$var]))
 				$cachekey[] = $_REQUEST[$var];
@@ -192,7 +192,7 @@ class News_Controller extends Action_Controller
 
 		if (empty($xml))
 		{
-			$xml = $this->{$subActions[$_GET['sa']][0]}($xml_format);
+			$xml = $this->{$subActions[$subAction][0]}($xml_format);
 
 			if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
 			|| (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))

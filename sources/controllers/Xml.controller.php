@@ -45,10 +45,11 @@ class Xml_Controller extends Action_Controller
 		$action->initialize($subActions);
 
 		// Valid action?
-		if (!isset($_REQUEST['sa'], $subActions[$_REQUEST['sa']]))
+		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : '';
+
+		// Act a  bit special for XML, probably never see it anyway :P
+		if (empty($subAction))
 			fatal_lang_error('no_access', false);
-		else
-			$subAction = $_REQUEST['sa'];
 
 		// Off we go then, (it will check permissions)
 		$action->dispatch($subAction);

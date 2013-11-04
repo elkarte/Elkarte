@@ -39,7 +39,7 @@ class ProfileHistory_Controller extends Action_Controller
 			'logins' => array('action_tracklogin', $txt['trackLogins']),
 		);
 
-		$context['history_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'activity';
+		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'activity';
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -58,10 +58,11 @@ class ProfileHistory_Controller extends Action_Controller
 			unset($context[$context['profile_menu_name']]['tab_data']['edits']);
 
 		// Set a page title.
-		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$context['history_area']][1] . ' - ' . $user_profile[$memID]['real_name'];
+		$context['history_area'] = $subAction;
+		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction][1] . ' - ' . $user_profile[$memID]['real_name'];
 
 		// Pass on to the actual method.
-		$this->{$subActions[$context['history_area']][0]}($memID);
+		$this->{$subActions[$subAction][0]}($memID);
 	}
 
 	/**

@@ -1371,17 +1371,19 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$subActions = array(
-			'log' => array('action_viewWarningLog'),
-			'templateedit' => array('action_modifyWarningTemplate', 'issue_warning'),
-			'templates' => array('action_viewWarningTemplates', 'issue_warning'),
-		);
-
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']]))? $_REQUEST['sa'] : 'log';
+		require_once(SUBSDIR . '/Action.class.php');
 
 		// Some of this stuff is overseas, so to speak.
 		loadTemplate('ModerationCenter');
 		loadLanguage('Profile');
+
+		$subActions = array(
+			'log' => array($this, 'action_viewWarningLog'),
+			'templateedit' => array($this, 'action_modifyWarningTemplate', 'permission' => 'issue_warning'),
+			'templates' => array($this, 'action_viewWarningTemplates', 'permission' => 'issue_warning'),
+		);
+
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'log';
 
 		// Setup the admin tabs.
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -1390,7 +1392,9 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// Call the right function.
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		$action = new Action();
+		$action->initialize($subActions, 'log');
+		$action->dispatch($subAction);
 	}
 
 	/**
