@@ -4270,8 +4270,8 @@ a.help .icon {
 		clear: both;
 	}
 	.avatar>.linklevel1>.avatar {
-		max-width: 20px;
-		max-height: 20px;
+		max-width: 40px;
+		max-height: 40px;
 	}
 	.poster_online, .icons img {
 		display: none;
@@ -4364,6 +4364,35 @@ a.help .icon {
 	.menulevel3 {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
+	}
+	.poster {
+		float: none;
+		padding: 0px 1em 0px 1.5em;
+	}
+	.poster .subsections {
+		max-width: 120px;
+		max-height: 1.5em;
+	}
+	.poster .subsections>a {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.poster .membergroup {
+		float: right;
+	}
+	.poster .title {
+		display: none;
+	}
+	.poster .subsections, .poster .avatar {
+		float: left;
+	}
+	.poster:after, .posterarea:before {
+		display: block;
+		clear: both;
+		content:"";
+		border-bottom: 1px solid #BFBFBF;
+		padding-bottom: 3px;
 	}
 
 	/*	$MODERATE	*/
