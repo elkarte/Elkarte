@@ -946,35 +946,40 @@ class Admin_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		isAllowedTo('admin_forum');
-
 		// What can we search for?
-		$subactions = array(
-			'internal' => 'action_search_internal',
-			'online' => 'action_search_doc',
-			'member' => 'action_search_member',
+		$subActions = array(
+			'internal' => array($this, 'action_search_internal', 'permission' => 'admin_forum'),
+			'online' => array($this, 'action_search_doc', 'permission' => 'admin_forum'),
+			'member' => array($this, 'action_search_member', 'permission' => 'admin_forum'),
 		);
 
-		$context['search_type'] = !isset($_REQUEST['search_type']) || !isset($subactions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
-		$context['search_term'] = isset($_REQUEST['search_term']) ? Util::htmlspecialchars($_REQUEST['search_term'], ENT_QUOTES) : '';
+		$subAction = !isset($_REQUEST['search_type']) || !isset($subActions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
 
-		$context['sub_template'] = 'admin_search_results';
-		$context['page_title'] = $txt['admin_search_results'];
-
-		// Keep track of what the admin wants.
-		if (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] != $context['search_type'])
+		// Keep track of what the admin wants in terms of advanced or not
+		if (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] != $subAction)
 		{
-			$context['admin_preferences']['sb'] = $context['search_type'];
+			$context['admin_preferences']['sb'] = $subAction;
 
 			// Update the preferences.
 			require_once(SUBSDIR . '/Admin.subs.php');
 			updateAdminPreferences();
 		}
 
+		// Setup for the template
+		$context['search_type'] = $subAction;
+		$context['search_term'] = isset($_REQUEST['search_term']) ? Util::htmlspecialchars($_REQUEST['search_term'], ENT_QUOTES) : '';
+		$context['sub_template'] = 'admin_search_results';
+		$context['page_title'] = $txt['admin_search_results'];
+
+		// You did remember to enter something to search for, otherwise its easy
 		if (trim($context['search_term']) == '')
 			$context['search_results'] = array();
 		else
-			$this->{$subactions[$context['search_type']]}();
+		{
+			$action = new Action();
+			$action->initialize($subActions, 'log');
+			$action->dispatch($subAction);
+		}
 	}
 
 	/**

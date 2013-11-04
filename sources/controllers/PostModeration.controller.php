@@ -34,19 +34,22 @@ class PostModeration_Controller extends Action_Controller
 		loadLanguage('ModerationCenter');
 		loadTemplate('ModerationCenter');
 
+		require_once(SUBSDIR . '/Action.class.php');
+
 		// Allowed sub-actions, you know the drill by now!
-		$subactions = array(
-			'approve' => 'action_approve',
-			'attachments' => 'action_unapproved_attachments',
-			'replies' => 'action_unapproved',
-			'topics' => 'action_unapproved',
+		$subActions = array(
+			'approve' =>  array($this, 'action_approve'),
+			'attachments' =>  array($this, 'action_unapproved_attachments'),
+			'replies' =>  array($this, 'action_unapproved'),
+			'topics' =>  array($this, 'action_unapproved'),
 		);
 
 		// Pick something valid...
-		if (!isset($_REQUEST['sa']) || !isset($subactions[$_REQUEST['sa']]))
-			$_REQUEST['sa'] = 'replies';
+		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? 'replies' : $_REQUEST['sa'];
 
-		$this->{$subactions[$_REQUEST['sa']]}();
+		$action = new Action();
+		$action->initialize($subActions, 'replies');
+		$action->dispatch($subAction);
 	}
 
 	/**

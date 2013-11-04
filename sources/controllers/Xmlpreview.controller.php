@@ -34,7 +34,9 @@ class XmlPreview_Controller extends Action_Controller
 		);
 
 		// Valid action?
-		if (!isset($_REQUEST['item'], $subActions[$_REQUEST['item']]))
+		$subAction = !isset($_REQUEST['item']) || !isset($subActions[$_REQUEST['item']]) ? null : $_REQUEST['item'];
+
+		if (empty($subAction))
 			return;
 
 		// Set up the template and default sub-template.
@@ -42,7 +44,7 @@ class XmlPreview_Controller extends Action_Controller
 		$context['sub_template'] = 'generic_xml';
 
 		// A preview it is then
-		$this->{$subActions[$_REQUEST['item']][0]}();
+		$this->{$subActions[$subAction][0]}();
 	}
 
 	/**

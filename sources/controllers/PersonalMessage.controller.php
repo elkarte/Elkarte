@@ -28,53 +28,6 @@ if (!defined('ELK'))
 class PersonalMessage_Controller extends Action_Controller
 {
 	/**
-	 * This is the main function of personal messages, called before the action handler.
-	 * PersonalMessages is a menu-based controller.
-	 * It sets up the menu.
-	 * @todo and call from the menu the appropriate method/function
-	 * for the current area.
-	 *
-	 * @see Action_Controller::action_index()
-	 */
-	function action_index()
-	{
-		global $context;
-
-		// Finally all the things we know how to do
-		$subActions = array(
-			'manlabels' => 'action_manlabels',
-			'manrules' => 'action_manrules',
-			'pmactions' => 'action_pmactions',
-			'prune' => 'action_prune',
-			'removeall' => 'action_removeall',
-			'removeall2' => 'action_removeall2',
-			'report' => 'action_report',
-			'search' => 'action_search',
-			'search2' => 'action_search2',
-			'send' => 'action_send',
-			'send2' => 'action_send2',
-			'settings' => 'action_settings',
-			'showpmdrafts' => 'action_showpmdrafts',
-		);
-
-		// Known action, go to it, otherwise the inbox for you
-		if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		{
-			// Set the index bar
-			messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
-			$this->action_folder();
-		}
-		else
-		{
-			if (!isset($_REQUEST['xml']))
-				messageIndexBar($_REQUEST['sa']);
-
-			// So it was set - let's go to that action.
-			$this->{$subActions[$_REQUEST['sa']]}();
-		}
-	}
-
-	/**
 	 * This method is executed before any other in this file
 	 * (when the class is loaded by the dispatcher).
 	 * It sets the context, load templates and language file(s), as necessary
@@ -195,6 +148,63 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Preferences...
 		$context['display_mode'] = $user_settings['pm_prefs'] & 3;
+	}
+
+	/**
+	 * This is the main function of personal messages, called before the action handler.
+	 * PersonalMessages is a menu-based controller.
+	 * It sets up the menu.
+	 * @todo and call from the menu the appropriate method/function
+	 * for the current area.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	function action_index()
+	{
+		global $context;
+
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// Finally all the things we know how to do
+		$subActions = array(
+			'manlabels' => array($this, 'action_manlabels', 'permissions' => 'pm_read'),
+			'manrules' => array($this, 'action_manrules', 'permissions' => 'pm_read'),
+			'pmactions' => array($this, 'action_pmactions', 'permissions' => 'pm_read'),
+			'prune' => array($this, 'action_prune', 'permissions' => 'pm_read'),
+			'removeall' => array($this, 'action_removeall', 'permissions' => 'pm_read'),
+			'removeall2' => array($this, 'action_removeall2', 'permissions' => 'pm_read'),
+			'report' => array($this, 'action_report', 'permissions' => 'pm_read'),
+			'search' => array($this, 'action_search', 'permissions' => 'pm_read'),
+			'search2' => array($this, 'action_search2', 'permissions' => 'pm_read'),
+			'send' => array($this, 'action_send', 'permissions' => 'pm_read'),
+			'send2' => array($this, 'action_send2', 'permissions' => 'pm_read'),
+			'settings' => array($this, 'action_settings', 'permissions' => 'pm_read'),
+			'showpmdrafts' => array($this, 'action_showpmdrafts', 'permissions' => 'pm_read'),
+			'inbox' => array($this, 'action_folder', 'permissions' => 'pm_read'),
+		);
+
+		// Known action, go to it, otherwise the inbox for you
+		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? 'inbox' : $_REQUEST['sa'];
+
+		// Set up our action array
+		$action = new Action();
+		$action->initialize($subActions, 'inbox');
+
+		// Known action, go to it, otherwise the inbox for you
+		if ($subAction === 'inbox')
+		{
+			// Set the index bar
+			messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
+			$action->dispatch($subAction);
+		}
+		else
+		{
+			if (!isset($_REQUEST['xml']))
+				messageIndexBar($_REQUEST['sa']);
+
+			// So it was set - let's go to that action.
+			$action->dispatch($subAction);
+		}
 	}
 
 	/**
