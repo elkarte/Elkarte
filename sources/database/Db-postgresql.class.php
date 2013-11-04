@@ -74,6 +74,8 @@ class Database_PostgreSQL implements Database
 			}
 		}
 
+		self::$_db->_connection = $connection;
+
 		return $connection;
 	}
 

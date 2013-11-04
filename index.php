@@ -26,7 +26,7 @@ define('ELK', 1);
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
-error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
+error_reporting(E_ALL | E_STRICT);
 $time_start = microtime(true);
 
 // Turn on output buffering.

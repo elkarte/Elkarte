@@ -140,6 +140,7 @@ class TestRequest extends UnitTestCase
 	function testActionAsArray()
 	{
 		$_GET['action'] = array('test1', 'test2');
+		$this->expectError('Array to string conversion');
 		$this->request->parseRequest();
 
 		// we expect 'action' as string
