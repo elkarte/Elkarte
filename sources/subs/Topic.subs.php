@@ -1061,7 +1061,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
  * @param int $topic
  * @param bool $on = false
  */
-function setTopicRegard($id_member, $topic, $on = false)
+function setTopicWatch($id_member, $topic, $on = false)
 {
 	global $user_info;
 
@@ -1071,10 +1071,10 @@ function setTopicRegard($id_member, $topic, $on = false)
 	$was_set = getLoggedTopics($user_info['id'], array($topic));
 
 	// Set topic unwatched on/off for this topic.
-	$db->insert(empty($was_set) ? 'ignore' : 'replace',
+	$db->insert(empty($was_set[$topic]) ? 'ignore' : 'replace',
 		'{db_prefix}log_topics',
 		array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'unwatched' => 'int'),
-		array($id_member, $topic, !empty($was_set['id_msg']) ? $was_set['id_msg'] : 0, $on ? 1 : 0),
+		array($id_member, $topic, !empty($was_set[$topic]['id_msg']) ? $was_set[$topic]['id_msg'] : 0, $on ? 1 : 0),
 		array('id_member', 'id_topic')
 	);
 }
@@ -1845,7 +1845,7 @@ function getLoggedTopics($member, $topics)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_topic, unwatched
+		SELECT id_topic, id_msg, unwatched
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})
 			AND id_member = {int:current_user}',
@@ -1856,7 +1856,7 @@ function getLoggedTopics($member, $topics)
 	);
 	$logged_topics = array();
 	while ($row = $db->fetch_assoc($request))
-		$logged_topics[$row['id_topic']] = $row['unwatched'];
+		$logged_topics[$row['id_topic']] = $row;
 	$db->free_result($request);
 
 	return $logged_topics;

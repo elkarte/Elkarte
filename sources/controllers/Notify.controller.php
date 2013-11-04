@@ -280,7 +280,7 @@ class Notify_Controller extends Action_Controller
 		{
 			checkSession('get');
 
-			setTopicRegard($user_info['id'], $topic, $_GET['sa'] == 'on');
+			setTopicWatch($user_info['id'], $topic, $_GET['sa'] == 'on');
 		}
 
 		// Back to the topic.
@@ -334,7 +334,7 @@ class Notify_Controller extends Action_Controller
 		// our topic functions are here
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		setTopicRegard($user_info['id'], $topic, $_GET['sa'] == 'on');
+		setTopicWatch($user_info['id'], $topic, $_GET['sa'] == 'on');
 
 		$context['xml_data'] = array(
 			'text' => $_GET['sa'] == 'on' ? $txt['watch'] : $txt['unwatch'],
