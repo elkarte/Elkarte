@@ -42,6 +42,7 @@ $databases = array(
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
 			return true;
 		'),
+		'require_db_confirm' => true,
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
@@ -65,6 +66,7 @@ $databases = array(
 
 			return true;
 		'),
+		'require_db_confirm' => true,
 	),
 );
 
@@ -1176,7 +1178,7 @@ function action_adminAccount()
 	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']));
 	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']));
 
-	$incontext['require_db_confirm'] = empty($db_type);
+	$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
 
 	// Only allow create an admin account if they don't have one already.
 	$request = $db->query('', '
