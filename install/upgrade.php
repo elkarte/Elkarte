@@ -561,7 +561,7 @@ function action_welcomeLogin()
 	// Check for some key files - one template, one language, and a new and an old source file.
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
-		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php')
+		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
 		&& @file_exists(dirname(__FILE__) . '/upgrade_elk_1-0_' . $db_type . '.sql');
 
 	// Need scripts to migrate from SMF?

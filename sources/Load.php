@@ -2526,7 +2526,7 @@ function loadDatabase()
 	require_once(SOURCEDIR . '/database/Database.subs.php');
 
 	// Figure out what type of database we are using.
-	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
+	if (empty($db_type) || !file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
 		$db_type = 'mysql';
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.

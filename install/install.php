@@ -301,7 +301,6 @@ function load_database()
 	if (!$db_connection)
 	{
 		require_once(SOURCEDIR . '/database/Database.subs.php');
-		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
 			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
@@ -747,9 +746,9 @@ function action_databaseSettings()
 			define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 		// Better find the database file!
-		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
+		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
 		{
-			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.subs.php');
+			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.class.php');
 			return false;
 		}
 

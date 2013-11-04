@@ -26,7 +26,6 @@
 function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array(), $db_type = 'mysql')
 {
 	require_once(SOURCEDIR . '/database/Db.php');
-	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 	require_once(SOURCEDIR . '/database/Db-' . $db_type . '.class.php');
 
 	// quick 'n dirty initialization of the right database class.
@@ -43,7 +42,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  *
  * @param string $type = 'extra'
  */
-function db_extend ($type = 'extra')
+function db_extend($type = 'extra')
 {
 	// this can be removed.
 }
