@@ -141,7 +141,8 @@
 
 						// IE needs unselectable attr to stop it from unselecting the text in the editor.
 						// The editor can cope if IE does unselect the text it's just not nice.
-						if (base.ieUnselectable !== false) {
+						if (base.ieUnselectable !== false)
+						{
 							content = $(content);
 							content.find(':not(input,textarea)').filter(function() {return this.nodeType === 1;}).attr('unselectable', 'on');
 						}
@@ -208,7 +209,8 @@ $.sceditor.command
 				var val = content.find("#link").val(),
 					description = content.find("#des").val();
 
-				if (val !== "" && val !== "ftp://") {
+				if (val !== "" && val !== "ftp://")
+				{
 					// needed for IE to reset the last range
 					editor.focus();
 
