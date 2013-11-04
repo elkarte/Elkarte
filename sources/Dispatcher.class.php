@@ -140,7 +140,7 @@ class Site_Dispatcher
 			'coppa' => array('Register.controller.php', 'Register_Controller', 'action_coppa'),
 			'deletemsg' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_deletemsg'),
 			'dlattach' => array('Attachment.controller.php', 'Attachment_Controller', 'action_index'),
-			'disregardtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_disregardtopic'),
+			'unwatchtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_unwatchtopic'),
 			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
 			'editpoll2' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll2'),
 			'findmember' => array('Members.controller.php', 'Members_Controller', 'action_findmember'),

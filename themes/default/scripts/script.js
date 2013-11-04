@@ -1690,7 +1690,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 			if (confirm_elem.length === 1)
 				var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
 
-			$('.' + btn.className).each(function() {
+			$('.' + btn.className.replace(/(list|link)level\d/g, '').trim()).each(function() {
 				// @todo: the span should be moved somewhere in themes.js?
 				if (text.length === 1)
 					$(this).html('<span>' + text[0].firstChild.nodeValue.removeEntities() + '</span>');
@@ -1788,9 +1788,9 @@ function notifyboardButton(btn)
 }
 
 /**
- * Ajaxify the "disregard" button in Display
+ * Ajaxify the "unwatch" button in Display
  */
-function disregardButton(btn)
+function unwatchButton(btn)
 {
 	toggleButtonAJAX(btn);
 	return false;

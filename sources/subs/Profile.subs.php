@@ -2557,7 +2557,7 @@ function getNumAttachments($boardsAllowed, $memID)
 }
 
 /**
- * Get the relevant topics in the disregarded list
+ * Get the relevant topics in the unwatched list
  * (used by createList() callbacks)
  *
  * @param int $start
@@ -2565,7 +2565,7 @@ function getNumAttachments($boardsAllowed, $memID)
  * @param string $sort
  * @param int $memID
  */
-function getDisregardedBy($start, $items_per_page, $sort, $memID)
+function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 {
 	$db = database();
 
@@ -2578,7 +2578,7 @@ function getDisregardedBy($start, $items_per_page, $sort, $memID)
 			LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)' . (in_array($sort, array('mem.real_name', 'mem.real_name DESC', 'mem.poster_time', 'mem.poster_time DESC')) ? '
 			LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)' : '') . '
 		WHERE lt.id_member = {int:current_member}
-			AND disregarded = 1
+			AND lt.unwatched = 1
 			AND {query_see_board}
 		ORDER BY {raw:sort}
 		LIMIT {int:offset}, {int:limit}',
@@ -2619,11 +2619,11 @@ function getDisregardedBy($start, $items_per_page, $sort, $memID)
 }
 
 /**
- * Count the number of topics in the disregarded list
+ * Count the number of topics in the unwatched list
  *
  * @param int $memID
  */
-function getNumDisregardedBy($memID)
+function getNumUnwatchedBy($memID)
 {
 	$db = database();
 
@@ -2634,16 +2634,16 @@ function getNumDisregardedBy($memID)
 		LEFT JOIN {db_prefix}topics AS t ON (lt.id_topic = t.id_topic)
 		LEFT JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 		WHERE id_member = {int:current_member}
-			AND disregarded = 1
+			AND unwatched = 1
 			AND {query_see_board}',
 		array(
 			'current_member' => $memID,
 		)
 	);
-	list ($disregardedCount) = $db->fetch_row($request);
+	list ($unwatchedCount) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return $disregardedCount;
+	return $unwatchedCount;
 }
 
 /**

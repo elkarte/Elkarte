@@ -121,7 +121,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 
 		// @todo SLOW This query seems to eat it sometimes.
 		$result = $db->query('', '
-			SELECT lt.id_topic, lt.disregarded
+			SELECT lt.id_topic, lt.unwatched
 			FROM {db_prefix}log_topics AS lt
 				INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
 					AND t.id_board IN ({array_int:board_list}))
@@ -137,7 +137,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 		$update_topics = array();
 		while ($row = $db->fetch_assoc($result))
 		{
-			if (!empty($row['disregarded']))
+			if (!empty($row['unwatched']))
 				$update_topics[] = array(
 					$user_info['id'],
 					$modSettings['maxMsgID'],
@@ -156,7 +156,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 					'id_member' => 'int',
 					'id_msg' => 'int',
 					'id_topic' => 'int',
-					'disregarded' => 'int'
+					'unwatched' => 'int'
 				),
 				$update_topics,
 				array('id_topic', 'id_member')

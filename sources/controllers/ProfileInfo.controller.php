@@ -398,7 +398,7 @@ class ProfileInfo_Controller extends Action_Controller
 				),
 				'topics' => array(
 				),
-				'disregardedtopics' => array(
+				'unwatchedtopics' => array(
 				),
 				'attach' => array(
 				),
@@ -415,9 +415,9 @@ class ProfileInfo_Controller extends Action_Controller
 		// If we're specifically dealing with attachments use that function!
 		if (isset($_GET['sa']) && $_GET['sa'] == 'attach')
 			return $this->action_showAttachments($memID);
-		// Instead, if we're dealing with disregarded topics (and the feature is enabled) use that other function.
-		elseif (isset($_GET['sa']) && $_GET['sa'] == 'disregardedtopics' && $modSettings['enable_disregard'])
-			return $this->action_showDisregarded($memID);
+		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
+		elseif (isset($_GET['sa']) && $_GET['sa'] == 'unwatchedtopics' && $modSettings['enable_unwatch'])
+			return $this->action_showUnwatched($memID);
 
 		// Are we just viewing topics?
 		$context['is_topics'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? true : false;
@@ -712,36 +712,36 @@ class ProfileInfo_Controller extends Action_Controller
 	}
 
 	/**
-	 * Show all the disregarded topics.
+	 * Show all the unwatched topics.
 	 */
-	public function action_showDisregarded()
+	public function action_showUnwatched()
 	{
 		global $txt, $user_info, $scripturl, $modSettings, $context;
 
 		$memID = currentMemberID();
 
 		// Only the owner can see the list (if the function is enabled of course)
-		if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
+		if ($user_info['id'] != $memID || !$modSettings['enable_unwatch'])
 			return;
 
 		require_once(SUBSDIR . '/List.class.php');
 
 		// And here they are: the topics you don't like
 		$listOptions = array(
-			'id' => 'disregarded_topics',
+			'id' => 'unwatched_topics',
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['disregarded_topics_none'],
-			'base_href' => $scripturl . '?action=profile;area=showposts;sa=disregardedtopics;u=' . $memID,
+			'no_items_label' => $txt['unwatched_topics_none'],
+			'base_href' => $scripturl . '?action=profile;area=showposts;sa=unwatchedtopics;u=' . $memID,
 			'default_sort_col' => 'started_on',
 			'get_items' => array(
-				'function' => array($this, 'list_getDisregarded'),
+				'function' => array($this, 'list_getUnwatched'),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumDisregarded'),
+				'function' => array($this, 'list_getNumUnwatched'),
 				'params' => array(
 					$memID,
 				),
@@ -830,7 +830,7 @@ class ProfileInfo_Controller extends Action_Controller
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'disregarded_topics';
+		$context['default_list'] = 'unwatched_topics';
 	}
 
 	/**
@@ -1112,7 +1112,7 @@ class ProfileInfo_Controller extends Action_Controller
 	}
 
 	/**
-	 * Get the relevant topics in the disregarded list
+	 * Get the relevant topics in the unwatched list
 	 * Callback for createList()
 	 *
 	 * @param int $start
@@ -1120,19 +1120,19 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param int $memID
 	 */
-	function list_getDisregarded($start, $items_per_page, $sort, $memID)
+	function list_getUnwatcheded($start, $items_per_page, $sort, $memID)
 	{
-		return getDisregardedBy($start, $items_per_page, $sort, $memID);
+		return getUnwatchedBy($start, $items_per_page, $sort, $memID);
 	}
 
 	/**
-	 * Count the number of topics in the disregarded list
+	 * Count the number of topics in the unwatched list
 	 * Callback for createList()
 	 *
 	 * @param int $memID
 	 */
-	public function list_getNumDisregarded($memID)
+	public function list_getNumUnwatched($memID)
 	{
-		return getNumDisregardedBy($memID);
+		return getNumUnwatchedBy($memID);
 	}
 }
