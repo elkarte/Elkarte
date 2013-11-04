@@ -1788,9 +1788,9 @@ function notifyboardButton(btn)
 }
 
 /**
- * Ajaxify the "disregard" button in Display
+ * Ajaxify the "unwatch" button in Display
  */
-function disregardButton(btn)
+function unwatchButton(btn)
 {
 	toggleButtonAJAX(btn);
 	return false;

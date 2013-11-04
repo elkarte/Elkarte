@@ -118,7 +118,7 @@ class Profile_Controller extends Action_Controller
 					'subsections' => array(
 						'messages' => array($txt['showMessages'], array('profile_view_own', 'profile_view_any')),
 						'topics' => array($txt['showTopics'], array('profile_view_own', 'profile_view_any')),
-						'disregardedtopics' => array($txt['showDisregarded'], array('profile_view_own', 'profile_view_any'), 'enabled' => $modSettings['enable_disregard'] && $context['user']['is_owner']),
+						'unwatchedtopics' => array($txt['showUnwatched'], array('profile_view_own', 'profile_view_any'), 'enabled' => $modSettings['enable_unwatch'] && $context['user']['is_owner']),
 						'attach' => array($txt['showAttachments'], array('profile_view_own', 'profile_view_any')),
 					),
 					'permission' => $context['user']['is_owner'] ? array('profile_view_own') : array('profile_view_any'),

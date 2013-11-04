@@ -54,7 +54,7 @@ VALUES
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
-	('enable_disregard', 0);
+	('enable_unwatch', 0);
 INSERT IGNORE INTO {$db_prefix}settings
 	(variable, value)
 VALUES
@@ -276,17 +276,17 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
---- Adding support for topic disregard
+--- Adding support for topic unwatch
 /******************************************************************************/
 ---# Adding new columns to log_topics...
 ---{
 upgrade_query("
 	ALTER TABLE {$db_prefix}log_topics
-	ADD COLUMN disregarded int NOT NULL DEFAULT '0'");
+	ADD COLUMN unwatched int NOT NULL DEFAULT '0'");
 ---}
 
 UPDATE {$db_prefix}log_topics
-SET disregarded = 0;
+SET unwatched = 0;
 ---#
 
 /******************************************************************************/

@@ -61,7 +61,7 @@ class TestDispatcher extends UnitTestCase
 			'deletemsg' => 'RemoveTopic',
 			'dlattach' => 'Attachment',
 			'findmember' => 'Members',
-			'disregardtopic' => 'Notify',
+			'unwatchtopic' => 'Notify',
 			'quickhelp' => 'Help',
 			'login' => 'Auth',
 			'login2' => 'Auth',

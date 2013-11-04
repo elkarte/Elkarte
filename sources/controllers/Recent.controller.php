@@ -479,14 +479,14 @@ class Recent_Controller extends Action_Controller
 				CREATE TEMPORARY TABLE {db_prefix}log_topics_unread (
 					PRIMARY KEY (id_topic)
 				)
-				SELECT lt.id_topic, lt.id_msg, lt.disregarded
+				SELECT lt.id_topic, lt.id_msg, lt.unwatched
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic)
 				WHERE lt.id_member = {int:current_member}
 					AND t.' . $query_this_board . (empty($earliest_msg) ? '' : '
 					AND t.id_last_msg > {int:earliest_msg}') . ($modSettings['postmod_active'] ? '
-					AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_disregard'] ? '
-					AND lt.disregarded != 1' : ''),
+					AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+					AND lt.unwatched != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -509,7 +509,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg > {int:earliest_msg}' : '') . '
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
 					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -569,7 +569,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg >= {int:min_message}
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
 					($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:sort}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($query_parameters, array(
@@ -595,7 +595,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
 					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -660,7 +660,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg >= {int:min_message}
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' .
 					($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($query_parameters, array(
@@ -713,7 +713,7 @@ class Recent_Controller extends Action_Controller
 					WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 						AND t.id_board = {int:current_board}' : '') .
 						($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-						($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+						($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 					GROUP BY m.id_topic',
 					array(
 						'current_board' => $board,
@@ -766,8 +766,8 @@ class Recent_Controller extends Action_Controller
 					WHERE t.' . $query_this_board . '
 						AND m.id_member = {int:current_member}
 						AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
-						AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_disregard'] ? '
-						AND IFNULL(lt.disregarded, 0) != 1' : ''),
+						AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+						AND IFNULL(lt.unwatched, 0) != 1' : ''),
 					array_merge($query_parameters, array(
 						'current_member' => $user_info['id'],
 						'is_approved' => 1,
@@ -831,7 +831,7 @@ class Recent_Controller extends Action_Controller
 						AND t.id_last_msg >= {int:min_message}
 						AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg' .
 						($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-						($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+						($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 					ORDER BY {raw:order}
 					LIMIT {int:offset}, {int:limit}',
 					array_merge($query_parameters, array(

@@ -471,7 +471,7 @@ function moveTopics($topics, $toBoard)
 	// Move over the mark_read data. (because it may be read and now not by some!)
 	$SaveAServer = max(0, $modSettings['maxMsgID'] - 50000);
 	$request = $db->query('', '
-		SELECT lmr.id_member, lmr.id_msg, t.id_topic, IFNULL(lt.disregarded, 0) as disregarded
+		SELECT lmr.id_member, lmr.id_msg, t.id_topic, IFNULL(lt.unwatched, 0) as unwatched
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board
 				AND lmr.id_msg > t.id_first_msg AND lmr.id_msg > {int:protect_lmr_msg})
@@ -486,7 +486,7 @@ function moveTopics($topics, $toBoard)
 	$log_topics = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$log_topics[] = array($row['id_member'], $row['id_topic'], $row['id_msg'], $row['disregarded']);
+		$log_topics[] = array($row['id_member'], $row['id_topic'], $row['id_msg'], $row['unwatched']);
 
 		// Prevent queries from getting too big. Taking some steam off.
 		if (count($log_topics) > 500)
@@ -785,7 +785,7 @@ function markTopicsRead($mark_topics, $was_set = false)
 	$db->insert($was_set ? 'replace' : 'ignore',
 		'{db_prefix}log_topics',
 		array(
-			'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int',
+			'id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'unwatched' => 'int',
 		),
 		$mark_topics,
 		array('id_member', 'id_topic')
@@ -1070,10 +1070,10 @@ function setTopicRegard($id_member, $topic, $on = false)
 	// find the current entry if it exists that is
 	$was_set = getLoggedTopics($user_info['id'], array($topic));
 
-	// Set topic disregard on/off for this topic.
+	// Set topic unwatched on/off for this topic.
 	$db->insert(empty($was_set) ? 'ignore' : 'replace',
 		'{db_prefix}log_topics',
-		array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'disregarded' => 'int'),
+		array('id_member' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'unwatched' => 'int'),
 		array($id_member, $topic, !empty($was_set['id_msg']) ? $was_set['id_msg'] : 0, $on ? 1 : 0),
 		array('id_member', 'id_topic')
 	);
@@ -1089,7 +1089,7 @@ function setTopicRegard($id_member, $topic, $on = false)
  * @param string $full defines the values returned by the function:
  *             - if empty returns only the data from {db_prefix}topics
  *             - if 'message' returns also informations about the message (subject, body, etc.)
- *             - if 'all' returns additional infos about the read/disregard status
+ *             - if 'all' returns additional infos about the read/unwatched status
  * @param array $selects (optional from integation)
  * @param array $tables (optional from integation)
  */
@@ -1127,7 +1127,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
-			' . (!$user_info['is_guest'] ? ', IFNULL(lt.disregarded, 0) as disregarded' : '') : '') .
+			' . (!$user_info['is_guest'] ? ', IFNULL(lt.unwatched, 0) as unwatched' : '') : '') .
 			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($follow_ups_table ? '
@@ -1836,7 +1836,7 @@ function toggleTopicSticky($topics)
  *
  * @param int $member a member id
  * @param array $topics an array of topics
- * @return array an array of topics in the table (key) and its disregard status (value)
+ * @return array an array of topics in the table (key) and its unwatched status (value)
  *
  * @todo find a better name
  */
@@ -1845,7 +1845,7 @@ function getLoggedTopics($member, $topics)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_topic, disregarded
+		SELECT id_topic, unwatched
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:selected_topics})
 			AND id_member = {int:current_user}',
@@ -1856,7 +1856,7 @@ function getLoggedTopics($member, $topics)
 	);
 	$logged_topics = array();
 	while ($row = $db->fetch_assoc($request))
-		$logged_topics[$row['id_topic']] = $row['disregarded'];
+		$logged_topics[$row['id_topic']] = $row['unwatched'];
 	$db->free_result($request);
 
 	return $logged_topics;
@@ -2324,7 +2324,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	// Copy log topic entries.
 	// @todo This should really be chunked.
 	$request = $db->query('', '
-		SELECT id_member, id_msg, disregarded
+		SELECT id_member, id_msg, unwatched
 		FROM {db_prefix}log_topics
 		WHERE id_topic = {int:id_topic}',
 		array(
@@ -2335,7 +2335,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	{
 		$replaceEntries = array();
 		while ($row = $db->fetch_assoc($request))
-			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['disregarded']);
+			$replaceEntries[] = array($row['id_member'], $split2_ID_TOPIC, $row['id_msg'], $row['unwatched']);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		markTopicsRead($replaceEntries, false);
@@ -2806,9 +2806,9 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 	);
 
 	// Merge log topic entries.
-	// The disregard setting comes from the oldest topic
+	// The unwatched setting comes from the oldest topic
 	$request = $db->query('', '
-		SELECT id_member, MIN(id_msg) AS new_id_msg, disregarded
+		SELECT id_member, MIN(id_msg) AS new_id_msg, unwatched
 		FROM {db_prefix}log_topics
 		WHERE id_topic IN ({array_int:topics})
 		GROUP BY id_member',
@@ -2821,7 +2821,7 @@ function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_
 	{
 		$replaceEntries = array();
 		while ($row = $db->fetch_assoc($request))
-			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
+			$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['unwatched']);
 
 		markTopicsRead($replaceEntries, true);
 		unset($replaceEntries);

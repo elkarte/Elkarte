@@ -202,7 +202,7 @@ class MarkRead_Controller extends Action_Controller
 		}
 
 		// Blam, unread!
-		markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['disregarded']), true);
+		markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['unwatched']), true);
 
 		return 'board=' . $board . '.0';
 	}

@@ -595,7 +595,7 @@ class ManageThemes_Controller extends Action_Controller
 			// Make sure items are cast correctly.
 			foreach ($context['theme_settings'] as $item)
 			{
-				// Disregard this item if this is just a separator.
+				// Unwatch this item if this is just a separator.
 				if (!is_array($item))
 					continue;
 
