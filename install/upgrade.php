@@ -2767,7 +2767,7 @@ function loadEssentialFunctions()
 	{
 		function cache_put_data($val)
 		{
-		
+
 		}
 	}
 
@@ -3665,8 +3665,7 @@ function template_welcome_message()
 		<h3>', sprintf($txt['upgrade_ready_proceed'], CURRENT_VERSION), '</h3>
 		<form id="upform" action="', $upcontext['form_url'], '" method="post" accept-charset="UTF-8" name="upform"', empty($upcontext['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $upcontext['rid'] . '\', \'' . (!empty($upcontext['login_token']) ? $upcontext['login_token'] : '') . '\');"' : '', '>
 		<input type="hidden" name="', $upcontext['login_token_var'], '" value="', $upcontext['login_token'], '" />
-		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background: #fbbbe2; display: none;">
-			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
+		<div id="version_warning" class="errorbox" style="display: none;">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 			<div style="padding-left: 6ex;">
 				', sprintf($txt['upgrade_warning_out_of_date'], CURRENT_VERSION), '
@@ -3813,7 +3812,7 @@ function template_welcome_message()
 				if (!(\'elkVersion\' in window))
 					return;
 
-				window.elkVersion = window.elkVersion.replace(/ELKARTE\s?/g, \'\');
+				window.elkVersion = window.elkVersion.replace(/ELKARTE\s?/ig, \'\');
 
 				ourVer = document.getElementById(\'elkVersion\');
 				yourVer = document.getElementById(\'yourVersion\');
