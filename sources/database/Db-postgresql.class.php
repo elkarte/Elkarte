@@ -26,6 +26,12 @@ class Database_PostgreSQL implements Database
 
 	private $_db_last_result = null;
 
+	/**
+	 * Since PostgreSQL doesn't support INSERT REPLACE we are using this to remember
+	 * the rows affected by the delete
+	 */
+	private $_db_replace_result = null;
+
 	private function __construct()
 	{
 		// Private constructor.
@@ -249,7 +255,7 @@ class Database_PostgreSQL implements Database
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_cache, $db_count, $db_show_debug, $time_start;
-		global $db_unbuffered, $db_callback, $db_replace_result, $modSettings;
+		global $db_unbuffered, $db_callback, $modSettings;
 
 		// Decide which connection to use.
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -361,7 +367,7 @@ class Database_PostgreSQL implements Database
 
 		// One more query....
 		$db_count = !isset($db_count) ? 1 : $db_count + 1;
-		$db_replace_result = 0;
+		$this->_db_replace_result = null;
 
 		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
 			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
@@ -475,10 +481,8 @@ class Database_PostgreSQL implements Database
 	 */
 	function affected_rows($result = null)
 	{
-		global $db_replace_result;
-
-		if ($db_replace_result)
-			return $db_replace_result;
+		if ($this->_db_replace_result !== null)
+			return $this->_db_replace_result;
 		elseif ($result === null && !$this->_db_last_result)
 			return 0;
 
@@ -731,6 +735,7 @@ class Database_PostgreSQL implements Database
 		{
 			$count = 0;
 			$where = '';
+			$db_replace_result = 0;
 			foreach ($columns as $columnName => $type)
 			{
 				// Are we restricting the length?
@@ -755,6 +760,7 @@ class Database_PostgreSQL implements Database
 						' WHERE ' . $where,
 						$entry, $connection
 					);
+					$db_replace_result += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
 				}
 			}
 		}
@@ -781,7 +787,9 @@ class Database_PostgreSQL implements Database
 			foreach ($data as $dataRow)
 				$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
 
+			$inserted_results = 0;
 			foreach ($insertRows as $entry)
+			{
 				// Do the insert.
 				$this->query('', '
 					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
@@ -793,6 +801,10 @@ class Database_PostgreSQL implements Database
 					),
 					$connection
 				);
+				$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+			}
+			if (isset($db_replace_result))
+				$this->_db_replace_result = $db_replace_result + $inserted_results;
 		}
 
 		if ($priv_trans)
