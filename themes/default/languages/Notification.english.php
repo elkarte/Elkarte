@@ -18,7 +18,7 @@ $txt['notification_markread'] = 'Mark as read';
 $txt['notification_markunread'] = 'Mark as unread';
 
 $txt['notification_settings'] = 'Notification Settings';
-$txt['enable_notifications'] = 'Enable site notificaitons';
+$txt['notifications_enabled'] = 'Enable site notificaitons';
 
 
 $txt['notification_men'] = 'Mentioned you in the message {msg_link}';
