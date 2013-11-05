@@ -1383,6 +1383,9 @@ div.bbc_footnotes {
 .pagesection .floatright input, .pagesection .floatright select {
 	margin-top: 3px;
 }
+.category_header .pagesection .floatright input, .pagesection .floatright select {
+	margin-top: 0px;
+}
 /* Necessary for some browsers to keep the pages all on the same line */
 .pagelinks {
 	min-width: 35em;
@@ -2675,7 +2678,10 @@ ul.post_options li {
 	padding: 6px;
 }
 #edit_poll fieldset input {
-	margin-left: 8.1em;
+	margin-left: 7.8em;
+}
+#chrome fieldset input {
+	margin-left: 7.9em;
 }
 #edit_poll ul.poll_main li {
 	padding-left: 12px;
@@ -3736,7 +3742,7 @@ dl.merge_topic dd {
 }
 
 #mlsearch {
-  padding-top: 5px;
+  padding-top: 2px;
 }
 #mlsearch_options {
   position: absolute;
@@ -3752,7 +3758,6 @@ dl.merge_topic dd {
 #mlsearch_options .mlsearch_option {
   padding: 0.2em 0;
 }
-
 
 /*	$LOGIN		*/
 /* ------------------------------------------------------- */
