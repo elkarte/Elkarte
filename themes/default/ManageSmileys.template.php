@@ -85,7 +85,7 @@ function template_modifyset()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=editsets" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsets" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 			', $context['current_set']['is_new'] ? $txt['smiley_set_new'] : $txt['smiley_set_modify_existing'], '
 			</h2>';
@@ -176,7 +176,7 @@ function template_modifysmiley()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm">
 			<h2 class="category_header">', $txt['smiley_modify_existing'], '</h2>
 			<div class="windowbg">
 				<div class="content">
@@ -276,7 +276,7 @@ function template_addsmiley()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=addsmiley" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm" enctype="multipart/form-data">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=addsmiley" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm" enctype="multipart/form-data">
 			<h2 class="category_header">', $txt['smileys_add_method'], '</h2>
 			<div class="windowbg">
 				<div class="content">
@@ -418,7 +418,7 @@ function template_setorder()
 	foreach ($context['smileys'] as $location)
 	{
 		echo '
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $location['title'], '</h2>
 			<div class="information">
 				', $location['description'], '
