@@ -329,10 +329,10 @@ function onDocSent(XMLDoc)
 // Add additional poll option fields
 function addPollOption()
 {
-	if (pollOptionNum == 0)
+	if (pollOptionNum === 0)
 	{
 		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
-			if (document.forms[form_name].elements[i].id.substr(0, 8) == 'options-')
+			if (document.forms[form_name].elements[i].id.substr(0, 8) === 'options-')
 			{
 				pollOptionNum++;
 				pollTabIndex = document.forms[form_name].elements[i].tabIndex;
