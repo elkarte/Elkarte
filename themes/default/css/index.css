@@ -1797,7 +1797,7 @@ dl.settings textarea {
 	font-size: 0.857em;
 }
 
-.topic_sorting #sortby {
+#sortby {
 	width: 8.4em;
 }
 .topic_sorting:hover #sortby, #sortby:hover {
@@ -1909,6 +1909,13 @@ img.new_posts {
 	vertical-align: middle;
 	width: 2%;
 	padding: 8px 8px 0 8px;
+}
+.sort_by_container {
+	font-size: 0.892em;
+	float: right;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+    vertical-align: top;
 }
 .topic_info {
 	display: table-cell;
