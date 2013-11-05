@@ -526,7 +526,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// The notification settings
 		$config_vars = array(
 			array('title', 'notification_settings'),
-			array('check', 'enable_notifications'),
+			array('check', 'notifications_enabled'),
 		);
 
 		// Some context stuff

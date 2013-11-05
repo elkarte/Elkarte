@@ -1550,7 +1550,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['admin_features'] = isset($modSettings['admin_features']) ? explode(',', $modSettings['admin_features']) : array('cd,cp,k,w,rg,ml,pm');
 
 	// Default JS variables for use in every theme
-	$context['javascript_vars'] = array(
+	addJavascriptVar(array(
 		'elk_theme_url' => '"' . $settings['theme_url'] . '"',
 		'elk_default_theme_url' => '"' . $settings['default_theme_url'] . '"',
 		'elk_images_url' => '"' . $settings['images_url'] . '"',
@@ -1566,7 +1566,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
 		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
 		'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
-		'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0,
+		'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
 	);
 
 	// Auto video embeding enabled, then load the needed JS
@@ -2012,11 +2012,14 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  * @param string $value
  * @param bool $escape = false, whether or not to escape the value
  */
-function addJavascriptVar($key, $value, $escape = false)
+function addJavascriptVar($vars, $escape = false)
 {
 	global $context;
 
-	if (!empty($key) && isset($value))
+	if (empty($vars) || !is_array($vars))
+		return;
+
+	foreach ($vars as $key => $value)
 		$context['javascript_vars'][$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
 }
 

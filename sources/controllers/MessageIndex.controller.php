@@ -512,7 +512,7 @@ class MessageIndex_Controller extends Action_Controller
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
 		$template_layers->add('pages_and_buttons');
 
-		addJavascriptVar('notification_board_notice', $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board'], true);
+		addJavascriptVar(array('notification_board_notice' => $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board']), true);
 
 		// Build the message index button array.
 		$context['normal_buttons'] = array(

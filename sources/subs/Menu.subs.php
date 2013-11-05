@@ -124,21 +124,21 @@ class Standard_Menu extends Menu_Entries
 	 *
 	 * @param string $id a menu identifier
 	 * @param array an array of options that can be used to override some default behaviours.
-	 *              It can accepthave the following indexes:
-	 *               - action => overrides the default action
-	 *               - current_area => overrides the current area
-	 *               - extra_url_parameters => an array or pairs or parameters to be added to the url
-	 *               - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
-	 *               - base_url => an alternative base url
-	 *               - menu_type => alternative menu types?
-	 *               - can_toggle_drop_down => (boolean) if the menu can "toggle"
-	 *               - template_name => an alternative template to load (instead of Generic
-	 *               - layer_name => alternative layer name for the menu
+	 *			It can accept the following indexes:
+	 *				- action => overrides the default action
+	 *				- current_area => overrides the current area
+	 *				- extra_url_parameters => an array or pairs or parameters to be added to the url
+	 *				- disable_url_session_check => (boolean) if true the session var/id are omitted from the url
+	 *				- base_url => an alternative base url
+	 *				- menu_type => alternative menu types?
+	 *				- can_toggle_drop_down => (boolean) if the menu can "toggle"
+	 *				- template_name => an alternative template to load (instead of Generic
+	 *				- layer_name => alternative layer name for the menu
 	 */
 	public function createMenu($id, $menuOptions = array())
 	{
 		// Allow extend *any* menu with a single hook
-		call_integration_hook('integrate_' . strtolower($id), array(&$menuData));
+		call_integration_hook('integrate_' . strtolower($id), array(&$menuOptions));
 
 		$menu = $this->_instances[$id];
 		$menuData = array();

@@ -856,14 +856,15 @@ class Display_Controller
 			}
 		}
 
-		addJavascriptVar('notification_topic_notice', $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic'], true);
+		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
 		if ($context['can_send_topic'])
 		{
-			addJavascriptVar('sendtopic_cancel', $txt['modify_cancel'], true);
-			addJavascriptVar('sendtopic_back', $txt['back'], true);
-			addJavascriptVar('sendtopic_close', $txt['find_close'], true);
-			addJavascriptVar('sendtopic_error', $txt['send_error_occurred'], true);
-			addJavascriptVar('required_field', $txt['require_field'], true);
+			addJavascriptVar(array(
+				'sendtopic_cancel' => $txt['modify_cancel'],
+				'sendtopic_back' => $txt['back'],
+				'sendtopic_close' => $txt['find_close'],
+				'sendtopic_error' => $txt['send_error_occurred'],
+				'required_field' => $txt['require_field']), true);
 		}
 
 		// Build the normal button array.

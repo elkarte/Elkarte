@@ -272,6 +272,7 @@ function topBoards($limit = null, $read_status = false)
 	{
 		$top_boards[$i]['post_percent'] = round(($board['num_posts'] * 100) / $max_num_posts);
 		$top_boards[$i]['num_posts'] = comma_format($top_boards[$i]['num_posts']);
+		$top_boards[$i]['num_topics'] = comma_format($top_boards[$i]['num_topics']);
 	}
 
 	return $top_boards;
