@@ -56,7 +56,7 @@ class ManageCalendar_Controller extends Action_Controller
 
 		call_integration_hook('integrate_manage_calendar', array(&$subActions));
 
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'settings';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'holidays';
 
 		// Set up the two tabs here...
 		$context[$context['admin_menu_name']]['tab_data'] = array(

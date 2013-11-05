@@ -502,7 +502,7 @@ function loadForumTests()
 				$db->insert(\'\',
 					\'{db_prefix}boards\',
 					array(\'id_cat\' => \'int\', \'name\' => \'string\', \'description\' => \'string\', \'num_topics\' => \'int\', \'num_posts\' => \'int\', \'member_groups\' => \'string\'),
-					array($salvageCatID, \'Salvaged board\', \'\', $row[\'my_num_topics\'], $row[\'my_num_posts\'], \'1\'),
+					array($salvageCatID, $txt[\'salvaged_board_name\'], $txt[\'salvaged_board_description\'], $row[\'my_num_topics\'], $row[\'my_num_posts\'], \'1\'),
 					array(\'id_board\')
 				);
 				$newBoardID = $db->insert_id(\'{db_prefix}boards\', \'id_board\');
