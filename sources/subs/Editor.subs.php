@@ -176,11 +176,12 @@ function create_control_richedit($editorOptions)
 
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
-		addInlineJavascript('
-		var elk_smileys_url = \'' . $settings['smileys_url'] . '\';
-		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
-		var bbc_quote = \'' . addcslashes($txt['quote'], "'") . '\';
-		var bbc_search_on = \'' . addcslashes($txt['search_on'], "'") . '\';');
+		addJavascriptVar(array(
+			'elk_smileys_url' => '"' . $settings['smileys_url'] . '"',
+			'bbc_quote_from' => '"' . addcslashes($txt['quote_from'], "'") . '"',
+			'bbc_quote' => '"' . addcslashes($txt['quote'], "'") . '"',
+			'bbc_search_on' => '"' . addcslashes($txt['search_on'], "'") . '"')
+		);
 
 		// editor language file
 		if (!empty($txt['lang_locale']) && $txt['lang_locale'] != 'en_US')
