@@ -41,7 +41,7 @@ function template_main()
 	if (!empty($settings['additional_options_collapsible']))
 		echo '
 					<h4 id="postAdditionalOptionsHeader" class="titlebg">
-						<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a></strong>
+						<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h4>';
 	echo '
 					<div id="postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
@@ -162,7 +162,7 @@ function template_load_drafts_below()
 	// Show a draft selection box
 	echo '
 					<h4 id="postDraftOptionsHeader" class="titlebg">
-						<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
+						<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 					</h4>
 					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>
 						<dl class="settings">
