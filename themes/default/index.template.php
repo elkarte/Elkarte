@@ -83,7 +83,7 @@ function template_init()
 	$settings['page_index_template'] = array(
 		'base_link' => '<li><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
 		'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
-		'current_page' => '<strong class="current_page" role="menuitem">%1$s</strong>',
+		'current_page' => '<li><strong class="current_page" role="menuitem">%1$s</strong></li>',
 		'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
 		'expand_pages' => '<li class="expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
 		'all' => '<li class="all_pages" role="menuitem">{all_txt}</li>',
