@@ -676,46 +676,42 @@ function template_install_options()
 		<div class="information">
 			', $txt['package_install_options_ftp_why'], '
 		</div>
-		<div class="windowbg">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=packages;sa=options" method="post" accept-charset="UTF-8">
-					<dl class="settings">
-						<dt>
-							<label for="pack_server"><strong>', $txt['package_install_options_ftp_server'], ':</strong></label>
-						</dt>
-						<dd>
-							<input type="text" name="pack_server" id="pack_server" value="', $context['package_ftp_server'], '" size="30" class="input_text" />
-						</dd>
-						<dt>
-							<label for="pack_port"><strong>', $txt['package_install_options_ftp_port'], ':</strong></label>
-						</dt>
-						<dd>
-							<input type="text" name="pack_port" id="pack_port" size="3" value="', $context['package_ftp_port'], '" class="input_text" />
-						</dd>
-						<dt>
-							<label for="pack_user"><strong>', $txt['package_install_options_ftp_user'], ':</strong></label>
-						</dt>
-						<dd>
-							<input type="text" name="pack_user" id="pack_user" value="', $context['package_ftp_username'], '" size="30" class="input_text" />
-						</dd>
-						<dt>
-							<label for="package_make_backups">', $txt['package_install_options_make_backups'], '</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="package_make_backups" id="package_make_backups" value="1" class="input_check"', $context['package_make_backups'] ? ' checked="checked"' : '', ' />
-						</dd>
-						<dt>
-							<label for="package_make_full_backups">', $txt['package_install_options_make_full_backups'], '</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="package_make_full_backups" id="package_make_full_backups" value="1" class="input_check"', $context['package_make_full_backups'] ? ' checked="checked"' : '', ' />
-						</dd>
-					</dl>
-					<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</form>
-			</div>
-		</div>
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=options" method="post" accept-charset="UTF-8">
+			<dl class="settings">
+				<dt>
+					<label for="pack_server"><strong>', $txt['package_install_options_ftp_server'], ':</strong></label>
+				</dt>
+				<dd>
+					<input type="text" name="pack_server" id="pack_server" value="', $context['package_ftp_server'], '" size="30" class="input_text" />
+				</dd>
+				<dt>
+					<label for="pack_port"><strong>', $txt['package_install_options_ftp_port'], ':</strong></label>
+				</dt>
+				<dd>
+					<input type="text" name="pack_port" id="pack_port" size="3" value="', $context['package_ftp_port'], '" class="input_text" />
+				</dd>
+				<dt>
+					<label for="pack_user"><strong>', $txt['package_install_options_ftp_user'], ':</strong></label>
+				</dt>
+				<dd>
+					<input type="text" name="pack_user" id="pack_user" value="', $context['package_ftp_username'], '" size="30" class="input_text" />
+				</dd>
+				<dt>
+					<label for="package_make_backups">', $txt['package_install_options_make_backups'], '</label>
+				</dt>
+				<dd>
+					<input type="checkbox" name="package_make_backups" id="package_make_backups" value="1" class="input_check"', $context['package_make_backups'] ? ' checked="checked"' : '', ' />
+				</dd>
+				<dt>
+					<label for="package_make_full_backups">', $txt['package_install_options_make_full_backups'], '</label>
+				</dt>
+				<dd>
+					<input type="checkbox" name="package_make_full_backups" id="package_make_full_backups" value="1" class="input_check"', $context['package_make_full_backups'] ? ' checked="checked"' : '', ' />
+				</dd>
+			</dl>
+			<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+		</form>
 	</div>';
 }
 
