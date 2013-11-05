@@ -1445,7 +1445,6 @@ div.bbc_footnotes {
 /* @todo - Fix for all templates. */
 .small_pagelinks {
 	float: right;
-	clear: left;
 }
 .small_pagelinks li {
 	float: left;
