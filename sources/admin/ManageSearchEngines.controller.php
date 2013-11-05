@@ -421,7 +421,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$deleteTime = time() - (((int) $_POST['older']) * 24 * 60 * 60);
 
 			// Delete the entires.
-			require_once(SUBSDIR . '/SeachEngines.subs.php');
+			require_once(SUBSDIR . '/SearchEngines.subs.php');
 			removeSpiderOldLogs($deleteTime);
 		}
 

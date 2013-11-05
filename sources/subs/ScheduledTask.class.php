@@ -1143,7 +1143,7 @@ class ScheduledTask
 				// Figure out when our cutoff time is.  1 day = 86400 seconds.
 				$t = time() - $modSettings['pruneSpiderHitLog'] * 86400;
 
-				require_once(SUBSDIR . '/SeachEngines.subs.php');
+				require_once(SUBSDIR . '/SearchEngines.subs.php');
 				removeSpiderOldLogs($t);
 			}
 		}
