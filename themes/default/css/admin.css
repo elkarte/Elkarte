@@ -513,7 +513,7 @@ dl.settings dd.questions input {
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-#manage_boards {
+#manage_boards, #manage_attachments {
 	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
@@ -539,7 +539,7 @@ dl.settings dd.questions input {
 	margin: 0;
 	padding: 0;
 }
-#manage_boards .content {
+#manage_boards .content, #manage_attachments .content {
 	background: #efefef;
 	margin: -6px 0 12px 0;
 	padding: 6px 8px 16px 8px;
@@ -547,6 +547,10 @@ dl.settings dd.questions input {
 	border-top: 0px solid;
 	overflow: auto;
 	border-radius: 0 0 7px 7px;
+}
+#manage_attachments .content {
+	margin: -10px 0 0;
+	padding: 6px 8px;
 }
 #manage_boards ul {
 	margin: 0 0 12px;

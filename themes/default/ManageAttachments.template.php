@@ -111,8 +111,7 @@ function template_maintenance()
 					<input type="hidden" name="sa" value="byAge" />
 				</form>
 			</div>
-		</div>
-	</div>';
+		</div>';
 
 	echo '
 	<h3 id="transfer" class="category_header">', $txt['attachment_transfer'], '</h3>';
@@ -200,6 +199,7 @@ function template_maintenance()
 
 			// ]]></script>
 		</div>
+	</div>
 	</div>';
 }
 
