@@ -404,8 +404,11 @@ class Auth_Controller extends Action_Controller
 			logOnline($user_info['id'], false);
 		}
 
-		// Logout? Let's kill the admin session, too.
-		unset($_SESSION['admin_time']);
+		// Logout? Let's kill the admin/moderate/other sessions, too.
+		$types = array('admin', 'moderate');
+		call_integration_hook('integrate_validateSession', array(&$types));
+		foreach ($types as $type)
+			unset($_SESSION[$type . '_time']);
 
 		$_SESSION['log_time'] = 0;
 
@@ -416,7 +419,6 @@ class Auth_Controller extends Action_Controller
 		session_destroy();
 		if (!empty($user_info['id']))
 			updateMemberData($user_info['id'], array('password_salt' => substr(md5(mt_rand()), 0, 4)));
-
 
 		// Off to the merry board index we go!
 		if ($redirect)
