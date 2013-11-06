@@ -1105,7 +1105,7 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 	else
 	{
 		// SUM and MAX on a smaller table is better for InnoDB tables.
-		$db->query('', '
+		$request = $db->query('', '
 			SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
 			FROM {db_prefix}boards
 			WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
@@ -1115,8 +1115,8 @@ function updateMessageStats($increment = null, $max_msg_id = null)
 				'blank_redirect' => '',
 			)
 		);
-		$row = $db->fetch_assoc($result);
-		$db->free_result($result);
+		$row = $db->fetch_assoc($request);
+		$db->free_result($request);
 
 		updateSettings(array(
 			'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],

@@ -2929,7 +2929,7 @@ function updateTopicStats($increment = null)
 	{
 		// Get the number of topics - a SUM is better for InnoDB tables.
 		// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
-		$db->query('', '
+		$request = $db->query('', '
 			SELECT SUM(num_topics + unapproved_topics) AS total_topics
 			FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			WHERE id_board != {int:recycle_board}' : ''),
@@ -2937,8 +2937,8 @@ function updateTopicStats($increment = null)
 				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
 			)
 		);
-		$row = $db->fetch_assoc($result);
-		$db->free_result($result);
+		$row = $db->fetch_assoc($request);
+		$db->free_result($request);
 
 		updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
 	}

@@ -2290,7 +2290,7 @@ function updateMemberStats($id_member = null, $real_name = null)
 	else
 	{
 		// Update the latest activated member (highest id_member) and count.
-		$result = $db->query('', '
+		$request = $db->query('', '
 			SELECT COUNT(*), MAX(id_member)
 			FROM {db_prefix}members
 			WHERE is_activated = {int:is_activated}',
@@ -2298,18 +2298,18 @@ function updateMemberStats($id_member = null, $real_name = null)
 				'is_activated' => 1,
 			)
 		);
-		list ($changes['totalMembers'], $changes['latestMember']) = $db->fetch_row($result);
-		$db->free_result($result);
+		list ($changes['totalMembers'], $changes['latestMember']) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// Get the latest activated member's display name.
-		$result = getBasicMemberData((int) $changes['latestMember']);
-		$changes['latestRealName'] = $result['real_name'];
+		$request = getBasicMemberData((int) $changes['latestMember']);
+		$changes['latestRealName'] = $request['real_name'];
 
 		// Are we using registration approval?
 		if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
 		{
 			// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
-			$result = $db->query('', '
+			$request = $db->query('', '
 				SELECT COUNT(*)
 				FROM {db_prefix}members
 				WHERE is_activated IN ({array_int:activation_status})',
@@ -2317,8 +2317,8 @@ function updateMemberStats($id_member = null, $real_name = null)
 					'activation_status' => array(3, 4),
 				)
 			);
-			list ($changes['unapprovedMembers']) = $db->fetch_row($result);
-			$db->free_result($result);
+			list ($changes['unapprovedMembers']) = $db->fetch_row($request);
+			$db->free_result($request);
 		}
 	}
 
