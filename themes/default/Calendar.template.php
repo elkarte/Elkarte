@@ -61,9 +61,7 @@ function template_main()
 
 	echo '
 					</select>
-					<input type="submit" class="button_submit" value="', $txt['view'], '" />';
-
-	echo '
+					<input type="submit" class="button_submit" value="', $txt['view'], '" />
 				</form>
 			</div>
 		</div>';
