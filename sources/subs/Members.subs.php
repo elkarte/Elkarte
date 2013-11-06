@@ -431,7 +431,7 @@ function deleteMembers($users, $check_not_admin = false)
 	// Integration rocks!
 	call_integration_hook('integrate_delete_members', array($users));
 
-	updateStats('member');
+	updateMemberStats();
 
 	logActions($log_changes);
 }
@@ -720,9 +720,9 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	// Update the number of members and latest member's info - and pass the name, but remove the 's.
 	if ($regOptions['register_vars']['is_activated'] == 1)
-		updateStats('member', $memberID, $regOptions['register_vars']['real_name']);
+		updateMemberStats($memberID, $regOptions['register_vars']['real_name']);
 	else
-		updateStats('member');
+		updateMemberStats();
 
 	// Theme variables too?
 	if (!empty($theme_vars))
@@ -2255,4 +2255,72 @@ function canContact($who)
 		else
 			return false;
 	}
+}
+
+/**
+ * This function updates the latest member, the total member
+ * count, and the number of unapproved members.
+ * It also only counts approved members when approval is on,
+ * but is much more efficient with it off.
+ *
+ * Used by updateStats('member').
+ *
+ * @param int $member = null If not an integer reload from the database
+ * @param string $real_name = null
+ */
+function updateMemberStats($id_member = null, $real_name = null)
+{
+	global $modSettings;
+
+	$db = database();
+
+	$changes = array(
+		'memberlist_updated' => time(),
+	);
+
+	// #1 latest member ID, #2 the real name for a new registration.
+	if (is_int($id_member))
+	{
+		$changes['latestMember'] = $id_member;
+		$changes['latestRealName'] = $real_name;
+
+		updateSettings(array('totalMembers' => true), true);
+	}
+	// We need to calculate the totals.
+	else
+	{
+		// Update the latest activated member (highest id_member) and count.
+		$result = $db->query('', '
+			SELECT COUNT(*), MAX(id_member)
+			FROM {db_prefix}members
+			WHERE is_activated = {int:is_activated}',
+			array(
+				'is_activated' => 1,
+			)
+		);
+		list ($changes['totalMembers'], $changes['latestMember']) = $db->fetch_row($result);
+		$db->free_result($result);
+
+		// Get the latest activated member's display name.
+		$result = getBasicMemberData((int) $changes['latestMember']);
+		$changes['latestRealName'] = $result['real_name'];
+
+		// Are we using registration approval?
+		if ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']))
+		{
+			// Update the amount of members awaiting approval - ignoring COPPA accounts, as you can't approve them until you get permission.
+			$result = $db->query('', '
+				SELECT COUNT(*)
+				FROM {db_prefix}members
+				WHERE is_activated IN ({array_int:activation_status})',
+				array(
+					'activation_status' => array(3, 4),
+				)
+			);
+			list ($changes['unapprovedMembers']) = $db->fetch_row($result);
+			$db->free_result($result);
+		}
+	}
+
+	updateSettings($changes);
 }
