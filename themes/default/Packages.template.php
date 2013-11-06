@@ -745,13 +745,13 @@ function template_control_chmod()
 	}
 
 	echo '
-				<div class="bordercolor" id="ftp_error_div" style="', (!empty($context['package_ftp']['error']) ? '' : 'display:none;'), 'padding: 1px; margin: 1ex;"><div class="windowbg2" id="ftp_error_innerdiv" style="padding: 1ex;">
-					<tt id="ftp_error_message">', !empty($context['package_ftp']['error']) ? $context['package_ftp']['error'] : '', '</tt>
-				</div></div>';
+				<div id="ftp_error_div" style="', (!empty($context['package_ftp']['error']) ? '' : 'display:none;'), '">
+					<span id="ftp_error_message">', !empty($context['package_ftp']['error']) ? $context['package_ftp']['error'] : '', '</span>
+				</div>';
 
 	if (!empty($context['package_ftp']['destination']))
 		echo '
-				<form action="', $context['package_ftp']['destination'], '" method="post" accept-charset="UTF-8" style="margin: 0;">';
+				<form action="', $context['package_ftp']['destination'], '" method="post" accept-charset="UTF-8">';
 
 	echo '
 					<fieldset>
@@ -821,6 +821,7 @@ function template_control_chmod()
 
 			var ftpTest = document.createElement("input");
 			ftpTest.type = "button";
+			ftpTest.className = "right_submit";
 			ftpTest.onclick = testFTP;
 
 			if (document.getElementById("test_ftp_placeholder"))
@@ -834,6 +835,7 @@ function template_control_chmod()
 				document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
 			}
 		}
+
 		function testFTPResults(oXMLDoc)
 		{
 			ajax_indicator(false);
@@ -851,12 +853,10 @@ function template_control_chmod()
 			}
 
 			document.getElementById("ftp_error_div").style.display = "";
-			document.getElementById("ftp_error_div").style.backgroundColor = wasSuccess ? "green" : "red";
-			document.getElementById("ftp_error_innerdiv").style.backgroundColor = wasSuccess ? "#DBFDC7" : "#FDBDBD";
+			document.getElementById("ftp_error_div").className = wasSuccess ? "infobox" : "errorbox";
 
 			setInnerHTML(document.getElementById("ftp_error_message"), message);
 		}
-		generateFTPTest();
 	// ]]></script>';
 
 	// Make sure the button gets generated last.
@@ -1135,12 +1135,10 @@ function template_file_permissions()
 		</div>
 	</div>
 
-	<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-		<div class="title_bar">
-			<h3 class="titlebg">
-				<span class="floatleft">', $txt['package_file_perms'], '</span><span class="fperm floatright">', $txt['package_file_perms_new_status'], '</span>
-			</h3>
-		</div>
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+		<h2 class="category_header">
+			<span class="floatleft">', $txt['package_file_perms'], '</span><span class="fperm floatright">', $txt['package_file_perms_new_status'], '</span>
+		</h2>
 		<table class="table_grid">
 			<thead>
 				<tr class="table_head">
@@ -1158,7 +1156,6 @@ function template_file_permissions()
 	foreach ($context['file_tree'] as $name => $dir)
 	{
 		echo '
-
 				<tr class="windowbg2">
 					<td style="width:30%"><strong>';
 
@@ -1237,7 +1234,7 @@ function template_file_permissions()
 		echo '
 			<input type="hidden" name="back_look[]" value="', $path, '" />';
 	echo '
-	</form><br />';
+	</form>';
 }
 
 /**
@@ -1267,29 +1264,29 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 
 			$cur_ident = preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident . '/' . $name);
 			echo '
-			<tr class="windowbg" id="content_', $cur_ident, '">
-				<td class="smalltext" style="width:30%">' . str_repeat('&nbsp;', $level * 5), '
-					', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '<a id="link_' . $cur_ident . '" href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident . '/' . $name) . ';back_look=' . $context['back_look_data'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . $cur_ident . '" onclick="return expandFolder(\'' . $cur_ident . '\', \'' . addcslashes($ident . '/' . $name, "'\\") . '\');">' : '';
+				<tr class="windowbg" id="content_', $cur_ident, '">
+					<td class="smalltext" style="width:30%">' . str_repeat('&nbsp;', $level * 5), '
+						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '<a id="link_' . $cur_ident . '" href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident . '/' . $name) . ';back_look=' . $context['back_look_data'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . $cur_ident . '" onclick="return expandFolder(\'' . $cur_ident . '\', \'' . addcslashes($ident . '/' . $name, "'\\") . '\');">' : '';
 
 			if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
 				echo '
-					<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
+						<img src="', $settings['default_images_url'], '/board.png" alt="*" />';
 
 			echo '
-					', $name, '
-					', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '</a>' : '', '
-				</td>
-				<td class="smalltext">
-					<span class="', ($dir['perms']['chmod'] ? 'success' : 'error'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
-					', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
-				</td>
-				<td class="perm_read centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
-				<td class="perm_write centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
-				<td class="perm_execute centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
-				<td class="perm_custom centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
-				<td class="perm_nochange centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
-			</tr>
-			<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td></td></tr>';
+						', $name, '
+						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '</a>' : '', '
+					</td>
+					<td class="smalltext">
+						<span class="', ($dir['perms']['chmod'] ? 'success' : 'error'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
+						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
+					</td>
+					<td class="perm_read centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
+					<td class="perm_write centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
+					<td class="perm_execute centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
+					<td class="perm_custom centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
+					<td class="perm_nochange centertext" style="width:8%"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+				</tr>
+				<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td colspan="7"></td></tr>';
 
 			if (!empty($dir['contents']))
 				template_permission_show_contents($ident . '/' . $name, $dir['contents'], $level + 1, !empty($dir['more_files']));
@@ -1324,7 +1321,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 		// ]]></script>
 		<table class="table_grid">
 			<tbody>
-			<tr style="display: none;"><td></td></tr>';
+			<tr style="display: none;"><td colspan="7"></td></tr>';
 	}
 }
 
