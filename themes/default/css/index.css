@@ -100,9 +100,8 @@ p, fieldset, form, input, button, select, textarea, .editor {
 }
 
 /* Collection of pseudo element clearfixes. */
-/* @todo - Clean up old catbg and titlebg stuff. */
-h3.catbg:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after,
-.category_header:after, .wrapper:after,
+/* @todo - Clean up old titlebg stuff. */
+h3.titlebg:after, h4.titlebg:after, .category_header:after, .wrapper:after,
 #main_content_section:after, #main_container:after,
 .attachments_bot:after, .editor_wrapper:after {
 	display: block;
@@ -431,26 +430,18 @@ em {
 }
 
 /* Generic header bars. @todo - To be deprecated. */
-.titlebg, .catbg {
+.titlebg {
 	padding: 0 6px;
 	background: #ebebeb;
 	background-image: linear-gradient(to bottom, #ebebeb 0%, #c6c6c6 100%);
 	color: #555;
 	font-size: 1.1em;
 }
-.catbg {
-	font-size: 1.2em;
-}
-.catbg select {
-	margin-top: 1px;
-	padding: 1px;
-	height: 1.8em;
-	font-size: 0.857em;
-}
+
 /* Styles for main headers. */
 .category_header, .forum_category .category_header,
 /* Generic header bars. @todo - To be deprecated. */
-h3.catbg, h3.titlebg, h4.titlebg, h4.catbg {
+h3.titlebg, h4.titlebg {
 	padding: 4px 10px 2px 10px;
 	border: 1px solid #ccc;
 	border-top: 1px solid #ddd;
@@ -486,17 +477,12 @@ h3.catbg, h3.titlebg, h4.titlebg, h4.catbg {
 	color: #777;
 }
 
-h3.catbg a:link, h3.catbg a:visited, h4.catbg a:link, h4.catbg a:visited,
 h3.titlebg a, h3.titlebg, h4.titlebg, h4.titlebg a {
 	color: #555;
 }
-h3.catbg a:hover, h4.catbg a:hover, h3.titlebg a:hover, h4.titlebg a:hover {
+h3.titlebg a:hover, h4.titlebg a:hover {
 	color: #333;
 	text-decoration: none;
-}
-h3.catbg .icon {
-	margin: 0 5px 0 0;
-	vertical-align: text-top;
 }
 h4.titlebg .icon {
 	float: left;
@@ -1075,10 +1061,6 @@ div.bbc_footnotes {
 	width: 200px;
 }
 /* @todo */
-#menu_sidebar .catbg {
-	padding: 3px 10px 2px 10px;
-	font-size: 1.1em;
-}
 #menu_sidebar .sidebar_menu {
 	padding: 4px 0 9px 0;
 }
@@ -4007,9 +3989,6 @@ a.help .icon {
 	 }
 	#menu_nav {
 		padding: 0;
-	}
-	.catbg img, .catbg span {
-		display: none;
 	}
 	.poster {
 		margin-bottom: 5px;
