@@ -179,7 +179,9 @@ class Topic_Controller extends Action_Controller
 		$context['robot_no_index'] = true;
 
 		// Get the topic starter information.
+		require_once(SUBSDIR . '/Poll.subs.php');
 		$row = pollStarters($topic);
+
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($row))
 			redirectexit();

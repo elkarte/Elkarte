@@ -471,9 +471,7 @@ function template_user_subscription()
 
 	echo '
 		</form>
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['paid_current'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['paid_current'], '</h2>
 		<div class="information">
 			', $txt['paid_current_desc'], '
 		</div>

@@ -110,9 +110,6 @@ h3 a.help .icon {
 	padding: 0 4px 0 0;
 }
 
-.catbg a.help .icon {
-	margin: 0;
-}
 .table_caption, tr.table_caption td {
 	color: #000;
 	font-size: 10px;
@@ -204,10 +201,6 @@ legend {
 	padding: 8px 12px 4px 12px;
 	border-radius: 7px 7px 0 0;
 	border-bottom: none;
-}
-#admin_main_section .catbg, #admin_main_section .catbg a {
-	color: #444;
-	overflow: hidden;
 }
 #live_news, #supportVersionsTable {
 	width: 70%;
@@ -525,16 +518,6 @@ dl.settings dd.questions input {
 #manage_boards .titlebg {
 	border-bottom: 1px solid #bbb;
 }
-#manage_boards .catbg {
-	padding: 8px 16px 4px 16px;
-	color: #444;
-}
-#manage_boards .catbg a {
-	color: #346;
-}
-#manage_boards .catbg a:hover {
-	border-bottom: 1px solid #346;
-}
 #manage_boards .windowbg {
 	margin: 0;
 	padding: 0;
@@ -640,10 +623,6 @@ dl.settings dd.questions input {
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
-#manage_maintenance .catbg {
-	border: none;
-	background: none;
-}
 #manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
 	background: none;
 	padding: 0;
@@ -834,10 +813,6 @@ dl.themes_list dd {
 #admin_main_section {
 	margin: 12px 0 0 0;
 	padding: 8px 12px 4px 12px;
-}
-#mod_main_section .catbg, #mod_main_section .catbg a {
-	color: #444;
-	overflow: hidden;
 }
 #mod_main_section .windowbg {
 	padding: 6px 0;
@@ -1069,10 +1044,10 @@ ul.moderation_notes li {
 	background-color: transparent;
 }
 #taskpad select {
-	margin-top: 1px;
+	margin-top: 3px;
 }
 #taskpad {
-	margin: 8px 8px 0 0;
+	margin: 2px 8px 2px 0;
 }
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
@@ -1104,19 +1079,6 @@ ul.moderation_notes li {
 	}
 	.dropmenu li li a {
 		line-height: 3.2em;
-	}
-	h3.catbg #quick_search form {
-		margin: 0 0 8px 0;
-		padding: 0;
-	}
-	h3.catbg #quick_search form input {
-		margin: 0 0 12px 0;
-	}
-	h3.catbg #quick_search form select option {
-		padding: 4px 4px;
-	}
-	h3.catbg #quick_search form .button_submit {
-		margin: 0 3px 0 3px;
 	}
 	#live_news, #supportVersionsTable {
 		width: 100%;
@@ -1152,9 +1114,6 @@ ul.moderation_notes li {
 		min-height: 0;
 		max-height: 5em;
 		overflow: auto;
-	}
-	#manage_boards .catbg {
-		margin-top: 10px;
 	}
 	#manage_boards .windowbg {
 		line-height: 3.2em;

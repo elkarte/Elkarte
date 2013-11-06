@@ -764,7 +764,6 @@ function template_build_poster_div($message, $ignoring)
 								</a>
 							</li>';
 
-
 		// Show the post group icons, but not for guests.
 		if (!$message['member']['is_guest'])
 			$poster_div .= '

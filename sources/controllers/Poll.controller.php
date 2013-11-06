@@ -153,7 +153,6 @@ class Poll_Controller extends Action_Controller
 		addVote($inserts);
 		increaseVoteCounter($row['id_poll'], $pollOptions);
 
-
 		// If it's a guest don't let them vote again.
 		if ($user_info['is_guest'] && count($pollOptions) > 0)
 		{

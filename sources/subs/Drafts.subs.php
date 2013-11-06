@@ -68,7 +68,7 @@ function modify_pm_draft($draft, $recipientList)
 			poster_time = {int:poster_time},
 			subject = {string:subject},
 			body = {string:body},
-			to_list = {string:to_list},
+			to_list = {string:to_list}
 		WHERE id_draft = {int:id_pm_draft}
 		LIMIT 1',
 		array(

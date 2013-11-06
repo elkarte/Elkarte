@@ -27,7 +27,7 @@ function template_main()
 		<div id="recentposts" class="forumposts">';
 
 	echo '
-			<h3 class="catbg">
+			<h3 class="category_header">
 				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />', $txt['recent_posts'], '
 			</h3>';
 

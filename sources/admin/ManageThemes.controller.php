@@ -622,7 +622,6 @@ class ManageThemes_Controller extends Action_Controller
 			if (!empty($inserts))
 				updateThemeOptions($inserts);
 
-
 			cache_put_data('theme_settings-' . $_GET['th'], null, 90);
 			cache_put_data('theme_settings-1', null, 90);
 

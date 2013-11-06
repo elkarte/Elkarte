@@ -201,7 +201,6 @@ class Xml_Controller extends Action_Controller
 		else
 			$errors[] = array('value' => $txt[$validation]);
 
-
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
 		$context['xml_data'] = array(

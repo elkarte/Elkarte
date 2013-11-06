@@ -844,8 +844,6 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $modSettings;
 
-		$db = database();
-
 		isAllowedTo('pm_send');
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -1086,7 +1084,10 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Mark the message as "replied to".
 		if (!empty($context['send_log']['sent']) && !empty($_REQUEST['replied_to']) && isset($_REQUEST['f']) && $_REQUEST['f'] == 'inbox')
+		{
+			require_once(SUBSDIR . '/PersonalMessage.subs.php');
 			setPMRepliedStatus($user_info['id'], (int) $_REQUEST['replied_to'] );
+		}
 
 		// If one or more of the recipient were invalid, go back to the post screen with the failed usernames.
 		if (!empty($context['send_log']['failed']))

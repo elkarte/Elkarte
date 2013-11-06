@@ -1159,7 +1159,6 @@ function template_profile_signature_modify()
 		echo '
 								<span class="smalltext">', $context['signature_warning'], '</span>';
 
-
 	// Some javascript used to count how many characters have been used so far in the signature.
 	echo '
 								<script><!-- // --><![CDATA[

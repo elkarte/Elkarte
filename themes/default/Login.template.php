@@ -108,7 +108,6 @@ function template_kick_guest()
 			<p class="information centertext">
 				', empty($context['kick_message']) ? $txt['only_members_can_access'] : $context['kick_message'], '<br />';
 
-
 	if ($context['can_register'])
 		echo sprintf($txt['login_below_or_register'], $scripturl . '?action=register', $context['forum_name_html_safe']);
 	else

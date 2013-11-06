@@ -44,7 +44,6 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 		<a href="javascript:void(0);" onclick="document.getElementById(\'', $current_group_list['id'], '\').style.display = \'block\'; document.getElementById(\'', $current_group_list['id'], '_groups_link\').style.display = \'none\'; return false;" id="', $current_group_list['id'], '_groups_link" style="display: none;">[ ', $current_group_list['select_group'], ' ]</a>';
 
-
 		if (!empty($current_group_list['collapsed']))
 			echo '
 		<script><!-- // --><![CDATA[
