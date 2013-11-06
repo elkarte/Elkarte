@@ -646,7 +646,6 @@ function template_profile_block_summary()
 							<a href="', $scripturl, '?action=profile;area=statistics;u=', $context['id_member'], '">', $txt['statPanel'], '</a>
 						</dd>';
 
-
 	// close this block up
 	echo '
 					</dl>

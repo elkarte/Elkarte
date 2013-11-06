@@ -20,7 +20,6 @@ $txt['notification_markunread'] = 'Mark as unread';
 $txt['notification_settings'] = 'Notification Settings';
 $txt['notifications_enabled'] = 'Enable site notificaitons';
 
-
 $txt['notification_men'] = 'Mentioned you in the message {msg_link}';
 $txt['notification_like'] = 'Liked your message {msg_link}';
 $txt['notification_rlike'] = 'Unliked your message {msg_link}';

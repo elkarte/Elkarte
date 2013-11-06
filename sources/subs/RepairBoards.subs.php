@@ -23,7 +23,6 @@
 if (!defined('ELK'))
 	die('No access...');
 
-
 /**
  * Load up all the tests we might want to do ;)
  */
@@ -999,7 +998,6 @@ function loadForumTests()
 				WHERE t.id_topic BETWEEN {STEP_LOW} AND {STEP_HIGH}
 					AND lss.id_topic IS NULL',
 			'fix_full_processing' => create_function('$result', '
-
 
 				$db = database();
 

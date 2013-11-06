@@ -607,7 +607,6 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		if (!empty($modSettings['trackStats']))
 			trackStats(array('email' => '+'));
 
-
 		// Keep our post via email log
 		if (!empty($unq_head))
 			$sent[] = array($unq_head, time(), $mail_to);

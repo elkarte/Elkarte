@@ -417,7 +417,6 @@ class Auth_Controller extends Action_Controller
 		if (!empty($user_info['id']))
 			updateMemberData($user_info['id'], array('password_salt' => substr(md5(mt_rand()), 0, 4)));
 
-
 		// Off to the merry board index we go!
 		if ($redirect)
 		{

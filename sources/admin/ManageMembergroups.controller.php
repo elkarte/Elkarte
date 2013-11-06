@@ -363,7 +363,6 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			addMembergroup($id_group, $_POST['group_name'], $minposts, $_POST['group_type']);
 
-
 			call_integration_hook('integrate_add_membergroup', array($id_group, $postCountBasedGroup));
 
 			// Update the post groups now, if this is a post group!
@@ -603,7 +602,6 @@ class ManageMembergroups_Controller extends Action_Controller
 				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
 				if ($_POST['group_hidden'] == 2)
 					setGroupToHidden($current_group['id_group']);
-
 
 				// Either way, let's check our "show group membership" setting is correct.
 				validateShowGroupMembership();

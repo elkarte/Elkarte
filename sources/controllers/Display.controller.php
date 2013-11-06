@@ -691,7 +691,6 @@ class Display_Controller
 
 			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
 
-
 			if (!empty($modSettings['enableFollowup']))
 			{
 				require_once(SUBSDIR . '/FollowUps.subs.php');
