@@ -1069,10 +1069,10 @@ ul.moderation_notes li {
 	background-color: transparent;
 }
 #taskpad select {
-	margin-top: 1px;
+	margin-top: 3px;
 }
 #taskpad {
-	margin: 8px 8px 0 0;
+	margin: 2px 8px 2px 0;
 }
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */

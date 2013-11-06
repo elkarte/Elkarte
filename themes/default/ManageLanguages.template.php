@@ -228,9 +228,8 @@ function template_modify_language_entries()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], '" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['edit_languages'], '</h2>
-			</div>
 			<div class="information">
 				', $txt['edit_language_entries_primary'], '
 			</div>';
@@ -259,7 +258,7 @@ function template_modify_language_entries()
 								<input type="text" name="character_set" id="character_set" size="20" value="', $context['primary_settings']['character_set'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
 							</dd>
 							<dt>
-								<label for="locale>', $txt['languages_locale'], ':</label>
+								<label for="locale">', $txt['languages_locale'], ':</label>
 							</dt>
 							<dd>
 								<input type="text" name="locale" id="locale" size="20" value="', $context['primary_settings']['locale'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
@@ -304,30 +303,30 @@ function template_modify_language_entries()
 		</form>
 
 		<form action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], ';entries" id="entry_form" method="post" accept-charset="UTF-8">
-			<div class="title_bar">
+			<div class="category_header">
+				<h3 class="floatleft">
+					', $txt['edit_language_entries'], '
+				</h3>
 				<div id="taskpad" class="floatright">
 					', $txt['edit_language_entries_file'], ':
-						<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
+					<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
 
 	foreach ($context['possible_files'] as $id_theme => $theme)
 	{
 		echo '
-							<option value="-1">', $theme['name'], '</option>';
+						<option value="-1">', $theme['name'], '</option>';
 
 		foreach ($theme['files'] as $file)
 			echo '
-							<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
+						<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
 	}
 
 	echo '
-						</select>
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
-						<noscript><input type="submit" value="', $txt['go'], '" class="button_submit submitgo" /></noscript>
+					</select>
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
+					<noscript><input type="submit" value="', $txt['go'], '" class="button_submit submitgo" /></noscript>
 				</div>
-				<h3 class="titlebg">
-					', $txt['edit_language_entries'], '
-				</h3>
 			</div>';
 
 	// Is it not writable?
@@ -342,9 +341,8 @@ function template_modify_language_entries()
 	if (!empty($context['file_entries']))
 	{
 		echo '
-			<div class="windowbg2">
-				<div class="content">
-					<dl class="settings">';
+			<div class="content">
+				<dl class="settings">';
 
 		$cached = array();
 		foreach ($context['file_entries'] as $entry)
@@ -357,20 +355,20 @@ function template_modify_language_entries()
 			}
 
 			echo '
-						<dt>
-							<span class="smalltext">', $cached['key'], '</span>
-						</dt>
-						<dd>
-							<span class="smalltext">', $entry['key'], '</span>
-						</dd>
-						<dt>
-							<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
-							<textarea name="entry[', $cached['key'], ']" cols="40" rows="', $cached['rows'] < 2 ? 2 : $cached['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
-						</dt>
-						<dd>
-							<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
-							<textarea name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $entry['value'], '</textarea>
-						</dd>';
+					<dt>
+						<span class="smalltext">', $cached['key'], '</span>
+					</dt>
+					<dd>
+						<span class="smalltext">', $entry['key'], '</span>
+					</dd>
+					<dt>
+						<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
+						<textarea name="entry[', $cached['key'], ']" cols="40" rows="', $cached['rows'] < 2 ? 2 : $cached['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
+					</dt>
+					<dd>
+						<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
+						<textarea name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $entry['value'], '</textarea>
+					</dd>';
 			$cached = array();
 		}
 
@@ -379,24 +377,22 @@ function template_modify_language_entries()
 		{
 			// Alternative time
 			echo '
-
-						<dt>
-							<span class="smalltext">', $cached['key'], '</span>
-						</dt>
-						<dd>
-						</dd>
-						<dt>
-							<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
-							<textarea name="entry[', $cached['key'], ']" cols="40" rows="2" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
-						</dt>
-						<dd>
-						</dd>';
+					<dt>
+						<span class="smalltext">', $cached['key'], '</span>
+					</dt>
+					<dd>
+					</dd>
+					<dt>
+						<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
+						<textarea name="entry[', $cached['key'], ']" cols="40" rows="2" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
+					</dt>
+					<dd>
+					</dd>';
 		}
 
 		echo '
-					</dl>
-					<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="button_submit" />
-				</div>
+				</dl>
+				<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="button_submit" />
 			</div>';
 	}
 
