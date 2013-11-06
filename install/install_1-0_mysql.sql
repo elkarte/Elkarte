@@ -1038,7 +1038,7 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
   status tinyint(1) NOT NULL DEFAULT '0',
   id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
   log_time int(10) unsigned NOT NULL DEFAULT '0',
-  type varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  notif_type varchar(5) NOT NULL DEFAULT '',
   PRIMARY KEY (id_notification),
   KEY id_member (id_member,status)
 ) ENGINE=MyISAM;
