@@ -337,7 +337,7 @@ function template_postarea_above()
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
 			<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-				<h3 class="catbg">
+				<h3 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 				</h3>
 				<div class="post" id="preview_body">
@@ -348,7 +348,7 @@ function template_postarea_above()
 	// Start the main table.
 	echo '
 			<div class="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
-				<h3 class="catbg">', $context['page_title'], '</h3>
+				<h3 class="category_header">', $context['page_title'], '</h3>
 				<div class="windowbg">
 					<div class="editor_wrapper">';
 

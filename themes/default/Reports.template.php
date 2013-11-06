@@ -99,7 +99,7 @@ function template_main()
 				<tr class="windowbg table_caption">';
 			else
 				echo '
-				<tr class="', !empty($row[0]['separator']) ? 'catbg' : ($alternate ? 'windowbg' : 'windowbg2'), '" style="vertical-align:top">';
+				<tr class="', !empty($row[0]['separator']) ? 'category_header' : ($alternate ? 'windowbg' : 'windowbg2'), '" style="vertical-align:top">';
 
 			// Now do each column.
 			$column_number = 0;
@@ -208,7 +208,7 @@ function template_print()
 				if (!empty($data['separator']) && $column_number == 0)
 				{
 					echo '
-					<td colspan="', $table['column_count'], '" class="catbg">
+					<td colspan="', $table['column_count'], '" class="category_header">
 						<strong>', $data['v'], ':</strong>
 					</td>';
 					break;
