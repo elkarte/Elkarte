@@ -85,7 +85,6 @@ function template_maintain_database()
 
 	// Show an option to convert the body column of the post table to MEDIUMTEXT or TEXT
 	if (isset($context['convert_to']))
-	{
 		echo '
 		<h3 class="category_header">', $txt[$context['convert_to'] . '_title'], '</h3>
 		<div class="windowbg">
@@ -101,7 +100,6 @@ function template_maintain_database()
 				</form>
 			</div>
 		</div>';
-	}
 
 	echo '
 	</div>';
