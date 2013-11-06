@@ -2507,7 +2507,7 @@ dl.send_mail dd {
 #preview_body {
 	padding: 0.5em 1em;
 	overflow: auto;
-	margin: 0.5em 0 0 0;
+	margin: 2px 0 0;
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	background: #fff;
