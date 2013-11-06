@@ -3577,6 +3577,12 @@ dl.merge_topic dd {
 	opacity: 1;
 }
 
+a.help .icon {
+    padding: 4px 0 0;
+	position: relative;
+    vertical-align: top;
+}
+
 /* Styles for the tooltips. */
 .tooltip {
 	position: absolute;
