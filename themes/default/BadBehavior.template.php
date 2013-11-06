@@ -18,9 +18,7 @@ function template_badbehavior_log()
 	global $context, $settings, $scripturl, $txt;
 
 	echo '
-		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">';
-
-	echo '
+		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
 			</h2>
@@ -78,9 +76,7 @@ function template_badbehavior_log()
 		echo '
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=valid;value=', $entries['valid']['code'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '" /></a>', $txt['badbehaviorlog_error_valid_response'], ': ', $entries['valid']['response'], '<br />
 							<a href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=valid;value=', $entries['valid']['code'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_type'], '" /></a>', $txt['badbehaviorlog_error_valid_log'], ': ', $entries['valid']['log'], '<br />
-							<a style="display: table-cell; padding: 4px 0; width: 20px; vertical-align: top;" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=request_uri;value=', $entries['request_uri']['href'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '" /></a><a style="display: table-cell;" href="', $entries['request_uri']['html'], '">', $entries['request_uri']['html'], '</a>';
-
-		echo '
+							<a style="display: table-cell; padding: 4px 0; width: 20px; vertical-align: top;" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=request_uri;value=', $entries['request_uri']['href'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_headers'], '" /></a><a style="display: table-cell;" href="', $entries['request_uri']['html'], '">', $entries['request_uri']['html'], '</a>
 						</div>
 						<div class="error_where">
 							<a class="scope" href="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=user_agent;value=', $entries['user_agent']['href'], '" title="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_agent'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['badbehaviorlog_apply_filter'], ': ', $txt['badbehaviorlog_filter_only_agent'], '" /></a><span style="display: table-cell;">', $entries['user_agent']['html'], '</span>
@@ -88,9 +84,7 @@ function template_badbehavior_log()
 						<div class="error_where">
 							<a onclick="expandCollapse(\'details', $i, '\', \'icon', $i, '\'); return false;">
 							<img id="icon', $i, '" src="', $settings['images_url'], '/selected.png" alt="*" />&nbsp;<strong>', $txt['badbehaviorlog_details'], '</strong></a><div id="details', $i, '" class="padding" style="display:none">', $entries['http_headers']['html'], '</div>
-						</div>';
-
-		echo '
+						</div>
 					</td>
 					<td class="checkbox_column">
 						<input type="checkbox" name="delete[]" value="', $entries['id'], '" class="input_check" />
@@ -268,7 +262,6 @@ function template_callback_badbehavior_add_useragent()
 
 	// If we have none, then lets show a blank one.
 	if (empty($context['badbehavior_useragent_wl']))
-	{
 		echo '
 			<dt>
 				<input type="text" name="badbehavior_useragent_wl_desc[]" class="input_text" />
@@ -276,7 +269,6 @@ function template_callback_badbehavior_add_useragent()
 			<dd>
 				<input type="text" name="badbehavior_useragent_wl[]" class="input_text" />
 			</dd>';
-	}
 
 	// And a link so they can add more
 	echo '
