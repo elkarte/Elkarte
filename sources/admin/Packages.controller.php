@@ -1744,7 +1744,7 @@ class Packages_Controller extends Action_Controller
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
 		if (isset($_POST['action_changes']))
-			return action_perms_save();
+			return $this->action_perms_save();
 
 		$context['look_for'] = array();
 
