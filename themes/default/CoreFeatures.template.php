@@ -133,13 +133,8 @@ function template_core_features()
 			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
 
-	$alternate = true;
-	$num = 0;
-
+	// Loop through all the shiny features.
 	foreach ($context['features'] as $id => $feature)
-	{
-		$num++;
-
 		echo '
 			<div class="content features">
 				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
@@ -149,12 +144,8 @@ function template_core_features()
 				</div>
 				<h3 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h3>
 				<p>', $feature['desc'], '</p>
-
 				<hr />
 			</div>';
-
-		$alternate = !$alternate;
-	}
 
 	echo '
 			<div class="righttext">
