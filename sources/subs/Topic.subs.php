@@ -385,7 +385,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 	// Update the totals...
 	updateStats('message');
-	updateStats('topic');
+	updateTopicStats();
 	updateSettings(array(
 		'calendar_updated' => time(),
 	));
@@ -704,7 +704,7 @@ function moveTopics($topics, $toBoard)
 	updateLastMessages(array_unique($updates));
 
 	// Update 'em pesky stats.
-	updateStats('topic');
+	updateTopicStats();
 	updateStats('message');
 	updateSettings(array(
 		'calendar_updated' => time(),
@@ -2344,7 +2344,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	$db->free_result($request);
 
 	// Housekeeping.
-	updateStats('topic');
+	updateTopicStats();
 	updateLastMessages($id_board);
 
 	logAction('split', array('topic' => $split1_ID_TOPIC, 'new_topic' => $split2_ID_TOPIC, 'board' => $id_board));
@@ -2908,4 +2908,38 @@ function getSubject($id_topic)
 	$db->free_result($request);
 
 	return $subject;
+}
+
+/**
+ * This function updates the total number of topics,
+ * or if parameter $increment is true it simply increments them.
+ * Used by updateStats('topic').
+ *
+ * @param bool $increment = null if true, increment + 1 the total topics, otherwise recount all topics
+ */
+function updateTopicStats($increment = null)
+{
+	global $modSettings;
+
+	$db = database();
+
+	if ($increment === true)
+		updateSettings(array('totalTopics' => true), true);
+	else
+	{
+		// Get the number of topics - a SUM is better for InnoDB tables.
+		// We also ignore the recycle bin here because there will probably be a bunch of one-post topics there.
+		$db->query('', '
+			SELECT SUM(num_topics + unapproved_topics) AS total_topics
+			FROM {db_prefix}boards' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			WHERE id_board != {int:recycle_board}' : ''),
+			array(
+				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+			)
+		);
+		$row = $db->fetch_assoc($result);
+		$db->free_result($result);
+
+		updateSettings(array('totalTopics' => $row['total_topics'] === null ? 0 : $row['total_topics']));
+	}
 }
