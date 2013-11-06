@@ -30,10 +30,7 @@ function template_fatal_error()
 		<div class="windowbg generic_list_wrapper">
 			<div ', $context['error_code'], '>', $context['error_message'], '</div>
 		</div>
-	</div>';
-
-	// Show a back button (using javascript.)
-	echo '
+	</div>
 	<div class="centertext">
 		<a class="linkbutton" href="javascript:history.go(-1)">', $txt['back'], '</a>
 	</div>';
@@ -233,9 +230,7 @@ function template_attachment_errors()
 
 	echo '
 	<div>
-		<h2 class="category_header">
-			', $txt['attach_error_title'], '
-		</h2>
+		<h2 class="category_header">', $txt['attach_error_title'], '</h2>
 		<div class="windowbg">';
 
 	foreach ($context['attachment_error_keys'] as $key)
