@@ -45,7 +45,7 @@ class Xml_Controller extends Action_Controller
 		$action->initialize($subActions);
 
 		// Valid action?
-		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : '';
+		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? '' : $_REQUEST['sa'];
 
 		// Act a  bit special for XML, probably never see it anyway :P
 		if (empty($subAction))
@@ -105,6 +105,7 @@ class Xml_Controller extends Action_Controller
 		$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
 		$context['membergroup_icons'] = array();
 		$directory = $settings['theme_dir'] . '/images/group_icons';
+		$icons = array();
 
 		// Get all the available member group icons
 		$files = scandir($directory);
