@@ -1361,8 +1361,8 @@ function template_profile_timeformat_modify()
 	echo '
 							<dt>
 								<strong><label for="easyformat">', $txt['time_format'], ':</label></strong><br />
-								<a href="', $scripturl, '?action=quickhelp;help=time_format" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="floatleft" /></a>
-								<span class="smalltext">&nbsp;<label for="time_format">', $txt['date_format'], '</label></span>
+								<a href="', $scripturl, '?action=quickhelp;help=time_format" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+								<span>&nbsp;<label for="time_format">', $txt['date_format'], '</label></span>
 							</dt>
 							<dd>
 								<select name="easyformat" id="easyformat" onchange="document.forms.creator.time_format.value = this.options[this.selectedIndex].value;" style="margin-bottom: 4px;">';
@@ -1388,7 +1388,7 @@ function template_profile_timeoffset_modify()
 	echo '
 							<dt>
 								<strong', (isset($context['modify_error']['bad_offset']) ? ' class="error"' : ''), '><label for="time_offset">', $txt['time_offset'], ':</label></strong><br />
-								<span class="smalltext">', $txt['personal_time_offset'], '</span>
+								<span>', $txt['personal_time_offset'], '</span>
 							</dt>
 							<dd>
 								<input type="text" name="time_offset" id="time_offset" size="5" maxlength="5" value="', $context['member']['time_offset'], '" class="input_text" /> ', $txt['hours'], ' [<a href="javascript:void(0);" onclick="currentDate = new Date(', $context['current_forum_time_js'], '); document.getElementById(\'time_offset\').value = autoDetectTimeOffset(currentDate); return false;">', $txt['timeoffset_autodetect'], '</a>]<br />', $txt['current_time'], ': <em>', $context['current_forum_time'], '</em>

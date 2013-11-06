@@ -327,7 +327,6 @@ function template_modify_board()
 			<h2 class="category_header">
 				', isset($context['board']['is_new']) ? $txt['mboards_new_board_name'] : $txt['boardsEdit'], '
 			</h2>
-			</div>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">';
@@ -337,7 +336,6 @@ function template_modify_board()
 
 						<dt>
 							<strong>', $txt['mboards_category'], ':</strong>
-
 						</dt>
 						<dd>
 							<select name="new_cat" onchange="if (this.form.order) {this.form.order.disabled = this.options[this.selectedIndex].value != 0; this.form.board_order.disabled = this.options[this.selectedIndex].value != 0 || this.form.order.options[this.form.order.selectedIndex].value == \'\';}">';
@@ -432,6 +430,7 @@ function template_modify_board()
 									<th>', $txt['permissions_option_on'], '</th>
 									<th>', $txt['permissions_option_off'], '</th>
 									<th>', $txt['permissions_option_deny'], '</th>
+									<th></th>
 								</tr>';
 
 	// List all the membergroups so the user can choose who may access this board.
@@ -443,7 +442,8 @@ function template_modify_board()
 								<span', $group['is_post_group'] ? ' class="post_group" title="' . $txt['mboards_groups_post_group'] . '"' : '', $group['id'] == 0 ? ' class="regular_members" title="' . $txt['mboards_groups_regular_members'] . '"' : '', '>
 									', $group['name'], '
 								</span>
-							</label><br />';
+							</label>
+							<br />';
 		else
 			echo '
 								<tr>

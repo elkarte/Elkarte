@@ -106,32 +106,36 @@ function template_unread()
 							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'];
 
 		echo '
-							<ul class="topic_sorting" id="sort_by">';
+							<span class="sort_by_container">
+								<ul id="sort_by" class="topic_sorting">';
+
+		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])
 			echo '
-								<li class="listlevel1 quickmod_select_all">
-									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
-								</li>';
+									<li class="listlevel1 quickmod_select_all">
+										<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+									</li>';
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
-								<li class="listlevel1 topic_sorting_row">
-									<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
-								</li>';
+									<li class="listlevel1 topic_sorting_row">
+										<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+									</li>';
 
 		echo '
-								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
-									<ul class="menulevel2" id="sortby">';
+									<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+										<ul class="menulevel2" id="sortby">';
+
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
-										<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+											<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
 		echo '
-									</ul>';
+										</ul>';
 
-			// Show a "select all" box for quick moderation?
 		echo '
-								</li>
-							</ul>';
+									</li>
+								</ul>
+							</span>';
 
 		echo '
 						</h2>
@@ -165,10 +169,10 @@ function template_unread()
 											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
-									<p class="topic_starter">
+									<div class="topic_starter">
 										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], !empty($topic['pages']) ? '
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
-									</p>
+									</div>
 								</div>
 								<div class="topic_latest">
 									<p class="topic_stats">
@@ -249,32 +253,34 @@ function template_replies()
 							', $txt['unread_replies'];
 
 		echo '
-							<ul class="topic_sorting" id="sort_by">';
+							<span class="sort_by_container">
+								<ul id="sort_by" class="topic_sorting" >';
 		if ($context['showCheckboxes'])
 			echo '
-								<li class="listlevel1 quickmod_select_all">
-									<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
-								</li>';
+									<li class="listlevel1 quickmod_select_all">
+										<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+									</li>';
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
 		echo '
-								<li class="listlevel1 topic_sorting_row">
-									<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
-								</li>';
+									<li class="listlevel1 topic_sorting_row">
+										<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+									</li>';
 
 		echo '
-								<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
-									<ul class="menulevel2" id="sortby">';
+									<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+										<ul class="menulevel2" id="sortby">';
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
-										<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+											<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
 		echo '
-									</ul>';
+										</ul>';
 
 			// Show a "select all" box for quick moderation?
 		echo '
-								</li>
-							</ul>';
+									</li>
+								</ul>
+							</span>';
 
 		echo '
 						</h2>
@@ -311,10 +317,10 @@ function template_replies()
 											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
-									<p class="topic_starter">
+									<div class="topic_starter">
 										', $topic['first_post']['started_by'], !empty($topic['pages']) ? '
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
-									</p>
+									</div>
 								</div>
 								<div class="topic_latest">
 									<p class="topic_stats">

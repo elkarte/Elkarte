@@ -186,7 +186,7 @@ function template_pages_and_buttons_above()
 		}
 
 		echo '
-				<ul class="topic_sorting" id="sort_by">';
+				<ul id="sort_by" class="topic_sorting">';
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
 					<li class="listlevel1 quickmod_select_all">
