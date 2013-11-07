@@ -262,10 +262,10 @@ class Emailuser_Controller extends Action_Controller
 	 */
 	public function action_email()
 	{
-		global $context, $modSettings, $user_info, $txt, $scripturl;
+		global $context, $user_info, $txt, $scripturl;
 
 		// Can the user even see this information?
-		if ($user_info['is_guest'] && !empty($modSettings['guest_hideContacts']))
+		if ($user_info['is_guest'])
 			fatal_lang_error('no_access', false);
 
 		isAllowedTo('send_email_to_members');
