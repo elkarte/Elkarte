@@ -14,13 +14,18 @@
 // Any output here is not good
 error_reporting(0);
 
-// SSI needed to get ElkArte functions
-require_once(dirname(__FILE__) . '/SSI.php');
+// Being run as a cron job
+if (!defined('ELK'))
+{
+	require_once(dirname(__FILE__) . '/SSI.php');
+	postbyemail_imap();
 
-// Get and save the latest emails
-postbyemail_imap();
-
-exit(0);
+	// Need to keep the cli clean on return
+	exit(0);
+}
+// Or a scheduled task
+else
+	postbyemail_imap();
 
 /**
  * postbyemail_imap()
