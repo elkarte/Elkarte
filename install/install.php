@@ -42,6 +42,7 @@ $databases = array(
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
 			return true;
 		'),
+		'require_db_confirm' => true,
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
@@ -65,6 +66,7 @@ $databases = array(
 
 			return true;
 		'),
+		'require_db_confirm' => true,
 	),
 );
 
@@ -301,7 +303,6 @@ function load_database()
 	if (!$db_connection)
 	{
 		require_once(SOURCEDIR . '/database/Database.subs.php');
-		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
 			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
@@ -747,9 +748,9 @@ function action_databaseSettings()
 			define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 		// Better find the database file!
-		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
+		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
 		{
-			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.subs.php');
+			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.class.php');
 			return false;
 		}
 
@@ -1177,7 +1178,7 @@ function action_adminAccount()
 	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']));
 	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']));
 
-	$incontext['require_db_confirm'] = empty($db_type);
+	$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
 
 	// Only allow create an admin account if they don't have one already.
 	$request = $db->query('', '

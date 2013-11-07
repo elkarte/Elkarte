@@ -404,8 +404,11 @@ class Auth_Controller extends Action_Controller
 			logOnline($user_info['id'], false);
 		}
 
-		// Logout? Let's kill the admin session, too.
-		unset($_SESSION['admin_time']);
+		// Logout? Let's kill the admin/moderate/other sessions, too.
+		$types = array('admin', 'moderate');
+		call_integration_hook('integrate_validateSession', array(&$types));
+		foreach ($types as $type)
+			unset($_SESSION[$type . '_time']);
 
 		$_SESSION['log_time'] = 0;
 
@@ -493,7 +496,7 @@ class Auth_Controller extends Action_Controller
 		// we deal only with logged in folks in here!
 		if (!$user_info['is_guest'])
 		{
-			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
+			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
 				list (, , $timeout) = @unserialize($_COOKIE[$cookiename]);
 			elseif (isset($_SESSION['login_' . $cookiename]))
 				list (, , $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
