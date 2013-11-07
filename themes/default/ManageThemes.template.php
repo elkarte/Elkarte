@@ -100,22 +100,8 @@ function template_main()
 				</div>
 			</form>';
 
-	// Link to some server for latest themes and info!
-	echo '
-			<br />
-			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=latest_themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_latest'], '
-			</h3>
-			<div class="windowbg">
-				<div class="content">
-					<div id="themeLatest">
-						', $txt['theme_latest_fetch'], '
-					</div>
-				</div>
-			</div>
-			<br />';
-
 	// Warn them if theme creation isn't possible!
+	// @todo move to a proper error box somewhere?
 	if (!$context['can_create_new'])
 		echo '
 			<div class="errorbox">', $txt['theme_install_writable'], '</div>';
@@ -166,24 +152,7 @@ function template_main()
 				</div>
 			</form>
 		</div>
-	</div>
-
-	<script><!-- // --><![CDATA[
-		window.elkForum_scripturl = elk_scripturl;
-		window.elkForum_sessionid = elk_session_id;
-		window.elkForum_sessionvar = elk_session_var;
-		window.elkThemes_writable = ', $context['can_create_new'] ? 'true' : 'false', ';
-	// ]]></script>';
-
-	if (empty($modSettings['disable_elk_js']))
-		echo '
-		<script src="', $scripturl, '?action=viewadminfile;filename=latest-themes.js"></script>';
-
-	echo '
-		<script><!-- // --><![CDATA[
-			var tempOldOnload;
-			elkSetLatestThemes();
-		// ]]></script>';
+	</div>';
 }
 
 /**
