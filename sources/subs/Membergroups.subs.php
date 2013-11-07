@@ -1891,7 +1891,7 @@ function deleteGroupRequests($groups)
  * @param array $members = null The members to update, null if all
  * @param array $parameter2 = null
  */
-function updatePostGroupStats($members = null, $parameter2)
+function updatePostGroupStats($members = null, $parameter2 = null)
 {
 	$db = database();
 
@@ -1900,7 +1900,7 @@ function updatePostGroupStats($members = null, $parameter2)
 		return;
 
 	$postgroups = cache_get_data('updateStats:postgroups', 360);
-	if ($postgroups === null || $parameter1 === null)
+	if ($postgroups === null || $members === null)
 	{
 		// Fetch the postgroups!
 		$request = $db->query('', '

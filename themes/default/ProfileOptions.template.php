@@ -773,7 +773,7 @@ function template_action_notification()
 							<select name="notify_types" id="notify_types">';
 
 	// Using the maillist functions, then limit the options so they make sense
-	if (!empty($modSettings['pbe_no_mod_notices']) && !empty($modSettings['maillist_enabled']))
+	if (empty($modSettings['maillist_enabled']) || (empty($modSettings['pbe_no_mod_notices']) && !empty($modSettings['maillist_enabled'])))
 	{
 		echo '
 								<option value="1"', $context['member']['notify_types'] == 1 ? ' selected="selected"' : '', '>', $txt['notify_send_type_everything'], '</option>
@@ -796,8 +796,7 @@ function template_action_notification()
 					</div>
 				</div>
 			</div>
-		</form>
-		<br />';
+		</form>';
 
 	// Show the boards you have on notify
 	template_show_list('board_notification_list');

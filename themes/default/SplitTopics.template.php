@@ -122,66 +122,68 @@ function template_select()
 	echo '
 	<div id="split_topics">
 		<form action="', $scripturl, '?action=splittopics;sa=splitSelection;board=', $context['current_board'], '.0" method="post" accept-charset="UTF-8">
-			<div id="not_selected" class="floatleft">
-				<h2 class="category_header">', $txt['split_topic'], ' - ', $txt['select_split_posts'], '</h2>
-				<div class="information">
-					', $txt['please_select_split'], '
-				</div>', template_pagesection(false, false, array('page_index_markup' => '<div id="pageindex_not_selected">' . $context['not_selected']['page_index'] . '</div>')), '
-				<ul id="messages_not_selected" class="split_messages smalltext">';
+			<div class="content">
+				<div id="not_selected" class="floatleft">
+					<h2 class="category_header">', $txt['split_topic'], ' - ', $txt['select_split_posts'], '</h2>
+					<div class="information">
+						', $txt['please_select_split'], '
+					</div>', template_pagesection(false, false, array('page_index_markup' => $context['not_selected']['page_index'])), '
+					<ul id="messages_not_selected" class="split_messages smalltext">';
 
 	foreach ($context['not_selected']['messages'] as $message)
 		echo '
-					<li class="windowbg', $message['alternate'] ? '2' : '', '" id="not_selected_', $message['id'], '">
-						<div class="content">
-							<div class="message_header">
-								<a class="split_icon floatright" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=down;msg=', $message['id'], '" onclick="return select(\'down\', ', $message['id'], ');"><img src="', $settings['images_url'], '/split_select.png" alt="-&gt;" /></a>
-								<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
-								<em>', $message['time'], '</em>
+						<li class="windowbg', $message['alternate'] ? '2' : '', '" id="not_selected_', $message['id'], '">
+							<div class="content">
+								<div class="message_header">
+									<a class="split_icon floatright" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=down;msg=', $message['id'], '" onclick="return select(\'down\', ', $message['id'], ');"><img src="', $settings['images_url'], '/split_select.png" alt="-&gt;" /></a>
+									<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
+									<em>', $message['time'], '</em>
+								</div>
+								<div class="post">', $message['body'], '</div>
 							</div>
-							<div class="post">', $message['body'], '</div>
-						</div>
-					</li>';
+						</li>';
 
 	echo '
-					<li class="dummy" />
-				</ul>
-			</div>
-			<div id="selected" class="floatright">
-				<h3 class="category_header">
-						', $txt['split_selected_posts'], ' (<a href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=reset;msg=0" onclick="return select(\'reset\', 0);">', $txt['split_reset_selection'], '</a>)
-				</h3>
-				<div class="information">
-					', $txt['split_selected_posts_desc'], '
-				</div>', template_pagesection(false, false, array('page_index_markup' => '<div id="pageindex_selected">' . $context['selected']['page_index'] . '</div>')), '
-				<ul id="messages_selected" class="split_messages smalltext">';
+						<li class="dummy"></li>
+					</ul>
+				</div>
+				<div id="selected" class="floatright">
+					<h3 class="category_header">
+							', $txt['split_selected_posts'], ' (<a href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=reset;msg=0" onclick="return select(\'reset\', 0);">', $txt['split_reset_selection'], '</a>)
+					</h3>
+					<div class="information">
+						', $txt['split_selected_posts_desc'], '
+					</div>', template_pagesection(false, false, array('page_index_markup' => $context['selected']['page_index'])), '
+					<ul id="messages_selected" class="split_messages smalltext">';
 
 	if (!empty($context['selected']['messages']))
 	{
 		foreach ($context['selected']['messages'] as $message)
 			echo '
-					<li class="windowbg', $message['alternate'] ? '2' : '', '" id="selected_', $message['id'], '">
-						<div class="content">
-							<div class="message_header">
-								<a class="split_icon floatleft" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=up;msg=', $message['id'], '" onclick="return select(\'up\', ', $message['id'], ');"><img src="', $settings['images_url'], '/split_deselect.png" alt="&lt;-" /></a>
-								<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
-								<em>', $message['time'], '</em>
+						<li class="windowbg', $message['alternate'] ? '2' : '', '" id="selected_', $message['id'], '">
+							<div class="content">
+								<div class="message_header">
+									<a class="split_icon floatleft" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=up;msg=', $message['id'], '" onclick="return select(\'up\', ', $message['id'], ');"><img src="', $settings['images_url'], '/split_deselect.png" alt="&lt;-" /></a>
+									<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
+									<em>', $message['time'], '</em>
+								</div>
+								<div class="post">', $message['body'], '</div>
 							</div>
-							<div class="post">', $message['body'], '</div>
-						</div>
-					</li>';
+						</li>';
 	}
 
 	echo '
-					<li class="dummy" />
-				</ul>
-			</div>
-			<div class="submitbutton">
-				<input type="hidden" name="topic" value="', $context['current_topic'], '" />
-				<input type="hidden" name="subname" value="', $context['new_subject'], '" />
-				<input type="hidden" name="move_to_board" value="', $context['move_to_board'], '" />
-				<input type="hidden" name="reason" value="', $context['reason'], '" />
-				<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<li class="dummy"></li>
+					</ul>
+				</div>
+				<div class="submitbutton">
+					<input type="hidden" name="topic" value="', $context['current_topic'], '" />
+					<input type="hidden" name="subname" value="', $context['new_subject'], '" />
+					<input type="hidden" name="move_to_board" value="', $context['move_to_board'], '" />
+					<input type="hidden" name="reason" value="', $context['reason'], '" />
+					<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				</div>
 			</div>
 		</form>
 	</div>

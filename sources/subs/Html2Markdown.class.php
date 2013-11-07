@@ -116,11 +116,16 @@ class Convert_Md
 			$markdown = html_entity_decode(htmlspecialchars_decode($markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 			if (preg_match('~<body>(.*)</body>~s', $markdown, $body))
 				$markdown = $body[1];
+			elseif (preg_match('~<html>(.*)</html>~s', $markdown, $body))
+				$markdown = $body[1];
 		}
 
 		// Remove non breakable spaces that may be hiding in here
 		$markdown = str_replace("\xC2\xA0\x20", ' ', $markdown);
 		$markdown = str_replace("\xC2\xA0", ' ', $markdown);
+
+		// Remove any tags
+		$markdown = strip_tags($markdown);
 
 		// Strip the chaff and any excess blank lines we may have produced
 		$markdown = trim($markdown);

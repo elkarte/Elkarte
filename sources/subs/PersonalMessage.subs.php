@@ -1606,7 +1606,7 @@ function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doD
  * @param int $id_member
  * @param int $replied_to
  */
-function ssetPMRepliedStatus($id_member, $replied_to)
+function setPMRepliedStatus($id_member, $replied_to)
 {
 	$db = database();
 
