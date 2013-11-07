@@ -787,8 +787,8 @@ function registerMember(&$regOptions, $error_context = 'register')
 		}
 
 		// Send admin their notification.
-		require_once(SUBSDIR . '/Post.subs.php');
-		adminNotify('standard', $memberID, $regOptions['username']);
+		require_once(SUBSDIR . '/Notification.subs.php');
+		sendAdminNotifications('standard', $memberID, $regOptions['username']);
 	}
 	// Need to activate their account - or fall under COPPA.
 	elseif ($regOptions['require'] == 'activation' || $regOptions['require'] == 'coppa')
@@ -832,8 +832,8 @@ function registerMember(&$regOptions, $error_context = 'register')
 		sendmail($regOptions['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 		// Admin gets informed here...
-		require_once(SUBSDIR . '/Post.subs.php');
-		adminNotify('approval', $memberID, $regOptions['username']);
+		require_once(SUBSDIR . '/Notification.subs.php');
+		sendAdminNotifications('approval', $memberID, $regOptions['username']);
 	}
 
 	// Okay, they're for sure registered... make sure the session is aware of this for security. (Just married :P!)

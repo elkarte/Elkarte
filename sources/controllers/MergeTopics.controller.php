@@ -151,8 +151,7 @@ class MergeTopics_Controller extends Action_Controller
 	 */
 	public function action_mergeExecute($topics = array())
 	{
-		global $user_info, $txt, $context, $scripturl;
-		global $language, $modSettings;
+		global $user_info, $txt, $context, $scripturl, $language, $modSettings;
 
 		$db = database();
 
@@ -486,9 +485,9 @@ class MergeTopics_Controller extends Action_Controller
 		}
 
 		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])): '';
+
 		// Merge topic notifications.
 		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();
-
 		fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications);
 
 		// Asssign the properties of the newly merged topic.
@@ -546,6 +545,7 @@ class MergeTopics_Controller extends Action_Controller
 		logAction('merge', array('topic' => $id_topic, 'board' => $id_board));
 
 		// Notify people that these topics have been merged?
+		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($id_topic, 'merge');
 
 		// If there's a search index that needs updating, update it...

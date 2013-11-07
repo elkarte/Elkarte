@@ -419,7 +419,10 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	// Notify members who have notification turned on for this,
 	// but only if it's going to be approved
 	if ($becomesApproved)
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($topic_info['id_topic'], 'reply', array(), array(), $pbe);
+	}
 
 	return true;
 }
@@ -576,7 +579,10 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 
 	// Notify members who have notification turned on for this, (if it's approved)
 	if ($becomesApproved)
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($topicOptions['id'], 'reply', array(), array(), $pbe);
+	}
 
 	// Update this users info so the log shows them as active
 	query_update_member_stats($pbe, $email_message, $topicOptions);

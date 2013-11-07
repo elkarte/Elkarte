@@ -712,9 +712,8 @@ class Register_Controller extends Action_Controller
 
 		if (!isset($_POST['new_email']))
 		{
-			require_once(SUBSDIR . '/Post.subs.php');
-
-			adminNotify('activation', $row['id_member'], $row['member_name']);
+			require_once(SUBSDIR . '/Notification.subs.php');
+			sendAdminNotifications('activation', $row['id_member'], $row['member_name']);
 		}
 
 		$context += array(

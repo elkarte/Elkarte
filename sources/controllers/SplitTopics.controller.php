@@ -49,7 +49,7 @@ class SplitTopics_Controller extends Action_Controller
 		if (empty($topic))
 			fatal_lang_error('numbers_one_to_nine', false);
 
-		// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
+		// Load up the "dependencies" - the template, getMsgMemberID().
 		if (!isset($_REQUEST['xml']))
 			loadTemplate('SplitTopics');
 

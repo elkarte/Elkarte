@@ -551,6 +551,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// This is going to be needed to send off the notifications and for updateLastMessages().
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Notification.subs.php');
 
 		// Process process process data.
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -991,7 +992,6 @@ class MessageIndex_Controller extends Action_Controller
 
 		if (!empty($markCache))
 		{
-			require_once(SUBSDIR . '/Topic.subs.php');
 			$logged_topics = getLoggedTopics($user_info['id'], $markCache);
 
 			$markArray = array();

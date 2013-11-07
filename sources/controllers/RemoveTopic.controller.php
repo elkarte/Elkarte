@@ -48,7 +48,7 @@ class RemoveTopic_Controller extends Action_Controller
 		checkSession('get');
 
 		// This file needs to be included for sendNotifications().
-		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Notification.subs.php');
 
 		// This needs to be included for all the topic db functions
 		require_once(SUBSDIR . '/Topic.subs.php');
