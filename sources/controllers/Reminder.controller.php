@@ -80,7 +80,9 @@ class Reminder_Controller extends Action_Controller
 			fatal_lang_error('username_no_exist', false);
 
 		// Make sure we are not being slammed
-		spamProtection('remind');
+		// Don't call this if you're coming from the "Choose a reminder type" page - otherwise you'll likely get an error
+		if (!isset($_POST['reminder_type']) || !in_array($_POST['reminder_type'], array('email', 'secret')))
+			spamProtection('remind');
 
 		$member = findUser($where, $where_params);
 
