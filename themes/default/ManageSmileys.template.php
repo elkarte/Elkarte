@@ -32,48 +32,7 @@ function template_editsets()
 	template_show_list('smiley_set_list');
 
 	echo '
-		<br />
-		<h3 class="category_header">', $txt['smiley_sets_latest'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<div id="smileysLatest">', $txt['smiley_sets_latest_fetch'], '</div>
-			</div>
-		</div>
-	</div>
-
-	<script><!-- // --><![CDATA[
-		window.elkForum_scripturl = elk_scripturl;
-		window.elkForum_sessionid = elk_session_id;
-		window.elkForum_sessionvar = elk_session_var;
-	// ]]></script>';
-
-	if (empty($modSettings['disable_elk_js']))
-		echo '
-	<script src="', $scripturl, '?action=viewadminfile;filename=latest-smileys.js"></script>';
-
-	echo '
-	<script><!-- // --><![CDATA[
-		function elkSetLatestSmileys()
-		{
-			if (typeof(window.elkLatestSmileys) != "undefined")
-				setInnerHTML(document.getElementById("smileysLatest"), window.elkLatestSmileys);';
-
-		if (!empty($context['selected_set']))
-			echo '
-			changeSet("', $context['selected_set'], '");';
-
-		if (!empty($context['selected_smiley']))
-			echo '
-			loadSmiley(', $context['selected_smiley'], ');';
-
-		echo '
-		}';
-
-		echo '
-			elkSetLatestSmileys();';
-
-		echo '
-	// ]]></script>';
+	</div>';
 }
 
 /**

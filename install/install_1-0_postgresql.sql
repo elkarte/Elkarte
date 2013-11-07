@@ -143,7 +143,7 @@ CREATE OPERATOR != (PROCEDURE = bool_not_eq_int, LEFTARG = boolean, RIGHTARG = i
 # Sequence for table `admin_info_files`
 #
 
-CREATE SEQUENCE {$db_prefix}admin_info_files_seq START WITH 5;
+CREATE SEQUENCE {$db_prefix}admin_info_files_seq START WITH 4;
 
 #
 # Table structure for table `admin_info_files`
@@ -172,7 +172,6 @@ CREATE INDEX {$db_prefix}admin_info_files_filename ON {$db_prefix}admin_info_fil
 INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript');
 INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
 INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (4, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #

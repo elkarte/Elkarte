@@ -25,8 +25,7 @@ INSERT INTO {$db_prefix}admin_info_files
 VALUES
 	(1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript'),
 	(2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript'),
-	(4, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
