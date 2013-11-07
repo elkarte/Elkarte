@@ -2482,7 +2482,6 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('send_welcomeEmail', 
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_editDisplayName', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('admin_session_lifetime', '10');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_hideOnline', '1');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('guest_hideContacts', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('spamWaitTime', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('pm_spam_settings', '10,5,20');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('reserveWord', '0');

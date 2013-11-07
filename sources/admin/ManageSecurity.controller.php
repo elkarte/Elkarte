@@ -153,7 +153,6 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// initialize it with our settings
 		$config_vars = array(
-				array('check', 'guest_hideContacts'),
 				array('check', 'make_email_viewable'),
 			'',
 				array('int', 'failed_login_threshold'),
@@ -582,7 +581,6 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// initialize it with our settings
 		$config_vars = array(
-				array('check', 'guest_hideContacts'),
 				array('check', 'make_email_viewable'),
 			'',
 				array('int', 'failed_login_threshold'),

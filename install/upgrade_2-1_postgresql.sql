@@ -359,3 +359,11 @@ if (@$modSettings['smfVersion'] < '2.1')
 DELETE FROM {$db_prefix}settings
 WHERE variable LIKE 'integrate_%';
 ---#
+
+/******************************************************************************/
+--- Cleaning up guest hide contacts
+/******************************************************************************/
+---# Showing contact details to guests should never happen.
+DELETE FROM {$db_prefix}settings
+WHERE variable = 'guest_hideContacts';
+---#
