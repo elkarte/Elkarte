@@ -32,6 +32,11 @@ class Database_PostgreSQL implements Database
 	 */
 	private $_db_replace_result = null;
 
+	/**
+	 * A variable to remember if a transaction was started already or not
+	 */
+	private $_in_transaction = false;
+
 	private function __construct()
 	{
 		// Private constructor.
@@ -431,7 +436,7 @@ class Database_PostgreSQL implements Database
 				while (true)
 				{
 					$pos1 = strpos($db_string, '\'', $pos + 1);
-					$pos2 = strpos($db_string, '\\', $pos + 1);
+					$pos2 = strpos($db_string, '\'\'', $pos + 1);
 					if ($pos1 === false)
 						break;
 					elseif ($pos2 == false || $pos2 > $pos1)
@@ -466,12 +471,22 @@ class Database_PostgreSQL implements Database
 
 			if (!empty($fail) && function_exists('log_error'))
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
+
+			// If we are updating something, better start a transaction so that indexes may be kept consistent
+			if (!$this->_in_transaction && strpos($clean, 'update') !== false)
+			{
+				$using_transaction = true;
+				$this->db_transaction('begin', $connection);
+			}
 		}
 
 		$this->_db_last_result = @pg_query($connection, $db_string);
 
 		if ($this->_db_last_result === false && empty($db_values['db_error_skip']))
 			$this->_db_last_result = $this->error($db_string, $connection);
+
+		if ($this->_in_transaction)
+			$this->db_transaction('commit', $connection);
 
 		// Debugging.
 		if (isset($db_show_debug) && $db_show_debug === true)
@@ -566,11 +581,17 @@ class Database_PostgreSQL implements Database
 		$connection = $connection === null ? $this->_connection : $connection;
 
 		if ($type == 'begin')
+		{
+			$this->_in_transaction = true;
 			return @pg_query($connection, 'BEGIN');
+		}
 		elseif ($type == 'rollback')
 			return @pg_query($connection, 'ROLLBACK');
 		elseif ($type == 'commit')
+		{
+			$this->_in_transaction = false;
 			return @pg_query($connection, 'COMMIT');
+		}
 
 		return false;
 	}
@@ -716,7 +737,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_in_transact, $db_prefix;
+		global $db_prefix;
 
 		$connection = $connection === null ? $this->_connection : $connection;
 
@@ -730,7 +751,7 @@ class Database_PostgreSQL implements Database
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		$priv_trans = false;
-		if ((count($data) > 1 || $method == 'replace') && !$db_in_transact && !$disable_trans)
+		if ((count($data) > 1 || $method == 'replace') && !$this->_in_transaction && !$disable_trans)
 		{
 			$this->db_transaction('begin', $connection);
 			$priv_trans = true;
