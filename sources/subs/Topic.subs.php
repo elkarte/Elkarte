@@ -2276,6 +2276,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	// Check the subject length.
 	if (Util::strlen($new_subject) > 100)
 		$new_subject = Util::substr($new_subject, 0, 100);
+
 	// Valid subject?
 	if ($new_subject != '')
 	{
@@ -2350,6 +2351,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	logAction('split', array('topic' => $split1_ID_TOPIC, 'new_topic' => $split2_ID_TOPIC, 'board' => $id_board));
 
 	// Notify people that this topic has been split?
+	require_once(SUBSDIR . '/Notification.subs.php');
 	sendNotifications($split1_ID_TOPIC, 'split');
 
 	// If there's a search index that needs updating, update it...

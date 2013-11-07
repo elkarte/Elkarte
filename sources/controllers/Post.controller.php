@@ -1737,6 +1737,7 @@ class Post_Controller extends Action_Controller
 		// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
 		if ($becomesApproved)
 		{
+			require_once(SUBSDIR . '/Notification.subs.php');
 			if ($newTopic)
 			{
 				$notifyData = array(
@@ -1749,7 +1750,7 @@ class Post_Controller extends Action_Controller
 					'topic' => $topic,
 					'signature' => (isset($user_settings['signature']) ? $user_settings['signature'] : ''),
 				);
-				notifyMembersBoard($notifyData);
+				sendBoardNotifications($notifyData);
 			}
 			elseif (empty($_REQUEST['msg']))
 			{

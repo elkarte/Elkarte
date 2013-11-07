@@ -60,8 +60,8 @@ class Topic_Controller extends Action_Controller
 
 		checkSession('get');
 
-		// Get subs/Post.subs.php for sendNotifications.
-		require_once(SUBSDIR . '/Post.subs.php');
+		// Load up the helpers
+		require_once(SUBSDIR . '/Notification.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Find out who started the topic and its lock status
@@ -129,8 +129,9 @@ class Topic_Controller extends Action_Controller
 
 		checkSession('get');
 
-		// We need subs/Post.subs.php for the sendNotifications() function.
-		require_once(SUBSDIR . '/Post.subs.php');
+		// We need this for the sendNotifications() function.
+		require_once(SUBSDIR . '/Notification.subs.php');
+
 		// And Topic subs for topic attributes.
 		require_once(SUBSDIR . '/Topic.subs.php');
 
