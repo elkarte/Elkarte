@@ -26,10 +26,9 @@ VALUES
 	(1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript'),
 	(2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
 	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript'),
-	(4, 'latest-packages.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(5, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(6, 'latest-support.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(7, 'latest-themes.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+	(4, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(5, 'latest-support.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(6, 'latest-themes.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
