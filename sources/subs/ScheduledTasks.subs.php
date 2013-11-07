@@ -439,7 +439,7 @@ function processNextTasks($ts = 0)
 		// When should this next be run?
 		$next_time = next_time($row['time_regularity'], $row['time_unit'], $row['time_offset']);
 
-		// How long in seconds it the gap?
+		// How long in seconds is the gap?
 		$duration = $row['time_regularity'];
 		if ($row['time_unit'] == 'm')
 			$duration *= 60;
