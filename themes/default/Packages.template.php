@@ -589,7 +589,7 @@ function template_browse()
 					</span>
 					<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
 				</h3>
-				<div id="advanced_panel_div" class="windowbg"', empty($context['admin_preferences']['pkg']) ? '' : ' style="display: none;"', '>
+				<div id="advanced_panel_div" class="windowbg"', !empty($context['admin_preferences']['pkg']) ? ' style="display: none;"' : '', '>
 					<div class="content">
 						<p>
 							', $txt['package_emulate_desc'], '
@@ -643,7 +643,7 @@ function template_browse()
 				}
 			],
 			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				bUseThemeSettings: true,
 				sOptionName: \'admin_preferences\',
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
