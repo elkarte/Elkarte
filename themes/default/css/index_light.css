@@ -442,6 +442,30 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /*End sidebar flyout coding. */
 
 
+/*	$BOARDICONS	*/
+/* ------------------------------------------------------- */
+.board_icon {
+	display: inline-block;
+	width: 48px;
+	height: 48px;
+}
+.category_boards a span {
+	background-repeat: no-repeat;
+	background-image: url(../images/_light/board_icons.png);
+}
+/* The long list of sprite coordinates is much less verbose this way. */
+.on_board {
+	background-position: 0 0;
+}
+.on2_board {
+	background-position: -72px 0;
+}
+.off_board {
+	background-position: -144px 0;
+}
+.redirect_board {
+	background-position: -216px 0;
+}
 
 
 /*	$LINKTREE	*/
