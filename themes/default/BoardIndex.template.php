@@ -201,11 +201,11 @@ function template_boardindex_outer_below()
 
 	if ($context['user']['is_logged'])
 		echo '
-			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_some.png" alt="" /> ', $txt['new_posts'], '</p>';
+			<p class="board_key new_some_board" title="', $txt['new_posts'], '">', $txt['new_posts'], '</p>';
 
 	echo '
-			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_none.png" alt="" /> ', $txt['old_posts'], '</p>
-			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_redirect.png" alt="" /> ', $txt['redirect_board'], '</p>
+			<p class="board_key new_none_board" title="', $txt['old_posts'], '">', $txt['old_posts'], '</p>
+			<p class="board_key new_redirect_board" title="', $txt['redirect_board'], '">', $txt['redirect_board'], '</p>
 		</div>';
 
 	if (!empty($context['info_center_callbacks']))
