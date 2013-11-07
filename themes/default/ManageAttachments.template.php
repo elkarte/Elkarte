@@ -38,7 +38,6 @@ function template_avatar_settings_below()
 		document.getElementById("avatar_action_too_large").disabled = document.getElementById("avatar_download_external").checked;
 		document.getElementById("custom_avatar_dir").disabled = document.getElementById("custom_avatar_enabled").value == 0;
 		document.getElementById("custom_avatar_url").disabled = document.getElementById("custom_avatar_enabled").value == 0;
-
 	}
 	addLoadEvent(fUpdateStatus);
 // ]]></script>
@@ -69,7 +68,6 @@ function template_maintenance()
 				</dl>
 			</div>
 		</div>
-
 		<h3 class="category_header">', $txt['attachment_integrity_check'], '</h3>
 		<div class="windowbg">
 			<div class="content">
@@ -81,7 +79,6 @@ function template_maintenance()
 				</form>
 			</div>
 		</div>
-
 		<h3 class="category_header">', $txt['attachment_pruning'], '</h3>
 		<div class="windowbg">
 			<div class="content">
