@@ -3198,6 +3198,8 @@ function template_css()
 /**
  * I know this is becoming annoying, though this template
  * *shall* be present for security reasons, so better it stays here
+ *
+ * @todo rework it and merge into some other kind of general warning-box (i.e. modtask at index.template)
  */
 function template_admin_warning_above()
 {
@@ -3261,7 +3263,7 @@ function template_admin_warning_above()
 		echo '
 			<div class="noticebox">';
 
-		if (!empty($context['security_controls']['admin_session']) && empty($modSettings['securityDisable']))
+		if (!empty($context['security_controls']['admin_session']))
 			echo
 				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br>';
 

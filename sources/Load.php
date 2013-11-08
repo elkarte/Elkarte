@@ -2706,7 +2706,7 @@ function doSecurityChecks()
 			$context['security_controls']['files']['cache'] = true;
 
 		// Active admin session?
-		if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
+		if (empty($modSettings['securityDisable']) && (isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 			$context['security_controls']['admin_session'] = true;
 
 		// Maintenance mode enabled?
