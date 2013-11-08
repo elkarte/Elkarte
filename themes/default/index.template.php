@@ -479,7 +479,7 @@ function theme_linktree($force_show = false)
  */
 function template_menu()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
@@ -487,8 +487,12 @@ function template_menu()
 
 	// The upshrink image, right-floated.
 	echo '
-						<li id="collapse_button" class="listlevel1 floatright">
-							<a class="linklevel1"><img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />&nbsp;</a>
+						<li id="collapse_button" class="listlevel1">
+							<a class="linklevel1">
+								<span id="category_toggle">&nbsp;
+									<span id="upshrink" class="collapse" style="display: none;" title="', $txt['upshrink_description'], '"></span>
+								</span>
+							</a>
 						</li>';
 
 	foreach ($context['menu_buttons'] as $act => $button)
@@ -549,13 +553,13 @@ function template_menu()
 						aSwappableContainers: [
 							\'upper_section\',\'header\'
 						],
-						aSwapImages: [
+						aSwapClasses: [
 							{
 								sId: \'upshrink\',
-								srcExpanded: elk_images_url + \'/upshrink.png\',
-								altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-								srcCollapsed: elk_images_url + \'/upshrink2.png\',
-								altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
+								classExpanded: \'collapse\',
+								titleExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
+								classCollapsed: \'expand\',
+								titleCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 							}
 						],
 						oThemeOptions: {
