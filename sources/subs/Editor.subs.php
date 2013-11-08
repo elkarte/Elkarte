@@ -1147,10 +1147,6 @@ class Control_Verification_Questions implements Control_Verifications
 					$lang['selected'] = true;
 		}
 
-		// The javascript needs to go at the end
-		addInlineJavascript('
-			document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
-
 		if (isset($_GET['save']))
 		{
 			// Handle verification questions.
