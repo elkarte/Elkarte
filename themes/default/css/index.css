@@ -499,15 +499,15 @@ h4.titlebg .icon {
 	float: right;
 	margin: 4px 0 0 0;
 	padding: 4px;
-}
-.collapse {
+}*/
+
+h2 a.collapse {
 	margin: 2px 4px -2px 0;
 	float: right;
 }
-*/
 
-/* Upshrink image in the category headers */
-#category_toggle {
+/* Upshrink image in the general category headers */
+#category_toggle, #category_toggle_more {
 	display: block;
 	float:right;
 	padding: 0 16px;
@@ -515,7 +515,7 @@ h4.titlebg .icon {
 	overflow: hidden;
 	position: relative;
 }
-#category_toggle span {
+#category_toggle span, #category_toggle_more span {
 	background-repeat: no-repeat;
 	background-image: url(../images/_light/expcol.png);
 	position: absolute;
@@ -524,6 +524,14 @@ h4.titlebg .icon {
 	left: 50%;
 	margin-left: -58px;
 	padding: 47px 50px;
+}
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	display: block;
+	border-radius: 2px;
+	overflow: hidden;
+	position: relative;
+	padding: 0;
 }
 .collapse {
 	background-position: 0 -25px;
@@ -1001,21 +1009,7 @@ div.bbc_footnotes {
 	display: block;
 	padding: 0 0.6em;
 }
-#collapse_button .linklevel1 {
-	display: block;
-	padding: 0 16px;
-	border-radius: 2px;
-	overflow: hidden;
-	position: relative;
-}
-#upshrink {
-	position: absolute;
-	top: 50%;
-	margin-top: -55px;
-	left: 50%;
-	margin-left: -58px;
-	padding: 47px 50px;
-}
+
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
 	position: absolute;
