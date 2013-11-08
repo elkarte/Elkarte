@@ -853,11 +853,32 @@ elk_Toggle.prototype.init = function ()
 				oImage.onclick = function () {
 					this.instanceRef.toggle();
 					this.blur();
-				}
+				};
 				oImage.style.cursor = 'pointer';
 
 				// Preload the collapsed image.
 				smc_preCacheImage(this.opt.aSwapImages[i].srcCollapsed);
+			}
+		}
+	}
+	// No images to swap, perhaps they want to swap the class?
+	else if ('aSwapClasses' in this.opt)
+	{
+		for (var i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
+		{
+			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
+			if (typeof(oContainer) === 'object' && oContainer !== null)
+			{
+				// Display the image in case it was hidden.
+				if (oContainer.style.display === 'none')
+					oContainer.style.display = '';
+
+				oContainer.instanceRef = this;
+				oContainer.onclick = function () {
+					this.instanceRef.toggle();
+					this.blur();
+				};
+				oContainer.style.cursor = 'pointer';
 			}
 		}
 	}
@@ -879,11 +900,11 @@ elk_Toggle.prototype.init = function ()
 					this.instanceRef.toggle();
 					this.blur();
 					return false;
-				}
+				};
 			}
 		}
 	}
-}
+};
 
 // Collapse or expand the section.
 elk_Toggle.prototype.changeState = function(bCollapse, bInit)
@@ -907,9 +928,10 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		delete this.tmpMethod;
 	}
 
-	// Loop through all the images that need to be toggled.
+	// Loop through all the items that need to be toggled.
 	if ('aSwapImages' in this.opt)
 	{
+		// Swapping images on a click
 		for (var i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
@@ -921,6 +943,24 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 					oImage.src = sTargetSource;
 
 				oImage.alt = oImage.title = bCollapse ? this.opt.aSwapImages[i].altCollapsed : this.opt.aSwapImages[i].altExpanded;
+			}
+		}
+	}
+	else if ('aSwapClasses' in this.opt)
+	{
+		// Or swapping the classes
+		for (var i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
+		{
+			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
+			if (typeof(oContainer) === 'object' && oContainer !== null)
+			{
+				// Only swap the class if the state changed
+				var sTargetClass = bCollapse ? this.opt.aSwapClasses[i].classCollapsed : this.opt.aSwapClasses[i].classExpanded;
+				if (oContainer.className !== sTargetClass)
+					oContainer.className = sTargetClass;
+
+				// And show the new title
+				oContainer.title = oContainer.title = bCollapse ? this.opt.aSwapClasses[i].titleCollapsed : this.opt.aSwapClasses[i].titleExpanded;
 			}
 		}
 	}

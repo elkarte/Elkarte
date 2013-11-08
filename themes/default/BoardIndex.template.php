@@ -217,13 +217,15 @@ function template_boardindex_outer_below()
  */
 function template_info_center()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	// Here's where the "Info Center" starts...
 	echo '
 	<div id="info_center" class="forum_category">
 		<h2 class="category_header">
-			<img class="icon" id="upshrink_ic" title="', $txt['hide'], '" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
+			<p id="category_toggle">&nbsp;
+				<span id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+			</p>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
@@ -248,13 +250,13 @@ function template_info_center()
 			aSwappableContainers: [
 				\'upshrinkHeaderIC\'
 			],
-			aSwapImages: [
+			aSwapClasses: [
 				{
 					sId: \'upshrink_ic\',
-					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
+					classExpanded: \'collapse\',
+					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			aSwapLinks: [
