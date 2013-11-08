@@ -334,7 +334,11 @@ function template_quickreply_below()
 			<a id="quickreply"></a>
 			<div class="forumposts" id="quickreplybox">
 				<h2 class="category_header">
-					<a href="javascript:oQuickReply.swap();"><img src="', $settings['images_url'], '/', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '.png" alt="+" id="quickReplyExpand" class="icon" /></a>
+					<span id="category_toggle">&nbsp;
+						<a href="javascript:oQuickReply.swap();">
+							<span id="quickReplyExpand" class="', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '" title="', $txt['hide'], '"></span>
+						</a>
+					</span>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
 				</h2>
 				<div id="quickReplyOptions" class="windowbg"', $options['display_quick_reply'] > 1 ? '' : ' style="display: none"', '>
@@ -422,13 +426,13 @@ function template_quickreply_below()
 			</div>';
 	}
 
-	// tooltips for likes
+	// Tooltips for likes
 	echo '
 		<script><!-- // --><![CDATA[
 			$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 		// ]]></script>';
 
-	// draft autosave available and the user has it enabled?
+	// Draft autosave available and the user has it enabled?
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
 		echo '
 			<script><!-- // --><![CDATA[
@@ -465,9 +469,11 @@ function template_quickreply_below()
 						sScriptUrl: elk_scripturl,
 						sImagesUrl: elk_images_url,
 						sContainerId: "quickReplyOptions",
-						sImageId: "quickReplyExpand",
-						sImageCollapsed: "collapse.png",
-						sImageExpanded: "expand.png",
+						sClassId: "quickReplyExpand",
+						sClassCollapsed: "collapse",
+						sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
+						sClassExpanded: "expand",
+						sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
 						sJumpAnchor: "quickreply",
 						bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
 					});';
