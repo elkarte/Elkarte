@@ -3596,14 +3596,20 @@ function setupMenuContext()
 					'show' => !$context['allow_admin'] && $context['allow_moderation_center'],
 				),
 
+				'profile' => array(
+					'title' => $txt['account_short'],
+					'href' => $scripturl . '?action=profile',
+					'show' => $context['allow_edit_profile'],
+				),
+
 				// Language string needs agreement here. Anything but bloody username, please. :P
 				// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
 				// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
 				'pm' => array(
-					'title' => $context['allow_pm'] && !$context['allow_edit_profile'] ? $txt['pm_short'] : $txt['account_short'],
+					'title' => $txt['pm_short'],
 					'counter' => 'unread_messages',
-					'href' => $context['allow_pm'] ? $scripturl . '?action=pm' : $scripturl . '?action=profile',
-					'show' => $context['allow_pm'] || $context['allow_edit_profile'],
+					'href' => $scripturl . '?action=pm',
+					'show' => $context['allow_pm'],
 				),
 
 				// The old language string made no sense, and was too long.
@@ -3711,8 +3717,7 @@ function setupMenuContext()
 		);
 
 		// Personal messages
-		$pm_sub_buttons = $menu->childOf('pm')->add('pm_sub_buttons');
-		$pm_sub_buttons->addBulk(
+		$menu->childOf('pm')->add('pm_sub_buttons')->addBulk(
 			array(
 				'pm_read' => array(
 					'title' => $txt['pm_menu_read'],
@@ -3723,11 +3728,6 @@ function setupMenuContext()
 					'title' => $txt['pm_menu_send'],
 					'href' => $scripturl . '?action=pm;sa=send',
 					'show' => allowedTo('pm_send'),
-				),
-				'profile' => array(
-					'title' => $txt['profile'],
-					'href' => $scripturl . '?action=profile',
-					'show' => $context['allow_edit_profile'],
 				),
 			)
 		);
@@ -3773,7 +3773,7 @@ function setupMenuContext()
 		);
 
 		// Profile
-		$pm_sub_buttons->childOf('profile')->add('profile_sub_buttons')->addBulk(
+		$menu->childOf('profile')->add('profile_sub_buttons')->addBulk(
 			array(
 				'account' => array(
 					'title' => $txt['account'],
