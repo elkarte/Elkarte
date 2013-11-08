@@ -189,7 +189,7 @@ function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 
 	$db->query('', '
 		UPDATE {db_prefix}log_reported
-		SET ' . ($property == 'close' ? 'closed' : 'ignore_all') . '= {int:closed}
+		SET ' . ($property == 'close' ? 'closed' : 'ignore_all') . '= {int:status}
 		WHERE id_report IN ({array_int:report_list})
 			AND ' . $user_info['mod_cache']['bq'],
 		array(
