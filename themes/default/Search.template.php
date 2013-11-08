@@ -161,7 +161,10 @@ function template_main()
 			echo '
 					<fieldset class="content">
 						<h3 class="secondary_header">
-								<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['search']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
+							<span id="category_toggle">&nbsp;
+								<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['search']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+							</span>
+							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
 						<div id="advanced_panel_div"', $context['boards_check_all'] ? '' : ' style="display: none;"', '>
 							<ul class="ignoreboards floatleft">';
@@ -238,13 +241,13 @@ function template_main()
 							aSwappableContainers: [
 								\'advanced_panel_div\'
 							],
-							aSwapImages: [
+							aSwapClasses: [
 								{
 									sId: \'advanced_panel_toggle\',
-									srcExpanded: elk_images_url + \'/collapse.png\',
-									altExpanded: ', JavaScriptEscape($txt['hide']), ',
-									srcCollapsed: elk_images_url + \'/expand.png\',
-									altCollapsed: ', JavaScriptEscape($txt['show']), '
+									classExpanded: \'collapse\',
+									titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+									classCollapsed: \'expand\',
+									titleCollapsed: ', JavaScriptEscape($txt['show']), '
 								}
 							],
 							aSwapLinks: [

@@ -762,7 +762,9 @@ function template_search()
 			echo '
 		<fieldset class="labels">
 			<h3 class="category_header">
-						<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['pm_search_choose_label'], '</a>
+				<span id="category_toggle">&nbsp;
+					<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+				</span>
 			</h3>
 			<div id="advanced_panel_div"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
 				<ul id="searchLabelsExpand">';
@@ -795,13 +797,13 @@ function template_search()
 				aSwappableContainers: [
 					\'advanced_panel_div\'
 				],
-				aSwapImages: [
+				aSwapClasses: [
 					{
 						sId: \'advanced_panel_toggle\',
-						srcExpanded: elk_images_url + \'/collapse.png\',
-						altExpanded: ', JavaScriptEscape($txt['hide']), ',
-						srcCollapsed: elk_images_url + \'/expand.png\',
-						altCollapsed: ', JavaScriptEscape($txt['show']), '
+						classExpanded: \'collapse\',
+						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+						classCollapsed: \'expand\',
+						titleCollapsed: ', JavaScriptEscape($txt['show']), '
 					}
 				],
 				aSwapLinks: [
@@ -1086,11 +1088,12 @@ function template_send()
 	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts_pm_save']) && !empty($context['drafts']))
 	{
 		echo '
-			<div id="postDraftOptionsHeader" class="title_bar">
-				<h4 class="titlebg">
-					<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '.png"  alt="*" /><strong><a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a></strong>
-				</h4>
-			</div>
+			<h3 id="postDraftOptionsHeader" class="category_header">
+				<span id="category_toggle">&nbsp;
+					<span id="postDraftExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+				</span>
+				<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
+			</h3>
 			<div id="postDraftOptions" class="load_drafts padding"', empty($context['minmax_preferences']['pmdraft']) ? '' : ' style="display: none;"', '>
 				<dl class="settings">
 					<dt><strong>', $txt['subject'], '</strong></dt>
@@ -1130,13 +1133,13 @@ function template_send()
 				aSwappableContainers: [
 					\'postDraftOptions\',
 				],
-				aSwapImages: [
+				aSwapClasses: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: elk_images_url + \'/collapse.png\',
-						altExpanded: \'-\',
-						srcCollapsed: elk_images_url + \'/expand.png\',
-						altCollapsed: \'+\'
+						classExpanded: \'collapse\',
+						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+						classCollapsed: \'expand\',
+						titleCollapsed: ', JavaScriptEscape($txt['show']), '
 					}
 				],
 				aSwapLinks: [

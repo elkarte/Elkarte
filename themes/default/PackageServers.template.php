@@ -157,7 +157,7 @@ function template_package_list()
 		{
 			echo '
 					<li>
-						<strong><img id="ps_img_', $i, '" src="', $settings['images_url'], '/collapse.png" alt="*" style="display: none;" /> ', $packageSection['title'], '</strong>';
+						<img id="ps_img_', $i, '" src="', $settings['images_url'], '/collapse.png" class="floatright" alt="*" style="display: none;" /><strong>', $packageSection['title'], '</strong>';
 
 			if (!empty($packageSection['text']))
 				echo '
@@ -193,7 +193,7 @@ function template_package_list()
 				{
 					// 1. Some addon [ Download ].
 					echo '
-							<strong><img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/collapse.png" alt="*" style="display: none;" /> ', $package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a href="' . $package['download']['href'] . '">[ ' . $txt['download'] . ' ]</a>': $package['name'];
+							<strong><img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" /> ', $package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a href="' . $package['download']['href'] . '">[ ' . $txt['download'] . ' ]</a>': $package['name'];
 
 					// Mark as installed and current?
 					if ($package['is_installed'] && !$package['is_newer'])
@@ -289,9 +289,9 @@ function template_package_list()
 					aSwapImages: [
 						{
 							sId: \'ps_img_', $section, '_pkg_', $id, '\',
-							srcExpanded: elk_images_url + \'/collapse.png\',
+							srcExpanded: elk_images_url + \'/selected.png\',
 							altExpanded: \'*\',
-							srcCollapsed: elk_images_url + \'/expand.png\',
+							srcCollapsed: elk_images_url + \'/selected_open.png\',
 							altCollapsed: \'*\'
 						}
 					]

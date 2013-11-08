@@ -206,7 +206,7 @@ function template_download_language()
 				aSwapImages: [
 					{
 						sId: \'toggle_image_', $theme, '\',
-						srcExpanded: elk_images_url + \'/sort_down.png\',
+						srcExpanded: elk_images_url + \'/selected_open.png\',
 						altExpanded: \'*\',
 						srcCollapsed: elk_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
