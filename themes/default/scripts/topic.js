@@ -304,8 +304,14 @@ QuickReply.prototype.onQuoteReceived = function (oXMLDoc)
 // The function handling the swapping of the quick reply.
 QuickReply.prototype.swap = function ()
 {
-	document.getElementById(this.opt.sImageId).src = this.opt.sImagesUrl + "/" + (this.bCollapsed ? this.opt.sImageCollapsed : this.opt.sImageExpanded);
+	var oQuickReplyContainer = document.getElementById(this.opt.sClassId);
+
+	// Swap the class on the image sprite
+	oQuickReplyContainer.className = this.bCollapsed ? this.opt.sClassCollapsed : this.opt.sClassExpanded;
 	$('#' + this.opt.sContainerId).slideToggle();
+
+	// Give it a new title as well
+	oQuickReplyContainer.title = this.bCollapsed ? this.opt.sTitleExpanded : this.opt.sTitleCollapsed;
 
 	this.bCollapsed = !this.bCollapsed;
 }
