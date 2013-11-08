@@ -223,9 +223,9 @@ function template_info_center()
 	echo '
 	<div id="info_center" class="forum_category">
 		<h2 class="category_header">
-			<p id="category_toggle">&nbsp;
+			<span id="category_toggle">&nbsp;
 				<span id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
-			</p>
+			</span>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
