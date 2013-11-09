@@ -33,7 +33,7 @@ class ManageTopics_Controller extends Action_Controller
 		global $context, $txt;
 
 		$subActions = array(
-			'display' => array (
+			'display' => array(
 				'controller' => $this,
 				'function' => 'action_topicSettings_display',
 				'permission' => 'admin_forum')

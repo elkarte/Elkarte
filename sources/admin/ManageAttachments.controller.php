@@ -63,16 +63,16 @@ class ManageAttachments_Controller extends Action_Controller
 				'file' => 'ManageAvatars.controller.php',
 				'controller' => 'ManageAvatars_Controller',
 				'function' => 'action_index'),
-			'attachpaths' => array ($this, 'action_attachpaths'),
-			'browse' => array ($this, 'action_browse'),
-			'byAge' => array ($this, 'action_byAge'),
-			'bySize' => array ($this, 'action_bySize'),
-			'maintenance' => array ($this, 'action_maintenance'),
-			'moveAvatars' => array ($this, 'action_moveAvatars'),
-			'repair' => array ($this, 'action_repair'),
-			'remove' => array ($this, 'action_remove'),
-			'removeall' => array ($this, 'action_removeall'),
-			'transfer' => array ($this, 'action_transfer'),
+			'attachpaths' => array($this, 'action_attachpaths'),
+			'browse' => array($this, 'action_browse'),
+			'byAge' => array($this, 'action_byAge'),
+			'bySize' => array($this, 'action_bySize'),
+			'maintenance' => array($this, 'action_maintenance'),
+			'moveAvatars' => array($this, 'action_moveAvatars'),
+			'repair' => array($this, 'action_repair'),
+			'remove' => array($this, 'action_remove'),
+			'removeall' => array($this, 'action_removeall'),
+			'transfer' => array($this, 'action_transfer'),
 		);
 
 		call_integration_hook('integrate_manage_attachments', array(&$subActions));
@@ -182,7 +182,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 						$_POST['use_subdirectories_for_attachments'] = 1;
 						$_POST['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
-
 					}
 				}
 			}
@@ -231,7 +230,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
 
 		if (!empty($modSettings['automanage_attachments']))
-			$context['valid_basedirectory'] =  !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
+			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
 		else
 			$context['valid_basedirectory'] = true;
 
@@ -1282,7 +1281,6 @@ class ManageAttachments_Controller extends Action_Controller
 											$to_fix[] = 'files_without_attachment';
 										}
 									}
-
 								}
 							}
 							elseif ($file != 'index.php')
@@ -1366,8 +1364,8 @@ class ManageAttachments_Controller extends Action_Controller
 					// or is it?
 					if (in_array($path, $modSettings['attachmentUploadDir']) || in_array(BOARDDIR . DIRECTORY_SEPARATOR . $path, $modSettings['attachmentUploadDir']))
 					{
-							$errors[] = $path . ': ' . $txt['attach_dir_duplicate_msg'];
-							continue;
+						$errors[] = $path . ': ' . $txt['attach_dir_duplicate_msg'];
+						continue;
 					}
 
 					// OK, so let's try to create it then.
@@ -1486,7 +1484,7 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 
 			// If the user wishes to go back, update the last_dir array
-			if ($_POST['current_dir'] !=  $modSettings['currentAttachmentUploadDir']&& !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
+			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir']&& !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
 					$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
@@ -1499,7 +1497,7 @@ class ManageAttachments_Controller extends Action_Controller
 					$use_subdirectories_for_attachments = 0;
 					if (!empty($modSettings['attachment_basedirectories']))
 						foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
-							if (strpos($modSettings['attachmentUploadDir'][$_POST['current_dir']], $base . DIRECTORY_SEPARATOR) !==false)
+							if (strpos($modSettings['attachmentUploadDir'][$_POST['current_dir']], $base . DIRECTORY_SEPARATOR) !== false)
 							{
 								$use_subdirectories_for_attachments = 1;
 								break;
@@ -1975,7 +1973,7 @@ class ManageAttachments_Controller extends Action_Controller
 						$dir_size += !empty($row['size']) ? $row['size'] : filesize($source);
 
 						// If we've reached a limit. Do something.
-						if (!empty($modSettings['attachmentDirSizeLimit']) && $dir_size > $modSettings['attachmentDirSizeLimit'] * 1024 || (!empty($modSettings['attachmentDirFileLimit']) && $dir_files >  $modSettings['attachmentDirFileLimit']))
+						if (!empty($modSettings['attachmentDirSizeLimit']) && $dir_size > $modSettings['attachmentDirSizeLimit'] * 1024 || (!empty($modSettings['attachmentDirFileLimit']) && $dir_files > $modSettings['attachmentDirFileLimit']))
 						{
 							if (!empty($_POST['auto']))
 							{
