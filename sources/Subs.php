@@ -3934,12 +3934,25 @@ function call_integration_hook($hook, $parameters = array())
 {
 	global $modSettings, $settings, $db_show_debug, $context;
 
+	static $path_replacements = array(
+		'BOARDDIR' => BOARDDIR,
+		'SOURCEDIR' => SOURCEDIR,
+		'EXTDIR' => EXTDIR,
+		'LANGUAGEDIR' => LANGUAGEDIR,
+		'ADMINDIR' => ADMINDIR,
+		'CONTROLLERDIR' => CONTROLLERDIR,
+		'SUBSDIR' => SUBSDIR,
+	);
+
 	if ($db_show_debug === true)
 		$context['debug']['hooks'][] = $hook;
 
 	$results = array();
 	if (empty($modSettings[$hook]))
 		return $results;
+
+	if (!empty($settings['theme_dir']))
+		$path_replacements['$themedir'] = $settings['theme_dir'];
 
 	$functions = explode(',', $modSettings[$hook]);
 	// Loop through each function.
@@ -3969,18 +3982,6 @@ function call_integration_hook($hook, $parameters = array())
 
 		if (!empty($file))
 		{
-			$path_replacements = array(
-				'BOARDDIR' => BOARDDIR,
-				'SOURCEDIR' => SOURCEDIR,
-				'EXTDIR' => EXTDIR,
-				'LANGUAGEDIR' => LANGUAGEDIR,
-				'ADMINDIR' => ADMINDIR,
-				'CONTROLLERDIR' => CONTROLLERDIR,
-				'SUBSDIR' => SUBSDIR,
-			);
-			if (!empty($settings['theme_dir']))
-				$path_replacements['$themedir'] = $settings['theme_dir'];
-			
 			$absPath = strtr(trim($file), $path_replacements);
 
 			if (file_exists($absPath))
@@ -3993,6 +3994,45 @@ function call_integration_hook($hook, $parameters = array())
 	}
 
 	return $results;
+}
+
+/**
+ * Includes files for hooks that only do that (i.e. integrate_pre_include)
+ *
+ * @param string $hook
+ */
+function call_integration_include_hook($hook)
+{
+	global $modSettings, $settings, $db_show_debug, $context;
+
+	static $path_replacements = array(
+		'BOARDDIR' => BOARDDIR,
+		'SOURCEDIR' => SOURCEDIR,
+		'EXTDIR' => EXTDIR,
+		'LANGUAGEDIR' => LANGUAGEDIR,
+		'ADMINDIR' => ADMINDIR,
+		'CONTROLLERDIR' => CONTROLLERDIR,
+		'SUBSDIR' => SUBSDIR,
+	);
+
+	if ($db_show_debug === true)
+		$context['debug']['hooks'][] = $hook;
+
+	// Any file to include?
+	if (!empty($modSettings[$hook]))
+	{
+		if (!empty($settings['theme_dir']))
+			$path_replacements['$themedir'] = $settings['theme_dir'];
+
+		$pre_includes = explode(',', $modSettings[$hook]);
+		foreach ($pre_includes as $include)
+		{
+			$include = strtr(trim($include), $path_replacements);
+
+			if (file_exists($include))
+				require_once($include);
+		}
+	}
 }
 
 /**

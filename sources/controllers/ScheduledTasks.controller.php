@@ -34,7 +34,7 @@ class ScheduledTasks_Controller
 			$this->action_reducemailqueue();
 		else
 		{
-			call_integration_hook('integrate_autotask_include');
+			call_integration_include_hook('integrate_autotask_include');
 
 			$ts = isset($_GET['ts']) ? (int) $_GET['ts'] : 0;
 			processNextTasks($ts);
