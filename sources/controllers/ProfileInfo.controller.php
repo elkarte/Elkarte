@@ -68,7 +68,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// Each tab template defines a div, the value of which are the template(s) to load in that div
 		// Templates are named template_profile_block_YOURNAME
 		$context['summarytabs'] = array(
-			'summary' => array (
+			'summary' => array(
 				'name' => $txt['summary'],
 				'templates' => array(
 					array('summary', 'user_info'),
@@ -98,7 +98,7 @@ class ProfileInfo_Controller extends Action_Controller
 		{
 			// If the tab is active we add it
 			if ($tab['active'] !== true)
-				unset ($context['summarytabs'][$id]);
+				unset($context['summarytabs'][$id]);
 			else
 			{
 				// All the active templates, used to prevent processing data we don't need
