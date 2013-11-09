@@ -1119,7 +1119,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param int $memID
 	 */
-	function list_getUnwatcheded($start, $items_per_page, $sort, $memID)
+	function list_getUnwatched($start, $items_per_page, $sort, $memID)
 	{
 		return getUnwatchedBy($start, $items_per_page, $sort, $memID);
 	}
