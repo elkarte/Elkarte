@@ -2809,6 +2809,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = 0;
 		$context['user']['unread_messages'] = 0;
+		$context['user']['notifications'] = 0;
 		$context['user']['avatar'] = array();
 		$context['user']['total_time_logged_in'] = array('days' => 0, 'hours' => 0, 'minutes' => 0);
 		$context['user']['popup_messages'] = false;
@@ -3619,7 +3620,7 @@ function setupMenuContext()
 					'title' => $txt['notifications'],
 					'counter' => 'notifications',
 					'href' => $scripturl . '?action=notification',
-					'show' => true,
+					'show' => !$user_info['is_guest'],
 				),
 
 				// The old language string made no sense, and was too long.
