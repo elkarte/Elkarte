@@ -121,7 +121,7 @@ function reloadSettings()
 	}
 
 	// Any files to pre include?
-	call_integration_include_hook('integrate_pre_include')
+	call_integration_include_hook('integrate_pre_include');
 
 	// Call pre load integration functions.
 	call_integration_hook('integrate_pre_load');
@@ -1629,7 +1629,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// Any files to include at this point?
-	call_integration_include_hook('integrate_theme_include')
+	call_integration_include_hook('integrate_theme_include');
 
 	// Call load theme integration functions.
 	call_integration_hook('integrate_load_theme');

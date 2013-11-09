@@ -142,7 +142,7 @@ class Xml_Controller extends Action_Controller
 		loadLanguage('Errors');
 
 		// We need (at least) this to ensure that mod files are included
-		call_integration_include_hook('integrate_admin_include'])
+		call_integration_include_hook('integrate_admin_include']);
 
 		$errors = array();
 		$returns = array();
