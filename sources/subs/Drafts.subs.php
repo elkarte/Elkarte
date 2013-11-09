@@ -157,7 +157,7 @@ function modify_post_draft($draft)
 			locked = {int:locked},
 			is_sticky = {int:is_sticky}
 		WHERE id_draft = {int:id_draft}',
-		array (
+		array(
 			'id_topic' => $draft['topic_id'],
 			'id_board' => $draft['board'],
 			'poster_time' => time(),
@@ -293,7 +293,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 		DELETE FROM {db_prefix}user_drafts
 		WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
 			AND  id_member = {int:id_member}' : ''),
-		array (
+		array(
 			'id_draft' => $id_draft,
 			'id_member' => $member_id ,
 		)
@@ -414,7 +414,7 @@ function saveDraft()
 		return false;
 
 	// Read in what they sent, if anything
-	$id_draft =  empty($_POST['id_draft']) ? 0 : (int) $_POST['id_draft'];
+	$id_draft = empty($_POST['id_draft']) ? 0 : (int) $_POST['id_draft'];
 	$draft_info = loadDraft($id_draft);
 
 	// If a draft has been saved less than 5 seconds ago, let's not do the autosave again
