@@ -1573,8 +1573,7 @@ class ManageMaillist_Controller extends Action_Controller
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
-		// We'll need this, because bounce templates are stored
-		// with warning templates.
+		// We'll need this, because bounce templates are stored with warning templates.
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Submitting a new one or editing an existing one then pass this request off

@@ -214,7 +214,7 @@ class MarkRead_Controller extends Action_Controller
 	 */
 	public function action_markasread()
 	{
-		global $board, $user_info, $board_info, $modSettings;
+		global $board, $board_info;
 
 		checkSession('get');
 
