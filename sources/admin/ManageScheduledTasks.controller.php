@@ -24,8 +24,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
 	 * Scheduled tasks management dispatcher.
-	 * This function checks permissions and delegates to
-	 *  the appropriate function based on the sub-action.
+	 * This function checks permissions and delegates to the appropriate function
+	 * based on the sub-action.
 	 * Everything here requires admin_forum permission.
 	 *
 	 * @uses ManageScheduledTasks template file
@@ -207,8 +207,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' =>
-								'<input type="hidden" name="enable_task[%1$d]" id="task_%1$d" value="0" /><input type="checkbox" name="enable_task[%1$d]" id="task_check_%1$d" %2$s class="input_check" />',
+							'format' => '
+								<input type="hidden" name="enable_task[%1$d]" id="task_%1$d" value="0" /><input type="checkbox" name="enable_task[%1$d]" id="task_check_%1$d" %2$s class="input_check" />',
 							'params' => array(
 								'id' => false,
 								'checked_state' => false,
@@ -224,8 +224,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' =>
-								'<input type="checkbox" name="run_task[%1$d]" id="run_task_%1$d" class="input_check" />',
+							'format' => '
+								<input type="checkbox" name="run_task[%1$d]" id="run_task_%1$d" class="input_check" />',
 							'params' => array(
 								'id' => false,
 							),
@@ -262,7 +262,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		if (isset($_SESSION['st_error']))
 		{
 			$context['scheduled_errors'] = $_SESSION['st_error'];
-			unset ($_SESSION['st_error']);
+			unset($_SESSION['st_error']);
 		}
 	}
 
@@ -341,7 +341,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 *
 	 * @uses ManageScheduledTasks language file
 	 */
-	function action_log()
+	public function action_log()
 	{
 		global $scripturl, $context, $txt;
 
@@ -449,7 +449,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 * Callback function for createList() in action_tasks().
 	 *
 	 */
-	function list_getScheduledTasks()
+	public function list_getScheduledTasks()
 	{
 		return scheduledTasks();
 	}
@@ -461,7 +461,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 */
-	function list_getTaskLogEntries($start, $items_per_page, $sort)
+	public function list_getTaskLogEntries($start, $items_per_page, $sort)
 	{
 		return getTaskLogEntries($start, $items_per_page, $sort);
 	}
@@ -469,7 +469,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	/**
 	 * Callback function for createList() in action_log().
 	 */
-	function list_getNumTaskLogEntries()
+	public function list_getNumTaskLogEntries()
 	{
 		return countTaskLogEntries();
 	}
