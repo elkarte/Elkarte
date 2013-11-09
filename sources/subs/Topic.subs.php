@@ -2456,7 +2456,7 @@ function splitDestinationBoard()
 
 	if (!empty($_POST['move_new_topic']))
 	{
-		$toboard =  !empty($_POST['board_list']) ? (int) $_POST['board_list'] : 0;
+		$toboard = !empty($_POST['board_list']) ? (int) $_POST['board_list'] : 0;
 		if (!empty($toboard) && $board !== $toboard)
 		{
 			$destination_board = boardInfo($toboard);

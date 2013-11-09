@@ -538,7 +538,7 @@ function initialize_inputs()
 
 	// Force a step, defaulting to 0.
 	$_GET['step'] = !isset($_GET['step']) ? 0 : (int) $_GET['step'];
-	$_GET['substep'] =  !isset($_GET['substep']) ? 0 : (int) $_GET['substep'];
+	$_GET['substep'] = !isset($_GET['substep']) ? 0 : (int) $_GET['substep'];
 }
 
 /**

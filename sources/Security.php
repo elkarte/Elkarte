@@ -43,7 +43,7 @@ function validateSession($type = 'admin')
 	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
 
 	// Set the lifetime for our admin session. Default is ten minutes.
-	$refreshTime =  600;
+	$refreshTime = 600;
 
 	if (isset($modSettings['admin_session_lifetime']))
 	{

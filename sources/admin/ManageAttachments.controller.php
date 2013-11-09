@@ -332,7 +332,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
 
 		if (!empty($modSettings['automanage_attachments']))
-			$context['valid_basedirectory'] =  !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
+			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
 		else
 			$context['valid_basedirectory'] = true;
 
@@ -1372,7 +1372,7 @@ class ManageAttachments_Controller extends Action_Controller
 					if (automanage_attachments_create_directory($path))
 						$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
 					else
-						$errors[] =  $path . ': ' . $txt[$context['dir_creation_error']];
+						$errors[] = $path . ': ' . $txt[$context['dir_creation_error']];
 				}
 
 				// Changing a directory name?

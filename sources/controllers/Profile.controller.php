@@ -383,12 +383,12 @@ class Profile_Controller extends Action_Controller
 		if (!empty($profile_include_data['token']))
 		{
 			if ($profile_include_data['token'] !== true)
-				$token_name =  str_replace('%u', $context['id_member'], $profile_include_data['token']);
+				$token_name = str_replace('%u', $context['id_member'], $profile_include_data['token']);
 			else
-				$token_name =  'profile-u' . $context['id_member'];
+				$token_name = 'profile-u' . $context['id_member'];
 
 			if (isset($profile_include_data['token_type']) && in_array($profile_include_data['token_type'], array('request', 'post', 'get')))
-				$token_type =  $profile_include_data['token_type'];
+				$token_type = $profile_include_data['token_type'];
 			else
 				$token_type = 'post';
 
