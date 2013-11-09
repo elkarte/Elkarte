@@ -353,8 +353,6 @@ class Recent_Controller extends Action_Controller
 		{
 			$categories = array_map('intval', explode(',', $_REQUEST['c']));
 
-			require_once(SUBSDIR . '/Boards.subs.php');
-
 			$boards = array_keys(boardsPosts(array(), $categories, isset($_REQUEST['action']) && $_REQUEST['action'] != 'unreadreplies'));
 
 			if (empty($boards))
@@ -538,8 +536,6 @@ class Recent_Controller extends Action_Controller
 			if ($num_topics == 0)
 			{
 				// Mark the boards as read if there are no unread topics!
-				require_once(SUBSDIR . '/Boards.subs.php');
-
 				// @todo look at this... there are no more unread topics already.
 				// If clearing of log_topics is still needed, perhaps do it separately.
 				markBoardsRead(empty($boards) ? $board : $boards, false, true);
@@ -628,8 +624,6 @@ class Recent_Controller extends Action_Controller
 				if ($context['showing_all_topics'])
 				{
 					// Since there are no unread topics, mark the boards as read!
-					require_once(SUBSDIR . '/Boards.subs.php');
-
 					// @todo look at this... there are no more unread topics already.
 					// If clearing of log_topics is still needed, perhaps do it separately.
 					markBoardsRead(empty($boards) ? $board : $boards, false, true);

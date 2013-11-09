@@ -539,7 +539,7 @@ function attachmentChecks($attachID)
 	$db = database();
 
 	// No data or missing data .... Not necessarily needed, but in case a mod author missed something.
-	if ( empty($_SESSION['temp_attachments'][$attachID]))
+	if (empty($_SESSION['temp_attachments'][$attachID]))
 		$error = '$_SESSION[\'temp_attachments\'][$attachID]';
 	elseif (empty($attachID))
 		$error = '$attachID';
@@ -893,7 +893,7 @@ function createAttachment(&$attachmentOptions)
  * from the database.
  *
  * @param int $id_attach
-*/
+ */
 function getAvatar($id_attach)
 {
 	$db = database();
@@ -932,7 +932,7 @@ function getAvatar($id_attach)
  *
  * @param int $id_attach
  * @param int $id_topic
-*/
+ */
 function getAttachmentFromTopic($id_attach, $id_topic)
 {
 	$db = database();
@@ -964,7 +964,7 @@ function getAttachmentFromTopic($id_attach, $id_topic)
  * Does not check if it's a thumbnail.
  *
  * @param int $id_attach
-*/
+ */
 function increaseDownloadCounter($id_attach)
 {
 	$db = database();
@@ -1345,7 +1345,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
  * Attempts to connect to the server first so it won't time out.
  *
  * @param string $url
- * @return array or false, the image size as array (width, height), or false on failure
+ * @return array or false, the image size as array(width, height), or false on failure
  */
 function url_image_size($url)
 {
@@ -1703,7 +1703,7 @@ function getServerStoredAvatars($directory, $level)
 	{
 		$tmp = getServerStoredAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
 		if (!empty($tmp))
-		$result[] = array(
+			$result[] = array(
 				'filename' => htmlspecialchars($line),
 				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
 				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line)) . ']',

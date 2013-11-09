@@ -375,7 +375,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 
 					// Any attachments? if so lets make a big deal about them!
 					if ($data['attachments'] != 0)
-						$replacements['MESSAGE'] .=  "\n\n" . sprintf($txt['message_attachments'], $data['attachments'], $replacements['TOPICLINK']);
+						$replacements['MESSAGE'] .= "\n\n" . sprintf($txt['message_attachments'], $data['attachments'], $replacements['TOPICLINK']);
 				}
 
 				if (!empty($row['notify_regularity']) && $type === 'reply')

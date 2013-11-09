@@ -32,7 +32,7 @@ class ManageAvatars_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		$subActions = array(
-			'display' => array ($this, 'action_avatarSettings_display')
+			'display' => array($this, 'action_avatarSettings_display')
 		);
 
 		// this is hardcoded now, to be fixed
@@ -72,10 +72,10 @@ class ManageAvatars_Controller extends Action_Controller
 			if (isset($_POST['custom_avatar_enabled']) && $_POST['custom_avatar_enabled'] == 1 && (empty($_POST['custom_avatar_dir']) || empty($_POST['custom_avatar_url'])))
 				$_POST['custom_avatar_enabled'] = 0;
 
-				call_integration_hook('integrate_save_avatar_settings');
+			call_integration_hook('integrate_save_avatar_settings');
 
-				Settings_Form::save_db($config_vars);
-				redirectexit('action=admin;area=manageattachments;sa=avatars');
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=manageattachments;sa=avatars');
 		}
 
 		// Attempt to figure out if the admin is trying to break things.
@@ -104,10 +104,8 @@ class ManageAvatars_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings;
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_avatarSettings = new Settings_Form();
-
-		// initialize it with our settings
 
 		// Check for GD and ImageMagick. It will set up a warning for the admin otherwise.
 		$testImg = get_extension_funcs('gd') || class_exists('Imagick');

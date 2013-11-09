@@ -23,6 +23,7 @@ if (!defined('ELK'))
 
 class Auth_Controller extends Action_Controller
 {
+
 	/**
 	 * Entry point in Auth controller
 	 * (well no, not really. We route directly to the rest.)
@@ -31,7 +32,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// what can we do? login page!
+		// What can we do? login page!
 		$this->action_login();
 	}
 
@@ -41,8 +42,6 @@ class Auth_Controller extends Action_Controller
 	 *  It caches the referring URL in $_SESSION['login_url'].
 	 *  It is accessed from ?action=login.
 	 *  @uses Login template and language file with the login sub-template.
-	 *  @uses the protocol_login sub-template in the Wireless template,
-	 *   if you are using a wireless device
 	 */
 	public function action_login()
 	{
@@ -280,9 +279,11 @@ class Auth_Controller extends Action_Controller
 				{
 					// BurningBoard3 style of hashing.
 					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($user_settings['password_salt'] . sha1($_POST['passwrd'])));
+
 					// PunBB 1.4 and later
 					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($_POST['passwrd']));
 				}
+
 				// Perhaps we converted to UTF-8 and have a valid password being hashed differently.
 				if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
 				{
@@ -299,10 +300,12 @@ class Auth_Controller extends Action_Controller
 			{
 				// Yet another downgrade .. PHP-Fusion7
 				$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
+
 				// Xenforo?
 				$other_passwords[] = sha1(sha1($_POST['passwrd']) . $user_settings['password_salt']);
 				$other_passwords[] = sha256(sha256($_POST['passwrd']) . $user_settings['password_salt']);
 			}
+
 			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
 			if (stripos(PHP_OS, 'win') !== 0)
 			{
@@ -366,14 +369,14 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
-	* Logs the current user out of their account.
-	* It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
-	* It redirects back to $_SESSION['logout_url'], if it exists.
-	* It is accessed via ?action=logout;session_var=...
-	*
-	* @param bool $internal if true, it doesn't check the session
-	* @param $redirect
-	*/
+	 * Logs the current user out of their account.
+	 * It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
+	 * It redirects back to $_SESSION['logout_url'], if it exists.
+	 * It is accessed via ?action=logout;session_var=...
+	 *
+	 * @param bool $internal if true, it doesn't check the session
+	 * @param $redirect
+	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
 		global $user_info, $user_settings, $context;
@@ -427,7 +430,7 @@ class Auth_Controller extends Action_Controller
 				redirectexit('', $context['server']['needs_login_fix']);
 			elseif (!empty($_SESSION['logout_url']) && (strpos('http://', $_SESSION['logout_url']) === false && strpos('https://', $_SESSION['logout_url']) === false))
 			{
-				unset ($_SESSION['logout_url']);
+				unset($_SESSION['logout_url']);
 				redirectexit();
 			}
 			else
@@ -462,10 +465,10 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
-	* Display a message about the forum being in maintenance mode.
-	* Displays a login screen with sub template 'maintenance'.
-	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
-	*/
+	 * Display a message about the forum being in maintenance mode.
+	 * Displays a login screen with sub template 'maintenance'.
+	 * It sends a 503 header, so search engines don't index while we're in maintenance mode.
+	 */
 	public function action_maintenance_mode()
 	{
 		global $txt, $mtitle, $mmessage, $context;
@@ -497,9 +500,9 @@ class Auth_Controller extends Action_Controller
 		if (!$user_info['is_guest'])
 		{
 			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
-				list (, , $timeout) = @unserialize($_COOKIE[$cookiename]);
+				list (,, $timeout) = @unserialize($_COOKIE[$cookiename]);
 			elseif (isset($_SESSION['login_' . $cookiename]))
-				list (, , $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
+				list (,, $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
 			else
 				trigger_error('Auth: Cannot be logged in without a session or cookie', E_USER_ERROR);
 
@@ -541,7 +544,7 @@ class Auth_Controller extends Action_Controller
 				redirectexit();
 			elseif (!empty($_SESSION['login_url']) && (strpos('http://', $_SESSION['login_url']) === false && strpos('https://', $_SESSION['login_url']) === false))
 			{
-				unset ($_SESSION['login_url']);
+				unset($_SESSION['login_url']);
 				redirectexit();
 			}
 			else

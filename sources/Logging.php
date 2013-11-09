@@ -183,7 +183,7 @@ function logLastDatabaseError()
 	if (filemtime(BOARDDIR . '/db_last_error.php') === $last_db_error_change)
 	{
 		// Write the change
-		$write_db_change =  '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
+		$write_db_change = '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
 		$written_bytes = file_put_contents(BOARDDIR . '/db_last_error.php', $write_db_change, LOCK_EX);
 
 		// survey says ...

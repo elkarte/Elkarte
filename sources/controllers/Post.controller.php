@@ -659,7 +659,7 @@ class Post_Controller extends Action_Controller
 						$file_list = array();
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 							if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-								$file_list[] =  $attachment['name'];
+								$file_list[] = $attachment['name'];
 
 						$_SESSION['temp_attachments']['post']['files'] = $file_list;
 						$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';

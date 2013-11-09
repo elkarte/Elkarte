@@ -642,7 +642,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 .ic_section_header>a {
 	color: #666;
 }
-#ic_recentposts td {
+#ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
 	border-top: 1px solid #ddd;
 }
 .recentpost>strong>a, .inline>strong>a {

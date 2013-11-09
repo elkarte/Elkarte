@@ -387,7 +387,6 @@ class ManageSecurity_Controller extends Action_Controller
 
 	/**
 	 * Change the way bad behavior ... well behaves
-	 *
 	 */
 	public function action_bbSettings_display()
 	{
@@ -457,18 +456,18 @@ class ManageSecurity_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=badbehavior';
 
-		// javascript vars for the "add more xyz" buttons in the callback forms
-		addInlineJavascript('
-		var sUrlParent = \'add_more_url_placeholder\';
-		var oUrlOptionsdt = {name: \'badbehavior_url_wl_desc[]\', class: \'input_text\'};
-		var oUrlOptionsdd = {name: \'badbehavior_url_wl[]\', class: \'input_text\'};
-		var sUseragentParent = \'add_more_useragent_placeholder\';
-		var oUseragentOptionsdt = {name: \'badbehavior_useragent_wl_desc[]\', class: \'input_text\'};
-		var oUseragentOptionsdd = {name: \'badbehavior_useragent_wl[]\', class: \'input_text\'};
-		var sIpParent = \'add_more_ip_placeholder\';
-		var oIpOptionsdt = {name: \'badbehavior_ip_wl_desc[]\', class: \'input_text\'};
-		var oIpOptionsdd = {name: \'badbehavior_ip_wl[]\', class: \'input_text\'};'
-		);
+		// Javascript vars for the "add more xyz" buttons in the callback forms
+		addJavascriptVar(array(
+			'sUrlParent' => '\'add_more_url_placeholder\'',
+			'oUrlOptionsdt' => '{name: \'badbehavior_url_wl_desc[]\', class: \'input_text\'}',
+			'oUrlOptionsdd' => '{name: \'badbehavior_url_wl[]\', class: \'input_text\'}',
+			'sUseragentParent' => '\'add_more_useragent_placeholder\'',
+			'oUseragentOptionsdt' => '{name: \'badbehavior_useragent_wl_desc[]\', class: \'input_text\'}',
+			'oUseragentOptionsdd' => '{name: \'badbehavior_useragent_wl[]\', class: \'input_text\'}',
+			'sIpParent' => '\'add_more_ip_placeholder\'',
+			'oIpOptionsdt' => '{name: \'badbehavior_ip_wl_desc[]\', class: \'input_text\'}',
+			'oIpOptionsdd' => '{name: \'badbehavior_ip_wl[]\', class: \'input_text\'}'
+		));
 
 		Settings_Form::prepare_db($config_vars);
 	}

@@ -1424,7 +1424,7 @@ function membersBy($query, $query_params, $details = false)
 		if (!empty($query_parts['or']))
 			$query_parts['and'][] = implode('
 			OR ', $query_parts['or']);
-		$query_where =  implode('
+		$query_where = implode('
 			AND ', $query_parts['and']);
 	}
 	else
@@ -1500,7 +1500,7 @@ function countMembersBy($query, $query_params)
 		if (!empty($query_parts['or']))
 			$query_parts['and'][] = implode('
 			OR ', $query_parts['or']);
-		$query_where =  implode('
+		$query_where = implode('
 			AND ', $query_parts['and']);
 	}
 	else
