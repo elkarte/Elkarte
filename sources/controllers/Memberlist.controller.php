@@ -148,10 +148,6 @@ class Memberlist_Controller extends Action_Controller
 			$context['colspan'] += isset($column['colspan']) ? $column['colspan'] : 1;
 		}
 
-		// Define the last column of those that remain
-		end($context['columns']);
-		$context['columns'][key($context['columns'])]['class'] = 'last_th';
-
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=memberlist',
 			'name' => $txt['members_list']

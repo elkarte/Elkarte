@@ -554,7 +554,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'board_name' => array(
 					'header' => array(
 						'value' => $txt['notifications_boards'],
-						'class' => 'lefttext first_th',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'function' => create_function('$board', '
@@ -642,7 +642,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'subject' => array(
 					'header' => array(
 						'value' => $txt['notifications_topics'],
-						'class' => 'lefttext first_th',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'function' => create_function('$topic', '
