@@ -3946,35 +3946,45 @@ function call_integration_hook($hook, $parameters = array())
 	foreach ($functions as $function)
 	{
 		$function = trim($function);
+		// OOP static method
 		if (strpos($function, '::') !== false)
 		{
 			$call = explode('::', $function);
 			if (strpos($call[1], ':') !== false)
 			{
 				list ($func, $file) = explode(':', $call[1]);
-				if (empty($settings['theme_dir']))
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
-				else
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($absPath))
-					require_once($absPath);
 				$call = array($call[0], $func);
 			}
 		}
+		// Normal plain function
 		else
 		{
 			$call = $function;
 			if (strpos($function, ':') !== false)
 			{
 				list ($func, $file) = explode(':', $function);
-				if (empty($settings['theme_dir']))
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
-				else
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($absPath))
-					require_once($absPath);
 				$call = $func;
 			}
+		}
+
+		if (!empty($file))
+		{
+			$path_replacements = array(
+				'BOARDDIR' => BOARDDIR,
+				'SOURCEDIR' => SOURCEDIR,
+				'EXTDIR' => EXTDIR,
+				'LANGUAGEDIR' => LANGUAGEDIR,
+				'ADMINDIR' => ADMINDIR,
+				'CONTROLLERDIR' => CONTROLLERDIR,
+				'SUBSDIR' => SUBSDIR,
+			);
+			if (!empty($settings['theme_dir']))
+				$path_replacements['$themedir'] = $settings['theme_dir'];
+			
+			$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
+
+			if (file_exists($absPath))
+				require_once($absPath);
 		}
 
 		// Is it valid?
