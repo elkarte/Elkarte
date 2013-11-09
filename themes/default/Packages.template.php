@@ -355,9 +355,9 @@ function template_view_package()
 					{
 						sId: \'operation_img_', $key, '\',
 						srcExpanded: elk_images_url + \'/selected_open.png\',
-						altExpanded: \'*\',
+						altExpanded: ', JavaScriptEscape($txt['hide']), ',
 						srcCollapsed: elk_images_url + \'/selected.png\',
-						altCollapsed: \'*\'
+						altCollapsed: ', JavaScriptEscape($txt['show']), ',
 					}
 				]
 			});';
@@ -584,7 +584,9 @@ function template_browse()
 		<form action="', $scripturl, '?action=admin;area=packages;sa=', $context['sub_action'], '" method="get">
 			<div id="advanced_box" >
 				<h3 class="category_header">
-					<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '.png" alt="*" />
+					<span id="category_toggle">&nbsp;
+						<span id="upshrink_ic" class="', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+					</span>
 					<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
 				</h3>
 				<div id="advanced_panel_div" class="windowbg"', empty($context['admin_preferences']['pkg']) ? '' : ' style="display: none;"', '>
@@ -620,17 +622,17 @@ function template_browse()
 	<script><!-- // --><![CDATA[
 		var oAdvancedPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['admin_preferences']['pkg']) ? 'true' : 'false', ',
+			bCurrentlyCollapsed: ', empty($context['admin_preferences']['pkg']) ? 'false' : 'true', ',
 			aSwappableContainers: [
 				\'advanced_panel_div\'
 			],
-			aSwapImages: [
+			aSwapClasses: [
 				{
-					sId: \'advanced_panel_toggle\',
-					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
+					sId: \'upshrink_ic\',
+					classExpanded: \'collapse\',
+					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			aSwapLinks: [

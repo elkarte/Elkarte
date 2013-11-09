@@ -442,6 +442,46 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /*End sidebar flyout coding. */
 
 
+/*	$BOARDICONS	*/
+/* ------------------------------------------------------- */
+.board_icon {
+	display: block;
+	float: left;
+	width: 48px;
+	height: 48px;
+}
+.board_key:before {
+	display: block;
+	float: left;
+	height: 24px;
+	width: 26px;
+	content: "";
+}
+.category_boards a span, .board_key:before {
+	background-repeat: no-repeat;
+	background-image: url(../images/_light/board_icons.png);
+}
+.on_board {
+	background-position: 0 0;
+}
+.on2_board {
+	background-position: -72px 0;
+}
+.off_board {
+	background-position: -144px 0;
+}
+.redirect_board {
+	background-position: -216px 0;
+}
+.new_some_board:before {
+	background-position: -300px -14px;
+}
+.new_none_board:before {
+	background-position: -372px -14px;
+}
+.new_redirect_board:before {
+	background-position: -444px -14px;
+}
 
 
 /*	$LINKTREE	*/

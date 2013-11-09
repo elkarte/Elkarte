@@ -66,15 +66,15 @@ function template_main()
 				// If the board or children is new, show an indicator.
 				if ($board['new'] || $board['children_new'])
 					echo '
-							<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'on', $board['new'] ? '' : '2', '.png" alt="', $txt['new_posts'], '" title="', $txt['new_posts'], '" />';
+							<span class="board_icon ', $board['new'] ? 'on_board' : 'on2_board', '" title="', $txt['new_posts'], '"></span>';
 				// Is it a redirection board?
 				elseif ($board['is_redirect'])
 					echo '
-							<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'redirect.png" alt="*" title="*" />';
+							<span class="board_icon redirect_board" title="*"></span>';
 				// No new posts at all! The agony!!
 				else
 					echo '
-							<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'off.png" alt="', $txt['old_posts'], '" title="', $txt['old_posts'], '" />';
+							<span class="board_icon off_board" title="', $txt['old_posts'], '"></span>';
 
 				echo '
 						</a>
@@ -201,11 +201,11 @@ function template_boardindex_outer_below()
 
 	if ($context['user']['is_logged'])
 		echo '
-			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_some.png" alt="" /> ', $txt['new_posts'], '</p>';
+			<p class="board_key new_some_board" title="', $txt['new_posts'], '">', $txt['new_posts'], '</p>';
 
 	echo '
-			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_none.png" alt="" /> ', $txt['old_posts'], '</p>
-			<p><img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'new_redirect.png" alt="" /> ', $txt['redirect_board'], '</p>
+			<p class="board_key new_none_board" title="', $txt['old_posts'], '">', $txt['old_posts'], '</p>
+			<p class="board_key new_redirect_board" title="', $txt['redirect_board'], '">', $txt['redirect_board'], '</p>
 		</div>';
 
 	if (!empty($context['info_center_callbacks']))
@@ -217,13 +217,15 @@ function template_boardindex_outer_below()
  */
 function template_info_center()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	// Here's where the "Info Center" starts...
 	echo '
 	<div id="info_center" class="forum_category">
 		<h2 class="category_header">
-			<img class="icon" id="upshrink_ic" title="', $txt['hide'], '" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
+			<span id="category_toggle">&nbsp;
+				<span id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+			</span>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
@@ -248,13 +250,13 @@ function template_info_center()
 			aSwappableContainers: [
 				\'upshrinkHeaderIC\'
 			],
-			aSwapImages: [
+			aSwapClasses: [
 				{
 					sId: \'upshrink_ic\',
-					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
+					classExpanded: \'collapse\',
+					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			aSwapLinks: [

@@ -40,9 +40,12 @@ function template_main()
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
 		echo '
-					<h4 id="postAdditionalOptionsHeader" class="titlebg">
-						<img id="postMoreExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', '.png" alt="-" /> <a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
-					</h4>';
+					<h3 id="postAdditionalOptionsHeader" class="category_header">
+						<span id="category_toggle">&nbsp;
+							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+						</span>
+						<a href="#" id="postMoreExpandLink">', $context['can_post_attachment'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
+					</h3>';
 	echo '
 					<div id="postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
 
@@ -157,13 +160,16 @@ function template_main()
 
 function template_load_drafts_below()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	// Show a draft selection box
 	echo '
-					<h4 id="postDraftOptionsHeader" class="titlebg">
-						<img id="postDraftExpand" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '.png" alt="-" /> <a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
-					</h4>
+					<h3 id="postDraftOptionsHeader" class="category_header">
+						<span id="category_toggle_more">&nbsp;
+							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+						</span>
+						<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
+					</h3>
 					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>
 						<dl class="settings">
 							<dt>
@@ -191,13 +197,13 @@ function template_load_drafts_below()
 				aSwappableContainers: [
 					\'postDraftOptions\',
 				],
-				aSwapImages: [
+				aSwapClasses: [
 					{
 						sId: \'postDraftExpand\',
-						srcExpanded: elk_images_url + \'/collapse.png\',
-						altExpanded: \'-\',
-						srcCollapsed: elk_images_url + \'/expand.png\',
-						altCollapsed: \'+\'
+						classExpanded: \'collapse\',
+						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+						classCollapsed: \'expand\',
+						titleCollapsed: ', JavaScriptEscape($txt['show']), '
 					}
 				],
 				aSwapLinks: [
@@ -496,22 +502,22 @@ function template_postarea_below()
 	// The variables used to preview a post without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '";
-			var form_name = "postmodify";
-			var preview_area = "post";
-			var current_board = ', empty($context['current_board']) ? 'null' : $context['current_board'], ';
-			var txt_preview_title = "', $txt['preview_title'], '";
-			var txt_preview_fetch = "', $txt['preview_fetch'], '";
-			var make_poll = ', $context['make_poll'] ? 'true' : 'false', ';
-			var new_replies = new Array();
-			var reply_counter = ', empty($counter) ? 0 : $counter, ';
-			var can_quote = ', $context['can_quote'] ? 'true' : 'false', ';
-			var show_ignore_user_post = "', $txt['show_ignore_user_post'], '";
-			var txt_bbc_quote = "', $txt['bbc_quote'], '";
-			var txt_ignoring_user = "', $txt['ignoring_user'], '";
-			var txt_new = "', $txt['new'], '";
-			var txt_posted_by = "', $txt['posted_by'], '";
-			var txt_on = "', $txt['on'], '";';
+			var post_box_name = "', $context['post_box_name'], '",
+				form_name = "postmodify",
+				preview_area = "post",
+				current_board = ', empty($context['current_board']) ? 'null' : $context['current_board'], ',
+				txt_preview_title = "', $txt['preview_title'], '",
+				txt_preview_fetch = "', $txt['preview_fetch'], '",
+				make_poll = ', $context['make_poll'] ? 'true' : 'false', ',
+				new_replies = new Array(),
+				reply_counter = ', empty($counter) ? 0 : $counter, ',
+				can_quote = ', $context['can_quote'] ? 'true' : 'false', ',
+				show_ignore_user_post = "', $txt['show_ignore_user_post'], '",
+				txt_bbc_quote = "', $txt['bbc_quote'], '",
+				txt_ignoring_user = "', $txt['ignoring_user'], '",
+				txt_new = "', $txt['new'], '",
+				txt_posted_by = "', $txt['posted_by'], '",
+				txt_on = "', $txt['on'], '";';
 
 	// Code for showing and hiding additional options.
 	if (!empty($settings['additional_options_collapsible']))
@@ -528,13 +534,13 @@ function template_postarea_below()
 				aSwappableContainers: [
 					\'postAdditionalOptions\',
 				],
-				aSwapImages: [
+				aSwapClasses: [
 					{
 						sId: \'postMoreExpand\',
-						srcExpanded: elk_images_url + \'/collapse.png\',
-						altExpanded: \'-\',
-						srcCollapsed: elk_images_url + \'/expand.png\',
-						altCollapsed: \'+\'
+						classExpanded: \'collapse\',
+						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+						classCollapsed: \'expand\',
+						titleCollapsed: ', JavaScriptEscape($txt['show']), '
 					}
 				],
 				aSwapLinks: [
@@ -550,40 +556,6 @@ function template_postarea_below()
 					sSessionId: elk_session_id,
 					sSessionVar: elk_session_var,
 					sAdditionalVars: \';minmax_key=post\'
-				},
-			});';
-
-	// Code for showing and hiding drafts
-	if (!empty($context['drafts']))
-		echo '
-			var oSwapDraftOptions = new elk_Toggle({
-				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
-				aSwappableContainers: [
-					\'postDraftOptions\',
-				],
-				aSwapImages: [
-					{
-						sId: \'postDraftExpand\',
-						srcExpanded: elk_images_url + \'/collapse.png\',
-						altExpanded: \'-\',
-						srcCollapsed: elk_images_url + \'/expand.png\',
-						altCollapsed: \'+\'
-					}
-				],
-				aSwapLinks: [
-					{
-						sId: \'postDraftExpandLink\',
-						msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
-						msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
-					}
-				],
-				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-					sOptionName: \'minmax_preferences\',
-					sSessionId: elk_session_id,
-					sSessionVar: elk_session_var,
-					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});';
 

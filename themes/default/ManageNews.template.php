@@ -81,7 +81,9 @@ function template_email_members()
 			</div>
 			<div id="exclude_panel_header">
 				<h3 class="category_header">
-					<img id="exclude_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '.png" alt="*" />
+					<span id="category_toggle">&nbsp;
+						<span id="upshrink_ic" class="', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+					</span>
 					<a href="#" id="exclude_panel_link" >', $txt['exclude_these'], '</a>
 				</h3>
 			</div>
@@ -124,13 +126,13 @@ function template_email_members()
 			aSwappableContainers: [
 				\'exclude_panel_div\'
 			],
-			aSwapImages: [
+			aSwapClasses: [
 				{
-					sId: \'exclude_panel_toggle\',
-					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
+					sId: \'upshrink_ic\',
+					classExpanded: \'collapse\',
+					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			aSwapLinks: [

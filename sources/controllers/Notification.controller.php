@@ -177,7 +177,7 @@ class Notification_Controller extends Action_Controller
 								\'{subject}\',
 							),
 							array(
-								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
+								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
 								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
 							), $txt[\'notification_\' . $row[\'notif_type\']]);

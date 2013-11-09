@@ -52,7 +52,9 @@ function template_permission_index()
 	{
 		echo '
 			<h3 class="category_header">
-				<img id="permissions_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', '.png"  alt="*" />
+				<span id="category_toggle">&nbsp;
+					<span id="upshrink_ic" class="', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+				</span>
 				<a href="#" id="permissions_panel_link">', $txt['permissions_advanced_options'], '</a>
 			</h3>
 			<div id="permissions_panel_advanced" class="windowbg">
@@ -89,15 +91,18 @@ function template_permission_index()
 								<select name="add_remove">
 									<option value="add">', $txt['permissions_add'], '...</option>
 									<option value="clear">', $txt['permissions_remove'], '...</option>';
+
 		if (!empty($modSettings['permission_enable_deny']))
 			echo '
 									<option value="deny">', $txt['permissions_deny'], '...</option>';
+
 		echo '
 								</select>
 							</dt>
 							<dd style="overflow:auto;">
 								<select name="permissions">
 									<option value="">(', $txt['permissions_select_permission'], ')</option>';
+
 		foreach ($context['permissions'] as $permissionType)
 		{
 			if ($permissionType['id'] == 'membergroup' && !empty($context['profile']))
@@ -128,6 +133,7 @@ function template_permission_index()
 				}
 			}
 		}
+
 		echo '
 								</select>
 							</dd>
@@ -142,17 +148,17 @@ function template_permission_index()
 	<script><!-- // --><![CDATA[
 		var oPermissionsPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['admin_preferences']['app']) ? 'true' : 'false', ',
+			bCurrentlyCollapsed: ', empty($context['admin_preferences']['app']) ? 'false' : 'true', ',
 			aSwappableContainers: [
 				\'permissions_panel_advanced\'
 			],
-			aSwapImages: [
+			aSwapClasses: [
 				{
-					sId: \'permissions_panel_toggle\',
-					srcExpanded: elk_images_url + \'/collapse.png\',
-					altExpanded: ', JavaScriptEscape($txt['hide']), ',
-					srcCollapsed: elk_images_url + \'/expand.png\',
-					altCollapsed: ', JavaScriptEscape($txt['show']), '
+					sId: \'upshrink_ic\',
+					classExpanded: \'collapse\',
+					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
 			aSwapLinks: [
