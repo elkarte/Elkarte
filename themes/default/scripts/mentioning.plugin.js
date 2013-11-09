@@ -18,7 +18,12 @@
 	};
 
 	elk_Mentions.prototype.attachAtWho = function(oMentions, $element, oIframeWindow) {
-		$('#' + oMentions.opts.editor_id).after(oMentions.opts._mentioned);
+		var mentioned = document.getElementById('mentioned');
+		if (mentioned == null)
+			$('#' + oMentions.opts.editor_id).after(oMentions.opts._mentioned);
+		else
+			oMentions.opts._mentioned = $(mentioned);
+
 		oMentions.opts.cache.mentions = this.opts._mentioned;
 		$element.atwho({
 			at: "@",

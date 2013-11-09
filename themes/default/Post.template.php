@@ -30,6 +30,19 @@ function template_main()
 	echo '
 					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
+	if (!empty($context['member_ids']))
+	{
+		echo '
+							<div id="mentioned" style="display:none">';
+
+		foreach ($context['member_ids'] as $id)
+			echo '
+								<input type="hidden" name="uid[]" value="', $id, '" />';
+
+		echo '
+							</div>';
+	}
+
 	// If this message has been edited in the past - display when it was.
 	if (isset($context['last_modified']))
 		echo '
@@ -358,6 +371,7 @@ function template_postarea_above()
 		template_attachment_errors();
 
 	// If this won't be approved let them know!
+	// @todo why not use the template_show_error above?
 	if (!$context['becomes_approved'])
 	{
 		echo '
@@ -368,6 +382,7 @@ function template_postarea_above()
 	}
 
 	// If it's locked, show a message to warn the replyer.
+	// @todo why not output it only for locked topics and why not use the template_show_error above?
 	echo '
 						<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
 							', $txt['topic_locked_no_reply'], '
