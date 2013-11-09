@@ -652,6 +652,11 @@ function create_control_richedit($editorOptions)
 			}
 			else
 				$context['smileys'] = $temp;
+
+			// The smiley popup may take advantage of Jquery UI ....
+			if (!empty($context['smileys']['popup']))
+				$modSettings['jquery_include_ui'] = true;
+			
 		}
 	}
 

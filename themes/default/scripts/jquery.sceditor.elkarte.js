@@ -121,7 +121,7 @@
 						var emoticons = $.extend({}, base.opts.emoticons.popup),
 							popup_position,
 							adjheight = 0,
-							titlebar = $('<div class="catbg sceditor-popup-grip"/>');
+							titlebar = $('<div class="category_header sceditor-popup-grip"/>');
 
 						popupContent = $('<div id="sceditor-popup" />');
 						line = $('<div id="sceditor-popup-smiley" />');
@@ -133,7 +133,7 @@
 						if (line.children().length > 0)
 							popupContent.append(line);
 
-						closeButton = $('<span />').text('[' + base._('Close') + ']').click(function () {
+						closeButton = $('<div id="sceditor-popup-close" />').text('[' + base._('Close') + ']').click(function () {
 							$(".sceditor-smileyPopup").fadeOut('fast');
 						});
 						if (typeof closeButton !== "undefined")
@@ -153,16 +153,8 @@
 
 						// position it on the screen
 						$dropdown.css({
-							"position": "fixed",
 							"top": $(window).height() * 0.2,
-							"left": $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2),
-							"max-width": "50%",
-							"max-height": "50%"
-						});
-
-						// make the window fit the content
-						$('#sceditor-popup-smiley').css({
-							"overflow": "auto"
+							"left": $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2)
 						});
 
 						// Allow the smiley window to be moved about
