@@ -3981,7 +3981,7 @@ function call_integration_hook($hook, $parameters = array())
 			if (!empty($settings['theme_dir']))
 				$path_replacements['$themedir'] = $settings['theme_dir'];
 			
-			$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
+			$absPath = strtr(trim($file), $path_replacements);
 
 			if (file_exists($absPath))
 				require_once($absPath);
