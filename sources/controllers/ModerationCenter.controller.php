@@ -83,6 +83,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$allMenus = Standard_Menu::context();
 		$moderation_menu = $allMenus->get('Moderation_Menu');
 
+		// Our top level menu
 		$moderation_menu->addBulk(
 			array(
 				'main' => array(
@@ -102,31 +103,42 @@ class ModerationCenter_Controller extends Action_Controller
 			)
 		);
 
+		// All the items available under the main button
 		$moderation_menu->childOf('main')->add('main_areas')->addBulk(
 			array(
 				'index' => array(
 					'label' => $txt['moderation_center'],
 					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_moderationHome',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_home',
 				),
 				'settings' => array(
 					'label' => $txt['mc_settings'],
 					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_moderationSettings',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_features',
 				),
 				'modlogoff' => array(
 					'label' => $txt['mc_logoff'],
 					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_modEndSession',
 					'enabled' => empty($modSettings['securityDisable_moderate']),
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_exit',
 				),
 				'notice' => array(
 					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_showNotice',
-					'select' => 'index'
+					'select' => 'index',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_news',
 				),
 			)
 		);
+
+		// All the items available under the logs button
 		$moderation_menu->childOf('logs')->add('logs_areas')->addBulk(
 			array(
 				'modlog' => array(
@@ -135,12 +147,16 @@ class ModerationCenter_Controller extends Action_Controller
 					'file' => 'admin/Modlog.controller.php',
 					'controller' => 'Modlog_Controller',
 					'function' => 'action_log',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_logs',
 				),
 				'warnings' => array(
 					'label' => $txt['mc_warnings'],
 					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_viewWarnings',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_reports',
 					'subsections' => array(
 						'log' => array($txt['mc_warning_log']),
 						'templates' => array($txt['mc_warning_templates'], 'issue_warning'),
@@ -149,6 +165,7 @@ class ModerationCenter_Controller extends Action_Controller
 			)
 		);
 
+		// All the items available under the posts button
 		$moderation_menu->childOf('posts')->add('posts_areas')->addBulk(
 			array(
 				'postmod' => array(
@@ -158,6 +175,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'controller' => 'PostModeration_Controller',
 					'function' => 'action_index',
 					'custom_url' => $scripturl . '?action=moderate;area=postmod',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_posts',
 					'subsections' => array(
 						'posts' => array($txt['mc_unapproved_replies']),
 						'topics' => array($txt['mc_unapproved_topics']),
@@ -168,6 +187,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
 					'file' => 'admin/ManageMaillist.controller.php',
 					'function' => 'UnapprovedEmails',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_mail',
 					'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
 				),
 				'attachmod' => array(
@@ -176,6 +197,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'file' => 'controllers/PostModeration.controller.php',
 					'controller' => 'PostModeration_Controller',
 					'function' => 'action_index',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_attachment',
 					'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
 				),
 				'reports' => array(
@@ -183,6 +206,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'enabled' => $context['can_moderate_boards'],
 					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_reportedPosts',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_reports',
 					'subsections' => array(
 						'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
 						'closed' => array($txt['mc_reportedp_closed']),
@@ -191,6 +216,7 @@ class ModerationCenter_Controller extends Action_Controller
 			)
 		);
 
+		// All the items available under the groups button
 		$moderation_menu->childOf('groups')->add('groups_areas')->addBulk(
 			array(
 				'userwatch' => array(
@@ -198,6 +224,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
 					'controller' => 'ModerationCenter_Controller',
 					'function' => 'action_viewWatchedUsers',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_permissions',
 					'subsections' => array(
 						'member' => array($txt['mc_watched_users_member']),
 						'post' => array($txt['mc_watched_users_post']),
@@ -208,6 +236,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'file' => 'controllers/Groups.controller.php',
 					'controller' => 'Groups_Controller',
 					'function' => 'action_requests',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_regcenter',
 					'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
 				),
 				'members' => array(
@@ -216,6 +246,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'file' => 'controllers/ManageMembers.controller.php',
 					'controller' => 'ManageMembers_Controller',
 					'function' => 'action_approve',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_members',
 					'custom_url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
 				),
 				'viewgroups' => array(
@@ -223,6 +255,8 @@ class ModerationCenter_Controller extends Action_Controller
 					'file' => 'controllers/Groups.controller.php',
 					'controller' => 'Groups_Controller',
 					'function' => 'action_list',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_membergroups',
 				),
 			)
 		);
@@ -246,15 +280,10 @@ class ModerationCenter_Controller extends Action_Controller
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
 		$context['moderation_menu_name'] = 'menu_data_' . $context['moderation_menu_id'];
-
-		// @todo: html in here is not good
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['moderation_center'],
 			'help' => '',
-			'description' => '
-				<strong>' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</strong>
-				<br /><br />
-				' . $txt['mc_description']);
+			'description' => sprintf($txt['mc_description'], $txt['hello_guest'], $context['user']['name']));
 
 		// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
 		$context['admin_area'] = $mod_include_data['current_area'];
@@ -418,7 +447,6 @@ class ModerationCenter_Controller extends Action_Controller
 				updateReportsStatus((int) $_GET['rid'], 'close', (int) $_GET['close']);
 
 			// Time to update.
-			require_once(SUBSDIR . '/Moderation.subs.php');
 			updateSettings(array('last_mod_report_action' => time()));
 			recountOpenReports();
 		}

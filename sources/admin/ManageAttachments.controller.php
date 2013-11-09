@@ -635,7 +635,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// We're working with them attachments here!
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// we need our attachments directories...
 		$attach_dirs = getAttachmentDirs();
@@ -714,7 +713,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// someone has to do the dirty work
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Deleting an attachment?
 		if ($_REQUEST['type'] != 'avatars')
@@ -772,7 +770,6 @@ class ManageAttachments_Controller extends Action_Controller
 		if (!empty($_POST['remove']))
 		{
 			// we'll need this
-			require_once(SUBSDIR . '/Attachments.subs.php');
 			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			$attachments = array();
@@ -1341,6 +1338,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
 			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
 		if (!isset($modSettings['attachment_basedirectories']))
 			$modSettings['attachment_basedirectories'] = array();
 		elseif (!is_array($modSettings['attachment_basedirectories']))

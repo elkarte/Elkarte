@@ -211,6 +211,7 @@ class Groups_Controller extends Action_Controller
 			fatal_lang_error('membergroup_does_not_exist', false);
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Load up the group details.
 		$context['group'] = membergroupById($current_group, true, true);
@@ -237,7 +238,6 @@ class Groups_Controller extends Action_Controller
 		// @todo: use createList
 
 		// Load all the group moderators, for fun.
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['group']['moderators'] = array();
 
 		$moderators = getGroupModerators($current_group);
@@ -321,17 +321,13 @@ class Groups_Controller extends Action_Controller
 				$member_parameters['member_names'] = $member_names;
 			}
 
-			require_once(SUBSDIR . '/Members.subs.php');
 			$members = membersBy($member_query, $member_parameters);
 
 			// @todo Add $_POST['additional'] to templates!
 
 			// Do the updates...
 			if (!empty($members))
-			{
-				require_once(SUBSDIR . '/Membergroups.subs.php');
 				addMembersToGroup($members, $current_group, isset($_POST['additional']) || $context['group']['hidden'] ? 'only_additional' : 'auto', true);
-			}
 		}
 
 		// Sort out the sorting!
@@ -357,8 +353,6 @@ class Groups_Controller extends Action_Controller
 		}
 
 		$context['sort_direction'] = isset($_REQUEST['desc']) ? 'down' : 'up';
-
-		require_once(SUBSDIR . '/Members.subs.php');
 
 		// The where on the query is interesting. Non-moderators should only see people who are in this group as primary.
 		if ($context['group']['can_moderate'])
@@ -479,7 +473,6 @@ class Groups_Controller extends Action_Controller
 								if ($value == 0 || trim($value) == '')
 									unset($groups['add'][$key]);
 
-							require_once(SUBSDIR . '/Members.subs.php');
 							assignGroupsToMember($id, $groups['primary'], $groups['add']);
 						}
 

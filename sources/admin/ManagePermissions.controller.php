@@ -95,7 +95,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['permissions_title'];
 		$context['sub_action'] = $subAction;
-		
+
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['permissions_title'],
@@ -1025,6 +1025,7 @@ class ManagePermissions_Controller extends Action_Controller
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+
 		// Just in case.
 		checkSession('get');
 
@@ -1071,7 +1072,6 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Load the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		$context['profile_groups'] = prepareMembergroupPermissions();
 
 		// What are the permissions we are querying?

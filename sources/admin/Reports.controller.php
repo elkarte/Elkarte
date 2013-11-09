@@ -596,9 +596,6 @@ class Reports_Controller extends Action_Controller
 		// Do it in columns, it's just easier.
 		setKeys('cols');
 
-		// Get each member!
-		require_once(SUBSDIR . '/Members.subs.php');
-
 		// Get the latest activated member's display name.
 		$result = getBasicMemberData($allStaff, array('moderation' => true, 'sort' => 'real_name'));
 		foreach ($result as $row)

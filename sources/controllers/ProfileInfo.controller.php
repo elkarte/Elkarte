@@ -436,7 +436,6 @@ class ProfileInfo_Controller extends Action_Controller
 				redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
-			require_once(SUBSDIR . '/Messages.subs.php');
 			removeMessage((int) $_GET['delete']);
 
 			// Add it to the mod log.

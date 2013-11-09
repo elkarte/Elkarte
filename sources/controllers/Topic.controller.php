@@ -190,7 +190,6 @@ class Topic_Controller extends Action_Controller
 		if (!empty($row['id_poll']))
 		{
 			loadLanguage('Post');
-			require_once(SUBSDIR . '/Poll.subs.php');
 
 			// Get the question and if it's locked.
 			$pollinfo = pollInfo($row['id_poll']);
