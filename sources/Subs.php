@@ -2753,6 +2753,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = &$user_info['messages'];
 		$context['user']['unread_messages'] = &$user_info['unread_messages'];
+		$context['user']['notifications'] = &$user_info['notifications'];
 
 		// Personal message popup...
 		if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
@@ -3556,7 +3557,9 @@ function setupMenuContext()
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		$menu_count = loadModeratorMenuCounts();
 	}
+
 	$menu_count['unread_messages'] = $context['user']['unread_messages'];
+	$menu_count['notifications'] = $context['user']['notifications'];
 
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
@@ -3610,6 +3613,13 @@ function setupMenuContext()
 					'counter' => 'unread_messages',
 					'href' => $scripturl . '?action=pm',
 					'show' => $context['allow_pm'],
+				),
+
+				'notification' => array(
+					'title' => $txt['notifications'],
+					'counter' => 'notifications',
+					'href' => $scripturl . '?action=notification',
+					'show' => true,
 				),
 
 				// The old language string made no sense, and was too long.

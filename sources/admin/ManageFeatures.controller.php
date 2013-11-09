@@ -529,6 +529,8 @@ class ManageFeatures_Controller extends Action_Controller
 			array('check', 'notifications_enabled'),
 		);
 
+		call_integration_hook('integrate_notification_settings', array(&$config_vars));
+
 		// Some context stuff
 		$context['page_title'] = $txt['notification_settings'];
 		$context['sub_template'] = 'show_settings';
