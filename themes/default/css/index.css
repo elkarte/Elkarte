@@ -507,7 +507,7 @@ h2 a.collapse {
 }
 
 /* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more {
+#category_toggle, #category_toggle_more, upshrink_header {
 	display: block;
 	float:right;
 	padding: 0 16px;
@@ -515,7 +515,7 @@ h2 a.collapse {
 	overflow: hidden;
 	position: relative;
 }
-#category_toggle span, #category_toggle_more span {
+#category_toggle span, #category_toggle_more span, #upshrink_header span {
 	background-repeat: no-repeat;
 	background-image: url(../images/_light/expcol.png);
 	position: absolute;
