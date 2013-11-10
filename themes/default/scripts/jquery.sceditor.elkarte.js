@@ -36,7 +36,10 @@
 			if (!bIsSource)
 				this.toggleSourceMode();
 
-			var current_value = bClear ? text + "\n" : this.getSourceEditorValue(false) + "\n" + text + "\n";
+			var current_value = this.getSourceEditorValue(false),
+				iEmpty = current_value.length;
+
+			current_value = bClear ? text + "\n" : current_value + (iEmpty > 0 ? "\n" : "") + text + "\n";
 			this.setSourceEditorValue(current_value);
 
 			if (!bIsSource)
@@ -119,9 +122,7 @@
 					else
 					{
 						var emoticons = $.extend({}, base.opts.emoticons.popup),
-							popup_position,
-							adjheight = 0,
-							titlebar = $('<div class="catbg sceditor-popup-grip"/>');
+							titlebar = $('<div class="category_header sceditor-popup-grip"/>');
 
 						popupContent = $('<div id="sceditor-popup" />');
 						line = $('<div id="sceditor-popup-smiley" />');
@@ -136,6 +137,7 @@
 						closeButton = $('<span />').text('[' + base._('Close') + ']').click(function () {
 							$(".sceditor-smileyPopup").fadeOut('fast');
 						});
+						
 						if (typeof closeButton !== "undefined")
 							popupContent.append(closeButton);
 
@@ -219,7 +221,7 @@ $.sceditor.command
 						if (!description)
 							description = val;
 
-						editor.wysiwygEditorInsertHtml('<a href="' + val + '">' + description + '</a>');
+						editor.insert('<a href="' + val + '">' + description, '</a>', false);
 					}
 					else
 						editor.execCommand("createlink", val);
@@ -231,56 +233,88 @@ $.sceditor.command
 
 			editor.createDropDown(caller, "insertlink", content);
 		},
-		txtExec: ["[ftp]", "[/ftp]"],
+		txtExec: ['[ftp]', '[/ftp]'],
 		tooltip: 'Insert FTP Link'
 	})
 	.set('glow', {
 		exec: function () {
 			this.insert('[glow=red,2,300]', '[/glow]');
 		},
-		txtExec: ["[glow=red,2,300]", "[/glow]"],
+		txtExec: ['[glow=red,2,300]', '[/glow]'],
 		tooltip: 'Glow'
 	})
 	.set('shadow', {
 		exec: function () {
 			this.insert('[shadow=red,left]', '[/shadow]');
 		},
-		txtExec: ["[shadow=red,left]", "[/shadow]"],
+		txtExec: ['[shadow=red,left]', '[/shadow]'],
 		tooltip: 'Shadow'
 	})
 	.set('spoiler', {
 		exec: function () {
 			this.insert('[spoiler]', '[/spoiler]');
 		},
-		txtExec: ["[spoiler]", "[/spoiler]"],
+		txtExec: ['[spoiler]', '[/spoiler]'],
 		tooltip: 'Insert Spoiler'
 	})
 	.set('footnote', {
-		exec: function () {
-			this.insert('[footnote]', '[/footnote]');
+		state: function() {
+			var currentNode = this.currentNode();
+
+			return $(currentNode).is('aside') || $(currentNode).parents('aside').length > 0 ? 1 : 0;
 		},
-		txtExec: ["[footnote]", "[/footnote]"],
+		exec: function () {
+			this.insert('[footnote] ', '[/footnote]', false);
+		},
+		txtExec: ['[footnote]', '[/footnote]'],
 		tooltip: 'Insert Footnote'
 	})
 	.set('tt', {
-		exec: function () {
-			this.insert('<span class="tt">', '</span>', false);
+		state: function() {
+			var currentNode = this.currentNode();
+
+			return $(currentNode).is('span.tt') || $(currentNode).parents('span.tt').length > 0 ? 1 : 0;
 		},
-		txtExec: ["[tt]", "[/tt]"],
+		exec: function () {
+			var editor = this,
+				currentNode = this.currentNode();
+
+			if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length === 0)
+				this.insert('<span class="tt">', '</span>', false);
+			else
+				return;
+		},
+		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
 	})
 	.set('pre', {
-		exec: function () {
-			this.insert('<pre>', '</pre>', false);
+		state: function() {
+			var currentNode = this.currentNode();
+
+			return $(currentNode).is('pre') || $(currentNode).parents('pre').length > 0 ? 1 : 0;
 		},
-		txtExec: ["[pre]", "[/pre]"],
+		exec: function () {
+			var editor = this,
+				currentNode = this.currentNode();
+
+			if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length === 0)
+				this.insert('<pre>', '</pre>', false);
+			else
+				return;
+		},
+		txtExec: ['[pre]', '[/pre]'],
 		tooltip: 'Preformatted Text'
-	})
+    })
 	.set('move', {
-		exec: function () {
-			this.insert('<marquee>', '</marquee>', false);
+		state: function() {
+			var currentNode = this.currentNode();
+
+			return $(currentNode).is('marquee') || $(currentNode).parents('marquee').length > 0 ? 1 : 0;
 		},
-		txtExec: ["[move]", "[/move]"],
+		exec: function () {
+			this.insert('[move]', '[/move]', false);
+		},
+		txtExec: ['[move]', '[/move]'],
 		tooltip: 'Move'
 	})
 	/*
@@ -289,13 +323,13 @@ $.sceditor.command
 	 * Makes changes to the text inserted for Bulletlist, OrderedList and Table
 	 */
 	.set('bulletlist', {
-		txtExec: ["[list]\n[li]", "[/li]\n[li][/li]\n[/list]"]
+		txtExec: ['[list]\n[li]', '[/li]\n[li][/li]\n[/list]']
 	})
 	.set('orderedlist', {
-		txtExec:  ["[list type=decimal]\n[li]", "[/li]\n[li][/li]\n[/list]"]
+		txtExec:  ['[list type=decimal]\n[li]', '[/li]\n[li][/li]\n[/list]']
 	})
 	.set('table', {
-		txtExec: ["[table]\n[tr]\n[td]", "[/td]\n[/tr]\n[/table]"]
+		txtExec: ['[table]\n[tr]\n[td]', '[/td]\n[/tr]\n[/table]']
 	});
 
 /**
@@ -394,7 +428,7 @@ $.sceditor.plugins.bbcode.bbcode
 			span: {'class': ['php']}
 		},
 		isInline: false,
-		format: "[php]{0}[/php]",
+		format: '[php]{0}[/php]',
 		html: '<code class="php">{0}</code>'
 	})
 	.set('pre', {
@@ -402,21 +436,21 @@ $.sceditor.plugins.bbcode.bbcode
 			pre: null
 		},
 		isInline: false,
-		format: "[pre]{0}[/pre]",
-		html: "<pre>{0}</pre>\n"
+		format: '[pre]{0}[/pre]',
+		html: '<pre>{0}</pre>'
 	})
 	.set('move', {
 		tags: {
 			marquee: null
 		},
-		format: "[move]{0}[/move]",
+		format: '[move]{0}[/move]',
 		html: '<marquee>{0}</marquee>'
 	})
 	.set('footnote', {
 		tags: {
 			aside: null
 		},
-		format: "[footnote]{0}[/footnote]",
+		format: '[footnote]{0}[/footnote]',
 		html: '<aside>{0}</aside>'
 	})
 	/*
@@ -614,7 +648,7 @@ $.sceditor.plugins.bbcode.bbcode
 		breakStart: true,
 		isInline: false,
 		skipLastLineBreak: true,
-		format: "[list type=decimal]{0}[/list]",
+		format: '[list type=decimal]{0}[/list]',
 		html: '<ol>{0}</ol>'
 	}
 );
