@@ -378,7 +378,7 @@ function onDocReceived(XMLDoc)
 	for (var i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
 		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
 
-	$('#' + post_box_name).data("sceditor").InsertText(text);
+	$('#' + post_box_name).data("sceditor").insert(text);
 
 	ajax_indicator(false);
 }
@@ -386,5 +386,5 @@ function onDocReceived(XMLDoc)
 // insert text in to the editor
 function onReceiveOpener(text)
 {
-	$('#' + post_box_name).data("sceditor").InsertText(text);
+	$('#' + post_box_name).data("sceditor").insert(text);
 }

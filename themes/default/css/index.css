@@ -493,21 +493,13 @@ h4.titlebg .icon {
 	vertical-align: text-top;
 }
 
-/* Upshrinks in cat and title bars. */
-/* @todo - Why is this stranded in this spot?
-#upshrink_ic, #newsupshrink, .panel_toggle, #quickReplyExpand {
-	float: right;
-	margin: 4px 0 0 0;
-	padding: 4px;
-}*/
-
 h2 a.collapse {
 	margin: 2px 4px -2px 0;
 	float: right;
 }
 
 /* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more {
+#category_toggle, #category_toggle_more, #upshrink_header {
 	display: block;
 	float:right;
 	padding: 0 16px;
@@ -515,7 +507,7 @@ h2 a.collapse {
 	overflow: hidden;
 	position: relative;
 }
-#category_toggle span, #category_toggle_more span {
+#category_toggle span, #category_toggle_more span, #upshrink_header span {
 	background-repeat: no-repeat;
 	background-image: url(../images/_light/expcol.png);
 	position: absolute;

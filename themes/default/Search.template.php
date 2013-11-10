@@ -39,7 +39,7 @@ function template_main()
 						<div id="search_term_input">
 							<strong>', $txt['search_for'], ':</strong>
 							<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />
-							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit" />
+							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit" />', '
 						</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -121,7 +121,6 @@ function template_main()
 							</dt>
 							<dd><label for="minage">',
 								$txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
-							</dd>
 							</dd>';
 
 		// If we allow a simple form, show a link to get back to it

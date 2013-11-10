@@ -709,14 +709,7 @@ function create_control_richedit($editorOptions)
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
 		(function () {
-			var editor = $("#' . $editorOptions['id'] . '").data("sceditor");
-			var editor_val = \'\';
-			if (editor.inSourceMode())
-				editor_val = editor.getText();
-			else
-				editor_val = editor.getText();
-
-			return editor_val;
+			return $("#' . $editorOptions['id'] . '").data("sceditor").val();
 		});') . '
 	});', true);
 	}

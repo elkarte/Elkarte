@@ -489,7 +489,7 @@ function template_menu()
 	echo '
 						<li id="collapse_button" class="listlevel1">
 							<a class="linklevel1">
-								<span id="category_toggle">&nbsp;
+								<span id="upshrink_header">&nbsp;
 									<span id="upshrink" class="collapse" style="display: none;" title="', $txt['upshrink_description'], '"></span>
 								</span>
 							</a>
