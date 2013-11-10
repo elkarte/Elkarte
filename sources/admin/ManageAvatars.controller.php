@@ -96,7 +96,7 @@ class ManageAvatars_Controller extends Action_Controller
 	/**
 	 * This method retrieves and returns avatar settings.
 	 * It also returns avatar-related permissions profile_server_avatar,
-	 * 	profile_upload_avatar, profile_remote_avatar, profile_gvatar.
+	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
 	 *
 	 * Initializes the avatarSettings form.
 	 */
@@ -169,7 +169,7 @@ class ManageAvatars_Controller extends Action_Controller
 	/**
 	 * This method retrieves and returns avatar settings.
 	 * It also returns avatar-related permissions profile_server_avatar,
-	 * 	profile_upload_avatar, profile_remote_avatar, profile_gvatar.
+	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
 	 * @deprecated
 	 */
 	public function settings()

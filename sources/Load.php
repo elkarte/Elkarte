@@ -130,13 +130,13 @@ function reloadSettings()
 /**
  * Load all the important user information.
  * What it does:
- * 	- sets up the $user_info array
- * 	- assigns $user_info['query_wanna_see_board'] for what boards the user can see.
- * 	- first checks for cookie or integration validation.
- * 	- uses the current session if no integration function or cookie is found.
- * 	- checks password length, if member is activated and the login span isn't over.
- * 		- if validation fails for the user, $id_member is set to 0.
- * 		- updates the last visit time when needed.
+ *  - sets up the $user_info array
+ *  - assigns $user_info['query_wanna_see_board'] for what boards the user can see.
+ *  - first checks for cookie or integration validation.
+ *  - uses the current session if no integration function or cookie is found.
+ *  - checks password length, if member is activated and the login span isn't over.
+ *    - if validation fails for the user, $id_member is set to 0.
+ *    - updates the last visit time when needed.
  */
 function loadUserSettings()
 {
@@ -1786,7 +1786,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 /**
  * Load a sub-template.
  * What it does:
- * 	- loads the sub template specified by sub_template_name, which must be in an already-loaded template.
+ *  - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
  *  - if ?debug is in the query string, shows administrators a marker after every sub template
  *    for debugging purposes.
  *
@@ -1825,8 +1825,8 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  * @param string $filename
  * @param array $params = array()
  * Keys are the following:
- * 	- ['local'] (true/false): define if the file is local
- * 	- ['fallback'] (true/false): if false  will attempt to load the file from the default theme if not found in the current theme
+ *  - ['local'] (true/false): define if the file is local
+ *  - ['fallback'] (true/false): if false  will attempt to load the file from the default theme if not found in the current theme
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
  * @param string $id = ''
@@ -1909,10 +1909,10 @@ function loadCSSFile($filenames, $params = array(), $id = '')
  * @param array $filenames
  * @param array $params = array()
  * Keys are the following:
- * 	- ['local'] (true/false): define if the file is local
- * 	- ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
- * 	- ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
- *	- ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
+ *  - ['local'] (true/false): define if the file is local
+ *  - ['defer'] (true/false): define if the file should load in <head> or before the closing <html> tag
+ *  - ['fallback'] (true/false): if true will attempt to load the file from the default theme if not found in the current
+ *  - ['async'] (true/false): if the script should be loaded asynchronously (HTML5)
  *  - ['stale'] (true/false/string): if true or null, use cache stale, false do not, or used a supplied string
  *
  * @param string $id = ''
@@ -2304,10 +2304,10 @@ function censorText(&$text, $force = false)
 
 /**
  * Load the template/language file using eval or require? (with eval we can show an error message!)
- * 	- loads the template or language file specified by filename.
- * 	- uses eval unless disableTemplateEval is enabled.
- * 	- outputs a parse error if the file did not exist or contained errors.
- * 	- attempts to detect the error and line, and show detailed information.
+ *  - loads the template or language file specified by filename.
+ *  - uses eval unless disableTemplateEval is enabled.
+ *  - outputs a parse error if the file did not exist or contained errors.
+ *  - attempts to detect the error and line, and show detailed information.
  *
  * @param string $filename
  * @param bool $once = false, if true only includes the file once (like include_once)

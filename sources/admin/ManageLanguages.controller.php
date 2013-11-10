@@ -1036,7 +1036,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 * Format of the array:
 	 *  - either, variable name, description, type (constant), size/possible values, helptext.
 	 *  - or, an empty string for a horizontal rule.
-	 *	- or, a string for a titled section.
+	 *  - or, a string for a titled section.
 	 *
 	 * Initialize _languageSettings form.
 	 */

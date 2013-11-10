@@ -329,7 +329,7 @@ function attachments_init_dir(&$tree, &$count)
  * Validates the save location actually exists.
  *
  * @param $id_msg = null id of the message with attachments, if any.
- *					If null, this is an upload in progress for a new post.
+ *                  If null, this is an upload in progress for a new post.
  */
 function processAttachments($id_msg = null)
 {
@@ -1524,7 +1524,7 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,
 			a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
 			IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
-    	FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
+			FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
 		WHERE a.id_msg IN ({array_int:message_list})
 			AND a.attachment_type = {int:attachment_type}',

@@ -193,12 +193,12 @@ class OpenID_Controller extends Action_Controller
 		// Generate the XRDS data for OpenID 2.0, YADIS discovery..
 		echo '
 <xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
-  <XRD>
-    <Service>
-      <Type>http://specs.openid.net/auth/2.0/return_to</Type>
-      <URI>', $scripturl, '?action=openidreturn</URI>
+	<XRD>
+		<Service>
+			<Type>http://specs.openid.net/auth/2.0/return_to</Type>
+			<URI>', $scripturl, '?action=openidreturn</URI>
 	</Service>
-  </XRD>
+	</XRD>
 </xrds:XRDS>';
 
 	obExit(false);

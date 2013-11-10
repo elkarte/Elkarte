@@ -133,13 +133,13 @@ class Database_PostgreSQL implements Database
 		if ($matches[1] === 'query_wanna_see_board')
 			return $user_info['query_wanna_see_board'];
 
-        if ($matches[1] === 'empty')
-                return '\'\'';
+		if ($matches[1] === 'empty')
+			return '\'\'';
 
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
-        if ($matches[1] === 'literal')
+		if ($matches[1] === 'literal')
 			return '\'' . pg_escape_string($matches[2]) . '\'';
 
 		if (!isset($values[$matches[2]]))

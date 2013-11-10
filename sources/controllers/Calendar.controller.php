@@ -170,7 +170,7 @@ class Calendar_Controller extends Action_Controller
 	/**
 	 * This function processes posting/editing/deleting a calendar event.
 	 *
-	 * 	- calls action_post() function if event is linked to a post.
+	 *  - calls action_post() function if event is linked to a post.
 	 *  - calls insertEvent() to insert the event if not linked to post.
 	 *
 	 * It requires the calendar_post permission to use.

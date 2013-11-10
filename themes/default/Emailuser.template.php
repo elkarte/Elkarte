@@ -18,18 +18,18 @@
  * This is where we get information about who they want to send the topic to, etc.
  *
  * The template gets shown from:
- * 	'?action=emailuser;sa=sendtopic;topic=##.##'
+ *  '?action=emailuser;sa=sendtopic;topic=##.##'
  * And should submit to:
- * 	'?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.' . $context['start']
+ *  '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.' . $context['start']
  *
  * It should send the following fields:
- * 	y_name: sender's name.
- * 	y_email: sender's email.
- * 	comment: any additional comment.
- * 	r_name: receiver's name.
- * 	r_email: receiver's email address.
- * 	send: this just needs to be set, as by the submit button.
- * 	sc: the session id, or $context['session_id'].
+ *  y_name: sender's name.
+ *  y_email: sender's email.
+ *  comment: any additional comment.
+ *  r_name: receiver's name.
+ *  r_email: receiver's email address.
+ *  send: this just needs to be set, as by the submit button.
+ *  sc: the session id, or $context['session_id'].
  */
 function template_main()
 {
@@ -191,13 +191,13 @@ function template_custom_email()
 
 /**
  * The report sub template gets shown from:
- * 	'?action=reporttm;topic=##.##;msg=##'
+ *  '?action=reporttm;topic=##.##;msg=##'
  * It should submit to:
- * 	'?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
+ *  '?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
  *
  * It only needs to send the following fields:
- * 	comment: an additional comment to give the moderator.
- * 	sc: the session id, or $context['session_id'].
+ *  comment: an additional comment to give the moderator.
+ *  sc: the session id, or $context['session_id'].
  */
 function template_report()
 {

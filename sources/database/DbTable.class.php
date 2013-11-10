@@ -25,23 +25,23 @@ abstract class DbTable
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
 	 *  The columns array should have one sub-array for each column - these sub arrays contain:
-	 *  	'name' = Column name
-	 *  	'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
-	 *  	'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
-	 *  		If not set it will pick a size.
-	 *  	- 'default' = Default value - do not set if no default required.
-	 *  	- 'null' => Can it be null (true or false) - if not set default will be false.
-	 *  	- 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
-	 *  		it should begin counting.
+	 *    'name' = Column name
+	 *    'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
+	 *    'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
+	 *      If not set it will pick a size.
+	 *    - 'default' = Default value - do not set if no default required.
+	 *    - 'null' => Can it be null (true or false) - if not set default will be false.
+	 *    - 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
+	 *      it should begin counting.
 	 *  - Adds indexes as specified within indexes parameter. Each index should be a member of $indexes. Values are:
-	 *  	- 'name' => Index name (If left empty it will be generated).
-	 *  	- 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
-	 *  	- 'columns' => Array containing columns that form part of key - in the order the index is to be created.
+	 *    - 'name' => Index name (If left empty it will be generated).
+	 *    - 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
+	 *    - 'columns' => Array containing columns that form part of key - in the order the index is to be created.
 	 *  - parameters: (None yet)
 	 *  - if_exists values:
-	 *  	- 'ignore' will do nothing if the table exists. (And will return true)
-	 *  	- 'overwrite' will drop any existing table of the same name.
-	 *  	- 'error' will return false if the table already exists.
+	 *    - 'ignore' will do nothing if the table exists. (And will return true)
+	 *    - 'overwrite' will drop any existing table of the same name.
+	 *    - 'error' will return false if the table already exists.
 	 *
 	 * @param string $table_name
 	 * @param array $columns in the format specified.

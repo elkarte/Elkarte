@@ -59,12 +59,12 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * detects if the file is really a .zip file, and if so returns the result of read_zip_data
  *
  * if destination is null
- *	- returns a list of files in the archive.
+ *  - returns a list of files in the archive.
  *
  * if single_file is true
- * - returns the contents of the file specified by destination, if it exists, or false.
- * - destination can start with * and / to signify that the file may come from any directory.
- * - destination should not begin with a / if single_file is true.
+ *  - returns the contents of the file specified by destination, if it exists, or false.
+ *  - destination can start with * and / to signify that the file may come from any directory.
+ *  - destination should not begin with a / if single_file is true.
  *
  * overwrites existing files with newer modification times if and only if overwrite is true.
  * creates the destination directory if it doesn't exist, and is is specified.

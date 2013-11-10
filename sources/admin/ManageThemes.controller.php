@@ -20,17 +20,17 @@
  * @todo Update this for the new package manager?
  *
  * Creating and distributing theme packages:
- * 	There isn't that much required to package and distribute your own themes...
+ *  There isn't that much required to package and distribute your own themes...
  * just do the following:
- * - create a theme_info.xml file, with the root element theme-info.
- * - its name should go in a name element, just like description.
- * - your name should go in author. (email in the email attribute.)
- * - any support website for the theme should be in website.
- * - layers and templates (non-default) should go in those elements ;).
- * - if the images dir isn't images, specify in the images element.
- * - any extra rows for themes should go in extra, serialized. (as in array(variable => value).)
- * - tar and gzip the directory - and you're done!
- * - please include any special license in a license.txt file.
+ *  - create a theme_info.xml file, with the root element theme-info.
+ *  - its name should go in a name element, just like description.
+ *  - your name should go in author. (email in the email attribute.)
+ *  - any support website for the theme should be in website.
+ *  - layers and templates (non-default) should go in those elements ;).
+ *  - if the images dir isn't images, specify in the images element.
+ *  - any extra rows for themes should go in extra, serialized. (as in array(variable => value).)
+ *  - tar and gzip the directory - and you're done!
+ *  - please include any special license in a license.txt file.
  *
  */
 

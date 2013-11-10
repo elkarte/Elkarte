@@ -16,15 +16,15 @@ if (!defined('ELK'))
  * Converts a string of HTML to BBC
  *
  * Initiate
- *		$bbc_converter = new Convert_BBC($html);
- *		where $html is a string of html we want to convert to bbc
+ *    $bbc_converter = new Convert_BBC($html);
+ *    where $html is a string of html we want to convert to bbc
  *
  * Override
- *		$bbc_converter->skip_tags(array())
- *		will prevent the conversion of certain html tags to bbc
+ *    $bbc_converter->skip_tags(array())
+ *    will prevent the conversion of certain html tags to bbc
  *
  * Convert
- *		$bbc = $bbc_converter->get_bbc();
+ *    $bbc = $bbc_converter->get_bbc();
  *
  */
 class Convert_BBC

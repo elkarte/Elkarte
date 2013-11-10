@@ -416,15 +416,15 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  * @param int $group
  * @param string $type = 'auto' specifies whether the group is added as primary or as additional group.
  * Supported types:
- * 	- only_primary      - Assigns a membergroup as primary membergroup, but only
- * 						  if a member has not yet a primary membergroup assigned,
- * 						  unless the member is already part of the membergroup.
- * 	- only_additional   - Assigns a membergroup to the additional membergroups,
- * 						  unless the member is already part of the membergroup.
- * 	- force_primary     - Assigns a membergroup as primary membergroup no matter
- * 						  what the previous primary membergroup was.
- * 	- auto              - Assigns a membergroup to the primary group if it's still
- * 						  available. If not, assign it to the additional group.
+ *  - only_primary    - Assigns a membergroup as primary membergroup, but only
+ *                      if a member has not yet a primary membergroup assigned,
+ *                      unless the member is already part of the membergroup.
+ *  - only_additional - Assigns a membergroup to the additional membergroups,
+ *                      unless the member is already part of the membergroup.
+ *  - force_primary   - Assigns a membergroup as primary membergroup no matter
+ *                      what the previous primary membergroup was.
+ *  - auto            - Assigns a membergroup to the primary group if it's still
+ *                      available. If not, assign it to the additional group.
  * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
  *
  * @return boolean success or failure
@@ -1139,7 +1139,7 @@ function getMaxGroupID()
 {
 	$db = database();
 
-    $request = $db->query('', '
+	$request = $db->query('', '
 		SELECT MAX(id_group)
 		FROM {db_prefix}membergroups',
 		array(
@@ -1824,11 +1824,11 @@ function list_getGroupRequestCount($where, $where_parameters)
  * @param string $where_parameters
  * @return array, an array of group requests
  * Each group request has:
- * 		'id'
- * 		'member_link'
- * 		'group_link'
- * 		'reason'
- * 		'time_submitted'
+ *   'id'
+ *   'member_link'
+ *   'group_link'
+ *   'reason'
+ *   'time_submitted'
  */
 function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
 {
