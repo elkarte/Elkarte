@@ -535,11 +535,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 			$reg_errors->addError('profile_error_password_' . $passwordError);
 	}
 
-	// If they are using an OpenID that hasn't been verified yet error out.
-	// @todo Change this so they can register without having to attempt a login first
-	if ($regOptions['auth_method'] == 'openid' && (empty($_SESSION['openid']['verified']) || $_SESSION['openid']['openid_uri'] != $regOptions['openid']))
-		$reg_errors->addError('openid_not_verified');
-
 	// You may not be allowed to register this email.
 	if (!empty($regOptions['check_email_ban']))
 		isBannedEmail($regOptions['email'], 'cannot_register', $txt['ban_register_prohibited']);

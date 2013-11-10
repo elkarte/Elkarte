@@ -215,7 +215,7 @@ class Register_Controller extends Action_Controller
 			$context['visual_verification'] = false;
 
 		// Are they coming from an OpenID login attempt?
-		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']) )
+		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
 		{
 			$context['openid'] = $_SESSION['openid']['openid_uri'];
 			$context['username'] = !empty($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : $_SESSION['openid']['nickname'];
@@ -252,8 +252,12 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context, $user_info;
 
-		checkSession();
-		validateToken('register');
+		// We can't validate the token and the session with OpenID enabled.
+		if(!$verifiedOpenID)
+		{
+			checkSession();
+			validateToken('register');
+		}
 
 		// Start collecting together any errors.
 		$reg_errors = error_context::context('register', 0);
@@ -519,12 +523,12 @@ class Register_Controller extends Action_Controller
 			$openID->validate($_POST['openid_identifier'], false, $save_variables);
 		}
 		// If we've come from OpenID set up some default stuff.
-		elseif ($verifiedOpenID || (!empty($_POST['openid_identifier']) && $_POST['authenticate'] == 'openid'))
-		{
+		elseif ($verifiedOpenID || ((!empty($_POST['openid_identifier']) || !empty($_SESSION['openid']['openid_uri'])) && $_POST['authenticate'] == 'openid'))
+		{	
 			$regOptions['username'] = !empty($_POST['user']) && trim($_POST['user']) != '' ? $_POST['user'] : $_SESSION['openid']['nickname'];
 			$regOptions['email'] = !empty($_POST['email']) && trim($_POST['email']) != '' ? $_POST['email'] : $_SESSION['openid']['email'];
 			$regOptions['auth_method'] = 'openid';
-			$regOptions['openid'] = !empty($_POST['openid_identifier']) ? $_POST['openid_identifier'] : $_SESSION['openid']['openid_uri'];
+			$regOptions['openid'] = !empty($_SESSION['openid']['openid_uri']) ? $_SESSION['openid']['openid_uri'] : (!empty($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '');
 		}
 
 		// Registration needs to know your IP
