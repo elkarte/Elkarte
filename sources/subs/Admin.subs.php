@@ -94,6 +94,78 @@ function getServerVersions($checkFor)
 }
 
 /**
+ * Builds the availalble tasks for this admin / moderator
+ * Sets up the support resource txt stings
+ *
+ * Called from Admin.controller action_home and action_credits
+ */
+function getQuickAdminTasks()
+{
+	global $txt, $scripturl;
+
+	// The format of this array is: permission, action, title, description, icon.
+	$quick_admin_tasks = array(
+		array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
+		array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
+		array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
+		array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
+		array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
+		array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
+		array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
+		array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
+	);
+
+	$available_admin_tasks = array();
+	foreach ($quick_admin_tasks as $task)
+	{
+		if (!empty($task[0]) && !allowedTo($task[0]))
+			continue;
+
+		$available_admin_tasks[] = array(
+			'href' => $scripturl . '?action=admin;area=' . $task[1],
+			'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
+			'title' => $txt[$task[2]],
+			'description' => $txt[$task[3]],
+			'icon' => $task[4],
+			'is_last' => false
+		);
+	}
+
+	if (count($available_admin_tasks) % 2 == 1)
+	{
+		$available_admin_tasks[] = array(
+			'href' => '',
+			'link' => '',
+			'title' => '',
+			'description' => '',
+			'is_last' => true
+		);
+		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
+	}
+	elseif (count($available_admin_tasks) != 0)
+	{
+		$available_admin_tasks[count($available_admin_tasks) - 1]['is_last'] = true;
+		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
+	}
+
+	// Lastly, fill in the blanks in the support resources paragraphs.
+	$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
+		'https://github.com/elkarte/Elkarte/wiki',
+		'https://github.com/elkarte/Elkarte/wiki/features',
+		'https://github.com/elkarte/Elkarte/wiki/options',
+		'https://github.com/elkarte/Elkarte/wiki/themes',
+		'https://github.com/elkarte/Elkarte/wiki/packages'
+	);
+	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
+		'http://www.elkarte.net/',
+		'http://www.elkarte.net/redirect/support',
+		'http://www.elkarte.net/redirect/customize_support'
+	);
+
+	return $available_admin_tasks;
+}
+
+/**
  * Search through source, theme and language files to determine their version.
  * Get detailed version information about the physical Elk files on the server.
  *

@@ -763,6 +763,7 @@ class Admin_Controller extends Action_Controller
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -779,7 +780,6 @@ class Admin_Controller extends Action_Controller
 		$context['forum_version'] = $forum_version;
 
 		// Get a list of current server versions.
-		require_once(SUBSDIR . '/Admin.subs.php');
 		$checkFor = array(
 			'gd',
 			'imagick',
@@ -793,8 +793,8 @@ class Admin_Controller extends Action_Controller
 			'php',
 			'server',
 		);
-
 		$context['current_versions'] = getServerVersions($checkFor);
+
 		$context['can_admin'] = allowedTo('admin_forum');
 		$context['sub_template'] = 'admin';
 		$context['page_title'] = $txt['admin_center'];
@@ -806,64 +806,8 @@ class Admin_Controller extends Action_Controller
 				' . sprintf($txt['admin_main_welcome'], $txt['admin_center'], $txt['help'], $txt['help']),
 		);
 
-		// The format of this array is: permission, action, title, description, icon.
-		$quick_admin_tasks = array(
-			array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
-			array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
-			array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
-			array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
-			array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
-			array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
-			array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
-			array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
-		);
-
-		$context['quick_admin_tasks'] = array();
-		foreach ($quick_admin_tasks as $task)
-		{
-			if (!empty($task[0]) && !allowedTo($task[0]))
-				continue;
-
-			$context['quick_admin_tasks'][] = array(
-				'href' => $scripturl . '?action=admin;area=' . $task[1],
-				'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
-				'title' => $txt[$task[2]],
-				'description' => $txt[$task[3]],
-				'icon' => $task[4],
-				'is_last' => false
-			);
-		}
-
-		if (count($context['quick_admin_tasks']) % 2 == 1)
-		{
-			$context['quick_admin_tasks'][] = array(
-				'href' => '',
-				'link' => '',
-				'title' => '',
-				'description' => '',
-				'is_last' => true
-			);
-			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
-		}
-		elseif (count($context['quick_admin_tasks']) != 0)
-		{
-			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 1]['is_last'] = true;
-			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
-		}
-
-		// Lastly, fill in the blanks in the support resources paragraphs.
-		$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
-			'https://github.com/elkarte/Elkarte/wiki',
-			'https://github.com/elkarte/Elkarte/wiki/features',
-			'https://github.com/elkarte/Elkarte/wiki/options',
-			'https://github.com/elkarte/Elkarte/wiki/themes',
-			'https://github.com/elkarte/Elkarte/wiki/packages'
-		);
-		$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
-			'http://www.elkarte.net/',
-			'http://www.elkarte.net/redirect/support',
-			'http://www.elkarte.net/redirect/customize_support'
-		);
+		// Load in the admin quick tasks
+		$context['quick_admin_tasks'] = getQuickAdminTasks();
 	}
 
 	/**
@@ -920,68 +864,11 @@ class Admin_Controller extends Action_Controller
 		$context['current_versions'] = getServerVersions($checkFor);
 
 		$context['can_admin'] = allowedTo('admin_forum');
-
 		$context['sub_template'] = 'credits';
 		$context['page_title'] = $txt['support_credits_title'];
 
-		// The format of this array is: permission, action, title, description, icon.
-		$quick_admin_tasks = array(
-			array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
-			array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
-			array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
-			array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
-			array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
-			array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
-			array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
-			array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
-		);
-
-		$context['quick_admin_tasks'] = array();
-		foreach ($quick_admin_tasks as $task)
-		{
-			if (!empty($task[0]) && !allowedTo($task[0]))
-				continue;
-
-			$context['quick_admin_tasks'][] = array(
-				'href' => $scripturl . '?action=admin;area=' . $task[1],
-				'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
-				'title' => $txt[$task[2]],
-				'description' => $txt[$task[3]],
-				'icon' => $task[4],
-				'is_last' => false
-			);
-		}
-
-		if (count($context['quick_admin_tasks']) % 2 == 1)
-		{
-			$context['quick_admin_tasks'][] = array(
-				'href' => '',
-				'link' => '',
-				'title' => '',
-				'description' => '',
-				'is_last' => true
-			);
-			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
-		}
-		elseif (count($context['quick_admin_tasks']) != 0)
-		{
-			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 1]['is_last'] = true;
-			$context['quick_admin_tasks'][count($context['quick_admin_tasks']) - 2]['is_last'] = true;
-		}
-
-		// Lastly, fill in the blanks in the support resources paragraphs.
-		$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
-			'https://github.com/elkarte/Elkarte/wiki',
-			'https://github.com/elkarte/Elkarte/wiki/features',
-			'https://github.com/elkarte/Elkarte/wiki/options',
-			'https://github.com/elkarte/Elkarte/wiki/themes',
-			'https://github.com/elkarte/Elkarte/wiki/packages'
-		);
-		$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
-			'http://www.elkarte.net/',
-			'http://www.elkarte.net/redirect/support',
-			'http://www.elkarte.net/redirect/customize_support'
-		);
+		// Load in the admin quick tasks
+		$context['quick_admin_tasks'] = getQuickAdminTasks();
 	}
 
 	/**
