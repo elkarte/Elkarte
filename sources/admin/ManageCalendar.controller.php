@@ -92,12 +92,11 @@ class ManageCalendar_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-mc');
 
-			foreach ($_REQUEST['holiday'] as $id => $value)
-				$_REQUEST['holiday'][$id] = (int) $id;
+			$to_remove = array_map('intval', array_keys($_REQUEST['holiday']));
 
 			// Now the IDs are "safe" do the delete...
 			require_once(SUBSDIR . '/Calendar.subs.php');
-			removeHolidays($_REQUEST['holiday']);
+			removeHolidays($to_remove);
 		}
 
 		createToken('admin-mc');
