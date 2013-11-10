@@ -142,16 +142,7 @@ class Xml_Controller extends Action_Controller
 		loadLanguage('Errors');
 
 		// We need (at least) this to ensure that mod files are included
-		if (!empty($modSettings['integrate_admin_include']))
-		{
-			$admin_includes = explode(',', $modSettings['integrate_admin_include']);
-			foreach ($admin_includes as $include)
-			{
-				$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($include))
-					require_once($include);
-			}
-		}
+		call_integration_include_hook('integrate_admin_include');
 
 		$errors = array();
 		$returns = array();

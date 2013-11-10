@@ -333,7 +333,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'email_address', 'hide_email', 'show_online', 'hr',
 				'passwrd1', 'passwrd2', 'hr',
 				'secret_question', 'secret_answer',
-			)
+			),
+			'account'
 		);
 	}
 
@@ -364,7 +365,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'usertitle', 'signature', 'hr',
 				'karma_good', 'hr',
 				'website_title', 'website_url',
-			)
+			),
+			'forum'
 		);
 	}
 
@@ -390,7 +392,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'receive_from',
 				'hr',
 				'pm_settings',
-			)
+			),
+			'pmprefs'
 		);
 	}
 
@@ -419,7 +422,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'id_theme', 'smiley_set', 'hr',
 				'time_format', 'time_offset', 'hr',
 				'theme_settings',
-			)
+			),
+			'themepick'
 		);
 	}
 
@@ -550,7 +554,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'board_name' => array(
 					'header' => array(
 						'value' => $txt['notifications_boards'],
-						'class' => 'lefttext first_th',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'function' => create_function('$board', '
@@ -638,7 +642,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'subject' => array(
 					'header' => array(
 						'value' => $txt['notifications_topics'],
-						'class' => 'lefttext first_th',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'function' => create_function('$topic', '

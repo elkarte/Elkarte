@@ -66,10 +66,14 @@ function currentMemberID($fatal = true, $reload_id = false)
  * Setup the context for a page load!
  *
  * @param array $fields
+ * @param string $hook a string that represent the hook that can be used to operate on $fields
  */
-function setupProfileContext($fields)
+function setupProfileContext($fields, $hook = '')
 {
 	global $profile_fields, $context, $cur_profile, $txt;
+
+	if (!empty($hook))
+		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
 
 	// Make sure we have this!
 	loadProfileFields(true);

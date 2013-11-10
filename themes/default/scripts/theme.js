@@ -328,22 +328,30 @@ function revalidateMentions(sForm, sInput)
 				mentions = $(all_elk_mentions[i].oMention.mentions);
 			}
 
+			// Adding a space at the beginning to facilitate catching of mentions at the 1st char
+			// and one at the end to simplify catching any aa last thing in the text
+			body = ' ' + body + ' ';
+
 			// First check if all those in the list are really mentioned
 			$(mentions).find('input').each(function (idx, elem) {
-				var name = $(elem).data('name');
+				var name = $(elem).data('name'),
+					next_char, prev_char, index = body.indexOf(name);
 
-				var next_char, prev_char, index = body.indexOf(name);
-				if (index === -1)
-					$(elem).remove();
-				else
+				// It is undefined coming from a preview
+				if (typeof name != 'undefined')
 				{
-					next_char = body.charAt(index + name.length);
-					prev_char = body.charAt(index - 1);
+					if (index === -1)
+						$(elem).remove();
+					else
+					{
+						next_char = body.charAt(index + name.length);
+						prev_char = body.charAt(index - 1);
 
-					if (next_char != '' && next_char.localeCompare(" ") != 0)
-						$(elem).remove();
-					else if (prev_char != '' && prev_char.localeCompare(" ") != 0)
-						$(elem).remove();
+						if (next_char != '' && next_char.localeCompare(" ") != 0)
+							$(elem).remove();
+						else if (prev_char != '' && prev_char.localeCompare(" ") != 0)
+							$(elem).remove();
+					}
 				}
 			});
 
@@ -352,12 +360,6 @@ function revalidateMentions(sForm, sInput)
 				names = cached_names[cached_queries[k]];
 				for (var l = 0, ncount = names.length; l < ncount; l++)
 					if (body.indexOf(' @' + names[l].name + ' ') !== -1)
-						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
-					else if (body.indexOf('@' + names[l].name + ' ') === 0)
-						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
-					else if (body.indexOf(' @' + names[l].name) === (body.length - (' @' + names[l].name).length))
-						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
-					else if (body.indexOf('@' + names[l].name) === (body.length - (' @' + names[l].name).length))
 						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
 			}
 		}

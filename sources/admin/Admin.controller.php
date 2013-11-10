@@ -275,7 +275,7 @@ class Admin_Controller extends Action_Controller
 				'likes' => array($txt['likes'], 'enabled' => in_array('l', $context['admin_features'])),
 				'sig' => array($txt['signature_settings_short']),
 				'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => in_array('cp', $context['admin_features'])),
-				'notification' => array($txt['notification']),
+				'notification' => array($txt['notifications']),
 			)
 		);
 
@@ -701,16 +701,7 @@ class Admin_Controller extends Action_Controller
 		);
 
 		// Any files to include for administration?
-		if (!empty($modSettings['integrate_admin_include']))
-		{
-			$admin_includes = explode(',', $modSettings['integrate_admin_include']);
-			foreach ($admin_includes as $include)
-			{
-				$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($include))
-					require_once($include);
-			}
-		}
+		call_integration_include_hook('integrate_admin_include');
 
 		// Make sure the administrator has a valid session...
 		validateSession();

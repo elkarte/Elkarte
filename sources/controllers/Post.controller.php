@@ -93,6 +93,9 @@ class Post_Controller extends Action_Controller
 			$context['preview_subject'] = '';
 		}
 
+		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+			$context['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+
 		// No message is complete without a topic.
 		if (empty($topic) && !empty($_REQUEST['msg']))
 		{
@@ -544,9 +547,6 @@ class Post_Controller extends Action_Controller
 			// Set the destination.
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 			$context['submit_label'] = $txt['save'];
-
-			// The smiley popup may take advantage of Jquery UI ....
-			$modSettings['jquery_include_ui'] = true;
 		}
 		// Posting...
 		else
@@ -563,9 +563,6 @@ class Post_Controller extends Action_Controller
 			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['poll']) ? ';poll' : '');
 
 			$context['submit_label'] = $txt['post'];
-
-			// The smiley popup may take advantage of Jquery UI ....
-			$modSettings['jquery_include_ui'] = true;
 
 			list ($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 		}
@@ -1445,8 +1442,14 @@ class Post_Controller extends Action_Controller
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 			require_once(SUBSDIR . '/Members.subs.php');
 			$mentioned_members = membersBy($query, $query_params, true);
+			$replacements = 0;
+			$actually_mentioned = array();
 			foreach ($mentioned_members as $member)
-				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message']);
+			{
+				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
+				if ($replacements > 0)
+					$actually_mentioned[] = $member['id_member'];
+			}
 		}
 
 		// Make the poll...
@@ -1762,12 +1765,12 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		if (!empty($modSettings['notifications_enabled']) && !empty($actually_mentioned))
 		{
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
 			$notify = new Notification_Controller();
 			$notify->setData(array(
-				'id_member' => $_REQUEST['uid'],
+				'id_member' => $actually_mentioned,
 				'type' => 'men',
 				'id_msg' => $msgOptions['id'],
 				'status' => $becomesApproved ? 'new' : 'unapproved',

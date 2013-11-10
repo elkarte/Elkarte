@@ -468,22 +468,53 @@ function processNextTasks($ts = 0)
 		);
 		$affected_rows = $db->affected_rows();
 
-		// The method must exist in ScheduledTask class, or we are wasting our time.
 		// Do also some timestamp checking,
 		// and do this only if we updated it before.
-		$task = new ScheduledTask();
-		if (method_exists($task, $row['task']) && (!empty($ts) || $ts == $row['next_time']) && $affected_rows)
+		if ((!empty($ts) || $ts == $row['next_time']) && $affected_rows)
 		{
-			ignore_user_abort(true);
+			// The method must exist in ScheduledTask class, or we are wasting our time.
+			// Actually for extendability sake, we need to have other ways, so:
+			// A simple procedural function?
+			if (strpos($row['task'], '::') === false && function_exists($row['task']))
+			{
+				$method = $row['task'];
 
-			// Do the task...
-			$completed = $task->{$row['task']}();
+				ignore_user_abort(true);
+
+				// Do the task...
+				$completed = $method();
+			}
+			// It may be a class (no static, sorry)
+			else
+			{
+				// It may be a custom one
+				if (strpos($row['task'], '::') !== false)
+				{
+					$call = explode('::', $row['task']);
+					$task = new $call[0];
+					$method = $call[1];
+				}
+				// Otherwise we try with the ScheduledTask class
+				else
+				{
+					$task = new ScheduledTask();
+					$method = $row['task'];
+				}
+
+				if (method_exists($task, $method))
+				{
+					ignore_user_abort(true);
+
+					// Do the task...
+					$completed = $task->{$method}();
+				}
+			}
 
 			// Log that we did it ;)
 			if ($completed)
 			{
 				$total_time = round(microtime(true) - $time_start, 3);
-				logTask($row['id_task'], (int)$total_time);
+				logTask($method, (int)$total_time);
 			}
 		}
 	}

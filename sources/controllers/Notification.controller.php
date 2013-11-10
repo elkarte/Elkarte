@@ -61,6 +61,8 @@ class Notification_Controller extends Action_Controller
 			'deleted' => 2,
 			'unapproved' => 3,
 		);
+		// @todo is it okay to have it here?
+		call_integration_hook('integrate_add_notification', array(&$this->_known_notifications));
 	}
 
 	/**
@@ -438,9 +440,6 @@ class Notification_Controller extends Action_Controller
 	 */
 	private function _isValid()
 	{
-		// @todo almost useless
-		call_integration_hook('integrate_add_notification', array(&$this->_known_notifications));
-
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		$this->_validator = new Data_Validator();
 		$sanitization = array(

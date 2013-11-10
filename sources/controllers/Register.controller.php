@@ -197,7 +197,7 @@ class Register_Controller extends Action_Controller
 			}
 
 			// Load all the fields in question.
-			setupProfileContext($reg_fields);
+			setupProfileContext($reg_fields, 'registration');
 		}
 
 		// Generate a visual verification code to make sure the user is no bot.

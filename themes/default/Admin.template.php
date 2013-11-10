@@ -1240,6 +1240,7 @@ function template_callback_question_answer_list()
 		</dt><dd></dd>';
 
 	addInlineJavascript('
+				document.getElementById(\'add_more_link_div\').style.display = \'\';
 				var question_last_blank = ' . $count . ';
 				var txt_add_another_answer = ' . JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;') . ';
 				var add_question_template = ' . JavaScriptEscape('
@@ -1501,6 +1502,9 @@ function template_callback_external_search_engines()
 		<dt id="add_more_link_div" style="display: none;">
 			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
+
+	addInlineJavascript('
+				document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
 }
 
 /**

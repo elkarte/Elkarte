@@ -121,16 +121,7 @@ function reloadSettings()
 	}
 
 	// Any files to pre include?
-	if (!empty($modSettings['integrate_pre_include']))
-	{
-		$pre_includes = explode(',', $modSettings['integrate_pre_include']);
-		foreach ($pre_includes as $include)
-		{
-			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, 'SUBSDIR' => SUBSDIR));
-			if (file_exists($include))
-				require_once($include);
-		}
-	}
+	call_integration_include_hook('integrate_pre_include');
 
 	// Call pre load integration functions.
 	call_integration_hook('integrate_pre_load');
@@ -1638,16 +1629,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// Any files to include at this point?
-	if (!empty($modSettings['integrate_theme_include']))
-	{
-		$theme_includes = explode(',', $modSettings['integrate_theme_include']);
-		foreach ($theme_includes as $include)
-		{
-			$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-			if (file_exists($include))
-				require_once($include);
-		}
-	}
+	call_integration_include_hook('integrate_theme_include');
 
 	// Call load theme integration functions.
 	call_integration_hook('integrate_load_theme');
@@ -2706,7 +2688,7 @@ function doSecurityChecks()
 			$context['security_controls']['files']['cache'] = true;
 
 		// Active admin session?
-		if ((isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
+		if (empty($modSettings['securityDisable']) && (isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time()))
 			$context['security_controls']['admin_session'] = true;
 
 		// Maintenance mode enabled?

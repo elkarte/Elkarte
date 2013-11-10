@@ -1476,6 +1476,16 @@ div.bbc_footnotes {
 	float: left;
 	font-size: 1.3em;
 }
+#pages_scroll_left, #pages_scroll_right {
+	position: absolute;
+	top: 0;
+}
+#pages_scroll_left {
+	left: 0;
+}
+#pages_scroll_right {
+	right: 0;
+}
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
 	position: fixed;

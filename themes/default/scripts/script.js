@@ -740,6 +740,7 @@ function hashModeratePassword(doForm, username, cur_session_id, token)
 }
 
 // Shows the page numbers by clicking the dots (in compact view).
+// @DEPRECATED it is not used. If we don't care about compatibility it can be removed
 function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
 {
 	var replacement = '', i, oldLastPage = 0;

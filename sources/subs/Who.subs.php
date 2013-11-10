@@ -425,7 +425,7 @@ function prepareCreditsData()
 	$credits['credits'] = array(
 		array(
 			'pretext' => $txt['credits_intro'],
-			'title' => $txt['credits_team'],
+			'title' => $txt['credits_contributors'],
 			'groups' => array(
 				array(
 					'title' => $txt['credits_groups_dev'],

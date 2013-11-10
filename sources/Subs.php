@@ -431,7 +431,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the ... after the first page.  (prev page 1 >...< 6 7 [8] 9 10 ... 15 next page)
 		if ($start > $num_per_page * ($PageContiguous + 1))
-			$pageindex .= str_replace('{custom}', 'onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . $num_per_page . ', ' . ($start - $num_per_page * $PageContiguous) . ', ' . $num_per_page . ');return false;') . '" data-baseurl="' . htmlspecialchars(JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'))) . '" data-perpage="' . $num_per_page . '" data-firstpage="' . $num_per_page . '" data-lastpage="' . ($start - $num_per_page * $PageContiguous) . '"', $settings['page_index_template']['expand_pages']);
+			$pageindex .= str_replace('{custom}', 'data-baseurl="' . htmlspecialchars(JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'))) . '" data-perpage="' . $num_per_page . '" data-firstpage="' . $num_per_page . '" data-lastpage="' . ($start - $num_per_page * $PageContiguous) . '"', $settings['page_index_template']['expand_pages']);
 
 		// Show the pages before the current one. (prev page 1 ... >6 7< [8] 9 10 ... 15 next page)
 		for ($nCont = $PageContiguous; $nCont >= 1; $nCont--)
@@ -458,7 +458,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the '...' part near the end. (prev page 1 ... 6 7 [8] 9 10 >...< 15 next page)
 		if ($start + $num_per_page * ($PageContiguous + 1) < $tmpMaxPages)
-			$pageindex .= str_replace('{custom}', 'onclick="' . htmlspecialchars('expandPages(this, ' . JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d')) . ', ' . ($start + $num_per_page * ($PageContiguous + 1)) . ', ' . $tmpMaxPages . ', ' . $num_per_page . ');return false;') . '" data-baseurl="' . htmlspecialchars(JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'))) . '" data-perpage="' . $num_per_page . '" data-firstpage="' . ($start + $num_per_page * ($PageContiguous + 1)) . '" data-lastpage="' . $tmpMaxPages . '"', $settings['page_index_template']['expand_pages']);
+			$pageindex .= str_replace('{custom}', 'data-baseurl="' . htmlspecialchars(JavaScriptEscape(($flexible_start ? $base_url : strtr($base_url, array('%' => '%%')) . ';start=%1$d'))) . '" data-perpage="' . $num_per_page . '" data-firstpage="' . ($start + $num_per_page * ($PageContiguous + 1)) . '" data-lastpage="' . $tmpMaxPages . '"', $settings['page_index_template']['expand_pages']);
 
 		// Show the last number in the list. (prev page 1 ... 6 7 [8] 9 10 ... >15<  next page)
 		if ($start + $num_per_page * $PageContiguous < $tmpMaxPages)
@@ -2753,6 +2753,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = &$user_info['messages'];
 		$context['user']['unread_messages'] = &$user_info['unread_messages'];
+		$context['user']['notifications'] = &$user_info['notifications'];
 
 		// Personal message popup...
 		if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
@@ -2808,6 +2809,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = 0;
 		$context['user']['unread_messages'] = 0;
+		$context['user']['notifications'] = 0;
 		$context['user']['avatar'] = array();
 		$context['user']['total_time_logged_in'] = array('days' => 0, 'hours' => 0, 'minutes' => 0);
 		$context['user']['popup_messages'] = false;
@@ -3198,6 +3200,8 @@ function template_css()
 /**
  * I know this is becoming annoying, though this template
  * *shall* be present for security reasons, so better it stays here
+ *
+ * @todo rework it and merge into some other kind of general warning-box (i.e. modtask at index.template)
  */
 function template_admin_warning_above()
 {
@@ -3261,7 +3265,7 @@ function template_admin_warning_above()
 		echo '
 			<div class="noticebox">';
 
-		if (!empty($context['security_controls']['admin_session']) && empty($modSettings['securityDisable']))
+		if (!empty($context['security_controls']['admin_session']))
 			echo
 				sprintf($txt['admin_session_active'], ($scripturl . '?action=admin;area=adminlogoff;redir;' . $context['session_var'] . '=' . $context['session_id'])) . '<br>';
 
@@ -3554,7 +3558,9 @@ function setupMenuContext()
 		require_once(SUBSDIR . '/Moderation.subs.php');
 		$menu_count = loadModeratorMenuCounts();
 	}
+
 	$menu_count['unread_messages'] = $context['user']['unread_messages'];
+	$menu_count['notifications'] = $context['user']['notifications'];
 
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
@@ -3594,14 +3600,27 @@ function setupMenuContext()
 					'show' => !$context['allow_admin'] && $context['allow_moderation_center'],
 				),
 
+				'profile' => array(
+					'title' => $txt['account_short'],
+					'href' => $scripturl . '?action=profile',
+					'show' => $context['allow_edit_profile'],
+				),
+
 				// Language string needs agreement here. Anything but bloody username, please. :P
 				// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
 				// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
 				'pm' => array(
-					'title' => $context['allow_pm'] && !$context['allow_edit_profile'] ? $txt['pm_short'] : $txt['account_short'],
+					'title' => $txt['pm_short'],
 					'counter' => 'unread_messages',
-					'href' => $context['allow_pm'] ? $scripturl . '?action=pm' : $scripturl . '?action=profile',
-					'show' => $context['allow_pm'] || $context['allow_edit_profile'],
+					'href' => $scripturl . '?action=pm',
+					'show' => $context['allow_pm'],
+				),
+
+				'notification' => array(
+					'title' => $txt['notifications'],
+					'counter' => 'notifications',
+					'href' => $scripturl . '?action=notification',
+					'show' => !$user_info['is_guest'],
 				),
 
 				// The old language string made no sense, and was too long.
@@ -3709,8 +3728,7 @@ function setupMenuContext()
 		);
 
 		// Personal messages
-		$pm_sub_buttons = $menu->childOf('pm')->add('pm_sub_buttons');
-		$pm_sub_buttons->addBulk(
+		$menu->childOf('pm')->add('pm_sub_buttons')->addBulk(
 			array(
 				'pm_read' => array(
 					'title' => $txt['pm_menu_read'],
@@ -3721,11 +3739,6 @@ function setupMenuContext()
 					'title' => $txt['pm_menu_send'],
 					'href' => $scripturl . '?action=pm;sa=send',
 					'show' => allowedTo('pm_send'),
-				),
-				'profile' => array(
-					'title' => $txt['profile'],
-					'href' => $scripturl . '?action=profile',
-					'show' => $context['allow_edit_profile'],
 				),
 			)
 		);
@@ -3771,7 +3784,7 @@ function setupMenuContext()
 		);
 
 		// Profile
-		$pm_sub_buttons->childOf('profile')->add('profile_sub_buttons')->addBulk(
+		$menu->childOf('profile')->add('profile_sub_buttons')->addBulk(
 			array(
 				'account' => array(
 					'title' => $txt['account'],
@@ -3921,6 +3934,16 @@ function call_integration_hook($hook, $parameters = array())
 {
 	global $modSettings, $settings, $db_show_debug, $context;
 
+	static $path_replacements = array(
+		'BOARDDIR' => BOARDDIR,
+		'SOURCEDIR' => SOURCEDIR,
+		'EXTDIR' => EXTDIR,
+		'LANGUAGEDIR' => LANGUAGEDIR,
+		'ADMINDIR' => ADMINDIR,
+		'CONTROLLERDIR' => CONTROLLERDIR,
+		'SUBSDIR' => SUBSDIR,
+	);
+
 	if ($db_show_debug === true)
 		$context['debug']['hooks'][] = $hook;
 
@@ -3928,40 +3951,41 @@ function call_integration_hook($hook, $parameters = array())
 	if (empty($modSettings[$hook]))
 		return $results;
 
+	if (!empty($settings['theme_dir']))
+		$path_replacements['$themedir'] = $settings['theme_dir'];
+
 	$functions = explode(',', $modSettings[$hook]);
 	// Loop through each function.
 	foreach ($functions as $function)
 	{
 		$function = trim($function);
+		// OOP static method
 		if (strpos($function, '::') !== false)
 		{
 			$call = explode('::', $function);
 			if (strpos($call[1], ':') !== false)
 			{
 				list ($func, $file) = explode(':', $call[1]);
-				if (empty($settings['theme_dir']))
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
-				else
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($absPath))
-					require_once($absPath);
 				$call = array($call[0], $func);
 			}
 		}
+		// Normal plain function
 		else
 		{
 			$call = $function;
 			if (strpos($function, ':') !== false)
 			{
 				list ($func, $file) = explode(':', $function);
-				if (empty($settings['theme_dir']))
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR));
-				else
-					$absPath = strtr(trim($file), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($absPath))
-					require_once($absPath);
 				$call = $func;
 			}
+		}
+
+		if (!empty($file))
+		{
+			$absPath = strtr(trim($file), $path_replacements);
+
+			if (file_exists($absPath))
+				require_once($absPath);
 		}
 
 		// Is it valid?
@@ -3970,6 +3994,45 @@ function call_integration_hook($hook, $parameters = array())
 	}
 
 	return $results;
+}
+
+/**
+ * Includes files for hooks that only do that (i.e. integrate_pre_include)
+ *
+ * @param string $hook
+ */
+function call_integration_include_hook($hook)
+{
+	global $modSettings, $settings, $db_show_debug, $context;
+
+	static $path_replacements = array(
+		'BOARDDIR' => BOARDDIR,
+		'SOURCEDIR' => SOURCEDIR,
+		'EXTDIR' => EXTDIR,
+		'LANGUAGEDIR' => LANGUAGEDIR,
+		'ADMINDIR' => ADMINDIR,
+		'CONTROLLERDIR' => CONTROLLERDIR,
+		'SUBSDIR' => SUBSDIR,
+	);
+
+	if ($db_show_debug === true)
+		$context['debug']['hooks'][] = $hook;
+
+	// Any file to include?
+	if (!empty($modSettings[$hook]))
+	{
+		if (!empty($settings['theme_dir']))
+			$path_replacements['$themedir'] = $settings['theme_dir'];
+
+		$pre_includes = explode(',', $modSettings[$hook]);
+		foreach ($pre_includes as $include)
+		{
+			$include = strtr(trim($include), $path_replacements);
+
+			if (file_exists($include))
+				require_once($include);
+		}
+	}
 }
 
 /**
