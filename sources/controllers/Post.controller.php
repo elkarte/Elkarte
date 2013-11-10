@@ -1874,10 +1874,8 @@ class Post_Controller extends Action_Controller
 			if (!empty($modSettings['removeNestedQuotes']))
 				$row['body'] = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $row['body']);
 
-			$lb = "\n";
-
 			// Add a quote string on the front and end.
-			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=topic=' . $row['id_topic'] . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . ']' . $lb . $row['body'] . $lb . '[/quote]';
+			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=topic=' . $row['id_topic'] . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . ']' . $row['body'] . '[/quote]';
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
 
