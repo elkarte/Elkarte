@@ -879,7 +879,17 @@ function action_upgradeOptions()
 		DELETE FROM {db_prefix}settings
 		WHERE variable = {string:allow_sm_stats}',
 		array(
-			'allow_sm_stats' => false,
+			'allow_sm_stats' => 'allow_sm_stats',
+			'db_error_skip' => true,
+		)
+	);
+
+	// Cleanup all the hooks (we are upgrading, so better have everything cleaned up)
+	$db->query('', '
+		DELETE FROM {db_prefix}settings
+		WHERE variable = {string:integrate}',
+		array(
+			'integrate' => 'integrate_%',
 			'db_error_skip' => true,
 		)
 	);
