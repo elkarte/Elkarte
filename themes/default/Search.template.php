@@ -24,7 +24,7 @@ function template_main()
 	echo '
 				<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform" class="standard_category">
 					<h2 class="category_header">
-							', !empty($settings['use_buttons']) ? '<img src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="" class="icon" />' : ' ', $txt['set_parameters'], '
+							', !empty($settings['use_buttons']) ? '<img src="' . $settings['images_url'] . '/icons/search_hd.png" alt="" class="icon" />' : ' ', $txt['set_parameters'], '
 					</h2>';
 
 	if (!empty($context['search_errors']))
@@ -339,7 +339,7 @@ function template_results()
 
 		echo '
 						</span>
-						<img src="' . $settings['images_url'] . '/buttons/search.png" alt="?" class="centericon" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
+						<img src="' . $settings['images_url'] . '/icons/search_hd.png" alt="?" class="centericon" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
 					</h3>';
 
 		// was anything even found?
@@ -469,7 +469,7 @@ function template_results()
 	{
 		echo '
 				<h3 class="category_header">
-						<img class="centericon" src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
+						<img class="centericon" src="' . $settings['images_url'] . '/icons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
 				</h3>';
 		template_pagesection();
 
