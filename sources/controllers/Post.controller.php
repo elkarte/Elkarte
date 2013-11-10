@@ -1064,7 +1064,7 @@ class Post_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			if (isset($_REQUEST['msg']))
-				processAttachments((int)$_REQUEST['msg']);
+				processAttachments((int) $_REQUEST['msg']);
 			else
 				processAttachments();
 		}
