@@ -3205,7 +3205,7 @@ function template_css()
  */
 function template_admin_warning_above()
 {
-	global $context, $user_info, $scripturl, $txt, $modSettings;
+	global $context, $user_info, $scripturl, $txt;
 
 	if (!empty($context['security_controls']['query']))
 	{

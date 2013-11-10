@@ -1258,7 +1258,7 @@ function addModeratorNote($id_poster, $poster_name, $contents)
 	);
 }
 
-function addReportComment($report, $id_poster, $poster_name, $newComment)
+function addReportComment($report, $newComment)
 {
 	global $user_info;
 

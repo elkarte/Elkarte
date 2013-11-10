@@ -774,7 +774,7 @@ class ModerationCenter_Controller extends Action_Controller
 			// In it goes.
 			if (!empty($newComment))
 			{
-				addReportComment($report, $user_info['id'], $user_info['name'], $newComment);
+				addReportComment($report, $newComment);
 
 				// Redirect to prevent double submittion.
 				redirectexit($scripturl . '?action=moderate;area=reports;report=' . $report);

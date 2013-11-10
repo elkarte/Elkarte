@@ -258,7 +258,7 @@ class ManageCalendar_Controller extends Action_Controller
 	 */
 	public function action_calendarSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $scripturl;
 
 		// initialize the form
 		$this->_initCalendarSettingsForm();

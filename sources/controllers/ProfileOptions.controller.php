@@ -1181,8 +1181,6 @@ function loadThemeOptions($memID)
 {
 	global $context, $options, $cur_profile;
 
-	$db = database();
-
 	if (isset($_POST['default_options']))
 		$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
 

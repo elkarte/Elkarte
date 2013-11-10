@@ -968,7 +968,7 @@ class Post_Controller extends Action_Controller
 	function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context, $user_settings;
-		global $user_info, $board_info, $options, $scripturl, $settings, $ignore_temp;
+		global $user_info, $board_info, $options, $ignore_temp;
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -1438,7 +1438,7 @@ class Post_Controller extends Action_Controller
 
 		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
 		{
-			$query['and'][] = 'member_ids';
+			$query = array('and' => array('member_ids'));
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 			require_once(SUBSDIR . '/Members.subs.php');
 			$mentioned_members = membersBy($query, $query_params, true);
