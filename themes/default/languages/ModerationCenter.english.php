@@ -128,18 +128,18 @@ $txt['mc_warning_template_modify'] = 'Edit Template';
 $txt['mc_warning_template_delete'] = 'Delete Selected';
 $txt['mc_warning_template_delete_confirm'] = 'Are you sure you want to delete the selected templates?';
 
-$txt['mc_warning_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template. Note that as the notification is sent by PM you can use BBC within the template. Note if you use the {MESSAGE} variable then this template will not be available when issuing a generic warning (i.e. A warning not linked to a post).';
+$txt['mc_warning_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template. Note that as the notification is sent by PM you can use BBC within the template. If you use the {MESSAGE} variable then this template will not be available when issuing a generic warning (i.e. A warning not linked to a post).';
 $txt['mc_warning_template_title'] = 'Template Title';
-$txt['mc_warning_template_body_desc'] = 'The content of the notification message. Note that you can use the following shortcuts in this template.<ul style="margin-top: 0px;"><li>{MEMBER} - Member Name.</li><li>{MESSAGE} - Link to Offending Post. (If Applicable)</li><li>{FORUMNAME} - Forum Name.</li><li>{SCRIPTURL} - Web address of forum.</li><li>{REGARDS} - Standard email sign-off.</li></ul>';
+$txt['mc_warning_template_body_desc'] = 'The content of the notification message. You can use the following shortcuts in this template.<ul style="margin-top: 0px;"><li>{MEMBER} - Member Name.</li><li>{MESSAGE} - Link to Offending Post. (If Applicable)</li><li>{FORUMNAME} - Forum Name.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{REGARDS} - Standard email sign-off.</li></ul>';
 $txt['mc_warning_template_body_default'] = '{MEMBER},' . "\n\n" . 'You have received a warning for inappropriate activity. Please cease these activities and abide by the forum rules otherwise we will take further action.' . "\n\n" . '{REGARDS}';
 $txt['mc_warning_template_personal'] = 'Personal Template';
 $txt['mc_warning_template_personal_desc'] = 'If you select this option only you will be able to see, edit and use this template. If not selected all moderators will be able to use this template.';
-$txt['mc_warning_template_error_no_title'] = 'You must set title.';
-$txt['mc_warning_template_error_no_body'] = 'You must set a notification body.';
+$txt['mc_warning_template_error_no_title'] = 'You must set the title.';
+$txt['mc_warning_template_error_no_body'] = 'You must set the notification body.';
 
 $txt['mc_settings'] = 'Change Settings';
 $txt['mc_prefs_title'] = 'Moderation Preferences';
-$txt['mc_prefs_desc'] = 'This section allows you to set some personal preferences for moderation related activities such as email notifications.';
+$txt['mc_prefs_desc'] = 'This section allows you to set some personal preferences for moderation related activities such as e-mail notifications.';
 $txt['mc_prefs_homepage'] = 'Items to show on moderation homepage';
 $txt['mc_prefs_latest_news'] = 'ElkArte News';
 $txt['mc_prefs_show_reports'] = 'Show open report count in forum header';
@@ -148,7 +148,7 @@ $txt['mc_prefs_notify_report_never'] = 'Never';
 $txt['mc_prefs_notify_report_moderator'] = 'Only if it\'s a board I moderate';
 $txt['mc_prefs_notify_report_always'] = 'Always';
 $txt['mc_prefs_notify_approval'] = 'Notify of items awaiting approval';
-$txt['mc_logoff'] = 'Moderator End Session';
+$txt['mc_logoff'] = 'End Moderator Session';
 
 // Use entities in the below string.
 $txt['mc_click_add_note'] = 'Add a new note';

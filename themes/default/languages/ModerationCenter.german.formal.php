@@ -110,47 +110,46 @@ $txt['mc_watched_users_delete_posts'] = 'Sind Sie sich sicher, dass Sie diese Be
 $txt['mc_watched_users_posted'] = 'Verfasst';
 $txt['mc_watched_users_member'] = 'Benutzer';
 
-// TODO FROM HERE :o)
-$txt['mc_warnings_description'] = 'From this section you can see which warnings have been issued to members of the forum. You can also add and modify the notification templates used when sending a warning to a member.';
-$txt['mc_warning_log'] = 'Log';
-$txt['mc_warning_templates'] = 'Custom Templates';
-$txt['mc_warning_log_title'] = 'Viewing warning log';
-$txt['mc_warning_templates_title'] = 'Custom warning templates';
+$txt['mc_warnings_description'] = 'In diesem Bereich können Sie sehen, welche Verwarnungen gegenüber Benutzern des Forums ausgesprochen wurden. Sie können hier zudem die Vorlagen ändern, die beim Verwarnen von Benutzern verwendet werden.';
+$txt['mc_warning_log'] = 'Protokoll';
+$txt['mc_warning_templates'] = 'Eigene Vorlagen';
+$txt['mc_warning_log_title'] = 'Betrachtet das Verwarnprotokoll';
+$txt['mc_warning_templates_title'] = 'Eigene Verwarnvorlagen';
 
-$txt['mc_warnings_none'] = 'No warnings have been issued.';
-$txt['mc_warnings_recipient'] = 'Recipient';
+$txt['mc_warnings_none'] = 'Keine Warnungen wurden ausgesprochen.';
+$txt['mc_warnings_recipient'] = 'Empfänger';
 
-$txt['mc_warning_templates_none'] = 'No warning templates have been created yet';
-$txt['mc_warning_templates_time'] = 'Time Created';
-$txt['mc_warning_templates_name'] = 'Template';
-$txt['mc_warning_templates_creator'] = 'Created By';
-$txt['mc_warning_template_add'] = 'Add Template';
-$txt['mc_warning_template_modify'] = 'Edit Template';
-$txt['mc_warning_template_delete'] = 'Delete Selected';
-$txt['mc_warning_template_delete_confirm'] = 'Are you sure you want to delete the selected templates?';
+$txt['mc_warning_templates_none'] = 'Es wurden noch keine Verwarnvorlagen erstellt';
+$txt['mc_warning_templates_time'] = 'Erstellzeitpunkt';
+$txt['mc_warning_templates_name'] = 'Vorlage';
+$txt['mc_warning_templates_creator'] = 'Erstellt von';
+$txt['mc_warning_template_add'] = 'Vorlage hinzufügen';
+$txt['mc_warning_template_modify'] = 'Vorlage ändern';
+$txt['mc_warning_template_delete'] = 'Ausgewählte löschen';
+$txt['mc_warning_template_delete_confirm'] = 'Sind Sie sich sicher, dass Sie die ausgewählten Vorlagen löschen möchten?';
 
-$txt['mc_warning_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template. Note that as the notification is sent by PM you can use BBC within the template. Note if you use the {MESSAGE} variable then this template will not be available when issuing a generic warning (i.e. A warning not linked to a post).';
-$txt['mc_warning_template_title'] = 'Template Title';
-$txt['mc_warning_template_body_desc'] = 'The content of the notification message. Note that you can use the following shortcuts in this template.<ul style="margin-top: 0px;"><li>{MEMBER} - Member Name.</li><li>{MESSAGE} - Link to Offending Post. (If Applicable)</li><li>{FORUMNAME} - Forum Name.</li><li>{SCRIPTURL} - Web address of forum.</li><li>{REGARDS} - Standard email sign-off.</li></ul>';
-$txt['mc_warning_template_body_default'] = '{MEMBER},' . "\n\n" . 'You have received a warning for inappropriate activity. Please cease these activities and abide by the forum rules otherwise we will take further action.' . "\n\n" . '{REGARDS}';
-$txt['mc_warning_template_personal'] = 'Personal Template';
-$txt['mc_warning_template_personal_desc'] = 'If you select this option only you will be able to see, edit and use this template. If not selected all moderators will be able to use this template.';
-$txt['mc_warning_template_error_no_title'] = 'You must set title.';
-$txt['mc_warning_template_error_no_body'] = 'You must set a notification body.';
+$txt['mc_warning_template_desc'] = 'Benutzen Sie diese Seite, um die Details der Vorlage auszufüllen. Beachten Sie, dass der Betreff der Nachricht kein Teil der Vorlage ist. Beachten Sie außerdem, dass, da die Benachrichtigung per PN versandt wird, Sie BBCodes innerhalb der Vorlage nutzen können.  Falls Sie die {MESSAGE}-Variable nutzen, wird diese Vorlage nicht verfügbar sein, wenn Sie eine generische Verwarnung (zum Beispiel eine Verwarnung, die nicht mit einem Beitrag zusammenhängt) aussprechen.';
+$txt['mc_warning_template_title'] = 'Titel der Vorlage';
+$txt['mc_warning_template_body_desc'] = 'Der Inhalt der Benachrichtigung. Beachten Sie, dass Sie folgende Kürzel in dieser Vorlage nutzen können.<ul style="margin-top: 0px;"><li>{MEMBER} - Benutzername.</li><li>{MESSAGE} - Verweis auf beanstandeten Beitrag (falls zutreffend).</li><li>{FORUMNAME} - Name des Forums.</li><li>{SCRIPTURL} - Webadresse des Forums.</li><li>{REGARDS} - Standard-E-Mail-Signatur.</li></ul>';
+$txt['mc_warning_template_body_default'] = '{MEMBER},' . "\n\n" . 'Sie haben aufgrund unpassenden Verhaltens eine Verwarnung erhalten. Bitte stellen Sie diese Aktivitäten ein und halten Sie sich künftig an die Regeln, andernfalls werden wir entsprechende Maßnahmen ergreifen.' . "\n\n" . '{REGARDS}';
+$txt['mc_warning_template_personal'] = 'Persönliche Vorlage';
+$txt['mc_warning_template_personal_desc'] = 'Wenn Sie diese Option auswählen, werden nur Sie diese Vorlage sehen, ändern und benutzen können, andernfalls gilt dies für alle Moderatoren.';
+$txt['mc_warning_template_error_no_title'] = 'Sie müssen den Titel festlegen.';
+$txt['mc_warning_template_error_no_body'] = 'Sie müssen den Benachrichtigungstext festlegen.';
 
-$txt['mc_settings'] = 'Change Settings';
-$txt['mc_prefs_title'] = 'Moderation Preferences';
-$txt['mc_prefs_desc'] = 'This section allows you to set some personal preferences for moderation related activities such as email notifications.';
-$txt['mc_prefs_homepage'] = 'Items to show on moderation homepage';
-$txt['mc_prefs_latest_news'] = 'ElkArte News';
-$txt['mc_prefs_show_reports'] = 'Show open report count in forum header';
-$txt['mc_prefs_notify_report'] = 'Notify of topic reports';
-$txt['mc_prefs_notify_report_never'] = 'Never';
-$txt['mc_prefs_notify_report_moderator'] = 'Only if it\'s a board I moderate';
-$txt['mc_prefs_notify_report_always'] = 'Always';
-$txt['mc_prefs_notify_approval'] = 'Notify of items awaiting approval';
-$txt['mc_logoff'] = 'Moderator End Session';
+$txt['mc_settings'] = 'Einstellungen ändern';
+$txt['mc_prefs_title'] = 'Moderationseinstellungen';
+$txt['mc_prefs_desc'] = 'Dieser Bereich ermöglicht es Ihnen, einige persönliche Einstellungen für moderationsbezogene Aktivitäten wie E-Mail-Benachrichtigungen vorzunehmen.';
+$txt['mc_prefs_homepage'] = 'Auf Moderationsseite angezeigte Elemente';
+$txt['mc_prefs_latest_news'] = 'ElkArte-Neuigkeiten';
+$txt['mc_prefs_show_reports'] = 'Anzahl offener Meldungen im Kopfbereich anzeigen';
+$txt['mc_prefs_notify_report'] = 'Bei Themenmeldungen benachrichtigen';
+$txt['mc_prefs_notify_report_never'] = 'Niemals';
+$txt['mc_prefs_notify_report_moderator'] = 'Nur, falls ich dieses Forum moderiere';
+$txt['mc_prefs_notify_report_always'] = 'Immer';
+$txt['mc_prefs_notify_approval'] = 'Bei zu überprüfenden Elementen benachrichtigen';
+$txt['mc_logoff'] = 'Moderationssitzung beenden';
 
 // Use entities in the below string.
-$txt['mc_click_add_note'] = 'Add a new note';
-$txt['mc_add_note'] = 'Add';
+$txt['mc_click_add_note'] = 'Einen neuen Hinweis hinzufügen';
+$txt['mc_add_note'] = 'Hinzufügen';
