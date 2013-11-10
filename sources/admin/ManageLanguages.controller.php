@@ -47,11 +47,11 @@ class ManageLanguages_Controller extends Action_Controller
 		loadLanguage('ManageSettings');
 
 		$subActions = array(
-			'edit' => array ($this, 'action_edit', 'permission' => 'admin_forum'),
-			'add' => array ($this, 'action_add', 'permission' => 'admin_forum'),
+			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'add' => array($this, 'action_add', 'permission' => 'admin_forum'),
 			'settings' => array($this, 'action_languageSettings_display', 'permission' => 'admin_forum'),
-			'downloadlang' => array ($this, 'action_downloadlang', 'permission' => 'admin_forum'),
-			'editlang' => array ($this, 'action_editlang', 'permission' => 'admin_forum'),
+			'downloadlang' => array($this, 'action_downloadlang', 'permission' => 'admin_forum'),
+			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_languages', array(&$subActions));
@@ -263,9 +263,9 @@ class ManageLanguages_Controller extends Action_Controller
 			),
 			// For highlighting the default.
 			'javascript' => '
-						var prevClass = "";
-						var prevDiv = "";
-						highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language). '");
+						var prevClass = "",
+							prevDiv = "";
+						highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language) . '");
 			',
 		);
 
@@ -1047,7 +1047,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// We'll want to use them someday. That is, right now.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// make it happen!
+		// Make it happen!
 		$this->_languageSettings = new Settings_Form();
 
 		// Warn the user if the backup of Settings.php failed.
@@ -1065,7 +1065,7 @@ class ManageLanguages_Controller extends Action_Controller
 		foreach ($languages as $lang)
 			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
-		// initialize the little form
+		// Initialize the little form
 		return $this->_languageSettings->settings($config_vars);
 	}
 

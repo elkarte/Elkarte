@@ -68,7 +68,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// Each tab template defines a div, the value of which are the template(s) to load in that div
 		// Templates are named template_profile_block_YOURNAME
 		$context['summarytabs'] = array(
-			'summary' => array (
+			'summary' => array(
 				'name' => $txt['summary'],
 				'templates' => array(
 					array('summary', 'user_info'),
@@ -98,7 +98,7 @@ class ProfileInfo_Controller extends Action_Controller
 		{
 			// If the tab is active we add it
 			if ($tab['active'] !== true)
-				unset ($context['summarytabs'][$id]);
+				unset($context['summarytabs'][$id]);
 			else
 			{
 				// All the active templates, used to prevent processing data we don't need
@@ -436,7 +436,6 @@ class ProfileInfo_Controller extends Action_Controller
 				redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
-			require_once(SUBSDIR . '/Messages.subs.php');
 			removeMessage((int) $_GET['delete']);
 
 			// Add it to the mod log.
@@ -1120,7 +1119,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param int $memID
 	 */
-	function list_getUnwatcheded($start, $items_per_page, $sort, $memID)
+	function list_getUnwatched($start, $items_per_page, $sort, $memID)
 	{
 		return getUnwatchedBy($start, $items_per_page, $sort, $memID);
 	}

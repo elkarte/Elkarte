@@ -117,7 +117,6 @@ class MoveTopic_Controller extends Action_Controller
 		}
 
 		// We will need this
-		require_once(SUBSDIR . '/Topic.subs.php');
 		moveTopicConcurrence();
 
 		// Register this form and get a sequence number in $context.

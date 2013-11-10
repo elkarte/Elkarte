@@ -62,7 +62,7 @@
 .sceditor-dropdown {
 	position: absolute;
 	margin: 22px 0 0 0;
-	border: 1px solid #bbb;
+/* 	border: 1px solid #bbb; */
 	background: #fff;
 	color: #444;
 	z-index: 6;
@@ -89,9 +89,6 @@
 }
 #sceditor-smileycontainer {
 	float:left;
-}
-.sceditor-smileyPopup {
-	margin: 0;
 }
 .sceditor-insertemoticon img, .sceditor-smileyPopup img {
 	cursor: pointer;
@@ -122,7 +119,21 @@
 	display: inline;
 	text-align: center;
 	cursor: pointer;
-	padding: 2px 0;
+	margin: 0;
+	position: fixed;
+	max-width: 50%;
+	max-height: 50%;
+}
+#sceditor-popup-smiley {
+	border-left: 1px solid #bbb;
+	border-right: 1px solid #bbb;
+	overflow: auto;
+}
+#sceditor-popup-close {
+	border-left: 1px solid #bbb;
+	border-right: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+	padding: 2px 0px;
 }
 .sceditor-fontsize-option, .sceditor-font-option {
 	display: block;

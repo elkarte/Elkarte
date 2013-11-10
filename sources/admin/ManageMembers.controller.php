@@ -651,6 +651,7 @@ class ManageMembers_Controller extends Action_Controller
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'admin_browse';
 		$context['browse_type'] = isset($_REQUEST['type']) ? $_REQUEST['type'] : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
+
 		if (isset($context['tabs'][$context['browse_type']]))
 			$context['tabs'][$context['browse_type']]['is_selected'] = true;
 
@@ -1058,8 +1059,6 @@ class ManageMembers_Controller extends Action_Controller
 		// Maybe we're sending it off for activation?
 		elseif ($_POST['todo'] == 'require_activation')
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
-
 			// We have to do this for each member I'm afraid.
 			foreach ($member_info as $member)
 			{
@@ -1085,7 +1084,6 @@ class ManageMembers_Controller extends Action_Controller
 		// Are we rejecting them?
 		elseif ($_POST['todo'] == 'reject' || $_POST['todo'] == 'rejectemail')
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($conditions['members']);
 
 			// Send email telling them they aren't welcome?
@@ -1105,7 +1103,6 @@ class ManageMembers_Controller extends Action_Controller
 		// A simple delete?
 		elseif ($_POST['todo'] == 'delete' || $_POST['todo'] == 'deleteemail')
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($conditions['members']);
 
 			// Send email telling them they aren't welcome?

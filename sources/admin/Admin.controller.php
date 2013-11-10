@@ -56,6 +56,7 @@ class Admin_Controller extends Action_Controller
 		$allMenus = Standard_Menu::context();
 		$admin_menu = $allMenus->get('Admin_Menu');
 
+		// Add in all of the top level items, like main, config, layout, etc
 		$admin_menu->addBulk(
 			array(
 				'forum' => array(
@@ -81,7 +82,7 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
-		// The "main" menu
+		// Add the sub items under the "main" menu
 		$forum_areas = $admin_menu->childOf('forum')->add('forum_areas');
 		$forum_areas->addBulk(
 			array(
@@ -104,7 +105,7 @@ class Admin_Controller extends Action_Controller
 					'file' => 'ManageMaillist.controller.php',
 					'controller' => 'ManageMaillist_Controller',
 					'function' => 'action_index',
-					'icon' => 'mail.png',
+					'icon' => 'transparent.png',
 					'class' => 'admin_img_mail',
 					'permission' => array('approve_emails', 'admin_forum'),
 					'enabled' => in_array('pe', $context['admin_features']),
@@ -153,6 +154,7 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
+		// All the subitems of the mailist function
 		$forum_areas->childOf('maillist')->add('maillist_sub')->addBulk(
 			array(
 				'emaillist' => array($txt['mm_emailerror'], 'approve_emails'),
@@ -162,6 +164,8 @@ class Admin_Controller extends Action_Controller
 				'emailsettings' => array($txt['mm_emailsettings'], 'admin_forum'),
 			)
 		);
+
+		// Next up the news
 		$forum_areas->childOf('news')->add('news_sub')->addBulk(
 			array(
 				'editnews' => array($txt['admin_edit_news'], 'edit_news'),
@@ -169,6 +173,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['settings'], 'admin_forum'),
 			)
 		);
+
+		// Packages make the forum
 		$forum_areas->childOf('packages')->add('packages_sub')->addBulk(
 			array(
 				'browse' => array($txt['browse_packages']),
@@ -177,6 +183,8 @@ class Admin_Controller extends Action_Controller
 				'options' => array($txt['package_settings']),
 			)
 		);
+
+		// Pacakge server menu
 		$forum_areas->childOf('packageservers')->add('packageservers_sub')->addBulk(
 			array(
 				'servers' => array($txt['download_packages']),
@@ -184,6 +192,7 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
+		// All of the items under the conig menu
 		$config_areas = $admin_menu->childOf('config')->add('config_areas');
 		$config_areas->addBulk(
 			array(
@@ -255,6 +264,8 @@ class Admin_Controller extends Action_Controller
 				),
 			)
 		);
+
+		// Sub items of features and settings
 		$config_areas->childOf('featuresettings')->add('featuresettings_sub')->addBulk(
 			array(
 				'basic' => array($txt['mods_cat_features']),
@@ -264,9 +275,11 @@ class Admin_Controller extends Action_Controller
 				'likes' => array($txt['likes'], 'enabled' => in_array('l', $context['admin_features'])),
 				'sig' => array($txt['signature_settings_short']),
 				'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => in_array('cp', $context['admin_features'])),
-				'notification' => array($txt['notification']),
+				'notification' => array($txt['notifications']),
 			)
 		);
+
+		// Sub items of security
 		$config_areas->childOf('securitysettings')->add('securitysettings_sub')->addBulk(
 			array(
 				'general' => array($txt['mods_cat_security_general']),
@@ -275,6 +288,8 @@ class Admin_Controller extends Action_Controller
 				'moderation' => array($txt['moderation_settings_short'], 'enabled' => !empty($modSettings['warning_enable'])),
 			)
 		);
+
+		// Sub items of langauges
 		$config_areas->childOf('languages')->add('languages_sub')->addBulk(
 			array(
 				'edit' => array($txt['language_edit']),
@@ -282,6 +297,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['language_settings']),
 			)
 		);
+
+		// Sub items of server
 		$config_areas->childOf('serversettings')->add('serversettings_sub')->addBulk(
 			array(
 				'general' => array($txt['general_settings']),
@@ -292,6 +309,8 @@ class Admin_Controller extends Action_Controller
 				'phpinfo' => array($txt['phpinfo_settings']),
 			)
 		);
+
+		// Sub items of theme
 		$config_areas->childOf('theme')->add('theme_sub')->addBulk(
 			array(
 				'admin' => array($txt['themeadmin_admin_title']),
@@ -302,17 +321,20 @@ class Admin_Controller extends Action_Controller
 				'browse' => array($txt['themeadmin_edit_title'], 'enabled' => false),
 			)
 		);
+
+		// Sub items of addons
 		$config_areas->childOf('addonsettings')->add('addonsettings_sub')->addBulk(
 			array(
 				'general' => array($txt['mods_cat_modifications_misc']),
 				'hooks' => array($txt['hooks_title_list']),
 				// @deprecated: do not rely on this line, use the appropriate hook and tools provided
-				// Mod Authors for a "ADD AFTER" on this line. Ensure you end your change with a comma. For example:
+				// Addon Authors for a "ADD AFTER" on this line. Ensure you end your change with a comma. For example:
 				// 'shout' => array($txt['shout']),
 				// Note the comma!! The setting with automatically appear with the first mod to be added.
 			)
 		);
 
+		// Next up the layout menu items
 		$layout_areas = $admin_menu->childOf('layout')->add('layout_areas');
 		$layout_areas->addBulk(
 			array(
@@ -384,6 +406,7 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
+		// Sub items for manage boards
 		$layout_areas->childOf('manageboards')->add('manageboards_sub')->addBulk(
 			array(
 				'main' => array($txt['boardsEdit']),
@@ -391,6 +414,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['settings'], 'admin_forum'),
 			)
 		);
+
+		// Sub items for post settings
 		$layout_areas->childOf('postsettings')->add('postsettings_sub')->addBulk(
 			array(
 				'posts' => array($txt['manageposts_settings']),
@@ -399,12 +424,16 @@ class Admin_Controller extends Action_Controller
 				'topics' => array($txt['manageposts_topic_settings']),
 			)
 		);
+
+		// Sub items of calendar
 		$layout_areas->childOf('managecalendar')->add('managecalendar_sub')->addBulk(
 			array(
 				'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
 				'settings' => array($txt['calendar_settings'], 'admin_forum'),
 			)
 		);
+
+		// Sub items of manage search
 		$layout_areas->childOf('managesearch')->add('managesearch_sub')->addBulk(
 			array(
 				'weights' => array($txt['search_weights']),
@@ -413,6 +442,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['settings']),
 			)
 		);
+
+		// Sub items of smile
 		$layout_areas->childOf('smileys')->add('smileys_sub')->addBulk(
 			array(
 				'editsets' => array($txt['smiley_sets']),
@@ -423,6 +454,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['settings']),
 			)
 		);
+
+		// Sub items of manage attachments
 		$layout_areas->childOf('manageattachments')->add('manageattachments_sub')->addBulk(
 			array(
 				'browse' => array($txt['attachment_manager_browse']),
@@ -433,6 +466,7 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
+		// And now the member button
 		$members_areas = $admin_menu->childOf('members')->add('members_areas');
 		$members_areas->addBulk(
 			array(
@@ -504,12 +538,15 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
+		// Sub items of view members
 		$members_areas->childOf('viewmembers')->add('viewmembers_sub')->addBulk(
 			array(
 				'all' => array($txt['view_all_members']),
 				'search' => array($txt['mlist_search']),
 			)
 		);
+
+		// Sub items of membergroups
 		$members_areas->childOf('membergroups')->add('membergroups_sub')->addBulk(
 			array(
 				'index' => array($txt['membergroups_edit_groups'], 'manage_membergroups'),
@@ -517,6 +554,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['settings'], 'admin_forum'),
 			)
 		);
+
+		// Sub items of permissions
 		$members_areas->childOf('permissions')->add('permissions_sub')->addBulk(
 			array(
 				'index' => array($txt['permissions_groups'], 'manage_permissions'),
@@ -526,6 +565,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['settings'], 'admin_forum'),
 			)
 		);
+
+		// Sub items of the registration center
 		$members_areas->childOf('regcenter')->add('regcenter_sub')->addBulk(
 			array(
 				'register' => array($txt['admin_browse_register_new'], 'moderate_forum'),
@@ -534,6 +575,8 @@ class Admin_Controller extends Action_Controller
 				'settings' => array($txt['settings'], 'admin_forum'),
 			)
 		);
+
+		// Sub items of Ban
 		$members_areas->childOf('ban')->add('ban_sub')->addBulk(
 			array(
 				'list' => array($txt['ban_edit_list']),
@@ -542,12 +585,16 @@ class Admin_Controller extends Action_Controller
 				'log' => array($txt['ban_log']),
 			)
 		);
+
+		// Sub items of paid subscriptions
 		$members_areas->childOf('paidsubscribe')->add('paidsubscribe_sub')->addBulk(
 			array(
 				'view' => array($txt['paid_subs_view']),
 				'settings' => array($txt['settings']),
 			)
 		);
+
+		// Sub items of search engines
 		$members_areas->childOf('sengines')->add('sengines_sub')->addBulk(
 			array(
 				'stats' => array($txt['spider_stats']),
@@ -557,6 +604,7 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
+		// Last but not least, maintenance
 		$maintenance_areas = $admin_menu->childOf('maintenance')->add('maintenance_areas');
 		$maintenance_areas->addBulk(
 			array(
@@ -612,6 +660,7 @@ class Admin_Controller extends Action_Controller
 			)
 		);
 
+		// Sub items of routine
 		$maintenance_areas->childOf('maintain')->add('maintain_sub')->addBulk(
 			array(
 				'routine' => array($txt['maintain_sub_routine'], 'admin_forum'),
@@ -620,18 +669,24 @@ class Admin_Controller extends Action_Controller
 				'topics' => array($txt['maintain_sub_topics'], 'admin_forum'),
 			)
 		);
+
+		// Sub items of scheduled tasks
 		$maintenance_areas->childOf('scheduledtasks')->add('scheduledtasks_sub')->addBulk(
 			array(
 				'tasks' => array($txt['maintain_tasks'], 'admin_forum'),
 				'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
 			)
 		);
+
+		// Sub items of mail queue
 		$maintenance_areas->childOf('mailqueue')->add('mailqueue_sub')->addBulk(
 			array(
 				'browse' => array($txt['mailqueue_browse'], 'admin_forum'),
 				'settings' => array($txt['mailqueue_settings'], 'admin_forum'),
 			)
 		);
+
+		// Sub items of logs
 		$maintenance_areas->childOf('logs')->add('logs_sub')->addBulk(
 			array(
 				'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc'),
@@ -646,16 +701,7 @@ class Admin_Controller extends Action_Controller
 		);
 
 		// Any files to include for administration?
-		if (!empty($modSettings['integrate_admin_include']))
-		{
-			$admin_includes = explode(',', $modSettings['integrate_admin_include']);
-			foreach ($admin_includes as $include)
-			{
-				$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($include))
-					require_once($include);
-			}
-		}
+		call_integration_include_hook('integrate_admin_include');
 
 		// Make sure the administrator has a valid session...
 		validateSession();
@@ -715,7 +761,7 @@ class Admin_Controller extends Action_Controller
 	{
 		global $forum_version, $txt, $scripturl, $context, $user_info;
 
-		// we need a little help
+		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
@@ -747,10 +793,9 @@ class Admin_Controller extends Action_Controller
 			'php',
 			'server',
 		);
+
 		$context['current_versions'] = getServerVersions($checkFor);
-
 		$context['can_admin'] = allowedTo('admin_forum');
-
 		$context['sub_template'] = 'admin';
 		$context['page_title'] = $txt['admin_center'];
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -830,9 +875,10 @@ class Admin_Controller extends Action_Controller
 	{
 		global $forum_version, $txt, $scripturl, $context, $user_info;
 
-		// we need a little help from our friends
+		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Who.subs.php');
+		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -858,7 +904,6 @@ class Admin_Controller extends Action_Controller
 		$context['forum_version'] = $forum_version;
 
 		// Get a list of current server versions.
-		require_once(SUBSDIR . '/Admin.subs.php');
 		$checkFor = array(
 			'gd',
 			'imagick',
@@ -1056,7 +1101,7 @@ class Admin_Controller extends Action_Controller
 		foreach ($include_files as $file)
 			require_once(ADMINDIR . '/' . $file . '.php');
 
-		/* This is the huge array that defines everything... it's a huge array of items formatted as follows:
+		/* This is the huge array that defines everything ... it's items are formatted as follows:
 			0 = Language index (Can be array of indexes) to search through for this setting.
 			1 = URL for this indexes page.
 			2 = Help index for help associated with this item (If different from 0)
@@ -1110,8 +1155,8 @@ class Admin_Controller extends Action_Controller
 		$context['page_title'] = $txt['admin_search_results'];
 		$context['search_results'] = array();
 
-		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
 		// Go through all the search data trying to find this text!
+		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
 		foreach ($search_data as $section => $data)
 		{
 			foreach ($data as $item)

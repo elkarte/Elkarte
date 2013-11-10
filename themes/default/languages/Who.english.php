@@ -132,7 +132,7 @@ $txt['who_pm_byemail'] = 'Sending a personal message by email.';
 // Credits text
 $txt['credits'] = 'Credits';
 $txt['credits_intro'] = 'ElkArte wants to thank everyone who helped make it possible it is today.  It wouldn\'t have been possible without you. Thanks for installing and using our software as well as providing valuable feedback, bug reports, and opinions.';
-$txt['credits_team'] = 'The Team';
+$txt['credits_contributors'] = 'Contributors';
 $txt['credits_and'] = 'and';
 $txt['credits_copyright'] = 'Copyrights';
 $txt['credits_forum'] = 'Forum';

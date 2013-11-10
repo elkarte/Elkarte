@@ -387,7 +387,6 @@ class ManageMembergroups_Controller extends Action_Controller
 				// Are you a powerful admin?
 				if (!allowedTo('admin_forum'))
 				{
-					require_once(SUBSDIR . '/Membergroups.subs.php');
 					$copy_type = membergroupById($copy_id);
 
 					// Protected groups are... well, protected!
@@ -452,7 +451,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		if (!empty($modSettings['deny_boards_access']))
 			loadLanguage('ManagePermissions');
 
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -504,6 +502,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			loadLanguage('ManagePermissions');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+
 		// Make sure this group is editable.
 		if (!empty($current_group_id))
 			$current_group = membergroupById($current_group_id);
@@ -661,6 +660,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			// There might have been some post group changes.
 			updateStats('postgroups');
+
 			// We've definitely changed some group stuff.
 			updateSettings(array(
 				'settings_updated' => time(),

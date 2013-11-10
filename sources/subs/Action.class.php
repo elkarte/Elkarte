@@ -26,22 +26,22 @@ class Action
 	 * The accepted array format is:
 	 *    'sub_action name' => 'function name',
 	 *  or
-	 *    'sub_action name' => array (
+	 *    'sub_action name' => array(
 	 *  	'function' => 'function name'),
 	 *  or
-	 *    'sub_action name' => array (
+	 *    'sub_action name' => array(
 	 *  	'controller' => 'controller name',
 	 *  	'function' => 'method name',
 	 *  	'enabled' => true/false,
 	 * 		'permission' => area),
 	 *  or
-	 *    'sub_action name' => array (
+	 *    'sub_action name' => array(
 	 *  	'controller object, i.e. $this',
 	 *  	'method name',
 	 *  	'enabled' => true/false
 	 * 		'permission' => area),
 	 *  or
-	 *    'sub_action name' => array (
+	 *    'sub_action name' => array(
 	 *  	'file' => 'file name',
 	 * 		'dir' => 'controller file location', if not set ADMINDIR is assumed
 	 *  	'controller' => 'controller name',

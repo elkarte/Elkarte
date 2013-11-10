@@ -66,10 +66,14 @@ function currentMemberID($fatal = true, $reload_id = false)
  * Setup the context for a page load!
  *
  * @param array $fields
+ * @param string $hook a string that represent the hook that can be used to operate on $fields
  */
-function setupProfileContext($fields)
+function setupProfileContext($fields, $hook = '')
 {
 	global $profile_fields, $context, $cur_profile, $txt;
+
+	if (!empty($hook))
+		call_integration_hook('integrate_' . $hook . '_profile_fields', array(&$fields));
 
 	// Make sure we have this!
 	loadProfileFields(true);
@@ -201,7 +205,7 @@ function loadCustomFields($memID, $area = 'summary')
 		{
 			$value = Util::htmlspecialchars($_POST['customfield'][$row['col_name']]);
 			if (in_array($row['field_type'], array('select', 'radio')))
-					$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
+				$value = ($options = explode(',', $row['field_options'])) && isset($options[$value]) ? $options[$value] : '';
 		}
 
 		// HTML for the input form.
@@ -1111,7 +1115,7 @@ function profileValidateEmail($email, $memID = 0)
 	require_once(SUBSDIR . '/DataValidator.class.php');
 	$check['email'] = strtr($email, array('&#039;' => '\''));
 	if (Data_Validator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
- 		$email = $check['email'];
+		$email = $check['email'];
 	else
 		return empty($check['email']) ? 'no_email' : 'bad_email';
 
@@ -1127,9 +1131,7 @@ function profileValidateEmail($email, $memID = 0)
 			'email_address' => $email,
 		)
 	);
-
 	$num = $db->num_rows($request);
-
 	$db->free_result($request);
 
 	return ($num > 0) ? 'email_taken' : true;
@@ -1189,7 +1191,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 	if (isset($_POST['ignore_brd']))
 	{
 		if (!is_array($_POST['ignore_brd']))
-			$_POST['ignore_brd'] = array ($_POST['ignore_brd']);
+			$_POST['ignore_brd'] = array($_POST['ignore_brd']);
 
 		foreach ($_POST['ignore_brd'] as $k => $d)
 		{
@@ -1308,7 +1310,7 @@ function makeThemeChanges($memID, $id_theme)
 				$val = max(0, min($val, 50));
 			// Only let admins and owners change the censor.
 			elseif ($opt == 'allow_no_censored' && !$user_info['is_admin'] && !$context['user']['is_owner'])
-					continue;
+				continue;
 
 			$themeSetArray[] = array(1, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
 			$erase_options[] = $opt;
@@ -2730,7 +2732,7 @@ function findMinMaxUserMessage($memID, $board = '')
 
 	$db = database();
 
-	$minmax = array(0,0);
+	$minmax = array(0, 0);
 	$is_owner = $memID == $user_info['id'];
 
 	$request = $db->query('', '

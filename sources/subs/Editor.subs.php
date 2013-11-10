@@ -652,6 +652,11 @@ function create_control_richedit($editorOptions)
 			}
 			else
 				$context['smileys'] = $temp;
+
+			// The smiley popup may take advantage of Jquery UI ....
+			if (!empty($context['smileys']['popup']))
+				$modSettings['jquery_include_ui'] = true;
+			
 		}
 	}
 
@@ -1139,10 +1144,6 @@ class Control_Verification_Questions implements Control_Verifications
 				if ($lang['filename'] === $language)
 					$lang['selected'] = true;
 		}
-
-		// The javascript needs to go at the end
-		addInlineJavascript('
-			document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
 
 		if (isset($_GET['save']))
 		{

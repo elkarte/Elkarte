@@ -793,135 +793,201 @@
 		var $container,
 			lastPositions = new Array();
 
-		this.attr('tabindex', 0)
-		.click(function() {
-			$(this).data('expanded', 'true');
-		})
-		.bind("mouseenter focus",
-			function()
+		function hover_expand($element)
+		{
+			var $expanded_pages_li = $element,
+				baseurl = eval($element.data('baseurl')),
+				perpage = $element.data('perpage'),
+				firstpage = $element.data('firstpage'),
+				lastpage = $element.data('lastpage'),
+				$exp_pages = $('<li id="expanded_pages" />'),
+				pages = 0,
+				container_width = $element.outerWidth() * 2,
+				width_elements = 3,
+				$scroll_left = null,
+				$scroll_right = null;
+
+			var aModel = $element.closest('.linavPages').prev().find('a').clone();
+
+			if (typeof(lastPositions[firstpage]) == 'undefined')
+				lastPositions[firstpage] = 0;
+
+			$container = $('<ul id="expanded_pages_container" />');
+
+			for (var i = firstpage; i < lastpage; i += perpage)
 			{
-				if ($(this).data('expanded') === 'true')
-					return;
+				pages++;
+				var bElem = aModel.clone();
 
-				var $expanded_pages_li = $(this),
-					baseurl = eval($(this).data('baseurl')),
-					perpage = $(this).data('perpage'),
-					firstpage = $(this).data('firstpage'),
-					lastpage = $(this).data('lastpage'),
-					$exp_pages = $('<li id="expanded_pages" />'),
-					pages = 0,
-					container_width = $(this).outerWidth() * 2,
-					width_elements = 3,
-					$scroll_left = null,
-					$scroll_right = null;
+				bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perpage + 1);
+				$exp_pages.append(bElem);
+			}
 
-				var aModel = $(this).prev().children().first().clone();
-
-				if (typeof(lastPositions[firstpage]) == 'undefined')
-					lastPositions[firstpage] = 0;
-
-				$container = $('<ul id="expanded_pages_container" />');
-
-				for (var i = firstpage; i < lastpage; i += perpage)
-				{
-					pages++;
-					var bElem = aModel.clone();
-
-					bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perpage + 1);
-					$exp_pages.append(bElem);
-				}
-
-				if (pages > width_elements)
-				{
-					$container.append($('<li />').append(aModel.clone().css({
-						'position': 'absolute',
-						'top': 0,
-						'left': 0
-					})
-					.attr('id', 'pages_scroll_left')
-					.attr('href', '#').text('<').click(function(ev) {
-						ev.stopPropagation();
-						ev.preventDefault();
-					}).hover(
-						function() {
-							$exp_pages.animate({
-								'margin-left': 0
-							}, 200 * pages);
-						},
-						function() {
-							$exp_pages.stop();
-							lastPositions[firstpage] = $exp_pages.css('margin-left');
-						}
-					)));
-				}
-
-				$container.append($exp_pages);
-				$(this).parent().superfish({
-					delay : 300,
-					speed: 175,
-					onHide: function () {
-						$container.remove();
+			if (pages > width_elements)
+			{
+				$container.append($('<li />').append(aModel.clone()
+				.attr('id', 'pages_scroll_left')
+				.attr('href', '#').text('<').click(function(ev) {
+					ev.stopPropagation();
+					ev.preventDefault();
+				}).hover(
+					function() {
+						$exp_pages.animate({
+							'margin-left': 0
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+						lastPositions[firstpage] = $exp_pages.css('margin-left');
 					}
-				});
+				)));
+			}
 
-				$(this).append($container);
-
-				if (pages > width_elements)
-				{
-					$container.append($('<li />').append(aModel.clone().css({
-						'position': 'absolute',
-						'top': 0,
-						'right': 0
-					})
-					.attr('id', 'pages_scroll_right')
-					.attr('href', '#').text('>').click(function(ev) {
-						ev.stopPropagation();
-						ev.preventDefault();
-					}).hover(
-						function() {
-							var $pages = $exp_pages.find('a'),
-								move = 0;
-
-							for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
-								move += $($pages[i]).outerWidth();
-
-							move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
-
-							$exp_pages.animate({
-								'margin-left': -move
-							}, 200 * pages);
-						},
-						function() {
-							$exp_pages.stop();
-							lastPositions[firstpage] = $exp_pages.css('margin-left');
-						}
-					)));
+			$container.append($exp_pages);
+			$element.parent().superfish({
+				delay : 300,
+				speed: 175,
+				onHide: function () {
+					$container.remove();
 				}
-
-				$exp_pages.find('a').each(function() {
-										if (width_elements > -1)
-						container_width += $(this).outerWidth();
-
-					if (width_elements <= 0 || pages >= width_elements)
-					{
-						$container.css({
-							'margin-left': -container_width / 2
-						}).width(container_width);
-					}
-
-					if (width_elements < 0)
-						return false;
-
-					width_elements--;
-				}).click(function (ev) {
-					$expanded_pages_li.attr('onclick', '').unbind('click');
-				});
-				$exp_pages.css({
-					'height': $(this).outerHeight(),
-					'padding-left': $container.find('#pages_scroll_left').outerWidth(),
-					'margin-left': lastPositions[firstpage]
-				});
-
 			});
+
+			$element.append($container);
+
+			if (pages > width_elements)
+			{
+				$container.append($('<li />').append(aModel.clone()
+				.attr('id', 'pages_scroll_right')
+				.attr('href', '#').text('>').click(function(ev) {
+					ev.stopPropagation();
+					ev.preventDefault();
+				}).hover(
+					function() {
+						var $pages = $exp_pages.find('a'),
+							move = 0;
+
+						for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
+							move += $($pages[i]).outerWidth();
+
+						move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
+
+						$exp_pages.animate({
+							'margin-left': -move
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+						lastPositions[firstpage] = $exp_pages.css('margin-left');
+					}
+				)));
+			}
+
+			// @todo this seems broken
+			$exp_pages.find('a').each(function() {
+				if (width_elements > -1)
+					container_width += $element.outerWidth();
+
+				if (width_elements <= 0 || pages >= width_elements)
+				{
+					$container.css({
+						'margin-left': -container_width / 2
+					}).width(container_width);
+				}
+
+				if (width_elements < 0)
+					return false;
+
+				width_elements--;
+			}).click(function (ev) {
+				$expanded_pages_li.attr('onclick', '').unbind('click');
+			});
+			$exp_pages.css({
+				'height': $element.outerHeight(),
+				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
+				'margin-left': lastPositions[firstpage]
+			});
+
+		};
+
+		function expand_pages($element)
+		{
+			var $baseAppend = $($element.closest('.linavPages')),
+				boxModel = $baseAppend.prev().clone(),
+				aModel = boxModel.find('a').clone(),
+				expandModel = $element.clone(),
+				perPage = $element.data('perpage'),
+				firstPage = $element.data('firstpage'),
+				lastPage = $element.data('lastpage'),
+				rawBaseurl = $element.data('baseurl'),
+				baseurl = eval($element.data('baseurl')),
+				first;
+
+			var i, oldLastPage = 0,
+				perPageLimit = 10;
+
+			// Prevent too many pages to be loaded at once.
+			if ((lastPage - firstPage) / perPage > perPageLimit)
+			{
+				oldLastPage = lastPage;
+				lastPage = firstPage + perPageLimit * perPage;
+			}
+
+			// Calculate the new pages.
+			for (i = lastPage; i > firstPage; i -= perPage)
+			{
+				var bElem = aModel.clone(),
+					boxModelClone = boxModel.clone();
+
+				bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perPage);
+				boxModelClone.find('a').each(function() {
+					$(this).replaceWith(bElem[0]);
+				});
+				$baseAppend.after(boxModelClone);
+
+				// This is needed just to remember where to attach the new expand
+				if (typeof first == 'undefined')
+					first = boxModelClone;
+			}
+			$baseAppend.remove();
+
+			if (oldLastPage > 0)
+			{
+				// This is to remove any hover_expand
+				expandModel.find('#expanded_pages_container').each(function() {
+					$(this).remove();
+				});
+
+				expandModel.click(function(e) {
+					var $zhis = $(this);
+					e.preventDefault();
+
+					expand_pages($zhis);
+
+					$zhis.unbind('mouseenter focus');
+				})
+				.bind('mouseenter focus', function() {
+					hover_expand($(this))
+				})
+				.data('perpage', perPage)
+				.data('firstpage', lastPage)
+				.data('lastpage', oldLastPage)
+				.data('baseurl', rawBaseurl);
+
+				first.after(expandModel);
+			}
+		}
+
+		this.attr('tabindex', 0)
+		.click(function(e) {
+			var $zhis = $(this);
+			e.preventDefault();
+
+			expand_pages($zhis);
+
+			$zhis.unbind('mouseenter focus');
+		})
+		.bind('mouseenter focus', function() {
+			hover_expand($(this))
+		});
 	};
 })(jQuery);

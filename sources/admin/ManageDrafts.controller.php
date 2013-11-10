@@ -51,16 +51,10 @@ class ManageDrafts_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		loadLanguage('Drafts');
 
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
-
 		// initialize the form
 		$this->_initDraftSettingsForm();
 
 		$config_vars = $this->_draftSettings->settings();
-
-		// Get the settings template ready.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['managedrafts_settings'];

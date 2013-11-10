@@ -616,8 +616,10 @@ class ManageThemes_Controller extends Action_Controller
 			$inserts = array();
 			foreach ($_POST['options'] as $opt => $val)
 				$inserts[] = array($_GET['th'], 0, $opt, is_array($val) ? implode(',', $val) : $val);
+
 			foreach ($_POST['default_options'] as $opt => $val)
 				$inserts[] = array(1, 0, $opt, is_array($val) ? implode(',', $val) : $val);
+
 			// If we're actually inserting something..
 			if (!empty($inserts))
 				updateThemeOptions($inserts);
@@ -819,7 +821,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function action_pick()
 	{
-		global $txt, $context, $modSettings, $user_info, $language, $settings, $scripturl;
+		global $txt, $context, $modSettings, $user_info, $scripturl;
 
 		require_once(SUBSDIR . '/Themes.subs.php');
 
@@ -1105,9 +1107,11 @@ class ManageThemes_Controller extends Action_Controller
 			if (file_exists($theme_dir . '/theme_info.xml'))
 			{
 				$theme_info = file_get_contents($theme_dir . '/theme_info.xml');
+
 				// Parse theme-info.xml into an Xml_Array.
 				require_once(SUBSDIR . '/XmlArray.class.php');
 				$theme_info_xml = new Xml_Array($theme_info);
+
 				// @todo Error message of some sort?
 				if (!$theme_info_xml->exists('theme-info[0]'))
 					return 'package_get_error_packageinfo_corrupt';
@@ -1326,17 +1330,11 @@ class ManageThemes_Controller extends Action_Controller
 		// Note: we're here sending $theme_dir as parameter to action_()
 		// controller functions, which isn't cool. To be refactored.
 		if (substr($_REQUEST['filename'], -4) == '.css')
-		{
 			$this->_action_edit_style($theme_dir);
-		}
 		elseif (substr($_REQUEST['filename'], -13) == '.template.php')
-		{
 			$this->_action_edit_template($theme_dir);
-		}
 		else
-		{
 			$this->_action_edit_file($theme_dir);
-		}
 
 		// Create a special token to allow editing of multiple files.
 		createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
@@ -1412,7 +1410,7 @@ class ManageThemes_Controller extends Action_Controller
 	{
 		global $context;
 
-		// simply set the template and the file contents.
+		// Simply set the template and the file contents.
 		$context['sub_template'] = 'edit_file';
 		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
 	}
@@ -1432,30 +1430,30 @@ class ManageThemes_Controller extends Action_Controller
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 		if (empty($selectedTheme))
 		{
-			// this should never be happening. Never I say. But... in case it does :P
+			// This should never be happening. Never I say. But... in case it does :P
 			fatal_lang_error('theme_edit_missing');
 		}
 
 		$theme_dir = themeDirectory($context['theme_id']);
 		$file = isset($_POST['entire_file']) ? $_POST['entire_file'] : '';
 
-		// you did submit *something*, didn't you?
+		// You did submit *something*, didn't you?
 		if (empty($file))
 		{
 			// @todo a better error message
 			fatal_lang_error('theme_edit_missing');
 		}
 
-		// checking PHP syntax on css files is not a most constructive use of processing power :P
-		// we need to know what kind of file we have
+		// Checking PHP syntax on css files is not a most constructive use of processing power :P
+		// We need to know what kind of file we have
 		$is_php = substr($_REQUEST['filename'], -4) == '.php';
 		$is_template = substr($_REQUEST['filename'], -13) == '.template.php';
 		$is_css = substr($_REQUEST['filename'], -4) == '.css';
 
-		// check you up
+		// Check you up
 		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']), 'post', false) == true)
 		{
-			// consolidate the format in which we received the file contents
+			// Consolidate the format in which we received the file contents
 			if (is_array($file))
 				$entire_file = implode("\n", $file);
 			else
@@ -1465,7 +1463,7 @@ class ManageThemes_Controller extends Action_Controller
 			// errors? No errors!
 			$errors = array();
 
-			// for PHP files, we check the syntax.
+			// For PHP files, we check the syntax.
 			if ($is_php)
 			{
 				require_once(SUBSDIR . '/DataValidator.class.php');
@@ -1476,41 +1474,40 @@ class ManageThemes_Controller extends Action_Controller
 				));
 				$validator->validate(array('entire_file' => $entire_file));
 
-				// retrieve the errors
-				// @todo fix the fields names.
+				// Retrieve the errors
 				$errors = $validator->validation_errors();
 			}
 
-			// if successful so far, we'll take the plunge and save this piece of art.
+			// If successful so far, we'll take the plunge and save this piece of art.
 			if (empty($errors))
 			{
-				// try to save the new file contents
+				// Try to save the new file contents
 				$fp = fopen($theme_dir . '/' . $_REQUEST['filename'], 'w');
 				fwrite($fp, $entire_file);
 				fclose($fp);
 
-				// we're done here.
+				// We're done here.
 				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . dirname($_REQUEST['filename']));
 			}
 			else
 			{
 				// I can't let you off the hook yet: syntax errors are a nasty beast.
 
-				// pick the right sub-template for the next try
+				// Pick the right sub-template for the next try
 				if ($is_template)
 					$context['sub_template'] = 'edit_template';
 				else
 					$context['sub_template'] = 'edit_file';
 
-				// fill contextual data for the template, the errors to show
+				// Fill contextual data for the template, the errors to show
 				foreach ($errors as $error)
 					$context['parse_error'][] = $error;
 
-				// the format of the data depends on template/non-template file.
+				// The format of the data depends on template/non-template file.
 				if (!is_array($file))
 					$file = array($file);
 
-				// send back the file contents
+				// Send back the file contents
 				$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')));
 
 				foreach ($file as $i => $file_part)
@@ -1519,7 +1516,7 @@ class ManageThemes_Controller extends Action_Controller
 					$context['file_parts'][$i]['data'] = $file_part;
 				}
 
-				// re-create token for another try
+				// Re-create token for another try
 				createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
 
 				return;
@@ -1530,10 +1527,10 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			loadLanguage('Errors');
 
-			// notify the template of trouble
+			// Notify the template of trouble
 			$context['session_error'] = true;
 
-			// choose sub-template
+			// Choose sub-template
 			if ($is_template)
 				$context['sub_template'] = 'edit_template';
 			elseif ($is_css)
@@ -1838,11 +1835,11 @@ class ManageThemes_Controller extends Action_Controller
 				$_REQUEST['filename'] = '';
 		}
 
-		// we shouldn't end up with no file
+		// We shouldn't end up with no file
 		if (empty($_REQUEST['filename']))
 			fatal_lang_error('theme_edit_missing', false);
 
-		// initialize context
+		// Initialize context
 		$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
 		$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
 		$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);

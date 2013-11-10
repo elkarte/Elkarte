@@ -466,7 +466,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 		return false;
 	// ... and assign protected groups!
 	elseif (!allowedTo('admin_forum') && $group_details['group_type'] == 1)
-			return false;
+		return false;
 
 	// Do the actual updates.
 	if ($type == 'only_additional')
@@ -997,12 +997,14 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	$where .= !in_array('custom', $excludes) ? '' : ' AND id_group < {int:newbie_group}';
 	// Exclude hidden?
 	$where .= !in_array('hidden', $excludes) ? '' : ' AND hidden != {int:hidden_group}';
+
 	// Only the post based membergroups? We can safely overwrite the $where.
 	if (in_array('membergroups', $excludes))
 		$where = ' AND min_posts != {int:min_posts}';
+
 	// Simply all of them?
 	if (in_array('all', $includes))
-			$where = '';
+		$where = '';
 
 	$request = $db->query('', '
 		SELECT id_group, group_name, min_posts, online_color
@@ -1054,13 +1056,13 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			);
 
 			if ($row['min_posts'] == -1)
-				$groups['membergroups'][] =  array(
+				$groups['membergroups'][] = array(
 					'id' => $row['id_group'],
 					'name' => $row['group_name'],
 					'can_be_additional' => true,
 				);
 			else
-				$groups['postgroups'][] =  array(
+				$groups['postgroups'][] = array(
 					'id' => $row['id_group'],
 					'name' => $row['group_name'],
 				);
@@ -1564,7 +1566,6 @@ function getIDMemberFromGroupModerators($moderators)
 	$db->free_result($request);
 
 	return $group_moderators;
-
 }
 
 /**
@@ -1594,7 +1595,7 @@ function assignGroupModerators($id_group, $group_moderators)
  *
  * @param int $id_group
  *
- * @return array moderators as array (id => name)
+ * @return array moderators as array(id => name)
  */
 function getGroupModerators($id_group)
 {
