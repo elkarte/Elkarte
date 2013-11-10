@@ -514,7 +514,7 @@ function processNextTasks($ts = 0)
 			if ($completed)
 			{
 				$total_time = round(microtime(true) - $time_start, 3);
-				logTask($method, (int)$total_time);
+				logTask($row['id_task'], (int)$total_time);
 			}
 		}
 	}
