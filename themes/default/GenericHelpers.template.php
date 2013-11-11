@@ -22,7 +22,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 	echo '
 		<fieldset id="', $current_group_list['id'], '">
-			<legend><a href="javascript:void(0);" onclick="document.getElementById(\'', $current_group_list['id'], '\').style.display = \'none\';document.getElementById(\'', $current_group_list['id'], '_groups_link\').style.display = \'block\'; return false;">', $current_group_list['select_group'], '</a></legend>';
+			<legend>', $current_group_list['select_group'], '</legend>';
 
 	echo '
 			<ul class="permission_groups">';
@@ -39,17 +39,7 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 	echo '
 			</ul>
-			<label for="checkAllGroups', $current_group_list['id'], '"><input type="checkbox" id="checkAllGroups', $current_group_list['id'], '" ', $all_selected ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'', $current_group_list['id'], '\');" class="input_check" /> <em>', $txt['check_all'], '</em></label>
-		</fieldset>
-
-		<a href="javascript:void(0);" onclick="document.getElementById(\'', $current_group_list['id'], '\').style.display = \'block\'; document.getElementById(\'', $current_group_list['id'], '_groups_link\').style.display = \'none\'; return false;" id="', $current_group_list['id'], '_groups_link" style="display: none;">[ ', $current_group_list['select_group'], ' ]</a>';
-
-		if (!empty($current_group_list['collapsed']))
-			echo '
-		<script><!-- // --><![CDATA[
-			document.getElementById("', $current_group_list['id'], '").style.display = "none";
-			document.getElementById("', $current_group_list['id'], '_groups_link").style.display = "";
-		// ]]></script>';
+		</fieldset>';
 }
 
 /**

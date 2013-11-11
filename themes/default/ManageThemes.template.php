@@ -46,19 +46,19 @@ function template_main()
 								<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>:
 							</dt>
 							<dd>
-								<div id="known_themes_list">';
+								<fieldset id="known_themes_list">
+									<legend data-collapsed="true">', $txt['themeadmin_themelist_link'], '</legend>
+									<ul id="known_themes_list_ul">';
 
 	foreach ($context['themes'] as $theme)
 		echo '
-									<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' class="input_check" /> ', $theme['name'], '</label><br />';
+										<li>
+											<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' class="input_check" /> ', $theme['name'], '</label>
+										</li>';
 
 		echo '
-								</div>
-								<a href="javascript:void(0);" onclick="document.getElementById(\'known_themes_list\').style.display=\'block\'; document.getElementById(\'known_themes_link\').style.display = \'none\'; return false; " id="known_themes_link" style="display: none;">[ ', $txt['themeadmin_themelist_link'], ' ]</a>
-								<script><!-- // --><![CDATA[
-									document.getElementById("known_themes_list").style.display = "none";
-									document.getElementById("known_themes_link").style.display = "";
-								// ]]></script>
+									</ul>
+								</fieldset>
 							</dd>
 							<dt>
 								<label for="theme_guests">', $txt['theme_guests'], ':</label>
