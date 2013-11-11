@@ -233,6 +233,7 @@ $txt['maintain_sub_database'] = 'Database';
 $txt['maintain_sub_routine'] = 'Routine';
 $txt['maintain_sub_members'] = 'Members';
 $txt['maintain_sub_topics'] = 'Topics';
+$txt['maintain_sub_attachments'] = 'Attachments';
 $txt['maintain_done'] = 'The maintenance task \'%1$s\' was executed successfully.';
 $txt['maintain_no_errors'] = 'Congratulations, no errors were found.  Thanks for checking.';
 
