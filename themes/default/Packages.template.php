@@ -651,17 +651,6 @@ function template_browse()
 				sAdditionalVars: \';admin_key=pkg\'
 			},
 		});
-	// ]]></script>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
-	<script><!-- // --><![CDATA[
-			var oAddVersionSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddVersionSuggest\',
-			sSessionId: elk_session_id,
-			sSessionVar: elk_session_var,
-			sControlId: \'ve\',
-			sSearchType: \'versions\',
-			bItemList: false
-		});
 	// ]]></script>';
 }
 
