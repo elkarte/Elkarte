@@ -678,60 +678,61 @@ $txt['spell_check'] = 'Rechtschreibprüfung';
 $txt['quick_reply'] = 'Schnellantwort';
 $txt['quick_reply_desc'] = 'Mit der <em>Schnellantwort</em> können Sie einen Beitrag verfassen, während Sie ein Thema ansehen, ohne eine neue Seite zu laden. Sie können weiterhin BBCode und Smileys wie in einem normalen Beitrag nutzen.';
 $txt['quick_reply_warning'] = 'Warnung! Dieses Thema ist zurzeit geschlossen, nur Administratoren und Moderatoren können antworten.';
-$txt['quick_reply_verification'] = 'After submitting your post you will be directed to the regular post page to verify your post %1$s.';
-$txt['quick_reply_verification_guests'] = '(required for all guests)';
-$txt['quick_reply_verification_posts'] = '(required for all users with less than %1$d posts)';
-$txt['wait_for_approval'] = 'Note: this post will not display until it\'s been approved by a moderator.';
+$txt['quick_reply_verification'] = 'Nach der Übertragung werden Sie auf die normale Beitragsseite weitergeleitet, um Ihren Beitrag %1$s zu überprüfen.';
+$txt['quick_reply_verification_guests'] = '(gilt für alle Gäste)';
+$txt['quick_reply_verification_posts'] = '(gilt für alle Benutzer mit weniger als %1$s Beiträgen)';
+$txt['wait_for_approval'] = 'Hinweis: Dieser Beitrag wird nicht angezeigt, bevor er von einem Moderator freigeschaltet worden ist.';
 
-$txt['notification_enable_board'] = 'Are you sure you wish to enable notification of new topics for this board?';
-$txt['notification_disable_board'] = 'Are you sure you wish to disable notification of new topics for this board?';
-$txt['notification_enable_topic'] = 'Are you sure you wish to enable notification of new replies for this topic?';
-$txt['notification_disable_topic'] = 'Are you sure you wish to disable notification of new replies for this topic?';
+$txt['notification_enable_board'] = 'Sind Sie sich sicher, dass Sie die Benachrichtigung über neue Themen in diesem Forum aktivieren möchten?';
+$txt['notification_disable_board'] = 'Sind Sie sich sicher, dass Sie die Benachrichtigung über neue Themen in diesem Forum deaktivieren möchten?';
+$txt['notification_enable_topic'] = 'Sind Sie sich sicher, dass Sie die Benachrichtigung über neue Antworten in diesem Thema aktivieren möchten?';
+$txt['notification_disable_topic'] = 'Sind Sie sich sicher, dass Sie die Benachrichtigung über neue Antworten in diesem Thema deaktivieren möchten?';
 
-$txt['report_to_mod'] = 'Report Post';
-$txt['issue_warning_post'] = 'Issue a warning because of this message';
+$txt['report_to_mod'] = 'Beitrag melden';
+$txt['issue_warning_post'] = 'Eine Verwarnung aufgrund dieses Beitrags aussprechen';
 
-$txt['like_post'] = 'Like Post';
-$txt['unlike_post'] = 'Unlike Post';
-$txt['likes'] = 'Likes';
-$txt['liked_by'] = 'Liked by:';
-$txt['liked_you'] = 'You';
-$txt['liked_more'] = 'more';
+$txt['like_post'] = 'Beitrag gefällt mir';
+$txt['unlike_post'] = 'Beitrag gefällt mir nicht mehr';
+$txt['likes'] = 'gefällt\'s'; // ? :-)
+$txt['liked_by'] = 'Gefällt diesen Benutzern:';
+$txt['liked_you'] = 'Ihnen';
+$txt['liked_more'] = 'mehr';
 
-$txt['unread_topics_visit'] = 'Recent Unread Topics';
-$txt['unread_topics_visit_none'] = 'No unread topics found since your last visit. <a href="' . $scripturl . '?action=unread;all" class="linkbutton">Click here to try all unread topics</a>';
-$txt['unread_topics_all'] = 'All Unread Topics';
-$txt['unread_replies'] = 'Updated Topics';
+$txt['unread_topics_visit'] = 'Neue ungelesene Themen';
+$txt['unread_topics_visit_none'] = 'Es wurden keine seit Ihrem letzten Besuch ungelesenen Themen gefunden. <a href="' . $scripturl . '?action=unread;all" class="linkbutton">Klicken Sie hier, um alle ungelesenen Themen anzuzeigen</a>';
+$txt['unread_topics_all'] = 'Alle ungelesenen Themen';
+$txt['unread_replies'] = 'Aktualisierte Themen';
 
-$txt['who_title'] = 'Who\'s Online';
-$txt['who_and'] = ' and ';
-$txt['who_viewing_topic'] = ' are viewing this topic.';
-$txt['who_viewing_board'] = ' are viewing this board.';
-$txt['who_member'] = 'Member';
+$txt['who_title'] = 'Wer ist online';
+$txt['who_and'] = ' und ';
+$txt['who_viewing_topic'] = ' betrachten dieses Thema.';
+$txt['who_viewing_board'] = ' betrachten dieses Forum.';
+$txt['who_member'] = 'Mitglied';
 
 // No longer used by default theme, but for backwards compat
-$txt['powered_by_php'] = 'Powered by PHP';
-$txt['powered_by_mysql'] = 'Powered by MySQL';
-$txt['valid_css'] = 'Valid CSS';
+$txt['powered_by_php'] = 'Angetrieben von PHP';
+$txt['powered_by_mysql'] = 'Angetrieben von MySQL';
+$txt['valid_css'] = 'Gültiges CSS';
 
 // Current footer strings
-$txt['valid_html'] = 'Valid HTML 5';
+$txt['valid_html'] = 'Gültiges HTML 5';
 $txt['rss'] = 'RSS';
 $txt['atom'] = 'Atom';
 $txt['html'] = 'HTML';
 
-$txt['guest'] = 'Guest';
-$txt['guests'] = 'Guests';
-$txt['user'] = 'User';
-$txt['users'] = 'Users';
-$txt['hidden'] = 'Hidden';
+$txt['guest'] = 'Gast';
+$txt['guests'] = 'Gäste';
+$txt['user'] = 'Benutzer';
+$txt['users'] = 'Benutzer';
+$txt['hidden'] = 'Versteckt';
 // Plural form of hidden for languages other than English
-$txt['hidden_s'] = 'Hidden';
-$txt['buddy'] = 'Buddy';
-$txt['buddies'] = 'Buddies';
-$txt['most_online_ever'] = 'Most Online Ever';
-$txt['most_online_today'] = 'Most Online Today';
+$txt['hidden_s'] = 'Versteckte';
+$txt['buddy'] = 'Freund';
+$txt['buddies'] = 'Freunde';
+$txt['most_online_ever'] = 'Bisher am meisten online';
+$txt['most_online_today'] = 'Heute am meisten online';
 
+// TODO: Continue here.
 $txt['merge_select_target_board'] = 'Select the target board of the merged topic';
 $txt['merge_select_poll'] = 'Select which poll the merged topic should have';
 $txt['merge_topic_list'] = 'Select topics to be merged';
