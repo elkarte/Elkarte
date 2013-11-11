@@ -1274,9 +1274,7 @@ class Admin_Controller extends Action_Controller
 		unset($_SESSION['admin_time']);
 
 		// Clean any admin tokens as well.
-		foreach ($_SESSION['token'] as $key => $token)
-			if (strpos($key, '-admin') !== false)
-				unset($_SESSION['token'][$key]);
+		cleanTokens(false, '-admin');
 
 		if (isset($_GET['redir']) && isset($_SERVER['HTTP_REFERER']))
 			redirectexit($_SERVER['HTTP_REFERER']);
