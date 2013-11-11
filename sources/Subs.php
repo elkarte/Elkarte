@@ -3908,8 +3908,10 @@ function setupMenuContext()
  */
 function elk_seed_generator()
 {
+	global $modSettings;
+
 	// Change the seed.
-	if (mt_rand(1, 250) == 69)
+	if (mt_rand(1, 250) == 69 || empty($modSettings['rand_seed']))
 		updateSettings(array('rand_seed' => mt_rand()));
 }
 
