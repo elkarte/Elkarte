@@ -834,7 +834,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 *  - Attachments that file size does not match the DB size
 	 *  - Attachments that no longer have a message
 	 *  - Avatars with no members associated with them.
-	 * 	- Attachments that are in the attachment folder, but not listed in the DB
+	 *  - Attachments that are in the attachment folder, but not listed in the DB
 	 */
 	public function action_repair()
 	{
