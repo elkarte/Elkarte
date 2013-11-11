@@ -188,351 +188,351 @@ $txt['approve_all'] = 'alles freigeben';
 $txt['awaiting_approval'] = 'Wartet auf Freischaltung';
 $txt['attach_awaiting_approve'] = 'Anhänge warten auf Freischaltung';
 $txt['post_awaiting_approval'] = 'Hinweis: Dieser Beitrag wartet auf Freischaltung durch einen Moderator.';
-// TODO: CONTINUE HERE :o)
-$txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them all</a>.';
-$txt['send_message'] = 'Send message';
+$txt['there_are_unapproved_topics'] = '%1$s Themen und %2$s Beiträge warten in diesem Forum auf Freischaltung. <a href="%3$s">Klicken Sie hier, um sie anzusehen</a>.';
+$txt['send_message'] = 'Nachricht senden';
 
-$txt['msg_alert_you_have'] = 'you have'; //Deprecated
-$txt['msg_alert_messages'] = 'messages'; //Deprecated
-$txt['msg_alert_no_messages'] = 'you don\'t have any message';
-$txt['msg_alert_one_message'] = 'you have <a href="%1$s">1 message</a>';
-$txt['msg_alert_many_message'] = 'you have <a href="%1$s">%2$d messages</a>';
-$txt['msg_alert_one_new'] = '1 is new';
-$txt['msg_alert_many_new'] = '%1$d are new';
-$txt['remove_message'] = 'Remove this message';
+$txt['msg_alert_you_have'] = 'Sie haben'; //Deprecated
+$txt['msg_alert_messages'] = 'Nachrichten'; //Deprecated
+$txt['msg_alert_no_messages'] = 'Sie haben keine Nachrichten';
+$txt['msg_alert_one_message'] = 'Sie haben <a href="%1$s">1 Nachricht</a>';
+$txt['msg_alert_many_message'] = 'Sie haben <a href="%1$s">%2$d Nachrichten</a>';
+$txt['msg_alert_one_new'] = '1 ist neu';
+$txt['msg_alert_many_new'] = '%1$d sind neu';
+$txt['remove_message'] = 'Diese Nachricht entfernen';
 
-$txt['topic_alert_none'] = 'No messages...';
-$txt['pm_alert_none'] = 'No messages...';
+$txt['topic_alert_none'] = 'Keine Nachrichten...';
+$txt['pm_alert_none'] = 'Keine Nachrichten...'; // oh the redundancy
 
-$txt['online_users'] = 'Users Online'; //Deprecated
-$txt['online_now'] = 'Online Now';
-$txt['personal_message'] = 'Personal Message';
-$txt['jump_to'] = 'Jump to';
-$txt['go'] = 'Go';
-$txt['are_sure_remove_topic'] = 'Are you sure you want to remove this topic?';
-$txt['yes'] = 'Yes';
-$txt['no'] = 'No';
+$txt['online_users'] = 'Benutzer online'; //Deprecated
+$txt['online_now'] = 'jetzt online';
+$txt['personal_message'] = 'Persönliche Nachricht';
+$txt['jump_to'] = 'Springe zu';
+$txt['go'] = 'Los';
+$txt['are_sure_remove_topic'] = 'Sind Sie sich sicher, dass Sie dieses Thema löschen möchten?';
+$txt['yes'] = 'Ja';
+$txt['no'] = 'Nein';
 
-$txt['search_end_results'] = 'End of results';
-$txt['search_on'] = 'on';
+$txt['search_end_results'] = 'Keine weiteren Ergebnisse';
+$txt['search_on'] = 'am';
 
-$txt['search'] = 'Search';
-$txt['all'] = 'All';
-$txt['search_entireforum'] = 'Entire Forum';
-$txt['search_thisbrd'] = 'This board';
+$txt['search'] = 'Suchen';
+$txt['all'] = 'Alles';
+$txt['search_entireforum'] = 'Ganzes Forum';
+$txt['search_thisbrd'] = 'Dieses Board';
 $txt['search_thistopic'] = 'This topic';
 $txt['search_members'] = 'Members';
 
-$txt['back'] = 'Back';
-$txt['continue'] = 'Continue';
-$txt['password_reminder'] = 'Password reminder';
-$txt['topic_started'] = 'Topic started by';
-$txt['title'] = 'Title';
-$txt['post_by'] = 'Post by';
-$txt['memberlist_searchable'] = 'Searchable list of all registered members.';
-$txt['welcome_member'] = 'Please welcome'; //Deprecated
-$txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
-$txt['admin_center'] = 'Administration Center';
-$txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
-$txt['admin_maintenance_active'] = 'Your forum is currently in maintenance mode, only admins can log in.  Remember to <strong><a class="strong" href="%1$s">exit maintenance</a></strong> once you have finished your administrative tasks.';
-$txt['query_command_denied'] = 'The following MySQL errors are occurring, please verify your setup:';
-$txt['query_command_denied_guests'] = 'It seems something has gone sour on the forum with the database. This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please report the following message to the administrator:';
-$txt['query_command_denied_guests_msg'] = 'the command %1$s is denied on the database';
-$txt['last_edit'] = 'Last Edit'; //Deprecated
-$txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
-$txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
+$txt['back'] = 'Zurück';
+$txt['continue'] = 'Weiter';
+$txt['password_reminder'] = 'Passworterinnerung';
+$txt['topic_started'] = 'Thema begonnen von';
+$txt['title'] = 'Titel';
+$txt['post_by'] = 'Beitrag von';
+$txt['memberlist_searchable'] = 'Durchsuchbare Liste aller registrierten Mitglieder.';
+$txt['welcome_member'] = 'Bitte begrüßen Sie'; //Deprecated
+$txt['welcome_newest_member'] = 'Bitte heißen Sie %1$s, unser neuestes Mitglied, willkommen.';
+$txt['admin_center'] = 'Administrationszentrum';
+$txt['admin_session_active'] = 'Sie haben eine laufende Adminsitzung. Wir empfehlen <strong><a class="strong" href="%1$s">diese Sitzung zu beenden</a></strong>, wenn Sie mit Ihren administrativen Tätigkeiten fertig sind.';
+$txt['admin_maintenance_active'] = 'Ihr Forum läuft zurzeit im Wartungsmodus, nur Administratoren können sich anmelden.  Denken Sie daran, <strong><a class="strong" href="%1$s">den Wartungsmodus abzuschalten</a></strong> , wenn Sie mit Ihren administrativen Tätigkeiten fertig sind.';
+$txt['query_command_denied'] = 'Folgende MySQL-Fehler sind aufgetreten, bitte überprüfen Sie Ihre Konfiguration:';
+$txt['query_command_denied_guests'] = 'Es scheint, als wäre im Forum etwas mit der Datenbank nicht in Ordnung. Dieses Problem sollte nur vorübergehend bestehen, kommen Sie also bitte später wieder und versuchen Sie es erneut.  Wenn Sie diese Nachricht weiterhin zu Gesicht bekommen, melden Sie bitte folgende Nachricht einem Administrator:';
+$txt['query_command_denied_guests_msg'] = 'der Befehl %1$s ist der Datenbank nicht erlaubt';
+$txt['last_edit'] = 'Zuletzt geändert'; //Deprecated
+$txt['last_edit_by'] = '<span class="lastedit">Zuletzt geändert</span>: %1$s von %2$s';
+$txt['notify_deactivate'] = 'Möchten Sie die Benachrichtigungen in diesem Thema deaktivieren?';
 
-$txt['location'] = 'Location';
-$txt['gender'] = 'Gender';
-$txt['personal_text'] = 'Personal Text';
-$txt['date_registered'] = 'Date Registered';
+$txt['location'] = 'Ort';
+$txt['gender'] = 'Geschlecht';
+$txt['personal_text'] = 'Persönlicher Text';
+$txt['date_registered'] = 'Registrierungsdatum';
 
-$txt['recent_view'] = 'View all recent posts.';
-$txt['recent_updated'] = 'is the most recently updated topic';
-$txt['is_recent_updated'] = '%1$s is the most recently updated topic';
+$txt['recent_view'] = 'Alle neuen Beiträge anzeigen.';
+$txt['recent_updated'] = 'ist das zuletzt aktualisierte Thema';
+$txt['is_recent_updated'] = '%1$s ist das zuletzt aktualisierte Thema';
 
-$txt['male'] = 'Male';
-$txt['female'] = 'Female';
+$txt['male'] = 'Männlich';
+$txt['female'] = 'Weiblich';
 
-$txt['error_invalid_characters_username'] = 'Invalid character used in Username.';
+$txt['error_invalid_characters_username'] = 'Ungültiges Zeichen im Benutzernamen.';
 
-$txt['welcome_guest'] = 'Welcome, <strong>%1$s</strong>. Please <a href="%2$s">login</a>.';
+$txt['welcome_guest'] = 'Willkommen, <strong>%1$s</strong>. Bitte <a href="%2$s">melden Sie sich an</a>.';
 
-//$txt['welcome_guest_register'] = 'Welcome, <strong>%1$s</strong>. Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
-$txt['welcome_guest_register'] = 'Welcome to <strong>'. $context['forum_name']. '</strong>. Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
+//$txt['welcome_guest_register'] = 'Willkommen, <strong>%1$s</strong>. Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a> oder <a href="' . $scripturl . '?action=register">registrieren Sie sich</a>.';
+$txt['welcome_guest_register'] = 'Willkommen, <strong>'.$context["forum_name"].'</strong>. Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a> oder <a href="' . $scripturl . '?action=register">registrieren Sie sich</a>.';
 
-$txt['please_login'] = 'Please <a href="' . $scripturl . '?action=login">login</a>.';
-$txt['login_or_register'] = 'Please <a href="' . $scripturl . '?action=login">login</a> or <a href="' . $scripturl . '?action=register">register</a>.';
-$txt['welcome_guest_activate'] = '<br />Did you miss your <a href="' . $scripturl . '?action=activate">activation email</a>?';
+$txt['please_login'] = 'Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a>.';
+$txt['login_or_register'] = 'Bitte <a href="' . $scripturl . '?action=login">melden Sie sich an</a> oder <a href="' . $scripturl . '?action=register">registrieren Sie sich</a>.';
+$txt['welcome_guest_activate'] = '<br />Haben Sie Ihre <a href="' . $scripturl . '?action=activate">Aktivierungs-E-Mail</a> übersehen?';
 // @todo the following to sprintf
 $txt['hello_member'] = 'Hey,';
 // Use numeric entities in the below string.
-$txt['hello_guest'] = 'Welcome,';
+$txt['hello_guest'] = 'Willkommen,';
 $txt['welmsg_hey'] = 'Hey,';
-$txt['welmsg_welcome'] = 'Welcome,';
-$txt['welmsg_please'] = 'Please';
-$txt['select_destination'] = 'Please select a destination';
+$txt['welmsg_welcome'] = 'Willkommen,';
+$txt['welmsg_please'] = 'Bitte';
+$txt['select_destination'] = 'Bitte wählen Sie ein Ziel aus';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
-$txt['posted_by'] = 'Posted by';
+$txt['posted_by'] = 'Geschrieben von';
 
-$txt['icon_smiley'] = 'Smiley';
-$txt['icon_angry'] = 'Angry';
-$txt['icon_cheesy'] = 'Cheesy';
-$txt['icon_laugh'] = 'Laugh';
-$txt['icon_sad'] = 'Sad';
-$txt['icon_wink'] = 'Wink';
-$txt['icon_grin'] = 'Grin';
-$txt['icon_shocked'] = 'Shocked';
-$txt['icon_cool'] = 'Cool';
-$txt['icon_huh'] = 'Huh';
-$txt['icon_rolleyes'] = 'Roll Eyes';
-$txt['icon_tongue'] = 'Tongue';
-$txt['icon_embarrassed'] = 'Embarrassed';
-$txt['icon_lips'] = 'Lips sealed';
-$txt['icon_undecided'] = 'Undecided';
-$txt['icon_kiss'] = 'Kiss';
-$txt['icon_cry'] = 'Cry';
-$txt['icon_angel'] = 'Innocent';
+$txt['icon_smiley'] = 'Lächeln';
+$txt['icon_angry'] = 'Wütend';
+$txt['icon_cheesy'] = 'Frech';
+$txt['icon_laugh'] = 'Lachen';
+$txt['icon_sad'] = 'Traurig';
+$txt['icon_wink'] = 'Zwinkern';
+$txt['icon_grin'] = 'Grinsen';
+$txt['icon_shocked'] = 'Schockiert';
+$txt['icon_cool'] = 'Lässig';
+$txt['icon_huh'] = 'Hä?';
+$txt['icon_rolleyes'] = 'Augenrollen';
+$txt['icon_tongue'] = 'Zunge';
+$txt['icon_embarrassed'] = 'Peinlich berührt';
+$txt['icon_lips'] = 'Lippen versiegelt';
+$txt['icon_undecided'] = 'Unentschlossen';
+$txt['icon_kiss'] = 'Kuss';
+$txt['icon_cry'] = 'Weinen';
+$txt['icon_angel'] = 'Unschuldig';
 
 $txt['moderator'] = 'Moderator';
-$txt['moderators'] = 'Moderators';
+$txt['moderators'] = 'Moderatoren';
 
-$txt['mark_board_read'] = 'Mark Topics as Read for this Board';
-$txt['views'] = 'Views';
-$txt['new'] = 'New';
-$txt['no_redir'] = 'Redirected from %1$s';
+$txt['mark_board_read'] = 'Themen in diesem Forum als gelesen markieren';
+$txt['views'] = 'Ansichten';
+$txt['new'] = 'Neu';
+$txt['no_redir'] = 'Weitergeleitet von %1$s';
 
-$txt['view_all_members'] = 'View All Members';
-$txt['view'] = 'View';
+$txt['view_all_members'] = 'Alle Mitglieder ansehen';
+$txt['view'] = 'Ansicht';
 
-$txt['viewing_members'] = 'Viewing Members %1$s to %2$s';
-$txt['of_total_members'] = 'of %1$s total members';
+$txt['viewing_members'] = 'Betrachte Mitglied %1$s bis %2$s';
+$txt['of_total_members'] = 'von insgesamt %1$s Mitgliedern';
 
-$txt['forgot_your_password'] = 'Forgot your password?';
+$txt['forgot_your_password'] = 'Passwort vergessen?';
 
-$txt['date'] = 'Date';
+$txt['date'] = 'Datum';
 // Use numeric entities in the below string.
-$txt['from'] = 'From';
-$txt['check_new_messages'] = 'Check for new messages';
-$txt['to'] = 'To';
+$txt['from'] = 'Von';
+$txt['check_new_messages'] = 'Auf neue Nachrichten prüfen';
+$txt['to'] = 'An'; // ... oder "Bis"?!
 
-$txt['board_topics'] = 'Topics';
-$txt['members_title'] = 'Members';
-$txt['members_list'] = 'Members List';
-$txt['new_posts'] = 'New Posts';
-$txt['old_posts'] = 'No New Posts';
-$txt['redirect_board'] = 'Redirect Board';
+$txt['board_topics'] = 'Themen';
+$txt['members_title'] = 'Mitglieder';
+$txt['members_list'] = 'Mitgliederliste';
+$txt['new_posts'] = 'Neue Beiträge';
+$txt['old_posts'] = 'Keine neuen Beiträge';
+$txt['redirect_board'] = 'Forum umleiten';
 
-$txt['sendtopic_send'] = 'Send';
-$txt['report_sent'] = 'Your report has been sent successfully.';
-$txt['topic_sent'] = 'Your email has been sent successfully.';
+$txt['sendtopic_send'] = 'Absenden';
+$txt['report_sent'] = 'Ihre Meldung wurde erfolgreich versandt.';
+$txt['topic_sent'] = 'Ihre E-Mail wurde erfolgreich versandt.';
 
-$txt['time_offset'] = 'Time Offset';
-$txt['or'] = 'or';
+$txt['time_offset'] = 'Zeitabweichung';
+$txt['or'] = 'oder';
 
-$txt['no_matches'] = 'Sorry, no matches were found';
+$txt['no_matches'] = 'Verzeihung, es gab keine Treffer';
 
-$txt['notification'] = 'Notification';
-$txt['notifications'] = 'Notifications';
+$txt['notification'] = 'Benachrichtigung';
+$txt['notifications'] = 'Benachrichtigungen';
 
-$txt['your_ban'] = 'Sorry %1$s, you are banned from using this forum!';
-$txt['your_ban_expires'] = 'This ban is set to expire %1$s.';
-$txt['your_ban_expires_never'] = 'This ban is not set to expire.';
-$txt['ban_continue_browse'] = 'You may continue to browse the forum as a guest.';
+$txt['your_ban'] = 'Pardon, %1$s, Sie wurden aus diesem Forum verbannt!';
+$txt['your_ban_expires'] = 'Dieser Bann wird am %1$s aufgehoben.';
+$txt['your_ban_expires_never'] = 'Dieser Bann wird niemals aufgehoben.';
+$txt['ban_continue_browse'] = 'Sie können das Forum als Gast weiterhin benutzen.';
 
-$txt['mark_as_read'] = 'Mark ALL messages as read';
+$txt['mark_as_read'] = 'ALLE Nachrichten als gelesen markieren';
 
-$txt['hot_topics'] = 'Hot Topic (More than %1$d replies)';
-$txt['very_hot_topics'] = 'Very Hot Topic (More than %1$d replies)';
-$txt['locked_topic'] = 'Locked Topic';
-$txt['normal_topic'] = 'Normal Topic';
-$txt['participation_caption'] = 'Topic you have posted in';
+$txt['hot_topics'] = 'Heißes Thema (mehr als %1$d Antworten)';
+$txt['very_hot_topics'] = 'Sehr heißes Thema (mehr als %1$d Antworten)';
+$txt['locked_topic'] = 'Geschlossenes Thema';
+$txt['normal_topic'] = 'Normales Thema';
+$txt['participation_caption'] = 'Thema, in dem Sie geschrieben haben';
 
-$txt['go_caps'] = 'GO';
+$txt['go_caps'] = 'LOS';
 
-$txt['print'] = 'Print';
-$txt['topic_summary'] = 'Topic Summary';
-$txt['not_applicable'] = 'N/A';
-$txt['message_lowercase'] = 'message'; //Deprecated
-$txt['name_in_use'] = 'The name %1$s is already in use by another member.';
+$txt['print'] = 'Drucken';
+$txt['topic_summary'] = 'Themenzusammenfassung';
+$txt['not_applicable'] = 'n.v.';
+$txt['message_lowercase'] = 'Nachricht'; //Deprecated
+$txt['name_in_use'] = 'Der Name %1$s wird bereits von einem anderen Mitglied verwendet.';
 
-$txt['total_members'] = 'Total Members';
-$txt['total_posts'] = 'Total Posts';
-$txt['total_topics'] = 'Total Topics';
+$txt['total_members'] = 'Mitglieder insgesamt';
+$txt['total_posts'] = 'Beiträge insgesamt';
+$txt['total_topics'] = 'Themen insgesamt';
 
-$txt['mins_logged_in'] = 'Minutes to stay logged in';
+$txt['mins_logged_in'] = 'Minuten angemeldet bleiben'; // someone (tm) should improve that :)
 
-$txt['preview'] = 'Preview';
-$txt['always_logged_in'] = 'Always stay logged in';
+$txt['preview'] = 'Vorschau';
+$txt['always_logged_in'] = 'Immer angemeldet bleiben';
 
-$txt['logged'] = 'Logged';
+$txt['logged'] = 'Protokolliert';
 // Use numeric entities in the below string.
 $txt['ip'] = 'IP';
 
 $txt['www'] = 'WWW';
 
-$txt['by'] = 'by'; //Deprecated
+$txt['by'] = 'von'; //Deprecated // OK :-(
 
-$txt['hours'] = 'hours';
-$txt['minutes'] = 'minutes';
-$txt['seconds'] = 'seconds';
+$txt['hours'] = 'Stunden';
+$txt['minutes'] = 'Minuten';
+$txt['seconds'] = 'Sekunden';
 
 // Used upper case in Paid subscriptions management
-$txt['hour'] = 'Hour';
-$txt['days_word'] = 'days';
+$txt['hour'] = 'Stunde';
+$txt['days_word'] = 'Tage';
 
-$txt['newest_member'] = ', our newest member.'; //Deprecated
+$txt['newest_member'] = ', unser neuestes Mitglied.'; //Deprecated
 
-$txt['search_for'] = 'Search for';
-$txt['search_match'] = 'Match';
+$txt['search_for'] = 'Suche nach';
+$txt['search_match'] = 'Treffer';
 
-$txt['maintain_mode_on'] = 'Remember, this forum is in \'Maintenance Mode\'.';
+$txt['maintain_mode_on'] = 'Denken Sie daran: Dieses Forum befindet sich im \'Wartungsmodus\'.';
 
-$txt['read'] = 'Read'; //Deprecated
-$txt['times'] = 'times'; //Deprecated
-$txt['read_one_time'] = 'Read 1 time';
-$txt['read_many_times'] = 'Read %1$d times';
+$txt['read'] = 'Gelesen'; //Deprecated
+$txt['times'] = '-mal'; //Deprecated
+$txt['read_one_time'] = 'Einmal gelesen';
+$txt['read_many_times'] = '%1$d-mal gelesen';
 
-$txt['forum_stats'] = 'Forum Stats';
-$txt['latest_member'] = 'Latest Member';
-$txt['total_cats'] = 'Total Categories';
-$txt['latest_post'] = 'Latest Post';
+$txt['forum_stats'] = 'Forumsstatistiken';
+$txt['latest_member'] = 'Neuestes Mitglied';
+$txt['total_cats'] = 'Kategorien insgesamt';
+$txt['latest_post'] = 'Neuester Beitrag';
 
-$txt['you_have'] = 'You\'ve';
-$txt['click'] = 'Click';
-$txt['here'] = 'here';
-$txt['to_view'] = 'to view them.';
-$txt['you_have_no_msg'] = 'You don\'t have any message...';
-$txt['you_have_one_msg'] = 'You\'ve 1 message...<a href="%1$s">Click here to view it</a>';
-$txt['you_have_many_msgs'] = 'You\'ve %2$d messages...<a href="%1$s">Click here to view them</a>';
+$txt['you_have'] = 'Sie haben';
+$txt['click'] = 'Klicken Sie';
+$txt['here'] = 'hier';
+$txt['to_view'] = ', um sie anzusehen.';
+$txt['you_have_no_msg'] = 'Sie haben keine Nachrichten...';
+$txt['you_have_one_msg'] = 'Sie haben eine Nachricht...<a href="%1$s">Klicken Sie hier, um sie anzusehen</a>';
+$txt['you_have_many_msgs'] = 'Sie haben %2$d Nachrichten...<a href="%1$s">Klicken Sie hier, um sie anzusehen</a>';
 
-$txt['total_boards'] = 'Total Boards';
+$txt['total_boards'] = 'Foren insgesamt';
 
-$txt['print_page'] = 'Print Page';
-$txt['print_page_text'] = 'Text only';
-$txt['print_page_images'] = 'Text with Images';
+$txt['print_page'] = 'Seite drucken';
+$txt['print_page_text'] = 'Nur Text';
+$txt['print_page_images'] = 'Text mit Bildern';
 
-$txt['valid_email'] = 'This must be a valid email address.';
+$txt['valid_email'] = 'Dies muss eine gültige E-Mail-Adresse sein.';
 
-$txt['info_center_title'] = '%1$s - Info Center';
+$txt['info_center_title'] = '%1$s - Infozentrum';
 
-$txt['send_topic'] = 'Send this topic';
-$txt['unwatch'] = 'Unwatch';
-$txt['watch'] = 'Watch';
+$txt['send_topic'] = 'Dieses Thema versenden';
+$txt['unwatch'] = 'Nicht mehr beobachten';
+$txt['watch'] = 'Beobachten';
 
-$txt['sendtopic_title'] = 'Send the topic &quot;%1$s&quot; to a friend.';
-$txt['sendtopic_sender_name'] = 'Your name';
-$txt['sendtopic_sender_email'] = 'Your email address';
-$txt['sendtopic_receiver_name'] = 'Recipient\'s name';
-$txt['sendtopic_receiver_email'] = 'Recipient\'s email address';
-$txt['sendtopic_comment'] = 'Add a comment';
+$txt['sendtopic_title'] = 'Das Thema &quot;%1$s&quot; einem Freund senden.';
+$txt['sendtopic_sender_name'] = 'Ihr Name';
+$txt['sendtopic_sender_email'] = 'Ihre E-Mail-Adresse';
+$txt['sendtopic_receiver_name'] = 'Name des Empfängers';
+$txt['sendtopic_receiver_email'] = 'E-Mail-Adresse des Empfängers';
+$txt['sendtopic_comment'] = 'Fügen Sie einen Kommentar hinzu';
 
-$txt['allow_user_email'] = 'Allow users to email me';
+$txt['allow_user_email'] = 'Benutzern erlauben, mir eine E-Mail zu senden';
 
-$txt['check_all'] = 'Check all';
+$txt['check_all'] = 'Alle auswählen'; // ? :-)
 
 // Use numeric entities in the below string.
-$txt['database_error'] = 'Database Error';
-$txt['try_again'] = 'Please try again.  If you come back to this error screen, report the error to an administrator.';
-$txt['file'] = 'File';
-$txt['line'] = 'Line';
+$txt['database_error'] = 'Datenbankfehler';
+$txt['try_again'] = 'Bitte versuchen Sie es erneut.  Wenn Sie nochmals diesen Fehler sehen, melden Sie dies bitte einem Administrator.';
+$txt['file'] = 'Datei';
+$txt['line'] = 'Zeile';
 // Use numeric entities in the below string.
-$txt['tried_to_repair'] = 'ElkArte has detected and automatically tried to repair an error in your database.  If you continue to have problems, or continue to receive these emails, please contact your host.';
-$txt['database_error_versions'] = '<strong>Note:</strong> Your database version is %1$s.';
-$txt['template_parse_error'] = 'Template Parse Error!';
-$txt['template_parse_error_message'] = 'It seems something has gone sour on the forum with the template system.  This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please contact the administrator.<br /><br />You can also try <a href="javascript:location.reload();">refreshing this page</a>.';
-$txt['template_parse_error_details'] = 'There was a problem loading the <span class="tt"><strong>%1$s</strong></span> template or language file.  Please check the syntax and try again - remember, single quotes (<span class="tt">\'</span>) often have to be escaped with a slash (<span class="tt">\\</span>).  To see more specific error information from PHP, try <a href="' . $boardurl . '%1$s">accessing the file directly</a>.<br /><br />You may want to try to <a href="javascript:location.reload();">refresh this page</a> or <a href="' . $scripturl . '?theme=1">use the default theme</a>.';
+$txt['tried_to_repair'] = 'ElkArte hat einen Fehler in Ihrer Datenbank entdeckt und automatisch zu beheben versucht.  Wenn Sie weiterhin Probleme haben oder diese E-Mails erhalten, kontaktieren Sie bitte Ihren Serverbetreiber.';
+$txt['database_error_versions'] = '<strong>Hinweis:</strong> Ihre Datenbankversion ist %1$s.';
+$txt['template_parse_error'] = 'Vorlagenverarbeitungsfehler!';
+$txt['template_parse_error_message'] = 'Anscheinend ist etwas mit dem Vorlagensystem nicht in Ordnung.  Dieses Problem sollte nur vorübergehend bestehen, kommen Sie also bitte später wieder und versuchen Sie es erneut.  Wenn Sie diese Nachricht weiterhin zu Gesicht bekommen, kontaktieren Sie bitte einen Administrator.<br /><br />Sie können auch versuchen, <a href="javascript:location.reload();">diese Seite neu zu laden</a>.';
+$txt['template_parse_error_details'] = 'Ein Problem ist beim Laden der Vorlage oder Sprachdatei <span class="tt"><strong>%1$s</strong></span> aufgetreten.  Bitte überprüfen Sie die Syntax und versuchen Sie es erneut - denken Sie daran, dass einfache Anführungszeichen (<span class="tt">\'</span>) oft mit einem umgekehrten Schrägstrich (<span class="tt">\\</span>) markiert werden müssen.  Um spezifischere Fehlerinformationen von PHP einzusehen, versuchen Sie <a href="' . $boardurl . '%1$s">die Datei direkt zu öffnen</a>.<br /><br />Möglicherweise möchten Sie <a href="javascript:location.reload();">diese Seite neu laden</a> oder <a href="' . $scripturl . '?theme=1">das Standardtheme verwenden</a>.';
 
-$txt['today'] = 'Today at ';
-$txt['yesterday'] = 'Yesterday at ';
+$txt['today'] = 'Heute um ';
+$txt['yesterday'] = 'Gestern um ';
 
 //Relative times
-$txt['rt_now'] = 'just now';
-$txt['rt_minute'] = 'A minute ago';
-$txt['rt_minutes'] = '%s minutes ago';
-$txt['rt_hour'] = 'An hour ago';
-$txt['rt_hours'] = '%s hours ago';
-$txt['rt_day'] = 'A day ago';
-$txt['rt_days'] = '%s days ago';
-$txt['rt_week'] = 'A week ago';
-$txt['rt_weeks'] = '%s weeks ago';
-$txt['rt_month'] = 'A month ago';
-$txt['rt_months'] = '%s months ago';
-$txt['rt_year'] = 'A year ago';
-$txt['rt_years'] = '%s years ago';
+$txt['rt_now'] = 'gerade eben';
+$txt['rt_minute'] = 'Vor einer Minute';
+$txt['rt_minutes'] = 'Vor %s Minuten';
+$txt['rt_hour'] = 'Vor einer Stunde';
+$txt['rt_hours'] = 'Vor %s Stunden';
+$txt['rt_day'] = 'Gestern';
+$txt['rt_days'] = 'Vor %s Tagen';
+$txt['rt_week'] = 'Letzte Woche';
+$txt['rt_weeks'] = 'Vor %s Wochen';
+$txt['rt_month'] = 'Letzten Monat';
+$txt['rt_months'] = 'Vor %s Monaten';
+$txt['rt_year'] = 'Letztes Jahr';
+$txt['rt_years'] = 'Vor %s Jahren';
 
-$txt['new_poll'] = 'New poll';
-$txt['poll_question'] = 'Question';
-$txt['poll_vote'] = 'Submit Vote';
-$txt['poll_total_voters'] = 'Total Members Voted';
-$txt['shortcuts'] = 'shortcuts: alt+s submit/post, alt+p preview';
-$txt['shortcuts_firefox'] = 'shortcuts: shift+alt+s submit/post, shift+alt+p preview';
-$txt['shortcuts_drafts'] = ', alt+d save draft';
-$txt['shortcuts_drafts_firefox'] = ', shift+alt+d save draft';
-$txt['draft_saved_on'] = 'Draft last saved';
-$txt['poll_results'] = 'View results';
-$txt['poll_lock'] = 'Lock Voting';
-$txt['poll_unlock'] = 'Unlock Voting';
-$txt['poll_edit'] = 'Edit Poll';
-$txt['poll'] = 'Poll';
-$txt['one_day'] = '1 Day';
-$txt['one_week'] = '1 Week';
-$txt['two_weeks'] = '2 Weeks';
-$txt['one_month'] = '1 Month';
-$txt['two_months'] = '2 Months';
-$txt['forever'] = 'Forever';
-$txt['quick_login_dec'] = 'Login with username, password and session length';
-$txt['one_hour'] = '1 Hour';
-$txt['moved'] = 'MOVED';
-$txt['moved_why'] = 'Please enter a brief description as to<br />why this topic is being moved.';
+$txt['new_poll'] = 'Neue Umfrage';
+$txt['poll_question'] = 'Frage';
+$txt['poll_vote'] = 'Abstimmen';
+$txt['poll_total_voters'] = 'Teilnehmer insgesamt';
+$txt['shortcuts'] = 'Tastenkürzel: Alt+s absenden/verfassen, Alt+p Vorschau';
+$txt['shortcuts_firefox'] = 'Tastenkürzel: Umschalt+Alt+s absenden/verfassen, Umschalt+Alt+p Vorschau';
+$txt['shortcuts_drafts'] = ', Alt+d Entwurf speichern';
+$txt['shortcuts_drafts_firefox'] = ', Umschalt+Alt+d Entwurf speichern';
+$txt['draft_saved_on'] = 'Entwurf zuletzt gespeichert';
+$txt['poll_results'] = 'Ergebnisse ansehen';
+$txt['poll_lock'] = 'Abstimmung beenden';
+$txt['poll_unlock'] = 'Abstimmung fortsetzen';
+$txt['poll_edit'] = 'Umfrage ändern';
+$txt['poll'] = 'Umfrage';
+$txt['one_day'] = '1 Tag';
+$txt['one_week'] = '1 Woche';
+$txt['two_weeks'] = '2 Wochen';
+$txt['one_month'] = '1 Monat';
+$txt['two_months'] = '2 Monate';
+$txt['forever'] = 'Für immer';
+$txt['quick_login_dec'] = 'Mit Benutzername, Passwort und Sitzungslänge anmelden';
+$txt['one_hour'] = '1 Stunde';
+$txt['moved'] = 'VERSCHOBEN';
+$txt['moved_why'] = 'Bitte geben Sie eine kurze Begründung ein,<br />warum dieses Thema verschoben wird.';
 $txt['board'] = 'Board';
 $txt['in'] = 'in';
-$txt['sticky_topic'] = 'Sticky Topic';
-$txt['split'] = 'SPLIT';
+$txt['sticky_topic'] = 'Angeheftetes Thema';
+$txt['split'] = 'AUFTEILEN';
 
-$txt['delete'] = 'Delete';
+$txt['delete'] = 'Löschen';
 
-$txt['your_pms'] = 'Your Personal Messages';
+$txt['your_pms'] = 'Ihre persönlichen Nachrichten';
 
 $txt['kilobyte'] = 'KB';
 $txt['megabyte'] = 'MB';
 
-$txt['more_stats'] = '[More Stats]';
+$txt['more_stats'] = '[Mehr Statistiken]';
 
 // Use numeric entities in the below three strings.
 $txt['code'] = 'Code';
-$txt['code_select'] = '[Select]';
-$txt['quote_from'] = 'Quote from';
-$txt['quote'] = 'Quote';
-$txt['quote_new'] = 'New topic';
-$txt['follow_ups'] = 'Follow-ups';
-$txt['topic_derived_from'] = 'Topic derived from %1$s';
-$txt['fulledit'] = 'Full&nbsp;edit';
-$txt['edit'] = 'Edit';
-$txt['quick_edit'] = 'Quick Edit';
-$txt['post_options'] = 'More...';
+$txt['code_select'] = '[Auswählen]';
+$txt['quote_from'] = 'Zitat von';
+$txt['quote'] = 'Zitat';
+$txt['quote_new'] = 'Neues Thema';
+$txt['follow_ups'] = 'Antworten';
+$txt['topic_derived_from'] = 'Thema abgeleitet von %1$s';
+$txt['fulledit'] = 'Kompletter&nbsp;Editor';
+$txt['edit'] = 'Ändern';
+$txt['quick_edit'] = 'Schnell ändern';
+$txt['post_options'] = 'Mehr...';
 
-$txt['set_sticky'] = 'Set topic sticky';
-$txt['set_nonsticky'] = 'Set topic non-sticky';
-$txt['set_lock'] = 'Lock topic';
-$txt['set_unlock'] = 'Unlock topic';
+$txt['set_sticky'] = 'Thema anheften';
+$txt['set_nonsticky'] = 'Thema nicht mehr anheften';
+$txt['set_lock'] = 'Thema sperren';
+$txt['set_unlock'] = 'Thema entsperren';
 
-$txt['search_advanced'] = 'Show advanced options';
-$txt['search_simple'] = 'Hide advanced options';
+$txt['search_advanced'] = 'Erweiterte Optionen anzeigen';
+$txt['search_simple'] = 'Erweiterte Optionen verstecken';
 
-$txt['security_risk'] = 'MAJOR SECURITY RISK:';
-$txt['not_removed'] = 'You have not removed ';
-$txt['not_removed_extra'] = '%1$s is a backup of %2$s that was not generated by ElkArte. It can be accessed directly and used to gain unauthorised access to your forum. You should delete it immediately.';
-$txt['generic_warning'] = 'Warning';
-$txt['agreement_missing'] = 'You are requiring new users to accept a registration agreement, however the file (agreement.txt) doesn\'t exist.';
+$txt['security_risk'] = 'GROSSES SICHERHEITSRISIKO:';
+$txt['not_removed'] = 'Sie haben vergessen, ';
+$txt['not_removed_2'] = 'zu entfernen';
+$txt['not_removed_extra'] = '%1$s ist eine Sicherungskopie von %2$s, die nicht von ElkArte erzeugt wurde. Sie kann direkt aufgerufen und verwendet werden, um vollen Zugriff auf das Forum zu erhalten. Sie sollten sie umgehend löschen.';
+$txt['generic_warning'] = 'Warnung';
+$txt['agreement_missing'] = 'Sie haben eingestellt, dass neue Benutzer einer Vereinbarung zustimmen müssen, diese (agreement.txt) existiert jedoch nicht.';
 
-$txt['cache_writable'] = 'The cache directory is not writable - this will adversely affect the performance of your forum.';
+$txt['cache_writable'] = 'Das Cacheverzeichnis ist nicht beschreibbar - dies wird sich negativ auf die Geschwindigkeit Ihres Forums auswirken.';
 
-$txt['page_created'] = 'Page created in '; //Deprecated
-$txt['seconds_with'] = ' seconds with '; //Deprecated
-$txt['queries'] = ' queries.'; //Deprecated
-$txt['page_created_full'] = 'Page created in %1$.3f seconds with %2$d queries.';
+$txt['page_created'] = 'Seite erstellt in '; //Deprecated
+$txt['seconds_with'] = ' Sekunden mit '; //Deprecated
+$txt['queries'] = ' Abfragen.'; //Deprecated
+$txt['page_created_full'] = 'Seite erstellt in %1$.3f Sekunden mit %2$d Abfragen.';
 
 $txt['report_to_mod_func'] = 'Use this function to inform the moderators and administrators of an abusive or wrongly posted message.<br /><em>Please note that your email address will be revealed to the moderators if you use this.</em>';
 

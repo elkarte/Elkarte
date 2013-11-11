@@ -7,13 +7,13 @@ $txt['moderation_center'] = 'Moderationszentrum';
 $txt['mc_main'] = 'Hauptseite';
 $txt['mc_logs'] = 'Protokolle';
 $txt['mc_posts'] = 'Beiträge';
-$txt['mc_groups'] = 'Benutzer und Gruppen';
+$txt['mc_groups'] = 'Mitglieder und Gruppen';
 
 $txt['mc_view_groups'] = 'Benutzergruppen ansehen';
 
 $txt['mc_description'] = '<strong>%1$s %2$s!</strong><br>Dies ist Ihr &quot;Moderationszentrum&quot;. Von hier aus können Sie alle Moderationshandlungen durchführen, die Ihnen vom Administrator genehmigt wurden. Diese Seite stellt eine Übersicht über die neuesten Geschehnisse in Ihrer Community bereit. Sie können <a href="' . $scripturl . '?action=moderate;area=settings">die Darstellung anpassen, indem Sie hier klicken</a>.';
 $txt['mc_group_requests'] = 'Benutzergruppenanfragen';
-$txt['mc_member_requests'] = 'Benutzeranfragen';
+$txt['mc_member_requests'] = 'Mitgliedsanfragen';
 $txt['mc_unapproved_posts'] = 'Nicht freigegebene Beiträge';
 $txt['mc_watched_users'] = 'Zuletzt beobachtete Mitglieder';
 $txt['mc_watched_topics'] = 'Beobachtete Themen';
@@ -59,7 +59,7 @@ $txt['mc_reportedp_ignore_confirm'] = 'Sind Sie sich sicher, dass Sie weitere Me
 $txt['mc_reportedp_close_selected'] = 'Ausgewählte schließen';
 
 $txt['mc_groupr_group'] = 'Benutzergruppen';
-$txt['mc_groupr_member'] = 'Benutzer';
+$txt['mc_groupr_member'] = 'Mitglied';
 $txt['mc_groupr_reason'] = 'Grund';
 $txt['mc_groupr_none_found'] = 'Es gibt keine offenen Anfragen für eine Gruppenmitgliedschaft.';
 $txt['mc_groupr_submit'] = 'Übernehmen';
@@ -108,7 +108,7 @@ $txt['mc_watched_users_no_posts'] = 'Es gibt keine Beiträge von beobachteten Be
 $txt['mc_watched_users_delete_post'] = 'Sind Sie sich sicher, dass Sie diesen Beitrag löschen möchten?';
 $txt['mc_watched_users_delete_posts'] = 'Sind Sie sich sicher, dass Sie diese Beiträge löschen möchten?';
 $txt['mc_watched_users_posted'] = 'Verfasst';
-$txt['mc_watched_users_member'] = 'Benutzer';
+$txt['mc_watched_users_member'] = 'Mitglied';
 
 $txt['mc_warnings_description'] = 'In diesem Bereich können Sie sehen, welche Verwarnungen gegenüber Benutzern des Forums ausgesprochen wurden. Sie können hier zudem die Vorlagen ändern, die beim Verwarnen von Benutzern verwendet werden.';
 $txt['mc_warning_log'] = 'Protokoll';
