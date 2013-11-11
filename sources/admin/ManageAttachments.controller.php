@@ -624,12 +624,13 @@ class ManageAttachments_Controller extends Action_Controller
 	 * Calculates file statistics (total file size, number of attachments,
 	 * number of avatars, attachment space available).
 	 *
-	 * @uses the 'maintain' sub template.
+	 * @uses the 'maintenance' sub template.
 	 */
 	public function action_maintenance()
 	{
 		global $context, $modSettings;
 
+		loadTemplate('ManageAttachments');
 		$context['sub_template'] = 'maintenance';
 
 		// We're working with them attachments here!
@@ -822,14 +823,22 @@ class ManageAttachments_Controller extends Action_Controller
 	}
 
 	/**
-	 * This function should find attachments in the database that no longer exist and clear them, and fix filesize issues.
-	 * @todo Move db queries to ManageAttachments.subs.php
+	 * This function will performs many attachment checks and provides ways to fix them
+	 * Checks for the following common issues
+	 *  - Orphan Thumbnails
+	 *  - Attachments that have no thumbnails
+	 *  - Attachments that list thumbnails, but actually, don't have any
+	 *  - Attachments list in the wrong_folder
+	 *  - Attachments that dont exists on disk anylonger
+	 *  - Attachments that are zero size
+	 *  - Attachments that file size does not match the DB size
+	 *  - Attachments that no longer have a message
+	 *  - Avatars with no members associated with them.
+	 * 	- Attachments that are in the attachment folder, but not listed in the DB
 	 */
 	public function action_repair()
 	{
 		global $modSettings, $context, $txt;
-
-		$db = database();
 
 		checkSession('get');
 
@@ -855,9 +864,7 @@ class ManageAttachments_Controller extends Action_Controller
 				if (empty($_POST['to_fix']))
 					redirectexit('action=admin;area=manageattachments;sa=maintenance');
 
-				$_SESSION['attachments_to_fix'] = array();
-				// @todo No need to do this I think.
-				foreach ($_POST['to_fix'] as $key => $value)
+				foreach($_POST['to_fix'] as $key => $value)
 					$_SESSION['attachments_to_fix'][] = $value;
 			}
 		}
@@ -889,55 +896,13 @@ class ManageAttachments_Controller extends Action_Controller
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_remove = array();
-
-				$result = $db->query('', '
-					SELECT thumb.id_attach, thumb.id_folder, thumb.filename, thumb.file_hash
-					FROM {db_prefix}attachments AS thumb
-						LEFT JOIN {db_prefix}attachments AS tparent ON (tparent.id_thumb = thumb.id_attach)
-					WHERE thumb.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND thumb.attachment_type = {int:thumbnail}
-						AND tparent.id_attach IS NULL',
-					array(
-						'thumbnail' => 3,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					// Only do anything once... just in case
-					if (!isset($to_remove[$row['id_attach']]))
-					{
-						$to_remove[$row['id_attach']] = $row['id_attach'];
-						$context['repair_errors']['missing_thumbnail_parent']++;
-
-						// If we are repairing remove the file from disk now.
-						if ($fix_errors && in_array('missing_thumbnail_parent', $to_fix))
-						{
-							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-							@unlink($filename);
-						}
-					}
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'missing_thumbnail_parent';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove) && in_array('missing_thumbnail_parent', $to_fix))
-					$db->query('', '
-						DELETE FROM {db_prefix}attachments
-						WHERE id_attach IN ({array_int:to_remove})
-							AND attachment_type = {int:attachment_type}',
-						array(
-							'to_remove' => $to_remove,
-							'attachment_type' => 3,
-						)
-					);
+				$removed = findOrphanThumbnails($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['missing_thumbnail_parent'] += count($removed);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
+			// Done here, on to the next
 			$_GET['step'] = 1;
 			$_GET['substep'] = 0;
 			pauseAttachmentMaintenance($to_fix);
@@ -950,153 +915,35 @@ class ManageAttachments_Controller extends Action_Controller
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_update = array();
-
-				$result = $db->query('', '
-					SELECT a.id_attach
-					FROM {db_prefix}attachments AS a
-						LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
-					WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND a.id_thumb != {int:no_thumb}
-						AND thumb.id_attach IS NULL',
-					array(
-						'no_thumb' => 0,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					$to_update[] = $row['id_attach'];
-					$context['repair_errors']['parent_missing_thumbnail']++;
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'parent_missing_thumbnail';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_update) && in_array('parent_missing_thumbnail', $to_fix))
-					$db->query('', '
-						UPDATE {db_prefix}attachments
-						SET id_thumb = {int:no_thumb}
-						WHERE id_attach IN ({array_int:to_update})',
-						array(
-							'to_update' => $to_update,
-							'no_thumb' => 0,
-						)
-					);
+				$to_update = findParentsOrphanThumbnails($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['parent_missing_thumbnail'] += count($to_update);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
+			// Another step done, but many to go
 			$_GET['step'] = 2;
 			$_GET['substep'] = 0;
 			pauseAttachmentMaintenance($to_fix);
+
 		}
 
 		// This may take forever I'm afraid, but life sucks... recount EVERY attachments!
 		if ($_GET['step'] <= 2)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments',
-				array(
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = maxAttachment();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 250)
 			{
 				$to_remove = array();
-				$errors_found = array();
-
-				$result = $db->query('', '
-					SELECT id_attach, id_folder, filename, file_hash, size, attachment_type
-					FROM {db_prefix}attachments
-					WHERE id_attach BETWEEN {int:substep} AND {int:substep} + 249',
-					array(
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					// Get the filename.
-					if ($row['attachment_type'] == 1)
-						$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
-					else
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-
-					// File doesn't exist?
-					if (!file_exists($filename))
-					{
-						// If we're lucky it might just be in a different folder.
-						if (!empty($modSettings['currentAttachmentUploadDir']))
-						{
-							// Get the attachment name with out the folder.
-							$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
-
-							if (!is_array($modSettings['attachmentUploadDir']))
-								$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-
-							// Loop through the other folders.
-							foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
-								if (file_exists($dir . '/' . $attachment_name))
-								{
-									$context['repair_errors']['wrong_folder']++;
-									$errors_found[] = 'wrong_folder';
-
-									// Are we going to fix this now?
-									if ($fix_errors && in_array('wrong_folder', $to_fix))
-										attachment_folder($row['id_attach'], $id);
-
-									continue 2;
-								}
-						}
-
-						$to_remove[] = $row['id_attach'];
-						$context['repair_errors']['file_missing_on_disk']++;
-						$errors_found[] = 'file_missing_on_disk';
-					}
-					elseif (filesize($filename) == 0)
-					{
-						$context['repair_errors']['file_size_of_zero']++;
-						$errors_found[] = 'file_size_of_zero';
-
-						// Fixing?
-						if ($fix_errors && in_array('file_size_of_zero', $to_fix))
-						{
-							$to_remove[] = $row['id_attach'];
-							@unlink($filename);
-						}
-					}
-					elseif (filesize($filename) != $row['size'])
-					{
-						$context['repair_errors']['file_wrong_size']++;
-						$errors_found[] = 'file_wrong_size';
-
-						// Fix it here?
-						if ($fix_errors && in_array('file_wrong_size', $to_fix))
-							attachment_filesize($row['id_attach'], filesize($filename));
-					}
-				}
-
-				if (in_array('file_missing_on_disk', $errors_found))
-					$to_fix[] = 'file_missing_on_disk';
-				if (in_array('file_size_of_zero', $errors_found))
-					$to_fix[] = 'file_size_of_zero';
-				if (in_array('file_wrong_size', $errors_found))
-					$to_fix[] = 'file_wrong_size';
-				if (in_array('wrong_folder', $errors_found))
-					$to_fix[] = 'wrong_folder';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove))
-					removeOrphanAttachments($to_remove);
+				$repair_errors = repairAttachmentData($_GET['substep'], $fix_errors, $to_fix);
+				foreach($repair_errors as $key => $value)
+					$context['repair_errors'][$key] += $value;
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
+			// And onward we go
 			$_GET['step'] = 3;
 			$_GET['substep'] = 0;
 			pauseAttachmentMaintenance($to_fix);
@@ -1105,65 +952,12 @@ class ManageAttachments_Controller extends Action_Controller
 		// Get avatars with no members associated with them.
 		if ($_GET['step'] <= 3)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments',
-				array(
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = maxAttachment();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_remove = array();
-
-				$result = $db->query('', '
-					SELECT a.id_attach, a.id_folder, a.filename, a.file_hash, a.attachment_type
-					FROM {db_prefix}attachments AS a
-						LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
-					WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND a.id_member != {int:no_member}
-						AND a.id_msg = {int:no_msg}
-						AND mem.id_member IS NULL',
-					array(
-						'no_member' => 0,
-						'no_msg' => 0,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					$to_remove[] = $row['id_attach'];
-					$context['repair_errors']['avatar_no_member']++;
-
-					// If we are repairing remove the file from disk now.
-					if ($fix_errors && in_array('avatar_no_member', $to_fix))
-					{
-						if ($row['attachment_type'] == 1)
-							$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
-						else
-							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-						@unlink($filename);
-					}
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'avatar_no_member';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove) && in_array('avatar_no_member', $to_fix))
-					$db->query('', '
-						DELETE FROM {db_prefix}attachments
-						WHERE id_attach IN ({array_int:to_remove})
-							AND id_member != {int:no_member}
-							AND id_msg = {int:no_msg}',
-						array(
-							'to_remove' => $to_remove,
-							'no_member' => 0,
-							'no_msg' => 0,
-						)
-					);
+				$to_remove = findOrphanAvatars($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['avatar_no_member'] += count($to_remove);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
@@ -1180,51 +974,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_remove = array();
-
-				$result = $db->query('', '
-					SELECT a.id_attach, a.id_folder, a.filename, a.file_hash
-					FROM {db_prefix}attachments AS a
-						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
-					WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND a.id_member = {int:no_member}
-						AND a.id_msg != {int:no_msg}
-						AND m.id_msg IS NULL',
-					array(
-						'no_member' => 0,
-						'no_msg' => 0,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					$to_remove[] = $row['id_attach'];
-					$context['repair_errors']['attachment_no_msg']++;
-
-					// If we are repairing remove the file from disk now.
-					if ($fix_errors && in_array('attachment_no_msg', $to_fix))
-					{
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-						@unlink($filename);
-					}
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'attachment_no_msg';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove) && in_array('attachment_no_msg', $to_fix))
-					$db->query('', '
-						DELETE FROM {db_prefix}attachments
-						WHERE id_attach IN ({array_int:to_remove})
-							AND id_member = {int:no_member}
-							AND id_msg != {int:no_msg}',
-						array(
-							'to_remove' => $to_remove,
-							'no_member' => 0,
-							'no_msg' => 0,
-						)
-					);
+				$to_remove = findOrphanAttachments($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['attachment_no_msg'] += count($to_remove);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
@@ -1251,7 +1002,7 @@ class ManageAttachments_Controller extends Action_Controller
 				{
 					while ($file = readdir($dir))
 					{
-						if ($file == '.' || $file == '..')
+						if ($file == '.' || $file == '..' || $file == '.htaccess')
 							continue;
 
 						if ($files_checked <= $current_check)
@@ -1272,28 +1023,18 @@ class ManageAttachments_Controller extends Action_Controller
 									if (!validateAttachID($attachID))
 									{
 										if ($fix_errors && in_array('files_without_attachment', $to_fix))
-										{
 											@unlink($attach_dir . '/' . $file);
-										}
 										else
-										{
 											$context['repair_errors']['files_without_attachment']++;
-											$to_fix[] = 'files_without_attachment';
-										}
 									}
 								}
 							}
 							elseif ($file != 'index.php')
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix))
-								{
 									@unlink($attach_dir . '/' . $file);
-								}
 								else
-								{
 									$context['repair_errors']['files_without_attachment']++;
-									$to_fix[] = 'files_without_attachment';
-								}
 							}
 						}
 						$current_check++;

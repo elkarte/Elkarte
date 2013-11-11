@@ -1872,6 +1872,352 @@ function maxNoThumb()
 }
 
 /**
+ * Finds orphan thumbnails in the database
+ * Checks in groups of 500
+ * Called by attachment maintance
+ * If $fix_errors is set to true it will attempt to remove the thumbnail from disk
+ *
+ * @param int $start
+ * @param boolean $fix_errors
+ * @param array $to_fix
+ */
+function findOrphanThumbnails($start, $fix_errors, $to_fix)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT thumb.id_attach, thumb.id_folder, thumb.filename, thumb.file_hash
+		FROM {db_prefix}attachments AS thumb
+			LEFT JOIN {db_prefix}attachments AS tparent ON (tparent.id_thumb = thumb.id_attach)
+		WHERE thumb.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+			AND thumb.attachment_type = {int:thumbnail}
+			AND tparent.id_attach IS NULL',
+		array(
+			'thumbnail' => 3,
+			'substep' => $start,
+		)
+	);
+	$to_remove = array();
+	if ($db->num_rows($result) != 0)
+	{
+		$to_fix[] = 'missing_thumbnail_parent';
+		while ($row = $db->fetch_assoc($result))
+		{
+			// Only do anything once... just in case
+			if (!isset($to_remove[$row['id_attach']]))
+			{
+				$to_remove[$row['id_attach']] = $row['id_attach'];
+
+				// If we are repairing remove the file from disk now.
+				if ($fix_errors && in_array('missing_thumbnail_parent', $to_fix))
+				{
+					$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+					@unlink($filename);
+				}
+			}
+		}
+	}
+	$db->free_result($result);
+
+	// Do we need to delete what we have?
+	if ($fix_errors && !empty($to_remove) && in_array('missing_thumbnail_parent', $to_fix))
+	{
+		$db->query('', '
+			DELETE FROM {db_prefix}attachments
+			WHERE id_attach IN ({array_int:to_remove})
+				AND attachment_type = {int:attachment_type}',
+			array(
+				'to_remove' => $to_remove,
+				'attachment_type' => 3,
+			)
+		);
+	}
+
+	return $to_remove;
+}
+
+/**
+ * Finds parents who thing they do have thumbnails, but dont
+ * Checks in groups of 500
+ * Called by attachment maintance
+ * If $fix_errors is set to true it will attempt to remove the thumbnail from disk
+ *
+ * @param int $start
+ * @param boolean $fix_errors
+ * @param array $to_fix
+ */
+function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT a.id_attach
+		FROM {db_prefix}attachments AS a
+			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
+		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+			AND a.id_thumb != {int:no_thumb}
+			AND thumb.id_attach IS NULL',
+		array(
+			'no_thumb' => 0,
+			'substep' => $start,
+		)
+	);
+	$to_update = array();
+	if ($db->num_rows($result) != 0)
+	{
+		while ($row = $db->fetch_assoc($result))
+			$to_update[] = $row['id_attach'];
+	}
+	$db->free_result($result);
+
+	// Do we need to delete what we have?
+	if ($fix_errors && !empty($to_update) && in_array('parent_missing_thumbnail', $to_fix))
+	{
+		$db->query('', '
+			UPDATE {db_prefix}attachments
+			SET id_thumb = {int:no_thumb}
+			WHERE id_attach IN ({array_int:to_update})',
+			array(
+				'to_update' => $to_update,
+				'no_thumb' => 0,
+			)
+		);
+	}
+
+	return $to_update;
+}
+
+/**
+ * Goes thought all the attachments and checks that they exist
+ * Goes in increments of 250
+ * if $fix_errors is true will remove empty files, update wrong filesizes in the DB and
+ * remove DB entries if the file can not be found.
+ *
+ * @param int $start
+ * @param boolean $fix_errors
+ * @param array $to_fix
+ */
+function repairAttachmentData($start, $fix_errors, $to_fix)
+{
+	global $modSettings;
+
+	$db = database();
+
+	$repair_errors = array(
+		'wrong_folder' => 0,
+		'file_missing_on_disk' => 0,
+		'file_size_of_zero' => 0,
+		'file_wrong_size' => 0
+	);
+
+	$result = $db->query('', '
+		SELECT id_attach, id_folder, filename, file_hash, size, attachment_type
+		FROM {db_prefix}attachments
+		WHERE id_attach BETWEEN {int:substep} AND {int:substep} + 249',
+		array(
+			'substep' => $start,
+		)
+	);
+	$to_remove = array();
+	while ($row = $db->fetch_assoc($result))
+	{
+		// Get the filename.
+		if ($row['attachment_type'] == 1)
+			$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
+		else
+			$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+
+		// File doesn't exist?
+		if (!file_exists($filename))
+		{
+			// If we're lucky it might just be in a different folder.
+			if (!empty($modSettings['currentAttachmentUploadDir']))
+			{
+				// Get the attachment name with out the folder.
+				$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
+
+				if (!is_array($modSettings['attachmentUploadDir']))
+					$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
+				// Loop through the other folders looking for this file
+				foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
+				{
+					if (file_exists($dir . '/' . $attachment_name))
+					{
+						$repair_errors['wrong_folder']++;
+
+						// Are we going to fix this now?
+						if ($fix_errors && in_array('wrong_folder', $to_fix))
+							attachment_folder($row['id_attach'], $id);
+
+						// Found it, on to the next attachment
+						continue 2;
+					}
+				}
+			}
+
+			// Could not find it anywhere
+			$to_remove[] = $row['id_attach'];
+			$repair_errors['file_missing_on_disk']++;
+		}
+		// An empty file on disk?
+		elseif (filesize($filename) == 0)
+		{
+			$repair_errors['file_size_of_zero']++;
+
+			// Fixing?
+			if ($fix_errors && in_array('file_size_of_zero', $to_fix))
+			{
+				$to_remove[] = $row['id_attach'];
+				@unlink($filename);
+			}
+		}
+		// Size listed and actual size are not the same?
+		elseif (filesize($filename) != $row['size'])
+		{
+			$repair_errors['file_wrong_size']++;
+
+			// Fix it here?
+			if ($fix_errors && in_array('file_wrong_size', $to_fix))
+				attachment_filesize($row['id_attach'], filesize($filename));
+		}
+	}
+	$db->free_result($result);
+
+	// Do we need to delete what we have?
+	if ($fix_errors && !empty($to_remove) && in_array('file_missing_on_disk', $to_fix))
+		removeOrphanAttachments($to_remove);
+
+	return $repair_errors;
+}
+
+/**
+ * Finds avatar files that are not assigned to any members
+ * If $fix_errors is set, it will
+ *
+ * @param int $start
+ * @param boolean $fix_errors
+ * @param array $to_fix
+ */
+function findOrphanAvatars($start, $fix_errors, $to_fix)
+{
+	global $modSettings;
+		
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash, a.attachment_type
+		FROM {db_prefix}attachments AS a
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
+		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+			AND a.id_member != {int:no_member}
+			AND a.id_msg = {int:no_msg}
+			AND mem.id_member IS NULL',
+		array(
+			'no_member' => 0,
+			'no_msg' => 0,
+			'substep' => $start,
+		)
+	);
+	$to_remove = array();
+	if ($db->num_rows($result) != 0)
+	{
+		while ($row = $db->fetch_assoc($result))
+		{
+			$to_remove[] = $row['id_attach'];
+
+			// If we are repairing remove the file from disk now.
+			if ($fix_errors && in_array('avatar_no_member', $to_fix))
+			{
+				if ($row['attachment_type'] == 1)
+					$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
+				else
+					$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+				@unlink($filename);
+			}
+		}
+	}
+	$db->free_result($result);
+
+	// Do we need to delete what we have?
+	if ($fix_errors && !empty($to_remove) && in_array('avatar_no_member', $to_fix))
+	{
+		$db->query('', '
+			DELETE FROM {db_prefix}attachments
+			WHERE id_attach IN ({array_int:to_remove})
+				AND id_member != {int:no_member}
+				AND id_msg = {int:no_msg}',
+			array(
+				'to_remove' => $to_remove,
+				'no_member' => 0,
+				'no_msg' => 0,
+			)
+		);
+	}
+
+	return $to_remove;
+}
+
+/**
+ * Finds attachments that are not used in any message
+ *
+ * @param int $start
+ * @param boolean $fix_errors
+ * @param array $to_fix
+ */
+function findOrphanAttachments($start, $fix_errors, $to_fix)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash
+		FROM {db_prefix}attachments AS a
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+		WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
+			AND a.id_member = {int:no_member}
+			AND a.id_msg != {int:no_msg}
+			AND m.id_msg IS NULL',
+		array(
+			'no_member' => 0,
+			'no_msg' => 0,
+			'substep' => $start,
+		)
+	);
+	$to_remove = array();
+	if ($db->num_rows($result) != 0)
+	{
+		while ($row = $db->fetch_assoc($result))
+		{
+			$to_remove[] = $row['id_attach'];
+
+			// If we are repairing remove the file from disk now.
+			if ($fix_errors && in_array('attachment_no_msg', $to_fix))
+			{
+				$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+				@unlink($filename);
+			}
+		}
+	}
+	$db->free_result($result);
+
+	// Do we need to delete what we have?
+	if ($fix_errors && !empty($to_remove) && in_array('attachment_no_msg', $to_fix))
+	{
+		$db->query('', '
+			DELETE FROM {db_prefix}attachments
+			WHERE id_attach IN ({array_int:to_remove})
+				AND id_member = {int:no_member}
+				AND id_msg != {int:no_msg}',
+			array(
+				'to_remove' => $to_remove,
+				'no_member' => 0,
+				'no_msg' => 0,
+			)
+		);
+	}
+}
+
+/**
  * Get the max attachment ID which is a thumbnail.
  */
 function getMaxThumbnail()
