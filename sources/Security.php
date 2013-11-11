@@ -876,7 +876,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
  *
  * @param bool $complete = false
  */
-function cleanTokens($complete = false)
+function cleanTokens($complete = false, $suffix = '')
 {
 	// We appreciate cleaning up after yourselves.
 	if (!isset($_SESSION['token']))
@@ -884,8 +884,15 @@ function cleanTokens($complete = false)
 
 	// Clean up tokens, trying to give enough time still.
 	foreach ($_SESSION['token'] as $key => $data)
-		if ($data[2] + 10800 < time() || $complete)
+	{
+		if (!empty($suffix))
+			$force = $complete || strpos($key, $suffix);
+		else
+			$force = $complete;
+
+		if ($data[2] + 10800 < time() || $force)
 			unset($_SESSION['token'][$key]);
+	}
 }
 
 /**

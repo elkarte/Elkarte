@@ -369,11 +369,7 @@ class ModerationCenter_Controller extends Action_Controller
 		unset($_SESSION['moderate_time']);
 
 		// Clean any moderator tokens as well.
-		foreach ($_SESSION['token'] as $key => $token)
-		{
-			if (strpos($key, '-mod') !== false)
-				unset($_SESSION['token'][$key]);
-		}
+		cleanTokens(false, '-mod');
 
 		redirectexit('action=moderate');
 	}
