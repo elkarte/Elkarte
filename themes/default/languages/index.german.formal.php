@@ -732,176 +732,175 @@ $txt['buddies'] = 'Freunde';
 $txt['most_online_ever'] = 'Bisher am meisten online';
 $txt['most_online_today'] = 'Heute am meisten online';
 
-// TODO: Continue here.
-$txt['merge_select_target_board'] = 'Select the target board of the merged topic';
-$txt['merge_select_poll'] = 'Select which poll the merged topic should have';
-$txt['merge_topic_list'] = 'Select topics to be merged';
-$txt['merge_select_subject'] = 'Select subject of merged topic';
-$txt['merge_custom_subject'] = 'Custom subject';
-$txt['merge_enforce_subject'] = 'Change the subject of all the messages';
-$txt['merge_include_notifications'] = 'Include notifications?';
-$txt['merge_check'] = 'Merge?';
-$txt['merge_no_poll'] = 'No poll';
+$txt['merge_select_target_board'] = 'Wählen Sie das Zielforum des zusammengeführten Themas aus';
+$txt['merge_select_poll'] = 'Wählen Sie aus, welche Umfrage das zusammengeführte Thema haben soll';
+$txt['merge_topic_list'] = 'Wählen Sie die zusammenzuführenden Themen aus';
+$txt['merge_select_subject'] = 'Wählen Sie den Betreff des zusammengeführten Themas aus';
+$txt['merge_custom_subject'] = 'Eigener Betreff';
+$txt['merge_enforce_subject'] = 'Den Betreff aller Beiträge ändern';
+$txt['merge_include_notifications'] = 'Benachrichtigungen einschließen?';
+$txt['merge_check'] = 'Zusammenführen?';
+$txt['merge_no_poll'] = 'Keine Umfrage';
 
-$txt['response_prefix'] = 'Re: ';
-$txt['current_icon'] = 'Current Icon';
-$txt['message_icon'] = 'Message Icon';
+$txt['response_prefix'] = 'AW: ';
+$txt['current_icon'] = 'Aktuelles Symbol';
+$txt['message_icon'] = 'Nachrichtensymbol';
 
-$txt['smileys_current'] = 'Current Smiley Set';
-$txt['smileys_none'] = 'No Smileys';
-$txt['smileys_forum_board_default'] = 'Forum/Board Default';
+$txt['smileys_current'] = 'Aktueller Smileysatz';
+$txt['smileys_none'] = 'Keine Smileys';
+$txt['smileys_forum_board_default'] = 'Forumsstandard';
 
-$txt['search_results'] = 'Search Results';
-$txt['search_no_results'] = 'Sorry, no matches were found';
+$txt['search_results'] = 'Suchergebnisse';
+$txt['search_no_results'] = 'Verzeihung, es wurde nichts gefunden';
 
-$txt['totalTimeLogged1'] = 'Total time logged in: '; //Deprecated
-$txt['totalTimeLogged2'] = ' days, ';
-$txt['totalTimeLogged3'] = ' hours and ';
-$txt['totalTimeLogged4'] = ' minutes.';
-$txt['totalTimeLogged5'] = 'd ';
+$txt['totalTimeLogged1'] = 'Insgesamt angemeldet: '; //Deprecated
+$txt['totalTimeLogged2'] = ' Tage, ';
+$txt['totalTimeLogged3'] = ' Stunden und ';
+$txt['totalTimeLogged4'] = ' Minutes.';
+$txt['totalTimeLogged5'] = 'T '; // ? :-)
 $txt['totalTimeLogged6'] = 'h ';
 $txt['totalTimeLogged7'] = 'm';
 
-$txt['approve_thereis'] = 'There is'; //Deprecated
-$txt['approve_thereare'] = 'There are'; //Deprecated
-$txt['approve_member'] = 'one member'; //Deprecated
-$txt['approve_members'] = 'members'; //Deprecated
-$txt['approve_members_waiting'] = 'awaiting approval.'; //Deprecated
-$txt['approve_one_member_waiting'] = 'There is <a href="%1$s">one member</a> awaiting approval.';
-$txt['approve_many_members_waiting'] = 'There are <a href="%1$s">%2$d members</a> awaiting approval.';
+$txt['approve_thereis'] = 'Es wartet'; //Deprecated
+$txt['approve_thereare'] = 'Es warten'; //Deprecated
+$txt['approve_member'] = 'ein Mitglied'; //Deprecated
+$txt['approve_members'] = 'Mitglieder'; //Deprecated
+$txt['approve_members_waiting'] = 'auf Freischaltung.'; //Deprecated
+$txt['approve_one_member_waiting'] = 'Es wartet <a href="%1$s">ein Mitglied</a> auf Freischaltung.';
+$txt['approve_many_members_waiting'] = 'Es warten <a href="%1$s">%2$d Mitglieder</a> auf Freischaltung.';
 
-$txt['notifyboard_turnon'] = 'Do you want a notification email when someone posts a new topic in this board?';
-$txt['notifyboard_turnoff'] = 'Are you sure you do not want to receive new topic notifications for this board?';
+$txt['notifyboard_turnon'] = 'Möchten Sie eine Benachrichtigungsmail erhalten, wenn jemand ein neues Thema in diesem Forum erstellt?';
+$txt['notifyboard_turnoff'] = 'Sind Sie sich sicher, dass Sie keine Benachrichtigungsmails bei neuen Themen in diesem Forum mehr erhalten möchten?';
 
-$txt['activate_code'] = 'Your activation code is';
+$txt['activate_code'] = 'Ihr Aktivierungscode lautet';
 
-$txt['find_members'] = 'Find Members';
-$txt['find_username'] = 'Name, username, or email address';
-$txt['find_buddies'] = 'Show Buddies Only?';
-$txt['find_wildcards'] = 'Allowed Wildcards: *, ?';
-$txt['find_no_results'] = 'No results found';
-$txt['find_results'] = 'Results';
-$txt['find_close'] = 'Close';
+$txt['find_members'] = 'Mitglieder suchen';
+$txt['find_username'] = 'Name, Benutzername oder E-Mail-Adresse';
+$txt['find_buddies'] = 'Nur Freunde anzeigen?';
+$txt['find_wildcards'] = 'Erlaubte Platzhalter: *, ?';
+$txt['find_no_results'] = 'Nichts gefunden';
+$txt['find_results'] = 'Ergebnisse';
+$txt['find_close'] = 'Schließen';
 
-$txt['unread_since_visit'] = 'Show unread posts since last visit.';
-$txt['show_unread_replies'] = 'Show new replies to your posts.';
+$txt['unread_since_visit'] = 'Ungelesene Beiträge seit dem letzten Besuch anzeigen.';
+$txt['show_unread_replies'] = 'Neue Antworten auf Ihre Beiträge anzeigen.';
 
-$txt['change_color'] = 'Change Color';
+$txt['change_color'] = 'Farbe ändern';
 
-$txt['quickmod_delete_selected'] = 'Remove Selected';
-$txt['quickmod_split_selected'] = 'Split Selected';
+$txt['quickmod_delete_selected'] = 'Ausgewählte löschen';
+$txt['quickmod_split_selected'] = 'Ausgewählte aufteilen';
 
-$txt['show_personal_messages_heading'] = 'New messages';
-$txt['show_personal_messages'] = 'You have <strong>%1$s</strong> unread personal messages in your inbox.<br /><br /><a href="%2$s">Go to your inbox</a>';
+$txt['show_personal_messages_heading'] = 'Neue Nachrichten';
+$txt['show_personal_messages'] = 'Sie haben <strong>%1$s</strong> ungelesene private Nachrichten in Ihrem Posteingang.<br /><br /><a href="%2$s">Zum Posteingang wechseln</a>';
 
-$txt['help_popup'] = 'A little lost? Let me explain:';
+$txt['help_popup'] = 'Sie wissen nicht weiter? Lassen Sie mich erklären:';
 
-$txt['previous_next_back'] = 'previous topic';
-$txt['previous_next_forward'] = 'next topic';
+$txt['previous_next_back'] = 'vorheriges Thema';
+$txt['previous_next_forward'] = 'nächstes Thema';
 
-$txt['upshrink_description'] = 'Shrink or expand the header.';
+$txt['upshrink_description'] = 'Die Kopfzeile ein- oder ausklappen.';
 
-$txt['mark_unread'] = 'Mark unread';
+$txt['mark_unread'] = 'Als ungelesen markieren';
 
-$txt['ssi_not_direct'] = 'Please don\'t access SSI.php by URL directly; you may want to use the path (%1$s) or add ?ssi_function=something.';
-$txt['ssi_session_broken'] = 'SSI.php was unable to load a session!  This may cause problems with logout and other functions - please make sure SSI.php is included before *anything* else in all your scripts!';
+$txt['ssi_not_direct'] = 'Bitte greifen Sie nicht per URL direkt auf SSI.php zu; Sie sollten den Pfad (%1$s) verwenden oder ?ssi_function=irgendwas hinzufügen.';
+$txt['ssi_session_broken'] = 'SSI.php konnte keine Sitzung laden!  Dies könnte Probleme beim Abmelden und anderen Funktionen verursachen - bitte stellen Sie sicher, dass SSI.php in all Ihren Scripts vor *irgendetwas* anderem eingebunden wird!';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
-$txt['preview_title'] = 'Preview post';
-$txt['preview_fetch'] = 'Fetching preview...';
-$txt['preview_new'] = 'New message';
-$txt['pm_error_while_submitting'] = 'The following error or errors occurred while sending this personal message:';
-$txt['error_while_submitting'] = 'The message has the following error or errors that must be corrected before continuing:';
-$txt['error_old_topic'] = 'Warning: this topic has not been posted in for at least %1$d days.<br />Unless you\'re sure you want to reply, please consider starting a new topic.';
+$txt['preview_title'] = 'Beitragsvorschau';
+$txt['preview_fetch'] = 'Hole Vorschau...';
+$txt['preview_new'] = 'Neue Nachricht';
+$txt['pm_error_while_submitting'] = 'Folgende Fehler traten beim Versand dieser privaten Nachricht auf:';
+$txt['error_while_submitting'] = 'Die Nachricht hat folgende Fehler, die vor dem Versand korrigiert werden müssen:';
+$txt['error_old_topic'] = 'Warnung: In diesem Thema wurde seit %1$d Tagen nichts geschrieben.<br />Falls Sie sich nicht sicher sind, ob Sie hier antworten müssen, ziehen Sie bitte in Erwägung, ein neues Thema zu eröffnen.';
 
-$txt['split_selected_posts'] = 'Selected posts';
-$txt['split_selected_posts_desc'] = 'The posts below will form a new topic after splitting.';
-$txt['split_reset_selection'] = 'reset selection';
+$txt['split_selected_posts'] = 'Ausgewählte Beiträge';
+$txt['split_selected_posts_desc'] = 'Unten stehende Beiträge werden nach der Aufteilung ein neues Thema bilden.';
+$txt['split_reset_selection'] = 'Auswahl zurücksetzen';
 
-$txt['modify_cancel'] = 'Cancel';
-$txt['mark_read_short'] = 'Mark Read';
+$txt['modify_cancel'] = 'Abbrechen';
+$txt['mark_read_short'] = 'Als gelesen markieren';
 
-$txt['hello_member_ndt'] = 'Hello';
+$txt['hello_member_ndt'] = 'Hallo';
 
-$txt['unapproved_posts'] = 'Unapproved Posts (Topics: %1$d, Posts: %2$d)';
+$txt['unapproved_posts'] = 'Nicht freigeschaltete Beiträge (Themen: %1$d, Beiträge: %2$d)';
 
-$txt['ajax_in_progress'] = 'Loading...';
+$txt['ajax_in_progress'] = 'Lade...';
 
-$txt['mod_reports_waiting'] = 'There are currently %1$d moderator reports open.';
+$txt['mod_reports_waiting'] = 'Derzeit gibt es %1$s offene Moderationsberichte.';
 
-$txt['new_posts_in_category'] = 'Click to see the new posts in %1$s';
-$txt['verification'] = 'Verification';
-$txt['visual_verification_hidden'] = 'Please leave this box empty';
-$txt['visual_verification_description'] = 'Type the letters shown in the picture';
-$txt['visual_verification_sound'] = 'Listen to the letters';
-$txt['visual_verification_request_new'] = 'Request another image';
+$txt['new_posts_in_category'] = 'Klicken Sie hier, um die neuen Beiträge in %1$s anzusehen';
+$txt['verification'] = 'Verifizierung';
+$txt['visual_verification_hidden'] = 'Bitte lassen Sie dieses Feld leer';
+$txt['visual_verification_description'] = 'Geben Sie die Buchstaben im Bild ein';
+$txt['visual_verification_sound'] = 'Hören Sie den Buchstaben zu';
+$txt['visual_verification_request_new'] = 'Ein anderes Bild anfordern';
 
 // Sub menu labels
-$txt['calendar_menu'] = 'View Calendar';
+$txt['calendar_menu'] = 'Kalender ansehen';
 
 // @todo Send email strings - should move?
-$txt['send_email'] = 'Send Email';
-$txt['send_email_disclosed'] = 'Note this will be visible to the recipient.';
-$txt['send_email_subject'] = 'Email Subject';
+$txt['send_email'] = 'E-Mail senden';
+$txt['send_email_disclosed'] = 'Beachten Sie, dass dies für den Empfänger sichtbar sein wird.';
+$txt['send_email_subject'] = 'E-Mail-Betreff';
 
-$txt['ignoring_user'] = 'You are ignoring this user.';
-$txt['show_ignore_user_post'] = 'Show me the post.';
+$txt['ignoring_user'] = 'Sie ignorieren diesen Benutzer.';
+$txt['show_ignore_user_post'] = 'Zeig\' mir den Beitrag.';
 
-$txt['spider'] = 'Spider';
-$txt['spiders'] = 'Spiders';
+$txt['spider'] = 'Spinne'; // ? :-)
+$txt['spiders'] = 'Spinnen'; // ? :-)
 $txt['openid'] = 'OpenID';
 
 $txt['downloads'] = 'Downloads';
-$txt['filesize'] = 'Filesize';
-$txt['subscribe_webslice'] = 'Subscribe to Webslice';
+$txt['filesize'] = 'Dateigröße';
+$txt['subscribe_webslice'] = 'Webslice abonnieren';
 
 // Restore topic
-$txt['restore_topic'] = 'Restore Topic';
-$txt['restore_message'] = 'Restore';
-$txt['quick_mod_restore'] = 'Restore Selected';
+$txt['restore_topic'] = 'Thema wiederherstellen';
+$txt['restore_message'] = 'Wiederherstellen';
+$txt['quick_mod_restore'] = 'Ausgewählte wiederherstellen';
 
 // Editor prompt.
-$txt['prompt_text_email'] = 'Please enter the email address.';
-$txt['prompt_text_ftp'] = 'Please enter the ftp address.';
-$txt['prompt_text_url'] = 'Please enter the URL you wish to link to.';
-$txt['prompt_text_img'] = 'Enter image location';
+$txt['prompt_text_email'] = 'Bitte geben Sie die E-Mail-Adresse ein.';
+$txt['prompt_text_ftp'] = 'Bitte geben Sie die FTP-Adresse ein.';
+$txt['prompt_text_url'] = 'Bitte geben Sie den URL ein, auf den Sie verweisen möchten.';
+$txt['prompt_text_img'] = 'Geben Sie den Ort des Bildes ein';
 
 // Escape any single quotes in here twice.. 'it\'s' -> 'it\\\'s'.
-$txt['autosuggest_delete_item'] = 'Delete Item';
+$txt['autosuggest_delete_item'] = 'Element löschen';
 
 // Bad Behavior
-$txt['badbehavior_blocked'] = '<a href="http://www.bad-behavior.ioerror.us/">Bad Behavior</a> has blocked %1$s access attempts in the last 7 days.';
+$txt['badbehavior_blocked'] = '<a href="http://www.bad-behavior.ioerror.us/">Bad Behavior</a> hat in den letzten 7 Tagen %1$s Zugriffsversuche vereitelt.';
 
 // Debug related - when $db_show_debug is true.
-$txt['debug_templates'] = 'Templates: ';
-$txt['debug_subtemplates'] = 'Sub templates: ';
-$txt['debug_language_files'] = 'Language files: ';
-$txt['debug_stylesheets'] = 'Style sheets: ';
+$txt['debug_templates'] = 'Vorlagen: ';
+$txt['debug_subtemplates'] = 'Untervorlagen: ';
+$txt['debug_language_files'] = 'Sprachdateien: ';
+$txt['debug_stylesheets'] = 'Stylesheets: ';
 $txt['debug_javascript'] = 'Scripts: ';
-$txt['debug_files_included'] = 'Files included: ';
+$txt['debug_files_included'] = 'Eingebundene Dateien: ';
 $txt['debug_kb'] = 'KB.';
-$txt['debug_show'] = 'show';
-$txt['debug_cache_hits'] = 'Cache hits: ';
-$txt['debug_cache_seconds_bytes'] = '%1$ss - %2$s bytes';
-$txt['debug_cache_seconds_bytes_total'] = '%1$ss for %2$s bytes';
-$txt['debug_queries_used'] = 'Queries used: %1$d.';
-$txt['debug_queries_used_and_warnings'] = 'Queries used: %1$d, %2$d warnings.';
-$txt['debug_query_in_line'] = 'in <em>%1$s</em> line <em>%2$s</em>, ';
-$txt['debug_query_which_took'] = 'which took %1$s seconds.';
-$txt['debug_query_which_took_at'] = 'which took %1$s seconds at %2$s into request.';
-$txt['debug_show_queries'] = '[Show Queries]';
-$txt['debug_hide_queries'] = '[Hide Queries]';
+$txt['debug_show'] = 'zeigen';
+$txt['debug_cache_hits'] = 'Cachetreffer: ';
+$txt['debug_cache_seconds_bytes'] = '%1$ss - %2$s Byte';
+$txt['debug_cache_seconds_bytes_total'] = '%1$ss für %2$s Byte';
+$txt['debug_queries_used'] = 'Verwendete Abfragen: %1$d.';
+$txt['debug_queries_used_and_warnings'] = 'Verwendete Abfragen: %1$d, %2$d Warnungen.';
+$txt['debug_query_in_line'] = 'in <em>%1$s</em> Zeile <em>%2$s</em>, ';
+$txt['debug_query_which_took'] = 'was %1$s Sekunden dauerte.';
+$txt['debug_query_which_took_at'] = 'which took %1$s seconds at %2$s into request.'; // ??? :-/
+$txt['debug_show_queries'] = '[Abfragen zeigen]';
+$txt['debug_hide_queries'] = '[Abfragen verstecken]';
 $txt['debug_tokens'] = 'Tokens: ';
-$txt['debug_browser'] = 'Browser ID: ';
-$txt['debug_hooks'] = 'Hooks called: ';
+$txt['debug_browser'] = 'Browser-ID: ';
+$txt['debug_hooks'] = 'Aufgerufene Hooks: ';
 
 // Video embedding
-$txt['preview_image'] = 'Video Preview Image';
-$txt['ctp_video'] = 'Click to play video, double click to load video';
-$txt['hide_video'] = 'Show/Hide video';
-$txt['youtube'] = 'YouTube video:';
-$txt['vimeo'] = 'Vimeo video:';
-$txt['dailymotion'] = 'Dailymotion video:';
+$txt['preview_image'] = 'Videovorschaubild';
+$txt['ctp_video'] = 'Klicken Sie, um das Video abzuspielen, doppelklicken Sie, um es zu laden';
+$txt['hide_video'] = 'Video anzeigen/verstecken';
+$txt['youtube'] = 'YouTube-Video:';
+$txt['vimeo'] = 'Vimeo-Video:';
+$txt['dailymotion'] = 'Dailymotion-Video:';
 
 // Spoiler BBC
-$txt['spoiler'] = 'Spoiler (click to show/hide)';
+$txt['spoiler'] = 'Spoiler (klicken zum Umschalten)';

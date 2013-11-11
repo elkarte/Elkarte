@@ -839,7 +839,7 @@ $txt['calendar_menu'] = 'View Calendar';
 // @todo Send email strings - should move?
 $txt['send_email'] = 'Send e-mail';
 $txt['send_email_disclosed'] = 'Note this will be visible to the recipient.';
-$txt['send_email_subject'] = 'e-mail Subject';
+$txt['send_email_subject'] = 'E-mail Subject';
 
 $txt['ignoring_user'] = 'You are ignoring this user.';
 $txt['show_ignore_user_post'] = 'Show me the post.';
@@ -849,7 +849,7 @@ $txt['spiders'] = 'Spiders';
 $txt['openid'] = 'OpenID';
 
 $txt['downloads'] = 'Downloads';
-$txt['filesize'] = 'Filesize';
+$txt['filesize'] = 'File size';
 $txt['subscribe_webslice'] = 'Subscribe to Webslice';
 
 // Restore topic
@@ -859,7 +859,7 @@ $txt['quick_mod_restore'] = 'Restore Selected';
 
 // Editor prompt.
 $txt['prompt_text_email'] = 'Please enter the e-mail address.';
-$txt['prompt_text_ftp'] = 'Please enter the ftp address.';
+$txt['prompt_text_ftp'] = 'Please enter the FTP address.';
 $txt['prompt_text_url'] = 'Please enter the URL you wish to link to.';
 $txt['prompt_text_img'] = 'Enter image location';
 
