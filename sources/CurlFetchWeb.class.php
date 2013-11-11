@@ -20,8 +20,8 @@ if (!defined('ELK'))
  * Load class
  * Initiate as
  *  - $fetch_data = new Curl_Fetch_Webdata();
- *	- optionally pass an array of cURL options and redirect count
- *	- Curl_Fetch_Webdata(cURL options array, Max redirects);
+ *  - optionally pass an array of cURL options and redirect count
+ *  - Curl_Fetch_Webdata(cURL options array, Max redirects);
  *  - $fetch_data = new Curl_Fetch_Webdata(array(CURLOPT_SSL_VERIFYPEER => 1), 5);
  *
  * Make the call

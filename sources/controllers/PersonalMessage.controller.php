@@ -562,7 +562,7 @@ class PersonalMessage_Controller extends Action_Controller
 	function action_send()
 	{
 		global $txt, $scripturl, $modSettings;
-		global $context, $options, $language, $user_info;
+		global $context, $language, $user_info;
 
 		$db = database();
 

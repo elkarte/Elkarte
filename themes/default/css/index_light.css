@@ -264,9 +264,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 #debug_logging {
 	color: #bbb;
 	background: #222;
-    margin: 0 auto;
-    max-width: 90em;
-    width: 90%;
+	margin: 0 auto;
+	max-width: 90em;
+	width: 90%;
 }
 #debug_logging_wrapper {
 	background: #222;
@@ -595,9 +595,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
 /* Set up some general framing classes. @todo */
-/*			.forum_category for board index/child boards. */
-/*			.forumposts for thread pages and recent posts, etc. */
-/*			.content_category for general divisions around the place. */
+/*    .forum_category for board index/child boards.             */
+/*    .forumposts for thread pages and recent posts, etc.       */
+/*    .content_category for general divisions around the place. */
 /* All styled the same in default variant, but available for fun and games. */
 
 /* The board categories and newsfader - some shared styling. */

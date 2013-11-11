@@ -1277,15 +1277,17 @@ class ScheduledTask
 
 		foreach ($attach_dirs as $attach_dir)
 		{
-		    $dir = @opendir($attach_dir);
-		    if (!$dir)
-		    {
+			$dir = @opendir($attach_dir);
+			if (!$dir)
+			{
 				loadEssentialThemeData();
 				loadLanguage('Post');
+
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
 				log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
+
 				return false;
-		    }
+			}
 
 			while ($file = readdir($dir))
 			{

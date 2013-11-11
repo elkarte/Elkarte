@@ -187,7 +187,7 @@ abstract class Positioning_Items
 	public function end()
 	{
 		$this->_position = 'end';
-		$this->_relative = $position;
+		$this->_relative = '';
 
 		return $this;
 	}
@@ -198,7 +198,7 @@ abstract class Positioning_Items
 	public function begin()
 	{
 		$this->_position = 'begin';
-		$this->_relative = $position;
+		$this->_relative = '';
 
 		return $this;
 	}

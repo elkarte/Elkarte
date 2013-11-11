@@ -349,7 +349,7 @@ class News_Controller extends Action_Controller
 
 		// Find the most recent members.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$members = recentMembers((int)$_GET['limit']);
+		$members = recentMembers((int) $_GET['limit']);
 
 		$data = array();
 		foreach ($members as $member)

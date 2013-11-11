@@ -214,7 +214,7 @@ class OpenID
 		// Clean things up a bit.
 		$handle = isset($assoc_data['assoc_handle']) ? $assoc_data['assoc_handle'] : '';
 		$issued = time();
-		$expires = $issued + min((int)$assoc_data['expires_in'], 60);
+		$expires = $issued + min((int) $assoc_data['expires_in'], 60);
 		$assoc_type = isset($assoc_data['assoc_type']) ? $assoc_data['assoc_type'] : '';
 
 		// @todo Is this really needed?

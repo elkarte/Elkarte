@@ -17,9 +17,9 @@
  *
  * Adding options to one of the setting screens isn't hard. Call prepareDBSettingsContext;
  * The basic format for a checkbox is:
- * 		array('check', 'nameInModSettingsAndSQL'),
+ *    array('check', 'nameInModSettingsAndSQL'),
  * And for a text box:
- * 		array('text', 'nameInModSettingsAndSQL')
+ *    array('text', 'nameInModSettingsAndSQL')
  * (NOTE: You have to add an entry for this at the bottom!)
  *
  * In these cases, it will look for $txt['nameInModSettingsAndSQL'] as the description,
@@ -28,33 +28,33 @@
  * Here's a quick explanation of how to add a new item:
  *
  * - A text input box.  For textual values.
- * 		array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A text input box.  For numerical values.
- * 		array('int', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('int', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A text input box.  For floating point values.
- * 		array('float', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('float', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A large text input box. Used for textual values spanning multiple lines.
- * 		array('large_text', 'nameInModSettingsAndSQL', 'OptionalNumberOfRows'),
+ *    array('large_text', 'nameInModSettingsAndSQL', 'OptionalNumberOfRows'),
  * - A check box.  Either one or zero. (boolean)
- * 		array('check', 'nameInModSettingsAndSQL'),
+ *    array('check', 'nameInModSettingsAndSQL'),
  * - A selection box.  Used for the selection of something from a list.
- * 		array('select', 'nameInModSettingsAndSQL', array('valueForSQL' => $txt['displayedValue'])),
- * 		Note that just saying array('first', 'second') will put 0 in the SQL for 'first'.
+ *    array('select', 'nameInModSettingsAndSQL', array('valueForSQL' => $txt['displayedValue'])),
+ *    Note that just saying array('first', 'second') will put 0 in the SQL for 'first'.
  * - A password input box. Used for passwords, no less!
- * 		array('password', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('password', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A permission - for picking groups who have a permission.
- * 		array('permissions', 'manage_groups'),
+ *    array('permissions', 'manage_groups'),
  * - A BBC selection box.
- * 		array('bbc', 'sig_bbc'),
+ *    array('bbc', 'sig_bbc'),
  *
  * For each option:
- * 	- type (see above), variable name, size/possible values.
- * 	  OR make type '' for an empty string for a horizontal rule.
+ *  - type (see above), variable name, size/possible values.
+ *    OR make type '' for an empty string for a horizontal rule.
  *  - SET preinput - to put some HTML prior to the input box.
  *  - SET postinput - to put some HTML following the input box.
  *  - SET invalid - to mark the data as invalid.
  *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
- *  	array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
+ *    array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
  *
  */
 
@@ -80,13 +80,13 @@ class Settings_Form
 	 * Helper method, it sets up the context for the settings.
 	 * - The basic usage of the six numbered key fields are
 	 * - array(0 ,1, 2, 3, 4, 5
-	 * 		0 variable name - the name of the saved variable
-	 * 		1 label - the text to show on the settings page
-	 * 		2 saveto - file or db, where to save the variable name - value pair
-	 * 		3 type - type of data to save, int, float, text, check
-	 * 		4 size - false or field size
-	 * 		5 help - '' or helptxt variable name
-	 * 	)
+	 *    0 variable name - the name of the saved variable
+	 *    1 label - the text to show on the settings page
+	 *    2 saveto - file or db, where to save the variable name - value pair
+	 *    3 type - type of data to save, int, float, text, check
+	 *    4 size - false or field size
+	 *    5 help - '' or helptxt variable name
+	 *  )
 	 *
 	 * the following named keys are also permitted
 	 * 'disabled' => 'postinput' => 'preinput' =>

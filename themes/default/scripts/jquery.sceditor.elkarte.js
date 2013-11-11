@@ -296,7 +296,7 @@ $.sceditor.command
 		},
 		txtExec: ['[pre]', '[/pre]'],
 		tooltip: 'Preformatted Text'
-    })
+	})
 	.set('move', {
 		state: function() {
 			var currentNode = this.currentNode();

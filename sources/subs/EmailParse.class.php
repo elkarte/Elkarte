@@ -41,7 +41,7 @@ if (!defined('ELK'))
  * Optional functions
  *  - $email_message->load_address(); // returns array with to/from/cc addresses
  *  - $email_message->load_key(); // returns the security key is found, also sets
- *			message_key_id, message_type and message_id
+ *      message_key_id, message_type and message_id
  *  - $email_message->load_spam(); // returns boolean on if spam headers are set
  *  - $email_message->load_ip(); // set ip origin of the email if available
  *  - $email_message->load_returnpath(); // load the message return path
@@ -223,7 +223,7 @@ class Email_Parse
 	 * Separate the email message headers from the message body
 	 *
 	 * The header is separated from the body by
-	 * 	(1) the first empty line or
+	 *  (1) the first empty line or
 	 *  (2) a line that does not start with a tab, a field name followed by a colon or a space
 	 */
 	private function _split_headers()
@@ -560,7 +560,7 @@ class Email_Parse
 
 	/**
 	 * Converts a header string to ascii/UTF8
-     *
+	 *
 	 * Headers, mostly subject and names may be encoded as quoted printable or base64
 	 * to allow for non ascii characters in those fields. This encoding is separate
 	 * from the message body encoding and must be determined since this encoding is
@@ -633,7 +633,7 @@ class Email_Parse
 
 	/**
 	 * Checks the body text to see if it may need to be further decoded
-     *
+	 *
 	 * Sadly whats in the body text is not always what the header claims, or the
 	 * header is just wrong.  Copy/paste in to email from other apps etc.
 	 * This does an extra check for quoted printable DNA and if found decodes the

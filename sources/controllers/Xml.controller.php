@@ -134,7 +134,7 @@ class Xml_Controller extends Action_Controller
 	 */
 	public function action_corefeatures()
 	{
-		global $context, $modSettings, $txt, $settings;
+		global $context, $txt;
 
 		$context['xml_data'] = array();
 

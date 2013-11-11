@@ -366,8 +366,6 @@ class Profile_Controller extends Action_Controller
 		$this->_completed_save = false;
 		$context['do_preview'] = isset($_REQUEST['preview_signature']);
 
-		$security_checks = array();
-
 		// Are we saving data in a valid area?
 		if (isset($profile_include_data['sc']) && (isset($_REQUEST['save']) || $context['do_preview']))
 		{

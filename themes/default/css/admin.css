@@ -129,12 +129,12 @@ fieldset dl {
 legend {
 	font-weight: bold;
 	color: #000;
-    background: url(../images/selected_open.png) no-repeat scroll left center transparent;
-    cursor: pointer;
-    padding-left: 20px;
+	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
 }
 .collapsed legend  {
-    background:  url(../images/selected.png) no-repeat scroll left center transparent;
+	background:  url(../images/selected.png) no-repeat scroll left center transparent;
 }
 
 /* Styles for the admin home screen.
@@ -796,9 +796,9 @@ dl.themes_list dd {
 #modcenter {
 	display: block;
 	width: 100%;
-    background: none repeat scroll 0 0 #DEEDDA;
-    border-radius: 5px 5px 0 0;
-    box-shadow: 1px 2px 3px #EEEEEE;
+	background: none repeat scroll 0 0 #DEEDDA;
+	border-radius: 5px 5px 0 0;
+	box-shadow: 1px 2px 3px #EEEEEE;
 }
 #modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
 	overflow: visible;
@@ -1132,7 +1132,7 @@ ul.moderation_notes li {
 
 /* Drag sort lists show the move cursor and up/down arrow content */
 #sort_email_fp td {
-    cursor: move;
+	cursor: move;
 }
 #sort_email_fp td:nth-child(2):before {
 	content: "\21f3";
@@ -1141,7 +1141,7 @@ ul.moderation_notes li {
 	float: left;
 }
 #custom_profile_fields td:nth-child(2) {
-    cursor: move;
+	cursor: move;
 }
 #custom_profile_fields td:nth-child(2):before {
 	content: "\21f3";
@@ -1153,17 +1153,17 @@ ul.moderation_notes li {
 
 /* jQuery Dialog Box */
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
-    border-collapse: collapse;
-    content: "";
-    display: table;
+	border-collapse: collapse;
+	content: "";
+	display: table;
 }
 .ui-helper-clearfix:after {
-    clear: both;
+	clear: both;
 }
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
-    border-collapse: collapse;
-    content: "";
-    display: table;
+	border-collapse: collapse;
+	content: "";
+	display: table;
 }
 
 /* Scheduled tasks */
@@ -1181,12 +1181,12 @@ ul.moderation_notes li {
 	border-radius: 4px 4px 0 0;
 }
 .ui-dialog .ui-dialog-title {
-    float: left;
-    margin: 0.5em 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 90%;
+	float: left;
+	margin: 0.5em 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 90%;
 }
 .ui-dialog .ui-dialog-titlebar {
 	padding: 0 1em;
@@ -1214,9 +1214,9 @@ ul.moderation_notes li {
 	z-index: 100;
 	background-color: #000;
 	opacity: 0.3;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%
 }

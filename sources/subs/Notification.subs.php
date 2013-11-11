@@ -1098,8 +1098,8 @@ function validate_ownnotification($field, $input, $validation_parameters = null)
  * Checks if a user has the correct access to get notifications
  * - validates they have proper group access to a board
  * - if using the maillist, checks if they should get a reply-able message
- * 		- not muted
- * 		- has postby_email permission on the board
+ *     - not muted
+ *     - has postby_email permission on the board
  *
  * Returns false if they do not have the proper group access to a board
  * Sets email_perm to false if they should not get a reply-able message

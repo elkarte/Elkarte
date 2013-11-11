@@ -96,7 +96,7 @@ class DbSearch_PostgreSQL implements DbSearch
 	 */
 	public function membersTableInfo()
 	{
-		global $db_prefix;
+		global $db_prefix, $txt;
 
 		$db = database();
 

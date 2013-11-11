@@ -947,11 +947,11 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  * this function (on behalf of the email owner, simliar to profile views etc)
  *
  * Sets
- *	- pbe['profile']
+ *  - pbe['profile']
  *  - pbe['profile']['options']
  *  - pbe['user_info']
  *  - pbe['user_info']['permissions']
- * -  pbe['user_info']['groups']
+ *  - pbe['user_info']['groups']
  *
  * @param string $email
  */

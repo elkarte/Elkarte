@@ -25,7 +25,7 @@ if (!defined('ELK'))
  *
  * What it does:
  * - cleans the request variables (ENV, GET, POST, COOKIE, SERVER) and
- *	 makes sure the query string was parsed correctly.
+ *   makes sure the query string was parsed correctly.
  * - handles the URLs passed by the queryless URLs option.
  * - makes sure, regardless of php.ini, everything has slashes.
  * - uses Request parseRequest() to clean and set up variables like $board or $_REQUEST'start'].
@@ -238,7 +238,7 @@ function expandIPv6($addr, $strict_check = true)
 
 	unset($p);
 
-    // Join segments.
+	// Join segments.
 	$result = implode(':', $part);
 
 	// Save this incase of repeated use.

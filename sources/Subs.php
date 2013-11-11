@@ -885,79 +885,79 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				- unparsed_equals_content: [tag=...]unparsed content[/tag]
 
 			parameters: an optional array of parameters, for the form
-			  [tag abc=123]content[/tag].  The array is an associative array
-			  where the keys are the parameter names, and the values are an
-			  array which may contain the following:
-				- match: a regular expression to validate and match the value.
-				- quoted: true if the value should be quoted.
-				- validate: callback to evaluate on the data, which is $data.
-				- value: a string in which to replace $1 with the data.
-				  either it or validate may be used, not both.
-				- optional: true if the parameter is optional.
+				[tag abc=123]content[/tag].  The array is an associative array
+				where the keys are the parameter names, and the values are an
+				array which may contain the following:
+					- match: a regular expression to validate and match the value.
+					- quoted: true if the value should be quoted.
+					- validate: callback to evaluate on the data, which is $data.
+					- value: a string in which to replace $1 with the data.
+					  either it or validate may be used, not both.
+					- optional: true if the parameter is optional.
 
 			test: a regular expression to test immediately after the tag's
-			  '=', ' ' or ']'.  Typically, should have a \] at the end.
-			  Optional.
+				'=', ' ' or ']'.  Typically, should have a \] at the end.
+				Optional.
 
 			content: only available for unparsed_content, closed,
-			  unparsed_commas_content, and unparsed_equals_content.
-			  $1 is replaced with the content of the tag.  Parameters
-			  are replaced in the form {param}.  For unparsed_commas_content,
-			  $2, $3, ..., $n are replaced.
+				unparsed_commas_content, and unparsed_equals_content.
+				$1 is replaced with the content of the tag.  Parameters
+				are replaced in the form {param}.  For unparsed_commas_content,
+				$2, $3, ..., $n are replaced.
 
 			before: only when content is not used, to go before any
-			  content.  For unparsed_equals, $1 is replaced with the value.
-			  For unparsed_commas, $1, $2, ..., $n are replaced.
+				content.  For unparsed_equals, $1 is replaced with the value.
+				For unparsed_commas, $1, $2, ..., $n are replaced.
 
 			after: similar to before in every way, except that it is used
-			  when the tag is closed.
+				when the tag is closed.
 
 			disabled_content: used in place of content when the tag is
-			  disabled.  For closed, default is '', otherwise it is '$1' if
-			  block_level is false, '<div>$1</div>' elsewise.
+				disabled.  For closed, default is '', otherwise it is '$1' if
+				block_level is false, '<div>$1</div>' elsewise.
 
 			disabled_before: used in place of before when disabled.  Defaults
-			  to '<div>' if block_level, '' if not.
+				to '<div>' if block_level, '' if not.
 
 			disabled_after: used in place of after when disabled.  Defaults
-			  to '</div>' if block_level, '' if not.
+				to '</div>' if block_level, '' if not.
 
 			block_level: set to true the tag is a "block level" tag, similar
-			  to HTML.  Block level tags cannot be nested inside tags that are
-			  not block level, and will not be implicitly closed as easily.
-			  One break following a block level tag may also be removed.
+				to HTML.  Block level tags cannot be nested inside tags that are
+				not block level, and will not be implicitly closed as easily.
+				One break following a block level tag may also be removed.
 
 			trim: if set, and 'inside' whitespace after the begin tag will be
-			  removed.  If set to 'outside', whitespace after the end tag will
-			  meet the same fate.
+				removed.  If set to 'outside', whitespace after the end tag will
+				meet the same fate.
 
 			validate: except when type is missing or 'closed', a callback to
-			  validate the data as $data.  Depending on the tag's type, $data
-			  may be a string or an array of strings (corresponding to the
-			  replacement.)
+				validate the data as $data.  Depending on the tag's type, $data
+				may be a string or an array of strings (corresponding to the
+				replacement.)
 
 			quoted: when type is 'unparsed_equals' or 'parsed_equals' only,
-			  may be not set, 'optional', or 'required' corresponding to if
-			  the content may be quoted.  This allows the parser to read
-			  [tag="abc]def[esdf]"] properly.
+				may be not set, 'optional', or 'required' corresponding to if
+				the content may be quoted.  This allows the parser to read
+				[tag="abc]def[esdf]"] properly.
 
 			require_parents: an array of tag names, or not set.  If set, the
-			  enclosing tag *must* be one of the listed tags, or parsing won't
-			  occur.
+				enclosing tag *must* be one of the listed tags, or parsing won't
+				occur.
 
 			require_children: similar to require_parents, if set children
-			  won't be parsed if they are not in the list.
+				won't be parsed if they are not in the list.
 
 			disallow_children: similar to, but very different from,
-			  require_children, if it is set the listed tags will not be
-			  parsed inside the tag.
+				require_children, if it is set the listed tags will not be
+				parsed inside the tag.
 
-		   	disallow_parents: similar to, but very different from,
-			  require_parents, if it is set the listed tags will not be
-			  parsed inside the tag.
+			disallow_parents: similar to, but very different from,
+				require_parents, if it is set the listed tags will not be
+				parsed inside the tag.
 
 			parsed_tags_allowed: an array restricting what BBC can be in the
-			  parsed_equals parameter, if desired.
+				parsed_equals parameter, if desired.
 		*/
 
 		$codes = array(
@@ -2499,7 +2499,7 @@ function parsesmileys(&$message)
  */
 function smileyPregReplaceCallback($replacements, $matches)
 {
-    return $replacements[$matches[1]];
+	return $replacements[$matches[1]];
 }
 
 /**
@@ -3045,7 +3045,7 @@ function template_footer()
 
 /**
  * Output the Javascript files
- * 	- tabbing in this function is to make the HTML source look proper
+ *  - tabbing in this function is to make the HTML source look proper
  *  - if defered is set function will output all JS (source & inline) set to load at page end
  *  - if the admin option to combine files is set, will use Combiner.class
  *
@@ -3205,7 +3205,7 @@ function template_css()
  */
 function template_admin_warning_above()
 {
-	global $context, $user_info, $scripturl, $txt, $modSettings;
+	global $context, $user_info, $scripturl, $txt;
 
 	if (!empty($context['security_controls']['query']))
 	{
@@ -3910,15 +3910,9 @@ function elk_seed_generator()
 {
 	global $modSettings;
 
-	// Never existed?
-	if (empty($modSettings['rand_seed']))
-	{
-		$modSettings['rand_seed'] = microtime() * 1000000;
-		updateSettings(array('rand_seed' => $modSettings['rand_seed']));
-	}
-
 	// Change the seed.
-	updateSettings(array('rand_seed' => mt_rand()));
+	if (mt_rand(1, 250) == 69 || empty($modSettings['rand_seed']))
+		updateSettings(array('rand_seed' => mt_rand()));
 }
 
 /**

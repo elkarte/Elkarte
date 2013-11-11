@@ -133,13 +133,13 @@ class Database_PostgreSQL implements Database
 		if ($matches[1] === 'query_wanna_see_board')
 			return $user_info['query_wanna_see_board'];
 
-        if ($matches[1] === 'empty')
-                return '\'\'';
+		if ($matches[1] === 'empty')
+			return '\'\'';
 
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
-        if ($matches[1] === 'literal')
+		if ($matches[1] === 'literal')
 			return '\'' . pg_escape_string($matches[2]) . '\'';
 
 		if (!isset($values[$matches[2]]))
@@ -474,10 +474,7 @@ class Database_PostgreSQL implements Database
 
 			// If we are updating something, better start a transaction so that indexes may be kept consistent
 			if (!$this->_in_transaction && strpos($clean, 'update') !== false)
-			{
-				$using_transaction = true;
 				$this->db_transaction('begin', $connection);
-			}
 		}
 
 		$this->_db_last_result = @pg_query($connection, $db_string);
@@ -615,9 +612,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function error($db_string, $connection = null)
 	{
-		global $txt, $context, $webmaster_email, $modSettings;
-		global $forum_version, $db_last_error, $db_persist;
-		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
+		global $txt, $context, $modSettings, $db_show_debug;
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);

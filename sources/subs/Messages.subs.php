@@ -1076,7 +1076,7 @@ function mailFromMesasge($id_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_msg = {int:id_msg}',
 		array(
-			'id_msg' => (int) $_REQUEST['msg'],
+			'id_msg' => $id_msg,
 		)
 	);
 	$row = $db->fetch_assoc($request);

@@ -137,7 +137,7 @@ class ManagePermissions_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $settings, $user_info, $modSettings;
+		global $txt, $scripturl, $context, $user_info, $modSettings;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Members.subs.php');

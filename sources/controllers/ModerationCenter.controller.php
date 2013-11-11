@@ -369,11 +369,7 @@ class ModerationCenter_Controller extends Action_Controller
 		unset($_SESSION['moderate_time']);
 
 		// Clean any moderator tokens as well.
-		foreach ($_SESSION['token'] as $key => $token)
-		{
-			if (strpos($key, '-mod') !== false)
-				unset($_SESSION['token'][$key]);
-		}
+		cleanTokens(false, '-mod');
 
 		redirectexit('action=moderate');
 	}
@@ -479,6 +475,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// By George, that means we in a position to get the reports, golly good.
 		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10);
 		$report_ids = array_keys($context['reports']);
+		$report_boards_ids = array();
 		foreach ($context['reports'] as $row)
 		{
 			$context['reports'][$row['id_report']] = array(
@@ -501,14 +498,12 @@ class ModerationCenter_Controller extends Action_Controller
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all']
 			);
+			$report_boards_ids[] = $row['board'];
 		}
 
 		// Get the names of boards these topics are in.
 		if (!empty($report_ids))
 		{
-			$board_names = array();
-			$report_boards_ids = array_unique(array_map(function($element){return $element['board'];}, $context['reports']));
-
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$board_names = getBoardList(array('included_boards' => $report_boards_ids), true);
 
@@ -775,7 +770,7 @@ class ModerationCenter_Controller extends Action_Controller
 			// In it goes.
 			if (!empty($newComment))
 			{
-				addReportComment($report, $user_info['id'], $user_info['name'], $newComment);
+				addReportComment($report, $newComment);
 
 				// Redirect to prevent double submittion.
 				redirectexit($scripturl . '?action=moderate;area=reports;report=' . $report);
