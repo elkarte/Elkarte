@@ -64,10 +64,7 @@ class PackageServers_Controller extends Action_Controller
 		);
 
 		// Now let's decide where we are taking this...
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'servers';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'servers';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
