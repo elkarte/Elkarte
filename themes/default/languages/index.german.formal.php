@@ -534,6 +534,8 @@ $txt['seconds_with'] = ' Sekunden mit '; //Deprecated
 $txt['queries'] = ' Abfragen.'; //Deprecated
 $txt['page_created_full'] = 'Seite erstellt in %1$.3f Sekunden mit %2$d Abfragen.';
 
+// TODO: Continue here.
+
 $txt['report_to_mod_func'] = 'Use this function to inform the moderators and administrators of an abusive or wrongly posted message.<br /><em>Please note that your email address will be revealed to the moderators if you use this.</em>';
 
 $txt['online'] = 'Online';
