@@ -49,11 +49,6 @@ class Suggest_Controller extends Action_Controller
 				'class' => 'Suggest',
 				'function' => 'member'
 			),
-			'versions' => array(
-				'file' => SUBSDIR . '/Suggest.class.php',
-				'class' => 'Suggest',
-				'function' => 'versions'
-			),
 		);
 
 		call_integration_hook('integrate_autosuggest', array(&$searchTypes));
