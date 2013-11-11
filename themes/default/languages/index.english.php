@@ -575,7 +575,7 @@ $txt['calendar_week_title'] = 'Week %1$d of %2$d';
 $txt['calendar_numb_days'] = 'Number of Days:';
 $txt['calendar_how_edit'] = 'how do you edit these events?';
 $txt['calendar_link_event'] = 'Link Event To Post:';
-$txt['calendar_confirm_delete'] = 'Are you sure you want to delete this event?';
+$txt['calendar_confirm_delete'] = 'Are you sure you want to delete this event?'; // not "calendar"?
 $txt['calendar_linked_events'] = 'Linked Events';
 $txt['calendar_click_all'] = 'click to see all %1$s';
 
@@ -635,7 +635,7 @@ $txt['mlist_search_name'] = 'Search by name';
 $txt['mlist_search_website'] = 'Search by website';
 $txt['mlist_search_results'] = 'Search results for';
 $txt['mlist_search_by'] = 'Search by %1$s';
-$txt['mlist_menu_view'] = 'View the memberlist';
+$txt['mlist_menu_view'] = 'View the member list';
 
 $txt['attach_downloaded'] = 'downloaded %1$d times';
 $txt['attach_viewed'] = 'viewed %1$d times';

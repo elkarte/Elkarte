@@ -177,7 +177,7 @@ $txt['move_topic'] = 'Thema verschieben';
 $txt['move_to'] = 'Verschieben nach';
 $txt['pages'] = 'Seiten';
 $txt['users_active'] = 'Aktiv in den letzten %1$d Minuten';
-$txt['personal_messages'] = 'Persönliche Nachrichten';
+$txt['personal_messages'] = 'Private Nachrichten';
 $txt['reply_quote'] = 'Mit Zitat antworten';
 $txt['reply'] = 'Antworten';
 $txt['reply_noun'] = 'Antwort';
@@ -205,7 +205,7 @@ $txt['pm_alert_none'] = 'Keine Nachrichten...'; // oh the redundancy
 
 $txt['online_users'] = 'Benutzer online'; //Deprecated
 $txt['online_now'] = 'jetzt online';
-$txt['personal_message'] = 'Persönliche Nachricht';
+$txt['personal_message'] = 'Private Nachricht';
 $txt['jump_to'] = 'Springe zu';
 $txt['go'] = 'Los';
 $txt['are_sure_remove_topic'] = 'Sind Sie sich sicher, dass Sie dieses Thema löschen möchten?';
@@ -492,7 +492,7 @@ $txt['split'] = 'AUFTEILEN';
 
 $txt['delete'] = 'Löschen';
 
-$txt['your_pms'] = 'Ihre persönlichen Nachrichten';
+$txt['your_pms'] = 'Ihre privaten Nachrichten';
 
 $txt['kilobyte'] = 'KB';
 $txt['megabyte'] = 'MB';
@@ -534,150 +534,150 @@ $txt['seconds_with'] = ' Sekunden mit '; //Deprecated
 $txt['queries'] = ' Abfragen.'; //Deprecated
 $txt['page_created_full'] = 'Seite erstellt in %1$.3f Sekunden mit %2$d Abfragen.';
 
-// TODO: Continue here.
-
-$txt['report_to_mod_func'] = 'Use this function to inform the moderators and administrators of an abusive or wrongly posted message.<br /><em>Please note that your email address will be revealed to the moderators if you use this.</em>';
+$txt['report_to_mod_func'] = 'Verwenden Sie diese Funktion, um Administratoren und Moderatoren über eine feindselige oder sonstwie missbräuchliche Nachricht zu informieren.<br /><em>Bitte beachten Sie, dass Ihre E-Mail-Adresse den Moderatoren angezeigt wird, wenn Sie dies tun.</em>';
 
 $txt['online'] = 'Online';
-$txt['member_is_online'] = '%1$s is online';
+$txt['member_is_online'] = '%1$s ist online';
 $txt['offline'] = 'Offline';
-$txt['member_is_offline'] = '%1$s is offline';
-$txt['pm_online'] = 'Personal Message (Online)';
-$txt['pm_offline'] = 'Personal Message (Offline)';
+$txt['member_is_offline'] = '%1$s ist offline';
+$txt['pm_online'] = 'Private Nachricht (online)';
+$txt['pm_offline'] = 'Private Nachricht (offline)';
 $txt['status'] = 'Status';
 
-$txt['skip_nav'] = 'Skip Navigation';
-$txt['go_up'] = 'Go Up';
-$txt['go_down'] = 'Go Down';
+$txt['skip_nav'] = 'Navigation beenden';
+$txt['go_up'] = 'Nach oben';
+$txt['go_down'] = 'Nach unten';
 
-$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="License" target="_blank" class="new_win">ElkArte &copy; 2013</a>';
+$forum_copyright = '<a href="' . $scripturl . '?action=who;sa=credits" title="ElkArte-Forum" target="_blank" class="new_win">%1$s</a> | <a href="https://github.com/elkarte/ElkArte/blob/master/license.md" title="Lizenz" target="_blank" class="new_win">ElkArte &copy; 2013</a>';
 
-$txt['birthdays'] = 'Birthdays:';
-$txt['events'] = 'Events:';
-$txt['birthdays_upcoming'] = 'Upcoming Birthdays:';
-$txt['events_upcoming'] = 'Upcoming Events:';
+$txt['birthdays'] = 'Geburtstage:';
+$txt['events'] = 'Ereignisse:';
+$txt['birthdays_upcoming'] = 'Kommende Geburtstage:';
+$txt['events_upcoming'] = 'Kommende Ereignisse:';
 // Prompt for holidays in the calendar, leave blank to just display the holiday's name.
-$txt['calendar_prompt'] = 'Holidays:';
-$txt['calendar_month'] = 'Month:';
-$txt['calendar_year'] = 'Year:';
-$txt['calendar_day'] = 'Day:';
-$txt['calendar_event_title'] = 'Event Title';
-$txt['calendar_event_options'] = 'Event Options';
-$txt['calendar_post_in'] = 'Post In:';
-$txt['calendar_edit'] = 'Edit Event';
-$txt['event_delete_confirm'] = 'Delete this event?';
-$txt['event_delete'] = 'Delete Event';
-$txt['calendar_post_event'] = 'Post Event';
-$txt['calendar'] = 'Calendar';
-$txt['calendar_link'] = 'Link to Calendar';
-$txt['calendar_upcoming'] = 'Upcoming Calendar';
-$txt['calendar_today'] = 'Today\'s Calendar';
-$txt['calendar_week'] = 'Week';
-$txt['calendar_week_title'] = 'Week %1$d of %2$d';
-$txt['calendar_numb_days'] = 'Number of Days:';
-$txt['calendar_how_edit'] = 'how do you edit these events?';
-$txt['calendar_link_event'] = 'Link Event To Post:';
-$txt['calendar_confirm_delete'] = 'Are you sure you want to delete this event?';
-$txt['calendar_linked_events'] = 'Linked Events';
-$txt['calendar_click_all'] = 'click to see all %1$s';
+$txt['calendar_prompt'] = 'Feiertage:';
+$txt['calendar_month'] = 'Monat:';
+$txt['calendar_year'] = 'Jahr:';
+$txt['calendar_day'] = 'Tag:';
+$txt['calendar_event_title'] = 'Ereignistitel';
+$txt['calendar_event_options'] = 'Ereignisoptionen';
+$txt['calendar_post_in'] = 'Veröffentlichen in:';
+$txt['calendar_edit'] = 'Ereignis ändern';
+$txt['event_delete_confirm'] = 'Dieses Ereignis löschen?';
+$txt['event_delete'] = 'Ereignis löschen';
+$txt['calendar_post_event'] = 'Ereignis veröffentlichen';
+$txt['calendar'] = 'Kalender';
+$txt['calendar_link'] = 'Mit Kalender verknüpfen';
+$txt['calendar_upcoming'] = 'Kommender Kalender';
+$txt['calendar_today'] = 'Heutiger Kalender';
+$txt['calendar_week'] = 'Woche';
+$txt['calendar_week_title'] = 'Woche %1$d von %2$d';
+$txt['calendar_numb_days'] = 'Anzahl an Tagen:';
+$txt['calendar_how_edit'] = 'wie ändert man diese Ereignisse?';
+$txt['calendar_link_event'] = 'Ereignis mit Beitrag verknüpfen:';
+$txt['calendar_confirm_delete'] = 'Sind Sie sich sicher, dass Sie dieses Ereignis löschen möchten?';
+$txt['calendar_linked_events'] = 'Verknüpfte Ereignisse';
+$txt['calendar_click_all'] = 'klicken Sie hier, um alle %1$s zu sehen';
 
-$txt['moveTopic1'] = 'Post a redirection topic';
-$txt['moveTopic2'] = 'Change the topic\'s subject';
-$txt['moveTopic3'] = 'New subject';
-$txt['moveTopic4'] = 'Change every message\'s subject';
-$txt['move_topic_unapproved_js'] = 'Warning! This topic has not yet been approved.\\n\\nIt is not recommended that you create a redirection topic unless you intend to approve the post immediately following the move.';
+$txt['moveTopic1'] = 'Eine Weiterleitung erstellen';
+$txt['moveTopic2'] = 'Den Betreff dieses Themas ändern';
+$txt['moveTopic3'] = 'Neuer Betreff';
+$txt['moveTopic4'] = 'Den Betreff jeder Nachricht ändern';
+$txt['move_topic_unapproved_js'] = 'Warnung! Dieses Thema wurde noch nicht freigeschaltet.\\n\\nEs wird nicht empfohlen, dass Sie eine Weiterleitung erstellen, sofern Sie nicht sofort danach den Beitrag freigeben möchten.';
 $txt['movetopic_auto_board'] = '[BOARD]';
 $txt['movetopic_auto_topic'] = '[TOPIC LINK]';
-$txt['movetopic_default'] = 'This topic has been moved to ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
-$txt['movetopic_redirect'] = 'Redirect to the moved topic';
-$txt['movetopic_expires'] = 'Automatically remove the redirection topic';
+$txt['movetopic_default'] = 'Dieses Thema wurde verschoben nach ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
+$txt['movetopic_redirect'] = 'In das verschobene Thema wechseln';
+$txt['movetopic_expires'] = 'Die Weiterleitung automatisch entfernen';
 
-$txt['merge_to_topic_id'] = 'ID of target topic';
-$txt['split_topic'] = 'Split Topic';
-$txt['merge'] = 'Merge Topics';
-$txt['subject_new_topic'] = 'Subject For New Topic';
-$txt['split_this_post'] = 'Only split this post.';
-$txt['split_after_and_this_post'] = 'Split topic after and including this post.';
-$txt['select_split_posts'] = 'Select posts to split.';
+$txt['merge_to_topic_id'] = 'ID des Zielthemas';
+$txt['split_topic'] = 'Thema aufteilen';
+$txt['merge'] = 'Themen zusammenführen';
+$txt['subject_new_topic'] = 'Betreff des neuen Themas';
+$txt['split_this_post'] = 'Nur diesen Beitrag abtrennen.';
+$txt['split_after_and_this_post'] = 'Thema ab diesem Beitrag aufteilen.';
+$txt['select_split_posts'] = 'Beiträge zum Abtrennen auswählen.';
 
-$txt['splittopic_notification'] = 'Post a message when the topic is split.';
-$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to ' . $txt['movetopic_auto_board'] . ".\n\n" . $txt['movetopic_auto_topic'];
-$txt['splittopic_move'] = 'Move the new topic to another board';
+$txt['splittopic_notification'] = 'Eine Nachricht schreiben, wenn das Thema aufgeteilt wird.';
+$txt['splittopic_default'] = 'Eine oder mehr Nachrichten in diesem Thema wurden nach ' . $txt['movetopic_auto_board'] . " verschoben.\n\n" . $txt['movetopic_auto_topic'];
+$txt['splittopic_move'] = 'Das neue Thema in ein anderes Forum verschieben';
 
-$txt['new_topic'] = 'New Topic';
-$txt['split_successful'] = 'Topic successfully split into two topics.';
-$txt['origin_topic'] = 'Origin Topic';
-$txt['please_select_split'] = 'Please select which posts you wish to split.';
-$txt['merge_successful'] = 'Topics successfully merged.';
-$txt['new_merged_topic'] = 'Newly Merged Topic';
-$txt['topic_to_merge'] = 'Topic to be merged';
-$txt['target_board'] = 'Target board';
-$txt['target_topic'] = 'Target topic';
-$txt['merge_confirm'] = 'Are you sure you want to merge';
-$txt['with'] = 'with';
-$txt['merge_desc'] = 'This function will merge the messages of two topics into one topic. The messages will be sorted according to the time of posting. Therefore the earliest posted message will be the first message of the merged topic.';
+$txt['new_topic'] = 'Neues Thema';
+$txt['split_successful'] = 'Thema erfolgreich in zwei Themen aufgeteilt.';
+$txt['origin_topic'] = 'Ursprungsthema';
+$txt['please_select_split'] = 'Bitte wählen Sie die Beiträge aus, die Sie abtrennen möchten.';
+$txt['merge_successful'] = 'Themen erfolgreich zusammengeführt.';
+$txt['new_merged_topic'] = 'Neu zusammengeführtes Thema';
+$txt['topic_to_merge'] = 'Zusammenzuführendes Thema';
+$txt['target_board'] = 'Zielforum';
+$txt['target_topic'] = 'Zielthema';
+$txt['merge_confirm'] = 'Sind Sie sich sicher, dass Sie';
+$txt['with'] = 'zusammenführen möchten mit';
 
-$txt['theme_template_error'] = 'Unable to load the \'%1$s\' template.';
-$txt['theme_language_error'] = 'Unable to load the \'%1$s\' language file.';
+$txt['merge_desc'] = 'Diese Funktion wird die Beiträge zweier Themen in ein Thema zusammenführen. Die Beiträge werden nach der Zeit ihrer Erstellung sortiert. Daher wird der zuerst erstellte Beitrag der erste Beitrag des zusammengeführten Themas sein.';
 
-$txt['parent_boards'] = 'Child Boards';
+$txt['theme_template_error'] = 'Konnte die Vorlage \'%1$s\' nicht laden.';
+$txt['theme_language_error'] = 'Konnte die Sprachdatei \'%1$s\' nicht laden.';
 
-$txt['smtp_no_connect'] = 'Could not connect to SMTP host';
-$txt['smtp_port_ssl'] = 'SMTP port setting incorrect; it should be 465 for SSL servers.';
-$txt['smtp_bad_response'] = 'Couldn\'t get mail server response codes';
-$txt['smtp_error'] = 'Ran into problems sending Mail. Error: ';
-$txt['mail_send_unable'] = 'Unable to send mail to the email address \'%1$s\'';
+$txt['parent_boards'] = 'Unterforen';
 
-$txt['mlist_search'] = 'Search For Members';
-$txt['mlist_search_again'] = 'Search again';
-$txt['mlist_search_filter'] = 'Search Options';
-$txt['mlist_search_email'] = 'Search by email address';
-$txt['mlist_search_group'] = 'Search by position';
-$txt['mlist_search_name'] = 'Search by name';
-$txt['mlist_search_website'] = 'Search by website';
-$txt['mlist_search_results'] = 'Search results for';
-$txt['mlist_search_by'] = 'Search by %1$s';
-$txt['mlist_menu_view'] = 'View the memberlist';
+$txt['smtp_no_connect'] = 'Konnte nicht mit dem SMTP-Host verbinden';
+$txt['smtp_port_ssl'] = 'SMTP-Porteinstellung inkorrekt; sie sollte für SSL-Server 465 lauten.';
+$txt['smtp_bad_response'] = 'Konnte Mailserverantwortcodes nicht erhalten';
+$txt['smtp_error'] = 'Beim Versenden von Mails sind Probleme aufgetreten. Fehler: ';
+$txt['mail_send_unable'] = 'Konnte keine Mail an die E-Mail-Adresse \'%1$s\' versenden';
 
-$txt['attach_downloaded'] = 'downloaded %1$d times';
-$txt['attach_viewed'] = 'viewed %1$d times';
+$txt['mlist_search'] = 'Nach Mitgliedern suchen';
+$txt['mlist_search_again'] = 'Erneut suchen';
+$txt['mlist_search_filter'] = 'Suchoptionen';
+$txt['mlist_search_email'] = 'Nach E-Mail-Adresse suchen';
+$txt['mlist_search_group'] = 'Nach Position suchen';
+$txt['mlist_search_name'] = 'Nach Namen suchen';
+$txt['mlist_search_website'] = 'Nach Website suchen';
+$txt['mlist_search_results'] = 'Suchergebnisse für';
+$txt['mlist_search_by'] = 'Nach %1$s suchen';
+$txt['mlist_menu_view'] = 'Mitgliederliste ansehen';
 
-$txt['settings'] = 'Settings';
-$txt['never'] = 'Never';
-$txt['more'] = 'more';
+$txt['attach_downloaded'] = '%1$d-mal heruntergeladen';
+$txt['attach_viewed'] = '%1$d-mal angesehen';
+
+$txt['settings'] = 'Einstellungen';
+$txt['never'] = 'Niemals';
+$txt['more'] = 'mehr';
 
 $txt['hostname'] = 'Hostname';
-$txt['you_are_post_banned'] = 'Sorry %1$s, you are banned from posting and sending personal messages on this forum.';
-$txt['ban_reason'] = 'Reason';
+$txt['you_are_post_banned'] = 'Verzeihung, %1$s, Sie wurden vom Schreiben von Beiträgen und privaten Nachrichten in diesem Forum ausgeschlossen.';
 
-$txt['tables_optimized'] = 'Database tables optimized';
+$txt['ban_reason'] = 'Grund';
 
-$txt['add_poll'] = 'Add poll';
-$txt['poll_options6'] = 'You may only select up to %1$s options.';
-$txt['poll_remove'] = 'Remove Poll';
-$txt['poll_remove_warn'] = 'Are you sure you want to remove this poll from the topic?';
-$txt['poll_results_expire'] = 'Results will be shown when voting has closed';
-$txt['poll_expires_on'] = 'Voting closes';
-$txt['poll_expired_on'] = 'Voting closed';
-$txt['poll_change_vote'] = 'Remove Vote';
-$txt['poll_return_vote'] = 'Voting options';
-$txt['poll_cannot_see'] = 'You cannot see the results of this poll at the moment.';
+$txt['tables_optimized'] = 'Datenbanktabellen optimiert';
 
-$txt['quick_mod_approve'] = 'Approve selected';
-$txt['quick_mod_remove'] = 'Remove selected';
-$txt['quick_mod_lock'] = 'Lock/Unlock selected';
-$txt['quick_mod_sticky'] = 'Sticky/Unsticky selected';
-$txt['quick_mod_move'] = 'Move selected to';
-$txt['quick_mod_merge'] = 'Merge selected';
-$txt['quick_mod_markread'] = 'Mark selected read';
-$txt['quick_mod_go'] = 'Go';
-$txt['quickmod_confirm'] = 'Are you sure you want to do this?';
+$txt['add_poll'] = 'Umfrage hinzufügen';
+$txt['poll_options6'] = 'Sie können höchstens %1$s Optionen auswählen.';
+$txt['poll_remove'] = 'Umfrage entfernen';
+$txt['poll_remove_warn'] = 'Sind Sie sich sicher, dass Sie diese Umfrage aus dem Thema entfernen möchten?';
+$txt['poll_results_expire'] = 'Die Ergebnisse werden erst angezeigt, wenn die Umfrage abgeschlossen ist';
+$txt['poll_expires_on'] = 'Abstimmung läuft bis';
+$txt['poll_expired_on'] = 'Abstimmung beendet am';
+$txt['poll_change_vote'] = 'Stimme zurückziehen';
+$txt['poll_return_vote'] = 'Abstimmungsoptionen';
+$txt['poll_cannot_see'] = 'Sie können derzeit die Ergebnisse dieser Umfrage nicht einsehen.';
 
-$txt['spell_check'] = 'Spell Check';
+$txt['quick_mod_approve'] = 'Ausgewählte freigeben';
+$txt['quick_mod_remove'] = 'Ausgewählte entfernen';
+$txt['quick_mod_lock'] = 'Ausgewählte sperren/entsperren';
+$txt['quick_mod_sticky'] = 'Ausgewählte anheften/nicht mehr anheften';
+$txt['quick_mod_move'] = 'Ausgewählte verschieben nach';
+$txt['quick_mod_merge'] = 'Ausgewählte zusammenführen';
+$txt['quick_mod_markread'] = 'Ausgewählte als gelesen markieren';
+$txt['quick_mod_go'] = 'Los';
+$txt['quickmod_confirm'] = 'Sind Sie sich sicher, dass Sie dies tun möchten?';
 
-$txt['quick_reply'] = 'Quick Reply';
-$txt['quick_reply_desc'] = 'With <em>Quick-Reply</em> you can write a post when viewing a topic without loading a new page. You can still use bulletin board code and smileys as you would in a normal post.';
-$txt['quick_reply_warning'] = 'Warning! This topic is currently locked, only admins and moderators can reply.';
+$txt['spell_check'] = 'Rechtschreibprüfung';
+
+$txt['quick_reply'] = 'Schnellantwort';
+$txt['quick_reply_desc'] = 'Mit der <em>Schnellantwort</em> können Sie einen Beitrag verfassen, während Sie ein Thema ansehen, ohne eine neue Seite zu laden. Sie können weiterhin BBCode und Smileys wie in einem normalen Beitrag nutzen.';
+$txt['quick_reply_warning'] = 'Warnung! Dieses Thema ist zurzeit geschlossen, nur Administratoren und Moderatoren können antworten.';
 $txt['quick_reply_verification'] = 'After submitting your post you will be directed to the regular post page to verify your post %1$s.';
 $txt['quick_reply_verification_guests'] = '(required for all guests)';
 $txt['quick_reply_verification_posts'] = '(required for all users with less than %1$d posts)';
