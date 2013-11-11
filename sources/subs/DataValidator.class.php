@@ -16,52 +16,52 @@ if (!defined('ELK'))
  * Class used to validate and transform data
  *
  * Initiate
- *		$validation = new Data_Validator();
+ *    $validation = new Data_Validator();
  *
  * Set validation rules
- * 		$validation->validation_rules(array(
- * 			'username' => 'required|alpha_numeric|max_length[10]|min_length[6]',
- * 			'email'    => 'required|valid_email'
- * 		));
+ *    $validation->validation_rules(array(
+ *      'username' => 'required|alpha_numeric|max_length[10]|min_length[6]',
+ *      'email'    => 'required|valid_email'
+ *    ));
  *
  * Set optional sanitation rules
- * 		$validation->sanitation_rules(array(
- * 			'username'    => 'trim|strtoupper',
- * 			'email'   	  => 'trim|gmail_normalize'
- * 		));
+ *    $validation->sanitation_rules(array(
+ *      'username' => 'trim|strtoupper',
+ *      'email'    => 'trim|gmail_normalize'
+ *    ));
  *
  * Set optional variable name substitutions
- *		$validation->text_replacements(array(
- *			'username' => $txt['someThing'],
- *			'email' => $txt['someEmail']
- *		));
+ *    $validation->text_replacements(array(
+ *      'username' => $txt['someThing'],
+ *      'email'    => $txt['someEmail']
+ *    ));
  *
  * Set optional special processing tags
- *		$validation->input_processing(array(
- *			'somefield' => 'csv',
- *			'anotherfield' => 'array'
- *		));
+ *    $validation->input_processing(array(
+ *      'somefield'    => 'csv',
+ *      'anotherfield' => 'array'
+ *    ));
  *
  * Run the validation
- * 		$validation->validate($data);
+ *    $validation->validate($data);
  * $data must be an array with keys matching the validation rule e.g. $data['username'], $data['email']
  *
  * Get the results
- * 		$validation->validation_errors(optional array of fields to return errors on)
- * 		$validation->validation_data()
- *		$validation->username
+ *    $validation->validation_errors(optional array of fields to return errors on)
+ *    $validation->validation_data()
+ *    $validation->username
  *
  * Use it inline with the static method
  * $_POST['username'] = ' username '
  * if (Data_Validator::is_valid($_POST, array('username' => 'required|alpha_numeric'), array('username' => 'trim|strtoupper')))
- *		$username = $_POST['username'] // now = 'USERNAME'
+ *    $username = $_POST['username'] // now = 'USERNAME'
  *
  * Current validation can be one or a combination of:
- * 		max_length[x], min_length[x], length[x],
- * 		alpha, alpha_numeric, alpha_dash
- * 		numeric, integer, boolean, float, notequal[x,y,z]
- * 		valid_url, valid_ip, valid_ipv6, valid_email,
- * 		php_syntax, contains[x,y,x], required, without[x,y,z]
+ *    max_length[x], min_length[x], length[x],
+ *    alpha, alpha_numeric, alpha_dash
+ *    numeric, integer, boolean, float, notequal[x,y,z]
+ *    valid_url, valid_ip, valid_ipv6, valid_email,
+ *    php_syntax, contains[x,y,x], required, without[x,y,z]
  */
 class Data_Validator
 {
@@ -223,9 +223,10 @@ class Data_Validator
 	/**
 	 * Return any errors found, either in the raw or nicely formatted
 	 *
-	 * @param mixed $raw - true returns the raw error array,
-	 *					 - array returns just error messages of those fields
-	 *					 - otherwise all error message(s)
+	 * @param mixed $raw
+	 *    - true returns the raw error array,
+	 *    - array returns just error messages of those fields
+	 *    - otherwise all error message(s)
 	 */
 	public function validation_errors($raw = false)
 	{

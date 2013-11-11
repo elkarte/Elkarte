@@ -637,7 +637,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * List all members who are awaiting approval / activation, sortable on different columns.
 	 * It allows instant approval or activation of (a selection of) members.
 	 * Called by ?action=admin;area=viewmembers;sa=browse;type=approve
-	 *		  or ?action=admin;area=viewmembers;sa=browse;type=activate.
+	 *   or ?action=admin;area=viewmembers;sa=browse;type=activate.
 	 * The form submits to ?action=admin;area=viewmembers;sa=approve.
 	 * Requires the moderate_forum permission.
 	 *

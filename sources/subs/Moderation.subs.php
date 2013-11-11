@@ -62,7 +62,7 @@ function recountOpenReports($flush = true)
 
 /**
  * How many unapproved posts and topics do we have?
- * 	- Sets $context['total_unapproved_topics']
+ *  - Sets $context['total_unapproved_topics']
  *  - Sets $context['total_unapproved_posts']
  *  - approve_query is set to list of boards they can see
  *
@@ -659,7 +659,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 
 /**
  * Get the report details, need this so we can limit access to a particular board
- * 	 - returns false if they are requesting a report they can not see or does not exist
+ *  - returns false if they are requesting a report they can not see or does not exist
  */
 function modReportDetails($id_report)
 {
@@ -1258,7 +1258,7 @@ function addModeratorNote($id_poster, $poster_name, $contents)
 	);
 }
 
-function addReportComment($report, $id_poster, $poster_name, $newComment)
+function addReportComment($report, $newComment)
 {
 	global $user_info;
 

@@ -429,6 +429,7 @@ function drop_log_search_words()
 	global $db_prefix;
 
 	$db = database();
+	$db_search = db_search();
 
 	$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
 	if (!empty($tables))

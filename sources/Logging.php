@@ -263,9 +263,7 @@ function displayDebug()
 	// What tokens are active?
 	if (isset($_SESSION['token']))
 	{
-		$token_list = array();
-		foreach ($_SESSION['token'] as $key => $data)
-			$token_list[] = $key;
+		$token_list = array_keys($_SESSION['token']);
 
 		echo $txt['debug_tokens'] . '<em>' . implode(',</em> <em>', $token_list), '</em>.<br />';
 	}

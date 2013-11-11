@@ -346,7 +346,7 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
  */
 function list_getModLogEntriesCallback($entries, $key, $matches)
 {
-    return isset($entries[$key]['extra'][$matches[1]]) ? $entries[$key]['extra'][$matches[1]] : '';
+	return isset($entries[$key]['extra'][$matches[1]]) ? $entries[$key]['extra'][$matches[1]] : '';
 }
 
 /**

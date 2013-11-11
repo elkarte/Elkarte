@@ -343,7 +343,7 @@ class Emailpost_Controller extends Action_Controller
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
-    global $modSettings, $txt;
+	global $modSettings, $txt;
 
 	// Validate they have permission to reply
 	$becomesApproved = true;
@@ -440,7 +440,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 */
 function pbe_create_pm($pbe, $email_message)
 {
-    global $modSettings, $txt;
+	global $modSettings, $txt;
 
 	// Can they send?
 	if (!$pbe['user_info']['is_admin'] && !in_array('pm_send', $pbe['user_info']['permissions']))
@@ -478,7 +478,7 @@ function pbe_create_pm($pbe, $email_message)
 
 /**
  * Called by
- *	- pbe_topic to create a new topic
+ *  - pbe_topic to create a new topic
  *  - pbe_main to create a new topic via a subject change
  * Checks posting permissions, but requires email validation checks are complete
  *  - Calls pbe_load_text to prepare text for the post

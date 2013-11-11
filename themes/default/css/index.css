@@ -232,10 +232,10 @@ input[disabled].input_text {
 /* @todo - Will have to do some shuffling here. */
 /* The old .button_submit class was problematic, due to forcing float right on all buttons. */
 /* It is being replaced with three classes:
-/*					.button_submit is not floated	*/
-/*					.right_submit is right floated	*/
-/*					.left_submit is left floated	*/
-/* The button_reset class may need attention too.	*/
+/*    .button_submit is not floated    */
+/*    .right_submit is right floated   */
+/*    .left_submit is left floated     */
+/* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
 /* The old .button_link class has been replaced with the following three classes. */
@@ -1924,7 +1924,7 @@ img.new_posts {
 	float: right;
 	border: 1px solid #ccc;
 	border-radius: 2px;
-    vertical-align: top;
+	vertical-align: top;
 }
 .topic_info {
 	display: table-cell;
@@ -2413,7 +2413,7 @@ img.new_posts {
 }
 .elk_videoheader {
 	padding: 0 4px 0 6px;
-    width: 630px;
+	width: 630px;
 	max-width: 98%;
 	border: #27a348 1px solid;
 }
@@ -2801,9 +2801,9 @@ dl.merge_topic dd {
 	margin: 0 3px -1px 0;
 	border: 1px #ccc solid;
 	border-radius: 2px 2px 0 0;
-    color: #fff;
-    font-size: 0.929em;
-    line-height: 2.077em;
+	color: #fff;
+	font-size: 0.929em;
+	line-height: 2.077em;
 }
 .ui-tabs .ui-tabs-nav li a {
 	display: block;
@@ -2827,9 +2827,9 @@ dl.merge_topic dd {
 	background: linear-gradient(to bottom, #fff, #e4e4e4) repeat scroll 0 0 #f4f4f4;
 }
 .ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
-    background: linear-gradient(to bottom, #5ba048, #3d6e32) repeat scroll 0 0 #4b863c;
-    color: #fff;
-    font-weight: 600;
+	background: linear-gradient(to bottom, #5ba048, #3d6e32) repeat scroll 0 0 #4b863c;
+	color: #fff;
+	font-weight: 600;
 	border-radius: 2px 2px 0 0;
 }
 .ui-tabs .ui-state-hover {
@@ -2932,8 +2932,8 @@ dl.merge_topic dd {
 }
 .profileblock ul.cf_icon {
 	display: block;
-    float: left;
-    margin: 4px 5px 0 0;
+	float: left;
+	margin: 4px 5px 0 0;
 }
 #detailedinfo {
 	float: right;
@@ -3587,9 +3587,9 @@ dl.merge_topic dd {
 }
 
 a.help .icon {
-    padding: 4px 0 0;
+	padding: 4px 0 0;
 	position: relative;
-    vertical-align: top;
+	vertical-align: top;
 }
 
 /* Styles for the tooltips. */
@@ -3622,7 +3622,7 @@ a.help .icon {
 	width: 100%;
 	height: 100%;
 	/* Should be rgba only, IMHO. */
-	/*	Flat colour fallback would be bad (visually). */
+	/* Flat colour fallback would be bad (visually). */
 	background: rgba(0,0,0,0.4);
 }
 

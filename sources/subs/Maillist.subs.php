@@ -161,7 +161,7 @@ function maillist_delete_error_entry($id)
 /**
  * Loads the filers or parsers for the post by email system
  *  - If an ID is supplied, it will load that specific filter/parser
- *	- Style defines if it will load parsers or filters
+ *  - Style defines if it will load parsers or filters
  *
  * @param int type $start
  * @param int $chunk_size

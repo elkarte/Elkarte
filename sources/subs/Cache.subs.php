@@ -340,7 +340,7 @@ function get_memcached_server($level = 3)
  *
  * It may only remove the files of a certain type (if the $type parameter is given)
  * Type can be user, data or left blank
- * 	- user clears out user data
+ *  - user clears out user data
  *  - data clears out system / opcode data
  *  - If no type is specified will perfom a complete cache clearing
  * For cache engines that do not distinguish on types, a full cache flush will be done

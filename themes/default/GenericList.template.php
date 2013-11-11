@@ -212,21 +212,21 @@ function template_additional_rows($row_position, $cur_list)
 /**
  * Used this if you want your generic lists to have navigation menus.
  * $cur_list['list_menu'] = array(
- *		// The position of the tabs/buttons.  Left or Right.  By default is set to left.
- *		'position' => 'left',
- *		// Links.  This is the core of the array.  It has all the info that we need.
- *		'links' => array(
- *			'name' => array(
- *				// This will tell use were to go when they click it.
- *				'href' => $scripturl . '?action=theaction',
- *				// The name that you want to appear for the link.
- *				'label' => $txt['name'],
- *				// If we use tabs instead of buttons we highlight the current tab.
- *				// Must use conditions to determine if its selected or not.
- *				'is_selected' => isset($_REQUEST['name']),
- *			),
- *		),
- *	);
+ *    // The position of the tabs/buttons.  Left or Right.  By default is set to left.
+ *    'position' => 'left',
+ *    // Links.  This is the core of the array.  It has all the info that we need.
+ *    'links' => array(
+ *      'name' => array(
+ *        // This will tell use were to go when they click it.
+ *        'href' => $scripturl . '?action=theaction',
+ *        // The name that you want to appear for the link.
+ *        'label' => $txt['name'],
+ *        // If we use tabs instead of buttons we highlight the current tab.
+ *        // Must use conditions to determine if its selected or not.
+ *        'is_selected' => isset($_REQUEST['name']),
+ *      ),
+ *    ),
+ * );
  */
 function template_create_list_menu($list_menu)
 {

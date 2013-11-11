@@ -2502,7 +2502,7 @@ function topicNotificationCount($memID)
 	list ($totalNotifications) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return (int)$totalNotifications;
+	return (int) $totalNotifications;
 }
 
 /**

@@ -736,7 +736,7 @@ class ManageAttachments_Controller extends Action_Controller
 	 * Called from the maintenance screen by
 	 *  ?action=admin;area=manageattachments;sa=bySize.
 	 * Optionally adds a certain text to the messages the attachments were
-	 * 	removed from.
+	 *  removed from.
 	 */
 	public function action_bySize()
 	{

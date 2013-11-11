@@ -281,8 +281,8 @@ class ManageBans_Controller extends Action_Controller
 	/**
 	 * This function is behind the screen for adding new bans and modifying existing ones.
 	 * Adding new bans:
-	 * 	- is accesssed by ?action=admin;area=ban;sa=add.
-	 * 	- uses the ban_edit sub template of the ManageBans template.
+	 *  - is accesssed by ?action=admin;area=ban;sa=add.
+	 *  - uses the ban_edit sub template of the ManageBans template.
 	 * Modifying existing bans:
 	 *  - is accesssed by ?action=admin;area=ban;sa=edit;bg=x
 	 *  - uses the ban_edit sub template of the ManageBans template.
@@ -718,8 +718,8 @@ class ManageBans_Controller extends Action_Controller
 	 * This function handles the ins and outs of the screen for adding new ban
 	 * triggers or modifying existing ones.
 	 * Adding new ban triggers:
-	 * 	- is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x
-	 * 	- uses the ban_edit_trigger sub template of ManageBans.
+	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x
+	 *  - uses the ban_edit_trigger sub template of ManageBans.
 	 * Editing existing ban triggers:
 	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
 	 *  - uses the ban_edit_trigger sub template of ManageBans.
