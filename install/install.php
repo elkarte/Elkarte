@@ -169,7 +169,7 @@ function initialize_inputs()
 	<head>
 		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
 	</head>
-	<body style="background: #d4d4d4; margin-top: 16%; text-align: center; font-size: 16pt;">
+	<body style="background: #d4d4d4; margin-top: 16%; font-size: 16pt;">
 		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
 	</body>
 </html>';
@@ -2217,7 +2217,7 @@ function template_chmod_files()
 
 	echo '
 		<form action="', $incontext['form_url'], '" method="post">
-			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
+			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
 				<tr>
 					<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
 					<td>
@@ -2264,7 +2264,7 @@ function template_database_settings()
 	template_warning_divs();
 
 	echo '
-		<table style="width: 100%; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">';
+		<table style="width: 100%; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0">';
 
 	// More than one database type?
 	if (count($incontext['supported_databases']) > 1)
@@ -2448,7 +2448,7 @@ function template_admin_account()
 	template_warning_divs();
 
 	echo '
-		<table style="width: 100%; margin: 2em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
+		<table style="width: 100%; margin: 2em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
 			<tr>
 				<td style="width:18%; vertical-align:top" class="textbox"><label for="username">', $txt['user_settings_username'], ':</label></td>
 				<td>
