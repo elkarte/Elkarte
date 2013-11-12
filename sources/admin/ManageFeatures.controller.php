@@ -601,7 +601,8 @@ class ManageFeatures_Controller extends Action_Controller
 					if (!empty($sig_limits[2]))
 					{
 						$count = 0;
-						for ($i = 0; $i < strlen($sig); $i++)
+						$str_len = strlen($sig);
+						for ($i = 0; $i < $str_len; $i++)
 						{
 							if ($sig[$i] == "\n")
 							{

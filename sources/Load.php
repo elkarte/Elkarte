@@ -424,7 +424,7 @@ function loadBoard()
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
 		// Looking through the message table can be slow, so try using the cache first.
-		if (($topic = cache_get_data('msg_topic-' . $_REQUEST['msg'], 120)) === NULL)
+		if (($topic = cache_get_data('msg_topic-' . $_REQUEST['msg'], 120)) === null)
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$topic = associatedTopic($_REQUEST['msg']);
@@ -2609,7 +2609,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => '',
-			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png' . '" alt="" class="avatar" />',
+			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png" alt="" class="avatar" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);

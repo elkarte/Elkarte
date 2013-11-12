@@ -389,7 +389,7 @@ class Maintenance_Controller extends Action_Controller
 
 			// Make it longer so we can do their limit.
 			if ($body_type == 'text')
-				 resizeMessageTableBody('mediumtext');
+				resizeMessageTableBody('mediumtext');
 			// Shorten the column so we can have a bit (literally per record) less space occupied
 			else
 				resizeMessageTableBody('text');
@@ -1091,8 +1091,9 @@ class Maintenance_Controller extends Action_Controller
 				apache_reset_timeout();
 			return;
 		}
+		
 		// No countable posts? set posts counter to 0
-		 updateZeroPostMembers();
+		updateZeroPostMembers();
 
 		// all done
 		unset($_SESSION['total_members']);

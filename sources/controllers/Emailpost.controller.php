@@ -327,7 +327,7 @@ class Emailpost_Controller extends Action_Controller
 			$text .= "\n\n" . sprintf($txt['email_attachments'], $attachment_count);
 
 		// Return the parsed and formatted body and who it was sent to for the template
-		return array('body' => $text, 'to' => implode(' & ', $email_message->email['to']) . (!empty($email_message->email['cc']) ? ', ' . implode(' & ',$email_message->email['cc']) : ''));
+		return array('body' => $text, 'to' => implode(' & ', $email_message->email['to']) . (!empty($email_message->email['cc']) ? ', ' . implode(' & ', $email_message->email['cc']) : ''));
 	}
 }
 

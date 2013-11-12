@@ -2559,7 +2559,7 @@ function redirectexit($setLocation = '', $refresh = false)
 			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html?" . SID . (isset($m[2]) ? $m[2] : "");'), $setLocation);
 		else
 			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html" . (isset($m[2]) ? $m[2] : "");'), $setLocation);
-   }
+	}
 
 	// Maybe integrations want to change where we are heading?
 	call_integration_hook('integrate_redirect', array(&$setLocation, &$refresh));
@@ -2765,7 +2765,7 @@ function setupThemeContext($forceload = false)
 		if (allowedTo('moderate_forum'))
 		{
 			$context['unapproved_members'] = (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion']) ? $modSettings['unapprovedMembers'] : 0;
-			$context['unapproved_members_text'] = $context['unapproved_members'] == 1 ? sprintf($txt['approve_one_member_waiting'],  $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve') : sprintf($txt['approve_many_members_waiting'],  $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $context['unapproved_members']);
+			$context['unapproved_members_text'] = $context['unapproved_members'] == 1 ? sprintf($txt['approve_one_member_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve') : sprintf($txt['approve_many_members_waiting'], $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve', $context['unapproved_members']);
 		}
 		$context['show_open_reports'] = empty($user_settings['mod_prefs']) || $user_settings['mod_prefs'][0] == 1;
 

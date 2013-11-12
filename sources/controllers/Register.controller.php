@@ -524,7 +524,7 @@ class Register_Controller extends Action_Controller
 		}
 		// If we've come from OpenID set up some default stuff.
 		elseif ($verifiedOpenID || ((!empty($_POST['openid_identifier']) || !empty($_SESSION['openid']['openid_uri'])) && $_POST['authenticate'] == 'openid'))
-		{	
+		{
 			$regOptions['username'] = !empty($_POST['user']) && trim($_POST['user']) != '' ? $_POST['user'] : $_SESSION['openid']['nickname'];
 			$regOptions['email'] = !empty($_POST['email']) && trim($_POST['email']) != '' ? $_POST['email'] : $_SESSION['openid']['email'];
 			$regOptions['auth_method'] = 'openid';

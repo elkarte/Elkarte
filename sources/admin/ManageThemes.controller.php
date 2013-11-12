@@ -194,7 +194,7 @@ class ManageThemes_Controller extends Action_Controller
 			loadTemplate('ManageThemes');
 
 			// Make our known themes a little easier to work with.
-			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',',$modSettings['knownThemes']) : array();
+			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',', $modSettings['knownThemes']) : array();
 
 			// Load up all the themes.
 			require_once(SUBSDIR . '/Themes.subs.php');
@@ -1254,7 +1254,7 @@ class ManageThemes_Controller extends Action_Controller
 			$_GET['val'] = serialize($options['admin_preferences']);
 		}
 		// If this is the window min/max settings, the passed window name will just be an element of it.
-		else if ($_GET['var'] == 'minmax_preferences')
+		elseif ($_GET['var'] == 'minmax_preferences')
 		{
 			$options['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
 

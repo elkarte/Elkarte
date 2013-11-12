@@ -195,7 +195,7 @@ function logLastDatabaseError()
 		}
 		else
 		{
-			@touch(BOARDDIR . '/' . 'Settings.php');
+			@touch(BOARDDIR . '/Settings.php');
 			return true;
 		}
 	}

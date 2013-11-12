@@ -39,7 +39,7 @@ class Xml_Controller extends Action_Controller
 		);
 
 		// Easy adding of xml sub actions
-	 	call_integration_hook('integrate_xmlhttp', array(&$subActions));
+		call_integration_hook('integrate_xmlhttp', array(&$subActions));
 
 		$action = new Action();
 		$action->initialize($subActions);
