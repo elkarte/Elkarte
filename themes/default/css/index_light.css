@@ -206,7 +206,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 /* News section. */
 #news {
-	padding: 0 0 1em 1em;
+	padding: 0 1em 1em 1em;
 	font-size: 0.929em;
 }
 #news>h2 {

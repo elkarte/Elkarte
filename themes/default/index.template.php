@@ -205,29 +205,66 @@ function template_body_above()
 	// Skip nav link.
 	echo '
 	<div id="top_section">
-		<div class="wrapper">
-			<p id="top_section_notice">';
+		<div class="wrapper">';
 
 	// If the user is logged in, display the time, or a maintenance warning for admins.
 	// @todo - TBH I always intended the time/date to be more or less a place holder for more important things.
 	// The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
 	// I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
 	// This could still be done via conditional, so that administration and moderation notices were still active when applicable.
-	if ($context['user']['is_logged'])
-	{
-		// Is the forum in maintenance mode?
-		if ($context['in_maintenance'] && $context['user']['is_admin'])
-			echo '
-				<span class="notice">', $txt['maintain_mode_on'], '</span>';
-		else
-			echo $context['current_time'];
-	}
-	// Otherwise they're a guest. Ask them to either register or login.
-	else
-		echo sprintf($txt[$context['can_register'] ? 'welcome_guest_register' : 'welcome_guest'], $txt['guest_title'], $scripturl . '?action=login');
 
 	echo '
-			</p>';
+			<div id="top_section_notice" class="user">';
+
+	// Show log in form to guests.
+	if (!empty($context['show_login_bar']))
+	{
+		echo '
+				<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
+				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>', !empty($modSettings['enableOpenID']) ? '
+					<img style="display: none" class="toggle_login" src="' . $settings['images_url'] . '/login.png" alt="' . $txt['toggle_password'] . '" title="' . $txt['toggle_openid'] . '" />' : '', '
+					<div id="password_login">
+						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
+						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
+						<select name="cookielength">
+							<option value="60">', $txt['one_hour'], '</option>
+							<option value="1440">', $txt['one_day'], '</option>
+							<option value="10080">', $txt['one_week'], '</option>
+							<option value="43200">', $txt['one_month'], '</option>
+							<option value="-1" selected="selected">', $txt['forever'], '</option>
+						</select>
+					</div>';
+
+		if (!empty($modSettings['enableOpenID']))
+		{
+			echo '
+					<div id="openid_login">
+						<input type="text" name="openid_identifier" size="25" class="input_text openid_login" placeholder="', $txt['openid'], '" />
+					</div>
+					<script>
+						var toggle_openid = ', JavaScriptEscape($txt['toggle_openid']), ';
+						var toggle_password = ', JavaScriptEscape($txt['toggle_password']), ';
+					</script>';
+		}
+
+		echo '
+					<input type="submit" value="', $txt['login'], '" class="button_submit" />
+					<input type="hidden" name="hash_passwrd" value="" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+				</form>';
+	}
+	// If the user is logged in, display stuff like their name, new messages, etc.
+	elseif ($context['user']['is_logged'])
+	{
+		echo '
+				<span class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></span>';
+		if (!empty($context['user']['avatar']))
+			echo '
+				<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
+	}
+	echo '
+			</div>';
 
 	if ($context['allow_search'])
 	{
@@ -304,50 +341,7 @@ function template_body_above()
 		</div>
 	</div>
 	<div id="wrapper" class="wrapper">
-		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
-			<div class="user">';
-
-	// Show log in form to guests.
-	if (!empty($context['show_login_bar']))
-	{
-		echo '
-				<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
-				<form id="guest_form" action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
-					<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
-					<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
-					<select name="cookielength">
-						<option value="60">', $txt['one_hour'], '</option>
-						<option value="1440">', $txt['one_day'], '</option>
-						<option value="10080">', $txt['one_week'], '</option>
-						<option value="43200">', $txt['one_month'], '</option>
-						<option value="-1" selected="selected">', $txt['forever'], '</option>
-					</select>
-					<input type="submit" value="', $txt['login'], '" class="button_submit" />
-					<div>', $txt['quick_login_dec'], '</div>';
-
-		if (!empty($modSettings['enableOpenID']))
-			echo '
-					<br /><input type="text" name="openid_identifier" size="25" class="input_text openid_login" placeholder="', $txt['openid'], '" />';
-
-		echo '
-					<input type="hidden" name="hash_passwrd" value="" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
-				</form>';
-	}
-
-	// If the user is logged in, display stuff like their name, new messages, etc.
-	if ($context['user']['is_logged'])
-	{
-		if (!empty($context['user']['avatar']))
-			echo '
-				<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
-		echo '
-				<span class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></span>';
-	}
-
-	echo '
-			</div>';
+		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>';
 
 	// Display either news fader and random news lines (not both). These now run most of the same mark up and CSS. Less complication = happier n00bz. :)
 	if (!empty($settings['enable_news']) && !empty($context['random_news_line']))
