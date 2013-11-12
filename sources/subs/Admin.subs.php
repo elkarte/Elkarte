@@ -45,7 +45,7 @@ function getServerVersions($checkFor)
 	// Why not have a look at ImageMagick? If it is, we should show version information for it too.
 	if (in_array('imagick', $checkFor) && class_exists('Imagick'))
 	{
-		$temp = New Imagick;
+		$temp = new Imagick;
 		$temp2 = $temp->getVersion();
 		$versions['imagick'] = array('title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']);
 	}
@@ -203,7 +203,7 @@ function getFileVersions(&$versionOptions)
 	// Find the version in SSI.php's file header.
 	if (!empty($versionOptions['include_ssi']) && file_exists(BOARDDIR . '/SSI.php'))
 	{
-		$header = file_get_contents(BOARDDIR . '/SSI.php', NULL, NULL, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/SSI.php', null, null, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['SSI.php'] = $match[1];
 		// Not found!  This is bad.
@@ -214,7 +214,7 @@ function getFileVersions(&$versionOptions)
 	// Do the paid subscriptions handler?
 	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
 	{
-		$header = file_get_contents(BOARDDIR . '/subscriptions.php', NULL, NULL, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/subscriptions.php', null, null, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['subscriptions.php'] = $match[1];
 		// If we haven't how do we all get paid?
@@ -239,7 +239,7 @@ function getFileVersions(&$versionOptions)
 			if (substr($entry, -4) === '.php' && !is_dir($dir . '/' . $entry) && $entry !== 'index.php' && $entry !== 'sphinxapi.php')
 			{
 				// Read the first 4k from the file.... enough for the header.
-				$header = file_get_contents($dir . '/' . $entry, NULL, NULL, 0, 768);
+				$header = file_get_contents($dir . '/' . $entry, null, null, 0, 768);
 
 				// Look for the version comment in the file header.
 				if (preg_match($version_regex, $header, $match))
@@ -265,7 +265,7 @@ function getFileVersions(&$versionOptions)
 			if (substr($entry, -12) == 'template.php' && !is_dir($dirname . '/' . $entry))
 			{
 				// Read the first 768 bytes from the file.... enough for the header.
-				$header = file_get_contents($dirname . '/' . $entry, NULL, NULL, 0, 768);
+				$header = file_get_contents($dirname . '/' . $entry, null, null, 0, 768);
 
 				// Look for the version comment in the file header.
 				if (preg_match($version_regex, $header, $match) == 1)
@@ -285,7 +285,7 @@ function getFileVersions(&$versionOptions)
 		if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($lang_dir . '/' . $entry))
 		{
 			// Read the first 768 bytes from the file.... enough for the header.
-			$header = file_get_contents($lang_dir . '/' . $entry, NULL, NULL, 0, 768);
+			$header = file_get_contents($lang_dir . '/' . $entry, null, null, 0, 768);
 
 			// Split the file name off into useful bits.
 			list ($name, $language) = explode('.', $entry);
@@ -332,7 +332,7 @@ function updateDbLastError($time)
 {
 	// Write out the db_last_error file with the error timestamp
 	file_put_contents(BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
-	@touch(BOARDDIR . '/' . 'Settings.php');
+	@touch(BOARDDIR . '/Settings.php');
 }
 
 /**

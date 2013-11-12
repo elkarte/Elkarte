@@ -301,7 +301,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 		);
 		$preferred_format = empty($preferred_format) || !isset($default_formats[$preferred_format]) ? 2 : $preferred_format;
 
-		$imagick = New Imagick($destName);
+		$imagick = new Imagick($destName);
 		$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
 		$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
 		$dest_width = empty($max_width) ? $src_width : $max_width;
@@ -748,7 +748,8 @@ function showCodeImage($code)
 	// Create a list of characters to be shown.
 	$characters = array();
 	$loaded_fonts = array();
-	for ($i = 0; $i < strlen($code); $i++)
+	$str_len = strlen($code);
+	for ($i = 0; $i < $str_len; $i++)
 	{
 		$characters[$i] = array(
 			'id' => $code{$i},
