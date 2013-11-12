@@ -63,12 +63,12 @@ $txt['modlog_ac_install'] = 'Installed version {version}';
 $txt['modlog_ac_add_board'] = 'Added a new board: &quot;{board}&quot;';
 $txt['modlog_ac_edit_board'] = 'Edited the &quot;{board}&quot; board';
 $txt['modlog_ac_delete_board'] = 'Deleted the &quot;{boardname}&quot; board';
-$txt['modlog_ac_add_cat'] = 'Added a new category, &quot;{catname}&quot;';
+$txt['modlog_ac_add_cat'] = 'Added a new category: &quot;{catname}&quot;';
 $txt['modlog_ac_edit_cat'] = 'Edited the &quot;{catname}&quot; category';
 $txt['modlog_ac_delete_cat'] = 'Deleted the &quot;{catname}&quot; category';
 
 $txt['modlog_ac_delete_group'] = 'Deleted the &quot;{group}&quot; group';
-$txt['modlog_ac_add_group'] = 'Added the &quot;{group}&quot; group';
+$txt['modlog_ac_add_group'] = 'Added new group: &quot;{group}&quot;';
 $txt['modlog_ac_edited_group'] = 'Edited the &quot;{group}&quot; group';
 $txt['modlog_ac_added_to_group'] = 'Added &quot;{member}&quot; to the &quot;{group}&quot; group';
 $txt['modlog_ac_removed_from_group'] = 'Removed &quot;{member}&quot; from the &quot;{group}&quot; group';
