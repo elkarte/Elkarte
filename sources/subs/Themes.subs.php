@@ -446,7 +446,7 @@ function availableThemes($current_theme, $current_member)
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Figure out which theme it is they are REALLY using.
-		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',',$modSettings['knownThemes'])))
+		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',', $modSettings['knownThemes'])))
 			$row['id_theme'] = $guest_theme;
 		elseif (empty($modSettings['theme_allow']))
 			$row['id_theme'] = $guest_theme;

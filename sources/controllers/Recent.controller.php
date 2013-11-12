@@ -125,7 +125,7 @@ class Recent_Controller extends Action_Controller
 		elseif (!empty($board))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$board_data = fetchBoardsInfo(array('boards' => $board),  array('selects' => 'posts'));
+			$board_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
 
 			$query_this_board = 'b.id_board = {int:board}';
 			$query_parameters['board'] = $board;
@@ -1074,6 +1074,6 @@ class Recent_Controller extends Action_Controller
 		}
 
 		// Allow helpdesks and bug trackers and what not to add their own unread data (just add a template_layer to show custom stuff in the template!)
-	 	call_integration_hook('integrate_unread_list');
+		call_integration_hook('integrate_unread_list');
 	}
 }

@@ -35,12 +35,13 @@ function sha1_smf($str)
 	$nblk = (strlen($str) + 8 >> 6) + 1;
 	$blks = array_pad(array(), $nblk * 16, 0);
 
-	for ($i = 0; $i < strlen($str); $i++)
+	$str_len = strlen($str);
+	for ($i = 0; $i < $str_len; $i++)
 		$blks[$i >> 2] |= ord($str{$i}) << (24 - ($i % 4) * 8);
 
 	$blks[$i >> 2] |= 0x80 << (24 - ($i % 4) * 8);
 
-	return sha1_core($blks, strlen($str) * 8);
+	return sha1_core($blks, $str_len * 8);
 }
 
 /**

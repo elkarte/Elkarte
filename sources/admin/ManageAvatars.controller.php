@@ -35,8 +35,8 @@ class ManageAvatars_Controller extends Action_Controller
 			'display' => array($this, 'action_avatarSettings_display')
 		);
 
-		// this is hardcoded now, to be fixed
-		$subAction = 'display';
+		// Not many options
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['avatar_settings'];
 

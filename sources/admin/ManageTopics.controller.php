@@ -39,9 +39,8 @@ class ManageTopics_Controller extends Action_Controller
 				'permission' => 'admin_forum')
 		);
 
-		$subAction = 'display';
-
 		// Only one option I'm afraid
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['manageposts_topic_settings'];
 

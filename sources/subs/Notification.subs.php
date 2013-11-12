@@ -1033,7 +1033,7 @@ function toggleNotificationsApproval($msgs, $approved)
 {
 	$db = database();
 
-	$db->query('','
+	$db->query('', '
 		UPDATE {db_prefix}log_notifications
 		SET status = {int:status}
 		WHERE id_msg IN ({array_int:messages})',

@@ -78,14 +78,10 @@ class ManageAttachments_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_attachments', array(&$subActions));
 
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'browse');
 
 		// Pick the correct sub-action.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'browse';
-
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
 		$context['sub_action'] = $subAction;
 
 		// Default page title is good.
@@ -492,7 +488,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'value' => $txt['attachment_file_size'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData','
+						'function' => create_function('$rowData', '
 							global $txt;
 
 							return sprintf(\'%1$s%2$s\', round($rowData[\'size\'] / 1024, 2), $txt[\'kilobyte\']);
@@ -779,7 +775,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 			if ($_REQUEST['type'] == 'avatars' && !empty($attachments))
 				removeAttachments(array('id_attach' => $attachments));
-			else if (!empty($attachments))
+			elseif (!empty($attachments))
 			{
 				$messages = removeAttachments(array('id_attach' => $attachments), 'messages', true);
 
@@ -1059,7 +1055,6 @@ class ManageAttachments_Controller extends Action_Controller
 		// What stage are we at?
 		$context['completed'] = $fix_errors ? true : false;
 		$context['errors_found'] = !empty($to_fix) ? true : false;
-
 	}
 
 	/**
@@ -1316,7 +1311,7 @@ class ManageAttachments_Controller extends Action_Controller
 				//$modSettings['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
 			}
 
-			If (isset($_POST['base_dir']))
+			if (isset($_POST['base_dir']))
 			{
 				foreach ($_POST['base_dir'] as $id => $dir)
 				{
@@ -1710,7 +1705,6 @@ class ManageAttachments_Controller extends Action_Controller
 					if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
 					{
 						$dir_files++;
-						// @todo $source is unitialized at this point. If this isn't a bug, we should comment where it is set as to not add confusion later
 						$dir_size += !empty($row['size']) ? $row['size'] : filesize($source);
 
 						// If we've reached a limit. Do something.

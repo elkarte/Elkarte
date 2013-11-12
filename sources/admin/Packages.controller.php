@@ -64,14 +64,11 @@ class Packages_Controller extends Action_Controller
 		);
 
 		// Work out exactly who it is we are calling.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'browse';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'browse');
 		$context['sub_action'] = $subAction;
 
 		// Set up some tabs...
@@ -355,7 +352,7 @@ class Packages_Controller extends Action_Controller
 						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
 							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
 						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php' . '||' . $action['filename']);
+							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
 						else
 							$actual_filename = $key;
 
@@ -438,7 +435,7 @@ class Packages_Controller extends Action_Controller
 						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
 							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
 						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php' . '||' . $action['filename']);
+							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
 						else
 							$actual_filename = $key;
 

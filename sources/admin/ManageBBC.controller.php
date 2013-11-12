@@ -38,7 +38,7 @@ class ManageBBC_Controller extends Action_Controller
 		);
 
 		// Only one option I'm afraid
-		$subAction = 'display';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
 		$context['sub_action'] = $subAction;
 		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
 

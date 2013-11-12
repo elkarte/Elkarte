@@ -1006,7 +1006,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 		ORDER BY' . (
 			$includeStickies ? '
 				t2.is_sticky {raw:sorting},' :
-				 '') .
+				'') .
 			' t2.id_last_msg {raw:sorting}
 		LIMIT 1',
 		array(

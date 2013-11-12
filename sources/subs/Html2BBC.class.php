@@ -281,7 +281,7 @@ class Convert_BBC
 				$bbc = ':   ' . $this->_get_value($node) . $this->line_break;
 				break;
 			case 'dl':
-				 $bbc = trim($this->_get_value($node)) . $this->line_break;
+				$bbc = trim($this->_get_value($node)) . $this->line_break;
 				break;
 			case 'div':
 				$bbc = $this->strip_newlines ? str_replace("\n", ' ', $this->_convert_styles($node)) : $this->_convert_styles($node);
@@ -847,7 +847,7 @@ class Convert_BBC
 	{
 		$styles = array();
 
-		if (preg_match_all('~.*?:.*?(;|$)~', $style, $matches,  PREG_SET_ORDER ))
+		if (preg_match_all('~.*?:.*?(;|$)~', $style, $matches, PREG_SET_ORDER))
 		{
 			foreach ($matches as $match)
 			{	if (strpos($match[0], ':'))

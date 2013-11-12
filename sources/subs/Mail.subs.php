@@ -224,11 +224,11 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			{
 				$unq_head = md5($boardurl . microtime() . rand()) . '-' . $message_id;
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
 				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif (empty($modSettings['mail_no_message_id']))
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
 			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id))
 			{
@@ -572,7 +572,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		{
 			$unq_head = md5($scripturl . microtime() . rand()) . '-' . $message_id;
 			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-			$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
 			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
 		}
 
@@ -1234,11 +1234,11 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 			{
 				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
 			// No point logging a specific error here, as we have no language. PHP error is helpful anyway...
 			$result = mail(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);

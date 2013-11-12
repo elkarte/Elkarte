@@ -223,7 +223,7 @@ function updateLike($id_liker, $liked_message, $direction)
 	// Or you are just being fickle?
 	elseif ($count !==0 && $direction === '-')
 	{
-		$db->query('','
+		$db->query('', '
 			DELETE FROM {db_prefix}message_likes
 			WHERE id_member = {int:id_member}
 				AND id_msg = {int:id_msg}',
