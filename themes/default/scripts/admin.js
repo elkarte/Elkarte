@@ -620,15 +620,6 @@ function make_preview_btn (preview_id)
 		$id.wrap('<a class="linkbutton_right" href="javascript:void(0);"></a>');
 }
 
-function elkSetLatestThemes()
-{
-	if (typeof(window.ourLatestThemes) !== "undefined")
-		setInnerHTML(document.getElementById("themeLatest"), window.ourLatestThemes);
-
-	if (tempOldOnload)
-		tempOldOnload();
-}
-
 function changeVariant(sVariant)
 {
 	document.getElementById('variant_preview').src = oThumbnails[sVariant];

@@ -168,7 +168,7 @@ class PackageServers_Controller extends Action_Controller
 			{
 				$context['sub_template'] = 'package_confirm';
 				$context['page_title'] = $txt['package_servers'];
-				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute']));
+				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute'], ENT_COMPAT, 'UTF-8'));
 				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
 
 				return;

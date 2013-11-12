@@ -26,9 +26,6 @@ $txt['theme_install_general'] = 'The theme doesn\'t seem to be where it should, 
 $txt['theme_installed'] = 'Installed Successfully';
 $txt['theme_installed_message'] = 'was installed successfully.';
 
-$txt['theme_latest'] = 'Latest and Greatest Themes';
-$txt['theme_latest_fetch'] = 'Fetching latest themes from www.elkarte.net...';
-
 $txt['theme_pick'] = 'Choose a theme...';
 $txt['theme_preview'] = 'Preview theme';
 $txt['theme_set'] = 'Use this theme';

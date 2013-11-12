@@ -1768,7 +1768,7 @@ function parse_sql($filename)
 					flush();
 				}
 
-				$last_step = htmlspecialchars(rtrim(substr($line, 4)));
+				$last_step = htmlspecialchars(rtrim(substr($line, 4)), ENT_COMPAT, 'UTF-8');
 				$upcontext['current_item_num']++;
 				$upcontext['current_item_name'] = $last_step;
 
@@ -1785,7 +1785,7 @@ function parse_sql($filename)
 
 				$upcontext['current_debug_item_num']++;
 				if (trim($line) != '---#')
-					$upcontext['current_debug_item_name'] = htmlspecialchars(rtrim(substr($line, 4)));
+					$upcontext['current_debug_item_name'] = htmlspecialchars(rtrim(substr($line, 4)), ENT_COMPAT, 'UTF-8');
 
 				// Have we already done something?
 				if (isset($_GET['xml']) && $done_something)
@@ -1803,7 +1803,7 @@ function parse_sql($filename)
 					elseif (trim($line) != '---#')
 					{
 						if ($is_debug)
-							$upcontext['actioned_items'][] = htmlspecialchars(rtrim(substr($line, 4)));
+							$upcontext['actioned_items'][] = htmlspecialchars(rtrim(substr($line, 4)), ENT_COMPAT, 'UTF-8');
 					}
 				}
 
@@ -3882,9 +3882,9 @@ function template_upgrade_options()
 							<label for="maint">Put the forum into maintenance mode during upgrade.</label> <span class="smalltext">(<a href="#" onclick="document.getElementById(\'mainmess\').style.display = document.getElementById(\'mainmess\').style.display == \'\' ? \'none\' : \'\'">Customize</a>)</span>
 							<div id="mainmess" style="display: none;">
 								<strong class="smalltext">Maintenance Title: </strong><br />
-								<input type="text" name="maintitle" size="30" value="', htmlspecialchars($mtitle), '" class="input_text" /><br />
+								<input type="text" name="maintitle" size="30" value="', htmlspecialchars($mtitle, ENT_COMPAT, 'UTF-8'), '" class="input_text" /><br />
 								<strong class="smalltext">Maintenance Message: </strong><br />
-								<textarea name="mainmessage" rows="3" cols="50">', htmlspecialchars($mmessage), '</textarea>
+								<textarea name="mainmessage" rows="3" cols="50">', htmlspecialchars($mmessage, ENT_COMPAT, 'UTF-8'), '</textarea>
 							</div>
 						</td>
 					</tr>

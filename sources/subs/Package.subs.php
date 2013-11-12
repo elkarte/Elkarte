@@ -1136,12 +1136,12 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 						if (isset($context[$type]['selected']) && $context[$type]['selected'] == 'default')
 							$context[$type][] = 'default';
 
-						$context[$type]['selected'] = htmlspecialchars($action->fetch('@lang'));
+						$context[$type]['selected'] = htmlspecialchars($action->fetch('@lang'), ENT_COMPAT, 'UTF-8');
 					}
 					else
 					{
 						// We don't want this now, but we'll allow the user to select to read it.
-						$context[$type][] = htmlspecialchars($action->fetch('@lang'));
+						$context[$type][] = htmlspecialchars($action->fetch('@lang'), ENT_COMPAT, 'UTF-8');
 						continue;
 					}
 				}

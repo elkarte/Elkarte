@@ -199,7 +199,7 @@ class News_Controller extends Action_Controller
 				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 		}
 
-		$feed_title = htmlspecialchars(strip_tags($context['forum_name'])) . (isset($feed_title) ? $feed_title : '');
+		$feed_title = htmlspecialchars(strip_tags($context['forum_name']), ENT_COMPAT, 'UTF-8') . (isset($feed_title) ? $feed_title : '');
 
 		// This is an xml file....
 		ob_end_clean();
@@ -380,7 +380,7 @@ class News_Controller extends Action_Controller
 			else
 				$data[] = array(
 					'name' => cdata_parse($member['real_name']),
-					'time' => htmlspecialchars(strip_tags(standardTime($member['date_registered']))),
+					'time' => htmlspecialchars(strip_tags(standardTime($member['date_registered'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $member['id_member'],
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member']
 				);
@@ -514,7 +514,7 @@ class News_Controller extends Action_Controller
 			else
 			{
 				$data[] = array(
-				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time']))),
+				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_topic'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),
@@ -679,7 +679,7 @@ class News_Controller extends Action_Controller
 			else
 			{
 				$data[] = array(
-				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time']))),
+				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_msg'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),

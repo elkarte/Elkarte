@@ -720,7 +720,7 @@ class PersonalMessage_Controller extends Action_Controller
 				{
 					$context['recipients']['to'][] = array(
 						'id' => $row_quoted['id_member'],
-						'name' => htmlspecialchars($row_quoted['real_name']),
+						'name' => htmlspecialchars($row_quoted['real_name'], ENT_COMPAT, 'UTF-8'),
 					);
 				}
 
@@ -1822,9 +1822,9 @@ class PersonalMessage_Controller extends Action_Controller
 		if (isset($_REQUEST['search']))
 			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
 		if (isset($context['search_params']['search']))
-			$context['search_params']['search'] = htmlspecialchars($context['search_params']['search']);
+			$context['search_params']['search'] = htmlspecialchars($context['search_params']['search'], ENT_COMPAT, 'UTF-8');
 		if (isset($context['search_params']['userspec']))
-			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec']);
+			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT, 'UTF-8');
 		if (!empty($context['search_params']['searchtype']))
 			$context['search_params']['searchtype'] = 2;
 		if (!empty($context['search_params']['minage']))

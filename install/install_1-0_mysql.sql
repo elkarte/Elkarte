@@ -25,11 +25,7 @@ INSERT INTO {$db_prefix}admin_info_files
 VALUES
 	(1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript'),
 	(2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript'),
-	(4, 'latest-packages.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(5, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(6, 'latest-support.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(7, 'latest-themes.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
@@ -80,7 +76,8 @@ CREATE TABLE {$db_prefix}attachments (
   PRIMARY KEY (id_attach),
   UNIQUE id_member (id_member, id_attach),
   KEY id_msg (id_msg),
-  KEY attachment_type (attachment_type)
+  KEY attachment_type (attachment_type),
+  KEY id_thumb (id_thumb)
 ) ENGINE=MyISAM;
 
 #

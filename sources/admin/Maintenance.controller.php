@@ -49,12 +49,15 @@ class Maintenance_Controller extends Action_Controller
 				'database' => array(),
 				'members' => array(),
 				'topics' => array(),
+				'topics' => array(),
+				'attachments' => array('label' => $txt['maintain_sub_attachments']),
 			),
 		);
 
 		// So many things you can do - but frankly I won't let you - just these!
 		$subActions = array(
 			'routine' => array(
+				'controller' => $this,
 				'function' => 'action_routine',
 				'activities' => array(
 					'version' => 'action_version_display',
@@ -65,6 +68,7 @@ class Maintenance_Controller extends Action_Controller
 				),
 			),
 			'database' => array(
+				'controller' => $this,
 				'function' => 'action_database',
 				'activities' => array(
 					'optimize' => 'action_optimize_display',
@@ -73,6 +77,7 @@ class Maintenance_Controller extends Action_Controller
 				),
 			),
 			'members' => array(
+				'controller' => $this,
 				'function' => 'action_members',
 				'activities' => array(
 					'reattribute' => 'action_reattribute_display',
@@ -81,6 +86,7 @@ class Maintenance_Controller extends Action_Controller
 				),
 			),
 			'topics' => array(
+				'controller' => $this,
 				'function' => 'action_topics',
 				'activities' => array(
 					'massmove' => 'action_massmove_display',
@@ -88,26 +94,31 @@ class Maintenance_Controller extends Action_Controller
 					'olddrafts' => 'action_olddrafts_display',
 				),
 			),
+			'attachments' => array(
+				'file' => 'ManageAttachments.controller.php',
+				'controller' => 'ManageAttachments_Controller',
+				'function' => 'action_maintenance',
+			),
 		);
 
 		call_integration_hook('integrate_manage_maintenance', array(&$subActions));
 
 		// Yep, sub-action time!
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'routine';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'routine';
 
 		// Doing something special?
 		if (isset($_REQUEST['activity']) && isset($subActions[$subAction]['activities'][$_REQUEST['activity']]))
 			$activity = $_REQUEST['activity'];
 
 		// Set a few things.
+		$context[$context['admin_menu_name']]['current_subsection'] = $subAction;
 		$context['page_title'] = $txt['maintain_title'];
 		$context['sub_action'] = $subAction;
 
 		// Finally fall through to what we are doing.
-		$this->{$subActions[$subAction]['function']}();
+		$action = new Action();
+		$action->initialize($subActions, 'routine');
+		$action->dispatch($subAction);
 
 		// Any special activity?
 		if (isset($activity))

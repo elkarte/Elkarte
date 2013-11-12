@@ -168,7 +168,7 @@ function prepareMessageContext($message)
 	foreach ($message['attachment_stuff'] as $attachment)
 	{
 		$context['current_attachments'][] = array(
-			'name' => htmlspecialchars($attachment['filename']),
+			'name' => htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8'),
 			'size' => $attachment['filesize'],
 			'id' => $attachment['id_attach'],
 			'approved' => $attachment['attachment_approved'],
@@ -178,8 +178,8 @@ function prepareMessageContext($message)
 	// Allow moderators to change names....
 	if (allowedTo('moderate_forum') && empty($message['message']['id_member']))
 	{
-		$context['name'] = htmlspecialchars($message['message']['poster_name']);
-		$context['email'] = htmlspecialchars($message['message']['poster_email']);
+		$context['name'] = htmlspecialchars($message['message']['poster_name'], ENT_COMPAT, 'UTF-8');
+		$context['email'] = htmlspecialchars($message['message']['poster_email'], ENT_COMPAT, 'UTF-8');
 	}
 
 	// When was it last modified?

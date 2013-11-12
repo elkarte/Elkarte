@@ -1029,8 +1029,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'given' => $profile['likes_given'],
 				'received' => $profile['likes_received']
 			),
-			'ip' => htmlspecialchars($profile['member_ip']),
-			'ip2' => htmlspecialchars($profile['member_ip2']),
+			'ip' => htmlspecialchars($profile['member_ip'], ENT_COMPAT, 'UTF-8'),
+			'ip2' => htmlspecialchars($profile['member_ip2'], ENT_COMPAT, 'UTF-8'),
 			'online' => array(
 				'is_online' => $profile['is_online'],
 				'text' => Util::htmlspecialchars($txt[$profile['is_online'] ? 'online' : 'offline']),

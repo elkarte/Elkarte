@@ -261,7 +261,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_spider\'], htmlspecialchars($rowData[\'spider_name\']));
+							return sprintf(\'<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_spider\'], htmlspecialchars($rowData[\'spider_name\'], ENT_COMPAT, \'UTF-8\'));
 						'),
 					),
 					'sort' => array(

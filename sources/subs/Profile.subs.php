@@ -819,8 +819,8 @@ function loadProfileFields($force_reload = false)
 				foreach ($context[\'smiley_sets\'] as $i => $set)
 				{
 					$context[\'smiley_sets\'][$i] = array(
-						\'id\' => htmlspecialchars($set),
-						\'name\' => htmlspecialchars($set_names[$i]),
+						\'id\' => htmlspecialchars($set, ENT_COMPAT, \'UTF-8\'),
+						\'name\' => htmlspecialchars($set_names[$i], ENT_COMPAT, \'UTF-8\'),
 						\'selected\' => $set == $context[\'member\'][\'smiley_set\'][\'id\']
 					);
 
@@ -1993,7 +1993,7 @@ function profileValidateSignature(&$value)
 	// Too long?
 	if (!allowedTo('admin_forum') && !empty($sig_limits[1]) && Util::strlen(str_replace('<br />', "\n", $value)) > $sig_limits[1])
 	{
-		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES));
+		$_POST['signature'] = trim(htmlspecialchars(str_replace('<br />', "\n", $value), ENT_QUOTES, 'UTF-8'));
 		$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);
 		return 'signature_max_length';
 	}

@@ -181,7 +181,7 @@ class ManageBoards_Controller extends Action_Controller
 		{
 			createToken('admin-bm-' . $context['move_board'], 'request');
 
-			$context['move_title'] = sprintf($txt['mboards_select_destination'], htmlspecialchars($boards[$context['move_board']]['name']));
+			$context['move_title'] = sprintf($txt['mboards_select_destination'], htmlspecialchars($boards[$context['move_board']]['name'], ENT_COMPAT, 'UTF-8'));
 			foreach ($cat_tree as $catid => $tree)
 			{
 				$prev_child_level = 0;
@@ -194,7 +194,7 @@ class ManageBoards_Controller extends Action_Controller
 					if (!isset($context['categories'][$catid]['move_link']))
 						$context['categories'][$catid]['move_link'] = array(
 							'child_level' => 0,
-							'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($boards[$boardid]['name']) . '\'',
+							'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
 							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=before;' . $security,
 						);
 
@@ -202,12 +202,12 @@ class ManageBoards_Controller extends Action_Controller
 					$context['categories'][$catid]['boards'][$boardid]['move_links'] = array(
 						array(
 							'child_level' => $boards[$boardid]['level'],
-							'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name']) . '\'',
+							'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
 							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=after;' . $security,
 						),
 						array(
 							'child_level' => $boards[$boardid]['level'] + 1,
-							'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name']) . '\'',
+							'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
 							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=child;' . $security,
 						),
 					);
@@ -236,7 +236,7 @@ class ManageBoards_Controller extends Action_Controller
 				if (empty($boardList[$catid]))
 					$context['categories'][$catid]['move_link'] = array(
 						'child_level' => 0,
-						'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($tree['node']['name']) . '\'',
+						'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($tree['node']['name'], ENT_COMPAT, 'UTF-8') . '\'',
 						'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_cat=' . $catid . ';move_to=top;' . $security,
 					);
 			}
@@ -285,7 +285,7 @@ class ManageBoards_Controller extends Action_Controller
 			$context['category'] = array(
 				'id' => 0,
 				'name' => $txt['mboards_new_cat_name'],
-				'editable_name' => htmlspecialchars($txt['mboards_new_cat_name']),
+				'editable_name' => htmlspecialchars($txt['mboards_new_cat_name'], ENT_COMPAT, 'UTF-8'),
 				'can_collapse' => true,
 				'is_new' => true,
 				'is_empty' => true
@@ -299,7 +299,7 @@ class ManageBoards_Controller extends Action_Controller
 			$context['category'] = array(
 				'id' => $_REQUEST['cat'],
 				'name' => $cat_tree[$_REQUEST['cat']]['node']['name'],
-				'editable_name' => htmlspecialchars($cat_tree[$_REQUEST['cat']]['node']['name']),
+				'editable_name' => htmlspecialchars($cat_tree[$_REQUEST['cat']]['node']['name'], ENT_COMPAT, 'UTF-8'),
 				'can_collapse' => !empty($cat_tree[$_REQUEST['cat']]['node']['can_collapse']),
 				'children' => array(),
 				'is_empty' => empty($cat_tree[$_REQUEST['cat']]['children'])
@@ -467,8 +467,8 @@ class ManageBoards_Controller extends Action_Controller
 			// Just some easy shortcuts.
 			$curBoard = &$boards[$_REQUEST['boardid']];
 			$context['board'] = $boards[$_REQUEST['boardid']];
-			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')));
-			$context['board']['description'] = htmlspecialchars($context['board']['description']);
+			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')), ENT_COMPAT, 'UTF-8');
+			$context['board']['description'] = htmlspecialchars($context['board']['description'], ENT_COMPAT, 'UTF-8');
 			$context['board']['no_children'] = empty($boards[$_REQUEST['boardid']]['tree']['children']);
 			$context['board']['is_recycle'] = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $context['board']['id'];
 		}

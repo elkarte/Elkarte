@@ -327,8 +327,8 @@ class ManageSmileys_Controller extends Action_Controller
 		foreach ($context['smiley_sets'] as $i => $set)
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
-				'path' => htmlspecialchars($set),
-				'name' => htmlspecialchars($set_names[$i]),
+				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -539,8 +539,8 @@ class ManageSmileys_Controller extends Action_Controller
 		foreach ($context['smiley_sets'] as $i => $set)
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
-				'path' => htmlspecialchars($set),
-				'name' => htmlspecialchars($set_names[$i]),
+				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -732,7 +732,7 @@ class ManageSmileys_Controller extends Action_Controller
 				{
 					if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 						$context['filenames'][strtolower($entry)] = array(
-							'id' => htmlspecialchars($entry),
+							'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
 							'selected' => false,
 						);
 				}
@@ -843,8 +843,8 @@ class ManageSmileys_Controller extends Action_Controller
 		foreach ($context['smiley_sets'] as $i => $set)
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
-				'path' => htmlspecialchars($set),
-				'name' => htmlspecialchars($set_names[$i]),
+				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -946,7 +946,7 @@ class ManageSmileys_Controller extends Action_Controller
 						),
 						'data' => array(
 							'function' => create_function('$rowData', empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir']) ? '
-								return htmlspecialchars($rowData[\'description\']);
+								return htmlspecialchars($rowData[\'description\'], ENT_COMPAT, \'UTF-8\');
 							' : '
 								global $context, $txt, $modSettings;
 
@@ -956,7 +956,7 @@ class ManageSmileys_Controller extends Action_Controller
 									if (!file_exists(sprintf(\'%1$s/%2$s/%3$s\', $modSettings[\'smileys_dir\'], $smiley_set[\'path\'], $rowData[\'filename\'])))
 										$missing_sets[] = $smiley_set[\'path\'];
 
-								$description = htmlspecialchars($rowData[\'description\']);
+								$description = htmlspecialchars($rowData[\'description\'], ENT_COMPAT, \'UTF-8\');
 
 								if (!empty($missing_sets))
 									$description .= sprintf(\'<br /><span class="smalltext"><strong>%1$s:</strong> %2$s</span>\', $txt[\'smileys_not_found_in_set\'], implode(\', \', $missing_sets));
@@ -1078,8 +1078,8 @@ class ManageSmileys_Controller extends Action_Controller
 			foreach ($context['smiley_sets'] as $i => $set)
 				$context['smiley_sets'][$i] = array(
 					'id' => $i,
-					'path' => htmlspecialchars($set),
-					'name' => htmlspecialchars($set_names[$i]),
+					'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+					'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 					'selected' => $set == $modSettings['smiley_sets_default']
 				);
 
@@ -1099,7 +1099,7 @@ class ManageSmileys_Controller extends Action_Controller
 					{
 						if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 							$context['filenames'][strtolower($entry)] = array(
-								'id' => htmlspecialchars($entry),
+								'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
 								'selected' => false,
 							);
 					}
@@ -1110,9 +1110,9 @@ class ManageSmileys_Controller extends Action_Controller
 
 			$_REQUEST['smiley'] = (int) $_REQUEST['smiley'];
 			$context['current_smiley'] = getSmiley($_REQUEST['smiley']);
-			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code']);
-			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename']);
-			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description']);
+			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code'], ENT_COMPAT, 'UTF-8');
+			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename'], ENT_COMPAT, 'UTF-8');
+			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description'], ENT_COMPAT, 'UTF-8');
 
 			if (isset($context['filenames'][strtolower($context['current_smiley']['filename'])]))
 				$context['filenames'][strtolower($context['current_smiley']['filename'])]['selected'] = true;
@@ -1234,7 +1234,7 @@ class ManageSmileys_Controller extends Action_Controller
 							global $settings;
 
 							$images_url = $settings[file_exists(sprintf(\'%1$s/images/post/%2$s.png\', $settings[\'theme_dir\'], $rowData[\'filename\'])) ? \'actual_images_url\' : \'default_images_url\'];
-							return sprintf(\'<img src="%1$s/post/%2$s.png" alt="%3$s" />\', $images_url, $rowData[\'filename\'], htmlspecialchars($rowData[\'title\']));
+							return sprintf(\'<img src="%1$s/post/%2$s.png" alt="%3$s" />\', $images_url, $rowData[\'filename\'], htmlspecialchars($rowData[\'title\'], ENT_COMPAT, \'UTF-8\'));
 						'),
 						'class' => 'centertext',
 					),
@@ -1531,9 +1531,9 @@ class ManageSmileys_Controller extends Action_Controller
 				$has_readme = true;
 				$type = 'package_' . $action['type'];
 				if (file_exists(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']), "\n\r"));
+					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 				elseif (file_exists($action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"));
+					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 
 				if (!empty($action['parse_bbc']))
 				{

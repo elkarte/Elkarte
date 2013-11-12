@@ -60,7 +60,7 @@ function template_maintenance()
 					<dt><strong>', $txt['attachment_total'], ':</strong></dt><dd>', $context['num_attachments'], '</dd>
 					<dt><strong>', $txt['attachment_manager_total_avatars'], ':</strong></dt><dd>', $context['num_avatars'], '</dd>
 					<dt><strong>', $txt['attachmentdir_size'], ':</strong></dt><dd>', $context['attachment_total_size'], ' ', $txt['kilobyte'], '</dd>
-					<dt><strong>', $txt['attach_current_dir'], ':</strong></dt><dd>', $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']], '</dd>
+					<dt><strong>', $txt['attach_current_dir'], ':</strong></dt><dd>', $context['attach_dirs'][$modSettings['currentAttachmentUploadDir']], '</dd>
 					<dt><strong>', $txt['attachmentdir_size_current'], ':</strong></dt><dd>', $context['attachment_current_size'], ' ', $txt['kilobyte'], '</dd>
 					<dt><strong>', $txt['attachment_space'], ':</strong></dt><dd>', isset($context['attachment_space']) ? $context['attachment_space'] . ' ' . $txt['kilobyte'] : $txt['attachmentdir_size_not_set'], '</dd>
 					<dt><strong>', $txt['attachmentdir_files_current'], ':</strong></dt><dd>', $context['attachment_current_files'], '</dd>
@@ -238,31 +238,30 @@ function template_attachment_repair()
 	else
 	{
 		echo '
-	<div id="manage_attachments">
-		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=manageattachments;sa=repair;fixErrors=1;step=0;substep=0;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">', $txt['repair_attachments'], '</h2>
-			<div class="windowbg">
-				<div class="content">
-					<p>', $txt['repair_attachments_error_desc'], '</p>';
+	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=manageattachments;sa=repair;fixErrors=1;step=0;substep=0;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+		<h3 class="category_header">', $txt['repair_attachments'], '</h3>
+		<div class="windowbg">
+			<div class="content">
+				<p>', $txt['repair_attachments_error_desc'], '</p>';
 
 		// Loop through each error reporting the status
 		foreach ($context['repair_errors'] as $error => $number)
 		{
 			if (!empty($number))
 				echo '
-					<input type="checkbox" name="to_fix[]" id="', $error, '" value="', $error, '" class="input_check" />
-					<label for="', $error, '">', sprintf($txt['attach_repair_' . $error], $number), '</label><br />';
+				<input type="checkbox" name="to_fix[]" id="', $error, '" value="', $error, '" class="input_check" />
+				<label for="', $error, '">', sprintf($txt['attach_repair_' . $error], $number), '</label>
+				<br>';
 		}
 
 		echo '
-					<div class="submitbutton">
-						<input type="submit" value="', $txt['repair_attachments_continue'], '" class="button_submit" />
-						<input type="submit" name="cancel" value="', $txt['repair_attachments_cancel'], '" class="button_submit" />
-					</div>
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['repair_attachments_continue'], '" class="button_submit" />
+					<input type="submit" name="cancel" value="', $txt['repair_attachments_cancel'], '" class="button_submit" />
 				</div>
 			</div>
-		</form>
-	</div>';
+		</div>
+	</form>';
 	}
 }
 

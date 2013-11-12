@@ -355,9 +355,9 @@ function getSmileys()
 		$location = empty($row['hidden']) ? 'postform' : 'popup';
 		$smileys[$location]['rows'][$row['smiley_row']][] = array(
 			'id' => $row['id_smiley'],
-			'code' => htmlspecialchars($row['code']),
-			'filename' => htmlspecialchars($row['filename']),
-			'description' => htmlspecialchars($row['description']),
+			'code' => htmlspecialchars($row['code'], ENT_COMPAT, 'UTF-8'),
+			'filename' => htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'),
+			'description' => htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8'),
 			'row' => $row['smiley_row'],
 			'order' => $row['smiley_order'],
 			'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
