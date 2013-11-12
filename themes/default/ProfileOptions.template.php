@@ -1072,22 +1072,22 @@ function template_profile_group_manage()
 								<strong>', $txt['additional_membergroups'], ':</strong>
 							</dt>
 							<dd>
-								<span id="additional_groupsList">
-									<input type="hidden" name="additional_groups[]" value="0" />';
+								<input type="hidden" name="additional_groups[]" value="0" />
+								<fieldset id="additional_groupsList">
+									<legend data-collapsed="true">', $txt['additional_membergroups_show'], '</legend>
+									<ul>';
 
 	// For each membergroup show a checkbox so members can be assigned to more than one group.
 	foreach ($context['member_groups'] as $member_group)
 		if ($member_group['can_be_additional'])
 			echo '
-									<label for="additional_groups-', $member_group['id'], '"><input type="checkbox" name="additional_groups[]" value="', $member_group['id'], '" id="additional_groups-', $member_group['id'], '"', $member_group['is_additional'] ? ' checked="checked"' : '', ' class="input_check" /> ', $member_group['name'], '</label><br />';
+										<li>
+											<label for="additional_groups-', $member_group['id'], '"><input type="checkbox" name="additional_groups[]" value="', $member_group['id'], '" id="additional_groups-', $member_group['id'], '"', $member_group['is_additional'] ? ' checked="checked"' : '', ' class="input_check" /> ', $member_group['name'], '</label>
+										</li>';
 
 	echo '
-								</span>
-								<a href="javascript:void(0);" onclick="document.getElementById(\'additional_groupsList\').style.display = \'block\'; document.getElementById(\'additional_groupsLink\').style.display = \'none\'; return false;" id="additional_groupsLink" style="display: none;">', $txt['additional_membergroups_show'], '</a>
-								<script><!-- // --><![CDATA[
-									document.getElementById("additional_groupsList").style.display = "none";
-									document.getElementById("additional_groupsLink").style.display = "";
-								// ]]></script>
+									</ul>
+								</fieldset>
 							</dd>';
 }
 

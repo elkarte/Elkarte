@@ -284,8 +284,7 @@ function template_credits()
 	echo '
 					// ]]></script>
 					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
+					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
 
 	// This sets the latest support stuff.
 	echo '

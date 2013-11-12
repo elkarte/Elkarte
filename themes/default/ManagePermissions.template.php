@@ -701,7 +701,7 @@ function template_inline_permissions()
 
 	echo '
 		<fieldset id="', $context['current_permission'], '">
-			<legend><a href="javascript:void(0);" onclick="document.getElementById(\'', $context['current_permission'], '\').style.display = \'none\';document.getElementById(\'', $context['current_permission'], '_groups_link\').style.display = \'block\'; return false;">', $txt['avatar_select_permission'], '</a></legend>';
+			<legend>', $txt['avatar_select_permission'], '</legend>';
 
 	if (empty($modSettings['permission_enable_deny']))
 		echo '
@@ -756,14 +756,7 @@ function template_inline_permissions()
 			</dl>';
 
 	echo '
-		</fieldset>
-
-		<a href="javascript:void(0);" onclick="document.getElementById(\'', $context['current_permission'], '\').style.display = \'block\'; document.getElementById(\'', $context['current_permission'], '_groups_link\').style.display = \'none\'; return false;" id="', $context['current_permission'], '_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
-
-		<script><!-- // --><![CDATA[
-			document.getElementById("', $context['current_permission'], '").style.display = "none";
-			document.getElementById("', $context['current_permission'], '_groups_link").style.display = "";
-		// ]]></script>';
+		</fieldset>';
 }
 
 /**

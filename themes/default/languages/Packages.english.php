@@ -78,9 +78,6 @@ $txt['package_installed_redirecting'] = 'Redirecting...';
 $txt['package_installed_redirect_go_now'] = 'Redirect Now';
 $txt['package_installed_redirect_cancel'] = 'Return to Package Manager';
 
-$txt['packages_latest'] = 'Latest Packages';
-$txt['packages_latest_fetch'] = 'Attempting to fetch the most popular and recent packages ...';
-
 $txt['package_upgrade'] = 'Upgrade';
 $txt['package_uninstall_readme'] = 'Uninstallation Readme';
 $txt['package_install_readme'] = 'Installation Readme';

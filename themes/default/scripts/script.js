@@ -1668,15 +1668,6 @@ function updateActionDef(optNum)
 	}
 }
 
-function elkSetLatestPackages()
-{
-	if (typeof(window.elkLatestPackages) != "undefined")
-		setInnerHTML(document.getElementById("packagesLatest"), window.elkLatestPackages);
-
-	if (tempOldOnload)
-	tempOldOnload();
-}
-
 function highlightSelected(box)
 {
 	if (prevClass != "")
