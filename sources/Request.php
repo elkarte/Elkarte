@@ -184,7 +184,7 @@ class Request
 		$this->_scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
 
 		// make sure we know everything about you... HTTP_USER_AGENT!
-		$this->_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES) : '';
+		$this->_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : '';
 
 		// keep compatibility with the uses of $_SERVER['HTTP_USER_AGENT']...
 		$_SERVER['HTTP_USER_AGENT'] = $this->_user_agent;

@@ -552,7 +552,7 @@ class ManageThemes_Controller extends Action_Controller
 			'' => $txt['smileys_no_default']
 		);
 		foreach ($sets as $i => $set)
-			$context['smiley_sets'][$set] = htmlspecialchars($set_names[$i]);
+			$context['smiley_sets'][$set] = htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8');
 
 		$old_id = $settings['theme_id'];
 		$old_settings = $settings;
@@ -1354,7 +1354,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// pick the template and send it the file
 		$context['sub_template'] = 'edit_style';
-		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 	}
 
 	/**
@@ -1391,10 +1391,10 @@ class ManageThemes_Controller extends Action_Controller
 			}
 
 			$context['file_parts'][$j]['lines']++;
-			$context['file_parts'][$j]['data'] .= htmlspecialchars(strtr($file_data[$i], array("\t" => '   ')));
+			$context['file_parts'][$j]['data'] .= htmlspecialchars(strtr($file_data[$i], array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 		}
 
-		$context['entire_file'] = htmlspecialchars(strtr(implode('', $file_data), array("\t" => '   ')));
+		$context['entire_file'] = htmlspecialchars(strtr(implode('', $file_data), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 	}
 
 	/**
@@ -1412,7 +1412,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Simply set the template and the file contents.
 		$context['sub_template'] = 'edit_file';
-		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')));
+		$context['entire_file'] = htmlspecialchars(strtr(file_get_contents($theme_dir . '/' . $_REQUEST['filename']), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 	}
 
 	/**
@@ -1508,7 +1508,7 @@ class ManageThemes_Controller extends Action_Controller
 					$file = array($file);
 
 				// Send back the file contents
-				$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')));
+				$context['entire_file'] = htmlspecialchars(strtr(implode('', $file), array("\t" => '   ')), ENT_COMPAT, 'UTF-8');
 
 				foreach ($file as $i => $file_part)
 				{
@@ -1540,11 +1540,11 @@ class ManageThemes_Controller extends Action_Controller
 
 			// Recycle the submitted data.
 			if (is_array($file))
-				$context['entire_file'] = htmlspecialchars(implode("\n", $file));
+				$context['entire_file'] = htmlspecialchars(implode("\n", $file), ENT_COMPAT, 'UTF-8');
 			else
-				$context['entire_file'] = htmlspecialchars($file);
+				$context['entire_file'] = htmlspecialchars($file, ENT_COMPAT, 'UTF-8');
 
-			$context['edit_filename'] = htmlspecialchars($_POST['filename']);
+			$context['edit_filename'] = htmlspecialchars($_POST['filename'], ENT_COMPAT, 'UTF-8');
 
 			// Re-create the token so that it can be used
 			createToken('admin-te-' . md5($selectedTheme . '-' . $_REQUEST['filename']));
@@ -1842,6 +1842,6 @@ class ManageThemes_Controller extends Action_Controller
 		// Initialize context
 		$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);
 		$context['allow_save_filename'] = strtr($theme_dir . '/' . $_REQUEST['filename'], array(BOARDDIR => '...'));
-		$context['edit_filename'] = htmlspecialchars($_REQUEST['filename']);
+		$context['edit_filename'] = htmlspecialchars($_REQUEST['filename'], ENT_COMPAT, 'UTF-8');
 	}
 }

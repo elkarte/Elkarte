@@ -218,14 +218,14 @@ class Generic_List
 
 				// Take the value from the database and make it HTML safe.
 				elseif (isset($column['data']['db_htmlsafe']))
-					$cur_data['value'] = htmlspecialchars($list_item[$column['data']['db_htmlsafe']]);
+					$cur_data['value'] = htmlspecialchars($list_item[$column['data']['db_htmlsafe']], ENT_COMPAT, 'UTF-8');
 
 				// Using sprintf is probably the most readable way of injecting data.
 				elseif (isset($column['data']['sprintf']))
 				{
 					$params = array();
 					foreach ($column['data']['sprintf']['params'] as $sprintf_param => $htmlsafe)
-						$params[] = $htmlsafe ? htmlspecialchars($list_item[$sprintf_param]) : $list_item[$sprintf_param];
+						$params[] = $htmlsafe ? htmlspecialchars($list_item[$sprintf_param], ENT_COMPAT, 'UTF-8') : $list_item[$sprintf_param];
 					$cur_data['value'] = vsprintf($column['data']['sprintf']['format'], $params);
 				}
 

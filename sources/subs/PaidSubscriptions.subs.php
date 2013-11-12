@@ -720,7 +720,7 @@ function getSubscriptionDetails($sub_id)
 			'repeatable' => $row['repeatable'],
 			'allow_partial' => $row['allow_partial'],
 			'duration' => $isFlexible ? 'flexible' : 'fixed',
-			'email_complete' => htmlspecialchars($row['email_complete']),
+			'email_complete' => htmlspecialchars($row['email_complete'], ENT_COMPAT, 'UTF-8'),
 			'reminder' => $row['reminder'],
 		);
 	}

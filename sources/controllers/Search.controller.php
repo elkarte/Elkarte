@@ -112,7 +112,7 @@ class Search_Controller extends Action_Controller
 		if (isset($context['search_params']['search']))
 			$context['search_params']['search'] = Util::htmlspecialchars($context['search_params']['search']);
 		if (isset($context['search_params']['userspec']))
-			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec']);
+			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT, 'UTF-8');
 		if (!empty($context['search_params']['searchtype']))
 			$context['search_params']['searchtype'] = 2;
 		if (!empty($context['search_params']['minage']))
@@ -1860,7 +1860,7 @@ class Search_Controller extends Action_Controller
 					$message['body'] = '';
 					foreach ($matches[0] as $index => $match)
 					{
-						$match = strtr(htmlspecialchars($match, ENT_QUOTES), array("\n" => '&nbsp;'));
+						$match = strtr(htmlspecialchars($match, ENT_QUOTES, 'UTF-8'), array("\n" => '&nbsp;'));
 						$message['body'] .= '<strong>......</strong>&nbsp;' . $match . '&nbsp;<strong>......</strong>';
 					}
 				}

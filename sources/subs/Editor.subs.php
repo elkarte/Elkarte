@@ -632,8 +632,8 @@ function create_control_richedit($editorOptions)
 				);
 				while ($row = $db->fetch_assoc($request))
 				{
-					$row['filename'] = htmlspecialchars($row['filename']);
-					$row['description'] = htmlspecialchars($row['description']);
+					$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
+					$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
 
 					$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
 				}
@@ -656,7 +656,7 @@ function create_control_richedit($editorOptions)
 			// The smiley popup may take advantage of Jquery UI ....
 			if (!empty($context['smileys']['popup']))
 				$modSettings['jquery_include_ui'] = true;
-			
+
 		}
 	}
 

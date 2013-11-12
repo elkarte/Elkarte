@@ -90,7 +90,7 @@ class ManageLanguages_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Package.subs.php');
 			require_once(SUBSDIR . '/Language.subs.php');
 
-			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']));
+			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']), ENT_COMPAT, 'UTF-8');
 
 			$listOptions = array(
 				'id' => 'languages',
