@@ -76,7 +76,8 @@ CREATE TABLE {$db_prefix}attachments (
   PRIMARY KEY (id_attach),
   UNIQUE id_member (id_member, id_attach),
   KEY id_msg (id_msg),
-  KEY attachment_type (attachment_type)
+  KEY attachment_type (attachment_type),
+  KEY id_thumb (id_thumb)
 ) ENGINE=MyISAM;
 
 #
