@@ -54,7 +54,7 @@ class Notification_Controller extends Action_Controller
 			'men', // mention
 			'like', // message liked
 			'rlike', // like removed
-			'buddy', // added asbuddy
+			'buddy', // added as buddy
 		);
 		$this->_known_status = array(
 			'new' => 0,
