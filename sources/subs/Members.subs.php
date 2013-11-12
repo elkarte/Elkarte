@@ -1887,9 +1887,12 @@ function approveMembers($conditions)
 				AND id_member IN ({array_int:members})',
 	);
 
+	// @todo maybe an hook here?
+
 	$query_cond = array();
 	foreach ($conditions as $key => $dummy)
-		$query_cond[] = $available_conditions[$key];
+		if (isset($available_conditions[$key]))
+			$query_cond[] = $available_conditions[$key];
 
 	$conditions['is_activated'] = 1;
 	$conditions['blank_string'] = '';
