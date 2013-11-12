@@ -163,7 +163,7 @@ class News_Controller extends Action_Controller
 		);
 
 		// Easy adding of sub actions
-	 	call_integration_hook('integrate_xmlfeeds', array(&$subActions));
+		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
 		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'recent';
 

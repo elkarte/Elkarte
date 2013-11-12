@@ -1623,9 +1623,8 @@ function getBasicMemberData($member_ids, $options = array())
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})
 		' . (isset($options['sort']) ? '
-		ORDER BY {string:sort}' : '' . '
-		LIMIT {int:limit}'
-			),
+		ORDER BY {string:sort}' : '') . '
+		LIMIT {int:limit}',
 		array(
 			'member_list' => $member_ids,
 			'limit' => isset($options['limit']) ? $options['limit'] : count($member_ids),

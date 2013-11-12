@@ -223,7 +223,8 @@ function expandIPv6($addr, $strict_check = true)
 		$part[1] = explode(':', $part[1]);
 		$missing = array();
 
-		for ($i = 0; $i < (8 - (count($part[0]) + count($part[1]))); $i++)
+		$limit = count($part[0]) + count($part[1]);
+		for ($i = 0; $i < (8 - $limit); $i++)
 			array_push($missing, '0000');
 
 		$part = array_merge($part[0], $missing, $part[1]);

@@ -280,7 +280,7 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function list_getNotificationCount($all, $type)
 	{
-	   return countUserNotifications($all, $type);
+		return countUserNotifications($all, $type);
 	}
 
 	/**
@@ -295,7 +295,7 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function list_loadNotifications($start, $limit, $sort, $all, $type)
 	{
-	   return getUserNotifications($start, $limit, $sort, $all, $type);
+		return getUserNotifications($start, $limit, $sort, $all, $type);
 	}
 
 	/**

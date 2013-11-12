@@ -778,7 +778,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<img src="', $settings['images_url'], '/profile/im_', ($context['member']['online']['is_online']) ? 'on.png' : 'off.png' . '" alt="" class="icon" />
+						<img src="', $settings['images_url'], '/profile/im_', $context['member']['online']['is_online'] ? 'on.png' : 'off.png', '" alt="" class="icon" />
 					</dt>
 					<dd>
 						<a href="', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '">', $txt['send_member_pm'], '</a>
@@ -1098,7 +1098,7 @@ function template_profile_block_buddies()
 						<td class="vcard">
 							', $data['avatar']['image'], '<br />
 							<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br />
-							<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png' . '" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>';
+							<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>';
 
 				// Only show the email address fully if it's not hidden - and we reveal the email.
 				if ($context['can_send_email'] && ($data['show_email'] == 'yes' || $data['show_email'] == 'yes_permission_override'))
@@ -1172,7 +1172,7 @@ function template_profile_block_attachments()
 			echo '
 					<td class="profile_attachment">
 						<span class="attach_title">', $picture['filename'], '</span>
-						<a href="', $picture['url'], '">', $picture['img'], '</a>				
+						<a href="', $picture['url'], '">', $picture['img'], '</a>
 					</td>';
 
 			if (++$i % $per_line === 0)

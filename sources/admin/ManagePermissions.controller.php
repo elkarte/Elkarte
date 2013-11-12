@@ -445,7 +445,7 @@ class ManagePermissions_Controller extends Action_Controller
 			);
 		}
 
-		$context['groups'] = array_merge(array(0 => $txt['membergroups_members']),  getInheritableGroups());
+		$context['groups'] = array_merge(array(0 => $txt['membergroups_members']), getInheritableGroups());
 
 		// Load the proper template.
 		$context['sub_template'] = 'permission_index';

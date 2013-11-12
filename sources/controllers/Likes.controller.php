@@ -473,7 +473,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function list_getLikesCount($memberID, $given)
 	{
-	   return likesCount($memberID, $given);
+		return likesCount($memberID, $given);
 	}
 
 	/**
@@ -484,7 +484,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function list_getMessageLikeCount($messageID)
 	{
-	   return messageLikeCount($messageID);
+		return messageLikeCount($messageID);
 	}
 
 	/**
