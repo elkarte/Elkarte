@@ -293,7 +293,7 @@ class Admin_Controller extends Action_Controller
 		$config_areas->childOf('languages')->add('languages_sub')->addBulk(
 			array(
 				'edit' => array($txt['language_edit']),
-				'add' => array($txt['language_add']),
+// 				'add' => array($txt['language_add']),
 				'settings' => array($txt['language_settings']),
 			)
 		);
