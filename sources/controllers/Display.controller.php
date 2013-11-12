@@ -717,7 +717,7 @@ class Display_Controller
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
-			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&'))),
+			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&')), ENT_COMPAT, 'UTF-8'),
 			'child_level' => $board_info['child_level'],
 		);
 

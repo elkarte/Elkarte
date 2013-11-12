@@ -459,7 +459,7 @@ function processAttachments($id_msg = null)
 		if (empty($errors))
 		{
 			$_SESSION['temp_attachments'][$attachID] = array(
-				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n])),
+				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'size' => $_FILES['attachment']['size'][$n],
 				'type' => $_FILES['attachment']['type'][$n],
@@ -480,7 +480,7 @@ function processAttachments($id_msg = null)
 		else
 		{
 			$_SESSION['temp_attachments'][$attachID] = array(
-				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n])),
+				'name' => htmlspecialchars(basename($_FILES['attachment']['name'][$n]), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'errors' => $errors,
 			);
@@ -1704,9 +1704,9 @@ function getServerStoredAvatars($directory, $level)
 		$tmp = getServerStoredAvatars($directory . (!empty($directory) ? '/' : '') . $line, $level + 1);
 		if (!empty($tmp))
 			$result[] = array(
-				'filename' => htmlspecialchars($line),
+				'filename' => htmlspecialchars($line, ENT_COMPAT, 'UTF-8'),
 				'checked' => strpos($context['member']['avatar']['server_pic'], $line . '/') !== false,
-				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line)) . ']',
+				'name' => '[' . htmlspecialchars(str_replace('_', ' ', $line), ENT_COMPAT, 'UTF-8') . ']',
 				'is_dir' => true,
 				'files' => $tmp
 		);
@@ -1723,9 +1723,9 @@ function getServerStoredAvatars($directory, $level)
 			continue;
 
 		$result[] = array(
-			'filename' => htmlspecialchars($line),
+			'filename' => htmlspecialchars($line, ENT_COMPAT, 'UTF-8'),
 			'checked' => $line == $context['member']['avatar']['server_pic'],
-			'name' => htmlspecialchars(str_replace('_', ' ', $filename)),
+			'name' => htmlspecialchars(str_replace('_', ' ', $filename), ENT_COMPAT, 'UTF-8'),
 			'is_dir' => false
 		);
 		if ($level == 1)
@@ -2679,12 +2679,12 @@ function loadAttachmentContext($id_msg)
 		{
 			$attachmentData[$i] = array(
 				'id' => $attachment['id_attach'],
-				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'])),
+				'name' => preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8')),
 				'downloads' => $attachment['downloads'],
 				'size' => ($attachment['filesize'] < 1024000) ? round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'] : round($attachment['filesize'] / 1024 / 1024, 2) . ' ' . $txt['megabyte'],
 				'byte_size' => $attachment['filesize'],
 				'href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'],
-				'link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename']) . '</a>',
+				'link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'] . '">' . htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8') . '</a>',
 				'is_image' => !empty($attachment['width']) && !empty($attachment['height']) && !empty($modSettings['attachmentShowImages']),
 				'is_approved' => $attachment['approved'],
 				'file_hash' => $attachment['file_hash'],

@@ -225,7 +225,7 @@ function adminLogin_outputPostVars($k, $v)
 {
 	if (!is_array($v))
 		return '
-<input type="hidden" name="' . htmlspecialchars($k) . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '" />';
+<input type="hidden" name="' . htmlspecialchars($k, ENT_COMPAT, 'UTF-8') . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '" />';
 	else
 	{
 		$ret = '';
@@ -466,7 +466,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($username, $memID, false))
-			$errors->addError(array('name_in_use', array(htmlspecialchars($username))));
+			$errors->addError(array('name_in_use', array(htmlspecialchars($username, ENT_COMPAT, 'UTF-8'))));
 	}
 }
 

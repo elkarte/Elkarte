@@ -1072,7 +1072,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	if ($output_method != 'echo' || !$user_info['is_guest'])
 		return $user_info['is_guest'];
 
-	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'])) : '';
+	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 
 	echo '
 		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
@@ -2021,7 +2021,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 	$attachments = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$filename = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($row['filename']));
+		$filename = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'));
 
 		// Is it an image?
 		$attachments[$row['id_attach']] = array(

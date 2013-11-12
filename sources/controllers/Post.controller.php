@@ -249,7 +249,7 @@ class Post_Controller extends Action_Controller
 
 			// Start loading up the event info.
 			$context['event'] = array();
-			$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle'])) : '';
+			$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
 			$context['event']['id'] = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 			$context['event']['new'] = $context['event']['id'] == -1;
 
@@ -724,7 +724,7 @@ class Post_Controller extends Action_Controller
 						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 
 					$context['current_attachments'][] = array(
-						'name' => '<u>' . htmlspecialchars($attachment['name']) . '</u>',
+						'name' => '<u>' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</u>',
 						'size' => $attachment['size'],
 						'id' => $attachID,
 						'unchecked' => false,
@@ -1429,8 +1429,8 @@ class Post_Controller extends Action_Controller
 
 		// Add special html entities to the subject, name, and email.
 		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-		$_POST['guestname'] = htmlspecialchars($_POST['guestname']);
-		$_POST['email'] = htmlspecialchars($_POST['email']);
+		$_POST['guestname'] = htmlspecialchars($_POST['guestname'], ENT_COMPAT, 'UTF-8');
+		$_POST['email'] = htmlspecialchars($_POST['email'], ENT_COMPAT, 'UTF-8');
 
 		// At this point, we want to make sure the subject isn't too long.
 		if (Util::strlen($_POST['subject']) > 100)
@@ -1493,7 +1493,7 @@ class Post_Controller extends Action_Controller
 				$_POST['poll_hide'] = 1;
 
 			// Clean up the question and answers.
-			$_POST['question'] = htmlspecialchars($_POST['question']);
+			$_POST['question'] = htmlspecialchars($_POST['question'], ENT_COMPAT, 'UTF-8');
 			$_POST['question'] = Util::truncate($_POST['question'], 255);
 			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
 			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);

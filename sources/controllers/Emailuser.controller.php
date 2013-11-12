@@ -538,7 +538,7 @@ class Emailuser_Controller extends Action_Controller
 
 			isBannedEmail($_POST['email'], 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
-			$user_info['email'] = htmlspecialchars($_POST['email']);
+			$user_info['email'] = htmlspecialchars($_POST['email'], ENT_COMPAT, 'UTF-8');
 		}
 
 		// Could they get the right verification code?

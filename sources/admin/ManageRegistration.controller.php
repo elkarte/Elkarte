@@ -240,7 +240,7 @@ class ManageRegistration_Controller extends Action_Controller
 			updateSettings(array('requireAgreement' => !empty($_POST['requireAgreement'])));
 		}
 
-		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt')) : '';
+		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt'), ENT_COMPAT, 'UTF-8') : '';
 		$context['warning'] = is_writable(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 

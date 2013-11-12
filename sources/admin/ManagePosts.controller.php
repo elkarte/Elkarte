@@ -166,7 +166,7 @@ class ManagePosts_Controller extends Action_Controller
 		if (isset($_POST['censortest']))
 		{
 			require_once(SUBSDIR . '/Post.subs.php');
-			$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES);
+			$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));
 		}
@@ -185,7 +185,7 @@ class ManagePosts_Controller extends Action_Controller
 			if (trim(strtr($censor_vulgar[$i], '*', ' ')) == '')
 				continue;
 
-			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i]) ? htmlspecialchars($censor_proper[$i]) : '';
+			$context['censored_words'][htmlspecialchars(trim($censor_vulgar[$i]))] = isset($censor_proper[$i]) ? htmlspecialchars($censor_proper[$i], ENT_COMPAT, 'UTF-8') : '';
 		}
 
 		call_integration_hook('integrate_censors');

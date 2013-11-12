@@ -135,7 +135,7 @@ class Database_MySQL implements Database
 			return '\'' . mysql_real_escape_string($matches[2], $connection) . '\'';
 
 		if (!isset($values[$matches[2]]))
-			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2]), '', E_USER_ERROR, __FILE__, __LINE__);
+			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
 
 		$replacement = $values[$matches[2]];
 

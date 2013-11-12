@@ -167,10 +167,10 @@ function initialize_inputs()
 			echo '<!DOCTYPE html>
 <html>
 	<head>
-		<title>', htmlspecialchars($_GET['pass_string']), '</title>
+		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
 	</head>
 	<body style="background: #d4d4d4; margin-top: 16%; text-align: center; font-size: 16pt;">
-		<strong>', htmlspecialchars($_GET['pass_string']), '</strong>
+		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
 	</body>
 </html>';
 		exit;
@@ -1175,8 +1175,8 @@ function action_adminAccount()
 	if (!isset($_POST['email']))
 		$_POST['email'] = '';
 
-	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']));
-	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']));
+	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']), ENT_COMPAT, 'UTF-8');
+	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']), ENT_COMPAT, 'UTF-8');
 
 	$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
 
@@ -1306,7 +1306,7 @@ function action_adminAccount()
 			if ($request === false)
 			{
 				$incontext['error'] = $txt['error_user_settings_query'] . '<br />
-				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection))) . '</div>';
+				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
 				return false;
 			}
 
@@ -2418,7 +2418,7 @@ function template_populate_database()
 
 		foreach ($incontext['failures'] as $line => $fail)
 			echo '
-						<li><strong>', $txt['error_db_queries_line'], $line + 1, ':</strong> ', nl2br(htmlspecialchars($fail)), '</li>';
+						<li><strong>', $txt['error_db_queries_line'], $line + 1, ':</strong> ', nl2br(htmlspecialchars($fail, ENT_COMPAT, 'UTF-8')), '</li>';
 
 		echo '
 					</ul>

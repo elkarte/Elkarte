@@ -524,7 +524,7 @@ class Register_Controller extends Action_Controller
 		}
 		// If we've come from OpenID set up some default stuff.
 		elseif ($verifiedOpenID || ((!empty($_POST['openid_identifier']) || !empty($_SESSION['openid']['openid_uri'])) && $_POST['authenticate'] == 'openid'))
-		{	
+		{
 			$regOptions['username'] = !empty($_POST['user']) && trim($_POST['user']) != '' ? $_POST['user'] : $_SESSION['openid']['nickname'];
 			$regOptions['email'] = !empty($_POST['email']) && trim($_POST['email']) != '' ? $_POST['email'] : $_SESSION['openid']['email'];
 			$regOptions['auth_method'] = 'openid';
@@ -645,7 +645,7 @@ class Register_Controller extends Action_Controller
 			// @todo Separate the sprintf?
 			require_once(SUBSDIR . '/DataValidator.class.php');
 			if (!Data_Validator::is_valid($_POST, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
-				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'])), false);
+				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
 
 			// Make sure their email isn't banned.
 			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
@@ -653,7 +653,7 @@ class Register_Controller extends Action_Controller
 			// Ummm... don't even dare try to take someone else's email!!
 			// @todo Separate the sprintf?
 			if (userByEmail($_POST['new_email']))
-				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'])));
+				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
 
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];

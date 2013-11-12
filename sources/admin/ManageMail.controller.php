@@ -116,7 +116,7 @@ class ManageMail_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return Util::strlen($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', htmlspecialchars(Util::substr($rowData[\'subject\'], 0, 47))) : htmlspecialchars($rowData[\'subject\']);
+							return Util::strlen($rowData[\'subject\']) > 50 ? sprintf(\'%1$s...\', Util::htmlspecialchars(Util::substr($rowData[\'subject\'], 0, 47))) : Util::htmlspecialchars($rowData[\'subject\']);
 						'),
 						'class' => 'smalltext',
 					),

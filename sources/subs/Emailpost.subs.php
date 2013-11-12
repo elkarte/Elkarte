@@ -755,7 +755,7 @@ function pbe_email_attachments($pbe, $email_message)
 
 			// Place them in session since that's where attachmentChecks looks
 			$_SESSION['temp_attachments'][$attachID] = array(
-				'name' => htmlspecialchars(basename($name)),
+				'name' => htmlspecialchars(basename($name), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'size' => strlen($attachment),
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],

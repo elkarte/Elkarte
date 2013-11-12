@@ -126,7 +126,7 @@ class Auth_Controller extends Action_Controller
 		$context['sub_template'] = 'login';
 
 		// Set up the default/fallback stuff.
-		$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'])) : '';
+		$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 		$context['default_password'] = '';
 		$context['never_expire'] = $modSettings['cookieTime'] == 525600 || $modSettings['cookieTime'] == 3153600;
 		$context['login_errors'] = array($txt['error_occurred']);
