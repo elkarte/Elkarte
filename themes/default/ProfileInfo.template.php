@@ -778,7 +778,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<img src="', $settings['images_url'], '/profile/im_', ($context['member']['online']['is_online'] ? 'on.png' : 'off.png') . '" alt="" class="icon" />
+						<img src="', $settings['images_url'], '/profile/im_', $context['member']['online']['is_online'] ? 'on.png' : 'off.png', '" alt="" class="icon" />
 					</dt>
 					<dd>
 						<a href="', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '">', $txt['send_member_pm'], '</a>
