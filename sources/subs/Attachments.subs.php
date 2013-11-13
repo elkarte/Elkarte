@@ -335,7 +335,7 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
-	$attach_errors = attachment_error_context::context('attachment', 1);
+	$attach_errors = attachment_Error_Context::context('attachment', 1);
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))

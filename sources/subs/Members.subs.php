@@ -461,7 +461,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
-	$reg_errors = error_context::context($error_context, 0);
+	$reg_errors = Error_Context::context($error_context, 0);
 
 	// Registration from the admin center, let them sweat a little more.
 	if ($regOptions['interface'] == 'admin')

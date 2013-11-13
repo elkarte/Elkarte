@@ -404,7 +404,7 @@ function resetPassword($memID, $username = null)
 	// Do some checks on the username if needed.
 	if ($username !== null)
 	{
-		$errors = error_context::context('reset_pwd', 0);
+		$errors = Error_Context::context('reset_pwd', 0);
 		validateUsername($memID, $user, 'reset_pwd');
 
 		// If there are "important" errors and you are not an admin: log the first error
@@ -445,7 +445,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
 {
 	global $txt;
 
-	$errors = error_context::context($error_context, 0);
+	$errors = Error_Context::context($error_context, 0);
 
 	// Don't use too long a name.
 	if (Util::strlen($username) > 25)
