@@ -101,7 +101,7 @@ function getServerVersions($checkFor)
  */
 function getQuickAdminTasks()
 {
-	global $txt, $scripturl;
+	global $txt, $scripturl, $context;
 
 	// The format of this array is: permission, action, title, description, icon.
 	$quick_admin_tasks = array(
