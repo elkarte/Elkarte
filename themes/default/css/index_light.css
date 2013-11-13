@@ -148,6 +148,9 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50aa3a;
 	font-weight: 700;
 }
+div.bbc_footnotes .meaction{
+	display: inline-block;
+}
 
 
 /*	$AJAX		*/

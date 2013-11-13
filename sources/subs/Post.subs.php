@@ -101,16 +101,21 @@ function preparsecode(&$message, $previewing = false)
 			fixTags($parts[$i]);
 
 			// Replace /me.+?\n with [me=name]dsf[/me]\n.
-			if (strpos($user_info['name'], '[') !== false || strpos($user_info['name'], ']') !== false || strpos($user_info['name'], '\'') !== false || strpos($user_info['name'], '"') !== false)
+			if (preg_match('~[\[\]\\"]~', $user_info['name']) !== false)
+			{
 				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=&quot;' . $user_info['name'] . '&quot;]$2[/me]', $parts[$i]);
+				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=&quot;' . $user_info['name'] . '&quot;]$2[/me]$3', $parts[$i]);
+			}
 			else
+			{
 				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=' . $user_info['name'] .  ']$2[/me]', $parts[$i]);
+				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=' . $user_info['name'] . ']$2[/me]$3', $parts[$i]);
+			}
 
 			if (!$previewing && strpos($parts[$i], '[html]') !== false)
 			{
 				if (allowedTo('admin_forum'))
 					$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', 'return "[html]" . strtr(un_htmlspecialchars("$m[1]"), array("\n" => \'&#13;\', \'  \' => \' &#32;\', \'[\' => \'&#91;\', \']\' => \'&#93;\')) . "[/html]";'), $parts[$i]);
-
 				// We should edit them out, or else if an admin edits the message they will get shown...
 				else
 				{
