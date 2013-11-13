@@ -4208,8 +4208,8 @@ a.help .icon {
 		min-width: 100%;
 		border-radius: 0;
 	}
-	.board_info, .board_latest {
-		display: block;
+	.board_lastpost {
+		display: none;
 	}
 	.board_latest {
 		padding-left: 64px;
