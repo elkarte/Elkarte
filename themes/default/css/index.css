@@ -842,13 +842,13 @@ div.bbc_footnotes {
 	padding: 0;
 }
 #top_section_notice {
+	position: relative;
 	float: right;
 	margin: 0;
 	padding: 14px 8px 0 8px;
 	line-height: 1.3em;
 	min-width:38%;
-	position: relative;
-	min-height: 40px;
+	min-height: 1.8em;
 	/* @todo - See me grumblez in Issue #552. ;) */
 }
 #top_section_notice .toggle_login {
@@ -1031,6 +1031,16 @@ div.bbc_footnotes {
 }
 .listlevel1#collapse_button, .listlevel1#button_profile {
 	float: right;
+}
+.listlevel1#button_profile .menu_avatar {
+	max-width: 27px;
+	max-height: 27px;
+	padding-left: 5px;
+	float: right;
+	
+}
+.listlevel1#button_profile .linklevel1 {
+	padding-right: 0px;
 }
 /* Level 1 Menu bar: link or button. */
 .linklevel1 {

@@ -254,15 +254,7 @@ function template_body_above()
 					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
 				</form>';
 	}
-	// If the user is logged in, display stuff like their name, new messages, etc.
-	elseif ($context['user']['is_logged'])
-	{
-		echo '
-				<span class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></span>';
-		if (!empty($context['user']['avatar']))
-			echo '
-				<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
-	}
+
 	echo '
 			</div>';
 

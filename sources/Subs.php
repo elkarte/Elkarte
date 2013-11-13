@@ -3593,7 +3593,7 @@ function setupMenuContext()
 				),
 
 				'profile' => array(
-					'title' => $txt['account_short'],
+					'title' => $txt['account_short'] . (!empty($user_info['avatar']) ? '<img src="' . $user_info['avatar']['url'] . '" class="menu_avatar" alt="*"/>' : ''),
 					'href' => $scripturl . '?action=profile',
 					'show' => $context['allow_edit_profile'],
 				),

@@ -337,12 +337,12 @@ function loadUserSettings()
 		'posts' => empty($user_settings['posts']) ? 0 : $user_settings['posts'],
 		'time_format' => empty($user_settings['time_format']) ? $modSettings['time_format'] : $user_settings['time_format'],
 		'time_offset' => empty($user_settings['time_offset']) ? 0 : $user_settings['time_offset'],
-		'avatar' => array(
+		'avatar' => array_merge(array(
 			'url' => isset($user_settings['avatar']) ? $user_settings['avatar'] : '',
 			'filename' => empty($user_settings['filename']) ? '' : $user_settings['filename'],
 			'custom_dir' => !empty($user_settings['attachment_type']) && $user_settings['attachment_type'] == 1,
 			'id_attach' => isset($user_settings['id_attach']) ? $user_settings['id_attach'] : 0
-		),
+		), determineAvatar($user_settings)),
 		'smiley_set' => isset($user_settings['smiley_set']) ? $user_settings['smiley_set'] : '',
 		'messages' => empty($user_settings['personal_messages']) ? 0 : $user_settings['personal_messages'],
 		'notifications' => empty($user_settings['notifications']) ? 0 : $user_settings['notifications'],
@@ -2539,12 +2539,17 @@ function loadDatabase()
 /**
  * Determine the user's avatar type and return the information as an array
  *
+ * @todo this function seems more useful than expected, it should be improved. :P
+ *
  * @param array $profile
  * @return array $avatar
  */
 function determineAvatar($profile)
 {
 	global $modSettings, $scripturl, $settings;
+
+	if (empty($profile))
+		return array();
 
 	// If we're always html resizing, assume it's too large.
 	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
