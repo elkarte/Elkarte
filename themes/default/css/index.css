@@ -4262,6 +4262,10 @@ a.help .icon {
 	#gobottom, #gotop {
 		padding-left: 0.25em;
 	}
+	#message_index_jump_to {
+		display: block;
+		float: none;
+	}
 	#news, #logo, #top_section_notice {
 		display: none;
 	}
