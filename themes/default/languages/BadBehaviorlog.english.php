@@ -23,7 +23,7 @@ $txt['badbehaviorlog_desc'] = 'Below is a list of all the bad behavior entries t
 $txt['badbehaviorlog_details'] = "Additional Details";
 $txt['badbehaviorlog_no_entries_found'] = 'There are currently no bad behavior log entries.';
 
-$txt['badbehaviorlog_remove_selection'] = 'Remove Selection';
+$txt['badbehaviorlog_remove_selection'] = 'Remove Selected';
 $txt['badbehaviorlog_remove_selection_confirm'] = 'Are you sure you want to delete the selected log entries?';
 $txt['badbehaviorlog_remove_filtered_results'] = 'Remove all filtered results';
 $txt['badbehaviorlog_remove_filtered_results_confirm'] = 'Are you sure you want to delete the filtered entries?';
