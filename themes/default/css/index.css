@@ -711,7 +711,7 @@ legend {
 	cursor: pointer;
 	padding-left: 20px;
 }
-.collapsed legend { 
+.collapsed legend {
 	background:  url(../images/selected.png) no-repeat scroll left center transparent;
 }
 
@@ -901,6 +901,7 @@ div.bbc_footnotes {
 	vertical-align: top;
 	min-width: 26em;
 	font-size: 0.857em;
+	white-space: nowrap;
 }
 .greeting {
 	font-weight: bold;
@@ -911,7 +912,7 @@ div.bbc_footnotes {
 }
 #guest_form input, #guest_form select {
 	font-size: 1.083em;
-	margin: 0 4px 8px 0;
+	margin: 0 0 8px 0;
 }
 /* User information. @todo - Simplify. */
 #upper_section .avatar {
