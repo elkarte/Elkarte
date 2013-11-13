@@ -18,12 +18,8 @@ $txt['notification_markread'] = 'Mark as read';
 $txt['notification_markunread'] = 'Mark as unread';
 
 $txt['notification_settings'] = 'Notification Settings';
-<<<<<<< HEAD
 $txt['notifications_enabled'] = 'Enable site notifications';
-=======
-$txt['notifications_enabled'] = 'Enable site notificaitons';
 $txt['notifications_buddy'] = 'Notify Members added to someone\'s buddy list';
->>>>>>> upstream/master
 
 $txt['notification_men'] = 'Mentioned you in the message {msg_link}';
 $txt['notification_like'] = 'Liked your message {msg_link}';
