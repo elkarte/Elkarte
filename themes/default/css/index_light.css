@@ -316,6 +316,22 @@ div.bbc_footnotes .meaction{
 	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
 	color: #555;
 }
+.poster li.poster_online .nolink {
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	box-shadow: 1px 1px 2px #e5e5e5;
+	color: #566e4b;
+    display: block;
+    line-height: 2em;
+    margin: 3px 1.5em;
+    position: relative;
+}
+.poster li.poster_online .nolink img {
+	vertical-align: middle;
+}
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator {

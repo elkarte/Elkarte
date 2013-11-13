@@ -805,7 +805,7 @@ function template_build_poster_div($message, $ignoring)
 		}
 		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']))
 			$poster_div .= '
-							<li class="listlevel1 poster_online">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></li>';
+							<li class="listlevel1 poster_online"><span class="nolink">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></span></li>';
 
 		// Are we showing the warning status?
 		if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
