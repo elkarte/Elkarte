@@ -27,12 +27,16 @@ function countUserNotifications($all = false, $type = '')
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}log_notifications
-		WHERE id_member = {int:current_user}
+		FROM {db_prefix}log_notifications as n
+			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE ({query_see_board} OR n.id_msg = 0)
+			AND n.id_member = {int:current_user}
 			AND status != {int:unapproved}' . ($all ? '
-			AND status != {int:is_not_deleted}' : '
-			AND status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND notif_type = {string:current_type}'),
+			AND n.status != {int:is_not_deleted}' : '
+			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
+			AND n.notif_type = {string:current_type}'),
+>>>>>>> Filter notifications based on boards access - fixes #936
 		array(
 			'current_user' => $user_info['id'],
 			'current_type' => $type,
@@ -75,9 +79,11 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 		FROM {db_prefix}log_notifications AS n
 			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			LEFT JOIN {db_prefix}members AS men ON (n.id_member_from = men.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = men.id_member)
-		WHERE n.id_member = {int:current_user}
+		WHERE ({query_see_board} OR n.id_msg = 0)
+			AND n.id_member = {int:current_user}
 			AND status != {int:unapproved}' . ($all ? '
 			AND n.status != {int:is_not_deleted}' : '
 			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
