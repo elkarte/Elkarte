@@ -87,7 +87,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function action_editBuddies($memID)
 	{
-		global $context, $user_profile, $memberContext;
+		global $context, $user_profile, $memberContext, $modSettings;
 
 		$db = database();
 
@@ -154,9 +154,29 @@ class ProfileOptions_Controller extends Action_Controller
 					)
 				);
 
+				// Let them know who's their buddy.
+				if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+				{
+					require_once(CONTROLLERDIR . '/Notification.controller.php');
+					$notify = new Notification_Controller();
+				}
+
 				// Add the new member to the buddies array.
 				while ($row = $db->fetch_assoc($request))
+				{
 					$buddiesArray[] = (int) $row['id_member'];
+
+					if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+					{
+						// Set notifications for our buddy.
+						$notify->setData(array(
+							'id_member' => $row['id_member'],
+							'type' => 'buddy',
+							'id_msg' => 0,
+						));
+						$notify->action_add();
+					}
+				}
 				$db->free_result($request);
 
 				// Now update the current users buddy list.

@@ -19,12 +19,15 @@ $txt['notification_markunread'] = 'Mark as unread';
 
 $txt['notification_settings'] = 'Notification Settings';
 $txt['notifications_enabled'] = 'Enable site notificaitons';
+$txt['notifications_buddy'] = 'Notify Members added to someone\'s buddy list';
 
 $txt['notification_men'] = 'Mentioned you in the message {msg_link}';
 $txt['notification_like'] = 'Liked your message {msg_link}';
 $txt['notification_rlike'] = 'Unliked your message {msg_link}';
+$txt['notification_buddy'] = 'Added you to their buddy list.';
 
 $txt['notification_type_all'] = 'All notifications';
 $txt['notification_type_men'] = 'Mentions';
 $txt['notification_type_like'] = 'Likes';
 $txt['notification_type_rlike'] = 'Unlikes';
+$txt['notification_type_buddy'] = 'Buddy';
