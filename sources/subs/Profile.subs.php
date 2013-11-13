@@ -606,7 +606,7 @@ function loadProfileFields($force_reload = false)
 						resetPassword($context[\'id_member\'], $value);
 					elseif ($value !== null)
 					{
-						$errors = error_context::context(\'change_username\', 0);
+						$errors = Error_Context::context(\'change_username\', 0);
 
 						validateUsername($context[\'id_member\'], $value, \'change_username\');
 

@@ -424,7 +424,7 @@ class Emailuser_Controller extends Action_Controller
 		isAllowedTo('report_any');
 
 		// No errors, yet.
-		$report_errors = error_context::context('report', 1);
+		$report_errors = Error_Context::context('report', 1);
 
 		// ...or maybe some.
 		$context['report_error'] = array(
@@ -515,7 +515,7 @@ class Emailuser_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Mail.subs.php');
 
 		// No errors, yet.
-		$report_errors = error_context::context('report', 1);
+		$report_errors = Error_Context::context('report', 1);
 
 		// Check their session.
 		if (checkSession('post', '', false) != '')
