@@ -144,7 +144,7 @@ class Browser_Detector
 	{
 		// I'm IE, Yes I'm the real IE; All you other IEs are just imitating.
 		if (!isset($this->_browsers['is_ie']))
-			$this->_browsers['is_ie'] = !$this->isOpera() && !$this->isGecko() && !$this->isWebTv() && preg_match('~MSIE \d+~', $this->_ua) === 1;
+			$this->_browsers['is_ie'] = !$this->isOpera() && !$this->isGecko() && !$this->isWebTv() && (preg_match('~Trident/\d+~', $this->_ua) === 1 || preg_match('~MSIE \d+~', $this->_ua) === 1);
 		return $this->_browsers['is_ie'];
 	}
 
@@ -204,7 +204,7 @@ class Browser_Detector
 	function isGecko()
 	{
 		if (!isset($this->_browsers['is_gecko']))
-			$this->_browsers['is_gecko'] = strpos($this->_ua, 'Gecko') !== false && !$this->isWebkit() && !$this->isKonqueror();
+			$this->_browsers['is_gecko'] = strpos($this->_ua, 'Gecko') !== false && strpos($this->_ua, 'like Gecko') === false && !$this->isWebkit() && !$this->isKonqueror();
 		return $this->_browsers['is_gecko'];
 	}
 

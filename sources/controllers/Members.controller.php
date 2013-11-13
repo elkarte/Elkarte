@@ -45,7 +45,7 @@ class Members_Controller extends Action_Controller
 	 */
 	public function action_buddy()
 	{
-		global $user_info;
+		global $user_info, $modSettings;
 
 		checkSession('get');
 
@@ -64,8 +64,23 @@ class Members_Controller extends Action_Controller
 			$user_info['buddies'] = array_diff($user_info['buddies'], array($user));
 		// ...or add if it's not there (and not you).
 		elseif ($user_info['id'] != $user)
+		{
 			$user_info['buddies'][] = $user;
 
+			// Do we want a notification for our newly added buddy?
+			if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+			{
+				require_once(CONTROLLERDIR . '/Notification.controller.php');
+				$notify = new Notification_Controller();
+				// Set notifications for our buddy.
+				$notify->setData(array(
+					'id_member' => $user,
+					'type' => 'buddy',
+					'id_msg' => 0,
+					));
+				$notify->action_add();
+			}
+		}
 		// Update the settings.
 		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
 

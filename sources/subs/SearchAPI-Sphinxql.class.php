@@ -289,7 +289,7 @@ class Sphinxql_Search
 			$cleanWords = $this->_cleanString($token[2]);
 
 			// Explode the cleanWords again incase the cleaning put more spaces into it
-			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, NULL, PREG_SPLIT_NO_EMPTY);
+			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
 
 			if ($token[1] == '-')
 				$keywords['exclude'] = array_merge($keywords['exclude'], $addWords);
