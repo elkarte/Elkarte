@@ -61,7 +61,7 @@ $txt['pm_labels_delete'] = 'Are you sure you wish to delete the selected labels?
 $txt['pm_labels_desc'] = 'From here you can add, edit and delete the labels used in your personal message center.';
 $txt['pm_label_add_new'] = 'Add new label';
 $txt['pm_label_name'] = 'Label name';
-$txt['pm_labels_no_exist'] = 'You currently have no labels setup!';
+$txt['pm_labels_no_exist'] = 'You currently have no labels set up!';
 
 // Labeling Drop Down.
 $txt['pm_current_label'] = 'Label';
@@ -128,7 +128,7 @@ $txt['pm_search_orderby_recent_first'] = 'Most recent first';
 $txt['pm_search_orderby_old_first'] = 'Oldest first';
 
 $txt['pm_visual_verification_label'] = 'Verification';
-$txt['pm_visual_verification_desc'] = 'Please enter the code in the image above to send this pm.';
+$txt['pm_visual_verification_desc'] = 'Please enter the code in the image above in order to send this PM.';
 
 $txt['pm_settings'] = 'Change settings';
 $txt['pm_change_view'] = 'Change view';
