@@ -4265,16 +4265,9 @@ a.help .icon {
 	#news, #logo, #top_section_notice {
 		display: none;
 	}
-	ul.poster {
-		display: block;
-		clear: both;
-	}
 	.avatar>.linklevel1>.avatar {
 		max-width: 40px;
 		max-height: 40px;
-	}
-	.poster_online, .icons img {
-		display: none;
 	}
 	.postarea {
 		display: block;
@@ -4365,13 +4358,22 @@ a.help .icon {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
 	}
+	ul.poster {
+		display: block;
+		clear: both;
+		text-align: center;
+	}
 	.poster {
 		float: none;
 		padding: 0px 1em 0px 1.5em;
 	}
+	.poster .listlevel1 {
+		display: inline-block;
+	}
 	.poster .subsections {
 		max-width: 120px;
 		max-height: 1.5em;
+		float: left;
 	}
 	.poster .subsections>a {
 		text-overflow: ellipsis;
@@ -4381,11 +4383,8 @@ a.help .icon {
 	.poster .membergroup {
 		float: right;
 	}
-	.poster .title {
+	.poster .title, .poster .poster_online, .icons img {
 		display: none;
-	}
-	.poster .subsections, .poster .avatar {
-		float: left;
 	}
 	.poster:after, .posterarea:before {
 		display: block;
