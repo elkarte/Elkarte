@@ -221,8 +221,7 @@ function template_body_above()
 	{
 		echo '
 				<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
-				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>', !empty($modSettings['enableOpenID']) ? '
-					<img style="display: none" class="toggle_login" src="' . $settings['images_url'] . '/login.png" alt="' . $txt['toggle_password'] . '" title="' . $txt['toggle_openid'] . '" />' : '', '
+				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 					<div id="password_login">
 						<input type="text" name="user" size="10" class="input_text" placeholder="', $txt['username'], '" />
 						<input type="password" name="passwrd" size="10" class="input_password" placeholder="', $txt['password'], '" />
@@ -233,36 +232,20 @@ function template_body_above()
 							<option value="43200">', $txt['one_month'], '</option>
 							<option value="-1" selected="selected">', $txt['forever'], '</option>
 						</select>
-					</div>';
-
-		if (!empty($modSettings['enableOpenID']))
-		{
-			echo '
-					<div id="openid_login">
-						<input type="text" name="openid_identifier" size="25" class="input_text openid_login" placeholder="', $txt['openid'], '" />
 					</div>
-					<script>
-						var toggle_openid = ', JavaScriptEscape($txt['toggle_openid']), ';
-						var toggle_password = ', JavaScriptEscape($txt['toggle_password']), ';
-					</script>';
-		}
-
-		echo '
 					<input type="submit" value="', $txt['login'], '" class="button_submit" />
 					<input type="hidden" name="hash_passwrd" value="" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
+				
+		if (!empty($modSettings['enableOpenID']))
+			echo '
+					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['toggle_openid'] . '" /></a>';
+		echo '
 				</form>';
 	}
 	// If the user is logged in, display stuff like their name, new messages, etc.
-	elseif ($context['user']['is_logged'])
-	{
-		echo '
-				<span class="greeting">', $txt['hello_member_ndt'], ' <span>', $context['user']['name'], '</span></span>';
-		if (!empty($context['user']['avatar']))
-			echo '
-				<a href="', $scripturl, '?action=profile" class="avatar">', $context['user']['avatar']['image'], '</a>';
-	}
+	
 	echo '
 			</div>';
 

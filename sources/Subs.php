@@ -3593,7 +3593,7 @@ function setupMenuContext()
 				),
 
 				'profile' => array(
-					'title' => $txt['account_short'],
+					'title' => $context['user']['avatar']['image'] . ' ' . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
 					'href' => $scripturl . '?action=profile',
 					'show' => $context['allow_edit_profile'],
 				),
