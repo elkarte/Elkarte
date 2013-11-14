@@ -213,13 +213,11 @@ function template_body_above()
 	// I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
 	// This could still be done via conditional, so that administration and moderation notices were still active when applicable.
 
-	echo '
-			<div id="top_section_notice" class="user">';
-
 	// Show log in form to guests.
 	if (!empty($context['show_login_bar']))
 	{
 		echo '
+			<div id="top_section_notice" class="user">
 				<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 					<div id="password_login">
@@ -242,11 +240,9 @@ function template_body_above()
 			echo '
 					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['toggle_openid'] . '" /></a>';
 		echo '
-				</form>';
-	}
-
-	echo '
+				</form>
 			</div>';
+	}
 
 	if ($context['allow_search'])
 	{
