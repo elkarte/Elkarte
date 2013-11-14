@@ -842,15 +842,40 @@ div.bbc_footnotes {
 	padding: 0;
 }
 #top_section_notice {
-	float: right;
+	float: left;
 	margin: 0;
 	padding: 14px 8px 0 8px;
 	line-height: 1.3em;
+	min-width:38%;
 	/* @todo - See me grumblez in Issue #552. ;) */
+}
+#top_section_notice .toggle_login {
+	padding-top: 2px;
+	display: inline;
+	cursor: pointer;
+}
+#top_section_notice form {
+	white-space: nowrap;
+	width: 100%;
+}
+.top_button {
+	line-height: 1.9em;
+	padding: 3px;
+	margin-left: 1px;
+}
+.top_button img {
+	vertical-align: middle;
+}
+#password_login, #openid_login {
+	display: inline-block;
+	margin-left: 20px;
+}
+#password_login input, #password_login select {
+	margin-left: -5px;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
-	float: left;
+	float: right;
 }
 /* @todo - Simplify. */
 #search_form .input_text, #search_form select, #search_form .button_submit {
@@ -892,9 +917,7 @@ div.bbc_footnotes {
 }
 /* The user info, news, etc.*/
 #news {
-	display: table-cell;
 	vertical-align: top;
-	width: 90%;
 }
 #upper_section>.user {
 	display: table-cell;
@@ -904,7 +927,9 @@ div.bbc_footnotes {
 	white-space: nowrap;
 }
 .greeting {
+	float: right;
 	font-weight: bold;
+	padding-top: 10px;
 }
 /* The login form. */
 #guest_form {
@@ -915,16 +940,18 @@ div.bbc_footnotes {
 	margin: 0 0 8px 0;
 }
 /* User information. @todo - Simplify. */
-#upper_section .avatar {
-	float: left;
-	margin: 0 5px 5px 0;
+#top_section_notice a.avatar {
+	float: right;
+	vertical-align: middle;
+	padding-right: 5px;
 }
 /* No more huge avatars up top. YAY! */
-#upper_section .avatar img, .notifavatar .avatar {
+#top_section_notice .avatar img, .notifavatar .avatar {
 	width: auto;
 	height: auto;
-	max-width: 60px;
-	max-height: 60px;
+	max-width: 36px;
+	max-height: 36px;
+	border-radius: 2px;
 }
 .modtask {
 	margin: 1em 0 0 0;
@@ -1003,13 +1030,24 @@ div.bbc_footnotes {
 .listlevel1:hover {
 	z-index: 5;
 }
-.listlevel1#collapse_button, .listlevel1#button_logout {
+.listlevel1#collapse_button, .listlevel1#button_profile {
 	float: right;
 }
-/* Level 1 Menu bar: link or button. */
+.listlevel1#button_profile img {
+	max-width: 1.5em;
+	max-height: 1.5em;
+	margin: 0;
+	margin-right: 0.6em;
+	position: relative;
+	top: 4px;
+}
+	/* Level 1 Menu bar: link or button. */
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
+}
+.listlevel1#button_profile .linklevel1 {
+	min-width: 5em;
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
@@ -1030,6 +1068,10 @@ div.bbc_footnotes {
 /* @todo - Check Superfish class. I think .sfhover may be deprecated. */
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: 0;
+}
+.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 { 
+	left: auto;
+	right: 0px;
 }
 /* Hiding Level 3 drop menu off hover. */
 .listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
@@ -4136,6 +4178,9 @@ a.help .icon {
 	.board_stats, .topic_stats {
 		display: none;
 	}
+	#password_login select {
+		display: none;
+	}
 }
 /* This one does 800 screens at default font size. */
 @media screen (max-width: 50em) {
@@ -4186,6 +4231,12 @@ a.help .icon {
 		display: block;
 	}
 	/* End playing silly buggers. */
+	#top_section_notice {
+		min-width: 250px;
+	}
+	#password_login select {
+		display: none;
+	}
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {

@@ -48,7 +48,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 		$subActions = array(
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
-			'add' => array($this, 'action_add', 'permission' => 'admin_forum'),
+// 			'add' => array($this, 'action_add', 'permission' => 'admin_forum'),
 			'settings' => array($this, 'action_languageSettings_display', 'permission' => 'admin_forum'),
 			'downloadlang' => array($this, 'action_downloadlang', 'permission' => 'admin_forum'),
 			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),

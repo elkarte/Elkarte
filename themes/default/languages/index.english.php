@@ -847,6 +847,9 @@ $txt['spider'] = 'Spider';
 $txt['spiders'] = 'Spiders';
 $txt['openid'] = 'OpenID';
 
+$txt['toggle_openid'] = 'Show OpenID';
+$txt['toggle_password'] = 'Show Username/Password';
+
 $txt['downloads'] = 'Downloads';
 $txt['filesize'] = 'Filesize';
 $txt['subscribe_webslice'] = 'Subscribe to Webslice';

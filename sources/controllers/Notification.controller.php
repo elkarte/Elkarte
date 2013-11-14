@@ -72,6 +72,12 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
+		global $modSettings;
+
+		// I'm not sure this is needed, though better have it. :P
+		if (empty($modSettings['notifications_enabled']))
+			fatal_lang_error('no_access', false);
+
 		$this->_data = array(
 			'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : null,
 			'uid' => isset($_REQUEST['uid']) ? $_REQUEST['uid'] : null,
@@ -87,12 +93,6 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $modSettings;
-
-		// I'm not sure this is needed, though better have it. :P
-		if (empty($modSettings['notifications_enabled']))
-			return false;
-
 		// default action to execute
 		$this->action_list();
 	}

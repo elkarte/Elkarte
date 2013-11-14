@@ -293,7 +293,7 @@ class ManageBans_Controller extends Action_Controller
 		global $txt, $modSettings, $context, $scripturl;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
-		$ban_errors = error_context::context('ban', 1);
+		$ban_errors = Error_Context::context('ban', 1);
 
 		if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors())
 			$this->action_edit2();
@@ -638,7 +638,7 @@ class ManageBans_Controller extends Action_Controller
 		checkSession();
 		validateToken('admin-bet');
 
-		$ban_errors = error_context::context('ban', 1);
+		$ban_errors = Error_Context::context('ban', 1);
 
 		// Adding or editing a ban group
 		if (isset($_POST['add_ban']) || isset($_POST['modify_ban']))

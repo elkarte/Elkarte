@@ -914,6 +914,8 @@ function action_forumSettings()
 		return true;
 	}
 
+	definePaths();
+
 	return false;
 }
 
@@ -934,6 +936,8 @@ function action_databasePopulation()
 
 	// Reload settings.
 	require(dirname(__FILE__) . '/Settings.php');
+	definePaths();
+
 	$db = load_database();
 
 	// Before running any of the queries, let's make sure another version isn't already installed.
@@ -1168,6 +1172,8 @@ function action_adminAccount()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
+	definePaths();
+
 	$db = load_database();
 
 	if (!isset($_POST['username']))
@@ -1334,6 +1340,8 @@ function action_deleteInstall()
 	$incontext['continue'] = 0;
 
 	require(dirname(__FILE__) . '/Settings.php');
+	definePaths();
+
 	$db = load_database();
 
 	if (!defined('SUBSDIR'))
@@ -1952,6 +1960,42 @@ function fixModSecurity()
 	}
 	else
 		return false;
+}
+
+function definePaths()
+{
+	global $boarddir, $cachedir, $extdir, $languagedir, $sourcedir;
+
+	// Make sure the paths are correct... at least try to fix them.
+	if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+		$boarddir = dirname(__FILE__);
+	if (!file_exists($sourcedir . '/Dispatcher.class.php') && file_exists($boarddir . '/sources'))
+		$sourcedir = $boarddir . '/sources';
+
+	// Check that directories which didn't exist in past releases are initialized.
+	if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+		$cachedir = $boarddir . '/cache';
+	if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+		$extdir = $sourcedir . '/ext';
+	if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+		$languagedir = $boarddir . '/themes/default/languages';
+
+	if (!DEFINED('BOARDDIR'))
+		DEFINE('BOARDDIR', $boarddir);
+	if (!DEFINED('CACHEDIR'))
+		DEFINE('CACHEDIR', $cachedir);
+	if (!DEFINED('EXTDIR'))
+		DEFINE('EXTDIR', $extdir);
+	if (!DEFINED('LANGUAGEDIR'))
+		DEFINE('LANGUAGEDIR', $languagedir);
+	if (!DEFINED('SOURCEDIR'))
+		DEFINE('SOURCEDIR', $sourcedir);
+	if (!DEFINED('ADMINDIR'))
+		DEFINE('ADMINDIR', $sourcedir . '/admin');
+	if (!DEFINED('CONTROLLERDIR'))
+		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+	if (!DEFINED('SUBSDIR'))
+		DEFINE('SUBSDIR', $sourcedir . '/subs');
 }
 
 /**

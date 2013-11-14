@@ -63,8 +63,8 @@ class Post_Controller extends Action_Controller
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
 			unset($_REQUEST['poll']);
 
-		$post_errors = error_context::context('post', 1);
-		$attach_errors = attachment_error_context::context('attachment', 1);
+		$post_errors = Error_Context::context('post', 1);
+		$attach_errors = attachment_Error_Context::context('attachment', 1);
 		$attach_errors->activate();
 		$first_subject = '';
 
@@ -992,8 +992,8 @@ class Post_Controller extends Action_Controller
 		checkSubmitOnce('check');
 
 		// No errors as yet.
-		$post_errors = error_context::context('post', 1);
-		$attach_errors = attachment_error_context::context();
+		$post_errors = Error_Context::context('post', 1);
+		$attach_errors = attachment_Error_Context::context();
 
 		// If the session has timed out, let the user re-submit their form.
 		if (checkSession('post', '', false) != '')
@@ -1972,7 +1972,7 @@ class Post_Controller extends Action_Controller
 			$moderationAction = $row['id_member'] != $user_info['id'];
 		}
 
-		$post_errors = error_context::context('post', 1);
+		$post_errors = Error_Context::context('post', 1);
 
 		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
 		{

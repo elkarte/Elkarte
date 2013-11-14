@@ -435,7 +435,7 @@ function saveDraft()
 	}
 
 	// Be ready for surprises
-	$post_errors = error_context::context('post', 1);
+	$post_errors = Error_Context::context('post', 1);
 
 	// Prepare and clean the data, load the draft array
 	$draft['id_draft'] = $id_draft;
@@ -517,7 +517,7 @@ function savePMDraft($recipientList)
 	// Read in what was sent
 	$id_pm_draft = empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'];
 	$draft_info = loadDraft($id_pm_draft, 1);
-	$post_errors = error_context::context('pm', 1);
+	$post_errors = Error_Context::context('pm', 1);
 
 	// 5 seconds is the same limit we have for posting
 	if (isset($_REQUEST['xml']) && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
