@@ -63,7 +63,7 @@ $(document).ready(function() {
 	});
 
 	// Spoiler
-	$('.spoilerheader').click(function(){
+	$('.spoilerheader').click(function() {
 		$(this).next().children().slideToggle("fast");
 	});
 });

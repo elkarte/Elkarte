@@ -2726,7 +2726,7 @@ function determineTopicClass(&$topic_context)
  */
 function setupThemeContext($forceload = false)
 {
-	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
+	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt;
 	global $user_settings;
 
 	static $loaded = false;
@@ -2738,7 +2738,6 @@ function setupThemeContext($forceload = false)
 
 	$loaded = true;
 
-	$context['in_maintenance'] = !empty($maintenance);
 	$context['current_time'] = standardTime(time(), false);
 	$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
 	$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
@@ -3580,13 +3579,6 @@ function setupMenuContext()
 		// The main menu
 		$menu->addBulk(
 			array(
-				// The old "logout" is meh. Not a real word. "Log out" is better.
-				'logout' => array(
-					'title' => $txt['logout'],
-					'href' => $scripturl . '?action=logout;%1$s=%2$s',
-					'show' => !$user_info['is_guest'],
-				),
-
 				'home' => array(
 					'title' => $txt['community'],
 					'href' => $scripturl,
@@ -3608,7 +3600,7 @@ function setupMenuContext()
 				),
 
 				'profile' => array(
-					'title' => $txt['account_short'],
+					'title' => $context['user']['avatar']['image'] . ' ' . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
 					'href' => $scripturl . '?action=profile',
 					'show' => $context['allow_edit_profile'],
 				),
@@ -3808,6 +3800,12 @@ function setupMenuContext()
 					'href' => $scripturl . '?action=profile;area=theme',
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
 				),
+				// The old "logout" is meh. Not a real word. "Log out" is better.
+				'logout' => array(
+					'title' => $txt['logout'],
+					'href' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
+					'show' => !$user_info['is_guest'],
+				),
 			)
 		);
 
@@ -3876,10 +3874,6 @@ function setupMenuContext()
 
 	$context['menu_buttons'] = $menu_buttons;
 	$allMenus->destroy('Main_Menu');
-
-	// Logging out requires the session id in the url.
-	if (isset($context['menu_buttons']['logout']))
-		$context['menu_buttons']['logout']['href'] = sprintf($context['menu_buttons']['logout']['href'], $context['session_var'], $context['session_id']);
 
 	// Figure out which action we are doing so we can set the active tab.
 	// Default to home.
