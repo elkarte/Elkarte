@@ -842,18 +842,14 @@ div.bbc_footnotes {
 	padding: 0;
 }
 #top_section_notice {
-	position: relative;
-	float: right;
+	float: left;
 	margin: 0;
 	padding: 14px 8px 0 8px;
 	line-height: 1.3em;
 	min-width:38%;
-	min-height: 1.8em;
 	/* @todo - See me grumblez in Issue #552. ;) */
 }
 #top_section_notice .toggle_login {
-	position:absolute;
-	left: 0;
 	padding-top: 2px;
 	display: inline;
 	cursor: pointer;
@@ -862,20 +858,24 @@ div.bbc_footnotes {
 	white-space: nowrap;
 	width: 100%;
 }
-#top_section_notice .button_submit {
-	position: absolute;
-	right: 0;
+.top_button {
+	line-height: 1.9em;
+	padding: 3px;
+	margin-left: 1px;
+}
+.top_button img {
+	vertical-align: middle;
 }
 #password_login, #openid_login {
 	display: inline-block;
-	margin-left: 50px;
+	margin-left: 20px;
 }
 #password_login input, #password_login select {
 	margin-left: -5px;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
-	float: left;
+	float: right;
 }
 /* @todo - Simplify. */
 #search_form .input_text, #search_form select, #search_form .button_submit {
@@ -1032,20 +1032,21 @@ div.bbc_footnotes {
 .listlevel1#collapse_button, .listlevel1#button_profile {
 	float: right;
 }
-.listlevel1#button_profile .menu_avatar {
-	max-width: 27px;
-	max-height: 27px;
-	padding-left: 5px;
-	float: right;
-	
+.listlevel1#button_profile img {
+	max-width: 1.5em;
+	max-height: 1.5em;
+	margin: 0;
+	margin-right: 0.6em;
+	position: relative;
+	top: 4px;
 }
-.listlevel1#button_profile .linklevel1 {
-	padding-right: 0px;
-}
-/* Level 1 Menu bar: link or button. */
+	/* Level 1 Menu bar: link or button. */
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
+}
+.listlevel1#button_profile .linklevel1 {
+	min-width: 5em;
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
