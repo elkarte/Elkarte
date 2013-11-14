@@ -1130,9 +1130,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'footnote',
 				'before' => '<sup class="bbc_footnotes">%fn%',
 				'after' => '%fn%</sup>',
-				'disallow_parents' => array('quote', 'anchor', 'url', 'iurl'),
+				'disallow_parents' => array('footnote', 'code', 'anchor', 'url', 'iurl'),
 				'disallow_before' => '',
 				'disallow_after' => '',
+				'block_level' => true,
 			),
 			array(
 				'tag' => 'font',
@@ -2351,15 +2352,19 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	$message = strtr($message, array('  ' => ' &nbsp;', "\r" => '', "\n" => '<br />', '<br /> ' => '<br />&nbsp;', '&#13;' => "\n"));
 
 	// Finish footnotes if we have any.
-	if (strpos($message, '%fn%'))
+	if (strpos($message, '<sup class="bbc_footnotes">'))
 	{
 		global $fn_num, $fn_content, $fn_count;
 		static $fn_total;
+
+		// @todo temporary until we have nesting
+		$message = str_replace(array('[footnote]', '[/footnote]'), '', $message);
 
 		$fn_num = 0;
 		$fn_content = array();
 		$fn_count = isset($fn_total) ? $fn_total : 0;
 
+		// Replace our footnote text with a [1] link, save the text for use at the end of the message
 		$message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', create_function('$m', '
 			global $fn_num, $fn_content, $fn_count;
 
@@ -2368,6 +2373,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			return "<a href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
 
 		$fn_total += $fn_num;
+
+		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 			$message .= '<div class="bbc_footnotes">' . implode('<br>', $fn_content) . '</div>';
 	}

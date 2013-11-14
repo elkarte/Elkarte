@@ -711,7 +711,7 @@ legend {
 	cursor: pointer;
 	padding-left: 20px;
 }
-.collapsed legend { 
+.collapsed legend {
 	background:  url(../images/selected.png) no-repeat scroll left center transparent;
 }
 
@@ -901,6 +901,7 @@ div.bbc_footnotes {
 	vertical-align: top;
 	min-width: 26em;
 	font-size: 0.857em;
+	white-space: nowrap;
 }
 .greeting {
 	font-weight: bold;
@@ -911,7 +912,7 @@ div.bbc_footnotes {
 }
 #guest_form input, #guest_form select {
 	font-size: 1.083em;
-	margin: 0 4px 8px 0;
+	margin: 0 0 8px 0;
 }
 /* User information. @todo - Simplify. */
 #upper_section .avatar {
@@ -4125,7 +4126,7 @@ a.help .icon {
 /* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
 
 /* This one does 1024 screens at default font size. */
-@media screen and (min-width: 50em) and (max-width: 64em) {
+@media screen (max-width: 64em) {
 	.board_latest {
 		min-width: 27em;
 	}
@@ -4137,15 +4138,12 @@ a.help .icon {
 	}
 }
 /* This one does 800 screens at default font size. */
-@media screen and (min-width: 30em) and (max-width: 50em) {
+@media screen (max-width: 50em) {
 	.wrapper {
 		min-width: 98%;
 	}
 	.board_latest {
 		min-width: 20em;
-	}
-	.topic_latest {
-		min-width: 17em;
 	}
 	.board_name {
 		margin: 0 0 0 56px;
@@ -4161,13 +4159,10 @@ a.help .icon {
 	.board_description, .moderators, .childboards {
 		margin: 0 0 0 8px;
 	}
-	.board_stats, .topic_stats {
-		display: none;
-	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
-	position: relative;
-	padding: 0 0 0 12px;
+		position: relative;
+		padding: 0 0 0 12px;
 	}
 	#menu_sidebar {
 		position: absolute;
@@ -4214,20 +4209,14 @@ a.help .icon {
 		min-width: 100%;
 		border-radius: 0;
 	}
-	.board_info, .board_latest {
-		display: block;
+	.board_lastpost {
+		display: none;
 	}
 	.board_latest {
 		padding-left: 64px;
 		border-left: none;
 	}
-	.topic_latest {
-		min-width: 17em;
-	}
 	.board_description, .moderators {
-		display: none;
-	}
-	.board_stats, .topic_stats {
 		display: none;
 	}
 	.topic_info {
@@ -4274,19 +4263,16 @@ a.help .icon {
 	#gobottom, #gotop {
 		padding-left: 0.25em;
 	}
+	#message_index_jump_to {
+		display: block;
+		float: none;
+	}
 	#news, #logo, #top_section_notice {
 		display: none;
 	}
-	ul.poster {
-		display: block;
-		clear: both;
-	}
 	.avatar>.linklevel1>.avatar {
-		max-width: 20px;
-		max-height: 20px;
-	}
-	.poster_online, .icons img {
-		display: none;
+		max-width: 40px;
+		max-height: 40px;
 	}
 	.postarea {
 		display: block;
@@ -4377,33 +4363,41 @@ a.help .icon {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
 	}
-	/* Playing silly buggers with a sidebar menu option for narrow screens. */
-	#main_container {
-	position: relative;
-	padding: 0 0 0 12px;
+	ul.poster {
+		display: block;
+		clear: both;
+		text-align: center;
 	}
-	#menu_sidebar {
-		position: absolute;
-		left: -0.8em;
-		width: 6px;
-		min-height: 500px;
-		border: 1px solid #aaa;
-		border-radius: 4px;
-		background: #fff;
-		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
-		z-index: 90;
+	.poster {
+		float: none;
+		padding: 0px 1em 0px 1.5em;
 	}
-	#menu_sidebar ul, #menu_sidebar .category_header {
+	.poster .listlevel1 {
+		display: inline-block;
+	}
+	.poster .subsections {
+		max-width: 120px;
+		max-height: 1.5em;
+		float: left;
+	}
+	.poster .subsections>a {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.poster .membergroup {
+		float: right;
+	}
+	.poster .title, .poster .poster_online, .icons img {
 		display: none;
 	}
-	#menu_sidebar:hover {
-		width: 200px;
-		padding: 0.8em 1em 1em 0.6em;
-	}
-	#menu_sidebar:hover ul, #menu_sidebar:hover .category_header {
+	.poster:after, .posterarea:before {
 		display: block;
+		clear: both;
+		content:"";
+		border-bottom: 1px solid #BFBFBF;
+		padding-bottom: 3px;
 	}
-	/* End playing silly buggers. */
 
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */
