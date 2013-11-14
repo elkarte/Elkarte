@@ -842,7 +842,7 @@ function action_databaseSettings()
  */
 function action_forumSettings()
 {
-	global $txt, $incontext, $databases, $db_connection, $db_type;
+	global $txt, $incontext, $databases, $db_connection, $db_type, $boardurl;
 
 	$incontext['sub_template'] = 'forum_settings';
 	$incontext['page_title'] = $txt['install_settings'];
