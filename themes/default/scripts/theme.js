@@ -66,24 +66,6 @@ $(document).ready(function() {
 	$('.spoilerheader').click(function() {
 		$(this).next().children().slideToggle("fast");
 	});
-
-	$('#top_section_notice .toggle_login').css({display: ''}).click(function() {
-		if ($('#openid_login').is(':visible'))
-		{
-			$(this).attr('alt', toggle_openid).attr('title', toggle_openid);
-			$('#openid_login').animate({width: 'toggle'}, function() {
-				$('#password_login').animate({width: 'toggle'});
-			});
-		}
-		else
-		{
-			$(this).attr('alt', toggle_password).attr('title', toggle_password);
-			$('#password_login').animate({width: 'toggle'}, function() {
-				$('#openid_login').animate({width: 'toggle'});
-			});
-		}
-	});
-	$('#openid_login').hide();
 });
 
 // Toggles the element height and width styles of an image.
