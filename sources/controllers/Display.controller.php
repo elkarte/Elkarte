@@ -115,8 +115,6 @@ class Display_Controller
 		$topic_tables = array();
 		call_integration_hook('integrate_display_topic', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
-		// @todo Why isn't this cached?
-		// @todo if we get id_board in this query and cache it, we can save a query on posting
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
