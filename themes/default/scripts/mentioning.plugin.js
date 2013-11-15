@@ -19,12 +19,13 @@
 
 	elk_Mentions.prototype.attachAtWho = function(oMentions, $element, oIframeWindow) {
 		var mentioned = document.getElementById('mentioned');
-		if (mentioned == null)
+		if (mentioned === null)
 			$('#' + oMentions.opts.editor_id).after(oMentions.opts._mentioned);
 		else
 			oMentions.opts._mentioned = $(mentioned);
 
 		oMentions.opts.cache.mentions = this.opts._mentioned;
+
 		$element.atwho({
 			at: "@",
 			limit: 7 ,
@@ -33,11 +34,10 @@
 			callbacks: {
 				filter: function (query, items, search_key) {
 					var current_call = parseInt(new Date().getTime() / 1000);
-
-					if (oMentions.opts._last_call != 0 && oMentions.opts._last_call + 1 > current_call)
+					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 1 > current_call)
 						return oMentions.opts._names;
 
-					if (typeof oMentions.opts.cache.names[query] != 'undefined')
+					if (typeof oMentions.opts.cache.names[query] !== 'undefined')
 						return oMentions.opts.cache.names[query];
 
 					oMentions.opts._names = [];
@@ -48,7 +48,7 @@
 					})
 					.done(function(request) {
 						$(request).find('item').each(function (idx, item) {
-							if (typeof oMentions.opts._names[oMentions.opts._names.length] == 'undefined')
+							if (typeof oMentions.opts._names[oMentions.opts._names.length] === 'undefined')
 								oMentions.opts._names[oMentions.opts._names.length] = {};
 							oMentions.opts._names[oMentions.opts._names.length - 1].id = $(item).attr('id');
 							oMentions.opts._names[oMentions.opts._names.length - 1].name = $(item).text();
@@ -70,12 +70,57 @@
 				}
 			}
 		});
+
+		// This hook is triggered when atWho places a slection list on the screen
+		$(oIframeWindow).on("reposition.atwho", function(event, offset) {
+			// We only need this for the wysiwyg window
+			if (base.inSourceMode())
+				return;
+
+			// offset contains the top left values of the offset to the iframe
+			// we need to convert that to main window coordinates
+			var oIframe = $('#' + oMentions.opts.editor_id).parent().find('iframe').offset(),
+				iLeft = oIframe.left + offset.left,
+				iTop = oIframe.top,
+				select_height = 0;
+
+			// atWho adds 3 select areas, presumably for differnet positing on screen (above below etc)
+			// This finds the active one and gets the container height
+			// @todo find something better than this
+			// @todo 64 is the character code @
+			$('#at-view-64.atwho-view').each(function(index, element) {
+				if ($(this).outerHeight() > 0)
+					select_height += $(this).height() + 10;
+			});
+
+			// Now should we show the selection box above or below?
+			var iWindowHeight = $(window).height(),
+				iDocViewTop = $(window).scrollTop(),
+				iSelectionPosition = iTop + offset.top - $(window).scrollTop(),
+				iAvailableSpace = iWindowHeight - (iSelectionPosition - iDocViewTop);
+
+		   if (iAvailableSpace >= select_height)
+		   {
+			   // Enough space below
+			   iTop = iTop + offset.top + select_height - $(window).scrollTop();
+		   }
+		   else
+		   {
+			   // Place it above instead
+			   // @todo should check if this is more space than below
+			   iTop= iTop + offset.top - $(window).scrollTop();
+		   }
+
+			// Move the select box
+			offset = {left: iLeft, top: iTop};
+			$('#at-view-64.atwho-view').offset(offset);
+		});
 	};
 
 	elk_Mentions.prototype.addUID = function(user_id, name) {
 		this.opts._mentioned.append($('<input type="hidden" name="uid[]" />').val(user_id).attr('data-name', name));
-	}
-	
+	};
+
 	/**
 	 * Private mention vars
 	 */
@@ -108,17 +153,19 @@
 
 			// Adds the selector to the list of known "mentioner"
 			add_elk_mention(oMentions.opts.editor_id, {isPlugin: true});
-
 			oMentions.attachAtWho(oMentions, $('#' + oMentions.opts.editor_id).parent().find('textarea'));
 
-			var oIframe = $('#' + oMentions.opts.editor_id).parent().find('iframe')[0],
-				oIframeWindow = oIframe.contentWindow;
+			// Using wysiwyg, then lets attach atwho to it
+			var instance = $('#' + oMentions.opts.editor_id).sceditor('instance');
+			if (!instance.opts.runWithoutWysiwygSupport)
+			{
+				// We need to monitor the iframe window and body to text input
+				var oIframe =  $('#' + oMentions.opts.editor_id).parent().find('iframe')[0],
+					oIframeWindow = oIframe.contentWindow,
+					oIframeBody = $('#' + oMentions.opts.editor_id).parent().find('iframe').contents().find('body')[0];
 
-			var oIframeDoc = oIframeWindow.document;
-			var oIframeBody = oIframeDoc.body;
-
-			oMentions.attachAtWho(oMentions, $(oIframeBody), oIframeWindow);
+					oMentions.attachAtWho(oMentions, $(oIframeBody), oIframeWindow);
+			}
 		};
 	};
-
 })(jQuery, window, document);
