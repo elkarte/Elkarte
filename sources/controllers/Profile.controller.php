@@ -37,6 +37,10 @@ class Profile_Controller extends Action_Controller
 		global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
 		global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
 
+		// Lets check on guests up front
+		if ($user_info['is_guest'] && !allowedTo('profile_view_any'))
+			validateSession();
+
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
 			loadLanguage('Profile+Drafts');
@@ -350,7 +354,7 @@ class Profile_Controller extends Action_Controller
 			$profile_include_data['enabled'] = false;
 
 		// No menu means no access.
-		if (!$profile_include_data && (!$user_info['is_guest'] || validateSession()) || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
+		if (!$profile_include_data && !$user_info['is_guest'] || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
 			fatal_lang_error('no_access', false);
 
 		// Make a note of the Unique ID for this menu.
