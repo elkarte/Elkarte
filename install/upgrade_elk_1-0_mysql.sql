@@ -127,11 +127,18 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
 ---# Copying the current package backup setting...
 ---{
 if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['package_make_backups']))
-	upgrade_query("
-		INSERT INTO {$db_prefix}settings
-			(variable, value)
-		VALUES
-			('package_make_full_backups', '" . $modSettings['package_make_backups'] . "')");
+	$db->insert('',
+		'{db_prefix}settings',
+		array(
+			'variable' => 'string',
+			'value' => 'string'
+		),
+		array (
+			'package_make_full_backups',
+			$modSettings['package_make_backups']
+		),
+		array('variable')
+	);
 ---}
 ---#
 
@@ -148,20 +155,27 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 ---#
 
 ---# Adding new settings to the settings table...
-INSERT IGNORE INTO {$db_prefix}settings
-	(variable, value)
-VALUES
-	('avatar_default', '0'),
-	('gravatar_rating', 'g'),
-	('admin_session_lifetime', 10),
-	('xmlnews_limit', 5),
-	('visual_verification_num_chars', '6'),
-	('enable_unwatch', 0),
-	('jquery_source', 'local'),
-	('mentions_enabled', '1'),
-	('mentions_buddy', '0'),
-	('mentions_dont_notify_rlike', '0'),
-	('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
+	$db->insert('ignore',
+		'{db_prefix}settings',
+		array(
+			'variable' => 'string',
+			'value' => 'string'
+		),
+		array (
+			array('avatar_default', '0'),
+			array('gravatar_rating', 'g'),
+			array('admin_session_lifetime', 10),
+			array('xmlnews_limit', 5),
+			array('visual_verification_num_chars', '6'),
+			array('enable_unwatch', 0),
+			array('jquery_source', 'local')
+			array('mentions_enabled', '1'),
+			array('mentions_buddy', '0'),
+			array('mentions_dont_notify_rlike', '0'),
+			array('detailed-version.js', 'https://elkarte.github.io/Elkarte/site/detailed-version.js');
+		),
+		array('variable')
+	);
 ---#
 
 /******************************************************************************/
@@ -290,30 +304,19 @@ ADD COLUMN id_redirect_topic mediumint(8) unsigned NOT NULL default '0';
 --- Updating scheduled tasks
 /******************************************************************************/
 ---# Adding new scheduled tasks
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 120, 1, 'd', 0, 'remove_temp_attachments');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 180, 1, 'd', 0, 'remove_topic_redirect');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 240, 1, 'd', 0, 'remove_old_drafts');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 0, 6, 'h', 0, 'remove_old_followups');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 360, 10, 'm', 1, 'maillist_fetch_IMAP');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 30, 1, 'h', 0, 'user_access_mentions');
+$db->insert('',
+	'{db_prefix}scheduled_tasks',
+	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'int'),
+	array(
+		array(0, 120, 1, 'd', 0, 'remove_temp_attachments'),
+		array(0, 180, 1, 'd', 0, 'remove_topic_redirect'),
+		array(0, 240, 1, 'd', 0, 'remove_old_drafts'),
+		array(0, 0, 6, 'h', 0, 'remove_old_followups'),
+		array(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP'),
+		array(0, 30, 1, 'h', 0, 'user_access_mentions'),
+		array('task')
+	)
+);
 ---#
 
 ---# Remove unused scheduled tasks...
@@ -420,11 +423,12 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT IGNORE INTO {$db_prefix}board_permissions
-				(id_group, id_profile, permission, add_deny)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('ignore',
+			'{db_prefix}board_permissions',
+			array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'string'),
+			$inserts,
+			array('id_group', 'id_profile', 'permission')
+		);
 
 	// Next we find people who can send PMs, and assume they can save pm_drafts as well
 	$request = upgrade_query("
@@ -440,11 +444,12 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT IGNORE INTO {$db_prefix}permissions
-				(id_group, permission, add_deny)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('ignore',
+			'{db_prefix}permissions',
+			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'string'),
+			$inserts,
+			array('id_group', 'permission')
+		);
 }
 ---}
 ---#
@@ -485,17 +490,39 @@ if ($db->affected_rows() != 0)
 --- Messenger fields
 /******************************************************************************/
 ---# Insert new fields
-INSERT INTO `{$db_prefix}custom_fields`
-	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
-VALUES
-	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1),
-	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
-	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1),
-	('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1),
-	('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1),
-	('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1),
-	('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1),
-	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
+$db->insert('',
+	'{db_prefix}custom_fields',
+	array(
+		'col_name' => 'string',
+		'field_name' => 'string',
+		'field_desc' => 'string',
+		'field_type' => 'string',
+		'field_length' => 'int',
+		'field_options' => 'string',
+		'mask' => 'string',
+		'show_reg' => 'int',
+		'show_display' => 'int',
+		'show_profile' => 'int',
+		'private' => 'int',
+		'active' => 'int',
+		'bbc' => 'int',
+		'can_search' => 'int',
+		'default_value' => 'string',
+		'enclose' => 'string',
+		'placement' => 'int'
+	),
+	array(
+		array('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1),
+		array('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
+		array('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1),
+		array('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1),
+		array('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1),
+		array('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1),
+		array('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1),
+		array('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1)
+	),
+		array('id_field')
+);
 ---#
 
 ---# Move existing values...
@@ -537,11 +564,12 @@ if ($move_im)
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT INTO {$db_prefix}custom_fields_data
-				(id_member, variable, value)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('',
+			'{db_prefix}custom_fields_data',
+			arrau('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+			$inserts,
+			array('id_member', 'variable')
+		);
 }
 ---}
 ---#
@@ -572,11 +600,12 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	$db->free_result($request);
 
 	if (!empty($inserts))
-		upgrade_query("
-			INSERT IGNORE INTO {$db_prefix}permissions
-				(id_group, permission, add_deny)
-			VALUES
-				" . implode(',', $inserts));
+		$db->insert('ignore',
+			'{db_prefix}permissions',
+			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'string'),
+			$inserts,
+			array('id_group', 'permission')
+		);
 }
 ---}
 ---#
@@ -630,18 +659,23 @@ if ($db->num_rows($request) != 0)
 {
 	$values = array();
 	$id_comments = array();
+	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		upgrade_query("
-			INSERT INTO {$db_prefix}antispam_questions
-				(answer, question, language)
-			VALUES
-				('" . serialize(array($row['answer'])) . "', '" . $row['question'] . "', '" . $language . "')");
+		$inserts[] = array(serialize(array($row['answer'])), $row['question'], $language);
+		// @todo use $id_comments and move the DELETE out of the loop
 		upgrade_query("
 			DELETE FROM {$db_prefix}log_comments
 			WHERE id_comment = " . $row['id_comment'] . "
 			LIMIT 1");
 	}
+	if (!empty($inserts))
+		$db->insert('',
+			'{db_prefix}antispam_questions',
+			array('answer' => 'string', 'question' => 'string', 'language' => 'string'),
+			$inserts,
+			array('id_question')
+		);
 }
 ---}
 ---#
@@ -707,10 +741,16 @@ ADD COLUMN message_id varchar(12) NOT NULL DEFAULT '';
 ---#
 
 ---# Updating board profiles...
-INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 1, 'postby_email');
-INSERT INTO {$db_prefix}board_permissions (id_group, id_profile, permission) VALUES (0, 2, 'postby_email');
+$db->insert('',
+	'{db_prefix}board_permissions',
+	array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string'),
+	array(
+		array(0, 1, 'postby_email'),
+		array(0, 2, 'postby_email')
+	),
+	array('id_profile', 'id_group')
+);
 ---#
-
 
 /******************************************************************************/
 --- Adding likes support.
