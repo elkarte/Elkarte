@@ -32,24 +32,36 @@ class Members_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		global $context;
+
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// Little short on the list here
+		$subActions = array(
+			'add' => array($this, 'action_addbuddy', 'permission' => 'profile_identity_own'),
+			'remove' => array($this, 'action_removebuddy', 'permission' => 'profile_identity_own'),
+		);
+
 		// I don't think we know what to do... throw dies?
-		$this->action_buddy();
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : '';
+		$context['sub_action'] = $subAction;
+
+		$action = new Action();
+		$action->initialize($subActions, 'add');
+		$action->dispatch($subAction);
 	}
 
 	/**
-	 * This simple function adds/removes the passed user from the current users buddy list.
-	 * Requires profile_identity_own permission.
+	 * This simple function adds the passed user from the current users buddy list.
+	 *
 	 * Called by ?action=buddy;u=x;session_id=y.
-	 * Subactions: sa=add and sa=remove. (@todo refactor subactions)
 	 * Redirects to ?action=profile;u=x.
 	 */
-	public function action_buddy()
+	public function action_addbuddy()
 	{
 		global $user_info, $modSettings;
 
 		checkSession('get');
-
-		isAllowedTo('profile_identity_own');
 		is_not_guest();
 
 		// You have to give a user
@@ -59,11 +71,10 @@ class Members_Controller extends Action_Controller
 		// Always an int
 		$user = (int) $_REQUEST['u'];
 
-		// Remove this user if it's already in your buddies...
-		if (in_array($user, $user_info['buddies']))
-			$user_info['buddies'] = array_diff($user_info['buddies'], array($user));
-		// ...or add if it's not there (and not you).
-		elseif ($user_info['id'] != $user)
+		call_integration_hook('integrate_add_buddies', array($user_info['id'], &$user));
+
+		// Add if it's not there (and not you).
+		if (!in_array($user, $user_info['buddies']) && $user_info['id'] != $user)
 		{
 			$user_info['buddies'][] = $user;
 
@@ -72,6 +83,7 @@ class Members_Controller extends Action_Controller
 			{
 				require_once(CONTROLLERDIR . '/Notification.controller.php');
 				$notify = new Notification_Controller();
+
 				// Set notifications for our buddy.
 				$notify->setData(array(
 					'id_member' => $user,
@@ -81,6 +93,40 @@ class Members_Controller extends Action_Controller
 				$notify->action_add();
 			}
 		}
+
+		// Update the settings.
+		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
+
+		// Redirect back to the profile
+		redirectexit('action=profile;u=' . $user);
+	}
+
+	/**
+	 * This function removes the passed user from the current users buddy list.
+	 *
+	 * Called by ?action=buddy;u=x;session_id=y.
+	 * Redirects to ?action=profile;u=x.
+	 */
+	public function action_removebuddy()
+	{
+		global $user_info;
+
+		checkSession('get');
+		is_not_guest();
+
+		call_integration_hook('integrate_remove_buddy', array($user_info['id']));
+
+		// You have to give a user
+		if (empty($_REQUEST['u']))
+			fatal_lang_error('no_access', false);
+
+		// Always an int
+		$user = (int) $_REQUEST['u'];
+
+		// Remove this user, assuming we can find them
+		if (in_array($user, $user_info['buddies']))
+			$user_info['buddies'] = array_diff($user_info['buddies'], array($user));
+
 		// Update the settings.
 		updateMemberData($user_info['id'], array('buddy_list' => implode(',', $user_info['buddies'])));
 
@@ -91,6 +137,9 @@ class Members_Controller extends Action_Controller
 	/**
 	 * Called by index.php?action=findmember.
 	 * This function result is used as a popup for searching members.
+	 *
+	 * @todo This function is "deprecated" and will be remove from 1.1
+	 *
 	 * @uses sub template find_members of the Members template.
 	 */
 	public function action_findmember()
