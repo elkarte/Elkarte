@@ -14,10 +14,14 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Start of the template, just calls in the helpers
+ */
 function template_ManageNews_init()
 {
 	loadtemplate('GenericHelpers');
 }
+
 /**
  * Template for the email to members page in admin panel.
  * It allows to select members and membergroups.
@@ -204,7 +208,7 @@ function template_email_members_compose()
 					</div>
 				</div>
 			</div>
-		</div><br />';
+		</div>';
 
 	echo '
 	<div id="admincenter">
