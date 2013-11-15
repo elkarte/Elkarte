@@ -921,6 +921,7 @@ function action_databasePopulation()
 	definePaths();
 
 	$db = load_database();
+	$db_table = db_table();
 
 	// Before running any of the queries, let's make sure another version isn't already installed.
 	$result = $db->query('', '

@@ -111,20 +111,61 @@ if (!empty($possible_theme_url))
 --- Adding new settings...
 /******************************************************************************/
 
----# Creating login history sequence.
-CREATE SEQUENCE {$db_prefix}member_logins_seq;
----#
-
 ---# Adding login history...
-CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
-	id_login int NOT NULL default nextval('{$db_prefix}member_logins_seq'),
-	id_member int NOT NULL,
-	time int NOT NULL,
-	ip varchar(255) NOT NULL default '',
-	ip2 varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_login)
+---{
+$db_table->db_create_table('{db_prefix}member_logins',
+	array(
+		array(
+			'name' => 'id_login',
+			'type' => 'int',
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8
+		),
+		array(
+			'name' => 'time',
+			'type' => 'int',
+			'size' => 10
+		),
+		array(
+			'name' => 'ip',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'ip2',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => array('id_login'),
+			'columns' => array('id_login'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => array('id_member'),
+			'columns' => array('id_member'),
+			'type' => 'key'
+		),
+		array(
+			'name' => array('time'),
+			'columns' => array('time'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
-// @todo two indexes missing
+---}
 ---#
 
 ---# Copying the current package backup setting...
@@ -242,7 +283,19 @@ unset($_GET['a']);
 --- Adding new indexes to attachments table.
 /******************************************************************************/
 ---# Adding index on id_thumb...
-CREATE INDEX {$db_prefix}attachments_id_thumb ON {$db_prefix}attachments (id_thumb);
+---{
+$db_table->db_add_index('{db_prefix}attachments',
+	array(
+		array(
+			'name' => array('id_thumb'),
+			'columns' => array('id_thumb'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -250,53 +303,187 @@ CREATE INDEX {$db_prefix}attachments_id_thumb ON {$db_prefix}attachments (id_thu
 /******************************************************************************/
 
 ---# Adding new columns to ban items...
-ALTER TABLE {$db_prefix}ban_items
-ADD COLUMN ip_low5 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high5 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_low6 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high6 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_low7 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high7 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_low8 smallint NOT NULL DEFAULT '0',
-ADD COLUMN ip_high8 smallint NOT NULL DEFAULT '0';
+---{
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low5',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high5',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low6',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high6',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low7',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high7',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_low8',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}ban_items',
+	array(
+		'name' => 'ip_high8',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Changing existing columns to ban items...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}ban_items
-	ALTER COLUMN ip_low1 type smallint,
-	ALTER COLUMN ip_high1 type smallint,
-	ALTER COLUMN ip_low2 type smallint,
-	ALTER COLUMN ip_high2 type smallint,
-	ALTER COLUMN ip_low3 type smallint,
-	ALTER COLUMN ip_high3 type smallint,
-	ALTER COLUMN ip_low4 type smallint,
-	ALTER COLUMN ip_high4 type smallint;"
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low1',
+	array(
+		'name' => 'ip_low1',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
 );
-
-upgrade_query("
-	ALTER TABLE {$db_prefix}ban_items
-	ALTER COLUMN ip_low1 SET DEFAULT '0',
-	ALTER COLUMN ip_high1 SET DEFAULT '0',
-	ALTER COLUMN ip_low2 SET DEFAULT '0',
-	ALTER COLUMN ip_high2 SET DEFAULT '0',
-	ALTER COLUMN ip_low3 SET DEFAULT '0',
-	ALTER COLUMN ip_high3 SET DEFAULT '0',
-	ALTER COLUMN ip_low4 SET DEFAULT '0',
-	ALTER COLUMN ip_high4 SET DEFAULT '0';"
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high1',
+	array(
+		'name' => 'ip_high1',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
 );
-
-upgrade_query("
-	ALTER TABLE {$db_prefix}ban_items
-	ALTER COLUMN ip_low1 SET NOT NULL,
-	ALTER COLUMN ip_high1 SET NOT NULL,
-	ALTER COLUMN ip_low2 SET NOT NULL,
-	ALTER COLUMN ip_high2 SET NOT NULL,
-	ALTER COLUMN ip_low3 SET NOT NULL,
-	ALTER COLUMN ip_high3 SET NOT NULL,
-	ALTER COLUMN ip_low4 SET NOT NULL,
-	ALTER COLUMN ip_high4 SET NOT NULL;"
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low2',
+	array(
+		'name' => 'ip_low2',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high2',
+	array(
+		'name' => 'ip_high2',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low3',
+	array(
+		'name' => 'ip_low3',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high3',
+	array(
+		'name' => 'ip_high3',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_low4',
+	array(
+		'name' => 'ip_low4',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
+);
+$db_table->db_change_column('{db_prefix}ban_items',
+	'ip_high4',
+	array(
+		'name' => 'ip_high4',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 255,
+		'default' => 0
+	)
+	array()
 );
 ---}
 ---#
@@ -304,9 +491,19 @@ upgrade_query("
 /******************************************************************************/
 --- Adding support for <credits> tag in package manager
 /******************************************************************************/
----# Adding new columns to log_packages ..
-ALTER TABLE {$db_prefix}log_packages
-ADD COLUMN credits varchar(255) NOT NULL DEFAULT '';
+---# Adding new columns to log_packages...
+---{
+$db_table->db_add_column('{db_prefix}log_packages',
+	array(
+		'name' => 'credits',
+		'type' => 'varchar',
+		'size' => 255,
+		'default' => ''
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -314,45 +511,66 @@ ADD COLUMN credits varchar(255) NOT NULL DEFAULT '';
 /******************************************************************************/
 ---# Altering the session_id columns...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_online
-	ALTER COLUMN session type varchar(64);
-
-	ALTER TABLE {$db_prefix}log_errors
-	ALTER COLUMN session type char(64);
-
-	ALTER TABLE {$db_prefix}sessions
-	ALTER COLUMN session_id type char(64);");
-
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_online
-	ALTER COLUMN session SET DEFAULT '';
-
-	ALTER TABLE {$db_prefix}log_errors
-	ALTER COLUMN session SET default '                                                                ';");
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_online
-	ALTER COLUMN session SET NOT NULL;
-
-	ALTER TABLE {$db_prefix}log_errors
-	ALTER COLUMN session SET NOT NULL;
-
-	ALTER TABLE {$db_prefix}sessions
-	ALTER COLUMN session_id SET NOT NULL;");
+$db_table->db_change_column('{db_prefix}log_online',
+	'session',
+	array(
+		'name' => 'session',
+		'type' => 'varchar',
+		'size' => 64,
+		'default' => ''
+	)
+	array()
+);
+$db_table->db_change_column('{db_prefix}log_errors',
+	'session',
+	array(
+		'name' => 'session',
+		'type' => 'char',
+		'size' => 64,
+		'default' => '                                                                '
+	)
+	array()
+);
+$db_table->db_change_column('{db_prefix}sessions',
+	'session_id',
+	array(
+		'name' => 'session_id',
+		'type' => 'char',
+		'size' => 64
+	)
+	array()
+);
 ---}
 ---#
 
 /******************************************************************************/
 --- Adding support for MOVED topics enhancements
 /******************************************************************************/
----# Adding new columns to topics table
+---# Adding new columns to topics ..
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}topics
-	ADD COLUMN redirect_expires int NOT NULL DEFAULT '0'");
-upgrade_query("
-	ALTER TABLE {$db_prefix}topics
-	ADD COLUMN id_redirect_topic int NOT NULL DEFAULT '0'");
+
+$db_table->db_add_column('{db_prefix}topics',
+	array(
+		'name' => 'redirect_expires',
+		'type' => 'int',
+		'unsigned' => true,
+		'size' => 10,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}topics',
+	array(
+		'name' => 'id_redirect_topic',
+		'type' => 'mediumint',
+		'unsigned' => true,
+		'size' => 8,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
 ---}
 ---#
 
@@ -390,20 +608,34 @@ upgrade_query("
 /******************************************************************************/
 ---# Adding new columns to boards...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}boards
-	ADD COLUMN deny_member_groups varchar(255) NOT NULL DEFAULT ''");
+$db_table->db_add_column('{db_prefix}boards',
+	array(
+		'name' => 'deny_member_groups',
+		'type' => 'varchar',
+		'size' => 255,
+		'default' => ''
+	),
+	array(),
+	'ignore'
+);
 ---}
 ---#
 
 /******************************************************************************/
---- Adding support for topic unwatch
+--- Adding support for topic unwatched
 /******************************************************************************/
----# Adding new columns to log_topics...
+---# Adding new columns to boards...
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}log_topics
-	ADD COLUMN unwatched int NOT NULL DEFAULT '0'");
+$db_table->db_add_column('{db_prefix}log_topics',
+	array(
+		'name' => 'unwatched',
+		'type' => 'tinyint',
+		'size' => 3,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
 ---}
 
 UPDATE {$db_prefix}log_topics
@@ -413,27 +645,63 @@ SET unwatched = 0;
 /******************************************************************************/
 --- Adding support for custom profile fields on the memberlist and ordering
 /******************************************************************************/
----# Adding new columns to boards...
-ALTER TABLE {$db_prefix}custom_fields
-ADD COLUMN show_memberlist smallint NOT NULL DEFAULT '0',
-ADD COLUMN vieworder smallint NOT NULL default '0';
+---# Adding new columns to custom_fields...
+---{
+$db_table->db_add_column('{db_prefix}custom_fields',
+	array(
+		'name' => 'show_memberlist',
+		'type' => 'tinyint',
+		'size' => 3,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}custom_fields',
+	array(
+		'name' => 'vieworder',
+		'type' => 'smallint',
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
 --- Fixing mail queue for long messages
 /******************************************************************************/
 ---# Altering mail_queue table...
-for the release - related to #1033)
-ALTER TABLE {$db_prefix}mail_queue
-CHANGE body body mediumtext NOT NULL;
+---{
+$db_table->db_change_column('{db_prefix}mail_queue',
+	'body',
+	array(
+		'name' => 'body',
+		'type' => 'mediumtext'
+	)
+	array()
+);
+---}
 ---#
 
 /******************************************************************************/
 --- Fixing floodcontrol for long types
 /******************************************************************************/
 ---# Altering the floodcontrol table...
-ALTER TABLE {$db_prefix}log_floodcontrol
-CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
+---{
+$db_table->db_change_column('{db_prefix}log_floodcontrol',
+	'log_type',
+	array(
+		'name' => 'log_type',
+		'type' => 'varchar',
+		'size' => 10,
+		'default' => 'post'
+	)
+	array()
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -441,37 +709,125 @@ CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
 /******************************************************************************/
 ---# Altering the membergroup stars to icons
 ---{
-upgrade_query("
-	ALTER TABLE {$db_prefix}membergroups
-	CHANGE COLUMN stars icons varchar(255) NOT NULL DEFAULT ''");
+$db_table->db_change_column('{db_prefix}membergroups',
+	'stars',
+	array(
+		'name' => 'icons',
+		'type' => 'varchar',
+		'size' => 255,
+		'default' => ''
+	)
+	array()
+);
 ---}
 ---#
 
 /******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
----# Creating sequence for user_drafts.
-CREATE SEQUENCE {$db_prefix}user_drafts_seq;
----#
-
 ---# Creating draft table
-CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
-	id_draft int default nextval('{$db_prefix}user_drafts_seq'),
-	id_topic int NOT NULL default '0',
-	id_board smallint NOT NULL default '0',
-	id_reply int NOT NULL default '0',
-	type smallint NOT NULL default '0',
-	poster_time int NOT NULL default '0',
-	id_member int NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	smileys_enabled smallint NOT NULL default '1',
-	body text NOT NULL,
-	icon varchar(16) NOT NULL default 'xx',
-	locked smallint NOT NULL default '0',
-	is_sticky smallint NOT NULL default '0',
-	to_list varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_draft)
+---{
+$db_table->db_create_table('{db_prefix}user_drafts',
+	array(
+		array(
+			'name' => 'id_draft',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'id_topic',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_board',
+			'type' => 'smallint',
+			'unsigned' => true,
+			'size' => 5,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_reply',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'poster_time',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'subject',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'smileys_enabled',
+			'type' => 'tinyint',
+			'size' => 4,
+			'default' => 1
+		),
+		array(
+			'name' => 'body',
+			'type' => 'mediumtext'
+		),
+		array(
+			'name' => 'icon',
+			'type' => 'varchar',
+			'size' => 16,
+			'default' => 'xx'
+		),
+		array(
+			'name' => 'locked',
+			'type' => 'tinyint',
+			'size' => 4,
+			'default' => 0
+		),
+		array(
+			'name' => 'is_sticky',
+			'type' => 'tinyint',
+			'size' => 4,
+			'default' => 0
+		),
+		array(
+			'name' => 'to_list',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => array('id_draft'),
+			'columns' => array('id_draft'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => array('id_member'),
+			'columns' => array('id_member', 'id_draft', 'type'),
+			'type' => 'unique'
+		)
+	),
+	array(),
+	'ignore'
 );
+---}
 ---#
 
 ---# Adding draft permissions...
@@ -479,7 +835,6 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 // We cannot do this twice
 // @todo this won't work when you upgrade from smf <= is it still true?
 if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersion'], '1.0') == -1)
-for the release - related to #1033)
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
 	$request = upgrade_query("
@@ -530,16 +885,43 @@ for the release - related to #1033)
 --- Adding support for custom profile fields data
 /******************************************************************************/
 ---# Creating custom profile fields data table
-CREATE TABLE IF NOT EXISTS {$db_prefix}custom_fields_data (
-	id_member int NOT NULL default '0',
-	variable varchar(255) NOT NULL default '',
-	value text NOT NULL,
-	PRIMARY KEY (id_member, variable)
+---{
+$db_table->db_create_table('{db_prefix}custom_fields_data',
+	array(
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'variable',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'value',
+			'type' => 'text'
+		)
+	),
+	array(
+		array(
+			'name' => array('id_member_variable'),
+			'columns' => array('id_member', 'variable(30)'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => array('id_member'),
+			'columns' => array('id_member'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----#
-CREATE INDEX {$db_prefix}custom_fields_data_id_member ON {$db_prefix}custom_fields_data (id_member);
+---}
 ---#
 
 ---# Move existing custom profile values...
@@ -605,6 +987,7 @@ $db->insert('',
 ---# Move existing values...
 ---{
 // We cannot do this twice
+<<<<<<< HEAD
 $db_table = db_table();
 $members_tbl = $db_table->db_table_structure("{db_prefix}members");
 $move_im = false;
@@ -652,11 +1035,12 @@ if ($move_im)
 ---#
 
 ---# Drop the old cols
-ALTER TABLE `{$db_prefix}members`
-	DROP `icq`,
-	DROP `aim`,
-	DROP `yim`,
-	DROP `msn`;
+---{
+$db_table->db_remove_column('{db_prefix}members', 'icq');
+$db_table->db_remove_column('{db_prefix}members', 'aim');
+$db_table->db_remove_column('{db_prefix}members', 'yim');
+$db_table->db_remove_column('{db_prefix}members', 'msn');
+---}
 ---#
 
 ---# Adding gravatar permissions...
@@ -702,37 +1086,83 @@ WHERE url = 'http://custom.simplemachines.org/packages/mods';
 /******************************************************************************/
 
 ---# Creating follow-up table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}follow_ups (
-	follow_up int NOT NULL default '0',
-	derived_from int NOT NULL default '0',
-	PRIMARY KEY (follow_up, derived_from)
+---{
+$db_table->db_create_table('{db_prefix}follow_ups',
+	array(
+		array(
+			'name' => 'follow_up',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'derived_from',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		)
+	),
+	array(
+		array(
+			'name' => array('follow_up'),
+			'columns' => array('follow_up', 'derived_from'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
+---}
 ---#
 
 /******************************************************************************/
 --- Updating antispam questions.
 /******************************************************************************/
 
----# Creating sequence for antispam_questions table...
-CREATE SEQUENCE {$db_prefix}antispam_questions_seq;
----#
-
 ---# Creating antispam questions table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}antispam_questions (
-	id_question int default nextval('{$db_prefix}antispam_questions_seq'),
-	question text NOT NULL default '',
-	answer text NOT NULL default '',
-	language varchar(50) NOT NULL default '',
-	PRIMARY KEY (id_question)
+---{
+$db_table->db_create_table('{db_prefix}antispam_questions',
+	array(
+		array(
+			'name' => 'id_question',
+			'type' => 'tinyint',
+			'unsigned' => true,
+			'size' => 4,
+			'auto' => true
+		),
+		array(
+			'name' => 'question',
+			'type' => 'text',
+		),
+		array(
+			'name' => 'answer',
+			'type' => 'text',
+		),
+		array(
+			'name' => 'language',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => array('id_question'),
+			'columns' => array('id_question'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => array('language'),
+			'columns' => array('language(30)'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
-#
-# Indexes for table `ban_items`
-#
-
----# Creating index for antispam_questions table...
-CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
+---}
 ---#
 
 ---# Move existing values...
@@ -773,52 +1203,178 @@ if ($db->num_rows($request) != 0)
 --- Adding support for Maillist
 /******************************************************************************/
 ---# Creating postby_emails table
-CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails (
-	id_email varchar(50) NOT NULL default '',
-	time_sent int NOT NULL default '0',
-	email_to varchar(50) NOT NULL default '',
-	PRIMARY KEY (id_email)
+---{
+$db_table->db_create_table('{db_prefix}postby_emails',
+	array(
+		array(
+			'name' => 'id_email',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		),
+		array(
+			'name' => 'time_sent',
+			'type' => 'int',
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'email_to',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => array('id_email'),
+			'columns' => array('id_email'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Sequence for table `postby_emails_error`
-CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
+---}
 ---#
 
 ---# Creating postby_emails_error table
-CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_error (
-	id_email int default nextval('{$db_prefix}postby_emails_error_seq'),
-	error varchar(255) NOT NULL default '',
-	data_id varchar(255) NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	id_message int NOT NULL default '0',
-	id_board smallint NOT NULL default '0',
-	email_from varchar(50) NOT NULL default '',
-	message_type char(10) NOT NULL default '',
-	message mediumtext NOT NULL default '',
-	PRIMARY KEY (id_email)
+---{
+$db_table->db_create_table('{db_prefix}postby_emails_error',
+	array(
+		array(
+			'name' => 'id_email',
+			'type' => 'int',
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'error',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'data_id',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => '0'
+		),
+		array(
+			'name' => 'subject',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'id_message',
+			'type' => 'int',
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_board',
+			'type' => 'smallint',
+			'size' => 5,
+			'default' => 0
+		),
+		array(
+			'name' => 'email_from',
+			'type' => 'varchar',
+			'size' => 50,
+			'default' => ''
+		),
+		array(
+			'name' => 'message_type',
+			'type' => 'char',
+			'size' => 10,
+			'default' => ''
+		),
+		array(
+			'name' => 'message',
+			'type' => 'mediumtext'
+		)
+	),
+	array(
+		array(
+			'name' => array('id_email'),
+			'columns' => array('id_email'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Sequence for table `postby_emails_filter`
-CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
+---}
 ---#
 
 ---# Creating postby_emails_filters table
-CREATE TABLE IF NOT EXISTS {$db_prefix}postby_emails_filters (
-	id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
-	filter_style char(5) NOT NULL default '',
-	filter_type varchar(255) NOT NULL default '',
-	filter_to varchar(255) NOT NULL default '',
-	filter_from varchar(255) NOT NULL default '',
-	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter)
+---{
+$db_table->db_create_table('{db_prefix}postby_emails_filters',
+	array(
+		array(
+			'name' => 'id_filter',
+			'type' => 'int',
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'filter_style',
+			'type' => 'char',
+			'size' => 5,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_type',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_to',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_from',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		),
+		array(
+			'name' => 'filter_name',
+			'type' => 'varchar',
+			'size' => 255,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => array('id_filter'),
+			'columns' => array('id_filter'),
+			'type' => 'primary'
+		)
+	),
+	array(),
+	'ignore'
 );
+---}
 ---#
 
 ---# Adding new columns to postby_emails_filters...
-ALTER TABLE {$db_prefix}postby_emails_filters
-ADD COLUMN filter_order int NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}postby_emails_filters',
+	array(
+		'name' => 'filter_order',
+		'type' => 'int',
+		'size' => 10,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Set the default values so the order is set / maintained
@@ -830,14 +1386,45 @@ upgrade_query("
 ---#
 
 ---# Adding new columns to log_activity...
-ALTER TABLE {$db_prefix}log_activity
-ADD COLUMN pm smallint NOT NULL DEFAULT '0',
-ADD COLUMN email smallint NOT NULL DEFAULT '0';
+---{
+$db_table->db_add_column('{db_prefix}log_activity',
+	array(
+		'name' => 'pm',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}log_activity',
+	array(
+		'name' => 'email',
+		'type' => 'smallint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Adding new columns to mail_queue...
-ALTER TABLE {$db_prefix}mail_queue
-ADD COLUMN message_id varchar(12) NOT NULL DEFAULT '';
+---{
+$db_table->db_add_column('{db_prefix}mail_queue',
+	array(
+		'name' => 'message_id',
+		'type' => 'varchar',
+		'size' => 12,
+		'default' => ''
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Updating board profiles...
@@ -859,42 +1446,145 @@ $db->insert('',
 /******************************************************************************/
 
 ---# Creating likes log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_likes (
-	action char(1) NOT NULL default '0',
-	id_target int NOT NULL default '0',
-	id_member int NOT NULL default '0',
-	log_time int NOT NULL default '0',
-	PRIMARY KEY (id_target, id_member)
+---{
+$db_table->db_create_table('{db_prefix}log_likes',
+	array(
+		array(
+			'name' => 'action',
+			'type' => 'char',
+			'size' => 1,
+			'default' => '0'
+		),
+		array(
+			'name' => 'id_target',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'log_time',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		)
+	),
+	array(
+		array(
+			'name' => array('id_target_member'),
+			'columns' => array('id_target', 'id_member'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => array('log_time'),
+			'columns' => array('log_time'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Creating likes log index ...
-CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
+---}
 ---#
 
 ---# Creating likes message table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}message_likes (
-	id_member int NOT NULL default '0',
-	id_msg int NOT NULL default '0',
-	id_poster int NOT NULL default '0',
-	PRIMARY KEY (id_msg, id_member)
+---{
+$db_table->db_create_table('{db_prefix}message_likes',
+	array(
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_msg',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_poster',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		)
+	),
+	array(
+		array(
+			'name' => array('id_msg_member'),
+			'columns' => array('id_msg', 'id_member'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => array('id_member'),
+			'columns' => array('id_member'),
+			'type' => 'key'
+		),
+		array(
+			'name' => array('id_poster'),
+			'columns' => array('id_poster'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Creating message_likes index ...
-CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
-CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
+---}
 ---#
 
 ---# Adding new columns to topics...
-ALTER TABLE {$db_prefix}topics
-ADD COLUMN num_likes int NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}topics',
+	array(
+		'name' => 'num_likes',
+		'type' => 'int',
+		'unsigned' => true,
+		'size' => 10,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 ---# Adding new columns to members...
-ALTER TABLE {$db_prefix}members
-ADD COLUMN likes_given int NOT NULL default '0',
-ADD COLUMN likes_received int NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => 'likes_given',
+		'type' => 'mediumint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => 'likes_received',
+		'type' => 'mediumint',
+		'unsigned' => true,
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 /******************************************************************************/
@@ -902,43 +1592,123 @@ ADD COLUMN likes_received int NOT NULL default '0';
 /******************************************************************************/
 
 ---# Renaming column that stores the PM receiving setting...
-ALTER TABLE {$db_prefix}members
-CHANGE pm_receive_from receive_from tinyint NOT NULL default '1';
+---{
+$db_table->db_change_column('{db_prefix}members',
+	'pm_receive_from',
+	array(
+		'name' => 'receive_from',
+		'type' => 'tinyint',
+		'unsigned' => true,
+		'size' => 4,
+		'default' => 1
+	)
+	array()
+);
+---}
 ---#
 
 /******************************************************************************/
 --- Adding mentions support.
 /******************************************************************************/
 
----# Creating mentions log index ...
-CREATE SEQUENCE {$db_prefix}log_mentions_id_mention_seq;
----#
-
----# Creating mentions log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
-	id_mention int default nextval('{$db_prefix}log_mentions_id_mention_seq'),
-	id_member int NOT NULL DEFAULT '0',
-	id_msg int NOT NULL DEFAULT '0',
-	status int NOT NULL DEFAULT '0',
-	id_member_from int NOT NULL DEFAULT '0',
-	log_time int NOT NULL DEFAULT '0',
-	mention_type varchar(5) NOT NULL DEFAULT '',
-	PRIMARY KEY (id_mention)
+---# Creating notifications log table...
+---{
+$db_table->db_create_table('{db_prefix}log_mentions',
+	array(
+		array(
+			'name' => 'id_mention',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'auto' => true
+		),
+		array(
+			'name' => 'id_member',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_msg',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'status',
+			'type' => 'tinyint',
+			'size' => 1,
+			'default' => 0
+		),
+		array(
+			'name' => 'id_member_from',
+			'type' => 'mediumint',
+			'unsigned' => true,
+			'size' => 8,
+			'default' => 0
+		),
+		array(
+			'name' => 'log_time',
+			'type' => 'int',
+			'unsigned' => true,
+			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'mention_type',
+			'type' => 'varchar',
+			'size' => 5,
+			'default' => ''
+		)
+	),
+	array(
+		array(
+			'name' => array('id_mention'),
+			'columns' => array('id_mention'),
+			'type' => 'primary'
+		),
+		array(
+			'name' => array('id_member_status'),
+			'columns' => array('id_member', 'status'),
+			'type' => 'key'
+		)
+	),
+	array(),
+	'ignore'
 );
----#
-
----# Creating mentions log index ...
-CREATE INDEX {$db_prefix}log_mentions_id_member ON {$db_prefix}log_mentions (id_member, status);
+---}
 ---#
 
 ---# Adding new columns to members...
-ALTER TABLE {$db_prefix}members
-ADD COLUMN mentions smallint NOT NULL default '0';
+---{
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => 'mentions',
+		'type' => 'smallint',
+		'size' => 5,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
 ---#
 
 --- Fixing personal messages column name
 /******************************************************************************/
 ---# Adding new columns to log_packages ..
-ALTER TABLE {$db_prefix}members
-CHANGE `instant_messages` `personal_messages` smallint NOT NULL default 0;
+---{
+$db_table->db_change_column('{db_prefix}members',
+	'instant_messages',
+	array(
+		'name' => 'personal_messages',
+		'type' => 'smallint',
+		'size' => 5,
+		'default' => 1
+	)
+	array()
+);
+---}
 ---#
