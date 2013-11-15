@@ -783,7 +783,7 @@ VALUES
 #
 
 CREATE TABLE {$db_prefix}custom_fields_data (
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,
   PRIMARY KEY (id_member, variable(30)),
@@ -1138,7 +1138,7 @@ CREATE TABLE {$db_prefix}log_reported (
 CREATE TABLE {$db_prefix}log_reported_comments (
   id_comment mediumint(8) unsigned NOT NULL auto_increment,
   id_report mediumint(8) NOT NULL default '0',
-  id_member mediumint(8) NOT NULL,
+  id_member mediumint(8) unsigned NOT NULL,
   membername varchar(255) NOT NULL default '',
   email_address varchar(255) NOT NULL default '',
   member_ip varchar(255) NOT NULL default '',
@@ -1412,7 +1412,7 @@ CREATE TABLE {$db_prefix}members (
 
 CREATE TABLE {$db_prefix}member_logins (
   id_login int(10) NOT NULL auto_increment,
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   time int(10) NOT NULL default '0',
   ip varchar(255) NOT NULL default '0',
   ip2 varchar(255) NOT NULL default '0',
@@ -1710,7 +1710,7 @@ CREATE TABLE {$db_prefix}polls (
   guest_vote tinyint(3) unsigned NOT NULL default '0',
   num_guest_voters int(10) unsigned NOT NULL default '0',
   reset_poll int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   poster_name varchar(255) NOT NULL default '',
   PRIMARY KEY (id_poll)
 ) ENGINE=MyISAM;
@@ -2146,7 +2146,7 @@ CREATE TABLE {$db_prefix}subscriptions(
 #
 
 CREATE TABLE {$db_prefix}themes (
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   id_theme tinyint(4) unsigned NOT NULL default '1',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,
