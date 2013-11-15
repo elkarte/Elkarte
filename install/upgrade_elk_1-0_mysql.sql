@@ -155,6 +155,7 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 ---#
 
 ---# Adding new settings to the settings table...
+---{
 	$db->insert('ignore',
 		'{db_prefix}settings',
 		array(
@@ -176,6 +177,7 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 		),
 		array('variable')
 	);
+---}
 ---#
 
 /******************************************************************************/
@@ -304,6 +306,7 @@ ADD COLUMN id_redirect_topic mediumint(8) unsigned NOT NULL default '0';
 --- Updating scheduled tasks
 /******************************************************************************/
 ---# Adding new scheduled tasks
+---{
 $db->insert('',
 	'{db_prefix}scheduled_tasks',
 	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'int'),
@@ -317,6 +320,7 @@ $db->insert('',
 		array('task')
 	)
 );
+---}
 ---#
 
 ---# Remove unused scheduled tasks...
@@ -425,7 +429,7 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	if (!empty($inserts))
 		$db->insert('ignore',
 			'{db_prefix}board_permissions',
-			array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'string'),
+			array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
 			array('id_group', 'id_profile', 'permission')
 		);
@@ -446,7 +450,7 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	if (!empty($inserts))
 		$db->insert('ignore',
 			'{db_prefix}permissions',
-			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'string'),
+			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
 			array('id_group', 'permission')
 		);
@@ -490,6 +494,7 @@ if ($db->affected_rows() != 0)
 --- Messenger fields
 /******************************************************************************/
 ---# Insert new fields
+---{
 $db->insert('',
 	'{db_prefix}custom_fields',
 	array(
@@ -523,6 +528,7 @@ $db->insert('',
 	),
 		array('id_field')
 );
+---}
 ---#
 
 ---# Move existing values...
@@ -602,7 +608,7 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	if (!empty($inserts))
 		$db->insert('ignore',
 			'{db_prefix}permissions',
-			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'string'),
+			array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
 			array('id_group', 'permission')
 		);
@@ -741,6 +747,7 @@ ADD COLUMN message_id varchar(12) NOT NULL DEFAULT '';
 ---#
 
 ---# Updating board profiles...
+---{
 $db->insert('',
 	'{db_prefix}board_permissions',
 	array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string'),
@@ -750,6 +757,7 @@ $db->insert('',
 	),
 	array('id_profile', 'id_group')
 );
+---}
 ---#
 
 /******************************************************************************/
