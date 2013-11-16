@@ -73,11 +73,9 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 		FROM {db_prefix}log_notifications AS n
 			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			LEFT JOIN {db_prefix}members AS men ON (n.id_member_from = men.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = men.id_member)
-		WHERE {query_see_board}
-			AND n.id_member = {int:current_user}' . ($all ? '
+		WHERE n.id_member = {int:current_user}' . ($all ? '
 			AND n.status != {int:is_not_deleted}' : '
 			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND n.notif_type = {string:current_type}') . '
