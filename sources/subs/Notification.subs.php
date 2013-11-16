@@ -824,7 +824,6 @@ function sendApprovalNotifications(&$topicData)
 		)
 	);
 	$sent = 0;
-
 	$current_language = $user_info['language'];
 	while ($row = $db->fetch_assoc($members))
 	{
@@ -844,23 +843,28 @@ function sendApprovalNotifications(&$topicData)
 			$current_language = loadLanguage('Post', $needed_language, false);
 
 		$sent_this_time = false;
+		$replacements = array(
+			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
+		);
+
 		// Now loop through all the messages to send.
 		foreach ($topicData[$row['id_topic']] as $msg)
 		{
-			$replacements = array(
-				'TOPICSUBJECT' => $topicData[$row['id_topic']]['subject'],
-				'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
-				'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-				'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
+			$replacements += array(
+				'TOPICSUBJECT' => $msg['subject'],
+				'POSTERNAME' => un_htmlspecialchars($msg['name']),
 			);
 
 			$message_type = 'notification_reply';
+
 			// Do they want the body of the message sent too?
 			if (!empty($row['notify_send_body']) && empty($modSettings['disallow_sendBody']))
 			{
 				$message_type .= '_body';
-				$replacements['BODY'] = $topicData[$row['id_topic']]['body'];
+				$replacements['MESSAGE'] = $msg['body'];
 			}
+
 			if (!empty($row['notify_regularity']))
 				$message_type .= '_once';
 
@@ -868,7 +872,7 @@ function sendApprovalNotifications(&$topicData)
 			if (empty($row['notify_regularity']) || (empty($row['sent']) && !$sent_this_time))
 			{
 				$emaildata = loadEmailTemplate($message_type, $replacements, $needed_language);
-				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicData[$row['id_topic']]['last_id']);
+				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $msg['last_id']);
 				$sent++;
 			}
 

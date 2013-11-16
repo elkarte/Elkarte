@@ -768,7 +768,7 @@ function template_profile_block_contact()
 						<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />
 					</dt>
 					<dd>
-						<a class="button_link" href="', $scripturl, '?action=buddy;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['buddy_' . ($context['member']['is_buddy'] ? 'remove' : 'add')], '</a>
+						<a class="linkbutton" href="', $scripturl, '?action=buddy;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], ';sa=', ($context['member']['is_buddy'] ? 'remove' : 'add'), '">', $txt['buddy_' . ($context['member']['is_buddy'] ? 'remove' : 'add')], '</a>
 					</dd>';
 	}
 

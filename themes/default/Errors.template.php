@@ -27,8 +27,8 @@ function template_fatal_error()
 	echo '
 	<div id="fatal_error">
 		<h2 class="category_header">', $context['error_title'], '</h2>
-		<div class="windowbg generic_list_wrapper">
-			<div ', $context['error_code'], '>', $context['error_message'], '</div>
+		<div class="generic_list_wrapper">
+			<div class="errorbox" ', $context['error_code'], '>', $context['error_message'], '</div>
 		</div>
 	</div>
 	<div class="centertext">

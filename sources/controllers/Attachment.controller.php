@@ -63,10 +63,7 @@ class Attachment_Controller extends Action_Controller
 		// This is just a regular attachment...
 		else
 		{
-			// This checks only the current board for $board/$topic's permissions.
-			// @todo: We must verify that $topic is the attachment's topic, or else the permission check is broken.
 			isAllowedTo('view_attachments');
-
 			$attachment = getAttachmentFromTopic($id_attach, $topic);
 		}
 

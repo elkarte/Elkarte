@@ -344,7 +344,6 @@ function getCalendarGrid($month, $year, $calendarOptions)
 			'month' => $month == 12 ? 1 : $month + 1,
 			'disabled' => $modSettings['cal_maxyear'] < ($month == 12 ? $year + 1 : $year),
 		),
-		// @todo Better tweaks?
 		'size' => isset($calendarOptions['size']) ? $calendarOptions['size'] : 'large',
 	);
 
