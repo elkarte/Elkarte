@@ -676,7 +676,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 				array(
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="restore_perms" value="' . $txt['package_restore_permissions_restore'] . '" class="right_submit" />',
-					'class' => 'titlebg',
+					'class' => 'category_header',
 				),
 				array(
 					'position' => 'after_title',

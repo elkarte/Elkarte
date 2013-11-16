@@ -24,7 +24,7 @@ function template_main()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a>
+			<a href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a>
 			', $txt['themeadmin_title'], '
 		</h2>
 		<div class="information">
@@ -108,7 +108,7 @@ function template_main()
 
 	echo '
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" class="help" id="theme_install"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_install'], '
+				<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" class="help" id="theme_install"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_install'], '
 			</h3>
 			<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
 				<div class="windowbg">
@@ -296,7 +296,7 @@ function template_reset_list()
 		</div>
 		<div id="admin_form_wrapper">';
 
-	// Show each theme.... with X for delete and a link to settings.
+	// Show each theme with the links to modify the settings
 	$alternate = false;
 
 	foreach ($context['themes'] as $theme)
@@ -304,9 +304,7 @@ function template_reset_list()
 		$alternate = !$alternate;
 
 		echo '
-			<div class="title_bar">
-				<h3 class="titlebg">', $theme['name'], '</h3>
-			</div>
+			<h3 class="secondary_header">', $theme['name'], '</h3>
 			<div class="windowbg', $alternate ? '' : '2','">
 				<div class="content">
 					<ul>
@@ -445,7 +443,7 @@ function template_set_settings()
 	<div id="admin_form_wrapper">
 		<form action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
+				<a href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
 			</h2>
 			<br />';
 

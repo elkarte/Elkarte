@@ -37,7 +37,7 @@ function template_admin()
 							<div id="admin_search_box">', $txt['try_searching'], template_admin_quick_search(), '</div>
 							<div id="live_news" class="floatleft">
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
+									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
 								</h3>
 								<div class="windowbg">
 									<div class="content">
@@ -214,7 +214,7 @@ function template_credits()
 	// Display latest support questions from ElkArte
 	echo '
 							<h3 class="category_header">
-								<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
+								<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
 							</h3>
 							<div class="windowbg">
 								<div class="content">
@@ -890,7 +890,7 @@ function template_show_settings()
 			{
 				echo '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
-						', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
+						', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
 						', $config_var['label'], '
 					</h3>';
 			}
@@ -1386,7 +1386,7 @@ function template_php_info()
 				{
 					// heading row for the settings section of this category's settings
 					echo '
-			<tr class="titlebg">
+			<tr class="secondary_header">
 				<td><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>

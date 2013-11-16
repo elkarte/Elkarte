@@ -91,7 +91,7 @@ div.quick_tasks {
 .action_admin .generic_list .flow_auto {
 	padding: 4px 2px;
 }
-h3.titlebg form {
+h3.category_header form {
 	font-size: 80%;
 }
 .windowbg.nopadding {
@@ -515,7 +515,7 @@ dl.settings dd.questions input {
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
 }
-#manage_boards .titlebg {
+#manage_boards .category_header {
 	border-bottom: 1px solid #bbb;
 }
 #manage_boards .windowbg {

@@ -26,10 +26,6 @@ hr {
 	background-color: #d6d6d6;
 	font-weight: bold;
 }
-.titlebg, tr.titlebg td, .titlebg a:link, .titlebg a:visited {
-	font-style: normal;
-	background-color: #f0f4f7;
-}
 .bordercolor {
 	background-color: #333;
 }

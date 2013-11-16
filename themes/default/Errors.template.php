@@ -46,9 +46,9 @@ function template_error_log()
 
 	echo '
 		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
-			</h2>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
+			</h3>
 			<div class="flow_auto">
 				<div class="floatleft">';
 
@@ -86,7 +86,7 @@ function template_error_log()
 				</tr>';
 
 	echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="3" class="righttext" style="padding: 4px 8px;">
 						<label for="check_all1"><strong>', $txt['check_all'], '</strong></label>&nbsp;
 						<input type="checkbox" id="check_all1" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all2.checked = this.checked;" class="input_check" />
@@ -154,7 +154,7 @@ function template_error_log()
 	}
 
 	echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="3" class="righttext" style="padding-right: 1.2ex">
 						<label for="check_all2"><strong>', $txt['check_all'], '</strong></label>&nbsp;
 						<input type="checkbox" id="check_all2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all1.checked = this.checked;" class="input_check" />

@@ -429,36 +429,50 @@ function template_results()
 					</div>';
 		}
 
+		// If we have results show a page index
 		if (!empty($context['topics']))
-			template_pagesection();
-
-		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
 		{
 			echo '
-					<div class="titlebg flow_auto" style="padding: 4px;">
-						<div class="floatright">
+					<div class="flow_auto">
+						<div class="floatleft">';
+
+							template_pagesection();
+
+			echo '
+						</div>';
+
+			// Quick moderation enabled, then show an action area
+			if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
+			{
+				echo '
+						<div class="additional_row floatright">
 							<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 								<option value="">--------</option>';
 
-			foreach ($context['qmod_actions'] as $qmod_action)
-				if ($context['can_' . $qmod_action])
-					echo '
+				foreach ($context['qmod_actions'] as $qmod_action)
+					if ($context['can_' . $qmod_action])
+						echo '
 								<option value="' . $qmod_action . '">' . $txt['quick_mod_'  . $qmod_action] . '</option>';
 
-			echo '
+				echo '
 							</select>';
 
-			// Show a list of boards they can move the topic to.
-			if ($context['can_move'])
-				echo '
-							<span id="quick_mod_jump_to">&nbsp;</span>';
+				// Show a list of boards they can move the topic to.
+				if ($context['can_move'])
+					echo '
+									<span id="quick_mod_jump_to">&nbsp;</span>';
 
-			echo '
-							<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search2;params=' . $context['params'], '" />
-							<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
-						</div>
+				echo '
+									<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search2;params=' . $context['params'], '" />
+									<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
+
+						</div>';
+			}
+
+			echo'
 					</div>';
 		}
+
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
@@ -528,7 +542,7 @@ function template_results()
 
 	// Show a jump to box for easy navigation.
 	echo '
-				<div class="smalltext righttext" id="search_jump_to">&nbsp;</div>
+				<div class="floatright" id="search_jump_to">&nbsp;</div>
 				<script><!-- // --><![CDATA[';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])
