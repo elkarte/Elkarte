@@ -265,8 +265,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_cache, $db_count, $db_show_debug, $time_start;
-		global $db_unbuffered, $db_callback, $modSettings;
+		global $db_cache, $db_count, $db_show_debug, $time_start, $db_callback, $modSettings;
 
 		// Decide which connection to use.
 		$connection = $connection === null ? $this->_connection : $connection;

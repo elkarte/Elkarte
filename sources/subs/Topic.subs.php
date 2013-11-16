@@ -2064,7 +2064,7 @@ function approveTopics($topics, $approve = true)
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
-	global $scripturl, $user_info, $language, $txt, $user_info, $topic, $board;
+	global $scripturl, $user_info, $language, $txt, $topic, $board;
 
 	// Should be in the boardwide language.
 	if ($user_info['language'] != $language)

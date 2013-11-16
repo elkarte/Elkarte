@@ -211,7 +211,7 @@ class Standard_Menu extends Menu_Entries
  */
 function createMenu($menuData, $menuOptions = array())
 {
-	global $context, $settings, $options, $txt, $scripturl, $user_info, $options;
+	global $context, $settings, $options, $txt, $scripturl, $user_info;
 
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
