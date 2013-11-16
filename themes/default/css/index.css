@@ -100,8 +100,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 }
 
 /* Collection of pseudo element clearfixes. */
-/* @todo - Clean up old titlebg stuff. */
-h3.titlebg:after, h4.titlebg:after, .category_header:after, .wrapper:after,
+.category_header:after, .wrapper:after,
 #main_content_section:after, #main_container:after,
 .attachments_bot:after, .editor_wrapper:after {
 	display: block;
@@ -429,19 +428,8 @@ em {
 	line-height: 2em;
 }
 
-/* Generic header bars. @todo - To be deprecated. */
-.titlebg {
-	padding: 0 6px;
-	background: #ebebeb;
-	background-image: linear-gradient(to bottom, #ebebeb 0%, #c6c6c6 100%);
-	color: #555;
-	font-size: 1.1em;
-}
-
 /* Styles for main headers. */
-.category_header, .forum_category .category_header,
-/* Generic header bars. @todo - To be deprecated. */
-h3.titlebg, h4.titlebg {
+.category_header, .forum_category .category_header {
 	padding: 4px 10px 2px 10px;
 	border: 1px solid #ccc;
 	border-top: 1px solid #ddd;
@@ -477,17 +465,6 @@ h3.titlebg, h4.titlebg {
 	color: #777;
 }
 
-h3.titlebg a, h3.titlebg, h4.titlebg, h4.titlebg a {
-	color: #555;
-}
-h3.titlebg a:hover, h4.titlebg a:hover {
-	color: #333;
-	text-decoration: none;
-}
-h4.titlebg .icon {
-	float: left;
-	margin: 0 5px 0 0;
-}
 .category_header .icon {
 	margin: 0 5px 0 0;
 	vertical-align: text-top;
@@ -652,11 +629,6 @@ div.windowbg, div.windowbg2 {
 	border-bottom: 1px solid #fff;
 	border-radius: 0;
 	background: none;
-}
-.generic_list_wrapper .titlebg {
-	border-bottom: 1px solid #aaa;
-	background: none;
-	font-size: 1.1em;
 }
 .generic_list_wrapper .additional_row {
 	margin: 0;
@@ -1069,7 +1041,7 @@ div.bbc_footnotes {
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: 0;
 }
-.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 { 
+.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
 	left: auto;
 	right: 0px;
 }
