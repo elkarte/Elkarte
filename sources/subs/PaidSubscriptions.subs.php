@@ -628,7 +628,7 @@ function updateSubscription($update, $ignore_active)
 			email_complete = {string:email_complete}, reminder = {int:reminder}
 		WHERE id_subscribe = {int:current_subscription}',
 		array(
-			'is_active' => $update['isActive'],
+			'is_active' => $update['is_active'],
 			'id_group' => $update['id_group'],
 			'repeatable' => $update['repeatable'],
 			'allow_partial' => $update['allow_partial'],
@@ -639,7 +639,7 @@ function updateSubscription($update, $ignore_active)
 			'length' => $update['length'],
 			'cost' => $update['cost'],
 			'additional_groups' => $update['additional_groups'],
-			'email_complete' => $update['emain_complete'],
+			'email_complete' => $update['email_complete'],
 		)
 	);
 }

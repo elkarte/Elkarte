@@ -972,9 +972,11 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 
 	$db = database();
 
-	//No $includes parameters given? Let's set some default values
+	// No $includes parameters given? Let's set some default values
 	if (empty($includes))
 		$includes = array('globalmod', 'member', 'postgroups');
+	elseif (!is_array($includes))
+		$includes = array($includes);
 
 	$groups = array();
 
