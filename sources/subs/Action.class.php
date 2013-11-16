@@ -121,6 +121,11 @@ class Action
 				// 'controller'->'function'
 				$controller_name = $subAction['controller'];
 				$controller = new $controller_name();
+
+				// Starting a new controller, run pre_dispatch
+				if (method_exists($controller, 'pre_dispatch'))
+					$controller->pre_dispatch();
+
 				$controller->{$subAction['function']}();
 			}
 			elseif (isset($subAction['function']))
