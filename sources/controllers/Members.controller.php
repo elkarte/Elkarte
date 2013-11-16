@@ -43,7 +43,7 @@ class Members_Controller extends Action_Controller
 		);
 
 		// I don't think we know what to do... throw dies?
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : '';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'none';
 		$context['sub_action'] = $subAction;
 
 		$action = new Action();
@@ -144,12 +144,13 @@ class Members_Controller extends Action_Controller
 	 */
 	public function action_findmember()
 	{
-		global $context, $scripturl, $user_info;
+		global $context, $scripturl, $user_info, $settings;
 
 		checkSession('get');
 
 		// Load members template
 		loadTemplate('Members');
+		loadTemplate('index');
 		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'find_members';
 
@@ -175,11 +176,22 @@ class Members_Controller extends Action_Controller
 		// If the user has done a search, well - search.
 		if (isset($_REQUEST['search']))
 		{
+			require_once(SUBSDIR . '/Auth.subs.php');
 			$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search'], ENT_QUOTES);
 
 			$context['results'] = findMembers(array($_REQUEST['search']), true, $context['buddy_search']);
 			$total_results = count($context['results']);
 			$_REQUEST['start'] = (int) $_REQUEST['start'];
+
+			// This is a bit hacky, but its defined in index template, and this is a popup
+			$settings['page_index_template'] = array(
+				'base_link' => '<li class="linavPages"><a class="navPages" href="{base_link}" role="menuitem">%2$s</a></li>',
+				'previous_page' => '<span class="previous_page" role="menuitem">{prev_txt}</span>',
+				'current_page' => '<li class="linavPages"><strong class="current_page" role="menuitem">%1$s</strong></li>',
+				'next_page' => '<span class="next_page" role="menuitem">{next_txt}</span>',
+				'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
+				'all' => '<li class="linavPages all_pages" role="menuitem">{all_txt}</li>',
+			);
 			$context['page_index'] = constructPageIndex($scripturl . '?action=findmember;search=' . $context['last_search'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';input=' . $context['input_box_name'] . ($context['quote_results'] ? ';quote=1' : '') . ($context['buddy_search'] ? ';buddies' : ''), $_REQUEST['start'], $total_results, 7);
 
 			// Determine the navigation context (especially useful for the wireless template).
@@ -191,6 +203,7 @@ class Members_Controller extends Action_Controller
 				'last' => $_REQUEST['start'] + 7 < $total_results ? $base_url . ';start=' . (floor(($total_results - 1) / 7) * 7) : '',
 				'up' => $scripturl . '?action=pm;sa=send' . (empty($_REQUEST['u']) ? '' : ';u=' . $_REQUEST['u']),
 			);
+
 			$context['page_info'] = array(
 				'current_page' => $_REQUEST['start'] / 7 + 1,
 				'num_pages' => floor(($total_results - 1) / 7) + 1
