@@ -262,11 +262,11 @@ $txt['package_restore_permissions_action_done'] = 'An attempt to restore the sel
 
 $txt['package_file_perms_warning'] = 'Please Note';
 $txt['package_file_perms_warning_desc'] = '
-	<li>Be careful when changing file permissions from this section - incorrect permissions can adversely affect the operation of your forum!</li>
-	<li>On some server configurations selecting the wrong permissions may stop the forum from operating.</li>
-	<li>Certain directories such as <em>attachments</em> need to be writable to use that functionality.</li>
-	<li>This functionality is mainly applicable on non-Windows based servers - it will not work as expected on Windows in regards to permission flags.</li>
-	<li>Before proceeding make sure you have an FTP client installed in case you do make an error and need to FTP into the server to remedy it.</li>';
+	Be careful when changing file permissions from this section - incorrect permissions can adversely affect the operation of your forum!<br>
+	On some server configurations selecting the wrong permissions may stop the forum from operating.<br>
+	Certain directories such as <em>attachments</em> need to be writable to use that functionality.<br>
+	This functionality is mainly applicable on non-Windows based servers - it will not work as expected on Windows in regards to permission flags.<br>
+	Before proceeding make sure you have an FTP client installed in case you do make an error and need to FTP into the server to remedy it.';
 
 $txt['package_confirm_view_package_content'] = 'Are you sure you want to view the package contents from this location:<br /><br />%1$s';
 $txt['package_confirm_proceed'] = 'Proceed';
