@@ -2544,7 +2544,7 @@ function determineAvatar($profile)
 {
 	global $modSettings, $scripturl, $settings;
 
-	if (empty($profile) || empty($settings))
+	if (empty($profile))
 		return array();
 
 	// If we're always html resizing, assume it's too large.
@@ -2608,6 +2608,11 @@ function determineAvatar($profile)
 	// no custon avatar found yet, maybe a default avatar?
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
+		// $settings not initialized? We can't do anything further..
+		if (empty($settings))
+			return array();
+
+		// Let's proceed with the default avatar.
 		$avatar = array(
 			'name' => '',
 			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png" alt="" class="avatar" />',
