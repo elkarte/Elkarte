@@ -523,7 +523,7 @@ function template_examine()
  */
 function template_browse()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings, $forum_version;
+	global $context, $txt, $scripturl, $forum_version;
 
 	echo '
 	<div id="admincenter">';
