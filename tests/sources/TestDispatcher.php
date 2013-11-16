@@ -54,7 +54,7 @@ class TestDispatcher extends UnitTestCase
 		$actions = array(
 			'activate' => 'Register',
 			'attachapprove' => 'ModerateAttachments',
-			'buddy' => 'Members',
+			'addbuddy' => 'Members',
 			'collapse' => 'BoardIndex',
 			'contact' => 'Register',
 			'coppa' => 'Register',
