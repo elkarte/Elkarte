@@ -233,7 +233,7 @@ function template_view_package()
 				$js_operations[$action_num] = !empty($theme['has_failure']);
 
 				echo '
-					<tr class="titlebg">
+					<tr class="secondary_header">
 						<td></td>
 						<td class="centertext">';
 
