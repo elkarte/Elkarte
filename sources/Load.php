@@ -140,10 +140,9 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings;
+	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
 	$db = database();
-	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
 	if (count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
