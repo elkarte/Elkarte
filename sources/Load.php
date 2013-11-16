@@ -140,10 +140,9 @@ function reloadSettings()
  */
 function loadUserSettings()
 {
-	global $modSettings, $user_settings;
+	global $context, $modSettings, $user_settings, $cookiename, $user_info, $language;
 
 	$db = database();
-	global $cookiename, $user_info, $language, $context;
 
 	// Check first the integration, then the cookie, and last the session.
 	if (count($integration_ids = call_integration_hook('integrate_verify_user')) > 0)
@@ -202,9 +201,6 @@ function loadUserSettings()
 			);
 			$user_settings = $db->fetch_assoc($request);
 			$db->free_result($request);
-
-			if (!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
-				$user_settings['avatar'] = 'default_avatar.png';
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
@@ -2612,6 +2608,11 @@ function determineAvatar($profile)
 	// no custon avatar found yet, maybe a default avatar?
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
+		// $settings not initialized? We can't do anything further..
+		if (empty($settings))
+			return array();
+
+		// Let's proceed with the default avatar.
 		$avatar = array(
 			'name' => '',
 			'image' => '<img src="' . $settings['images_url'] . '/default_avatar.png" alt="" class="avatar" />',
