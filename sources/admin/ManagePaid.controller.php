@@ -113,7 +113,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
-		// initialize the form
+		// Initialize the form
 		$this->_init_paidSettingsForm();
 
 		$config_vars = $this->_paidSettings->settings();
@@ -233,7 +233,7 @@ class ManagePaid_Controller extends Action_Controller
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_paidSettings = new Settings_Form();
 
 		// If the currency is set to something different then we need to set it to other for this to work and set it back shortly.
@@ -572,13 +572,14 @@ class ManagePaid_Controller extends Action_Controller
 		else
 		{
 			$context['sub'] = getSubscriptionDetails($context['sub_id']);
+
 			// Does this have members who are active?
 			$context['disable_groups'] = countActiveSubscriptions($context['sub_id']);
 		}
 
 		// Load up all the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		$context['groups'] = getBasicMembergroupData('permission');
+		$context['groups'] = getBasicMembergroupData(array('permission'));
 
 		// This always happens.
 		createToken($context['action_type'] == 'delete' ? 'admin-pmsd' : 'admin-pms');
