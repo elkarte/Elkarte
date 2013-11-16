@@ -203,9 +203,6 @@ function loadUserSettings()
 			$user_settings = $db->fetch_assoc($request);
 			$db->free_result($request);
 
-			if (!empty($modSettings['avatar_default']) && empty($user_settings['avatar']) && empty($user_settings['filename']))
-				$user_settings['avatar'] = 'default_avatar.png';
-
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 				cache_put_data('user_settings-' . $id_member, $user_settings, 60);
 		}
@@ -2548,7 +2545,7 @@ function determineAvatar($profile)
 {
 	global $modSettings, $scripturl, $settings;
 
-	if (empty($profile))
+	if (empty($profile) || empty($settings))
 		return array();
 
 	// If we're always html resizing, assume it's too large.
