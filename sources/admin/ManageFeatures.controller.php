@@ -335,6 +335,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'compactTopicPagesEnable'),
 				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
 				array('int', 'defaultMaxMembers'),
+				array('check', 'displayMemberNames'),
 			'',
 				// Stuff that just is everywhere - today, search, online, etc.
 				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
@@ -527,6 +528,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'notification_settings'),
 			array('check', 'notifications_enabled'),
+			array('check', 'notifications_buddy'),
 		);
 
 		call_integration_hook('integrate_notification_settings', array(&$config_vars));

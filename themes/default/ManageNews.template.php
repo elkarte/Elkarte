@@ -14,10 +14,14 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Start of the template, just calls in the helpers
+ */
 function template_ManageNews_init()
 {
 	loadtemplate('GenericHelpers');
 }
+
 /**
  * Template for the email to members page in admin panel.
  * It allows to select members and membergroups.
@@ -204,13 +208,13 @@ function template_email_members_compose()
 					</div>
 				</div>
 			</div>
-		</div><br />';
+		</div>';
 
 	echo '
 	<div id="admincenter">
 		<form name="newsmodify" action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['admin_newsletters'], '
+				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['admin_newsletters'], '
 			</h3>
 			<div class="information">
 				', $txt['email_variables'], '
@@ -305,7 +309,7 @@ function template_email_members_send()
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['admin_newsletters'], '
+				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['admin_newsletters'], '
 			</h3>
 			<div class="windowbg">
 				<div class="content">

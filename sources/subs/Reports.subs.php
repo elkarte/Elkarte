@@ -75,6 +75,7 @@ function allMembergroups($group_clause, $query_groups = array())
 			'min_posts' => -1,
 			'newbie_group' => 4,
 			'groups' => $query_groups,
+			'moderator_group' => 3,
 		)
 	);
 

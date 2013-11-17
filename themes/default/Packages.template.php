@@ -233,7 +233,7 @@ function template_view_package()
 				$js_operations[$action_num] = !empty($theme['has_failure']);
 
 				echo '
-					<tr class="titlebg">
+					<tr class="secondary_header">
 						<td></td>
 						<td class="centertext">';
 
@@ -523,7 +523,7 @@ function template_examine()
  */
 function template_browse()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings, $forum_version;
+	global $context, $txt, $scripturl, $forum_version;
 
 	echo '
 	<div id="admincenter">';
@@ -1080,12 +1080,8 @@ function template_file_permissions()
 		echo '
 	<div class="noticebox">
 		<div>
-			<strong>', $txt['package_file_perms_warning'], ':</strong>
-			<div class="smalltext">
-				<ol style="margin-top: 2px; margin-bottom: 2px">
-					', $txt['package_file_perms_warning_desc'], '
-				</ol>
-			</div>
+			<strong>', $txt['package_file_perms_warning'], ':</strong><br>
+				', $txt['package_file_perms_warning_desc'], '
 		</div>
 	</div>
 
@@ -1098,11 +1094,11 @@ function template_file_permissions()
 				<tr class="table_head">
 					<th class="lefttext" style="width:30%">&nbsp;', $txt['package_file_perms_name'], '&nbsp;</th>
 					<th class="lefttext" style="width:30%">', $txt['package_file_perms_status'], '</th>
-					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
-					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
-					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
-					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
-					<th style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_read'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_write'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_execute'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_custom'], '</span></th>
+					<th class="centertext" style="width:8%"><span class="filepermissions">', $txt['package_file_perms_status_no_change'], '</span></th>
 				</tr>
 			</thead>
 			<tbody>';
@@ -1150,7 +1146,7 @@ function template_file_permissions()
 							<label for="method_individual"><strong>', $txt['package_file_perms_apply'], '</strong></label>
 						</dt>
 						<dd>
-							<em class="smalltext">', $txt['package_file_perms_custom'], ': <input type="text" name="custom_value" value="0755" maxlength="4" size="5" class="input_text" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=chmod_flags" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a></em>
+							<em class="smalltext">', $txt['package_file_perms_custom'], ': <input type="text" name="custom_value" value="0755" maxlength="4" size="5" class="input_text" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=chmod_flags" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></em>
 						</dd>
 						<dt>
 							<input type="radio" name="method" value="predefined" id="method_predefined" class="input_radio" />

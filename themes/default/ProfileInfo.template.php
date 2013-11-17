@@ -251,7 +251,7 @@ function template_action_showPermissions()
 			echo '
 					<table class="table_grid">
 						<thead>
-							<tr class="titlebg">
+							<tr class="table_head">
 								<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_permission'], '</th>
 								<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_status'], '</th>
 							</tr>
@@ -316,7 +316,7 @@ function template_action_showPermissions()
 			echo '
 				<table class="table_grid">
 					<thead>
-						<tr class="titlebg">
+						<tr class="table_head">
 							<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_permission'], '</th>
 							<th scope="col" class="lefttext" style="width:50%">', $txt['showPermissions_status'], '</th>
 						</tr>
@@ -768,7 +768,7 @@ function template_profile_block_contact()
 						<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />
 					</dt>
 					<dd>
-						<a class="button_link" href="', $scripturl, '?action=buddy;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['buddy_' . ($context['member']['is_buddy'] ? 'remove' : 'add')], '</a>
+						<a class="linkbutton" href="', $scripturl, '?action=buddy;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], ';sa=', ($context['member']['is_buddy'] ? 'remove' : 'add'), '">', $txt['buddy_' . ($context['member']['is_buddy'] ? 'remove' : 'add')], '</a>
 					</dd>';
 	}
 

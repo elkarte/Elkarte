@@ -54,6 +54,7 @@ class Notification_Controller extends Action_Controller
 			'men', // mention
 			'like', // message liked
 			'rlike', // like removed
+			'buddy', // added as buddy
 		);
 		$this->_known_status = array(
 			'new' => 0,
@@ -71,6 +72,12 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
+		global $modSettings;
+
+		// I'm not sure this is needed, though better have it. :P
+		if (empty($modSettings['notifications_enabled']))
+			fatal_lang_error('no_access', false);
+
 		$this->_data = array(
 			'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : null,
 			'uid' => isset($_REQUEST['uid']) ? $_REQUEST['uid'] : null,
@@ -86,12 +93,6 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		global $modSettings;
-
-		// I'm not sure this is needed, though better have it. :P
-		if (empty($modSettings['notifications_enabled']))
-			return false;
-
 		// default action to execute
 		$this->action_list();
 	}
@@ -245,6 +246,11 @@ class Notification_Controller extends Action_Controller
 						'href' => $scripturl . '?action=notification;type=rlike' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'rlike',
 						'label' => $txt['notification_type_rlike']
+					),
+					array(
+						'href' => $scripturl . '?action=notification;type=buddy' . (!empty($this->_all) ? ';all' : ''),
+						'is_selected' => $this->_type === 'buddy',
+						'label' => $txt['notification_type_buddy']
 					),
 				),
 			),
@@ -449,7 +455,6 @@ class Notification_Controller extends Action_Controller
 		$validation = array(
 			'type' => 'required|contains[' . implode(',', $this->_known_notifications) . ']',
 			'uid' => 'isarray',
-			'msg' => 'required|notequal[0]',
 		);
 
 		// Any optional fields we need to check?

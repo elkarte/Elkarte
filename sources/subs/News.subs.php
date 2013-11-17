@@ -108,7 +108,7 @@ function excludeBannedMembers()
 			$condition_array_params
 		);
 		while ($row = $db->fetch_assoc($request))
-			$excludes['exclude_members'][] = $row['id_member'];
+			$excludes[] = $row['id_member'];
 		$db->free_result($request);
 	}
 

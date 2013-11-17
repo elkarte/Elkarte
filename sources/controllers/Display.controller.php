@@ -115,8 +115,6 @@ class Display_Controller
 		$topic_tables = array();
 		call_integration_hook('integrate_display_topic', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
-		// @todo Why isn't this cached?
-		// @todo if we get id_board in this query and cache it, we can save a query on posting
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
@@ -349,12 +347,8 @@ class Display_Controller
 		$context['is_very_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 		$context['is_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $topicinfo['approved'];
-
-		// @todo Tricks? We don't want to show the poll icon in the topic class here, so pretend it's not one.
-		$context['is_poll'] = false;
-		determineTopicClass($context);
-
 		$context['is_poll'] = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
+		determineTopicClass($context);
 
 		// Did this user start the topic or not?
 		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];

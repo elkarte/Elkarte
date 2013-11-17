@@ -807,7 +807,7 @@ function template_postmod_permissions()
 							', $txt['permissions_post_moderation_attachments'], '
 						</th>
 					</tr>
-					<tr class="titlebg">
+					<tr class="secondary_header">
 						<th style="width:30%">
 							', $txt['permissions_post_moderation_group'], '
 						</th>

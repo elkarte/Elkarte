@@ -461,7 +461,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Put any errors in here.
-	$reg_errors = error_context::context($error_context, 0);
+	$reg_errors = Error_Context::context($error_context, 0);
 
 	// Registration from the admin center, let them sweat a little more.
 	if ($regOptions['interface'] == 'admin')
@@ -1886,9 +1886,12 @@ function approveMembers($conditions)
 				AND id_member IN ({array_int:members})',
 	);
 
+	// @todo maybe an hook here?
+
 	$query_cond = array();
 	foreach ($conditions as $key => $dummy)
-		$query_cond[] = $available_conditions[$key];
+		if (isset($available_conditions[$key]))
+			$query_cond[] = $available_conditions[$key];
 
 	$conditions['is_activated'] = 1;
 	$conditions['blank_string'] = '';

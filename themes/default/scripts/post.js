@@ -326,6 +326,11 @@ function onDocSent(XMLDoc)
 	// Preview video links if the feature is available
 	if ($.isFunction($.fn.linkifyvideo))
 		$().linkifyvideo(oEmbedtext, 'preview_body');
+
+	// Preview spoilers
+	$('.spoilerheader').click(function(){
+		$(this).next().children().slideToggle("fast");
+	});
 }
 
 // Add additional poll option fields

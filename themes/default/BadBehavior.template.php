@@ -19,9 +19,9 @@ function template_badbehavior_log()
 
 	echo '
 		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
-			</h2>
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
+			</h3>
 			', template_pagesection(), '
 			<table class="table_grid" id="error_log">';
 
@@ -35,7 +35,7 @@ function template_badbehavior_log()
 
 	// The checkall box
 	echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="3" class="righttext" style="padding: 4px 8px;">
 						<label for="check_all_1"><strong>', $txt['check_all'], '</strong></label>&nbsp;
 						<input type="checkbox" id="check_all_1" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all_2.checked = this.checked;" class="input_check" />
@@ -93,22 +93,25 @@ function template_badbehavior_log()
 	}
 
 	echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="3" class="righttext" style="padding-right: 1.2ex">
 						<label for="check_all_2"><strong>', $txt['check_all'], '</strong></label>&nbsp;
 						<input type="checkbox" id="check_all_2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all_1.checked = this.checked;" class="input_check" />
 					</td>
 				</tr>
-			</table>';
+			</table>
+			<div class="flow_auto">
+				<div class="floatleft">';
 
 	template_pagesection();
 
 	echo '
-			<div class="submitbutton">
-				<input type="submit" name="removeSelection" value="' . $txt['badbehaviorlog_remove_selection'] . '" onclick="return confirm(\'' . $txt['badbehaviorlog_remove_selection_confirm'] . '\');" class="button_submit" />
-				<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results_confirm'] : $txt['badbehaviorlog_sure_remove'], '\');" class="button_submit" />
-			</div>
-			<br />';
+				</div>
+				<div class="additional_row floatright">
+					<input type="submit" name="removeSelection" value="' . $txt['badbehaviorlog_remove_selection'] . '" onclick="return confirm(\'' . $txt['badbehaviorlog_remove_selection_confirm'] . '\');" class="button_submit" />
+					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['badbehaviorlog_remove_filtered_results_confirm'] : $txt['badbehaviorlog_sure_remove'], '\');" class="button_submit" />
+				</div>
+			</div>';
 
 	if ($context['sort_direction'] == 'down')
 		echo '

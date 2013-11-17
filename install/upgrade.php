@@ -1399,6 +1399,8 @@ function convertSettingsToTheme()
 	}
 	if (!empty($themeData))
 	{
+		$db = database();
+
 		$db->insert('ignore',
 			$db_prefix . 'themes',
 			array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
@@ -2743,6 +2745,8 @@ function makeFilesWritable(&$files)
  */
 function deleteUpgrader()
 {
+	global $db_type;
+
 	@unlink(__FILE__);
 
 	// And the extra little files ;).

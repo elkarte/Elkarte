@@ -1130,9 +1130,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'footnote',
 				'before' => '<sup class="bbc_footnotes">%fn%',
 				'after' => '%fn%</sup>',
-				'disallow_parents' => array('quote', 'anchor', 'url', 'iurl'),
+				'disallow_parents' => array('footnote', 'code', 'anchor', 'url', 'iurl'),
 				'disallow_before' => '',
 				'disallow_after' => '',
+				'block_level' => true,
 			),
 			array(
 				'tag' => 'font',
@@ -2351,15 +2352,19 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	$message = strtr($message, array('  ' => ' &nbsp;', "\r" => '', "\n" => '<br />', '<br /> ' => '<br />&nbsp;', '&#13;' => "\n"));
 
 	// Finish footnotes if we have any.
-	if (strpos($message, '%fn%'))
+	if (strpos($message, '<sup class="bbc_footnotes">'))
 	{
 		global $fn_num, $fn_content, $fn_count;
 		static $fn_total;
+
+		// @todo temporary until we have nesting
+		$message = str_replace(array('[footnote]', '[/footnote]'), '', $message);
 
 		$fn_num = 0;
 		$fn_content = array();
 		$fn_count = isset($fn_total) ? $fn_total : 0;
 
+		// Replace our footnote text with a [1] link, save the text for use at the end of the message
 		$message = preg_replace_callback('~(%fn%(.*?)%fn%)~is', create_function('$m', '
 			global $fn_num, $fn_content, $fn_count;
 
@@ -2368,6 +2373,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			return "<a href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
 
 		$fn_total += $fn_num;
+
+		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 			$message .= '<div class="bbc_footnotes">' . implode('<br>', $fn_content) . '</div>';
 	}
@@ -2719,7 +2726,7 @@ function determineTopicClass(&$topic_context)
  */
 function setupThemeContext($forceload = false)
 {
-	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $maintenance;
+	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt;
 	global $user_settings;
 
 	static $loaded = false;
@@ -2731,7 +2738,6 @@ function setupThemeContext($forceload = false)
 
 	$loaded = true;
 
-	$context['in_maintenance'] = !empty($maintenance);
 	$context['current_time'] = standardTime(time(), false);
 	$context['current_action'] = isset($_GET['action']) ? $_GET['action'] : '';
 	$context['show_quick_login'] = !empty($modSettings['enableVBStyleLogin']) && $user_info['is_guest'];
@@ -3573,13 +3579,6 @@ function setupMenuContext()
 		// The main menu
 		$menu->addBulk(
 			array(
-				// The old "logout" is meh. Not a real word. "Log out" is better.
-				'logout' => array(
-					'title' => $txt['logout'],
-					'href' => $scripturl . '?action=logout;%1$s=%2$s',
-					'show' => !$user_info['is_guest'],
-				),
-
 				'home' => array(
 					'title' => $txt['community'],
 					'href' => $scripturl,
@@ -3601,7 +3600,7 @@ function setupMenuContext()
 				),
 
 				'profile' => array(
-					'title' => $txt['account_short'],
+					'title' => (!empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] . ' ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
 					'href' => $scripturl . '?action=profile',
 					'show' => $context['allow_edit_profile'],
 				),
@@ -3620,7 +3619,7 @@ function setupMenuContext()
 					'title' => $txt['notifications'],
 					'counter' => 'notifications',
 					'href' => $scripturl . '?action=notification',
-					'show' => !$user_info['is_guest'],
+					'show' => !$user_info['is_guest'] && !empty($modSettings['notifications_enabled']),
 				),
 
 				// The old language string made no sense, and was too long.
@@ -3801,6 +3800,12 @@ function setupMenuContext()
 					'href' => $scripturl . '?action=profile;area=theme',
 					'show' => allowedTo(array('profile_extra_any', 'profile_extra_own', 'profile_extra_any')),
 				),
+				// The old "logout" is meh. Not a real word. "Log out" is better.
+				'logout' => array(
+					'title' => $txt['logout'],
+					'href' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
+					'show' => !$user_info['is_guest'],
+				),
 			)
 		);
 
@@ -3869,10 +3874,6 @@ function setupMenuContext()
 
 	$context['menu_buttons'] = $menu_buttons;
 	$allMenus->destroy('Main_Menu');
-
-	// Logging out requires the session id in the url.
-	if (isset($context['menu_buttons']['logout']))
-		$context['menu_buttons']['logout']['href'] = sprintf($context['menu_buttons']['logout']['href'], $context['session_var'], $context['session_id']);
 
 	// Figure out which action we are doing so we can set the active tab.
 	// Default to home.

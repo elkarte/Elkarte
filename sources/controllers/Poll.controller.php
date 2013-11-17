@@ -254,7 +254,7 @@ class Poll_Controller extends Action_Controller
 		$context['start'] = (int) $_REQUEST['start'];
 		$context['is_edit'] = isset($_REQUEST['add']) ? 0 : 1;
 
-		$poll_errors = error_context::context('poll');
+		$poll_errors = Error_Context::context('poll');
 		$pollinfo = pollInfoForTopic($topic);
 
 		// Assume it all exists, right?
@@ -496,7 +496,7 @@ class Poll_Controller extends Action_Controller
 		if (empty($_POST))
 			redirectexit('action=editpoll;topic=' . $topic . '.0');
 
-		$poll_errors = error_context::context('poll');
+		$poll_errors = Error_Context::context('poll');
 
 		if (checkSession('post', '', false) != '')
 			$poll_errors->addError('session_timeout');
