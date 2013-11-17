@@ -1443,12 +1443,12 @@ function template_clean_cache_button_below()
 	global $txt, $scripturl, $context;
 
 	echo '
-	<h3 class="category_header">', $txt['maintain_cache'], '</h3>
-	<div class="windowbg">
+	<div class="generic_list_wrapper">
+		<h3 class="category_header">', $txt['maintain_cache'], '</h3>
 		<div class="content">
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
-				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" /></span>
+				<input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 			</form>
