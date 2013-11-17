@@ -772,7 +772,7 @@ legend {
 .bbc_tt {
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 }
-div.bbc_footnotes {
+.bbc_footnotes {
 	margin-top: 10px;
 	padding: 4px 8px 4px 0;
 	font-size: small;
@@ -1043,7 +1043,7 @@ div.bbc_footnotes {
 }
 .listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
 	left: auto;
-	right: 0px;
+	right: 0;
 }
 /* Hiding Level 3 drop menu off hover. */
 .listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
@@ -1404,7 +1404,7 @@ div.bbc_footnotes {
 	margin-top: 3px;
 }
 .category_header .pagesection .floatright input, .pagesection .floatright select {
-	margin-top: 0px;
+	margin-top: 0;
 }
 /* Necessary for some browsers to keep the pages all on the same line */
 .pagelinks {
@@ -1836,7 +1836,7 @@ dl.settings textarea {
 .topic_sorting:hover #sortby, #sortby:hover {
 	width: 8.4em;
 	left: auto;
-	right: 0px;
+	right: 0;
 }
 .sort_by_item {
 	width: 7em;
@@ -2002,6 +2002,8 @@ img.new_posts {
 	float: right;
 	min-width: 14em;
 	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 	color: #777;
 }
@@ -2190,10 +2192,9 @@ img.new_posts {
 	font-size: 0.857em;
 	padding: 4px 0;
 	display: inline-block;
-	font-size: 0.857em;
+
 }
 /* Poster and postarea + moderation area underneath */
-
 .forumposts .windowbg, .forumposts .windowbg2,
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
@@ -2214,7 +2215,8 @@ img.new_posts {
 	vertical-align: top;
 	min-width: 15em;
 	word-wrap: break-word;
-	word-break: hyphenate;
+	word-break: break-all;
+	hyphens: auto;
 	font-size: 0.857em;
 }
 .poster.poster2 {
@@ -2329,7 +2331,6 @@ img.new_posts {
 }
 .postarea {
 	display: block;
-	vertical-align: top;
 	margin: 0 0 0 180px;
 	padding: 0 1em 0 1.5em;
 	max-width: 100%;
@@ -2427,9 +2428,9 @@ img.new_posts {
 	display: block;
 	width: 640px;
 	height: auto;
-	max-height: auto;
+	max-height: 480px;
 	border: #27a348 1px solid;
-	border-top: 0px;
+	border-top: 0;
 }
 .elk_video a img, .elk_video embed {
 	margin: 0 auto;
@@ -2831,14 +2832,14 @@ dl.merge_topic dd {
 }
 .ui-tabs .ui-tabs-nav li a {
 	display: block;
-	padding: 0px 7px;
+	padding: 0 7px;
 	background: #f0f0f0;
 	border-bottom-color: #ccc;
 	outline: none;
 	text-decoration: none;
 	border-radius: 2px 2px 0 0;
 }
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a {
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav .ui-state-disabled a, .ui-tabs .ui-tabs-nav .ui-state-processing a {
 	cursor: default;
 }
 .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
@@ -2954,7 +2955,7 @@ dl.merge_topic dd {
 #basicinfo .windowbg .content {
 	padding-left: 30px;
 }
-.profileblock ul.cf_icon {
+.profileblock .cf_icon {
 	display: block;
 	float: left;
 	margin: 4px 5px 0 0;
@@ -3645,8 +3646,8 @@ a.help .icon {
 	display: none;
 	width: 100%;
 	height: 100%;
-	/* Should be rgba only, IMHO. */
-	/* Flat colour fallback would be bad (visually). */
+	/* Flat colour fallback will be bad (visually), ie8 only though. */
+	background: rgb(0,0,0);
 	background: rgba(0,0,0,0.4);
 }
 
@@ -4370,7 +4371,7 @@ a.help .icon {
 	.views_text, .nextlinks {
 		display: none !important;
 	}
-	a#top, #gotop, #gobottom {
+	#top, #gotop, #gobottom {
 		display: none;
 	}
 	#main_menu li, .admin_menu li{
@@ -4393,7 +4394,7 @@ a.help .icon {
 	}
 	.poster {
 		float: none;
-		padding: 0px 1em 0px 1.5em;
+		padding: 0 1em 0 1.5em;
 	}
 	.poster .listlevel1 {
 		display: inline-block;
