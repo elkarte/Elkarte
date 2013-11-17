@@ -227,43 +227,73 @@ errorbox_handler.prototype.removeError = function (error_box, error_elem)
 	}
 }
 
+/**
+ * This is called from the editor plugin or display.template to set where to
+ * find the cache values for use in revalidateMentions
+ *
+ * @param {string} selector id of element that atWho is attached to
+ * @param {object} oOptions only set when called from the pluging, contains those options
+ */
 var all_elk_mentions = [];
 function add_elk_mention(selector, oOptions)
 {
+	// Global does not exist, hummm
 	if (all_elk_mentions.hasOwnProperty(selector))
 		return;
 
-	if (typeof oOptions == 'undefined')
+	// No options means its attached to the plain text box
+	if (typeof oOptions === 'undefined')
 		oOptions = {};
 	oOptions.selector = selector;
 
+	// Add it to the stack
 	all_elk_mentions[all_elk_mentions.length] = {
 		selector: selector,
 		oOptions: oOptions
 	};
 }
 
+/**
+ * Used to tag mentioned names when they are entered inline but NOT selected from the dropdown list
+ * The name must have appeared in the dropdown and be found in that cache list
+ *
+ * @param {string} sForm the form that holds the container, only used for plain text QR
+ * @param {string} sInput the container that atWho is attached
+ */
 function revalidateMentions(sForm, sInput)
 {
-	var cached_names, cached_queries, body, mentions;
+	var cached_names,
+		cached_queries,
+		body,
+		mentions;
 
 	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
 	{
-		if (all_elk_mentions[i].selector == sInput || all_elk_mentions[i].selector == '#' + sInput)
+		// Make sure this mention object is for this selector, saftey first
+		if (all_elk_mentions[i].selector === sInput || all_elk_mentions[i].selector === '#' + sInput)
 		{
+			// Was this invoked as the editor plugin?
 			if (all_elk_mentions[i].oOptions.isPlugin)
 			{
 				var $editor = $('#' + all_elk_mentions[i].selector).data("sceditor");
+
 				cached_names = $editor.opts.mentionOptions.cache.names;
 				cached_queries = $editor.opts.mentionOptions.cache.queries;
-				body = $editor.getText().replace(/\u00a0/g, ' ');
+
+				// Clean up the newlines and spacing so we can find the @mentions
+				body = $editor.getText().replace(/[\u00a0\r\n]/g, ' ');
 				mentions = $($editor.opts.mentionOptions.cache.mentions);
 			}
+			// Or just our plain text quick reply box?
 			else
 			{
 				cached_names = all_elk_mentions[i].oMention.cached_names;
-				cached_queries = all_elk_mentions[i].oMention.queries;
-				body = document.forms[sForm][sInput].value.replace(/\u00a0/g, ' ');
+				cached_queries = all_elk_mentions[i].oMention.cached_queries;
+
+				// Keep everying sepeteate with spaces, not newlines or no breakable
+				body = document.forms[sForm][sInput].value.replace(/[\u00a0\r\n]/g, ' ');
+
+				// The last pulldown box that atWho populated
 				mentions = $(all_elk_mentions[i].oMention.mentions);
 			}
 
@@ -274,10 +304,12 @@ function revalidateMentions(sForm, sInput)
 			// First check if all those in the list are really mentioned
 			$(mentions).find('input').each(function (idx, elem) {
 				var name = $(elem).data('name'),
-					next_char, prev_char, index = body.indexOf(name);
+					next_char,
+					prev_char,
+					index = body.indexOf(name);
 
 				// It is undefined coming from a preview
-				if (typeof name != 'undefined')
+				if (typeof(name) !== 'undefined')
 				{
 					if (index === -1)
 						$(elem).remove();
@@ -286,9 +318,9 @@ function revalidateMentions(sForm, sInput)
 						next_char = body.charAt(index + name.length);
 						prev_char = body.charAt(index - 1);
 
-						if (next_char != '' && next_char.localeCompare(" ") != 0)
+						if (next_char !== '' && next_char.localeCompare(" ") !== 0)
 							$(elem).remove();
-						else if (prev_char != '' && prev_char.localeCompare(" ") != 0)
+						else if (prev_char !== '' && prev_char.localeCompare(" ") !== 0)
 							$(elem).remove();
 					}
 				}
