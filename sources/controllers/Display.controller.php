@@ -1108,7 +1108,7 @@ class Display_Controller
 		if (!empty($output['modified']['name']))
 			$output['modified']['last_edit_text'] = sprintf($txt['last_edit_by'], $output['modified']['time'], $output['modified']['name'], standardTime($output['modified']['timestamp']));
 
-		if ($output['member']['karma']['allow'])
+		if (!empty($output['member']['karma']['allow']))
 		{
 			$output['member']['karma'] += array(
 				'applaud_url' => $scripturl . '?action=karma;sa=applaud;uid=' . $output['member']['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';m=' . $output['id'] . ';' . $context['session_var'] . '=' . $context['session_id'],
