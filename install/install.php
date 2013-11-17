@@ -15,8 +15,8 @@
  *
  */
 
-$GLOBALS['current_version'] = '1.0 Alpha';
-$GLOBALS['db_script_version'] = '1-0';
+define('CURRENT_VERSION', '1.0 Alpha');
+define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.1.0';
 
@@ -393,11 +393,11 @@ function action_welcome()
 	{
 		if ($db['supported'])
 		{
-			if (!file_exists(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql'))
+			if (!file_exists(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql'))
 			{
 				$databases[$key]['supported'] = false;
 				$notFoundSQLFile = true;
-				$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], 'install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+				$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], 'install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
 			}
 			else
 			{
@@ -956,7 +956,7 @@ function action_databasePopulation()
 		$db->free_result($result);
 
 		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != $GLOBALS['current_version'])
+		if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != CURRENT_VERSION)
 		{
 			$incontext['error'] = $txt['error_versions_do_not_match'];
 			return false;
@@ -979,7 +979,7 @@ function action_databasePopulation()
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
-		'{$current_version}' => $GLOBALS['current_version'],
+		'{$current_version}' => CURRENT_VERSION,
 		'{$current_time}' => time(),
 		'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
 	);
@@ -996,7 +996,7 @@ function action_databasePopulation()
 		$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 
 	// Read in the SQL.  Turn this on and that off... internationalize... etc.
-	$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $db_type . '.sql')), $replaces));
+	$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $db_type . '.sql')), $replaces));
 
 	// Execute the SQL.
 	$current_statement = '';
@@ -2013,7 +2013,7 @@ function action_deleteInstaller()
 		$ftp->unlink('webinstall.php');
 
 		foreach ($databases as $key => $dummy)
-			$ftp->unlink('install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+			$ftp->unlink('install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
 
 		$ftp->close();
 
@@ -2025,7 +2025,7 @@ function action_deleteInstaller()
 		@unlink(dirname(__FILE__) . '/webinstall.php');
 
 		foreach ($databases as $key => $dummy)
-			@unlink(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+			@unlink(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
 	}
 
 	// Now just redirect to a blank.png...
@@ -2154,14 +2154,14 @@ function template_welcome_message()
 	global $incontext, $installurl, $txt;
 
 	echo '
-	<script type="text/javascript" src="http://www.spudsdesign.com/site/current-version.js?version=' . $GLOBALS['current_version'] . '"></script>
+	<script type="text/javascript" src="http://www.spudsdesign.com/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
 	<form action="', $incontext['form_url'], '" method="post">
-		<p>', sprintf($txt['install_welcome_desc'], $GLOBALS['current_version']), '</p>
+		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
 			<strong style="text-decoration: underline;">', $txt['error_warning_notice'], '</strong><br />
 			<div style="padding-left: 6ex;">
-				', sprintf($txt['error_script_outdated'], '<em id="ourVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . $GLOBALS['current_version'] . '</em>'), '
+				', sprintf($txt['error_script_outdated'], '<em id="ourVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . CURRENT_VERSION . '</em>'), '
 			</div>
 		</div>';
 
