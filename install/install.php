@@ -245,8 +245,6 @@ function load_lang_file()
 	// Override the language file?
 	if (isset($_GET['lang_file']))
 		$_SESSION['installer_temp_lang'] = $_GET['lang_file'];
-	elseif (isset($GLOBALS['HTTP_GET_VARS']['lang_file']))
-		$_SESSION['installer_temp_lang'] = $GLOBALS['HTTP_GET_VARS']['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
 	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']))
