@@ -517,14 +517,6 @@ function initialize_inputs()
 	if (isset($_GET['delete']))
 		deleteUpgrader();
 
-	// Are we calling the backup css file?
-	if (isset($_GET['infile_css']))
-	{
-		header('Content-Type: text/css');
-		template_css();
-		exit;
-	}
-
 	// Something is causing this to happen, and it's annoying.  Stop it.
 	$temp = 'upgrade_php?step';
 	while (strlen($temp) > 4)

@@ -166,14 +166,6 @@ function initialize_inputs()
 			@session_start();
 	}
 
-	// Are we calling the backup css file?
-	if (isset($_GET['infile_css']))
-	{
-		header('Content-Type: text/css');
-		template_css();
-		exit;
-	}
-
 	// Add slashes, as long as they aren't already being added.
 	if (!function_exists('get_magic_quotes_gpc') || @get_magic_quotes_gpc() == 0)
 	{
