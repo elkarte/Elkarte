@@ -135,16 +135,8 @@ function initialize_inputs()
 		@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
 
-	if (!isset($_GET['obgz']))
-	{
-		ob_start();
-
-		if (ini_get('session.save_handler') == 'user')
-			@ini_set('session.save_handler', 'files');
-		if (function_exists('session_start'))
-			@session_start();
-	}
-	else
+	// This is the test for support of compression
+	if (isset($_GET['obgz']))
 	{
 		ob_start('ob_gzhandler');
 
@@ -163,6 +155,15 @@ function initialize_inputs()
 	</body>
 </html>';
 		exit;
+	}
+	else
+	{
+		ob_start();
+
+		if (ini_get('session.save_handler') == 'user')
+			@ini_set('session.save_handler', 'files');
+		if (function_exists('session_start'))
+			@session_start();
 	}
 
 	// Are we calling the backup css file?
