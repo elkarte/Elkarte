@@ -26,6 +26,7 @@ $original_theme_dir = $row['value'];
 // If the file exists, everything is in the correct place, so go back.
 if (file_exists($original_theme_dir . '/GenericHelpers.template.php'))
 {
+<<<<<<< HEAD
 	$possible_theme_dir = $original_theme_dir;
 }
 else
@@ -871,8 +872,8 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], 'pm_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], 'pm_autosave_draft', $row[add_deny])";
+		$inserts[] = array($row['id_group'], 'pm_draft', $row['add_deny']);
+		$inserts[] = array($row['id_group'], 'pm_autosave_draft', $row['add_deny']);
 	}
 	$db->free_result($request);
 
@@ -954,7 +955,7 @@ if ($db->affected_rows() != 0)
 /******************************************************************************/
 ---# Insert new fields
 ---{
-$db->insert('',
+$db->insert('ignore',
 	'{db_prefix}custom_fields',
 	array(
 		'col_name' => 'string',
@@ -966,7 +967,7 @@ $db->insert('',
 		'mask' => 'string',
 		'show_reg' => 'int',
 		'show_display' => 'int',
-		'show_profile' => 'int',
+		'show_profile' => 'string',
 		'private' => 'int',
 		'active' => 'int',
 		'bbc' => 'int',
@@ -1015,23 +1016,23 @@ if ($move_im)
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!empty($row[aim]))
-			$inserts[] = "($row[id_member], 'cust_aim', '" . addslashes($row['aim']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_aim', $row['aim']);
 
 		if (!empty($row[icq]))
-			$inserts[] = "($row[id_member], 'cust_icq', '" . addslashes($row['icq']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_icq', $row['icq']);
 
 		if (!empty($row[msn]))
-			$inserts[] = "($row[id_member], 'cust_skype', '" . addslashes($row['msn']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_skype', $row['msn']);
 
 		if (!empty($row[yim]))
-			$inserts[] = "($row[id_member], 'cust_yim', '" . addslashes($row['yim']) . "')";
+			$inserts[] = array($row['id_member'], 'cust_yim', $row['yim']);
 	}
 	$db->free_result($request);
 
 	if (!empty($inserts))
 		$db->insert('',
 			'{db_prefix}custom_fields_data',
-			arrau('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+			array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
 			$inserts,
 			array('id_member', 'variable')
 		);
@@ -1061,7 +1062,7 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], 'profile_gravatar', $row[add_deny])";
+		$inserts[] = array($row['id_group'], 'profile_gravatar', $row['add_deny']);
 	}
 	$db->free_result($request);
 
@@ -1430,7 +1431,7 @@ $db_table->db_add_column('{db_prefix}mail_queue',
 
 ---# Updating board profiles...
 ---{
-$db->insert('',
+$db->insert('ignore',
 	'{db_prefix}board_permissions',
 	array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string'),
 	array(
@@ -1602,7 +1603,7 @@ $db_table->db_change_column('{db_prefix}members',
 		'unsigned' => true,
 		'size' => 4,
 		'default' => 1
-	)
+	),
 	array()
 );
 ---}
@@ -1708,7 +1709,7 @@ $db_table->db_change_column('{db_prefix}members',
 		'type' => 'smallint',
 		'size' => 5,
 		'default' => 1
-	)
+	),
 	array()
 );
 ---}
