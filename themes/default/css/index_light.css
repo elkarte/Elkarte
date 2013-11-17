@@ -342,6 +342,7 @@ div.bbc_footnotes .meaction{
 	color: #fff;
 	font-weight: 600;
 	box-shadow: 1px 1px 2px #bbb;
+	padding: 0 5px;
 }
 /* Hover effects for those buttons. */
 .linklevel1.active:hover,.listlevel1:hover .linklevel1.active,
