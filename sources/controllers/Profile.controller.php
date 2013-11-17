@@ -37,10 +37,6 @@ class Profile_Controller extends Action_Controller
 		global $txt, $scripturl, $user_info, $context, $user_profile, $cur_profile;
 		global $modSettings, $memberContext, $profile_vars, $post_errors, $user_settings;
 
-		// Lets check on guests up front
-		if ($user_info['is_guest'] && !allowedTo('profile_view_any'))
-			validateSession();
-
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
 			loadLanguage('Profile+Drafts');
@@ -152,7 +148,7 @@ class Profile_Controller extends Action_Controller
 					'file' => '/controllers/ProfileInfo.controller.php',
 					'controller' => 'ProfileInfo_Controller',
 					'function' => 'action_showPermissions',
-					'permission' => $context['user']['is_owner'] ? array('manage_permissions') : array('manage_permissions'),
+					'permission' => array('manage_permissions'),
 				),
 				'history' => array(
 					'label' => $txt['history'],
@@ -165,7 +161,7 @@ class Profile_Controller extends Action_Controller
 						'edits' => array($txt['trackEdits'], 'moderate_forum'),
 						'logins' => array($txt['trackLogins'], array('profile_view_own', 'moderate_forum')),
 					),
-					'permission' => $context['user']['is_owner'] ? array('moderate_forum') : array('moderate_forum'),
+					'permission' => array('moderate_forum'),
 				),
 				'viewwarning' => array(
 					'label' => $txt['profile_view_warnings'],
@@ -350,11 +346,16 @@ class Profile_Controller extends Action_Controller
 		$allMenus->destroy('Profile_Menu');
 
 		// If it said no permissions that meant it wasn't valid!
-		if (empty($profile_include_data['permission']))
+		// @todo maybe move to createMenu of the class?
+		if ($profile_include_data && empty($profile_include_data['permission']))
 			$profile_include_data['enabled'] = false;
 
+		// No menu and guest? A warm welcome to register
+		if (!$profile_include_data && $user_info['is_guest'])
+			is_not_guest();
+
 		// No menu means no access.
-		if (!$profile_include_data && !$user_info['is_guest'] || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
+		if (!$profile_include_data || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
 			fatal_lang_error('no_access', false);
 
 		// Make a note of the Unique ID for this menu.
