@@ -33,13 +33,11 @@ function template_display_child_boards_above()
 	<div id="board_', $context['current_board'], '_childboards" class="forum_category">
 		<h2 class="category_header">
 			', $txt['parent_boards'], '
-		</h2>
-		<ul class="category_boards" id="board_', $context['current_board'], '_children">';
+		</h2>';
 
-	template_list_boards($context['boards']);
+	template_list_boards($context['boards'], 'board_', $context['current_board'], '_children');
 
 	echo '
-		</ul>
 	</div>';
 }
 

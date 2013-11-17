@@ -57,7 +57,7 @@ function template_main()
 
 		// Assuming the category hasn't been collapsed...
 		if (!$category['is_collapsed'])
-			template_list_boards($category['boards']);
+			template_list_boards($category['boards'], 'category_', $category['id'], '_boards');
 
 		echo '
 		</div>';

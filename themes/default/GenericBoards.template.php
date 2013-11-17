@@ -17,12 +17,12 @@
 /**
  * Main template for displaying the list of boards
  */
-function template_list_boards($boards)
+function template_list_boards($boards, $id)
 {
 	global $context, $settings, $txt, $scripturl;
 
 	echo '
-			<ul class="category_boards" id="category_', $category['id'], '_boards">';
+			<ul class="category_boards" id="', $id, '">';
 
 	// Each board in each category's boards has:
 	// new (is it new?), id, name, description, moderators (see below), link_moderators (just a list.),
