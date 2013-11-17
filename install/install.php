@@ -315,12 +315,7 @@ function installExit($fallThrough = false)
 
 			call_user_func('template_' . $incontext['sub_template']);
 		}
-		// @todo REMOVE THIS!!
-		else
-		{
-			if (function_exists('doStep' . $_GET['step']))
-				call_user_func('doStep' . $_GET['step']);
-		}
+
 		// Show the footer.
 		template_install_below();
 	}
