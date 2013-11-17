@@ -238,7 +238,7 @@ function template_body_above()
 				
 		if (!empty($modSettings['enableOpenID']))
 			echo '
-					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['toggle_openid'] . '" /></a>';
+					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" /></a>';
 		echo '
 				</form>
 			</div>';
