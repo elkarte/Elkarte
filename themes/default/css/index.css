@@ -4140,7 +4140,7 @@ a.help .icon {
 /* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
 
 /* This one does 1024 screens at default font size. */
-@media screen (max-width: 64em) {
+@media screen and (max-width: 64em) {
 	.board_latest {
 		min-width: 27em;
 	}
@@ -4155,7 +4155,7 @@ a.help .icon {
 	}
 }
 /* This one does 800 screens at default font size. */
-@media screen (max-width: 50em) {
+@media screen and (max-width: 50em) {
 	.wrapper {
 		min-width: 98%;
 	}
