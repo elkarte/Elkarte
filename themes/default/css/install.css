@@ -15,7 +15,7 @@ h1.forumtitle {
 	padding: 35px 0 0 15px;
 	float: left;
 	font-weight: normal;
-	color: #a85400;
+	color: #4b863c;
 	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
 }
 /* Tweak the logo */
@@ -40,10 +40,10 @@ img#logo {
 }
 #main_steps h2 {
 	font-size: 1.2em;
-	border-bottom: 1px solid #d05800;
+	border-bottom: 1px solid #4b863c;
 	line-height: 1.6em;
 	margin: 0 1em 0.5em 0;
-	color: #d05800;
+	color: #4b863c;
 }
 #main_steps ul {
 	list-style: none;
@@ -103,10 +103,10 @@ img#logo {
 }
 #main_screen h2 {
 	font-size: 1.2em;
-	border-bottom: 1px solid #d05800;
+	border-bottom: 1px solid #4b863c;
 	line-height: 1.6em;
 	margin: 0 0 0.5em 0;
-	color: #d05800;
+	color: #4b863c;
 }
 .panel form div{
 	max-height: 560px;

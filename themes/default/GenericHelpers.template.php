@@ -13,7 +13,7 @@
  */
 function template_list_groups_collapsible($group = 'default_groups_list')
 {
-	global $context, $txt;
+	global $context;
 
 	$current_group_list = $context[$group];
 	$all_selected = true;
