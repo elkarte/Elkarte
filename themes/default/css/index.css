@@ -138,7 +138,6 @@ a img {
 
 
 
-
 /* Style the different types of inputs to be uniform for all browsers. */
 
 /* NOTE: This does require some browser-specific code to get good results. */
@@ -151,8 +150,7 @@ a img {
 /*
 	.button_submit	-	covers input[type=submit], input[type=button],
 						button[type=submit] and button[type=button]
-
-	.linkbutton	-	covers links, to make them look like a submit button.
+	.linkbutton		-	covers links, to make them look like a submit button.
 	.button_reset	-	covers input[type=reset] and button[type=reset]
 	.input_check	-	covers input[type=checkbox]
 	.input_radio	-	covers input[type=radio]
@@ -237,7 +235,6 @@ input[disabled].input_text {
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
-/* The old .button_link class has been replaced with the following three classes. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
@@ -287,7 +284,7 @@ input[disabled].input_text {
 	padding: 2px 6px;
 	vertical-align: middle;
 }
-/* @todo mostly for those go buttons that don't have a form id*/
+/* @todo mostly for those go buttons that don't have a form id */
 .button_submit.submitgo {
 	margin-bottom: 4px;
 }
@@ -1013,7 +1010,7 @@ legend {
 	position: relative;
 	top: 4px;
 }
-	/* Level 1 Menu bar: link or button. */
+/* Level 1 Menu bar: link or button. */
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
@@ -1277,7 +1274,7 @@ legend {
 /* The rest of them. */
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	background-repeat: no-repeat;
-/* A rare example of where longhand background declarations work well. */
+	/* A rare example of where longhand background declarations work well. */
 	background-image: url(../images/theme/quickbuttons.png);
 }
 /* The long list of sprite coordinates is much less verbose this way. */
@@ -2109,7 +2106,7 @@ img.new_posts {
 }
 
 /* Poll vote options */
- /* @todo - Slow selectors for the next few declarations here. Change? */
+/* @todo - Slow selectors for the next few declarations here. Change? */
 #poll_options ul.options {
 	margin: 0 0 12px 0;
 	padding: 12px 30px 0 25px;
@@ -3782,21 +3779,21 @@ a.help .icon {
 }
 
 #mlsearch {
-  padding-top: 2px;
+	padding-top: 2px;
 }
 #mlsearch_options {
-  position: absolute;
-  display: none;
-  background: #FAFAFA;
-  padding: 0.5em;
-  border: 1px solid #DDDDDD;
-  border-radius: 5px;
+	position: absolute;
+	display: none;
+	background: #FAFAFA;
+	padding: 0.5em;
+	border: 1px solid #DDDDDD;
+	border-radius: 5px;
 }
 #mlsearch_options .mlsearch_option .input_check {
-  margin-left: 0.5em;
+	margin-left: 0.5em;
 }
 #mlsearch_options .mlsearch_option {
-  padding: 0.2em 0;
+	padding: 0.2em 0;
 }
 
 /*	$LOGIN		*/
@@ -4031,13 +4028,13 @@ a.help .icon {
 /* 7" Tablets like Google Nexus (landscape) or other mobile devices *//*
 @media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
-	 	 display: none;
+		 display: none;
 	 }
 	 #posting_icons, #top_section div ul{
 		 display: none;
 	 }
 	 #collapse_button, #button_home, #button_help, #button_memberlist, #button_search {
-	 	 display: none;
+		 display: none;
 	 }
 	#menu_nav {
 		padding: 0;
