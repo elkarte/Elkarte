@@ -28,18 +28,26 @@
 
 		$element.atwho({
 			at: "@",
-			limit: 7 ,
+			limit: 7,
 			cWindow: oIframeWindow,
 			tpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
 			callbacks: {
 				filter: function (query, items, search_key) {
 					var current_call = parseInt(new Date().getTime() / 1000);
+
+					// Let be easy-ish on the server, don't go looking until we have at least two characters
+					if (query.length < 2)
+						return [];
+
+					// No slamming the server either
 					if (oMentions.opts._last_call !== 0 && oMentions.opts._last_call + 1 > current_call)
 						return oMentions.opts._names;
 
+					// Already cached this query, then use it
 					if (typeof oMentions.opts.cache.names[query] !== 'undefined')
 						return oMentions.opts.cache.names[query];
 
+					// Well then lets make a find member suggest call
 					oMentions.opts._names = [];
 					$.ajax({
 						url: elk_scripturl + "?action=suggest;suggest_type=member;search=" + query.php_to8bit().php_urlencode() + ";" + elk_session_var + "=" + elk_session_id + ";xml;time=" + current_call,
@@ -50,13 +58,19 @@
 						$(request).find('item').each(function (idx, item) {
 							if (typeof oMentions.opts._names[oMentions.opts._names.length] === 'undefined')
 								oMentions.opts._names[oMentions.opts._names.length] = {};
+
 							oMentions.opts._names[oMentions.opts._names.length - 1].id = $(item).attr('id');
 							oMentions.opts._names[oMentions.opts._names.length - 1].name = $(item).text();
 						});
 					});
+
+					// Save this information so we can reuse it
 					oMentions.opts._last_call = current_call;
+
+					// Update the cache with the values
 					oMentions.opts.cache.names[query] = oMentions.opts._names;
 					oMentions.opts.cache.queries[oMentions.opts.cache.queries.length] = query;
+					
 					return oMentions.opts._names;
 				},
 				before_insert: function(value, $li) {
@@ -71,7 +85,8 @@
 			}
 		});
 
-		// This hook is triggered when atWho places a slection list on the screen
+		// This hook is triggered when atWho places a slection list on the screen, we use
+		// it to properly place it next to the @text
 		$(oIframeWindow).on("reposition.atwho", function(event, offset) {
 			// We only need this for the wysiwyg window
 			if (base.inSourceMode())
