@@ -253,6 +253,7 @@ else
 	$upcontext['rid'] = mt_rand(0, 5000);
 	$upcontext['upgrade_status'] = array(
 		'curstep' => 0,
+		// memo: .lng files were used by YaBB SE
 		'lang' => isset($_GET['lang']) ? $_GET['lang'] : basename($language, '.lng'),
 		'rid' => $upcontext['rid'],
 		'pass' => 0,
