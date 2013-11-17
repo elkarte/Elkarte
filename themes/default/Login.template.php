@@ -172,8 +172,8 @@ function template_maintenance()
 <form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 	<div class="login" id="maintenance_mode">
 		<h2 class="category_header">', $context['title'], '</h2>
-		<p class="description">
-			<img class="floatleft" src="', $settings['images_url'], '/construction.png" style="width:40px; height:40px" alt="', $txt['in_maintain_mode'], '" />
+		<p class="description flow_auto">
+			<img class="floatleft" src="', $settings['images_url'], '/construction.png" alt="', $txt['in_maintain_mode'], '" />
 			', $context['description'], '
 		</p>
 		<h3 class="category_header">', $txt['admin_login'], '</h3>
@@ -188,7 +188,7 @@ function template_maintenance()
 				<dt>', $txt['always_logged_in'], ':</dt>
 				<dd><input type="checkbox" name="cookieneverexp" class="input_check" /></dd>
 			</dl>
-			<input type="submit" value="', $txt['login'], '" class="button_submit" />
+			<p><input type="submit" value="', $txt['login'], '" class="button_submit" /></p>
 		</div>
 		<input type="hidden" name="hash_passwrd" value="" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
