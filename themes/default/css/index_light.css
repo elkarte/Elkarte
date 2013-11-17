@@ -322,13 +322,18 @@ div.bbc_footnotes .meaction{
 	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
 	box-shadow: 1px 1px 2px #e5e5e5;
 	color: #566e4b;
-    display: block;
-    line-height: 2em;
-    margin: 3px 1.5em;
-    position: relative;
+	display: block;
+	line-height: 2em;
+	margin: 3px 1.5em;
+	position: relative;
 }
 .poster li.poster_online .nolink img {
 	vertical-align: middle;
+}
+.poster li.subsections.listlevel1:hover .linklevel1 {
+	background: transparent;
+	border: none;
+	box-shadow: none;
 }
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
