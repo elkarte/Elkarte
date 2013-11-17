@@ -130,10 +130,6 @@ function initialize_inputs()
 {
 	global $databases, $incontext;
 
-	// Just so people using older versions of PHP aren't left in the cold.
-	if (!isset($_SERVER['PHP_SELF']))
-		$_SERVER['PHP_SELF'] = isset($GLOBALS['HTTP_SERVER_VARS']['PHP_SELF']) ? $GLOBALS['HTTP_SERVER_VARS']['PHP_SELF'] : 'install.php';
-
 	// Turn off magic quotes runtime and enable error reporting.
 	if (function_exists('set_magic_quotes_runtime'))
 		@set_magic_quotes_runtime(0);
