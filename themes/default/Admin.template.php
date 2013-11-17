@@ -318,11 +318,9 @@ function template_view_versions()
 
 	echo '
 					<div id="admincenter">
-						<div id="section_header">
-							<h3 class="category_header">
-								', $txt['admin_version_check'], '
-							</h3>
-						</div>
+						<h3 class="category_header">
+							', $txt['admin_version_check'], '
+						</h3>
 						<div class="information">', $txt['version_check_desc'], '</div>
 							<table class="table_grid">
 								<thead>
@@ -719,11 +717,9 @@ function template_edit_censored()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
-			<div id="section_header">
-				<h3 class="category_header">
-					', $txt['admin_censored_words'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $txt['admin_censored_words'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="content">
 					<p>', $txt['admin_censored_where'], '</p>';
@@ -795,9 +791,7 @@ function template_not_done()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header">
-			<h3 class="category_header">', $txt['not_done_title'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['not_done_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				', $txt['not_done_reason'];
@@ -1093,7 +1087,7 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-					<div id="section_header">
+					<div>
 						<h3 class="category_header">
 							<object id="quick_search">
 								<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
@@ -1266,11 +1260,9 @@ function template_repair_boards()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header">
-			<h3 class="category_header">',
-				$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
-			</h3>
-		</div>
+		<h3 class="category_header">',
+			$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
+		</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -1354,10 +1346,7 @@ function template_php_info()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<div id="section_header">
-			<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>
-		</div>
-		<br />';
+		<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>';
 
 	// for each php info area
 	foreach ($context['pinfo'] as $area => $php_area)
