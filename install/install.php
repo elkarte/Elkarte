@@ -135,13 +135,6 @@ function initialize_inputs()
 		@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
 
-	// Fun.  Low PHP version...
-	if (!isset($_GET))
-	{
-		$GLOBALS['_GET']['step'] = 0;
-		return;
-	}
-
 	if (!isset($_GET['obgz']))
 	{
 		ob_start();
