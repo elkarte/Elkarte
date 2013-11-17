@@ -147,17 +147,17 @@ $db_table->db_create_table('{db_prefix}member_logins',
 	),
 	array(
 		array(
-			'name' => array('id_login'),
+			'name' => 'id_login',
 			'columns' => array('id_login'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member'),
 			'type' => 'key'
 		),
 		array(
-			'name' => array('time'),
+			'name' => 'time',
 			'columns' => array('time'),
 			'type' => 'key'
 		)
@@ -287,7 +287,7 @@ unset($_GET['a']);
 $db_table->db_add_index('{db_prefix}attachments',
 	array(
 		array(
-			'name' => array('id_thumb'),
+			'name' => 'id_thumb',
 			'columns' => array('id_thumb'),
 			'type' => 'key'
 		)
@@ -388,7 +388,7 @@ $db_table->db_add_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array(),
 	'ignore'
 );
@@ -405,7 +405,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -416,7 +416,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -427,7 +427,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -438,7 +438,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -449,7 +449,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -460,7 +460,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -471,7 +471,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}ban_items',
@@ -482,7 +482,7 @@ $db_table->db_change_column('{db_prefix}ban_items',
 		'unsigned' => true,
 		'size' => 255,
 		'default' => 0
-	)
+	),
 	array()
 );
 ---}
@@ -518,7 +518,7 @@ $db_table->db_change_column('{db_prefix}log_online',
 		'type' => 'varchar',
 		'size' => 64,
 		'default' => ''
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}log_errors',
@@ -528,7 +528,7 @@ $db_table->db_change_column('{db_prefix}log_errors',
 		'type' => 'char',
 		'size' => 64,
 		'default' => '                                                                '
-	)
+	),
 	array()
 );
 $db_table->db_change_column('{db_prefix}sessions',
@@ -537,7 +537,7 @@ $db_table->db_change_column('{db_prefix}sessions',
 		'name' => 'session_id',
 		'type' => 'char',
 		'size' => 64
-	)
+	),
 	array()
 );
 ---}
@@ -579,18 +579,18 @@ $db_table->db_add_column('{db_prefix}topics',
 /******************************************************************************/
 ---# Adding new scheduled tasks
 ---{
-$db->insert('',
+$db->insert('ignore',
 	'{db_prefix}scheduled_tasks',
-	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'int'),
+	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
 	array(
 		array(0, 120, 1, 'd', 0, 'remove_temp_attachments'),
 		array(0, 180, 1, 'd', 0, 'remove_topic_redirect'),
 		array(0, 240, 1, 'd', 0, 'remove_old_drafts'),
 		array(0, 0, 6, 'h', 0, 'remove_old_followups'),
 		array(0, 360, 10, 'm', 0, 'maillist_fetch_IMAP'),
-		array(0, 30, 1, 'h', 0, 'user_access_mentions'),
-		array('task')
-	)
+		array(0, 30, 1, 'h', 0, 'user_access_mentions')
+	),
+	array('task')
 );
 ---}
 ---#
@@ -680,7 +680,7 @@ $db_table->db_change_column('{db_prefix}mail_queue',
 	array(
 		'name' => 'body',
 		'type' => 'mediumtext'
-	)
+	),
 	array()
 );
 ---}
@@ -698,7 +698,7 @@ $db_table->db_change_column('{db_prefix}log_floodcontrol',
 		'type' => 'varchar',
 		'size' => 10,
 		'default' => 'post'
-	)
+	),
 	array()
 );
 ---}
@@ -716,7 +716,7 @@ $db_table->db_change_column('{db_prefix}membergroups',
 		'type' => 'varchar',
 		'size' => 255,
 		'default' => ''
-	)
+	),
 	array()
 );
 ---}
@@ -755,6 +755,12 @@ $db_table->db_create_table('{db_prefix}user_drafts',
 			'type' => 'int',
 			'unsigned' => true,
 			'size' => 10,
+			'default' => 0
+		),
+		array(
+			'name' => 'type',
+			'type' => 'tinyint',
+			'size' => 4,
 			'default' => 0
 		),
 		array(
@@ -814,12 +820,12 @@ $db_table->db_create_table('{db_prefix}user_drafts',
 	),
 	array(
 		array(
-			'name' => array('id_draft'),
+			'name' => 'id_draft',
 			'columns' => array('id_draft'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member', 'id_draft', 'type'),
 			'type' => 'unique'
 		)
@@ -844,8 +850,8 @@ if (empty($modSettings['elkVersion']) || compareVersions($modSettings['elkVersio
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], $row[id_profile], 'post_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], $row[id_profile], 'post_autosave_draft', $row[add_deny])";
+		$inserts[] = array($row['id_group'], $row['id_profile'], 'post_draft', $row['add_deny']);
+		$inserts[] = array($row['id_group'], $row['id_profile'], 'post_autosave_draft', $row['add_deny']);
 	}
 	$db->free_result($request);
 
@@ -908,12 +914,12 @@ $db_table->db_create_table('{db_prefix}custom_fields_data',
 	),
 	array(
 		array(
-			'name' => array('id_member_variable'),
+			'name' => 'id_member_variable',
 			'columns' => array('id_member', 'variable(30)'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member'),
 			'type' => 'key'
 		)
@@ -1105,7 +1111,7 @@ $db_table->db_create_table('{db_prefix}follow_ups',
 	),
 	array(
 		array(
-			'name' => array('follow_up'),
+			'name' => 'follow_up',
 			'columns' => array('follow_up', 'derived_from'),
 			'type' => 'primary'
 		)
@@ -1148,12 +1154,12 @@ $db_table->db_create_table('{db_prefix}antispam_questions',
 	),
 	array(
 		array(
-			'name' => array('id_question'),
+			'name' => 'id_question',
 			'columns' => array('id_question'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('language'),
+			'name' => 'language',
 			'columns' => array('language(30)'),
 			'type' => 'key'
 		)
@@ -1225,7 +1231,7 @@ $db_table->db_create_table('{db_prefix}postby_emails',
 	),
 	array(
 		array(
-			'name' => array('id_email'),
+			'name' => 'id_email',
 			'columns' => array('id_email'),
 			'type' => 'primary'
 		)
@@ -1295,7 +1301,7 @@ $db_table->db_create_table('{db_prefix}postby_emails_error',
 	),
 	array(
 		array(
-			'name' => array('id_email'),
+			'name' => 'id_email',
 			'columns' => array('id_email'),
 			'type' => 'primary'
 		)
@@ -1349,7 +1355,7 @@ $db_table->db_create_table('{db_prefix}postby_emails_filters',
 	),
 	array(
 		array(
-			'name' => array('id_filter'),
+			'name' => 'id_filter',
 			'columns' => array('id_filter'),
 			'type' => 'primary'
 		)
@@ -1474,12 +1480,12 @@ $db_table->db_create_table('{db_prefix}log_likes',
 	),
 	array(
 		array(
-			'name' => array('id_target_member'),
+			'name' => 'id_target_member',
 			'columns' => array('id_target', 'id_member'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('log_time'),
+			'name' => 'log_time',
 			'columns' => array('log_time'),
 			'type' => 'key'
 		)
@@ -1518,17 +1524,17 @@ $db_table->db_create_table('{db_prefix}message_likes',
 	),
 	array(
 		array(
-			'name' => array('id_msg_member'),
+			'name' => 'id_msg_member',
 			'columns' => array('id_msg', 'id_member'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member'),
+			'name' => 'id_member',
 			'columns' => array('id_member'),
 			'type' => 'key'
 		),
 		array(
-			'name' => array('id_poster'),
+			'name' => 'id_poster',
 			'columns' => array('id_poster'),
 			'type' => 'key'
 		)
@@ -1660,12 +1666,12 @@ $db_table->db_create_table('{db_prefix}log_mentions',
 	),
 	array(
 		array(
-			'name' => array('id_mention'),
+			'name' => 'id_mention',
 			'columns' => array('id_mention'),
 			'type' => 'primary'
 		),
 		array(
-			'name' => array('id_member_status'),
+			'name' => 'id_member_status',
 			'columns' => array('id_member', 'status'),
 			'type' => 'key'
 		)
