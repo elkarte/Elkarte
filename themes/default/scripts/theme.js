@@ -243,11 +243,6 @@ function add_elk_mention(selector, oOptions)
 	};
 }
 
-$(document).ready(function () {
-	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-		all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions)
-});
-
 function revalidateMentions(sForm, sInput)
 {
 	var cached_names, cached_queries, body, mentions;

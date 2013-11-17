@@ -798,8 +798,14 @@ class Display_Controller
 		if (!empty($modSettings['notifications_enabled']))
 		{
 			$context['notifications_enabled'] = true;
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
 			loadCSSFile('jquery.atwho.css');
+
+			addInlineJavascript('
+			$(document).ready(function () {
+				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+			});');
 		}
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
