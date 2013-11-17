@@ -1680,6 +1680,7 @@ function parse_sql($filename)
 */
 
 	$db = database();
+	$db_table = db_table();
 
 	// Our custom error handler - does nothing but does stop public errors from XML!
 	if (!function_exists('sql_error_handler'))
