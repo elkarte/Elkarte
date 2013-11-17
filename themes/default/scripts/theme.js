@@ -248,68 +248,6 @@ $(document).ready(function () {
 		all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions)
 });
 
-function elk_mentions(oOptions)
-{
-	this.last_call = 0,
-	this.last_query = '',
-	this.names = [],
-	this.cached_names = [],
-	this.queries = [],
-	this.mentions,
-	this.$atwho;
-
-	this.opt = oOptions;
-	this.init();
-}
-
-elk_mentions.prototype.init = function ()
-{
-	this_mention = this;
-	this_mention.$atwho = $(this.opt.selector);
-	this_mention.mentions = $('<div style="display:none" />');
-	this_mention.$atwho.after(this_mention.mentions);
-	this_mention.$atwho.atwho({
-		at: "@",
-		limit: 7 ,
-		tpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
-		callbacks: {
-			filter: function (query, items, search_key) {
-				var current_call = parseInt(new Date().getTime() / 1000);
-
-				if (this_mention.last_call != 0 && this_mention.last_call + 1 > current_call)
-					return this_mention.names;
-
-				if (typeof this_mention.cached_names[query] != 'undefined')
-					return this_mention.cached_names[query];
-
-				this_mention.names = [];
-				$.ajax({
-					url: elk_scripturl + "?action=suggest;suggest_type=member;search=" + query.php_to8bit().php_urlencode() + ";" + elk_session_var + "=" + elk_session_id + ";xml;time=" + current_call,
-					type: "get",
-					async: false
-				})
-				.done(function(request) {
-					$(request).find('item').each(function (idx, item) {
-						if (typeof this_mention.names[this_mention.names.length] == 'undefined')
-							this_mention.names[this_mention.names.length] = {};
-						this_mention.names[this_mention.names.length - 1].id = $(item).attr('id');
-						this_mention.names[this_mention.names.length - 1].name = $(item).text();
-					});
-				});
-				this_mention.last_call = current_call;
-				this_mention.last_query = query;
-				this_mention.cached_names[query] = this_mention.names;
-				this_mention.queries[this_mention.queries.length] = query;
-				return this_mention.names;
-			},
-			before_insert: function (value, $li) {
-				this_mention.mentions.append($('<input type="hidden" name="uid[]" />').val($li.data('id')).attr('data-name', $li.data('value')));
-				return value;
-			}
-		}
-	});
-}
-
 function revalidateMentions(sForm, sInput)
 {
 	var cached_names, cached_queries, body, mentions;
