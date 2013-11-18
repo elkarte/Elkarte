@@ -3577,7 +3577,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy;2011, ElkArte</a></div>
+		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy;2013, ElkArte</a></div>
 	</div></div>
 	</body>
 </html>';
