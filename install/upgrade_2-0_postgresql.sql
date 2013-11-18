@@ -975,7 +975,7 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 					array(0, $id_core_theme, 'images_url', $core['images_url']),
 					array(0, $id_core_theme, 'theme_dir', $core['theme_dir'])
 				),
-				array()
+				array('id_member', 'id_theme', 'variable', 'value')
 		);
 
 		// Update the name of the default theme in the database.
