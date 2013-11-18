@@ -844,6 +844,12 @@ class Post_Controller extends Action_Controller
 			$context['notifications_enabled'] = true;
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
 			loadCSSFile('jquery.atwho.css');
+
+			addInlineJavascript('
+			$(document).ready(function () {
+				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+			});');
 		}
 
 		// Build a list of drafts that they can load into the editor

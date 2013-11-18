@@ -426,159 +426,169 @@ function template_quickreply_below()
 			</div>';
 	}
 
-	// Tooltips for likes
-	echo '
-		<script><!-- // --><![CDATA[
-			$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
-		// ]]></script>';
-
-	// Draft autosave available and the user has it enabled?
-	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
+	// Showing something below, full editor or a text box, we need to load some options
+	if (!empty($options['display_quick_reply']))
+	{
 		echo '
-			<script><!-- // --><![CDATA[
+			<script><!-- // --><![CDATA[';
+
+		// Draft autosave available and the user has it enabled?
+		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+			echo '
 				var oDraftAutoSave = new elk_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',
 					iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
+				});';
+
+		// Notifications enabled and only using a plain text quick reply?
+		if (!empty($modSettings['notifications_enabled']) && empty($options['use_editor_quick_reply']))
+			echo '
+				add_elk_mention(\'#message\');';
+
+		// Show the quick reply
+		echo '
+				var oQuickReply = new QuickReply({
+					bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
+					iTopicId: ', $context['current_topic'], ',
+					iStart: ', $context['start'], ',
+					sScriptUrl: elk_scripturl,
+					sImagesUrl: elk_images_url,
+					sContainerId: "quickReplyOptions",
+					sClassId: "quickReplyExpand",
+					sClassCollapsed: "collapse",
+					sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
+					sClassExpanded: "expand",
+					sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					sJumpAnchor: "quickreply",
+					bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
 				});
 			// ]]></script>';
+	}
 
 	// Spell check for quick modify and quick reply (w/o the editor)
-	if ($context['show_spellchecking'] && (empty($options['use_editor_quick_reply']) || empty($options['display_quick_reply'])))
+	if ($context['show_spellchecking'])
 		echo '
-				<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
-					<input type="hidden" name="spellstring" value="" />
-					<input type="hidden" name="fulleditor" value="" />
-				</form>
-				<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
+			<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
+				<input type="hidden" name="spellstring" value="" />
+				<input type="hidden" name="fulleditor" value="" />
+			</form>
+			<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
 
+	// Tooltips for likes
 	echo '
-				<script><!-- // --><![CDATA[';
-	if (!empty($modSettings['notifications_enabled']) && empty($options['use_editor_quick_reply']))
-		echo '
-					add_elk_mention(\'#message\');';
+			<script><!-- // --><![CDATA[
+				$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+			// ]]></script>';
 
-	if (!empty($options['display_quick_reply']))
-		echo '
-					var oQuickReply = new QuickReply({
-						bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
-						iTopicId: ', $context['current_topic'], ',
-						iStart: ', $context['start'], ',
-						sScriptUrl: elk_scripturl,
-						sImagesUrl: elk_images_url,
-						sContainerId: "quickReplyOptions",
-						sClassId: "quickReplyExpand",
-						sClassCollapsed: "collapse",
-						sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
-						sClassExpanded: "expand",
-						sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
-						sJumpAnchor: "quickreply",
-						bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
-					});';
-
+	// Quick moderation options
+	echo '
+			<script><!-- // --><![CDATA[';
+	
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 		echo '
-					var oInTopicModeration = new InTopicModeration({
-						sSelf: \'oInTopicModeration\',
-						sCheckboxContainerMask: \'in_topic_mod_check_\',
-						aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
+				var oInTopicModeration = new InTopicModeration({
+					sSelf: \'oInTopicModeration\',
+					sCheckboxContainerMask: \'in_topic_mod_check_\',
+					aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sButtonStrip: \'moderationbuttons\',
+					sButtonStripDisplay: \'moderationbuttons_strip\',
+					sButtonStripClass: \'menuitem\',
+					bUseImageButton: false,
+					bCanRemove: ', $context['can_remove_post'] ? 'true' : 'false', ',
+					sRemoveButtonLabel: \'', $txt['quickmod_delete_selected'], '\',
+					sRemoveButtonImage: \'delete_selected.png\',
+					sRemoveButtonConfirm: \'', $txt['quickmod_confirm'], '\',
+					bCanRestore: ', $context['can_restore_msg'] ? 'true' : 'false', ',
+					sRestoreButtonLabel: \'', $txt['quick_mod_restore'], '\',
+					sRestoreButtonImage: \'restore_selected.png\',
+					sRestoreButtonConfirm: \'', $txt['quickmod_confirm'], '\',
+					bCanSplit: ', $context['can_split'] ? 'true' : 'false', ',
+					sSplitButtonLabel: \'', $txt['quickmod_split_selected'], '\',
+					sSplitButtonImage: \'split_selected.png\',
+					sSplitButtonConfirm: \'', $txt['quickmod_confirm'], '\',
+					sFormId: \'quickModForm\'
+				});';
+
+	// Quick modify can be used
+	echo '
+				if (\'XMLHttpRequest\' in window)
+				{
+					var oQuickModify = new QuickModify({
+						sIconHide: \'xx.png\',
+						sScriptUrl: elk_scripturl,
+						sClassName: \'quick_edit\',
+						sIDSubject: \'post_subject_\',
+						sIDInfo: \'info_\',
+						bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
+						iTopicId: ', $context['current_topic'], ',
+						sTemplateBodyEdit: ', JavaScriptEscape('
+							<div id="quick_edit_body_container" style="width: 90%">
+								<div id="error_box" class="errorbox" style="display:none;"></div>
+								<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
+								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
+								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
+								<input type="hidden" name="msg" value="%msg_id%" />
+								<div class="righttext">
+									<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" class="button_submit" />&nbsp;&nbsp;' . ($context['show_spellchecking'] ? '<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\');" class="button_submit" />&nbsp;&nbsp;' : '') . '<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" class="button_submit" />
+								</div>
+							</div>'), ',
+						sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
+						sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
+						sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
+						sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
+						sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
+						sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
+						sFormRemoveAccessKeys: \'postmodify\'' : '', '
+					});
+
+					aJumpTo[aJumpTo.length] = new JumpTo({
+						sContainerId: "display_jump_to",
+						sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
+						iCurBoardId: ', $context['current_board'], ',
+						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+						sCurBoardName: "', $context['jump_to']['board_name'], '",
+						sBoardChildLevelIndicator: "==",
+						sBoardPrefix: "=> ",
+						sCatSeparator: "-----------------------------",
+						sCatPrefix: "",
+						sGoButtonLabel: "', $txt['go'], '"
+					});
+
+					aIconLists[aIconLists.length] = new IconList({
+						sBackReference: "aIconLists[" + aIconLists.length + "]",
+						sIconIdPrefix: "msg_icon_",
+						sScriptUrl: elk_scripturl,
+						bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
+						iBoardId: ', $context['current_board'], ',
+						iTopicId: ', $context['current_topic'], ',
 						sSessionId: elk_session_id,
 						sSessionVar: elk_session_var,
-						sButtonStrip: \'moderationbuttons\',
-						sButtonStripDisplay: \'moderationbuttons_strip\',
-						sButtonStripClass: \'menuitem\',
-						bUseImageButton: false,
-						bCanRemove: ', $context['can_remove_post'] ? 'true' : 'false', ',
-						sRemoveButtonLabel: \'', $txt['quickmod_delete_selected'], '\',
-						sRemoveButtonImage: \'delete_selected.png\',
-						sRemoveButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-						bCanRestore: ', $context['can_restore_msg'] ? 'true' : 'false', ',
-						sRestoreButtonLabel: \'', $txt['quick_mod_restore'], '\',
-						sRestoreButtonImage: \'restore_selected.png\',
-						sRestoreButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-						bCanSplit: ', $context['can_split'] ? 'true' : 'false', ',
-						sSplitButtonLabel: \'', $txt['quickmod_split_selected'], '\',
-						sSplitButtonImage: \'split_selected.png\',
-						sSplitButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-						sFormId: \'quickModForm\'
-					});';
-
-	echo '
-					if (\'XMLHttpRequest\' in window)
-					{
-						var oQuickModify = new QuickModify({
-							sIconHide: \'xx.png\',
-							sScriptUrl: elk_scripturl,
-							sClassName: \'quick_edit\',
-							sIDSubject: \'post_subject_\',
-							sIDInfo: \'info_\',
-							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
-							iTopicId: ', $context['current_topic'], ',
-							sTemplateBodyEdit: ', JavaScriptEscape('
-								<div id="quick_edit_body_container" style="width: 90%">
-									<div id="error_box" class="errorbox" style="display:none;"></div>
-									<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
-									<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
-									<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
-									<input type="hidden" name="msg" value="%msg_id%" />
-									<div class="righttext">
-										<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" class="button_submit" />&nbsp;&nbsp;' . ($context['show_spellchecking'] ? '<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\');" class="button_submit" />&nbsp;&nbsp;' : '') . '<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" class="button_submit" />
-									</div>
-								</div>'), ',
-							sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
-							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
-							sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
-							sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
-							sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
-							sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
-							sFormRemoveAccessKeys: \'postmodify\'' : '', '
-						});
-
-						aJumpTo[aJumpTo.length] = new JumpTo({
-							sContainerId: "display_jump_to",
-							sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-							iCurBoardId: ', $context['current_board'], ',
-							iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-							sCurBoardName: "', $context['jump_to']['board_name'], '",
-							sBoardChildLevelIndicator: "==",
-							sBoardPrefix: "=> ",
-							sCatSeparator: "-----------------------------",
-							sCatPrefix: "",
-							sGoButtonLabel: "', $txt['go'], '"
-						});
-
-						aIconLists[aIconLists.length] = new IconList({
-							sBackReference: "aIconLists[" + aIconLists.length + "]",
-							sIconIdPrefix: "msg_icon_",
-							sScriptUrl: elk_scripturl,
-							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
-							iBoardId: ', $context['current_board'], ',
-							iTopicId: ', $context['current_topic'], ',
-							sSessionId: elk_session_id,
-							sSessionVar: elk_session_var,
-							sAction: "messageicons;board=', $context['current_board'], '" ,
-							sLabelIconList: "', $txt['message_icon'], '",
-							sBoxBackground: "transparent",
-							sBoxBackgroundHover: "#ffffff",
-							iBoxBorderWidthHover: 1,
-							sBoxBorderColorHover: "#adadad" ,
-							sContainerBackground: "#ffffff",
-							sContainerBorder: "1px solid #adadad",
-							sItemBorder: "1px solid #ffffff",
-							sItemBorderHover: "1px dotted gray",
-							sItemBackground: "transparent",
-							sItemBackgroundHover: "#e0e0f0"
-						});
-					}';
+						sAction: "messageicons;board=', $context['current_board'], '" ,
+						sLabelIconList: "', $txt['message_icon'], '",
+						sBoxBackground: "transparent",
+						sBoxBackgroundHover: "#ffffff",
+						iBoxBorderWidthHover: 1,
+						sBoxBorderColorHover: "#adadad" ,
+						sContainerBackground: "#ffffff",
+						sContainerBorder: "1px solid #adadad",
+						sItemBorder: "1px solid #ffffff",
+						sItemBorderHover: "1px dotted gray",
+						sItemBackground: "transparent",
+						sItemBackgroundHover: "#e0e0f0"
+					});
+				}';
 
 	if (!empty($ignoredMsgs))
 		echo '
-					ignore_toggles([', implode(', ', $ignoredMsgs), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
+				ignore_toggles([', implode(', ', $ignoredMsgs), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
 
 	echo '
-				// ]]></script>';
+			// ]]></script>';
 }
 
 /**

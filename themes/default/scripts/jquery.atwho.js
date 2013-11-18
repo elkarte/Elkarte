@@ -218,7 +218,7 @@
 
       Controller.prototype.rect = function() {
         var c, scale_bottom;
-        if (!(c = this.$inputor.caret('offset', this.pos - 1))) {
+        if (!(c = this.$inputor.caret('offset', this.setting.cWindow, this.pos - 1))) {
           return;
         }
         if (this.$inputor.attr('contentEditable') === 'true') {
@@ -446,6 +446,7 @@
       View.prototype.reposition = function(rect) {
         var offset, thisWin;
         thisWin = this.context.setting.cWindow;
+
         if (rect.bottom + this.$el.height() - $(thisWin).scrollTop() > $(thisWin).height()) {
           rect.bottom = rect.top - this.$el.height();
         }
@@ -453,6 +454,7 @@
           left: rect.left,
           top: rect.bottom
         };
+
         this.$el.offset(offset);
         return this.context.trigger("reposition", [offset]);
       };
@@ -482,9 +484,9 @@
         if (!this.visible()) {
           this.$el.show();
         }
-        if (rect = this.context.rect()) {
+       if (rect = this.context.rect()) {
           return this.reposition(rect);
-        }
+       }
       };
 
       View.prototype.hide = function(time) {
