@@ -138,7 +138,6 @@ a img {
 
 
 
-
 /* Style the different types of inputs to be uniform for all browsers. */
 
 /* NOTE: This does require some browser-specific code to get good results. */
@@ -151,8 +150,7 @@ a img {
 /*
 	.button_submit	-	covers input[type=submit], input[type=button],
 						button[type=submit] and button[type=button]
-
-	.linkbutton	-	covers links, to make them look like a submit button.
+	.linkbutton		-	covers links, to make them look like a submit button.
 	.button_reset	-	covers input[type=reset] and button[type=reset]
 	.input_check	-	covers input[type=checkbox]
 	.input_radio	-	covers input[type=radio]
@@ -228,16 +226,13 @@ input[disabled].input_text {
 }
 
 /* Common button styling. */
-/* @todo - Will have to do some shuffling here. */
-/* The old .button_submit class was problematic, due to forcing float right on all buttons. */
-/* It is being replaced with three classes:
+/* It is being replaced with three classes: */
 /*    .button_submit is not floated    */
 /*    .right_submit is right floated   */
 /*    .left_submit is left floated     */
 /* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
-/* The old .button_link class has been replaced with the following three classes. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
@@ -287,7 +282,7 @@ input[disabled].input_text {
 	padding: 2px 6px;
 	vertical-align: middle;
 }
-/* @todo mostly for those go buttons that don't have a form id*/
+/* @todo mostly for those go buttons that don't have a form id */
 .button_submit.submitgo {
 	margin-bottom: 4px;
 }
@@ -625,7 +620,7 @@ div.windowbg, div.windowbg2 {
 	border-radius: 7px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 }
-.generic_list_wrapper .title_bar{
+.generic_list_wrapper .title_bar {
 	border-bottom: 1px solid #fff;
 	border-radius: 0;
 	background: none;
@@ -772,7 +767,7 @@ legend {
 .bbc_tt {
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 }
-div.bbc_footnotes {
+.bbc_footnotes {
 	margin-top: 10px;
 	padding: 4px 8px 4px 0;
 	font-size: small;
@@ -1013,7 +1008,7 @@ div.bbc_footnotes {
 	position: relative;
 	top: 4px;
 }
-	/* Level 1 Menu bar: link or button. */
+/* Level 1 Menu bar: link or button. */
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
@@ -1043,7 +1038,7 @@ div.bbc_footnotes {
 }
 .listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
 	left: auto;
-	right: 0px;
+	right: 0;
 }
 /* Hiding Level 3 drop menu off hover. */
 .listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
@@ -1277,7 +1272,7 @@ div.bbc_footnotes {
 /* The rest of them. */
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	background-repeat: no-repeat;
-/* A rare example of where longhand background declarations work well. */
+	/* A rare example of where longhand background declarations work well. */
 	background-image: url(../images/theme/quickbuttons.png);
 }
 /* The long list of sprite coordinates is much less verbose this way. */
@@ -1404,11 +1399,11 @@ div.bbc_footnotes {
 	margin-top: 3px;
 }
 .category_header .pagesection .floatright input, .pagesection .floatright select {
-	margin-top: 0px;
+	margin-top: 0;
 }
 /* Necessary for some browsers to keep the pages all on the same line */
-.pagelinks {
-	min-width: 35em;
+.linavPages {
+	float: left;
 }
 .selectbox, .pagelinks {
 	margin: 5px 0 0 0;
@@ -1836,7 +1831,7 @@ dl.settings textarea {
 .topic_sorting:hover #sortby, #sortby:hover {
 	width: 8.4em;
 	left: auto;
-	right: 0px;
+	right: 0;
 }
 .sort_by_item {
 	width: 7em;
@@ -2002,6 +1997,8 @@ img.new_posts {
 	float: right;
 	min-width: 14em;
 	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 	color: #777;
 }
@@ -2107,7 +2104,7 @@ img.new_posts {
 }
 
 /* Poll vote options */
- /* @todo - Slow selectors for the next few declarations here. Change? */
+/* @todo - Slow selectors for the next few declarations here. Change? */
 #poll_options ul.options {
 	margin: 0 0 12px 0;
 	padding: 12px 30px 0 25px;
@@ -2190,10 +2187,9 @@ img.new_posts {
 	font-size: 0.857em;
 	padding: 4px 0;
 	display: inline-block;
-	font-size: 0.857em;
+
 }
 /* Poster and postarea + moderation area underneath */
-
 .forumposts .windowbg, .forumposts .windowbg2,
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
@@ -2214,7 +2210,8 @@ img.new_posts {
 	vertical-align: top;
 	min-width: 15em;
 	word-wrap: break-word;
-	word-break: hyphenate;
+	word-break: break-all;
+	hyphens: auto;
 	font-size: 0.857em;
 }
 .poster.poster2 {
@@ -2329,7 +2326,6 @@ img.new_posts {
 }
 .postarea {
 	display: block;
-	vertical-align: top;
 	margin: 0 0 0 180px;
 	padding: 0 1em 0 1.5em;
 	max-width: 100%;
@@ -2427,9 +2423,9 @@ img.new_posts {
 	display: block;
 	width: 640px;
 	height: auto;
-	max-height: auto;
+	max-height: 480px;
 	border: #27a348 1px solid;
-	border-top: 0px;
+	border-top: 0;
 }
 .elk_video a img, .elk_video embed {
 	margin: 0 auto;
@@ -2831,14 +2827,14 @@ dl.merge_topic dd {
 }
 .ui-tabs .ui-tabs-nav li a {
 	display: block;
-	padding: 0px 7px;
+	padding: 0 7px;
 	background: #f0f0f0;
 	border-bottom-color: #ccc;
 	outline: none;
 	text-decoration: none;
 	border-radius: 2px 2px 0 0;
 }
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a {
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav .ui-state-disabled a, .ui-tabs .ui-tabs-nav .ui-state-processing a {
 	cursor: default;
 }
 .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
@@ -2954,7 +2950,7 @@ dl.merge_topic dd {
 #basicinfo .windowbg .content {
 	padding-left: 30px;
 }
-.profileblock ul.cf_icon {
+.profileblock .cf_icon {
 	display: block;
 	float: left;
 	margin: 4px 5px 0 0;
@@ -3645,8 +3641,8 @@ a.help .icon {
 	display: none;
 	width: 100%;
 	height: 100%;
-	/* Should be rgba only, IMHO. */
-	/* Flat colour fallback would be bad (visually). */
+	/* Flat colour fallback will be bad (visually), ie8 only though. */
+	background: rgb(0,0,0);
 	background: rgba(0,0,0,0.4);
 }
 
@@ -3781,21 +3777,21 @@ a.help .icon {
 }
 
 #mlsearch {
-  padding-top: 2px;
+	padding-top: 2px;
 }
 #mlsearch_options {
-  position: absolute;
-  display: none;
-  background: #FAFAFA;
-  padding: 0.5em;
-  border: 1px solid #DDDDDD;
-  border-radius: 5px;
+	position: absolute;
+	display: none;
+	background: #FAFAFA;
+	padding: 0.5em;
+	border: 1px solid #DDDDDD;
+	border-radius: 5px;
 }
 #mlsearch_options .mlsearch_option .input_check {
-  margin-left: 0.5em;
+	margin-left: 0.5em;
 }
 #mlsearch_options .mlsearch_option {
-  padding: 0.2em 0;
+	padding: 0.2em 0;
 }
 
 /*	$LOGIN		*/
@@ -4030,13 +4026,13 @@ a.help .icon {
 /* 7" Tablets like Google Nexus (landscape) or other mobile devices *//*
 @media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
-	 	 display: none;
+		 display: none;
 	 }
 	 #posting_icons, #top_section div ul{
 		 display: none;
 	 }
 	 #collapse_button, #button_home, #button_help, #button_memberlist, #button_search {
-	 	 display: none;
+		 display: none;
 	 }
 	#menu_nav {
 		padding: 0;
@@ -4370,7 +4366,7 @@ a.help .icon {
 	.views_text, .nextlinks {
 		display: none !important;
 	}
-	a#top, #gotop, #gobottom {
+	#top, #gotop, #gobottom {
 		display: none;
 	}
 	#main_menu li, .admin_menu li{
@@ -4393,7 +4389,7 @@ a.help .icon {
 	}
 	.poster {
 		float: none;
-		padding: 0px 1em 0px 1.5em;
+		padding: 0 1em 0 1.5em;
 	}
 	.poster .listlevel1 {
 		display: inline-block;

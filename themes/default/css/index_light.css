@@ -251,7 +251,6 @@ div.bbc_footnotes .meaction{
 /* The footer with copyright links etc. */
 #footer_section {
 	color: #bbb;
-	border-top: 4px solid #aaa;
 	background: #222;
 	border-top: 6px solid #3d6e32;
 	box-shadow: 0 -1px 0 #777, 0 1px 0 #0e0e0e inset;
@@ -342,6 +341,7 @@ div.bbc_footnotes .meaction{
 	color: #fff;
 	font-weight: 600;
 	box-shadow: 1px 1px 2px #bbb;
+	padding: 0 5px;
 }
 /* Hover effects for those buttons. */
 .linklevel1.active:hover,.listlevel1:hover .linklevel1.active,
@@ -911,7 +911,6 @@ div.bbc_footnotes .meaction{
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
 @media screen and (min-width: 320px) and (max-width: 480px) {
 	.board_latest {
-		border-left: 0px;
+		border-left: 0;
 	}
 }
-
