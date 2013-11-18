@@ -2352,7 +2352,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	$message = strtr($message, array('  ' => ' &nbsp;', "\r" => '', "\n" => '<br />', '<br /> ' => '<br />&nbsp;', '&#13;' => "\n"));
 
 	// Finish footnotes if we have any.
-	if (strpos($message, '<sup class="bbc_footnotes">'))
+	if (strpos($message, '<sup class="bbc_footnotes">') !== false)
 	{
 		global $fn_num, $fn_content, $fn_count;
 		static $fn_total;
