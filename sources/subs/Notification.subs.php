@@ -28,17 +28,17 @@ function countUserNotifications($all = false, $type = '')
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_notifications
-        WHERE id_member = {int:current_user}' . ($all ? '
-            AND status != {int:is_not_deleted}
-            AND status != {int:unapproved}' : '
-            AND status = {int:is_not_read}') . (empty($type) ? '' : '
+		WHERE id_member = {int:current_user}
+			AND status != {int:unapproved}' . ($all ? '
+			AND status != {int:is_not_deleted}' : '
+			AND status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND notif_type = {string:current_type}'),
 		array(
 			'current_user' => $user_info['id'],
 			'current_type' => $type,
 			'is_not_read' => 0,
 			'is_not_deleted' => 2,
-			'unapproved'	=> 3,
+			'unapproved' => 3,
 		)
 	);
 
@@ -77,7 +77,8 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}members AS men ON (n.id_member_from = men.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = men.id_member)
-		WHERE n.id_member = {int:current_user}' . ($all ? '
+		WHERE n.id_member = {int:current_user}
+			AND status != {int:unapproved}' . ($all ? '
 			AND n.status != {int:is_not_deleted}' : '
 			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND n.notif_type = {string:current_type}') . '
@@ -88,6 +89,7 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			'current_type' => $type,
 			'is_not_read' => 0,
 			'is_not_deleted' => 2,
+			'unapproved' => 3,
 			'start' => $start,
 			'limit' => $limit,
 			'sort' => $sort,
@@ -140,6 +142,7 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 		$existing[] = $row['id_member'];
 	$db->free_result($request);
 
+	// If the member has already been notified, it's not necessary to do it again
 	foreach ($members_to as $id_member)
 		if (!in_array($id_member, $existing))
 			$inserts[] = array(
