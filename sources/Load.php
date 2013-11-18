@@ -2087,7 +2087,17 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 		$found = false;
 		foreach ($attempts as $k => $file)
 		{
-			if (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
+			if (file_exists($file[0] . '/languages/' . $lang . '/' . $file[1] . '.' . $file[2] . '.php'))
+			{
+				// Include it!
+				template_include($file[0] . '/languages/' . $lang . '/' . $file[1] . '.' . $file[2] . '.php');
+
+				// Note that we found it.
+				$found = true;
+
+				break;
+			}
+			elseif (file_exists($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php'))
 			{
 				// Include it!
 				template_include($file[0] . '/languages/' . $file[1] . '.' . $file[2] . '.php');
