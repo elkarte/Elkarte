@@ -1,3 +1,5 @@
+[![ElkArte](https://raw.github.com/elkarte/Elkarte/master/themes/default/images/logo.png "ElkArte")](http://www.elkarte.net "ElkArte")
+
 This is the **ElkArte** development repository.
 
 

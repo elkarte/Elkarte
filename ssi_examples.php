@@ -22,6 +22,8 @@
 */
 $ssi_guest_access = false;
 
+global $settings, $user_info;
+
 // Include the SSI file.
 require(dirname(__FILE__) . '/SSI.php');
 
@@ -104,7 +106,7 @@ template_ssi_above();
 					<?php } ?>
 					<h3>Website Samples</h3>
 					<ul>
-						<li><a href="#" onclick="showSSIBlock('htmlhome')">Sample 1</a></li>
+						<li><a href="#" onclick="showSSIBlock('htmlhome');">Sample 1</a></li>
 					</ul>
 					<h2 id="other">Other</h2>
 					<ul>
@@ -527,8 +529,6 @@ function template_ssi_above()
 
 function template_ssi_below()
 {
-	global $time_start;
-
 	echo '
 							<script type="text/javascript"><!-- // --><![CDATA[
 								showSSIBlock("ssi_recentTopics");

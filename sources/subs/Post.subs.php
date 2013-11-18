@@ -1171,8 +1171,11 @@ function approvePosts($msgs, $approve = true)
 	foreach ($topic_changes as $id => $changes)
 		$db->query('', '
 			UPDATE {db_prefix}topics
-			SET approved = {int:approved}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_replies = num_replies + {int:num_replies}, id_last_msg = {int:id_last_msg}
+			SET
+				approved = {int:approved},
+				unapproved_posts = CASE WHEN unapproved_posts + {int:unapproved_posts} < 0 THEN 0 ELSE unapproved_posts + {int:unapproved_posts} END,
+				num_replies = CASE WHEN num_replies + {int:num_replies} < 0 THEN 0 ELSE num_replies + {int:num_replies} END,
+				id_last_msg = {int:id_last_msg}
 			WHERE id_topic = {int:id_topic}',
 			array(
 				'approved' => $changes['approved'],
@@ -1187,8 +1190,11 @@ function approvePosts($msgs, $approve = true)
 	foreach ($board_changes as $id => $changes)
 		$db->query('', '
 			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + {int:num_posts}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_topics = num_topics + {int:num_topics}, unapproved_topics = unapproved_topics + {int:unapproved_topics}
+			SET
+				num_posts = num_posts + {int:num_posts},
+				unapproved_posts = CASE WHEN unapproved_posts + {int:unapproved_posts} < 0 THEN 0 ELSE unapproved_posts + {int:unapproved_posts} END,
+				num_topics = CASE WHEN num_topics + {int:num_topics} < 0 THEN 0 ELSE num_topics + {int:num_topics} END,
+				unapproved_topics = CASE WHEN unapproved_topics + {int:unapproved_topics} < 0 THEN 0 ELSE unapproved_topics + {int:unapproved_topics} END
 			WHERE id_board = {int:id_board}',
 			array(
 				'num_posts' => $changes['posts'],

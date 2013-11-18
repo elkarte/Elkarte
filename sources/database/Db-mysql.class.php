@@ -549,17 +549,18 @@ class Database_MySQL implements Database
 		if ($query_errno == 1142)
 		{
 			$command = substr(trim($db_string), 0, 6);
-			if ($command == 'DELETE' || $command == 'UPDATE' || $command == 'INSERT')
+			if ($command === 'DELETE' || $command === 'UPDATE' || $command === 'INSERT')
 			{
-				// @todo log something somewhere?
 				// We can try to ignore it (warning the admin though it's a thing to do)
 				// and serve the page just SELECTing
 				$_SESSION['query_command_denied'][$command] = $query_error;
+
+				// Let the admin know there is a command denied issue
+				if (function_exists('log_error'))
+					log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+
 				return false;
 			}
-			// If we can't SELECT (?) there is not much we can do at all...
-// 			else
-// 				return false;
 		}
 
 		// Log the error.
@@ -570,7 +571,7 @@ class Database_MySQL implements Database
 		if (function_exists('cache_get_data') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			// Force caching on, just for the error checking.
-			$old_cache = @$modSettings['cache_enable'];
+			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
 
 			if (($temp = cache_get_data('db_last_error', 600)) !== null)
@@ -705,9 +706,7 @@ class Database_MySQL implements Database
 			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
 		if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)
-		{
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
-		}
 
 		// It's already been logged... don't log it again.
 		fatal_error($context['error_message'], false);

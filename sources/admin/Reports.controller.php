@@ -294,8 +294,8 @@ class Reports_Controller extends Action_Controller
 		else
 			$group_clause = '1=1';
 
-			require_once(SUBSDIR . '/Reports.subs.php');
 		// Get all the possible membergroups, except admin!
+		require_once(SUBSDIR . '/Reports.subs.php');
 		$all_groups = allMembergroups($group_clause, $query_groups);
 
 		if (empty($query_groups) || in_array(-1, $query_groups) || in_array(0, $query_groups))
@@ -472,8 +472,7 @@ class Reports_Controller extends Action_Controller
 
 	/**
 	 * Show the large variety of group permissions assigned to each membergroup.
-	 * functions ending with "Report" are responsible for generating data
-	 * for reporting.
+	 * functions ending with "Report" are responsible for generating data for reporting.
 	 * they are all called from action_index.
 	 * never access the context directly, but use the data handling
 	 * functions to do so.
@@ -491,9 +490,13 @@ class Reports_Controller extends Action_Controller
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
 		else
+		{
+			$query_groups = array();
 			$group_clause = 'id_group != {int:moderator_group}';
+		}
 
 		// Get all the possible membergroups, except admin!
+		require_once(SUBSDIR . '/Reports.subs.php');
 		$all_groups = allMembergroups($group_clause, $query_groups);
 
 		if (!isset($_REQUEST['groups']) || in_array(-1, $_REQUEST['groups']) || in_array(0, $_REQUEST['groups']))
@@ -557,6 +560,7 @@ class Reports_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Members.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 
 		// Fetch all the board names.
 		$boards = fetchBoardsInfo('all');
@@ -583,7 +587,7 @@ class Reports_Controller extends Action_Controller
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
 		$groups = array(0 => $txt['full_member']);
 		foreach ($all_groups as $row)
-			$groups[$row['id_group']] = empty($row['online_color']) ? $row['group_name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>';
+			$groups[$row['id']] = empty($row['online_color']) ? $row['name'] : '<span style="color: ' . $row['online_color'] . '">' . $row['name'] . '</span>';
 
 		// All the fields we'll show.
 		$staffSettings = array(

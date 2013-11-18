@@ -38,15 +38,17 @@ function template_display_child_boards_above()
 		// If the board or children is new, show an indicator.
 		if ($board['new'] || $board['children_new'])
 			echo '
-						<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'on', $board['new'] ? '' : '2', '.png" alt="', $txt['new_posts'], '" title="', $txt['new_posts'], '" />';
+						<span class="board_icon ', $board['new'] ? 'on_board' : 'on2_board', '" title="', $txt['new_posts'], '"></span>';
+
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
 			echo '
-						<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'redirect.png" alt="*" title="*" />';
+						<span class="board_icon redirect_board" title="*"></span>';
+
 		// No new posts at all! The agony!!
 		else
 			echo '
-						<img class="board_icon" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'off.png" alt="', $txt['old_posts'], '" title="', $txt['old_posts'], '" />';
+						<span class="board_icon off_board" title="', $txt['old_posts'], '"></span>';
 
 		echo '
 					</a>
@@ -290,7 +292,7 @@ function template_main()
 
 			echo '
 						<h4>
-							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+							', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], ($context['can_approve_posts'] && !$topic['approved'] ? '&nbsp;&nbsp;<em><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" style="width:16px" alt="' . $txt['awaiting_approval'] . '" title="' . $txt['awaiting_approval'] . '" />(' . $txt['awaiting_approval'] . ')</em>' : ''), '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 						</h4>
 					</div>
 					<div class="topic_starter">

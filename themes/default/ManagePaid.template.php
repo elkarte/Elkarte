@@ -74,7 +74,7 @@ function template_modify_subscription()
 	// Put each group into the box.
 	foreach ($context['groups'] as $groups)
 		echo '
-								<option value="', $groups['id_group'], '" ', $context['sub']['prim_group'] == $groups['id_group'] ? 'selected="selected"' : '', '>', $groups['name'], '</option>';
+								<option value="', $groups['id'], '" ', $context['sub']['prim_group'] == $groups['id'] ? 'selected="selected"' : '', '>', $groups['name'], '</option>';
 
 	echo '
 							</select>
@@ -87,7 +87,7 @@ function template_modify_subscription()
 	// Put a checkbox in for each group
 	foreach ($context['groups'] as $groups)
 		echo '
-							<label for="addgroup_', $groups['id_group'], '"><input type="checkbox" id="addgroup_', $groups['id_group'], '" name="addgroup[', $groups['id_group'], ']"', in_array($groups['id_group'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' class="input_check" />&nbsp;<span class="smalltext">', $groups['name'], '</span></label><br />';
+							<label for="addgroup_', $groups['id'], '"><input type="checkbox" id="addgroup_', $groups['id_group'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' class="input_check" />&nbsp;<span class="smalltext">', $groups['name'], '</span></label><br />';
 
 	echo '
 						</dd>
@@ -591,9 +591,7 @@ function template_paid_done()
 
 	echo '
 	<div id="paid_subscription">
-		<div class="title_bar">
-			<h3 class="titlebg">', $txt['paid_done'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['paid_done'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<p>', $txt['paid_done_desc'], '</p>

@@ -169,9 +169,9 @@ CREATE INDEX {$db_prefix}admin_info_files_filename ON {$db_prefix}admin_info_fil
 # Dumping data for table `admin_info_files`
 #
 
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'current-version.js', 'http://elkarte.github.io/Elkarte/site/', 'version=%3$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (2, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (3, 'latest-news.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
@@ -2581,8 +2581,8 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_enabled'
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_logging', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}');
 # --------------------------------------------------------
 
 #

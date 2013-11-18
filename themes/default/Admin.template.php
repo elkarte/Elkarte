@@ -37,7 +37,7 @@ function template_admin()
 							<div id="admin_search_box">', $txt['try_searching'], template_admin_quick_search(), '</div>
 							<div id="live_news" class="floatleft">
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
+									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
 								</h3>
 								<div class="windowbg">
 									<div class="content">
@@ -214,7 +214,7 @@ function template_credits()
 	// Display latest support questions from ElkArte
 	echo '
 							<h3 class="category_header">
-								<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
+								<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
 							</h3>
 							<div class="windowbg">
 								<div class="content">
@@ -318,11 +318,9 @@ function template_view_versions()
 
 	echo '
 					<div id="admincenter">
-						<div id="section_header">
-							<h3 class="category_header">
-								', $txt['admin_version_check'], '
-							</h3>
-						</div>
+						<h3 class="category_header">
+							', $txt['admin_version_check'], '
+						</h3>
 						<div class="information">', $txt['version_check_desc'], '</div>
 							<table class="table_grid">
 								<thead>
@@ -719,11 +717,9 @@ function template_edit_censored()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
-			<div id="section_header">
-				<h3 class="category_header">
-					', $txt['admin_censored_words'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $txt['admin_censored_words'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="content">
 					<p>', $txt['admin_censored_where'], '</p>';
@@ -795,9 +791,7 @@ function template_not_done()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header">
-			<h3 class="category_header">', $txt['not_done_title'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['not_done_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				', $txt['not_done_reason'];
@@ -890,7 +884,7 @@ function template_show_settings()
 			{
 				echo '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
-						', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
+						', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
 						', $config_var['label'], '
 					</h3>';
 			}
@@ -1093,7 +1087,7 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-					<div id="section_header">
+					<div>
 						<h3 class="category_header">
 							<object id="quick_search">
 								<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
@@ -1266,11 +1260,9 @@ function template_repair_boards()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header">
-			<h3 class="category_header">',
-				$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
-			</h3>
-		</div>
+		<h3 class="category_header">',
+			$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
+		</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -1354,10 +1346,7 @@ function template_php_info()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<div id="section_header">
-			<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>
-		</div>
-		<br />';
+		<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>';
 
 	// for each php info area
 	foreach ($context['pinfo'] as $area => $php_area)
@@ -1386,7 +1375,7 @@ function template_php_info()
 				{
 					// heading row for the settings section of this category's settings
 					echo '
-			<tr class="titlebg">
+			<tr class="secondary_header">
 				<td><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
@@ -1443,12 +1432,12 @@ function template_clean_cache_button_below()
 	global $txt, $scripturl, $context;
 
 	echo '
-	<h3 class="category_header">', $txt['maintain_cache'], '</h3>
-	<div class="windowbg">
+	<div class="generic_list_wrapper">
+		<h3 class="category_header">', $txt['maintain_cache'], '</h3>
 		<div class="content">
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
-				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" /></span>
+				<input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 			</form>

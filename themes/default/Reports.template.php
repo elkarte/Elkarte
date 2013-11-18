@@ -195,7 +195,7 @@ function template_print()
 		{
 			if ($row_number == 0 && !empty($table['shading']['top']))
 				echo '
-				<tr class="titlebg" style="vertical-align:top">';
+				<tr class="secondary_header" style="vertical-align:top">';
 			else
 				echo '
 				<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align:top">';
@@ -217,7 +217,7 @@ function template_print()
 				// Shaded?
 				if ($column_number == 0 && !empty($table['shading']['left']))
 					echo '
-					<td class="titlebg" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . '"' : '"', '>
+					<td class="secondary_header" style="text-align:', $table['align']['shaded'], $table['width']['shaded'] != 'auto' ? ';width:' . $table['width']['shaded'] . '"' : '"', '>
 						', $data['v'] == $table['default_value'] ? '' : ($data['v'] . (empty($data['v']) ? '' : ':')), '
 					</td>';
 				else

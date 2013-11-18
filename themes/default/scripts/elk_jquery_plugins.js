@@ -936,7 +936,7 @@
 				var bElem = aModel.clone(),
 					boxModelClone = boxModel.clone();
 
-				bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perPage);
+				bElem.attr('href', baseurl.replace('%1$d', i - perPage)).text(i / perPage);
 				boxModelClone.find('a').each(function() {
 					$(this).replaceWith(bElem[0]);
 				});

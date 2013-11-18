@@ -858,7 +858,7 @@ class PersonalMessage_Controller extends Action_Controller
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
 
 		// Initialize the errors we're about to make.
-		$post_errors = error_context::context('pm', 1);
+		$post_errors = Error_Context::context('pm', 1);
 
 		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 		if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] == '0=1' && $user_info['mod_cache']['gq'] == '0=1')
@@ -2713,7 +2713,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 		$context['sub_template'] = 'pm';
 
 	$context['page_title'] = $txt['send_message'];
-	$error_types = error_context::context('pm', 1);
+	$error_types = Error_Context::context('pm', 1);
 
 	// Got some known members?
 	$context['recipients'] = array(

@@ -89,7 +89,7 @@ function template_download_language()
 	{
 		$count = 0;
 		echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="4">
 						<img class="sort" src="', $settings['images_url'], '/sort_down.png" id="toggle_image_', $theme, '" alt="*" />&nbsp;', isset($context['theme_names'][$theme]) ? $context['theme_names'][$theme] : $theme, '
 					</td>

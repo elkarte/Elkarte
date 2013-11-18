@@ -45,7 +45,7 @@ function template_login()
 	echo '
 				<dl>
 					<dt>', $txt['username'], ':</dt>
-					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" placeholder="', $txt['username'], '" /></dd>
+					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" ', !isset($_GET['openid'])? 'autofocus="autofocus" ' : '', 'placeholder="', $txt['username'], '" /></dd>
 					<dt>', $txt['password'], ':</dt>
 					<dd><input type="password" name="passwrd" value="', $context['default_password'], '" size="20" class="input_password" placeholder="', $txt['password'], '" /></dd>
 				</dl>';
@@ -54,7 +54,7 @@ function template_login()
 		echo '<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
 				<dl>
 					<dt>', $txt['openid'], ':</dt>
-					<dd><input type="text" name="openid_identifier" class="input_text openid_login" size="17" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="centericon" /></a></dd>
+					<dd><input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', isset($_GET['openid'])? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="centericon" /></a></dd>
 				</dl>
 				<hr />';
 
@@ -85,7 +85,7 @@ function template_login()
 	// Focus on the correct input - username or password.
 	echo '
 		<script><!-- // --><![CDATA[
-			document.forms.frmLogin.', isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user', '.focus();
+			document.forms.frmLogin.', isset($_GET['openid']) ? 'openid_identifier' : (isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user'), '.focus();
 		// ]]></script>';
 }
 
@@ -172,8 +172,8 @@ function template_maintenance()
 <form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8"', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
 	<div class="login" id="maintenance_mode">
 		<h2 class="category_header">', $context['title'], '</h2>
-		<p class="description">
-			<img class="floatleft" src="', $settings['images_url'], '/construction.png" style="width:40px; height:40px" alt="', $txt['in_maintain_mode'], '" />
+		<p class="description flow_auto">
+			<img class="floatleft" src="', $settings['images_url'], '/construction.png" alt="', $txt['in_maintain_mode'], '" />
 			', $context['description'], '
 		</p>
 		<h3 class="category_header">', $txt['admin_login'], '</h3>
@@ -188,7 +188,7 @@ function template_maintenance()
 				<dt>', $txt['always_logged_in'], ':</dt>
 				<dd><input type="checkbox" name="cookieneverexp" class="input_check" /></dd>
 			</dl>
-			<input type="submit" value="', $txt['login'], '" class="button_submit" />
+			<p><input type="submit" value="', $txt['login'], '" class="button_submit" /></p>
 		</div>
 		<input type="hidden" name="hash_passwrd" value="" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

@@ -28,7 +28,8 @@ function countUserNotifications($all = false, $type = '')
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_notifications
-		WHERE id_member = {int:current_user}' . ($all ? '
+		WHERE id_member = {int:current_user}
+			AND status != {int:unapproved}' . ($all ? '
 			AND status != {int:is_not_deleted}' : '
 			AND status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND notif_type = {string:current_type}'),
@@ -37,6 +38,7 @@ function countUserNotifications($all = false, $type = '')
 			'current_type' => $type,
 			'is_not_read' => 0,
 			'is_not_deleted' => 2,
+			'unapproved' => 3,
 		)
 	);
 
@@ -75,7 +77,8 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}members AS men ON (n.id_member_from = men.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = men.id_member)
-		WHERE n.id_member = {int:current_user}' . ($all ? '
+		WHERE n.id_member = {int:current_user}
+			AND status != {int:unapproved}' . ($all ? '
 			AND n.status != {int:is_not_deleted}' : '
 			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND n.notif_type = {string:current_type}') . '
@@ -86,6 +89,7 @@ function getUserNotifications($start, $limit, $sort, $all = false, $type = '')
 			'current_type' => $type,
 			'is_not_read' => 0,
 			'is_not_deleted' => 2,
+			'unapproved' => 3,
 			'start' => $start,
 			'limit' => $limit,
 			'sort' => $sort,
@@ -138,6 +142,7 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 		$existing[] = $row['id_member'];
 	$db->free_result($request);
 
+	// If the member has already been notified, it's not necessary to do it again
 	foreach ($members_to as $id_member)
 		if (!in_array($id_member, $existing))
 			$inserts[] = array(
@@ -822,7 +827,6 @@ function sendApprovalNotifications(&$topicData)
 		)
 	);
 	$sent = 0;
-
 	$current_language = $user_info['language'];
 	while ($row = $db->fetch_assoc($members))
 	{
@@ -842,23 +846,28 @@ function sendApprovalNotifications(&$topicData)
 			$current_language = loadLanguage('Post', $needed_language, false);
 
 		$sent_this_time = false;
+		$replacements = array(
+			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
+			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
+		);
+
 		// Now loop through all the messages to send.
 		foreach ($topicData[$row['id_topic']] as $msg)
 		{
-			$replacements = array(
-				'TOPICSUBJECT' => $topicData[$row['id_topic']]['subject'],
-				'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
-				'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-				'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
+			$replacements += array(
+				'TOPICSUBJECT' => $msg['subject'],
+				'POSTERNAME' => un_htmlspecialchars($msg['name']),
 			);
 
 			$message_type = 'notification_reply';
+
 			// Do they want the body of the message sent too?
 			if (!empty($row['notify_send_body']) && empty($modSettings['disallow_sendBody']))
 			{
 				$message_type .= '_body';
-				$replacements['BODY'] = $topicData[$row['id_topic']]['body'];
+				$replacements['MESSAGE'] = $msg['body'];
 			}
+
 			if (!empty($row['notify_regularity']))
 				$message_type .= '_once';
 
@@ -866,7 +875,7 @@ function sendApprovalNotifications(&$topicData)
 			if (empty($row['notify_regularity']) || (empty($row['sent']) && !$sent_this_time))
 			{
 				$emaildata = loadEmailTemplate($message_type, $replacements, $needed_language);
-				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicData[$row['id_topic']]['last_id']);
+				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $msg['last_id']);
 				$sent++;
 			}
 

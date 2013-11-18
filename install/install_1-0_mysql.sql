@@ -23,9 +23,9 @@ CREATE TABLE {$db_prefix}admin_info_files (
 INSERT INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, data, filetype)
 VALUES
-	(1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript'),
-	(2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
+	(1, 'current-version.js', 'http://elkarte.github.io/Elkarte/site/', 'version=%3$s', '', 'text/javascript'),
+	(2, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(3, 'latest-news.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
@@ -783,7 +783,7 @@ VALUES
 #
 
 CREATE TABLE {$db_prefix}custom_fields_data (
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,
   PRIMARY KEY (id_member, variable(30)),
@@ -1138,7 +1138,7 @@ CREATE TABLE {$db_prefix}log_reported (
 CREATE TABLE {$db_prefix}log_reported_comments (
   id_comment mediumint(8) unsigned NOT NULL auto_increment,
   id_report mediumint(8) NOT NULL default '0',
-  id_member mediumint(8) NOT NULL,
+  id_member mediumint(8) unsigned NOT NULL,
   membername varchar(255) NOT NULL default '',
   email_address varchar(255) NOT NULL default '',
   member_ip varchar(255) NOT NULL default '',
@@ -1412,7 +1412,7 @@ CREATE TABLE {$db_prefix}members (
 
 CREATE TABLE {$db_prefix}member_logins (
   id_login int(10) NOT NULL auto_increment,
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   time int(10) NOT NULL default '0',
   ip varchar(255) NOT NULL default '0',
   ip2 varchar(255) NOT NULL default '0',
@@ -1710,7 +1710,7 @@ CREATE TABLE {$db_prefix}polls (
   guest_vote tinyint(3) unsigned NOT NULL default '0',
   num_guest_voters int(10) unsigned NOT NULL default '0',
   reset_poll int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   poster_name varchar(255) NOT NULL default '',
   PRIMARY KEY (id_poll)
 ) ENGINE=MyISAM;
@@ -2013,8 +2013,8 @@ VALUES ('elkVersion', '{$current_version}'),
 	('badbehavior_logging', '0'),
 	('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}'),
 	('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
-	('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}'),
-	('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
+	('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
+	('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}');
 # --------------------------------------------------------
 
 #
@@ -2146,7 +2146,7 @@ CREATE TABLE {$db_prefix}subscriptions(
 #
 
 CREATE TABLE {$db_prefix}themes (
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   id_theme tinyint(4) unsigned NOT NULL default '1',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,

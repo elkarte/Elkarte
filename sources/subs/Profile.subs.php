@@ -439,7 +439,7 @@ function loadProfileFields($force_reload = false)
 			'log_change' => true,
 			'permission' => 'profile_identity',
 			'input_validate' => create_function('&$value', '
-				global $context, $old_profile, $context, $profile_vars, $modSettings;
+				global $context, $old_profile, $profile_vars, $modSettings;
 
 				if (strtolower($value) == strtolower($old_profile[\'email_address\']))
 					return false;
@@ -606,7 +606,7 @@ function loadProfileFields($force_reload = false)
 						resetPassword($context[\'id_member\'], $value);
 					elseif ($value !== null)
 					{
-						$errors = error_context::context(\'change_username\', 0);
+						$errors = Error_Context::context(\'change_username\', 0);
 
 						validateUsername($context[\'id_member\'], $value, \'change_username\');
 

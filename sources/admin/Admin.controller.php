@@ -293,7 +293,7 @@ class Admin_Controller extends Action_Controller
 		$config_areas->childOf('languages')->add('languages_sub')->addBulk(
 			array(
 				'edit' => array($txt['language_edit']),
-				'add' => array($txt['language_add']),
+// 				'add' => array($txt['language_add']),
 				'settings' => array($txt['language_settings']),
 			)
 		);
@@ -326,7 +326,6 @@ class Admin_Controller extends Action_Controller
 		$config_areas->childOf('addonsettings')->add('addonsettings_sub')->addBulk(
 			array(
 				'general' => array($txt['mods_cat_modifications_misc']),
-				'hooks' => array($txt['hooks_title_list']),
 				// @deprecated: do not rely on this line, use the appropriate hook and tools provided
 				// Addon Authors for a "ADD AFTER" on this line. Ensure you end your change with a comma. For example:
 				// 'shout' => array($txt['shout']),
@@ -667,6 +666,8 @@ class Admin_Controller extends Action_Controller
 				'database' => array($txt['maintain_sub_database'], 'admin_forum'),
 				'members' => array($txt['maintain_sub_members'], 'admin_forum'),
 				'topics' => array($txt['maintain_sub_topics'], 'admin_forum'),
+				'hooks' => array($txt['maintain_sub_hooks_list'], 'admin_forum'),
+				'attachments' => array($txt['maintain_sub_attachments'], 'admin_forum'),
 			)
 		);
 

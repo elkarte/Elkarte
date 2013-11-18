@@ -96,7 +96,6 @@ class Emailpost_Controller extends Action_Controller
 
 		// Can't find this key in the database, either
 		//   a) spam attempt or b) replying with an expired/consumed key
-		// @todo @Spuds this is for you I think: I replaced $message_type with $email_message->message_type
 		if (empty($key_owner))
 			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
 

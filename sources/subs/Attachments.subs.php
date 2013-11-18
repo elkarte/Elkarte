@@ -335,7 +335,7 @@ function processAttachments($id_msg = null)
 {
 	global $context, $modSettings, $txt, $user_info, $ignore_temp, $topic, $board;
 
-	$attach_errors = attachment_error_context::context('attachment', 1);
+	$attach_errors = attachment_Error_Context::context('attachment', 1);
 
 	// Make sure we're uploading to the right place.
 	if (!empty($modSettings['automanage_attachments']))
@@ -1582,6 +1582,32 @@ function getAttachmentCount()
 }
 
 /**
+ * How many attachments we have in a certain folder.
+ *
+ * @return int
+ */
+function getFolderAttachmentCount($folder)
+{
+	$db = database();
+
+	// Get the number of attachments....
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}attachments
+		WHERE id_folder = {int:folder_id}
+			AND attachment_type != {int:attachment_type}',
+		array(
+			'folder_id' => $folder,
+			'attachment_type' => 1,
+		)
+	);
+	list ($num_attachments) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $num_attachments;
+}
+
+/**
  * How many avatars do we have. Need to know. :P
  *
  * @return int
@@ -2765,6 +2791,14 @@ function currentAttachDirProperties()
 {
 	global $modSettings;
 
+	return attachDirProperties($modSettings['currentAttachmentUploadDir']);
+}
+
+/**
+ * Get files and size from the current attachments dir
+ */
+function attachDirProperties($dir)
+{
 	$db = database();
 
 	$current_dir = array();
@@ -2775,7 +2809,7 @@ function currentAttachDirProperties()
 		WHERE id_folder = {int:folder_id}
 			AND attachment_type != {int:type}',
 		array(
-			'folder_id' => $modSettings['currentAttachmentUploadDir'],
+			'folder_id' => $dir,
 			'type' => 1,
 		)
 	);
@@ -3205,4 +3239,25 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 		$filename = $path . '/' . $clean_name;
 
 	return $filename;
+}
+
+/**
+ * Changes the folder id of all the attachments in a certain folder
+ *
+ * @param int $from - the folder the attachments are in
+ * @param int $to - the folder the attachments should be moved to
+ */
+function updateAttachmentIdFolder($from, $to)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}attachments
+		SET id_folder = {int:folder_to}
+		WHERE id_folder = {int:folder_from}',
+		array(
+			'folder_from' => $from,
+			'folder_to' => $to,
+		)
+	);
 }

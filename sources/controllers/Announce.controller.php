@@ -13,13 +13,14 @@
  *
  * @version 1.0 Alpha
  *
- * Handles announce topic functionality.
- *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class to handles announce topic functionality.
+ */
 class Announce_Controller extends Action_Controller
 {
 	/**
