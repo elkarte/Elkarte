@@ -362,18 +362,19 @@ CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 ---# Adding draft permissions...
 ---{
 // We cannot do this twice
+// @todo this won't work when you upgrade from smf
 if (@$modSettings['elkVersion'] < '1.0')
 {
 	// Anyone who can currently post unapproved topics we assume can create drafts as well ...
 	$request = upgrade_query("
-		SELECT id_group, id_board, add_deny, permission
+		SELECT id_group, id_profile, add_deny, permission
 		FROM {$db_prefix}board_permissions
 		WHERE permission = 'post_unapproved_topics'");
 	$inserts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$inserts[] = "($row[id_group], $row[id_board], 'post_draft', $row[add_deny])";
-		$inserts[] = "($row[id_group], $row[id_board], 'post_autosave_draft', $row[add_deny])";
+		$inserts[] = "($row[id_group], $row[id_profile], 'post_draft', $row[add_deny])";
+		$inserts[] = "($row[id_group], $row[id_profile], 'post_autosave_draft', $row[add_deny])";
 	}
 	$db->free_result($request);
 
