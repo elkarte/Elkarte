@@ -1059,13 +1059,10 @@ class ManageAttachments_Controller extends Action_Controller
 
 	/**
 	 * This function lists and allows updating of multiple attachments paths.
-	 * @todo Move db queries to ManageAttachments.subs.php
 	 */
 	public function action_attachpaths()
 	{
 		global $modSettings, $scripturl, $context, $txt;
-
-		$db = database();
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
@@ -1260,15 +1257,7 @@ class ManageAttachments_Controller extends Action_Controller
 				foreach ($new_dirs as $id => $dir)
 				{
 					if ($id != 1)
-						$db->query('', '
-							UPDATE {db_prefix}attachments
-							SET id_folder = {int:default_folder}
-							WHERE id_folder = {int:current_folder}',
-							array(
-								'default_folder' => 1,
-								'current_folder' => $id,
-							)
-						);
+						updateAttachmentIdFolder($id, 1);
 
 					$update = array(
 						'currentAttachmentUploadDir' => 1,
@@ -1608,18 +1597,7 @@ class ManageAttachments_Controller extends Action_Controller
 		if (empty($results))
 		{
 			// Get the total file count for the progress bar.
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}attachments
-				WHERE id_folder = {int:folder_id}
-					AND attachment_type != {int:attachment_type}',
-				array(
-					'folder_id' => $_POST['from'],
-					'attachment_type' => 1,
-				)
-			);
-			list ($total_progress) = $db->fetch_row($request);
-			$db->free_result($request);
+			$total_progress = getFolderAttachmentCount($_POST['from']);
 			$total_progress -= $start;
 
 			if ($total_progress < 1)
@@ -1654,20 +1632,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 				// If limts are set, get the file count and size for the destination folder
 				if ($dir_files <= 0 && (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit'])))
-				{
-					$request = $db->query('', '
-						SELECT COUNT(*), SUM(size)
-						FROM {db_prefix}attachments
-						WHERE id_folder = {int:folder_id}
-							AND attachment_type != {int:attachment_type}',
-						array(
-							'folder_id' => $new_dir,
-							'attachment_type' => 1,
-						)
-					);
-					list ($dir_files, $dir_size) = $db->fetch_row($request);
-					$db->free_result($request);
-				}
+					list ($dir_files, $dir_size) = attachDirProperties($new_dir);
 
 				// Find some attachments to move
 				$request = $db->query('', '
