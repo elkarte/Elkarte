@@ -23,9 +23,9 @@ CREATE TABLE {$db_prefix}admin_info_files (
 INSERT INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, data, filetype)
 VALUES
-	(1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript'),
-	(2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
+	(1, 'current-version.js', 'http://elkarte.github.io/Elkarte/site/', 'version=%3$s', '', 'text/javascript'),
+	(2, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(3, 'latest-news.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
