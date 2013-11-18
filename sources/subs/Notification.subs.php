@@ -28,15 +28,17 @@ function countUserNotifications($all = false, $type = '')
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_notifications
-		WHERE id_member = {int:current_user}' . ($all ? '
-			AND status != {int:is_not_deleted}' : '
-			AND status = {int:is_not_read}') . (empty($type) ? '' : '
+        WHERE id_member = {int:current_user}' . ($all ? '
+            AND status != {int:is_not_deleted}
+            AND status != {int:unapproved}' : '
+            AND status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND notif_type = {string:current_type}'),
 		array(
 			'current_user' => $user_info['id'],
 			'current_type' => $type,
 			'is_not_read' => 0,
 			'is_not_deleted' => 2,
+			'unapproved'	=> 3,
 		)
 	);
 
