@@ -544,34 +544,30 @@ function template_browse()
 
 	// the advanced (emulation) box, collapsed by default
 	echo '
-		<form action="', $scripturl, '?action=admin;area=packages;sa=', $context['sub_action'], '" method="get">
-			<div id="advanced_box" >
-				<h3 class="category_header">
-					<span id="category_toggle">&nbsp;
-						<span id="upshrink_ic" class="', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
-					</span>
-					<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
-				</h3>
-				<div id="advanced_panel_div" class="windowbg"', !empty($context['admin_preferences']['pkg']) ? ' style="display: none;"' : '', '>
-					<div class="content">
-						<p>
-							', $txt['package_emulate_desc'], '
-						</p>
-						<dl class="settings">
-							<dt>
-								<strong>', $txt['package_emulate'], ':</strong><br />
-								<span class="smalltext">
-									<a href="#" onclick="document.getElementById(\'ve\').value = \'', $forum_version, '\';document.getElementsByName(\'version_emulate\')[0].value = \'', $forum_version, '\';return false">', $txt['package_emulate_revert'], '</a>
-								</span>
-							</dt>
-							<dd>
-								<input type="text" name="version_emulate" id="ve" value="', $context['forum_version'], '" size="25" class="input_text" />
-							</dd>
-						</dl>
-						<div class="submitbutton">
-							<input type="submit" value="', $txt['package_apply'], '" class="button_submit" />
-						</div>
-					</div>
+		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=', $context['sub_action'], '" method="get">
+			<h3 class="category_header">
+				<span id="category_toggle">&nbsp;
+					<span id="upshrink_ic" class="', empty($context['admin_preferences']['pkg']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+				</span>
+				<a href="#" id="advanced_panel_link">', $txt['package_advanced_button'], '</a>
+			</h3>
+			<div id="advanced_panel_div" class="windowbg"', !empty($context['admin_preferences']['pkg']) ? ' style="display: none;"' : '', '>
+				<div class="content">
+					<p>
+						', $txt['package_emulate_desc'], '
+					</p>
+					<dl class="settings">
+						<dt>
+							<strong>', $txt['package_emulate'], ':</strong><br />
+							<span class="smalltext">
+								<a href="#" onclick="document.getElementById(\'ve\').value = \'', $forum_version, '\';document.getElementsByName(\'version_emulate\')[0].value = \'', $forum_version, '\';return false">', $txt['package_emulate_revert'], '</a>
+							</span>
+						</dt>
+						<dd>
+							<input type="text" name="version_emulate" id="ve" value="', $context['forum_version'], '" size="25" class="input_text" />
+						</dd>
+					</dl>
+					<input type="submit" value="', $txt['package_apply'], '" class="right_submit" />
 				</div>
 			</div>
 			<input type="hidden" name="action" value="admin" />
