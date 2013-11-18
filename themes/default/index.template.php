@@ -301,12 +301,15 @@ function template_body_above()
 	echo '
 		</div>
 		<div id="header" class="wrapper"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
-			<h1 class="forumtitle">
-				<a href="', $scripturl, '">', empty($context['header_logo_url_html_safe']) ? $context['forum_name'] : '<img src="' . $context['header_logo_url_html_safe'] . '" alt="' . $context['forum_name'] . '" />', '</a>
+			<h1 id="forumtitle', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? 'none' : 'right') : '', '">
+				<a href="', $scripturl, '">', $context['forum_name'], '</a>
 			</h1>';
 
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="logo" src="' . $settings['images_url'] . (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ) . '" alt="ElkArte Community" title="ElkArte Community" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '';
+			<div id="logobox', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? 'center' : 'left') : '', '">
+				<img id="logo" src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name'], '" title="', $context['forum_name'], '" />', empty($settings['site_slogan']) ? '' : '
+				<div id="siteslogan">' . $settings['site_slogan'] . '</div>', '
+			</div>';
 
 	// Show the menu here, according to the menu sub template.
 	echo '
