@@ -8,7 +8,7 @@
 CREATE SEQUENCE {$db_prefix}member_logins_seq;
 ---#
 
----# Creating login history table.
+---# Adding login history...
 CREATE TABLE IF NOT EXISTS {$db_prefix}member_logins (
 	id_login int NOT NULL default nextval('{$db_prefix}member_logins_seq'),
 	id_member int NOT NULL,
@@ -98,7 +98,7 @@ while (!$is_done)
 
 	while ($row = $db->fetch_assoc($request))
 	{
-		// The current folder.
+		// The current folder and name
 		$current_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$row['id_folder']] : $modSettings['attachmentUploadDir'];
 
 		// The old location of the file.
@@ -297,14 +297,28 @@ SET unwatched = 0;
 ---#
 
 /******************************************************************************/
---- Adding support for custom profile fields on memberlist
+--- Adding support for custom profile fields on the memberlist and ordering
 /******************************************************************************/
 ---# Adding new columns to boards...
----{
 ALTER TABLE {$db_prefix}custom_fields
 ADD COLUMN show_memberlist smallint NOT NULL DEFAULT '0',
 ADD COLUMN vieworder smallint NOT NULL default '0';
----}
+---#
+
+/******************************************************************************/
+--- Fixing mail queue for long messages
+/******************************************************************************/
+---# Altering mil_queue table...
+ALTER TABLE {$db_prefix}mail_queue
+CHANGE body body mediumtext NOT NULL;
+---#
+
+/******************************************************************************/
+--- Fixing floodcontrol for long types
+/******************************************************************************/
+---# Altering the floodcontrol table...
+ALTER TABLE {$db_prefix}log_floodcontrol
+CHANGE `log_type` `log_type` varchar(10) NOT NULL DEFAULT 'post';
 ---#
 
 /******************************************************************************/
@@ -319,22 +333,13 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
---- PM_Prefs changes
-/******************************************************************************/
----# Altering the defalut pm layout to conversation
-upgrade_query("
-	ALTER TABLE {$db_prefix}members
-	CHANGE `pm_prefs` `pm_prefs` int NOT NULL default '2'");
----#
-
-/******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating sequence for user_drafts.
 CREATE SEQUENCE {$db_prefix}user_drafts_seq;
 ---#
 
----# Creating drafts table.
+---# Creating draft table
 CREATE TABLE IF NOT EXISTS {$db_prefix}user_drafts (
 	id_draft int default nextval('{$db_prefix}user_drafts_seq'),
 	id_topic int NOT NULL default '0',
@@ -742,7 +747,7 @@ ADD COLUMN filter_order int NOT NULL default '0';
 
 ---# Set the default values so the order is set / maintained
 ---{
-$request = upgrade_query("
+upgrade_query("
 	UPDATE {$db_prefix}postby_emails_filters
 	SET filter_order = id_filter");
 ---}
