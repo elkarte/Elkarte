@@ -5,7 +5,6 @@ global $scripturl, $context;
 
 // profile
 $txt['drafts_show'] = 'Show Drafts';
-$txt['drafts_autosave_enabled'] = 'Enable automatic saving of drafts.';
 $txt['drafts_show_desc'] = 'This area shows all the drafts you currently have saved. From here you can edit them before posting, or you can delete them';
 
 // misc
@@ -21,8 +20,8 @@ $txt['draft_saved_on'] = 'Draft last saved';
 $txt['draft_days_ago'] = '%s days ago';
 $txt['draft_retain'] = 'this will be retained for %s more days';
 $txt['draft_remove'] = 'Remove this draft';
-$txt['draft_saved'] = 'The contents have been saved as a draft, and will be accessible from the <a href="%1$s">Show Drafts area</a> of your profile.';
-$txt['draft_pm_saved'] = 'The contents have been saved as a draft, and will be accessible from the <a href="%1$s">Show Drafts area</a> of your message center.';
+$txt['draft_saved'] = 'The contents have been saved as a draft and will be accessible from the <a href="%1$s">Show Drafts area</a> of your profile.';
+$txt['draft_pm_saved'] = 'The contents have been saved as a draft and will be accessible from the <a href="%1$s">Show Drafts area</a> of your message center.';
 
 // Admin options
 $txt['drafts_autosave_enabled'] = 'Enable automatic saving of drafts';
