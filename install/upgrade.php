@@ -19,8 +19,7 @@
 define('CURRENT_VERSION', '1.0 Alpha');
 define('CURRENT_LANG_VERSION', '1.0');
 
-$GLOBALS['required_php_version'] = '5.1.0';
-$GLOBALS['required_mysql_version'] = '4.1.13';
+define('REQUIRED_PHP_VERSION', '5.1.0');
 
 $databases = array(
 	'mysql' => array(
@@ -254,6 +253,7 @@ else
 	$upcontext['rid'] = mt_rand(0, 5000);
 	$upcontext['upgrade_status'] = array(
 		'curstep' => 0,
+		// memo: .lng files were used by YaBB SE
 		'lang' => isset($_GET['lang']) ? $_GET['lang'] : basename($language, '.lng'),
 		'rid' => $upcontext['rid'],
 		'pass' => 0,
@@ -518,14 +518,6 @@ function initialize_inputs()
 	if (isset($_GET['delete']))
 		deleteUpgrader();
 
-	// Are we calling the backup css file?
-	if (isset($_GET['infile_css']))
-	{
-		header('Content-Type: text/css');
-		template_css();
-		exit;
-	}
-
 	// Something is causing this to happen, and it's annoying.  Stop it.
 	$temp = 'upgrade_php?step';
 	while (strlen($temp) > 4)
@@ -580,7 +572,7 @@ function action_welcomeLogin()
 		return throw_error('The upgrader was unable to find some crucial files.<br /><br />Please make sure you uploaded all of the files included in the package, including the themes, sources, and other directories.');
 
 	// Do they meet the install requirements?
-	if (!php_version_check())
+	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>='))
 		return throw_error('Warning!  You do not appear to have a version of PHP installed on your webserver that meets ElkArte\'s minimum installations requirements.<br /><br />Please ask your host to upgrade.');
 
 	if (!db_version_check())
@@ -1539,17 +1531,6 @@ function updateLastError()
 }
 
 /**
- * Checks the servers php version against our requirements
- */
-function php_version_check()
-{
-	$minver = explode('.', $GLOBALS['required_php_version']);
-	$curver = explode('.', PHP_VERSION);
-
-	return !(($curver[0] <= $minver[0]) && ($curver[1] <= $minver[1]) && ($curver[1] <= $minver[1]) && ($curver[2][0] < $minver[2][0]));
-}
-
-/**
  * Checks the servers database version against our requirements
  */
 function db_version_check()
@@ -2430,7 +2411,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 		}
 	}
 
-	if (!php_version_check())
+	if (version_compare(REQUIRED_PHP_VERSION, PHP_VERSION, '>='))
 		print_error('Error: PHP ' . PHP_VERSION . ' does not match version requirements.', true);
 	if (!db_version_check())
 		print_error('Error: ' . $databases[$db_type]['name'] . ' ' . $databases[$db_type]['version'] . ' does not match minimum requirements.', true);

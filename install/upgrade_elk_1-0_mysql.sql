@@ -57,6 +57,7 @@ $_GET['a'] = isset($_GET['a']) ? (int) $_GET['a'] : 0;
 $step_progress['name'] = 'Converting legacy attachments';
 $step_progress['current'] = $_GET['a'];
 
+// We may be using multiple attachment directories.
 if (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']))
 	$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 
@@ -96,7 +97,7 @@ unset($_GET['a']);
 
 /******************************************************************************/
 --- Adding new indexes to attachments table.
-/*****************************************************************************/
+/******************************************************************************/
 ---# Adding index on id_thumb...
 ALTER TABLE {$db_prefix}attachments
 ADD INDEX id_thumb (id_thumb);
@@ -240,17 +241,6 @@ CHANGE `stars` `icons` varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
---- PM_Prefs changes
-/******************************************************************************/
----# Altering the defalut pm layout to conversation
-ALTER TABLE {$db_prefix}members
-CHANGE `pm_prefs` `pm_prefs` mediumint(8) NOT NULL default '2';
----#
-
-ALTER TABLE {$db_prefix}smileys
-CHANGE COLUMN smileyOrder smileyOrder smallint(5) unsigned NOT NULL default '0';
-
-/******************************************************************************/
 --- Adding support for drafts
 /******************************************************************************/
 ---# Creating draft table
@@ -346,6 +336,7 @@ $request = upgrade_query("
 	WHERE SUBSTRING(variable, 1, 5) = 'cust_'");
 
 // remove the moved rows from themes
+// @TODO this is broken because upgrade_query returns only true or false
 if ($db->num_rows($request) != 0)
 {
 	upgrade_query("
@@ -553,10 +544,8 @@ ADD COLUMN filter_order int(10) NOT NULL default '0';
 ---#
 
 ---# Set the default values so the order is set / maintained
----{
 UPDATE {$db_prefix}postby_emails_filters
 SET filter_order = 'id_filter');
----}
 ---#
 
 ---# Adding new columns to log_activity...
