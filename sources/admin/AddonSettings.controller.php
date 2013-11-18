@@ -43,6 +43,7 @@ class AddonSettings_Controller extends Action_Controller
 
 		$subActions = array(
 			'general' => array($this, 'action_addonSettings_display', 'permission' => 'admin_forum'),
+			// @deprecated: do not rely on this line, use the appropriate hook and tools provided
 			// Mod authors, once again, if you have a whole section to add do it AFTER this line, and keep a comma at the end.
 			// And SET the permission level
 		);
