@@ -652,8 +652,8 @@ class ManageLanguages_Controller extends Action_Controller
 		{
 			if (count($data) != 2)
 				unset($themes[$id]);
-			elseif (is_dir($data['theme_dir'] . '/languages'))
-				$lang_dirs[$id] = $data['theme_dir'] . '/languages';
+			elseif (is_dir($data['theme_dir'] . '/languages/' . $context['lang_id']))
+				$lang_dirs[$id] = $data['theme_dir'] . '/languages/' . $context['lang_id'];
 
 			// How about image directories?
 			if (is_dir($data['theme_dir'] . '/images/' . $context['lang_id']))
@@ -755,7 +755,7 @@ class ManageLanguages_Controller extends Action_Controller
 			validateToken('admin-mlang');
 
 			// Read in the current file.
-			$current_data = implode('', file($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php'));
+			$current_data = implode('', file($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php'));
 			// These are the replacements. old => new
 			$replace_array = array(
 				'~\$txt\[\'lang_character_set\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_character_set\'] = \'' . addslashes($_POST['character_set']) . '\';',
@@ -765,7 +765,7 @@ class ManageLanguages_Controller extends Action_Controller
 				'~\$txt\[\'lang_rtl\'\]\s=\s[A-Za-z0-9]+;~' => '$txt[\'lang_rtl\'] = ' . (!empty($_POST['rtl']) ? 'true' : 'false') . ';',
 			);
 			$current_data = preg_replace(array_keys($replace_array), array_values($replace_array), $current_data);
-			$fp = fopen($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php', 'w+');
+			$fp = fopen($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php', 'w+');
 			fwrite($fp, $current_data);
 			fclose($fp);
 
@@ -774,8 +774,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// Quickly load index language entries.
 		$old_txt = $txt;
-		require($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php');
-		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/index.' . $context['lang_id'] . '.php');
+		require($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
+		$context['lang_file_not_writable_message'] = is_writable($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php') ? '' : sprintf($txt['lang_file_not_writable'], $settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
 		// Setup the primary settings context.
 		$context['primary_settings'] = array(
 			'name' => Util::ucwords(strtr($context['lang_id'], array('_' => ' ', '-utf8' => ''))),
