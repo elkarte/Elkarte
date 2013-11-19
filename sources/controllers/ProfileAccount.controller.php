@@ -81,23 +81,8 @@ class ProfileAccount_Controller extends Action_Controller
 		$context['max_allowed'] = 100;
 		if ($context['warning_limit'] > 0)
 		{
-			// Make sure we cannot go outside of our limit for the day.
-			$request = $db->query('', '
-				SELECT SUM(counter)
-				FROM {db_prefix}log_comments
-				WHERE id_recipient = {int:selected_member}
-					AND id_member = {int:current_member}
-					AND comment_type = {string:warning}
-					AND log_time > {int:day_time_period}',
-				array(
-					'current_member' => $user_info['id'],
-					'selected_member' => $memID,
-					'day_time_period' => time() - 86400,
-					'warning' => 'warning',
-				)
-			);
-			list ($current_applied) = $db->fetch_row($request);
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Moderation.subs.php');
+			$current_applied = warningDailyLimit($memID);
 
 			$context['min_allowed'] = max(0, $cur_profile['warning'] - $current_applied - $context['warning_limit']);
 			$context['max_allowed'] = min(100, $cur_profile['warning'] - $current_applied + $context['warning_limit']);
