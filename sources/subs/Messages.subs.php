@@ -194,6 +194,38 @@ function prepareMessageContext($message)
 		$context['show_approval'] = allowedTo('approve_posts');
 }
 
+
+/**
+ * This function removes all the messages of a certain user that are *not*
+ * first messages of a topic
+ *
+ * @param int The member id
+ */
+function removeNonTopicMessages($memID)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT m.id_msg
+		FROM {db_prefix}messages AS m
+			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic
+				AND t.id_first_msg != m.id_msg)
+		WHERE m.id_member = {int:selected_member}',
+		array(
+			'selected_member' => $memID,
+		)
+	);
+	// This could take a while... but ya know it's gonna be worth it in the end.
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (function_exists('apache_reset_timeout'))
+			@apache_reset_timeout();
+
+		removeMessage($row['id_msg']);
+	}
+	$db->free_result($request);
+}
+
 /**
  * Remove a specific message.
  * !! This includes permission checks.
