@@ -327,6 +327,9 @@ class ProfileAccount_Controller extends Action_Controller
 		// Create the list for viewing.
 		createList($listOptions);
 
+		$warning_for_message = (int) $_REQUEST['msg'];
+		$warned_message_subject = '';
+
 		// Are they warning because of a message?
 		if (isset($_REQUEST['msg']) && 0 < (int) $_REQUEST['msg'])
 		{
@@ -334,37 +337,18 @@ class ProfileAccount_Controller extends Action_Controller
 			$message = basicMessageInfo((int) $_REQUEST['msg']);
 
 			if (!empty($message))
-			{
-				$context['warning_for_message'] = (int) $_REQUEST['msg'];
-				$context['warned_message_subject'] = $message['subject'];
-			}
+				$warned_message_subject = $message['subject'];
 		}
 
-		// Didn't find the message?
-		if (empty($context['warning_for_message']))
-		{
-			$context['warning_for_message'] = 0;
-			$context['warned_message_subject'] = '';
-		}
-
+		require_once(SUBSDIR . '/Maillist.subs.php');
 		// Any custom templates?
 		$context['notification_templates'] = array();
+		$notification_templates = maillist_templates('warntpl');
 
-		$request = $db->query('', '
-			SELECT recipient_name AS template_title, body
-			FROM {db_prefix}log_comments
-			WHERE comment_type = {string:warntpl}
-				AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
-			array(
-				'warntpl' => 'warntpl',
-				'generic' => 0,
-				'current_member' => $user_info['id'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		foreach ($notification_templates as $row)
 		{
 			// If we're not warning for a message skip any that are.
-			if (!$context['warning_for_message'] && strpos($row['body'], '{MESSAGE}') !== false)
+			if (!$warning_for_message && strpos($row['body'], '{MESSAGE}') !== false)
 				continue;
 
 			$context['notification_templates'][] = array(
@@ -372,20 +356,27 @@ class ProfileAccount_Controller extends Action_Controller
 				'body' => $row['body'],
 			);
 		}
-		$db->free_result($request);
 
 		// Setup the "default" templates.
 		foreach (array('spamming', 'offence', 'insulting') as $type)
 		{
 			$context['notification_templates'][] = array(
 				'title' => $txt['profile_warning_notify_title_' . $type],
-				'body' => sprintf($txt['profile_warning_notify_template_outline' . (!empty($context['warning_for_message']) ? '_post' : '')], $txt['profile_warning_notify_for_' . $type]),
+				'body' => sprintf($txt['profile_warning_notify_template_outline' . (!empty($warning_for_message) ? '_post' : '')], $txt['profile_warning_notify_for_' . $type]),
 			);
 		}
 
 		// Replace all the common variables in the templates.
 		foreach ($context['notification_templates'] as $k => $name)
-			$context['notification_templates'][$k]['body'] = strtr($name['body'], array('{MEMBER}' => un_htmlspecialchars($context['member']['name']), '{MESSAGE}' => '[url=' . $scripturl . '?msg=' . $context['warning_for_message'] . ']' . un_htmlspecialchars($context['warned_message_subject']) . '[/url]', '{SCRIPTURL}' => $scripturl, '{FORUMNAME}' => $mbname, '{REGARDS}' => $txt['regards_team']));
+			$context['notification_templates'][$k]['body'] = strtr($name['body'],
+				array(
+					'{MEMBER}' => un_htmlspecialchars($context['member']['name']),
+					'{MESSAGE}' => '[url=' . $scripturl . '?msg=' . $warning_for_message . ']' . un_htmlspecialchars($warned_message_subject) . '[/url]',
+					'{SCRIPTURL}' => $scripturl,
+					'{FORUMNAME}' => $mbname,
+					'{REGARDS}' => $txt['regards_team']
+				)
+			);
 	}
 
 	/**
