@@ -28,7 +28,7 @@ $txt['whoall_activate'] = 'Activating their account.';
 $txt['whoall_buddy'] = 'Modifying their buddy list.';
 $txt['whoall_coppa'] = 'Filling out parent/guardian consent form.';
 $txt['whoall_credits'] = 'Viewing credits page.';
-$txt['whoall_emailuser'] = 'Sending email to another member.';
+$txt['whoall_emailuser'] = 'Sending e-mail to another member.';
 $txt['whoall_groups'] = 'Viewing the member groups page.';
 $txt['whoall_help'] = 'Viewing the <a href="' . $scripturl . '?action=help">help page</a>.';
 $txt['whoall_quickhelp'] = 'Viewing a help popup.';
@@ -102,16 +102,16 @@ $txt['whoallow_ban'] = 'Editing the ban list.';
 $txt['whoallow_boardrecount'] = 'Recounting the forum totals.';
 $txt['whoallow_calendar'] = 'Viewing the <a href="' . $scripturl . '?action=calendar">calendar</a>.';
 $txt['whoallow_editnews'] = 'Editing the news.';
-$txt['whoallow_mailing'] = 'Sending a forum email.';
+$txt['whoallow_mailing'] = 'Sending a forum e-mail.';
 $txt['whoallow_maintain'] = 'Performing routine forum maintenance.';
 $txt['whoallow_manageattachments'] = 'Managing the attachments.';
 $txt['whoallow_moderate'] = 'Viewing the <a href="' . $scripturl . '?action=moderate">Moderation Center</a>.';
-$txt['whoallow_memberlist'] = 'Viewing the <a href="' . $scripturl . '?action=memberlist">memberlist</a>.';
+$txt['whoallow_memberlist'] = 'Viewing the <a href="' . $scripturl . '?action=memberlist">member list</a>.';
 $txt['whoallow_optimizetables'] = 'Optimizing the database tables.';
 $txt['whoallow_repairboards'] = 'Repairing the database tables.';
 $txt['whoallow_search'] = '<a href="' . $scripturl . '?action=search">Searching</a> the forum.';
 $txt['whoallow_search2'] = 'Viewing the results of a search.';
-$txt['whoallow_setcensor'] = 'Editing the censor text.';
+$txt['whoallow_setcensor'] = 'Editing the word censorship.';
 $txt['whoallow_setreserve'] = 'Editing the reserved names.';
 $txt['whoallow_stats'] = 'Viewing the <a href="' . $scripturl . '?action=stats">forum stats</a>.';
 $txt['whoallow_viewErrorLog'] = 'Viewing the error log.';
@@ -125,9 +125,9 @@ $txt['who_profile'] = 'Editing the profile of <a href="' . $scripturl . '?action
 $txt['who_post'] = 'Posting a new topic in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
 $txt['who_poll'] = 'Posting a new poll in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
 
-$txt['whotopic_topicbyemail'] = 'Email starting a new topic in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
-$txt['whotopic_postbyemail'] = 'Email posting in <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
-$txt['who_pm_byemail'] = 'Sending a personal message by email.';
+$txt['whotopic_topicbyemail'] = 'E-mail starting a new topic in <a href="' . $scripturl . '?board=%1$d.0">%2$s</a>.';
+$txt['whotopic_postbyemail'] = 'E-mail posting in <a href="' . $scripturl . '?topic=%1$d.0">%2$s</a>.';
+$txt['who_pm_byemail'] = 'Sending a personal message by e-mail.';
 
 // Credits text
 $txt['credits'] = 'Credits';

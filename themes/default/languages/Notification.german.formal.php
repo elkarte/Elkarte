@@ -19,12 +19,15 @@ $txt['notification_markunread'] = 'Als ungelesen markieren';
 
 $txt['notification_settings'] = 'Benachrichtigungseinstellungen';
 $txt['notifications_enabled'] = 'Seitenbenachrichtigungen aktivieren';
+$txt['notifications_buddy'] = 'Mitglieder benachrichtigen, die zu Freundeslisten hinzugefügt werden';
 
 $txt['notification_men'] = 'Hat Sie in der Nachricht {msg_link} erwähnt';
 $txt['notification_like'] = 'Gefällt Ihre Nachricht {msg_link}';
 $txt['notification_rlike'] = 'Gefällt Ihre Nachricht {msg_link} nicht mehr';
+$txt['notification_buddy'] = 'Hat Sie zu seiner Freundesliste hinzugefügt.';
 
 $txt['notification_type_all'] = 'Alle Benachrichtigungen';
 $txt['notification_type_men'] = 'Erwähnungen';
 $txt['notification_type_like'] = 'Gefällt mir';
 $txt['notification_type_rlike'] = 'Gefällt mir nicht mehr';
+$txt['notification_type_buddy'] = 'Freund';
