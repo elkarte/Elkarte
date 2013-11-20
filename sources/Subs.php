@@ -3057,9 +3057,6 @@ function template_footer()
  *
  * @param bool $do_defered = false
  *
- * @todo - Note that type="text/javascript" and type="text/css" are deprecated in HTML5.
- * @todo - There are several occurrences in this function, and the next one.
- * @todo - Full directory search for any strays should be done, then hit the lot of them.
  */
 function template_javascript($do_defered = false)
 {
@@ -3072,23 +3069,23 @@ function template_javascript($do_defered = false)
 		{
 			case 'cdn':
 				echo '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'local':
 				echo '
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
+	<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'auto':
 				echo '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js"><\/script>\');',
 		(!empty($modSettings['jquery_include_ui']) ? '
 		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js"><\/script>\')' : ''), '
@@ -3111,7 +3108,7 @@ function template_javascript($do_defered = false)
 
 			if (!empty($combine_name))
 				echo '
-	<script type="text/javascript" src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
+	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		}
 		else
 		{
@@ -3120,7 +3117,7 @@ function template_javascript($do_defered = false)
 			{
 				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
 					echo '
-	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
 			}
 		}
 	}
@@ -3129,7 +3126,7 @@ function template_javascript($do_defered = false)
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{
 		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 		$output = array();
 		foreach ($context['javascript_vars'] as $key => $value)
@@ -3148,7 +3145,7 @@ function template_javascript($do_defered = false)
 		if (!empty($context['javascript_inline']['defer']) && $do_defered)
 		{
 			echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 			foreach ($context['javascript_inline']['defer'] as $js_code)
 				echo $js_code;
@@ -3160,7 +3157,7 @@ function template_javascript($do_defered = false)
 		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
 		{
 			echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 			foreach ($context['javascript_inline']['standard'] as $js_code)
 				echo $js_code;
@@ -3192,13 +3189,13 @@ function template_css()
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))
 				echo '
-	<link rel="stylesheet" type="text/css" href="', $combine_name, '" id="csscombined" />';
+	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
 		}
 		else
 		{
 			foreach ($context['css_files'] as $id => $file)
 				echo '
-	<link rel="stylesheet" type="text/css" href="', $file['filename'], '" id="', $id,'" />';
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
 		}
 	}
 }
