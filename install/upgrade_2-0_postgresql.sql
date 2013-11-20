@@ -22,7 +22,7 @@ CREATE TABLE {$db_prefix}openid_assoc (
 
 ---# Adding search ability to custom fields.
 ---{
-if ($smcFunc['db_server_info'] < 8.0)
+if ($db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}custom_fields
@@ -95,7 +95,7 @@ SET show_profile='forumprofile' WHERE show_profile='forumProfile';
 
 ---# Implementing board redirects.
 ---{
-if ($db_type == 'postgresql' && $smcFunc['db_server_info'] < 8.0)
+if ($db_type == 'postgresql' && $db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}boards
@@ -210,10 +210,10 @@ if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] <= '2.0 Beta
 		SELECT value
 		FROM {$db_prefix}settings
 		WHERE variable = 'cache_enable'");
-	list ($cache_enable) = $smcFunc['db_fetch_row']($request);
+	list ($cache_enable) = $db->fetch_row($request);
 
 	// No cache before
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		upgrade_query("
 			INSERT INTO {$db_prefix}settings
 				(variable, value)
@@ -230,7 +230,7 @@ if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] <= '2.0 Beta
 ---# Ensuring forum width setting present...
 ---{
 // Don't do this twice!
-$smcFunc['db_insert']('ignore',
+$db->insert('ignore',
 	'{db_prefix}themes',
 	array('id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-255'),
 	array(1, 'forum_width', '90%'),
@@ -262,7 +262,7 @@ CREATE INDEX {$db_prefix}log_online_id_member ON {$db_prefix}log_online (id_memb
 
 ---# Adding guest voting - part 1...
 ---{
-if ($smcFunc['db_server_info'] < 8.0)
+if ($db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}polls
@@ -300,7 +300,7 @@ CREATE INDEX {$db_prefix}log_polls_id_poll ON {$db_prefix}log_polls (id_poll, id
 
 ---# Adding admin log...
 ---{
-if ($db_type == 'postgresql' && $smcFunc['db_server_info'] < 8.0)
+if ($db_type == 'postgresql' && $db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}log_actions
@@ -329,7 +329,7 @@ else
 
 ---# Adding search ability to custom fields.
 ---{
-if ($smcFunc['db_server_info'] < 8.0)
+if ($db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}members
@@ -391,7 +391,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('pruningOptions', '30
 
 ---# Adding private to mail queue...
 ---{
-if ($smcFunc['db_server_info'] < 8.0)
+if ($db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}mail_queue
@@ -424,7 +424,7 @@ else
 
 ---# Adding multiple attachment path functionality.
 ---{
-if ($smcFunc['db_server_info'] < 8.0)
+if ($db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}attachments
@@ -465,7 +465,7 @@ else
 
 ---# Adding restore topic from recycle feature...
 ---{
-if ($db_type == 'postgresql' && $smcFunc['db_server_info'] < 8.0)
+if ($db_type == 'postgresql' && $db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}topics
@@ -645,7 +645,7 @@ ALTER COLUMN field_options TYPE text;
 
 ---# Adding reset poll timestamp and guest voters counter.
 ---{
-if ($smcFunc['db_server_info'] < 8.0)
+if ($db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}polls
@@ -703,7 +703,7 @@ $request = upgrade_query("
 		AND p.num_guest_voters = 0
 	GROUP BY p.id_poll");
 
-while ($request && $row = $smcFunc['db_fetch_assoc']($request))
+while ($request && $row = $db->fetch_assoc($request))
 	upgrade_query("
 		UPDATE {$db_prefix}polls
 		SET num_guest_voters = ". $row['guest_voters']. "
@@ -751,7 +751,7 @@ ALTER COLUMN ip TYPE int8;
 
 ---# Removing index on hits...
 ---{
-$smcFunc['db_remove_index']($db_prefix . 'log_activity', $db_prefix . 'log_activity_hits');
+$db->db_remove_index($db_prefix . 'log_activity', $db_prefix . 'log_activity_hits');
 ---}
 ---#
 
@@ -786,7 +786,7 @@ if (empty($modSettings['dont_repeat_buddylists']))
 		WHERE pm_ignore_list = '*'");
 
 	// Enable buddy and ignore lists.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('enable_buddylist', '1'),
@@ -794,7 +794,7 @@ if (empty($modSettings['dont_repeat_buddylists']))
 	);
 
 	// Ignore posts made by ignored users by default, too.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}themes',
 		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-255'),
 		array(-1, 1, 'posts_apply_ignore_list', '1'),
@@ -802,7 +802,7 @@ if (empty($modSettings['dont_repeat_buddylists']))
 	);
 
 	// Make sure not to skip this step next time we run this.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('dont_repeat_buddylists', '1'),
@@ -816,7 +816,7 @@ if (!empty($modSettings['dont_repeat_buddylists']) && !isset($modSettings['enabl
 	// Correct RC3 adopters setting here...
 	if (isset($modSettings['enable_buddylists']))
 	{
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string-255', 'value' => 'string-255'),
 			array('enable_buddylist', $modSettings['enable_buddylists']),
@@ -826,7 +826,7 @@ if (!empty($modSettings['dont_repeat_buddylists']) && !isset($modSettings['enabl
 	else
 	{
 		// This should never happen :)
-		$smcFunc['db_insert']('replace',
+		$db->insert('replace',
 			'{db_prefix}settings',
 			array('variable' => 'string-255', 'value' => 'string-255'),
 			array('enable_buddylist', '1'),
@@ -849,7 +849,7 @@ if (!empty($modSettings['dont_repeat_buddylists']) && !isset($modSettings['enabl
 if (!isset($modSettings['attachment_image_reencode']))
 {
 	// Enable image re-encoding by default.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('attachment_image_reencode', '1'),
@@ -859,7 +859,7 @@ if (!isset($modSettings['attachment_image_reencode']))
 if (!isset($modSettings['attachment_image_paranoid']))
 {
 	// Disable draconic checks by default.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('attachment_image_paranoid', '0'),
@@ -869,7 +869,7 @@ if (!isset($modSettings['attachment_image_paranoid']))
 if (!isset($modSettings['avatar_reencode']))
 {
 	// Enable image re-encoding by default.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('avatar_reencode', '1'),
@@ -879,7 +879,7 @@ if (!isset($modSettings['avatar_reencode']))
 if (!isset($modSettings['avatar_paranoid']))
 {
 	// Disable draconic checks by default.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('avatar_paranoid', '0'),
@@ -894,7 +894,7 @@ if (!isset($modSettings['avatar_paranoid']))
 if (!isset($modSettings['attachment_thumb_png']))
 {
 	// Make image attachment thumbnail as PNG by default.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('attachment_thumb_png', '1'),
@@ -922,7 +922,7 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 		WHERE variable = 'theme_dir'
 			AND value LIKE '%core'");
 	// Only do the upgrade if it doesn't find the theme already.
-	if ($smcFunc['db_num_rows']($theme_request) == 0)
+	if ($db->num_rows($theme_request) == 0)
 	{
 		// Try to get some settings from the current default theme.
 		$request = upgrade_query("
@@ -938,9 +938,9 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 				AND t3.id_member = 0
 				AND t3.variable = 'images_url'
 			LIMIT 1");
-		if ($smcFunc['db_num_rows']($request) != 0)
+		if ($db->num_rows($request) != 0)
 		{
-			$curve = $smcFunc['db_fetch_assoc']($request);
+			$curve = $db->fetch_assoc($request);
 
 			if (substr_count($curve['theme_dir'], 'default') === 1)
 				$core['theme_dir'] = strtr($curve['theme_dir'], array('default' => 'core'));
@@ -949,7 +949,7 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 			if (substr_count($curve['images_url'], 'default') === 1)
 				$core['images_url'] = strtr($curve['images_url'], array('default' => 'core'));
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 
 		if (!isset($core['theme_dir']))
 			$core['theme_dir'] = addslashes($GLOBALS['boarddir']) . '/themes/core';
@@ -962,11 +962,11 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 		$request = upgrade_query("
 			SELECT MAX(id_theme) + 1
 			FROM {$db_prefix}themes");
-		list ($id_core_theme) = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
+		list ($id_core_theme) = $db->fetch_row($request);
+		$db->free_result($request);
 
 		// Insert the core theme into the tables.
-		$smcFunc['db_insert']('ignore',
+		$db->insert('ignore',
 			'{db_prefix}themes',
 				array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-255'),
 				array(
@@ -975,7 +975,7 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 					array(0, $id_core_theme, 'images_url', $core['images_url']),
 					array(0, $id_core_theme, 'theme_dir', $core['theme_dir'])
 				),
-				array()
+				array('id_member', 'id_theme', 'variable', 'value')
 		);
 
 		// Update the name of the default theme in the database.
@@ -1000,7 +1000,7 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 				SELECT DISTINCT id_theme
 				FROM {$db_prefix}themes");
 			$themes = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$themes[] = $row['id_theme'];
 			$modSettings['knownThemes'] = implode(',', $themes);
 			upgrade_query("
@@ -1049,9 +1049,9 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 				SELECT DISTINCT id_theme
 				FROM {$db_prefix}themes
 				WHERE variable = 'base_theme_dir'");
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 				$coreBasedThemes = array_diff($coreBasedThemes, array($row['id_theme']));
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			// Only base themes if there are templates that need a fall-back.
 			$insertRows = array();
@@ -1061,7 +1061,7 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 				WHERE id_theme IN (" . implode(', ', $coreBasedThemes) . ")
 					AND id_member = 0
 					AND variable = 'theme_dir'");
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				if (!file_exists($row['theme_dir'] . '/BoardIndex.template.php') || !file_exists($row['theme_dir'] . '/Display.template.php') || !file_exists($row['theme_dir'] . '/index.template.php') || !file_exists($row['theme_dir'] . '/MessageIndex.template.php') || !file_exists($row['theme_dir'] . '/Settings.template.php'))
 				{
@@ -1069,7 +1069,7 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 					$insertRows[] = "(0, $row[id_theme], 'base_theme_url', '" . addslashes($core['theme_url']) . "')";
 				}
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			if (!empty($insertRows))
 				upgrade_query("
@@ -1080,10 +1080,10 @@ if ((!isset($modSettings['smfVersion']) || $modSettings['smfVersion'] <= '2.0 RC
 						', $insertRows));
 		}
 	}
-	$smcFunc['db_free_result']($theme_request);
+	$db->free_result($theme_request);
 
 	// This ain't running twice either - not with the risk of log_tables timing us all out!
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('dont_repeat_theme_core', '1'),
@@ -1116,7 +1116,7 @@ if (empty($modSettings['installed_new_smiley_sets_20']))
 		WHERE variable = 'smiley_sets_names'");
 
 	// This ain't running twice either.
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('installed_new_smiley_sets_20', '1'),
@@ -1132,7 +1132,7 @@ if (empty($modSettings['installed_new_smiley_sets_20']))
 
 ---# Adding instr()
 ---{
-if ($smcFunc['db_server_info'] < 8.2)
+if ($db->db_server_info() < 8.2)
 {
 	$request = upgrade_query("
 		SELECT type_udt_name
@@ -1141,7 +1141,7 @@ if ($smcFunc['db_server_info'] < 8.2)
 	");
 
 	// Assume there's only one such function called inet_aton()
-	$return_type = $smcFunc['db_fetch_assoc']($request);
+	$return_type = $db->fetch_assoc($request);
 
 	// No point in dropping and recreating it if it's already what we want
 	if ($return_type['type_udt_name'] != 'int4')
@@ -1203,7 +1203,7 @@ LANGUAGE 'sql';
 ---# Creating operator bool_not_eq_int()
 ---{
 $result = upgrade_query("SELECT oprname FROM pg_operator WHERE oprcode='bool_not_eq_int'::regproc");
-if($smcFunc['db_num_rows']($result) == 0)
+if ($db->num_rows($result) == 0)
 {
 	upgrade_query("
 		CREATE OPERATOR != (PROCEDURE = bool_not_eq_int, LEFTARG = boolean, RIGHTARG = integer)");
@@ -1213,16 +1213,16 @@ if($smcFunc['db_num_rows']($result) == 0)
 
 ---# Recreating function FIND_IN_SET()
 ---{
-if ($smcFunc['db_server_info'] < 8.2)
+if ($db->db_server_info() < 8.2)
 {
 	$query = upgrade_query("SELECT * FROM pg_proc WHERE proname = 'find_in_set' AND proargtypes = '25 25'");
-	if ($smcFunc['db_num_rows']($query) != 0)
+	if ($db->num_rows($query) != 0)
 	{
 		upgrade_query("DROP FUNCTION FIND_IN_SET(text, text)");
 	}
 
 	$query = upgrade_query("SELECT * FROM pg_proc WHERE proname = 'find_in_set' AND proargtypes = '23 1043'");
-	if ($smcFunc['db_num_rows']($query) != 0)
+	if ($db->num_rows($query) != 0)
 	{
 		upgrade_query("DROP FUNCTION FIND_IN_SET(integer, character varying)");
 	}
@@ -1271,7 +1271,7 @@ LANGUAGE 'sql';
 
 ---# Adding email address and member ip columns...
 ---{
-if ($smcFunc['db_server_info'] < 8.0)
+if ($db->db_server_info() < 8.0)
 {
 	upgrade_query("
 		ALTER TABLE {$db_prefix}log_reported_comments
@@ -1330,8 +1330,8 @@ $request = upgrade_query("
 	FROM {$db_prefix}membergroups
 	WHERE id_group = 1
 	LIMIT 1");
-list ($admin_group_type) = pg_fetch_row($request);
-pg_free_result($request);
+list ($admin_group_type) = $db->num_rows($request);
+$db->free_result($request);
 
 // Not protected means we haven't updated yet!
 if ($admin_group_type != 1)
@@ -1359,7 +1359,7 @@ WHERE id_group = 1;
 ---{
 if (!isset($modSettings['cal_maxyear']) || $modSettings['cal_maxyear'] == '2010')
 {
-	$smcFunc['db_insert']('replace',
+	$db->insert('replace',
 		'{db_prefix}settings',
 		array('variable' => 'string-255', 'value' => 'string-255'),
 		array('cal_maxyear', '2020'),

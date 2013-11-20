@@ -80,127 +80,185 @@ class ModerationCenter_Controller extends Action_Controller
 		$mod_counts = loadModeratorMenuCounts();
 
 		// This is the menu structure - refer to subs/Menu.subs.php for the details.
-		$moderation_areas = array(
-			'main' => array(
-				'title' => $txt['mc_main'],
-				'areas' => array(
-					'index' => array(
-						'label' => $txt['moderation_center'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_moderationHome',
-					),
-					'settings' => array(
-						'label' => $txt['mc_settings'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_moderationSettings',
-					),
-					'modlogoff' => array(
-						'label' => $txt['mc_logoff'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_modEndSession',
-						'enabled' => empty($modSettings['securityDisable_moderate']),
-					),
-					'notice' => array(
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_showNotice',
-						'select' => 'index'
+		$allMenus = Standard_Menu::context();
+		$moderation_menu = $allMenus->get('Moderation_Menu');
+
+		// Our top level menu
+		$moderation_menu->addBulk(
+			array(
+				'main' => array(
+					'title' => $txt['mc_main'],
+				),
+				'logs' => array(
+					'title' => $txt['mc_logs'],
+				),
+				'posts' => array(
+					'title' => $txt['mc_posts'] . (!empty($mod_counts['pt_total']) ? ' [' . $mod_counts['pt_total'] . ']' : ''),
+					'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
+				),
+				'groups' => array(
+					'title' => $txt['mc_groups'] . (!empty($mod_counts['mg_total']) ? ' [' . $mod_counts['mg_total'] . ']' : ''),
+					'enabled' => $context['can_moderate_groups'],
+				),
+			)
+		);
+
+		// All the items available under the main button
+		$moderation_menu->childOf('main')->add('main_areas')->addBulk(
+			array(
+				'index' => array(
+					'label' => $txt['moderation_center'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_moderationHome',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_home',
+				),
+				'settings' => array(
+					'label' => $txt['mc_settings'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_moderationSettings',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_features',
+				),
+				'modlogoff' => array(
+					'label' => $txt['mc_logoff'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_modEndSession',
+					'enabled' => empty($modSettings['securityDisable_moderate']),
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_exit',
+				),
+				'notice' => array(
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_showNotice',
+					'select' => 'index',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_news',
+				),
+			)
+		);
+
+		// All the items available under the logs button
+		$moderation_menu->childOf('logs')->add('logs_areas')->addBulk(
+			array(
+				'modlog' => array(
+					'label' => $txt['modlog_view'],
+					'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
+					'file' => 'admin/Modlog.controller.php',
+					'controller' => 'Modlog_Controller',
+					'function' => 'action_log',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_logs',
+				),
+				'warnings' => array(
+					'label' => $txt['mc_warnings'],
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_viewWarnings',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_reports',
+					'subsections' => array(
+						'log' => array($txt['mc_warning_log']),
+						'templates' => array($txt['mc_warning_templates'], 'issue_warning'),
 					),
 				),
-			),
-			'logs' => array(
-				'title' => $txt['mc_logs'],
-				'areas' => array(
-					'modlog' => array(
-						'label' => $txt['modlog_view'],
-						'enabled' => !empty($modSettings['modlog_enabled']) && $context['can_moderate_boards'],
-						'file' => 'admin/Modlog.controller.php',
-						'controller' => 'Modlog_Controller',
-						'function' => 'action_log',
-					),
-					'warnings' => array(
-						'label' => $txt['mc_warnings'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_viewWarnings',
-						'subsections' => array(
-							'log' => array($txt['mc_warning_log']),
-							'templates' => array($txt['mc_warning_templates'], 'issue_warning'),
-						),
+			)
+		);
+
+		// All the items available under the posts button
+		$moderation_menu->childOf('posts')->add('posts_areas')->addBulk(
+			array(
+				'postmod' => array(
+					'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
+					'enabled' => $context['can_moderate_approvals'],
+					'file' => 'controllers/PostModeration.controller.php',
+					'controller' => 'PostModeration_Controller',
+					'function' => 'action_index',
+					'custom_url' => $scripturl . '?action=moderate;area=postmod',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_posts',
+					'subsections' => array(
+						'posts' => array($txt['mc_unapproved_replies']),
+						'topics' => array($txt['mc_unapproved_topics']),
 					),
 				),
-			),
-			'posts' => array(
-				'title' => $txt['mc_posts'] . (!empty($mod_counts['total']) ? ' [' . $mod_counts['total'] . ']' : ''),
-				'enabled' => $context['can_moderate_boards'] || $context['can_moderate_approvals'],
-				'areas' => array(
-					'postmod' => array(
-						'label' => $txt['mc_unapproved_posts'] . (!empty($mod_counts['postmod']) ? ' [' . $mod_counts['postmod'] . ']' : ''),
-						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'controllers/PostModeration.controller.php',
-						'controller' => 'PostModeration_Controller',
-						'function' => 'action_index',
-						'custom_url' => $scripturl . '?action=moderate;area=postmod',
-						'subsections' => array(
-							'posts' => array($txt['mc_unapproved_replies']),
-							'topics' => array($txt['mc_unapproved_topics']),
-						),
-					),
-					'emailmod' => array(
-						'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
-						'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
-						'file' => 'admin/ManageMaillist.controller.php',
-						'function' => 'UnapprovedEmails',
-						'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
-					),
-					'attachmod' => array(
-						'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
-						'enabled' => $context['can_moderate_approvals'],
-						'file' => 'controllers/PostModeration.controller.php',
-						'controller' => 'PostModeration_Controller',
-						'function' => 'action_index',
-						'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
-					),
-					'reports' => array(
-						'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
-						'enabled' => $context['can_moderate_boards'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_reportedPosts',
-						'subsections' => array(
-							'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
-							'closed' => array($txt['mc_reportedp_closed']),
-						),
+				'emailmod' => array(
+					'label' => $txt['mc_emailerror'] . (!empty($mod_counts['emailmod']) ? ' [' . $mod_counts['emailmod'] . ']' : ''),
+					'enabled' => !empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'),
+					'file' => 'admin/ManageMaillist.controller.php',
+					'function' => 'UnapprovedEmails',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_mail',
+					'custom_url' => $scripturl . '?action=admin;area=maillist;sa=emaillist',
+				),
+				'attachmod' => array(
+					'label' => $txt['mc_unapproved_attachments'] . (!empty($mod_counts['attachments']) ? ' [' . $mod_counts['attachments'] . ']' : ''),
+					'enabled' => $context['can_moderate_approvals'],
+					'file' => 'controllers/PostModeration.controller.php',
+					'controller' => 'PostModeration_Controller',
+					'function' => 'action_index',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_attachment',
+					'custom_url' => $scripturl . '?action=moderate;area=attachmod;sa=attachments',
+				),
+				'reports' => array(
+					'label' => $txt['mc_reported_posts'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : ''),
+					'enabled' => $context['can_moderate_boards'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_reportedPosts',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_reports',
+					'subsections' => array(
+						'open' => array($txt['mc_reportedp_active'] . (!empty($mod_counts['reports']) ? ' [' . $mod_counts['reports'] . ']' : '')),
+						'closed' => array($txt['mc_reportedp_closed']),
 					),
 				),
-			),
-			'groups' => array(
-				'title' => $txt['mc_groups'],
-				'enabled' => $context['can_moderate_groups'],
-				'areas' => array(
-					'userwatch' => array(
-						'label' => $txt['mc_watched_users_title'],
-						'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
-						'controller' => 'ModerationCenter_Controller',
-						'function' => 'action_viewWatchedUsers',
-						'subsections' => array(
-							'member' => array($txt['mc_watched_users_member']),
-							'post' => array($txt['mc_watched_users_post']),
-						),
-					),
-					'groups' => array(
-						'label' => $txt['mc_group_requests'],
-						'file' => 'controllers/Groups.controller.php',
-						'controller' => 'Groups_Controller',
-						'function' => 'action_requests',
-						'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
-					),
-					'viewgroups' => array(
-						'label' => $txt['mc_view_groups'],
-						'file' => 'controllers/Groups.controller.php',
-						'controller' => 'Groups_Controller',
-						'function' => 'action_list',
+			)
+		);
+
+		// All the items available under the groups button
+		$moderation_menu->childOf('groups')->add('groups_areas')->addBulk(
+			array(
+				'userwatch' => array(
+					'label' => $txt['mc_watched_users_title'],
+					'enabled' => in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']) && $context['can_moderate_boards'],
+					'controller' => 'ModerationCenter_Controller',
+					'function' => 'action_viewWatchedUsers',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_permissions',
+					'subsections' => array(
+						'member' => array($txt['mc_watched_users_member']),
+						'post' => array($txt['mc_watched_users_post']),
 					),
 				),
-			),
+				'groups' => array(
+					'label' => $txt['mc_group_requests'] . (!empty($mod_counts['groupreq']) ? ' [' . $mod_counts['groupreq'] . ']' : ''),
+					'file' => 'controllers/Groups.controller.php',
+					'controller' => 'Groups_Controller',
+					'function' => 'action_requests',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_regcenter',
+					'custom_url' => $scripturl . '?action=moderate;area=groups;sa=requests',
+				),
+				'members' => array(
+					'enabled' => allowedTo('moderate_forum'),
+					'label' => $txt['mc_member_requests'] . (!empty($mod_counts['memberreq']) ? ' [' . $mod_counts['memberreq'] . ']' : ''),
+					'file' => 'controllers/ManageMembers.controller.php',
+					'controller' => 'ManageMembers_Controller',
+					'function' => 'action_approve',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_members',
+					'custom_url' => $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve',
+				),
+				'viewgroups' => array(
+					'label' => $txt['mc_view_groups'],
+					'file' => 'controllers/Groups.controller.php',
+					'controller' => 'Groups_Controller',
+					'function' => 'action_list',
+					'icon' => 'transparent.png',
+					'class' => 'admin_img_membergroups',
+				),
+			)
 		);
 
 		// Make sure the administrator has a valid session...
@@ -212,8 +270,8 @@ class ModerationCenter_Controller extends Action_Controller
 			'disable_url_session_check' => true,
 		);
 
-		$mod_include_data = createMenu($moderation_areas, $menuOptions);
-		unset($moderation_areas);
+		$mod_include_data = $allMenus->createMenu('Moderation_Menu', $menuOptions);
+		$allMenus->destroy('Moderation_Menu');
 
 		// We got something - didn't we? DIDN'T WE!
 		if ($mod_include_data == false)
@@ -222,15 +280,10 @@ class ModerationCenter_Controller extends Action_Controller
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
 		$context['moderation_menu_name'] = 'menu_data_' . $context['moderation_menu_id'];
-
-		// @todo: html in here is not good
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
 			'title' => $txt['moderation_center'],
 			'help' => '',
-			'description' => '
-				<strong>' . $txt['hello_guest'] . ' ' . $context['user']['name'] . '!</strong>
-				<br /><br />
-				' . $txt['mc_description']);
+			'description' => sprintf($txt['mc_description'], $txt['hello_guest'], $context['user']['name']));
 
 		// What a pleasant shortcut - even tho we're not *really* on the admin screen who cares...
 		$context['admin_area'] = $mod_include_data['current_area'];
@@ -271,22 +324,24 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['sub_template'] = 'moderation_center';
 
 		// Load what blocks the user actually can see...
-		$valid_blocks = array(
-			'n' => 'latestNews',
-			'p' => 'notes',
-		);
+		$valid_blocks['p'] = 'notes';
+
+		if ($context['can_moderate_boards'])
+		{
+			$valid_blocks['a'] = 'actionRequired';
+			$valid_blocks['r'] = 'reportedPosts';
+		}
 
 		if ($context['can_moderate_groups'])
 			$valid_blocks['g'] = 'groupRequests';
 
 		if ($context['can_moderate_boards'])
-		{
-			$valid_blocks['r'] = 'reportedPosts';
 			$valid_blocks['w'] = 'watchedUsers';
-		}
+
+		$valid_blocks['n'] = 'latestNews';
 
 		if (empty($user_settings['mod_prefs']))
-			$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wr' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+			$user_blocks = 'n' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 		else
 			list (, $user_blocks) = explode('|', $user_settings['mod_prefs']);
 
@@ -298,6 +353,7 @@ class ModerationCenter_Controller extends Action_Controller
 			if (in_array($k, $user_blocks))
 			{
 				$block = 'block_' . $block;
+
 				if (method_exists($this, $block))
 					$context['mod_blocks'][] = $this->{$block}();
 			}
@@ -313,11 +369,7 @@ class ModerationCenter_Controller extends Action_Controller
 		unset($_SESSION['moderate_time']);
 
 		// Clean any moderator tokens as well.
-		foreach ($_SESSION['token'] as $key => $token)
-		{
-			if (strpos($key, '-mod') !== false)
-				unset($_SESSION['token'][$key]);
-		}
+		cleanTokens(false, '-mod');
 
 		redirectexit('action=moderate');
 	}
@@ -328,8 +380,6 @@ class ModerationCenter_Controller extends Action_Controller
 	public function action_showNotice()
 	{
 		global $txt, $context;
-
-		$db = database();
 
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
@@ -343,7 +393,6 @@ class ModerationCenter_Controller extends Action_Controller
 		if (empty($notice))
 			fatal_lang_error('no_access', false);
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
-		$db->free_result($request);
 
 		$context['notice_body'] = parse_bbc($context['notice_body'], false);
 	}
@@ -356,9 +405,8 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		$db = database();
-
 		loadTemplate('ModerationCenter');
+		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Put the open and closed options into tabs, because we can...
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -389,20 +437,12 @@ class ModerationCenter_Controller extends Action_Controller
 			$_GET['rid'] = (int) $_GET['rid'];
 
 			// Update the report...
-			$db->query('', '
-				UPDATE {db_prefix}log_reported
-				SET ' . (isset($_GET['ignore']) ? 'ignore_all = {int:ignore_all}' : 'closed = {int:closed}') . '
-				WHERE id_report = {int:id_report}
-					AND ' . $user_info['mod_cache']['bq'],
-				array(
-					'ignore_all' => isset($_GET['ignore']) ? (int) $_GET['ignore'] : 0,
-					'closed' => isset($_GET['close']) ? (int) $_GET['close'] : 0,
-					'id_report' => $_GET['rid'],
-				)
-			);
+			if (isset($_GET['ignore']))
+				updateReportsStatus((int) $_GET['rid'], 'ignore', (int) $_GET['ignore']);
+			elseif (isset($_GET['close']))
+				updateReportsStatus((int) $_GET['rid'], 'close', (int) $_GET['close']);
 
 			// Time to update.
-			require_once(SUBSDIR . '/Moderation.subs.php');
 			updateSettings(array('last_mod_report_action' => time()));
 			recountOpenReports();
 		}
@@ -417,64 +457,30 @@ class ModerationCenter_Controller extends Action_Controller
 
 			if (!empty($toClose))
 			{
-				$db->query('', '
-					UPDATE {db_prefix}log_reported
-					SET closed = {int:is_closed}
-					WHERE id_report IN ({array_int:report_list})
-						AND ' . $user_info['mod_cache']['bq'],
-					array(
-						'report_list' => $toClose,
-						'is_closed' => 1,
-					)
-				);
+				updateReportsStatus($toClose, 'close', 1);
 
 				// Time to update.
-				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}
 		}
 
 		// How many entries are we viewing?
-		$request = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}log_reported AS lr
-			WHERE lr.closed = {int:view_closed}
-				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
-			array(
-				'view_closed' => $context['view_closed'],
-			)
-		);
-		list ($context['total_reports']) = $db->fetch_row($request);
-		$db->free_result($request);
+		$context['total_reports'] = totalReports($context['view_closed']);
 
 		// So, that means we can page index, yes?
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : ''), $_GET['start'], $context['total_reports'], 10);
 		$context['start'] = $_GET['start'];
 
 		// By George, that means we in a position to get the reports, golly good.
-		$request = $db->query('', '
-			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
-				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
-				IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
-			FROM {db_prefix}log_reported AS lr
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-			WHERE lr.closed = {int:view_closed}
-				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
-			ORDER BY lr.time_updated DESC
-			LIMIT ' . $context['start'] . ', 10',
-			array(
-				'view_closed' => $context['view_closed'],
-			)
-		);
-		$context['reports'] = array();
-		$report_ids = array();
-		for ($i = 0; $row = $db->fetch_assoc($request); $i++)
+		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10);
+		$report_ids = array_keys($context['reports']);
+		$report_boards_ids = array();
+		foreach ($context['reports'] as $row)
 		{
-			$report_ids[] = $row['id_report'];
 			$context['reports'][$row['id_report']] = array(
+				'board' => $row['id_board'],
 				'id' => $row['id_report'],
-				'alternate' => $i % 2,
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
 				'author' => array(
@@ -492,37 +498,41 @@ class ModerationCenter_Controller extends Action_Controller
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all']
 			);
+			$report_boards_ids[] = $row['board'];
 		}
-		$db->free_result($request);
+
+		// Get the names of boards these topics are in.
+		if (!empty($report_ids))
+		{
+			require_once(SUBSDIR . '/Boards.subs.php');
+			$board_names = getBoardList(array('included_boards' => $report_boards_ids), true);
+
+			// Add the board name to the report array
+			foreach ($context['reports'] as $id_report => $report)
+				if (!empty($board_names[$report['board']]))
+					$context['reports'][$id_report]['board_name'] = $board_names[$report['board']]['board_name'];
+		}
 
 		// Now get all the people who reported it.
 		if (!empty($report_ids))
 		{
-			$request = $db->query('', '
-				SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment,
-					IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lrc.membername) AS reporter
-				FROM {db_prefix}log_reported_comments AS lrc
-					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lrc.id_member)
-				WHERE lrc.id_report IN ({array_int:report_list})',
-				array(
-					'report_list' => $report_ids,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
+			$comments = getReportsUserComments($report_ids);
+			foreach ($comments as $id_rep => $rows)
 			{
-				$context['reports'][$row['id_report']]['comments'][] = array(
-					'id' => $row['id_comment'],
-					'message' => $row['comment'],
-					'time' => standardTime($row['time_sent']),
-					'member' => array(
-						'id' => $row['id_member'],
-						'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
-						'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
-						'href' => $row['id_member'] ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-					),
-				);
+				foreach ($rows as $row)
+					$context['reports'][$id_rep]['comments'][] = array(
+						'id' => $row['id_comment'],
+						'message' => $row['comment'],
+						'raw_time' => $row['time_sent'],
+						'time' => standardTime($row['time_sent']),
+						'member' => array(
+							'id' => $row['id_member'],
+							'name' => empty($row['reporter']) ? $txt['guest'] : $row['reporter'],
+							'link' => $row['id_member'] ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['reporter'] . '</a>' : (empty($row['reporter']) ? $txt['guest'] : $row['reporter']),
+							'href' => $row['id_member'] ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+						),
+					);
 			}
-			$db->free_result($request);
 		}
 	}
 
@@ -556,12 +566,13 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			$context['homepage_blocks']['r'] = $txt['mc_reported_posts'];
 			$context['homepage_blocks']['w'] = $txt['mc_watched_users'];
+			$context['homepage_blocks']['a'] = $txt['mc_required'];
 		}
 
 		// Does the user have any settings yet?
 		if (empty($user_settings['mod_prefs']))
 		{
-			$mod_blocks = 'n' . ($context['can_moderate_boards'] ? 'wr' : '') . ($context['can_moderate_groups'] ? 'g' : '');
+			$mod_blocks = 'np' . ($context['can_moderate_boards'] ? 'wra' : '') . ($context['can_moderate_groups'] ? 'g' : '');
 			$pref_binary = 5;
 			$show_reports = 1;
 		}
@@ -734,8 +745,6 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $user_info, $context, $scripturl, $txt;
 
-		$db = database();
-
 		// Have to at least give us something
 		if (empty($_REQUEST['report']))
 			fatal_lang_error('mc_no_modreport_specified');
@@ -761,18 +770,7 @@ class ModerationCenter_Controller extends Action_Controller
 			// In it goes.
 			if (!empty($newComment))
 			{
-				$db->insert('',
-					'{db_prefix}log_comments',
-					array(
-						'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
-						'id_notice' => 'int', 'body' => 'string', 'log_time' => 'int',
-					),
-					array(
-						$user_info['id'], $user_info['name'], 'reportc', '',
-						$report, $newComment, time(),
-					),
-					array('id_comment')
-				);
+				addReportComment($report, $newComment);
 
 				// Redirect to prevent double submittion.
 				redirectexit($scripturl . '?action=moderate;area=reports;report=' . $report);
@@ -805,17 +803,8 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// So what bad things do the reporters have to say about it?
-		$request = $db->query('', '
-			SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment, lrc.member_ip,
-				IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lrc.membername) AS reporter
-			FROM {db_prefix}log_reported_comments AS lrc
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lrc.id_member)
-			WHERE lrc.id_report = {int:id_report}',
-			array(
-				'id_report' => $context['report']['id'],
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		$comments = getReportsUserComments($context['report']['id']);
+		foreach ($comments[$context['report']['id']] as $row)
 		{
 			$context['report']['comments'][] = array(
 				'id' => $row['id_comment'],
@@ -830,22 +819,10 @@ class ModerationCenter_Controller extends Action_Controller
 				),
 			);
 		}
-		$db->free_result($request);
 
 		// Hang about old chap, any comments from moderators on this one?
-		$request = $db->query('', '
-			SELECT lc.id_comment, lc.id_notice, lc.log_time, lc.body,
-				IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS moderator
-			FROM {db_prefix}log_comments AS lc
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
-			WHERE lc.id_notice = {int:id_report}
-				AND lc.comment_type = {string:reportc}',
-			array(
-				'id_report' => $context['report']['id'],
-				'reportc' => 'reportc',
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
+		$mod_comments = getReportModeratorsComments($context['report']['id']);
+		foreach ($mod_comments as $row)
 		{
 			$context['report']['mod_comments'][] = array(
 				'id' => $row['id_comment'],
@@ -859,11 +836,10 @@ class ModerationCenter_Controller extends Action_Controller
 				),
 			);
 		}
-		$db->free_result($request);
 
 		// What have the other moderators done to this message?
 		require_once(SUBSDIR . '/Modlog.subs.php');
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		loadLanguage('Modlog');
 
 		// This is all the information from the moderation log.
@@ -978,7 +954,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function action_viewWatchedUsers()
 	{
-		global $modSettings, $context, $txt, $scripturl;
+		global $modSettings, $context, $txt, $scripturl, $user_info;
 
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
@@ -1040,7 +1016,7 @@ class ModerationCenter_Controller extends Action_Controller
 				$approve_query = ' AND 1=0';
 		}
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1195,7 +1171,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_log_title'];
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// This is all the information required for a watched user listing.
@@ -1314,7 +1290,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Setup context as always.
 		$context['page_title'] = $txt['mc_warning_templates_title'];
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// This is all the information required for a watched user listing.
 		$listOptions = array(
@@ -1418,17 +1394,19 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$subActions = array(
-			'log' => array('action_viewWarningLog'),
-			'templateedit' => array('action_modifyWarningTemplate', 'issue_warning'),
-			'templates' => array('action_viewWarningTemplates', 'issue_warning'),
-		);
-
-		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']]))? $_REQUEST['sa'] : 'log';
+		require_once(SUBSDIR . '/Action.class.php');
 
 		// Some of this stuff is overseas, so to speak.
 		loadTemplate('ModerationCenter');
 		loadLanguage('Profile');
+
+		$subActions = array(
+			'log' => array($this, 'action_viewWarningLog'),
+			'templateedit' => array($this, 'action_modifyWarningTemplate', 'permission' => 'issue_warning'),
+			'templates' => array($this, 'action_viewWarningTemplates', 'permission' => 'issue_warning'),
+		);
+
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'log';
 
 		// Setup the admin tabs.
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -1437,7 +1415,9 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// Call the right function.
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		$action = new Action();
+		$action->initialize($subActions, 'log');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -1449,7 +1429,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		return watchedUserCount($approve_query, $modSettings['warning_watch']);
+		return watchedUserCount($modSettings['warning_watch']);
 	}
 
 	/**
@@ -1543,7 +1523,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function block_groupRequests()
 	{
-		global $context, $user_info, $scripturl;
+		global $context, $user_info;
 
 		// Make sure they can even moderate someone!
 		if ($user_info['mod_cache']['gq'] == '0=1')
@@ -1572,7 +1552,7 @@ class ModerationCenter_Controller extends Action_Controller
 	 */
 	public function block_watchedUsers()
 	{
-		global $context, $scripturl, $modSettings;
+		global $context, $scripturl;
 
 		$watched_users = basicWatchedUsers();
 
@@ -1592,13 +1572,41 @@ class ModerationCenter_Controller extends Action_Controller
 	}
 
 	/**
+	 * Shows a list of items requiring moderation action
+	 * Includes post, topic, attachment, group, member and PBE values with links to each
+	 */
+	public function block_actionRequired()
+	{
+		global $context;
+
+		// Get the action totals
+		$mod_totals = loadModeratorMenuCounts();
+
+		// This blocks total is only these fields
+		$context['mc_required'] = $mod_totals['attachments'] + $mod_totals['emailmod'] + $mod_totals['topics'] + $mod_totals['posts'] + $mod_totals['memberreq'] + $mod_totals['groupreq'] + + $mod_totals['reports'];
+		unset($mod_totals['postmod'], $mod_totals['pt_total'], $mod_totals['mg_total'], $mod_totals['grand_total']);
+		$context['required'] = $mod_totals;
+
+		// Links to the areas
+		$context['links'] = array(
+			'attachments' => '?action=moderate;area=attachmod;sa=attachments',
+			'emailmod' => '?action=admin;area=maillist;sa=emaillist',
+			'topics' => '?action=moderate;area=postmod;sa=topics',
+			'posts' => '?action=moderate;area=postmod;sa=posts',
+			'memberreq' => '?action=admin;area=viewmembers;sa=browse;type=approve',
+			'groupreq' => '?action=moderate;area=groups;sa=requests',
+			'reports' => '?action=moderate;area=reports;sa=open',
+		);
+
+		return 'action_required';
+	}
+
+	/**
 	 * Show an area for the moderator to type into.
 	 */
 	public function block_notes()
 	{
 		global $context, $scripturl, $txt, $user_info;
-
-		$db = database();
 
 		// Are we saving a note?
 		if (isset($_POST['makenote']) && isset($_POST['new_note']))

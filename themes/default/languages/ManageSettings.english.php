@@ -7,7 +7,7 @@ $txt['modSettings_desc'] = 'This page allows you to change the settings of featu
 $txt['security_settings_desc'] = 'This page allows you to set options specifically related to the security and moderation of your forum, including anti-spam options.';
 $txt['modification_settings_desc'] = 'This page contains settings added by any modifications to your forum';
 
-$txt['modification_no_misc_settings'] = 'There are no modifications installed that have added any settings to this area yet.';
+$txt['modification_no_misc_settings'] = 'There are no addons installed that have added any settings to this area yet.';
 
 $txt['pollMode'] = 'Poll mode';
 $txt['disable_polls'] = 'Disable polls';
@@ -17,10 +17,9 @@ $txt['allow_guestAccess'] = 'Allow guests to browse the forum';
 $txt['userLanguage'] = 'Enable user-selectable language support';
 $txt['allow_editDisplayName'] = 'Allow users to edit their displayed name';
 $txt['allow_hideOnline'] = 'Allow non-administrators to hide their online status';
-$txt['guest_hideContacts'] = 'Do not reveal contact details of members to guests';
 $txt['titlesEnable'] = 'Enable custom titles';
 $txt['enable_buddylist'] = 'Enable buddy/ignore lists';
-$txt['enable_disregard'] = 'Enable disregard topics';
+$txt['enable_unwatch'] = 'Enable unwatching of topics';
 $txt['default_personal_text'] = 'Default personal text';
 $txt['default_personal_text_note'] = 'Personal text to assign to newly registered members.';
 $txt['time_format'] = 'Default time format';
@@ -97,6 +96,7 @@ $txt['topbottomEnable'] = 'Enable Go Up/Go Down buttons';
 $txt['onlineEnable'] = 'Show online/offline in posts and PMs';
 $txt['enableVBStyleLogin'] = 'Show a quick login on every page';
 $txt['defaultMaxMembers'] = 'Members per page in member list';
+$txt['displayMemberNames'] = 'Display the member\'s name instead of "My Account" on the profile account button';
 $txt['timeLoadPageEnable'] = 'Display time taken to create every page';
 $txt['disableHostnameLookup'] = 'Disable hostname lookups';
 $txt['who_enabled'] = 'Enable who\'s online list';
@@ -120,6 +120,7 @@ $txt['likeMinPosts'] = 'Set the minimum number of posts a member needs in order 
 $txt['likeWaitTime'] = 'Set wait time period in minutes';
 $txt['likeWaitCount'] = 'Set the maximum number of likes/unlikes the member can do in the above time period';
 $txt['likeRestrictAdmins'] = 'Restrict administrators to limits';
+$txt['likeAllowSelf'] = 'Allow members to like their own posts';
 $txt['likeDisplayLimit'] = 'Set the maximum number of "liked by" names to display in the topic view, 0 for no limit, -1 to disable';
 
 $txt['caching_information'] = 'ElkArte supports caching through the use of accelerators. The currently supported accelerators include:
@@ -135,7 +136,6 @@ Caching will work best if you have PHP compiled with one of the above optimizers
 $txt['detected_no_caching'] = '<strong class="alert">Unable to detect a compatible accelerator on your server.  File based caching can be used instead.</strong>';
 $txt['detected_accelerators'] = '<strong class="success">The following accelerators have been detected: %1$s</strong>';
 
-
 $txt['cache_enable'] = 'Caching Level';
 $txt['cache_off'] = 'No caching';
 $txt['cache_level1'] = 'Level 1 Caching (Recommended)';
@@ -143,6 +143,8 @@ $txt['cache_level2'] = 'Level 2 Caching';
 $txt['cache_level3'] = 'Level 3 Caching (Not Recommended)';
 $txt['cache_memcached'] = 'Memcache settings';
 $txt['cache_accelerator'] = 'Caching Accelerator';
+$txt['cache_uid'] = 'Cache Accelerator Userid';
+$txt['cache_password'] = 'Cache Accelerator Password';
 $txt['default_cache'] = 'File based caching';
 $txt['apc_cache'] = 'APC';
 $txt['eAccelerator_cache'] = 'eAccelerator';
@@ -219,6 +221,9 @@ $txt['badbehavior_url_wl_desc'] = 'Example: /subscriptions.php';
 $txt['badbehavior_url_wl_add'] = 'Add another URL';
 $txt['badbehavior_wl_comment'] = 'Comment';
 
+$txt['configure_emptyfield'] = 'Verification Empty Field';
+$txt['configure_emptyfield_desc'] = '<span class="smalltext">Below you can enable the empty field verification method.  This will insert a hidden field that should stay empty, this is used to trick spam bots in to erroneosly posting information. Although this can be used alone, its best enabled with the CAPTCHA verifcation.</span>';
+$txt['enable_emptyfield'] = 'Enable empty field verification';
 $txt['configure_verification_means'] = 'Configure Verification Methods';
 $txt['setting_qa_verification_number'] = 'Number of verification questions user must answer';
 $txt['setting_qa_verification_number_desc'] = '(0 to disable; questions are set below)';
@@ -284,6 +289,7 @@ $txt['pm_posts_per_hour_note'] = '(0 for no limit, moderators are exempt)';
 $txt['custom_profile_title'] = 'Custom Profile Fields';
 $txt['custom_profile_desc'] = 'From this page you can create your own custom profile fields that fit in with your own forums requirements';
 $txt['custom_profile_active'] = 'Active';
+$txt['custom_profile_order'] = 'Field Order';
 $txt['custom_profile_fieldname'] = 'Field Name';
 $txt['custom_profile_fieldtype'] = 'Field Type';
 $txt['custom_profile_make_new'] = 'New Field';
@@ -295,6 +301,7 @@ $txt['custom_profile_type_textarea'] = 'Large Text';
 $txt['custom_profile_type_select'] = 'Select Box';
 $txt['custom_profile_type_radio'] = 'Radio Button';
 $txt['custom_profile_type_check'] = 'Checkbox';
+$txt['custom_profile_reordered'] = 'Profile fields successfully reordered';
 
 $txt['custom_add_title'] = 'Add Profile Field';
 $txt['custom_edit_title'] = 'Edit Profile Field';
@@ -367,7 +374,7 @@ $txt['core_settings_item_dr_desc'] = 'Enabling this feature will allow users to 
 $txt['core_settings_item_cp'] = 'Advanced Profile Fields';
 $txt['core_settings_item_cp_desc'] = 'This enables you to hide standard profile fields, add profile fields to registration, and create new profile fields for your forum.';
 $txt['core_settings_item_ih'] = 'Integration Hooks Management';
-$txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disable any integration hooks added by modifications. Changing hooks can prevent your forum from working properly, so use this feature only if you know what you are doing.';
+$txt['core_settings_item_ih_desc'] = 'This feature allows you to enable or disable any integration hooks added by addons. Changing hooks can prevent your forum from working properly, so use this feature only if you know what you are doing.';
 $txt['core_settings_item_k'] = 'Karma';
 $txt['core_settings_item_k_desc'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can \'applaud\' or \'smite\' other members, which is how their popularity is calculated.';
 $txt['core_settings_item_pe'] = 'Post by Email Management';

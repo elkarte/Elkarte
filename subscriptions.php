@@ -111,7 +111,7 @@ $db->free_result($request);
 
 // We wish to check the pending payments to make sure we are expecting this.
 $request = $db->query('', '
-	SELECT id_sublog, payments_pending, pending_details, end_time
+	SELECT id_sublog, id_subscribe, payments_pending, pending_details, end_time
 	FROM {db_prefix}log_subscribed
 	WHERE id_subscribe = {int:current_subscription}
 		AND id_member = {int:current_member}

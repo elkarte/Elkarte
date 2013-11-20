@@ -215,15 +215,13 @@ function onDocSent(XMLDoc)
 	var errorList = '';
 	var errorCode = '';
 
-	// @todo: this should stay together with the rest of the error handling or should use errorbox_handler (at the moment it cannot be used because is not enough generic)
+	// @todo: this should stay together with the rest of the error handling or
+	// should use errorbox_handler (at the moment it cannot be used because is not enough generic)
 	for (var i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
 		errorList += '<li id="post_error_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
-
-	document.getElementById('post_error').style.display = numErrors == 0 ? 'none' : '';
-	document.getElementById('post_error').className = errors.getAttribute('serious') == 1 ? 'errorbox' : 'noticebox';
 
 	oError_box = $(document.getElementById('post_error'));
 	if ($.trim(oError_box.children("#post_error_list").html()) === '')
@@ -231,6 +229,8 @@ function onDocSent(XMLDoc)
 
 	// Add the error it and show it
 	setInnerHTML(document.getElementById('post_error_list'), numErrors == 0 ? '' : errorList);
+	if (numErrors === 0)
+		oError_box.css("display", "none");
 
 	// Show a warning if the topic has been locked.
 	if (bPost)
@@ -266,11 +266,12 @@ function onDocSent(XMLDoc)
 			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
 		new_replies = new Array();
 
-		var ignored_replies = new Array(), ignoring;
-		var newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0};
-		var numNewPosts = newPosts.length;
+		var ignored_replies = new Array(),
+			ignoring = null,
+			newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0},
+			numNewPosts = newPosts.length;
 
-		if (numNewPosts != 0)
+		if (numNewPosts !== 0)
 		{
 			var newPostsHTML = '<span id="new_replies"><' + '/span>';
 			for (var i = 0; i < numNewPosts; i++)
@@ -286,8 +287,6 @@ function onDocSent(XMLDoc)
 				if (can_quote)
 					newPostsHTML += '<ul class="quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="linklevel1 quote_button">' + txt_bbc_quote + '</a></li></ul>';
 
-				// Eh wot? Why is this here? That explains why I keep getting extra effing line breaks before quotes.
-				// Is this essential? Will something break if we remove it? Would be great to get rid of it if possible.
 				newPostsHTML += '<br class="clear" />';
 
 				if (ignoring)
@@ -324,17 +323,23 @@ function onDocSent(XMLDoc)
 
 	location.hash = '#' + 'preview_section';
 
-	if (typeof(elk_codeFix) != 'undefined')
-		elk_codeFix();
+	// Preview video links if the feature is available
+	if ($.isFunction($.fn.linkifyvideo))
+		$().linkifyvideo(oEmbedtext, 'preview_body');
+
+	// Preview spoilers
+	$('.spoilerheader').click(function(){
+		$(this).next().children().slideToggle("fast");
+	});
 }
 
 // Add additional poll option fields
 function addPollOption()
 {
-	if (pollOptionNum == 0)
+	if (pollOptionNum === 0)
 	{
 		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
-			if (document.forms[form_name].elements[i].id.substr(0, 8) == 'options-')
+			if (document.forms[form_name].elements[i].id.substr(0, 8) === 'options-')
 			{
 				pollOptionNum++;
 				pollTabIndex = document.forms[form_name].elements[i].tabIndex;
@@ -378,7 +383,7 @@ function onDocReceived(XMLDoc)
 	for (var i = 0, n = XMLDoc.getElementsByTagName('quote')[0].childNodes.length; i < n; i++)
 		text += XMLDoc.getElementsByTagName('quote')[0].childNodes[i].nodeValue;
 
-	$('#' + post_box_name).data("sceditor").InsertText(text);
+	$('#' + post_box_name).data("sceditor").insert(text);
 
 	ajax_indicator(false);
 }
@@ -386,5 +391,5 @@ function onDocReceived(XMLDoc)
 // insert text in to the editor
 function onReceiveOpener(text)
 {
-	$('#' + post_box_name).data("sceditor").InsertText(text);
+	$('#' + post_box_name).data("sceditor").insert(text);
 }

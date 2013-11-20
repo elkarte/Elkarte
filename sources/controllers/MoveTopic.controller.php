@@ -80,6 +80,20 @@ class MoveTopic_Controller extends Action_Controller
 		if (empty($context['categories']) || $context['num_boards'] == 1)
 			fatal_lang_error('moveto_noboards', false);
 
+		// Already used the function, let's set the selected board back to the last
+		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
+		if (!empty($last_moved_to))
+		{
+			foreach ($context['categories'] as $id => $values)
+				if (isset($values['boards'][$last_moved_to]))
+				{
+					$context['categories'][$id]['boards'][$last_moved_to]['selected'] = true;
+					break;
+				}
+		}
+		$context['redirect_topic'] = isset($_SESSION['move_to_topic']['redirect_topic']) ? (int) $_SESSION['move_to_topic']['redirect_topic'] : 0;
+		$context['redirect_expires'] = isset($_SESSION['move_to_topic']['redirect_expires']) ? (int) $_SESSION['move_to_topic']['redirect_expires'] : 0;
+
 		$context['page_title'] = $txt['move_topic'];
 
 		$context['linktree'][] = array(
@@ -103,7 +117,6 @@ class MoveTopic_Controller extends Action_Controller
 		}
 
 		// We will need this
-		require_once(SUBSDIR . '/Topic.subs.php');
 		moveTopicConcurrence();
 
 		// Register this form and get a sequence number in $context.
@@ -187,7 +200,9 @@ class MoveTopic_Controller extends Action_Controller
 			fatal_lang_error('no_board');
 
 		// Remember this for later.
-		$_SESSION['move_to_topic'] = $toboard;
+		$_SESSION['move_to_topic'] = array(
+			'move_to' => $toboard
+		);
 
 		// Rename the topic...
 		if (isset($_POST['reset_subject'], $_POST['custom_subject']) && $_POST['custom_subject'] != '')
@@ -251,6 +266,10 @@ class MoveTopic_Controller extends Action_Controller
 			// redirect to the MOVED topic from topic list?
 			$redirect_topic = isset($_POST['redirect_topic']) ? $topic : 0;
 
+			// And remember the last expiry period too.
+			$_SESSION['move_to_topic']['redirect_topic'] = $redirect_topic;
+			$_SESSION['move_to_topic']['redirect_expires'] = (int) $_POST['redirect_expires'];
+
 			$msgOptions = array(
 				'subject' => $txt['moved'] . ': ' . $board_info['subject'],
 				'body' => $reason,
@@ -298,6 +317,7 @@ class MoveTopic_Controller extends Action_Controller
 			logAction('move', array('topic' => $topic, 'board_from' => $board, 'board_to' => $toboard));
 
 		// Notify people that this topic has been moved?
+		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($topic, 'move');
 
 		// Why not go back to the original board in case they want to keep moving?

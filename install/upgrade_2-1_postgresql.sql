@@ -39,8 +39,8 @@ if (!isset($modSettings['package_make_full_backups']) && isset($modSettings['pac
 $request = upgrade_query("
 	SELECT MAX(id_attach)
 	FROM {$db_prefix}attachments");
-list ($step_progress['total']) = $smcFunc['db_fetch_row']($request);
-$smcFunc['db_free_result']($request);
+list ($step_progress['total']) = $db->fetch_row($request);
+$db->free_result($request);
 
 $_GET['a'] = isset($_GET['a']) ? (int) $_GET['a'] : 0;
 $step_progress['name'] = 'Converting legacy attachments';
@@ -62,10 +62,10 @@ while (!$is_done)
 		LIMIT $_GET[a], 100");
 
 	// Finished?
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if ($db->num_rows($request) == 0)
 		$is_done = true;
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		// The current folder.
 		$current_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$row['id_folder']] : $modSettings['attachmentUploadDir'];
@@ -86,7 +86,7 @@ while (!$is_done)
 				SET file_hash = '$file_hash'
 				WHERE id_attach = $row[id_attach]");
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	$_GET['a'] += 100;
 	$step_progress['current'] = $_GET['a'];
@@ -161,6 +161,17 @@ ADD COLUMN credits varchar(255) NOT NULL DEFAULT '';
 ---#
 
 /******************************************************************************/
+--- Fixing floodcontrol for long types
+/******************************************************************************/
+---# Altering the floodcontrol table...
+---{
+upgrade_query("
+	ALTER TABLE {$db_prefix}log_floodcontrol
+	ALTER COLUMN log_type type varchar(20);");
+---}
+---#
+
+/******************************************************************************/
 --- Adding more space for session ids
 /******************************************************************************/
 ---# Altering the session_id columns...
@@ -223,10 +234,6 @@ INSERT INTO {$db_prefix}scheduled_tasks
 	(next_time, time_offset, time_regularity, time_unit, disabled, task)
 VALUES
 	(0, 240, 1, 'd', 0, 'remove_old_drafts');
-INSERT INTO {$db_prefix}scheduled_tasks
-	(next_time, time_offset, time_regularity, time_unit, disabled, task)
-VALUES
-	(0, 0, 6, 'h', 0, 'remove_old_followups');
 ---#
 
 /******************************************************************************/
@@ -241,21 +248,21 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
---- Adding support for topic disregard
+--- Adding support for topic unwatch
 /******************************************************************************/
 ---# Adding new columns to log_topics...
 ---{
 upgrade_query("
 	ALTER TABLE {$db_prefix}log_topics
-	ADD COLUMN disregarded int NOT NULL DEFAULT '0'");
+	ADD COLUMN unwatched int NOT NULL DEFAULT '0'");
 
 UPDATE {$db_prefix}log_topics
-SET disregarded = 0;
+SET unwatched = 0;
 
 INSERT INTO {$db_prefix}settings
 	(variable, value)
 VALUES
-	('enable_disregard', 0);
+	('enable_unwatch', 0);
 ---}
 ---#
 
@@ -289,7 +296,6 @@ CREATE TABLE {$db_prefix}user_drafts (
 	locked smallint NOT NULL default '0',
 	is_sticky smallint NOT NULL default '0',
 	to_list varchar(255) NOT NULL default '',
-	outbox smallint NOT NULL default '0',
 	PRIMARY KEY (id_draft)
 );
 ---#
@@ -305,12 +311,12 @@ if (@$modSettings['smfVersion'] < '2.1')
 		FROM {$db_prefix}board_permissions
 		WHERE permission = 'post_unapproved_topics'");
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], $row[id_board], 'post_draft', $row[add_deny])";
 		$inserts[] = "($row[id_group], $row[id_board], 'post_autosave_draft', $row[add_deny])";
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -325,12 +331,12 @@ if (@$modSettings['smfVersion'] < '2.1')
 		FROM {$db_prefix}permissions
 		WHERE permission = 'pm_send'");
 	$inserts = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	while ($row = $db->fetch_assoc($request))
 	{
 		$inserts[] = "($row[id_group], 'pm_draft', $row[add_deny])";
 		$inserts[] = "($row[id_group], 'pm_autosave_draft', $row[add_deny])";
 	}
-	$smcFunc['db_free_result']($request);
+	$db->free_result($request);
 
 	if (!empty($inserts))
 		upgrade_query("
@@ -348,4 +354,12 @@ if (@$modSettings['smfVersion'] < '2.1')
 ---#
 DELETE FROM {$db_prefix}settings
 WHERE variable LIKE 'integrate_%';
+---#
+
+/******************************************************************************/
+--- Cleaning up guest hide contacts
+/******************************************************************************/
+---# Showing contact details to guests should never happen.
+DELETE FROM {$db_prefix}settings
+WHERE variable = 'guest_hideContacts';
 ---#

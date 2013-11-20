@@ -63,8 +63,9 @@ class Post_Controller extends Action_Controller
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
 			unset($_REQUEST['poll']);
 
-		$post_errors = error_context::context('post', 1);
-		$attach_errors = error_context::context('attachment', 1);
+		$post_errors = Error_Context::context('post', 1);
+		$attach_errors = attachment_Error_Context::context('attachment', 1);
+		$attach_errors->activate();
 		$first_subject = '';
 
 		// Posting an event?
@@ -91,6 +92,9 @@ class Post_Controller extends Action_Controller
 			$context['preview_message'] = '';
 			$context['preview_subject'] = '';
 		}
+
+		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+			$context['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 
 		// No message is complete without a topic.
 		if (empty($topic) && !empty($_REQUEST['msg']))
@@ -156,10 +160,6 @@ class Post_Controller extends Action_Controller
 
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
-
-			// Check whether this is a really old post being bumped...
-			if (!empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
-				$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 		}
 		else
 		{
@@ -249,7 +249,7 @@ class Post_Controller extends Action_Controller
 
 			// Start loading up the event info.
 			$context['event'] = array();
-			$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle'])) : '';
+			$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
 			$context['event']['id'] = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
 			$context['event']['new'] = $context['event']['id'] == -1;
 
@@ -370,10 +370,10 @@ class Post_Controller extends Action_Controller
 
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
-		if (isset($_REQUEST['message']) || $post_errors->hasErrors())
+		if (isset($_REQUEST['message']) || $post_errors->hasErrors() || $attach_errors->hasErrors())
 		{
 			// Validate inputs.
-			if (!$post_errors->hasErrors())
+			if (!$post_errors->hasErrors() && !$attach_errors->hasErrors())
 			{
 				// This means they didn't click Post and get an error.
 				$really_previewing = true;
@@ -535,7 +535,7 @@ class Post_Controller extends Action_Controller
 
 			// Get the stuff ready for the form.
 			$form_subject = $message['message']['subject'];
-			$form_message = $message['message']['body'];
+			$form_message = un_preparsecode($message['message']['body']);
 
 			censorText($form_message);
 			censorText($form_subject);
@@ -564,17 +564,30 @@ class Post_Controller extends Action_Controller
 
 			$context['submit_label'] = $txt['post'];
 
-			list($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
+			list ($form_subject, $form_message) = getFormMsgSubject(false, $topic, $first_subject);
 		}
 
+		// Check whether this is a really old post being bumped...
+		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
+			$post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
+
 		// Are we moving a discussion to its own topic?
-		if (!empty($_REQUEST['followup']))
+		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
 		{
 			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 			$context['show_boards_dropdown'] = true;
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('use_permissions' => true, 'not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
+			if (!empty($board))
+			{
+				foreach ($context['categories'] as $id => $values)
+					if (isset($values['boards'][$board]))
+					{
+						$context['categories'][$id]['boards'][$board]['selected'] = true;
+						break;
+					}
+			}
 		}
 
 		$context['can_post_attachment'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
@@ -643,7 +656,7 @@ class Post_Controller extends Action_Controller
 						$file_list = array();
 						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 							if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-								$file_list[] =  $attachment['name'];
+								$file_list[] = $attachment['name'];
 
 						$_SESSION['temp_attachments']['post']['files'] = $file_list;
 						$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';
@@ -663,9 +676,6 @@ class Post_Controller extends Action_Controller
 						}
 					}
 				}
-
-				if (!empty($context['we_are_history']))
-					$attach_errors->addError($context['we_are_history']);
 
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
@@ -714,7 +724,7 @@ class Post_Controller extends Action_Controller
 						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 
 					$context['current_attachments'][] = array(
-						'name' => '<u>' . htmlspecialchars($attachment['name']) . '</u>',
+						'name' => '<u>' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</u>',
 						'size' => $attachment['size'],
 						'id' => $attachID,
 						'unchecked' => false,
@@ -747,11 +757,19 @@ class Post_Controller extends Action_Controller
 			'title' => $txt['error_while_submitting'],
 		);
 
-		$context['attachment_error'] = array(
-			'errors' => $attach_errors->prepareErrors(),
-			'type' => $attach_errors->getErrorType() == 0 ? 'minor' : 'serious',
-			'title' => $txt['error_while_submitting'],
-		);
+		// If there are attachment errors. Let's show a list to the user.
+		if ($attach_errors->hasErrors())
+		{
+			loadTemplate('Errors');
+
+			$errors = $attach_errors->prepareErrors();
+
+			foreach ($errors as $key => $error)
+			{
+				$context['attachment_error_keys'][] = $key . '_error';
+				$context[$key . '_error'] = $error;
+			}
+		}
 
 		// What are you doing? Posting a poll, modifying, previewing, new post, or reply...
 		if (isset($_REQUEST['poll']))
@@ -820,6 +838,19 @@ class Post_Controller extends Action_Controller
 		// Are post drafts enabled?
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
+
+		if (!empty($modSettings['notifications_enabled']))
+		{
+			$context['notifications_enabled'] = true;
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
+			loadCSSFile('jquery.atwho.css');
+
+			addInlineJavascript('
+			$(document).ready(function () {
+				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+			});');
+		}
 
 		// Build a list of drafts that they can load into the editor
 		if (!empty($context['drafts_save']))
@@ -943,7 +974,7 @@ class Post_Controller extends Action_Controller
 	function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context, $user_settings;
-		global $user_info, $board_info, $options, $scripturl, $settings, $ignore_temp;
+		global $user_info, $board_info, $options, $ignore_temp;
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -967,8 +998,8 @@ class Post_Controller extends Action_Controller
 		checkSubmitOnce('check');
 
 		// No errors as yet.
-		$post_errors = error_context::context('post', 1);
-		$attach_errors = attachment_error_context::context();
+		$post_errors = Error_Context::context('post', 1);
+		$attach_errors = attachment_Error_Context::context();
 
 		// If the session has timed out, let the user re-submit their form.
 		if (checkSession('post', '', false) != '')
@@ -1039,7 +1070,7 @@ class Post_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			if (isset($_REQUEST['msg']))
-				processAttachments((int)$_REQUEST['msg']);
+				processAttachments((int) $_REQUEST['msg']);
 			else
 				processAttachments();
 		}
@@ -1278,11 +1309,9 @@ class Post_Controller extends Action_Controller
 				// Only check if they changed it!
 				if (!isset($msgInfo) || $msgInfo['poster_email'] != $_POST['email'])
 				{
-					if (!allowedTo('moderate_forum') && (!isset($_POST['email']) || $_POST['email'] == ''))
-						$post_errors->addError('no_email');
-
-					if (!allowedTo('moderate_forum') && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['email']) == 0)
-						$post_errors->addError('bad_email');
+					require_once(SUBSDIR . '/DataValidator.class.php');
+					if (!allowedTo('moderate_forum') && !Data_Validator::is_valid($_POST, array('email' => 'valid_email|required'), array('email' => 'trim')))
+						empty($_POST['email']) ? $post_errors->addError('no_email') : $post_errors->addError('bad_email');
 				}
 
 				// Now make sure this email address is not banned from posting.
@@ -1388,7 +1417,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Any mistakes?
-		if ($post_errors->hasErrors())
+		if ($post_errors->hasErrors() || $attach_errors->hasErrors())
 		{
 			// Previewing.
 			$_REQUEST['preview'] = true;
@@ -1406,12 +1435,28 @@ class Post_Controller extends Action_Controller
 
 		// Add special html entities to the subject, name, and email.
 		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-		$_POST['guestname'] = htmlspecialchars($_POST['guestname']);
-		$_POST['email'] = htmlspecialchars($_POST['email']);
+		$_POST['guestname'] = htmlspecialchars($_POST['guestname'], ENT_COMPAT, 'UTF-8');
+		$_POST['email'] = htmlspecialchars($_POST['email'], ENT_COMPAT, 'UTF-8');
 
 		// At this point, we want to make sure the subject isn't too long.
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
+
+		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		{
+			$query = array('and' => array('member_ids'));
+			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+			require_once(SUBSDIR . '/Members.subs.php');
+			$mentioned_members = membersBy($query, $query_params, true);
+			$replacements = 0;
+			$actually_mentioned = array();
+			foreach ($mentioned_members as $member)
+			{
+				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
+				if ($replacements > 0)
+					$actually_mentioned[] = $member['id_member'];
+			}
+		}
 
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
@@ -1454,7 +1499,7 @@ class Post_Controller extends Action_Controller
 				$_POST['poll_hide'] = 1;
 
 			// Clean up the question and answers.
-			$_POST['question'] = htmlspecialchars($_POST['question']);
+			$_POST['question'] = htmlspecialchars($_POST['question'], ENT_COMPAT, 'UTF-8');
 			$_POST['question'] = Util::truncate($_POST['question'], 255);
 			$_POST['question'] = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $_POST['question']);
 			$_POST['options'] = htmlspecialchars__recursive($_POST['options']);
@@ -1481,9 +1526,6 @@ class Post_Controller extends Action_Controller
 		{
 			$attachIDs = array();
 
-			if (!empty($context['we_are_history']))
-				$attach_errors->addError('temp_attachments_flushed');
-
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
 				if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
@@ -1492,9 +1534,6 @@ class Post_Controller extends Action_Controller
 				// If there was an initial error just show that message.
 				if ($attachID == 'initial_error')
 				{
-					$attach_errors->addError($txt['attach_no_upload']);
-					$attach_errors->addError(is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]);
-
 					unset($_SESSION['temp_attachments']);
 					break;
 				}
@@ -1525,22 +1564,6 @@ class Post_Controller extends Action_Controller
 				// We have errors on this file, build out the issues for display to the user
 				else
 				{
-					// Sort out the errors for display and delete any associated files.
-					$attach_errors->addAttach($attachID, $attachment['name']);
-					$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
-
-					foreach ($attachment['errors'] as $error)
-					{
-						if (!is_array($error))
-						{
-							$attach_errors->addError($txt[$error], $attachID);
-							if (in_array($error, $log_these))
-								log_error($attachment['name'] . ': ' . $txt[$error], 'critical');
-						}
-						else
-							$attach_errors->addError(vsprintf($txt[$error[0]], $error[1]), $attachID);
-					}
-
 					if (file_exists($attachment['tmp_name']))
 						unlink($attachment['tmp_name']);
 				}
@@ -1600,7 +1623,7 @@ class Post_Controller extends Action_Controller
 		// This is a new topic or an already existing one. Save it.
 		else
 		{
-			if (!empty($_REQUEST['followup']))
+			if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
 				$original_post = (int) $_REQUEST['followup'];
 
 			// We also have to fake the board:
@@ -1621,12 +1644,15 @@ class Post_Controller extends Action_Controller
 			if (isset($topicOptions['id']))
 				$topic = $topicOptions['id'];
 
-			require_once(SUBSDIR . '/FollowUps.subs.php');
-			require_once(SUBSDIR . '/Messages.subs.php');
+			if (!empty($modSettings['enableFollowup']))
+			{
+				require_once(SUBSDIR . '/FollowUps.subs.php');
+				require_once(SUBSDIR . '/Messages.subs.php');
 
-			// Time to update the original message with a pointer to the new one
-			if (!empty($original_post) && canAccessMessage($original_post))
-				linkMessages($original_post, $topic);
+				// Time to update the original message with a pointer to the new one
+				if (!empty($original_post) && canAccessMessage($original_post))
+					linkMessages($original_post, $topic);
+			}
 		}
 
 		// If we had a draft for this, its time to remove it since it was just posted
@@ -1720,6 +1746,7 @@ class Post_Controller extends Action_Controller
 		// Notify any members who have notification turned on for this topic/board - only do this if it's going to be approved(!)
 		if ($becomesApproved)
 		{
+			require_once(SUBSDIR . '/Notification.subs.php');
 			if ($newTopic)
 			{
 				$notifyData = array(
@@ -1732,7 +1759,7 @@ class Post_Controller extends Action_Controller
 					'topic' => $topic,
 					'signature' => (isset($user_settings['signature']) ? $user_settings['signature'] : ''),
 				);
-				notifyMembersBoard($notifyData);
+				sendBoardNotifications($notifyData);
 			}
 			elseif (empty($_REQUEST['msg']))
 			{
@@ -1744,6 +1771,19 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
+		if (!empty($modSettings['notifications_enabled']) && !empty($actually_mentioned))
+		{
+			require_once(CONTROLLERDIR . '/Notification.controller.php');
+			$notify = new Notification_Controller();
+			$notify->setData(array(
+				'id_member' => $actually_mentioned,
+				'type' => 'men',
+				'id_msg' => $msgOptions['id'],
+				'status' => $becomesApproved ? 'new' : 'unapproved',
+			));
+			$notify->action_add();
+		}
+
 		if ($board_info['num_topics'] == 0)
 			cache_put_data('board-' . $board, null, 120);
 
@@ -1752,37 +1792,6 @@ class Post_Controller extends Action_Controller
 
 		if (!empty($_POST['move']) && allowedTo('move_any'))
 			redirectexit('action=movetopic;topic=' . $topic . '.0' . (empty($_REQUEST['goback']) ? '' : ';goback'));
-
-		// If there are attachment errors. Let's show a list to the user.
-		if ($attach_errors->hasErrors())
-		{
-			loadTemplate('Errors');
-			$context['sub_template'] = 'attachment_errors';
-			$context['page_title'] = $txt['error_occurred'];
-
-			$errors = $attach_errors->prepareErrors();
-
-			foreach ($errors as $key => $error)
-			{
-				$context['attachment_error_keys'][] = $key . '_error';
-				$context[$key . '_error'] = $error;
-			}
-
-			$context['linktree'][] = array(
-				'url' => $scripturl . '?topic=' . $topic . '.0',
-				'name' => $_POST['subject'],
-				'extra_before' => !empty($settings['linktree_inline']) ? $txt['topic'] . ': ' : ''
-			);
-
-			if (isset($_REQUEST['msg']))
-				$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.msg' . $_REQUEST['msg'] . '#msg' . $_REQUEST['msg'];
-			else
-				$context['redirect_link'] = $scripturl . '?topic=' . $topic . '.new#new';
-
-			$context['back_link'] =  $scripturl . '?action=post;msg=' . $msgOptions['id'] . ';topic=' . $topic . ';additionalOptions#postAttachment';
-
-			obExit(null, true);
-		}
 
 		// Return to post if the mod is on.
 		if (isset($_REQUEST['msg']) && !empty($_REQUEST['goback']))
@@ -1874,10 +1883,8 @@ class Post_Controller extends Action_Controller
 			if (!empty($modSettings['removeNestedQuotes']))
 				$row['body'] = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $row['body']);
 
-			$lb = "\n";
-
 			// Add a quote string on the front and end.
-			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=topic=' . $row['id_topic'] . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . ']' . $lb . $row['body'] . $lb . '[/quote]';
+			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=topic=' . $row['id_topic'] . '.msg' . (int) $_REQUEST['quote'] . '#msg' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . ']' . $row['body'] . '[/quote]';
 			$context['quote']['text'] = strtr(un_htmlspecialchars($context['quote']['xml']), array('\'' => '\\\'', '\\' => '\\\\', "\n" => '\\n', '</script>' => '</\' + \'script>'));
 			$context['quote']['xml'] = strtr($context['quote']['xml'], array('&nbsp;' => '&#160;', '<' => '&lt;', '>' => '&gt;'));
 
@@ -1971,7 +1978,7 @@ class Post_Controller extends Action_Controller
 			$moderationAction = $row['id_member'] != $user_info['id'];
 		}
 
-		$post_errors = error_context::context('post', 1);
+		$post_errors = Error_Context::context('post', 1);
 
 		if (isset($_POST['subject']) && Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) !== '')
 		{
@@ -2281,9 +2288,8 @@ class Post_Controller extends Action_Controller
 			loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
 
 		// load all the drafts for this user that meet the criteria
-		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
 		$order = 'poster_time DESC';
-		$user_drafts = load_user_drafts($member_id, 0, $id_topic, $drafts_keep_days, $order);
+		$user_drafts = load_user_drafts($member_id, 0, $id_topic, $order);
 
 		// add them to the context draft array for template display
 		foreach ($user_drafts as $draft)

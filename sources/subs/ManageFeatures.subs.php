@@ -93,7 +93,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 
 	if ($standardFields)
 	{
-		$standard_fields = array('location', 'gender', 'website', 'posts', 'warning_status');
+		$standard_fields = array('location', 'gender', 'website', 'personal_text', 'posts', 'warning_status');
 		$fields_no_registration = array('posts', 'warning_status');
 		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 		$registration_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
@@ -111,9 +111,9 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 	{
 		// Load all the fields.
 		$request = $db->query('', '
-			SELECT id_field, col_name, field_name, field_desc, field_type, active, placement
+			SELECT id_field, col_name, field_name, field_desc, field_type, active, placement, vieworder
 			FROM {db_prefix}custom_fields
-			ORDER BY {raw:sort}
+			ORDER BY {raw:sort}, vieworder ASC
 			LIMIT {int:start}, {int:items_per_page}',
 			array(
 				'sort' => $sort,
@@ -122,7 +122,7 @@ function list_getProfileFields($start, $items_per_page, $sort, $standardFields)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
-			$list[] = $row;
+			$list[$row['id_field']] = $row;
 		$db->free_result($request);
 	}
 
@@ -165,14 +165,13 @@ function getProfileField($id_field)
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
 			show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
-			bbc, mask, enclose, placement
+			bbc, mask, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
 		array(
 			'current_field' => $id_field,
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		if ($row['field_type'] == 'textarea')
@@ -259,7 +258,7 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 	$db = database();
 
 	$db->query('', '
-		UPDATE {db_prefix}themes
+		UPDATE {db_prefix}custom_fields_data
 		SET value = {string:new_value}
 		WHERE variable = {string:current_column}
 			AND value = {string:old_value}
@@ -269,6 +268,25 @@ function updateRenamedProfileField($key, $newOptions, $name, $option)
 			'new_value' => $newOptions[$key],
 			'current_column' => $name,
 			'old_value' => $option,
+		)
+	);
+}
+
+/**
+ * Update the custom profile fields active status on/off
+ *
+ * @param array $enabled
+ */
+function updateRenamedProfileStatus($enabled)
+{
+	$db = database();
+
+	// Do the updates
+	$db->query('', '
+		UPDATE {db_prefix}custom_fields
+		SET active = CASE WHEN id_field IN ({array_int:id_cust_enable}) THEN 1 ELSE 0 END',
+		array(
+			'id_cust_enable' => $enabled,
 		)
 	);
 }
@@ -318,6 +336,23 @@ function updateProfileField($field_data)
 }
 
 /**
+ * Updates the viewing order for profile fields
+ * Done as a CASE WHEN one two three ELSE 0 END in place of many updates
+ *
+ * @param string replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ */
+function updateProfileFieldOrder($replace)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}custom_fields
+		SET vieworder = CASE ' . $replace . ' ELSE 0 END',
+		array('')
+	);
+}
+
+/**
  * Deletes selected values from old profile field selects
  *
  * @param type $newOptions
@@ -328,7 +363,7 @@ function deleteOldProfileFieldSelects($newOptions, $fieldname)
 	$db = database();
 
 	$db->query('', '
-		DELETE FROM {db_prefix}themes
+		DELETE FROM {db_prefix}custom_fields_data
 		WHERE variable = {string:current_column}
 			AND value NOT IN ({array_string:new_option_values})
 			AND id_member > {int:no_member}',
@@ -356,40 +391,23 @@ function addProfileField($field)
 			'field_type' => 'string', 'field_length' => 'string', 'field_options' => 'string',
 			'show_reg' => 'int', 'show_display' => 'int', 'show_memberlist' => 'int', 'show_profile' => 'string',
 			'private' => 'int', 'active' => 'int', 'default_value' => 'string', 'can_search' => 'int',
-			'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int',
+			'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int', 'vieworder' => 'int'
 		),
 		array(
 			$field['col_name'], $field['field_name'], $field['field_desc'],
 			$field['field_type'], $field['field_length'], $field['field_options'],
 			$field['show_reg'], $field['show_display'], $field['show_memberlist'], $field['show_profile'],
 			$field['private'], $field['active'], $field['default'], $field['can_search'],
-			$field['bbc'], $field['mask'], $field['enclose'], $field['placement'],
+			$field['bbc'], $field['mask'], $field['enclose'], $field['placement'], $field['vieworder']
 		),
 		array('id_field')
 	);
 }
 
 /**
- * Reorder the custom profile fields by alphabet
- */
-
-function reOrderProfileFields()
-{
-	$db = database();
-
-	$db->query('alter_table_boards', '
-		ALTER TABLE {db_prefix}custom_fields
-		ORDER BY field_name',
-		array(
-			'db_error_skip' => true,
-		)
-	);
-}
-
-/**
  * Delete all user data for a specified custom profile field
  *
-  * @param string $name
+ * @param string $name
  */
 function deleteProfileFieldUserData($name)
 {
@@ -397,7 +415,7 @@ function deleteProfileFieldUserData($name)
 
 	// Delete the user data first.
 	$db->query('', '
-		DELETE FROM {db_prefix}themes
+		DELETE FROM {db_prefix}custom_fields_data
 		WHERE variable = {string:current_column}
 			AND id_member > {int:no_member}',
 		array(
@@ -433,12 +451,13 @@ function updateDisplayCache()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT col_name, field_name, field_type, bbc, enclose, placement
+		SELECT col_name, field_name, field_type, bbc, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}
 			AND active = {int:active}
 			AND private != {int:not_owner_only}
-			AND private != {int:not_admin_only}',
+			AND private != {int:not_admin_only}
+		ORDER BY vieworder',
 		array(
 			'is_displayed' => 1,
 			'active' => 1,

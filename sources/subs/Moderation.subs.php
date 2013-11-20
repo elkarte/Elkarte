@@ -62,7 +62,7 @@ function recountOpenReports($flush = true)
 
 /**
  * How many unapproved posts and topics do we have?
- * 	- Sets $context['total_unapproved_topics']
+ *  - Sets $context['total_unapproved_topics']
  *  - Sets $context['total_unapproved_posts']
  *  - approve_query is set to list of boards they can see
  *
@@ -130,7 +130,7 @@ function recountFailedEmails($approve_query = null)
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}postby_emails_error as m
+		FROM {db_prefix}postby_emails_error AS m
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_see_board}
 			' . $approve_query . '
@@ -146,6 +146,62 @@ function recountFailedEmails($approve_query = null)
 }
 
 /**
+ * How many entries are we viewing?
+ */
+function totalReports($status = 0)
+{
+	global $user_info;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_reported AS lr
+		WHERE lr.closed = {int:view_closed}
+			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
+		array(
+			'view_closed' => $status,
+		)
+	);
+	list ($total_reports) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $total_reports;
+}
+
+/**
+ * Changes a property of all the reports passed (and the user can see)
+ *
+ * @param array an array of report IDs
+ * @param string the property to update ('close' or 'ignore')
+ * @param int the status of the property (mainly: 0 or 1)
+ */
+function updateReportsStatus($reports_id, $property = 'close', $status = 0)
+{
+	global $user_info;
+
+	if (empty($reports_id))
+		return;
+
+	$db = database();
+
+	$reports_id = is_array($reports_id) ? $reports_id : array($reports_id);
+
+	$db->query('', '
+		UPDATE {db_prefix}log_reported
+		SET ' . ($property == 'close' ? 'closed' : 'ignore_all') . '= {int:status}
+		WHERE id_report IN ({array_int:report_list})
+			AND ' . $user_info['mod_cache']['bq'],
+		array(
+			'report_list' => $reports_id,
+			'status' => $status,
+		)
+	);
+
+	return $db->affected_rows();
+}
+
+/**
  * Loads the number of items awaiting moderation attention
  *  - Only loads the value a given permission level can see
  *  - If supplied a board number will load the values only for that board
@@ -154,6 +210,7 @@ function recountFailedEmails($approve_query = null)
  *  - Unapproved attachments
  *  - Failed emails
  *  - Reported posts
+ *  - Members awaiting approval (activation, deletion, group requests)
  *
  * @param int $brd
  */
@@ -161,7 +218,7 @@ function loadModeratorMenuCounts($brd = null)
 {
 	global $modSettings, $user_info;
 
-	$menu_errors = array();
+	static $menu_errors = array();
 
 	// Work out what boards they can work in!
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -181,8 +238,11 @@ function loadModeratorMenuCounts($brd = null)
 	else
 		$approve_query = ' AND 1=0';
 
-	// Set up the cache key for this one
-	$cache_key = md5($user_info['query_see_board'] . $approve_query);
+	// Set up the cache key for this permissions level
+	$cache_key = md5($user_info['query_see_board'] . $approve_query . $user_info['mod_cache']['bq'] . $user_info['mod_cache']['gq'] . $user_info['mod_cache']['mq'] . (int) allowedTo('approve_emails') . '_' . (int) allowedTo('moderate_forum'));
+
+	if (isset($menu_errors[$cache_key]))
+		return $menu_errors[$cache_key];
 
 	// If its been cached, guess what, thats right use it!
 	$temp = cache_get_data('num_menu_errors', 900);
@@ -190,6 +250,8 @@ function loadModeratorMenuCounts($brd = null)
 	{
 		// Starting out with nothing is a good start
 		$menu_errors[$cache_key] = array(
+			'memberreq' => 0,
+			'groupreq' => 0,
 			'attachments' => 0,
 			'reports' => 0,
 			'emailmod' => 0,
@@ -223,8 +285,30 @@ function loadModeratorMenuCounts($brd = null)
 		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
 			$menu_errors[$cache_key]['emailmod'] = recountFailedEmails($approve_query);
 
-		// Grand Totals for the top most menu
-		$menu_errors[$cache_key]['total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
+		// Group requests
+		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['gq'] != '0=1')
+			$menu_errors[$cache_key]['groupreq'] = count(groupRequests());
+
+		// Member requests
+		if (allowedTo('moderate_forum') && ((!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 2) || !empty($modSettings['approveAccountDeletion'])))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			$awaiting_activation = 0;
+			$activation_numbers = countInactiveMembers();
+
+			// 5 = COPPA, 4 = Awaiting Deletion, 3 = Awaiting Approval
+			foreach ($activation_numbers as $activation_type => $total_members)
+			{
+				if (in_array($activation_type, array(3, 4, 5)))
+					$awaiting_activation += $total_members;
+			}
+			$menu_errors[$cache_key]['memberreq'] = $awaiting_activation;
+		}
+
+		// Grand Totals for the top most menus
+		$menu_errors[$cache_key]['pt_total'] = $menu_errors[$cache_key]['emailmod'] + $menu_errors[$cache_key]['postmod'] + $menu_errors[$cache_key]['reports'] + $menu_errors[$cache_key]['attachments'];
+		$menu_errors[$cache_key]['mg_total'] = $menu_errors[$cache_key]['memberreq'] + $menu_errors[$cache_key]['groupreq'];
+		$menu_errors[$cache_key]['grand_total'] = $menu_errors[$cache_key]['pt_total'] + $menu_errors[$cache_key]['mg_total'];
 
 		// Add this key in to the array, technically this resets the cache time for all keys
 		// done this way as the entire thing needs to go null once *any* moderation action is taken
@@ -575,7 +659,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
 
 /**
  * Get the report details, need this so we can limit access to a particular board
- * 	 - returns false if they are requesting a report they can not see or does not exist
+ *  - returns false if they are requesting a report they can not see or does not exist
  */
 function modReportDetails($id_report)
 {
@@ -606,6 +690,108 @@ function modReportDetails($id_report)
 	$db->free_result($request);
 
 	return $row;
+}
+
+/**
+ * Get the details for a bunch of open/closed reports
+ *
+ * @param int 0 => show open reports, 1 => closed reports
+ * @param int starting point
+ * @param int the number of reports
+ *
+ * @todo move to createList?
+ */
+function getModReports($status = 0, $start = 0, $limit = 10)
+{
+	global $user_info;
+
+	$db = database();
+
+		$request = $db->query('', '
+			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
+				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
+				IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
+			FROM {db_prefix}log_reported AS lr
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
+			WHERE lr.closed = {int:view_closed}
+				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
+			ORDER BY lr.time_updated DESC
+			LIMIT {int:start}, {int:limit}',
+			array(
+				'view_closed' => $status,
+				'start' => $start,
+				'limit' => $limit,
+			)
+		);
+
+	$reports = array();
+	while ($row = $db->fetch_assoc($request))
+		$reports[$row['id_report']] = $row;
+	$db->free_result($request);
+
+	return $reports;
+}
+
+/**
+ * Grabs all the comments made by the reporters to a set of reports
+ *
+ * @param array an array of report ids
+ */
+function getReportsUserComments($id_reports)
+{
+	$db = database();
+
+	$id_reports = is_array($id_reports) ? $id_reports : array($id_reports);
+
+	$request = $db->query('', '
+		SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment, lrc.member_ip,
+			IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lrc.membername) AS reporter
+		FROM {db_prefix}log_reported_comments AS lrc
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lrc.id_member)
+		WHERE lrc.id_report IN ({array_int:report_list})',
+		array(
+			'report_list' => $id_reports,
+		)
+	);
+
+	$comments = array();
+	while ($row = $db->fetch_assoc($request))
+		$comments[$row['id_report']][] = $row;
+
+	$db->free_result($request);
+
+	return $comments;
+}
+
+/**
+ * Retrieve all the comments made by the moderators to a certain report
+ *
+ * @param int the id of a report
+ */
+function getReportModeratorsComments($id_report)
+{
+	$db = database();
+
+	$request = $db->query('', '
+			SELECT lc.id_comment, lc.id_notice, lc.log_time, lc.body,
+				IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS moderator
+			FROM {db_prefix}log_comments AS lc
+				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
+			WHERE lc.id_notice = {int:id_report}
+				AND lc.comment_type = {string:reportc}',
+		array(
+				'id_report' => $id_report,
+				'reportc' => 'reportc',
+		)
+	);
+
+	$comments = array();
+	while ($row = $db->fetch_assoc($request))
+		$comments[] = $row;
+
+	$db->free_result($request);
+
+	return $comments;
 }
 
 /**
@@ -663,11 +849,10 @@ function approveAllUnapproved()
  * Returns the number of watched users in the system.
  * (used by createList() callbacks).
  *
- * @param string $approve_query
  * @param int $warning_watch
  * @return int
  */
-function watchedUserCount($approve_query, $warning_watch = 0)
+function watchedUserCount($warning_watch = 0)
 {
 	$db = database();
 
@@ -891,7 +1076,7 @@ function groupRequests()
 
 	// Make sure they can even moderate someone!
 	if ($user_info['mod_cache']['gq'] == '0=1')
-		return 'group_requests_block';
+		return array();
 
 	// What requests are outstanding?
 	$request = $db->query('', '
@@ -934,7 +1119,7 @@ function groupRequests()
  */
 function basicWatchedUsers()
 {
-	global $scripturl, $modSettings;
+	global $modSettings;
 
 	$db = database();
 
@@ -969,7 +1154,7 @@ function basicWatchedUsers()
  */
 function reportedPosts()
 {
-	global $user_info, $scripturl;
+	global $user_info;
 
 	$db = database();
 
@@ -1068,6 +1253,27 @@ function addModeratorNote($id_poster, $poster_name, $contents)
 		),
 		array(
 			$id_poster, $poster_name, 'modnote', '', $contents, time(),
+		),
+		array('id_comment')
+	);
+}
+
+function addReportComment($report, $newComment)
+{
+	global $user_info;
+
+	$db = database();
+
+	// Insert it into the database
+	$db->insert('',
+		'{db_prefix}log_comments',
+		array(
+			'id_member' => 'int', 'member_name' => 'string', 'comment_type' => 'string', 'recipient_name' => 'string',
+			'id_notice' => 'int', 'body' => 'string', 'log_time' => 'int',
+		),
+		array(
+			$user_info['id'], $user_info['name'], 'reportc', '',
+			$report, $newComment, time(),
 		),
 		array('id_comment')
 	);

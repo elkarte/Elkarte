@@ -25,7 +25,7 @@ if (!defined('ELK'))
  *
  * What it does:
  * - cleans the request variables (ENV, GET, POST, COOKIE, SERVER) and
- *	 makes sure the query string was parsed correctly.
+ *   makes sure the query string was parsed correctly.
  * - handles the URLs passed by the queryless URLs option.
  * - makes sure, regardless of php.ini, everything has slashes.
  * - uses Request parseRequest() to clean and set up variables like $board or $_REQUEST'start'].
@@ -86,7 +86,7 @@ function cleanRequest()
 		// Do not urldecode() the querystring, unless you so much wish to break OpenID implementation. :)
 		$_SERVER['QUERY_STRING'] = substr($_SERVER['QUERY_STRING'], 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $_SERVER['QUERY_STRING'];
 		// some german webmailers need a decoded string, so let's decode the string for action=activate and action=reminder
-		if(strpos($_SERVER['QUERY_STRING'], 'activate') !== false || strpos($_SERVER['QUERY_STRING'], 'reminder') !== false)
+		if (strpos($_SERVER['QUERY_STRING'], 'activate') !== false || strpos($_SERVER['QUERY_STRING'], 'reminder') !== false)
 			$_SERVER['QUERY_STRING'] = urldecode($_SERVER['QUERY_STRING']);
 
 		// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
@@ -223,7 +223,8 @@ function expandIPv6($addr, $strict_check = true)
 		$part[1] = explode(':', $part[1]);
 		$missing = array();
 
-		for ($i = 0; $i < (8 - (count($part[0]) + count($part[1]))); $i++)
+		$limit = count($part[0]) + count($part[1]);
+		for ($i = 0; $i < (8 - $limit); $i++)
 			array_push($missing, '0000');
 
 		$part = array_merge($part[0], $missing, $part[1]);
@@ -238,7 +239,7 @@ function expandIPv6($addr, $strict_check = true)
 
 	unset($p);
 
-    // Join segments.
+	// Join segments.
 	$result = implode(':', $part);
 
 	// Save this incase of repeated use.
@@ -351,7 +352,7 @@ function JavaScriptEscape($string)
  */
 function ob_sessrewrite($buffer)
 {
-	global $scripturl, $modSettings, $user_info, $context;
+	global $scripturl, $modSettings, $context;
 
 	// If $scripturl is set to nothing, or the SID is not defined (SSI?) just quit.
 	if ($scripturl == '' || !defined('SID'))
@@ -359,7 +360,8 @@ function ob_sessrewrite($buffer)
 
 	// Do nothing if the session is cookied, or they are a crawler - guests are caught by redirectexit().  This doesn't work below PHP 4.3.0, because it makes the output buffer bigger.
 	if (empty($_COOKIE) && SID != '' && !isBrowser('possibly_robot'))
-		$buffer = preg_replace('/"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
+		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', '"' . $scripturl . '?' . SID . '&amp;', $buffer);
+
 	// Debugging templates, are we?
 	elseif (isset($_GET['debug']))
 		$buffer = preg_replace('/(?<!<link rel="canonical" href=)"' . preg_quote($scripturl, '/') . '\\??/', '"' . $scripturl . '?debug;', $buffer);
@@ -369,9 +371,9 @@ function ob_sessrewrite($buffer)
 	{
 		// Let's do something special for session ids!
 		if (defined('SID') && SID != '')
-			$buffer = preg_replace('/"' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#"]+?)(#[^"]*?)?"/e', "'\"' . \$scripturl . '/' . strtr('\$1', '&;=', '//,') . '.html?' . SID . '\$2\"'", $buffer);
+			$buffer = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#"]+?)(#[^"]*?)?"~', create_function('$m', 'global $scripturl; return \'"\' . $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html?" . SID . (isset($m[2]) ? $m[2] : "") . \'"\';'), $buffer);
 		else
-			$buffer = preg_replace('/"' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?"/e', "'\"' . \$scripturl . '/' . strtr('\$1', '&;=', '//,') . '.html\$2\"'", $buffer);
+			$buffer = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?"~', create_function('$m', 'global $scripturl; return \'"\' . $scripturl . "/" . strtr("$m[1]", \'&;=\', \'//,\') . ".html" . (isset($m[2]) ? $m[2] : "") . \'"\';'), $buffer);
 	}
 
 	// Return the changed buffer.

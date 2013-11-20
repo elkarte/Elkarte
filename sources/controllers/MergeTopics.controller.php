@@ -151,8 +151,7 @@ class MergeTopics_Controller extends Action_Controller
 	 */
 	public function action_mergeExecute($topics = array())
 	{
-		global $user_info, $txt, $context, $scripturl;
-		global $language, $modSettings;
+		global $user_info, $txt, $context, $scripturl, $language, $modSettings;
 
 		$db = database();
 
@@ -160,6 +159,7 @@ class MergeTopics_Controller extends Action_Controller
 		checkSession('request');
 
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 
 		// Handle URLs from action_mergeIndex.
 		if (!empty($_GET['from']) && !empty($_GET['to']))
@@ -213,8 +213,8 @@ class MergeTopics_Controller extends Action_Controller
 			if (!isset($boardTotals[$row['id_board']]))
 			{
 				$boardTotals[$row['id_board']] = array(
-					'posts' => 0,
-					'topics' => 0,
+					'num_posts' => 0,
+					'num_topics' => 0,
 					'unapproved_posts' => 0,
 					'unapproved_topics' => 0
 				);
@@ -226,10 +226,10 @@ class MergeTopics_Controller extends Action_Controller
 			elseif (!$row['approved'])
 				$boardTotals[$row['id_board']]['unapproved_topics']++;
 			else
-				$boardTotals[$row['id_board']]['topics']++;
+				$boardTotals[$row['id_board']]['num_topics']++;
 
 			$boardTotals[$row['id_board']]['unapproved_posts'] += $row['unapproved_posts'];
-			$boardTotals[$row['id_board']]['posts'] += $row['num_replies'] + ($row['approved'] ? 1 : 0);
+			$boardTotals[$row['id_board']]['num_posts'] += $row['num_replies'] + ($row['approved'] ? 1 : 0);
 
 			$topic_data[$row['id_topic']] = array(
 				'id' => $row['id_topic'],
@@ -427,8 +427,8 @@ class MergeTopics_Controller extends Action_Controller
 		if (!isset($boardTotals[$target_board]))
 		{
 			$boardTotals[$target_board] = array(
-				'posts' => 0,
-				'topics' => 0,
+				'num_posts' => 0,
+				'num_topics' => 0,
 				'unapproved_posts' => 0,
 				'unapproved_topics' => 0
 			);
@@ -436,12 +436,12 @@ class MergeTopics_Controller extends Action_Controller
 
 		// Fix the topic count stuff depending on what the new one counts as.
 		if ($topic_approved)
-			$boardTotals[$target_board]['topics']--;
+			$boardTotals[$target_board]['num_topics']--;
 		else
 			$boardTotals[$target_board]['unapproved_topics']--;
 
 		$boardTotals[$target_board]['unapproved_posts'] -= $num_unapproved;
-		$boardTotals[$target_board]['posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
+		$boardTotals[$target_board]['num_posts'] -= $topic_approved ? $num_replies + 1 : $num_replies;
 
 		// Get the member ID of the first and last message.
 		$request = $db->query('', '
@@ -470,23 +470,25 @@ class MergeTopics_Controller extends Action_Controller
 		// Assign the first topic ID to be the merged topic.
 		$id_topic = min($topics);
 
-		// Delete the remaining topics.
-		$deleted_topics = array_diff($topics, array($id_topic));
-		$db->query('', '
-			DELETE FROM {db_prefix}topics
-			WHERE id_topic IN ({array_int:deleted_topics})',
-			array(
-				'deleted_topics' => $deleted_topics,
-			)
-		);
+		// Grab the response prefix (like 'Re: ') in the default forum language.
+		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
+		{
+			if ($language === $user_info['language'])
+				$context['response_prefix'] = $txt['response_prefix'];
+			else
+			{
+				loadLanguage('index', $language, false);
+				$context['response_prefix'] = $txt['response_prefix'];
+				loadLanguage('index');
+			}
+			cache_put_data('response_prefix', $context['response_prefix'], 600);
+		}
 
-		$db->query('', '
-			DELETE FROM {db_prefix}log_search_subjects
-			WHERE id_topic IN ({array_int:deleted_topics})',
-			array(
-				'deleted_topics' => $deleted_topics,
-			)
-		);
+		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])): '';
+
+		// Merge topic notifications.
+		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();
+		fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications);
 
 		// Asssign the properties of the newly merged topic.
 		$db->query('', '
@@ -520,202 +522,20 @@ class MergeTopics_Controller extends Action_Controller
 			)
 		);
 
-		// Grab the response prefix (like 'Re: ') in the default forum language.
-		if (!isset($context['response_prefix']) && !($context['response_prefix'] = cache_get_data('response_prefix')))
-		{
-			if ($language === $user_info['language'])
-				$context['response_prefix'] = $txt['response_prefix'];
-			else
-			{
-				loadLanguage('index', $language, false);
-				$context['response_prefix'] = $txt['response_prefix'];
-				loadLanguage('index');
-			}
-			cache_put_data('response_prefix', $context['response_prefix'], 600);
-		}
-
-		$enforce_subject = isset($_POST['enforce_subject']) ? Util::htmlspecialchars(trim($_POST['enforce_subject'])): '';
-
-		// Change the topic IDs of all messages that will be merged.  Also adjust subjects if 'enforce subject' was checked.
-		$db->query('', '
-			UPDATE {db_prefix}messages
-			SET
-				id_topic = {int:id_topic},
-				id_board = {int:target_board}' . (empty($enforce_subject) ? '' : ',
-				subject = {string:subject}') . '
-			WHERE id_topic IN ({array_int:topic_list})',
-			array(
-				'topic_list' => $topics,
-				'id_topic' => $id_topic,
-				'target_board' => $target_board,
-				'subject' => $context['response_prefix'] . $target_subject,
-			)
-		);
-
-		// Any reported posts should reflect the new board.
-		$db->query('', '
-			UPDATE {db_prefix}log_reported
-			SET
-				id_topic = {int:id_topic},
-				id_board = {int:target_board}
-			WHERE id_topic IN ({array_int:topics_list})',
-			array(
-				'topics_list' => $topics,
-				'id_topic' => $id_topic,
-				'target_board' => $target_board,
-			)
-		);
-
-		// Change the subject of the first message...
-		$db->query('', '
-			UPDATE {db_prefix}messages
-			SET subject = {string:target_subject}
-			WHERE id_msg = {int:first_msg}',
-			array(
-				'first_msg' => $first_msg,
-				'target_subject' => $target_subject,
-			)
-		);
-
-		// Adjust all calendar events to point to the new topic.
-		$db->query('', '
-			UPDATE {db_prefix}calendar
-			SET
-				id_topic = {int:id_topic},
-				id_board = {int:target_board}
-			WHERE id_topic IN ({array_int:deleted_topics})',
-			array(
-				'deleted_topics' => $deleted_topics,
-				'id_topic' => $id_topic,
-				'target_board' => $target_board,
-			)
-		);
-
-		// Merge log topic entries.
-		// The disregard setting comes from the oldest topic
-		$request = $db->query('', '
-			SELECT id_member, MIN(id_msg) AS new_id_msg, disregarded
-			FROM {db_prefix}log_topics
-			WHERE id_topic IN ({array_int:topics})
-			GROUP BY id_member',
-			array(
-				'topics' => $topics,
-			)
-		);
-		if ($db->num_rows($request) > 0)
-		{
-			$replaceEntries = array();
-			while ($row = $db->fetch_assoc($request))
-				$replaceEntries[] = array($row['id_member'], $id_topic, $row['new_id_msg'], $row['disregarded']);
-
-			require_once(SUBSDIR . '/Topic.subs.php');
-			markTopicsRead($replaceEntries, true);
-			unset($replaceEntries);
-
-			// Get rid of the old log entries.
-			$db->query('', '
-				DELETE FROM {db_prefix}log_topics
-				WHERE id_topic IN ({array_int:deleted_topics})',
-				array(
-					'deleted_topics' => $deleted_topics,
-				)
-			);
-		}
-		$db->free_result($request);
-
-		// Merge topic notifications.
-		$notifications = isset($_POST['notifications']) && is_array($_POST['notifications']) ? array_intersect($topics, $_POST['notifications']) : array();
-		if (!empty($notifications))
-		{
-			$request = $db->query('', '
-				SELECT id_member, MAX(sent) AS sent
-				FROM {db_prefix}log_notify
-				WHERE id_topic IN ({array_int:topics_list})
-				GROUP BY id_member',
-				array(
-					'topics_list' => $notifications,
-				)
-			);
-			if ($db->num_rows($request) > 0)
-			{
-				$replaceEntries = array();
-				while ($row = $db->fetch_assoc($request))
-					$replaceEntries[] = array($row['id_member'], $id_topic, 0, $row['sent']);
-
-				$db->insert('replace',
-						'{db_prefix}log_notify',
-						array('id_member' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'sent' => 'int'),
-						$replaceEntries,
-						array('id_member', 'id_topic', 'id_board')
-					);
-				unset($replaceEntries);
-
-				$db->query('', '
-					DELETE FROM {db_prefix}log_topics
-					WHERE id_topic IN ({array_int:deleted_topics})',
-					array(
-						'deleted_topics' => $deleted_topics,
-					)
-				);
-			}
-			$db->free_result($request);
-		}
-
 		// Get rid of the redundant polls.
 		if (!empty($deleted_polls))
 		{
-			$db->query('', '
-				DELETE FROM {db_prefix}polls
-				WHERE id_poll IN ({array_int:deleted_polls})',
-				array(
-					'deleted_polls' => $deleted_polls,
-				)
-			);
-
-			$db->query('', '
-				DELETE FROM {db_prefix}poll_choices
-				WHERE id_poll IN ({array_int:deleted_polls})',
-				array(
-					'deleted_polls' => $deleted_polls,
-				)
-			);
-
-			$db->query('', '
-				DELETE FROM {db_prefix}log_polls
-				WHERE id_poll IN ({array_int:deleted_polls})',
-				array(
-					'deleted_polls' => $deleted_polls,
-				)
-			);
+			require_once(SUBSDIR . '/Poll.subs.php');
+			removePoll($deleted_polls);
 		}
 
 		// Cycle through each board...
 		foreach ($boardTotals as $id_board => $stats)
-		{
-			$db->query('', '
-				UPDATE {db_prefix}boards
-				SET
-					num_topics = CASE WHEN {int:topics} > num_topics THEN 0 ELSE num_topics - {int:topics} END,
-					unapproved_topics = CASE WHEN {int:unapproved_topics} > unapproved_topics THEN 0 ELSE unapproved_topics - {int:unapproved_topics} END,
-					num_posts = CASE WHEN {int:posts} > num_posts THEN 0 ELSE num_posts - {int:posts} END,
-					unapproved_posts = CASE WHEN {int:unapproved_posts} > unapproved_posts THEN 0 ELSE unapproved_posts - {int:unapproved_posts} END
-				WHERE id_board = {int:id_board}',
-				array(
-					'id_board' => $id_board,
-					'topics' => $stats['topics'],
-					'unapproved_topics' => $stats['unapproved_topics'],
-					'posts' => $stats['posts'],
-					'unapproved_posts' => $stats['unapproved_posts'],
-				)
-			);
-		}
+			decrementBoard($id_board, $stats);
 
 		// Determine the board the final topic resides in
-		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($id_topic);
 		$id_board = $topic_info['id_board'];
-
-		require_once(SUBSDIR . '/Post.subs.php');
 
 		// Update all the statistics.
 		updateStats('topic');
@@ -725,6 +545,7 @@ class MergeTopics_Controller extends Action_Controller
 		logAction('merge', array('topic' => $id_topic, 'board' => $id_board));
 
 		// Notify people that these topics have been merged?
+		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($id_topic, 'merge');
 
 		// If there's a search index that needs updating, update it...

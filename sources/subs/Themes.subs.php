@@ -74,7 +74,7 @@ function themeDirectory($id_theme)
 			'theme_dir' => 'theme_dir',
 		)
 	);
-	list($themeDirectory) = $db->fetch_row($request);
+	list ($themeDirectory) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $themeDirectory;
@@ -355,23 +355,6 @@ function get_file_listing($path, $relative)
 }
 
 /**
- * Updates the pathes for a theme. Used to fix invalid pathes.
- * @param array $setValues
- */
-function updateThemePath($setValues)
-{
-	$db = database();
-
-	$db->insert('replace',
-		'{db_prefix}themes',
-		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-		$setValues,
-		array('id_theme', 'variable', 'id_member')
-	);
-	
-}
-
-/**
  * Counts the theme options configured for guests
  * @return array
  */
@@ -398,6 +381,170 @@ function countConfiguredGuestOptions()
 }
 
 /**
+ * Counts the theme options configured for guests
+ * @return array
+ */
+function availableThemes($current_theme, $current_member)
+{
+	global $modSettings, $settings, $user_info, $txt, $language;
+
+	$db = database();
+
+	$available_themes = array();
+	if (!empty($modSettings['knownThemes']))
+	{
+		$request = $db->query('', '
+			SELECT id_theme, variable, value
+			FROM {db_prefix}themes
+			WHERE variable IN ({string:name}, {string:theme_url}, {string:theme_dir}, {string:images_url}, {string:disable_user_variant})' . (!allowedTo('admin_forum') ? '
+				AND id_theme IN ({array_string:known_themes})' : '') . '
+				AND id_theme != {int:default_theme}
+				AND id_member = {int:no_member}',
+			array(
+				'default_theme' => 0,
+				'name' => 'name',
+				'no_member' => 0,
+				'theme_url' => 'theme_url',
+				'theme_dir' => 'theme_dir',
+				'images_url' => 'images_url',
+				'disable_user_variant' => 'disable_user_variant',
+				'known_themes' => explode(',', $modSettings['knownThemes']),
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+		{
+			if (!isset($available_themes[$row['id_theme']]))
+				$available_themes[$row['id_theme']] = array(
+					'id' => $row['id_theme'],
+					'selected' => $current_theme == $row['id_theme'],
+					'num_users' => 0
+				);
+			$available_themes[$row['id_theme']][$row['variable']] = $row['value'];
+		}
+		$db->free_result($request);
+	}
+
+	// Okay, this is a complicated problem: the default theme is 1, but they aren't allowed to access 1!
+	if (!isset($available_themes[$modSettings['theme_guests']]))
+	{
+		$available_themes[0] = array(
+			'num_users' => 0
+		);
+		$guest_theme = 0;
+	}
+	else
+		$guest_theme = $modSettings['theme_guests'];
+
+	$request = $db->query('', '
+		SELECT id_theme, COUNT(*) AS the_count
+		FROM {db_prefix}members
+		GROUP BY id_theme
+		ORDER BY id_theme DESC',
+		array(
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Figure out which theme it is they are REALLY using.
+		if (!empty($modSettings['knownThemes']) && !in_array($row['id_theme'], explode(',', $modSettings['knownThemes'])))
+			$row['id_theme'] = $guest_theme;
+		elseif (empty($modSettings['theme_allow']))
+			$row['id_theme'] = $guest_theme;
+
+		if (isset($available_themes[$row['id_theme']]))
+			$available_themes[$row['id_theme']]['num_users'] += $row['the_count'];
+		else
+			$available_themes[$guest_theme]['num_users'] += $row['the_count'];
+	}
+	$db->free_result($request);
+
+	// Get any member variant preferences.
+	$variant_preferences = array();
+	if ($current_member > 0)
+	{
+		$request = $db->query('', '
+			SELECT id_theme, value
+			FROM {db_prefix}themes
+			WHERE variable = {string:theme_variant}
+				AND id_member IN ({array_int:id_member})
+			ORDER BY id_member ASC',
+			array(
+				'theme_variant' => 'theme_variant',
+				'id_member' => isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? array(-1, $current_member) : array(-1),
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$variant_preferences[$row['id_theme']] = $row['value'];
+		$db->free_result($request);
+	}
+
+	// Save the setting first.
+	$current_images_url = $settings['images_url'];
+	$current_theme_variants = !empty($settings['theme_variants']) ? $settings['theme_variants'] : array();
+
+	foreach ($available_themes as $id_theme => $theme_data)
+	{
+		// Don't try to load the forum or board default theme's data... it doesn't have any!
+		if ($id_theme == 0)
+			continue;
+
+		// The thumbnail needs the correct path.
+		$settings['images_url'] = &$theme_data['images_url'];
+
+		if (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php'))
+			include($theme_data['theme_dir'] . '/languages/Settings.' . $user_info['language'] . '.php');
+		elseif (file_exists($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php'))
+			include($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php');
+		else
+		{
+			$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
+			$txt['theme_description'] = '';
+		}
+
+		$available_themes[$id_theme]['thumbnail_href'] = $txt['theme_thumbnail_href'];
+		$available_themes[$id_theme]['description'] = $txt['theme_description'];
+
+		// Are there any variants?
+		if (file_exists($theme_data['theme_dir'] . '/index.template.php') && (empty($theme_data['disable_user_variant']) || allowedTo('admin_forum')))
+		{
+			$file_contents = implode('', file($theme_data['theme_dir'] . '/index.template.php'));
+			if (preg_match('~\$settings\[\'theme_variants\'\]\s*=(.+?);~', $file_contents, $matches))
+			{
+				$settings['theme_variants'] = array();
+
+				// Fill settings up.
+				eval('global $settings;' . $matches[0]);
+
+				if (!empty($settings['theme_variants']))
+				{
+					loadLanguage('Settings');
+
+					$available_themes[$id_theme]['variants'] = array();
+					foreach ($settings['theme_variants'] as $variant)
+						$available_themes[$id_theme]['variants'][$variant] = array(
+							'label' => isset($txt['variant_' . $variant]) ? $txt['variant_' . $variant] : $variant,
+							'thumbnail' => !file_exists($theme_data['theme_dir'] . '/images/thumbnail.png') || file_exists($theme_data['theme_dir'] . '/images/thumbnail_' . $variant . '.png') ? $theme_data['images_url'] . '/thumbnail_' . $variant . '.png' : ($theme_data['images_url'] . '/thumbnail.png'),
+						);
+
+					$available_themes[$id_theme]['selected_variant'] = isset($_GET['vrt']) ? $_GET['vrt'] : (!empty($variant_preferences[$id_theme]) ? $variant_preferences[$id_theme] : (!empty($settings['default_variant']) ? $settings['default_variant'] : $settings['theme_variants'][0]));
+					if (!isset($available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail']))
+						$available_themes[$id_theme]['selected_variant'] = $settings['theme_variants'][0];
+
+					$available_themes[$id_theme]['thumbnail_href'] = $available_themes[$id_theme]['variants'][$available_themes[$id_theme]['selected_variant']]['thumbnail'];
+					// Allow themes to override the text.
+					$available_themes[$id_theme]['pick_label'] = isset($txt['variant_pick']) ? $txt['variant_pick'] : $txt['theme_pick_variant'];
+				}
+			}
+		}
+	}
+
+	// Then return it.
+	$settings['images_url'] = $current_images_url;
+	$settings['theme_variants'] = $current_theme_variants;
+
+	return array($available_themes, $guest_theme);
+}
+/**
  * Counts the theme options configured for members
  * @return array
  */
@@ -407,20 +554,13 @@ function countConfiguredMemberOptions()
 
 	$themes = array();
 
-	// Need to make sure we don't do custom fields.
-	$customFields = loadCustomFields();
-
-	$customFieldsQuery = empty($customFields) ? '' : ('AND variable NOT IN ({array_string:custom_fields})');
-
 	$request = $db->query('themes_count', '
 		SELECT COUNT(DISTINCT id_member) AS value, id_theme
 		FROM {db_prefix}themes
 		WHERE id_member > {int:no_member}
-			' . $customFieldsQuery . '
 		GROUP BY id_theme',
 		array(
 			'no_member' => 0,
-			'custom_fields' => empty($customFields) ? array() : $customFields,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -433,67 +573,77 @@ function countConfiguredMemberOptions()
 /**
  * Deletes all outdated options from the themes table
  *
- * @param bool $default_theme -> true is default, false for all custom themes
- * @param bool $membergroups -> true is for members, false for guests
- * @param array $old_settings
+ * @param mixed $theme: if int to remove option from a specific theme,
+ *              if string it can be:
+ *               - 'default' => to remove from the default theme
+ *               - 'custom' => to remove from all the custom themes
+ *               - 'all' => to remove from both default and custom
+ * @param mixed $membergroups: if int a specific member
+ *              if string a "group" of members and it can assume the following values:
+ *               - 'guests' => obviously guests,
+ *               - 'members' => all members with custom settings (i.e. id_member > 0)
+ *               - 'non_default' => guests and members with custom settings (i.e. id_member != 0)
+ *               - 'all' => any record
+ * @param mixed $old_settings can be a string or an array of strings. If empty deletes all settings.
  */
-function removeThemeOptions($default_theme, $membergroups, $old_settings)
+function removeThemeOptions($theme, $membergroups, $old_settings = array())
 {
 	$db = database();
-	
-	// Which theme's option should we clean? 
-	$default = ($default_theme = true ? '=' : '!='); 
 
-	// Guest or regular membergroups?
-	if ($membergroups === false )
-		$mem_param = array('operator' => '=', 'id' => -1);
-	else
-		$mem_param = array('operator' => '>', 'id' => 0);
+	// The default theme is 1 (id_theme = 1)
+	if ($theme === 'default')
+		$query_param = array('theme_operator' => '=', 'theme' => 1);
+	// All the themes that are not the default one (id_theme != 1)
+	// @todo 'non_default' would be more esplicative, though it could be confused with the one in $membergroups
+	elseif ($theme === 'custom')
+		$query_param = array('theme_operator' => '!=', 'theme' => 1);
+	// If numeric means a specific theme
+	elseif (is_numeric($theme))
+		$query_param = array('theme_operator' => '=', 'theme' => (int) $theme);
 
+	// Guests means id_member = -1
+	if ($membergroups === 'guests' )
+		$query_param += array('member_operator' => '=', 'member' => -1);
+	// Members means id_member > 0
+	elseif ($membergroups === 'members')
+		$query_param += array('member_operator' => '>', 'member' => 0);
+	// Non default settings id_member != 0 (that is different from id_member > 0)
+	elseif ($membergroups === 'non_default')
+		$query_param += array('member_operator' => '!=', 'member' => 0);
+	// all it's all
+	elseif ($membergroups === 'all')
+		$query_param += array('member_operator' => '', 'member' => 0);
+	// If it is a number, then it means a specific member (id_member = (int))
+	elseif (is_numeric($membergroups))
+		$query_param += array('member_operator' => '=', 'member' => (int) $membergroups);
+
+	// If array or string set up the query accordingly
 	if (is_array($old_settings))
 		$var = 'variable IN ({array_string:old_settings})';
-	else
+	elseif (!empty($old_settings))
 		$var = 'variable = {string:old_settings}';
-	
-	$db->query('', '
-		DELETE FROM {db_prefix}themes
-		WHERE id_theme '. $default . ' {int:default_theme}
-			AND id_member ' . $mem_param['operator'] . ' {int:guest_member}
-			AND ' . $var,
-		array(
-			'default_theme' => 1,
-			'guest_member' => $mem_param['id'],
-			'old_settings' => $old_settings,
-		)
-	);
-}
-
-/**
- * Remove a specific option from the themes table
- *
- * @param int $theme
- * @param string $options
- */
-function removeThemeOption($theme, $options)
-{
-	$db = database();
+	// If empty then means any setting
+	else
+		$var = '1=1';
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
-		WHERE variable = {string:option}
-			AND id_member > {int:no_member}
-			AND id_theme = {int:current_theme}',
-		array(
-			'no_member' => 0,
-			'current_theme' => $theme,
-			'option' => $options,
+		WHERE ' . $var . ($membergroups === 'all' ? '' : '
+			AND id_member {raw:member_operator} {int:member}') . ($theme === 'all' ? '' : '
+			AND id_theme {raw:theme_operator} {int:theme}'),
+		array_merge(
+			$query_param,
+			array(
+				'old_settings' => $old_settings
+			)
 		)
 	);
 }
 
 /**
  * Update the default options for our users.
- * @param  array $setValues
+ *
+ * @param  array $setValues in the order: id_theme, id_member, variable name, value
  */
 function updateThemeOptions($setValues)
 {
@@ -501,7 +651,7 @@ function updateThemeOptions($setValues)
 
 	$db->insert('replace',
 		'{db_prefix}themes',
-		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
+		array('id_theme' => 'int', 'id_member' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
 		$setValues,
 		array('id_theme', 'variable', 'id_member')
 	);
@@ -532,29 +682,6 @@ function addThemeOptions($id_theme, $options, $value)
 }
 
 /**
- * Loads all the custom profile fields.
- *
- * @return array
- */
-function loadCustomFields()
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT col_name
-		FROM {db_prefix}custom_fields',
-		array(
-		)
-	);
-	$customFields = array();
-	while ($row = $db->fetch_assoc($request))
-		$customFields[] = $row['col_name'];
-	$db->free_result($request);
-
-	return $customFields;
-}
-
-/**
  * Deletes a theme from the database.
  *
  * @param int $id
@@ -566,7 +693,7 @@ function deleteTheme($id)
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
 		fatal_lang_error('no_access', false);
-	
+
 	$db->query('', '
 		DELETE FROM {db_prefix}themes
 		WHERE id_theme = {int:current_theme}',
@@ -687,6 +814,104 @@ function deleteVariants($id)
 			'theme_variant' => 'theme_variant',
 		)
 	);
+}
+
+function loadThemeOptionsInto($theme, $memID = null, $options = array(), $variables = array())
+{
+	$db = database();
+
+	$variables = is_array($variables) ? $variables : array($variables);
+
+	// @todo the ORDER BY may or may not be necessary:
+	// I have the feeling that *sometimes* the default order may be a bit messy,
+	// and considering this function is not use in frequently accessed areas the
+	// overhead for an ORDER BY should be acceptable
+	$request = $db->query('', '
+		SELECT variable, value
+		FROM {db_prefix}themes
+		WHERE id_theme IN ({array_int:current_theme})' . ($memID === null ? '' : (is_array($memID) ? '
+			AND id_member IN ({array_int:guest_member})' : '
+			AND id_member = {int:guest_member}')) . (!empty($variables) ? '
+			AND variable IN ({array_string:variables})' : '') . '
+		ORDER BY id_theme ASC' . ($memID === null ? '' : ', id_member ASC'),
+		array(
+			'current_theme' => is_array($theme) ? $theme : array($theme),
+			'guest_member' => $memID,
+			'variables' => $variables,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+		$options[$row['variable']] = $row['value'];
+	$db->free_result($request);
+
+	return $options;
+}
+
+/**
+ * @todo needs documentation
+ * @todo may be merged with something else?
+ */
+function loadBasedOnTheme($based_on, $explicit_images = false)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT th.value AS base_theme_dir, th2.value AS base_theme_url' . (!empty($explicit_images) ? '' : ', th3.value AS images_url') . '
+		FROM {db_prefix}themes AS th
+			INNER JOIN {db_prefix}themes AS th2 ON (th2.id_theme = th.id_theme
+				AND th2.id_member = {int:no_member}
+				AND th2.variable = {string:theme_url})' . (!empty($explicit_images) ? '' : '
+			INNER JOIN {db_prefix}themes AS th3 ON (th3.id_theme = th.id_theme
+				AND th3.id_member = {int:no_member}
+				AND th3.variable = {string:images_url})') . '
+		WHERE th.id_member = {int:no_member}
+			AND (th.value LIKE {string:based_on} OR th.value LIKE {string:based_on_path})
+			AND th.variable = {string:theme_dir}
+		LIMIT 1',
+		array(
+			'no_member' => 0,
+			'theme_url' => 'theme_url',
+			'images_url' => 'images_url',
+			'theme_dir' => 'theme_dir',
+			'based_on' => '%/' . $based_on,
+			'based_on_path' => '%' . "\\" . $based_on,
+		)
+	);
+	$temp = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $temp;
+}
+
+function write_theme_info($name, $version, $theme_dir, $theme_values)
+{
+	$xml_info = '<' . '?xml version="1.0"?' . '>
+	<theme-info xmlns="http://www.simplemachines.org/xml/theme-info" xmlns:elk="http://www.simplemachines.org/">
+		<!-- For the id, always use something unique - put your name, a colon, and then the package name. -->
+		<id>elk:' . Util::strtolower(str_replace(array(' '), '_', $name)) . '</id>
+		<version>' . $version . '</version>
+		<!-- Theme name, used purely for aesthetics. -->
+		<name>' . $name . '</name>
+		<!-- Author: your email address or contact information. The name attribute is optional. -->
+		<author name="Your Name">info@youremailaddress.tld</author>
+		<!-- Website... where to get updates and more information. -->
+		<website>http://www.yourdomain.tld/</website>
+		<!-- Template layers to use, defaults to "html,body". -->
+		<layers>' . (empty($theme_values['theme_layers']) ? 'html,body' : $theme_values['theme_layers']) . '</layers>
+		<!-- Templates to load on startup. Default is "index". -->
+		<templates>' . (empty($theme_values['theme_templates']) ? 'index' : $theme_values['theme_templates']) . '</templates>
+		<!-- Base this theme off another? Default is blank, or no. It could be "default". -->
+		<based-on></based-on>
+	</theme-info>';
+
+	// Now write it.
+	$fp = @fopen($theme_dir . '/theme_info.xml', 'w+');
+	if ($fp)
+	{
+		fwrite($fp, $xml_info);
+		fclose($fp);
+	}
 }
 
 /**

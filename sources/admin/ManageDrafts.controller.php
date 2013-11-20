@@ -51,16 +51,10 @@ class ManageDrafts_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 		loadLanguage('Drafts');
 
-		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
-
 		// initialize the form
 		$this->_initDraftSettingsForm();
 
 		$config_vars = $this->_draftSettings->settings();
-
-		// Get the settings template ready.
-		require_once(SUBSDIR . '/Settings.class.php');
 
 		// Setup the template.
 		$context['page_title'] = $txt['managedrafts_settings'];
@@ -83,7 +77,7 @@ class ManageDrafts_Controller extends Action_Controller
 		}
 
 		// some javascript to enable / disable the frequency input box
-		$context['settings_post_javascript'] = '
+		addInlineJavascript('
 			var autosave = document.getElementById(\'drafts_autosave_enabled\');
 			createEventListener(autosave)
 			autosave.addEventListener(\'change\', toggle);
@@ -93,8 +87,7 @@ class ManageDrafts_Controller extends Action_Controller
 			{
 				var select_elem = document.getElementById(\'drafts_autosave_frequency\');
 				select_elem.disabled = !autosave.checked;
-			}
-		';
+			}', true);
 
 		// Final settings...
 		$context['post_url'] = $scripturl . '?action=admin;area=managedrafts;save';

@@ -14,7 +14,7 @@ $txt['theme_remove'] = 'Uninstall';
 $txt['theme_remove_confirm'] = 'Are you sure you want to uninstall this theme?';
 
 $txt['theme_install'] = 'Install a New Theme';
-$txt['theme_install_file'] = 'From a file';
+$txt['theme_install_file'] = 'From an archive (e.g. .zip, .tar.gz)';
 $txt['theme_install_dir'] = 'From a directory on the server';
 $txt['theme_install_error'] = 'That theme directory doesn\'t exist, or doesn\'t contain a theme.';
 $txt['theme_install_write_error'] = 'The themes directory must be writable to continue.';
@@ -25,9 +25,6 @@ $txt['theme_install_writable'] = 'Warning - you cannot create or install a new t
 $txt['theme_install_general'] = 'The theme doesn\'t seem to be where it should, please double check the information you provided.';
 $txt['theme_installed'] = 'Installed Successfully';
 $txt['theme_installed_message'] = 'was installed successfully.';
-
-$txt['theme_latest'] = 'Latest and Greatest Themes';
-$txt['theme_latest_fetch'] = 'Fetching latest themes from www.elkarte.net...';
 
 $txt['theme_pick'] = 'Choose a theme...';
 $txt['theme_preview'] = 'Preview theme';
@@ -58,12 +55,37 @@ $txt['theme_variants_user_disable'] = 'Disable user variant selection';
 
 $txt['site_slogan'] = 'Site slogan';
 $txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the default logo.';
+$txt['header_layout'] = 'Header layout';
+$txt['header_layout_desc'] = 'This setting allows you to select one of three layout for the header.
+<ul>
+	<li><strong>Default</strong>: the logo is placed on the right and the name of the community on the left</li>
+	<li><strong>Only logo</strong>: only the logo is displayed, in a centered position</li>
+	<li><strong>Logo on the left</strong>: similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)</li>
+</ul>';
+$txt['header_layout_default'] = 'Default';
+$txt['header_layout_logo_only'] = 'Only logo';
+$txt['header_layout_inverted'] = 'Logo on the left';
 $txt['forum_width'] = 'Forum width';
 $txt['forum_width_desc'] = 'Set the forum width. Examples: 950px, 80%, 1240px.';
 
-$txt['enable_random_news'] = 'Enable random news line in the forum header';
+$txt['enable_news'] = 'News line in the forum header';
+$txt['enable_news_off'] = 'Off';
+$txt['enable_news_random'] = 'Random';
+$txt['enable_news_fader'] = 'Fader';
+$txt['enable_news_desc'] = '<ul>
+	<li>
+		<strong>Off</strong>: no news shown
+	</li>
+	<li>
+		<strong>Random</strong>: one news shown chosen at random
+	</li>
+	<li>
+		<strong>Fader</strong>: all the news are displayed sequentially
+	</li>
+</ul>';
+
 $txt['show_group_key'] = 'Show group key on board index';
-$txt['additional_options_collapsable'] = 'Enable collapsible additional post options';
+$txt['additional_options_collapsible'] = 'Enable collapsible additional post options';
 $txt['message_index_preview'] = 'Show post previews on the message index';
 $txt['message_index_preview_off'] = 'Do not show the previews';
 $txt['message_index_preview_first'] = 'Show the text of the first post';
@@ -82,7 +104,6 @@ $txt['last_modification'] = 'Show last modification date on modified posts';
 $txt['user_avatars'] = 'Show user avatars in message view';
 $txt['user_text'] = 'Show personal text in message view';
 $txt['gender_images'] = 'Show gender images in message view';
-$txt['news_fader'] = 'Show news fader on board index';
 $txt['member_list_bar'] = 'Show members list bar on board index';
 $txt['current_pos_text_img'] = 'Show current position in forum as link instead of text';
 $txt['show_view_profile_button'] = 'Show view profile button under post';

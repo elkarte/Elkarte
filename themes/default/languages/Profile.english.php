@@ -15,8 +15,20 @@ $txt['profile_moderation'] = 'Moderation Information';
 $txt['profile_more'] = 'Signature';
 $txt['profile_attachments'] = 'Recent Attachments';
 $txt['profile_attachments_no'] = 'There are no Attachments from this member';
+$txt['profile_posts'] = 'Recent Posts';
+$txt['profile_posts_no'] = 'There are no posts from this member';
+$txt['profile_topics'] = 'Recent Topics';
+$txt['profile_topics_no'] = 'There are no topics from this member';
 $txt['profile_buddies_no'] = 'You have not set any buddies';
 $txt['profile_user_info'] = 'User Info';
+$txt['profile_contact_no'] = 'There is no contact informatin for this member';
+$txt['profile_signature_no'] = 'There is no signature for this member';
+$txt['profile_additonal_no'] = 'There is no additonal information for this member';
+$txt['profile_user_summary'] = 'Summary';
+$txt['profile_action'] = 'Currently';
+$txt['profile_recent_activity'] = 'Recent Activity';
+$txt['profile_activity'] = 'Activity';
+$txt['profile_loadavg'] = 'Please try again later.  This information is not currently available due to high demand on the site.';
 
 $txt['change_profile'] = 'Change profile';
 $txt['preview_signature'] = 'Preview signature';
@@ -24,7 +36,6 @@ $txt['current_signature'] = 'Current signature';
 $txt['signature_preview'] = 'Signature preview';
 $txt['delete_user'] = 'Delete user';
 $txt['current_status'] = 'Current Status:';
-$txt['personal_text'] = 'Personal Text';
 $txt['personal_picture'] = 'Personalized Picture';
 $txt['no_avatar'] = 'No avatar';
 $txt['choose_avatar_gallery'] = 'Choose avatar from gallery';
@@ -163,7 +174,7 @@ $txt['showPosts'] = 'Show Posts';
 $txt['showPosts_help'] = 'This section allows you to view all posts made by this member. Note that you can only see posts made in areas you currently have access to.';
 $txt['showMessages'] = 'Messages';
 $txt['showTopics'] = 'Topics';
-$txt['showDisregarded'] = 'Disregarded topics';
+$txt['showUnwatched'] = 'Unwatched topics';
 $txt['showAttachments'] = 'Attachments';
 $txt['viewWarning_help'] = 'This section allows you to view all warnings issued to this member.';
 $txt['statPanel'] = 'Show Stats';
@@ -175,6 +186,18 @@ $txt['trackActivity'] = 'Activity';
 $txt['trackIP'] = 'IP Address';
 $txt['trackLogins'] = 'Logins';
 
+$txt['likes_show'] = 'Show Likes';
+$txt['likes_given'] = 'Posts you liked';
+$txt['likes_profile_received'] = 'Likes received';
+$txt['likes_profile_given'] = 'Likes given';
+$txt['likes_received'] = 'Your posts liked by others';
+$txt['likes_none_given'] = 'You have not liked any posts';
+$txt['likes_none_received'] = 'No one has liked any of your posts :\'(';
+$txt['likes_confirm_delete'] = 'Remove this like?';
+$txt['likes_show_who'] = 'Show the members that liked this post';
+$txt['likes_by'] = 'Liked by';
+$txt['likes_delete'] = 'Delete';
+
 $txt['authentication'] = 'Authentication';
 $txt['change_authentication'] = 'From this section you can change how you login to the forum. You may choose to either use an OpenID account for your authentication, or alternatively switch to use a username and password.';
 
@@ -182,13 +205,13 @@ $txt['profileEdit'] = 'Modify Profile';
 $txt['account_info'] = 'These are your account settings. This page holds all critical information that identifies you on this forum. For security reasons, you will need to enter your (current) password to make changes to this information.';
 $txt['forumProfile_info'] = 'You can change your personal information on this page. This information will be displayed throughout ' . $context['forum_name_html_safe'] . '. If you aren\'t comfortable with sharing some information, simply skip it - nothing here is required.';
 $txt['theme_info'] = 'This section allows you to customize the look and layout of the forum.';
-$txt['notification'] = 'Notifications';
+$txt['notifications'] = 'Notifications';
 $txt['notification_info'] = 'This allows you to be notified of replies to posts, newly posted topics, and forum announcements. You can change those settings here, or oversee the topics and boards you are currently receiving notifications for.';
 $txt['groupmembership'] = 'Group Membership';
 $txt['groupMembership_info'] = 'In this section of your profile you can change which groups you belong to.';
 $txt['ignoreboards'] = 'Ignore Boards Options';
 $txt['ignoreboards_info'] = 'This page lets you ignore particular boards.  When a board is ignored, the new post indicator will not show up on the board index.  New posts will not show up using the "unread post" search link (when searching it will not look in those boards). However, ignored boards will still appear on the board index and upon entering will show which topics have new posts.  When using the "unread replies" link, new posts in an ignored board will still be shown.';
-$txt['pmprefs'] = 'Personal Messaging';
+$txt['contactprefs'] = 'Messaging';
 
 $txt['profileAction'] = 'Actions';
 $txt['deleteAccount'] = 'Delete this account';
@@ -248,7 +271,7 @@ $txt['registration_not_activated'] = 'Sorry, this account has not yet been activ
 
 $txt['primary_membergroup'] = 'Primary Membergroup';
 $txt['additional_membergroups'] = 'Additional Membergroups';
-$txt['additional_membergroups_show'] = '[ show additional groups ]';
+$txt['additional_membergroups_show'] = 'Show additional groups';
 $txt['no_primary_membergroup'] = '(no primary membergroup)';
 $txt['deadmin_confirm'] = 'Are you sure you wish to irrevocably remove your admin status?';
 
@@ -285,8 +308,8 @@ $txt['timeformat_easy5'] = 'DD-MM-YYYY, HH:MM:SS';
 
 $txt['poster'] = 'Poster';
 
-$txt['use_sidebar_menu'] = 'Use sidebar menus instead of dropdown menus.';
-$txt['use_click_menu'] = 'Use click instead of hover to open menus.';
+$txt['use_sidebar_menu'] = 'Use sidebar menu instead of dropdowns.';
+$txt['use_click_menu'] = 'Use click to open menus, instead of hover to open.';
 $txt['show_no_avatars'] = 'Don\'t show users\' avatars.';
 $txt['show_no_signatures'] = 'Don\'t show users\' signatures.';
 $txt['show_no_censored'] = 'Leave words uncensored.';
@@ -321,7 +344,7 @@ $txt['show_member_topics'] = 'View Member Topics';
 $txt['show_member_attachments'] = 'View Member Attachments';
 $txt['show_posts_none'] = 'No posts have been posted yet.';
 $txt['show_topics_none'] = 'No topics have been posted yet.';
-$txt['disregarded_topics_none'] = 'You don\'t have any topic in the disregarded list.';
+$txt['unwatched_topics_none'] = 'You don\'t have any topic in the unwatch list.';
 $txt['show_attachments_none'] = 'No attachments have been posted yet.';
 $txt['show_attach_filename'] = 'Filename';
 $txt['show_attach_downloads'] = 'Downloads';
@@ -332,7 +355,7 @@ $txt['showPermissions_status'] = 'Permission status';
 $txt['showPermissions_help'] = 'This section allows you to view all permissions for this member (denied permissions are <del>struck out</del>).';
 $txt['showPermissions_given'] = 'Given by';
 $txt['showPermissions_denied'] = 'Denied by';
-$txt['showPermissions_permission'] = 'Permission (denied permissions are <del>struck out</del>)';
+$txt['showPermissions_permission'] = 'Permission (denied permissions are shown <del>struck through</del>)';
 $txt['showPermissions_none_general'] = 'This member has no general permissions set.';
 $txt['showPermissions_none_board'] = 'This member has no board specific permissions set.';
 $txt['showPermissions_all'] = 'As an administrator, this member has all possible permissions.';
@@ -347,13 +370,13 @@ $txt['posts_per_day'] = 'per day';
 
 $txt['buddy_ignore_desc'] = 'This area allows you to maintain your buddy and ignore lists for this forum. Adding members to these lists will, amongst other things, help control mail and PM traffic, depending on your preferences.';
 
-$txt['buddy_add'] = 'Add To Buddy List';
-$txt['buddy_remove'] = 'Remove From Buddy List';
+$txt['buddy_add'] = 'Add to buddy list';
+$txt['buddy_remove'] = 'Remove from buddy list';
 $txt['buddy_add_button'] = 'Add';
 $txt['no_buddies'] = 'Your buddy list is currently empty';
 
-$txt['ignore_add'] = 'Add To Ignore List';
-$txt['ignore_remove'] = 'Remove From Ignore List';
+$txt['ignore_add'] = 'Add to ignore list';
+$txt['ignore_remove'] = 'Remove from ignore list';
 $txt['ignore_add_button'] = 'Add';
 $txt['no_ignore'] = 'Your ignore list is currently empty';
 
@@ -451,21 +474,19 @@ $txt['email_notify_never'] = 'Never';
 $txt['email_notify_buddies'] = 'From Buddies Only';
 $txt['email_notify_always'] = 'Always';
 
-$txt['pm_receive_from'] = 'Receive personal messages from:';
-$txt['pm_receive_from_everyone'] = 'All members';
-$txt['pm_receive_from_ignore'] = 'All members, except those on my ignore list';
-$txt['pm_receive_from_admins'] = 'Administrators only';
-$txt['pm_receive_from_buddies'] = 'Buddies and Administrators only';
+$txt['receive_from'] = 'Members allowed to contact me:';
+$txt['receive_from_everyone'] = 'All members';
+$txt['receive_from_ignore'] = 'All members, except those on my ignore list';
+$txt['receive_from_admins'] = 'Administrators only';
+$txt['receive_from_buddies'] = 'Buddies and Administrators only';
+$txt['receive_from_description'] = 'This setting applies to both Personal Messages and emails (if the option to email members is enabled)';
 
-$txt['copy_to_outbox'] = 'Save a copy of each personal message in my sent items by default.';
 $txt['popup_messages'] = 'Show a popup when I receive new messages.';
 $txt['pm_remove_inbox_label'] = 'Remove the inbox label when applying another label';
 $txt['pm_display_mode'] = 'Display personal messages';
 $txt['pm_display_mode_all'] = 'All at once';
 $txt['pm_display_mode_one'] = 'One at a time';
 $txt['pm_display_mode_linked'] = 'As a conversation';
-// Use entities in the below string.
-$txt['pm_recommend_enable_outbox'] = 'To make the most of this setting we suggest you enable &quot;Save a copy of each Personal Message in my sent items by default&quot;\\n\\nThis will help ensure that the conversations flow better as you can see both sides of the conversation.';
 
 $txt['history'] = 'History';
 $txt['history_description'] = 'This section allows you to review certain profile actions performed on this member\'s profile as well as track their IP address and login history.';

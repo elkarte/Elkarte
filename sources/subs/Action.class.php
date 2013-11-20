@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0 Alpha
+ *
  */
 
 /**
@@ -24,25 +26,28 @@ class Action
 	 * The accepted array format is:
 	 *    'sub_action name' => 'function name',
 	 *  or
-	 *    'sub_action name' => array (
-	 *  	'function' => 'function name'),
+	 *    'sub_action name' => array(
+	 *    'function' => 'function name'),
 	 *  or
-	 *    'sub_action name' => array (
-	 *  	'controller' => 'controller name',
-	 *  	'function' => 'method name'
-	 *  	'enabled' => true/false),
+	 *    'sub_action name' => array(
+	 *    'controller' => 'controller name',
+	 *    'function' => 'method name',
+	 *    'enabled' => true/false,
+	 *    'permission' => area),
 	 *  or
-	 *    'sub_action name' => array (
-	 *  	'controller object, i.e. $this',
-	 *  	'method name',
-	 *  	'enabled' => true/false),
+	 *    'sub_action name' => array(
+	 *    'controller object, i.e. $this',
+	 *    'method name',
+	 *    'enabled' => true/false
+	 *    'permission' => area),
 	 *  or
-	 *    'sub_action name' => array (
-	 *  	'file' => 'file name',
-	 *		'dir' => 'controller file location', if not set ADMINDIR is assumed
-	 *  	'controller' => 'controller name',
-	 *  	'function' => 'method name',
-	 *  	'enabled' => true/false)
+	 *    'sub_action name' => array(
+	 *    'file' => 'file name',
+	 *    'dir' => 'controller file location', if not set ADMINDIR is assumed
+	 *    'controller' => 'controller name',
+	 *    'function' => 'method name',
+	 *    'enabled' => true/false,
+	 *    'permission' => area)
 	 * @var array
 	 */
 	protected $_subActions;
@@ -60,7 +65,7 @@ class Action
 	 *
 	 * @param array $subactions
 	 */
-	function initialize($subactions, $default = '')
+	public function initialize($subactions, $default = '')
 	{
 		$this->_subActions = array();
 
@@ -79,7 +84,7 @@ class Action
 	 *
 	 * @param string $sa
 	 */
-	function dispatch($sa)
+	public function dispatch($sa)
 	{
 		// for our sanity...
 		if (!key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
@@ -116,6 +121,11 @@ class Action
 				// 'controller'->'function'
 				$controller_name = $subAction['controller'];
 				$controller = new $controller_name();
+
+				// Starting a new controller, run pre_dispatch
+				if (method_exists($controller, 'pre_dispatch'))
+					$controller->pre_dispatch();
+
 				$controller->{$subAction['function']}();
 			}
 			elseif (isset($subAction['function']))
@@ -180,7 +190,7 @@ class Action
 	 *
 	 * @param string $sa
 	 */
-	function isAllowedTo($sa)
+	public function isAllowedTo($sa)
 	{
 		if (is_array($this->_subActions) && key_exists($sa, $this->_subActions))
 		{

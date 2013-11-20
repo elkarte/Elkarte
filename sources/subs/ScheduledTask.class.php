@@ -145,7 +145,7 @@ class ScheduledTask
 			// Check whether they are interested.
 			if (!empty($row['mod_prefs']))
 			{
-				list(,, $pref_binary) = explode('|', $row['mod_prefs']);
+				list (,, $pref_binary) = explode('|', $row['mod_prefs']);
 				if (!($pref_binary & 4))
 					continue;
 			}
@@ -253,9 +253,6 @@ class ScheduledTask
 
 		// First clean out the cache.
 		clean_cache();
-
-		// We're working with databases here (do we)
-		$db = database();
 
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
 		list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
@@ -373,13 +370,11 @@ class ScheduledTask
 	{
 		global $modSettings, $db_prefix;
 
+		// we're working with them databases but we shouldn't :P
 		$db = database();
 
 		// By default do it now!
 		$delay = false;
-
-		// we're working with them databases but we shouldn't :P
-		$db = database();
 
 		// As a kind of hack, if the server load is too great delay, but only by a bit!
 		if (!empty($modSettings['load_average']) && !empty($modSettings['loadavg_auto_opt']) && $modSettings['load_average'] >= $modSettings['loadavg_auto_opt'])
@@ -551,7 +546,7 @@ class ScheduledTask
 					// Convert to markdown markup e.g. text ;)
 					pbe_prepare_text($row['body']);
 					$row['body'] = shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
-					$row['body'] = preg_replace("~\n~s","\n  ", $row['body']);
+					$row['body'] = preg_replace("~\n~s", "\n  ", $row['body']);
 				}
 
 				// Topics are simple since we are only concerned with the first post
@@ -597,7 +592,7 @@ class ScheduledTask
 					$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
 					pbe_prepare_text($body);
 					$body = shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
-					$body = preg_replace("~\n~s","\n  ", $body);
+					$body = preg_replace("~\n~s", "\n  ", $body);
 					$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
 
 					unset($types['reply'][$id]['lines'][$topic['id']]['body_text'], $body);
@@ -830,7 +825,7 @@ class ScheduledTask
 	 */
 	function fetchFiles()
 	{
-		global $txt, $language, $forum_version, $modSettings;
+		global $txt, $language, $forum_version, $modSettings, $context;
 
 		$db = database();
 
@@ -874,6 +869,7 @@ class ScheduledTask
 			// If we are tossing errors - give up - the site might be down.
 			if ($file_data === false && $errors++ > 2)
 			{
+				$context['scheduled_errors']['fetchFiles'][] = sprintf($txt['st_cannot_retrieve_file'], $url);
 				log_error(sprintf($txt['st_cannot_retrieve_file'], $url));
 				return false;
 			}
@@ -1147,13 +1143,8 @@ class ScheduledTask
 				// Figure out when our cutoff time is.  1 day = 86400 seconds.
 				$t = time() - $modSettings['pruneSpiderHitLog'] * 86400;
 
-				$db->query('', '
-					DELETE FROM {db_prefix}log_spider_hits
-					WHERE log_time < {int:log_time}',
-					array(
-						'log_time' => $t,
-					)
-				);
+				require_once(SUBSDIR . '/SearchEngines.subs.php');
+				removeSpiderOldLogs($t);
 			}
 		}
 
@@ -1278,13 +1269,26 @@ class ScheduledTask
 	 */
 	function remove_temp_attachments()
 	{
+		global $context, $txt;
+
 		// We need to know where this thing is going.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$attach_dirs = attachmentPaths();
 
 		foreach ($attach_dirs as $attach_dir)
 		{
-			$dir = @opendir($attach_dir) or fatal_lang_error('cant_access_upload_path', 'critical');
+			$dir = @opendir($attach_dir);
+			if (!$dir)
+			{
+				loadEssentialThemeData();
+				loadLanguage('Post');
+
+				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
+				log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
+
+				return false;
+			}
+
 			while ($file = readdir($dir))
 			{
 				if ($file == '.' || $file == '..')
@@ -1299,6 +1303,8 @@ class ScheduledTask
 			}
 			closedir($dir);
 		}
+
+		return true;
 	}
 
 	/**
@@ -1399,12 +1405,17 @@ class ScheduledTask
 	 */
 	function remove_old_followups()
 	{
+		global $modSettings;
+
+		if (empty($modSettings['enableFollowup']))
+			return;
+
 		$db = database();
 
 		$request = $db->query('', '
 			SELECT fu.derived_from
-			FROM {db_prefix}follow_ups as fu
-				LEFT JOIN {db_prefix}messages as m ON (fu.derived_from = m.id_msg)
+			FROM {db_prefix}follow_ups AS fu
+				LEFT JOIN {db_prefix}messages AS m ON (fu.derived_from = m.id_msg)
 			WHERE m.id_msg IS NULL
 			LIMIT {int:limit}',
 			array(

@@ -46,7 +46,7 @@ class twocheckout_display
 
 	public function fetchGatewayFields($unique_id, $sub_data, $value, $period, $return_url)
 	{
-		global $modSettings, $txt, $boardurl, $context;
+		global $modSettings, $txt, $context;
 
 		$return_data = array(
 			'form' => 'https://www.2checkout.com/2co/buyer/purchase',

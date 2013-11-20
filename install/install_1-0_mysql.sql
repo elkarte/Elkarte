@@ -23,13 +23,9 @@ CREATE TABLE {$db_prefix}admin_info_files (
 INSERT INTO {$db_prefix}admin_info_files
 	(id_file, filename, path, parameters, data, filetype)
 VALUES
-	(1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript'),
-	(2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript'),
-	(4, 'latest-packages.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(5, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(6, 'latest-support.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
-	(7, 'latest-themes.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+	(1, 'current-version.js', 'http://elkarte.github.io/Elkarte/site/', 'version=%3$s', '', 'text/javascript'),
+	(2, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript'),
+	(3, 'latest-news.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
 
 #
@@ -80,7 +76,8 @@ CREATE TABLE {$db_prefix}attachments (
   PRIMARY KEY (id_attach),
   UNIQUE id_member (id_member, id_attach),
   KEY id_msg (id_msg),
-  KEY attachment_type (attachment_type)
+  KEY attachment_type (attachment_type),
+  KEY id_thumb (id_thumb)
 ) ENGINE=MyISAM;
 
 #
@@ -759,8 +756,38 @@ CREATE TABLE {$db_prefix}custom_fields (
   default_value varchar(255) NOT NULL default '',
   enclose text NOT NULL,
   placement tinyint(3) NOT NULL default '0',
+  vieworder smallint(5) NOT NULL default '0',
   PRIMARY KEY (id_field),
   UNIQUE col_name (col_name)
+) ENGINE=MyISAM;
+
+#
+# Dumping data for table `custom_fields`
+#
+
+INSERT INTO `{$db_prefix}custom_fields`
+	(`col_name`, `field_name`, `field_desc`, `field_type`, `field_length`, `field_options`, `mask`, `show_reg`, `show_display`, `show_profile`, `private`, `active`, `bbc`, `can_search`, `default_value`, `enclose`, `placement`)
+VALUES
+	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1),
+	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1),
+	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1),
+	('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1),
+	('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1),
+	('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1),
+	('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1),
+	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
+# --------------------------------------------------------
+
+#
+# Table structure for table `custom_fields_data`
+#
+
+CREATE TABLE {$db_prefix}custom_fields_data (
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  variable varchar(255) NOT NULL default '',
+  value text NOT NULL,
+  PRIMARY KEY (id_member, variable(30)),
+  KEY id_member (id_member)
 ) ENGINE=MyISAM;
 
 #
@@ -821,6 +848,28 @@ CREATE TABLE {$db_prefix}log_activity (
   email smallint(5) unsigned NOT NULL default '0',
   PRIMARY KEY (date),
   KEY most_on (most_on)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `log_badbehavior`
+#
+
+CREATE TABLE {$db_prefix}log_badbehavior (
+  id int(10) NOT NULL auto_increment,
+  ip char(19) NOT NULL,
+  date int(10) NOT NULL default '0',
+  request_method varchar(255) NOT NULL,
+  request_uri varchar(255) NOT NULL,
+  server_protocol varchar(255) NOT NULL,
+  http_headers text NOT NULL,
+  user_agent varchar(255) NOT NULL,
+  request_entity varchar(255) NOT NULL,
+  valid varchar(255) NOT NULL,
+  id_member mediumint(8) unsigned NOT NULL,
+  session char(64) NOT NULL default '',
+  PRIMARY KEY (id),
+  INDEX ip (ip),
+  INDEX user_agent (user_agent)
 ) ENGINE=MyISAM;
 
 #
@@ -909,8 +958,8 @@ CREATE TABLE {$db_prefix}log_errors (
 CREATE TABLE {$db_prefix}log_floodcontrol (
   ip char(16) NOT NULL default '                ',
   log_time int(10) unsigned NOT NULL default '0',
-  log_type varchar(8) NOT NULL default 'post',
-  PRIMARY KEY (ip(16), log_type(8))
+  log_type varchar(10) NOT NULL default 'post',
+  PRIMARY KEY (ip(16), log_type(10))
 ) ENGINE=MyISAM;
 
 #
@@ -941,6 +990,19 @@ CREATE TABLE {$db_prefix}log_karma (
 ) ENGINE=MyISAM;
 
 #
+# Table structure for table `log_likes`
+#
+
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target mediumint(8) unsigned NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  log_time int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member),
+  KEY log_time (log_time)
+) ENGINE=MyISAM;
+
+#
 # Table structure for table `log_mark_read`
 #
 
@@ -960,6 +1022,22 @@ CREATE TABLE {$db_prefix}log_member_notices (
   subject varchar(255) NOT NULL default '',
   body text NOT NULL,
   PRIMARY KEY (id_notice)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `log_notifications`
+#
+
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
+  id_notification int(10) NOT NULL auto_increment,
+  id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
+  id_msg int(10) unsigned NOT NULL DEFAULT '0',
+  status tinyint(1) NOT NULL DEFAULT '0',
+  id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
+  log_time int(10) unsigned NOT NULL DEFAULT '0',
+  notif_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_notification),
+  KEY id_member (id_member,status)
 ) ENGINE=MyISAM;
 
 #
@@ -1060,7 +1138,7 @@ CREATE TABLE {$db_prefix}log_reported (
 CREATE TABLE {$db_prefix}log_reported_comments (
   id_comment mediumint(8) unsigned NOT NULL auto_increment,
   id_report mediumint(8) NOT NULL default '0',
-  id_member mediumint(8) NOT NULL,
+  id_member mediumint(8) unsigned NOT NULL,
   membername varchar(255) NOT NULL default '',
   email_address varchar(255) NOT NULL default '',
   member_ip varchar(255) NOT NULL default '',
@@ -1133,7 +1211,7 @@ CREATE TABLE {$db_prefix}log_search_topics (
 #
 
 CREATE TABLE {$db_prefix}log_spider_hits (
-	id_hit int(10) unsigned NOT NULL auto_increment,
+  id_hit int(10) unsigned NOT NULL auto_increment,
   id_spider smallint(5) unsigned NOT NULL default '0',
   log_time int(10) unsigned NOT NULL default '0',
   url varchar(255) NOT NULL default '',
@@ -1189,7 +1267,7 @@ CREATE TABLE {$db_prefix}log_topics (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_topic mediumint(8) unsigned NOT NULL default '0',
   id_msg int(10) unsigned NOT NULL default '0',
-  disregarded tinyint(3) NOT NULL default '0',
+  unwatched tinyint(3) NOT NULL default '0',
   PRIMARY KEY (id_member, id_topic),
   KEY id_topic (id_topic)
 ) ENGINE=MyISAM;
@@ -1262,12 +1340,13 @@ CREATE TABLE {$db_prefix}members (
   lngfile varchar(255) NOT NULL default '',
   last_login int(10) unsigned NOT NULL default '0',
   real_name varchar(255) NOT NULL default '',
-  instant_messages smallint(5) NOT NULL default 0,
-  unread_messages smallint(5) NOT NULL default 0,
+  personal_messages smallint(5) NOT NULL default '0',
+  notifications smallint(5) NOT NULL default '0',
+  unread_messages smallint(5) NOT NULL default '0',
   new_pm tinyint(3) unsigned NOT NULL default '0',
   buddy_list text NOT NULL,
   pm_ignore_list varchar(255) NOT NULL default '',
-  pm_prefs mediumint(8) NOT NULL default '0',
+  pm_prefs mediumint(8) NOT NULL default '2',
   mod_prefs varchar(20) NOT NULL default '',
   message_labels text NOT NULL,
   passwd varchar(64) NOT NULL default '',
@@ -1311,7 +1390,7 @@ CREATE TABLE {$db_prefix}members (
   ignore_boards text NOT NULL,
   warning tinyint(4) NOT NULL default '0',
   passwd_flood varchar(12) NOT NULL default '',
-  pm_receive_from tinyint(4) unsigned NOT NULL default '1',
+  receive_from tinyint(4) unsigned NOT NULL default '1',
   PRIMARY KEY (id_member),
   KEY member_name (member_name),
   KEY real_name (real_name),
@@ -1333,7 +1412,7 @@ CREATE TABLE {$db_prefix}members (
 
 CREATE TABLE {$db_prefix}member_logins (
   id_login int(10) NOT NULL auto_increment,
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   time int(10) NOT NULL default '0',
   ip varchar(255) NOT NULL default '0',
   ip2 varchar(255) NOT NULL default '0',
@@ -1377,6 +1456,19 @@ VALUES ('xx', 'Standard', '0'),
 	('wink', 'Wink', '11'),
 	('poll', 'Poll', '12');
 # --------------------------------------------------------
+
+#
+# Table structure for table `message_likes`
+#
+
+CREATE TABLE {$db_prefix}message_likes (
+  id_member mediumint(8) unsigned NOT NULL default '0',
+  id_msg mediumint(8) unsigned NOT NULL default '0',
+  id_poster mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY (id_msg, id_member),
+  KEY id_member (id_member),
+  KEY id_poster (id_poster)
+) ENGINE=MyISAM;
 
 #
 # Table structure for table `messages`
@@ -1513,8 +1605,6 @@ VALUES (-1, 'search_posts'),
 	(0, 'profile_view_any'),
 	(0, 'pm_read'),
 	(0, 'pm_send'),
-	(0, 'pm_draft'),
-	(0, 'pm_autosave_draft'),
 	(0, 'calendar_view'),
 	(0, 'view_stats'),
 	(0, 'who_view'),
@@ -1620,7 +1710,7 @@ CREATE TABLE {$db_prefix}polls (
   guest_vote tinyint(3) unsigned NOT NULL default '0',
   num_guest_voters int(10) unsigned NOT NULL default '0',
   reset_poll int(10) unsigned NOT NULL default '0',
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   poster_name varchar(255) NOT NULL default '',
   PRIMARY KEY (id_poll)
 ) ENGINE=MyISAM;
@@ -1635,6 +1725,49 @@ CREATE TABLE {$db_prefix}poll_choices (
   label varchar(255) NOT NULL default '',
   votes smallint(5) unsigned NOT NULL default '0',
   PRIMARY KEY (id_poll, id_choice)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `postby_emails`
+#
+
+CREATE TABLE {$db_prefix}postby_emails (
+  id_email varchar(50) NOT NULL,
+  time_sent int(10) NOT NULL default '0',
+  email_to varchar(50) NOT NULL,
+  PRIMARY KEY (id_email)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `postby_emails_error`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_error (
+  id_email int(10) NOT NULL auto_increment,
+  error varchar(255) NOT NULL default '',
+  data_id varchar(255) NOT NULL default '0',
+  subject varchar(255) NOT NULL default '',
+  id_message int(10) NOT NULL default '0',
+  id_board smallint(5) NOT NULL default '0',
+  email_from varchar(50) NOT NULL default '',
+  message_type char(10) NOT NULL default '',
+  message mediumtext NOT NULL,
+  PRIMARY KEY (id_email)
+) ENGINE=MyISAM;
+
+#
+# Table structure for table `postby_emails_filters`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_filters (
+  id_filter int(10) NOT NULL auto_increment,
+  filter_style char(5) NOT NULL default '',
+  filter_type varchar(255) NOT NULL default '',
+  filter_to varchar(255) NOT NULL default '',
+  filter_from varchar(255) NOT NULL default '',
+  filter_name varchar(255) NOT NULL default '',
+  filter_order int(10) NOT NULL default '0',
+  PRIMARY KEY (id_filter)
 ) ENGINE=MyISAM;
 
 #
@@ -1778,7 +1911,6 @@ VALUES ('elkVersion', '{$current_version}'),
 	('allow_editDisplayName', '1'),
 	('admin_session_lifetime', '10'),
 	('allow_hideOnline', '1'),
-	('guest_hideContacts', '1'),
 	('spamWaitTime', '5'),
 	('pm_spam_settings', '10,5,20'),
 	('reserveWord', '0'),
@@ -1817,6 +1949,7 @@ VALUES ('elkVersion', '{$current_version}'),
 	('defaultMaxTopics', '20'),
 	('defaultMaxMembers', '30'),
 	('enableParticipation', '1'),
+	('enableFollowup', '1'),
 	('recycle_enable', '0'),
 	('recycle_board', '0'),
 	('maxMsgID', '1'),
@@ -1828,8 +1961,8 @@ VALUES ('elkVersion', '{$current_version}'),
 	('cookieTime', '60'),
 	('jquery_source', 'local'),
 	('lastActive', '15'),
-	('smiley_sets_known', 'default,aaron,akyhne,fugue'),
-	('smiley_sets_names', '{$default_smileyset_name}\n{$default_aaron_smileyset_name}\n{$default_akyhne_smileyset_name}\n{$default_fugue_smileyset_name}'),
+	('smiley_sets_known', 'default'),
+	('smiley_sets_names', '{$default_smileyset_name}'),
 	('smiley_sets_default', 'default'),
 	('cal_days_for_index', '7'),
 	('requireAgreement', '1'),
@@ -1875,13 +2008,13 @@ VALUES ('elkVersion', '{$current_version}'),
 	('attachment_thumb_png', '1'),
 	('avatar_reencode', '1'),
 	('avatar_paranoid', '0'),
-	('enable_disregard', '0'),
+	('enable_unwatch', '0'),
 	('badbehavior_enabled', '0'),
 	('badbehavior_logging', '0'),
 	('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}'),
 	('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
-	('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}'),
-	('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
+	('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
+	('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}');
 # --------------------------------------------------------
 
 #
@@ -1937,7 +2070,7 @@ VALUES (':)', 'smiley.gif', '{$default_smiley_smiley}', 0, 0),
 	('O0', 'afro.gif', '{$default_afro_smiley}', 18, 1),
 	(':))', 'laugh.gif', '{$default_laugh_smiley}', 19, 1),
 	('C:-)', 'police.gif', '{$default_police_smiley}', 20, 1),
-	('O:-)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
+	('O:)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
 # --------------------------------------------------------
 
 #
@@ -1985,6 +2118,7 @@ VALUES (1, 'Google', 'googlebot', ''),
 	(25, 'Yandex (Video)', 'YandexVideo', ''),
 	(26, 'Yandex (Blogs)', 'YandexBlogs', ''),
 	(27, 'Yandex (Media)', 'YandexMedia', '');
+# --------------------------------------------------------
 
 #
 # Table structure for table `subscriptions`
@@ -2012,7 +2146,7 @@ CREATE TABLE {$db_prefix}subscriptions(
 #
 
 CREATE TABLE {$db_prefix}themes (
-  id_member mediumint(8) NOT NULL default '0',
+  id_member mediumint(8) unsigned NOT NULL default '0',
   id_theme tinyint(4) unsigned NOT NULL default '1',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,
@@ -2036,7 +2170,6 @@ VALUES (1, 'name', '{$default_theme_name}'),
 	(1, 'show_user_images', '1'),
 	(1, 'show_blurb', '1'),
 	(1, 'show_gender', '0'),
-	(1, 'show_newsfader', '0'),
 	(1, 'number_recent_posts', '0'),
 	(1, 'show_member_bar', '1'),
 	(1, 'linktree_link', '1'),
@@ -2050,8 +2183,11 @@ VALUES (1, 'name', '{$default_theme_name}'),
 	(1, 'enable_news', '1'),
 	(1, 'forum_width', '90%');
 
-INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '2');
-INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
+INSERT INTO {$db_prefix}themes
+	(id_member, id_theme, variable, value)
+VALUES
+	(-1, 1, 'display_quick_reply', '2'),
+	(-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 
 #
@@ -2117,91 +2253,6 @@ CREATE TABLE {$db_prefix}user_drafts (
   locked tinyint(4) NOT NULL default '0',
   is_sticky tinyint(4) NOT NULL default '0',
   to_list varchar(255) NOT NULL default '',
-  outbox tinyint(4) NOT NULL default '0',
   PRIMARY KEY (id_draft),
   UNIQUE id_member (id_member, id_draft, type)
-) ENGINE=MyISAM;
-# --------------------------------------------------------
-
-#
-# Table structure for table `log_badbehavior`
-#
-CREATE TABLE {$db_prefix}log_badbehavior (
-	id int(10) NOT NULL auto_increment,
-	ip char(19) NOT NULL,
-	date int(10) NOT NULL default '0',
-	request_method varchar(255) NOT NULL,
-	request_uri varchar(255) NOT NULL,
-	server_protocol varchar(255) NOT NULL,
-	http_headers text NOT NULL,
-	user_agent varchar(255) NOT NULL,
-	request_entity varchar(255) NOT NULL,
-	valid varchar(255) NOT NULL,
-	id_member mediumint(8) unsigned NOT NULL,
-	session char(64) NOT NULL default '',
-	PRIMARY KEY (id),
-	INDEX ip (ip),
-	INDEX user_agent (user_agent)
-) ENGINE=MyISAM;
-
-#
-# Table structure for table `postby_emails`
-#
-CREATE TABLE {$db_prefix}postby_emails (
-	id_email varchar(50) NOT NULL,
-	time_sent int(10) NOT NULL default '0',
-	email_to varchar(50) NOT NULL,
-	PRIMARY KEY (id_email)
-) ENGINE=MyISAM;
-
-#
-# Table structure for table `postby_emails_error`
-#
-CREATE TABLE {$db_prefix}postby_emails_error (
-	id_email int(10) NOT NULL auto_increment,
-	error varchar(255) NOT NULL default '',
-	data_id varchar(255) NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	id_message int(10) NOT NULL default '0',
-	id_board smallint(5) NOT NULL default '0',
-	email_from varchar(50) NOT NULL default '',
-	message_type char(10) NOT NULL default '',
-	message mediumtext NOT NULL,
-	PRIMARY KEY (id_email)
-) ENGINE=MyISAM;
-
-#
-# Table structure for table `postby_emails_filters`
-#
-CREATE TABLE {$db_prefix}postby_emails_filters (
-	id_filter int(10) NOT NULL auto_increment,
-	filter_style char(5) NOT NULL default '',
-	filter_type varchar(255) NOT NULL default '',
-	filter_to varchar(255) NOT NULL default '',
-	filter_from varchar(255) NOT NULL default '',
-	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter)
-) ENGINE=MyISAM;
-
-#
-# Table structure for table `log_likes`
-#
-
-CREATE TABLE {$db_prefix}log_likes (
-  action char(1) NOT NULL default '0',
-  id_target mediumint(8) unsigned NOT NULL default '0',
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  log_time int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member),
-  KEY log_time (log_time)
-) ENGINE=MyISAM;
-
-#
-# Table structure for table `message_likes`
-#
-
-CREATE TABLE {$db_prefix}message_likes (
-  id_member mediumint(8) unsigned NOT NULL default '0',
-  id_msg mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member)
 ) ENGINE=MyISAM;

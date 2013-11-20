@@ -24,12 +24,10 @@ function template_search_members()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=viewmembers" method="post" accept-charset="UTF-8" id="admin_form_wrapper">
-			<div class="cat_bar">
-				<h3 class="catbg">
+			<h2 class="category_header">
 					<span class="floatleft">', $txt['search_for'], '</span>
 					<span class="smalltext floatright">', $txt['wild_cards_allowed'], '</span>
-				</h3>
-			</div>
+			</h2>
 			<input type="hidden" name="sa" value="query" />
 			<div class="windowbg">
 				<div class="content">
@@ -152,14 +150,13 @@ function template_search_members()
 								<legend>', $txt['activation_status'], '</legend>
 								<label for="activated-0"><input type="checkbox" name="activated[]" value="1" id="activated-0" checked="checked" class="input_check" /> ', $txt['activated'], '</label>&nbsp;&nbsp;
 								<label for="activated-1"><input type="checkbox" name="activated[]" value="0" id="activated-1" checked="checked" class="input_check" /> ', $txt['not_activated'], '</label>
+								<label for="activated-2"><input type="checkbox" name="activated[]" value="11" id="activated-2" checked="checked" class="input_check" /> ', $txt['is_banned'], '</label>
 							</fieldset>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="title_bar">
-				<h3 class="titlebg">', $txt['member_part_of_these_membergroups'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['member_part_of_these_membergroups'], '</h3>
 			<div class="flow_hidden">
 				<table style="width:49%" class="table_grid floatleft">
 					<thead>
@@ -171,8 +168,8 @@ function template_search_members()
 					</thead>
 					<tbody>';
 
-			foreach ($context['membergroups'] as $membergroup)
-				echo '
+	foreach ($context['membergroups'] as $membergroup)
+		echo '
 						<tr class="windowbg2">
 							<td>', $membergroup['name'], '</td>
 							<td class="centertext">
@@ -183,7 +180,7 @@ function template_search_members()
 							</td>
 						</tr>';
 
-			echo '
+	echo '
 						<tr class="windowbg2">
 							<td>
 								<em>', $txt['check_all'], '</em>
@@ -201,16 +198,16 @@ function template_search_members()
 				<table style="width:49%" class="table_grid floatright">
 					<thead>
 						<tr class="table_head">
-							<th scope="col" class="first_th">
+							<th scope="col">
 								', $txt['membergroups_postgroups'], '
 							</th>
-							<th class="last_th">&nbsp;</th>
+							<th>&nbsp;</th>
 						</tr>
 					</thead>
 					<tbody>';
 
-			foreach ($context['postgroups'] as $postgroup)
-				echo '
+	foreach ($context['postgroups'] as $postgroup)
+		echo '
 						<tr class="windowbg2">
 							<td>
 								', $postgroup['name'], '
@@ -220,7 +217,7 @@ function template_search_members()
 							</td>
 						</tr>';
 
-			echo '
+	echo '
 						<tr class="windowbg2">
 							<td>
 								<em>', $txt['check_all'], '</em>
@@ -256,9 +253,7 @@ function template_admin_browse()
 		echo '
 		<br />
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=viewmembers" method="post" accept-charset="UTF-8" name="postFormOutstanding" id="postFormOutstanding" onsubmit="return onOutstandingSubmit();">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['admin_browse_outstanding'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['admin_browse_outstanding'], '</h2>
 			<script><!-- // --><![CDATA[
 				function onOutstandingSubmit()
 				{

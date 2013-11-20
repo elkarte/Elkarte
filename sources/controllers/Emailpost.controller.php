@@ -97,7 +97,7 @@ class Emailpost_Controller extends Action_Controller
 		// Can't find this key in the database, either
 		//   a) spam attempt or b) replying with an expired/consumed key
 		if (empty($key_owner))
-			return pbe_emailError('error_' . ($message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
+			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
 
 		// The key received was not sent to this member ... how we love those email aggregators
 		if (strtolower($key_owner) !== $email_message->email['from'] && !$force)
@@ -190,11 +190,10 @@ class Emailpost_Controller extends Action_Controller
 	 * Accessed through emailtopic.
 	 *
 	 * @param string $data used to supply a full body+headers email
-	 * @param type $force used to override common failure errors
 	 */
-	function action_pbe_topic($data = null, $force = false)
+	function action_pbe_topic($data = null)
 	{
-		global $modSettings, $user_info;
+		global $modSettings, $user_info, $maintenance;
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
@@ -301,10 +300,10 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->load_key();
 
 		// Any reason to avoid using the html version since it helps with formatting
-		if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >=2)
+		if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 		{
 			// Some mobile responses wrap everything in a table structure
-			$text = $email_message->body_plain;
+			$text = $email_message->plain_body;
 			$html = false;
 		}
 		else
@@ -327,7 +326,7 @@ class Emailpost_Controller extends Action_Controller
 			$text .= "\n\n" . sprintf($txt['email_attachments'], $attachment_count);
 
 		// Return the parsed and formatted body and who it was sent to for the template
-		return array('body' => $text, 'to' => implode(' & ', $email_message->email['to']) . (!empty($email_message->email['cc']) ? ', ' . implode(' & ',$email_message->email['cc']) : ''));
+		return array('body' => $text, 'to' => implode(' & ', $email_message->email['to']) . (!empty($email_message->email['cc']) ? ', ' . implode(' & ', $email_message->email['cc']) : ''));
 	}
 }
 
@@ -343,7 +342,7 @@ class Emailpost_Controller extends Action_Controller
  */
 function pbe_create_post($pbe, $email_message, $topic_info)
 {
-    global $modSettings, $txt;
+	global $modSettings, $txt;
 
 	// Validate they have permission to reply
 	$becomesApproved = true;
@@ -414,12 +413,15 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
 
 	// Turn notifications on or off
-	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify);
+	query_notifications($pbe['profile']['id_member'], $topic_info['id_board'], $topic_info['id_topic'], $auto_notify, $pbe['user_info']['permissions']);
 
 	// Notify members who have notification turned on for this,
 	// but only if it's going to be approved
 	if ($becomesApproved)
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($topic_info['id_topic'], 'reply', array(), array(), $pbe);
+	}
 
 	return true;
 }
@@ -437,7 +439,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 */
 function pbe_create_pm($pbe, $email_message)
 {
-    global $modSettings, $txt;
+	global $modSettings, $txt;
 
 	// Can they send?
 	if (!$pbe['user_info']['is_admin'] && !in_array('pm_send', $pbe['user_info']['permissions']))
@@ -453,10 +455,6 @@ function pbe_create_pm($pbe, $email_message)
 	if (!empty($email_message->attachments) && !empty($modSettings['maillist_allow_attachments']) && !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1)
 		$text .= "\n\n" . $txt['error_no_pm_attach'] . "\n";
 
-	// We need how they have their PM options are set up
-	$theme_settings = query_get_theme($pbe['profile']['id_member'], $pbe['profile']['id_theme'], array());
-	$copy_to_outbox = isset($theme_settings['copy_to_outbox']) ? true : false;
-
 	// For sending the message...
 	$from = array(
 		'id' => $pbe['profile']['id_member'],
@@ -468,7 +466,7 @@ function pbe_create_pm($pbe, $email_message)
 
 	// send/save the actual PM.
 	require_once(SUBSDIR . '/PersonalMessage.subs.php');
-	$pm_result = sendpm(array('to' => array($pm_info['id_member_from']), 'bcc' => array()), $pm_info['subject'], $text, $copy_to_outbox, $from, $pm_info['id_pm_head']);
+	$pm_result = sendpm(array('to' => array($pm_info['id_member_from']), 'bcc' => array()), $pm_info['subject'], $text, true, $from, $pm_info['id_pm_head']);
 
 	// Assuming all went well, mark this as read, replied to and update the unread counter
 	if (!empty($pm_result))
@@ -479,7 +477,7 @@ function pbe_create_pm($pbe, $email_message)
 
 /**
  * Called by
- *	- pbe_topic to create a new topic
+ *  - pbe_topic to create a new topic
  *  - pbe_main to create a new topic via a subject change
  * Checks posting permissions, but requires email validation checks are complete
  *  - Calls pbe_load_text to prepare text for the post
@@ -576,11 +574,14 @@ function pbe_create_topic($pbe, $email_message, $board_info)
 	$auto_notify = isset($theme_settings['auto_notify']) ? $theme_settings['auto_notify'] : 0;
 
 	// Notifications on or off
-	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify);
+	query_notifications($pbe['profile']['id_member'], $board_info['id_board'], $topicOptions['id'], $auto_notify, $pbe['user_info']['permissions']);
 
 	// Notify members who have notification turned on for this, (if it's approved)
 	if ($becomesApproved)
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
 		sendNotifications($topicOptions['id'], 'reply', array(), array(), $pbe);
+	}
 
 	// Update this users info so the log shows them as active
 	query_update_member_stats($pbe, $email_message, $topicOptions);
@@ -600,7 +601,7 @@ function pbe_load_text($html, $email_message, $pbe)
 	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
 	{
 		// Some mobile responses wrap everything in a table structure so use plain text
-		$text = $email_message->body_plain;
+		$text = $email_message->plain_body;
 		$html = false;
 	}
 	else
@@ -619,7 +620,6 @@ function pbe_load_text($html, $email_message, $pbe)
 	if ($email_message->message_type !== 'p')
 	{
 		// Prepare it for the database
-		$text = Util::htmlspecialchars($text, ENT_QUOTES);
 		require_once(SUBSDIR . '/Post.subs.php');
 		preparsecode($text);
 	}

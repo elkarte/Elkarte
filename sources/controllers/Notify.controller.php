@@ -264,9 +264,9 @@ class Notify_Controller extends Action_Controller
 	 * The sub-action can be 'on', 'off', or nothing for what to do.
 	 * Requires the mark_any_notify permission.
 	 * Upon successful completion of action will direct user back to topic.
-	 * Accessed via ?action=disregardtopic.
+	 * Accessed via ?action=unwatchtopic.
 	 */
-	public function action_disregardtopic()
+	public function action_unwatchtopic()
 	{
 		global $user_info, $topic, $modSettings;
 
@@ -276,11 +276,11 @@ class Notify_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Let's do something only if the function is enabled
-		if (!$user_info['is_guest'] && !empty($modSettings['enable_disregard']))
+		if (!$user_info['is_guest'] && !empty($modSettings['enable_unwatch']))
 		{
 			checkSession('get');
 
-			setTopicRegard($user_info['id'], $topic, $_GET['sa'] == 'on');
+			setTopicWatch($user_info['id'], $topic, $_GET['sa'] == 'on');
 		}
 
 		// Back to the topic.
@@ -291,7 +291,7 @@ class Notify_Controller extends Action_Controller
 	 * Turn off/on unread replies subscription for a topic
 	 * Intended for use in XML or JSON calls
 	 */
-	public function action_disregardtopic_api()
+	public function action_unwatchtopic_api()
 	{
 		global $user_info, $topic, $modSettings, $txt, $context, $scripturl;
 
@@ -311,7 +311,7 @@ class Notify_Controller extends Action_Controller
 		}
 
 		// Let's do something only if the function is enabled
-		if (empty($modSettings['enable_disregard']))
+		if (empty($modSettings['enable_unwatch']))
 		{
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
@@ -326,7 +326,7 @@ class Notify_Controller extends Action_Controller
 			loadLanguage('Errors');
 			$context['xml_data'] = array(
 				'error' => 1,
-				'url' => $scripturl . '?action=disregardtopic;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'url' => $scripturl . '?action=unwatchtopic;sa=' . ($_GET['sa'] == 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $_REQUEST['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
 			return;
 		}
@@ -334,11 +334,11 @@ class Notify_Controller extends Action_Controller
 		// our topic functions are here
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		setTopicRegard($user_info['id'], $topic, $_GET['sa'] == 'on');
+		setTopicWatch($user_info['id'], $topic, $_GET['sa'] == 'on');
 
 		$context['xml_data'] = array(
-			'text' => $_GET['sa'] == 'on' ? $txt['undisregard'] : $txt['disregard'],
-			'url' => $scripturl . '?action=disregardtopic;topic=' . $context['current_topic'] . '.' . $_REQUEST['start'] . ';sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
+			'text' => $_GET['sa'] == 'on' ? $txt['watch'] : $txt['unwatch'],
+			'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $_REQUEST['start'] . ';sa=' . ($_GET['sa'] == 'on' ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id'] . ';api' . (isset($_REQUEST['json']) ? ';json' : ''),
 		);
 	}
 }

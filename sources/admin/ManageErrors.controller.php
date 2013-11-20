@@ -170,28 +170,26 @@ class ManageErrors_Controller extends Action_Controller
 				$context['filter']['value']['html'] = '<a href="' . $scripturl . '?action=profile;u=' . $id . '">' . $user_profile[$id]['real_name'] . '</a>';
 			}
 			elseif ($filter['variable'] == 'url')
-				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) == '?' ? $scripturl : '') . $filter['value']['sql']), array('\_' => '_')) . '\'';
+				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars((substr($filter['value']['sql'], 0, 1) == '?' ? $scripturl : '') . $filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array('\_' => '_')) . '\'';
 			elseif ($filter['variable'] == 'message')
 			{
-				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql']), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
+				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
 				$context['filter']['value']['html'] = preg_replace('~&amp;lt;span class=&amp;quot;remove&amp;quot;&amp;gt;(.+?)&amp;lt;/span&amp;gt;~', '$1', $context['filter']['value']['html']);
 			}
 			elseif ($filter['variable'] == 'error_type')
 			{
-				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql']), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
+				$context['filter']['value']['html'] = '\'' . strtr(htmlspecialchars($filter['value']['sql'], ENT_COMPAT, 'UTF-8'), array("\n" => '<br />', '&lt;br /&gt;' => '<br />', "\t" => '&nbsp;&nbsp;&nbsp;', '\_' => '_', '\\%' => '%', '\\\\' => '\\')) . '\'';
 			}
 			else
 				$context['filter']['value']['html'] = &$filter['value']['sql'];
 		}
 
-		$context['error_types'] = array();
-
 		$sort = ($context['sort_direction'] == 'down') ? ';desc' : '';
+
 		// What type of errors do we have and how many do we have?
+		$context['error_types'] = array();
 		$context['error_types'] = fetchErrorsByType($filter, $sort);
-		$sum = 0;
-		foreach ($context['error_types'] as $key => $value)
-			$sum += $key;
+		$sum = end(array_keys($context['error_types']));
 
 		$context['error_types']['all'] = array(
 			'label' => $txt['errortype_all'],
@@ -247,7 +245,7 @@ class ManageErrors_Controller extends Action_Controller
 		$basename = strtolower(basename($file));
 		$ext = strrchr($basename, '.');
 		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
-			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename)));
+			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
 
 		// get the min and max lines
 		$min = $line - 16 <= 0 ? 1 : $line - 16;
@@ -256,7 +254,7 @@ class ManageErrors_Controller extends Action_Controller
 		if ($max <= 0 || $min >= $max)
 			fatal_lang_error('error_bad_line');
 
-		$file_data = explode('<br />', highlight_php_code(htmlspecialchars(implode('', file($file)))));
+		$file_data = explode('<br />', highlight_php_code(htmlspecialchars(implode('', file($file)), ENT_COMPAT, 'UTF-8')));
 
 		// We don't want to slice off too many so lets make sure we stop at the last one
 		$max = min($max, max(array_keys($file_data)));

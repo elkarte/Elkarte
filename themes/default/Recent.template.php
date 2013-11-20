@@ -20,15 +20,17 @@
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
-		template_pagesection(false, false, 'go_down');
+
+	template_pagesection();
+
 	echo '
 		<div id="recentposts" class="forumposts">';
-		//template_pagesection(false, false, 'go_down');
-		echo '
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />',$txt['recent_posts'],'
+
+	echo '
+			<h3 class="category_header">
+				<img src="', $settings['images_url'], '/post/xx.png" alt="" class="icon" />', $txt['recent_posts'], '
 			</h3>';
-	//template_pagesection(false, false, 'go_down');
+
 	// @todo - I'm sure markup could be cleaned up a bit more here. CSS needs a bit of a tweak too.
 	foreach ($context['posts'] as $post)
 	{
@@ -75,10 +77,9 @@ function template_main()
 			</div>';
 	}
 
-	//template_pagesection();
-
 	echo '
 		</div>';
+
 	template_pagesection();
 }
 
@@ -91,7 +92,7 @@ function template_unread()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right', 'go_down');
+		template_pagesection('recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
 			echo '
@@ -102,25 +103,43 @@ function template_unread()
 
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'], '
-						</h2>
-						<ul class="topic_listing" id="unread">
-							<li class="topic_sorting_row">
-								<h3>
-									Sort by: <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] == 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-											/ <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] == 'replies' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] == 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-											 / <a href="', $scripturl, '?action=unread', $context['showing_all_topics'] ? ';all' : '', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] == 'last_post' && $context['sort_direction'] == 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] == 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-								</h3>';
+							', $context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit'];
+
+		echo '
+							<span class="sort_by_container">
+								<ul id="sort_by" class="topic_sorting">';
 
 		// Show a "select all" box for quick moderation?
 		if ($context['showCheckboxes'])
 			echo '
-								<p>
-									<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
-								</p>';
+									<li class="listlevel1 quickmod_select_all">
+										<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+									</li>';
+
+		$current_header = $context['topics_headers'][$context['sort_by']];
+		echo '
+									<li class="listlevel1 topic_sorting_row">
+										<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+									</li>';
 
 		echo '
-							</li>';
+									<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+										<ul class="menulevel2" id="sortby">';
+
+		foreach ($context['topics_headers'] as $key => $value)
+			echo '
+											<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+		echo '
+										</ul>';
+
+		echo '
+									</li>
+								</ul>
+							</span>';
+
+		echo '
+						</h2>
+						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
 		{
@@ -144,18 +163,16 @@ function template_unread()
 									<p class="topic_icons">
 										<img src="', $topic['first_post']['icon_url'], '" alt="" /><img src="', $settings['images_url'], '/icons/profile_sm.png" alt="" class="fred" />
 									</p>
-									<div class="topic_name">';
-
-			echo '
+									<div class="topic_name">
 										<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
 										<h4>
-											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+											', $topic['is_sticky'] ? '<strong>' : '', '<span class="preview" title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
-									<p class="topic_starter">
+									<div class="topic_starter">
 										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], !empty($topic['pages']) ? '
-										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</span>' : '', '
-									</p>
+										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
+									</div>
 								</div>
 								<div class="topic_latest">
 									<p class="topic_stats">
@@ -182,17 +199,17 @@ function template_unread()
 		echo '
 						</ul>';
 
-		template_pagesection('recent_buttons', 'right');
-
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
 
-	echo '
+		template_pagesection('recent_buttons', 'right');
+
+		echo '
 					<div id="topic_icons" class="description">
 						<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
 							<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
-							'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
+							' . ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
 						</p>
 						<p>
 							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
@@ -207,10 +224,9 @@ function template_unread()
 							', $txt['topic_alert_none'], '
 						</h2>
 						<div class="board_row centertext">
-							', $context['showing_all_topics'] ? '<strong>'. $txt['find_no_results']. '</strong>' : $txt['unread_topics_visit_none'], '
+							', $context['showing_all_topics'] ? '<strong>' . $txt['find_no_results'] . '</strong>' : $txt['unread_topics_visit_none'], '
 						</div>
 					</div>';
-
 }
 
 /**
@@ -222,7 +238,7 @@ function template_replies()
 
 	if (!empty($context['topics']))
 	{
-		template_pagesection('recent_buttons', 'right', 'go_down');
+		template_pagesection('recent_buttons', 'right');
 
 		if ($context['showCheckboxes'])
 			echo '
@@ -234,25 +250,41 @@ function template_replies()
 		// [WIP] There is trial code here to hide the topic icon column. Colspan can be cleaned up later.
 		echo '
 						<h2 class="category_header" id="unread_header">
-							', $txt['unread_replies'], '
-						</h2>
-						<ul class="topic_listing" id="unread">
-							<li class="topic_sorting_row">
-								<h3>
-									Sort by: <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=subject', $context['sort_by'] === 'subject' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['subject'], $context['sort_by'] === 'subject' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-											/ <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=replies', $context['sort_by'] === 'replies' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['replies'], $context['sort_by'] === 'replies' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-											 / <a href="', $scripturl, '?action=unreadreplies', $context['querystring_board_limits'], ';sort=last_post', $context['sort_by'] === 'last_post' && $context['sort_direction'] === 'up' ? ';desc' : '', '">', $txt['last_post'], $context['sort_by'] === 'last_post' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
-								</h3>';
-
-		// Show a "select all" box for quick moderation?
-		if ($context['showCheckboxes'])
-			echo '
-								<p>
-									<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />
-								</p>';
+							', $txt['unread_replies'];
 
 		echo '
-							</li>';
+							<span class="sort_by_container">
+								<ul id="sort_by" class="topic_sorting" >';
+		if ($context['showCheckboxes'])
+			echo '
+									<li class="listlevel1 quickmod_select_all">
+										<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+									</li>';
+
+		$current_header = $context['topics_headers'][$context['sort_by']];
+		echo '
+									<li class="listlevel1 topic_sorting_row">
+										<a href="', $current_header['url'], '">', $current_header['sort_dir_img'], '</a>
+									</li>';
+
+		echo '
+									<li class="listlevel1 topic_sorting_row">', $txt['sort_by'], ': <a href="', $current_header['url'], '">', $txt[$context['sort_by']], '</a>
+										<ul class="menulevel2" id="sortby">';
+		foreach ($context['topics_headers'] as $key => $value)
+			echo '
+											<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+		echo '
+										</ul>';
+
+			// Show a "select all" box for quick moderation?
+		echo '
+									</li>
+								</ul>
+							</span>';
+
+		echo '
+						</h2>
+						<ul class="topic_listing" id="unread">';
 
 		foreach ($context['topics'] as $topic)
 		{
@@ -282,13 +314,13 @@ function template_replies()
 			echo '
 										<a href="', $topic['new_href'], '" id="newicon', $topic['first_post']['id'], '"><span class="new_posts">' . $txt['new'] . '</span></a>
 										<h4>
-											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview_first'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
+											', $topic['is_sticky'] ? '<strong>' : '', '<span title="', $topic[(!empty($settings['message_index_preview']) && $settings['message_index_preview'] == 2 ? 'last_post' : 'first_post')]['preview'], '"><span id="msg_' . $topic['first_post']['id'] . '">', $topic['first_post']['link'], '</span></span>', $topic['is_sticky'] ? '</strong>' : '', '
 										</h4>
 									</div>
-									<p class="topic_starter">
+									<div class="topic_starter">
 										', $topic['first_post']['started_by'], !empty($topic['pages']) ? '
-										<span class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '">' . $topic['pages'] . '</span>' : '', '
-									</p>
+										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
+									</div>
 								</div>
 								<div class="topic_latest">
 									<p class="topic_stats">
@@ -315,17 +347,17 @@ function template_replies()
 		echo '
 						</ul>';
 
-		template_pagesection('recent_buttons', 'right');
-
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
 
-	echo '
+		template_pagesection('recent_buttons', 'right');
+
+		echo '
 					<div id="topic_icons" class="description">
 						<p class="floatleft">', !empty($modSettings['enableParticipation']) && $context['user']['is_logged'] ? '
 							<img src="' . $settings['images_url'] . '/icons/profile_sm.png" alt="" class="centericon" /> ' . $txt['participation_caption'] : '<img src="' . $settings['images_url'] . '/post/xx.png" alt="" class="centericon" /> ' . $txt['normal_topic'], '<br />
-							'. ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
+							' . ($modSettings['pollMode'] == '1' ? '<img src="' . $settings['images_url'] . '/topic/normal_poll.png" alt="" class="centericon" /> ' . $txt['poll'] : '') . '
 						</p>
 						<p>
 							<img src="' . $settings['images_url'] . '/icons/quick_lock.png" alt="" class="centericon" /> ' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
@@ -340,7 +372,7 @@ function template_replies()
 							', $txt['topic_alert_none'], '
 						</h2>
 						<div class="board_row centertext">
-							', $context['showing_all_topics'] ? '<strong>'. $txt['find_no_results']. '</strong>' : $txt['unread_topics_visit_none'], '
+							', $context['showing_all_topics'] ? '<strong>' . $txt['find_no_results'] . '</strong>' : $txt['unread_topics_visit_none'], '
 						</div>
 					</div>';
 }

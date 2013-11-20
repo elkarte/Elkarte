@@ -22,19 +22,20 @@ function template_poll_edit()
 	global $context, $txt;
 
 	// Some javascript for adding more options.
+	echo '
+	<script><!-- // --><![CDATA[
+		var pollOptionNum = 0,
+			pollTabIndex = null,
+			pollOptionId = ', $context['last_choice_id'], ',
+			txt_option = "', $txt['option'], '",
+			form_name = \'postmodify\';
+	// ]]></script>';
+
 	if (!empty($context['form_url']))
 		echo '
-	<script><!-- // --><![CDATA[
-		var pollOptionNum = 0, pollTabIndex;
-		var pollOptionId = ', $context['last_choice_id'], ';
-		var txt_option = "', $txt['option'], '";
-		var form_name = \'postmodify\';
-	// ]]></script>
 	<div id="edit_poll">
 		<form action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div>
 				<div class="roundframe">';
 
@@ -118,6 +119,7 @@ function template_poll_edit()
 								</dd>
 							</dl>
 						</fieldset>';
+
 	// If this is an edit, we can allow them to reset the vote counts.
 	if (!empty($context['is_edit']))
 		echo '

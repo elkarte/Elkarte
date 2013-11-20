@@ -150,17 +150,14 @@ function template_issueWarning()
 
 	echo '
 		}
-
 	// ]]></script>';
 
 	echo '
 	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=issuewarning" method="post" class="flow_hidden" accept-charset="UTF-8">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />
-				', $context['user']['is_owner'] ? $txt['profile_warning_level'] : $txt['profile_issue_warning'], '
-			</h3>
-		</div>';
+		<h3 class="category_header">
+			<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />
+			', $context['user']['is_owner'] ? $txt['profile_warning_level'] : $txt['profile_issue_warning'], '
+		</h3>';
 
 	if (!$context['user']['is_owner'])
 		echo '
@@ -233,7 +230,7 @@ function template_issueWarning()
 				<div id="box_preview"', !empty($context['warning_data']['body_preview']) ? '' : ' style="display:none"', '>
 					<dl class="settings">
 						<dt>
-							<strong>', $txt['preview'] , '</strong>
+							<strong>', $txt['preview'], '</strong>
 						</dt>
 						<dd id="body_preview">
 							', !empty($context['warning_data']['body_preview']) ? $context['warning_data']['body_preview'] : '', '
@@ -316,28 +313,28 @@ function template_issueWarning()
 				type: "POST",
 				url: "' . $scripturl . '?action=xmlpreview;xml",
 				data: {item: "warning_preview", title: $("#warn_sub").val(), body: $("#warn_body").val(), issuing: true},
-				context: document.body,
-				success: function(request){
-					$("#box_preview").show();
-					$("#body_preview").html($(request).find(\'body\').text());
-					if ($(request).find("error").text() != \'\')
-					{
-						$("#profile_error").show();
-						var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors">\';
-						var errors = $(request).find(\'error\').each(function() {
-							errors_html += \'<li>\' + $(this).text() + \'</li>\';
-						});
-						errors_html += \'</ul>\';
+				context: document.body
+			})
+			.done(function(request) {
+				$("#box_preview").show();
+				$("#body_preview").html($(request).find(\'body\').text());
+				if ($(request).find("error").text() != \'\')
+				{
+					$("#profile_error").show();
+					var errors_html = \'<span>\' + $("#profile_error").find("span").html() + \'</span>\' + \'<ul class="list_errors">\';
+					var errors = $(request).find(\'error\').each(function() {
+						errors_html += \'<li>\' + $(this).text() + \'</li>\';
+					});
+					errors_html += \'</ul>\';
 
-						$("#profile_error").html(errors_html);
-					}
-					else
-					{
-						$("#profile_error").hide();
-						$("#error_list").html(\'\');
-					}
-				return false;
-				},
+					$("#profile_error").html(errors_html);
+				}
+				else
+				{
+					$("#profile_error").hide();
+					$("#error_list").html(\'\');
+				}
+			return false;
 			});
 			return false;
 		}';
@@ -351,16 +348,14 @@ function template_issueWarning()
  */
 function template_deleteAccount()
 {
-	global $context, $settings, $scripturl, $txt, $scripturl;
+	global $context, $settings, $scripturl, $txt;
 
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=deleteaccount;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
-			<div class="title_bar">
-				<h3 class="titlebg">
-					<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['deleteAccount'], '
-				</h3>
-			</div>';
+			<h3 class="category_header">
+				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['deleteAccount'], '
+			</h3>';
 
 	// If deleting another account give them a lovely info box.
 	if (!$context['user']['is_owner'])

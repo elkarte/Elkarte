@@ -55,8 +55,6 @@ function validateDuplicateSmiley($code, $current = null)
 {
 	$db = database();
 
-	$db = database();
-
 	$request = $db->query('', '
 		SELECT id_smiley
 		FROM {db_prefix}smileys
@@ -160,7 +158,7 @@ function updateSmileyDisplayType($smileys, $display_type)
 }
 
 /**
- * Updates a smiley..
+ * Updates a smiley.
  *
  * @param array $param
  */
@@ -197,7 +195,7 @@ function getSmiley($id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new
+		SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new, smiley_row AS row
 		FROM {db_prefix}smileys
 		WHERE id_smiley = {int:current_smiley}',
 		array(
@@ -357,9 +355,9 @@ function getSmileys()
 		$location = empty($row['hidden']) ? 'postform' : 'popup';
 		$smileys[$location]['rows'][$row['smiley_row']][] = array(
 			'id' => $row['id_smiley'],
-			'code' => htmlspecialchars($row['code']),
-			'filename' => htmlspecialchars($row['filename']),
-			'description' => htmlspecialchars($row['description']),
+			'code' => htmlspecialchars($row['code'], ENT_COMPAT, 'UTF-8'),
+			'filename' => htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'),
+			'description' => htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8'),
 			'row' => $row['smiley_row'],
 			'order' => $row['smiley_order'],
 			'selected' => !empty($_REQUEST['move']) && $_REQUEST['move'] == $row['id_smiley'],
@@ -583,7 +581,7 @@ function list_getNumSmileys()
 		array(
 		)
 	);
-	list($numSmileys) = $db->fetch_row($request);
+	list ($numSmileys) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numSmileys;

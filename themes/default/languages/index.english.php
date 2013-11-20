@@ -155,12 +155,13 @@ $txt['last_post'] = 'Last post';
 $txt['first_post'] = 'First post';
 $txt['last_poster'] = 'Last post by';
 //$txt['last_post_message'] = '<strong>Last post</strong> by %1$s<br />in %2$s<br />on %3$s';
-// @todo - Clean this up a bit. See notes in template. Also, needs another string for topic_listing sorting options.
+// @todo - Clean this up a bit. See notes in template.
 // Just moved a space, so the output looks better when things break to an extra line.
 $txt['last_post_message'] = '<span class="lastpost_link">%2$s </span><span class="board_lastposter">by %1$s</span><span class="board_lasttime"><strong>Last post: </strong>%3$s</span>';
 $txt['boardindex_total_posts'] = '%1$s Posts in %2$d Topics by %3$d Members';
 $txt['show'] = 'Show';
 $txt['hide'] = 'Hide';
+$txt['sort_by'] = 'Sort By';
 
 $txt['admin_login'] = 'Administration Login';
 // Use numeric entities in the below string.
@@ -232,12 +233,17 @@ $txt['welcome_member'] = 'Please welcome'; //Deprecated
 $txt['welcome_newest_member'] = 'Please welcome %1$s, our newest member.';
 $txt['admin_center'] = 'Administration Center';
 $txt['admin_session_active'] = 'You have an active admin session in place. We recommend to <strong><a class="strong" href="%1$s">end this session</a></strong> once you have finished your administrative tasks.';
+$txt['admin_maintenance_active'] = 'Your forum is currently in maintenance mode, only admins can log in.  Remember to <strong><a class="strong" href="%1$s">exit maintenance</a></strong> once you have finished your administrative tasks.';
+$txt['query_command_denied'] = 'The following MySQL errors are occurring, please verify your setup:';
+$txt['query_command_denied_guests'] = 'It seems something has gone sour on the forum with the database. This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please report the following message to the administrator:';
+$txt['query_command_denied_guests_msg'] = 'the command %1$s is denied on the database';
 $txt['last_edit'] = 'Last Edit'; //Deprecated
-$txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: <time title="%3$s">%1$s</time> by %2$s';
+$txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
 
 $txt['location'] = 'Location';
 $txt['gender'] = 'Gender';
+$txt['personal_text'] = 'Personal Text';
 $txt['date_registered'] = 'Date Registered';
 
 $txt['recent_view'] = 'View all recent posts.';
@@ -286,6 +292,7 @@ $txt['icon_lips'] = 'Lips sealed';
 $txt['icon_undecided'] = 'Undecided';
 $txt['icon_kiss'] = 'Kiss';
 $txt['icon_cry'] = 'Cry';
+$txt['icon_angel'] = 'Innocent';
 
 $txt['moderator'] = 'Moderator';
 $txt['moderators'] = 'Moderators';
@@ -293,6 +300,7 @@ $txt['moderators'] = 'Moderators';
 $txt['mark_board_read'] = 'Mark Topics as Read for this Board';
 $txt['views'] = 'Views';
 $txt['new'] = 'New';
+$txt['no_redir'] = 'Redirected from %1$s';
 
 $txt['view_all_members'] = 'View All Members';
 $txt['view'] = 'View';
@@ -325,6 +333,7 @@ $txt['or'] = 'or';
 $txt['no_matches'] = 'Sorry, no matches were found';
 
 $txt['notification'] = 'Notification';
+$txt['notifications'] = 'Notifications';
 
 $txt['your_ban'] = 'Sorry %1$s, you are banned from using this forum!';
 $txt['your_ban_expires'] = 'This ban is set to expire %1$s.';
@@ -408,8 +417,8 @@ $txt['valid_email'] = 'This must be a valid email address.';
 $txt['info_center_title'] = '%1$s - Info Center';
 
 $txt['send_topic'] = 'Send this topic';
-$txt['disregard'] = 'Disregard';
-$txt['undisregard'] = 'Stop disregarding';
+$txt['unwatch'] = 'Unwatch';
+$txt['watch'] = 'Watch';
 
 $txt['sendtopic_title'] = 'Send the topic &quot;%1$s&quot; to a friend.';
 $txt['sendtopic_sender_name'] = 'Your name';
@@ -460,6 +469,7 @@ $txt['shortcuts'] = 'shortcuts: alt+s submit/post, alt+p preview';
 $txt['shortcuts_firefox'] = 'shortcuts: shift+alt+s submit/post, shift+alt+p preview';
 $txt['shortcuts_drafts'] = ', alt+d save draft';
 $txt['shortcuts_drafts_firefox'] = ', shift+alt+d save draft';
+$txt['draft_saved_on'] = 'Draft last saved';
 $txt['poll_results'] = 'View results';
 $txt['poll_lock'] = 'Lock Voting';
 $txt['poll_unlock'] = 'Unlock Voting';
@@ -478,6 +488,7 @@ $txt['moved_why'] = 'Please enter a brief description as to<br />why this topic 
 $txt['board'] = 'Board';
 $txt['in'] = 'in';
 $txt['sticky_topic'] = 'Sticky Topic';
+$txt['split'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
 
@@ -532,6 +543,7 @@ $txt['pm_online'] = 'Personal Message (Online)';
 $txt['pm_offline'] = 'Personal Message (Offline)';
 $txt['status'] = 'Status';
 
+$txt['skip_nav'] = 'Skip Navigation';
 $txt['go_up'] = 'Go Up';
 $txt['go_down'] = 'Go Down';
 
@@ -578,7 +590,7 @@ $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
 
 $txt['merge_to_topic_id'] = 'ID of target topic';
-$txt['split'] = 'Split Topic';
+$txt['split_topic'] = 'Split Topic';
 $txt['merge'] = 'Merge Topics';
 $txt['subject_new_topic'] = 'Subject For New Topic';
 $txt['split_this_post'] = 'Only split this post.';
@@ -700,11 +712,9 @@ $txt['powered_by_mysql'] = 'Powered by MySQL';
 $txt['valid_css'] = 'Valid CSS';
 
 // Current footer strings
-$txt['valid_html'] = 'Valid HTML 4.01';
-$txt['valid_xhtml'] = 'Valid XHTML 1.0';
+$txt['valid_html'] = 'Valid HTML 5';
 $txt['rss'] = 'RSS';
 $txt['atom'] = 'Atom';
-$txt['xhtml'] = 'XHTML';
 $txt['html'] = 'HTML';
 
 $txt['guest'] = 'Guest';
@@ -817,6 +827,7 @@ $txt['mod_reports_waiting'] = 'There are currently %1$d moderator reports open.'
 
 $txt['new_posts_in_category'] = 'Click to see the new posts in %1$s';
 $txt['verification'] = 'Verification';
+$txt['visual_verification_hidden'] = 'Please leave this box empty';
 $txt['visual_verification_description'] = 'Type the letters shown in the picture';
 $txt['visual_verification_sound'] = 'Listen to the letters';
 $txt['visual_verification_request_new'] = 'Request another image';
@@ -862,6 +873,7 @@ $txt['debug_templates'] = 'Templates: ';
 $txt['debug_subtemplates'] = 'Sub templates: ';
 $txt['debug_language_files'] = 'Language files: ';
 $txt['debug_stylesheets'] = 'Style sheets: ';
+$txt['debug_javascript'] = 'Scripts: ';
 $txt['debug_files_included'] = 'Files included: ';
 $txt['debug_kb'] = 'KB.';
 $txt['debug_show'] = 'show';
@@ -878,3 +890,14 @@ $txt['debug_hide_queries'] = '[Hide Queries]';
 $txt['debug_tokens'] = 'Tokens: ';
 $txt['debug_browser'] = 'Browser ID: ';
 $txt['debug_hooks'] = 'Hooks called: ';
+
+// Video embedding
+$txt['preview_image'] = 'Video Preview Image';
+$txt['ctp_video'] = 'Click to play video, double click to load video';
+$txt['hide_video'] = 'Show/Hide video';
+$txt['youtube'] = 'YouTube video:';
+$txt['vimeo'] = 'Vimeo video:';
+$txt['dailymotion'] = 'Dailymotion video:';
+
+// Spoiler BBC
+$txt['spoiler'] = 'Spoiler (click to show/hide)';

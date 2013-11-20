@@ -63,10 +63,7 @@ class Attachment_Controller extends Action_Controller
 		// This is just a regular attachment...
 		else
 		{
-			// This checks only the current board for $board/$topic's permissions.
-			// @todo: We must verify that $topic is the attachment's topic, or else the permission check is broken.
 			isAllowedTo('view_attachments');
-
 			$attachment = getAttachmentFromTopic($id_attach, $topic);
 		}
 
@@ -109,7 +106,7 @@ class Attachment_Controller extends Action_Controller
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
 		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 		{
-			list($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
+			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
 				ob_end_clean();

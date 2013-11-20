@@ -12,55 +12,47 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
- *
- * This template file contains only the sub template fatal_error. It is
- * shown when an error occurs, and should show at least a back button and
- * $context['error_message'].
  */
 
-
-// Show an error message.....
+/**
+ * Show an error message.....
+ *
+ * It is shown when an error occurs, and should show at least a back
+ * button and $context['error_message'].
+ */
 function template_fatal_error()
 {
 	global $context, $txt;
 
 	echo '
 	<div id="fatal_error">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $context['error_title'], '
-			</h3>
+		<h2 class="category_header">', $context['error_title'], '</h2>
+		<div class="generic_list_wrapper">
+			<div class="errorbox" ', $context['error_code'], '>', $context['error_message'], '</div>
 		</div>
-		<div class="windowbg generic_list_wrapper">
-			<div ', $context['error_code'], '>', $context['error_message'], '</div>
-		</div>
-	</div>';
-
-	// Show a back button (using javascript.)
-	echo '
+	</div>
 	<div class="centertext">
 		<a class="linkbutton" href="javascript:history.go(-1)">', $txt['back'], '</a>
 	</div>';
 }
 
+/**
+ * Shows the forum error log in all its detail
+ * Supports filtering for viewing all errors of a 'type'
+ */
 function template_error_log()
 {
 	global $context, $settings, $scripturl, $txt;
 
 	echo '
-		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">';
-
-	echo '
-			<div class="title_bar clear_right">
-				<h3 class="titlebg">
-					<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
-				</h3>
-			</div>
-
+		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">
+			<h3 class="category_header">
+				<a href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['errlog'], '
+			</h3>
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	echo '
 				</div>
@@ -94,7 +86,7 @@ function template_error_log()
 				</tr>';
 
 	echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="3" class="righttext" style="padding: 4px 8px;">
 						<label for="check_all1"><strong>', $txt['check_all'], '</strong></label>&nbsp;
 						<input type="checkbox" id="check_all1" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all2.checked = this.checked;" class="input_check" />
@@ -108,7 +100,7 @@ function template_error_log()
 					<td class="centertext" colspan="2">', $txt['errlog_no_entries'], '</td>
 				</tr>';
 
-	// we have some errors, must be some mods installed :P
+	// we have some errors, show them...
 	foreach ($context['errors'] as $error)
 	{
 		echo '
@@ -135,7 +127,7 @@ function template_error_log()
 							<a style="display: table-cell; padding: 4px 0; width: 20px; vertical-align: top;" href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=message;value=', $error['message']['href'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['apply_filter'], ': ', $txt['filter_only_message'], '" /></a>
 							<span style="display: table-cell;">', $error['message']['html'], '</span>';
 
-			echo '
+		echo '
 						</div>
 
 						<div class="error_where">
@@ -162,7 +154,7 @@ function template_error_log()
 	}
 
 	echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="3" class="righttext" style="padding-right: 1.2ex">
 						<label for="check_all2"><strong>', $txt['check_all'], '</strong></label>&nbsp;
 						<input type="checkbox" id="check_all2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all1.checked = this.checked;" class="input_check" />
@@ -172,7 +164,7 @@ function template_error_log()
 			<div class="flow_auto">
 				<div class="floatleft">';
 
-	template_pagesection(false, false, 'go_down');
+	template_pagesection();
 
 	echo '
 				</div>
@@ -187,14 +179,15 @@ function template_error_log()
 			<input type="hidden" name="desc" value="1" />';
 
 	echo '
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
-
-	echo '
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['admin-el_token_var'], '" value="', $context['admin-el_token'], '" />
 		</form>';
 }
 
+/*
+ * Shows the subsection of a file where an error occurred
+ */
 function template_show_file()
 {
 	global $context, $settings;
@@ -209,42 +202,41 @@ function template_show_file()
 	</head>
 	<body>
 		<table id="errorfile_table" class="table_grid">';
+
 	foreach ($context['file_data']['contents'] as $index => $line)
 	{
 		$line_num = $index + $context['file_data']['min'];
 		$is_target = $line_num == $context['file_data']['target'];
 		echo '
 			<tr>
-				<td', $is_target ? ' class="righttext current">==&gt;' : '>', $line_num , ':</td>
-				<td style="white-space: nowrap;', $is_target ? ' border: 1px solid black;border-width: 1px 1px 1px 0;':'','">', $line, '</td>
+				<td', $is_target ? ' class="righttext current">==&gt;' : '>', $line_num, ':</td>
+				<td style="white-space: nowrap;', $is_target ? ' border: 1px solid black;border-width: 1px 1px 1px 0;' : '', '">', $line, '</td>
 			</tr>';
 	}
+
 	echo '
 		</table>
 	</body>
 </html>';
 }
 
+/*
+ * When an attachment fails to upload, this template will show
+ * all the issues to the user
+ */
 function template_attachment_errors()
 {
 	global $context, $txt;
 
 	echo '
 	<div>
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $txt['attach_error_title'], '
-			</h3>
-		</div>
+		<h2 class="category_header">', $txt['attach_error_title'], '</h2>
 		<div class="windowbg">';
 
 	foreach ($context['attachment_error_keys'] as $key)
 		template_show_error($key);
 
-	echo
-			!empty($context['back_link']) ? ('<a class="linkbutton" href="' . $context['back_link'] . '">' . $txt['back'] . '</a>&nbsp;') : '','
-			<a class="linkbutton" href="', $context['redirect_link'], '">', $txt['continue'], '</a>
-
+	echo '
 		</div>
 	</div>';
 }

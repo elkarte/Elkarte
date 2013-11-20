@@ -23,6 +23,7 @@ if (!defined('ELK'))
 
 class Auth_Controller extends Action_Controller
 {
+
 	/**
 	 * Entry point in Auth controller
 	 * (well no, not really. We route directly to the rest.)
@@ -31,7 +32,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// what can we do? login page!
+		// What can we do? login page!
 		$this->action_login();
 	}
 
@@ -41,8 +42,6 @@ class Auth_Controller extends Action_Controller
 	 *  It caches the referring URL in $_SESSION['login_url'].
 	 *  It is accessed from ?action=login.
 	 *  @uses Login template and language file with the login sub-template.
-	 *  @uses the protocol_login sub-template in the Wireless template,
-	 *   if you are using a wireless device
 	 */
 	public function action_login()
 	{
@@ -92,8 +91,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings;
-		global $cookiename, $maintenance, $modSettings, $context, $sc;
+		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context, $sc;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -128,7 +126,7 @@ class Auth_Controller extends Action_Controller
 		$context['sub_template'] = 'login';
 
 		// Set up the default/fallback stuff.
-		$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'])) : '';
+		$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
 		$context['default_password'] = '';
 		$context['never_expire'] = $modSettings['cookieTime'] == 525600 || $modSettings['cookieTime'] == 3153600;
 		$context['login_errors'] = array($txt['error_occurred']);
@@ -277,9 +275,14 @@ class Auth_Controller extends Action_Controller
 				// Maybe they are using a hash from before the password fix.
 				$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
 
-				// BurningBoard3 style of hashing.
 				if (!empty($modSettings['enable_password_conversion']))
+				{
+					// BurningBoard3 style of hashing.
 					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($user_settings['password_salt'] . sha1($_POST['passwrd'])));
+
+					// PunBB 1.4 and later
+					$other_passwords[] = sha1($user_settings['password_salt'] . sha1($_POST['passwrd']));
+				}
 
 				// Perhaps we converted to UTF-8 and have a valid password being hashed differently.
 				if (!empty($modSettings['previousCharacterSet']) && $modSettings['previousCharacterSet'] != 'utf8')
@@ -292,6 +295,15 @@ class Auth_Controller extends Action_Controller
 					if (empty($other_passwords['iconv']) && function_exists('mb_convert_encoding'))
 						$other_passwords[] = sha1(strtolower(mb_convert_encoding($user_settings['member_name'], 'UTF-8', $modSettings['previousCharacterSet'])) . un_htmlspecialchars(mb_convert_encoding($_POST['passwrd'], 'UTF-8', $modSettings['previousCharacterSet'])));
 				}
+			}
+			elseif (strlen($user_settings['passwd']) == 64 && !empty($modSettings['enable_password_conversion']))
+			{
+				// Yet another downgrade .. PHP-Fusion7
+				$other_passwords[] = hash_hmac('sha256', $_POST['passwrd'], $user_settings['password_salt']);
+
+				// Xenforo?
+				$other_passwords[] = sha1(sha1($_POST['passwrd']) . $user_settings['password_salt']);
+				$other_passwords[] = sha256(sha256($_POST['passwrd']) . $user_settings['password_salt']);
 			}
 
 			// ElkArte's sha1 function can give a funny result on Linux (Not our fault!). If we've now got the real one let the old one be valid!
@@ -357,14 +369,14 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
-	* Logs the current user out of their account.
-	* It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
-	* It redirects back to $_SESSION['logout_url'], if it exists.
-	* It is accessed via ?action=logout;session_var=...
-	*
-	* @param bool $internal if true, it doesn't check the session
-	* @param $redirect
-	*/
+	 * Logs the current user out of their account.
+	 * It requires that the session hash is sent as well, to prevent automatic logouts by images or javascript.
+	 * It redirects back to $_SESSION['logout_url'], if it exists.
+	 * It is accessed via ?action=logout;session_var=...
+	 *
+	 * @param bool $internal if true, it doesn't check the session
+	 * @param $redirect
+	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
 		global $user_info, $user_settings, $context;
@@ -395,13 +407,21 @@ class Auth_Controller extends Action_Controller
 			logOnline($user_info['id'], false);
 		}
 
-		// Logout? Let's kill the admin session, too.
-		unset($_SESSION['admin_time']);
+		// Logout? Let's kill the admin/moderate/other sessions, too.
+		$types = array('admin', 'moderate');
+		call_integration_hook('integrate_validateSession', array(&$types));
+		foreach ($types as $type)
+			unset($_SESSION[$type . '_time']);
 
 		$_SESSION['log_time'] = 0;
 
 		// Empty the cookie! (set it in the past, and for id_member = 0)
 		setLoginCookie(-3600, 0);
+
+		// And some other housekeeping while we're at it.
+		session_destroy();
+		if (!empty($user_info['id']))
+			updateMemberData($user_info['id'], array('password_salt' => substr(md5(mt_rand()), 0, 4)));
 
 		// Off to the merry board index we go!
 		if ($redirect)
@@ -410,7 +430,7 @@ class Auth_Controller extends Action_Controller
 				redirectexit('', $context['server']['needs_login_fix']);
 			elseif (!empty($_SESSION['logout_url']) && (strpos('http://', $_SESSION['logout_url']) === false && strpos('https://', $_SESSION['logout_url']) === false))
 			{
-				unset ($_SESSION['logout_url']);
+				unset($_SESSION['logout_url']);
 				redirectexit();
 			}
 			else
@@ -445,10 +465,10 @@ class Auth_Controller extends Action_Controller
 	}
 
 	/**
-	* Display a message about the forum being in maintenance mode.
-	* Displays a login screen with sub template 'maintenance'.
-	* It sends a 503 header, so search engines don't index while we're in maintenance mode.
-	*/
+	 * Display a message about the forum being in maintenance mode.
+	 * Displays a login screen with sub template 'maintenance'.
+	 * It sends a 503 header, so search engines don't index while we're in maintenance mode.
+	 */
 	public function action_maintenance_mode()
 	{
 		global $txt, $mtitle, $mmessage, $context;
@@ -479,10 +499,10 @@ class Auth_Controller extends Action_Controller
 		// we deal only with logged in folks in here!
 		if (!$user_info['is_guest'])
 		{
-			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
-				list (, , $timeout) = @unserialize($_COOKIE[$cookiename]);
+			if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
+				list (,, $timeout) = @unserialize($_COOKIE[$cookiename]);
 			elseif (isset($_SESSION['login_' . $cookiename]))
-				list (, , $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
+				list (,, $timeout) = @unserialize($_SESSION['login_' . $cookiename]);
 			else
 				trigger_error('Auth: Cannot be logged in without a session or cookie', E_USER_ERROR);
 
@@ -524,7 +544,7 @@ class Auth_Controller extends Action_Controller
 				redirectexit();
 			elseif (!empty($_SESSION['login_url']) && (strpos('http://', $_SESSION['login_url']) === false && strpos('https://', $_SESSION['login_url']) === false))
 			{
-				unset ($_SESSION['login_url']);
+				unset($_SESSION['login_url']);
 				redirectexit();
 			}
 			else
@@ -544,6 +564,14 @@ class Auth_Controller extends Action_Controller
 
 /**
  * Check activation status of the current user.
+ *
+ * > 10 Banned with activation status as value - 10
+ * 5 = Awaiting COPPA concent
+ * 4 = Awaiting Deletion approval
+ * 3 = Awaiting Admin approval
+ * 2 = Awaiting reactivation from email change
+ * 1 = Approved and active
+ * 0 = Not active
  */
 function checkActivation()
 {
@@ -597,8 +625,7 @@ function checkActivation()
  */
 function doLogin()
 {
-	global $user_info, $user_settings;
-	global $cookiename, $maintenance, $modSettings, $context;
+	global $user_info, $user_settings, $maintenance, $modSettings, $context;
 
 	// Load authentication stuffs.
 	require_once(SUBSDIR . '/Auth.subs.php');

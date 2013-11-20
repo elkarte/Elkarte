@@ -189,10 +189,11 @@ function deleteMembergroups($groups)
 		);
 
 	// Recalculate the post groups, as they likely changed.
-	updateStats('postgroups');
+	updatePostgroupStats();
 
 	// Make a note of the fact that the cache may be wrong.
 	$settings_update = array('settings_updated' => time());
+
 	// Have we deleted the spider group?
 	if (isset($modSettings['spider_group']) && in_array($modSettings['spider_group'], $groups))
 		$settings_update['spider_group'] = 0;
@@ -276,7 +277,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			)
 		);
 
-		updateStats('postgroups', $members);
+		updatePostgroupStats($members);
 
 		// Log what just happened.
 		foreach ($members as $member)
@@ -393,7 +394,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		);
 
 	// Their post groups may have changed now...
-	updateStats('postgroups', $members);
+	updatePostgroupStats($members);
 
 	// Do the log.
 	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
@@ -415,15 +416,15 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
  * @param int $group
  * @param string $type = 'auto' specifies whether the group is added as primary or as additional group.
  * Supported types:
- * 	- only_primary      - Assigns a membergroup as primary membergroup, but only
- * 						  if a member has not yet a primary membergroup assigned,
- * 						  unless the member is already part of the membergroup.
- * 	- only_additional   - Assigns a membergroup to the additional membergroups,
- * 						  unless the member is already part of the membergroup.
- * 	- force_primary     - Assigns a membergroup as primary membergroup no matter
- * 						  what the previous primary membergroup was.
- * 	- auto              - Assigns a membergroup to the primary group if it's still
- * 						  available. If not, assign it to the additional group.
+ *  - only_primary    - Assigns a membergroup as primary membergroup, but only
+ *                      if a member has not yet a primary membergroup assigned,
+ *                      unless the member is already part of the membergroup.
+ *  - only_additional - Assigns a membergroup to the additional membergroups,
+ *                      unless the member is already part of the membergroup.
+ *  - force_primary   - Assigns a membergroup as primary membergroup no matter
+ *                      what the previous primary membergroup was.
+ *  - auto            - Assigns a membergroup to the primary group if it's still
+ *                      available. If not, assign it to the additional group.
  * @param bool $permissionCheckDone = false if true, it checks permission of the current user to add groups ('manage_membergroups')
  *
  * @return boolean success or failure
@@ -465,7 +466,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 		return false;
 	// ... and assign protected groups!
 	elseif (!allowedTo('admin_forum') && $group_details['group_type'] == 1)
-			return false;
+		return false;
 
 	// Do the actual updates.
 	if ($type == 'only_additional')
@@ -523,7 +524,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
 
 	// Update their postgroup statistics.
-	updateStats('postgroups', $members);
+	updatePostgroupStats($members);
 
 	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)
@@ -623,17 +624,17 @@ function cache_getMembergroupList()
  * @param bool $include_hidden
  * @param bool $include_all
  */
-function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false)
+function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type, $user_id, $include_hidden, $include_all = false, $aggregate = false, $count_permissions = false, $pid = null)
 {
-	global $scripturl;
+	global $scripturl, $txt, $context;
 
 	$db = database();
 
 	$groups = array();
 
 	$request = $db->query('', '
-		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color, mg.hidden,
-			mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
+		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color,
+			mg.hidden, mg.id_parent, mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
 		WHERE mg.min_posts {raw:min_posts}' . ($include_all ? '' : '
@@ -652,11 +653,56 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	// Start collecting the data.
 	$groups = array();
 	$group_ids = array();
+
+	if ($membergroup_type === 'all')
+	{
+		// Determine the number of ungrouped members.
+		$num_members = countMembersInGroup(0);
+
+		// Fill the context variable with 'Guests' and 'Regular Members'.
+		$groups = array(
+			-1 => array(
+				'id_group' => -1,
+				'group_name' => $txt['membergroups_guests'],
+				'min_posts' => 0,
+				'desc' => '',
+				'num_members' => $txt['membergroups_guests_na'],
+				'icons' => '',
+				'can_search' => false,
+				'num_permissions' => array(
+					'allowed' => 0,
+					'denied' => 0,
+				)
+			),
+			0 => array(
+				'id_group' => 0,
+				'group_name' => $txt['membergroups_members'],
+				'min_posts' => 0,
+				'desc' => '',
+				'num_members' => $num_members,
+				'icons' => '',
+				'can_search' => true,
+				'num_permissions' => array(
+					'allowed' => 0,
+					'denied' => 0,
+				)
+			),
+		);
+	}
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		// We only list the groups they can see.
 		if ($row['hidden'] && !$row['can_moderate'] && !$include_hidden)
 			continue;
+
+		// If it's inherited, just add it as a child.
+		if ($aggregate && $row['id_parent'] != -2)
+		{
+			if (isset($groups[$row['id_parent']]))
+				$groups[$row['id_parent']]['children'][$row['id_group']] = $row['group_name'];
+			continue;
+		}
 
 		$row['icons'] = explode('#', $row['icons']);
 
@@ -670,7 +716,14 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			'num_members' => $row['num_members'],
 			'moderators' => array(),
 			'icons' => $row['icons'],
+			'can_search' => $row['id_group'] != 3,
 		);
+
+		if ($count_permissions)
+			$groups[$row['id_group']]['num_permissions'] = array(
+				'allowed' => $row['id_group'] == 1 ? '(' . $txt['permissions_all'] . ')' : 0,
+				'denied' => $row['id_group'] == 1 ? '(' . $txt['permissions_none'] . ')' : 0,
+			);
 
 		$include_hidden |= $row['can_moderate'];
 		$group_ids[] = $row['id_group'];
@@ -712,6 +765,21 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			$sort_array[] = $group['id_group'] != 3 ? (int) $group['num_members'] : -1;
 
 		array_multisort($sort_array, $sort_ascending ? SORT_ASC : SORT_DESC, SORT_REGULAR, $groups);
+	}
+
+	if ($count_permissions)
+	{
+		// pid = profile id
+		if (empty($pid))
+		{
+			$groups = countPermissions($groups, $context['hidden_permissions']);
+			// Get the "default" profile permissions too.
+			$groups = countBoardPermissions($groups, $context['hidden_permissions'], 1);
+		}
+		else
+		{
+			$groups = countBoardPermissions($groups, null, $pid);
+		}
 	}
 
 	return $groups;
@@ -904,9 +972,11 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 
 	$db = database();
 
-	//No $includes parameters given? Let's set some default values
-	if(empty($includes))
+	// No $includes parameters given? Let's set some default values
+	if (empty($includes))
 		$includes = array('globalmod', 'member', 'postgroups');
+	elseif (!is_array($includes))
+		$includes = array($includes);
 
 	$groups = array();
 
@@ -929,12 +999,14 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	$where .= !in_array('custom', $excludes) ? '' : ' AND id_group < {int:newbie_group}';
 	// Exclude hidden?
 	$where .= !in_array('hidden', $excludes) ? '' : ' AND hidden != {int:hidden_group}';
+
 	// Only the post based membergroups? We can safely overwrite the $where.
 	if (in_array('membergroups', $excludes))
 		$where = ' AND min_posts != {int:min_posts}';
+
 	// Simply all of them?
 	if (in_array('all', $includes))
-			$where = '';
+		$where = '';
 
 	$request = $db->query('', '
 		SELECT id_group, group_name, min_posts, online_color
@@ -954,7 +1026,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	);
 
 	// Include the default membergroup? the ones with id_member = 0
-	if(in_array('member', $includes) && !isset($split))
+	if (in_array('member', $includes) && !isset($split))
 		$groups[] = array(
 			'id' => 0,
 			'name' => $txt['membergroups_members']
@@ -986,13 +1058,13 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 			);
 
 			if ($row['min_posts'] == -1)
-				$groups['membergroups'][] =  array(
+				$groups['membergroups'][] = array(
 					'id' => $row['id_group'],
 					'name' => $row['group_name'],
 					'can_be_additional' => true,
 				);
 			else
-				$groups['postgroups'][] =  array(
+				$groups['postgroups'][] = array(
 					'id' => $row['id_group'],
 					'name' => $row['group_name'],
 				);
@@ -1069,7 +1141,7 @@ function getMaxGroupID()
 {
 	$db = database();
 
-    $request = $db->query('', '
+	$request = $db->query('', '
 		SELECT MAX(id_group)
 		FROM {db_prefix}membergroups',
 		array(
@@ -1112,6 +1184,7 @@ function addMembergroup($id_group, $groupname, $minposts, $type)
  * @param int $id_group
  * @param int $copy_id
  * @param array $illegal_permissions
+ * @todo another function with the same name in ManagePermissions.subs.php
  */
 function copyPermissions($id_group, $copy_from, $illegal_permissions)
 {
@@ -1495,7 +1568,6 @@ function getIDMemberFromGroupModerators($moderators)
 	$db->free_result($request);
 
 	return $group_moderators;
-
 }
 
 /**
@@ -1525,7 +1597,7 @@ function assignGroupModerators($id_group, $group_moderators)
  *
  * @param int $id_group
  *
- * @return array moderators as array (id => name)
+ * @return array moderators as array(id => name)
  */
 function getGroupModerators($id_group)
 {
@@ -1551,12 +1623,13 @@ function getGroupModerators($id_group)
 
 /**
  * Lists all groups which inherit permission profiles from the given group.
+ * If no group is specified it will list any group that can be used
  *
  * @param int $id_group
  *
  * @return array
  */
-function getInheritableGroups($id_group)
+function getInheritableGroups($id_group = false)
 {
 	global $modSettings;
 
@@ -1567,12 +1640,12 @@ function getInheritableGroups($id_group)
 	$request = $db->query('', '
 		SELECT id_group, group_name
 		FROM {db_prefix}membergroups
-		WHERE id_group != {int:current_group}' .
+		WHERE id_parent = {int:not_inherited}' . ($id_group === false ? '' : '
+			AND id_group != {int:current_group}') .
 			(empty($modSettings['permission_enable_postgroups']) ? '
 			AND min_posts = {int:min_posts}' : '') . (allowedTo('admin_forum') ? '' : '
 			AND group_type != {int:is_protected}') . '
-			AND id_group NOT IN (1, 3)
-			AND id_parent = {int:not_inherited}',
+			AND id_group NOT IN (1, 3)',
 		array(
 			'current_group' => $id_group,
 			'min_posts' => -1,
@@ -1586,48 +1659,6 @@ function getInheritableGroups($id_group)
 	$db->free_result($request);
 
 	return $inheritable_groups;
-}
-
-/**
- * Gets a list of membergroups, parent groups first.
- *
- * @todo: Merge with getBasicMembergroupData();
- * @return groups
- */
-function getExtendedMembergroupData()
-{
-	global $modSettings;
-
-	$db = database();
-
-	$groups = array();
-
-	// Query the database defined membergroups.
-	$query = $db->query('', '
-		SELECT id_group, id_parent, group_name, min_posts, online_color, icons
-		FROM {db_prefix}membergroups' . (empty($modSettings['permission_enable_postgroups']) ? '
-		WHERE min_posts = {int:min_posts}' : '') . '
-		ORDER BY id_parent = {int:not_inherited} DESC, min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-		array(
-			'min_posts' => -1,
-			'not_inherited' => -2,
-			'newbie_group' => 4,
-		)
-	);
-
-	while ($row = $db->fetch_assoc($query))
-	{
-		$groups[$row['id_group']] = array(
-			'id_group' => $row['id_group'],
-			'id_parent' => $row['id_parent'],
-			'group_name' => $row['group_name'],
-			'min_posts' => $row['min_posts'],
-			'online_color' => $row['online_color'],
-			'icons' => $row['icons'],
-		);
-	}
-
-	return $groups;
 }
 
 /**
@@ -1750,7 +1781,7 @@ function accessibleGroups()
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Hide hidden groups!
-		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups')) 
+		if ($row['hidden'] && !$row['can_moderate'] && !allowedTo('manage_membergroups'))
 			continue;
 
 		$groups[$row['id_group']] = $row['group_name'];
@@ -1759,4 +1790,166 @@ function accessibleGroups()
 	$db->free_result($request);
 
 	return $groups;
+}
+
+/**
+ * Callback function for createList().
+ *
+ * @param string $where
+ * @param string $where_parameters
+ * @return int, the count of group requests
+ */
+function list_getGroupRequestCount($where, $where_parameters)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}log_group_requests AS lgr
+		WHERE ' . $where,
+		array_merge($where_parameters, array(
+		))
+	);
+	list ($totalRequests) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $totalRequests;
+}
+
+/**
+ * Callback function for createList()
+ *
+ * @param int $start
+ * @param int $items_per_page
+ * @param string $sort
+ * @param string $where
+ * @param string $where_parameters
+ * @return array, an array of group requests
+ * Each group request has:
+ *   'id'
+ *   'member_link'
+ *   'group_link'
+ *   'reason'
+ *   'time_submitted'
+ */
+function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_parameters)
+{
+	global $scripturl;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
+			mem.member_name, mg.group_name, mg.online_color, mem.real_name
+		FROM {db_prefix}log_group_requests AS lgr
+			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lgr.id_member)
+			INNER JOIN {db_prefix}membergroups AS mg ON (mg.id_group = lgr.id_group)
+		WHERE ' . $where . '
+		ORDER BY {raw:sort}
+		LIMIT ' . $start . ', ' . $items_per_page,
+		array_merge($where_parameters, array(
+			'sort' => $sort,
+		))
+	);
+	$group_requests = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$group_requests[] = array(
+			'id' => $row['id_request'],
+			'member_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+			'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
+			'reason' => censorText($row['reason']),
+			'time_submitted' => standardTime($row['time_applied']),
+		);
+	}
+	$db->free_result($request);
+
+	return $group_requests;
+}
+
+/**
+ * Deletes old group requests.
+ *
+ * @param array $groups
+ */
+function deleteGroupRequests($groups)
+{
+	$db = database();
+
+	// Remove the evidence...
+	$db->query('', '
+		DELETE FROM {db_prefix}log_group_requests
+		WHERE id_request IN ({array_int:request_list})',
+		array(
+			'request_list' => $groups,
+		)
+	);
+}
+
+/**
+ * This function updates those members who match post-based
+ * membergroups in the database (restricted by parameter $members).
+ * Used by updateStats('postgroups').
+ *
+ * @param array $members = null The members to update, null if all
+ * @param array $parameter2 = null
+ */
+function updatePostGroupStats($members = null, $parameter2 = null)
+{
+	$db = database();
+
+	// Parameter two is the updated columns: we should check to see if we base groups off any of these.
+	if ($parameter2 !== null && !in_array('posts', $parameter2))
+		return;
+
+	$postgroups = cache_get_data('updateStats:postgroups', 360);
+	if ($postgroups === null || $members === null)
+	{
+		// Fetch the postgroups!
+		$request = $db->query('', '
+			SELECT id_group, min_posts
+			FROM {db_prefix}membergroups
+			WHERE min_posts != {int:min_posts}',
+			array(
+				'min_posts' => -1,
+			)
+		);
+		$postgroups = array();
+		while ($row = $db->fetch_assoc($request))
+			$postgroups[$row['id_group']] = $row['min_posts'];
+		$db->free_result($request);
+
+		// Sort them this way because if it's done with MySQL it causes a filesort :(.
+		arsort($postgroups);
+
+		cache_put_data('updateStats:postgroups', $postgroups, 360);
+	}
+
+	// Oh great, they've screwed their post groups.
+	if (empty($postgroups))
+		return;
+
+	// Set all membergroups from most posts to least posts.
+	$conditions = '';
+	$lastMin = 0;
+	foreach ($postgroups as $id => $min_posts)
+	{
+		$conditions .= '
+				WHEN posts >= ' . $min_posts . (!empty($lastMin) ? ' AND posts <= ' . $lastMin : '') . ' THEN ' . $id;
+		$lastMin = $min_posts;
+	}
+
+	$members = is_array($members) ? $members : array($members);
+
+	// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
+	$db->query('', '
+		UPDATE {db_prefix}members
+		SET id_post_group = CASE ' . $conditions . '
+				ELSE 0
+			END' . ($members !== null ? '
+		WHERE id_member IN ({array_int:members})' : ''),
+		array(
+			'members' => $members,
+		)
+	);
 }

@@ -158,17 +158,17 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$no_html_message = un_htmlspecialchars(strip_tags(strtr($orig_message, array('</title>' => $line_break))));
 
 		// But, then, dump it and use a plain one for dinosaur clients.
-		list(, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);
+		list (, $plain_message) = mimespecialchars($no_html_message, false, true, $line_break);
 		$message = $plain_message . $line_break . '--' . $mime_boundary . $line_break;
 
 		// This is the plain text version.  Even if no one sees it, we need it for spam checkers.
-		list($charset, $plain_charset_message, $encoding) = mimespecialchars($no_html_message, false, false, $line_break);
+		list ($charset, $plain_charset_message, $encoding) = mimespecialchars($no_html_message, false, false, $line_break);
 		$message .= 'Content-Type: text/plain; charset=' . $charset . $line_break;
 		$message .= 'Content-Transfer-Encoding: ' . $encoding . $line_break . $line_break;
 		$message .= $plain_charset_message . $line_break . '--' . $mime_boundary . $line_break;
 
 		// This is the actual HTML message, prim and proper.  If we wanted images, they could be inlined here (with multipart/related, etc.)
-		list($charset, $html_message, $encoding) = mimespecialchars($orig_message, false, $hotmail_fix, $line_break);
+		list ($charset, $html_message, $encoding) = mimespecialchars($orig_message, false, $hotmail_fix, $line_break);
 		$message .= 'Content-Type: text/html; charset=' . $charset . $line_break;
 		$message .= 'Content-Transfer-Encoding: ' . ($encoding == '' ? '7bit' : $encoding) . $line_break . $line_break;
 		$message .= $html_message . $line_break . '--' . $mime_boundary . '--';
@@ -177,7 +177,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	else
 	{
 		// Send a plain message first, for the older web clients.
-		list(, $plain_message) = mimespecialchars($orig_message, false, true, $line_break);
+		list (, $plain_message) = mimespecialchars($orig_message, false, true, $line_break);
 		$message = $plain_message . $line_break . '--' . $mime_boundary . $line_break;
 
 		// Now add an encoded message using the forum's character set.
@@ -224,11 +224,11 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			{
 				$unq_head = md5($boardurl . microtime() . rand()) . '-' . $message_id;
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
 				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif (empty($modSettings['mail_no_message_id']))
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
 			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id))
 			{
@@ -267,7 +267,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 	else
 		// SMTP protocol it is
-		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $message_id, $line_break, $mime_boundary);
+		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
 
 	// Clear out the stat cache.
 	trackStats();
@@ -291,7 +291,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
  */
 function AddMailQueue($flush = false, $to_array = array(), $subject = '', $message = '', $headers = '', $send_html = false, $priority = 3, $is_private = false, $message_id = '')
 {
-	global $context, $modSettings;
+	global $context;
 
 	$db = database();
 
@@ -475,7 +475,7 @@ function mimespecialchars($string, $with_charset = true, $hotmail_fix = false, $
  * @param string $message_id
  * @return boolean whether it sent or not.
  */
-function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = null)
+function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $message_id = null)
 {
 	global $modSettings, $webmaster_email, $txt, $scripturl;
 
@@ -572,7 +572,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = n
 		{
 			$unq_head = md5($scripturl . microtime() . rand()) . '-' . $message_id;
 			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-			$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
 			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
 		}
 
@@ -607,7 +607,6 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = n
 		if (!empty($modSettings['trackStats']))
 			trackStats(array('email' => '+'));
 
-
 		// Keep our post via email log
 		if (!empty($unq_head))
 			$sent[] = array($unq_head, time(), $mail_to);
@@ -625,6 +624,8 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $message_id = n
 	// Log each email
 	if (!empty($sent))
 	{
+		$db = database();
+
 		$db->insert('ignore',
 			'{db_prefix}postby_emails',
 			array(
@@ -720,7 +721,7 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  */
 function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true)
 {
-	global $txt, $mbname, $scripturl, $settings, $user_info, $boardurl, $modSettings;
+	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings;
 
 	// First things first, load up the email templates language file, if we need to.
 	if ($loadLang)
@@ -1083,7 +1084,7 @@ function updateNextSendTime()
 	);
 	if ($db->affected_rows() == 0)
 		return false;
-	return true;
+	return $delay;
 }
 
 /**
@@ -1158,7 +1159,8 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 	if (!$override_limit)
 	{
 		// Update next send time for our mails queue, if there was something to update. Otherwise bail out :P
-		if (!updateNextSendTime())
+		$delay = updateNextSendTime();
+		if ($delay !== false)
 			return false;
 		$modSettings['mail_next_send'] = time() + $delay;
 	}
@@ -1232,11 +1234,11 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 			{
 				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . ">";
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))
-				$unq_id = $need_break ? $line_break : '' . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
+				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($scripturl . microtime()) . '-' . $email['message_id'] . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
 			// No point logging a specific error here, as we have no language. PHP error is helpful anyway...
 			$result = mail(strtr($email['to'], array("\r" => '', "\n" => '')), $email['subject'], $email['body'], $email['headers'] . $unq_id);
@@ -1255,7 +1257,7 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 				@apache_reset_timeout();
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['message_id']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['priority'], $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)
@@ -1281,4 +1283,37 @@ function reduceMailQueue($number = false, $override_limit = false, $force_send =
 
 	// Had something to send...
 	return true;
+}
+
+/**
+ * This function finds email address and few other details of the
+ * poster of a certain message.
+ *
+ * @todo very similar to mailFromMesasge
+ *
+ * @param int $id_msg the id of a message
+ * @param int $topic_id the topic the message belongs to
+ * @return array, the poster's details
+ */
+function posterDetails($id_msg, $topic_id)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member AS id_poster, m.poster_name, mem.real_name
+		FROM {db_prefix}messages AS m
+			LEFT JOIN {db_prefix}members AS mem ON (m.id_member = mem.id_member)
+		WHERE m.id_msg = {int:id_msg}
+			AND m.id_topic = {int:current_topic}
+		LIMIT 1',
+		array(
+			'current_topic' => $topic_id,
+			'id_msg' => $id_msg,
+		)
+	);
+
+	$message = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $message;
 }

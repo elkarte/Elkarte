@@ -107,7 +107,7 @@ class MessageIndex_Controller extends Action_Controller
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?board=' . $board . '.' . $context['start'];
 
-		$context['links'] = array(
+		$context['links'] += array(
 			'first' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.0' : '',
 			'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($_REQUEST['start'] - $context['topics_per_page']) : '',
 			'next' => $_REQUEST['start'] + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($_REQUEST['start'] + $context['topics_per_page']) : '',
@@ -132,7 +132,7 @@ class MessageIndex_Controller extends Action_Controller
 		if (!empty($board_info['moderators']))
 		{
 			foreach ($board_info['moderators'] as $mod)
-				$context['link_moderators'][] ='<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
+				$context['link_moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $mod['id'] . '" title="' . $txt['board_moderator'] . '">' . $mod['name'] . '</a>';
 
 			$context['linktree'][count($context['linktree']) - 1]['extra_after'] = '<span class="board_moderators"> (' . (count($context['link_moderators']) == 1 ? $txt['moderator'] : $txt['moderators']) . ': ' . implode(', ', $context['link_moderators']) . ')</span>';
 		}
@@ -228,10 +228,14 @@ class MessageIndex_Controller extends Action_Controller
 		}
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
+		// Trick
 		$txt['starter'] = $txt['started_by'];
 
 		foreach ($sort_methods as $key => $val)
-			$context['topics_headers'][$key] = '<a href="' . $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : '') . '">' . $txt[$key] . ($context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '') . '</a>';
+			$context['topics_headers'][$key] = array(
+				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''),
+				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '',
+			);
 
 		// Calculate the fastest way to get the topics.
 		$start = (int) $_REQUEST['start'];
@@ -257,7 +261,7 @@ class MessageIndex_Controller extends Action_Controller
 		$indexOptions = array(
 			'include_sticky' => !empty($modSettings['enableStickyTopics']),
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
-			'previews' => empty($modSettings['preview_characters']) ? 0 : $modSettings['preview_characters'],
+			'previews' => !empty($settings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? 128 : $modSettings['preview_characters']) : 0,
 			'include_avatars' => !empty($settings['avatars_on_indexes']),
 			'ascending' => $ascending,
 			'fake_ascending' => $fake_ascending
@@ -277,13 +281,13 @@ class MessageIndex_Controller extends Action_Controller
 			$topic_ids[] = $row['id_topic'];
 
 			// Does the theme support message previews?
-			if (!empty($settings['message_index_preview']) && !empty($modSettings['preview_characters']))
+			if (!empty($settings['message_index_preview']))
 			{
 				// Limit them to $modSettings['preview_characters'] characters
-				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => '&#10;')));
+				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 				$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
-				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => '&#10;')));
+				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 				$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
 				// Censor the subject and message preview.
@@ -379,7 +383,7 @@ class MessageIndex_Controller extends Action_Controller
 					'time' => relativeTime($row['first_poster_time']),
 					'timestamp' => forum_time(true, $row['first_poster_time']),
 					'subject' => $row['first_subject'],
-					'preview' => $row['first_body'],
+					'preview' => trim($row['first_body']),
 					'icon' => $row['first_icon'],
 					'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
@@ -397,7 +401,7 @@ class MessageIndex_Controller extends Action_Controller
 					'time' => relativeTime($row['last_poster_time']),
 					'timestamp' => forum_time(true, $row['last_poster_time']),
 					'subject' => $row['last_subject'],
-					'preview' => $row['last_body'],
+					'preview' => trim($row['last_body']),
 					'icon' => $row['last_icon'],
 					'icon_url' => $settings[$context['icon_sources'][$row['last_icon']]] . '/post/' . $row['last_icon'] . '.png',
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . ($user_info['is_guest'] ? ('.' . (!empty($options['view_newest_first']) ? 0 : ((int) (($row['num_replies']) / $context['pageindex_multiplier'])) * $context['pageindex_multiplier']) . '#msg' . $row['id_last_msg']) : (($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . '#new')),
@@ -416,6 +420,7 @@ class MessageIndex_Controller extends Action_Controller
 				'new_from' => $row['new_from'],
 				'newtime' => $row['new_from'],
 				'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . '#new',
+				'redir_href' => !empty($row['id_redirect_topic']) ? $scripturl . '?topic=' . $row['id_topic'] . '.0;noredir' : '',
 				'pages' => $pages,
 				'replies' => comma_format($row['num_replies']),
 				'views' => comma_format($row['num_views']),
@@ -427,7 +432,7 @@ class MessageIndex_Controller extends Action_Controller
 			if (!empty($settings['avatars_on_indexes']))
 				$context['topics'][$row['id_topic']]['last_post']['member']['avatar'] = array(
 					'name' => $row['avatar'],
-					'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" />' : '') : (stristr($row['avatar'], 'http://') ? '<img class="avatar" src="' . $row['avatar'] . '" style="' . $avatar_width . $avatar_height . '" alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" />'),
+					'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" />' : '') : (stristr($row['avatar'], 'http://') ? '<img class="avatar" src="' . $row['avatar'] . '" style="' . $avatar_width . $avatar_height . '" alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar'], ENT_COMPAT, 'UTF-8') . '" alt="" />'),
 					'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
 					'url' => $row['avatar'] == '' ? '' : (stristr($row['avatar'], 'http://') ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
 				);
@@ -451,7 +456,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
-			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&'))),
+			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&')), ENT_COMPAT, 'UTF-8'),
 			'child_level' => $board_info['child_level'],
 		);
 
@@ -507,7 +512,7 @@ class MessageIndex_Controller extends Action_Controller
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
 		$template_layers->add('pages_and_buttons');
 
-		addJavascriptVar('notification_board_notice', $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board'], true);
+		addJavascriptVar(array('notification_board_notice' => $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board']), true);
 
 		// Build the message index button array.
 		$context['normal_buttons'] = array(
@@ -546,13 +551,19 @@ class MessageIndex_Controller extends Action_Controller
 
 		// This is going to be needed to send off the notifications and for updateLastMessages().
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Notification.subs.php');
 
 		// Process process process data.
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Remember the last board they moved things to.
 		if (isset($_REQUEST['move_to']))
-			$_SESSION['move_to_topic'] = $_REQUEST['move_to'];
+			$_SESSION['move_to_topic'] = array(
+				'move_to' => $_REQUEST['move_to'],
+				// And remember the last expiry period too.
+				'redirect_topic' => (int) $_REQUEST['redirect_topic'],
+				'redirect_expires' => (int) $_REQUEST['redirect_expires'],
+			);
 
 		// Only a few possible actions.
 		$possibleActions = array();
@@ -636,16 +647,9 @@ class MessageIndex_Controller extends Action_Controller
 		if (!empty($_REQUEST['actions']))
 		{
 			// Find all topics...
-			$request = $db->query('', '
-				SELECT id_topic, id_member_started, id_board, locked, approved, unapproved_posts
-				FROM {db_prefix}topics
-				WHERE id_topic IN ({array_int:action_topic_ids})
-				LIMIT ' . count($_REQUEST['actions']),
-				array(
-					'action_topic_ids' => array_keys($_REQUEST['actions']),
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
+			$topics_info = topicsDetails(array_keys($_REQUEST['actions']));
+
+			foreach ($topics_info as $row)
 			{
 				if (!empty($board))
 				{
@@ -672,7 +676,6 @@ class MessageIndex_Controller extends Action_Controller
 						unset($_REQUEST['actions'][$row['id_topic']]);
 				}
 			}
-			$db->free_result($request);
 		}
 
 		$stickyCache = array();
@@ -989,24 +992,11 @@ class MessageIndex_Controller extends Action_Controller
 
 		if (!empty($markCache))
 		{
-			$request = $db->query('', '
-				SELECT id_topic, disregarded
-				FROM {db_prefix}log_topics
-				WHERE id_topic IN ({array_int:selected_topics})
-					AND id_member = {int:current_user}',
-				array(
-					'selected_topics' => $markCache,
-					'current_user' => $user_info['id'],
-				)
-			);
-			$logged_topics = array();
-			while ($row = $db->fetch_assoc($request))
-				$logged_topics[$row['id_topic']] = $row['disregarded'];
-			$db->free_result($request);
+			$logged_topics = getLoggedTopics($user_info['id'], $markCache);
 
 			$markArray = array();
 			foreach ($markCache as $topic)
-				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], $logged_topics[$topic]);
+				$markArray[] = array($user_info['id'], $topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$topic]));
 
 			markTopicsRead($markArray, true);
 		}

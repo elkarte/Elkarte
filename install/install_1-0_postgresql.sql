@@ -34,20 +34,20 @@ CREATE OR REPLACE FUNCTION IFNULL (int, boolean) RETURNS int AS
   'SELECT COALESCE($1, CAST($2 AS int)) AS result'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION INET_ATON(text) RETURNS bigint AS
-  'SELECT
-	CASE WHEN
-		$1 !~ ''^[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?$'' THEN 0
-	ELSE
-		split_part($1, ''.'', 1)::int8 * (256 * 256 * 256) +
-		split_part($1, ''.'', 2)::int8 * (256 * 256) +
-		split_part($1, ''.'', 3)::int8 * 256 +
-		split_part($1, ''.'', 4)::int8
-	END AS result'
+CREATE OR REPLACE FUNCTION INET_ATON(text) RETURNS bigint AS '
+  SELECT
+  CASE WHEN
+    $1 !~ ''^[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?\.[0-9]?[0-9]?[0-9]?$'' THEN 0
+  ELSE
+    split_part($1, ''.'', 1)::int8 * (256 * 256 * 256) +
+    split_part($1, ''.'', 2)::int8 * (256 * 256) +
+    split_part($1, ''.'', 3)::int8 * 256 +
+    split_part($1, ''.'', 4)::int8
+  END AS result'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION INET_NTOA(bigint) RETURNS text AS
-  'SELECT
+CREATE OR REPLACE FUNCTION INET_NTOA(bigint) RETURNS text AS '
+  SELECT
     (($1 >> 24) & 255::int8) || ''.'' ||
     (($1 >> 16) & 255::int8) || ''.'' ||
     (($1 >> 8) & 255::int8) || ''.'' ||
@@ -55,30 +55,30 @@ CREATE OR REPLACE FUNCTION INET_NTOA(bigint) RETURNS text AS
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION FIND_IN_SET(needle text, haystack text) RETURNS integer AS '
-	SELECT i AS result
-	FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-	WHERE  (string_to_array($2,'',''))[i] = $1
-		UNION ALL
-	SELECT 0
-	LIMIT 1'
+  SELECT i AS result
+  FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+  WHERE (string_to_array($2,'',''))[i] = $1
+    UNION ALL
+  SELECT 0
+  LIMIT 1'
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION FIND_IN_SET(needle integer, haystack text) RETURNS integer AS '
-	SELECT i AS result
-	FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-	WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
-		UNION ALL
-	SELECT 0
-	LIMIT 1'
+  SELECT i AS result
+  FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+  WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
+    UNION ALL
+  SELECT 0
+  LIMIT 1'
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION FIND_IN_SET(needle smallint, haystack text) RETURNS integer AS '
-	SELECT i AS result
-	FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-	WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
-		UNION ALL
-	SELECT 0
-	LIMIT 1'
+  SELECT i AS result
+  FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+  WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
+    UNION ALL
+  SELECT 0
+  LIMIT 1'
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION LEFT (text, int4) RETURNS text AS
@@ -109,8 +109,8 @@ CREATE OR REPLACE FUNCTION HOUR (timestamp) RETURNS integer AS
   'SELECT CAST (EXTRACT(HOUR FROM $1) AS integer) AS result'
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION DATE_FORMAT (timestamp, text) RETURNS text AS
-  'SELECT
+CREATE OR REPLACE FUNCTION DATE_FORMAT (timestamp, text) RETURNS text AS '
+  SELECT
     REPLACE(
         REPLACE($2, ''%m'', to_char($1, ''MM'')),
     ''%d'', to_char($1, ''DD'')) AS result'
@@ -143,7 +143,7 @@ CREATE OPERATOR != (PROCEDURE = bool_not_eq_int, LEFTARG = boolean, RIGHTARG = i
 # Sequence for table `admin_info_files`
 #
 
-CREATE SEQUENCE {$db_prefix}admin_info_files_seq START WITH 8;
+CREATE SEQUENCE {$db_prefix}admin_info_files_seq START WITH 4;
 
 #
 # Table structure for table `admin_info_files`
@@ -169,33 +169,34 @@ CREATE INDEX {$db_prefix}admin_info_files_filename ON {$db_prefix}admin_info_fil
 # Dumping data for table `admin_info_files`
 #
 
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'current-version.js', '/site/', 'version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (2, 'detailed-version.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (3, 'latest-news.js', '/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (4, 'latest-packages.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (5, 'latest-smileys.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (6, 'latest-support.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
-INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (7, 'latest-themes.js', '/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (1, 'current-version.js', 'http://elkarte.github.io/Elkarte/site/', 'version=%3$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (2, 'detailed-version.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&version=%3$s', '', 'text/javascript');
+INSERT INTO {$db_prefix}admin_info_files (id_file, filename, path, parameters, data, filetype) VALUES (3, 'latest-news.js', 'http://elkarte.github.io/Elkarte/site/', 'language=%1$s&format=%2$s', '', 'text/javascript');
 # --------------------------------------------------------
+
+#
+# Sequence for table `antispam_questions`
+#
+
+CREATE SEQUENCE {$db_prefix}antispam_questions_seq;
 
 #
 # Table structure for table `antispam_questions`
 #
 
 CREATE TABLE {$db_prefix}antispam_questions (
-  id_question integer primary key,
+  id_question int default nextval('{$db_prefix}antispam_questions_seq'),
   question text NOT NULL,
   answer text NOT NULL,
-  language varchar(50) NOT NULL
+  language varchar(50) NOT NULL,
+  PRIMARY KEY (id_question)
 );
 
 #
-# Indexes for table `admin_info_files`
+# Indexes for table `antispam_questions`
 #
 
 CREATE INDEX {$db_prefix}antispam_questions_language ON {$db_prefix}antispam_questions (language);
-
-# --------------------------------------------------------
 
 #
 # Table structure for table `approval_queue`
@@ -243,6 +244,7 @@ CREATE TABLE {$db_prefix}attachments (
 CREATE UNIQUE INDEX {$db_prefix}attachments_id_member ON {$db_prefix}attachments (id_member, id_attach);
 CREATE INDEX {$db_prefix}attachments_id_msg ON {$db_prefix}attachments (id_msg);
 CREATE INDEX {$db_prefix}attachments_attachment_type ON {$db_prefix}attachments (attachment_type);
+CREATE INDEX {$db_prefix}attachments_id_thumb ON {$db_prefix}attachments (id_thumb);
 
 #
 # Sequence for table `ban_groups`
@@ -973,6 +975,7 @@ CREATE TABLE {$db_prefix}custom_fields (
   default_value varchar(255) NOT NULL,
   enclose text NOT NULL,
   placement smallint NOT NULL default '0',
+  vieworder smallint NOT NULL default '0',
   PRIMARY KEY (id_field)
 );
 
@@ -981,6 +984,60 @@ CREATE TABLE {$db_prefix}custom_fields (
 #
 
 CREATE UNIQUE INDEX {$db_prefix}custom_fields_col_name ON {$db_prefix}custom_fields (col_name);
+
+#
+# Dumping data for table `custom_fields`
+#
+
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_aim', 'AOL Instant Messenger', 'This is your AOL Instant Messenger nickname.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="aim" href="aim:goim?screenname={INPUT}&message=Hello!+Are+you+there?" target="_blank" title="AIM - {INPUT}"><img src="{IMAGES_URL}/profile/aim.png" alt="AIM - {INPUT}"></a>', 1);
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_icq', 'ICQ', 'This is your ICQ number.', 'text', 12, '', 'regex~[1-9][0-9]{4,9}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="icq" href="http://www.icq.com/whitepages/about_me.php?uin={INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>', 1);
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_skye', 'Skype', 'This is your Skype account name', 'text', 32, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a href="skype:{INPUT}?call"><img src="http://mystatus.skype.com/smallicon/{INPUT}" alt="Skype - {INPUT}" title="Skype - {INPUT}" /></a>', 1);
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_fbook', 'Facebook Profile', 'Enter your Facebook username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.facebook.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/facebook.png" alt="{INPUT}" /></a>', 1);
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_twitt', 'Twitter Profile', 'Enter your Twitter username.', 'text', 50, '', 'regex~[a-z][0-9a-z.-]{1,31}~i', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="https://www.twitter.com/{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/twitter.png" alt="{INPUT}" /></a>', 1);
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_linked', 'LinkedIn Profile', 'Set your LinkedIn Public profile link. You must set a Custom public url for this to work.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target={INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/linkedin.png" alt="LinkedIn profile" /></a>', 1);
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_gplus', 'Google+ Profile', 'This is your Google+ profile url.', 'text', 255, '', 'nohtml', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a target="_blank" href="{INPUT}"><img src="{DEFAULT_IMAGES_URL}/profile/gplus.png" alt="G+ profile" /></a>', 1);
+INSERT INTO {$db_prefix}custom_fields
+	(col_name, field_name, field_desc, field_type, field_length, field_options, mask, show_reg, show_display, show_profile, private, active, bbc, can_search, default_value, enclose, placement)
+VALUES
+	('cust_yim', 'Yahoo! Messenger', 'This is your Yahoo! Instant Messenger nickname.', 'text', 50, '', 'email', 0, 1, 'forumprofile', 0, 1, 0, 0, '', '<a class="yim" href="http://edit.yahoo.com/config/send_webmesg?.target={INPUT}" target="_blank" title="Yahoo! Messenger - {INPUT}"><img src="http://opi.yahoo.com/online?m=g&t=0&u={INPUT}" alt="Yahoo! Messenger - {INPUT}"></a>', 1);
+
+#
+# Table structure for table `custom_fields_data`
+#
+
+CREATE TABLE {$db_prefix}custom_fields_data (
+  id_member int NOT NULL default '0',
+  variable varchar(255) NOT NULL default '',
+  value text NOT NULL,
+  PRIMARY KEY (id_member, variable)
+);
+
+#
+# Indexes for table `custom_fields_data`
+#
+
+CREATE INDEX {$db_prefix}custom_fields_data_id_member ON {$db_prefix}custom_fields_data (id_member);
 
 #
 # Table structure for table `group_moderators`
@@ -1056,6 +1113,39 @@ CREATE TABLE {$db_prefix}log_activity (
 # Indexes for table `log_activity`
 #
 CREATE INDEX {$db_prefix}log_activity_most_on ON {$db_prefix}log_activity (most_on);
+
+#
+# Sequence for table `log_badbehavior`
+#
+
+CREATE SEQUENCE {$db_prefix}log_badbehavior_seq;
+
+#
+# Table structure for table `log_badbehavior`
+#
+
+CREATE TABLE {$db_prefix}log_badbehavior (
+  id int default nextval('{$db_prefix}log_badbehavior_seq'),
+  ip char NOT NULL,
+  date int NOT NULL default '0',
+  request_method varchar(255) NOT NULL,
+  request_uri varchar(255) NOT NULL,
+  server_protocol varchar(255) NOT NULL,
+  http_headers text NOT NULL,
+  user_agent varchar(255) NOT NULL,
+  request_entity varchar(255) NOT NULL,
+  valid varchar(255) NOT NULL,
+  id_member int NOT NULL,
+  session char(64) NOT NULL default '',
+  PRIMARY KEY (id)
+);
+
+#
+# Indexes for table `log_badbehavior`
+#
+
+CREATE INDEX {$db_prefix}ip ON {$db_prefix}log_badbehavior (ip);
+CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);
 
 #
 # Sequence for table `log_banned`
@@ -1176,7 +1266,7 @@ CREATE INDEX {$db_prefix}log_errors_ip ON {$db_prefix}log_errors (ip);
 CREATE TABLE {$db_prefix}log_floodcontrol (
   ip char(16) NOT NULL default '                ',
   log_time int NOT NULL default '0',
-  log_type varchar(8) NOT NULL default 'post',
+  log_type varchar(10) NOT NULL default 'post',
   PRIMARY KEY (ip, log_type)
 );
 
@@ -1224,6 +1314,24 @@ CREATE TABLE {$db_prefix}log_karma (
 CREATE INDEX {$db_prefix}log_karma_log_time ON {$db_prefix}log_karma (log_time);
 
 #
+# Table structure for table `log_likes`
+#
+
+CREATE TABLE {$db_prefix}log_likes (
+  action char(1) NOT NULL default '0',
+  id_target int NOT NULL default '0',
+  id_member int NOT NULL default '0',
+  log_time int NOT NULL default '0',
+  PRIMARY KEY (id_target, id_member)
+);
+
+#
+# Indexes for table `log_likes`
+#
+
+CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
+
+#
 # Table structure for table `log_mark_read`
 #
 
@@ -1252,6 +1360,33 @@ CREATE TABLE {$db_prefix}log_member_notices (
 );
 
 #
+# Sequence for table `log_notifications`
+#
+
+CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+
+#
+# Table structure for table `log_notifications`
+#
+
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
+  id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+  id_member int NOT NULL DEFAULT '0',
+  id_msg int NOT NULL DEFAULT '0',
+  status int NOT NULL DEFAULT '0',
+  id_member_from int NOT NULL DEFAULT '0',
+  log_time int NOT NULL DEFAULT '0',
+  notif_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_notification)
+);
+
+#
+# Indexes for table `log_notifications`
+#
+
+CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
+
+#
 # Table structure for table `log_notify`
 #
 
@@ -1278,7 +1413,7 @@ CREATE TABLE {$db_prefix}log_online (
   log_time int NOT NULL default '0',
   id_member int NOT NULL default '0',
   id_spider smallint NOT NULL default '0',
-  ip int8 NOT NULL default '0',
+  ip bigint NOT NULL default '0',
   url text NOT NULL,
   PRIMARY KEY (session)
 );
@@ -1532,9 +1667,9 @@ CREATE TABLE {$db_prefix}log_subscribed (
   old_id_group int NOT NULL default '0',
   start_time int NOT NULL default '0',
   end_time int NOT NULL default '0',
-  payments_pending smallint NOT NULL default '0',
   status smallint NOT NULL default '0',
-  pending_details text NOT NULL default '',
+  payments_pending smallint NOT NULL default '0',
+  pending_details text NOT NULL,
   reminder_sent smallint NOT NULL default '0',
   vendor_ref varchar(255) NOT NULL default '',
   PRIMARY KEY (id_sublog)
@@ -1559,7 +1694,7 @@ CREATE TABLE {$db_prefix}log_topics (
   id_member int NOT NULL default '0',
   id_topic int NOT NULL default '0',
   id_msg int NOT NULL default '0',
-  disregarded int NOT NULL default '0',
+  unwatched int NOT NULL default '0',
   PRIMARY KEY (id_member, id_topic)
 );
 
@@ -1663,12 +1798,13 @@ CREATE TABLE {$db_prefix}members (
   lngfile varchar(255) NOT NULL,
   last_login int NOT NULL default '0',
   real_name varchar(255) NOT NULL,
-  instant_messages smallint NOT NULL default 0,
-  unread_messages smallint NOT NULL default 0,
+  personal_messages smallint NOT NULL default '0',
+  notifications smallint NOT NULL default '0',
+  unread_messages smallint NOT NULL default '0',
   new_pm smallint NOT NULL default '0',
   buddy_list text NOT NULL,
   pm_ignore_list varchar(255) NOT NULL,
-  pm_prefs int NOT NULL default '0',
+  pm_prefs int NOT NULL default '2',
   mod_prefs varchar(20) NOT NULL default '',
   message_labels text NOT NULL,
   passwd varchar(64) NOT NULL default '',
@@ -1712,7 +1848,7 @@ CREATE TABLE {$db_prefix}members (
   ignore_boards text NOT NULL,
   warning smallint NOT NULL default '0',
   passwd_flood varchar(12) NOT NULL default '',
-  pm_receive_from smallint NOT NULL default '1',
+  receive_from smallint NOT NULL default '1',
   PRIMARY KEY (id_member)
 );
 
@@ -1804,6 +1940,24 @@ INSERT INTO {$db_prefix}message_icons (filename, title, icon_order) VALUES ('sad
 INSERT INTO {$db_prefix}message_icons (filename, title, icon_order) VALUES ('wink', 'Wink', '11');
 INSERT INTO {$db_prefix}message_icons (filename, title, icon_order) VALUES ('poll', 'Poll', '12');
 # --------------------------------------------------------
+
+#
+# Table structure for table `message_likes`
+#
+
+CREATE TABLE {$db_prefix}message_likes (
+	id_member int NOT NULL default '0',
+	id_msg int NOT NULL default '0',
+	id_poster int NOT NULL default '0',
+	PRIMARY KEY (id_msg, id_member)
+);
+
+#
+# Indexes for table `message_likes`
+#
+
+CREATE INDEX {$db_prefix}message_likes_id_member ON {$db_prefix}message_likes (id_member);
+CREATE INDEX {$db_prefix}message_likes_id_poster ON {$db_prefix}message_likes (id_poster);
 
 #
 # Sequence for table `messages`
@@ -1967,8 +2121,8 @@ INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_v
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'profile_view_any');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_read');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_send');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_draft');
-INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'pm_autosave_draft');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_draft');
+INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (2, 'pm_autosave_draft');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'calendar_view');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'view_stats');
 INSERT INTO {$db_prefix}permissions (id_group, permission) VALUES (0, 'who_view');
@@ -2125,6 +2279,61 @@ CREATE TABLE {$db_prefix}poll_choices (
 );
 
 #
+# Table structure for table `postby_emails`
+#
+
+CREATE TABLE {$db_prefix}postby_emails (
+  id_email varchar(50)  NOT NULL default '',
+  time_sent int NOT NULL default '0',
+  email_to varchar(50) NOT NULL default '',
+  PRIMARY KEY (id_email)
+);
+
+#
+# Sequence for table `postby_emails_error`
+#
+
+CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
+
+#
+# Table structure for table `postby_emails_error`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_error (
+  id_email int default nextval('{$db_prefix}postby_emails_error_seq'),
+  error varchar(255) NOT NULL default '',
+  data_id varchar(255) NOT NULL default '0',
+  subject varchar(255) NOT NULL default '',
+  id_message int NOT NULL default '0',
+  id_board smallint NOT NULL default '0',
+  email_from varchar(50) NOT NULL default '',
+  message_type char(10) NOT NULL default '',
+  message text NOT NULL,
+  PRIMARY KEY (id_email)
+);
+
+#
+# Sequence for table `postby_emails_filters`
+#
+
+CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
+
+#
+# Table structure for table `postby_emails_filters`
+#
+
+CREATE TABLE {$db_prefix}postby_emails_filters (
+  id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
+  filter_style char(5) NOT NULL default '',
+  filter_type varchar(255) NOT NULL default '',
+  filter_to varchar(255) NOT NULL default '',
+  filter_from varchar(255) NOT NULL default '',
+  filter_name varchar(255) NOT NULL default '',
+  filter_order int NOT NULL default '0',
+  PRIMARY KEY (id_filter)
+);
+
+#
 # Sequence for table `scheduled_tasks`
 #
 
@@ -2171,7 +2380,6 @@ INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_r
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (13, 0, 240, 1, 'd', 0, 'remove_old_drafts');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (14, 0, 0, 6, 'h', 0, 'remove_old_followups');
 INSERT INTO {$db_prefix}scheduled_tasks	(id_task, next_time, time_offset, time_regularity, time_unit, disabled, task) VALUES (15, 0, 360, 10, 'm', 0, 'maillist_fetch_IMAP');
-
 # --------------------------------------------------------
 
 #
@@ -2271,7 +2479,6 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('send_welcomeEmail', 
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_editDisplayName', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('admin_session_lifetime', '10');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('allow_hideOnline', '1');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('guest_hideContacts', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('spamWaitTime', '5');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('pm_spam_settings', '10,5,20');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('reserveWord', '0');
@@ -2310,6 +2517,7 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxMessages',
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxTopics', '20');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('defaultMaxMembers', '30');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableParticipation', '1');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enableFollowup', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('recycle_enable', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('recycle_board', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('maxMsgID', '1');
@@ -2321,8 +2529,8 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('time_offset', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cookieTime', '60');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('jquery_source', 'local');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('lastActive', '15');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_known', 'default,aaron,akyhne,fugue');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_names', '{$default_smileyset_name}\n{$default_aaron_smileyset_name}\n{$default_akyhne_smileyset_name}\n{$default_fugue_smileyset_name}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_known', 'default');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_names', '{$default_smileyset_name}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('smiley_sets_default', 'default');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('cal_days_for_index', '7');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('requireAgreement', '1');
@@ -2368,13 +2576,13 @@ INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachment_image_par
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('attachment_thumb_png', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_reencode', '1');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('avatar_paranoid', '0');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enable_disregard', '0');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('enable_unwatch', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_enabled', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_logging', '0');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}');
 INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:19:"/subscriptions.php";}');
-INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl_desc', 'a:1:{i:0;s:21:"Payment Gateway";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}');
+INSERT INTO {$db_prefix}settings (variable, value) VALUES ('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}');
 # --------------------------------------------------------
 
 #
@@ -2426,7 +2634,7 @@ INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidd
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':P', 'tongue.gif', '{$default_tongue_smiley}', 10, 0);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':-[', 'embarrassed.gif', '{$default_embarrassed_smiley}', 11, 0);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':-X', 'lipsrsealed.gif', '{$default_lips_sealed_smiley}', 12, 0);
-INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':-\', 'undecided.gif', '{$default_undecided_smiley}', 13, 0);
+INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':-\\', 'undecided.gif', '{$default_undecided_smiley}', 13, 0);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':-*', 'kiss.gif', '{$default_kiss_smiley}', 14, 0);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':''(', 'cry.gif', '{$default_cry_smiley}', 15, 0);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('>:D', 'evil.gif', '{$default_evil_smiley}', 16, 1);
@@ -2434,7 +2642,7 @@ INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidd
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('O0', 'afro.gif', '{$default_afro_smiley}', 18, 1);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES (':))', 'laugh.gif', '{$default_laugh_smiley}', 19, 1);
 INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('C:-)', 'police.gif', '{$default_police_smiley}', 20, 1);
-INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('O:-)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
+INSERT INTO {$db_prefix}smileys	(code, filename, description, smiley_order, hidden) VALUES ('O:)', 'angel.gif', '{$default_angel_smiley}', 21, 1);
 # --------------------------------------------------------
 
 #
@@ -2486,6 +2694,7 @@ INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VA
 INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VALUES (25, 'Yandex (Video)', 'YandexVideo', '');
 INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VALUES (26, 'Yandex (Blogs)', 'YandexBlogs', '');
 INSERT INTO {$db_prefix}spiders (id_spider, spider_name, user_agent, ip_info) VALUES (27, 'Yandex (Media)', 'YandexMedia', '');
+# --------------------------------------------------------
 
 #
 # Sequence for table `subscriptions`
@@ -2551,13 +2760,13 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_modi
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_user_images', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_blurb', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_gender', '0');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_newsfader', '0');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'number_recent_posts', '0');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_member_bar', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'linktree_link', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_profile_buttons', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_mark_read', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_stats_index', '1');
+INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_board_desc', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'newsfader_time', '5000');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'allow_no_censored', '0');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'additional_options_collapsable', '1');
@@ -2565,6 +2774,7 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'use_image
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'enable_news', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'forum_width', '90%');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '2');
+INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'posts_apply_ignore_list', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 
@@ -2649,7 +2859,6 @@ CREATE TABLE {$db_prefix}user_drafts (
   locked smallint NOT NULL default '0',
   is_sticky smallint NOT NULL default '0',
   to_list varchar(255) NOT NULL default '',
-  outbox smallint NOT NULL default '0',
   PRIMARY KEY (id_draft)
 );
 
@@ -2658,125 +2867,3 @@ CREATE TABLE {$db_prefix}user_drafts (
 #
 
 CREATE UNIQUE INDEX {$db_prefix}id_member ON {$db_prefix}user_drafts (id_member, id_draft, type);
-# --------------------------------------------------------
-
-#
-# Sequence for table `log_badbehavior`
-#
-
-CREATE SEQUENCE {$db_prefix}log_badbehavior_seq;
-
-#
-# Table structure for table `log_badbehavior`
-#
-
-CREATE TABLE {$db_prefix}log_badbehavior (
-	id int default nextval('{$db_prefix}log_badbehavior'),
-	ip char NOT NULL,
-	date int NOT NULL default '0',
-	request_method varchar(255) NOT NULL,
-	request_uri varchar(255) NOT NULL,
-	server_protocol varchar(255) NOT NULL,
-	http_headers text NOT NULL,
-	user_agent varchar(255) NOT NULL,
-	request_entity varchar(255) NOT NULL,
-	valid varchar(255) NOT NULL,
-	id_member int NOT NULL,
-	session char(64) NOT NULL default '',
-	PRIMARY KEY (id)
-);
-
-#
-# Indexes for table `log_badbehavior`
-#
-
-CREATE INDEX {$db_prefix}ip ON {$db_prefix}log_badbehavior (ip);
-CREATE INDEX {$db_prefix}user_agent ON {$db_prefix}log_badbehavior (user_agent);
-
-#
-# Sequence for table `postby_emails`
-#
-
-CREATE SEQUENCE {$db_prefix}postby_emails_seq;
-
-#
-# Table structure for table `postby_emails`
-#
-
-CREATE TABLE {$db_prefix}postby_emails (
-	id_email varchar(50) NOT NULL,
-	time_sent int NOT NULL,
-	email_to varchar(50) NOT NULL,
-	PRIMARY KEY (id_email)
-);
-
-#
-# Sequence for table `postby_emails_error`
-#
-
-CREATE SEQUENCE {$db_prefix}postby_emails_error_seq;
-
-#
-# Table structure for table `postby_emails_error`
-#
-
-CREATE TABLE {$db_prefix}postby_emails_error
-	id_email int default nextval('{$db_prefix}postby_emails_error'),
-	error varchar(255) NOT NULL default '',
-	data_id varchar(255) NOT NULL default '0',
-	subject varchar(255) NOT NULL default '',
-	id_message int NOT NULL default '0',
-	id_board smallint(5) NOT NULL default '0',
-	email_from varchar(50) NOT NULL default '',
-	message_type char(10) NOT NULL default '',
-	message text NOT NULL default '',
-	PRIMARY KEY (id_email)
-);
-
-#
-# Sequence for table `postby_emails_filter`
-#
-
-CREATE SEQUENCE {$db_prefix}postby_emails_filter_seq;
-
-#
-# Table structure for table `postby_emails_filter`
-#
-
-CREATE TABLE {$db_prefix}postby_emails_filter
-	id_filter int default nextval('{$db_prefix}postby_emails_filter'),
-	filter_style char(5) NOT NULL default '',
-	filter_type varchar(255) NOT NULL default '',
-	filter_to varchar(255) NOT NULL default '',
-	filter_from varchar(255) NOT NULL default '',
-	filter_name varchar(255) NOT NULL default '',
-	PRIMARY KEY (id_filter)
-);
-
-#
-# Table structure for table `log_likes`
-#
-
-CREATE TABLE {$db_prefix}log_likes (
-  action char(1) NOT NULL default '0',
-  id_target int NOT NULL default '0',
-  id_member int NOT NULL default '0',
-  log_time int NOT NULL default '0',
-  PRIMARY KEY (id_target, id_member)
-);
-
-#
-# Indexes for table `log_likes`
-#
-
-CREATE INDEX {$db_prefix}log_likes_log_time ON {$db_prefix}log_likes (log_time);
-
-#
-# Table structure for table `message_likes`
-#
-
-CREATE TABLE {$db_prefix}message_likes (
-  id_member int NOT NULL default '0',
-  id_msg int NOT NULL default '0',
-  PRIMARY KEY (id_msg, id_member)
-);

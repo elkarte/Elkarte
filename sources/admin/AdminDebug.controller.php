@@ -76,9 +76,11 @@ class AdminDebug_Controller extends Action_Controller
 		<style type="text/css">
 			body {
 				margin: 1ex;
+				color: #bbb;
+				background: #222;
 			}
 			body, td, th, .normaltext {
-				font-size: x-small;
+				font-size: small;
 			}
 			.smalltext {
 				font-size: xx-small;
@@ -86,7 +88,7 @@ class AdminDebug_Controller extends Action_Controller
 		</style>
 	</head>
 	<body id="help_popup">
-		<div class="tborder windowbg description">';
+		<div class="windowbg description">';
 
 		// db work...
 		$db = database();
@@ -138,7 +140,7 @@ class AdminDebug_Controller extends Action_Controller
 			echo '
 		<div id="qq', $q, '" style="margin-bottom: 2ex;">
 			<a', $is_select_query ? ' href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '"' : '', ' style="font-weight: bold; text-decoration: none;">
-				', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars($query_data['q']))), '
+				', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars($query_data['q'], ENT_COMPAT, 'UTF-8'))), '
 			</a><br />';
 
 			if (!empty($query_data['f']) && !empty($query_data['l']))
@@ -210,7 +212,7 @@ class AdminDebug_Controller extends Action_Controller
 	 */
 	public function action_viewadminfile()
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
 		require_once(SUBSDIR . '/AdminDebug.subs.php');
 

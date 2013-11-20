@@ -18,7 +18,6 @@
 if (!defined('ELK'))
 	die('No access...');
 
-
 /**
  * Set the permission level for a specific profile, group, or group for a profile.
  * @internal
@@ -390,7 +389,7 @@ function loadAllPermissions()
 {
 	global $context, $txt, $modSettings;
 
-	// List of all the groups 
+	// List of all the groups
 	// Note to Mod authors - you don't need to stick your permission group here if you don't mind having it as the last group of the page.
 	$permissionGroups = array(
 		'membergroup' => array(
@@ -758,6 +757,7 @@ function assignPermissionProfileToBoard($profile, $board)
  * @param array $groups
  * @param array $illgeal_permissions
  * @param array $non_guest_permissions
+ * @todo another function with the same name in Membergroups.subs.php
  */
 function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
 {

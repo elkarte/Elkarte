@@ -25,6 +25,9 @@ if (!defined('ELK'))
  */
 class News_Controller extends Action_Controller
 {
+
+	private $_query_this_board = null;
+
 	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
@@ -54,7 +57,7 @@ class News_Controller extends Action_Controller
 	public function action_showfeed()
 	{
 		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-		global $query_this_board, $forum_version, $cdata_override, $settings;
+		global $forum_version, $cdata_override, $settings;
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
@@ -67,7 +70,7 @@ class News_Controller extends Action_Controller
 		$_GET['limit'] = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
-		$query_this_board = 1;
+		$this->_query_this_board = '1=1';
 		$context['optimize_msg'] = array(
 			'highest' => 'm.id_msg <= b.id_last_msg',
 		);
@@ -89,7 +92,7 @@ class News_Controller extends Action_Controller
 			$boards = array_keys($boards_posts);
 
 			if (!empty($boards))
-				$query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
+				$this->_query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
 
 			// Try to limit the number of messages we look through.
 			if ($total_cat_posts > 100 && $total_cat_posts > $modSettings['totalMessages'] / 15)
@@ -119,7 +122,7 @@ class News_Controller extends Action_Controller
 
 			// @todo: when $boards is empty? If it is empty there is the fatal_lang_error. No?
 			if (!empty($boards))
-				$query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
+				$this->_query_this_board = 'b.id_board IN (' . implode(', ', $boards) . ')';
 
 			// The more boards, the more we're going to look through...
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
@@ -132,7 +135,7 @@ class News_Controller extends Action_Controller
 
 			$feed_title = ' - ' . strip_tags($board_info['name']);
 
-			$query_this_board = 'b.id_board = ' . $board;
+			$this->_query_this_board = 'b.id_board = ' . $board;
 
 			// Try to look through just a few messages, if at all possible.
 			if ($boards_data['num_posts'] > 80 && $boards_data['num_posts'] > $modSettings['totalMessages'] / 10)
@@ -140,7 +143,7 @@ class News_Controller extends Action_Controller
 		}
 		else
 		{
-			$query_this_board = '{query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			$this->_query_this_board = '{query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 				AND b.id_board != ' . $modSettings['recycle_board'] : '');
 			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $_GET['limit'] * 5);
 		}
@@ -151,6 +154,7 @@ class News_Controller extends Action_Controller
 		// @todo Birthdays?
 
 		// List all the different types of data they can pull.
+		// @todo what are the the [1] values used for in this array?
 		$subActions = array(
 			'recent' => array('action_xmlrecent', 'recent-post'),
 			'news' => array('action_xmlnews', 'article'),
@@ -159,13 +163,12 @@ class News_Controller extends Action_Controller
 		);
 
 		// Easy adding of sub actions
-	 	call_integration_hook('integrate_xmlfeeds', array(&$subActions));
+		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
-		if (empty($_GET['sa']) || !isset($subActions[$_GET['sa']]))
-			$_GET['sa'] = 'recent';
+		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'recent';
 
 		// @todo Temp - webslices doesn't do everything yet. (only recent posts)
-		if ($xml_format == 'webslice' && $_GET['sa'] != 'recent')
+		if ($xml_format == 'webslice' && $subAction != 'recent')
 			$xml_format = 'rss2';
 		// If this is webslices we kinda cheat - we allow a template that we call direct for the HTML, and we override the CDATA.
 		elseif ($xml_format == 'webslice')
@@ -176,11 +179,11 @@ class News_Controller extends Action_Controller
 		}
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $_GET['action'], $_GET['limit'], $_GET['sa']);
+		$cachekey = array($xml_format, $_GET['action'], $_GET['limit'], $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
 			if (isset($_REQUEST[$var]))
 				$cachekey[] = $_REQUEST[$var];
-		$cachekey = md5(serialize($cachekey) . (!empty($query_this_board) ? $query_this_board : ''));
+		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
 
 		// Get the associative array representing the xml.
@@ -189,14 +192,14 @@ class News_Controller extends Action_Controller
 
 		if (empty($xml))
 		{
-			$xml = $this->{$subActions[$_GET['sa']][0]}($xml_format);
+			$xml = $this->{$subActions[$subAction][0]}($xml_format);
 
 			if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
 			|| (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
 				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 		}
 
-		$feed_title = htmlspecialchars(strip_tags($context['forum_name'])) . (isset($feed_title) ? $feed_title : '');
+		$feed_title = htmlspecialchars(strip_tags($context['forum_name']), ENT_COMPAT, 'UTF-8') . (isset($feed_title) ? $feed_title : '');
 
 		// This is an xml file....
 		ob_end_clean();
@@ -346,7 +349,7 @@ class News_Controller extends Action_Controller
 
 		// Find the most recent members.
 		require_once(SUBSDIR . '/Members.subs.php');
-		$members = recentMembers((int)$_GET['limit']);
+		$members = recentMembers((int) $_GET['limit']);
 
 		$data = array();
 		foreach ($members as $member)
@@ -377,7 +380,7 @@ class News_Controller extends Action_Controller
 			else
 				$data[] = array(
 					'name' => cdata_parse($member['real_name']),
-					'time' => htmlspecialchars(strip_tags(standardTime($member['date_registered']))),
+					'time' => htmlspecialchars(strip_tags(standardTime($member['date_registered'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $member['id_member'],
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member']
 				);
@@ -398,7 +401,7 @@ class News_Controller extends Action_Controller
 	public function action_xmlnews($xml_format)
 	{
 		global $scripturl, $modSettings, $board;
-		global $query_this_board, $context;
+		global $context;
 
 		$db = database();
 
@@ -425,7 +428,7 @@ class News_Controller extends Action_Controller
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				WHERE ' . $query_this_board . (empty($optimize_msg) ? '' : '
+				WHERE ' . $this->_query_this_board . (empty($optimize_msg) ? '' : '
 					AND {raw:optimize_msg}') . (empty($board) ? '' : '
 					AND t.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
 					AND t.approved = {int:is_approved}' : '') . '
@@ -511,7 +514,7 @@ class News_Controller extends Action_Controller
 			else
 			{
 				$data[] = array(
-				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time']))),
+				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_topic'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),
@@ -545,7 +548,7 @@ class News_Controller extends Action_Controller
 	 */
 	public function action_xmlrecent($xml_format)
 	{
-		global $scripturl, $modSettings, $board, $query_this_board, $context;
+		global $scripturl, $modSettings, $board, $context;
 
 		$db = database();
 
@@ -559,7 +562,7 @@ class News_Controller extends Action_Controller
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-				WHERE ' . $query_this_board . (empty($optimize_msg) ? '' : '
+				WHERE ' . $this->_query_this_board . (empty($optimize_msg) ? '' : '
 					AND {raw:optimize_msg}') . (empty($board) ? '' : '
 					AND m.id_board = {int:current_board}') . ($modSettings['postmod_active'] ? '
 					AND m.approved = {int:is_approved}' : '') . '
@@ -676,7 +679,7 @@ class News_Controller extends Action_Controller
 			else
 			{
 				$data[] = array(
-				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time']))),
+				'time' => htmlspecialchars(strip_tags(standardTime($row['poster_time'])), ENT_COMPAT, 'UTF-8'),
 					'id' => $row['id_msg'],
 					'subject' => cdata_parse($row['subject']),
 					'body' => cdata_parse($row['body']),
@@ -853,7 +856,7 @@ function fix_possible_url($val)
 	if (empty($modSettings['queryless_urls']) || ($context['server']['is_cgi'] && ini_get('cgi.fix_pathinfo') == 0 && @get_cfg_var('cgi.fix_pathinfo') == 0) || (!$context['server']['is_apache'] && !$context['server']['is_lighttpd']))
 		return $val;
 
-	$val = preg_replace('/^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$/e', '\'\' . $scripturl . \'/\' . strtr(\'$1\', \'&;=\', \'//,\') . \'.html$2\'', $val);
+	$val = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$~', create_function('$m', 'global $scripturl; return $scripturl . \'/\' . strtr("$m[1]", \'&;=\', \'//,\') . \'.html\' . (isset($m[2]) ? $m[2] : "");'), $val);
 	return $val;
 }
 

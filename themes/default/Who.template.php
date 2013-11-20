@@ -25,9 +25,7 @@ function template_main()
 	echo '
 	<div id="whos_online">
 		<form action="', $scripturl, '?action=who" method="post" id="whoFilter" accept-charset="UTF-8">
-			<div class="title_bar">
-				<h4 class="titlebg margin_lower">', $txt['who_title'], '</h4>
-			</div>';
+			<h2 class="category_header">', $txt['who_title'], '</h2>';
 
 	$extra = '
 				<div class="selectbox floatright">' . $txt['who_show1'] . '
@@ -43,7 +41,7 @@ function template_main()
 					</noscript>
 				</div>';
 
-	template_pagesection(false, false, 'go_down', array('extra' => $extra));
+	template_pagesection(false, false, array('extra' => $extra));
 
 	echo '
 			<div class="topic_table" id="mlist">
@@ -103,7 +101,22 @@ function template_main()
 					</tbody>
 				</table>
 			</div>';
-	template_pagesection(false, false, 'go_down', array('extra' => $extra));
+
+	$extra_bottom = '
+			<div class="selectbox floatright">' . $txt['who_show1'] . '
+				<select name="show" onchange="document.forms.whoFilter.submit();">';
+
+	foreach ($context['show_methods'] as $value => $label)
+		$extra_bottom .= '
+					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+	$extra_bottom .= '
+				</select>
+				<noscript>
+					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
+				</noscript>
+			</div>';
+
+	template_pagesection(false, false, array('extra' => $extra_bottom));
 
 	echo '
 		</form>
@@ -120,14 +133,12 @@ function template_credits()
 	// The most important part - the credits :P.
 	echo '
 	<div id="credits">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits'], '</h3>
-		</div>';
+		<h2 class="category_header">', $txt['credits'], '</h2>';
 
 	foreach ($context['credits'] as $section)
 	{
 		if (isset($section['pretext']))
-		echo '
+			echo '
 		<div class="windowbg">
 			<div class="content">
 				<p>', $section['pretext'], '</p>
@@ -135,10 +146,8 @@ function template_credits()
 		</div>';
 
 		if (isset($section['title']))
-		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $section['title'], '</h3>
-		</div>';
+			echo '
+			<h3 class="category_header">', $section['title'], '</h3>';
 
 		echo '
 		<div class="windowbg2">
@@ -183,9 +192,7 @@ function template_credits()
 	if (!empty($context['credits_software_graphics']))
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_software_graphics'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['credits_software_graphics'], '</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -205,9 +212,7 @@ function template_credits()
 	if (!empty($context['credits_addons']))
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_addons'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['credits_addons'], '</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -224,9 +229,7 @@ function template_credits()
 
 	// ElkArte !
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['credits_copyright'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['credits_copyright'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<dl>

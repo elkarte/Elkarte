@@ -77,14 +77,8 @@ class ManagePaid_Controller extends Action_Controller
 		// Default the sub-action to 'view subscriptions', but only if they have already set things up..
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($modSettings['paid_currency_symbol']) ? 'view' : 'settings');
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
 		$context['page_title'] = $txt['paid_subscriptions'];
+		$context['sub_action'] = $subAction;
 
 		// Tabs for browsing the different subscription functions.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -102,6 +96,8 @@ class ManagePaid_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
@@ -117,7 +113,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
-		// initialize the form
+		// Initialize the form
 		$this->_init_paidSettingsForm();
 
 		$config_vars = $this->_paidSettings->settings();
@@ -182,17 +178,45 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			checkSession();
 
-			// Sort out the currency stuff.
-			if ($_POST['paid_currency'] != 'other')
+			// Check that the entered email addresses are valid
+			if (!empty($_POST['paid_email_to']))
 			{
-				$_POST['paid_currency_code'] = $_POST['paid_currency'];
-				$_POST['paid_currency_symbol'] = $txt[$_POST['paid_currency'] . '_symbol'];
+				require_once(SUBSDIR . '/DataValidator.class.php');
+				$validator = new Data_Validator();
+
+				// Some cleaning and some rules
+				$validator->sanitation_rules(array('paid_email_to' => 'trim'));
+				$validator->validation_rules(array('paid_email_to' => 'valid_email'));
+				$validator->input_processing(array('paid_email_to' => 'csv'));
+				$validator->text_replacements(array('paid_email_to' => $txt['paid_email_to']));
+
+				if ($validator->validate($_POST))
+					$_POST['paid_email_to'] = $validator->paid_email_to;
+				else
+				{
+					// Thats not an email, lets set it back in the form to be fixed and let them know its wrong
+					$config_vars[1]['value'] = $_POST['paid_email_to'];
+					$context['error_type'] = 'minor';
+					$context['settings_message'] = array();
+					foreach ($validator->validation_errors() as $id => $error)
+						$context['settings_message'][] = $error;
+				}
 			}
-			unset($config_vars['dummy_currency']);
 
-			Settings_Form::save_db($config_vars);
+			// No errors, then save away
+			if (empty($context['error_type']))
+			{
+				// Sort out the currency stuff.
+				if ($_POST['paid_currency'] != 'other')
+				{
+					$_POST['paid_currency_code'] = $_POST['paid_currency'];
+					$_POST['paid_currency_symbol'] = $txt[$_POST['paid_currency'] . '_symbol'];
+				}
 
-			redirectexit('action=admin;area=paidsubscribe;sa=settings');
+				unset($config_vars['dummy_currency']);
+				Settings_Form::save_db($config_vars);
+				redirectexit('action=admin;area=paidsubscribe;sa=settings');
+			}
 		}
 
 		// Prepare the settings...
@@ -209,7 +233,7 @@ class ManagePaid_Controller extends Action_Controller
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_paidSettings = new Settings_Form();
 
 		// If the currency is set to something different then we need to set it to other for this to work and set it back shortly.
@@ -388,7 +412,7 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -402,8 +426,6 @@ class ManagePaid_Controller extends Action_Controller
 	public function action_modify()
 	{
 		global $context, $txt;
-
-		$db = database();
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
@@ -494,7 +516,7 @@ class ManagePaid_Controller extends Action_Controller
 					'reminder' => $reminder,
 				);
 
-				insertSubscription($insert);
+				$sub_id = insertSubscription($insert);
 			}
 			// Otherwise must be editing.
 			else
@@ -518,7 +540,7 @@ class ManagePaid_Controller extends Action_Controller
 
 				updateSubscription($update, $ignore_active);
 			}
-			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $db->insert_id('{db_prefix}subscriptions', 'id_subscribe') : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
+			call_integration_hook('integrate_save_subscription', array(($context['action_type'] == 'add' ? $sub_id : $context['sub_id']), $_POST['name'], $_POST['desc'], $isActive, $span, $cost, $_POST['prim_group'], $addgroups, $isRepeatable, $allowpartial, $emailComplete, $reminder));
 
 			redirectexit('action=admin;area=paidsubscribe;view');
 		}
@@ -550,13 +572,14 @@ class ManagePaid_Controller extends Action_Controller
 		else
 		{
 			$context['sub'] = getSubscriptionDetails($context['sub_id']);
+
 			// Does this have members who are active?
 			$context['disable_groups'] = countActiveSubscriptions($context['sub_id']);
 		}
 
 		// Load up all the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		$context['groups'] = getBasicMembergroupData('permission');
+		$context['groups'] = getBasicMembergroupData(array('permission'));
 
 		// This always happens.
 		createToken($context['action_type'] == 'delete' ? 'admin-pmsd' : 'admin-pms');
@@ -735,7 +758,7 @@ class ManagePaid_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -796,7 +819,7 @@ class ManagePaid_Controller extends Action_Controller
 				if (empty($member))
 					fatal_lang_error('error_member_not_found');
 
-				if(alreadySubscribed($context['sub_id'], $member['id_member']))
+				if (alreadySubscribed($context['sub_id'], $member['id_member']))
 					fatal_lang_error('member_already_subscribed');
 
 				// Actually put the subscription in place.

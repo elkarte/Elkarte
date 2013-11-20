@@ -115,24 +115,31 @@ class Display_Controller
 		$topic_tables = array();
 		call_integration_hook('integrate_display_topic', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
-		// @todo Why isn't this cached?
-		// @todo if we get id_board in this query and cache it, we can save a query on posting
 		// Load the topic details
 		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
 			fatal_lang_error('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
-		if (!empty($topicinfo['id_redirect_topic']))
+		if (!empty($topicinfo['id_redirect_topic']) && !isset($_GET['noredir']))
 		{
 			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
-			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0');
+			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
 		}
 
 		$context['real_num_replies'] = $context['num_replies'] = $topicinfo['num_replies'];
 		$context['topic_first_message'] = $topicinfo['id_first_msg'];
 		$context['topic_last_message'] = $topicinfo['id_last_msg'];
-		$context['topic_disregarded'] = isset($topicinfo['disregarded']) ? $topicinfo['disregarded'] : 0;
+		$context['topic_unwatched'] = isset($topicinfo['unwatched']) ? $topicinfo['unwatched'] : 0;
+		if (isset($_GET['redirfrom']))
+		{
+			$redir_topics = topicsList(array((int) $_GET['redirfrom']));
+			if (!empty($redir_topics[(int) $_GET['redirfrom']]))
+			{
+				$context['topic_redirected_from'] = $redir_topics[(int) $_GET['redirfrom']];
+				$context['topic_redirected_from']['redir_href'] = $scripturl . '?topic=' . $context['topic_redirected_from']['id_topic'] . '.0;noredir';
+			}
+		}
 
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
@@ -214,10 +221,27 @@ class Display_Controller
 			}
 		}
 
+		// Mark the notification as read if requested
+		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
+		{
+			require_once(CONTROLLERDIR . '/Notification.controller.php');
+
+			$notify = new Notification_Controller();
+			$notify->setData(array(
+				'id_notification' => $_REQUEST['item'],
+				'mark' => $_REQUEST['mark'],
+			));
+			$notify->action_markread();
+		}
+
 		// Create a previous next string if the selected theme has it as a selected option.
-		$context['previous_next'] = $modSettings['enablePreviousNext'] ? '<a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new">' . $txt['previous_next_back'] . '</a> - <a href="' . $scripturl . '?topic=' . $topic . '.0;prev_next=next#new">' . $txt['previous_next_forward'] . '</a>' : '';
+		if ($modSettings['enablePreviousNext'])
+			$context['links'] += array(
+				'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
+				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
+			);
 		if (!empty($context['topic_derived_from']))
-			$context['previous_next'] .= ' - <a href="' . $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_text($context['topic_derived_from']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24)) . '</em></a>';
+			$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -279,7 +303,7 @@ class Display_Controller
 		);
 
 		// Figure out all the link to the next/prev/first/last/etc. for wireless mainly.
-		$context['links'] = array(
+		$context['links'] += array(
 			'first' => $_REQUEST['start'] >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.0' : '',
 			'prev' => $_REQUEST['start'] >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($_REQUEST['start'] - $context['messages_per_page']) : '',
 			'next' => $_REQUEST['start'] + $context['messages_per_page'] < $context['total_visible_posts'] ? $scripturl . '?topic=' . $topic. '.' . ($_REQUEST['start'] + $context['messages_per_page']) : '',
@@ -323,12 +347,8 @@ class Display_Controller
 		$context['is_very_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 		$context['is_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $topicinfo['approved'];
-
-		// @todo Tricks? We don't want to show the poll icon in the topic class here, so pretend it's not one.
-		$context['is_poll'] = false;
-		determineTopicClass($context);
-
 		$context['is_poll'] = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
+		determineTopicClass($context);
 
 		// Did this user start the topic or not?
 		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];
@@ -544,7 +564,7 @@ class Display_Controller
 					'voted_this' => $option['voted_this'] != -1,
 					'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12px" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
 					// Note: IE < 8 requires us to set a width on the container, too.
-					'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . ($bar * 3.5 + 4) . 'px;"><div style="width: ' . $bar * 3.5 . 'px;"></div></div>' : '',
+					'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . ($bar * 3.5 + 4) . 'px;"><div style="width: ' . $bar * 3.5 . 'px;"></div></div>' : '<div class="bar"></div>',
 					'bar_width' => $barWide,
 					'option' => parse_bbc($option['label']),
 					'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
@@ -601,7 +621,7 @@ class Display_Controller
 			if ($mark_at_msg >= $topicinfo['id_last_msg'])
 				$mark_at_msg = $modSettings['maxMsgID'];
 			if ($mark_at_msg >= $topicinfo['new_from'])
-				markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['disregarded']), $topicinfo['new_from'] !== 0);
+				markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
 
 			updateReadNotificationsFor($topic, $board);
 
@@ -665,8 +685,11 @@ class Display_Controller
 
 			$messages_request = loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options);
 
-			require_once(SUBSDIR . '/FollowUps.subs.php');
-			$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
+			if (!empty($modSettings['enableFollowup']))
+			{
+				require_once(SUBSDIR . '/FollowUps.subs.php');
+				$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
+			}
 
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
@@ -688,7 +711,7 @@ class Display_Controller
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
-			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&'))),
+			'board_name' => htmlspecialchars(strtr(strip_tags($board_info['name']), array('&amp;' => '&')), ENT_COMPAT, 'UTF-8'),
 			'child_level' => $board_info['child_level'],
 		);
 
@@ -745,7 +768,7 @@ class Display_Controller
 		$context['can_reply'] |= $context['can_reply_unapproved'];
 		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
 		$context['can_mark_unread'] = !$user_info['is_guest'] && $settings['show_mark_read'];
-		$context['can_disregard'] = !$user_info['is_guest'] && $modSettings['enable_disregard'];
+		$context['can_unwatch'] = !$user_info['is_guest'] && $modSettings['enable_unwatch'];
 		$context['can_send_topic'] = (!$modSettings['postmod_active'] || $topicinfo['approved']) && allowedTo('send_topic');
 		$context['can_print'] = empty($modSettings['disable_print_topic']);
 
@@ -756,7 +779,7 @@ class Display_Controller
 		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
 
-		$context['can_follow_up'] = boardsallowedto('post_new') !== array();
+		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
 
 		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft') && $context['can_reply'];
@@ -766,8 +789,31 @@ class Display_Controller
 		if (!empty($context['drafts_autosave']))
 			loadJavascriptFile('drafts.js');
 
+		if (!empty($modSettings['notifications_enabled']))
+		{
+			$context['notifications_enabled'] = true;
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
+			loadCSSFile('jquery.atwho.css');
+
+			addInlineJavascript('
+			$(document).ready(function () {
+				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+			});');
+		}
+
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
+
+		// Auto video embeding enabled?
+		if (!empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});'
+			);
+		}
 
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
@@ -809,14 +855,15 @@ class Display_Controller
 			}
 		}
 
-		addJavascriptVar('notification_topic_notice', $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic'], true);
+		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
 		if ($context['can_send_topic'])
 		{
-			addJavascriptVar('sendtopic_cancel', $txt['modify_cancel'], true);
-			addJavascriptVar('sendtopic_back', $txt['back'], true);
-			addJavascriptVar('sendtopic_close', $txt['find_close'], true);
-			addJavascriptVar('sendtopic_error', $txt['send_error_occurred'], true);
-			addJavascriptVar('required_field', $txt['require_field'], true);
+			addJavascriptVar(array(
+				'sendtopic_cancel' => $txt['modify_cancel'],
+				'sendtopic_back' => $txt['back'],
+				'sendtopic_close' => $txt['find_close'],
+				'sendtopic_error' => $txt['send_error_occurred'],
+				'required_field' => $txt['require_field']), true);
 		}
 
 		// Build the normal button array.
@@ -825,7 +872,7 @@ class Display_Controller
 			'add_poll' => array('test' => 'can_add_poll', 'text' => 'add_poll', 'image' => 'add_poll.png', 'lang' => true, 'url' => $scripturl . '?action=editpoll;add;topic=' . $context['current_topic'] . '.' . $context['start']),
 			'notify' => array( 'test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyButton(this);"', 'url' => $scripturl . '?action=notify;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'mark_unread' => array('test' => 'can_mark_unread', 'text' => 'mark_unread', 'image' => 'markunread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=topic;t=' . $context['mark_unread_time'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			'disregard' => array('test' => 'can_disregard', 'text' => ($context['topic_disregarded'] ? 'un' : '') . 'disregard', 'image' => ($context['topic_disregarded'] ? 'un' : '') . 'disregard.png', 'lang' => true, 'custom' => 'onclick="return disregardButton(this);"', 'url' => $scripturl . '?action=disregardtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_disregarded'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
+			'unwatch' => array('test' => 'can_unwatch', 'text' => ($context['topic_unwatched'] ? '' : 'un') . 'watch', 'image' => ($context['topic_unwatched'] ? '' : 'un') . 'watched.png', 'lang' => true, 'custom' => 'onclick="return unwatchButton(this);"', 'url' => $scripturl . '?action=unwatchtopic;topic=' . $context['current_topic'] . '.' . $context['start'] . ';sa=' . ($context['topic_unwatched'] ? 'off' : 'on') . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'send' => array('test' => 'can_send_topic', 'text' => 'send_topic', 'image' => 'sendtopic.png', 'lang' => true, 'url' => $scripturl . '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.0', 'custom' => 'onclick="return sendtopicOverlayDiv(this.href);"'),
 			'print' => array('test' => 'can_print', 'text' => 'print', 'image' => 'print.png', 'lang' => true, 'custom' => 'rel="nofollow"', 'class' => 'new_win', 'url' => $scripturl . '?action=topic;sa=printpage;topic=' . $context['current_topic'] . '.0'),
 		);
@@ -882,7 +929,7 @@ class Display_Controller
 			$mgsOptions = basicMessageInfo(min($messages), true);
 
 			$_SESSION['split_selection'][$topic] = $messages;
-			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' .urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
+			redirectexit('action=splittopics;sa=selectTopics;topic=' . $topic . '.0;subname_enc=' . urlencode($mgsOptions['subject']) . ';' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -987,7 +1034,7 @@ class Display_Controller
 
 		// Have you liked this post, can you?
 		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member']) && isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
-		$message['use_likes'] = allowedTo('like_posts') && $message['id_member'] != $user_info['id'] && (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
+		$message['use_likes'] = allowedTo('like_posts') && ($message['id_member'] != $user_info['id'] || !empty($modSettings['likeAllowSelf'])) && (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;
 
 		// If it couldn't load, or the user was a guest.... someday may be done with a guest table.

@@ -46,23 +46,21 @@ class ManageSmileys_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings;
 
-		isAllowedTo('manage_smileys');
-
 		loadLanguage('ManageSmileys');
 		loadTemplate('ManageSmileys');
 
 		$subActions = array(
-			'addsmiley' => array($this, 'action_addsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'editicon' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable'])),
-			'editicons' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable'])),
-			'editsets' => array($this, 'action_edit'),
-			'editsmileys' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'import' => array($this, 'action_edit'),
-			'modifyset' => array($this, 'action_edit'),
-			'modifysmiley' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'setorder' => array($this, 'action_setorder', 'enabled' => !empty($modSettings['smiley_enable'])),
-			'settings' => array($this, 'action_smileySettings_display'),
-			'install' => array($this, 'action_install')
+			'addsmiley' => array($this, 'action_addsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'editicon' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable']), 'permission' => 'manage_smileys'),
+			'editicons' => array($this, 'action_editicon', 'enabled' => !empty($modSettings['messageIcons_enable']), 'permission' => 'manage_smileys'),
+			'editsets' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'editsmileys' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'import' => array($this, 'action_edit', 'permission' => 'manage_smileys'),
+			'modifyset' => array($this, 'action_edit', 'permission' => 'manage_smileys'),
+			'modifysmiley' => array($this, 'action_editsmiley', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'setorder' => array($this, 'action_setorder', 'enabled' => !empty($modSettings['smiley_enable']), 'permission' => 'manage_smileys'),
+			'settings' => array($this, 'action_smileySettings_display', 'permission' => 'manage_smileys'),
+			'install' => array($this, 'action_install', 'permission' => 'manage_smileys')
 		);
 
 		call_integration_hook('integrate_manage_smileys', array(&$subActions));
@@ -73,13 +71,9 @@ class ManageSmileys_Controller extends Action_Controller
 		// Default the sub-action to 'edit smiley settings'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'editsets';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'editsets');
-
 		// Set up template stuff
 		$context['page_title'] = $txt['smileys_manage'];
-		$context['sub_action'] = $action->subaction($subAction);
+		$context['sub_action'] = $subAction;
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -111,6 +105,7 @@ class ManageSmileys_Controller extends Action_Controller
 		// Some settings may not be enabled, disallow these from the tabs as appropriate.
 		if (empty($modSettings['messageIcons_enable']))
 			$context[$context['admin_menu_name']]['tab_data']['tabs']['editicons']['disabled'] = true;
+
 		if (empty($modSettings['smiley_enable']))
 		{
 			$context[$context['admin_menu_name']]['tab_data']['tabs']['addsmiley']['disabled'] = true;
@@ -119,6 +114,8 @@ class ManageSmileys_Controller extends Action_Controller
 		}
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'editsets');
 		$action->dispatch($subAction);
 	}
 
@@ -246,18 +243,19 @@ class ManageSmileys_Controller extends Action_Controller
 		global $modSettings, $context, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
+
 		// Set the right tab to be selected.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'editsets';
 		$context['sub_template'] = $context['sub_action'];
 
 		// They must've been submitted a form.
-		if (isset($_POST['smiley_save']))
+		if (isset($_POST['smiley_save']) || isset($_POST['delete_set']))
 		{
 			checkSession();
 			validateToken('admin-mss', 'request');
 
 			// Delete selected smiley sets.
-			if (!empty($_POST['delete']) && !empty($_POST['smiley_set']))
+			if (!empty($_POST['delete_set']) && !empty($_POST['smiley_set']))
 			{
 				$set_paths = explode(',', $modSettings['smiley_sets_known']);
 				$set_names = explode("\n", $modSettings['smiley_sets_names']);
@@ -316,8 +314,9 @@ class ManageSmileys_Controller extends Action_Controller
 
 				// The user might have checked to also import smileys.
 				if (!empty($_POST['smiley_sets_import']))
-					importSmileys($_POST['smiley_sets_path']);
+					$this->importSmileys($_POST['smiley_sets_path']);
 			}
+
 			cache_put_data('parsing_smileys', null, 480);
 			cache_put_data('posting_smileys', null, 480);
 		}
@@ -328,8 +327,8 @@ class ManageSmileys_Controller extends Action_Controller
 		foreach ($context['smiley_sets'] as $i => $set)
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
-				'path' => htmlspecialchars($set),
-				'name' => htmlspecialchars($set_names[$i]),
+				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -343,12 +342,13 @@ class ManageSmileys_Controller extends Action_Controller
 
 			// Sanity check - then import.
 			if (isset($context['smiley_sets'][$_GET['set']]))
-				importSmileys(un_htmlspecialchars($context['smiley_sets'][$_GET['set']]['path']));
+				$this->importSmileys(un_htmlspecialchars($context['smiley_sets'][$_GET['set']]['path']));
 
 			// Force the process to continue.
 			$context['sub_action'] = 'modifyset';
 			$context['sub_template'] = 'modifyset';
 		}
+
 		// If we're modifying or adding a smileyset, some context info needs to be set.
 		if ($context['sub_action'] == 'modifyset')
 		{
@@ -390,6 +390,7 @@ class ManageSmileys_Controller extends Action_Controller
 					}
 
 					$context['current_set']['can_import'] = count($smileys);
+
 					// Setup this string to look nice.
 					$txt['smiley_set_import_multiple'] = sprintf($txt['smiley_set_import_multiple'], $context['current_set']['can_import']);
 				}
@@ -509,13 +510,13 @@ class ManageSmileys_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="delete" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="right_submit" />
-						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset' . '">' . $txt['smiley_sets_add'] . '</a> ',
+						<input type="submit" name="delete_set" value="' . $txt['smiley_sets_delete'] . '" onclick="return confirm(\'' . $txt['smiley_sets_confirm'] . '\');" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=smileys;sa=modifyset">' . $txt['smiley_sets_add'] . '</a> ',
 				),
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -527,6 +528,7 @@ class ManageSmileys_Controller extends Action_Controller
 		global $modSettings, $context, $txt;
 
 		require_once(SUBSDIR . '/Smileys.subs.php');
+
 		// Get a list of all known smiley sets.
 		$context['smileys_dir'] = empty($modSettings['smileys_dir']) ? BOARDDIR . '/smileys' : $modSettings['smileys_dir'];
 		$context['smileys_dir_found'] = is_dir($context['smileys_dir']);
@@ -537,8 +539,8 @@ class ManageSmileys_Controller extends Action_Controller
 		foreach ($context['smiley_sets'] as $i => $set)
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
-				'path' => htmlspecialchars($set),
-				'name' => htmlspecialchars($set_names[$i]),
+				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -572,6 +574,7 @@ class ManageSmileys_Controller extends Action_Controller
 					if (!is_writable($context['smileys_dir'] . '/' . un_htmlspecialchars($set['path'])))
 						$writeErrors[] = $set['path'];
 				}
+
 				if (!empty($writeErrors))
 					fatal_lang_error('smileys_upload_error_notwritable', true, array(implode(', ', $writeErrors)));
 			}
@@ -598,6 +601,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 				// Check if the file already exists... and if not move it to EVERY smiley set directory.
 				$i = 0;
+
 				// Keep going until we find a set the file doesn't exist in. (or maybe it exists in all of them?)
 				while (isset($context['smiley_sets'][$i]) && file_exists($context['smileys_dir'] . '/' . un_htmlspecialchars($context['smiley_sets'][$i]['path']) . '/' . $destName))
 					$i++;
@@ -728,7 +732,7 @@ class ManageSmileys_Controller extends Action_Controller
 				{
 					if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 						$context['filenames'][strtolower($entry)] = array(
-							'id' => htmlspecialchars($entry),
+							'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
 							'selected' => false,
 						);
 				}
@@ -775,7 +779,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 				if ($_POST['smiley_action'] == 'delete')
 					deleteSmileys($_POST['checked_smileys']);
-
 				// Changing the status of the smiley?
 				else
 				{
@@ -787,7 +790,6 @@ class ManageSmileys_Controller extends Action_Controller
 					);
 					if (isset($displayTypes[$_POST['smiley_action']]))
 						updateSmileyDisplayType($_POST['checked_smileys'], $displayTypes[$_POST['smiley_action']]);
-
 				}
 			}
 			// Create/modify a smiley.
@@ -818,12 +820,12 @@ class ManageSmileys_Controller extends Action_Controller
 						fatal_lang_error('smiley_not_unique');
 
 					$param = array(
-							'smiley_location' => $_POST['smiley_location'],
-							'smiley' => $_POST['smiley'],
-							'smiley_code' => $_POST['smiley_code'],
-							'smiley_filename' => $_POST['smiley_filename'],
-							'smiley_description' => $_POST['smiley_description'],
-						);
+						'smiley_location' => $_POST['smiley_location'],
+						'smiley' => $_POST['smiley'],
+						'smiley_code' => $_POST['smiley_code'],
+						'smiley_filename' => $_POST['smiley_filename'],
+						'smiley_description' => $_POST['smiley_description'],
+					);
 					updateSmiley($param);
 				}
 
@@ -841,8 +843,8 @@ class ManageSmileys_Controller extends Action_Controller
 		foreach ($context['smiley_sets'] as $i => $set)
 			$context['smiley_sets'][$i] = array(
 				'id' => $i,
-				'path' => htmlspecialchars($set),
-				'name' => htmlspecialchars($set_names[$i]),
+				'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+				'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 				'selected' => $set == $modSettings['smiley_sets_default']
 			);
 
@@ -944,7 +946,7 @@ class ManageSmileys_Controller extends Action_Controller
 						),
 						'data' => array(
 							'function' => create_function('$rowData', empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir']) ? '
-								return htmlspecialchars($rowData[\'description\']);
+								return htmlspecialchars($rowData[\'description\'], ENT_COMPAT, \'UTF-8\');
 							' : '
 								global $context, $txt, $modSettings;
 
@@ -954,7 +956,7 @@ class ManageSmileys_Controller extends Action_Controller
 									if (!file_exists(sprintf(\'%1$s/%2$s/%3$s\', $modSettings[\'smileys_dir\'], $smiley_set[\'path\'], $rowData[\'filename\'])))
 										$missing_sets[] = $smiley_set[\'path\'];
 
-								$description = htmlspecialchars($rowData[\'description\']);
+								$description = htmlspecialchars($rowData[\'description\'], ENT_COMPAT, \'UTF-8\');
 
 								if (!empty($missing_sets))
 									$description .= sprintf(\'<br /><span class="smalltext"><strong>%1$s:</strong> %2$s</span>\', $txt[\'smileys_not_found_in_set\'], implode(\', \', $missing_sets));
@@ -972,7 +974,7 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_modify'],
 							'class' => 'centertext',
 						),
-						'data' =>  array(
+						'data' => array(
 							'sprintf' => array(
 								'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifysmiley;smiley=%1$d">' . $txt['smileys_modify'] . '</a>',
 								'params' => array(
@@ -1058,7 +1060,7 @@ class ManageSmileys_Controller extends Action_Controller
 					}',
 			);
 
-			require_once(SUBSDIR . '/List.subs.php');
+			require_once(SUBSDIR . '/List.class.php');
 			createList($listOptions);
 
 			// The list is the only thing to show, so make it the main template.
@@ -1076,8 +1078,8 @@ class ManageSmileys_Controller extends Action_Controller
 			foreach ($context['smiley_sets'] as $i => $set)
 				$context['smiley_sets'][$i] = array(
 					'id' => $i,
-					'path' => htmlspecialchars($set),
-					'name' => htmlspecialchars($set_names[$i]),
+					'path' => htmlspecialchars($set, ENT_COMPAT, 'UTF-8'),
+					'name' => htmlspecialchars($set_names[$i], ENT_COMPAT, 'UTF-8'),
 					'selected' => $set == $modSettings['smiley_sets_default']
 				);
 
@@ -1097,7 +1099,7 @@ class ManageSmileys_Controller extends Action_Controller
 					{
 						if (!in_array($entry, $context['filenames']) && in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
 							$context['filenames'][strtolower($entry)] = array(
-								'id' => htmlspecialchars($entry),
+								'id' => htmlspecialchars($entry, ENT_COMPAT, 'UTF-8'),
 								'selected' => false,
 							);
 					}
@@ -1108,9 +1110,9 @@ class ManageSmileys_Controller extends Action_Controller
 
 			$_REQUEST['smiley'] = (int) $_REQUEST['smiley'];
 			$context['current_smiley'] = getSmiley($_REQUEST['smiley']);
-			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code']);
-			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename']);
-			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description']);
+			$context['current_smiley']['code'] = htmlspecialchars($context['current_smiley']['code'], ENT_COMPAT, 'UTF-8');
+			$context['current_smiley']['filename'] = htmlspecialchars($context['current_smiley']['filename'], ENT_COMPAT, 'UTF-8');
+			$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description'], ENT_COMPAT, 'UTF-8');
 
 			if (isset($context['filenames'][strtolower($context['current_smiley']['filename'])]))
 				$context['filenames'][strtolower($context['current_smiley']['filename'])]['selected'] = true;
@@ -1125,6 +1127,7 @@ class ManageSmileys_Controller extends Action_Controller
 		global $context, $settings, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
+
 		// Get a list of icons.
 		$context['icons'] = getMessageIcons();
 
@@ -1151,6 +1154,7 @@ class ManageSmileys_Controller extends Action_Controller
 				// Do some preperation with the data... like check the icon exists *somewhere*
 				if (strpos($_POST['icon_filename'], '.png') !== false)
 					$_POST['icon_filename'] = substr($_POST['icon_filename'], 0, -4);
+
 				if (!file_exists($settings['default_theme_dir'] . '/images/post/' . $_POST['icon_filename'] . '.png'))
 					fatal_lang_error('icon_not_found');
 				// There is a 16 character limit on message icons...
@@ -1174,6 +1178,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 				// Get the new order.
 				$newOrder = $_POST['icon_location'] == 0 ? 0 : $context['icons'][$_POST['icon_location']]['true_order'] + 1;
+
 				// Do the same, but with the one that used to be after this icon, done to avoid conflict.
 				foreach ($context['icons'] as $id => $data)
 					if ($data['true_order'] >= $newOrder)
@@ -1193,20 +1198,15 @@ class ManageSmileys_Controller extends Action_Controller
 				foreach ($context['icons'] as $id => $icon)
 				{
 					if ($id != 0)
-					{
 						$iconInsert[] = array($id, $icon['board_id'], $icon['title'], $icon['filename'], $icon['true_order']);
-					}
 					else
-					{
 						$iconInsert_new[] = array($icon['board_id'], $icon['title'], $icon['filename'], $icon['true_order']);
-					}
 				}
 
 				updateMessageIcon($iconInsert);
 
 				if (!empty($iconInsert_new))
 					addMessageIcon($iconInsert_new);
-
 			}
 
 			// Sort by order, so it is quicker :)
@@ -1234,7 +1234,7 @@ class ManageSmileys_Controller extends Action_Controller
 							global $settings;
 
 							$images_url = $settings[file_exists(sprintf(\'%1$s/images/post/%2$s.png\', $settings[\'theme_dir\'], $rowData[\'filename\'])) ? \'actual_images_url\' : \'default_images_url\'];
-							return sprintf(\'<img src="%1$s/post/%2$s.png" alt="%3$s" />\', $images_url, $rowData[\'filename\'], htmlspecialchars($rowData[\'title\']));
+							return sprintf(\'<img src="%1$s/post/%2$s.png" alt="%3$s" />\', $images_url, $rowData[\'filename\'], htmlspecialchars($rowData[\'title\'], ENT_COMPAT, \'UTF-8\'));
 						'),
 						'class' => 'centertext',
 					),
@@ -1314,7 +1314,7 @@ class ManageSmileys_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// If we're adding/editing an icon we'll need a list of boards
@@ -1322,7 +1322,6 @@ class ManageSmileys_Controller extends Action_Controller
 		{
 			// Force the sub_template just in case.
 			$context['sub_template'] = 'editicon';
-
 			$context['new_icon'] = !isset($_GET['icon']);
 
 			// Get the properties of the current icon from the icon list.
@@ -1378,9 +1377,6 @@ class ManageSmileys_Controller extends Action_Controller
 			}
 
 			moveSmileyPosition($smiley, $_GET['source']);
-
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
 		}
 
 		$context['smileys'] = getSmileys();
@@ -1408,6 +1404,7 @@ class ManageSmileys_Controller extends Action_Controller
 					// Only change the first row value of the first smiley (we don't need the others :P).
 					$context['smileys'][$location]['rows'][$id][0]['row'] = $id;
 				}
+
 				// Make sure the smiley order is always sequential.
 				foreach ($smiley_row as $order_id => $smiley)
 					if ($order_id != $smiley['order'])
@@ -1417,6 +1414,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 		cache_put_data('parsing_smileys', null, 480);
 		cache_put_data('posting_smileys', null, 480);
+
+		createToken('admin-sort');
 	}
 
 	/**
@@ -1428,6 +1427,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 		isAllowedTo('manage_smileys');
 		checkSession('request');
+
 		// One of these two may be necessary
 		loadLanguage('Errors');
 		loadLanguage('Packages');
@@ -1446,8 +1446,8 @@ class ManageSmileys_Controller extends Action_Controller
 			$context['filename'] = $base_name;
 
 			// Check that the smiley is from simplemachines.org, for now... maybe add mirroring later.
-			if (preg_match('~^http://[\w_\-]+\.simplemachines\.org/~', $_REQUEST['set_gz']) == 0 || strpos($_REQUEST['set_gz'], 'dlattach') !== false)
-				fatal_lang_error('not_on_simplemachines');
+			if (!isAuthorizedServer($_REQUEST['set_gz']) == 0)
+				fatal_lang_error('not_valid_server');
 
 			$destination = BOARDDIR . '/packages/' . $base_name;
 
@@ -1512,18 +1512,18 @@ class ManageSmileys_Controller extends Action_Controller
 			fatal_lang_error($smileyInfo);
 
 		// See if it is installed?
-		if(isSmileySetInstalled($smileyInfo['id']))
+		if (isSmileySetInstalled($smileyInfo['id']))
 			fata_lang_error('package_installed_warning1');
 
 		// Everything is fine, now it's time to do something
 		$actions = parsePackageInfo($smileyInfo['xml'], true, 'install');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=smileys;sa=install;package=' . $base_name;
-		$has_readme = false;
 		$context['has_failure'] = false;
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 
+		$has_readme = false;
 		foreach ($actions as $action)
 		{
 			if ($action['type'] == 'readme' || $action['type'] == 'license')
@@ -1531,9 +1531,9 @@ class ManageSmileys_Controller extends Action_Controller
 				$has_readme = true;
 				$type = 'package_' . $action['type'];
 				if (file_exists(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']), "\n\r"));
+					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $base_path . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 				elseif (file_exists($action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"));
+					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 
 				if (!empty($action['parse_bbc']))
 				{
@@ -1554,7 +1554,7 @@ class ManageSmileys_Controller extends Action_Controller
 					'action' => Util::htmlspecialchars(strtr($action['destination'], array(BOARDDIR => '.')))
 				);
 
-				$file =  BOARDDIR . '/packages/temp/' . $base_path . $action['filename'];
+				$file = BOARDDIR . '/packages/temp/' . $base_path . $action['filename'];
 				if (isset($action['filename']) && (!file_exists($file) || !is_writable(dirname($action['destination']))))
 				{
 					$context['has_failure'] = true;
@@ -1564,6 +1564,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'failed' => true,
 					);
 				}
+
 				// @todo None given?
 				if (empty($thisAction['description']))
 					$thisAction['description'] = isset($action['description']) ? $action['description'] : '';
@@ -1598,7 +1599,7 @@ class ManageSmileys_Controller extends Action_Controller
 			{
 				updateSettings(array(
 					'smiley_sets_known' => $modSettings['smiley_sets_known'] . ',' . basename($action['action']),
-					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' .  (!empty($action['description']) ? Util::htmlspecialchars($action['description']) : basename($action['action'])) : ''),
+					'smiley_sets_names' => $modSettings['smiley_sets_names'] . "\n" . $smileyInfo['name'] . (count($context['actions']) > 1 ? ' ' . (!empty($action['description']) ? Util::htmlspecialchars($action['description']) : basename($action['action'])) : ''),
 				));
 			}
 
@@ -1606,6 +1607,7 @@ class ManageSmileys_Controller extends Action_Controller
 
 			// Time to tell pacman we have a new package installed!
 			package_put_contents(BOARDDIR . '/packages/installed.list', time());
+
 			// Credits tag?
 			$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
 			$installed = array(
@@ -1649,53 +1651,55 @@ class ManageSmileys_Controller extends Action_Controller
 
 		$this->_smiley_context = $smiley_context;
 	}
-}
 
-/**
- * A function to import new smileys from an existing directory into the database.
- *
- * @param string $smileyPath
- */
-function importSmileys($smileyPath)
-{
-	global $modSettings;
-
-	require_once(SUBSDIR . '/Smileys.subs.php');
-
-	if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
-		fatal_lang_error('smiley_set_unable_to_import');
-
-	$smileys = array();
-	$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
-	while ($entry = $dir->read())
+	/**
+	 * A function to import new smileys from an existing directory into the database.
+	 *
+	 * @param string $smileyPath
+	 */
+	public function importSmileys($smileyPath)
 	{
-		if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
-			$smileys[strtolower($entry)] = $entry;
-	}
-	$dir->close();
+		global $modSettings;
 
-	// Exclude the smileys that are already in the database.
-	$duplicates = smileyExists($smileys);
+		require_once(SUBSDIR . '/Smileys.subs.php');
 
-	foreach ($duplicates as $duplicate)
-		if (isset($smileys[strtolower($duplicate)]))
-			unset($smileys[strtolower($duplicate)]);
+		if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir'] . '/' . $smileyPath))
+			fatal_lang_error('smiley_set_unable_to_import');
 
-	$smiley_order = getMaxSmileyOrder();
+		$smileys = array();
+		$dir = dir($modSettings['smileys_dir'] . '/' . $smileyPath);
+		while ($entry = $dir->read())
+		{
+			if (in_array(strrchr($entry, '.'), array('.jpg', '.gif', '.jpeg', '.png')))
+				$smileys[strtolower($entry)] = $entry;
+		}
+		$dir->close();
 
-	$new_smileys = array();
-	foreach ($smileys as $smiley)
-		if (strlen($smiley) <= 48)
-			$new_smileys[] = array(':' . strtok($smiley, '.') . ':', $smiley, strtok($smiley, '.'), 0, ++$smiley_order);
+		// Exclude the smileys that are already in the database.
+		$duplicates = smileyExists($smileys);
 
-	if (!empty($new_smileys))
-	{
-		addSmiley($new_smileys);
+		foreach ($duplicates as $duplicate)
+		{
+			if (isset($smileys[strtolower($duplicate)]))
+				unset($smileys[strtolower($duplicate)]);
+		}
 
-		// Make sure the smiley codes are still in the right order.
-		sortSmileyTable();
+		$smiley_order = getMaxSmileyOrder();
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		$new_smileys = array();
+		foreach ($smileys as $smiley)
+			if (strlen($smiley) <= 48)
+				$new_smileys[] = array(':' . strtok($smiley, '.') . ':', $smiley, strtok($smiley, '.'), 0, ++$smiley_order);
+
+		if (!empty($new_smileys))
+		{
+			addSmiley($new_smileys);
+
+			// Make sure the smiley codes are still in the right order.
+			sortSmileyTable();
+
+			cache_put_data('parsing_smileys', null, 480);
+			cache_put_data('posting_smileys', null, 480);
+		}
 	}
 }

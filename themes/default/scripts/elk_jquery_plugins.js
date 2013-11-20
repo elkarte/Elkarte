@@ -308,9 +308,8 @@
  * Superfish v1.7.2 - jQuery menu widget
  * Copyright (c) 2013 Joel Birch
  *
- * Dual licensed under the MIT and GPL licenses:
+ * Licensed under the MIT license:
  * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
  */
 
 ;(function($) {
@@ -564,9 +563,8 @@
  * Superclick v1.0.0 - jQuery menu widget
  * Copyright (c) 2013 Joel Birch
  *
- * Dual licensed under the MIT and GPL licenses:
+ * Licensed under the MIT license:
  * 	http://www.opensource.org/licenses/mit-license.php
- * 	http://www.gnu.org/licenses/gpl.html
  */
 
 ;(function($) {
@@ -778,119 +776,216 @@
 })(jQuery);
 
 /**
- * AnimaDrag
- * Animated jQuery Drag and Drop Plugin
- * Version 0.5.1 beta
- * Author Abel Mohler
- * Released with the MIT License: http://www.opensource.org/licenses/mit-license.php
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Alpha
+ *
+ * Expands the ... of the page indexes
+ * @todo not exactly a plugin and still very bound to the theme structure
+ *
  */
-(function($){
-	$.fn.animaDrag = function(o, callback) {
-		var defaults = {
-			speed: 400,
-			interval: 300,
-			easing: null,
-			cursor: 'move',
-			boundary: document.body,
-			grip: null,
-			overlay: true,
-			after: function(e) {},
-			during: function(e) {},
-			before: function(e) {},
-			afterEachAnimation: function(e) {}
-		}
-		if(typeof callback == 'function') {
-				defaults.after = callback;
-		}
-		o = $.extend(defaults, o || {});
-		return this.each(function() {
-			var id, startX, startY, draggableStartX, draggableStartY, dragging = false, Ev, draggable = this,
-			grip = ($(this).find(o.grip).length > 0) ? $(this).find(o.grip) : $(this);
-			if(o.boundary) {
-				var limitTop = $(o.boundary).offset().top, limitLeft = $(o.boundary).offset().left,
-				limitBottom = limitTop + $(o.boundary).innerHeight(), limitRight = limitLeft + $(o.boundary).innerWidth();
+;(function($) {
+	$.fn.expand_pages = function() {
+		var $container,
+			lastPositions = new Array();
+
+		function hover_expand($element)
+		{
+			var $expanded_pages_li = $element,
+				baseurl = eval($element.data('baseurl')),
+				perpage = $element.data('perpage'),
+				firstpage = $element.data('firstpage'),
+				lastpage = $element.data('lastpage'),
+				$exp_pages = $('<li id="expanded_pages" />'),
+				pages = 0,
+				container_width = $element.outerWidth() * 2,
+				width_elements = 3,
+				$scroll_left = null,
+				$scroll_right = null;
+
+			var aModel = $element.closest('.linavPages').prev().find('a').clone();
+
+			if (typeof(lastPositions[firstpage]) == 'undefined')
+				lastPositions[firstpage] = 0;
+
+			$container = $('<ul id="expanded_pages_container" />');
+
+			for (var i = firstpage; i < lastpage; i += perpage)
+			{
+				pages++;
+				var bElem = aModel.clone();
+
+				bElem.attr('href', baseurl.replace('%1$d', i)).text(i / perpage + 1);
+				$exp_pages.append(bElem);
 			}
-			grip.mousedown(function(e) {
-				o.before.call(draggable, e);
 
-				var lastX, lastY;
-				dragging = true;
-
-				Ev = e;
-
-				startX = lastX = e.pageX;
-				startY = lastY = e.pageY;
-				draggableStartX = $(draggable).offset().left;
-				draggableStartY = $(draggable).offset().top;
-
-				$(draggable).css({
-					position: 'absolute',
-					left: draggableStartX + 'px',
-					top: draggableStartY + 'px',
-					cursor: o.cursor,
-					zIndex: '1010'
-				}).addClass('anima-drag').appendTo(document.body);
-				if(o.overlay && $('#anima-drag-overlay').length == 0) {
-					$('<div id="anima-drag-overlay"></div>').css({
-						position: 'absolute',
-						top: '0',
-						left: '0',
-						zIndex: '1000',
-						width: $(document.body).outerWidth() + 'px',
-						height: $(document.body).outerHeight() + 'px'
-					}).appendTo(document.body);
-				}
-				else if(o.overlay) {
-					$('#anima-drag-overlay').show();
-				}
-				id = setInterval(function() {
-					if(lastX != Ev.pageX || lastY != Ev.pageY) {
-						var positionX = draggableStartX - (startX - Ev.pageX), positionY = draggableStartY - (startY - Ev.pageY);
-						if(positionX < limitLeft && o.boundary) {
-							positionX = limitLeft;
-						}
-						else if(positionX + $(draggable).innerWidth() > limitRight && o.boundary) {
-							positionX = limitRight - $(draggable).outerWidth();
-						}
-						if(positionY < limitTop && o.boundary) {
-							positionY = limitTop;
-						}
-						else if(positionY + $(draggable).innerHeight() > limitBottom && o.boundary) {
-							positionY = limitBottom - $(draggable).outerHeight();
-						}
-						$(draggable).stop().animate({
-							left: positionX + 'px',
-							top: positionY + 'px'
-						},
-						{
-                            duration:o.speed,
-                            easing:o.easing,
-                            step:function(){o.afterEachAnimation.call(draggable, Ev)}
-                        });
+			if (pages > width_elements)
+			{
+				$container.append($('<li />').append(aModel.clone()
+				.attr('id', 'pages_scroll_left')
+				.attr('href', '#').text('<').click(function(ev) {
+					ev.stopPropagation();
+					ev.preventDefault();
+				}).hover(
+					function() {
+						$exp_pages.animate({
+							'margin-left': 0
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+						lastPositions[firstpage] = $exp_pages.css('margin-left');
 					}
-					lastX = Ev.pageX;
-					lastY = Ev.pageY;
-				}, o.interval);
-				(e.preventDefault());
-			});
-			$(document).mousemove(function(e) {
-				if(dragging) {
-					Ev = e;
-					o.during.call(draggable, e);
+				)));
+			}
+
+			$container.append($exp_pages);
+			$element.parent().superfish({
+				delay : 300,
+				speed: 175,
+				onHide: function () {
+					$container.remove();
 				}
 			});
-			$(document).mouseup(function(e) {
-				if(dragging) {
-					$(draggable).css({
-						cursor: '',
-						zIndex: '990'
-					}).removeClass('anima-drag');
-					$('#anima-drag-overlay').hide().appendTo(document.body);
-					clearInterval(id);
-					o.after.call(draggable, e);
-					dragging = false;
+
+			$element.append($container);
+
+			if (pages > width_elements)
+			{
+				$container.append($('<li />').append(aModel.clone()
+				.attr('id', 'pages_scroll_right')
+				.attr('href', '#').text('>').click(function(ev) {
+					ev.stopPropagation();
+					ev.preventDefault();
+				}).hover(
+					function() {
+						var $pages = $exp_pages.find('a'),
+							move = 0;
+
+						for (var i = 0, count = $exp_pages.find('a').length; i < count; i++)
+							move += $($pages[i]).outerWidth();
+
+						move = (move + $container.find('#pages_scroll_left').outerWidth()) - ($container.outerWidth() - $container.find('#pages_scroll_right').outerWidth());
+
+						$exp_pages.animate({
+							'margin-left': -move
+						}, 200 * pages);
+					},
+					function() {
+						$exp_pages.stop();
+						lastPositions[firstpage] = $exp_pages.css('margin-left');
+					}
+				)));
+			}
+
+			// @todo this seems broken
+			$exp_pages.find('a').each(function() {
+				if (width_elements > -1)
+					container_width += $element.outerWidth();
+
+				if (width_elements <= 0 || pages >= width_elements)
+				{
+					$container.css({
+						'margin-left': -container_width / 2
+					}).width(container_width);
 				}
+
+				if (width_elements < 0)
+					return false;
+
+				width_elements--;
+			}).click(function (ev) {
+				$expanded_pages_li.attr('onclick', '').unbind('click');
 			});
+			$exp_pages.css({
+				'height': $element.outerHeight(),
+				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
+				'margin-left': lastPositions[firstpage]
+			});
+
+		};
+
+		function expand_pages($element)
+		{
+			var $baseAppend = $($element.closest('.linavPages')),
+				boxModel = $baseAppend.prev().clone(),
+				aModel = boxModel.find('a').clone(),
+				expandModel = $element.clone(),
+				perPage = $element.data('perpage'),
+				firstPage = $element.data('firstpage'),
+				lastPage = $element.data('lastpage'),
+				rawBaseurl = $element.data('baseurl'),
+				baseurl = eval($element.data('baseurl')),
+				first;
+
+			var i, oldLastPage = 0,
+				perPageLimit = 10;
+
+			// Prevent too many pages to be loaded at once.
+			if ((lastPage - firstPage) / perPage > perPageLimit)
+			{
+				oldLastPage = lastPage;
+				lastPage = firstPage + perPageLimit * perPage;
+			}
+
+			// Calculate the new pages.
+			for (i = lastPage; i > firstPage; i -= perPage)
+			{
+				var bElem = aModel.clone(),
+					boxModelClone = boxModel.clone();
+
+				bElem.attr('href', baseurl.replace('%1$d', i - perPage)).text(i / perPage);
+				boxModelClone.find('a').each(function() {
+					$(this).replaceWith(bElem[0]);
+				});
+				$baseAppend.after(boxModelClone);
+
+				// This is needed just to remember where to attach the new expand
+				if (typeof first == 'undefined')
+					first = boxModelClone;
+			}
+			$baseAppend.remove();
+
+			if (oldLastPage > 0)
+			{
+				// This is to remove any hover_expand
+				expandModel.find('#expanded_pages_container').each(function() {
+					$(this).remove();
+				});
+
+				expandModel.click(function(e) {
+					var $zhis = $(this);
+					e.preventDefault();
+
+					expand_pages($zhis);
+
+					$zhis.unbind('mouseenter focus');
+				})
+				.bind('mouseenter focus', function() {
+					hover_expand($(this))
+				})
+				.data('perpage', perPage)
+				.data('firstpage', lastPage)
+				.data('lastpage', oldLastPage)
+				.data('baseurl', rawBaseurl);
+
+				first.after(expandModel);
+			}
+		}
+
+		this.attr('tabindex', 0)
+		.click(function(e) {
+			var $zhis = $(this);
+			e.preventDefault();
+
+			expand_pages($zhis);
+
+			$zhis.unbind('mouseenter focus');
+		})
+		.bind('mouseenter focus', function() {
+			hover_expand($(this))
 		});
-	}
+	};
 })(jQuery);

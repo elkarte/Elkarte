@@ -45,7 +45,7 @@ function getServerVersions($checkFor)
 	// Why not have a look at ImageMagick? If it is, we should show version information for it too.
 	if (in_array('imagick', $checkFor) && class_exists('Imagick'))
 	{
-		$temp = New Imagick;
+		$temp = new Imagick;
 		$temp2 = $temp->getVersion();
 		$versions['imagick'] = array('title' => $txt['support_versions_imagick'], 'version' => $temp2['versionString']);
 	}
@@ -94,6 +94,78 @@ function getServerVersions($checkFor)
 }
 
 /**
+ * Builds the availalble tasks for this admin / moderator
+ * Sets up the support resource txt stings
+ *
+ * Called from Admin.controller action_home and action_credits
+ */
+function getQuickAdminTasks()
+{
+	global $txt, $scripturl, $context;
+
+	// The format of this array is: permission, action, title, description, icon.
+	$quick_admin_tasks = array(
+		array('', 'credits', 'support_credits_title', 'support_credits_info', 'support_and_credits.png'),
+		array('admin_forum', 'featuresettings', 'modSettings_title', 'modSettings_info', 'features_and_options.png'),
+		array('admin_forum', 'maintain', 'maintain_title', 'maintain_info', 'forum_maintenance.png'),
+		array('manage_permissions', 'permissions', 'edit_permissions', 'edit_permissions_info', 'permissions_lg.png'),
+		array('admin_forum', 'theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'], 'theme_admin', 'theme_admin_info', 'themes_and_layout.png'),
+		array('admin_forum', 'packages', 'package', 'package_info', 'packages_lg.png'),
+		array('manage_smileys', 'smileys', 'smileys_manage', 'smileys_manage_info', 'smilies_and_messageicons.png'),
+		array('moderate_forum', 'viewmembers', 'admin_users', 'member_center_info', 'members_lg.png'),
+	);
+
+	$available_admin_tasks = array();
+	foreach ($quick_admin_tasks as $task)
+	{
+		if (!empty($task[0]) && !allowedTo($task[0]))
+			continue;
+
+		$available_admin_tasks[] = array(
+			'href' => $scripturl . '?action=admin;area=' . $task[1],
+			'link' => '<a href="' . $scripturl . '?action=admin;area=' . $task[1] . '">' . $txt[$task[2]] . '</a>',
+			'title' => $txt[$task[2]],
+			'description' => $txt[$task[3]],
+			'icon' => $task[4],
+			'is_last' => false
+		);
+	}
+
+	if (count($available_admin_tasks) % 2 == 1)
+	{
+		$available_admin_tasks[] = array(
+			'href' => '',
+			'link' => '',
+			'title' => '',
+			'description' => '',
+			'is_last' => true
+		);
+		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
+	}
+	elseif (count($available_admin_tasks) != 0)
+	{
+		$available_admin_tasks[count($available_admin_tasks) - 1]['is_last'] = true;
+		$available_admin_tasks[count($available_admin_tasks) - 2]['is_last'] = true;
+	}
+
+	// Lastly, fill in the blanks in the support resources paragraphs.
+	$txt['support_resources_p1'] = sprintf($txt['support_resources_p1'],
+		'https://github.com/elkarte/Elkarte/wiki',
+		'https://github.com/elkarte/Elkarte/wiki/features',
+		'https://github.com/elkarte/Elkarte/wiki/options',
+		'https://github.com/elkarte/Elkarte/wiki/themes',
+		'https://github.com/elkarte/Elkarte/wiki/packages'
+	);
+	$txt['support_resources_p2'] = sprintf($txt['support_resources_p2'],
+		'http://www.elkarte.net/',
+		'http://www.elkarte.net/redirect/support',
+		'http://www.elkarte.net/redirect/customize_support'
+	);
+
+	return $available_admin_tasks;
+}
+
+/**
  * Search through source, theme and language files to determine their version.
  * Get detailed version information about the physical Elk files on the server.
  *
@@ -131,7 +203,7 @@ function getFileVersions(&$versionOptions)
 	// Find the version in SSI.php's file header.
 	if (!empty($versionOptions['include_ssi']) && file_exists(BOARDDIR . '/SSI.php'))
 	{
-		$header = file_get_contents(BOARDDIR . '/SSI.php', NULL, NULL, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/SSI.php', null, null, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['SSI.php'] = $match[1];
 		// Not found!  This is bad.
@@ -142,7 +214,7 @@ function getFileVersions(&$versionOptions)
 	// Do the paid subscriptions handler?
 	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
 	{
-		$header = file_get_contents(BOARDDIR . '/subscriptions.php', NULL, NULL, 0, 768);
+		$header = file_get_contents(BOARDDIR . '/subscriptions.php', null, null, 0, 768);
 		if (preg_match($version_regex, $header, $match) == 1)
 			$version_info['file_versions']['subscriptions.php'] = $match[1];
 		// If we haven't how do we all get paid?
@@ -167,7 +239,7 @@ function getFileVersions(&$versionOptions)
 			if (substr($entry, -4) === '.php' && !is_dir($dir . '/' . $entry) && $entry !== 'index.php' && $entry !== 'sphinxapi.php')
 			{
 				// Read the first 4k from the file.... enough for the header.
-				$header = file_get_contents($dir . '/' . $entry, NULL, NULL, 0, 768);
+				$header = file_get_contents($dir . '/' . $entry, null, null, 0, 768);
 
 				// Look for the version comment in the file header.
 				if (preg_match($version_regex, $header, $match))
@@ -193,7 +265,7 @@ function getFileVersions(&$versionOptions)
 			if (substr($entry, -12) == 'template.php' && !is_dir($dirname . '/' . $entry))
 			{
 				// Read the first 768 bytes from the file.... enough for the header.
-				$header = file_get_contents($dirname . '/' . $entry, NULL, NULL, 0, 768);
+				$header = file_get_contents($dirname . '/' . $entry, null, null, 0, 768);
 
 				// Look for the version comment in the file header.
 				if (preg_match($version_regex, $header, $match) == 1)
@@ -213,7 +285,7 @@ function getFileVersions(&$versionOptions)
 		if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($lang_dir . '/' . $entry))
 		{
 			// Read the first 768 bytes from the file.... enough for the header.
-			$header = file_get_contents($lang_dir . '/' . $entry, NULL, NULL, 0, 768);
+			$header = file_get_contents($lang_dir . '/' . $entry, null, null, 0, 768);
 
 			// Split the file name off into useful bits.
 			list ($name, $language) = explode('.', $entry);
@@ -260,7 +332,7 @@ function updateDbLastError($time)
 {
 	// Write out the db_last_error file with the error timestamp
 	file_put_contents(BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
-	@touch(BOARDDIR . '/' . 'Settings.php');
+	@touch(BOARDDIR . '/Settings.php');
 }
 
 /**
@@ -270,8 +342,6 @@ function updateAdminPreferences()
 {
 	global $options, $context, $settings, $user_info;
 
-	$db = database();
-
 	// This must exist!
 	if (!isset($context['admin_preferences']))
 		return false;
@@ -279,24 +349,12 @@ function updateAdminPreferences()
 	// This is what we'll be saving.
 	$options['admin_preferences'] = serialize($context['admin_preferences']);
 
-	// Just check we haven't ended up with something theme exclusive somehow.
-	$db->query('', '
-		DELETE FROM {db_prefix}themes
-		WHERE id_theme != {int:default_theme}
-		AND variable = {string:admin_preferences}',
-		array(
-			'default_theme' => 1,
-			'admin_preferences' => 'admin_preferences',
-		)
-	);
+	require_once(SUBSDIR . '/Themes.subs.php');
 
-	// Update the themes table.
-	$db->insert('replace',
-		'{db_prefix}themes',
-		array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string-255', 'value' => 'string-65534'),
-		array($user_info['id'], 1, 'admin_preferences', $options['admin_preferences']),
-		array('id_member', 'id_theme', 'variable')
-	);
+	// Just check we haven't ended up with something theme exclusive somehow.
+	removeThemeOptions('custom', 'all', 'admin_preferences');
+
+	updateThemeOptions(array(1, $user_info['id'], 'admin_preferences', $options['admin_preferences']));
 
 	// Make sure we invalidate any cache.
 	cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 0);
@@ -387,4 +445,74 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			// Send off the email.
 			sendmail($recipient['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 		}
+}
+
+/**
+ * Callback used in the core features page when the custom profiles
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the profile fields
+ *            (true => enabled, false => disabled)
+ */
+function custom_profiles_toggle_callback($value)
+{
+	$db = database();
+
+	if (!$value)
+	{
+		$db->query('', '
+			UPDATE {db_prefix}custom_fields
+			SET active = 0'
+		);
+	}
+}
+
+/**
+ * Callback used in the core features page when the drafts
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the drafts
+ *            (true => enabled, false => disabled)
+ */
+function drafts_toggle_callback($value)
+{
+	$db = database();
+
+	// Set the correct disabled value for the scheduled task.
+	$db->query('', '
+		UPDATE {db_prefix}scheduled_tasks
+		SET disabled = {int:disabled}
+		WHERE task = {string:task}',
+		array(
+			'disabled' => $value ? 0 : 1,
+			'task' => 'remove_old_drafts',
+		)
+	);
+}
+
+/**
+ * Callback used in the core features page when the paid subscriptions
+ * are enabled or disabled.
+ * @param bool $value the "new" status of the paid subscriptions
+ *            (true => enabled, false => disabled)
+ */
+function subscriptions_toggle_callback($value)
+{
+	$db = database();
+
+	// Set the correct disabled value for scheduled task.
+	$db->query('', '
+		UPDATE {db_prefix}scheduled_tasks
+		SET disabled = {int:disabled}
+		WHERE task = {string:task}',
+		array(
+			'disabled' => $value ? 0 : 1,
+			'task' => 'paid_subscriptions',
+		)
+	);
+
+	// Should we calculate next trigger?
+	if ($value)
+	{
+		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
+		calculateNextTrigger('paid_subscriptions');
+	}
 }

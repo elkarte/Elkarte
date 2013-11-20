@@ -24,8 +24,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
 	 * Scheduled tasks management dispatcher.
-	 * This function checks permissions and delegates to
-	 *  the appropriate function based on the sub-action.
+	 * This function checks permissions and delegates to the appropriate function
+	 * based on the sub-action.
 	 * Everything here requires admin_forum permission.
 	 *
 	 * @uses ManageScheduledTasks template file
@@ -37,28 +37,22 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		loadLanguage('ManageScheduledTasks');
 		loadTemplate('ManageScheduledTasks');
 
 		$subActions = array(
-			'taskedit' => array($this, 'action_edit'),
-			'tasklog' => array($this, 'action_log'),
-			'tasks' => array($this, 'action_tasks'),
+			'taskedit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'tasklog' => array($this, 'action_log', 'permission' => 'admin_forum'),
+			'tasks' => array($this, 'action_tasks', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_scheduled_tasks', array(&$subActions));
 
 		// We need to find what's the action.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'tasks';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'tasks';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'tasks');
+		$context['page_title'] = $txt['maintain_info'];
+		$context['sub_action'] = $subAction;
 
 		// Now for the lovely tabs. That we all love.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -74,10 +68,10 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				),
 			),
 		);
-		// @todo is this useless?
-		$context['sub_action'] = $subAction;
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'tasks');
 		$action->dispatch($subAction);
 	}
 
@@ -155,6 +149,11 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					logTask($task_id, $total_time);
 				}
 			}
+
+			// Things go as expected?  If not save the error in session
+			if (!empty($context['scheduled_errors']))
+				$_SESSION['st_error'] = $context['scheduled_errors'];
+
 			redirectexit('action=admin;area=scheduledtasks;done');
 		}
 
@@ -208,8 +207,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' =>
-								'<input type="hidden" name="enable_task[%1$d]" id="task_%1$d" value="0" /><input type="checkbox" name="enable_task[%1$d]" id="task_check_%1$d" %2$s class="input_check" />',
+							'format' => '
+								<input type="hidden" name="enable_task[%1$d]" id="task_%1$d" value="0" /><input type="checkbox" name="enable_task[%1$d]" id="task_check_%1$d" %2$s class="input_check" />',
 							'params' => array(
 								'id' => false,
 								'checked_state' => false,
@@ -225,8 +224,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' =>
-								'<input type="checkbox" name="run_task[%1$d]" id="run_task_%1$d" class="input_check" />',
+							'format' => '
+								<input type="checkbox" name="run_task[%1$d]" id="run_task_%1$d" class="input_check" />',
 							'params' => array(
 								'id' => false,
 							),
@@ -242,8 +241,8 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<input type="submit" name="save" value="' . $txt['scheduled_tasks_save_changes'] . '" class="right_submit" />
-						<input type="submit" name="run" value="' . $txt['scheduled_tasks_run_now'] . '" class="right_submit" />',
+						<input type="submit" name="run" value="' . $txt['scheduled_tasks_run_now'] . '" class="right_submit" />
+						<input type="submit" name="save" value="' . $txt['scheduled_tasks_save_changes'] . '" class="right_submit" />',
 				),
 				array(
 					'position' => 'after_title',
@@ -253,12 +252,18 @@ class ManageScheduledTasks_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'view_scheduled_tasks';
-
 		$context['tasks_were_run'] = isset($_GET['done']);
+
+		// If we had any errors, place them in context as well
+		if (isset($_SESSION['st_error']))
+		{
+			$context['scheduled_errors'] = $_SESSION['st_error'];
+			unset($_SESSION['st_error']);
+		}
 	}
 
 	/**
@@ -336,7 +341,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 *
 	 * @uses ManageScheduledTasks language file
 	 */
-	function action_log()
+	public function action_log()
 	{
 		global $scripturl, $context, $txt;
 
@@ -366,7 +371,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				'function' => array($this, 'list_getTaskLogEntries'),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumTaskLogEntries('),
+				'function' => array($this, 'list_getNumTaskLogEntries'),
 			),
 			'columns' => array(
 				'name' => array(
@@ -429,7 +434,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		createToken('admin-tl');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -444,7 +449,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 * Callback function for createList() in action_tasks().
 	 *
 	 */
-	function list_getScheduledTasks()
+	public function list_getScheduledTasks()
 	{
 		return scheduledTasks();
 	}
@@ -456,7 +461,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	 * @param int $items_per_page
 	 * @param string $sort
 	 */
-	function list_getTaskLogEntries($start, $items_per_page, $sort)
+	public function list_getTaskLogEntries($start, $items_per_page, $sort)
 	{
 		return getTaskLogEntries($start, $items_per_page, $sort);
 	}
@@ -464,7 +469,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 	/**
 	 * Callback function for createList() in action_log().
 	 */
-	function list_getNumTaskLogEntries()
+	public function list_getNumTaskLogEntries()
 	{
 		return countTaskLogEntries();
 	}

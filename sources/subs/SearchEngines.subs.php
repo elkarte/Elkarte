@@ -302,9 +302,12 @@ function getSpiders($start, $items_per_page, $sort)
 	$request = $db->query('', '
 		SELECT id_spider, spider_name, user_agent, ip_info
 		FROM {db_prefix}spiders
-		ORDER BY ' . $sort . '
-		LIMIT ' . $start . ', ' . $items_per_page,
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:limit}',
 		array(
+			'sort' => $sort,
+			'start' => $start,
+			'limit' => $items_per_page,
 		)
 	);
 	$spiders = array();
@@ -313,6 +316,30 @@ function getSpiders($start, $items_per_page, $sort)
 	$db->free_result($request);
 
 	return $spiders;
+}
+
+/**
+ * Return details of one spider from its ID
+ *
+ * @param int id of a spider
+ */
+function getSpiderDetails($spider_id)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_spider as id, spider_name as name, user_agent as agent, ip_info
+		FROM {db_prefix}spiders
+		WHERE id_spider = {int:current_spider}',
+		array(
+			'current_spider' => $spider_id,
+		)
+	);
+	$spider = $db->fetch_assoc($request);
+
+	$db->free_result($request);
+
+	return $spider;
 }
 
 /**
@@ -421,23 +448,196 @@ function getSpiderStats($start, $items_per_page, $sort)
 }
 
 /**
- * Get the number of spider stat rows from the log spicer stats table
+ * Get the number of spider stat rows from the log spider stats table
  * (used by createList() callbacks)
  *
+ * @param date (optional) if specified counts only the entries before that date
  * @return int
  */
-function getNumSpiderStats()
+function getNumSpiderStats($time = null)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*) AS num_stats
-		FROM {db_prefix}log_spider_stats',
+		SELECT COUNT(*)
+		FROM {db_prefix}log_spider_stats' . ($time === null ? '' : '
+		WHERE stat_date < {date:date_being_viewed}'),
 		array(
+			'date_being_viewed' => $time,
 		)
 	);
 	list ($numStats) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $numStats;
+}
+
+/**
+ * Remove spider logs older than the passed time
+ *
+ * @param int a time value
+ */
+function removeSpiderOldLogs($time)
+{
+	$db = database();
+
+	// Delete the entires.
+	$db->query('', '
+		DELETE FROM {db_prefix}log_spider_hits
+		WHERE log_time < {int:delete_period}',
+		array(
+			'delete_period' => $time,
+		)
+	);
+}
+
+/**
+ * Remove spider logs older than the passed time
+ *
+ * @param int a time value
+ */
+function removeSpiderOldStats($time)
+{
+	$db = database();
+
+	// Delete the entires.
+	$db->query('', '
+		DELETE FROM {db_prefix}log_spider_stats
+		WHERE last_seen < {int:delete_period}',
+		array(
+			'delete_period' => $time,
+		)
+	);
+}
+
+/**
+ * Remove all the entries connected to a certain spider (description, entries, stats)
+ *
+ * @param array an array of spider ids
+ */
+function removeSpiders($spiders_id)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}spiders
+		WHERE id_spider IN ({array_int:remove_list})',
+		array(
+			'remove_list' => $spiders_id,
+		)
+	);
+	$db->query('', '
+		DELETE FROM {db_prefix}log_spider_hits
+		WHERE id_spider IN ({array_int:remove_list})',
+		array(
+			'remove_list' => $spiders_id,
+		)
+	);
+	$db->query('', '
+		DELETE FROM {db_prefix}log_spider_stats
+		WHERE id_spider IN ({array_int:remove_list})',
+		array(
+			'remove_list' => $spiders_id,
+		)
+	);
+}
+
+/**
+ * Returns the last time any spider was seen around
+ */
+function spidersLastSeen()
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_spider, MAX(last_seen) AS last_seen_time
+		FROM {db_prefix}log_spider_stats
+		GROUP BY id_spider',
+		array(
+		)
+	);
+
+	$spider_last_seen = array();
+	while ($row = $db->fetch_assoc($request))
+		$spider_last_seen[$row['id_spider']] = $row['last_seen_time'];
+	$db->free_result($request);
+
+	return $spider_last_seen;
+}
+
+/**
+ * Returns an array of dates ranging from the first appearance of a spider and the last
+ */
+function spidersStatsDates()
+{
+	global $txt;
+
+	$db = database();
+
+	// Get the earliest and latest dates.
+	$request = $db->query('', '
+		SELECT MIN(stat_date) AS first_date, MAX(stat_date) AS last_date
+		FROM {db_prefix}log_spider_stats',
+		array(
+		)
+	);
+
+	list ($min_date, $max_date) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	$min_year = (int) substr($min_date, 0, 4);
+	$max_year = (int) substr($max_date, 0, 4);
+	$min_month = (int) substr($min_date, 5, 2);
+	$max_month = (int) substr($max_date, 5, 2);
+
+	// Prepare the dates for the drop down.
+	$date_choices = array();
+	for ($y = $min_year; $y <= $max_year; $y++)
+		for ($m = 1; $m <= 12; $m++)
+		{
+			// This doesn't count?
+			if ($y == $min_year && $m < $min_month)
+				continue;
+			if ($y == $max_year && $m > $max_month)
+				break;
+
+			$date_choices[$y . $m] = $txt['months_short'][$m] . ' ' . $y;
+		}
+
+	return $date_choices;
+}
+
+/**
+ * Update an existing or inserts a new spider entry
+ */
+function updateSpider($id = 0, $name = '', $agent = '', $info_ip = '')
+{
+	$db = database();
+
+	// New spider, insert
+	if (empty($id))
+		$db->insert('insert',
+			'{db_prefix}spiders',
+			array(
+				'spider_name' => 'string', 'user_agent' => 'string', 'ip_info' => 'string',
+			),
+			array(
+				$name, $agent, $info_ip,
+			),
+			array('id_spider')
+		);
+	// Existing spider update
+	else
+		$db->query('', '
+			UPDATE {db_prefix}spiders
+			SET spider_name = {string:spider_name}, user_agent = {string:spider_agent},
+				ip_info = {string:ip_info}
+			WHERE id_spider = {int:current_spider}',
+			array(
+				'current_spider' => $id,
+				'spider_name' => $name,
+				'spider_agent' => $agent,
+				'ip_info' => $info_ip,
+			)
+		);
 }

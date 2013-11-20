@@ -55,9 +55,7 @@ function template_find_members()
 	<body id="help_popup">
 		<form action="', $scripturl, '?action=findmember;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
 			<div class="roundframe">
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['find_members'], '</h3>
-				</div>
+				<h2 class="category_header">', $txt['find_members'], '</h2>
 				<div>
 					<strong>', $txt['find_username'], ':</strong><br />
 					<input type="text" name="search" id="search" value="', isset($context['last_search']) ? $context['last_search'] : '', '" style="margin-top: 4px; width: 96%;" class="input_text" autofocus="autofocus" placeholder="', $txt['find_members'], '" required="required" /><br />
@@ -75,9 +73,7 @@ function template_find_members()
 			</div>
 			<br />
 			<div class="roundframe">
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['find_results'], '</h3>
-				</div>';
+				<h3 class="category_header">', $txt['find_results'], '</h3>';
 
 	if (empty($context['results']))
 		echo '

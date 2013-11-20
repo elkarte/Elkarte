@@ -14,63 +14,23 @@
  * @version 1.0 Alpha
  */
 
+function template_ManageSmileys_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * Editing the smiley sets.
  */
 function template_editsets()
 {
-	global $context, $scripturl, $txt, $modSettings;
-
 	echo '
 	<div id="admincenter">';
 
 	template_show_list('smiley_set_list');
 
 	echo '
-		<br />
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['smiley_sets_latest'], '</h3>
-		</div>
-		<div class="windowbg">
-			<div class="content">
-				<div id="smileysLatest">', $txt['smiley_sets_latest_fetch'], '</div>
-			</div>
-		</div>
-	</div>
-
-	<script><!-- // --><![CDATA[
-		window.elkForum_scripturl = elk_scripturl;
-		window.elkForum_sessionid = elk_session_id;
-		window.elkForum_sessionvar = elk_session_var;
-	// ]]></script>';
-
-	if (empty($modSettings['disable_elk_js']))
-		echo '
-	<script src="', $scripturl, '?action=viewadminfile;filename=latest-smileys.js"></script>';
-
-	echo '
-	<script><!-- // --><![CDATA[
-		function elkSetLatestSmileys()
-		{
-			if (typeof(window.elkLatestSmileys) != "undefined")
-				setInnerHTML(document.getElementById("smileysLatest"), window.elkLatestSmileys);';
-
-		if (!empty($context['selected_set']))
-			echo '
-
-			changeSet("', $context['selected_set'], '");';
-		if (!empty($context['selected_smiley']))
-			echo '
-			loadSmiley(', $context['selected_smiley'], ');';
-
-		echo '
-		}';
-
-		echo '
-			elkSetLatestSmileys();';
-
-		echo '
-	// ]]></script>';
+	</div>';
 }
 
 /**
@@ -82,12 +42,10 @@ function template_modifyset()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=editsets" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-				', $context['current_set']['is_new'] ? $txt['smiley_set_new'] : $txt['smiley_set_modify_existing'], '
-				</h3>
-			</div>';
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsets" method="post" accept-charset="UTF-8">
+			<h2 class="category_header">
+			', $context['current_set']['is_new'] ? $txt['smiley_set_new'] : $txt['smiley_set_modify_existing'], '
+			</h2>';
 
 		// If this is an existing set, and there are still un-added smileys - offer an import opportunity.
 		if (!empty($context['current_set']['can_import']))
@@ -95,7 +53,6 @@ function template_modifyset()
 			echo '
 			<div class="information">
 				', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_import_single'] : $txt['smiley_set_import_multiple'], ' <a href="', $scripturl, '?action=admin;area=smileys;sa=import;set=', $context['current_set']['id'], ';', $context['session_var'], '=', $context['session_id'], ';', $context['admin-mss_token_var'], '=' ,$context['admin-mss_token'],'">', $txt['here'], '</a> ', $context['current_set']['can_import'] == 1 ? $txt['smiley_set_to_import_single'] : $txt['smiley_set_to_import_multiple'], '
-
 			</div>';
 		}
 
@@ -116,18 +73,20 @@ function template_modifyset()
 							', $modSettings['smileys_url'], '/';
 
 		if ($context['current_set']['id'] == 'default')
-			echo '<strong>default</strong><input type="hidden" name="smiley_sets_path" id="smiley_sets_path" value="default" />';
+			echo '
+							<strong>default</strong><input type="hidden" name="smiley_sets_path" id="smiley_sets_path" value="default" />';
 		elseif (empty($context['smiley_set_dirs']))
 			echo '
 							<input type="text" name="smiley_sets_path" id="smiley_sets_path" value="', $context['current_set']['path'], '" class="input_text" /> ';
-
 		else
 		{
 			echo '
 							<select name="smiley_sets_path" id="smiley_sets_path">';
+
 			foreach ($context['smiley_set_dirs'] as $smiley_set_dir)
 				echo '
 								<option value="', $smiley_set_dir['id'], '"', $smiley_set_dir['current'] ? ' selected="selected"' : '', $smiley_set_dir['selectable'] ? '' : ' disabled="disabled"', '>', $smiley_set_dir['id'], '</option>';
+
 			echo '
 							</select> ';
 		}
@@ -174,10 +133,8 @@ function template_modifysmiley()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['smiley_modify_existing'], '</h3>
-			</div>
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm">
+			<h2 class="category_header">', $txt['smiley_modify_existing'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -204,6 +161,7 @@ function template_modifysmiley()
 							<strong><label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
 						</dt>
 						<dd>';
+
 			if (empty($context['filenames']))
 				echo '
 							<input type="text" name="smiley_filename" id="smiley_filename" value="', $context['current_smiley']['filename'], '" class="input_text" />';
@@ -211,9 +169,11 @@ function template_modifysmiley()
 			{
 				echo '
 							<select name="smiley_filename" id="smiley_filename" onchange="updatePreview();">';
+
 				foreach ($context['filenames'] as $filename)
 					echo '
 								<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
+
 				echo '
 							</select>';
 			}
@@ -273,10 +233,8 @@ function template_addsmiley()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=addsmiley" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm" enctype="multipart/form-data">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['smileys_add_method'], '</h3>
-			</div>
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=addsmiley" method="post" accept-charset="UTF-8" name="smileyForm" id="smileyForm" enctype="multipart/form-data">
+			<h2 class="category_header">', $txt['smileys_add_method'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<ul>
@@ -309,6 +267,7 @@ function template_addsmiley()
 								<strong><label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
 							</dt>
 							<dd>';
+
 	if (empty($context['filenames']))
 		echo '
 								<input type="text" name="smiley_filename" id="smiley_filename" value="', $context['current_smiley']['filename'], '" onchange="selectMethod(\'existing\');" class="input_text" />';
@@ -319,6 +278,7 @@ function template_addsmiley()
 		foreach ($context['filenames'] as $filename)
 			echo '
 									<option value="', $filename['id'], '"', $filename['selected'] ? ' selected="selected"' : '', '>', $filename['id'], '</option>';
+
 		echo '
 								</select>';
 	}
@@ -360,10 +320,7 @@ function template_addsmiley()
 					</dl>
 				</div>
 			</div>
-
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['smiley_new'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['smiley_new'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -418,36 +375,49 @@ function template_setorder()
 	foreach ($context['smileys'] as $location)
 	{
 		echo '
-		<form action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $location['title'], '</h3>
-			</div>
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=smileys;sa=editsmileys" method="post" accept-charset="UTF-8">
+			<h2 class="category_header">', $location['title'], '</h2>
 			<div class="information">
 				', $location['description'], '
 			</div>
 			<div class="windowbg">
 				<div class="content">
 					<strong>', empty($context['move_smiley']) ? $txt['smileys_move_select_smiley'] : $txt['smileys_move_select_destination'], '...</strong><br />';
-		foreach ($location['rows'] as $row)
+
+		foreach ($location['rows'] as $key => $row)
 		{
 			if (!empty($context['move_smiley']))
 				echo '
 					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $row[0]['row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
 
+			echo '
+					<ul id="smiley_' . $location['id'] . '|' . $key . '" class="sortable_smiley">';
+
 			foreach ($row as $smiley)
 			{
 				if (empty($context['move_smiley']))
-					echo '<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '"><img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" /></a>';
+					echo '
+						<li id="smile_' . $smiley['id'] . '">
+							<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '"><img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" /></a>
+						</li>';
 				else
-					echo '<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" /><a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
+					echo '
+						<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" />
+						<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
 			}
 
 			echo '
-					<br />';
+					</ul>';
 		}
+
+		// Add an empty row for dropping items as a new row
+		echo '
+			<ul id="smiley_' . $location['id'] . '|' . ($key + 1) . '" class="sortable_smiley"><li></li></ul>';
+
 		if (!empty($context['move_smiley']))
 			echo '
 					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';row=', $location['last_row'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
+
 		echo '
 				</div>
 			</div>
@@ -456,7 +426,21 @@ function template_setorder()
 	}
 
 	echo '
-	</div>';
+	</div>
+	<script><!-- // --><![CDATA[
+		$().elkSortable({
+			sa: "smileyorder",
+			error: "' . $txt['admin_order_error'] . '",
+			title: "' . $txt['admin_order_title'] . '",
+			tag: "[id^=smiley_]",
+			connect: ".sortable_smiley",
+			containment: "document",
+			href: "?action=admin;area=smileys;sa=setorder",
+			axis: "",
+			placeholder: "ui-state-highlight",
+			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"}
+		});
+	// ]]></script>';
 }
 
 /**
@@ -469,11 +453,9 @@ function template_editicon()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=smileys;sa=editicon;icon=', $context['new_icon'] ? '0' : $context['icon']['id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['new_icon'] ? $txt['icons_new_icon'] : $txt['icons_edit_icon'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				', $context['new_icon'] ? $txt['icons_new_icon'] : $txt['icons_edit_icon'], '
+			</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">';
@@ -503,7 +485,7 @@ function template_editicon()
 						<dt>
 							<strong><label for="icon_board_select">', $txt['icons_board'], '</label>: </strong>
 						</dt>
-						<dd>', template_select_boards('icon_board'), '
+						<dd>', template_select_boards('icon_board', '', '', true), '
 						</dd>
 						<dt>
 							<strong><label for="icon_location">', $txt['smileys_location'], '</label>: </strong>

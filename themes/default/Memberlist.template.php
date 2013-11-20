@@ -25,7 +25,7 @@ function template_main()
 	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
 		<ul class="floatright">
 			<li>
-				<input onfocus="toggle_mlsearch_opt();" onblur="toggle_mlsearch_opt();" type="text" name="search" value="" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
+				<input id="mlsearch_input" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
 				<input type="submit" name="search2" value="' . $txt['search'] . '" class="button_submit" />
 				<ul id="mlsearch_options">';
 
@@ -43,25 +43,35 @@ function template_main()
 		</ul>
 	</form>';
 
-	template_pagesection('memberlist_buttons', 'right', 'go_down', array('extra' => $extra));
+	template_pagesection('memberlist_buttons', 'right', array('extra' => $extra));
 
 	echo '
 	<script><!-- // --><![CDATA[
 		function toggle_mlsearch_opt()
 		{
-			$("#mlsearch_options").slideToggle("fast");
+			$(\'body\').on(\'click\', mlsearch_opt_hide);
+			$(\'#mlsearch_options\').slideToggle(\'fast\');
+
+		}
+		function mlsearch_opt_hide(ev)
+		{
+			if (ev.target.id == \'mlsearch_options\' || ev.target.id == \'mlsearch_input\')
+				return;
+
+			$(\'body\').off(\'click\', mlsearch_opt_hide);
+			$(\'#mlsearch_options\').slideToggle(\'fast\');
 		}
 	// ]]></script>
 	<div id="memberlist">
 		<h2 class="category_header">
 				<span class="floatleft">', $txt['members_list'], '</span>';
-		if (!isset($context['old_search']))
-				echo '
-				<span class="floatright" letter_links>', $context['letter_links'], '</span>';
+
+	if (!isset($context['old_search']))
 		echo '
-		</h2>';
+				<span class="floatright" letter_links>', $context['letter_links'], '</span>';
 
 	echo '
+		</h2>
 		<table class="table_grid">
 			<thead>
 				<tr class="table_head">';
@@ -82,6 +92,7 @@ function template_main()
 						', $column['link'], '
 					</th>';
 	}
+
 	echo '
 				</tr>
 			</thead>
@@ -95,6 +106,7 @@ function template_main()
 		{
 			echo '
 				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>';
+
 			foreach ($context['columns'] as $column => $values)
 			{
 				if (isset($member[$column]))
@@ -120,16 +132,15 @@ function template_main()
 				// Any custom fields on display?
 				elseif (!empty($context['custom_profile_fields']['columns']) && isset($context['custom_profile_fields']['columns'][$column]))
 				{
-					foreach ($context['custom_profile_fields']['columns'] as $key => $col)
 						echo '
-							<td>', $member['options'][substr($key, 5)], '</td>';
+							<td>', $member['options'][substr($column, 5)], '</td>';
 				}
 			}
 
 			echo '
 					</tr>';
 
-				$alternate = !$alternate;
+			$alternate = !$alternate;
 		}
 	}
 	// No members?
@@ -139,7 +150,7 @@ function template_main()
 					<td colspan="', $context['colspan'], '" class="standard_row">', $txt['search_no_results'], '</td>
 				</tr>';
 
-				echo '
+	echo '
 			</tbody>
 		</table>';
 
@@ -151,9 +162,8 @@ function template_main()
 		$extra = '';
 
 	// Show the page numbers again. (makes 'em easier to find!)
-	template_pagesection(false, false, 'go_up', array('extra' => $extra));
+	template_pagesection(false, false, array('extra' => $extra));
 
 	echo '
 	</div>';
-
 }

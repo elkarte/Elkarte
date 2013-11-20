@@ -51,7 +51,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 		SELECT e.id_email, e.error, e.data_id, e.subject, e.id_message, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
-		WHERE id_email' . ($id === 0 ? '> {int:id}' : '= {int:id}') . '
+		WHERE id_email' . ($id === 0 ? ' > {int:id}' : ' = {int:id}') . '
 			AND ({query_see_board}
 				' . $approve_query . ')
 			OR e.id_board = -1
@@ -88,7 +88,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 		if ($row['message_type'] === 't')
 			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['id_message'];
 		elseif ($row['message_type'] === 'm')
-			$postemail[$i]['link'] = $boardurl . '?topic=' . $topic_id . '.msg' . $row['id_message'] . '#msg' . $row['id_message'];
+			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['id_message'];
 		elseif ($row['message_type'] === 'p')
 			$postemail[$i]['subject'] = $txt['private'];
 
@@ -102,8 +102,6 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 /**
  * Counts the number of errors (the user can see) for pagination
  *
- * @param int $id
- * @param int $id
  */
 function list_maillist_count_unapproved()
 {
@@ -111,7 +109,7 @@ function list_maillist_count_unapproved()
 
 	$db = database();
 
-	$total= 0;
+	$total = 0;
 
 	// Where can they approve items?
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -163,7 +161,7 @@ function maillist_delete_error_entry($id)
 /**
  * Loads the filers or parsers for the post by email system
  *  - If an ID is supplied, it will load that specific filter/parser
- *	- Style defines if it will load parsers or filters
+ *  - Style defines if it will load parsers or filters
  *
  * @param int type $start
  * @param int $chunk_size
@@ -177,7 +175,6 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 	$db = database();
 
 	// Init
-	$i = 0;
 	if (empty($sort))
 		$sort = 'id_filter ASC';
 
@@ -186,11 +183,11 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 
 	// Load all the email_filters, we need lots of these :0
 	$request = $db->query('', '
-		SELECT *
+		SELECT id_filter, filter_style, filter_type, filter_to, filter_from, filter_name, filter_order
 		FROM {db_prefix}postby_emails_filters
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
-		ORDER BY {raw:sort}
+		ORDER BY {raw:sort}, filter_type ASC, filter_order ASC
 		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'offset' => $start,
@@ -200,17 +197,17 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 			'style' => $style
 		)
 	);
-	while($row = $db->fetch_assoc($request))
+	while ($row = $db->fetch_assoc($request))
 	{
-		$email_filters[$i] = array(
+		$email_filters[$row['id_filter']] = array(
 			'id_filter' => $row['id_filter'],
 			'filter_type' => $row['filter_type'],
 			'filter_to' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_to']) . '<strong>"</strong>',
 			'filter_from' => '<strong>"</strong>' . Util::htmlspecialchars($row['filter_from']) . '<strong>"</strong>',
 			'filter_name' => Util::htmlspecialchars($row['filter_name']),
+			'filter_order' => $row['filter_order'],
 		);
-		$i++;
-	};
+	}
 	$db->free_result($request);
 
 	return $email_filters;
@@ -407,5 +404,27 @@ function log_email($sent)
 		),
 		$sent,
 		array('id_email')
+	);
+}
+
+/**
+ * Updates the processing order for the parser and filter fields
+ * Done as a CASE WHEN one two three ELSE 0 END in place of many updates\
+ * Called by Xmlcontroller as part of drag sort event
+ *
+ * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param array $filters list of ids in the WHEN clause to keep from updating the entire table
+ */
+function updateParserFilterOrder($replace, $filters)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}postby_emails_filters
+		SET filter_order = CASE ' . $replace . ' ELSE filter_order END
+		WHERE id_filter IN ({array_int:filters})',
+		array(
+			'filters' => $filters,
+		)
 	);
 }

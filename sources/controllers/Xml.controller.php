@@ -25,27 +25,34 @@ class Xml_Controller extends Action_Controller
 	public function action_index()
 	{
 		loadTemplate('Xml');
+		require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
-			'jumpto' => array('action_jumpto'),
-			'messageicons' => array('action_messageicons'),
-			'groupicons' => array('action_groupicons'),
-			'corefeatures' => array('action_corefeatures', 'admin_forum'),
+			'jumpto' => array('controller' => $this, 'function' => 'action_jumpto'),
+			'messageicons' => array('controller' => $this, 'function' => 'action_messageicons'),
+			'groupicons' => array('controller' => $this, 'function' => 'action_groupicons'),
+			'corefeatures' => array('controller' => $this, 'function' => 'action_corefeatures', 'permission' => 'admin_forum'),
+			'profileorder' => array('controller' => $this, 'function' => 'action_profileorder', 'permission' => 'admin_forum'),
+			'smileyorder' => array('controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'),
+			'boardorder' => array('controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'),
+			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
 		);
 
 		// Easy adding of xml sub actions
-	 	call_integration_hook('integrate_xmlhttp', array(&$subActions));
+		call_integration_hook('integrate_xmlhttp', array(&$subActions));
+
+		$action = new Action();
+		$action->initialize($subActions);
 
 		// Valid action?
-		if (!isset($_REQUEST['sa'], $subActions[$_REQUEST['sa']]))
+		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? '' : $_REQUEST['sa'];
+
+		// Act a  bit special for XML, probably never see it anyway :P
+		if (empty($subAction))
 			fatal_lang_error('no_access', false);
 
-		// Permissions check in the subAction?
-		if (isset($subActions[$_REQUEST['sa']][1]))
-			isAllowedTo($subActions[$_REQUEST['sa']][1]);
-
-		// Off we go then
-		$this->{$subActions[$_REQUEST['sa']][0]}();
+		// Off we go then, (it will check permissions)
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -98,6 +105,7 @@ class Xml_Controller extends Action_Controller
 		$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
 		$context['membergroup_icons'] = array();
 		$directory = $settings['theme_dir'] . '/images/group_icons';
+		$icons = array();
 
 		// Get all the available member group icons
 		$files = scandir($directory);
@@ -126,7 +134,7 @@ class Xml_Controller extends Action_Controller
 	 */
 	public function action_corefeatures()
 	{
-		global $context, $modSettings, $txt, $settings;
+		global $context, $txt;
 
 		$context['xml_data'] = array();
 
@@ -134,16 +142,7 @@ class Xml_Controller extends Action_Controller
 		loadLanguage('Errors');
 
 		// We need (at least) this to ensure that mod files are included
-		if (!empty($modSettings['integrate_admin_include']))
-		{
-			$admin_includes = explode(',', $modSettings['integrate_admin_include']);
-			foreach ($admin_includes as $include)
-			{
-				$include = strtr(trim($include), array('BOARDDIR' => BOARDDIR, 'SOURCEDIR' => SOURCEDIR, '$themedir' => $settings['theme_dir']));
-				if (file_exists($include))
-					require_once($include);
-			}
-		}
+		call_integration_include_hook('integrate_admin_include');
 
 		$errors = array();
 		$returns = array();
@@ -193,13 +192,510 @@ class Xml_Controller extends Action_Controller
 		else
 			$errors[] = array('value' => $txt[$validation]);
 
-
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
 		$context['xml_data'] = array(
 			'corefeatures' => array(
 				'identifier' => 'corefeature',
 				'children' => $returns,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the custom profile fields from a drag/drop event
+	 */
+	public function action_profileorder()
+	{
+		global $context, $txt;
+
+		// Start off with nothing
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+
+		// Chances are
+		loadLanguage('Errors');
+		loadLanguage('ManageSettings');
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+
+		// You have to be allowed to do this
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// No questions that we are reordering
+			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			{
+				$view_order = 1;
+				$replace = '';
+
+				// The field ids arrive in 1-n view order ...
+				foreach ($_POST['list_custom_profile_fields'] as $id)
+				{
+					$replace .= '
+						WHEN id_field = ' . $id . ' THEN ' . $view_order++;
+				}
+
+				// With the replace set
+				if (!empty($replace))
+					updateProfileFieldOrder($replace);
+				else
+					$errors[] = array('value' => $txt['no_sortable_items']);
+			}
+
+			$order[] = array(
+				'value' => $txt['custom_profile_reordered'],
+			);
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
+				),
+				array(
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
+				),
+			);
+		}
+		// Failed validation, tough to be you
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the boards in response to an ajax sortable request
+	 */
+	public function action_boardorder()
+	{
+		global $context, $txt, $boards, $cat_tree;
+
+		// Start off clean
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+		$board_tree = array();
+		$board_moved = null;
+
+		// Chances are we will need these
+		loadLanguage('Errors');
+		loadLanguage('ManageBoards');
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
+
+		// Validating that you can do this is always a good idea
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// No question that we are doing some board reordering
+			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
+			{
+				$list_order = 0;
+				$order = array();
+
+				// What board was drag and dropped?
+				list (, $board_moved,) = explode(',', $_POST['moved']);
+				$board_moved = (int) $board_moved;
+
+				// The board ids arrive in 1-n view order ...
+				foreach ($_POST['cbp'] as $id)
+				{
+					list ($category, $board, $childof) = explode(',', $id);
+
+					if ($board == -1)
+						continue;
+
+					$board_tree[] = array(
+						'category' => $category,
+						'parent' => $childof,
+						'order' => $list_order,
+						'id' => $board,
+					);
+
+					// Keep track of where the moved board is in the sort stack
+					if ($board == $board_moved)
+						$moved_key = $list_order;
+
+					$list_order++;
+				}
+
+				// Look behind for the previous board and previous sibling
+				$board_previous = (isset($board_tree[$moved_key - 1]) && $board_tree[$moved_key]['category'] == $board_tree[$moved_key - 1]['category']) ? $board_tree[$moved_key - 1] : null;
+				$board_previous_sibling = null;
+				for ($i = $moved_key - 1; $i >= 0; $i--)
+				{
+					// Sibling must have the same category and same parent tree
+					if ($board_tree[$moved_key]['category'] == $board_tree[$i]['category'])
+					{
+						if ($board_tree[$moved_key]['parent'] == $board_tree[$i]['parent'])
+						{
+							$board_previous_sibling = $board_tree[$i];
+							break;
+						}
+						// Don't go to another parent tree
+						elseif ($board_tree[$i]['parent'] == 0)
+							break;
+					}
+					// Don't go to another category
+					else
+						break;
+				}
+
+				// Retrieve the current saved state, returned in global $boards
+				getBoardTree();
+
+				$boardOptions = array();
+				$board_current = $boards[$board_moved];
+				$board_new = $board_tree[$moved_key];
+
+				// Dropped on a sibling node, move after that
+				if (isset($board_previous_sibling))
+				{
+					$boardOptions = array(
+						'move_to' => 'after',
+						'target_board' => $board_previous_sibling['id'],
+					);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_after'] . ' ' . $boards[$board_previous_sibling['id']]['name']);
+				}
+				// no sibling, maybe a new child
+				elseif (isset($board_previous))
+				{
+					$boardOptions = array(
+						'move_to' => 'child',
+						'target_board' => $board_previous['id'],
+						'move_first_child' => true,
+					);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_child_of'] . ' ' . $boards[$board_previous['id']]['name']);
+				}
+				// nothing before this board at all, move to the top of the cat
+				elseif (!isset($board_previous))
+				{
+					$boardOptions = array(
+						'move_to' => 'top',
+						'target_category' => $board_new['category'],
+					);
+					$order[] = array('value' => $board_current['name'] . ' ' . $txt['mboards_order_in_category'] . ' ' . $cat_tree[$board_new['category']]['node']['name']);
+				}
+
+				// If we have figured out what to do
+				if (!empty($boardOptions))
+					modifyBoard($board_moved, $boardOptions);
+				else
+					$errors[] = array('value' => $txt['mboards_board_error']);
+			}
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
+				),
+				array(
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
+				),
+			);
+		}
+		// Failed validation, extra work for you I'm afraid
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the smileys from a drag/drop event
+	 * Will move them from post to popup location and visa-versa
+	 * Will move them to new rows
+	 */
+	public function action_smileyorder()
+	{
+		global $context, $txt;
+
+		// Start off with an empty response
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+
+		// Chances are I wear a silly ;D
+		loadLanguage('Errors');
+		loadLanguage('ManageSmileys');
+		require_once(SUBSDIR . '/Smileys.subs.php');
+
+		// You have to be allowed to do this
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// Valid posting
+			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			{
+				// Get the details on the moved smile
+				list (, $smile_moved) = explode('_', $_POST['moved']);
+				$smile_moved = (int) $smile_moved;
+				$smile_moved_details = getSmiley($smile_moved);
+
+				// Check if we moved rows or locations
+				$smile_received_location = null;
+				$smile_received_row = null;
+				if (!empty($_POST['received']))
+				{
+					$displayTypes = array(
+						'postform' => 0,
+						'popup' => 2
+					);
+					list ($smile_received_location, $smile_received_row) = explode('|', $_POST['received']);
+					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
+				}
+
+				// If these are not set, we are kind of lost :P
+				if (isset($smile_received_location, $smile_received_row))
+				{
+					// Read the new ordering, remember where the moved smiley is in the stack
+					$list_order = 0;
+					foreach ($_POST['smile'] as $smile_id)
+					{
+						$smiley_tree[] = $smile_id;
+
+						// Keep track of where the moved smiley is in the sort stack
+						if ($smile_id == $smile_moved)
+							$moved_key = $list_order;
+
+						$list_order++;
+					}
+
+					// Now get the updated row, location, order
+					$smiley = array();
+					$smiley['row'] = !isset($smile_received_row) ? $smile_moved_details['row'] : $smile_received_row;
+					$smiley['location'] = !isset($smile_received_location) ? $smile_moved_details['location'] : $smile_received_location;
+					$smiley['order'] = -1;
+
+					// If the node after the drop zone is in the same row/container, we use its position
+					if (isset($smiley_tree[$moved_key + 1]))
+					{
+						$possible_after = getSmiley($smiley_tree[$moved_key - 1]);
+						if ($possible_after['row'] == $smiley['row'] && $possible_after['location'] == $smiley['location'])
+							$smiley = getSmileyPosition($smiley['location'], $smiley_tree[$moved_key - 1]);
+					}
+
+					// Empty means getSmileyPosition failed and so do we
+					if (!empty($smiley))
+					{
+						moveSmileyPosition($smiley, $smile_moved);
+
+						// Done with the move, now we clean up across the containers/rows
+						$smileys = getSmileys();
+						foreach (array_keys($smileys) as $location)
+						{
+							foreach ($smileys[$location]['rows'] as $id => $smiley_row)
+							{
+								// Fix empty rows if any.
+								if ($id != $smiley_row[0]['row'])
+								{
+									updateSmileyRow($id, $smiley_row[0]['row'], $location);
+
+									// Only change the first row value of the first smiley.
+									$smileys[$location]['rows'][$id][0]['row'] = $id;
+								}
+								// Make sure the smiley order is always sequential.
+								foreach ($smiley_row as $order_id => $smiley)
+									if ($order_id != $smiley['order'])
+										updateSmileyOrder($smiley['id'], $order_id);
+							}
+						}
+
+						// Clear the cache, its stale now
+						cache_put_data('parsing_smileys', null, 480);
+						cache_put_data('posting_smileys', null, 480);
+						$order[] = array('value' => $txt['smileys_moved_done']);
+					}
+				}
+			}
+			else
+				$errors[] = array('value' => $txt['smileys_moved_fail']);
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
+				),
+				array(
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
+				),
+			);
+		}
+		// Failed validation :'(
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response, whatever it is
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
+			),
+			'tokens' => array(
+				'identifier' => 'token',
+				'children' => $tokens,
+			),
+			'errors' => array(
+				'identifier' => 'error',
+				'children' => $errors,
+			),
+		);
+	}
+
+	/**
+	 * Reorders the PBE parsers or filters from a drag/drop event
+	 */
+	public function action_parserorder()
+	{
+		global $context, $txt;
+
+		// Start off with nothing
+		$context['xml_data'] = array();
+		$errors = array();
+		$order = array();
+		$tokens = array();
+
+		// Chances are
+		loadLanguage('Errors');
+		loadLanguage('Maillist');
+		require_once(SUBSDIR . '/Maillist.subs.php');
+
+		// You have to be allowed to do this
+		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_session = validateSession();
+
+		if (empty($validation_session) && $validation_token === true)
+		{
+			// No questions that we are reordering
+			if (isset($_POST['order'], $_POST['list_sort_email_fp']) && $_POST['order'] == 'reorder')
+			{
+				$filters = array();
+				$filter_order = 1;
+				$replace = '';
+
+				// The field ids arrive in 1-n view order ...
+				foreach ($_POST['list_sort_email_fp'] as $id)
+				{
+					$filters[] = $id;
+					$replace .= '
+						WHEN id_filter = ' . $id . ' THEN ' . $filter_order++;
+				}
+
+				// With the replace set
+				if (!empty($replace))
+					updateParserFilterOrder($replace, $filters);
+				else
+					$errors[] = array('value' => $txt['no_sortable_items']);
+			}
+
+			$order[] = array(
+				'value' => $txt['parser_reordered'],
+			);
+
+			// New generic token for use
+			createToken('admin-sort', 'post');
+			$tokens = array(
+				array(
+					'value' => $context['admin-sort_token'],
+					'attributes' => array('type' => 'token'),
+				),
+				array(
+					'value' => $context['admin-sort_token_var'],
+					'attributes' => array('type' => 'token_var'),
+				),
+			);
+		}
+		// Failed validation, tough to be you
+		else
+		{
+			if (!empty($validation_session))
+				$errors[] = array('value' => $txt[$validation_session]);
+
+			if (empty($validation_token))
+				$errors[] = array('value' => $txt['token_verify_fail']);
+		}
+
+		// Return the response
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'orders' => array(
+				'identifier' => 'order',
+				'children' => $order,
 			),
 			'tokens' => array(
 				'identifier' => 'token',

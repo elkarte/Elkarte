@@ -10,12 +10,12 @@
  */
 
 if (!defined('ELK'))
-	die('Hacking attempt...');
+	die('No access...');
 
 /**
  *  This class is an experiment for the job of handling errors.
  */
-class error_context
+class Error_Context
 {
 	/**
 	 * Holds the unique identifier of the error (a name).
@@ -53,7 +53,7 @@ class error_context
 	private $_language_files = array();
 
 	/**
-	 * Multipleton. This is an array of instances of error_context.
+	 * Multiton. This is an array of instances of error_context.
 	 * All callers use an error context ('post', 'attach', or 'default' if none chosen).
 	 *
 	 * @var array of error_context
@@ -75,11 +75,11 @@ class error_context
 			$this->_name = $id;
 
 		// initialize severity levels... waiting for details!
-		$this->_severity_levels = array(error_context::MINOR, error_context::SERIOUS);
+		$this->_severity_levels = array(Error_Context::MINOR, Error_Context::SERIOUS);
 
 		// initialize default severity (not sure this is needed)
 		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
-			$this->_default_severity = error_context::MINOR;
+			$this->_default_severity = Error_Context::MINOR;
 		else
 			$this->_default_severity = $default_severity;
 
@@ -248,7 +248,7 @@ class error_context
 		if (self::$_contexts === null)
 			self::$_contexts = array();
 		if (!array_key_exists($id, self::$_contexts))
-			self::$_contexts[$id] = new error_context($id, $default_severity);
+			self::$_contexts[$id] = new Error_Context($id, $default_severity);
 
 		return self::$_contexts[$id];
 	}
@@ -263,9 +263,11 @@ class attachment_error_context
 	private static $_context = null;
 	private $_attachs = null;
 	private $_generic_error = null;
+	private $_active_attach = null;
 
 	/**
 	 * Add attachment
+	 * Automatically activate the attachments added
 	 *
 	 * @param string $id
 	 * @param string $name
@@ -273,15 +275,35 @@ class attachment_error_context
 	public function addAttach($id, $name)
 	{
 		if (empty($id) || empty($name))
+		{
+			$this->activate();
 			return false;
+		}
 
 		if (!isset($this->_attachs[$id]))
 			$this->_attachs[$id] = array(
 				'name' => $name,
-				'error' => error_context::context($id, 1),
+				'error' => Error_Context::context($id, 1),
 			);
-		return true;
 
+		$this->activate($id);
+
+		return true;
+	}
+
+	/**
+	 * Sets the active attach (errors are "attached" to that)
+	 *
+	 * @param int A valid attachment, if invalid it defaults to 'generic'
+	 */
+	public function activate($id = null)
+	{
+		if (empty($id) || isset($this->_attachs[$id]))
+			$this->_active_attach = 'generic';
+		else
+			$this->_active_attach = $id;
+
+		return $this;
 	}
 
 	/**
@@ -291,20 +313,21 @@ class attachment_error_context
 	 * @param string $attachID = 'generic'
 	 * @param string $lang_file = null
 	 */
-	public function addError($error, $attachID = 'generic', $lang_file = null)
+	public function addError($error, $lang_file = null)
 	{
 		if (empty($error))
 			return;
 
-		if ($attachID == 'generic')
+		if ($this->_active_attach == 'generic')
 		{
-			if (!isset($this->_attachs[$attachID]))
-				$this->_generic_error = error_context::context('attach_generic_error', 1);
-			$this->_generic_error->addError($error, null, $lang_file);
+			if (!isset($this->_attachs[$this->_active_attach]))
+				$this->_generic_error = Error_Context::context('attach_generic_error', 1);
+
+			$this->_generic_error->addError($error, $lang_file);
 			return;
 		}
 
-		$this->_attachs[$attachID]['error']->addError($error, null, $lang_file);
+		$this->_attachs[$this->_active_attach]['error']->addError($error, $lang_file);
 	}
 
 	/**
@@ -391,5 +414,4 @@ class attachment_error_context
 
 		return self::$_context;
 	}
-
 }

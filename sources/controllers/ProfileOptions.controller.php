@@ -62,7 +62,8 @@ class ProfileOptions_Controller extends Action_Controller
 			'ignore' => array('action_editIgnoreList', $txt['editIgnoreList']),
 		);
 
-		$context['list_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'buddies';
+		// Set a subaction
+		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'buddies';
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -76,7 +77,7 @@ class ProfileOptions_Controller extends Action_Controller
 		);
 
 		// Pass on to the actual function.
-		$this->{$subActions[$context['list_area']][0]}($memID);
+		$this->{$subActions[$subAction][0]}($memID);
 	}
 
 	/**
@@ -86,7 +87,7 @@ class ProfileOptions_Controller extends Action_Controller
 	 */
 	public function action_editBuddies($memID)
 	{
-		global $context, $user_profile, $memberContext;
+		global $context, $user_profile, $memberContext, $modSettings;
 
 		$db = database();
 
@@ -153,9 +154,29 @@ class ProfileOptions_Controller extends Action_Controller
 					)
 				);
 
+				// Let them know who's their buddy.
+				if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+				{
+					require_once(CONTROLLERDIR . '/Notification.controller.php');
+					$notify = new Notification_Controller();
+				}
+
 				// Add the new member to the buddies array.
 				while ($row = $db->fetch_assoc($request))
+				{
 					$buddiesArray[] = (int) $row['id_member'];
+
+					if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+					{
+						// Set notifications for our buddy.
+						$notify->setData(array(
+							'id_member' => $row['id_member'],
+							'type' => 'buddy',
+							'id_msg' => 0,
+						));
+						$notify->action_add();
+					}
+				}
 				$db->free_result($request);
 
 				// Now update the current users buddy list.
@@ -332,7 +353,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'email_address', 'hide_email', 'show_online', 'hr',
 				'passwrd1', 'passwrd2', 'hr',
 				'secret_question', 'secret_answer',
-			)
+			),
+			'account'
 		);
 	}
 
@@ -363,7 +385,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'usertitle', 'signature', 'hr',
 				'karma_good', 'hr',
 				'website_title', 'website_url',
-			)
+			),
+			'forum'
 		);
 	}
 
@@ -386,8 +409,11 @@ class ProfileOptions_Controller extends Action_Controller
 
 		setupProfileContext(
 			array(
-				'pm_prefs',
-			)
+				'receive_from',
+				'hr',
+				'pm_settings',
+			),
+			'pmprefs'
 		);
 	}
 
@@ -416,7 +442,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'id_theme', 'smiley_set', 'hr',
 				'time_format', 'time_offset', 'hr',
 				'theme_settings',
-			)
+			),
+			'themepick'
 		);
 	}
 
@@ -427,12 +454,13 @@ class ProfileOptions_Controller extends Action_Controller
 	 * @param int $memID id_member
 	 * @param bool $saving = false
 	 */
-	public function action_authentication($memID, $saving = false)
+	public function action_authentication($saving = false)
 	{
 		global $context, $cur_profile, $post_errors, $modSettings;
 
-		loadLanguage('Login');
+		$memID = currentMemberID();
 
+		loadLanguage('Login');
 		loadTemplate('ProfileOptions');
 
 		// We are saving?
@@ -524,7 +552,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$memID = currentMemberID();
 
 		// Gonna want this for the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
@@ -546,7 +574,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'board_name' => array(
 					'header' => array(
 						'value' => $txt['notifications_boards'],
-						'class' => 'lefttext first_th',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'function' => create_function('$board', '
@@ -634,7 +662,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'subject' => array(
 					'header' => array(
 						'value' => $txt['notifications_topics'],
-						'class' => 'lefttext first_th',
+						'class' => 'lefttext',
 					),
 					'data' => array(
 						'function' => create_function('$topic', '
@@ -916,16 +944,14 @@ class ProfileOptions_Controller extends Action_Controller
 	/**
 	 * This function actually makes all the group changes
 	 *
-	 * @param array $profile_vars
-	 * @param array $post_errors
-	 * @param int $memID id_member
 	 * @return mixed
 	 */
-	function action_groupMembership2($profile_vars, $post_errors, $memID)
+	function action_groupMembership2()
 	{
 		global $context, $user_profile, $modSettings, $scripturl, $language;
 
 		$db = database();
+		$memID = currentMemberID();
 
 		// Let's be extra cautious...
 		if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
@@ -1090,7 +1116,7 @@ class ProfileOptions_Controller extends Action_Controller
 					// Check whether they are interested.
 					if (!empty($member['mod_prefs']))
 					{
-						list(,, $pref_binary) = explode('|', $member['mod_prefs']);
+						list (,, $pref_binary) = explode('|', $member['mod_prefs']);
 						if (!($pref_binary & 4))
 							continue;
 					}
@@ -1175,8 +1201,6 @@ function loadThemeOptions($memID)
 {
 	global $context, $options, $cur_profile;
 
-	$db = database();
-
 	if (isset($_POST['default_options']))
 		$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
 
@@ -1189,36 +1213,12 @@ function loadThemeOptions($memID)
 	}
 	else
 	{
-		$request = $db->query('', '
-			SELECT id_member, variable, value
-			FROM {db_prefix}themes
-			WHERE id_theme IN (1, {int:member_theme})
-				AND id_member IN (-1, {int:selected_member})',
-			array(
-				'member_theme' => (int) $cur_profile['id_theme'],
-				'selected_member' => $memID,
-			)
-		);
-		$temp = array();
-		while ($row = $db->fetch_assoc($request))
+		require_once(SUBSDIR . '/Themes.subs.php');
+		$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $memID), $context['member']['options']);
+		if (isset($_POST['options']))
 		{
-			if ($row['id_member'] == -1)
-			{
-				$temp[$row['variable']] = $row['value'];
-				continue;
-			}
-
-			if (isset($_POST['options'][$row['variable']]))
-				$row['value'] = $_POST['options'][$row['variable']];
-			$context['member']['options'][$row['variable']] = $row['value'];
-		}
-		$db->free_result($request);
-
-		// Load up the default theme options for any missing.
-		foreach ($temp as $k => $v)
-		{
-			if (!isset($context['member']['options'][$k]))
-				$context['member']['options'][$k] = $v;
+			foreach ($_POST['options'] as $var => $val)
+				$context['member']['options'][$var] = $val;
 		}
 	}
 }

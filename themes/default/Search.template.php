@@ -24,7 +24,7 @@ function template_main()
 	echo '
 				<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform" class="standard_category">
 					<h2 class="category_header">
-							', !empty($settings['use_buttons']) ? '<img src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="" class="icon" />' : ' ', $txt['set_parameters'], '
+							', !empty($settings['use_buttons']) ? '<img src="' . $settings['images_url'] . '/icons/search_hd.png" alt="" class="icon" />' : ' ', $txt['set_parameters'], '
 					</h2>';
 
 	if (!empty($context['search_errors']))
@@ -39,7 +39,7 @@ function template_main()
 						<div id="search_term_input">
 							<strong>', $txt['search_for'], ':</strong>
 							<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />
-							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit" />
+							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit" />', '
 						</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -121,13 +121,18 @@ function template_main()
 							</dt>
 							<dd><label for="minage">',
 								$txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
-							</dd>
-							</dd>
+							</dd>';
+
+		// If we allow a simple form, show a link to get back to it
+		if (!empty($modSettings['simpleSearch']))
+			echo '
 							<dt>
 							</dt>
 							<dd>
-								<a href="', $scripturl, '?action=search;basic" onclick="smf_setThemeOption(\'minmax_preferences\', \'0\', null, smf_session_id, smf_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['search_simple'], '</a>
-							</dd>
+								<a href="', $scripturl, '?action=search;basic" onclick="elk_setThemeOption(\'minmax_preferences\', \'0\', null, elk_session_id, elk_session_var, \';minmax_key=asearch\');this.href += \';search=\' + escape(document.forms.searchform.search.value);" class="linkbutton">', $txt['search_simple'], '</a>
+							</dd>';
+
+		echo '
 						</dl>
 						<input type="hidden" name="advanced" value="1" />';
 
@@ -155,7 +160,10 @@ function template_main()
 			echo '
 					<fieldset class="content">
 						<h3 class="secondary_header">
-								<img id="advanced_panel_toggle" class="panel_toggle" style="display: none;" src="', $settings['images_url'], '/', empty($context['minmax_preferences']['search']) ? 'collapse' : 'expand', '.png"  alt="*" /><a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
+							<span id="category_toggle">&nbsp;
+								<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['search']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+							</span>
+							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
 						<div id="advanced_panel_div"', $context['boards_check_all'] ? '' : ' style="display: none;"', '>
 							<ul class="ignoreboards floatleft">';
@@ -232,13 +240,13 @@ function template_main()
 							aSwappableContainers: [
 								\'advanced_panel_div\'
 							],
-							aSwapImages: [
+							aSwapClasses: [
 								{
 									sId: \'advanced_panel_toggle\',
-									srcExpanded: elk_images_url + \'/collapse.png\',
-									altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-									srcCollapsed: elk_images_url + \'/expand.png\',
-									altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
+									classExpanded: \'collapse\',
+									titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+									classCollapsed: \'expand\',
+									titleCollapsed: ', JavaScriptEscape($txt['show']), '
 								}
 							],
 							aSwapLinks: [
@@ -274,11 +282,7 @@ function template_results()
 	{
 		echo '
 				<div id="search_results">
-					<div class="cat_bar">
-						<h3 class="catbg">
-							', $txt['search_adjust_query'], '
-						</h3>
-					</div>
+					<h2 class="category_header">', $txt['search_adjust_query'], '</h2>
 					<div class="roundframe">';
 
 		// Did they make any typos or mistakes, perhaps?
@@ -326,23 +330,21 @@ function template_results()
 				<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm">';
 
 		echo '
-					<div class="cat_bar">
-						<h3 class="catbg">
-							<span class="floatright">';
+					<h3 class="category_header">
+						<span class="floatright">';
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
-								<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />';
+							<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />';
 
 		echo '
-							</span>
-							<img src="' . $settings['images_url'] . '/buttons/search.png" alt="?" class="centericon" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
-						</h3>
-					</div>';
+						</span>
+						<img src="' . $settings['images_url'] . '/icons/search_hd.png" alt="?" class="centericon" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
+					</h3>';
 
 		// was anything even found?
 		if (!empty($context['topics']))
-			template_pagesection(false, false, 'go_down');
+			template_pagesection();
 		else
 			echo '
 					<div class="roundframe">', $txt['find_no_results'], '</div>';
@@ -427,36 +429,50 @@ function template_results()
 					</div>';
 		}
 
+		// If we have results show a page index
 		if (!empty($context['topics']))
-			template_pagesection();
-
-		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
 		{
 			echo '
-					<div class="titlebg flow_auto" style="padding: 4px;">
-						<div class="floatright">
+					<div class="flow_auto">
+						<div class="floatleft">';
+
+							template_pagesection();
+
+			echo '
+						</div>';
+
+			// Quick moderation enabled, then show an action area
+			if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
+			{
+				echo '
+						<div class="additional_row floatright">
 							<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
 								<option value="">--------</option>';
 
-			foreach ($context['qmod_actions'] as $qmod_action)
-				if ($context['can_' . $qmod_action])
-					echo '
+				foreach ($context['qmod_actions'] as $qmod_action)
+					if ($context['can_' . $qmod_action])
+						echo '
 								<option value="' . $qmod_action . '">' . $txt['quick_mod_'  . $qmod_action] . '</option>';
 
-			echo '
+				echo '
 							</select>';
 
-			// Show a list of boards they can move the topic to.
-			if ($context['can_move'])
-				echo '
-							<span id="quick_mod_jump_to">&nbsp;</span>';
+				// Show a list of boards they can move the topic to.
+				if ($context['can_move'])
+					echo '
+									<span id="quick_mod_jump_to">&nbsp;</span>';
 
-			echo '
-							<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search2;params=' . $context['params'], '" />
-							<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
-						</div>
+				echo '
+									<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search2;params=' . $context['params'], '" />
+									<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" class="button_submit submitgo" />
+
+						</div>';
+			}
+
+			echo'
 					</div>';
 		}
+
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 			echo '
@@ -466,12 +482,10 @@ function template_results()
 	else
 	{
 		echo '
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<img class="centericon" src="' . $settings['images_url'] . '/buttons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
-					</h3>
-				</div>';
-		template_pagesection(false, false, 'go_down');
+				<h3 class="category_header">
+						<img class="centericon" src="' . $settings['images_url'] . '/icons/search_hd.png" alt="?" />&nbsp;', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'],'
+				</h3>';
+		template_pagesection();
 
 		if (empty($context['topics']))
 			echo '
@@ -528,7 +542,7 @@ function template_results()
 
 	// Show a jump to box for easy navigation.
 	echo '
-				<div class="smalltext righttext" id="search_jump_to">&nbsp;</div>
+				<div class="floatright" id="search_jump_to">&nbsp;</div>
 				<script><!-- // --><![CDATA[';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']) && $context['can_move'])

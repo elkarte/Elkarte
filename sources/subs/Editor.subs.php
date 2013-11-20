@@ -149,10 +149,9 @@ function getMessageIcons($board_id)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options;
+	global $txt, $modSettings, $options, $context, $settings, $user_info, $scripturl;
 
 	$db = database();
-	global $context, $settings, $user_info, $scripturl;
 
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
@@ -177,11 +176,12 @@ function create_control_richedit($editorOptions)
 
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
-		addInlineJavascript('
-		var elk_smileys_url = \'' . $settings['smileys_url'] . '\';
-		var bbc_quote_from = \'' . addcslashes($txt['quote_from'], "'") . '\';
-		var bbc_quote = \'' . addcslashes($txt['quote'], "'") . '\';
-		var bbc_search_on = \'' . addcslashes($txt['search_on'], "'") . '\';');
+		addJavascriptVar(array(
+			'elk_smileys_url' => '"' . $settings['smileys_url'] . '"',
+			'bbc_quote_from' => '"' . addcslashes($txt['quote_from'], "'") . '"',
+			'bbc_quote' => '"' . addcslashes($txt['quote'], "'") . '"',
+			'bbc_search_on' => '"' . addcslashes($txt['search_on'], "'") . '"')
+		);
 
 		// editor language file
 		if (!empty($txt['lang_locale']) && $txt['lang_locale'] != 'en_US')
@@ -190,6 +190,9 @@ function create_control_richedit($editorOptions)
 		// Drafts?
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			loadJavascriptFile('drafts.plugin.js');
+
+		if (!empty($context['notifications_enabled']))
+			loadJavascriptFile('mentioning.plugin.js');
 
 		// Our not so concise shortcut line
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
@@ -218,7 +221,7 @@ function create_control_richedit($editorOptions)
 		'disable_smiley_box' => !empty($editorOptions['disable_smiley_box']),
 		'columns' => isset($editorOptions['columns']) ? $editorOptions['columns'] : 60,
 		'rows' => isset($editorOptions['rows']) ? $editorOptions['rows'] : 18,
-		'width' => isset($editorOptions['width']) ? $editorOptions['width'] : '70%',
+		'width' => isset($editorOptions['width']) ? $editorOptions['width'] : '100%',
 		'height' => isset($editorOptions['height']) ? $editorOptions['height'] : '250px',
 		'form' => isset($editorOptions['form']) ? $editorOptions['form'] : 'postmodify',
 		'bbc_level' => !empty($editorOptions['bbc_level']) ? $editorOptions['bbc_level'] : 'full',
@@ -326,6 +329,14 @@ function create_control_richedit($editorOptions)
 			array(
 				'code' => 'quote',
 				'description' => $txt['bbc_quote']
+			),
+			array(
+				'code' => 'spoiler',
+				'description' => $txt['bbc_spoiler']
+			),
+			array(
+				'code' => 'footnote',
+				'description' => $txt['bbc_footnote']
 			),
 			array(),
 			array(
@@ -509,6 +520,7 @@ function create_control_richedit($editorOptions)
 
 		// Load smileys - don't bother to run a query if we're not using the database's ones anyhow.
 		if (empty($modSettings['smiley_enable']) && $user_info['smiley_set'] != 'none')
+		{
 			$context['smileys']['postform'][] = array(
 				'smileys' => array(
 					array(
@@ -535,6 +547,11 @@ function create_control_richedit($editorOptions)
 						'code' => '>:(',
 						'filename' => 'angry.gif',
 						'description' => $txt['icon_angry'],
+					),
+					array(
+						'code' => ':))',
+						'filename' => 'laugh.gif',
+						'description' => $txt['icon_laugh'],
 					),
 					array(
 						'code' => ':(',
@@ -587,6 +604,11 @@ function create_control_richedit($editorOptions)
 						'description' => $txt['icon_kiss'],
 					),
 					array(
+						'code' => 'O:)',
+						'filename' => 'angel.gif',
+						'description' => $txt['icon_angel'],
+					),
+					array(
 						'code' => ':\'(',
 						'filename' => 'cry.gif',
 						'description' => $txt['icon_cry'],
@@ -595,6 +617,7 @@ function create_control_richedit($editorOptions)
 				),
 				'isLast' => true,
 			);
+		}
 		elseif ($user_info['smiley_set'] != 'none')
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
@@ -609,8 +632,8 @@ function create_control_richedit($editorOptions)
 				);
 				while ($row = $db->fetch_assoc($request))
 				{
-					$row['filename'] = htmlspecialchars($row['filename']);
-					$row['description'] = htmlspecialchars($row['description']);
+					$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
+					$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
 
 					$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
 				}
@@ -629,6 +652,11 @@ function create_control_richedit($editorOptions)
 			}
 			else
 				$context['smileys'] = $temp;
+
+			// The smiley popup may take advantage of Jquery UI ....
+			if (!empty($context['smileys']['popup']))
+				$modSettings['jquery_include_ui'] = true;
+
 		}
 	}
 
@@ -681,14 +709,7 @@ function create_control_richedit($editorOptions)
 		editor_id: \'' . $editorOptions['id'] . '\',
 		editor: ' . JavaScriptEscape('
 		(function () {
-			var editor = $("#' . $editorOptions['id'] . '").data("sceditor");
-			var editor_val = \'\';
-			if(editor.inSourceMode())
-				editor_val = editor.getText();
-			else
-				editor_val = editor.getText();
-
-			return editor_val;
+			return $("#' . $editorOptions['id'] . '").data("sceditor").val();
 		});') . '
 	});', true);
 	}
@@ -703,14 +724,16 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 {
 	global $context;
 
-	// We need to remember this because when failing the page is realoaded and the code must remain the same (unless it has to change)
-	static $all_instances;
+	// We need to remember this because when failing the page is realoaded and the
+	// code must remain the same (unless it has to change)
+	static $all_instances = array();
 
 	// @todo: maybe move the list to $modSettings instead of hooking it?
 	// Used in ManageSecurity_Controller->action_spamSettings_display too
 	$known_verifications = array(
 		'captcha',
 		'questions',
+		'emptyfield'
 	);
 	call_integration_hook('integrate_control_verification', array(&$known_verifications));
 
@@ -753,7 +776,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	elseif (!$isNew && !$do_test)
 		return true;
 
-	$verification_errors = error_context::context($verificationOptions['id']);
+	$verification_errors = Error_Context::context($verificationOptions['id']);
 	$increase_error_count = false;
 
 	// Start with any testing.
@@ -814,7 +837,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 				$error_codes[] = $error;
 
 		return $error_codes;
-		}
+	}
 	// If we had a test that one, make a note.
 	elseif ($do_test)
 		$_SESSION[$verificationOptions['id'] . '_vv']['did_pass'] = true;
@@ -845,13 +868,14 @@ class Control_Verification_Captcha implements Control_Verifications
 	public function __construct($verificationOptions = null)
 	{
 		$this->_use_graphic_library = in_array('gd', get_loaded_extensions());
+
 		// Skip I, J, L, O, Q, S and Z.
 		$this->_standard_captcha_range = array_merge(range('A', 'H'), array('K', 'M', 'N', 'P', 'R'), range('T', 'Y'));
 
 		if (!empty($verificationOptions))
 			$this->_options = $verificationOptions;
 	}
-		
+
 	public function showVerification($isNew, $force_refresh = true)
 	{
 		global $context, $modSettings, $scripturl;
@@ -860,11 +884,12 @@ class Control_Verification_Captcha implements Control_Verifications
 		if (!isset($context['captcha_js_loaded']))
 		{
 			$context['captcha_js_loaded'] = false;
+
 			// The template
 			loadTemplate('GenericControls');
 		}
 
-		//Some javascript ma'am? (But load it only once)
+		// Some javascript ma'am? (But load it only once)
 		if (!empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual'])) && empty($context['captcha_js_loaded']))
 		{
 			loadJavascriptFile('captcha.js');
@@ -899,6 +924,7 @@ class Control_Verification_Captcha implements Control_Verifications
 		if ($refresh)
 		{
 			$_SESSION[$this->_options['id'] . '_vv']['code'] = '';
+
 			// Are we overriding the range?
 			$character_range = !empty($this->_options['override_range']) ? $this->_options['override_range'] : $this->_standard_captcha_range;
 
@@ -1119,10 +1145,6 @@ class Control_Verification_Questions implements Control_Verifications
 					$lang['selected'] = true;
 		}
 
-		// The javascript needs to go at the end
-		addInlineJavascript('
-			document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
-
 		if (isset($_GET['save']))
 		{
 			// Handle verification questions.
@@ -1320,147 +1342,129 @@ class Control_Verification_Questions implements Control_Verifications
 			array('id_question')
 		);
 	}
-
 }
 
 /**
- * Converts links to bbc tags.
+ * This class shows an anti spam bot box in the form
+ * The proper response is to leave the field empty, bots however will see this
+ * much like a session field and populate it with a value.
  *
- * @param string $text
- * @return string
+ * Adding additional catch terms is recommended to keep bots from learning
  */
-function convert_urls($text)
+class Control_Verification_EmptyField implements Control_Verifications
 {
-	global $modSettings;
+	private $_options = null;
+	private $_empty_field = null;
+	private $_tested = false;
+	private $_user_value = null;
+	private $_hash = null;
+	private $_terms = array('gadget', 'device', 'uid', 'gid', 'guid', 'uuid', 'unique', 'identifier', 'bb2');
+	private $_second_terms = array('hash', 'cipher', 'code', 'key', 'unlock', 'bit', 'value', 'screener');
 
-	// What about URL's - the pain in the ass of the tag world.
-	while (preg_match('~<a\s+([^<>]*)>([^<>]*)</a>~i', $text, $matches) === 1)
+	public function __construct($verificationOptions = null)
 	{
-		// Find the position of the URL.
-		$start_pos = strpos($text, $matches[0]);
-		if ($start_pos === false)
-			break;
-		$end_pos = $start_pos + strlen($matches[0]);
-
-		$tag_type = 'url';
-		$href = '';
-
-		$attrs = fetchTagAttributes($matches[1]);
-		foreach ($attrs as $attrib => $value)
-		{
-			if ($attrib == 'href')
-			{
-				$href = trim($value);
-
-				// Are we dealing with an FTP link?
-				if (preg_match('~^ftps?://~', $href) === 1)
-					$tag_type = 'ftp';
-
-				// Or is this a link to an email address?
-				elseif (substr($href, 0, 7) == 'mailto:')
-				{
-					$tag_type = 'email';
-					if ($href != 'mailto:' . (isset($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : ''))
-						$href = substr($href, 7);
-					else
-						$href = '';
-				}
-
-				// No http(s), so attempt to fix this potential relative URL.
-				elseif (preg_match('~^https?://~i', $href) === 0 && is_array($parsedURL = parse_url($scripturl)) && isset($parsedURL['host']))
-				{
-					$baseURL = (isset($parsedURL['scheme']) ? $parsedURL['scheme'] : 'http') . '://' . $parsedURL['host'] . (empty($parsedURL['port']) ? '' : ':' . $parsedURL['port']);
-
-					if (substr($href, 0, 1) === '/')
-						$href = $baseURL . $href;
-					else
-						$href = $baseURL . (empty($parsedURL['path']) ? '/' : preg_replace('~/(?:index\\.php)?$~', '', $parsedURL['path'])) . '/' . $href;
-				}
-			}
-
-			// External URL?
-			if ($attrib == 'target' && $tag_type == 'url')
-			{
-				if (trim($value) == '_blank')
-					$tag_type == 'iurl';
-			}
-		}
-
-		$tag = '';
-		if ($href != '')
-		{
-			if ($matches[2] == $href && $tag_type != 'email')
-				$tag = '[' . $tag_type . ']' . $href . '[/' . $tag_type . ']' . "\n";
-			elseif ($matches[2] == $href)
-				$tag = '[' . $tag_type . ']' . $href . '[/' . $tag_type . ']';
-			else
-				$tag = '[' . $tag_type . '=' . $href . ']' . $matches[2] . '[/' . $tag_type . ']' . "\n";
-		}
-
-		// Replace the tag
-		$text = substr($text, 0, $start_pos) . $tag . substr($text, $end_pos);
+		if (!empty($verificationOptions))
+			$this->_options = $verificationOptions;
 	}
 
-	return $text;
-}
-
-/**
- * Returns an array of attributes associated with a tag.
- *
- * @param string $text
- * @return string
- */
-function fetchTagAttributes($text)
-{
-	$attribs = array();
-	$key = $value = '';
-	$strpos = 0;
-	$tag_state = 0; // 0 = key, 1 = attribute with no string, 2 = attribute with string
-
-	for ($i = 0; $i < strlen($text); $i++)
+	/**
+	 * Returns if we are showing this verification control or not
+	 *
+	 * @param type $isNew
+	 * @param type $force_refresh
+	 */
+	public function showVerification($isNew, $force_refresh = true)
 	{
-		// We're either moving from the key to the attribute or we're in a string and this is fine.
-		if ($text[$i] == '=')
+		global $modSettings;
+
+		$this->_tested = false;
+
+		if ($isNew)
 		{
-			if ($tag_state == 0)
-				$tag_state = 1;
-			elseif ($tag_state == 2)
-				$value .= '=';
+			$this->_empty_field = !empty($this->_options['no_empty_field']) || (!empty($modSettings['enable_emptyfield']) && !isset($this->_option['no_empty_field']));
+			$this->_user_value = '';
 		}
-		// A space is either moving from an attribute back to a potential key or in a string is fine.
-		elseif ($text[$i] == ' ')
+
+		if ($isNew || $force_refresh)
+			$this->createTest($force_refresh);
+
+		return $this->_empty_field;
+	}
+
+	/**
+	 * Create the name data for the empty field that will be added to the template
+	 *
+	 * @param boolean $refresh
+	 */
+	public function createTest($refresh = true)
+	{
+		if (!$this->_empty_field)
+			return;
+
+		// Building a field with a believable name that will be inserted lives in the template.
+		if ($refresh)
 		{
-			if ($tag_state == 2)
-				$value .= ' ';
-			elseif ($tag_state == 1)
-			{
-				$attribs[$key] = $value;
-				$key = $value = '';
-				$tag_state = 0;
-			}
+			$start = mt_rand(0, 27);
+			$this->_hash = substr(md5(time()), $start, 6);
+			$_SESSION[$this->_options['id'] . '_vv']['empty_field'] = '';
+			$_SESSION[$this->_options['id'] . '_vv']['empty_field'] = $this->_terms[array_rand($this->_terms)] . '-' . $this->_second_terms[array_rand($this->_second_terms)] . '-' . $this->_hash;
 		}
-		// A quote?
-		elseif ($text[$i] == '"')
-		{
-			// Must be either going into or out of a string.
-			if ($tag_state == 1)
-				$tag_state = 2;
-			else
-				$tag_state = 1;
-		}
-		// Otherwise it's fine.
 		else
-		{
-			if ($tag_state == 0)
-				$key .= $text[$i];
-			else
-				$value .= $text[$i];
-		}
+			$this->_user_value = !empty($_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']]) ? $_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']] : '';
 	}
 
-	// Anything left?
-	if ($key != '' && $value != '')
-		$attribs[$key] = $value;
+	/**
+	 * Values passed to the template inside of GenericControls
+	 * Use the values to adjust how the control does or does not appear
+	 */
+	public function prepareContext()
+	{
+		return array(
+			'template' => 'emptyfield',
+			'values' => array(
+				'is_error' => $this->_tested && !$this->_verifyField(),
+				// Can be used in the template to show the normally hidden field to add some spice to things
+				'show' => !empty($_SESSION[$this->_options['id'] . '_vv']['empty_field']) && (mt_rand(1, 100) > 60),
+				'user_value' => $this->_user_value,
+				// Can be used in the template to randomly add a value to the empty field that needs to be removed when show is on
+				'clear' => (mt_rand(1, 100) > 60),
+			)
+		);
+	}
 
-	return $attribs;
+	/**
+	 * Run the test on the returned value and return pass or fail
+	 */
+	public function doTest()
+	{
+		$this->_tested = true;
+
+		if (!$this->_verifyField())
+			return 'wrong_verification_answer';
+
+		return true;
+	}
+
+	/**
+	 * Test the field, easy, its on, its is set and it is empty
+	 */
+	private function _verifyField()
+	{
+		return $this->_empty_field && !empty($_SESSION[$this->_options['id'] . '_vv']['empty_field']) && empty($_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']]);
+	}
+
+	/**
+	 * Callback for this verification control options, which is on or off
+	 */
+	public function settings()
+	{
+		// Empty field verification.
+		$config_vars = array(
+			array('title', 'configure_emptyfield'),
+			array('desc', 'configure_emptyfield_desc'),
+			array('check', 'enable_emptyfield'),
+		);
+
+		return $config_vars;
+	}
 }

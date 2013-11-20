@@ -11,8 +11,9 @@ $txt['mc_groups'] = 'Members and groups';
 
 $txt['mc_view_groups'] = 'View Membergroups';
 
-$txt['mc_description'] = 'This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can <a href="' . $scripturl . '?action=moderate;area=settings">personalize the layout by clicking here</a>.';
+$txt['mc_description'] = '<strong>%1$s %2$s!</strong><br>This is your &quot;Moderation Center&quot;. From here you can perform all the moderation actions assigned to yourself by the Administrator. This home page contains a summary of all the latest happenings in your community. You can <a href="' . $scripturl . '?action=moderate;area=settings">personalize the layout by clicking here</a>.';
 $txt['mc_group_requests'] = 'Membergroup Requests';
+$txt['mc_member_requests'] = 'Member Requests';
 $txt['mc_unapproved_posts'] = 'Unapproved Posts';
 $txt['mc_watched_users'] = 'Recent Watched Members';
 $txt['mc_watched_topics'] = 'Watched Topics';
@@ -21,6 +22,14 @@ $txt['mc_latest_news'] = 'Latest News';
 $txt['mc_recent_reports'] = 'Recent Topic Reports';
 $txt['mc_warnings'] = 'Warnings';
 $txt['mc_notes'] = 'Moderator Notes';
+$txt['mc_required'] = 'Items Requiring Approval';
+$txt['mc_attachments'] = 'Attachments needing approval';
+$txt['mc_emailmod'] = 'Email Postings needing approval';
+$txt['mc_topics'] = 'Topics needing approval';
+$txt['mc_posts'] = 'Posts needing approval';
+$txt['mc_groupreq'] = 'Group requests needing approval';
+$txt['mc_memberreq'] = 'Members needing approval';
+$txt['mc_reports'] = 'Report posts needing approval';
 
 $txt['mc_cannot_connect_sm'] = 'You are unable to connect to ElkArte\'s latest news file.';
 
@@ -132,14 +141,14 @@ $txt['mc_settings'] = 'Change Settings';
 $txt['mc_prefs_title'] = 'Moderation Preferences';
 $txt['mc_prefs_desc'] = 'This section allows you to set some personal preferences for moderation related activities such as email notifications.';
 $txt['mc_prefs_homepage'] = 'Items to show on moderation homepage';
-$txt['mc_prefs_latest_news'] = 'SM News';
+$txt['mc_prefs_latest_news'] = 'ElkArte News';
 $txt['mc_prefs_show_reports'] = 'Show open report count in forum header';
 $txt['mc_prefs_notify_report'] = 'Notify of topic reports';
 $txt['mc_prefs_notify_report_never'] = 'Never';
 $txt['mc_prefs_notify_report_moderator'] = 'Only if it\'s a board I moderate';
 $txt['mc_prefs_notify_report_always'] = 'Always';
 $txt['mc_prefs_notify_approval'] = 'Notify of items awaiting approval';
-$txt['mc_logoff'] = 'Moderator End Session';
+$txt['mc_logoff'] = 'End Moderator Session';
 
 // Use entities in the below string.
 $txt['mc_click_add_note'] = 'Add a new note';

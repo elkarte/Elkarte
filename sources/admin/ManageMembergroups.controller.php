@@ -44,6 +44,10 @@ class ManageMembergroups_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		// Language and template stuff, the usual.
+		loadLanguage('ManageMembers');
+		loadTemplate('ManageMembergroups');
+
 		$subActions = array(
 			'add' => array(
 				'controller' => $this,
@@ -78,16 +82,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		// Default to sub action 'index' or 'settings' depending on permissions.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_membergroups') ? 'index' : 'settings');
 
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
-		// Language and template stuff, the usual.
-		loadLanguage('ManageMembers');
-		loadTemplate('ManageMembergroups');
-
 		// Setup the admin tabs.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['membergroups_title'],
@@ -95,7 +89,12 @@ class ManageMembergroups_Controller extends Action_Controller
 			'description' => $txt['membergroups_description'],
 		);
 
+		$context['page_title'] = $txt['membergroups_title'];
+		$context['sub_action'] = $subAction;
+
 		// Call the right function.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
@@ -220,7 +219,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// The second list shows the post count based groups.
@@ -253,7 +252,7 @@ class ManageMembergroups_Controller extends Action_Controller
 							global $scripturl;
 
 							$colorStyle = empty($rowData[\'online_color\']) ? \'\' : sprintf(\' style="color: %1$s;"\', $rowData[\'online_color\']);
-							return sprintf(\'<a href="%1$s?action=moderate;area=viewgroups;sa=members;group=%2$d"%3$s>%4$s</a>\', $scripturl, $rowData[\'id_group\'], $colorStyle, $rowData[\'group_name\']);
+							return sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d"%3$s>%4$s</a>\', $scripturl, $rowData[\'id_group\'], $colorStyle, $rowData[\'group_name\']);
 						'),
 					),
 					'sort' => array(
@@ -364,7 +363,6 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			addMembergroup($id_group, $_POST['group_name'], $minposts, $_POST['group_type']);
 
-
 			call_integration_hook('integrate_add_membergroup', array($id_group, $postCountBasedGroup));
 
 			// Update the post groups now, if this is a post group!
@@ -389,7 +387,6 @@ class ManageMembergroups_Controller extends Action_Controller
 				// Are you a powerful admin?
 				if (!allowedTo('admin_forum'))
 				{
-					require_once(SUBSDIR . '/Membergroups.subs.php');
 					$copy_type = membergroupById($copy_id);
 
 					// Protected groups are... well, protected!
@@ -454,7 +451,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		if (!empty($modSettings['deny_boards_access']))
 			loadLanguage('ManagePermissions');
 
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['groups'] = getBasicMembergroupData(array('globalmod'), array(), 'min_posts, id_group != {int:global_mod_group}, group_name');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -506,6 +502,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			loadLanguage('ManagePermissions');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
+
 		// Make sure this group is editable.
 		if (!empty($current_group_id))
 			$current_group = membergroupById($current_group_id);
@@ -605,7 +602,6 @@ class ManageMembergroups_Controller extends Action_Controller
 				if ($_POST['group_hidden'] == 2)
 					setGroupToHidden($current_group['id_group']);
 
-
 				// Either way, let's check our "show group membership" setting is correct.
 				validateShowGroupMembership();
 			}
@@ -626,7 +622,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				// Get all the usernames from the string
 				if (!empty($moderator_string))
 				{
-					$moderator_string = strtr(preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', htmlspecialchars($moderator_string), ENT_QUOTES), array('&quot;' => '"'));
+					$moderator_string = strtr(preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', htmlspecialchars($moderator_string, ENT_QUOTES, 'UTF-8')), array('&quot;' => '"'));
 					preg_match_all('~"([^"]+)"~', $moderator_string, $matches);
 					$moderators = array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $moderator_string)));
 					for ($k = 0, $n = count($moderators); $k < $n; $k++)
@@ -664,6 +660,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			// There might have been some post group changes.
 			updateStats('postgroups');
+
 			// We've definitely changed some group stuff.
 			updateSettings(array(
 				'settings_updated' => time(),
@@ -686,7 +683,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['group'] = array(
 			'id' => $row['id_group'],
 			'name' => $row['group_name'],
-			'description' => htmlspecialchars($row['description']),
+			'description' => htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8'),
 			'editable_name' => $row['group_name'],
 			'color' => $row['online_color'],
 			'min_posts' => $row['min_posts'],

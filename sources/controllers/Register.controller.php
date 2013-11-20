@@ -121,6 +121,16 @@ class Register_Controller extends Action_Controller
 			'name' => $txt['register'],
 		);
 
+		// Prepare the time gate! Done like this to allow later steps to reset the limit for any reason
+		if (!isset($_SESSION['register']))
+			$_SESSION['register'] = array(
+				'timenow' => time(),
+				// minimum number of seconds required on this page for registration
+				'limit' => 8,
+			);
+		else
+			$_SESSION['register']['timenow'] = time();
+
 		// If you have to agree to the agreement, it needs to be fetched from the file.
 		if ($context['require_agreement'])
 		{
@@ -187,7 +197,7 @@ class Register_Controller extends Action_Controller
 			}
 
 			// Load all the fields in question.
-			setupProfileContext($reg_fields);
+			setupProfileContext($reg_fields, 'registration');
 		}
 
 		// Generate a visual verification code to make sure the user is no bot.
@@ -205,11 +215,11 @@ class Register_Controller extends Action_Controller
 			$context['visual_verification'] = false;
 
 		// Are they coming from an OpenID login attempt?
-		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']))
+		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
 		{
 			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] = Util::htmlspecialchars(!empty($_POST['user']) ? $_POST['user'] : $_SESSION['openid']['nickname']);
-			$context['email'] = Util::htmlspecialchars(!empty($_POST['email']) ? $_POST['email'] : $_SESSION['openid']['email']);
+			$context['username'] = !empty($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : $_SESSION['openid']['nickname'];
+			$context['email'] = !empty($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : $_SESSION['openid']['email'];
 		}
 		// See whether we have some prefiled values.
 		else
@@ -223,7 +233,7 @@ class Register_Controller extends Action_Controller
 
 		// Were there any errors?
 		$context['registration_errors'] = array();
-		$reg_errors = error_context::context('register', 0);
+		$reg_errors = Error_Context::context('register', 0);
 		if ($reg_errors->hasErrors())
 			$context['registration_errors'] = $reg_errors->prepareErrors();
 
@@ -242,14 +252,15 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context, $user_info;
 
-		$db = database();
-
-		checkSession();
-		validateToken('register');
+		// We can't validate the token and the session with OpenID enabled.
+		if(!$verifiedOpenID)
+		{
+			checkSession();
+			validateToken('register');
+		}
 
 		// Start collecting together any errors.
-		$reg_errors = array();
-		$reg_errors = error_context::context('register', 0);
+		$reg_errors = Error_Context::context('register', 0);
 
 		// Did we save some open ID fields?
 		if ($verifiedOpenID && !empty($context['openid_save_fields']))
@@ -280,9 +291,19 @@ class Register_Controller extends Action_Controller
 			// Are they under age, and under age users are banned?
 			if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 			{
-				// @todo This should be put in Errors, imho.
 				loadLanguage('Login');
 				fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			}
+
+			// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
+			if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
+				redirectexit('action=register');
+
+			// Failing that, check the time limit for exessive speed.
+			if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
+			{
+				loadLanguage('Login');
+				$reg_errors->addError('too_quickly');
 			}
 
 			// Check whether the visual verification code was entered correctly.
@@ -297,7 +318,7 @@ class Register_Controller extends Action_Controller
 				if (is_array($context['visual_verification']))
 				{
 					foreach ($context['visual_verification'] as $error)
-						$reg_errors->addError('error_' . $error);
+						$reg_errors->addError($error);
 				}
 			}
 		}
@@ -310,20 +331,18 @@ class Register_Controller extends Action_Controller
 
 		// Collect all extra registration fields someone might have filled in.
 		$possible_strings = array(
-			'website_url', 'website_title',
-			'location', 'birthdate',
+			'birthdate',
 			'time_format',
 			'buddy_list',
 			'pm_ignore_list',
 			'smiley_set',
-			'signature', 'personal_text', 'avatar',
+			'personal_text', 'avatar',
 			'lngfile',
 			'secret_question', 'secret_answer',
 		);
 		$possible_ints = array(
 			'pm_email_notify',
 			'notify_types',
-			'gender',
 			'id_theme',
 		);
 		$possible_floats = array(
@@ -343,7 +362,7 @@ class Register_Controller extends Action_Controller
 		// Validation... even if we're not a mall.
 		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
 		{
-			$_POST['real_name'] = trim(preg_replace('~[\s]~u', ' ', $_POST['real_name']));
+			$_POST['real_name'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $_POST['real_name']));
 			if (trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
 				$possible_strings[] = 'real_name';
 		}
@@ -372,6 +391,30 @@ class Register_Controller extends Action_Controller
 		}
 		else
 			unset($_POST['lngfile']);
+
+		// Some of these fields we may not want.
+		if (!empty($modSettings['registration_fields']))
+		{
+			// But we might want some of them if the admin asks for them.
+			$standard_fields = array('location', 'gender');
+			$reg_fields = explode(',', $modSettings['registration_fields']);
+
+			$exclude_fields = array_diff($standard_fields, $reg_fields);
+
+			// Website is a little different
+			if (!in_array('website', $reg_fields))
+				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
+
+			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
+			$exclude_fields[] = 'signature';
+		}
+		else
+			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
+
+		$possible_strings = array_diff($possible_strings, $exclude_fields);
+		$possible_ints = array_diff($possible_ints, $exclude_fields);
+		$possible_floats = array_diff($possible_floats, $exclude_fields);
+		$possible_bools = array_diff($possible_bools, $exclude_fields);
 
 		// Set the options needed for registration.
 		$regOptions = array(
@@ -418,58 +461,51 @@ class Register_Controller extends Action_Controller
 		$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
-		$request = $db->query('', '
-			SELECT col_name, field_name, field_type, field_length, mask, show_reg
-			FROM {db_prefix}custom_fields
-			WHERE active = {int:is_active}',
-			array(
-				'is_active' => 1,
-			)
-		);
+		require_once(SUBSDIR . '/Profile.subs.php');
+		loadCustomFields(0, 'register');
 
-		while ($row = $db->fetch_assoc($request))
+		foreach ($context['custom_fields'] as $row)
 		{
 			// Don't allow overriding of the theme variables.
-			if (isset($regOptions['theme_vars'][$row['col_name']]))
-				unset($regOptions['theme_vars'][$row['col_name']]);
-
-			// Not actually showing it then?
-			if (!$row['show_reg'])
-				continue;
+			if (isset($regOptions['theme_vars'][$row['colname']]))
+				unset($regOptions['theme_vars'][$row['colname']]);
 
 			// Prepare the value!
-			$value = isset($_POST['customfield'][$row['col_name']]) ? trim($_POST['customfield'][$row['col_name']]) : '';
+			$value = isset($_POST['customfield'][$row['colname']]) ? trim($_POST['customfield'][$row['colname']]) : '';
 
 			// We only care for text fields as the others are valid to be empty.
-			if (!in_array($row['field_type'], array('check', 'select', 'radio')))
+			if (!in_array($row['type'], array('check', 'select', 'radio')))
 			{
 				// Is it too long?
 				if ($row['field_length'] && $row['field_length'] < Util::strlen($value))
-					$reg_errors->addError(array('custom_field_too_long', array($row['field_name'], $row['field_length'])));
+					$reg_errors->addError(array('custom_field_too_long', array($row['name'], $row['field_length'])));
 
 				// Any masks to apply?
-				if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
+				if ($row['type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 				{
 					// @todo We never error on this - just ignore it at the moment...
 					if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
-						$reg_errors->addError(array('custom_field_invalid_email', array($row['field_name'])));
+						$reg_errors->addError(array('custom_field_invalid_email', array($row['name'])));
 					elseif ($row['mask'] == 'number' && preg_match('~[^\d]~', $value))
-						$reg_errors->addError(array('custom_field_not_number', array($row['field_name'])));
+						$reg_errors->addError(array('custom_field_not_number', array($row['name'])));
 					elseif (substr($row['mask'], 0, 5) == 'regex' && trim($value) !== '' && preg_match(substr($row['mask'], 5), $value) === 0)
-						$reg_errors->addError(array('custom_field_inproper_format', array($row['field_name'])));
+						$reg_errors->addError(array('custom_field_inproper_format', array($row['name'])));
 				}
 			}
 
 			// Is this required but not there?
 			if (trim($value) == '' && $row['show_reg'] > 1)
-				$reg_errors->addError(array('custom_field_empty', array($row['field_name'])));
+				$reg_errors->addError(array('custom_field_empty', array($row['name'])));
 		}
-		$db->free_result($request);
 
 		// Lets check for other errors before trying to register the member.
 		if ($reg_errors->hasErrors())
 		{
 			$_REQUEST['step'] = 2;
+
+			// If they've filled in some details but made an error then they need less time to finish
+			$_SESSION['register']['limit'] = 4;
+
 			return $this->action_register();
 		}
 
@@ -487,12 +523,12 @@ class Register_Controller extends Action_Controller
 			$openID->validate($_POST['openid_identifier'], false, $save_variables);
 		}
 		// If we've come from OpenID set up some default stuff.
-		elseif ($verifiedOpenID || (!empty($_POST['openid_identifier']) && $_POST['authenticate'] == 'openid'))
+		elseif ($verifiedOpenID || ((!empty($_POST['openid_identifier']) || !empty($_SESSION['openid']['openid_uri'])) && $_POST['authenticate'] == 'openid'))
 		{
 			$regOptions['username'] = !empty($_POST['user']) && trim($_POST['user']) != '' ? $_POST['user'] : $_SESSION['openid']['nickname'];
 			$regOptions['email'] = !empty($_POST['email']) && trim($_POST['email']) != '' ? $_POST['email'] : $_SESSION['openid']['email'];
 			$regOptions['auth_method'] = 'openid';
-			$regOptions['openid'] = !empty($_POST['openid_identifier']) ? $_POST['openid_identifier'] : $_SESSION['openid']['openid_uri'];
+			$regOptions['openid'] = !empty($_SESSION['openid']['openid_uri']) ? $_SESSION['openid']['openid_uri'] : (!empty($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '');
 		}
 
 		// Registration needs to know your IP
@@ -558,7 +594,7 @@ class Register_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $scripturl, $language, $user_info;
 
-		$db = database();
+		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// Logged in users should not bother to activate their accounts
 		if (!empty($user_info['id']))
@@ -582,20 +618,16 @@ class Register_Controller extends Action_Controller
 		}
 
 		// Get the code from the database...
-		$request = $db->query('', '
-			SELECT id_member, validation_code, member_name, real_name, email_address, is_activated, passwd, lngfile
-			FROM {db_prefix}members' . (empty($_REQUEST['u']) ? '
+		$row = findUser(empty($_REQUEST['u']) ? '
 			WHERE member_name = {string:email_address} OR email_address = {string:email_address}' : '
-			WHERE id_member = {int:id_member}') . '
-			LIMIT 1',
-			array(
+			WHERE id_member = {int:id_member}', array(
 				'id_member' => isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0,
 				'email_address' => isset($_POST['user']) ? $_POST['user'] : '',
-			)
+			), false
 		);
 
 		// Does this user exist at all?
-		if ($db->num_rows($request) == 0)
+		if (empty($row))
 		{
 			$context['sub_template'] = 'retry_activate';
 			$context['page_title'] = $txt['invalid_userid'];
@@ -604,9 +636,6 @@ class Register_Controller extends Action_Controller
 			return;
 		}
 
-		$row = $db->fetch_assoc($request);
-		$db->free_result($request);
-
 		// Change their email address? (they probably tried a fake one first :P.)
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && sha1(strtolower($row['member_name']) . $_REQUEST['passwd']) == $row['passwd'] && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
@@ -614,26 +643,17 @@ class Register_Controller extends Action_Controller
 				fatal_lang_error('no_access', false);
 
 			// @todo Separate the sprintf?
-			if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST['new_email']) == 0)
-				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'])), false);
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			if (!Data_Validator::is_valid($_POST, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
+				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
 
 			// Make sure their email isn't banned.
 			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
 
 			// Ummm... don't even dare try to take someone else's email!!
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE email_address = {string:email_address}
-				LIMIT 1',
-				array(
-					'email_address' => $_POST['new_email'],
-				)
-			);
 			// @todo Separate the sprintf?
-			if ($db->num_rows($request) != 0)
-				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'])));
-			$db->free_result($request);
+			if (userByEmail($_POST['new_email']))
+				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
 
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];
@@ -696,9 +716,8 @@ class Register_Controller extends Action_Controller
 
 		if (!isset($_POST['new_email']))
 		{
-			require_once(SUBSDIR . '/Post.subs.php');
-
-			adminNotify('activation', $row['id_member'], $row['member_name']);
+			require_once(SUBSDIR . '/Notification.subs.php');
+			sendAdminNotifications('activation', $row['id_member'], $row['member_name']);
 		}
 
 		$context += array(
@@ -876,11 +895,33 @@ class Register_Controller extends Action_Controller
 
 			// No errors, yet.
 			$context['errors'] = array();
+			loadLanguage('Errors');
 
 			// Could they get the right send topic verification code?
 			require_once(SUBSDIR . '/Editor.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
+			// form validation
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			$validator = new Data_Validator();
+			$validator->sanitation_rules(array(
+				'emailaddress' => 'trim',
+				'contactmessage' => 'trim|Util::htmlspecialchars'
+			));
+			$validator->validation_rules(array(
+				'emailaddress' => 'required|valid_email',
+				'contactmessage' => 'required'
+			));
+			$validator->text_replacements(array(
+				'emailaddress' => $txt['error_email'],
+				'contactmessage' => $txt['error_message']
+			));
+
+			// Any form errors
+			if (!$validator->validate($_POST))
+				$context['errors'] = $validator->validation_errors();
+
+			// How about any verification errors
 			$verificationOptions = array(
 				'id' => 'contactform',
 			);
@@ -888,31 +929,18 @@ class Register_Controller extends Action_Controller
 
 			if (is_array($context['require_verification']))
 			{
-				loadLanguage('Errors');
 				foreach ($context['require_verification'] as $error)
 					$context['errors'][] = $txt['error_' . $error];
 			}
 
-			// Check the email for validity.
-			$email = !empty($_POST['emailaddres']) ? trim($_POST['emailaddres']) : '';
-			if (empty($email))
-				$context['errors'][] = $txt['error_no_email'];
-
-			if (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $email) == 0)
-				$context['errors'][] = $txt['error_bad_email'];
-
-			$message = !empty($_POST['contactmessage']) ? trim(Util::htmlspecialchars($_POST['contactmessage'])) : '';
-			if (empty($message))
-				$context['errors'][] = $txt['error_no_message'];
-
+			// No errors, then send the PM to the admins
 			if (empty($context['errors']))
 			{
 				$admins = admins();
-
 				if (!empty($admins))
 				{
-					require_once(SUBSDIR . '/Post.subs.php');
-					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $email, 'username' => $email));
+					require_once(SUBSDIR . '/PersonalMessage.subs.php');
+					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $validator->emailaddress, 'username' => $validator->emailaddress));
 				}
 
 				// Send the PM
@@ -920,8 +948,8 @@ class Register_Controller extends Action_Controller
 			}
 			else
 			{
-				$context['emailaddres'] = $email;
-				$context['contactmessage'] = $message;
+				$context['emailaddress'] = $validator->emailaddress;
+				$context['contactmessage'] = $validator->contactmessage;
 			}
 		}
 
@@ -957,11 +985,12 @@ function registerCheckUsername()
 	$context['valid_username'] = true;
 
 	// Clean it up like mother would.
-	$context['checked_username'] = preg_replace('~[\t\n\r\x0B\0\x{A0}]+~u', ' ', $context['checked_username']);
-	$errors = error_context::context('valid_username', 0);
+	$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $context['checked_username']);
+
+	$errors = Error_Context::context('valid_username', 0);
 
 	require_once(SUBSDIR . '/Auth.subs.php');
 	validateUsername(0, $context['checked_username'], 'valid_username');
 
-	$context['valid_username'] = $errors->hasErrors();
+	$context['valid_username'] = !$errors->hasErrors();
 }

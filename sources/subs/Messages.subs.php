@@ -168,7 +168,7 @@ function prepareMessageContext($message)
 	foreach ($message['attachment_stuff'] as $attachment)
 	{
 		$context['current_attachments'][] = array(
-			'name' => htmlspecialchars($attachment['filename']),
+			'name' => htmlspecialchars($attachment['filename'], ENT_COMPAT, 'UTF-8'),
 			'size' => $attachment['filesize'],
 			'id' => $attachment['id_attach'],
 			'approved' => $attachment['attachment_approved'],
@@ -178,8 +178,8 @@ function prepareMessageContext($message)
 	// Allow moderators to change names....
 	if (allowedTo('moderate_forum') && empty($message['message']['id_member']))
 	{
-		$context['name'] = htmlspecialchars($message['message']['poster_name']);
-		$context['email'] = htmlspecialchars($message['message']['poster_email']);
+		$context['name'] = htmlspecialchars($message['message']['poster_name'], ENT_COMPAT, 'UTF-8');
+		$context['email'] = htmlspecialchars($message['message']['poster_email'], ENT_COMPAT, 'UTF-8');
 	}
 
 	// When was it last modified?
@@ -299,23 +299,6 @@ function removeMessage($message, $decreasePostCount = true)
 
 		if ($modSettings['postmod_active'] && !$row['approved'] && $row['id_member'] != $user_info['id'] && !allowedTo('delete_own'))
 			isAllowedTo('approve_posts');
-	}
-
-	// Close any moderation reports for this message.
-	$db->query('', '
-		UPDATE {db_prefix}log_reported
-		SET closed = {int:is_closed}
-		WHERE id_msg = {int:id_msg}',
-		array(
-			'is_closed' => 1,
-			'id_msg' => $message,
-		)
-	);
-	if ($db->affected_rows() != 0)
-	{
-		require_once(SUBSDIR . '/Moderation.subs.php');
-		updateSettings(array('last_mod_report_action' => time()));
-		recountOpenReports();
 	}
 
 	// Delete the *whole* topic, but only if the topic consists of one message.
@@ -509,12 +492,10 @@ function removeMessage($message, $decreasePostCount = true)
 
 			// Mark recycle board as seen, if it was marked as seen before.
 			if (!empty($isRead) && !$user_info['is_guest'])
-				$db->insert('replace',
-					'{db_prefix}log_boards',
-					array('id_board' => 'int', 'id_member' => 'int', 'id_msg' => 'int'),
-					array($modSettings['recycle_board'], $user_info['id'], $modSettings['maxMsgID']),
-					array('id_board', 'id_member')
-				);
+			{
+				require_once(SUBSDIR . '/Boards.subs.php');
+				markBoardsRead($modSettings['recycle_board']);
+			}
 
 			// Add one topic and post to the recycle bin board.
 			$db->query('', '
@@ -549,7 +530,7 @@ function removeMessage($message, $decreasePostCount = true)
 			$recycle = true;
 
 			// Make sure we update the search subject index.
-			updateStats('subject', $topicID, $row['subject']);
+			updateSubjectStats($topicID, $row['subject']);
 		}
 
 		// If it wasn't approved don't keep it in the queue.
@@ -589,6 +570,15 @@ function removeMessage($message, $decreasePostCount = true)
 		// Remove the likes!
 		$db->query('', '
 			DELETE FROM {db_prefix}message_likes
+			WHERE id_msg = {int:id_msg}',
+			array(
+				'id_msg' => $message,
+			)
+		);
+
+		// Remove the notifications!
+		$db->query('', '
+			DELETE FROM {db_prefix}log_notifications
 			WHERE id_msg = {int:id_msg}',
 			array(
 				'id_msg' => $message,
@@ -642,13 +632,12 @@ function removeMessage($message, $decreasePostCount = true)
 			);
 		}
 
-
 		// Allow mods to remove message related data of their own (likes, maybe?)
 		call_integration_hook('integrate_remove_message', array($message));
 	}
 
 	// Update the pesky statistics.
-	updateStats('message');
+	updateMessageStats();
 	updateStats('topic');
 	updateSettings(array(
 		'calendar_updated' => time(),
@@ -660,6 +649,15 @@ function removeMessage($message, $decreasePostCount = true)
 		updateLastMessages(array($row['id_board'], $modSettings['recycle_board']));
 	else
 		updateLastMessages($row['id_board']);
+
+	// Close any moderation reports for this message.
+	require_once(SUBSDIR . '/Moderation.subs.php');
+	$updated_reports = updateReportsStatus($message, 'close', 1);
+	if ($updated_reports != 0)
+	{
+		updateSettings(array('last_mod_report_action' => time()));
+		recountOpenReports();
+	}
 
 	return false;
 }
@@ -874,7 +872,7 @@ function recordReport($message, $poster_comment)
 	);
 
 	if ($db->num_rows($request) != 0)
-		list($id_report, $ignore_all) = $db->fetch_row($request);
+		list ($id_report, $ignore_all) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	if (!empty($ignore_all))
@@ -982,7 +980,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 			m.smileys_enabled, m.poster_name, m.poster_email, m.approved,
 			m.id_msg_modified < {int:new_from} AS is_read
 			' . (!empty($msg_selects) ? implode(',', $msg_selects) : '') . '
-		FROM {db_prefix}messages as m
+		FROM {db_prefix}messages AS m
 			' . (!empty($msg_tables) ? implode("\n\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
 		ORDER BY m.id_msg' . (empty($options['view_newest_first']) ? '' : ' DESC'),
@@ -1057,4 +1055,114 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
 	$db->free_result($request);
 
 	return $return;
+}
+
+/**
+ * Returns an email (and few other things) associated with a message,
+ * either the member's email or the poster_email (for example in case of guests)
+ *
+ * @todo very similar to posterDetails
+ *
+ * @param int $id_msg, the id of a message
+ * @return array
+ */
+function mailFromMesasge($id_msg)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
+		FROM {db_prefix}messages AS m
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+		WHERE m.id_msg = {int:id_msg}',
+		array(
+			'id_msg' => $id_msg,
+		)
+	);
+	$row = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return $row;
+}
+
+/**
+ * This function changes the total number of messages,
+ * and the highest message id by id_msg - which can be
+ * parameters 1 and 2, respectively.
+ * Used by updateStats('message').
+ *
+ * @param bool $increment = null If true and $max_msg_id != null, then increment the total messages by one, otherwise recount all messages and get the max message id
+ * @param int $max_msg_id = null, Only used if $increment === true
+ */
+function updateMessageStats($increment = null, $max_msg_id = null)
+{
+	global $modSettings;
+
+	$db = database();
+
+	if ($increment === true && $max_msg_id !== null)
+		updateSettings(array('totalMessages' => true, 'maxMsgID' => $max_msg_id), true);
+	else
+	{
+		// SUM and MAX on a smaller table is better for InnoDB tables.
+		$request = $db->query('', '
+			SELECT SUM(num_posts + unapproved_posts) AS total_messages, MAX(id_last_msg) AS max_msg_id
+			FROM {db_prefix}boards
+			WHERE redirect = {string:blank_redirect}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+				AND id_board != {int:recycle_board}' : ''),
+			array(
+				'recycle_board' => isset($modSettings['recycle_board']) ? $modSettings['recycle_board'] : 0,
+				'blank_redirect' => '',
+			)
+		);
+		$row = $db->fetch_assoc($request);
+		$db->free_result($request);
+
+		updateSettings(array(
+			'totalMessages' => $row['total_messages'] === null ? 0 : $row['total_messages'],
+			'maxMsgID' => $row['max_msg_id'] === null ? 0 : $row['max_msg_id']
+		));
+	}
+}
+
+/**
+ * This function updates the log_search_subjects in the event of a topic being
+ * moved, removed or split. It is being sent the topic id, and optionally
+ * the new subject.
+ * Used by updateStats('subject').
+ *
+ * @param int $id_topic
+ * @param string $subject
+ */
+function updateSubjectStats($id_topic, $subject = null)
+{
+	$db = database();
+
+	// Remove the previous subject (if any).
+	$db->query('', '
+		DELETE FROM {db_prefix}log_search_subjects
+		WHERE id_topic = {int:id_topic}',
+		array(
+			'id_topic' => (int) $id_topic,
+		)
+	);
+
+	// Insert the new subject.
+	if ($subject !== null)
+	{
+		$id_topic = (int) $id_topic;
+		$subject_words = text2words($subject);
+
+		$inserts = array();
+		foreach ($subject_words as $word)
+			$inserts[] = array($word, $id_topic);
+
+		if (!empty($inserts))
+			$db->insert('ignore',
+				'{db_prefix}log_search_subjects',
+				array('word' => 'string', 'id_topic' => 'int'),
+				$inserts,
+				array('word', 'id_topic')
+			);
+	}
 }

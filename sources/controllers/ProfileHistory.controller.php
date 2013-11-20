@@ -20,6 +20,8 @@ if (!defined('ELK'))
 
 class ProfileHistory_Controller extends Action_Controller
 {
+	private $memID = 0;
+
 	/**
 	 * Profile history entry point.
 	 * Re-directs to sub-actions.
@@ -30,20 +32,22 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $user_profile;
 
-		$memID = currentMemberID();
+		$this->memID = currentMemberID();
+		require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
-			'activity' => array('action_trackactivity', $txt['trackActivity']),
-			'ip' => array('action_trackip', $txt['trackIP']),
-			'edits' => array('action_trackedits', $txt['trackEdits']),
-			'logins' => array('action_tracklogin', $txt['trackLogins']),
+			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
+			'ip' => array('controller' => $this, 'function' => 'action_trackip', 'label' => $txt['trackIP']),
+			'edits' => array('controller' => $this, 'function' => 'action_trackedits', 'label' => $txt['trackEdits']),
+			'logins' => array('controller' => $this, 'function' => 'action_tracklogin', 'label' => $txt['trackLogins']),
 		);
 
-		$context['history_area'] = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'activity';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'activity';
 
-		// @todo what is $types? it is never set so this will never be true
-		if (isset($types[$context['history_area']][1]))
-			require_once(SOURCEDIR . '/' . $types[$context['history_area']][1]);
+		// Set up action/subaction stuff.
+		$action = new Action();
+		$action->initialize($subActions, 'activity');
+		$context['sub_action'] = $subAction;
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -62,22 +66,22 @@ class ProfileHistory_Controller extends Action_Controller
 			unset($context[$context['profile_menu_name']]['tab_data']['edits']);
 
 		// Set a page title.
-		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$context['history_area']][1] . ' - ' . $user_profile[$memID]['real_name'];
+		$context['history_area'] = $subAction;
+		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $user_profile[$this->memID]['real_name'];
 
 		// Pass on to the actual method.
-		$this->{$subActions[$context['history_area']][0]}($memID);
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Subaction for profile history actions: activity log.
-	 *
-	 * @param int $memID id_member
 	 */
-	public function action_trackactivity($memID)
+	public function action_trackactivity()
 	{
 		global $scripturl, $txt, $modSettings, $user_profile, $context;
 
 		$db = database();
+		$memID = $this->memID;
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('moderate_forum');
@@ -167,7 +171,7 @@ class ProfileHistory_Controller extends Action_Controller
 		);
 
 		// Create the list for viewing.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// @todo cache this
@@ -293,14 +297,13 @@ class ProfileHistory_Controller extends Action_Controller
 	 * Track an IP address.
 	 * Accessed through ?action=trackip
 	 * and through ?action=profile;area=history;sa=ip
-	 *
-	 * @param int $memID = 0 id_member
 	 */
-	public function action_trackip($memID = 0)
+	public function action_trackip()
 	{
 		global $user_profile, $scripturl, $txt, $user_info, $modSettings, $context;
 
 		$db = database();
+		$memID = $this->memID;
 
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
@@ -350,7 +353,7 @@ class ProfileHistory_Controller extends Action_Controller
 		ksort($context['ips']);
 
 		// Gonna want this for the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// Start with the user messages.
 		$listOptions = array(
@@ -581,15 +584,15 @@ class ProfileHistory_Controller extends Action_Controller
 	 * Tracks the logins of a given user.
 	 * Accessed by ?action=trackip
 	 * and ?action=profile;area=history;sa=ip
-	 *
-	 * @param int $memID = 0 id_member
 	 */
-	public function action_tracklogin($memID = 0)
+	public function action_tracklogin()
 	{
 		global $scripturl, $txt, $context;
 
+		$memID = $this->memID;
+
 		// Gonna want this for the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		if ($memID == 0)
 			$context['base_url'] = $scripturl . '?action=trackip';
@@ -659,16 +662,15 @@ class ProfileHistory_Controller extends Action_Controller
 
 	/**
 	 * Logs edits to a members profile.
-	 *
-	 * @param int $memID id_member
 	 */
-	public function action_trackedits($memID)
+	public function action_trackedits()
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
 		$db = database();
+		$memID = $this->memID;
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// Get the names of any custom fields.
 		$request = $db->query('', '
@@ -768,7 +770,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param array $where_vars = array()
 	 * @return string number of user errors
 	 */
-	function list_getUserErrorCount($where, $where_vars = array())
+	public function list_getUserErrorCount($where, $where_vars = array())
 	{
 		$db = database();
 
@@ -794,7 +796,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param array $where_vars
 	 * @return array error messages
 	 */
-	function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
+	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
 		global $txt, $scripturl;
 
@@ -836,7 +838,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param array $where_vars
 	 * @return string count of messages matching the IP
 	 */
-	function list_getIPMessageCount($where, $where_vars = array())
+	public function list_getIPMessageCount($where, $where_vars = array())
 	{
 		$db = database();
 
@@ -863,7 +865,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param array $where_vars
 	 * @return array an array of messages
 	 */
-	function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
+	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
 		global $scripturl;
 
@@ -912,7 +914,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param array $where_vars
 	 * @return string count of messages matching the IP
 	 */
-	function list_getLoginCount($where, $where_vars = array())
+	public function list_getLoginCount($where, $where_vars = array())
 	{
 		$db = database();
 
@@ -940,7 +942,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param array $where_vars
 	 * @return array an array of messages
 	 */
-	function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
+	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
 		$db = database();
 
@@ -950,7 +952,7 @@ class ProfileHistory_Controller extends Action_Controller
 			WHERE ' . $where .'
 			ORDER BY time DESC',
 			array(
-				'id_member' => $where_vars['current_member'],
+				'current_member' => $where_vars['current_member'],
 			)
 		);
 		$logins = array();
@@ -971,7 +973,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param int $memID id_member
 	 * @return string number of profile edits
 	 */
-	function list_getProfileEditCount($memID)
+	public function list_getProfileEditCount($memID)
 	{
 		$db = database();
 
@@ -1000,7 +1002,7 @@ class ProfileHistory_Controller extends Action_Controller
 	 * @param int $memID
 	 * @return array
 	 */
-	function list_getProfileEdits($start, $items_per_page, $sort, $memID)
+	public function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	{
 		global $txt, $scripturl, $context;
 

@@ -91,7 +91,7 @@ div.quick_tasks {
 .action_admin .generic_list .flow_auto {
 	padding: 4px 2px;
 }
-h3.titlebg form {
+h3.category_header form {
 	font-size: 80%;
 }
 .windowbg.nopadding {
@@ -110,9 +110,6 @@ h3 a.help .icon {
 	padding: 0 4px 0 0;
 }
 
-.catbg a.help .icon {
-	margin: 0;
-}
 .table_caption, tr.table_caption td {
 	color: #000;
 	font-size: 10px;
@@ -132,6 +129,12 @@ fieldset dl {
 legend {
 	font-weight: bold;
 	color: #000;
+	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
+}
+.collapsed legend  {
+	background:  url(../images/selected.png) no-repeat scroll left center transparent;
 }
 
 /* Styles for the admin home screen.
@@ -199,10 +202,6 @@ legend {
 	border-radius: 7px 7px 0 0;
 	border-bottom: none;
 }
-#admin_main_section .catbg, #admin_main_section .catbg a {
-	color: #444;
-	overflow: hidden;
-}
 #live_news, #supportVersionsTable {
 	width: 70%;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
@@ -221,6 +220,9 @@ legend {
 	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
 	height: 12em;
 	overflow: auto;
+}
+#admin_search_box {
+	padding: 0.5em 0;
 }
 #live_news div.content, #supportVersionsTable  div.content {
 	padding: 0 4px;
@@ -271,15 +273,15 @@ div.quick_tasks {
 	border-top: 1px solid #bbb;
 	border-bottom: 1px solid #fff;
 }
-#quick_tasks  li {
+#quick_tasks li {
 	list-style: none;
 	padding: 10px 6px 10px 6px;
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #bbb;
 	float: left;
 	width: 50%;
-	height: 6em;
-	overflow: hidden;
+	height: 7em;
+	overflow: auto;
 }
 #quick_tasks  li a  {
 	line-height: 1.6em;
@@ -352,6 +354,10 @@ div.quick_tasks {
 	padding: 0 12px;
 	overflow: auto;
 }
+.core_features_status_box {
+	margin-left: 5px;
+	vertical-align: middle;
+}
 /* Keep your enemies close, and your submit buttons if your screen is huge. */
 /* Speaking of which, I can't see the last submit that is in the markup. */
 /* Still works without it if you reload the page, but rather odd that it's hiding. */
@@ -360,10 +366,9 @@ div.quick_tasks {
 	margin: 0 12px 0 0;
 }
 .features_switch {
-	margin: -20px 0 6px 6px;
 	float: right;
 }
-.features h4 {
+.features h3 {
 	padding: 0;
 	margin: 0 6px 0 105px;
 	font-size: 1.1em;
@@ -374,7 +379,7 @@ div.quick_tasks {
 	max-height: 1.6em;
 }
 .features p {
-	margin: 0 6px 0 105px;
+	margin: 0 105px;
 	padding: 0;
 	min-height: 56px;
 }
@@ -382,9 +387,6 @@ div.quick_tasks {
 /* Styles for the package manager.
 /* Haven't got here yet. :P
 ------------------------------------------------- */
-#package_list .tborder {
-	margin: .25em 0 .25em 26px;
-}
 #package_list ol, #package_list ol li {
 	list-style: decimal;
 	margin-left: 50px;
@@ -504,7 +506,7 @@ dl.settings dd.questions input {
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-#manage_boards {
+#manage_boards, #manage_attachments {
 	background: #efefef;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
@@ -513,47 +515,44 @@ dl.settings dd.questions input {
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 	overflow: auto;
 }
-#manage_boards .titlebg {
+#manage_boards .category_header {
 	border-bottom: 1px solid #bbb;
-}
-#manage_boards .windowbg {
-	background: none;
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
-	border: none;
-	border-radius: 7px 7px 0 0;
-}
-#manage_boards .catbg {
-	padding: 8px 16px 4px 16px;
-	color: #444;
-}
-#manage_boards .catbg a {
-	color: #346;
-}
-#manage_boards .catbg a:hover {
-	border-bottom: 1px solid #346;
 }
 #manage_boards .windowbg {
 	margin: 0;
 	padding: 0;
 }
-#manage_boards ul {
-	padding: 0;
-	margin: 0 0 8px 0;
-	max-height: 30em;
+#manage_boards .content, #manage_attachments .content {
+	background: #efefef;
+	margin: -6px 0 12px 0;
+	padding: 6px 8px 16px 8px;
+	border: 1px solid #ccc;
+	border-top: 0px solid;
 	overflow: auto;
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #fff;
-	border-radius: 2px;
+	border-radius: 0 0 7px 7px;
+}
+#manage_attachments .content {
+	margin: -10px 0 0;
+	padding: 6px 8px;
+}
+#manage_boards ul {
+	margin: 0 0 12px;
+}
+#manage_boards ul:nth-child(n+2) {
+	min-height: 12px;
+	padding-left: 30px;
+	margin: 0 0 -12px;
+}
+.ui-state-highlight {
+	background-color: #efe;
+	height: 25px;
+	border: 1px dashed green;
+	cursor: move;
 }
 #manage_boards li, #manage_boards li.windowbg, #manage_boards li.windowbg2 {
 	list-style: none;
-	margin: 0 1px;
-	padding: 8px 0;
-	border: 1px solid #ccc;
-	border-bottom: 1px solid #bbb;
-	border-top: 1px solid #fff;
-	border-radius: 0;
+	margin: 0;
+	padding-top: 12px;
 }
 #manage_boards li img {
 	vertical-align: middle;
@@ -562,8 +561,18 @@ dl.settings dd.questions input {
 #manage_boards li .floatleft {
 	font-weight: bold;
 	padding: 0 6px;
+	font-size: 1.1em;
+	cursor: move;
+	width: 60%;
 }
-#manage_boards #recycle_board {
+#manage_boards li .floatleft:before {
+	content: "\21f3";
+	padding-right: 5px;
+	font-size: 1.3em;
+	float: left;
+	margin-top: -1px;
+}
+#manage_boards .recycle_board {
 	background-color: #dee;
 }
 .move_links {
@@ -614,10 +623,6 @@ dl.settings dd.questions input {
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
-#manage_maintenance .catbg {
-	border: none;
-	background: none;
-}
 #manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
 	background: none;
 	padding: 0;
@@ -791,6 +796,16 @@ dl.themes_list dd {
 #modcenter {
 	display: block;
 	width: 100%;
+	background: none repeat scroll 0 0 #DEEDDA;
+	border-radius: 5px 5px 0 0;
+	box-shadow: 1px 2px 3px #EEEEEE;
+}
+#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper  {
+	overflow: visible;
+	margin: 4px 0 0 0;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+	background: #fff;
 }
 #modcenter .content {
 	padding: 12px;
@@ -798,13 +813,6 @@ dl.themes_list dd {
 #admin_main_section {
 	margin: 12px 0 0 0;
 	padding: 8px 12px 4px 12px;
-}
-#mod_main_section .cat_bar {
-	background: none;
-}
-#mod_main_section .catbg, #mod_main_section .catbg a {
-	color: #444;
-	overflow: hidden;
 }
 #mod_main_section .windowbg {
 	padding: 6px 0;
@@ -814,7 +822,7 @@ dl.themes_list dd {
 	border-radius: 0;
 	background: #fff;
 	box-shadow:  0 2px 2px rgba(255,255,255,0.5), 0 -1px 2px rgba(0,0,0,0.1);
-	height: 12em;
+	height: 14em;
 	overflow: auto;
 }
 .modblock_left {
@@ -832,6 +840,10 @@ dl.themes_list dd {
 	height: 15em;
 	overflow: visible;
 }
+.modbox img.icon {
+	margin: 3px 5px 0 0;
+	vertical-align: text-top;
+}
 
 /* Moderation Notes */
 ul.moderation_notes {
@@ -839,7 +851,7 @@ ul.moderation_notes {
 	padding: 0;
 	list-style: none;
 	overflow: auto;
-	height: 10.2em;
+	height: auto;
 }
 ul.moderation_notes li {
 	padding: 0.2em;
@@ -1013,6 +1025,14 @@ ul.moderation_notes li {
 .admin_img_smiley {
 	background-position: -448px 0;
 }
+.sortable_smiley li {
+	display: inline;
+	padding: 0 6px;
+}
+.ui-sortable li > a {
+	cursor: move;
+}
+
 .admin_img_support {
 	background-position: -464px 0;
 }
@@ -1024,10 +1044,10 @@ ul.moderation_notes li {
 	background-color: transparent;
 }
 #taskpad select {
-	margin-top: 1px;
+	margin-top: 3px;
 }
 #taskpad {
-	margin: 8px 8px 0 0;
+	margin: 2px 8px 2px 0;
 }
 
 /* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
@@ -1059,19 +1079,6 @@ ul.moderation_notes li {
 	}
 	.dropmenu li li a {
 		line-height: 3.2em;
-	}
-	h3.catbg #quick_search form {
-		margin: 0 0 8px 0;
-		padding: 0;
-	}
-	h3.catbg #quick_search form input {
-		margin: 0 0 12px 0;
-	}
-	h3.catbg #quick_search form select option {
-		padding: 4px 4px;
-	}
-	h3.catbg #quick_search form .button_submit {
-		margin: 0 3px 0 3px;
 	}
 	#live_news, #supportVersionsTable {
 		width: 100%;
@@ -1108,9 +1115,6 @@ ul.moderation_notes li {
 		max-height: 5em;
 		overflow: auto;
 	}
-	#manage_boards .catbg {
-		margin-top: 10px;
-	}
 	#manage_boards .windowbg {
 		line-height: 3.2em;
 	}
@@ -1124,4 +1128,95 @@ ul.moderation_notes li {
 	#manage_boards dt {
 		line-height: 1.6em;
 	}
+}
+
+/* Drag sort lists show the move cursor and up/down arrow content */
+#sort_email_fp td {
+	cursor: move;
+}
+#sort_email_fp td:nth-child(2):before {
+	content: "\21f3";
+	padding-right: 5px;
+	font-size: 1.8em;
+	float: left;
+}
+#custom_profile_fields td:nth-child(2) {
+	cursor: move;
+}
+#custom_profile_fields td:nth-child(2):before {
+	content: "\21f3";
+	padding-right: 5px;
+	font-size: 1.8em;
+	float: left;
+	margin-top: 0.3em;
+}
+
+/* jQuery Dialog Box */
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+	border-collapse: collapse;
+	content: "";
+	display: table;
+}
+.ui-helper-clearfix:after {
+	clear: both;
+}
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+	border-collapse: collapse;
+	content: "";
+	display: table;
+}
+
+/* Scheduled tasks */
+.errorbox ul {
+	margin-left: 5em;
+}
+
+/* jQuery Dialog */
+.ui-dialog {
+	padding: 0;
+	z-index: 100;
+	border: 1px solid #999;
+	box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.3);
+	background-color: #f5f5f5;
+	border-radius: 4px 4px 0 0;
+}
+.ui-dialog .ui-dialog-title {
+	float: left;
+	margin: 0.5em 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 90%;
+}
+.ui-dialog .ui-dialog-titlebar {
+	padding: 0 1em;
+	background-color: #fafafa;
+	font-weight: 600;
+	font-size: 1.1em;
+	border-radius: 4px 4px 0 0;
+}
+.ui-dialog .ui-dialog-content {
+	padding: 4px;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+	cursor: pointer;
+	border: 0;
+	float: right;
+	width: 16px;
+	height: 16px;
+	margin: 0.7em 0;
+	background: url(../images/buttons/delete.png) no-repeat scroll left center transparent;
+}
+.ui-dialog .ui-dialog-titlebar-close .ui-button-text {
+	display: none;
+}
+.ui-widget-overlay {
+	z-index: 100;
+	background-color: #000;
+	opacity: 0.3;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%
 }

@@ -26,11 +26,7 @@ function template_download_language()
 	{
 		echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $txt['languages_download_complete'], '
-			</h3>
-		</div>
+		<h2 class="category_header">', $txt['languages_download_complete'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				', $context['install_complete'], '
@@ -51,11 +47,7 @@ function template_download_language()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=languages;sa=downloadlang;did=', $context['download_id'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['languages_download'], '
-				</h3>
-			</div>
+			<h2 class="category_header">', $txt['languages_download'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>
@@ -73,11 +65,7 @@ function template_download_language()
 	// Now, all the images and the likes, hidden via javascript 'cause there are so fecking many.
 	echo '
 			<br />
-			<div class="title_bar">
-				<h3 class="titlebg">
-					', $txt['languages_download_theme_files'], '
-				</h3>
-			</div>
+			<h3 class="category_header">', $txt['languages_download_theme_files'], '</h3>
 			<table class="table_grid">
 				<thead>
 					<tr class="table_head">
@@ -101,7 +89,7 @@ function template_download_language()
 	{
 		$count = 0;
 		echo '
-				<tr class="titlebg">
+				<tr class="secondary_header">
 					<td colspan="4">
 						<img class="sort" src="', $settings['images_url'], '/sort_down.png" id="toggle_image_', $theme, '" alt="*" />&nbsp;', isset($context['theme_names'][$theme]) ? $context['theme_names'][$theme] : $theme, '
 					</td>
@@ -145,14 +133,11 @@ function template_download_language()
 			</div>';
 
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['package_ftp_necessary'], '
-				</h3>
+			<h3 class="category_header">', $txt['package_ftp_necessary'], '</h3>
 			</div>
 			<div class="windowbg">
 				<div class="content">
-					<p>', $txt['package_ftp_why'],'</p>
+					<p>', $txt['package_ftp_why'], '</p>
 					<dl class="settings">
 						<dt
 							<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
@@ -210,16 +195,18 @@ function template_download_language()
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: true,
 				aSwappableContainers: [';
+
 		foreach ($group as $file)
 			echo '
 					', JavaScriptEscape($theme . '-' . $count++), ',';
+
 		echo '
 					null
 				],
 				aSwapImages: [
 					{
 						sId: \'toggle_image_', $theme, '\',
-						srcExpanded: elk_images_url + \'/sort_down.png\',
+						srcExpanded: elk_images_url + \'/selected_open.png\',
 						altExpanded: \'*\',
 						srcCollapsed: elk_images_url + \'/selected.png\',
 						altCollapsed: \'*\'
@@ -241,12 +228,8 @@ function template_modify_language_entries()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['edit_languages'], '
-				</h3>
-			</div>
+		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], '" method="post" accept-charset="UTF-8">
+			<h2 class="category_header">', $txt['edit_languages'], '</h2>
 			<div class="information">
 				', $txt['edit_language_entries_primary'], '
 			</div>';
@@ -275,7 +258,7 @@ function template_modify_language_entries()
 								<input type="text" name="character_set" id="character_set" size="20" value="', $context['primary_settings']['character_set'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
 							</dd>
 							<dt>
-								<label for="locale>', $txt['languages_locale'], ':</label>
+								<label for="locale">', $txt['languages_locale'], ':</label>
 							</dt>
 							<dd>
 								<input type="text" name="locale" id="locale" size="20" value="', $context['primary_settings']['locale'], '"', (empty($context['file_entries']) ? '' : ' disabled="disabled"'), ' class="input_text" />
@@ -320,31 +303,30 @@ function template_modify_language_entries()
 		</form>
 
 		<form action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], ';entries" id="entry_form" method="post" accept-charset="UTF-8">
-			<div class="title_bar">
+			<div class="category_header">
+				<h3 class="floatleft">
+					', $txt['edit_language_entries'], '
+				</h3>
 				<div id="taskpad" class="floatright">
 					', $txt['edit_language_entries_file'], ':
-						<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
+					<select name="tfid" onchange="if (this.value != -1) document.forms.entry_form.submit();">';
+
 	foreach ($context['possible_files'] as $id_theme => $theme)
 	{
 		echo '
-							<option value="-1">', $theme['name'], '</option>';
+						<option value="-1">', $theme['name'], '</option>';
 
 		foreach ($theme['files'] as $file)
-		{
 			echo '
-							<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
-		}
+						<option value="', $id_theme, '+', $file['id'], '"', $file['selected'] ? ' selected="selected"' : '', '> =&gt; ', $file['name'], '</option>';
 	}
 
 	echo '
-						</select>
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
-						<noscript><input type="submit" value="', $txt['go'], '" class="button_submit submitgo" /></noscript>
+					</select>
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
+					<noscript><input type="submit" value="', $txt['go'], '" class="button_submit submitgo" /></noscript>
 				</div>
-				<h3 class="titlebg">
-					', $txt['edit_language_entries'], '
-				</h3>
 			</div>';
 
 	// Is it not writable?
@@ -359,9 +341,8 @@ function template_modify_language_entries()
 	if (!empty($context['file_entries']))
 	{
 		echo '
-			<div class="windowbg2">
-				<div class="content">
-					<dl class="settings">';
+			<div class="content">
+				<dl class="settings">';
 
 		$cached = array();
 		foreach ($context['file_entries'] as $entry)
@@ -374,20 +355,20 @@ function template_modify_language_entries()
 			}
 
 			echo '
-						<dt>
-							<span class="smalltext">', $cached['key'], '</span>
-						</dt>
-						<dd>
-							<span class="smalltext">', $entry['key'], '</span>
-						</dd>
-						<dt>
-							<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
-							<textarea name="entry[', $cached['key'], ']" cols="40" rows="', $cached['rows'] < 2 ? 2 : $cached['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
-						</dt>
-						<dd>
-							<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
-							<textarea name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $entry['value'], '</textarea>
-						</dd>';
+					<dt>
+						<span class="smalltext">', $cached['key'], '</span>
+					</dt>
+					<dd>
+						<span class="smalltext">', $entry['key'], '</span>
+					</dd>
+					<dt>
+						<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
+						<textarea name="entry[', $cached['key'], ']" cols="40" rows="', $cached['rows'] < 2 ? 2 : $cached['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
+					</dt>
+					<dd>
+						<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
+						<textarea name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $entry['value'], '</textarea>
+					</dd>';
 			$cached = array();
 		}
 
@@ -396,28 +377,25 @@ function template_modify_language_entries()
 		{
 			// Alternative time
 			echo '
-
-						<dt>
-							<span class="smalltext">', $cached['key'], '</span>
-						</dt>
-						<dd>
-						</dd>
-						<dt>
-							<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
-							<textarea name="entry[', $cached['key'], ']" cols="40" rows="2" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
-						</dt>
-						<dd>
-						</dd>';
+					<dt>
+						<span class="smalltext">', $cached['key'], '</span>
+					</dt>
+					<dd>
+					</dd>
+					<dt>
+						<input type="hidden" name="comp[', $cached['key'], ']" value="', $cached['value'], '" />
+						<textarea name="entry[', $cached['key'], ']" cols="40" rows="2" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : 'width: 96%') . ';">', $cached['value'], '</textarea>
+					</dt>
+					<dd>
+					</dd>';
 		}
 
 		echo '
-					</dl>
-					<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="right_submit" />';
-
-		echo '
-				</div>
+				</dl>
+				<input type="submit" name="save_entries" value="', $txt['save'], '"', !empty($context['entries_not_writable_message']) ? ' disabled="disabled"' : '', ' class="button_submit" />
 			</div>';
 	}
+
 	echo '
 		</form>
 	</div>';
@@ -425,7 +403,6 @@ function template_modify_language_entries()
 
 /**
  * Add a new language
- *
  */
 function template_add_language()
 {
@@ -434,11 +411,7 @@ function template_add_language()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper"action="', $scripturl, '?action=admin;area=languages;sa=add;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['add_language'], '
-				</h3>
-			</div>
+			<h2 class="category_header">', $txt['add_language'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<fieldset>

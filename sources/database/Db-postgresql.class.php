@@ -24,6 +24,19 @@ class Database_PostgreSQL implements Database
 
 	private $_connection = null;
 
+	private $_db_last_result = null;
+
+	/**
+	 * Since PostgreSQL doesn't support INSERT REPLACE we are using this to remember
+	 * the rows affected by the delete
+	 */
+	private $_db_replace_result = null;
+
+	/**
+	 * A variable to remember if a transaction was started already or not
+	 */
+	private $_in_transaction = false;
+
 	private function __construct()
 	{
 		// Private constructor.
@@ -43,7 +56,7 @@ class Database_PostgreSQL implements Database
 	 *
 	 * @return resource
 	 */
-	static function initiate($db_server, $db_name, $db_user, $db_passwd, &$db_prefix, $db_options = array())
+	static function initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_options = array())
 	{
 		// initialize the instance... if not done already!
 		if (self::$_db === null)
@@ -71,6 +84,8 @@ class Database_PostgreSQL implements Database
 				display_db_error();
 			}
 		}
+
+		self::$_db->_connection = $connection;
 
 		return $connection;
 	}
@@ -118,11 +133,17 @@ class Database_PostgreSQL implements Database
 		if ($matches[1] === 'query_wanna_see_board')
 			return $user_info['query_wanna_see_board'];
 
+		if ($matches[1] === 'empty')
+			return '\'\'';
+
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
+		if ($matches[1] === 'literal')
+			return '\'' . pg_escape_string($matches[2]) . '\'';
+
 		if (!isset($values[$matches[2]]))
-			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2]), '', E_USER_ERROR, __FILE__, __LINE__);
+			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
 
 		$replacement = $values[$matches[2]];
 
@@ -222,7 +243,7 @@ class Database_PostgreSQL implements Database
 			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
 
 			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// Clear this global variable.
 			$db_callback = array();
@@ -244,8 +265,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_cache, $db_count, $db_show_debug, $time_start;
-		global $db_unbuffered, $db_callback, $db_last_result, $db_replace_result, $modSettings;
+		global $db_cache, $db_count, $db_show_debug, $time_start, $db_callback, $modSettings;
 
 		// Decide which connection to use.
 		$connection = $connection === null ? $this->_connection : $connection;
@@ -357,7 +377,7 @@ class Database_PostgreSQL implements Database
 
 		// One more query....
 		$db_count = !isset($db_count) ? 1 : $db_count + 1;
-		$db_replace_result = 0;
+		$this->_db_replace_result = null;
 
 		if (empty($modSettings['disableQueryCheck']) && strpos($db_string, '\'') !== false && empty($db_values['security_override']))
 			$this->error_backtrace('Hacking attempt...', 'Illegal character (\') used in query...', true, __FILE__, __LINE__);
@@ -368,7 +388,7 @@ class Database_PostgreSQL implements Database
 			$db_callback = array($db_values, $connection);
 
 			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// This shouldn't be residing in global space any longer.
 			$db_callback = array();
@@ -415,7 +435,7 @@ class Database_PostgreSQL implements Database
 				while (true)
 				{
 					$pos1 = strpos($db_string, '\'', $pos + 1);
-					$pos2 = strpos($db_string, '\\', $pos + 1);
+					$pos2 = strpos($db_string, '\'\'', $pos + 1);
 					if ($pos1 === false)
 						break;
 					elseif ($pos2 == false || $pos2 > $pos1)
@@ -450,33 +470,40 @@ class Database_PostgreSQL implements Database
 
 			if (!empty($fail) && function_exists('log_error'))
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
+
+			// If we are updating something, better start a transaction so that indexes may be kept consistent
+			if (!$this->_in_transaction && strpos($clean, 'update') !== false)
+				$this->db_transaction('begin', $connection);
 		}
 
-		$db_last_result = @pg_query($connection, $db_string);
+		$this->_db_last_result = @pg_query($connection, $db_string);
 
-		if ($db_last_result === false && empty($db_values['db_error_skip']))
-			$db_last_result = $this->error($db_string, $connection);
+		if ($this->_db_last_result === false && empty($db_values['db_error_skip']))
+			$this->_db_last_result = $this->error($db_string, $connection);
+
+		if ($this->_in_transaction)
+			$this->db_transaction('commit', $connection);
 
 		// Debugging.
 		if (isset($db_show_debug) && $db_show_debug === true)
 			$db_cache[$db_count]['t'] = microtime(true) - $st;
 
-		return $db_last_result;
+		return $this->_db_last_result;
 	}
 
 	/**
 	 * Affected rows from previous operation.
+	 *
+	 * @param result resource $result
 	 */
-	function affected_rows()
+	function affected_rows($result = null)
 	{
-		global $db_last_result, $db_replace_result;
-
-		if ($db_replace_result)
-			return $db_replace_result;
-		elseif ($result === null && !$db_last_result)
+		if ($this->_db_replace_result !== null)
+			return $this->_db_replace_result;
+		elseif ($result === null && !$this->_db_last_result)
 			return 0;
 
-		return pg_affected_rows($db_last_result);
+		return pg_affected_rows($result === null ? $this->_db_last_result : $result);
 	}
 
 	/**
@@ -550,11 +577,17 @@ class Database_PostgreSQL implements Database
 		$connection = $connection === null ? $this->_connection : $connection;
 
 		if ($type == 'begin')
+		{
+			$this->_in_transaction = true;
 			return @pg_query($connection, 'BEGIN');
+		}
 		elseif ($type == 'rollback')
 			return @pg_query($connection, 'ROLLBACK');
 		elseif ($type == 'commit')
+		{
+			$this->_in_transaction = false;
 			return @pg_query($connection, 'COMMIT');
+		}
 
 		return false;
 	}
@@ -578,9 +611,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function error($db_string, $connection = null)
 	{
-		global $txt, $context, $webmaster_email, $modSettings;
-		global $forum_version, $db_last_error, $db_persist;
-		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
+		global $txt, $context, $modSettings, $db_show_debug;
 
 		// We'll try recovering the file and line number the original db query was called from.
 		list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
@@ -700,7 +731,7 @@ class Database_PostgreSQL implements Database
 	 */
 	function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
-		global $db_replace_result, $db_in_transact, $db_prefix;
+		global $db_prefix;
 
 		$connection = $connection === null ? $this->_connection : $connection;
 
@@ -714,7 +745,7 @@ class Database_PostgreSQL implements Database
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
 		$priv_trans = false;
-		if ((count($data) > 1 || $method == 'replace') && !$db_in_transact && !$disable_trans)
+		if ((count($data) > 1 || $method == 'replace') && !$this->_in_transaction && !$disable_trans)
 		{
 			$this->db_transaction('begin', $connection);
 			$priv_trans = true;
@@ -725,6 +756,7 @@ class Database_PostgreSQL implements Database
 		{
 			$count = 0;
 			$where = '';
+			$db_replace_result = 0;
 			foreach ($columns as $columnName => $type)
 			{
 				// Are we restricting the length?
@@ -749,6 +781,7 @@ class Database_PostgreSQL implements Database
 						' WHERE ' . $where,
 						$entry, $connection
 					);
+					$db_replace_result += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
 				}
 			}
 		}
@@ -775,7 +808,9 @@ class Database_PostgreSQL implements Database
 			foreach ($data as $dataRow)
 				$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
 
+			$inserted_results = 0;
 			foreach ($insertRows as $entry)
+			{
 				// Do the insert.
 				$this->query('', '
 					INSERT INTO ' . $table . '("' . implode('", "', $indexed_columns) . '")
@@ -787,6 +822,10 @@ class Database_PostgreSQL implements Database
 					),
 					$connection
 				);
+				$inserted_results += (!$this->_db_last_result ? 0 : pg_affected_rows($this->_db_last_result));
+			}
+			if (isset($db_replace_result))
+				$this->_db_replace_result = $db_replace_result + $inserted_results;
 		}
 
 		if ($priv_trans)
@@ -1068,7 +1107,7 @@ class Database_PostgreSQL implements Database
 				'table' => $tableName,
 			)
 		);
-		$indexes = array();
+
 		while ($row = $this->fetch_assoc($result))
 		{
 			if ($row['is_primary'])

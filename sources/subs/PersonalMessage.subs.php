@@ -24,6 +24,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Loads information about the users message limit.
+ */
 function loadMessageLimit()
 {
 	global $user_info, $context;
@@ -52,6 +55,9 @@ function loadMessageLimit()
 	}
 }
 
+/**
+ * Loads the list of PM labels.
+ */
 function loadPMLabels()
 {
 	global $user_info, $context;
@@ -86,7 +92,15 @@ function loadPMLabels()
 	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
 }
 
-function getPMCount($descending = false, $pmID = null, $labelQuery)
+/**
+ * Get the number of PMs.
+ *
+ * @param bool $descending
+ * @param int $pmID
+ * @param int $labelQuery
+ * @return int
+ */
+function getPMCount($descending = false, $pmID = null, $labelQuery = '')
 {
 	global $user_info, $context;
 
@@ -199,9 +213,9 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 		while ($row = $db->fetch_assoc($request))
 		{
 			if ($row['is_read'])
-				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : 'instant_messages - ' . $row['num_deleted_messages']));
+				updateMemberData($row['id_member'], array('personal_messages' => $where == '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages']));
 			else
-				updateMemberData($row['id_member'], array('instant_messages' => $where == '' ? 0 : 'instant_messages - ' . $row['num_deleted_messages'], 'unread_messages' => $where == '' ? 0 : 'unread_messages - ' . $row['num_deleted_messages']));
+				updateMemberData($row['id_member'], array('personal_messages' => $where == '' ? 0 : 'personal_messages - ' . $row['num_deleted_messages'], 'unread_messages' => $where == '' ? 0 : 'unread_messages - ' . $row['num_deleted_messages']));
 
 			// If this is the current member we need to make their message count correct.
 			if ($user_info['id'] == $row['id_member'])
@@ -415,7 +429,7 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
  * @param int $pm_head - the ID of the chain being replied to - if any.
  * @return array, an array with log entries telling how many recipients were successful and which recipients it failed to send to.
  */
-function sendpm($recipients, $subject, $message, $store_outbox = false, $from = null, $pm_head = 0)
+function sendpm($recipients, $subject, $message, $store_outbox = true, $from = null, $pm_head = 0)
 {
 	global $scripturl, $txt, $user_info, $language;
 	global $modSettings, $webmaster_email;
@@ -428,8 +442,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	// Needed for our email and post functions
 	require_once(SUBSDIR . '/Mail.subs.php');
 	require_once(SUBSDIR . '/Post.subs.php');
-
-	$onBehalf = $from !== null;
 
 	// Initialize log array.
 	$log = array(
@@ -480,7 +492,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		$request = $db->query('pm_find_username', '
 			SELECT id_member, member_name
 			FROM {db_prefix}members
-			WHERE ' . ($db->db_case_sensitive() ? 'LOWER(member_name)' : 'member_name') . ' IN ({array_string:usernames})',
+			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name') . ' IN ({array_string:usernames})',
 			array(
 				'usernames' => array_keys($usernames),
 			)
@@ -540,7 +552,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 		$delete = false;
 		foreach ($criteria as $criterium)
 		{
-			$match = false;
 			if (($criterium['t'] == 'mid' && $criterium['v'] == $from['id']) || ($criterium['t'] == 'gid' && in_array($criterium['v'], $user_info['groups'])) || ($criterium['t'] == 'sub' && strpos($subject, $criterium['v']) !== false) || ($criterium['t'] == 'msg' && strpos($message, $criterium['v']) !== false))
 				$delete = true;
 			// If we're adding and one criteria don't match then we stop!
@@ -599,10 +610,10 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	$request = $db->query('', '
 		SELECT
 			member_name, real_name, id_member, email_address, lngfile,
-			pm_email_notify, instant_messages,' . (allowedTo('moderate_forum') ? ' 0' : '
-			(pm_receive_from = {int:admins_only}' . (empty($modSettings['enable_buddylist']) ? '' : ' OR
-			(pm_receive_from = {int:buddies_only} AND FIND_IN_SET({string:from_id}, buddy_list) = 0) OR
-			(pm_receive_from = {int:not_on_ignore_list} AND FIND_IN_SET({string:from_id}, pm_ignore_list) != 0)') . ')') . ' AS ignored,
+			pm_email_notify, personal_messages,' . (allowedTo('moderate_forum') ? ' 0' : '
+			(receive_from = {int:admins_only}' . (empty($modSettings['enable_buddylist']) ? '' : ' OR
+			(receive_from = {int:buddies_only} AND FIND_IN_SET({string:from_id}, buddy_list) = 0) OR
+			(receive_from = {int:not_on_ignore_list} AND FIND_IN_SET({string:from_id}, pm_ignore_list) != 0)') . ')') . ' AS ignored,
 			FIND_IN_SET({string:from_id}, buddy_list) != 0 AS is_buddy, is_activated,
 			additional_groups, id_group, id_post_group
 		FROM {db_prefix}members
@@ -641,7 +652,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 					$message_limit = $message_limit_cache[$id];
 			}
 
-			if ($message_limit > 0 && $message_limit <= $row['instant_messages'])
+			if ($message_limit > 0 && $message_limit <= $row['personal_messages'])
 			{
 				$log['failed'][$row['id_member']] = sprintf($txt['pm_error_data_limit_reached'], $row['real_name']);
 				unset($all_to[array_search($row['id_member'], $all_to)]);
@@ -758,7 +769,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	elseif (empty($modSettings['disallow_sendBody']))
 	{
 		censorText($message);
-		$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc(htmlspecialchars($message), false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
+		$message = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc(htmlspecialchars($message, ENT_COMPAT, 'UTF-8'), false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
 	}
 	else
 		$message = '';
@@ -822,7 +833,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = false, $from = 
 	}
 
 	if (!empty($all_to))
-		updateMemberData($all_to, array('instant_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
+		updateMemberData($all_to, array('personal_messages' => '+', 'unread_messages' => '+', 'new_pm' => 1));
 
 	return $log;
 }
@@ -866,6 +877,8 @@ function markPMsRead($memberID)
  */
 function loadPMs($pm_options, $id_member)
 {
+	global $options;
+
 	$db = database();
 
 	// First work out what messages we need to see - if grouped is a little trickier...
@@ -999,7 +1012,7 @@ function loadPMs($pm_options, $id_member)
 		}
 
 		// Keep track of the last message so we know what the head is without another query!
-		if ((empty($pmID) && (empty($options['view_newest_pm_first']) || !isset($lastData))) || empty($lastData) || (!empty($pmID) && $pmID == $row['id_pm']))
+		if ((empty($pm_options['pmid']) && (empty($options['view_newest_pm_first']) || !isset($lastData))) || empty($lastData) || (!empty($pm_options['pmid']) && $pm_options['pmid'] == $row['id_pm']))
 			$lastData = array(
 				'id' => $row['id_pm'],
 				'head' => $row['id_pm_head'],
@@ -1198,10 +1211,8 @@ function loadRules($reload = false)
  */
 function toggleNewPM($id_member, $new = false)
 {
-	global $user_info;
-
 	$db = database();
-	
+
 	$db->query('', '
 		UPDATE {db_prefix}pm_recipients
 		SET is_new = ' . ($new ? '{int:new}' : '{int:not_new}') . '
@@ -1289,6 +1300,14 @@ function getPmsFromDiscussion($pm_heads)
 	return $pms;
 }
 
+/**
+ * Determines the PMs which need an updated label.
+ *
+ * @param array $to_label
+ * @param string $label_type
+ * @param int $user_id
+ * @return updatePMLabels
+ */
 function changePMLabels($to_label, $label_type, $user_id)
 {
 	global $options;
@@ -1336,6 +1355,14 @@ function changePMLabels($to_label, $label_type, $user_id)
 		return updatePMLabels($to_update);
 }
 
+/**
+ * Detects personal messages which need  a new label.
+ *
+ * @param array $searchArray
+ * @param array $new_labels
+ * @param int $user_id
+ * @return updatePMLabels
+ */
 function updateLabelsToPM($searchArray, $new_labels, $user_id)
 {
 	$db = database();
@@ -1376,6 +1403,13 @@ function updateLabelsToPM($searchArray, $new_labels, $user_id)
 		return updatePMLabels($to_update, $user_id);
 }
 
+/**
+ * Updates PMs with their new label.
+ *
+ * @param array $to_update
+ * @param int $user_id
+ * @return int
+ */
 function updatePMLabels($to_update, $user_id)
 {
 	$db = database();
@@ -1409,6 +1443,13 @@ function updatePMLabels($to_update, $user_id)
 	return $updateErrors;
 }
 
+/**
+ * Gets PMs older than a specific date.
+ *
+ * @param int $user_id the user's id.
+ * @param int $time timestamp with a specific date
+ * @return array
+ */
 function getPMsOlderThan($user_id, $time)
 {
 	$db = database();
@@ -1452,4 +1493,131 @@ function getPMsOlderThan($user_id, $time)
 	$db->free_result($request);
 
 	return $pm_ids;
+}
+
+/**
+ * Used to delete PM rules from the given member.
+ *
+ * @param int $id_member
+ * @param array $rule_changes
+ */
+function deletePMRules($id_member, $rule_changes)
+{
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}pm_rules
+		WHERE id_rule IN ({array_int:rule_list})
+		AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'rule_list' => $rule_changes,
+		)
+	);
+}
+
+/**
+ * Updates a personal messaging rule action for the given member.
+ *
+ * @param int $id_rule
+ * @param int $id_member
+ * @param array $actions
+ */
+function updatePMRuleAction($id_rule, $id_member, $actions)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_rules
+		SET actions = {string:actions}
+		WHERE id_rule = {int:id_rule}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'id_rule' => $id_rule,
+			'actions' => serialize($actions),
+		)
+	);
+}
+
+/**
+ * Add a new PM rule to the database.
+ *
+ * @param int $id_member
+ * @param string $ruleName
+ * @param string $criteria
+ * @param string $actions
+ * @param int $doDelete
+ * @param int $isOr
+ */
+function addPMRule($id_member, $ruleName, $criteria, $actions, $doDelete, $isOr)
+{
+	$db = database();
+
+	$db->insert('',
+		'{db_prefix}pm_rules',
+		array(
+			'id_member' => 'int', 'rule_name' => 'string', 'criteria' => 'string', 'actions' => 'string',
+			'delete_pm' => 'int', 'is_or' => 'int',
+		),
+		array(
+			$id_member, $ruleName, $criteria, $actions, $doDelete, $isOr,
+		),
+		array('id_rule')
+	);
+}
+
+/**
+ * Updates a personal messaging rule for the given member.
+ *
+ * @param int $id_member
+ * @param int $id_rule
+ * @param string $ruleName
+ * @param string $criteria
+ * @param string $actions
+ * @param int $doDelete
+ * @param int $isOr
+ */
+function updatePMRule($id_member, $id_rule, $ruleName, $criteria, $actions, $doDelete, $isOr)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_rules
+		SET rule_name = {string:rule_name}, criteria = {string:criteria}, actions = {string:actions},
+			delete_pm = {int:delete_pm}, is_or = {int:is_or}
+		WHERE id_rule = {int:id_rule}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'delete_pm' => $doDelete,
+			'is_or' => $isOr,
+			'id_rule' => $id_rule,
+			'rule_name' => $ruleName,
+			'criteria' => $criteria,
+			'actions' => $actions,
+		)
+	);
+}
+
+/**
+ * Used to set a replied status for a given PM.
+ *
+ * @param int $id_member
+ * @param int $replied_to
+ */
+function setPMRepliedStatus($id_member, $replied_to)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}pm_recipients
+		SET is_read = is_read | 2
+		WHERE id_pm = {int:replied_to}
+			AND id_member = {int:current_member}',
+		array(
+			'current_member' => $id_member,
+			'replied_to' => $replied_to,
+		)
+	);
 }

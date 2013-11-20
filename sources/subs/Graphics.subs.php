@@ -252,30 +252,29 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 		return false;
 
 	// A known and supported format?
-	// @todo test PSD and gif.
 	if (checkImagick() && isset($default_formats[$sizes[2]]))
-	{
 		return resizeImage(null, $destination, null, null, $max_width, $max_height, true, $preferred_format);
-	}
 	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
 		$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
 		if ($src_img = @$imagecreatefrom($destination))
-		{
 			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, true, $preferred_format);
-		}
 	}
 
 	return false;
 }
 
 /**
- * Resizes src_img proportionally to fit within max_width and max_height limits
- * if it is too large.
- * If GD2 is present, it'll use it to achieve better quality.
- * It saves the new image to destination_filename, as preferred_format
+ * Resizes an image proportionally to fit within the defined max_width and max_height limits
+ * Will do nothing to the image if the file fits within the size limits
+ *
+ * If Image Magick is present it will use those function over any GD solutions
+ * If GD2 is present, it'll use it to achieve better quality (imagecopyresampled)
+ * It saves the new image to destination_filename, in the preferred_format
  * if possible, default is jpeg.
+ *
  * @uses GD
+ * @uses Imagick
  *
  * @param resource $src_img
  * @param string $destName
@@ -292,6 +291,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 
 	if (checkImagick())
 	{
+		// These are the file formats we know about
 		static $default_formats = array(
 			'1' => 'gif',
 			'2' => 'jpeg',
@@ -301,14 +301,18 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 		);
 		$preferred_format = empty($preferred_format) || !isset($default_formats[$preferred_format]) ? 2 : $preferred_format;
 
-		$imagick = New Imagick($destName);
+		// Get a new instance of Image Magick for use
+		$imagick = new Imagick($destName);
 		$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
 		$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
 		$dest_width = empty($max_width) ? $src_width : $max_width;
 		$dest_height = empty($max_height) ? $src_height : $max_height;
 
+		// Create a new image in our prefered format and resize it if needed
 		$imagick->setImageFormat($default_formats[$preferred_format]);
 		$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
+
+		// Save the new image in the destination location
 		$success = $imagick->writeImage($destName);
 
 		return !empty($success);
@@ -378,7 +382,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 		return $success;
 	}
 	else
-		// Without GD, no image resizing at all.
+		// Without Image Magick or GD, no image resizing at all.
 		return false;
 }
 
@@ -599,7 +603,8 @@ if (!function_exists('imagecreatefrombmp'))
 					$byte = ord($scan_line{$j++});
 
 					imagesetpixel($dst_img, $x, $y, $palette[(($byte) & 128) != 0]);
-					for ($shift = 1; $shift < 8; $shift++) {
+					for ($shift = 1; $shift < 8; $shift++)
+					{
 						if (++$x < $info['width']) imagesetpixel($dst_img, $x, $y, $palette[(($byte << $shift) & 128) != 0]);
 					}
 				}
@@ -747,7 +752,8 @@ function showCodeImage($code)
 	// Create a list of characters to be shown.
 	$characters = array();
 	$loaded_fonts = array();
-	for ($i = 0; $i < strlen($code); $i++)
+	$str_len = strlen($code);
+	for ($i = 0; $i < $str_len; $i++)
 	{
 		$characters[$i] = array(
 			'id' => $code{$i},
@@ -763,7 +769,7 @@ function showCodeImage($code)
 			$loaded_fonts[$font_index] = imageloadfont($settings['default_theme_dir'] . '/fonts/' . $font_list[$font_index]);
 
 	// Determine the dimensions of each character.
-	$total_width = $character_spacing * strlen($code) + 20;
+	$total_width = $character_spacing * strlen($code) + 50;
 	$max_height = 0;
 	foreach ($characters as $char_index => $character)
 	{
@@ -771,9 +777,9 @@ function showCodeImage($code)
 		{
 			// GD2 handles font size differently.
 			if ($fontSizeRandom)
-				$font_size = $gd2 ? mt_rand(19, 21) : mt_rand(25, 32);
+				$font_size = $gd2 ? mt_rand(17, 19) : mt_rand(25, 27);
 			else
-				$font_size = $gd2 ? 24 : 30;
+				$font_size = $gd2 ? 17 : 27;
 
 			$img_box = imagettfbbox($font_size, 0, $settings['default_theme_dir'] . '/fonts/' . $ttfont_list[$character['font']], $character['id']);
 
@@ -787,7 +793,7 @@ function showCodeImage($code)
 		}
 
 		$max_height = max($characters[$char_index]['height'] + 5, $max_height);
-		$total_width += $characters[$char_index]['width'];
+		$total_width += $characters[$char_index]['width'] + 2;
 	}
 
 	// Create an image.
@@ -844,6 +850,7 @@ function showCodeImage($code)
 					array(0, 0, 0),
 					array(143, 39, 31),
 				);
+				// @todo why this is not initialized outside the loop?
 				if (!isset($last_index))
 					$last_index = -1;
 				$new_index = $last_index;

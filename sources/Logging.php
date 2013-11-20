@@ -183,7 +183,7 @@ function logLastDatabaseError()
 	if (filemtime(BOARDDIR . '/db_last_error.php') === $last_db_error_change)
 	{
 		// Write the change
-		$write_db_change =  '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
+		$write_db_change = '<' . '?' . "php\n" . '$db_last_error = ' . time() . ';';
 		$written_bytes = file_put_contents(BOARDDIR . '/db_last_error.php', $write_db_change, LOCK_EX);
 
 		// survey says ...
@@ -195,7 +195,7 @@ function logLastDatabaseError()
 		}
 		else
 		{
-			@touch(BOARDDIR . '/' . 'Settings.php');
+			@touch(BOARDDIR . '/Settings.php');
 			return true;
 		}
 	}
@@ -249,21 +249,21 @@ function displayDebug()
 	ob_clean();
 
 	echo preg_replace('~</body>\s*</html>~', '', $temp), '
-<div class="smalltext" style="text-align: left; margin: 1ex;">
+<div id="debug_logging_wrapper">
+<div id="debug_logging" class="smalltext">
 	', $txt['debug_browser'], $context['browser_body_id'], ' <em>(', implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))), ')</em><br />
 	', $txt['debug_templates'], count($context['debug']['templates']), ': <em>', implode('</em>, <em>', $context['debug']['templates']), '</em>.<br />
 	', $txt['debug_subtemplates'], count($context['debug']['sub_templates']), ': <em>', implode('</em>, <em>', $context['debug']['sub_templates']), '</em>.<br />
 	', $txt['debug_language_files'], count($context['debug']['language_files']), ': <em>', implode('</em>, <em>', $context['debug']['language_files']), '</em>.<br />
 	', $txt['debug_stylesheets'], count($context['debug']['sheets']), ': <em>', implode('</em>, <em>', $context['debug']['sheets']), '</em>.<br />
+	', $txt['debug_javascript'] . (!empty($context['debug']['javascript']) ? count($context['debug']['javascript']) . ': <em>' . implode('</em>, <em>', $context['debug']['javascript']) . '</em>.<br />' : '') . '
 	', $txt['debug_hooks'], empty($context['debug']['hooks']) ? 0 : count($context['debug']['hooks']) . ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_hooks\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_hooks" style="display: none;"><em>' . implode('</em>, <em>', $context['debug']['hooks']), '</em></span>)', '<br />
 	', $txt['debug_files_included'], count($files), ' - ', round($total_size / 1024), $txt['debug_kb'], ' (<a href="javascript:void(0);" onclick="document.getElementById(\'debug_include_info\').style.display = \'inline\'; this.style.display = \'none\'; return false;">', $txt['debug_show'], '</a><span id="debug_include_info" style="display: none;"><em>', implode('</em>, <em>', $files), '</em></span>)<br />';
 
 	// What tokens are active?
 	if (isset($_SESSION['token']))
 	{
-		$token_list = array();
-		foreach ($_SESSION['token'] as $key => $data)
-			$token_list[] = $key;
+		$token_list = array_keys($_SESSION['token']);
 
 		echo $txt['debug_tokens'] . '<em>' . implode(',</em> <em>', $token_list), '</em>.<br />';
 	}
@@ -311,7 +311,7 @@ function displayDebug()
 				$qq['f'] = preg_replace('~^' . preg_quote(BOARDDIR, '~') . '~', '...', $qq['f']);
 
 			echo '
-	<strong>', $is_select ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win" style="text-decoration: none;">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars(ltrim($qq['q'], "\n\r")))) . ($is_select ? '</a></strong>' : '</strong>') . '<br />
+	<strong>', $is_select ? '<a href="' . $scripturl . '?action=viewquery;qq=' . ($q + 1) . '#qq' . $q . '" target="_blank" class="new_win" style="text-decoration: none;">' : '', nl2br(str_replace("\t", '&nbsp;&nbsp;&nbsp;', htmlspecialchars(ltrim($qq['q'], "\n\r"), ENT_COMPAT, 'UTF-8'))) . ($is_select ? '</a></strong>' : '</strong>') . '<br />
 	&nbsp;&nbsp;&nbsp;';
 			if (!empty($qq['f']) && !empty($qq['l']))
 				echo sprintf($txt['debug_query_in_line'], $qq['f'], $qq['l']);
@@ -326,7 +326,7 @@ function displayDebug()
 
 	echo '
 	<a href="' . $scripturl . '?action=viewquery;sa=hide">', $txt['debug_' . (empty($_SESSION['view_queries']) ? 'show' : 'hide') . '_queries'], '</a>
-</div></body></html>';
+</div></div></body></html>';
 }
 
 /**

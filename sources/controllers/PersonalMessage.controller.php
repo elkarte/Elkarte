@@ -28,53 +28,6 @@ if (!defined('ELK'))
 class PersonalMessage_Controller extends Action_Controller
 {
 	/**
-	 * This is the main function of personal messages, called before the action handler.
-	 * PersonalMessages is a menu-based controller.
-	 * It sets up the menu.
-	 * @todo and call from the menu the appropriate method/function
-	 * for the current area.
-	 *
-	 * @see Action_Controller::action_index()
-	 */
-	function action_index()
-	{
-		global $context;
-
-		// Finally all the things we know how to do
-		$subActions = array(
-			'manlabels' => 'action_manlabels',
-			'manrules' => 'action_manrules',
-			'pmactions' => 'action_pmactions',
-			'prune' => 'action_prune',
-			'removeall' => 'action_removeall',
-			'removeall2' => 'action_removeall2',
-			'report' => 'action_report',
-			'search' => 'action_search',
-			'search2' => 'action_search2',
-			'send' => 'action_send',
-			'send2' => 'action_send2',
-			'settings' => 'action_settings',
-			'showpmdrafts' => 'action_showpmdrafts',
-		);
-
-		// Known action, go to it, otherwise the inbox for you
-		if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		{
-			// Set the index bar
-			messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
-			$this->action_folder();
-		}
-		else
-		{
-			if (!isset($_REQUEST['xml']))
-				messageIndexBar($_REQUEST['sa']);
-
-			// So it was set - let's go to that action.
-			$this->{$subActions[$_REQUEST['sa']]}();
-		}
-	}
-
-	/**
 	 * This method is executed before any other in this file
 	 * (when the class is loaded by the dispatcher).
 	 * It sets the context, load templates and language file(s), as necessary
@@ -198,6 +151,63 @@ class PersonalMessage_Controller extends Action_Controller
 	}
 
 	/**
+	 * This is the main function of personal messages, called before the action handler.
+	 * PersonalMessages is a menu-based controller.
+	 * It sets up the menu.
+	 * @todo and call from the menu the appropriate method/function
+	 * for the current area.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	function action_index()
+	{
+		global $context;
+
+		require_once(SUBSDIR . '/Action.class.php');
+
+		// Finally all the things we know how to do
+		$subActions = array(
+			'manlabels' => array($this, 'action_manlabels', 'permissions' => 'pm_read'),
+			'manrules' => array($this, 'action_manrules', 'permissions' => 'pm_read'),
+			'pmactions' => array($this, 'action_pmactions', 'permissions' => 'pm_read'),
+			'prune' => array($this, 'action_prune', 'permissions' => 'pm_read'),
+			'removeall' => array($this, 'action_removeall', 'permissions' => 'pm_read'),
+			'removeall2' => array($this, 'action_removeall2', 'permissions' => 'pm_read'),
+			'report' => array($this, 'action_report', 'permissions' => 'pm_read'),
+			'search' => array($this, 'action_search', 'permissions' => 'pm_read'),
+			'search2' => array($this, 'action_search2', 'permissions' => 'pm_read'),
+			'send' => array($this, 'action_send', 'permissions' => 'pm_read'),
+			'send2' => array($this, 'action_send2', 'permissions' => 'pm_read'),
+			'settings' => array($this, 'action_settings', 'permissions' => 'pm_read'),
+			'showpmdrafts' => array($this, 'action_showpmdrafts', 'permissions' => 'pm_read'),
+			'inbox' => array($this, 'action_folder', 'permissions' => 'pm_read'),
+		);
+
+		// Known action, go to it, otherwise the inbox for you
+		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? 'inbox' : $_REQUEST['sa'];
+
+		// Set up our action array
+		$action = new Action();
+		$action->initialize($subActions, 'inbox');
+
+		// Known action, go to it, otherwise the inbox for you
+		if ($subAction === 'inbox')
+		{
+			// Set the index bar
+			messageIndexBar($context['current_label_id'] == -1 ? $context['folder'] : 'label' . $context['current_label_id']);
+			$action->dispatch($subAction);
+		}
+		else
+		{
+			if (!isset($_REQUEST['xml']))
+				messageIndexBar($_REQUEST['sa']);
+
+			// So it was set - let's go to that action.
+			$action->dispatch($subAction);
+		}
+	}
+
+	/**
 	 * A folder, ie. inbox/sent etc.
 	 */
 	function action_folder()
@@ -222,6 +232,16 @@ class PersonalMessage_Controller extends Action_Controller
 			$start = 0;
 		else
 			$start = 'new';
+
+		// Auto video embeding enabled?
+		if (!empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+		$(document).ready(function() {
+			$().linkifyvideo(oEmbedtext);
+		});'
+			);
+		}
 
 		// Set up some basic theme stuff.
 		$context['from_or_to'] = $context['folder'] != 'sent' ? 'from' : 'to';
@@ -329,7 +349,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Determine the navigation context (especially useful for the wireless template).
-		$context['links'] = array(
+		$context['links'] += array(
 			'first' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=0' : '',
 			'prev' => $start >= $modSettings['defaultMaxMessages'] ? $scripturl . '?action=pm;start=' . ($start - $modSettings['defaultMaxMessages']) : '',
 			'next' => $start + $modSettings['defaultMaxMessages'] < $max_messages ? $scripturl . '?action=pm;start=' . ($start + $modSettings['defaultMaxMessages']) : '',
@@ -342,7 +362,7 @@ class PersonalMessage_Controller extends Action_Controller
 		);
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
-		list($pms, $posters, $recipients, $lastData) = loadPMs(array(
+		list ($pms, $posters, $recipients, $lastData) = loadPMs(array(
 			'sort_by_query' => $sort_by_query,
 			'display_mode' => $context['display_mode'],
 			'sort_by' => $sort_by,
@@ -352,6 +372,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'start' => $start,
 			'limit' => $modSettings['defaultMaxMessages'],
 			'folder' => $context['folder'],
+			'pmid' => isset($pmID) ? $pmID : 0,
 		), $user_info['id']);
 
 		// Make sure that we have been given a correct head pm id!
@@ -541,7 +562,7 @@ class PersonalMessage_Controller extends Action_Controller
 	function action_send()
 	{
 		global $txt, $scripturl, $modSettings;
-		global $context, $options, $language, $user_info;
+		global $context, $language, $user_info;
 
 		$db = database();
 
@@ -699,7 +720,7 @@ class PersonalMessage_Controller extends Action_Controller
 				{
 					$context['recipients']['to'][] = array(
 						'id' => $row_quoted['id_member'],
-						'name' => htmlspecialchars($row_quoted['real_name']),
+						'name' => htmlspecialchars($row_quoted['real_name'], ENT_COMPAT, 'UTF-8'),
 					);
 				}
 
@@ -754,7 +775,6 @@ class PersonalMessage_Controller extends Action_Controller
 		// Set the defaults...
 		$context['subject'] = $form_subject;
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
-		$context['copy_to_outbox'] = !empty($options['copy_to_outbox']);
 
 		// And build the link tree.
 		$context['linktree'][] = array(
@@ -824,8 +844,6 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $modSettings;
 
-		$db = database();
-
 		isAllowedTo('pm_send');
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -840,7 +858,7 @@ class PersonalMessage_Controller extends Action_Controller
 		list ($modSettings['max_pm_recipients'], $modSettings['pm_posts_verification'], $modSettings['pm_posts_per_hour']) = explode(',', $modSettings['pm_spam_settings']);
 
 		// Initialize the errors we're about to make.
-		$post_errors = error_context::context('pm', 1);
+		$post_errors = Error_Context::context('pm', 1);
 
 		// Check whether we've gone over the limit of messages we can send per hour - fatal error if fails!
 		if (!empty($modSettings['pm_posts_per_hour']) && !allowedTo(array('admin_forum', 'moderate_forum', 'send_mail')) && $user_info['mod_cache']['bq'] == '0=1' && $user_info['mod_cache']['gq'] == '0=1')
@@ -1057,7 +1075,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Do the actual sending of the PM.
 		if (!empty($recipientList['to']) || !empty($recipientList['bcc']))
-			$context['send_log'] = sendpm($recipientList, $_REQUEST['subject'], $_REQUEST['message'], !empty($_REQUEST['outbox']), null, !empty($_REQUEST['pm_head']) ? (int) $_REQUEST['pm_head'] : 0);
+			$context['send_log'] = sendpm($recipientList, $_REQUEST['subject'], $_REQUEST['message'], true, null, !empty($_REQUEST['pm_head']) ? (int) $_REQUEST['pm_head'] : 0);
 		else
 			$context['send_log'] = array(
 				'sent' => array(),
@@ -1067,16 +1085,8 @@ class PersonalMessage_Controller extends Action_Controller
 		// Mark the message as "replied to".
 		if (!empty($context['send_log']['sent']) && !empty($_REQUEST['replied_to']) && isset($_REQUEST['f']) && $_REQUEST['f'] == 'inbox')
 		{
-			$db->query('', '
-				UPDATE {db_prefix}pm_recipients
-				SET is_read = is_read | 2
-				WHERE id_pm = {int:replied_to}
-					AND id_member = {int:current_member}',
-				array(
-					'current_member' => $user_info['id'],
-					'replied_to' => (int) $_REQUEST['replied_to'],
-				)
-			);
+			require_once(SUBSDIR . '/PersonalMessage.subs.php');
+			setPMRepliedStatus($user_info['id'], (int) $_REQUEST['replied_to'] );
 		}
 
 		// If one or more of the recipient were invalid, go back to the post screen with the failed usernames.
@@ -1262,7 +1272,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
-		$db = database();
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Build the link tree elements...
 		$context['linktree'][] = array(
@@ -1393,31 +1403,13 @@ class PersonalMessage_Controller extends Action_Controller
 				foreach ($rule_changes as $k => $id)
 					if (!empty($context['rules'][$id]['actions']))
 					{
-						$db->query('', '
-							UPDATE {db_prefix}pm_rules
-							SET actions = {string:actions}
-							WHERE id_rule = {int:id_rule}
-								AND id_member = {int:current_member}',
-							array(
-								'current_member' => $user_info['id'],
-								'id_rule' => $id,
-								'actions' => serialize($context['rules'][$id]['actions']),
-							)
-						);
+						updatePMRuleAction($id, $user_info['id'], $context['rules'][$id]['actions']);
 						unset($rule_changes[$k]);
 					}
 
 				// Anything left here means it's lost all actions...
 				if (!empty($rule_changes))
-					$db->query('', '
-						DELETE FROM {db_prefix}pm_rules
-						WHERE id_rule IN ({array_int:rule_list})
-								AND id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-							'rule_list' => $rule_changes,
-						)
-					);
+					deletePMRules($user_info['id'], $rule_changes);
 			}
 
 			// Make sure we're not caching this!
@@ -1651,7 +1643,7 @@ class PersonalMessage_Controller extends Action_Controller
 	{
 		global $txt, $context, $user_info, $scripturl;
 
-		$db = database();
+		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// The link tree - gotta have this :o
 		$context['linktree'][] = array(
@@ -1782,34 +1774,9 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Create the rule?
 			if (empty($context['rid']))
-				$db->insert('',
-					'{db_prefix}pm_rules',
-					array(
-						'id_member' => 'int', 'rule_name' => 'string', 'criteria' => 'string', 'actions' => 'string',
-						'delete_pm' => 'int', 'is_or' => 'int',
-					),
-					array(
-						$user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr,
-					),
-					array('id_rule')
-				);
+				addPMRule($user_info['id'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 			else
-				$db->query('', '
-					UPDATE {db_prefix}pm_rules
-					SET rule_name = {string:rule_name}, criteria = {string:criteria}, actions = {string:actions},
-						delete_pm = {int:delete_pm}, is_or = {int:is_or}
-					WHERE id_rule = {int:id_rule}
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'delete_pm' => $doDelete,
-						'is_or' => $isOr,
-						'id_rule' => $context['rid'],
-						'rule_name' => $ruleName,
-						'criteria' => $criteria,
-						'actions' => $actions,
-					)
-				);
+				updatePMRule($user_info['id'], $context['rid'], $ruleName, $criteria, $actions, $doDelete, $isOr);
 
 			redirectexit('action=pm;sa=manrules');
 		}
@@ -1822,15 +1789,7 @@ class PersonalMessage_Controller extends Action_Controller
 				$toDelete[] = (int) $k;
 
 			if (!empty($toDelete))
-				$db->query('', '
-					DELETE FROM {db_prefix}pm_rules
-					WHERE id_rule IN ({array_int:delete_list})
-						AND id_member = {int:current_member}',
-					array(
-						'current_member' => $user_info['id'],
-						'delete_list' => $toDelete,
-					)
-				);
+				deletePMRules($user_info['id'], $toDelete);
 
 			redirectexit('action=pm;sa=manrules');
 		}
@@ -1863,9 +1822,9 @@ class PersonalMessage_Controller extends Action_Controller
 		if (isset($_REQUEST['search']))
 			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
 		if (isset($context['search_params']['search']))
-			$context['search_params']['search'] = htmlspecialchars($context['search_params']['search']);
+			$context['search_params']['search'] = htmlspecialchars($context['search_params']['search'], ENT_COMPAT, 'UTF-8');
 		if (isset($context['search_params']['userspec']))
-			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec']);
+			$context['search_params']['userspec'] = htmlspecialchars($context['search_params']['userspec'], ENT_COMPAT, 'UTF-8');
 		if (!empty($context['search_params']['searchtype']))
 			$context['search_params']['searchtype'] = 2;
 		if (!empty($context['search_params']['minage']))
@@ -1994,49 +1953,50 @@ class PersonalMessage_Controller extends Action_Controller
 
 			for ($k = 0, $n = count($possible_users); $k < $n; $k++)
 			{
-				$possible_users[$k] = trim($possible_users[$k]);
+				$possible_users[$k] = addcslashes(trim($possible_users[$k]), '\\\'');
 
 				if (strlen($possible_users[$k]) == 0)
 					unset($possible_users[$k]);
+				else
+					$possible_users[$k] = $db->quote('{string:name}', array('name' => $possible_users[$k]));
 			}
 
+			require_once(SUBSDIR . '/Members.subs.php');
+
 			// Who matches those criteria?
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE real_name LIKE {raw:real_name_implode}',
-				array(
-					'real_name_implode' => '\'' . implode('\' OR real_name LIKE \'', $possible_users) . '\'',
-				)
-			);
+			$members = membersBy('real_name LIKE {raw:real_name_implode}', array('real_name_implode' => implode(" OR real_name LIKE ", $possible_users), 'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name'));
+
 			// Simply do nothing if there're too many members matching the criteria.
-			if ($db->num_rows($request) > $maxMembersToSearch)
+			if (count($members) > $maxMembersToSearch)
 				$userQuery = '';
-			elseif ($db->num_rows($request) == 0)
+			elseif (count($members) == 0)
 			{
 				if ($context['folder'] === 'inbox')
-					$userQuery = 'AND pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})';
+				{
+					$userQuery = 'AND pm.id_member_from = 0 AND ({raw:pm_from_name} LIKE {raw:guest_user_name_implode})';
+					$searchq_parameters['pm_from_name'] = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
+				}
 				else
 					$userQuery = '';
 
-				$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
+				$searchq_parameters['guest_user_name_implode'] = implode('\' OR ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name') . ' LIKE ', $possible_users);
 			}
 			else
 			{
 				$memberlist = array();
-				while ($row = $db->fetch_assoc($request))
-					$memberlist[] = $row['id_member'];
+				foreach ($members as $id)
+					$memberlist[] = $id;
 
 				// Use the name as as sent from or sent to
 				if ($context['folder'] === 'inbox')
-					$userQuery = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND (pm.from_name LIKE {raw:guest_user_name_implode})))';
+					$userQuery = 'AND (pm.id_member_from IN ({array_int:member_list}) OR (pm.id_member_from = 0 AND ({raw:pm_from_name} LIKE {raw:guest_user_name_implode})))';
 				else
 					$userQuery = 'AND (pmr.id_member IN ({array_int:member_list}))';
 
-				$searchq_parameters['guest_user_name_implode'] = '\'' . implode('\' OR pm.from_name LIKE \'', $possible_users) . '\'';
+				$searchq_parameters['guest_user_name_implode'] = implode('\' OR ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name') . ' LIKE ', $possible_users);
+				$searchq_parameters['pm_from_name'] = defined('DB_CASE_SENSITIVE') ? 'LOWER(pm.from_name)' : 'pm.from_name';
 				$searchq_parameters['member_list'] = $memberlist;
 			}
-			$db->free_result($request);
 		}
 
 		// Setup the sorting variables...
@@ -2173,7 +2133,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
-			$context['search_errors']['invalid_search_string'] = true;
+			$context['search_errors']['invalid_search_string' . (!empty($foundBlackListedWords) ? '_blacklist' : '')] = true;
 
 		// Sort out the search query so the user can edit it - if they want.
 		$context['search_params'] = $search_params;
@@ -2322,6 +2282,7 @@ class PersonalMessage_Controller extends Action_Controller
 					'message_list' => $foundMessages,
 				)
 			);
+			$recipients = array();
 			while ($row = $db->fetch_assoc($request))
 			{
 				if ($context['folder'] == 'sent' || empty($row['bcc']))
@@ -2433,74 +2394,89 @@ function messageIndexBar($area)
 {
 	global $txt, $context, $scripturl, $modSettings, $user_info;
 
-	$pm_areas = array(
-		'folders' => array(
-			'title' => $txt['pm_messages'],
-			'areas' => array(
-				'send' => array(
-					'label' => $txt['new_message'],
-					'custom_url' => $scripturl . '?action=pm;sa=send',
-					'permission' => allowedTo('pm_send'),
-				),
-				'inbox' => array(
-					'label' => $txt['inbox'],
-					'custom_url' => $scripturl . '?action=pm',
-				),
-				'sent' => array(
-					'label' => $txt['sent_items'],
-					'custom_url' => $scripturl . '?action=pm;f=sent',
-				),
-				'drafts' => array(
-					'label' => $txt['drafts_show'],
-					'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
-					'permission' => allowedTo('pm_draft'),
-					'enabled' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']),
-				),
+	require_once(SUBSDIR . '/Menu.subs.php');
+
+	$allMenus = Standard_Menu::context();
+	$pm_menu = $allMenus->get('PM_Menu');
+
+	$pm_menu->addBulk(
+		array(
+			'folders' => array(
+				'title' => $txt['pm_messages'],
 			),
-		),
-		'labels' => array(
-			'title' => $txt['pm_labels'],
-			'areas' => array(),
-		),
-		'actions' => array(
-			'title' => $txt['pm_actions'],
-			'areas' => array(
-				'search' => array(
-					'label' => $txt['pm_search_bar_title'],
-					'custom_url' => $scripturl . '?action=pm;sa=search',
-				),
-				'prune' => array(
-					'label' => $txt['pm_prune'],
-					'custom_url' => $scripturl . '?action=pm;sa=prune'
-				),
+			'actions' => array(
+				'title' => $txt['pm_actions'],
 			),
-		),
-		'pref' => array(
-			'title' => $txt['pm_preferences'],
-			'areas' => array(
-				'manlabels' => array(
-					'label' => $txt['pm_manage_labels'],
-					'custom_url' => $scripturl . '?action=pm;sa=manlabels',
-				),
-				'manrules' => array(
-					'label' => $txt['pm_manage_rules'],
-					'custom_url' => $scripturl . '?action=pm;sa=manrules',
-				),
-				'settings' => array(
-					'label' => $txt['pm_settings'],
-					'custom_url' => $scripturl . '?action=pm;sa=settings',
-				),
+			'pref' => array(
+				'title' => $txt['pm_preferences'],
 			),
-		),
+		)
+	);
+
+	$inbox = $pm_menu->childOf('folders')->add('folders_areas');
+	$inbox->addBulk(
+		array(
+			'send' => array(
+				'label' => $txt['new_message'],
+				'custom_url' => $scripturl . '?action=pm;sa=send',
+				'permission' => allowedTo('pm_send'),
+			),
+			'inbox' => array(
+				'label' => $txt['inbox'],
+				'custom_url' => $scripturl . '?action=pm',
+			),
+			'sent' => array(
+				'label' => $txt['sent_items'],
+				'custom_url' => $scripturl . '?action=pm;f=sent',
+			),
+			'drafts' => array(
+				'label' => $txt['drafts_show'],
+				'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
+				'permission' => allowedTo('pm_draft'),
+				'enabled' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']),
+			),
+		)
+	);
+
+	$pm_menu->childOf('actions')->add('actions_areas')->addBulk(
+		array(
+			'search' => array(
+				'label' => $txt['pm_search_bar_title'],
+				'custom_url' => $scripturl . '?action=pm;sa=search',
+			),
+			'prune' => array(
+				'label' => $txt['pm_prune'],
+				'custom_url' => $scripturl . '?action=pm;sa=prune'
+			),
+		)
+	);
+
+	$pm_menu->childOf('pref')->add('pref_areas')->addBulk(
+		array(
+			'manlabels' => array(
+				'label' => $txt['pm_manage_labels'],
+				'custom_url' => $scripturl . '?action=pm;sa=manlabels',
+			),
+			'manrules' => array(
+				'label' => $txt['pm_manage_rules'],
+				'custom_url' => $scripturl . '?action=pm;sa=manrules',
+			),
+			'settings' => array(
+				'label' => $txt['pm_settings'],
+				'custom_url' => $scripturl . '?action=pm;sa=settings',
+			),
+		)
 	);
 
 	// Handle labels.
-	if (empty($context['currently_using_labels']))
-		unset($pm_areas['labels']);
-	else
+	if (!empty($context['currently_using_labels']))
 	{
+		$pm_menu->after('folders')->add('labels', array(
+				'title' => $txt['pm_labels'],
+		));
 		// Note we send labels by id as it will have less problems in the querystring.
 		$unread_in_labels = 0;
+		$labels_area = array();
 		foreach ($context['labels'] as $label)
 		{
 			if ($label['id'] == -1)
@@ -2510,7 +2486,7 @@ function messageIndexBar($area)
 			$unread_in_labels += $label['unread_messages'];
 
 			// Add the label to the menu.
-			$pm_areas['labels']['areas']['label' . $label['id']] = array(
+			$labels_area['label' . $label['id']] = array(
 				'label' => $label['name'] . (!empty($label['unread_messages']) ? ' (<strong>' . $label['unread_messages'] . '</strong>)' : ''),
 				'custom_url' => $scripturl . '?action=pm;l=' . $label['id'],
 				'unread_messages' => $label['unread_messages'],
@@ -2518,18 +2494,23 @@ function messageIndexBar($area)
 			);
 		}
 
-		if (!empty($unread_in_labels))
-			$pm_areas['labels']['title'] .= ' (' . $unread_in_labels . ')';
-	}
+		$pm_menu->childOf('labels')->add('labels_areas')->addBulk($labels_area);
 
-	$pm_areas['folders']['areas']['inbox']['unread_messages'] = &$context['labels'][-1]['unread_messages'];
-	$pm_areas['folders']['areas']['inbox']['messages'] = &$context['labels'][-1]['messages'];
+		if (!empty($unread_in_labels))
+			$pm_menu->add('labels', array(
+					'title' => $txt['pm_labels'] . ' (' . $unread_in_labels . ')',
+			));
+	}
 
 	// If we have unread messages, make note of the number in the menus
 	if (!empty($context['labels'][-1]['unread_messages']))
 	{
-		$pm_areas['folders']['areas']['inbox']['label'] .= ' (<strong>' . $context['labels'][-1]['unread_messages'] . '</strong>)';
-		$pm_areas['folders']['title'] .= ' (' . $context['labels'][-1]['unread_messages'] . ')';
+		$inbox->add('inbox', array(
+			'label' => $txt['inbox'] . ' (<strong>' . $context['labels'][-1]['unread_messages'] . '</strong>)',
+		));
+		$pm_menu->add('folders', array(
+			'title' => $txt['pm_messages'] . ' (' . $context['labels'][-1]['unread_messages'] . ')',
+		));
 	}
 
 	// Do we have a limit on the amount of messages we can keep?
@@ -2546,8 +2527,6 @@ function messageIndexBar($area)
 		);
 	}
 
-	require_once(SUBSDIR . '/Menu.subs.php');
-
 	// Set a few options for the menu.
 	$menuOptions = array(
 		'current_area' => $area,
@@ -2555,8 +2534,8 @@ function messageIndexBar($area)
 	);
 
 	// Actually create the menu!
-	$pm_include_data = createMenu($pm_areas, $menuOptions);
-	unset($pm_areas);
+	$pm_include_data = $allMenus->createMenu('PM_Menu', $menuOptions);
+	$allMenus->destroy('PM_Menu');
 
 	// No menu means no access.
 	if (!$pm_include_data && (!$user_info['is_guest'] || validateSession()))
@@ -2734,7 +2713,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 		$context['sub_template'] = 'pm';
 
 	$context['page_title'] = $txt['send_message'];
-	$error_types = error_context::context('pm', 1);
+	$error_types = Error_Context::context('pm', 1);
 
 	// Got some known members?
 	$context['recipients'] = array(
@@ -2763,7 +2742,6 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	// Set everything up like before....
 	$context['subject'] = isset($_REQUEST['subject']) ? Util::htmlspecialchars($_REQUEST['subject']) : '';
 	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'])) : '';
-	$context['copy_to_outbox'] = !empty($_REQUEST['outbox']);
 	$context['reply'] = !empty($_REQUEST['replied_to']);
 
 	if ($context['reply'])
@@ -2901,9 +2879,8 @@ function prepareDraftsContext($member_id, $id_pm = false)
 		loadDraft((int) $_REQUEST['id_draft'], 1, true, true);
 
 	// load all the drafts for this user that meet the criteria
-	$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
 	$order = 'poster_time DESC';
-	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $drafts_keep_days, $order);
+	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $order);
 
 	// add them to the context draft array for template display
 	foreach ($user_drafts as $draft)

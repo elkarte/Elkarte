@@ -21,12 +21,13 @@ function template_core_features()
 {
 	global $context, $txt, $settings, $scripturl;
 
+	// @todo move all this javascript to a file
 	echo '
 	<script><!-- // --><![CDATA[
 		var token_name,
 			token_value,
-			feature_on_text =  ', JavaScriptEscape($txt['core_settings_switch_off']), ',
-			feature_off_text =', JavaScriptEscape($txt['core_settings_switch_on']), ';
+			feature_on_text = ', JavaScriptEscape($txt['core_settings_switch_off']), ',
+			feature_off_text = ', JavaScriptEscape($txt['core_settings_switch_on']), ';
 
 		$(document).ready(function() {
 			$(".core_features_hide").css(\'display\', \'none\');
@@ -72,41 +73,45 @@ function template_core_features()
 
 					// The type of data that is getting returned.
 					data: data,
-					error: function(error){
-							$(ajax_infobar).html(error).slideDown(\'fast\');
-					},
-
-					success: function(request){
-						if ($(request).find("errors").find("error").length !== 0)
-						{
-							$(ajax_infobar).attr(\'class\', \'errorbox\');
-							$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
-						}
-						else if ($(request).find("elk").length !== 0)
-						{
-							$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
-							cc.attr({
-								"src": imgs[new_state ? 1 : 0],
-								"title": new_state ? feature_on_text : feature_off_text,
-								"alt": new_state ? feature_on_text : feature_off_text
-							});
-							$("#feature_link_" + cf).fadeOut().fadeIn();
-							$(ajax_infobar).attr(\'class\', \'infobox\');
-							var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
-							$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown(\'fast\');
-							setTimeout(function() {
-								$(ajax_infobar).slideUp();
-							}, 5000);
-
-							token_name = $(request).find("tokens").find(\'[type="token"]\').text();
-							token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
-						}
-						else
-						{
-							$(ajax_infobar).attr(\'class\', \'errorbox\');
-							$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
-						}
+					beforeSend: ajax_indicator(true)
+				})
+				.done(function(request) {
+					if ($(request).find("errors").find("error").length !== 0)
+					{
+						$(ajax_infobar).attr(\'class\', \'errorbox\');
+						$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
 					}
+					else if ($(request).find("elk").length !== 0)
+					{
+						$("#feature_link_" + cf).html($(request).find("corefeatures").find("corefeature").text());
+						cc.attr({
+							"src": imgs[new_state ? 1 : 0],
+							"title": new_state ? feature_on_text : feature_off_text,
+							"alt": new_state ? feature_on_text : feature_off_text
+						});
+						$("#feature_link_" + cf).fadeOut().fadeIn();
+						$(ajax_infobar).attr(\'class\', \'infobox\');
+						var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
+						$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown(\'fast\');
+						setTimeout(function() {
+							$(ajax_infobar).slideUp();
+						}, 5000);
+
+						token_name = $(request).find("tokens").find(\'[type="token"]\').text();
+						token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
+					}
+					else
+					{
+						$(ajax_infobar).attr(\'class\', \'errorbox\');
+						$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
+					}
+				})
+				.fail(function(error) {
+						$(ajax_infobar).html(error).slideDown(\'fast\');
+				})
+				.always(function() {
+					// turn off the indicator
+					ajax_indicator(false);
 				});
 			});
 		});
@@ -116,11 +121,9 @@ function template_core_features()
 	if ($context['is_new_install'])
 	{
 		echo '
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $txt['core_settings_welcome_msg'], '
-				</h3>
-			</div>
+			<h2 id="section_header" class="category_header">
+				', $txt['core_settings_welcome_msg'], '
+			</h2>
 			<div class="information">
 				', $txt['core_settings_welcome_msg_desc'], '
 			</div>';
@@ -130,28 +133,19 @@ function template_core_features()
 			<form id="core_features" action="', $scripturl, '?action=admin;area=corefeatures" method="post" accept-charset="UTF-8">
 			<div style="display:none" id="activation_message" class="errorbox"></div>';
 
-	$alternate = true;
-	$num = 0;
-
+	// Loop through all the shiny features.
 	foreach ($context['features'] as $id => $feature)
-	{
-		$num++;
-
 		echo '
 			<div class="content features">
 				<img class="features_image" src="', $feature['image'], '" alt="', $feature['title'], '" />
 				<div class="features_switch" id="js_feature_', $id, '">
 					<label class="core_features_hide" for="feature_', $id, '">', $txt['core_settings_enabled'], '<input class="core_features_status_box" type="checkbox" name="feature_', $id, '" id="feature_', $id, '"', $feature['enabled'] ? ' checked="checked"' : '', ' /></label>
-					<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="margin-top: 1.3em;display:none" />
+					<img class="core_features_img ', $feature['state'], '" src="', $settings['images_url'], '/admin/switch_', $feature['state'], '.png" alt="', $feature['state'], '" id="switch_', $id, '" style="display:none" />
 				</div>
-				<h4 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h4>
+				<h3 id="feature_link_' . $id . '">', ($feature['enabled'] && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']), '</h3>
 				<p>', $feature['desc'], '</p>
-
 				<hr />
 			</div>';
-
-		$alternate = !$alternate;
-	}
 
 	echo '
 			<div class="righttext">

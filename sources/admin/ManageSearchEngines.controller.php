@@ -42,27 +42,21 @@ class ManageSearchEngines_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		loadLanguage('Search');
 		loadTemplate('ManageSearch');
 
 		$subActions = array(
-			'editspiders' => array($this, 'action_editspiders'),
-			'logs' => array($this, 'action_logs'),
-			'settings' => array($this, 'action_engineSettings_display'),
-			'spiders' => array($this, 'action_spiders'),
-			'stats' => array($this, 'action_stats'),
+			'editspiders' => array($this, 'action_editspiders', 'permission' => 'admin_forum'),
+			'logs' => array($this, 'action_logs', 'permission' => 'admin_forum'),
+			'settings' => array($this, 'action_engineSettings_display', 'permission' => 'admin_forum'),
+			'spiders' => array($this, 'action_spiders', 'permission' => 'admin_forum'),
+			'stats' => array($this, 'action_stats', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_search_engines', array(&$subActions));
 
 		// Ensure we have a valid subaction.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'stats';
-
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
 
 		// Some contextual data for the template.
 		$context['sub_action'] = $subAction;
@@ -75,6 +69,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 
@@ -136,7 +132,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			// security checks
 			checkSession();
 
-			// notify the interested add-ons or integrations
+			// notify the interested addons or integrations
 			call_integration_hook('integrate_save_search_engine_settings', array(&$config_vars));
 
 			// save the results!
@@ -159,10 +155,10 @@ class ManageSearchEngines_Controller extends Action_Controller
 	}
 
 /**
-	 * Initialize the form with configuration settings for search engines
-	 *
-	 * @return array
-	 */
+	* Initialize the form with configuration settings for search engines
+	*
+	* @return array
+	*/
 	function _initEngineSettingsForm()
 	{
 		global $txt;
@@ -210,8 +206,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		$db = database();
-
 		// We'll need to do hard work here.
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 
@@ -231,49 +225,17 @@ class ManageSearchEngines_Controller extends Action_Controller
 			validateToken('admin-ser');
 
 			// Make sure every entry is a proper integer.
-			foreach ($_POST['remove'] as $index => $spider_id)
-				$_POST['remove'][(int) $index] = (int) $spider_id;
+			$toRemove = array_map('intval', $_POST['remove']);
 
 			// Delete them all!
-			$db->query('', '
-				DELETE FROM {db_prefix}spiders
-				WHERE id_spider IN ({array_int:remove_list})',
-				array(
-					'remove_list' => $_POST['remove'],
-				)
-			);
-			$db->query('', '
-				DELETE FROM {db_prefix}log_spider_hits
-				WHERE id_spider IN ({array_int:remove_list})',
-				array(
-					'remove_list' => $_POST['remove'],
-				)
-			);
-			$db->query('', '
-				DELETE FROM {db_prefix}log_spider_stats
-				WHERE id_spider IN ({array_int:remove_list})',
-				array(
-					'remove_list' => $_POST['remove'],
-				)
-			);
+			removeSpiders($toRemove);
 
 			cache_put_data('spider_search', null, 300);
 			recacheSpiderNames();
 		}
 
 		// Get the last seens.
-		$request = $db->query('', '
-			SELECT id_spider, MAX(last_seen) AS last_seen_time
-			FROM {db_prefix}log_spider_stats
-			GROUP BY id_spider',
-			array(
-			)
-		);
-
-		$context['spider_last_seen'] = array();
-		while ($row = $db->fetch_assoc($request))
-			$context['spider_last_seen'][$row['id_spider']] = $row['last_seen_time'];
-		$db->free_result($request);
+		$context['spider_last_seen'] = spidersLastSeen();
 
 		createToken('admin-ser');
 		$listOptions = array(
@@ -283,10 +245,11 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=sengines;sa=spiders',
 			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => array($this, 'list_getSpiders'),
+				'function' => 'getSpiders',
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumSpiders'),
+				'function' => 'getNumSpiders',
+				'file' => SUBSDIR . '/SearchEngines.subs.php',
 			),
 			'no_items_label' => $txt['spiders_no_entries'],
 			'columns' => array(
@@ -298,7 +261,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							global $scripturl;
 
-							return sprintf(\'<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_spider\'], htmlspecialchars($rowData[\'spider_name\']));
+							return sprintf(\'<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_spider\'], htmlspecialchars($rowData[\'spider_name\'], ENT_COMPAT, \'UTF-8\'));
 						'),
 					),
 					'sort' => array(
@@ -374,7 +337,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -387,8 +350,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 	function action_editspiders()
 	{
 		global $context, $txt;
-
-		$db = database();
 
 		// Some standard stuff.
 		$context['id_spider'] = !empty($_GET['sid']) ? (int) $_GET['sid'] : 0;
@@ -413,30 +374,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
-			if ($context['id_spider'])
-				$db->query('', '
-					UPDATE {db_prefix}spiders
-					SET spider_name = {string:spider_name}, user_agent = {string:spider_agent},
-						ip_info = {string:ip_info}
-					WHERE id_spider = {int:current_spider}',
-					array(
-						'current_spider' => $context['id_spider'],
-						'spider_name' => $_POST['spider_name'],
-						'spider_agent' => $_POST['spider_agent'],
-						'ip_info' => $ips,
-					)
-				);
-			else
-				$db->insert('insert',
-					'{db_prefix}spiders',
-					array(
-						'spider_name' => 'string', 'user_agent' => 'string', 'ip_info' => 'string',
-					),
-					array(
-						$_POST['spider_name'], $_POST['spider_agent'], $ips,
-					),
-					array('id_spider')
-				);
+			updateSpider($context['id_spider'], $_POST['spider_name'], $_POST['spider_agent'], $ips);
 
 			// Order by user agent length.
 			require_once(SUBSDIR . '/SearchEngines.subs.php');
@@ -458,24 +396,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		// An edit?
 		if ($context['id_spider'])
-		{
-			$request = $db->query('', '
-				SELECT id_spider, spider_name, user_agent, ip_info
-				FROM {db_prefix}spiders
-				WHERE id_spider = {int:current_spider}',
-				array(
-					'current_spider' => $context['id_spider'],
-				)
-			);
-			if ($row = $db->fetch_assoc($request))
-				$context['spider'] = array(
-					'id' => $row['id_spider'],
-					'name' => $row['spider_name'],
-					'agent' => $row['user_agent'],
-					'ip_info' => $row['ip_info'],
-				);
-			$db->free_result($request);
-		}
+			$context['spider'] = getSpiderDetails($context['id_spider']);
 
 		createToken('admin-ses');
 	}
@@ -486,8 +407,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 	function action_logs()
 	{
 		global $context, $txt, $scripturl, $modSettings;
-
-		$db = database();
 
 		// Load the template and language just incase.
 		loadLanguage('Search');
@@ -502,13 +421,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$deleteTime = time() - (((int) $_POST['older']) * 24 * 60 * 60);
 
 			// Delete the entires.
-			$db->query('', '
-				DELETE FROM {db_prefix}log_spider_hits
-				WHERE log_time < {int:delete_period}',
-				array(
-					'delete_period' => $deleteTime,
-				)
-			);
+			require_once(SUBSDIR . '/SearchEngines.subs.php');
+			removeSpiderOldLogs($deleteTime);
 		}
 
 		$listOptions = array(
@@ -519,10 +433,11 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'base_href' => $context['admin_area'] == 'sengines' ? $scripturl . '?action=admin;area=sengines;sa=logs' : $scripturl . '?action=admin;area=logs;sa=spiderlog',
 			'default_sort_col' => 'log_time',
 			'get_items' => array(
-				'function' => array($this, 'list_getSpiderLogs'),
+				'function' => 'getSpiderLogs',
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumSpiderLogs'),
+				'function' => 'getNumSpiderLogs',
+				'file' => SUBSDIR . '/SearchEngines.subs.php',
 			),
 			'columns' => array(
 				'name' => array(
@@ -579,7 +494,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-sl');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// Now determine the actions of the URLs.
@@ -616,8 +531,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		$db = database();
-
 		// We'll need to do hard work here.
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 
@@ -637,44 +550,13 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$deleteTime = time() - (((int) $_POST['older']) * 24 * 60 * 60);
 
 			// Delete the entires.
-			$db->query('', '
-				DELETE FROM {db_prefix}log_spider_stats
-				WHERE last_seen < {int:delete_period}',
-				array(
-					'delete_period' => $deleteTime,
-				)
-			);
+			removeSpiderOldStats($deleteTime);
 		}
 
-		// Get the earliest and latest dates.
-		$request = $db->query('', '
-			SELECT MIN(stat_date) AS first_date, MAX(stat_date) AS last_date
-			FROM {db_prefix}log_spider_stats',
-			array(
-			)
-		);
-
-		list ($min_date, $max_date) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		$min_year = (int) substr($min_date, 0, 4);
-		$max_year = (int) substr($max_date, 0, 4);
-		$min_month = (int) substr($min_date, 5, 2);
-		$max_month = (int) substr($max_date, 5, 2);
-
 		// Prepare the dates for the drop down.
-		$date_choices = array();
-		for ($y = $min_year; $y <= $max_year; $y++)
-			for ($m = 1; $m <= 12; $m++)
-			{
-				// This doesn't count?
-				if ($y == $min_year && $m < $min_month)
-					continue;
-				if ($y == $max_year && $m > $max_month)
-					break;
-
-				$date_choices[$y . $m] = $txt['months_short'][$m] . ' ' . $y;
-			}
+		$date_choices = spidersStatsDates();
+		end($date_choices);
+		$max_date = key($date_choices);
 
 		// What are we currently viewing?
 		$current_date = isset($_REQUEST['new_date']) && isset($date_choices[$_REQUEST['new_date']]) ? $_REQUEST['new_date'] : $max_date;
@@ -703,16 +585,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		{
 			$date_query = sprintf('%04d-%02d-01', substr($current_date, 0, 4), substr($current_date, 4));
 
-			$request = $db->query('', '
-				SELECT COUNT(*) AS offset
-				FROM {db_prefix}log_spider_stats
-				WHERE stat_date < {date:date_being_viewed}',
-				array(
-					'date_being_viewed' => $date_query,
-				)
-			);
-			list ($_REQUEST['start']) = $db->fetch_row($request);
-			$db->free_result($request);
+			$_REQUEST['start'] = getNumSpiderStats($date_query);
 		}
 
 		$listOptions = array(
@@ -722,10 +595,11 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=sengines;sa=stats',
 			'default_sort_col' => 'stat_date',
 			'get_items' => array(
-				'function' => array($this, 'list_getSpiderStats'),
+				'function' => 'getSpiderStats',
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumSpiderStats'),
+				'function' => 'getNumSpiderStats',
+				'file' => SUBSDIR . '/SearchEngines.subs.php',
 			),
 			'no_items_label' => $txt['spider_stats_no_entries'],
 			'columns' => array(
@@ -781,85 +655,9 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		createToken('admin-ss');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_spider_stats';
-	}
-
-	/**
-	 * Callback function for createList()
-	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string sort
-	 * @return array
-	 */
-	function list_getSpiders($start, $items_per_page, $sort)
-	{
-		// retrieve spiders within these limits
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
-		return getSpiders($start, $items_per_page, $sort);
-	}
-
-	/**
-	 * Callback function for createList()
-	 *
-	 * @return int
-	 */
-	function list_getNumSpiders()
-	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
-		return getNumSpiders();
-	}
-
-	/**
-	 * Callback function for createList()
-	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
-	 * @return array
-	 */
-	function list_getSpiderLogs($start, $items_per_page, $sort)
-	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
-		return getSpiderLogs($start, $items_per_page, $sort);
-	}
-
-	/**
-	 * Callback function for createList()
-	 *
-	 * @return int
-	 */
-	function list_getNumSpiderLogs()
-	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
-		return getNumSpiderLogs();
-	}
-
-	/**
-	 * Callback function for createList()
-	 *
-	 * @param type $start
-	 * @param type $items_per_page
-	 * @param type $sort
-	 * @return array
-	 */
-	function list_getSpiderStats($start, $items_per_page, $sort)
-	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
-		return getSpiderStats($start, $items_per_page, $sort);
-	}
-
-	/**
-	 * Callback function for createList()
-	 *
-	 * @return int
-	 */
-	function list_getNumSpiderStats()
-	{
-		require_once(SUBSDIR . '/SearchEngines.subs.php ');
-		return getNumSpiderStats();
 	}
 }

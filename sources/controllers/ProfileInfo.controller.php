@@ -30,14 +30,11 @@ class ProfileInfo_Controller extends Action_Controller
 	}
 
 	/**
-	 * View a summary.
+	 * View the user profile summary.
 	 */
 	public function action_summary()
 	{
-		global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile;
-		global $scripturl, $settings;
-
-		$db = database();
+		global $context, $memberContext, $txt, $modSettings, $user_info, $user_profile, $scripturl, $settings;
 
 		$memID = currentMemberID();
 
@@ -65,10 +62,51 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Menu tab
-		$context[$context['profile_menu_name']]['tab_data'] = array(
-			'title' => $txt['summary'],
-			'icon' => 'profile_hd.png'
+		$context[$context['profile_menu_name']]['tab_data'] = array();
+
+		// Tab information for use in the summary page
+		// Each tab template defines a div, the value of which are the template(s) to load in that div
+		// Templates are named template_profile_block_YOURNAME
+		$context['summarytabs'] = array(
+			'summary' => array(
+				'name' => $txt['summary'],
+				'templates' => array(
+					array('summary', 'user_info'),
+					array('contact', 'other_info'),
+					array('user_customprofileinfo', 'moderation'),
+				),
+				'active' => true,
+			),
+			'recent' => array(
+				'name' => $txt['profile_recent_activity'],
+				'templates' => array('posts', 'topics', 'attachments'),
+				'active' => true,
+			),
+			'buddies' => array(
+				'name' => $txt['buddies'],
+				'templates' => array('buddies'),
+				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
+			),
 		);
+
+		// Let addons add or remove to the tabs array
+		call_integration_hook('integrate_profile_summary', array($memID));
+
+		// Go forward with whats left
+		$summary_areas = '';
+		foreach ($context['summarytabs'] as $id => $tab)
+		{
+			// If the tab is active we add it
+			if ($tab['active'] !== true)
+				unset($context['summarytabs'][$id]);
+			else
+			{
+				// All the active templates, used to prevent processing data we don't need
+				foreach ($tab['templates'] as $template)
+					$summary_areas .= is_array($template) ? implode(',', $template) : ',' . $template;
+			}
+		}
+		$summary_areas = explode(',', $summary_areas);
 
 		// See if they have broken any warning levels...
 		if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $context['member']['warning'])
@@ -135,87 +173,34 @@ class ProfileInfo_Controller extends Action_Controller
 
 			// Should we show a custom message?
 			$context['activate_message'] = isset($txt['account_activate_method_' . $context['member']['is_activated'] % 10]) ? $txt['account_activate_method_' . $context['member']['is_activated'] % 10] : $txt['account_not_activated'];
+			$context['activate_url'] = $scripturl . '?action=profile;save;area=activateaccount;u=' . $memID . ';' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['profile-aa' . $memID . '_token_var'] . '=' . $context['profile-aa' . $memID . '_token'];
 		}
 
 		// Is the signature even enabled on this forum?
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 
 		// How about, are they banned?
-		$context['member']['bans'] = array();
 		if (allowedTo('moderate_forum'))
 		{
+			require_once(SUBSDIR . '/Bans.subs.php');
+			$hostname = !empty($context['member']['hostname']) ? $context['member']['hostname'] : '';
+			$email = !empty($context['member']['email']) ? $context['member']['email'] : '';
+			$context['member']['bans'] = BanCheckUser($memID, $hostname, $email);
+
 			// Can they edit the ban?
 			$context['can_edit_ban'] = allowedTo('manage_bans');
-
-			$ban_query = array();
-			$ban_query_vars = array(
-				'time' => time(),
-			);
-			$ban_query[] = 'id_member = ' . $context['member']['id'];
-			$ban_query[] = constructBanQueryIP($memberContext[$memID]['ip']);
-
-			// Do we have a hostname already?
-			if (!empty($context['member']['hostname']))
-			{
-				$ban_query[] = '({string:hostname} LIKE hostname)';
-				$ban_query_vars['hostname'] = $context['member']['hostname'];
-			}
-
-			// Check their email as well...
-			if (strlen($context['member']['email']) != 0)
-			{
-				$ban_query[] = '({string:email} LIKE bi.email_address)';
-				$ban_query_vars['email'] = $context['member']['email'];
-			}
-
-			// So... are they banned?  Dying to know!
-			$request = $db->query('', '
-				SELECT bg.id_ban_group, bg.name, bg.cannot_access, bg.cannot_post, bg.cannot_register,
-					bg.cannot_login, bg.reason
-				FROM {db_prefix}ban_items AS bi
-					INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group AND (bg.expire_time IS NULL OR bg.expire_time > {int:time}))
-				WHERE (' . implode(' OR ', $ban_query) . ')',
-				$ban_query_vars
-			);
-			while ($row = $db->fetch_assoc($request))
-			{
-				// Work out what restrictions we actually have.
-				$ban_restrictions = array();
-				foreach (array('access', 'register', 'login', 'post') as $type)
-					if ($row['cannot_' . $type])
-						$ban_restrictions[] = $txt['ban_type_' . $type];
-
-				// No actual ban in place?
-				if (empty($ban_restrictions))
-					continue;
-
-				// Prepare the link for context.
-				$ban_explanation = sprintf($txt['user_cannot_due_to'], implode(', ', $ban_restrictions), '<a href="' . $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $row['id_ban_group'] . '">' . $row['name'] . '</a>');
-
-				$context['member']['bans'][$row['id_ban_group']] = array(
-					'reason' => empty($row['reason']) ? '' : '<br /><br /><strong>' . $txt['ban_reason'] . ':</strong> ' . $row['reason'],
-					'cannot' => array(
-						'access' => !empty($row['cannot_access']),
-						'register' => !empty($row['cannot_register']),
-						'post' => !empty($row['cannot_post']),
-						'login' => !empty($row['cannot_login']),
-					),
-					'explanation' => $ban_explanation,
-				);
-			}
-			$db->free_result($request);
 		}
 
 		// Load up the most recent attachments for this user for use in profile views etc.
 		$context['thumbs'] = array();
-		if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments') && !empty($settings['attachments_on_summary']))
+		if (!empty($modSettings['attachmentEnable']) && !empty($settings['attachments_on_summary']) && in_array('attachments', $summary_areas))
 		{
 			$boardsAllowed = boardsAllowedTo('view_attachments');
 			if (empty($boardsAllowed))
 				$boardsAllowed = array(-1);
-			$attachments = $this->list_getAttachments(0, $settings['attachments_on_summary'], 'm.poster_time DESC', $boardsAllowed , $context['member']['id']);
+			$attachments = $this->list_getAttachments(0, $settings['attachments_on_summary'], 'm.poster_time DESC', $boardsAllowed, $memID);
 
-			// load them in to $context for use in the template
+			// Load them in to $context for use in the template
 			$i = 0;
 
 			// @todo keep or loose the mime thumbs ... useful at all?
@@ -227,22 +212,24 @@ class ProfileInfo_Controller extends Action_Controller
 				$context['thumbs'][$i] = array(
 					'url' => $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'],
 					'img' => '',
+					'filename' => $attachments[$i]['filename'],
+					'downloads' => $attachments[$i]['downloads'],
 				);
 
-				// Show a thumbnail image well?
+				// Show a thumbnail image as well?
 				if ($attachments[$i]['is_image'] && !empty($modSettings['attachmentShowImages']) && !empty($modSettings['attachmentThumbnails']))
 				{
 					if (!empty($attachments[$i]['id_thumb']))
-						$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="' . $attachments[$i]['subject'] . '" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id_thumb'] . ';image" title="" alt="" />';
 					else
 					{
 						// no thumbnail available ... use html instead
 						if (!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight']))
 						{
 							if ($attachments[$i]['width'] > $modSettings['attachmentThumbWidth'] || $attachments[$i]['height'] > $modSettings['attachmentThumbHeight'])
-								$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
+								$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
 							else
-								$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
+								$context['thumbs'][$i]['img'] = '<img src="' . $scripturl . '?action=dlattach;topic=' . $attachments[$i]['topic'] . '.0;attach=' . $attachments[$i]['id'] . '" title="" alt="" width="' . $attachments[$i]['width'] . '" height="' . $attachments[$i]['height'] . '" />';
 						}
 					}
 				}
@@ -250,15 +237,15 @@ class ProfileInfo_Controller extends Action_Controller
 				else
 				{
 					if ((!empty($modSettings['attachmentThumbWidth']) && !empty($modSettings['attachmentThumbHeight'])) && (128 > $modSettings['attachmentThumbWidth'] || 128 > $modSettings['attachmentThumbHeight']))
-						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" width="' . $modSettings['attachmentThumbWidth']. '" height="' . $modSettings['attachmentThumbHeight']. '" />';
+						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="" alt="" width="' . $modSettings['attachmentThumbWidth'] . '" height="' . $modSettings['attachmentThumbHeight'] . '" />';
 					else
-						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="' . $attachments[$i]['subject'] . '" alt="" />';
+						$context['thumbs'][$i]['img'] = '<img src="' . $mime_images_url . (!file_exists($mime_path . $attachments[$i]['fileext'] . '.png') ? 'default' : $attachments[$i]['fileext']) . '.png" title="" alt="" />';
 				}
 			}
 		}
 
 		// Would you be mine? Could you be mine? Be my buddy :D
-		if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'] && !empty($user_info['buddies']))
+		if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'] && !empty($user_info['buddies']) && in_array('buddies', $summary_areas))
 		{
 			$context['buddies'] = array();
 			loadMemberData($user_info['buddies'], false, 'profile');
@@ -271,9 +258,117 @@ class ProfileInfo_Controller extends Action_Controller
 			}
 		}
 
+		// How about thier most recent posts?
+		if (in_array('posts', $summary_areas))
+		{
+			// Is the load average too high just now, then let them know
+			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
+				$context['loadaverage'] = true;
+			else
+			{
+				// Set up to get the last 10 psots of this member
+				$msgCount = count_user_posts($memID);
+				$range_limit = '';
+				$maxIndex = 10;
+				$start = (int) $_REQUEST['start'];
+
+				// If they are a frequent poster, we guess the range to help minimize what the query work
+				if ($msgCount > 1000)
+				{
+					list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($memID);
+					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+					$range_limit = 'm.id_msg > ' . ($max_msg_member - $margin);
+				}
+
+				// Find this user's most recent posts
+				$rows = load_user_posts($memID, 0, $maxIndex, $range_limit);
+				$context['posts'] = array();
+				foreach ($rows as $row)
+				{
+					// Censor....
+					censorText($row['body']);
+					censorText($row['subject']);
+
+					// Do the code.
+					$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
+					$preview = shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
+					$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+
+					// And the array...
+					$context['posts'][] = array(
+						'body' => $preview,
+						'board' => array(
+							'name' => $row['bname'],
+							'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+						),
+						'subject' => $row['subject'],
+						'short_subject' => $short_subject,
+						'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+						'timestamp' => forum_time(true, $row['poster_time']),
+						'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+					);
+				}
+			}
+		}
+
+		// How about the most recent topics that they started?
+		if (in_array('topics', $summary_areas))
+		{
+			// Is the load average still too high?
+			if (!empty($context['load_average']) && !empty($modSettings['loadavg_show_posts']) && $context['load_average'] >= $modSettings['loadavg_show_posts'])
+				$context['loadaverage'] = true;
+			else
+			{
+				// Set up to get the last 10 topics of this member
+				$msgCount = count_user_topics($memID);
+				$range_limit = '';
+				$maxIndex = 10;
+
+				// If they are a frequent topic starter, we guess the range to help the query
+				if ($msgCount > 1000)
+				{
+					$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+					$margin *= 5;
+					$range_limit = 't.id_first_msg > ' . ($max_msg_member - $margin);
+				}
+
+				// Find this user's most recent topics
+				$rows = load_user_topics($memID, 0, $maxIndex, $range_limit);
+				$context['topics'] = array();
+				foreach ($rows as $row)
+				{
+					// Censor....
+					censorText($row['body']);
+					censorText($row['subject']);
+
+					// Do the code.
+					$short_subject = shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
+
+					// And the array...
+					$context['topics'][] = array(
+						'board' => array(
+							'name' => $row['bname'],
+							'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
+						),
+						'subject' => $row['subject'],
+						'short_subject' => $short_subject,
+						'time' => '<time datetime="' . htmlTime($row['poster_time']) . '" title="' . standardTime($row['poster_time']) . '">' . relativeTime($row['poster_time']) . '</time>',
+						'timestamp' => forum_time(true, $row['poster_time']),
+						'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $short_subject . '</a>',
+					);
+				}
+			}
+		}
+
 		// To finish this off, custom profile fields.
 		require_once(SUBSDIR . '/Profile.subs.php');
 		loadCustomFields($memID);
+
+		// To make tabs work, we need jQueryUI
+		$modSettings['jquery_include_ui'] = true;
+		addInlineJavascript('
+		$(function() {$( "#tabs" ).tabs();});', true);
 	}
 
 	/**
@@ -283,10 +378,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_showPosts()
 	{
-		global $txt, $user_info, $scripturl, $modSettings;
-		global $context, $user_profile, $board;
-
-		$db = database();
+		global $txt, $user_info, $scripturl, $modSettings, $context, $user_profile, $board;
 
 		$memID = currentMemberID();
 
@@ -306,7 +398,7 @@ class ProfileInfo_Controller extends Action_Controller
 				),
 				'topics' => array(
 				),
-				'disregardedtopics' => array(
+				'unwatchedtopics' => array(
 				),
 				'attach' => array(
 				),
@@ -323,9 +415,9 @@ class ProfileInfo_Controller extends Action_Controller
 		// If we're specifically dealing with attachments use that function!
 		if (isset($_GET['sa']) && $_GET['sa'] == 'attach')
 			return $this->action_showAttachments($memID);
-		// Instead, if we're dealing with disregarded topics (and the feature is enabled) use that other function.
-		elseif (isset($_GET['sa']) && $_GET['sa'] == 'disregardedtopics' && $modSettings['enable_disregard'])
-			return $this->action_showDisregarded($memID);
+		// Instead, if we're dealing with unwatched topics (and the feature is enabled) use that other function.
+		elseif (isset($_GET['sa']) && $_GET['sa'] == 'unwatchedtopics' && $modSettings['enable_unwatch'])
+			return $this->action_showUnwatched($memID);
 
 		// Are we just viewing topics?
 		$context['is_topics'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? true : false;
@@ -344,7 +436,6 @@ class ProfileInfo_Controller extends Action_Controller
 				redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $_GET['start']);
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
-			require_once(SUBSDIR . '/Messages.subs.php');
 			removeMessage((int) $_GET['delete']);
 
 			// Add it to the mod log.
@@ -360,57 +451,17 @@ class ProfileInfo_Controller extends Action_Controller
 			$_REQUEST['viewscount'] = '10';
 
 		if ($context['is_topics'])
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}topics AS t' . ($user_info['query_see_board'] == '1=1' ? '' : '
-					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})') . '
-				WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
-					AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
-					AND t.approved = {int:is_approved}'),
-				array(
-					'current_member' => $memID,
-					'is_approved' => 1,
-					'board' => $board,
-				)
-			);
+			$msgCount = count_user_topics($memID, $board);
 		else
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] == '1=1' ? '' : '
-					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
-				WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
-					AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
-					AND m.approved = {int:is_approved}'),
-				array(
-					'current_member' => $memID,
-					'is_approved' => 1,
-					'board' => $board,
-				)
-			);
-		list ($msgCount) = $db->fetch_row($request);
-		$db->free_result($request);
+			$msgCount = count_user_posts($memID, $board);
 
-		$request = $db->query('', '
-			SELECT MIN(id_msg), MAX(id_msg)
-			FROM {db_prefix}messages AS m
-			WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
-				AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
-				AND m.approved = {int:is_approved}'),
-			array(
-				'current_member' => $memID,
-				'is_approved' => 1,
-				'board' => $board,
-			)
-		);
-		list ($min_msg_member, $max_msg_member) = $db->fetch_row($request);
-		$db->free_result($request);
-
+		list ($min_msg_member, $max_msg_member) = findMinMaxUserMessage($memID, $board);
 		$reverse = false;
 		$range_limit = '';
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : '') . (!empty($board) ? ';board=' . $board : ''), $context['start'], $msgCount, $maxIndex);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=profile;u=' . $memID . ';area=showposts' . ($context['is_topics'] ? ';sa=topics' : ';sa=messages') . (!empty($board) ? ';board=' . $board : ''), $context['start'], $msgCount, $maxIndex);
 		$context['current_page'] = $context['start'] / $maxIndex;
 
 		// Reverse the query if we're past 50% of the pages for better performance.
@@ -422,10 +473,11 @@ class ProfileInfo_Controller extends Action_Controller
 			$start = $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] + 1 || $msgCount < $context['start'] + $modSettings['defaultMaxMessages'] ? 0 : $msgCount - $context['start'] - $modSettings['defaultMaxMessages'];
 		}
 
-		// Guess the range of messages to be shown.
+		// Guess the range of messages to be shown to help minimize what the query needs to do
 		if ($msgCount > 1000)
 		{
 			$margin = floor(($max_msg_member - $min_msg_member) * (($start + $modSettings['defaultMaxMessages']) / $msgCount) + .1 * ($max_msg_member - $min_msg_member));
+
 			// Make a bigger margin for topics only.
 			if ($context['is_topics'])
 			{
@@ -436,72 +488,17 @@ class ProfileInfo_Controller extends Action_Controller
 				$range_limit = $reverse ? 'm.id_msg < ' . ($min_msg_member + $margin) : 'm.id_msg > ' . ($max_msg_member - $margin);
 		}
 
-		// Find this user's posts.  The left join on categories somehow makes this faster, weird as it looks.
-		$looped = false;
-		while (true)
-		{
-			if ($context['is_topics'])
-			{
-				$request = $db->query('', '
-					SELECT
-						b.id_board, b.name AS bname, c.id_cat, c.name AS cname, t.id_member_started, t.id_first_msg, t.id_last_msg,
-						t.approved, m.body, m.smileys_enabled, m.subject, m.poster_time, m.id_topic, m.id_msg
-					FROM {db_prefix}topics AS t
-						INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-						LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-						INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-					WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
-						AND t.id_board = {int:board}' : '') . (empty($range_limit) ? '' : '
-						AND ' . $range_limit) . '
-						AND {query_see_board}' . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
-						AND t.approved = {int:is_approved} AND m.approved = {int:is_approved}') . '
-					ORDER BY t.id_first_msg ' . ($reverse ? 'ASC' : 'DESC') . '
-					LIMIT ' . $start . ', ' . $maxIndex,
-					array(
-						'current_member' => $memID,
-						'is_approved' => 1,
-						'board' => $board,
-					)
-				);
-			}
-			else
-			{
-				$request = $db->query('', '
-					SELECT
-						b.id_board, b.name AS bname, c.id_cat, c.name AS cname, m.id_topic, m.id_msg,
-						t.id_member_started, t.id_first_msg, t.id_last_msg, m.body, m.smileys_enabled,
-						m.subject, m.poster_time, m.approved
-					FROM {db_prefix}messages AS m
-						INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-						INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-						LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-					WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
-						AND b.id_board = {int:board}' : '') . (empty($range_limit) ? '' : '
-						AND ' . $range_limit) . '
-						AND {query_see_board}' . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
-						AND t.approved = {int:is_approved} AND m.approved = {int:is_approved}') . '
-					ORDER BY m.id_msg ' . ($reverse ? 'ASC' : 'DESC') . '
-					LIMIT ' . $start . ', ' . $maxIndex,
-					array(
-						'current_member' => $memID,
-						'is_approved' => 1,
-						'board' => $board,
-					)
-				);
-			}
-
-			// Make sure we quit this loop.
-			if ($db->num_rows($request) === $maxIndex || $looped)
-				break;
-			$looped = true;
-			$range_limit = '';
-		}
+		// Find this user's posts or topics started
+		if ($context['is_topics'])
+			$rows = load_user_topics($memID, $start, $maxIndex, $range_limit, $reverse, $board);
+		else
+			$rows = load_user_posts($memID, $start, $maxIndex, $range_limit, $reverse, $board);
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 		$context['posts'] = array();
 		$board_ids = array('own' => array(), 'any' => array());
-		while ($row = $db->fetch_assoc($request))
+		foreach ($rows as $row)
 		{
 			// Censor....
 			censorText($row['body']);
@@ -540,7 +537,6 @@ class ProfileInfo_Controller extends Action_Controller
 				$board_ids['own'][$row['id_board']][] = $counter;
 			$board_ids['any'][$row['id_board']][] = $counter;
 		}
-		$db->free_result($request);
 
 		// All posts were retrieved in reverse order, get them right again.
 		if ($reverse)
@@ -621,7 +617,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		$memID = currentMemberID();
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// This is all the information required to list attachments.
 		$listOptions = array(
@@ -715,37 +711,36 @@ class ProfileInfo_Controller extends Action_Controller
 	}
 
 	/**
-	 * Show all the disregarded topics.
-	 *
+	 * Show all the unwatched topics.
 	 */
-	public function action_showDisregarded()
+	public function action_showUnwatched()
 	{
 		global $txt, $user_info, $scripturl, $modSettings, $context;
 
 		$memID = currentMemberID();
 
 		// Only the owner can see the list (if the function is enabled of course)
-		if ($user_info['id'] != $memID || !$modSettings['enable_disregard'])
+		if ($user_info['id'] != $memID || !$modSettings['enable_unwatch'])
 			return;
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		// And here they are: the topics you don't like
 		$listOptions = array(
-			'id' => 'disregarded_topics',
+			'id' => 'unwatched_topics',
 			'width' => '100%',
 			'items_per_page' => $modSettings['defaultMaxMessages'],
-			'no_items_label' => $txt['disregarded_topics_none'],
-			'base_href' => $scripturl . '?action=profile;area=showposts;sa=disregardedtopics;u=' . $memID,
+			'no_items_label' => $txt['unwatched_topics_none'],
+			'base_href' => $scripturl . '?action=profile;area=showposts;sa=unwatchedtopics;u=' . $memID,
 			'default_sort_col' => 'started_on',
 			'get_items' => array(
-				'function' => array($this, 'list_getDisregarded'),
+				'function' => array($this, 'list_getUnwatched'),
 				'params' => array(
 					$memID,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNumDisregarded'),
+				'function' => array($this, 'list_getNumUnwatched'),
 				'params' => array(
 					$memID,
 				),
@@ -834,20 +829,18 @@ class ProfileInfo_Controller extends Action_Controller
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'disregarded_topics';
+		$context['default_list'] = 'unwatched_topics';
 	}
 
 	/**
 	 * Gets the user stats for display.
-	 *
 	 */
 	public function action_statPanel()
 	{
-		global $txt, $scripturl, $context, $user_profile, $user_info, $modSettings;
-
-		$db = database();
+		global $txt, $context, $user_profile, $modSettings;
 
 		$memID = currentMemberID();
+		require_once(SUBSDIR . '/Stats.subs.php');
 
 		$context['page_title'] = $txt['statPanel_showStats'] . ' ' . $user_profile[$memID]['real_name'];
 
@@ -870,176 +863,30 @@ class ProfileInfo_Controller extends Action_Controller
 		);
 
 		// Number of topics started.
-		$result = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}topics
-			WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND id_board != {int:recycle_board}' : ''),
-			array(
-				'current_member' => $memID,
-				'recycle_board' => $modSettings['recycle_board'],
-			)
-		);
-		list ($context['num_topics']) = $db->fetch_row($result);
-		$db->free_result($result);
+		$context['num_topics'] = UserStatsTopicsStarted($memID);
 
-		// Number polls started.
-		$result = $db->query('', '
-			SELECT COUNT(*)
-			FROM {db_prefix}topics
-			WHERE id_member_started = {int:current_member}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-				AND id_board != {int:recycle_board}' : '') . '
-				AND id_poll != {int:no_poll}',
-			array(
-				'current_member' => $memID,
-				'recycle_board' => $modSettings['recycle_board'],
-				'no_poll' => 0,
-			)
-		);
-		list ($context['num_polls']) = $db->fetch_row($result);
-		$db->free_result($result);
+		// Number of polls started.
+		$context['num_polls'] = UserStatsPollsStarted($memID);
 
-		// Number polls voted in.
-		$result = $db->query('distinct_poll_votes', '
-			SELECT COUNT(DISTINCT id_poll)
-			FROM {db_prefix}log_polls
-			WHERE id_member = {int:current_member}',
-			array(
-				'current_member' => $memID,
-			)
-		);
-		list ($context['num_votes']) = $db->fetch_row($result);
-		$db->free_result($result);
+		// Number of polls voted in.
+		$context['num_votes'] = UserStatsPollsVoted($memID);
 
 		// Format the numbers...
 		$context['num_topics'] = comma_format($context['num_topics']);
 		$context['num_polls'] = comma_format($context['num_polls']);
 		$context['num_votes'] = comma_format($context['num_votes']);
 
-		// Grab the board this member posted in most often.
-		$result = $db->query('', '
-			SELECT
-				b.id_board, MAX(b.name) AS name, MAX(b.num_posts) AS num_posts, COUNT(*) AS message_count
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			WHERE m.id_member = {int:current_member}
-				AND b.count_posts = {int:count_enabled}
-				AND {query_see_board}
-			GROUP BY b.id_board
-			ORDER BY message_count DESC
-			LIMIT 10',
-			array(
-				'current_member' => $memID,
-				'count_enabled' => 0,
-			)
-		);
-		$context['popular_boards'] = array();
-		while ($row = $db->fetch_assoc($result))
-		{
-			$context['popular_boards'][$row['id_board']] = array(
-				'id' => $row['id_board'],
-				'posts' => $row['message_count'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-				'posts_percent' => $user_profile[$memID]['posts'] == 0 ? 0 : ($row['message_count'] * 100) / $user_profile[$memID]['posts'],
-				'total_posts' => $row['num_posts'],
-				'total_posts_member' => $user_profile[$memID]['posts'],
-			);
-		}
-		$db->free_result($result);
+		// Grab the boards this member posted in most often.
+		$context['popular_boards'] = UserStatsMostPostedBoard($memID);
 
 		// Now get the 10 boards this user has most often participated in.
-		$result = $db->query('profile_board_stats', '
-			SELECT
-				b.id_board, MAX(b.name) AS name, b.num_posts, COUNT(*) AS message_count,
-				CASE WHEN COUNT(*) > MAX(b.num_posts) THEN 1 ELSE COUNT(*) / MAX(b.num_posts) END * 100 AS percentage
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			WHERE m.id_member = {int:current_member}
-				AND {query_see_board}
-			GROUP BY b.id_board, b.num_posts
-			ORDER BY percentage DESC
-			LIMIT 10',
-			array(
-				'current_member' => $memID,
-			)
-		);
-		$context['board_activity'] = array();
-		while ($row = $db->fetch_assoc($result))
-		{
-			$context['board_activity'][$row['id_board']] = array(
-				'id' => $row['id_board'],
-				'posts' => $row['message_count'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>',
-				'percent' => comma_format((float) $row['percentage'], 2),
-				'posts_percent' => (float) $row['percentage'],
-				'total_posts' => $row['num_posts'],
-			);
-		}
-		$db->free_result($result);
+		$context['board_activity'] = UserStatsMostActiveBoard($memID);
 
 		// Posting activity by time.
-		$result = $db->query('user_activity_by_time', '
-			SELECT
-				HOUR(FROM_UNIXTIME(poster_time + {int:time_offset})) AS hour,
-				COUNT(*) AS post_count
-			FROM {db_prefix}messages
-			WHERE id_member = {int:current_member}' . ($modSettings['totalMessages'] > 100000 ? '
-				AND id_topic > {int:top_ten_thousand_topics}' : '') . '
-			GROUP BY hour',
-			array(
-				'current_member' => $memID,
-				'top_ten_thousand_topics' => $modSettings['totalTopics'] - 10000,
-				'time_offset' => (($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
-			)
-		);
-		$maxPosts = $realPosts = 0;
-		$context['posts_by_time'] = array();
-		while ($row = $db->fetch_assoc($result))
-		{
-			// Cast as an integer to remove the leading 0.
-			$row['hour'] = (int) $row['hour'];
-
-			$maxPosts = max($row['post_count'], $maxPosts);
-			$realPosts += $row['post_count'];
-
-			$context['posts_by_time'][$row['hour']] = array(
-				'hour' => $row['hour'],
-				'hour_format' => stripos($user_info['time_format'], '%p') === false ? $row['hour'] : date('g a', mktime($row['hour'])),
-				'posts' => $row['post_count'],
-				'posts_percent' => 0,
-				'is_last' => $row['hour'] == 23,
-			);
-		}
-		$db->free_result($result);
-
-		if ($maxPosts > 0)
-		{
-			for ($hour = 0; $hour < 24; $hour++)
-			{
-				if (!isset($context['posts_by_time'][$hour]))
-					$context['posts_by_time'][$hour] = array(
-						'hour' => $hour,
-						'hour_format' => stripos($user_info['time_format'], '%p') === false ? $hour : date('g a', mktime($hour)),
-						'posts' => 0,
-						'posts_percent' => 0,
-						'relative_percent' => 0,
-						'is_last' => $hour == 23,
-					);
-				else
-				{
-					$context['posts_by_time'][$hour]['posts_percent'] = round(($context['posts_by_time'][$hour]['posts'] * 100) / $realPosts);
-					$context['posts_by_time'][$hour]['relative_percent'] = round(($context['posts_by_time'][$hour]['posts'] * 100) / $maxPosts);
-				}
-			}
-		}
-
-		// Put it in the right order.
-		ksort($context['posts_by_time']);
+		$context['posts_by_time'] = UserStatsPostingTime($memID);
 
 		// Custom stats (just add a template_layer to add it to the template!)
-	 	call_integration_hook('integrate_profile_stats', array($memID));
+		call_integration_hook('integrate_profile_stats', array($memID));
 	}
 
 	/**
@@ -1048,8 +895,6 @@ class ProfileInfo_Controller extends Action_Controller
 	public function action_showPermissions()
 	{
 		global $txt, $board, $user_profile, $context;
-
-		$db = database();
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('manage_permissions');
@@ -1077,39 +922,33 @@ class ProfileInfo_Controller extends Action_Controller
 			$curGroups = array();
 		else
 			$curGroups = explode(',', $user_profile[$memID]['additional_groups']);
+
 		$curGroups[] = $user_profile[$memID]['id_group'];
 		$curGroups[] = $user_profile[$memID]['id_post_group'];
 
 		// Load a list of boards for the jump box - except the defaults.
-		$request = $db->query('order_by_board_order', '
-			SELECT b.id_board, b.name, b.id_profile, b.member_groups, IFNULL(mods.id_member, 0) AS is_mod
-			FROM {db_prefix}boards AS b
-				LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})
-			WHERE {query_see_board}',
-			array(
-				'current_member' => $memID,
-			)
-		);
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$board_list = getBoardList(array('moderator' => $memID, 'use_permissions' => true), true);
+
 		$context['boards'] = array();
 		$context['no_access_boards'] = array();
-		while ($row = $db->fetch_assoc($request))
+		foreach ($board_list as $row)
 		{
 			if (count(array_intersect($curGroups, explode(',', $row['member_groups']))) === 0 && !$row['is_mod'])
 				$context['no_access_boards'][] = array(
 					'id' => $row['id_board'],
-					'name' => $row['name'],
+					'name' => $row['board_name'],
 					'is_last' => false,
 				);
 			elseif ($row['id_profile'] != 1 || $row['is_mod'])
 				$context['boards'][$row['id_board']] = array(
 					'id' => $row['id_board'],
-					'name' => $row['name'],
+					'name' => $row['board_name'],
 					'selected' => $board == $row['id_board'],
 					'profile' => $row['id_profile'],
 					'profile_name' => $context['profiles'][$row['id_profile']]['name'],
 				);
 		}
-		$db->free_result($request);
 
 		if (!empty($context['no_access_boards']))
 			$context['no_access_boards'][count($context['no_access_boards']) - 1]['is_last'] = true;
@@ -1124,107 +963,11 @@ class ProfileInfo_Controller extends Action_Controller
 		if ($context['member']['has_all_permissions'])
 			return;
 
-		$denied = array();
+		// Get all general permissions for the groups this member is in
+		$context['member']['permissions']['general'] = getMemberGeneralPermissions($curGroups);
 
-		// Get all general permissions.
-		$result = $db->query('', '
-			SELECT p.permission, p.add_deny, mg.group_name, p.id_group
-			FROM {db_prefix}permissions AS p
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = p.id_group)
-			WHERE p.id_group IN ({array_int:group_list})
-			ORDER BY p.add_deny DESC, p.permission, mg.min_posts, CASE WHEN mg.id_group < {int:newbie_group} THEN mg.id_group ELSE 4 END, mg.group_name',
-			array(
-				'group_list' => $curGroups,
-				'newbie_group' => 4,
-			)
-		);
-		while ($row = $db->fetch_assoc($result))
-		{
-			// We don't know about this permission, it doesn't exist :P.
-			if (!isset($txt['permissionname_' . $row['permission']]))
-				continue;
-
-			if (empty($row['add_deny']))
-				$denied[] = $row['permission'];
-
-			// Permissions that end with _own or _any consist of two parts.
-			if (in_array(substr($row['permission'], -4), array('_own', '_any')) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
-				$name = $txt['permissionname_' . substr($row['permission'], 0, -4)] . ' - ' . $txt['permissionname_' . $row['permission']];
-			else
-				$name = $txt['permissionname_' . $row['permission']];
-
-			// Add this permission if it doesn't exist yet.
-			if (!isset($context['member']['permissions']['general'][$row['permission']]))
-			{
-				$context['member']['permissions']['general'][$row['permission']] = array(
-					'id' => $row['permission'],
-					'groups' => array(
-						'allowed' => array(),
-						'denied' => array()
-					),
-					'name' => $name,
-					'is_denied' => false,
-					'is_global' => true,
-				);
-			}
-
-			// Add the membergroup to either the denied or the allowed groups.
-			$context['member']['permissions']['general'][$row['permission']]['groups'][empty($row['add_deny']) ? 'denied' : 'allowed'][] = $row['id_group'] == 0 ? $txt['membergroups_members'] : $row['group_name'];
-
-			// Once denied is always denied.
-			$context['member']['permissions']['general'][$row['permission']]['is_denied'] |= empty($row['add_deny']);
-		}
-		$db->free_result($result);
-
-		$request = $db->query('', '
-			SELECT
-				bp.add_deny, bp.permission, bp.id_group, mg.group_name' . (empty($board) ? '' : ',
-				b.id_profile, CASE WHEN mods.id_member IS NULL THEN 0 ELSE 1 END AS is_moderator') . '
-			FROM {db_prefix}board_permissions AS bp' . (empty($board) ? '' : '
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = {int:current_board})
-				LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})') . '
-				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = bp.id_group)
-			WHERE bp.id_profile = {raw:current_profile}
-				AND bp.id_group IN ({array_int:group_list}' . (empty($board) ? ')' : ', {int:moderator_group})
-				AND (mods.id_member IS NOT NULL OR bp.id_group != {int:moderator_group})'),
-			array(
-				'current_board' => $board,
-				'group_list' => $curGroups,
-				'current_member' => $memID,
-				'current_profile' => empty($board) ? '1' : 'b.id_profile',
-				'moderator_group' => 3,
-			)
-		);
-
-		while ($row = $db->fetch_assoc($request))
-		{
-			// We don't know about this permission, it doesn't exist :P.
-			if (!isset($txt['permissionname_' . $row['permission']]))
-				continue;
-
-			// The name of the permission using the format 'permission name' - 'own/any topic/event/etc.'.
-			if (in_array(substr($row['permission'], -4), array('_own', '_any')) && isset($txt['permissionname_' . substr($row['permission'], 0, -4)]))
-				$name = $txt['permissionname_' . substr($row['permission'], 0, -4)] . ' - ' . $txt['permissionname_' . $row['permission']];
-			else
-				$name = $txt['permissionname_' . $row['permission']];
-
-			// Create the structure for this permission.
-			if (!isset($context['member']['permissions']['board'][$row['permission']]))
-				$context['member']['permissions']['board'][$row['permission']] = array(
-					'id' => $row['permission'],
-					'groups' => array(
-						'allowed' => array(),
-						'denied' => array()
-					),
-					'name' => $name,
-					'is_denied' => false,
-					'is_global' => empty($board),
-				);
-
-			$context['member']['permissions']['board'][$row['permission']]['groups'][empty($row['add_deny']) ? 'denied' : 'allowed'][$row['id_group']] = $row['id_group'] == 0 ? $txt['membergroups_members'] : $row['group_name'];
-			$context['member']['permissions']['board'][$row['permission']]['is_denied'] |= empty($row['add_deny']);
-		}
-		$db->free_result($request);
+		// Get all board permissions for this member
+		$context['member']['permissions']['board'] = getMemberBoardPermissions($memID, $curGroups, $board);
 	}
 
 	/**
@@ -1250,7 +993,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Let's use a generic list to get all the current warnings
 		// and use the issue warnings grab-a-granny thing.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		$memID = currentMemberID();
 
@@ -1346,13 +1089,12 @@ class ProfileInfo_Controller extends Action_Controller
 	 * @param string $sort
 	 * @param array $boardsAllowed
 	 * @param int $memID
-	 * @return array
 	 */
 	public function list_getAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
 	{
 		// @todo tweak this method to use $context, etc,
 		// then call subs function with params set.
-		profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID);
+		return profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID);
 	}
 
 	/**
@@ -1360,7 +1102,6 @@ class ProfileInfo_Controller extends Action_Controller
 	 *
 	 * @param type $boardsAllowed
 	 * @param type $memID
-	 * @return int
 	 */
 	public function list_getNumAttachments($boardsAllowed, $memID)
 	{
@@ -1370,29 +1111,27 @@ class ProfileInfo_Controller extends Action_Controller
 	}
 
 	/**
-	 * Get the relevant topics in the disregarded list
+	 * Get the relevant topics in the unwatched list
 	 * Callback for createList()
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
 	 * @param string $sort
 	 * @param int $memID
-	 * @return array
 	 */
-	function list_getDisregarded($start, $items_per_page, $sort, $memID)
+	function list_getUnwatched($start, $items_per_page, $sort, $memID)
 	{
-		return getDisregardedBy($start, $items_per_page, $sort, $memID);
+		return getUnwatchedBy($start, $items_per_page, $sort, $memID);
 	}
 
 	/**
-	 * Count the number of topics in the disregarded list
+	 * Count the number of topics in the unwatched list
 	 * Callback for createList()
 	 *
 	 * @param int $memID
-	 * @return int
 	 */
-	public function list_getNumDisregarded($memID)
+	public function list_getNumUnwatched($memID)
 	{
-		return getNumDisregardedBy($memID);
+		return getNumUnwatchedBy($memID);
 	}
 }

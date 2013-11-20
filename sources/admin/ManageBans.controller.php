@@ -32,22 +32,17 @@ class ManageBans_Controller extends Action_Controller
 	{
 		global $context, $txt, $scripturl;
 
-		isAllowedTo('manage_bans');
-
 		loadTemplate('ManageBans');
 		require_once(SUBSDIR . '/Bans.subs.php');
 
 		$subActions = array(
-			'add' => array($this, 'action_edit'),
-			'browse' => array($this, 'action_browse'),
-			'edittrigger' => array($this, 'action_edittrigger'),
-			'edit' => array($this, 'action_edit'),
-			'list' => array($this, 'action_list'),
-			'log' => array($this, 'action_log'),
+			'add' => array($this, 'action_edit', 'permission' => 'manage_bans'),
+			'browse' => array($this, 'action_browse', 'permission' => 'manage_bans'),
+			'edittrigger' => array($this, 'action_edittrigger', 'permission' => 'manage_bans'),
+			'edit' => array($this, 'action_edit', 'permission' => 'manage_bans'),
+			'list' => array($this, 'action_list', 'permission' => 'manage_bans'),
+			'log' => array($this, 'action_log', 'permission' => 'manage_bans'),
 		);
-
-		$action = new Action();
-		$action->initialize($subActions);
 
 		call_integration_hook('integrate_manage_bans', array(&$subActions));
 
@@ -88,6 +83,8 @@ class ManageBans_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'list');
 		$action->dispatch($subAction);
 	}
 
@@ -277,15 +274,15 @@ class ManageBans_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
 	/**
 	 * This function is behind the screen for adding new bans and modifying existing ones.
 	 * Adding new bans:
-	 * 	- is accesssed by ?action=admin;area=ban;sa=add.
-	 * 	- uses the ban_edit sub template of the ManageBans template.
+	 *  - is accesssed by ?action=admin;area=ban;sa=add.
+	 *  - uses the ban_edit sub template of the ManageBans template.
 	 * Modifying existing bans:
 	 *  - is accesssed by ?action=admin;area=ban;sa=edit;bg=x
 	 *  - uses the ban_edit sub template of the ManageBans template.
@@ -296,7 +293,7 @@ class ManageBans_Controller extends Action_Controller
 		global $txt, $modSettings, $context, $scripturl;
 
 		require_once(SUBSDIR . '/Bans.subs.php');
-		$ban_errors = error_context::context('ban', 1);
+		$ban_errors = Error_Context::context('ban', 1);
 
 		if ((isset($_POST['add_ban']) || isset($_POST['modify_ban']) || isset($_POST['remove_selection'])) && !$ban_errors->hasErrors())
 			$this->action_edit2();
@@ -307,8 +304,6 @@ class ManageBans_Controller extends Action_Controller
 		loadLanguage('Errors');
 		createToken('admin-bet');
 		$context['form_url'] = $scripturl . '?action=admin;area=ban;sa=edit';
-
-		$ban_errors = error_context::context('ban', 1);
 
 		$context['ban_errors'] = array(
 			'errors' => $ban_errors->prepareErrors(),
@@ -324,7 +319,7 @@ class ManageBans_Controller extends Action_Controller
 				$context['ban_group_id'] = $ban_group_id;
 
 				// We're going to want this for making our list.
-				require_once(SUBSDIR . '/List.subs.php');
+				require_once(SUBSDIR . '/List.class.php');
 
 				$listOptions = array(
 					'id' => 'ban_items',
@@ -625,7 +620,7 @@ class ManageBans_Controller extends Action_Controller
 
 		createToken('admin-bl');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['ban_log'];
@@ -643,7 +638,7 @@ class ManageBans_Controller extends Action_Controller
 		checkSession();
 		validateToken('admin-bet');
 
-		$ban_errors = error_context::context('ban', 1);
+		$ban_errors = Error_Context::context('ban', 1);
 
 		// Adding or editing a ban group
 		if (isset($_POST['add_ban']) || isset($_POST['modify_ban']))
@@ -668,13 +663,13 @@ class ManageBans_Controller extends Action_Controller
 			$ban_info['cannot']['login'] = !empty($ban_info['full_ban']) || empty($_POST['cannot_login']) ? 0 : 1;
 
 			// Adding a new ban group
-			if (empty($_REQUEST['bg']))
+			if (empty($ban_info['id']))
 				$ban_group_id = insertBanGroup($ban_info);
 			// Editing an existing ban group
 			else
 				$ban_group_id = updateBanGroup($ban_info);
 
-			if (is_numeric($ban_group_id))
+			if ($ban_group_id !== false)
 			{
 				$ban_info['id'] = $ban_group_id;
 				$ban_info['is_new'] = false;
@@ -684,9 +679,11 @@ class ManageBans_Controller extends Action_Controller
 		}
 
 		if (isset($_POST['ban_suggestions']))
+		{
 			// @TODO: is $_REQUEST['bi'] ever set?
 			$saved_triggers = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
-
+			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
+		}
 		// Something went wrong somewhere... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
@@ -700,7 +697,6 @@ class ManageBans_Controller extends Action_Controller
 
 			return action_edit();
 		}
-		$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 
 		if (isset($_POST['ban_items']))
 		{
@@ -722,8 +718,8 @@ class ManageBans_Controller extends Action_Controller
 	 * This function handles the ins and outs of the screen for adding new ban
 	 * triggers or modifying existing ones.
 	 * Adding new ban triggers:
-	 * 	- is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x
-	 * 	- uses the ban_edit_trigger sub template of ManageBans.
+	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x
+	 *  - uses the ban_edit_trigger sub template of ManageBans.
 	 * Editing existing ban triggers:
 	 *  - is accessed by ?action=admin;area=ban;sa=edittrigger;bg=x;bi=y
 	 *  - uses the ban_edit_trigger sub template of ManageBans.
@@ -837,6 +833,9 @@ class ManageBans_Controller extends Action_Controller
 		if (!empty($_POST['remove_triggers']) && !empty($_POST['remove']) && is_array($_POST['remove']))
 		{
 			checkSession();
+
+			// Make sure every entry is a proper integer.
+			array_map('intval', $_POST['remove']);
 
 			removeBanTriggers($_POST['remove']);
 
@@ -1034,7 +1033,7 @@ class ManageBans_Controller extends Action_Controller
 		}
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 }

@@ -50,6 +50,11 @@ class ManageRegistration_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		// Loading, always loading.
+		loadLanguage('Login');
+		loadTemplate('Register');
+		loadJavascriptFile('register.js');
+
 		$subActions = array(
 			'register' => array(
 				'controller' => $this,
@@ -74,16 +79,8 @@ class ManageRegistration_Controller extends Action_Controller
 		// Work out which to call...
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'register';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'register');
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
-		// Loading, always loading.
-		loadLanguage('Login');
-		loadTemplate('Register');
+		$context['page_title'] = $txt['maintain_title'];
+		$context['sub_action'] = $subAction;
 
 		// Next create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -105,10 +102,10 @@ class ManageRegistration_Controller extends Action_Controller
 				)
 			)
 		);
-		// @todo is this useless?
-		$context['sub_action'] = $subAction;
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'register');
 		$action->dispatch($subAction);
 	}
 
@@ -122,7 +119,7 @@ class ManageRegistration_Controller extends Action_Controller
 	 */
 	public function action_register()
 	{
-		global $txt, $context, $scripturl;
+		global $txt, $context, $scripturl, $user_info;
 
 		if (!empty($_POST['regSubmit']))
 		{
@@ -148,7 +145,7 @@ class ManageRegistration_Controller extends Action_Controller
 			);
 
 			require_once(SUBSDIR . '/Members.subs.php');
-			$reg_errors = error_context::context('register', 0);
+			$reg_errors = Error_Context::context('register', 0);
 			$memberID = registerMember($regOptions, 'register');
 
 			// If there are "important" errors and you are not an admin: log the first error
@@ -168,7 +165,6 @@ class ManageRegistration_Controller extends Action_Controller
 				$context['registration_done'] = sprintf($txt['admin_register_done'], $context['new_member']['link']);
 			}
 		}
-
 
 		// Load the assignable member groups.
 		if (allowedTo('manage_membergroups'))
@@ -244,7 +240,7 @@ class ManageRegistration_Controller extends Action_Controller
 			updateSettings(array('requireAgreement' => !empty($_POST['requireAgreement'])));
 		}
 
-		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt')) : '';
+		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt'), ENT_COMPAT, 'UTF-8') : '';
 		$context['warning'] = is_writable(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? '' : $txt['agreement_not_writable'];
 		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
 
@@ -338,7 +334,7 @@ class ManageRegistration_Controller extends Action_Controller
 		$context['settings_title'] = $txt['settings'];
 
 		// Define some javascript for COPPA.
-		$context['settings_post_javascript'] = '
+		addInlineJavascript('
 			function checkCoppa()
 			{
 				var coppaDisabled = document.getElementById(\'coppaAge\').value == 0;
@@ -349,7 +345,7 @@ class ManageRegistration_Controller extends Action_Controller
 				document.getElementById(\'coppaFax\').disabled = disableContacts;
 				document.getElementById(\'coppaPhone\').disabled = disableContacts;
 			}
-			checkCoppa();';
+			checkCoppa();', true);
 
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';

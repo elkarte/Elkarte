@@ -24,9 +24,9 @@ if (!defined('ELK'))
 /**
  * Fetches a list of boards and (optional) categories including
  * statistical information, child boards and moderators.
- * 	- Used by both the board index (main data) and the message index (child
+ *  - Used by both the board index (main data) and the message index (child
  * boards).
- * 	- Depending on the include_categories setting returns an associative
+ *  - Depending on the include_categories setting returns an associative
  * array with categories->boards->child_boards or an associative array
  * with boards->child_boards.
  *
@@ -205,6 +205,7 @@ function getBoardIndex($boardIndexOptions)
 		// Child of a child... just add it on...
 		elseif (!empty($boardIndexOptions['countChildPosts']))
 		{
+			// @todo why this is not initialized outside the loop?
 			if (!isset($parent_map))
 				$parent_map = array();
 
@@ -276,7 +277,7 @@ function getBoardIndex($boardIndexOptions)
 		if (!empty($settings['avatars_on_indexes']))
 			$this_last_post['member']['avatar'] = array(
 				'name' => $row_board['avatar'],
-				'image' => $row_board['avatar'] == '' ? ($row_board['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($row_board['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row_board['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row_board['filename']) . '" alt="" />' : '') : (stristr($row_board['avatar'], 'http://') ? '<img class="avatar" src="' . $row_board['avatar'] . '" style="' . $avatar_width . $avatar_height . '" alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row_board['avatar']) . '" alt="" />'),
+				'image' => $row_board['avatar'] == '' ? ($row_board['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($row_board['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row_board['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row_board['filename']) . '" alt="" />' : '') : (stristr($row_board['avatar'], 'http://') ? '<img class="avatar" src="' . $row_board['avatar'] . '" style="' . $avatar_width . $avatar_height . '" alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row_board['avatar'], ENT_COMPAT, 'UTF-8') . '" alt="" />'),
 				'href' => $row_board['avatar'] == '' ? ($row_board['id_attach'] > 0 ? (empty($row_board['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row_board['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row_board['filename']) : '') : (stristr($row_board['avatar'], 'http://') ? $row_board['avatar'] : $modSettings['avatar_url'] . '/' . $row_board['avatar']),
 				'url' => $row_board['avatar'] == '' ? '' : (stristr($row_board['avatar'], 'http://') ? $row_board['avatar'] : $modSettings['avatar_url'] . '/' . $row_board['avatar'])
 			);

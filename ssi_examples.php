@@ -22,6 +22,8 @@
 */
 $ssi_guest_access = false;
 
+global $settings, $user_info;
+
 // Include the SSI file.
 require(dirname(__FILE__) . '/SSI.php');
 
@@ -104,7 +106,7 @@ template_ssi_above();
 					<?php } ?>
 					<h3>Website Samples</h3>
 					<ul>
-						<li><a href="#" onclick="showSSIBlock('htmlhome')">Sample 1</a></li>
+						<li><a href="#" onclick="showSSIBlock('htmlhome');">Sample 1</a></li>
 					</ul>
 					<h2 id="other">Other</h2>
 					<ul>
@@ -401,7 +403,7 @@ template_ssi_above();
 				ssi_recentTopics() is fetched using the array method, to allow further customizations on the output.
 
 				<h3>Code</h3>
-				<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><code class="bbc_code"><?php echo htmlspecialchars(template_homepage_sample1('source')); ?></code>
+				<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><code class="bbc_code"><?php echo htmlspecialchars(template_homepage_sample1('source'), ENT_COMPAT, 'UTF-8'); ?></code>
 				<h3>Result</h3>
 				<iframe src="?view=home1" style="width: 99%; height: 300px;"></iframe>
 			</div>
@@ -527,8 +529,6 @@ function template_ssi_above()
 
 function template_ssi_below()
 {
-	global $time_start;
-
 	echo '
 							<script type="text/javascript"><!-- // --><![CDATA[
 								showSSIBlock("ssi_recentTopics");

@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// announce a topic
+/**
+ * announce a topic
+ */
 function template_announce()
 {
 	global $context, $txt, $scripturl;
@@ -22,9 +24,7 @@ function template_announce()
 	echo '
 	<div id="announcement">
 		<form action="', $scripturl, '?action=announce;sa=send" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['announce_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['announce_title'], '</h2>
 			<div class="information">
 				', $txt['announce_desc'], '
 			</div>
@@ -62,6 +62,9 @@ function template_announce()
 	<br />';
 }
 
+/**
+ * Send an announcement out
+ */
 function template_announcement_send()
 {
 	global $context, $txt, $scripturl;

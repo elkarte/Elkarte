@@ -12,46 +12,37 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Alpha
- *
- * This template contains two humble sub templates - main. Its job is pretty
- * simple: it collects the information we need to actually send the topic.
- *
- * The main sub template gets shown from:
- * 	'?action=emailuser;sa=sendtopic;topic=##.##'
- * And should submit to:
- * 	'?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.' . $context['start']
- * It should send the following fields:
- * 	y_name: sender's name.
- * 	y_email: sender's email.
- * 	comment: any additional comment.
- * 	r_name: receiver's name.
- * 	r_email: receiver's email address.
- * 	send: this just needs to be set, as by the submit button.
- * 	sc: the session id, or $context['session_id'].
- *
- * The report sub template gets shown from:
- * 	'?action=reporttm;topic=##.##;msg=##'
- * It should submit to:
- * 	'?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
- * It only needs to send the following fields:
- * 	comment: an additional comment to give the moderator.
- * 	sc: the session id, or $context['session_id'].
- *
  */
 
-// This is where we get information about who they want to send the topic to, etc.
+/**
+ * This is where we get information about who they want to send the topic to, etc.
+ *
+ * The template gets shown from:
+ *  '?action=emailuser;sa=sendtopic;topic=##.##'
+ * And should submit to:
+ *  '?action=emailuser;sa=sendtopic;topic=' . $context['current_topic'] . '.' . $context['start']
+ *
+ * It should send the following fields:
+ *  y_name: sender's name.
+ *  y_email: sender's email.
+ *  comment: any additional comment.
+ *  r_name: receiver's name.
+ *  r_email: receiver's email address.
+ *  send: this just needs to be set, as by the submit button.
+ *  sc: the session id, or $context['session_id'].
+ */
 function template_main()
 {
 	global $context, $settings, $txt, $scripturl;
 
+	template_show_error('sendtopic_error');
+
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=sendtopic;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
+			</h2>
 			<div class="windowbg2">
 				<div class="content">
 					<fieldset id="sender" class="send_topic">
@@ -102,19 +93,21 @@ function template_main()
 	</div>';
 }
 
-// Send an email to a user!
+/**
+ * Send an email to a user!
+ */
 function template_custom_email()
 {
 	global $context, $settings, $txt, $scripturl;
 
+	template_show_error('sendemail_error');
+
 	echo '
 	<div id="send_topic">
 		<form action="', $scripturl, '?action=emailuser;sa=email" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
-				</h3>
-			</div>
+			<h2 class="category_header">
+				<img src="', $settings['images_url'], '/profile/email_sm.png" alt="" class="icon" />', $context['page_title'], '
+			</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings send_mail">
@@ -126,7 +119,7 @@ function template_custom_email()
 						</dd>';
 
 	// Can the user see the persons email?
-	if ($context['can_view_receipient_email'])
+	if ($context['can_view_recipient_email'])
 		echo '
 						<dt>
 							<strong>', $txt['sendtopic_receiver_email'], ':</strong>
@@ -196,6 +189,16 @@ function template_custom_email()
 	</div>';
 }
 
+/**
+ * The report sub template gets shown from:
+ *  '?action=reporttm;topic=##.##;msg=##'
+ * It should submit to:
+ *  '?action=reporttm;topic=' . $context['current_topic'] . '.' . $context['start']
+ *
+ * It only needs to send the following fields:
+ *  comment: an additional comment to give the moderator.
+ *  sc: the session id, or $context['session_id'].
+ */
 function template_report()
 {
 	global $context, $txt, $scripturl;
@@ -204,9 +207,7 @@ function template_report()
 	<div id="report_topic">
 		<form action="', $scripturl, '?action=reporttm;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="msg" value="' . $context['message_id'] . '" />
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['report_to_mod'], '</h3>
-				</div>
+				<h2 class="category_header">', $txt['report_to_mod'], '</h2>
 				<div class="windowbg">
 					<div class="content">';
 
@@ -233,7 +234,7 @@ function template_report()
 								<label for="report_comment">', $txt['enter_comment'], '</label>:
 							</dt>
 							<dd>
-								<textarea type="text" id="report_comment" name="comment" style="width: 70%" rows="5">', $context['comment_body'], '</textarea>
+								<textarea type="text" id="report_comment" name="comment">', $context['comment_body'], '</textarea>
 							</dd>';
 
 	if ($context['require_verification'])

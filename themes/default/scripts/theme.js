@@ -17,47 +17,54 @@
 $(document).ready(function() {
 	// menu drop downs
 	if (use_click_menu)
-		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}});
+		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}});
 	else
-		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons').superfish({delay : 300, speed: 175});
+		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superfish({delay : 300, speed: 175});
 
-	// Smooth scroll navigation
-	//$('.topbottom').bind('click', function(event) {
-	//	event.preventDefault();
-
-	//	// Position to the id pagetop or pagebot
-	//	var link = $('#page' + this.hash.substring(1)),
-	//		link_y = link.height() + 15;
-
-	//	$('html,body').animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1500);
-	//});
-
-	// Couldn't make sense of that lot, so replaced it with something that works. :P
 	// Smooth scroll to top.
 	$("a[href=#top]").bind("click", function(e) {
-		$("html,body").animate({scrollTop:0}, 1200);
 		e.preventDefault();
+		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
 	// Smooth scroll to bottom.
 	$("a[href=#bot]").bind("click", function(e) {
-		$("html,body").animate({scrollTop:$(document).height()}, 1200);
 		e.preventDefault();
+
+		// Don't scroll all the way down to the footer, just the content bottom
+		var link = $('#bot'),
+		link_y = link.height();
+
+		$("html,body").animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1200);
 	});
 
-	// tooltips
-	$('.preview').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 750, timeout: 50}}); 
+	// Tooltips
+	$('.preview').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 750, timeout: 50}});
 
-	// find all nested linked images and turn off the border
+	// Find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');
 
-	// Set a auto height so small code blocks collaspe, set a height for larger ones
-	// and let resize or overflow do its thing as normal
-	$('.bbc_code').each(function()
-	{
-		$(this).height("auto");
-		if ($(this).height() > 200)
-			$(this).css('height', '20em');
+	// Fix code blocks
+	if (typeof elk_codefix === 'function')
+		elk_codefix();
+
+	$('.expand_pages').expand_pages();
+
+	// Collapsabile fieldsets, pure candy
+	$('legend').click(function(){
+		$(this).siblings().slideToggle("fast");
+		$(this).parent().toggleClass("collapsed");
+	}).each(function () {
+		if ($(this).data('collapsed'))
+		{
+			$(this).siblings().css({display: "none"});
+			$(this).parent().toggleClass("collapsed");
+		}
+	});
+
+	// Spoiler
+	$('.spoilerheader').click(function() {
+		$(this).next().children().slideToggle("fast");
 	});
 });
 
@@ -97,9 +104,13 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	// Add the button.
 	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0];
 	var oNewButton = document.createElement('li');
+	var oRole = document.createAttribute('role');
+	oRole.value = 'menuitem';
+	oNewButton.setAttributeNode(oRole)
+
 	if ('sId' in oOptions)
 		oNewButton.id = oOptions.sId;
-	setInnerHTML(oNewButton, '<a href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
+	setInnerHTML(oNewButton, '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
 
 	oButtonStripList.appendChild(oNewButton);
 }
@@ -213,5 +224,115 @@ errorbox_handler.prototype.removeError = function (error_box, error_elem)
 			if (error_box.find("li").length === 0)
 				error_box.slideUp();
 		});
+	}
+}
+
+/**
+ * This is called from the editor plugin or display.template to set where to
+ * find the cache values for use in revalidateMentions
+ *
+ * @param {string} selector id of element that atWho is attached to
+ * @param {object} oOptions only set when called from the pluging, contains those options
+ */
+var all_elk_mentions = [];
+function add_elk_mention(selector, oOptions)
+{
+	// Global does not exist, hummm
+	if (all_elk_mentions.hasOwnProperty(selector))
+		return;
+
+	// No options means its attached to the plain text box
+	if (typeof oOptions === 'undefined')
+		oOptions = {};
+	oOptions.selector = selector;
+
+	// Add it to the stack
+	all_elk_mentions[all_elk_mentions.length] = {
+		selector: selector,
+		oOptions: oOptions
+	};
+}
+
+/**
+ * Used to tag mentioned names when they are entered inline but NOT selected from the dropdown list
+ * The name must have appeared in the dropdown and be found in that cache list
+ *
+ * @param {string} sForm the form that holds the container, only used for plain text QR
+ * @param {string} sInput the container that atWho is attached
+ */
+function revalidateMentions(sForm, sInput)
+{
+	var cached_names,
+		cached_queries,
+		body,
+		mentions;
+
+	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
+	{
+		// Make sure this mention object is for this selector, saftey first
+		if (all_elk_mentions[i].selector === sInput || all_elk_mentions[i].selector === '#' + sInput)
+		{
+			// Was this invoked as the editor plugin?
+			if (all_elk_mentions[i].oOptions.isPlugin)
+			{
+				var $editor = $('#' + all_elk_mentions[i].selector).data("sceditor");
+
+				cached_names = $editor.opts.mentionOptions.cache.names;
+				cached_queries = $editor.opts.mentionOptions.cache.queries;
+
+				// Clean up the newlines and spacing so we can find the @mentions
+				body = $editor.getText().replace(/[\u00a0\r\n]/g, ' ');
+				mentions = $($editor.opts.mentionOptions.cache.mentions);
+			}
+			// Or just our plain text quick reply box?
+			else
+			{
+				cached_names = all_elk_mentions[i].oMention.cached_names;
+				cached_queries = all_elk_mentions[i].oMention.cached_queries;
+
+				// Keep everying sepeteate with spaces, not newlines or no breakable
+				body = document.forms[sForm][sInput].value.replace(/[\u00a0\r\n]/g, ' ');
+
+				// The last pulldown box that atWho populated
+				mentions = $(all_elk_mentions[i].oMention.mentions);
+			}
+
+			// Adding a space at the beginning to facilitate catching of mentions at the 1st char
+			// and one at the end to simplify catching any aa last thing in the text
+			body = ' ' + body + ' ';
+
+			// First check if all those in the list are really mentioned
+			$(mentions).find('input').each(function (idx, elem) {
+				var name = $(elem).data('name'),
+					next_char,
+					prev_char,
+					index = body.indexOf(name);
+
+				// It is undefined coming from a preview
+				if (typeof(name) !== 'undefined')
+				{
+					if (index === -1)
+						$(elem).remove();
+					else
+					{
+						next_char = body.charAt(index + name.length);
+						prev_char = body.charAt(index - 1);
+
+						if (next_char !== '' && next_char.localeCompare(" ") !== 0)
+							$(elem).remove();
+						else if (prev_char !== '' && prev_char.localeCompare(" ") !== 0)
+							$(elem).remove();
+					}
+				}
+			});
+
+			for (var k = 0, ccount = cached_queries.length; k < ccount; k++)
+			{
+				names = cached_names[cached_queries[k]];
+				for (var l = 0, ncount = names.length; l < ncount; l++)
+					if (body.indexOf(' @' + names[l].name + ' ') !== -1)
+						mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
+			}
+		}
 	}
 }

@@ -186,7 +186,7 @@ class Sphinxql_Search
 			// Set the limits based on the search parameters.
 			$extra_where = array();
 			if (!empty($search_params['min_msg_id']) || !empty($search_params['max_msg_id']))
-				$extra_where[] = '@id >= ' . $search_params['min_msg_id'] . ' AND @id <=' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
+				$extra_where[] = '@id >= ' . $search_params['min_msg_id'] . ' AND @id <= ' . (empty($search_params['max_msg_id']) ? (int) $modSettings['maxMsgID'] : $search_params['max_msg_id']);
 			if (!empty($search_params['topic']))
 				$extra_where[] = 'id_topic = ' . (int) $search_params['topic'];
 			if (!empty($search_params['brd']))
@@ -269,27 +269,27 @@ class Sphinxql_Search
 		$keywords = array('include' => array(), 'exclude' => array());
 
 		// Split our search string and return an empty string if no matches
-		if (!preg_match_all('~ (-?)("[^"]+"|[^" ]+)~', ' ' . $string , $tokens, PREG_SET_ORDER))
+		if (!preg_match_all('~ (-?)("[^"]+"|[^" ]+)~', ' ' . $string, $tokens, PREG_SET_ORDER))
 			return '';
 
 		// First we split our string into included and excluded words and phrases
-		$or_part = FALSE;
+		$or_part = false;
 		foreach ($tokens as $token)
 		{
 			// Strip the quotes off of a phrase
 			if ($token[2][0] == '"')
 			{
 				$token[2] = substr($token[2], 1, -1);
-				$phrase = TRUE;
+				$phrase = true;
 			}
 			else
-				$phrase = FALSE;
+				$phrase = false;
 
 			// Prepare this token
 			$cleanWords = $this->_cleanString($token[2]);
 
 			// Explode the cleanWords again incase the cleaning put more spaces into it
-			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, NULL, PREG_SPLIT_NO_EMPTY);
+			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
 
 			if ($token[1] == '-')
 				$keywords['exclude'] = array_merge($keywords['exclude'], $addWords);
@@ -301,7 +301,7 @@ class Sphinxql_Search
 				if (!is_array($last))
 					$last = array($last);
 				$keywords['include'][] = $last;
-				$or_part = TRUE;
+				$or_part = true;
 				continue;
 			}
 
@@ -324,7 +324,7 @@ class Sphinxql_Search
 			}
 
 			// Start fresh on this...
-			$or_part = FALSE;
+			$or_part = false;
 		}
 
 		// Let's make sure they're not canceling each other out

@@ -23,8 +23,8 @@ function template_registration_agreement()
 
 	echo '
 		<form action="', $scripturl, '?action=register" method="post" accept-charset="UTF-8" id="registration">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['registration_agreement'];
+			<h2 class="category_header">', $txt['registration_agreement'];
+
 	if (!empty($context['languages']))
 	{
 		if (count($context['languages']) === 1)
@@ -35,15 +35,17 @@ function template_registration_agreement()
 		{
 			echo '
 				<select onchange="this.form.submit()" class="floatright" name="lngfile">';
+
 			foreach ($context['languages'] as $lang_key => $lang_val)
 				echo '
 					<option value="', $lang_key, '"', empty($lang_val['selected']) ? '' : ' selected="selected"', '>',  $lang_val['name'], '</option>';
+
 			echo '
 				</select>';
 		}
 	}
-	echo '</h3>
-			</div>
+	echo '
+			</h2>
 			<div class="roundframe">
 				<p>', $context['agreement'], '</p>
 			</div>
@@ -69,7 +71,6 @@ function template_registration_agreement()
 			</div>
 			<input type="hidden" name="step" value="1" />
 		</form>';
-
 }
 
 /**
@@ -116,12 +117,8 @@ function template_registration_form()
 
 	echo '
 		<form action="', $scripturl, '?action=register2" method="post" accept-charset="UTF-8" name="registration" id="registration" onsubmit="return verifyAgree();">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['registration_form'], '</h3>
-			</div>
-			<div class="title_bar">
-				<h4 class="titlebg">', $txt['required_info'], '</h4>
-			</div>
+			<h2 class="category_header">', $txt['registration_form'], '</h2>
+			<h3 class="category_header">', $txt['required_info'], '</h3>
 			<div class="windowbg2">
 				<fieldset class="content">
 					<dl class="register_form">
@@ -203,11 +200,11 @@ function template_registration_form()
 	if (!empty($context['custom_fields_required']) && !empty($context['custom_fields']))
 	{
 		echo '
-
 					<dl class="register_form">';
 
-		foreach ($context['custom_fields'] as $field)
+		foreach ($context['custom_fields'] as $key => $field)
 			if ($field['show_reg'] > 1)
+			{
 				echo '
 						<dt>
 							<strong', !empty($field['is_error']) ? ' style="color: red;"' : '', '>', $field['name'], ':</strong>
@@ -218,6 +215,10 @@ function template_registration_form()
 							return \'<\' . $matches[1] . \' tabindex="\' . $context[\'tabindex\']++ . \'"\';
 						')
 					, $field['input_html']), '</dd>';
+
+				// Drop this one so we don't show the additonal information header unless needed
+				unset($context['custom_fields'][$key]);
+			}
 
 		echo '
 					</dl>';
@@ -231,9 +232,7 @@ function template_registration_form()
 	if (!empty($context['profile_fields']) || !empty($context['custom_fields']))
 	{
 		echo '
-			<div class="title_bar">
-				<h4 class="titlebg">', $txt['additional_information'], '</h4>
-			</div>
+			<h3 class="category_header">', $txt['additional_information'], '</h3>
 			<div class="windowbg2">
 				<fieldset class="content">
 					<dl class="register_form" id="custom_group">';
@@ -267,7 +266,7 @@ function template_registration_form()
 						</dt>
 						<dd>';
 
-				// Want to put something infront of the box?
+				// Want to put something in front of the box?
 				if (!empty($field['preinput']))
 					echo '
 							', $field['preinput'];
@@ -348,9 +347,7 @@ function template_registration_form()
 	if ($context['visual_verification'])
 	{
 		echo '
-			<div class="title_bar">
-				<h4 class="titlebg">', $txt['verification'], '</h4>
-			</div>
+			<h3 class="category_header">', $txt['verification'], '</h3>
 			<div class="windowbg2">
 				<fieldset class="content centertext">
 					', template_control_verification($context['visual_verification_id'], 'all'), '
@@ -408,9 +405,7 @@ function template_after()
 	// Not much to see here, just a quick... "you're now registered!" or what have you.
 	echo '
 		<div id="registration_success">
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['title'], '</h2>
 			<div class="windowbg">
 				<p class="content">', $context['description'], '</p>
 			</div>
@@ -426,9 +421,7 @@ function template_coppa()
 
 	// Formulate a nice complicated message!
 	echo '
-			<div class="title_bar">
-				<h3 class="titlebg">', $context['page_title'], '</h3>
-			</div>
+			<h3 class="category_header">', $context['page_title'], '</h3>
 			<div class="windowbg2">
 				<div class="content">
 					<p>', $context['coppa']['body'], '</p>
@@ -463,6 +456,7 @@ function template_coppa()
 		echo '
 					<p>', $context['coppa']['phone'], '</p>';
 	}
+
 	echo '
 				</div>
 			</div>';
@@ -559,9 +553,7 @@ function template_admin_register()
 	<div id="admincenter">
 		<div id="admin_form_wrapper">
 			<form id="postForm" class="windowbg2" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8" name="postForm">
-				<div class="cat_bar">
-					<h3 class="catbg">', $txt['admin_browse_register_new'], '</h3>
-				</div>
+				<h2 class="category_header">', $txt['admin_browse_register_new'], '</h2>
 				<div class="content" id="register_screen">';
 
 	if (!empty($context['registration_done']))
@@ -650,9 +642,7 @@ function template_edit_agreement()
 	// Just a big box to edit the text file ;).
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['registration_agreement'], '</h3>
-			</div>';
+			<h2 class="category_header">', $txt['registration_agreement'], '</h2>';
 
 	// Warning for if the file isn't writable.
 	if (!empty($context['warning']))
@@ -667,9 +657,7 @@ function template_edit_agreement()
 	if (count($context['editable_agreements']) > 1)
 	{
 		echo '
-					<div class="cat_bar">
-						<h3 class="catbg">', $txt['language_configuration'], '</h3>
-					</div>
+					<h3 class="category_header">', $txt['language_configuration'], '</h3>
 					<div class="information">
 						<form action="', $scripturl, '?action=admin;area=regcenter" id="change_reg" method="post" accept-charset="UTF-8" style="display: inline;">
 							<strong>', $txt['admin_agreement_select_language'], ':</strong>&nbsp;
@@ -719,9 +707,7 @@ function template_edit_reserved_words()
 
 	echo '
 		<form id="admin_form_wrapper" class="windowbg2" action="', $scripturl, '?action=admin;area=regcenter" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['admin_reserved_set'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['admin_reserved_set'], '</h2>
 			<div class="content">
 				<h4>', $txt['admin_reserved_line'], '</h4>
 				<p class="reserved_names">
@@ -771,21 +757,21 @@ function template_contact_form()
 	global $context, $scripturl, $txt;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['admin_contact_form'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['admin_contact_form'], '</h2>
 		<form id="contact_form" class="windowbg2" action="', $scripturl, '?action=contact" method="post" accept-charset="UTF-8">
 			<div class="content">';
-			if (!empty($context['errors']))
-				echo '
+
+	if (!empty($context['errors']))
+		echo '
 				<div class="errorbox">', $txt['errors_contact_form'], ': <ul><li>', implode('</li><li>', $context['errors']), '</li></ul></div>';
-			echo '
+
+	echo '
 				<dl class="settings">
 					<dt>
-						<label for="emailaddres">', $txt['admin_register_email'], '</label>
+						<label for="emailaddress">', $txt['admin_register_email'], '</label>
 					</dt>
 					<dd>
-						<input type="text" name="emailaddres" id="emailaddres" value="', !empty($context['emailaddres']) ? $context['emailaddres'] : '', '" tabindex="', $context['tabindex']++, '" />
+						<input type="text" name="emailaddress" id="emailaddress" value="', !empty($context['emailaddress']) ? $context['emailaddress'] : '', '" tabindex="', $context['tabindex']++, '" />
 					</dd>
 					<dt>
 						<label for="contactmessage">', $txt['contact_your_message'], '</label>
@@ -794,18 +780,18 @@ function template_contact_form()
 						<textarea id="contactmessage" name="contactmessage" cols="50" rows="10" tabindex="', $context['tabindex']++, '">', !empty($context['contactmessage']) ? $context['contactmessage'] : '', '</textarea>
 					</dd>';
 
-			if ($context['require_verification'])
-			{
-					echo '
+	if ($context['require_verification'])
+	{
+			echo '
 					<dt>
 							', $txt['verification'], ':
 					</dt>
 					<dd>
 							', template_control_verification($context['visual_verification_id'], 'all'), '
 					</dd>';
-			}
+	}
 
-			echo '
+	echo '
 				</dl>
 				<hr />
 				<div class="submitbutton" >
@@ -826,10 +812,6 @@ function template_contact_form_done()
 	global $txt;
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['admin_contact_form'], '</h3>
-		</div>
-		<div class="windowbg2">
-				', $txt['contact_thankyou'], '
-		</div>';
+		<h2 class="category_header">', $txt['admin_contact_form'], '</h2>
+		<div class="windowbg2">', $txt['contact_thankyou'], '</div>';
 }

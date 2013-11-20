@@ -100,25 +100,11 @@ class Recent_Controller extends Action_Controller
 			foreach ($_REQUEST['boards'] as $i => $b)
 				$_REQUEST['boards'][$i] = (int) $b;
 
-			$request = $db->query('', '
-				SELECT b.id_board, b.num_posts
-				FROM {db_prefix}boards AS b
-				WHERE b.id_board IN ({array_int:board_list})
-					AND {query_see_board}
-				LIMIT {int:limit}',
-				array(
-					'board_list' => $_REQUEST['boards'],
-					'limit' => count($_REQUEST['boards']),
-				)
-			);
-			$total_posts = 0;
-			$boards = array();
-			while ($row = $db->fetch_assoc($request))
-			{
-				$boards[] = $row['id_board'];
-				$total_posts += $row['num_posts'];
-			}
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Boards.subs.php');
+
+			$boards_posts = boardsPosts($_REQUEST['boards'], array());
+			$total_posts = array_sum($boards_posts);
+			$boards = array_keys($boards_posts);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -139,7 +125,7 @@ class Recent_Controller extends Action_Controller
 		elseif (!empty($board))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$board_data = fetchBoardsInfo(array('boards' => $board),  array('selects' => 'posts'));
+			$board_data = fetchBoardsInfo(array('boards' => $board), array('selects' => 'posts'));
 
 			$query_this_board = 'b.id_board = {int:board}';
 			$query_parameters['board'] = $board;
@@ -219,7 +205,7 @@ class Recent_Controller extends Action_Controller
 			return;
 		}
 
-		list($context['posts'], $board_ids) = getRecentPosts($messages, $_REQUEST['start']);
+		list ($context['posts'], $board_ids) = getRecentPosts($messages, $_REQUEST['start']);
 
 		// There might be - and are - different permissions between any and own.
 		$permissions = array(
@@ -296,6 +282,7 @@ class Recent_Controller extends Action_Controller
 
 		// We need... we need... I know!
 		require_once(SUBSDIR . '/Recent.subs.php');
+		require_once(SUBSDIR . '/Boards.subs.php');
 
 		$context['showCheckboxes'] = !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $settings['show_mark_read'];
 		$context['showing_all_topics'] = isset($_GET['all']);
@@ -334,7 +321,6 @@ class Recent_Controller extends Action_Controller
 
 			// The easiest thing is to just get all the boards they can see,
 			// but since we've specified the top of tree we ignore some of them
-			require_once(SUBSDIR . '/Boards.subs.php');
 			addChildBoards($boards);
 
 			if (empty($boards))
@@ -352,23 +338,9 @@ class Recent_Controller extends Action_Controller
 		}
 		elseif (!empty($_REQUEST['boards']))
 		{
-			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
-			foreach ($_REQUEST['boards'] as $i => $b)
-				$_REQUEST['boards'][$i] = (int) $b;
+			$selected_boards = array_map('intval', explode(',', $_REQUEST['boards']));
 
-			$request = $db->query('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE {query_see_board}
-					AND b.id_board IN ({array_int:board_list})',
-				array(
-					'board_list' => $_REQUEST['boards'],
-				)
-			);
-			$boards = array();
-			while ($row = $db->fetch_assoc($request))
-				$boards[] = $row['id_board'];
-			$db->free_result($request);
+			$boards = accessibleBoards($selected_boards);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -380,8 +352,6 @@ class Recent_Controller extends Action_Controller
 		elseif (!empty($_REQUEST['c']))
 		{
 			$categories = array_map('intval', explode(',', $_REQUEST['c']));
-
-			require_once(SUBSDIR . '/Boards.subs.php');
 
 			$boards = array_keys(boardsPosts(array(), $categories, isset($_REQUEST['action']) && $_REQUEST['action'] != 'unreadreplies'));
 
@@ -397,19 +367,7 @@ class Recent_Controller extends Action_Controller
 			$see_board = isset($_REQUEST['action']) && $_REQUEST['action'] == 'unreadreplies' ? 'query_see_board' : 'query_wanna_see_board';
 
 			// Don't bother to show deleted posts!
-			$request = $db->query('', '
-				SELECT b.id_board
-				FROM {db_prefix}boards AS b
-				WHERE ' . $user_info[$see_board] . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-					AND b.id_board != {int:recycle_board}' : ''),
-				array(
-					'recycle_board' => (int) $modSettings['recycle_board'],
-				)
-			);
-			$boards = array();
-			while ($row = $db->fetch_assoc($request))
-				$boards[] = $row['id_board'];
-			$db->free_result($request);
+			$boards = wantedBoards($see_board);
 
 			if (empty($boards))
 				fatal_lang_error('error_no_boards_selected');
@@ -448,6 +406,14 @@ class Recent_Controller extends Action_Controller
 			$context['querystring_sort_limits'] = ';sort=' . $context['sort_by'] . ($ascending ? '' : ';desc');
 		}
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
+		// Trick
+		$txt['starter'] = $txt['started_by'];
+
+		foreach ($sort_methods as $key => $val)
+			$context['topics_headers'][$key] = array(
+				'url' => $scripturl . '?action=unread' . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start']) . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : ''),
+				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '',
+			);
 
 		if (!empty($_REQUEST['c']) && is_array($_REQUEST['c']) && count($_REQUEST['c']) == 1)
 		{
@@ -494,69 +460,7 @@ class Recent_Controller extends Action_Controller
 					SUBSTRING(ms.body, 1, 385) AS first_body, ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg';
 
 		if ($context['showing_all_topics'])
-		{
-			if (!empty($board))
-			{
-				$request = $db->query('', '
-					SELECT MIN(id_msg)
-					FROM {db_prefix}log_mark_read
-					WHERE id_member = {int:current_member}
-						AND id_board = {int:current_board}',
-					array(
-						'current_board' => $board,
-						'current_member' => $user_info['id'],
-					)
-				);
-				list ($earliest_msg) = $db->fetch_row($request);
-				$db->free_result($request);
-			}
-			else
-			{
-				$request = $db->query('', '
-					SELECT MIN(lmr.id_msg)
-					FROM {db_prefix}boards AS b
-						LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})
-					WHERE {query_see_board}',
-					array(
-						'current_member' => $user_info['id'],
-					)
-				);
-				list ($earliest_msg) = $db->fetch_row($request);
-				$db->free_result($request);
-			}
-
-			// This is needed in case of topics marked unread.
-			if (empty($earliest_msg))
-				$earliest_msg = 0;
-			else
-			{
-				// Using caching, when possible, to ignore the below slow query.
-				if (isset($_SESSION['cached_log_time']) && $_SESSION['cached_log_time'][0] + 45 > time())
-					$earliest_msg2 = $_SESSION['cached_log_time'][1];
-				else
-				{
-					// This query is pretty slow, but it's needed to ensure nothing crucial is ignored.
-					$request = $db->query('', '
-						SELECT MIN(id_msg)
-						FROM {db_prefix}log_topics
-						WHERE id_member = {int:current_member}',
-						array(
-							'current_member' => $user_info['id'],
-						)
-					);
-					list ($earliest_msg2) = $db->fetch_row($request);
-					$db->free_result($request);
-
-					// In theory this could be zero, if the first ever post is unread, so fudge it ;)
-					if ($earliest_msg2 == 0)
-						$earliest_msg2 = -1;
-
-					$_SESSION['cached_log_time'] = array(time(), $earliest_msg2);
-				}
-
-				$earliest_msg = min($earliest_msg2, $earliest_msg);
-			}
-		}
+			$earliest_msg = earliest_msg();
 
 		// @todo Add modified_time in for log_time check?
 
@@ -573,14 +477,14 @@ class Recent_Controller extends Action_Controller
 				CREATE TEMPORARY TABLE {db_prefix}log_topics_unread (
 					PRIMARY KEY (id_topic)
 				)
-				SELECT lt.id_topic, lt.id_msg, lt.disregarded
+				SELECT lt.id_topic, lt.id_msg, lt.unwatched
 				FROM {db_prefix}topics AS t
 					INNER JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic)
 				WHERE lt.id_member = {int:current_member}
 					AND t.' . $query_this_board . (empty($earliest_msg) ? '' : '
 					AND t.id_last_msg > {int:earliest_msg}') . ($modSettings['postmod_active'] ? '
-					AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_disregard'] ? '
-					AND lt.disregarded != 1' : ''),
+					AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+					AND lt.unwatched != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -603,7 +507,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg > {int:earliest_msg}' : '') . '
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
 					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -617,7 +521,7 @@ class Recent_Controller extends Action_Controller
 			$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $num_topics, $context['topics_per_page'], true);
 			$context['current_page'] = (int) $_REQUEST['start'] / $context['topics_per_page'];
 
-			$context['links'] = array(
+			$context['links'] += array(
 				'first' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'] : '',
 				'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 				'next' => $_REQUEST['start'] + $context['topics_per_page'] < $num_topics ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
@@ -632,8 +536,6 @@ class Recent_Controller extends Action_Controller
 			if ($num_topics == 0)
 			{
 				// Mark the boards as read if there are no unread topics!
-				require_once(SUBSDIR . '/Boards.subs.php');
-
 				// @todo look at this... there are no more unread topics already.
 				// If clearing of log_topics is still needed, perhaps do it separately.
 				markBoardsRead(empty($boards) ? $board : $boards, false, true);
@@ -663,7 +565,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg >= {int:min_message}
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
 					($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:sort}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($query_parameters, array(
@@ -689,7 +591,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
 					($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : ''),
 				array_merge($query_parameters, array(
 					'current_member' => $user_info['id'],
 					'earliest_msg' => !empty($earliest_msg) ? $earliest_msg : 0,
@@ -704,7 +606,7 @@ class Recent_Controller extends Action_Controller
 			$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $num_topics, $context['topics_per_page'], true);
 			$context['current_page'] = (int) $_REQUEST['start'] / $context['topics_per_page'];
 
-			$context['links'] = array(
+			$context['links'] += array(
 				'first' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'] : '',
 				'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 				'next' => $_REQUEST['start'] + $context['topics_per_page'] < $num_topics ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
@@ -722,8 +624,6 @@ class Recent_Controller extends Action_Controller
 				if ($context['showing_all_topics'])
 				{
 					// Since there are no unread topics, mark the boards as read!
-					require_once(SUBSDIR . '/Boards.subs.php');
-
 					// @todo look at this... there are no more unread topics already.
 					// If clearing of log_topics is still needed, perhaps do it separately.
 					markBoardsRead(empty($boards) ? $board : $boards, false, true);
@@ -754,7 +654,7 @@ class Recent_Controller extends Action_Controller
 					AND t.id_last_msg >= {int:min_message}
 					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' .
 					($modSettings['postmod_active'] ? ' AND ms.approved = {int:is_approved}' : '') .
-					($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+					($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($query_parameters, array(
@@ -807,7 +707,7 @@ class Recent_Controller extends Action_Controller
 					WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 						AND t.id_board = {int:current_board}' : '') .
 						($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-						($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+						($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 					GROUP BY m.id_topic',
 					array(
 						'current_board' => $board,
@@ -859,9 +759,9 @@ class Recent_Controller extends Action_Controller
 						LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 					WHERE t.' . $query_this_board . '
 						AND m.id_member = {int:current_member}
-						AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
-						($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-						($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : ''),
+						AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($modSettings['postmod_active'] ? '
+						AND t.approved = {int:is_approved}' : '') . ($modSettings['enable_unwatch'] ? '
+						AND IFNULL(lt.unwatched, 0) != 1' : ''),
 					array_merge($query_parameters, array(
 						'current_member' => $user_info['id'],
 						'is_approved' => 1,
@@ -875,7 +775,7 @@ class Recent_Controller extends Action_Controller
 			$context['page_index'] = constructPageIndex($scripturl . '?action=' . $_REQUEST['action'] . $context['querystring_board_limits'] . $context['querystring_sort_limits'], $_REQUEST['start'], $num_topics, $context['topics_per_page'], true);
 			$context['current_page'] = (int) $_REQUEST['start'] / $context['topics_per_page'];
 
-			$context['links'] = array(
+			$context['links'] += array(
 				'first' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], 0) . $context['querystring_sort_limits'] : '',
 				'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] - $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
 				'next' => $_REQUEST['start'] + $context['topics_per_page'] < $num_topics ? $scripturl . '?action=' . $_REQUEST['action'] . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start'] + $context['topics_per_page']) . $context['querystring_sort_limits'] : '',
@@ -925,7 +825,7 @@ class Recent_Controller extends Action_Controller
 						AND t.id_last_msg >= {int:min_message}
 						AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg' .
 						($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') .
-						($modSettings['enable_disregard'] ? ' AND IFNULL(lt.disregarded, 0) != 1' : '') . '
+						($modSettings['enable_unwatch'] ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 					ORDER BY {raw:order}
 					LIMIT {int:offset}, {int:limit}',
 					array_merge($query_parameters, array(
@@ -988,10 +888,10 @@ class Recent_Controller extends Action_Controller
 			if (!empty($settings['message_index_preview']))
 			{
 				// Limit them to 128 characters - do this FIRST because it's a lot of wasted censoring otherwise.
-				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => '&#10;')));
+				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 				$row['first_body'] = shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
-				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => '&#10;')));
+				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 				$row['last_body'] = shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
 				// Censor the subject and message preview.
@@ -1027,21 +927,10 @@ class Recent_Controller extends Action_Controller
 			$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 			if ($topic_length > $messages_per_page)
 			{
-				$tmppages = array();
-				$tmpa = 1;
-				for ($tmpb = 0; $tmpb < $topic_length; $tmpb += $messages_per_page)
-				{
-					$tmppages[] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.' . $tmpb . ';topicseen">' . $tmpa . '</a>';
-					$tmpa++;
-				}
+				$start = -1;
+				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d;topicseen', $start, $topic_length, $messages_per_page, true, array('prev_next' => false));
 
-				// Show links to all the pages?
-				if (count($tmppages) <= 5)
-					$pages = implode(' ', $tmppages);
-				// Or skip a few?
-				else
-					$pages = $tmppages[0] . ' ' . $tmppages[1] . ' ... ' . $tmppages[count($tmppages) - 2] . ' ' . $tmppages[count($tmppages) - 1];
-
+				// If we can use all, show it.
 				if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])
 					$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
 			}
@@ -1185,6 +1074,6 @@ class Recent_Controller extends Action_Controller
 		}
 
 		// Allow helpdesks and bug trackers and what not to add their own unread data (just add a template_layer to show custom stuff in the template!)
-	 	call_integration_hook('integrate_unread_list');
+		call_integration_hook('integrate_unread_list');
 	}
 }

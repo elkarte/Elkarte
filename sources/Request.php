@@ -171,7 +171,6 @@ class Request
 				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
 
-
 		// Some final checking.
 		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $this->_ban_ip) === 0 || !isValidIPv6($this->_ban_ip))
 			$this->_ban_ip = '';
@@ -185,7 +184,7 @@ class Request
 		$this->_scheme = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') ? 'https' : 'http';
 
 		// make sure we know everything about you... HTTP_USER_AGENT!
-		$this->_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES) : '';
+		$this->_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : '';
 
 		// keep compatibility with the uses of $_SERVER['HTTP_USER_AGENT']...
 		$_SERVER['HTTP_USER_AGENT'] = $this->_user_agent;
@@ -249,7 +248,8 @@ class Request
 
 			// $topic and $_REQUEST['start'] are numbers, numbers I say.
 			$topic = (int) $_REQUEST['topic'];
-			$_REQUEST['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+			// @todo in Display $_REQUEST['start'] is not always a number
+			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^(:?(:?from|msg)?\d+|new)$~', $_REQUEST['start']) ?  $_REQUEST['start'] : 0;
 
 			// Now make sure the online log gets the right number.
 			$_GET['topic'] = $topic;

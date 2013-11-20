@@ -50,7 +50,12 @@ function template_showDrafts()
 {
 	global $context, $settings, $scripturl, $txt;
 
-	template_pagesection(false, false, 'go_down');
+	echo '
+		<h3 class="category_header">
+			', $txt['drafts'], ' - ', $context['member']['name'], '
+		</h3>',
+
+	template_pagesection();
 
 	// No drafts? Just show an informative message.
 	if (empty($context['drafts']))
@@ -108,7 +113,6 @@ function template_profile_save()
 	global $context, $txt;
 
 	echo '
-
 					<hr class="clear" />';
 
 	// Only show the password box if it's actually needed.
@@ -130,6 +134,7 @@ function template_profile_save()
 	if (!empty($context['token_check']))
 		echo '
 						<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+
 	echo '
 						<input type="submit" value="', $txt['change_profile'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

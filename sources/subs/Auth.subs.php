@@ -38,9 +38,12 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	// If changing state force them to re-address some permission caching.
 	$_SESSION['mc']['time'] = 0;
 
+	// Let's be sure it is an int to simplify the regexp used to validate the cookie
+	$id = (int) $id;
+
 	// The cookie may already exist, and have been set with different options.
 	$cookie_state = (empty($modSettings['localCookies']) ? 0 : 1) | (empty($modSettings['globalCookies']) ? 0 : 2);
-	if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
+	if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
 	{
 		$array = @unserialize($_COOKIE[$cookiename]);
 
@@ -222,7 +225,7 @@ function adminLogin_outputPostVars($k, $v)
 {
 	if (!is_array($v))
 		return '
-<input type="hidden" name="' . htmlspecialchars($k) . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '" />';
+<input type="hidden" name="' . htmlspecialchars($k, ENT_COMPAT, 'UTF-8') . '" value="' . strtr($v, array('"' => '&quot;', '<' => '&lt;', '>' => '&gt;')) . '" />';
 	else
 	{
 		$ret = '';
@@ -325,8 +328,8 @@ function findMembers($names, $use_wildcards = false, $buddies_only = false, $max
 		$email_condition = '';
 
 	// Get the case of the columns right - but only if we need to as things like MySQL will go slow needlessly otherwise.
-	$member_name = $db->db_case_sensitive() ? 'LOWER(member_name)' : 'member_name';
-	$real_name = $db->db_case_sensitive() ? 'LOWER(real_name)' : 'real_name';
+	$member_name = defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name)' : 'member_name';
+	$real_name = defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name';
 
 	// Search by username, display name, and email address.
 	$request = $db->query('', '
@@ -401,7 +404,7 @@ function resetPassword($memID, $username = null)
 	// Do some checks on the username if needed.
 	if ($username !== null)
 	{
-		$errors = error_context::context('reset_pwd', 0);
+		$errors = Error_Context::context('reset_pwd', 0);
 		validateUsername($memID, $user, 'reset_pwd');
 
 		// If there are "important" errors and you are not an admin: log the first error
@@ -442,7 +445,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
 {
 	global $txt;
 
-	$errors = error_context::context($error_context, 0);
+	$errors = Error_Context::context($error_context, 0);
 
 	// Don't use too long a name.
 	if (Util::strlen($username) > 25)
@@ -463,7 +466,7 @@ function validateUsername($memID, $username, $error_context = 'register', $check
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
 		if (isReservedName($username, $memID, false))
-			$errors->addError(array('name_in_use', array(htmlspecialchars($username))));
+			$errors->addError(array('name_in_use', array(htmlspecialchars($username, ENT_COMPAT, 'UTF-8'))));
 	}
 }
 
@@ -684,7 +687,15 @@ function isFirstLogin($id_member)
 	return !empty($member) && $member['last_login'] == 0;
 }
 
-function findUser($where, $where_params)
+/**
+ * Search for a member by given criterias
+ *
+ * @param string $where
+ * @param string $where_params
+ * @param bool $fatal
+ * @return boolean
+ */
+function findUser($where, $where_params, $fatal = true)
 {
 	$db = database();
 
@@ -699,7 +710,7 @@ function findUser($where, $where_params)
 	);
 
 	// Maybe email?
-	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']))
+	if ($db->num_rows($request) == 0 && empty($_REQUEST['uid']) && isset($where_params['email_address']))
 	{
 		$db->free_result($request);
 
@@ -712,13 +723,44 @@ function findUser($where, $where_params)
 			))
 		);
 		if ($db->num_rows($request) == 0)
-			fatal_lang_error('no_user_with_email', false);
+		{
+			if ($fatal)
+				fatal_lang_error('no_user_with_email', false);
+			else
+				return false;
+		}
 	}
 
 	$member = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $member;
+}
+
+/**
+ * Find users by their email address.
+ *
+ * @param string $email
+ * @return int
+ */
+function userByEmail($email)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}members
+		WHERE email_address = {string:email_address}
+		LIMIT 1',
+		array(
+			'email_address' => $email,
+		)
+	);
+
+	$return = $db->num_rows($request) != 0;
+	$db->free_result($request);
+
+	return $return;
 }
 
 /**
@@ -749,46 +791,64 @@ function generateValidationCode()
  * name or email.
  *
  * @param string $name
+ * @param bool $is_id if true it treats $name as a member ID and try to load the data for that ID
  *
  * @return mixed, array or false if nothing is found
  */
-function loadExistingMember($name)
+function loadExistingMember($name, $is_id = false)
 {
 	$db = database();
 
-	// Try to find the user, assuming a member_name was passed...
-	$request = $db->query('', '
-		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-			openid_uri, passwd_flood
-		FROM {db_prefix}members
-		WHERE ' . ($db->db_case_sensitive() ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
-		LIMIT 1',
-		array(
-			'user_name' => $db->db_case_sensitive() ? strtolower($name) : $name,
-		)
-	);
-	// Didn't work. Try it as an email address.
-	if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
+	if ($is_id)
 	{
-		$db->free_result($request);
-
 		$request = $db->query('', '
-			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
-			passwd_flood
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+				openid_uri, passwd_flood
 			FROM {db_prefix}members
-			WHERE email_address = {string:user_name}
+			WHERE id_member = {int:id_member}
 			LIMIT 1',
 			array(
-				'user_name' => $name,
+				'id_member' => (int) $name,
 			)
 		);
+	}
+	else
+	{
+		// Try to find the user, assuming a member_name was passed...
+		$request = $db->query('', '
+			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+				openid_uri, passwd_flood
+			FROM {db_prefix}members
+			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
+			LIMIT 1',
+			array(
+				'user_name' => defined('DB_CASE_SENSITIVE') ? strtolower($name) : $name,
+			)
+		);
+		// Didn't work. Try it as an email address.
+		if ($db->num_rows($request) == 0 && strpos($name, '@') !== false)
+		{
+			$db->free_result($request);
+
+			$request = $db->query('', '
+				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
+				passwd_flood
+				FROM {db_prefix}members
+				WHERE email_address = {string:user_name}
+				LIMIT 1',
+				array(
+					'user_name' => $name,
+				)
+			);
+		}
 	}
 
 	// Nothing? Ah the horror...
 	if ($db->num_rows($request) == 0)
-		return false;
+		$user_settings = false;
+	else
+		$user_settings = $db->fetch_assoc($request);
 
-	$user_settings = $db->fetch_assoc($request);
 	$db->free_result($request);
 
 	return $user_settings;

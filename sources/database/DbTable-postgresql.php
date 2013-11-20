@@ -12,7 +12,7 @@
  * @version 1.0 Alpha
  *
  * This class implements functionality related to table structure.
- * Intended in particular for add-ons to change it to suit their needs.
+ * Intended in particular for addons to change it to suit their needs.
  *
  */
 
@@ -62,23 +62,23 @@ class DbTable_PostgreSQL extends DbTable
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
 	 *  The columns array should have one sub-array for each column - these sub arrays contain:
-	 *  	'name' = Column name
-	 *  	'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
-	 *  	'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
-	 *  		If not set it will pick a size.
-	 *  	- 'default' = Default value - do not set if no default required.
-	 *  	- 'null' => Can it be null (true or false) - if not set default will be false.
-	 *  	- 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
-	 *  		it should begin counting.
+	 *    'name' = Column name
+	 *    'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
+	 *    'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
+	 *      If not set it will pick a size.
+	 *    - 'default' = Default value - do not set if no default required.
+	 *    - 'null' => Can it be null (true or false) - if not set default will be false.
+	 *    - 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
+	 *      it should begin counting.
 	 *  - Adds indexes as specified within indexes parameter. Each index should be a member of $indexes. Values are:
-	 *  	- 'name' => Index name (If left empty it will be generated).
-	 *  	- 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
-	 *  	- 'columns' => Array containing columns that form part of key - in the order the index is to be created.
+	 *    - 'name' => Index name (If left empty it will be generated).
+	 *    - 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
+	 *    - 'columns' => Array containing columns that form part of key - in the order the index is to be created.
 	 *  - parameters: (None yet)
 	 *  - if_exists values:
-	 *  	- 'ignore' will do nothing if the table exists. (And will return true)
-	 *  	- 'overwrite' will drop any existing table of the same name.
-	 *  	- 'error' will return false if the table already exists.
+	 *    - 'ignore' will do nothing if the table exists. (And will return true)
+	 *    - 'overwrite' will drop any existing table of the same name.
+	 *    - 'error' will return false if the table already exists.
 	 *
 	 * @param string $table_name
 	 * @param array $columns in the format specified.
@@ -157,6 +157,11 @@ class DbTable_PostgreSQL extends DbTable
 		$index_queries = array();
 		foreach ($indexes as $index)
 		{
+			// MySQL supports a length argument, postgre no
+			foreach ($index['columns'] as $id => $col)
+				if (strpos($col, '(') !== false)
+					$index['columns'][$id] = substr($col, 0, strpos($col, '('))
+
 			$columns = implode(',', $index['columns']);
 
 			// Primary goes in the table...
@@ -265,7 +270,7 @@ class DbTable_PostgreSQL extends DbTable
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $txt, $db_prefix;
+		global $db_prefix;
 
 		// Working with the db
 		$db = database();
@@ -540,6 +545,12 @@ class DbTable_PostgreSQL extends DbTable
 		// No columns = no index.
 		if (empty($index_info['columns']))
 			return false;
+
+		// MySQL supports a length argument, postgre no
+		foreach ($index['columns'] as $id => $col)
+			if (strpos($col, '(') !== false)
+				$index['columns'][$id] = substr($col, 0, strpos($col, '('))
+
 		$columns = implode(',', $index_info['columns']);
 
 		// No name - make it up!

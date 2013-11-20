@@ -33,7 +33,7 @@ function countMessages()
 		FROM {db_prefix}messages',
 		array()
 	);
-	list($messages) = $db->fetch_row($request);
+	list ($messages) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $messages;
@@ -84,12 +84,26 @@ function flushLogTables()
  */
 function getMessageTableColumns()
 {
-	$db = database();
-
 	$table = db_table();
 	$colData = $table->db_list_columns('{db_prefix}messages', true);
 
 	return $colData;
+}
+
+/**
+ * Retrieve informations about the body column of the messages table
+ * Used in action_database
+ */
+function fetchBodyType()
+{
+	$table = db_table();
+
+	$colData = $table->db_list_columns('{db_prefix}messages', true);
+	foreach ($colData as $column)
+		if ($column['name'] == 'body')
+			$body_type = $column['type'];
+
+	return $body_type;
 }
 
 /**
@@ -99,8 +113,6 @@ function getMessageTableColumns()
  */
 function resizeMessageTableBody($type)
 {
-	$db = database();
-
 	$table = db_table();
 	$table->db_change_column('{db_prefix}messages', 'body', array('type' => $type));
 }
@@ -166,7 +178,7 @@ function getExceedingMessages($msg)
 
 /**
  * Lists all the tables from our ElkArte installation.
- * Additional tables from modifications are also included.
+ * Additional tables from addons are also included.
  *
  * @return array
  */
@@ -177,8 +189,6 @@ function getElkTables()
 	$db = database();
 
 	$tables = array();
-
-	$db = database();
 
 	// Only optimize the tables related to this installation, not all the tables in the db
 	$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -200,7 +210,6 @@ function optimizeTable($tablename)
 {
 	$db = database();
 
-	$db = database();
 	$db->db_optimize_table($tablename);
 }
 
@@ -465,17 +474,17 @@ function updatePersonalMessagesCounter()
 
 	$request = $db->query('', '
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
-			MAX(mem.instant_messages) AS instant_messages
+			MAX(mem.personal_messages) AS personal_messages
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}pm_recipients AS pmr ON (mem.id_member = pmr.id_member AND pmr.deleted = {int:is_not_deleted})
 		GROUP BY mem.id_member
-		HAVING COUNT(pmr.id_pm) != MAX(mem.instant_messages)',
+		HAVING COUNT(pmr.id_pm) != MAX(mem.personal_messages)',
 		array(
 			'is_not_deleted' => 0,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		updateMemberData($row['id_member'], array('instant_messages' => $row['real_num']));
+		updateMemberData($row['id_member'], array('personal_messages' => $row['real_num']));
 
 	$db->free_result($request);
 

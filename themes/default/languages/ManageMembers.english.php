@@ -86,8 +86,8 @@ $txt['admin_browse_approve'] = 'Members whose accounts are awaiting approval';
 $txt['admin_browse_approve_desc'] = 'From here you can manage all members who are waiting to have their accounts approved.';
 $txt['admin_browse_activate'] = 'Members whose accounts are awaiting activation';
 $txt['admin_browse_activate_desc'] = 'This screen lists all the members who have still not activated their accounts at your forum.';
-$txt['admin_browse_awaiting_approval'] = 'Awaiting Approval (%1$d)';
-$txt['admin_browse_awaiting_activate'] = 'Awaiting Activation (%1$d)';
+$txt['admin_browse_awaiting_approval'] = 'Awaiting Approval [%1$d]';
+$txt['admin_browse_awaiting_activate'] = 'Awaiting Activation [%1$d]';
 
 $txt['admin_browse_username'] = 'Username';
 $txt['admin_browse_email'] = 'Email Address';

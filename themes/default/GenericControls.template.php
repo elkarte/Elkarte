@@ -14,7 +14,9 @@
  * @version 1.0 Alpha
  */
 
-// This function displays all the stuff you get with a richedit box - BBC, smileys etc.
+/**
+ * This function displays all the stuff you get with a richedit box - BBC, smileys etc.
+ */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {
 	global $context, $settings, $options;
@@ -22,30 +24,38 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
 	echo '
-
-		<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" cols="600" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], '; height: ', $editor_context['height'], '; ', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '" required="required">', $editor_context['value'], '</textarea>
+		<textarea class="editor" name="', $editor_id, '" id="', $editor_id, '" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);" onchange="storeCaret(this);" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], ';height: ', $editor_context['height'], ';', isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? 'border: 1px solid red;' : '', '" required="required">', $editor_context['value'], '</textarea>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
 		<script><!-- // --><![CDATA[
 			$(document).ready(function(){',
 			!empty($context['bbcodes_handlers']) ? $context['bbcodes_handlers'] : '', '
 				$("#', $editor_id, '").sceditor({
 					style: "', $settings['default_theme_url'], '/css/jquery.sceditor.default.css",
-					width: "', $editor_context['width'], '",
-					height: "', $editor_context['height'], '",
+					width: "100%",
+					height: "100%",
 					resizeWidth: false,
 					resizeMaxHeight: -1,
-					emoticonsCompat: true,', !empty($editor_context['locale']) ? 'locale: \'' . $editor_context['locale'] . '\',' : '', '
+					emoticonsCompat: true,', !empty($editor_context['locale']) ? '
+					locale: \'' . $editor_context['locale'] . '\',' : '', '
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					enablePasteFiltering: true,
-					plugins: "bbcode', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
+					plugins: "bbcode', !empty($context['notifications_enabled']) ? ', mention' : '', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
 					draftOptions: {
 						sLastNote: \'draft_lastautosave\',
-						sSceditorID: \'' . $context['post_box_name'] . '\',
+						sSceditorID: \'' . $editor_id . '\',
 						sType: \'post\',
 						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
 						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
 						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
-					},' : '",'), '
+					},' : '",'), (!empty($context['notifications_enabled']) ? '
+					mentionOptions: {
+						editor_id: \'' . $editor_id . '\',
+						cache: {
+							mentions: [],
+							queries: [],
+							names: []
+						}
+					},' : ''), '
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
 					}';
@@ -136,6 +146,9 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 		// ]]></script>';
 }
 
+/**
+ * Shows the buttons that the user can see .. preview, spellchecker, drafts, etc
+ */
 function template_control_richedit_buttons($editor_id)
 {
 	global $context, $settings, $options, $txt;
@@ -209,7 +222,9 @@ function template_control_richedit_buttons($editor_id)
 	}
 }
 
-// What's this, verification?!
+/**
+ * What's this, verification?!
+ */
 function template_control_verification($verify_id)
 {
 	global $context;
@@ -217,6 +232,7 @@ function template_control_verification($verify_id)
 	$verify_context = &$context['controls']['verification'][$verify_id];
 
 	$i = 0;
+
 	// Loop through each item to show them.
 	foreach ($verify_context['test'] as $key => $verification)
 	{
@@ -230,31 +246,38 @@ function template_control_verification($verify_id)
 
 		echo '
 			</div>';
+
 		$i++;
 	}
 }
 
+/**
+ * Used to show a verification question
+ */
 function template_control_verification_questions($verify_id, $verify_context)
 {
 	global $context;
 
 	foreach ($verify_context as $question)
-			echo '
+		echo '
 				<div class="smalltext">
 					', $question['q'], ':<br />
 					<input type="text" name="', $verify_id, '_vv[q][', $question['id'], ']" size="30" value="', $question['a'], '" ', $question['is_error'] ? ' class="border_error"' : '', ' tabindex="', $context['tabindex']++, '" class="input_text" />
 				</div>';
 }
 
+/**
+ * Used to show one of those easy for robot, hard for human captcha's
+ */
 function template_control_verification_captcha($verify_id, $verify_context)
 {
 	global $context, $txt;
 
-			if ($verify_context['use_graphic_library'])
-				echo '
+	if ($verify_context['use_graphic_library'])
+		echo '
 				<img src="', $verify_context['image_href'], '" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '" />';
-			else
-				echo '
+	else
+		echo '
 				<img src="', $verify_context['image_href'], ';letter=1" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_1" />
 				<img src="', $verify_context['image_href'], ';letter=2" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_2" />
 				<img src="', $verify_context['image_href'], ';letter=3" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_3" />
@@ -262,11 +285,25 @@ function template_control_verification_captcha($verify_id, $verify_context)
 				<img src="', $verify_context['image_href'], ';letter=5" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_5" />
 				<img src="', $verify_context['image_href'], ';letter=6" alt="', $txt['visual_verification_description'], '" id="verification_image_', $verify_id, '_6" />';
 
-			echo '
+	echo '
 				<div class="smalltext" style="margin: 4px 0 8px 0;">
 					<a href="', $verify_context['image_href'], ';sound" id="visual_verification_', $verify_id, '_sound" rel="nofollow">', $txt['visual_verification_sound'], '</a> / <a href="#visual_verification_', $verify_id, '_refresh" id="visual_verification_', $verify_id, '_refresh">', $txt['visual_verification_request_new'], '</a><br /><br />
-					', $txt['visual_verification_description'], ':<br />
+					', $txt['visual_verification_description'], ':
 					<input type="text" name="', $verify_id, '_vv[code]" value="', !empty($verify_context['text_value']) ? $verify_context['text_value'] : '', '" size="30" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 				</div>';
+}
 
+/**
+ * Display the empty field verificaiton
+ */
+function template_control_verification_emptyfield($verify_id, $verify_context)
+{
+	global $context, $txt;
+
+	// Display an empty field verificaiton
+	echo '
+			<div class="smalltext verification_control_valid">
+				', $txt['visual_verification_hidden'], ':
+				<input type="text" name="', $_SESSION[$verify_id . '_vv']['empty_field'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : '' ), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
+			</div>';
 }

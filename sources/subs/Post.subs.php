@@ -101,16 +101,21 @@ function preparsecode(&$message, $previewing = false)
 			fixTags($parts[$i]);
 
 			// Replace /me.+?\n with [me=name]dsf[/me]\n.
-			if (strpos($user_info['name'], '[') !== false || strpos($user_info['name'], ']') !== false || strpos($user_info['name'], '\'') !== false || strpos($user_info['name'], '"') !== false)
+			if (preg_match('~[\[\]\\"]~', $user_info['name']) !== false)
+			{
 				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=&quot;' . $user_info['name'] . '&quot;]$2[/me]', $parts[$i]);
+				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=&quot;' . $user_info['name'] . '&quot;]$2[/me]$3', $parts[$i]);
+			}
 			else
+			{
 				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=' . $user_info['name'] .  ']$2[/me]', $parts[$i]);
+				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=' . $user_info['name'] . ']$2[/me]$3', $parts[$i]);
+			}
 
 			if (!$previewing && strpos($parts[$i], '[html]') !== false)
 			{
 				if (allowedTo('admin_forum'))
-					$parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ise', '\'[html]\' . strtr(un_htmlspecialchars(\'$1\'), array("\n" => \'&#13;\', \'  \' => \' &#32;\', \'[\' => \'&#91;\', \']\' => \'&#93;\')) . \'[/html]\'', $parts[$i]);
-
+					$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', 'return "[html]" . strtr(un_htmlspecialchars("$m[1]"), array("\n" => \'&#13;\', \'  \' => \' &#32;\', \'[\' => \'&#91;\', \']\' => \'&#93;\')) . "[/html]";'), $parts[$i]);
 				// We should edit them out, or else if an admin edits the message they will get shown...
 				else
 				{
@@ -272,7 +277,7 @@ function un_preparsecode($message)
 		// If $i is a multiple of four (0, 4, 8, ...) then it's not a code section...
 		if ($i % 4 == 0)
 		{
-			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', create_function('$m', 'return "[html]" . strtr(htmlspecialchars("$m[1]", ENT_QUOTES), array("\\&quot;" => "&quot;", "&amp;#13;" => "<br />", "&amp;#32;" => " ", "&amp;#91;" => "[", "&amp;#93;" => "]")) . "[/html]";'), $parts[$i]);
+			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', create_function('$m', 'return "[html]" . strtr(htmlspecialchars("$m[1]", ENT_QUOTES, "UTF-8"), array("\\&quot;" => "&quot;", "&amp;#13;" => "<br />", "&amp;#32;" => " ", "&amp;#91;" => "[", "&amp;#93;" => "]")) . "[/html]";'), $parts[$i]);
 
 			// Attempt to un-parse the time to something less awful.
 			$parts[$i] = preg_replace_callback('~\[time\](\d{0,10})\[/time\]~i', create_function('$m', ' return "[time]" . timeformat("$m[1]", false) . "[/time]";'), $parts[$i]);
@@ -365,7 +370,7 @@ function fixTags(&$message)
 		fixTag($message, $param['tag'], $param['protocols'], $param['embeddedUrl'], $param['hasEqualSign'], !empty($param['hasExtra']));
 
 	// Now fix possible security problems with images loading links automatically...
-	$message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is', create_function('$m', '"$m[1]" . preg_replace("~action(=|%3d)(?!dlattach)~i", "action-", "$2") . "[/img]";'), $message);
+	$message = preg_replace_callback('~(\[img.*?\])(.+?)\[/img\]~is', create_function('$m', 'return "$m[1]" . preg_replace("~action(=|%3d)(?!dlattach)~i", "action-", "$m[2]") . "[/img]";'), $message);
 
 	// Limit the size of images posted?
 	if (!empty($modSettings['max_image_width']) || !empty($modSettings['max_image_height']))
@@ -517,463 +522,6 @@ function resizeBBCImages(&$message)
 	// If any img tags were actually changed...
 	if (!empty($replaces))
 		$message = strtr($message, $replaces);
-}
-
-/**
- * Sends a notification to members who have elected to receive emails
- * when things happen to a topic, such as replies are posted.
- * The function automatically finds the subject and its board, and
- * checks permissions for each member who is "signed up" for notifications.
- * It will not send 'reply' notifications more than once in a row.
- *
- * @param array $topics - represents the topics the action is happening to.
- * @param string $type - can be any of reply, sticky, lock, unlock, remove,
- *  move, merge, and split.  An appropriate message will be sent for each.
- * @param array $exclude = array() - members in the exclude array will not be
- *  processed for the topic with the same key.
- * @param array $members_only = array() - are the only ones that will be sent the notification if they have it on.
- * @uses Post language file
- */
-function sendNotifications($topics, $type, $exclude = array(), $members_only = array(), $pbe = array())
-{
-	global $txt, $scripturl, $language, $user_info, $webmaster_email, $mbname;
-	global $modSettings;
-
-	$db = database();
-
-	// Coming in from emailpost or emailtopic, if so pbe values will be set to the credentials of the emailer
-	$user_id = (!empty($pbe['user_info']['id']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['id'] : $user_info['id'];
-	$user_language = (!empty($pbe['user_info']['language']) && !empty($modSettings['maillist_enabled'])) ? $pbe['user_info']['language'] : $user_info['language'];
-
-	// Load in our dependencies
-	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
-	if ($maillist)
-		require_once(SUBSDIR . '/Emailpost.subs.php');
-	require_once(SUBSDIR . '/Mail.subs.php');
-
-	// Can't do it if there's no topics.
-	if (empty($topics))
-		return;
-
-	// It must be an array - it must!
-	if (!is_array($topics))
-		$topics = array($topics);
-
-	// I hope we are not sending one of silly moderation notices
-	if ($type !== 'reply' && !empty($maillist) && !empty($modSettings['pbe_no_mod_notices']))
-		return;
-
-	// Get the subject, body and basic poster details
-	$result = $db->query('', '
-		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
-		WHERE t.id_topic IN ({array_int:topic_list})
-		LIMIT 1',
-		array(
-			'topic_list' => $topics,
-		)
-	);
-	$topicData = array();
-	$boards_index = array();
-	while ($row = $db->fetch_assoc($result))
-	{
-		// Any attachments, we just want the number of them for display
-		$num_attachments = 0;
-		$request = $db->query('', '
-			SELECT COUNT(id_attach)
-			FROM {db_prefix}attachments
-			WHERE attachment_type = {int:attachment_type}
-				AND id_msg = {int:id_msg}
-			LIMIT 1',
-			array(
-				'attachment_type' => 0,
-				'id_msg' => $row['id_last_msg'],
-			)
-		);
-		list($num_attachments) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		// Using the maillist function or the standard style
-		if ($maillist)
-		{
-			// Convert to markdown markup e.g. text ;)
-			pbe_prepare_text($row['body'], $row['subject'], $row['signature']);
-		}
-		else
-		{
-			// Clean it up.
-			censorText($row['subject']);
-			censorText($row['body']);
-			censorText($row['signature']);
-			$row['subject'] = un_htmlspecialchars($row['subject']);
-			$row['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($row['body'], false, $row['id_last_msg']), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
-		}
-
-		// all the boards for these topics, used to find all the members to be notified
-		$boards_index[] = $row['id_board'];
-
-		$topicData[$row['id_topic']] = array(
-			'subject' => $row['subject'],
-			'body' => $row['body'],
-			'last_id' => $row['id_last_msg'],
-			'topic' => $row['id_topic'],
-			'board' => $row['id_board'],
-			'name' => $row['poster_name'],
-			'exclude' => '',
-			'signature' => $row['signature'],
-			'attachments' => $num_attachments,
-		);
-	}
-	$db->free_result($result);
-
-	// Work out any exclusions...
-	foreach ($topics as $key => $id)
-		if (isset($topicData[$id]) && !empty($exclude[$key]))
-			$topicData[$id]['exclude'] = (int) $exclude[$key];
-
-	// Nada?
-	if (empty($topicData))
-		trigger_error('sendNotifications(): topics not found', E_USER_NOTICE);
-
-	$topics = array_keys($topicData);
-
-	// Just in case they've gone walkies.
-	if (empty($topics))
-		return;
-
-	// Insert all of these items into the digest log for those who want notifications later.
-	$digest_insert = array();
-	foreach ($topicData as $id => $data)
-		$digest_insert[] = array($data['topic'], $data['last_id'], $type, (int) $data['exclude']);
-
-	$db->insert('',
-		'{db_prefix}log_digest',
-		array(
-			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
-		),
-		$digest_insert,
-		array()
-	);
-
-	// Are we doing anything here?
-	$sent = 0;
-
-	// Using the posting email function in either group or list mode
-	if ($maillist)
-	{
-		// Find the members with *board* notifications on.
-		$members = $db->query('', '
-			SELECT
-				mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, mem.warning,
-				ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, b.name, b.id_profile,
-				ln.id_board
-			FROM {db_prefix}log_notify AS ln
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
-				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
-			WHERE ln.id_board IN ({array_int:board_list})
-				AND mem.notify_types != {int:notify_types}
-				AND mem.notify_regularity < {int:notify_regularity}
-				AND mem.is_activated = {int:is_activated}
-				AND ln.id_member != {int:current_member}' .
-				(empty($members_only) ? '' : ' AND ln.id_member IN ({array_int:members_only})') . '
-			ORDER BY mem.lngfile',
-			array(
-				'current_member' => $user_id,
-				'board_list' => $boards_index,
-				'notify_types' => $type === 'reply' ? 4 : 3,
-				'notify_regularity' => 2,
-				'is_activated' => 1,
-				'members_only' => is_array($members_only) ? $members_only : array($members_only),
-			)
-		);
-		$boards = array();
-		while ($row = $db->fetch_assoc($members))
-		{
-			// for this member/board, loop through the topics and see if we should send it
-			foreach ($topicData as $id => $data)
-			{
-				// Don't send it if its not from the right board
-				if ($data['board'] !== $row['id_board'])
-					continue;
-				else
-					$data['board_name'] = $row['name'];
-
-				// Don't do the excluded...
-				if ($data['exclude'] === $row['id_member'])
-					continue;
-
-				// If they are not the poster do they want to know?
-				// @todo maybe if they posted via email?
-				if ($type !== 'reply' && $row['notify_types'] == 2)
-					continue;
-
-				$email_perm = true;
-				if (validateAccess($row, $maillist, $email_perm) === false)
-					continue;
-
-				$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
-				if (empty($current_language) || $current_language != $needed_language)
-					$current_language = loadLanguage('Post', $needed_language, false);
-
-				$message_type = 'notification_' . $type;
-				$replacements = array(
-					'TOPICSUBJECT' => $data['subject'],
-					'POSTERNAME' => un_htmlspecialchars($data['name']),
-					'TOPICLINKNEW' => $scripturl . '?topic=' . $id . '.new;topicseen#new',
-					'TOPICLINK' => $scripturl . '?topic=' . $id . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
-					'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $data['board'] . '.0',
-					'SIGNATURE' => $data['signature'],
-					'BOARDNAME' => $data['board_name'],
-				);
-
-				if ($type === 'remove')
-					unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK']);
-
-				// Do they want the body of the message sent too?
-				if (!empty($row['notify_send_body']) && $type === 'reply')
-				{
-					$message_type .= '_body';
-					$replacements['MESSAGE'] = $data['body'];
-
-					// Any attachments? if so lets make a big deal about them!
-					if ($data['attachments'] != 0)
-						$replacements['MESSAGE'] .=  "\n\n" . sprintf($txt['message_attachments'], $data['attachments'], $replacements['TOPICLINK']);
-				}
-
-				if (!empty($row['notify_regularity']) && $type === 'reply')
-					$message_type .= '_once';
-
-				// Send only if once is off or it's on and it hasn't been sent.
-				if ($type !== 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
-				{
-					$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply') ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
-
-					if ($maillist && $email_perm && $type === 'reply')
-					{
-						// In group mode like google group or yahoo group, the mail is from the poster
-						// Otherwise in maillist mode, it is from the site
-						$emailfrom = !empty($modSettings['maillist_group_mode']) ? un_htmlspecialchars($data['name']) : (!empty($modSettings['maillist_sitename']) ? un_htmlspecialchars($modSettings['maillist_sitename']) : $mbname);
-
-						// The email address of the sender, irrespective of the envelope name above
-						$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
-						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $emailfrom, 'm' . $data['last_id'], false, 3, null, false, $from_wrapper, $id);
-					}
-					else
-						sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $data['last_id']);
-
-					$sent++;
-
-					// make a note that this member was sent this topic
-					$boards[$row['id_member']][$id] = 1;
-				}
-			}
-		}
-		$db->free_result($members);
-	}
-
-	// Find the members with notification on for this topic.
-	$members = $db->query('', '
-		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started, b.name,
-			ln.id_topic
-		FROM {db_prefix}log_notify AS ln
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE ln.id_topic IN ({array_int:topic_list})
-			AND mem.notify_types < {int:notify_types}
-			AND mem.notify_regularity < {int:notify_regularity}
-			AND mem.is_activated = {int:is_activated}
-			AND ln.id_member != {int:current_member}' .
-			(empty($members_only) ? '' : ' AND ln.id_member IN ({array_int:members_only})') . '
-		ORDER BY mem.lngfile',
-		array(
-			'current_member' => $user_id,
-			'topic_list' => $topics,
-			'notify_types' => $type == 'reply' ? 4 : 3,
-			'notify_regularity' => 2,
-			'is_activated' => 1,
-			'members_only' => is_array($members_only) ? $members_only : array($members_only),
-		)
-	);
-
-	while ($row = $db->fetch_assoc($members))
-	{
-		// Don't do the excluded...
-		if ($topicData[$row['id_topic']]['exclude'] == $row['id_member'])
-			continue;
-
-		// Don't do the ones that were sent via board notification, you only get one notice
-		if (isset($boards[$row['id_member']][$row['id_topic']]))
-			continue;
-
-		// Easier to check this here... if they aren't the topic poster do they really want to know?
-		// @todo prehaps just if they posted by email?
-		if ($type != 'reply' && $row['notify_types'] == 2 && $row['id_member'] != $row['id_member_started'])
-			continue;
-
-		$email_perm = true;
-		if (validateAccess($row, $maillist, $email_perm) === false)
-			continue;
-
-		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
-		if (empty($current_language) || $current_language != $needed_language)
-			$current_language = loadLanguage('Post', $needed_language, false);
-
-		$message_type = 'notification_' . $type;
-		$replacements = array(
-			'TOPICSUBJECT' => $topicData[$row['id_topic']]['subject'],
-			'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
-			'TOPICLINKNEW' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-			'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $data['last_id'] . '#msg' . $data['last_id'],
-			'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
-			'SIGNATURE' => $topicData[$row['id_topic']]['signature'],
-			'BOARDNAME' => $row['name'],
-		);
-
-		if ($type == 'remove')
-			unset($replacements['TOPICLINK'], $replacements['UNSUBSCRIBELINK']);
-
-		// Do they want the body of the message sent too?
-		if (!empty($row['notify_send_body']) && $type == 'reply')
-		{
-			$message_type .= '_body';
-			$replacements['MESSAGE'] = $topicData[$row['id_topic']]['body'];
-		}
-		if (!empty($row['notify_regularity']) && $type == 'reply')
-			$message_type .= '_once';
-
-		// Send only if once is off or it's on and it hasn't been sent.
-		if ($type != 'reply' || empty($row['notify_regularity']) || empty($row['sent']))
-		{
-			$emaildata = loadEmailTemplate((($maillist && $email_perm && $type === 'reply') ? 'pbe_' : '') . $message_type, $replacements, $needed_language);
-
-			// Using the maillist functions?
-			if ($maillist && $email_perm && $type === 'reply')
-			{
-				// Set the from name base on group or maillist mode
-				$emailfrom = !empty($modSettings['maillist_group_mode']) ? un_htmlspecialchars($topicData[$row['id_topic']]['name']) : un_htmlspecialchars($modSettings['maillist_sitename']);
-				$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
-				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], $emailfrom, 'm' . $data['last_id'], false, 3, null, false, $from_wrapper, $row['id_topic']);
-			}
-			else
-				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicData[$row['id_topic']]['last_id']);
-
-			$sent++;
-		}
-	}
-	$db->free_result($members);
-
-	if (isset($current_language) && $current_language != $user_language)
-		loadLanguage('Post');
-
-	// Sent!
-	if ($type == 'reply' && !empty($sent))
-		$db->query('', '
-			UPDATE {db_prefix}log_notify
-			SET sent = {int:is_sent}
-			WHERE id_topic IN ({array_int:topic_list})
-				AND id_member != {int:current_member}',
-			array(
-				'current_member' => $user_id,
-				'topic_list' => $topics,
-				'is_sent' => 1,
-			)
-		);
-
-	// For approvals we need to unsend the exclusions (This *is* the quickest way!)
-	if (!empty($sent) && !empty($exclude))
-	{
-		foreach ($topicData as $id => $data)
-		{
-			if ($data['exclude'])
-			{
-				$db->query('', '
-					UPDATE {db_prefix}log_notify
-					SET sent = {int:not_sent}
-					WHERE id_topic = {int:id_topic}
-						AND id_member = {int:id_member}',
-					array(
-						'not_sent' => 0,
-						'id_topic' => $id,
-						'id_member' => $data['exclude'],
-					)
-				);
-			}
-		}
-	}
-}
-
-/**
- * Checks if a user has the correct access to get notifications
- * - validates they have proper group access to a board
- * - if using the maillist, checks if they should get a reply-able message
- * 		- not muted
- * 		- has postby_email permission on the board
- *
- * Returns false if they do not have the proper group access to a board
- * Sets email_perm to false if they should not get a reply-able message
- *
- * @param array $row
- * @param boolean $maillist
- * @param boolean $email_perm
- */
-function validateAccess($row, $maillist, &$email_perm = true)
-{
-	global $modSettings;
-
-	$db = database();
-	static $board_profile = array();
-
-	// No need to check for you ;)
-	if ($row['id_group'] == 1)
-		return;
-
-	$allowed = explode(',', $row['member_groups']);
-	$row['additional_groups'] = !empty( $row['additional_groups']) ? explode(',', $row['additional_groups']) : array();
-	$row['additional_groups'][] = $row['id_group'];
-	$row['additional_groups'][] = $row['id_post_group'];
-
-	// They do have access to this board?
-	if (count(array_intersect($allowed, $row['additional_groups'])) === 0)
-		return false;
-
-	// If using maillist, see if they should get a reply-able message
-	if ($maillist)
-	{
-		// Perhaps they don't require a security key in the message
-		if (!empty($modSettings['postmod_active']) && !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $row['warning'])
-			$email_perm = false;
-		else
-		{
-			// In a group that has email posting permissions on this board
-			if (!isset($board_profile[$row['id_profile']]))
-			{
-				$request = $db->query('', '
-					SELECT permission, add_deny, id_group
-					FROM {db_prefix}board_permissions
-					WHERE id_profile = {int:id_profile}
-						AND permission = {string:permission}',
-					array(
-						'id_profile' => $row['id_profile'],
-						'permission' => 'postby_email',
-					)
-				);
-				while ($row_perm = $db->fetch_assoc($request))
-					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
-				$db->free_result($request);
-			}
-
-			// Get the email permission for this board / posting group
-			if (count(array_intersect($board_profile[$row['id_profile']], $row['additional_groups'])) === 0)
-				$email_perm = false;
-		}
-	}
 }
 
 /**
@@ -1479,6 +1027,8 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  */
 function approvePosts($msgs, $approve = true)
 {
+	global $modSettings;
+
 	$db = database();
 
 	if (!is_array($msgs))
@@ -1621,8 +1171,11 @@ function approvePosts($msgs, $approve = true)
 	foreach ($topic_changes as $id => $changes)
 		$db->query('', '
 			UPDATE {db_prefix}topics
-			SET approved = {int:approved}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_replies = num_replies + {int:num_replies}, id_last_msg = {int:id_last_msg}
+			SET
+				approved = {int:approved},
+				unapproved_posts = CASE WHEN unapproved_posts + {int:unapproved_posts} < 0 THEN 0 ELSE unapproved_posts + {int:unapproved_posts} END,
+				num_replies = CASE WHEN num_replies + {int:num_replies} < 0 THEN 0 ELSE num_replies + {int:num_replies} END,
+				id_last_msg = {int:id_last_msg}
 			WHERE id_topic = {int:id_topic}',
 			array(
 				'approved' => $changes['approved'],
@@ -1637,8 +1190,11 @@ function approvePosts($msgs, $approve = true)
 	foreach ($board_changes as $id => $changes)
 		$db->query('', '
 			UPDATE {db_prefix}boards
-			SET num_posts = num_posts + {int:num_posts}, unapproved_posts = unapproved_posts + {int:unapproved_posts},
-				num_topics = num_topics + {int:num_topics}, unapproved_topics = unapproved_topics + {int:unapproved_topics}
+			SET
+				num_posts = num_posts + {int:num_posts},
+				unapproved_posts = CASE WHEN unapproved_posts + {int:unapproved_posts} < 0 THEN 0 ELSE unapproved_posts + {int:unapproved_posts} END,
+				num_topics = CASE WHEN num_topics + {int:num_topics} < 0 THEN 0 ELSE num_topics + {int:num_topics} END,
+				unapproved_topics = CASE WHEN unapproved_topics + {int:unapproved_topics} < 0 THEN 0 ELSE unapproved_topics + {int:unapproved_topics} END
 			WHERE id_board = {int:id_board}',
 			array(
 				'num_posts' => $changes['posts'],
@@ -1652,8 +1208,11 @@ function approvePosts($msgs, $approve = true)
 	// Finally, least importantly, notifications!
 	if ($approve)
 	{
+		require_once(SUBSDIR . '/Notification.subs.php');
+
 		if (!empty($notification_topics))
-			notifyMembersBoard($notification_topics);
+			sendBoardNotifications($notification_topics);
+
 		if (!empty($notification_posts))
 			sendApprovalNotifications($notification_posts);
 
@@ -1682,6 +1241,12 @@ function approvePosts($msgs, $approve = true)
 		);
 	}
 
+	if (!empty($modSettings['notifications_enabled']))
+	{
+		require_once(SUBSDIR . '/Notification.subs.php');
+		toggleNotificationsApproval($msgs, $approve);
+	}
+
 	// Update the last messages on the boards...
 	updateLastMessages(array_keys($board_changes));
 
@@ -1691,158 +1256,6 @@ function approvePosts($msgs, $approve = true)
 			updateMemberData($id_member, array('posts' => 'posts ' . ($approve ? '+' : '-') . ' ' . $count_change));
 
 	return true;
-}
-
-/**
- * A special function for handling the hell which is sending approval notifications.
- *
- * @param $topicData
- */
-function sendApprovalNotifications(&$topicData)
-{
-	global $scripturl, $language, $user_info, $modSettings;
-
-	$db = database();
-
-	// Clean up the data...
-	if (!is_array($topicData) || empty($topicData))
-		return;
-
-	// Email ahoy
-	require_once(SUBSDIR . '/Mail.subs.php');
-
-	// Maillist format?
-	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
-	if ($maillist)
-		require_once(SUBSDIR . '/Emailpost.subs.php');
-
-	$topics = array();
-	$digest_insert = array();
-	foreach ($topicData as $topic => $msgs)
-	{
-		foreach ($msgs as $msgKey => $msg)
-		{
-			if ($maillist)
-			{
-				// Convert it to markdown for sending
-				pbe_prepare_text($topicData[$topic][$msgKey]['body'], $topicData[$topic][$msgKey]['subject'], '');
-			}
-			else
-			{
-				censorText($topicData[$topic][$msgKey]['subject']);
-				censorText($topicData[$topic][$msgKey]['body']);
-				$topicData[$topic][$msgKey]['subject'] = un_htmlspecialchars($topicData[$topic][$msgKey]['subject']);
-				$topicData[$topic][$msgKey]['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topicData[$topic][$msgKey]['body'], false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
-			}
-
-			$topics[] = $msg['id'];
-			$digest_insert[] = array($msg['topic'], $msg['id'], 'reply', $user_info['id']);
-		}
-	}
-
-	// These need to go into the digest too...
-	$db->insert('',
-		'{db_prefix}log_digest',
-		array(
-			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
-		),
-		$digest_insert,
-		array()
-	);
-
-	// Find everyone who needs to know about this.
-	$members = $db->query('', '
-		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile,
-			ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started,
-			ln.id_topic
-		FROM {db_prefix}log_notify AS ln
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
-			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE ln.id_topic IN ({array_int:topic_list})
-			AND mem.is_activated = {int:is_activated}
-			AND mem.notify_types < {int:notify_types}
-			AND mem.notify_regularity < {int:notify_regularity}
-		GROUP BY mem.id_member, ln.id_topic, mem.email_address, mem.notify_regularity, mem.notify_types, mem.notify_send_body, mem.lngfile, ln.sent, mem.id_group, mem.additional_groups, b.member_groups, mem.id_post_group, t.id_member_started
-		ORDER BY mem.lngfile',
-		array(
-			'topic_list' => $topics,
-			'is_activated' => 1,
-			'notify_types' => 4,
-			'notify_regularity' => 2,
-		)
-	);
-	$sent = 0;
-
-	$current_language = $user_info['language'];
-	while ($row = $db->fetch_assoc($members))
-	{
-		if ($row['id_group'] != 1)
-		{
-			$allowed = explode(',', $row['member_groups']);
-			$row['additional_groups'] = explode(',', $row['additional_groups']);
-			$row['additional_groups'][] = $row['id_group'];
-			$row['additional_groups'][] = $row['id_post_group'];
-
-			if (count(array_intersect($allowed, $row['additional_groups'])) == 0)
-				continue;
-		}
-
-		$needed_language = empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile'];
-		if (empty($current_language) || $current_language != $needed_language)
-			$current_language = loadLanguage('Post', $needed_language, false);
-
-		$sent_this_time = false;
-		// Now loop through all the messages to send.
-		foreach ($topicData[$row['id_topic']] as $msg)
-		{
-			$replacements = array(
-				'TOPICSUBJECT' => $topicData[$row['id_topic']]['subject'],
-				'POSTERNAME' => un_htmlspecialchars($topicData[$row['id_topic']]['name']),
-				'TOPICLINK' => $scripturl . '?topic=' . $row['id_topic'] . '.new;topicseen#new',
-				'UNSUBSCRIBELINK' => $scripturl . '?action=notify;topic=' . $row['id_topic'] . '.0',
-			);
-
-			$message_type = 'notification_reply';
-			// Do they want the body of the message sent too?
-			if (!empty($row['notify_send_body']) && empty($modSettings['disallow_sendBody']))
-			{
-				$message_type .= '_body';
-				$replacements['BODY'] = $topicData[$row['id_topic']]['body'];
-			}
-			if (!empty($row['notify_regularity']))
-				$message_type .= '_once';
-
-			// Send only if once is off or it's on and it hasn't been sent.
-			if (empty($row['notify_regularity']) || (empty($row['sent']) && !$sent_this_time))
-			{
-				$emaildata = loadEmailTemplate($message_type, $replacements, $needed_language);
-				sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, 'm' . $topicData[$row['id_topic']]['last_id']);
-				$sent++;
-			}
-
-			$sent_this_time = true;
-		}
-	}
-	$db->free_result($members);
-
-	if (isset($current_language) && $current_language != $user_info['language'])
-		loadLanguage('Post');
-
-	// Sent!
-	if (!empty($sent))
-		$db->query('', '
-			UPDATE {db_prefix}log_notify
-			SET sent = {int:is_sent}
-			WHERE id_topic IN ({array_int:topic_list})
-				AND id_member != {int:current_member}',
-			array(
-				'current_member' => $user_info['id'],
-				'topic_list' => $topics,
-				'is_sent' => 1,
-			)
-		);
 }
 
 /**
@@ -1985,297 +1398,6 @@ function updateLastMessages($setboards, $id_msg = 0)
 }
 
 /**
- * This simple function gets a list of all administrators and sends them an email
- *  to let them know a new member has joined.
- * Called by registerMember() function in subs/Members.subs.php.
- * Email is sent to all groups that have the moderate_forum permission.
- * The language set by each member is being used (if available).
- *
- * @param string $type types supported are 'approval', 'activation', and 'standard'.
- * @param int $memberID
- * @param string $member_name = null
- * @uses the Login language file.
- */
-function adminNotify($type, $memberID, $member_name = null)
-{
-	global $modSettings, $language, $scripturl, $user_info;
-
-	$db = database();
-
-	// If the setting isn't enabled then just exit.
-	if (empty($modSettings['notify_new_registration']))
-		return;
-
-	// Needed to notify admins, or anyone
-	require_once(SUBSDIR . '/Mail.subs.php');
-
-	if ($member_name == null)
-	{
-		require_once(SUBSDIR . '/Members.subs.php');
-		// Get the new user's name....
-		$member_info = getBasicMemberData($memberID);
-		$member_name = $member_info['real_name'];
-	}
-
-	$toNotify = array();
-	$groups = array();
-
-	// All membergroups who can approve members.
-	$request = $db->query('', '
-		SELECT id_group
-		FROM {db_prefix}permissions
-		WHERE permission = {string:moderate_forum}
-			AND add_deny = {int:add_deny}
-			AND id_group != {int:id_group}',
-		array(
-			'add_deny' => 1,
-			'id_group' => 0,
-			'moderate_forum' => 'moderate_forum',
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-		$groups[] = $row['id_group'];
-	$db->free_result($request);
-
-	// Add administrators too...
-	$groups[] = 1;
-	$groups = array_unique($groups);
-
-	// Get a list of all members who have ability to approve accounts - these are the people who we inform.
-	$request = $db->query('', '
-		SELECT id_member, lngfile, email_address
-		FROM {db_prefix}members
-		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
-			AND notify_types != {int:notify_types}
-		ORDER BY lngfile',
-		array(
-			'group_list' => $groups,
-			'notify_types' => 4,
-			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		)
-	);
-
-	$current_language = $user_info['language'];
-	while ($row = $db->fetch_assoc($request))
-	{
-		$replacements = array(
-			'USERNAME' => $member_name,
-			'PROFILELINK' => $scripturl . '?action=profile;u=' . $memberID
-		);
-		$emailtype = 'admin_notify';
-
-		// If they need to be approved add more info...
-		if ($type == 'approval')
-		{
-			$replacements['APPROVALLINK'] = $scripturl . '?action=admin;area=viewmembers;sa=browse;type=approve';
-			$emailtype .= '_approval';
-		}
-
-		$emaildata = loadEmailTemplate($emailtype, $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-
-		// And do the actual sending...
-		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
-	}
-	$db->free_result($request);
-
-	if (isset($current_language) && $current_language != $user_info['language'])
-		loadLanguage('Login');
-}
-
-/**
- * Notifies members who have requested notification for new topics posted on a board of said posts.
- *
- * receives data on the topics to send out notifications to by the passed in array.
- * only sends notifications to those who can *currently* see the topic (it doesn't matter if they could when they requested notification.)
- * loads the Post language file multiple times for each language if the userLanguage setting is set.
- * @param array &$topicData
- */
-function notifyMembersBoard(&$topicData)
-{
-	global $scripturl, $language, $user_info, $modSettings, $webmaster_email;
-
-	$db = database();
-
-	require_once(SUBSDIR . '/Mail.subs.php');
-
-	// Do we have one or lots of topics?
-	if (isset($topicData['body']))
-		$topicData = array($topicData);
-
-	// Using the post to email functions?
-	$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_post_enabled']);
-	if ($maillist)
-		require_once(SUBSDIR . '/Emailpost.subs.php');
-
-	// Find out what boards we have... and clear out any rubbish!
-	$boards = array();
-	foreach ($topicData as $key => $topic)
-	{
-		if (!empty($topic['board']))
-			$boards[$topic['board']][] = $key;
-		else
-		{
-			unset($topic[$key]);
-			continue;
-		}
-
-		// Using maillist functionality?
-		if ($maillist)
-		{
-			// Convert to markdown markup e.g. styled plain text
-			pbe_prepare_text($topicData[$key]['body'], $topicData[$key]['subject'], $topicData[$key]['signature']);
-		}
-		else
-		{
-			// Censor the subject and body...
-			censorText($topicData[$key]['subject']);
-			censorText($topicData[$key]['body']);
-
-			$topicData[$key]['subject'] = un_htmlspecialchars($topicData[$key]['subject']);
-			$topicData[$key]['body'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($topicData[$key]['body'], false), array('<br />' => "\n", '</div>' => "\n", '</li>' => "\n", '&#91;' => '[', '&#93;' => ']')))));
-		}
-	}
-
-	// Just the board numbers.
-	$board_index = array_unique(array_keys($boards));
-	if (empty($board_index))
-		return;
-
-	// Load the actual board names
-	$board_names = array();
-	$request = $db->query('', '
-		SELECT id_board, name
-		FROM {db_prefix}boards
-		WHERE id_board IN ({array_int:board_list})',
-		array(
-			'board_list' => $board_index,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-		$board_names[$row['id_board']] = $row['name'];
-	$db->free_result($request);
-
-	// Yea, we need to add this to the digest queue.
-	$digest_insert = array();
-	foreach ($topicData as $id => $data)
-		$digest_insert[] = array($data['topic'], $data['msg'], 'topic', $user_info['id']);
-	$db->insert('',
-		'{db_prefix}log_digest',
-		array(
-			'id_topic' => 'int', 'id_msg' => 'int', 'note_type' => 'string', 'exclude' => 'int',
-		),
-		$digest_insert,
-		array()
-	);
-
-	// Find the members with notification on for these boards.
-	$members = $db->query('', '
-		SELECT
-			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_send_body, mem.lngfile, mem.warning,
-			ln.sent, ln.id_board, mem.id_group, mem.additional_groups, b.member_groups, b.id_profile,
-			mem.id_post_group
-		FROM {db_prefix}log_notify AS ln
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
-		WHERE ln.id_board IN ({array_int:board_list})
-			AND mem.id_member != {int:current_member}
-			AND mem.is_activated = {int:is_activated}
-			AND mem.notify_types != {int:notify_types}
-			AND mem.notify_regularity < {int:notify_regularity}
-		ORDER BY mem.lngfile',
-		array(
-			'current_member' => $user_info['id'],
-			'board_list' => $board_index,
-			'is_activated' => 1,
-			'notify_types' => 4,
-			'notify_regularity' => 2,
-		)
-	);
-	// While we have members with board notifications
-	while ($rowmember = $db->fetch_assoc($members))
-	{
-		$email_perm = true;
-		if (validateAccess($rowmember, $maillist, $email_perm) === false)
-			continue;
-
-		$langloaded = loadLanguage('index', empty($rowmember['lngfile']) || empty($modSettings['userLanguage']) ? $language : $rowmember['lngfile'], false);
-
-		// Now loop through all the notifications to send for this board.
-		if (empty($boards[$rowmember['id_board']]))
-			continue;
-
-		$sentOnceAlready = 0;
-
-		// For each message we need to send (from this board to this member)
-		foreach ($boards[$rowmember['id_board']] as $key)
-		{
-			// Don't notify the guy who started the topic!
-			// @todo In this case actually send them a "it's approved hooray" email :P
-			if ($topicData[$key]['poster'] == $rowmember['id_member'])
-				continue;
-
-			// Setup the string for adding the body to the message, if a user wants it.
-			$send_body = $maillist || (empty($modSettings['disallow_sendBody']) && !empty($rowmember['notify_send_body']));
-
-			$replacements = array(
-				'TOPICSUBJECT' => $topicData[$key]['subject'],
-				'POSTERNAME' => un_htmlspecialchars($topicData[$key]['name']),
-				'TOPICLINK' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
-				'TOPICLINKNEW' => $scripturl . '?topic=' . $topicData[$key]['topic'] . '.new#new',
-				'MESSAGE' => $send_body ? $topicData[$key]['body'] : '',
-				'UNSUBSCRIBELINK' => $scripturl . '?action=notifyboard;board=' . $topicData[$key]['board'] . '.0',
-				'SIGNATURE' => !empty($topicData[$key]['signature']) ? $topicData[$key]['signature'] : '',
-				'BOARDNAME' => $board_names[$topicData[$key]['board']],
-			);
-
-			// Figure out which email to send
-			$emailtype = '';
-
-			// Send only if once is off or it's on and it hasn't been sent.
-			if (!empty($rowmember['notify_regularity']) && !$sentOnceAlready && empty($rowmember['sent']))
-				$emailtype = 'notify_boards_once';
-			elseif (empty($rowmember['notify_regularity']))
-				$emailtype = 'notify_boards';
-
-			if (!empty($emailtype))
-			{
-				$emailtype .= $send_body ? '_body' : '';
-				$emaildata = loadEmailTemplate((($maillist && $email_perm) ? 'pbe_' : '') . $emailtype, $replacements, $langloaded);
-				$emailname = (!empty($topicData[$key]['name'])) ? un_htmlspecialchars($topicData[$key]['name']) : null;
-
-				// Maillist style?
-				if ($maillist && $email_perm)
-				{
-					// Add in the from wrapper and trigger sendmail to add in a security key
-					$from_wrapper = !empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']);
-					sendmail($rowmember['email_address'], $emaildata['subject'], $emaildata['body'], $emailname, 't' . $topicData[$key]['topic'], false, 3, null, false, $from_wrapper, $topicData[$key]['topic']);
-				}
-				else
-					sendmail($rowmember['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 3);
-			}
-
-			$sentOnceAlready = 1;
-		}
-	}
-	$db->free_result($members);
-
-	loadLanguage('index', $user_info['language']);
-
-	// Sent!
-	$db->query('', '
-		UPDATE {db_prefix}log_notify
-		SET sent = {int:is_sent}
-		WHERE id_board IN ({array_int:board_list})
-			AND id_member != {int:current_member}',
-		array(
-			'current_member' => $user_info['id'],
-			'board_list' => $board_index,
-			'is_sent' => 1,
-		)
-	);
-}
-
-/**
  * Get the latest post made on the system
  * - respects approved, recycled, and board permissions
  *
@@ -2283,7 +1405,7 @@ function notifyMembersBoard(&$topicData)
  */
 function lastPost()
 {
-	global $user_info, $scripturl, $modSettings;
+	global $scripturl, $modSettings;
 
 	$db = database();
 
@@ -2355,7 +1477,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 	else
 	{
 		// Posting a quoted reply?
-		if ((!empty($topic) && !empty($_REQUEST['quote'])) || !empty($_REQUEST['followup']))
+		if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
 		{
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
@@ -2392,7 +1514,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 				{
 					// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
 					if ($i % 4 == 0)
-						$parts[$i] = preg_replace('~\[html\](.+?)\[/html\]~ise', '\'[html]\' . preg_replace(\'~<br\s?/?' . '>~i\', \'&lt;br /&gt;<br />\', \'$1\') . \'[/html]\'', $parts[$i]);
+						$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', create_function('$m', ' return "[html]" . preg_replace(\'~<br\s?/?' . '>~i\', \'&lt;br /&gt;<br />\', "$m[1]") . "[/html]";'), $parts[$i]);
 				}
 				$form_message = implode('', $parts);
 			}

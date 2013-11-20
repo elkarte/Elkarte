@@ -54,18 +54,14 @@ function template_edit_profile_field()
 		if (isset($txt['custom_option_' . $_GET['msg']]))
 			echo '
 	<div class="errorbox">',
-		$txt['custom_option_' . $_GET['msg']], '
+			$txt['custom_option_' . $_GET['msg']], '
 	</div>';
 	}
 
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=featuresettings;sa=profileedit;fid=', $context['fid'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $context['page_title'], '
-				</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<fieldset>
@@ -181,10 +177,8 @@ function template_edit_profile_field()
 								<div>';
 
 	foreach ($context['field']['options'] as $k => $option)
-	{
 		echo '
 								', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
-	}
 
 	echo '
 								<span id="addopt"></span>

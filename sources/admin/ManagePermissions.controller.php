@@ -93,12 +93,8 @@ class ManagePermissions_Controller extends Action_Controller
 
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
+		$context['page_title'] = $txt['permissions_title'];
+		$context['sub_action'] = $subAction;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -125,6 +121,8 @@ class ManagePermissions_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 
@@ -139,7 +137,7 @@ class ManagePermissions_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $settings;
+		global $txt, $scripturl, $context, $user_info, $modSettings;
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -147,135 +145,299 @@ class ManagePermissions_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['permissions_title'];
 
+		// pid = profile id
+		if (!empty($_REQUEST['pid']))
+			$_REQUEST['pid'] = (int) $_REQUEST['pid'];
+
+		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
+		$context['can_modify'] = empty($_REQUEST['pid']) || $_REQUEST['pid'] == 1 || $_REQUEST['pid'] > 4;
+
 		// Load all the permissions. We'll need them in the template.
 		loadAllPermissions();
 
 		// Also load profiles, we may want to reset.
 		loadPermissionProfiles();
 
-		// Determine the number of ungrouped members.
-		$num_members = countMembersInGroup(0);
-
-		// Fill the context variable with 'Guests' and 'Regular Members'.
-		$context['groups'] = array(
-			-1 => array(
-				'id' => -1,
-				'name' => $txt['membergroups_guests'],
-				'num_members' => $txt['membergroups_guests_na'],
-				'allow_delete' => false,
-				'allow_modify' => true,
-				'can_search' => false,
-				'href' => '',
-				'link' => '',
-				'help' => 'membergroup_guests',
-				'is_post_group' => false,
-				'color' => '',
-				'icons' => '',
-				'children' => array(),
-				'num_permissions' => array(
-					'allowed' => 0,
-					// Can't deny guest permissions!
-					'denied' => '(' . $txt['permissions_none'] . ')'
+		$listOptions = array(
+			'id' => 'regular_membergroups_list',
+			'title' => $txt['membergroups_regular'],
+			'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : '') . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : ''),
+			'default_sort_col' => 'name',
+			'get_items' => array(
+				'file' => SUBSDIR . '/Membergroups.subs.php',
+				'function' => 'list_getMembergroups',
+				'params' => array(
+					'all',
+					$user_info['id'],
+					allowedTo('manage_membergroups'),
+					allowedTo('admin_forum'),
+					true,
+					true,
+					isset($_REQUEST['pid']) ? $_REQUEST['pid'] : null,
 				),
-				'access' => false
 			),
-			0 => array(
-				'id' => 0,
-				'name' => $txt['membergroups_members'],
-				'num_members' => $num_members,
-				'allow_delete' => false,
-				'allow_modify' => true,
-				'can_search' => false,
-				'href' => $scripturl . '?action=moderate;area=viewgroups;sa=members;group=0',
-				'help' => 'membergroup_regular_members',
-				'is_post_group' => false,
-				'color' => '',
-				'icons' => '',
-				'children' => array(),
-				'num_permissions' => array(
-					'allowed' => 0,
-					'denied' => 0
+			'columns' => array(
+				'name' => array(
+					'header' => array(
+						'value' => $txt['membergroups_name'],
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $scripturl, $txt;
+
+							// Since the moderator group has no explicit members, no link is needed.
+							// Since guests and regular members are not groups, no link is needed.
+							if (in_array($rowData[\'id_group\'], array(-1, 0, 3)))
+								$group_name = $rowData[\'group_name\'];
+							else
+							{
+								$color_style = empty($rowData[\'online_color\']) ? \'\' : sprintf(\' style="color: %1$s;"\', $rowData[\'online_color\']);
+								$group_name = sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d"%3$s>%4$s</a>\', $scripturl, $rowData[\'id_group\'], $color_style, $rowData[\'group_name\']);
+							}
+
+							// Add a help option for guests, regular members, moderator and administrator.
+							if (!empty($rowData[\'help\']))
+								$group_name .= sprintf(\' (<a href="%1$s?action=quickhelp;help=\' . $rowData[\'help\'] . \'" onclick="return reqOverlayDiv(this.href);">?</a>)\', $scripturl);
+
+							if (!empty($rowData[\'children\']))
+								$group_name .= \'
+									<br />
+									<span class="smalltext">\' . $txt[\'permissions_includes_inherited\'] . \': &quot;\' . implode(\'&quot;, &quot;\', $rowData[\'children\']) . \'&quot;</span>\';
+
+							return $group_name;
+						'),
+					),
+					'sort' => array(
+						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name',
+						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, mg.group_name DESC',
+					),
 				),
-				'access' => false
+				'members' => array(
+					'header' => array(
+						'value' => $txt['membergroups_members_top'],
+						'style' => 'width:10%;',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $txt, $scripturl;
+
+							// No explicit members for guests and the moderator group.
+							if (in_array($rowData[\'id_group\'], array(-1, 3)))
+								return $txt[\'membergroups_guests_na\'];
+							elseif ($rowData[\'can_search\'])
+								return \'<a href="\' . $scripturl . \'?action=moderate;area=viewgroups;sa=members;group=\' . $rowData[\'id_group\'] . \'">\' . comma_format($rowData[\'num_members\']) . \'</a>\';
+							else
+								return comma_format($rowData[\'num_members\']);
+						'),
+					),
+					'sort' => array(
+						'default' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1',
+						'reverse' => 'CASE WHEN mg.id_group < 4 THEN mg.id_group ELSE 4 END, 1 DESC',
+					),
+				),
+				'permissions_allowed' => array(
+					'header' => array(
+						'value' => empty($modSettings['permission_enable_deny']) ? $txt['membergroups_permissions'] : $txt['permissions_allowed'],
+						'style' => 'width:8%;',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $txt, $scripturl;
+
+							return $rowData[\'num_permissions\'][\'allowed\'];
+						'),
+					),
+				),
+				'permissions_denied' => array(
+					'evaluate' => !empty($modSettings['permission_enable_deny']),
+					'header' => array(
+						'value' => $txt['permissions_denied'],
+						'style' => 'width:8%;',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $txt, $scripturl;
+
+							return $rowData[\'num_permissions\'][\'denied\'];
+						'),
+					),
+				),
+				'modify' => array(
+					'header' => array(
+						'value' => $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'],
+						'style' => 'width:8%;',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							global $scripturl;
+
+							if ($rowData[\'id_group\'] != 1)
+								return \'<a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_group\'] . \'' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>\';
+						'),
+					),
+				),
+				'check' => array(
+					'header' => array(
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+						'class' => 'centertext',
+						'style' => 'width:4%;',
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							if ($rowData[\'id_group\'] != 1)
+								return \'<input type="checkbox" name="group[]" value="\' . $rowData[\'id_group\'] . \'" class="input_check" />\';
+						'),
+						'class' => 'centertext',
+					),
+				),
 			),
 		);
 
-		$postGroups = array();
-		$normalGroups = array();
+		require_once(SUBSDIR . '/List.class.php');
+		createList($listOptions);
 
-		// Query the database defined membergroups.
-		$groupData = getExtendedMembergroupData();
-
-		foreach ($groupData as $row)
+		// The second list shows the post count based groups...if enabled
+		if (!empty($modSettings['permission_enable_postgroups']))
 		{
-			// If it's inherited, just add it as a child.
-			if ($row['id_parent'] != -2)
-			{
-				if (isset($context['groups'][$row['id_parent']]))
-					$context['groups'][$row['id_parent']]['children'][$row['id_group']] = $row['group_name'];
-				continue;
-			}
-
-			$row['icons'] = explode('#', $row['icons']);
-			$context['groups'][$row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => $row['group_name'],
-				'num_members' => $row['id_group'] != 3 ? 0 : $txt['membergroups_guests_na'],
-				'allow_delete' => $row['id_group'] > 4,
-				'allow_modify' => $row['id_group'] > 1,
-				'can_search' => $row['id_group'] != 3,
-				'href' => $scripturl . '?action=moderate;area=viewgroups;sa=members;group=' . $row['id_group'],
-				'help' => $row['id_group'] == 1 ? 'membergroup_administrator' : ($row['id_group'] == 3 ? 'membergroup_moderator' : ''),
-				'is_post_group' => $row['min_posts'] != -1,
-				'color' => empty($row['online_color']) ? '' : $row['online_color'],
-				'icons' => !empty($row['icons'][0]) && !empty($row['icons'][1]) ? str_repeat('<img src="' . $settings['images_url'] . '/group_icons/' . $row['icons'][1] . '" alt="*" />', $row['icons'][0]) : '',
-				'children' => array(),
-				'num_permissions' => array(
-					'allowed' => $row['id_group'] == 1 ? '(' . $txt['permissions_all'] . ')' : 0,
-					'denied' => $row['id_group'] == 1 ? '(' . $txt['permissions_none'] . ')' : 0
+			$listOptions = array(
+				'id' => 'post_count_membergroups_list',
+				'title' => $txt['membergroups_post'],
+				'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : '') . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : ''),
+				'default_sort_col' => 'required_posts',
+				'request_vars' => array(
+					'sort' => 'sort2',
+					'desc' => 'desc2',
 				),
-				'access' => false,
+				'get_items' => array(
+					'file' => SUBSDIR . '/Membergroups.subs.php',
+					'function' => 'list_getMembergroups',
+					'params' => array(
+						'post_count',
+						$user_info['id'],
+						allowedTo('manage_membergroups'),
+						allowedTo('admin_forum'),
+						false,
+						true,
+						isset($_REQUEST['pid']) ? $_REQUEST['pid'] : null,
+					),
+				),
+				'columns' => array(
+					'name' => array(
+						'header' => array(
+							'value' => $txt['membergroups_name'],
+						),
+						'data' => array(
+							'function' => create_function('$rowData', '
+								global $scripturl;
+
+								$colorStyle = empty($rowData[\'online_color\']) ? \'\' : sprintf(\' style="color: %1$s;"\', $rowData[\'online_color\']);
+								return sprintf(\'<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d"%3$s>%4$s</a>\', $scripturl, $rowData[\'id_group\'], $colorStyle, $rowData[\'group_name\']);
+							'),
+						),
+						'sort' => array(
+							'default' => 'mg.group_name',
+							'reverse' => 'mg.group_name DESC',
+						),
+					),
+					'required_posts' => array(
+						'header' => array(
+							'value' => $txt['membergroups_min_posts'],
+						),
+						'data' => array(
+							'db' => 'min_posts',
+						),
+						'sort' => array(
+							'default' => 'mg.min_posts',
+							'reverse' => 'mg.min_posts DESC',
+						),
+					),
+					'members' => array(
+						'header' => array(
+							'value' => $txt['membergroups_members_top'],
+							'style' => 'width:10%;',
+						),
+						'data' => array(
+							'function' => create_function('$rowData', '
+								global $scripturl;
+
+								if ($rowData[\'can_search\'])
+									return \'<a href="\' . $scripturl . \'?action=moderate;area=viewgroups;sa=members;group=\' . $rowData[\'id_group\'] . \'">\' . comma_format($rowData[\'num_members\']) . \'</a>\';
+								else
+									return comma_format($rowData[\'num_members\']);
+							'),
+						),
+						'sort' => array(
+							'default' => '1 DESC',
+							'reverse' => '1',
+						),
+					),
+					'permissions_allowed' => array(
+						'header' => array(
+							'value' => empty($modSettings['permission_enable_deny']) ? $txt['membergroups_permissions'] : $txt['permissions_allowed'],
+							'style' => 'width:8%;',
+						),
+						'data' => array(
+							'function' => create_function('$rowData', '
+								return $rowData[\'num_permissions\'][\'allowed\'];
+							'),
+						),
+					),
+					'permissions_denied' => array(
+						'evaluate' => !empty($modSettings['permission_enable_deny']),
+						'header' => array(
+							'value' => $txt['permissions_denied'],
+							'style' => 'width:8%;',
+						),
+						'data' => array(
+							'function' => create_function('$rowData', '
+								return $rowData[\'num_permissions\'][\'denied\'];
+							'),
+						),
+					),
+					'modify' => array(
+						'header' => array(
+							'value' => $txt['modify'],
+							'style' => 'width:8%;',
+						),
+						'data' => array(
+							'sprintf' => array(
+								'format' => '<a href="' . $scripturl . '?action=admin;area=membergroups;sa=edit;group=%1$d' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>',
+								'params' => array(
+									'id_group' => false,
+								),
+							),
+						),
+					),
+					'check' => array(
+						'header' => array(
+							'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
+							'class' => 'centertext',
+							'style' => 'width:4%;',
+						),
+						'data' => array(
+							'sprintf' => array(
+								'format' => '<input type="checkbox" name="group[]" value="%1$d" class="input_check" />',
+								'params' => array(
+									'id_group' => false,
+								),
+							),
+							'class' => 'centertext',
+						),
+					),
+				),
 			);
 
-			if ($row['min_posts'] == -1)
-				$normalGroups[$row['id_group']] = $row['id_group'];
-			else
-				$postGroups[$row['id_group']] = $row['id_group'];
+			createList($listOptions);
 		}
 
-		// Get the number of members in this post group.
-		$groups = membersInGroups($postGroups, $normalGroups, true);
-		// @todo not sure why += wouldn't = be enough?
-		foreach ($groups as $id_group => $member_count)
+		// pid = profile id
+		if (!empty($_REQUEST['pid']))
 		{
-			if (isset($context['groups'][$id_group]['member_count']))
-				$context['groups'][$id_group]['member_count'] += $member_count;
-			else
-				$context['groups'][$id_group]['member_count'] = $member_count;
-		}
-
-		foreach ($context['groups'] as $id => $data)
-		{
-			if ($data['href'] != '')
-				$context['groups'][$id]['link'] = '<a href="' . $data['href'] . '">' . $data['num_members'] . '</a>';
-		}
-
-		if (empty($_REQUEST['pid']))
-		{
-			$context['groups'] = countPermissions($context['groups'], $context['hidden_permissions']);
-			// Get the "default" profile permissions too.
-			$context['groups'] = countBoardPermissions($context['groups'], $context['hidden_permissions'], 1);
-		}
-		else
-		{
-			$_REQUEST['pid'] = (int) $_REQUEST['pid'];
-
 			if (!isset($context['profiles'][$_REQUEST['pid']]))
 				fatal_lang_error('no_access', false);
 
 			// Change the selected tab to better reflect that this really is a board profile.
 			$context[$context['admin_menu_name']]['current_subsection'] = 'profiles';
-			$context['groups'] = countBoardPermissions($context['groups'], null, $_REQUEST['pid']);
 
 			$context['profile'] = array(
 				'id' => $_REQUEST['pid'],
@@ -283,8 +445,7 @@ class ManagePermissions_Controller extends Action_Controller
 			);
 		}
 
-		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
-		$context['can_modify'] = empty($_REQUEST['pid']) || $_REQUEST['pid'] == 1 || $_REQUEST['pid'] > 4;
+		$context['groups'] = array_merge(array(0 => $txt['membergroups_members']), getInheritableGroups());
 
 		// Load the proper template.
 		$context['sub_template'] = 'permission_index';
@@ -864,6 +1025,7 @@ class ManagePermissions_Controller extends Action_Controller
 		global $context, $txt;
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+
 		// Just in case.
 		checkSession('get');
 
@@ -910,7 +1072,6 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Load the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		$context['profile_groups'] = prepareMembergroupPermissions();
 
 		// What are the permissions we are querying?

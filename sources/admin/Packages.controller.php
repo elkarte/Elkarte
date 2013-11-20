@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * This class is the administration package manager controller.
  * Its main job is to install/uninstall, allow to browse, packages and package servers.
- * In fact, just about everything related to add-on packages, including FTP connections when necessary.
+ * In fact, just about everything related to addon packages, including FTP connections when necessary.
  */
 class Packages_Controller extends Action_Controller
 {
@@ -64,14 +64,11 @@ class Packages_Controller extends Action_Controller
 		);
 
 		// Work out exactly who it is we are calling.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'browse';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
 
 		// Set up action/subaction stuff.
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'browse');
 		$context['sub_action'] = $subAction;
 
 		// Set up some tabs...
@@ -107,6 +104,7 @@ class Packages_Controller extends Action_Controller
 		// You have to specify a file!!
 		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
 			redirectexit('action=admin;area=packages');
+
 		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
 
 		// Do we have an existing id, for uninstalls and the like.
@@ -300,9 +298,9 @@ class Packages_Controller extends Action_Controller
 			{
 				$type = 'package_' . $action['type'];
 				if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), "\n\r"));
+					$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 				elseif (file_exists($action['filename']))
-					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"));
+					$context[$type] = htmlspecialchars(trim(file_get_contents($action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 
 				if (!empty($action['parse_bbc']))
 				{
@@ -354,7 +352,7 @@ class Packages_Controller extends Action_Controller
 						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
 							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
 						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php' . '||' . $action['filename']);
+							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
 						else
 							$actual_filename = $key;
 
@@ -437,7 +435,7 @@ class Packages_Controller extends Action_Controller
 						if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
 							$actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $action['filename']);
 						elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php' . '||' . $action['filename']);
+							$actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $action['filename']);
 						else
 							$actual_filename = $key;
 
@@ -536,7 +534,7 @@ class Packages_Controller extends Action_Controller
 				$context['has_failure'] = !($installed_version && $version_check);
 				$thisAction = array(
 					'type' => $txt['package_requires'],
-					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
+					'action' => $txt['package_check_for'] . ' ' . $action['id'] . (isset($action['version']) ? (' / ' . ($version_check ? $action['version'] : '<span class="error">' . $action['version'] . '</span>')) : ''),
 				);
 			}
 			elseif (in_array($action['type'], array('require-dir', 'require-file')))
@@ -809,6 +807,7 @@ class Packages_Controller extends Action_Controller
 			'require-file' => array(),
 			'require-dir' => array(),
 		);
+
 		if (!empty($_POST['theme_changes']))
 		{
 			foreach ($_POST['theme_changes'] as $change)
@@ -826,8 +825,10 @@ class Packages_Controller extends Action_Controller
 
 		// Get the package info...
 		$packageInfo = getPackageInfo($context['filename']);
+
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
+
 		$packageInfo['filename'] = $context['filename'];
 
 		// Set the type of extraction...
@@ -1235,14 +1236,14 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $forum_version, $settings;
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
 		$context['forum_version'] = $forum_version;
 		$installed = $context['sub_action'] == 'installed' ? true : false;
-		$context['modification_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
+		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'unknown');
 
-		foreach ($context['modification_types'] as $type)
+		foreach ($context['package_types'] as $type)
 		{
 			// Use the standard templates for showing this.
 			$listOptions = array(
@@ -1362,13 +1363,6 @@ class Packages_Controller extends Action_Controller
 
 		$context['sub_template'] = 'browse';
 		$context['default_list'] = 'packages_lists';
-
-		// Empty lists for now.
-		$context['available_mods'] = array();
-		$context['available_avatars'] = array();
-		$context['available_languages'] = array();
-		$context['available_other'] = array();
-		$context['available_all'] = array();
 	}
 
 	/**
@@ -1499,8 +1493,8 @@ class Packages_Controller extends Action_Controller
 
 		// Ok lets get the content of the file.
 		$context['operations'] = array(
-			'search' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['search_original']), array('[' => '&#91;', ']' => '&#93;')),
-			'replace' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['replace_original']), array('[' => '&#91;', ']' => '&#93;')),
+			'search' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'replace' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
 			'position' => $mod_actions[$_REQUEST['operation_key']]['position'],
 		);
 
@@ -1747,7 +1741,7 @@ class Packages_Controller extends Action_Controller
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
 		if (isset($_POST['action_changes']))
-			return action_perms_save();
+			return $this->action_perms_save();
 
 		$context['look_for'] = array();
 
@@ -1861,6 +1855,7 @@ class Packages_Controller extends Action_Controller
 					// Nothing to see here?
 					if ($status === 'no_change')
 						continue;
+
 					$legal = false;
 					foreach ($legal_roots as $root)
 						if (substr($path, 0, strlen($root)) == $root)
@@ -1960,7 +1955,6 @@ class Packages_Controller extends Action_Controller
 
 					return $count;
 				}
-
 				foreach ($context['file_tree'] as $path => $data)
 				{
 					if (is_dir($path))
@@ -2075,7 +2069,7 @@ class Packages_Controller extends Action_Controller
 	function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
 		global $scripturl, $context, $forum_version;
-		static $instmods, $packages;
+		static $instadds, $packages;
 
 		// Start things up
 		if (!isset($packages[$params]))
@@ -2085,13 +2079,11 @@ class Packages_Controller extends Action_Controller
 		if (!@is_writable(BOARDDIR . '/packages'))
 			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
 
-		list($the_brand, $the_version) = explode(' ', $forum_version, 2);
+		list ($the_brand, $the_version) = explode(' ', $forum_version, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
 		if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array($the_brand => '')) == $the_version)
-		{
 			unset($_SESSION['version_emulate']);
-		}
 		elseif (isset($_GET['version_emulate']))
 		{
 			if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === $forum_version) && isset($_SESSION['version_emulate']))
@@ -2109,34 +2101,34 @@ class Packages_Controller extends Action_Controller
 		if (isset($_SESSION['single_version_emulate']))
 			unset($_SESSION['single_version_emulate']);
 
-		if (empty($instmods))
+		if (empty($instadds))
 		{
-			$instmods = loadInstalledPackages();
-			$installed_mods = array();
+			$instadds = loadInstalledPackages();
+			$installed_adds = array();
 
 			// Look through the list of installed mods...
-			foreach ($instmods as $installed_mod)
-				$installed_mods[$installed_mod['package_id']] = array(
-					'id' => $installed_mod['id'],
-					'version' => $installed_mod['version'],
+			foreach ($instadds as $installed_add)
+				$installed_adds[$installed_add['package_id']] = array(
+					'id' => $installed_add['id'],
+					'version' => $installed_add['version'],
 				);
 
 			// Get a list of all the ids installed, so the latest packages won't include already installed ones.
-			$context['installed_mods'] = array_keys($installed_mods);
+			$context['installed_adds'] = array_keys($installed_adds);
 		}
 
 		if ($installed)
 		{
 			$sort_id = 1;
-			foreach ($instmods as $installed_mod)
+			foreach ($instadds as $installed_add)
 			{
-				$context['available_modification'][$installed_mod['package_id']] = array(
+				$context['available_modification'][$installed_add['package_id']] = array(
 					'sort_id' => $sort_id++,
 					'can_uninstall' => true,
-					'name' => $installed_mod['name'],
-					'filename' => $installed_mod['filename'],
-					'installed_id' => $installed_mod['id'],
-					'version' => $installed_mod['version'],
+					'name' => $installed_add['name'],
+					'filename' => $installed_add['filename'],
+					'installed_id' => $installed_add['id'],
+					'version' => $installed_add['version'],
 					'is_installed' => true,
 					'is_current' => true,
 				);
@@ -2144,7 +2136,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		if (empty($packages))
-			foreach ($context['modification_types'] as $type)
+			foreach ($context['package_types'] as $type)
 				$packages[$type] = array();
 
 		if ($dir = @opendir(BOARDDIR . '/packages'))
@@ -2163,7 +2155,7 @@ class Packages_Controller extends Action_Controller
 					continue;
 
 				$skip = false;
-				foreach ($context['modification_types'] as $type)
+				foreach ($context['package_types'] as $type)
 					if (isset($context['available_' . $type][md5($package)]))
 						$skip = true;
 
@@ -2196,11 +2188,11 @@ class Packages_Controller extends Action_Controller
 
 				if (!empty($packageInfo))
 				{
-					$packageInfo['installed_id'] = isset($installed_mods[$packageInfo['id']]) ? $installed_mods[$packageInfo['id']]['id'] : 0;
+					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
 					$packageInfo['sort_id'] = $sort_id[$packageInfo['type']];
-					$packageInfo['is_installed'] = isset($installed_mods[$packageInfo['id']]);
-					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] == $packageInfo['version']);
-					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_mods[$packageInfo['id']]['version'] > $packageInfo['version']);
+					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
+					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
+					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
 					$packageInfo['can_install'] = false;
 					$packageInfo['can_uninstall'] = false;
 					$packageInfo['can_upgrade'] = false;
@@ -2245,7 +2237,7 @@ class Packages_Controller extends Action_Controller
 						{
 							// Even if it is for this ElkArte, is it for the installed version of the mod?
 							if (!$upgrade->exists('@for') || matchPackageVersion($the_version, $upgrade->fetch('@for')))
-								if (!$upgrade->exists('@from') || matchPackageVersion($installed_mods[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
+								if (!$upgrade->exists('@from') || matchPackageVersion($installed_adds[$packageInfo['id']]['version'], $upgrade->fetch('@from')))
 								{
 									$packageInfo['can_upgrade'] = true;
 									break;
@@ -2513,7 +2505,6 @@ function fetchPerms__recursive($path, &$data, $level)
 /**
  * Function called to briefly pause execution of directory/file chmod actions
  * Called by action_perms_save().
- *
  */
 function pausePermsSave()
 {

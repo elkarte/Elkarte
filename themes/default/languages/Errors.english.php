@@ -8,8 +8,8 @@ $txt['wireless_error_notyet'] = 'Sorry, this section isn\'t available for wirele
 $txt['not_guests'] = 'Sorry, this action is not available to guests.';
 
 $txt['mods_only'] = 'Only Moderators can use the direct remove function, please remove this message through the modify feature.';
-$txt['no_name'] = 'You didn\'t fill the name field out. We can\'t let you without a name, sorry.';
-$txt['no_email'] = 'You didn\'t fill the email field out. We can\'t let you without an email, sorry.';
+$txt['no_name'] = 'You didn\'t fill the name field out. We can\'t let you continue without a name, sorry.';
+$txt['no_email'] = 'You didn\'t fill the email field out. We can\'t let you continue without an email, sorry.';
 $txt['topic_locked'] = 'This topic is locked, you are not allowed to post or modify messages...';
 $txt['no_password'] = 'Password field empty';
 $txt['already_a_user'] = 'The username you tried to use already exists.';
@@ -196,7 +196,7 @@ $txt['ban_no_triggers'] = 'Did you forget to select ban triggers? We need at lea
 $txt['ban_ban_item_empty'] = 'Ban trigger not found';
 $txt['impossible_insert_new_bangroup'] = 'An error occurred while inserting the new ban';
 
-$txt['cant_like_yourself']= 'Liking your own posts ... its like laughing at your own jokes when there is no one else around  ... lol ... Wait did I just lol myself?';
+$txt['cant_like_yourself'] = 'Liking your own posts ... its like laughing at your own jokes when there is no one else around  ... lol ... Wait did I just lol myself?';
 
 $txt['ban_name_exists'] = 'The name of this ban (%1$s) already exists. Please choose a different name.';
 $txt['ban_trigger_already_exists'] = 'This ban trigger (%1$s) already exists in %2$s.';
@@ -245,6 +245,8 @@ $txt['error_no_name'] = 'No name was provided.';
 $txt['error_bad_name'] = 'The name you submitted cannot be used, because it is or contains a reserved name.';
 $txt['error_no_email'] = 'No email address was provided.';
 $txt['error_bad_email'] = 'An invalid email address was given.';
+$txt['error_email'] = 'email address';
+$txt['error_message'] = 'message';
 $txt['error_no_event'] = 'No event name has been given.';
 $txt['error_no_subject'] = 'No subject was filled in.';
 $txt['error_no_question'] = 'No question was filled in for this poll.';
@@ -266,6 +268,7 @@ $txt['error_need_verification_code'] = 'Please enter the verification code below
 $txt['error_bad_file'] = 'Sorry but the file specified could not be opened: %1$s';
 $txt['error_bad_line'] = 'The line you specified is invalid.';
 $txt['error_draft_not_saved'] = 'There was an error saving the draft';
+$txt['error_name_in_use'] = 'The name %1$s is already in use by another member.';
 
 $txt['smiley_not_found'] = 'Smiley not found.';
 $txt['smiley_has_no_code'] = 'No code for this smiley was given.';
@@ -287,19 +290,20 @@ $txt['unable_to_create_temporary'] = 'The search function was unable to create t
 
 $txt['package_no_file'] = 'Unable to find package file!';
 $txt['packageget_unable'] = 'Unable to connect to the server.  Please try using <a href="%1$s" target="_blank" class="new_win">this URL</a> instead.';
-$txt['not_on_simplemachines'] = 'Sorry, packages can only be downloaded like this from the simplemachines.org server.';
+$txt['not_valid_server'] = 'Sorry, packages can only be downloaded like this from servers you have first authorized.';
 $txt['package_cant_uninstall'] = 'This package was either never installed or was already uninstalled - you can\'t uninstall it now.';
 $txt['package_cant_download'] = 'You cannot download or install new packages because the &quot;packages&quot; directory or one of the files in it are not writable!';
 $txt['package_upload_error_nofile'] = 'You did not select a package to upload.';
 $txt['package_upload_error_failed'] = 'Could not upload package, please check directory permissions!';
 $txt['package_upload_error_exists'] = 'The file you are uploading already exists on the server. Please delete it first then try again.';
+$txt['package_upload_already_exists'] = 'The package you are trying to upload already exists on the server under filename: %1$s';
 $txt['package_upload_error_supports'] = 'The package manager currently allows only these file types: %1$s.';
 $txt['package_upload_error_broken'] = 'Package upload failed due to the following error:<br />&quot;%1$s&quot;';
 
 $txt['package_get_error_not_found'] = 'The package you are trying to install cannot be located. You may want to manually upload the package to your &quot;packages&quot; directory.';
 $txt['package_get_error_missing_xml'] = 'The package you are attempting to install is missing the package-info.xml that must be in the root package directory.';
 $txt['package_get_error_is_zero'] = 'Although the package was downloaded to the server it appears to be empty. Please check the &quot;packages&quot; directory, and the &quot;temp&quot; sub-directory are both writable. If you continue to experience this problem you should try extracting the package on your PC and uploading the extracted files into a subdirectory in your &quot;packages&quot; directory and try again. For example, if the package was called shout.tar.gz you should:<br />1) Download the package to your local PC and extract it into files.<br />2) Using an FTP client create a new directory in your &quot;packages&quot; folder, in this example you may call it "shout".<br />3) Upload all the files from the extracted package to this directory.<br />4) Go back to the package manager browse page and the package will be automatically found.';
-$txt['package_get_error_packageinfo_corrupt'] = 'Unable to find any valid information within the package-info.xml file included within the Package. There may be an error with the modification, or the package may be corrupt.';
+$txt['package_get_error_packageinfo_corrupt'] = 'Unable to find any valid information within the package-info.xml file included within the Package. There may be an error in the addon, or the package may be corrupt.';
 $txt['package_get_error_is_theme'] = 'You can\'t install a Theme from this section, please use the <a href="{MANAGETHEMEURL}">Themes and Layout</a> management page to upload it';
 
 $txt['no_membergroup_selected'] = 'No membergroup selected';
@@ -432,4 +436,7 @@ $txt['restore_not_found'] = 'The following messages could not be restored; the o
 $txt['error_invalid_dir'] = 'The directory you entered is invalid.';
 
 // Admin/dispatching strings
-$txt['error_sa_not_set'] = 'Sub-action not set';
+$txt['error_sa_not_set'] = 'The Sub-action you requested is not defined';
+
+// Drag / Drop sort errors
+$txt['no_sortable_items'] = 'No sortable items were found';

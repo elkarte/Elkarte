@@ -73,11 +73,6 @@ function template_options()
 			'default' => true,
 		),
 		array(
-			'id' => 'copy_to_outbox',
-			'label' => $txt['copy_to_outbox'],
-			'default' => true,
-		),
-		array(
 			'id' => 'pm_remove_inbox_label',
 			'label' => $txt['pm_remove_inbox_label'],
 			'default' => true,
@@ -131,11 +126,11 @@ function template_options()
 			),
 			'default' => true,
 		),
-        array(
-            'id' => 'use_editor_quick_reply',
-            'label' => $txt['use_editor_quick_reply'],
-            'default' => true,
-        ),
+		array(
+			'id' => 'use_editor_quick_reply',
+			'label' => $txt['use_editor_quick_reply'],
+			'default' => true,
+		),
 		array(
 			'id' => 'display_quick_mod',
 			'label' => $txt['display_quick_mod'],
@@ -170,6 +165,17 @@ function template_settings()
 			'type' => 'text',
 		),
 		array(
+			'id' => 'header_layout',
+			'label' => $txt['header_layout'],
+			'options' => array(
+				0 => $txt['header_layout_default'],
+				1 => $txt['header_layout_logo_only'],
+				2 => $txt['header_layout_inverted'],
+			),
+			'description' => $txt['header_layout_desc'],
+			'type' => 'select',
+		),
+		array(
 			'id' => 'smiley_sets_default',
 			'label' => $txt['smileys_default_set_for_theme'],
 			'options' => $context['smiley_sets'],
@@ -197,18 +203,21 @@ function template_settings()
 		),
 		array(
 			'id' => 'enable_news',
-			'label' => $txt['enable_random_news'],
-		),
-	'',
-		array(
-			'id' => 'show_newsfader',
-			'label' => $txt['news_fader'],
+			'label' => $txt['enable_news'],
+			'options' => array(
+				0 => $txt['enable_news_off'],
+				1 => $txt['enable_news_random'],
+				2 => $txt['enable_news_fader'],
+			),
+			'type' => 'number',
+			'description' => $txt['enable_news_desc'],
 		),
 		array(
 			'id' => 'newsfader_time',
 			'label' => $txt['admin_fader_delay'],
 			'type' => 'number',
 		),
+	'',
 		array(
 			'id' => 'number_recent_posts',
 			'label' => $txt['number_recent_posts'],
@@ -269,8 +278,8 @@ function template_settings()
 			'label' => $txt['admin_bbc'],
 		),
 		array(
-			'id' => 'additional_options_collapsable',
-			'label' => $txt['additional_options_collapsable'],
+			'id' => 'additional_options_collapsible',
+			'label' => $txt['additional_options_collapsible'],
 		),
 	'',
 		array(
@@ -283,4 +292,17 @@ function template_settings()
 			),
 		),
 	);
+
+	addInlineJavascript('
+		function toggleNewsFaderTime(val)
+		{
+			if (val == 2)
+				$("#dt_newsfader_time, #dd_newsfader_time").fadeIn();
+			else
+				$("#dt_newsfader_time, #dd_newsfader_time").fadeOut();
+		}
+		toggleNewsFaderTime($("#enable_news").val());
+		$("#enable_news").on("change", function() {
+			toggleNewsFaderTime($(this).val());
+		});', true);
 }

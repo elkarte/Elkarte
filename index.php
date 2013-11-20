@@ -26,7 +26,7 @@ define('ELK', 1);
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
-error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
+error_reporting(E_ALL | E_STRICT);
 $time_start = microtime(true);
 
 // Turn on output buffering.
@@ -43,7 +43,7 @@ require_once(dirname(__FILE__) . '/Settings.php');
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
 	$boarddir = dirname(__FILE__);
-if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+if (!file_exists($sourcedir . '/Dispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
 // Check that directories which didn't exist in past releases are initialized.
@@ -80,6 +80,7 @@ require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
 require_once(SOURCEDIR . '/Action.controller.php');
+require_once(SOURCEDIR . '/Positioning.class.php');
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
@@ -104,8 +105,7 @@ Util::compat_init();
 $context = array();
 
 // Seed the random generator.
-if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
-	elk_seed_generator();
+elk_seed_generator();
 
 // Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
@@ -119,7 +119,7 @@ if (isset($_GET['scheduled']))
 if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 {
 	// If zlib is being used, turn off output compression.
-	if (ini_get('zlib.output_compression') >=  1 || ini_get('output_handler') == 'ob_gzhandler')
+	if (ini_get('zlib.output_compression') >= 1 || ini_get('output_handler') == 'ob_gzhandler')
 		$modSettings['enableCompressedOutput'] = 0;
 	else
 	{
@@ -153,7 +153,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance;
+	global $modSettings, $user_info, $topic, $board_info;
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
@@ -164,6 +164,7 @@ function elk_main()
 
 	// We should set our security headers now.
 	frameOptionsHeader();
+	securityOptionsHeader();
 
 	// Load the user's cookie (or set as guest) and load their settings.
 	loadUserSettings();

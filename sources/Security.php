@@ -43,7 +43,7 @@ function validateSession($type = 'admin')
 	$type = in_array($type, $types) || $type == 'moderate' ? $type : 'admin';
 
 	// Set the lifetime for our admin session. Default is ten minutes.
-	$refreshTime =  600;
+	$refreshTime = 600;
 
 	if (isset($modSettings['admin_session_lifetime']))
 	{
@@ -813,14 +813,15 @@ function createToken($action, $type = 'post')
 function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 {
 	$type = $type == 'get' || $type == 'request' ? $type : 'post';
+	$token_index = $type . '-' . $action;
 
 	// Logins are special: the token is used to has the password with javascript before POST it
 	if ($action == 'login')
 	{
-		if (isset($_SESSION['token'][$type . '-' . $action]))
+		if (isset($_SESSION['token'][$token_index]))
 		{
-			$return = $_SESSION['token'][$type . '-' . $action][3];
-			unset($_SESSION['token'][$type . '-' . $action]);
+			$return = $_SESSION['token'][$token_index][3];
+			unset($_SESSION['token'][$token_index]);
 			return $return;
 		}
 		else
@@ -836,10 +837,10 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 
 	// we use user agent
 	$req = request();
-	if (isset($_SESSION['token'][$type . '-' . $action], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$type . '-' . $action][0]] . $req->user_agent()) === $_SESSION['token'][$type . '-' . $action][1])
+	if (isset($_SESSION['token'][$token_index], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] . $req->user_agent()) === $_SESSION['token'][$token_index][1])
 	{
 		// Invalidate this token now.
-		unset($_SESSION['token'][$type . '-' . $action]);
+		unset($_SESSION['token'][$token_index]);
 
 		return true;
 	}
@@ -860,7 +861,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 	}
 	// Remove this token as its useless
 	else
-		unset($_SESSION['token'][$type . '-' . $action]);
+		unset($_SESSION['token'][$token_index]);
 
 	// Randomly check if we should remove some older tokens.
 	if (mt_rand(0, 138) == 23)
@@ -876,7 +877,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
  *
  * @param bool $complete = false
  */
-function cleanTokens($complete = false)
+function cleanTokens($complete = false, $suffix = '')
 {
 	// We appreciate cleaning up after yourselves.
 	if (!isset($_SESSION['token']))
@@ -884,8 +885,15 @@ function cleanTokens($complete = false)
 
 	// Clean up tokens, trying to give enough time still.
 	foreach ($_SESSION['token'] as $key => $data)
-		if ($data[2] + 10800 < time() || $complete)
+	{
+		if (!empty($suffix))
+			$force = $complete || strpos($key, $suffix);
+		else
+			$force = $complete;
+
+		if ($data[2] + 10800 < time() || $force)
 			unset($_SESSION['token'][$key]);
+	}
 }
 
 /**
@@ -1202,7 +1210,7 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 	// If the forum is set to show full email addresses: yes.
 	// Otherwise: no_through_forum.
 
-	if ((!empty($modSettings['guest_hideContacts']) && $user_info['is_guest']) || isset($_SESSION['ban']['cannot_post']))
+	if ($user_info['is_guest'] || isset($_SESSION['ban']['cannot_post']))
 		return 'no';
 	elseif ((!$user_info['is_guest'] && $user_info['id'] == $userProfile_id && !$userProfile_hideEmail) || allowedTo('moderate_forum'))
 		return 'yes_permission_override';
@@ -1311,7 +1319,8 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 	else
 	{
 		$fh = @fopen($path . '/.htaccess', 'w');
-		if ($fh) {
+		if ($fh)
+		{
 			fwrite($fh, '<Files *>
 	Order Deny,Allow
 	Deny from all' . $close);
@@ -1325,7 +1334,8 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 	else
 	{
 		$fh = @fopen($path . '/index.php', 'w');
-		if ($fh) {
+		if ($fh)
+		{
 			fwrite($fh, '<?php
 
 /**
@@ -1341,8 +1351,7 @@ if (file_exists(dirname(dirname(__FILE__)) . \'/Settings.php\'))
 }
 // Can\'t find it... just forget it.
 else
-	exit;
-');
+	exit;');
 			fclose($fh);
 		}
 		$errors[] = 'index-php_cannot_create_file';
@@ -1486,11 +1495,11 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 }
 
 /**
-* This sets the X-Frame-Options header.
-*
-* @param string $option the frame option, defaults to deny.
-* @return void.
-*/
+ * This sets the X-Frame-Options header.
+ *
+ * @param string $option the frame option, defaults to deny.
+ * @return void.
+ */
 function frameOptionsHeader($override = null)
 {
 	global $modSettings;
@@ -1507,4 +1516,24 @@ function frameOptionsHeader($override = null)
 
 	// Finally set it.
 	header('X-Frame-Options: ' . $option);
+}
+
+/**
+ * This adds additonal security headers that may prevent browsers from doing something they should not
+ *
+ * X-XSS-Protection header - This header enables the Cross-site scripting (XSS) filter
+ * built into most recent web browsers. It's usually enabled by default, so the role of this
+ * header is to re-enable the filter for this particular website if it was disabled by the user.
+ *
+ * X-Content-Type-Options header - It prevents the browser from doing MIME-type sniffing,
+ * only IE and Chrome are honoring this header. This reduces exposure to drive-by download attacks
+ * and sites serving user uploaded content that could be treated as executable or dynamic HTML files.
+ */
+function securityOptionsHeader($override = null)
+{
+	if ($override !== true)
+	{
+		header('X-XSS-Protection: 1; mode=block');
+		header('X-Content-Type-Options: nosniff');
+	}
 }

@@ -34,12 +34,11 @@ function template_admin()
 
 	// Display the "live news"
 	echo '
+							<div id="admin_search_box">', $txt['try_searching'], template_admin_quick_search(), '</div>
 							<div id="live_news" class="floatleft">
-								<div class="cat_bar">
-									<h3 class="catbg">
-										<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
-									</h3>
-								</div>
+								<h3 class="category_header">
+									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['live'], '
+								</h3>
 								<div class="windowbg">
 									<div class="content">
 										<div id="ourAnnouncements">', $txt['lfyi'], '</div>
@@ -50,11 +49,9 @@ function template_admin()
 	// Show the user version information from their server.
 	echo '
 							<div id="supportVersionsTable" class="floatright">
-								<div class="cat_bar">
-									<h3 class="catbg">
-										<a href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
-									</h3>
-								</div>
+								<h3 class="category_header">
+									<a href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
+								</h3>
 								<div class="windowbg">
 									<div class="content">
 										<div id="version_details">
@@ -93,7 +90,7 @@ function template_admin()
 									<li>
 										', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
 										<h5>', $task['link'], '</h5>
-										<span class="task">', $task['description'],'</span>
+										<span class="task">', $task['description'], '</span>
 									</li>';
 
 	echo '
@@ -102,7 +99,7 @@ function template_admin()
 						</div>
 					</div>';
 
-	// The below functions include all the scripts needed from the elkarte site. The language and format are passed for internationalization.
+	// The below functions include all the scripts needed from the ElkArte site. The language and format are passed for internationalization.
 	if (empty($modSettings['disable_elk_js']))
 		echo '
 					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
@@ -141,11 +138,9 @@ function template_admin()
 							sUpdateNotificationDefaultTitle: ', JavaScriptEscape($txt['update_available']), ',
 							sUpdateNotificationDefaultMessage: ', JavaScriptEscape($txt['update_message']), ',
 							sUpdateNotificationTemplate: ', JavaScriptEscape('
-								<div class="cat_bar">
-									<h3 id="update_title" class="catbg">
+									<h3 id="update_title" class="category_header">
 										%title%
 									</h3>
-								</div>
 								<div class="windowbg">
 									<div class="content">
 										<div id="update_message" class="smalltext">
@@ -171,11 +166,9 @@ function template_credits()
 	echo '
 					<div id="admincenter">
 						<div id="support_credits">
-							<div class="cat_bar">
-								<h3 class="catbg">
-									', $txt['support_title'], ' <img src="', $settings['images_url'], (!empty($context['theme_variant']) ? '/'. $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ), '" id="credits_logo" alt="" />
-								</h3>
-							</div>
+							<h3 class="category_header">
+								', $txt['support_title'], ' <img src="', $settings['images_url'], (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] . '/logo_elk.png' : '/logo_elk.png' ), '" id="credits_logo" alt="" />
+							</h3>
 							<div class="windowbg">
 								<div class="content">
 									<strong>', $txt['support_versions'], ':</strong><br />
@@ -194,7 +187,8 @@ function template_credits()
 		// more details for this item, show them a link
 		if ($context['can_admin'] && isset($version['more']))
 			echo
-									' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
+			' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
+
 		echo '
 									<br />';
 	}
@@ -205,8 +199,8 @@ function template_credits()
 
 	// Point the admin to common support resources.
 	echo '
-							<div id="support_resources" class="cat_bar">
-								<h3 class="catbg">
+							<div id="support_resources">
+								<h3 class="category_header">
 									', $txt['support_resources'], '
 								</h3>
 							</div>
@@ -217,13 +211,11 @@ function template_credits()
 								</div>
 							</div>';
 
-	// Display latest support questions from simplemachines.org.
+	// Display latest support questions from ElkArte
 	echo '
-							<div class="cat_bar">
-								<h3 class="catbg">
-									<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
-								</h3>
-							</div>
+							<h3 class="category_header">
+								<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['support_latest'], '
+							</h3>
 							<div class="windowbg">
 								<div class="content">
 									<div id="latestSupport">', $txt['support_latest_fetch'], '</div>
@@ -232,8 +224,8 @@ function template_credits()
 
 	// The most important part - the credits :P.
 	echo '
-							<div id="credits_sections" class="cat_bar">
-								<h3 class="catbg">
+							<div id="credits_sections">
+								<h3 class="category_header">
 									', $txt['admin_credits'], '
 								</h3>
 							</div>
@@ -292,8 +284,7 @@ function template_credits()
 	echo '
 					// ]]></script>
 					<script src="', $scripturl, '?action=viewadminfile;filename=current-version.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>
-					<script src="', $scripturl, '?action=viewadminfile;filename=latest-support.js"></script>';
+					<script src="', $scripturl, '?action=viewadminfile;filename=latest-news.js"></script>';
 
 	// This sets the latest support stuff.
 	echo '
@@ -327,11 +318,9 @@ function template_view_versions()
 
 	echo '
 					<div id="admincenter">
-						<div id="section_header" class="cat_bar">
-							<h3 class="catbg">
-								', $txt['admin_version_check'], '
-							</h3>
-						</div>
+						<h3 class="category_header">
+							', $txt['admin_version_check'], '
+						</h3>
 						<div class="information">', $txt['version_check_desc'], '</div>
 							<table class="table_grid">
 								<thead>
@@ -692,9 +681,9 @@ function template_view_versions()
 						</div>';
 
 	/* Below is the javascript for this. Upon opening the page it checks the current file versions with ones
-	   held at elkarte.net and works out if they are up to date.  If they aren't it colors that files number
-	   red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
-	   file categories. (sources, languages, and templates.) */
+	  held at ElkArte.net and works out if they are up to date.  If they aren't it colors that files number
+	  red.  It also contains the function, swapOption, that toggles showing the detailed information for each of the
+	  file categories. (sources, languages, and templates.) */
 	echo '
 						<script src="', $scripturl, '?action=viewadminfile;filename=detailed-version.js"></script>
 						<script><!-- // --><![CDATA[
@@ -728,11 +717,9 @@ function template_edit_censored()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
-			<div id="section_header" class="cat_bar">
-				<h3 class="catbg">
-					', $txt['admin_censored_words'], '
-				</h3>
-			</div>
+			<h3 class="category_header">
+				', $txt['admin_censored_words'], '
+			</h3>
 			<div class="windowbg2">
 				<div class="content">
 					<p>', $txt['admin_censored_where'], '</p>';
@@ -750,7 +737,7 @@ function template_edit_censored()
 						<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> => <input type="text" name="censor_proper[]" size="30" class="input_text" />
 					</div>
 					<div id="moreCensoredWords"></div><div style="margin-top: 1ex; display: none;" id="moreCensoredWords_link">
-						<a class="button_link" style="float: left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
+						<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 					</div>
 					<script><!-- // --><![CDATA[
 						document.getElementById("moreCensoredWords_link").style.display = "";
@@ -777,11 +764,7 @@ function template_edit_censored()
 
 	// This table lets you test out your filters by typing in rude words and seeing what comes out.
 	echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['censor_test'], '
-				</h3>
-			</div>
+			<h3 class="category_header">', $txt['censor_test'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<div class="centertext">
@@ -808,11 +791,7 @@ function template_not_done()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header" class="cat_bar">
-			<h3 class="catbg">
-				', $txt['not_done_title'], '
-			</h3>
-		</div>
+		<h3 class="category_header">', $txt['not_done_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				', $txt['not_done_reason'];
@@ -867,11 +846,7 @@ function template_show_settings()
 	// Is there a custom title?
 	if (isset($context['settings_title']))
 		echo '
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['settings_title'], '
-				</h3>
-			</div>';
+			<h3 class="category_header">', $context['settings_title'], '</h3>';
 
 	// any messages or errors to show?
 	if (!empty($context['settings_message']))
@@ -908,12 +883,10 @@ function template_show_settings()
 			if ($config_var['type'] == 'title')
 			{
 				echo '
-					<div class="cat_bar">
-						<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'catbg', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
-							', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
-							', $config_var['label'], '
-						</h3>
-					</div>';
+					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
+						', ($config_var['help'] ? '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>' : ''), '
+						', $config_var['label'], '
+					</h3>';
 			}
 			// A description?
 			else
@@ -952,6 +925,7 @@ function template_show_settings()
 			if (in_array($config_var['type'], array('message', 'warning')))
 			{
 				echo '
+						<dt></dt>
 						<dd', $config_var['type'] == 'warning' ? ' class="alert"' : '', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>
 							', $config_var['label'], '
 						</dd>';
@@ -979,7 +953,7 @@ function template_show_settings()
 
 				echo '
 						<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
-							$config_var['preinput'];
+				$config_var['preinput'];
 
 				// Show a check box.
 				if ($config_var['type'] == 'check')
@@ -995,16 +969,18 @@ function template_show_settings()
 				{
 					echo '
 							<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple"' : ''), '>';
+
 					foreach ($config_var['data'] as $option)
 						echo '
 								<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
+
 					echo '
 							</select>';
 				}
 				// Text area?
 				elseif ($config_var['type'] == 'large_text')
 					echo '
-							<textarea rows="', ($config_var['size'] ? $config_var['size'] : 4), '" cols="40" ', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
+							<textarea rows="', (!empty($config_var['size']) ? $config_var['size'] : (!empty($config_var['rows']) ? $config_var['rows'] : 4)), '" cols="', (!empty($config_var['cols']) ? $config_var['cols'] : 30), '" name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
 				// Permission group?
 				elseif ($config_var['type'] == 'permissions')
 					theme_inline_permissions($config_var['name']);
@@ -1043,7 +1019,7 @@ function template_show_settings()
 
 				echo isset($config_var['postinput']) ? '
 							' . $config_var['postinput'] : '',
-						'</dd>';
+				'</dd>';
 			}
 		}
 		else
@@ -1111,8 +1087,8 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-					<div id="section_header" class="cat_bar">
-						<h3 class="catbg">
+					<div>
+						<h3 class="category_header">
 							<object id="quick_search">
 								<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" class="floatright">
 									<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
@@ -1135,6 +1111,7 @@ function template_admin_search_results()
 	{
 		echo '
 							<ol class="search_results">';
+
 		foreach ($context['search_results'] as $result)
 		{
 			// Is it a result from the online manual?
@@ -1155,7 +1132,7 @@ function template_admin_search_results()
 			{
 				echo '
 								<li class="windowbg2">
-									<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', isset($txt['admin_search_section_' . $result['type']]) ? $txt['admin_search_section_' . $result['type']] : $result['type'] , ']';
+									<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', isset($txt['admin_search_section_' . $result['type']]) ? $txt['admin_search_section_' . $result['type']] : $result['type'], ']';
 
 				if ($result['help'])
 					echo '
@@ -1194,16 +1171,20 @@ function template_callback_question_answer_list()
 		echo '
 			<dt class="questions">
 				<input type="text" name="question[', $data['id_question'], ']" value="', $data['question'], '" size="40" class="input_text verification_question" />';
+
 		if (!empty($context['languages']))
 		{
 			echo '
 				<select name="language[', $data['id_question'], ']">';
+
 			foreach ($context['languages'] as $lang)
 				echo '
 					<option value="', $lang['filename'], '"', $lang['filename'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
+
 			echo '
 				</select>';
 		}
+
 		echo '
 			</dt>
 			<dd class="questions">';
@@ -1212,6 +1193,7 @@ function template_callback_question_answer_list()
 			echo '
 				<input type="text" name="answer[', $data['id_question'], '][]" value="', $answer, '" size="40" class="input_text verification_answer" />', $id == $count ? '<br />
 				<a href="#" onclick="addAnotherAnswer(this, ' . $data['id_question'] . '); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>' : '<br />';
+
 		echo '
 			</dd>';
 	}
@@ -1221,9 +1203,11 @@ function template_callback_question_answer_list()
 	{
 		$lang_dropdown .= '
 				<select name="language[b-%question_last_blank%]">';
+
 		foreach ($context['languages'] as $lang)
 			$lang_dropdown .= '
 					<option value="' . $lang['filename'] . '"' . ($lang['selected'] ? ' selected="selected"' : '') . '>' . $lang['name'] . '</option>';
+
 		$lang_dropdown .= '
 				</select>';
 	}
@@ -1249,12 +1233,13 @@ function template_callback_question_answer_list()
 		</dt><dd></dd>';
 
 	addInlineJavascript('
+				document.getElementById(\'add_more_link_div\').style.display = \'\';
 				var question_last_blank = ' . $count . ';
 				var txt_add_another_answer = ' . JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;') . ';
 				var add_question_template = ' . JavaScriptEscape('
 			<dt class="questions">
 				<input type="text" name="question[b-%question_last_blank%]" size="40" class="input_text verification_question" />' .
-				$lang_dropdown . '
+					$lang_dropdown . '
 			</dt>
 			<dd class="questions">
 				<input type="text" name="answer[b-%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />
@@ -1275,11 +1260,9 @@ function template_repair_boards()
 
 	echo '
 	<div id="admincenter">
-		<div id="section_header" class="cat_bar">
-			<h3 class="catbg">',
-				$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'] , '
-			</h3>
-		</div>
+		<h3 class="category_header">',
+			$context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '
+		</h3>
 		<div class="windowbg">
 			<div class="content">';
 
@@ -1313,7 +1296,6 @@ function template_repair_boards()
 				<p>
 					<a href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 				</p>';
-
 	}
 	else
 	{
@@ -1364,12 +1346,7 @@ function template_php_info()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<div id="section_header" class="cat_bar">
-			<h3 class="catbg">',
-				$txt['phpinfo_settings'], '
-			</h3>
-		</div>
-		<br />';
+		<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>';
 
 	// for each php info area
 	foreach ($context['pinfo'] as $area => $php_area)
@@ -1379,8 +1356,8 @@ function template_php_info()
 			<thead>
 			<tr class="table_head three_column">
 				<th scope="col"></th>
-				<th class="centertext" scope="col"><strong>', $area, '</strong></th>
-				<th class="centertext" scope="col"></th>
+				<th scope="col" class="centertext"><strong>', $area, '</strong></th>
+				<th scope="col" class="centertext"></th>
 			</tr>
 			</thead>
 			<tbody>';
@@ -1396,9 +1373,9 @@ function template_php_info()
 			{
 				if ($localmaster)
 				{
-					// heading row for the settings section of this categorys settings
+					// heading row for the settings section of this category's settings
 					echo '
-			<tr class="titlebg">
+			<tr class="secondary_header">
 				<td><strong>', $txt['phpinfo_itemsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_localsettings'], '</strong></td>
 				<td class="centertext"><strong>', $txt['phpinfo_defaultsettings'], '</strong></td>
@@ -1411,10 +1388,9 @@ function template_php_info()
 				<td class="windowbg', $alternate ? '2' : '', '">', $key, '</td>';
 
 				foreach ($setting as $key_lm => $value)
-				{
 					echo '
 				<td class="windowbg', $alternate ? '2' : '', ' centertext">', $value, '</td>';
-				}
+
 				echo '
 			</tr>';
 			}
@@ -1423,7 +1399,7 @@ function template_php_info()
 			{
 				echo '
 			<tr>
-				<td class="windowbg', $alternate ? '2' : '', '">', $key,  '</td>
+				<td class="windowbg', $alternate ? '2' : '', '">', $key, '</td>
 				<td class=" windowbg', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
 			</tr>';
 			}
@@ -1440,23 +1416,28 @@ function template_php_info()
 	</div>';
 }
 
+/**
+ * Hey this is blank, but you could use it to add items above the clean cache button
+ */
 function template_clean_cache_button_above()
 {
+
 }
 
+/**
+ * Shows the clean cache button
+ */
 function template_clean_cache_button_below()
 {
 	global $txt, $scripturl, $context;
 
 	echo '
-	<div class="cat_bar">
-		<h3 class="catbg">', $txt['maintain_cache'], '</h3>
-	</div>
-	<div class="windowbg">
+	<div class="generic_list_wrapper">
+		<h3 class="category_header">', $txt['maintain_cache'], '</h3>
 		<div class="content">
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>
-				<span><input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" /></span>
+				<input type="submit" value="', $txt['maintain_run_now'], '" class="right_submit" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
 			</form>
@@ -1466,7 +1447,8 @@ function template_clean_cache_button_below()
 
 /**
  * Admin quick search box.
- * @todo - See comments under https://github.com/elkarte/Elkarte/issues/617#issuecomment-20564476 */
+ * @todo - See comments under https://github.com/elkarte/Elkarte/issues/617#issuecomment-20564476
+ */
 function template_admin_quick_search()
 {
 	global $context, $settings, $txt, $scripturl;
@@ -1474,8 +1456,8 @@ function template_admin_quick_search()
 	if ($context['user']['is_admin'])
 		echo '
 			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="', $context['character_set'], '" id="quick_search" class="floatright">
-				<img class="icon" src="', $settings['images_url'] , '/filter.png" alt="" />
-				<input type="text" name="search_term" value="', $txt['admin_search'], '" onclick="if (this.value == \'', $txt['admin_search'], '\') this.value = \'\';" class="input_text" />
+				<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
+				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="search_type">
 					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
 					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
@@ -1486,7 +1468,7 @@ function template_admin_quick_search()
 }
 
 /**
- * A list of urls and "words separators" for new search engines in the dropdown
+ * A list of URLs and "words separators" for new search engines in the dropdown
  */
 function template_callback_external_search_engines()
 {
@@ -1508,8 +1490,14 @@ function template_callback_external_search_engines()
 		<dt id="add_more_link_div" style="display: none;">
 			<a href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">&#171; ', $txt['setup_search_engine_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
+
+	addInlineJavascript('
+				document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
 }
 
+/**
+ * Used to show all of the pm message limits each group allows
+ */
 function template_callback_pm_limits()
 {
 	global $context;

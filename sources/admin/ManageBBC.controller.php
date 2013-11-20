@@ -25,17 +25,27 @@ class ManageBBC_Controller extends Action_Controller
 
 	public function action_index()
 	{
-		isAllowedTo('admin_forum');
+		global $context, $txt;
 
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		$subActions = array(
-			'display' => array ($this, 'action_bbcSettings_display'));
+			'display' => array(
+				'controller' => $this,
+				'function' => 'action_bbcSettings_display',
+				'permission' => 'admin_forum')
+		);
 
+		// Only one option I'm afraid
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['manageposts_bbc_settings_title'];
+
+		// Initiate and call
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch('display');
+		$action->initialize($subActions, 'display');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -57,8 +67,8 @@ class ManageBBC_Controller extends Action_Controller
 		$config_vars = $this->_bbcSettings->settings();
 
 		// Make sure a nifty javascript will enable/disable checkboxes, according to BBC globally set or not.
-		$context['settings_post_javascript'] = '
-			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');';
+		addInlineJavascript('
+			toggleBBCDisabled(\'disabledBBC\', ' . (empty($modSettings['enableBBC']) ? 'true' : 'false') . ');', true);
 
 		call_integration_hook('integrate_modify_bbc_settings', array(&$config_vars));
 
@@ -85,7 +95,7 @@ class ManageBBC_Controller extends Action_Controller
 			// Work out what is actually disabled!
 			$_POST['disabledBBC'] = implode(',', array_diff($bbcTags, $_POST['disabledBBC_enabledTags']));
 
-			// notify add-ons and integrations
+			// notify addons and integrations
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// save the result

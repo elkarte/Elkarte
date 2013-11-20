@@ -125,11 +125,17 @@ class Database_MySQL implements Database
 		if ($matches[1] === 'query_wanna_see_board')
 			return $user_info['query_wanna_see_board'];
 
+		if ($matches[1] === 'empty')
+			return '\'\'';
+
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
+		if ($matches[1] === 'literal')
+			return '\'' . mysql_real_escape_string($matches[2], $connection) . '\'';
+
 		if (!isset($values[$matches[2]]))
-			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2]), '', E_USER_ERROR, __FILE__, __LINE__);
+			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
 
 		$replacement = $values[$matches[2]];
 
@@ -228,7 +234,7 @@ class Database_MySQL implements Database
 			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
 
 			// Do the quoting and escaping
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// Clear this global variable.
 			$db_callback = array();
@@ -290,7 +296,7 @@ class Database_MySQL implements Database
 			$db_callback = array($db_values, $connection);
 
 			// Inject the values passed to this function.
-			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', 'elk_db_replacement__callback', $db_string);
+			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
 			// This shouldn't be residing in global space any longer.
 			$db_callback = array();
@@ -515,7 +521,7 @@ class Database_MySQL implements Database
 	function error($db_string, $connection = null)
 	{
 		global $txt, $context, $webmaster_email, $modSettings;
-		global $forum_version, $db_last_error, $db_persist;
+		global $db_last_error, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// Get the file and line numbers.
@@ -533,10 +539,29 @@ class Database_MySQL implements Database
 		//    1030: Got error ??? from table handler.
 		//    1034: Incorrect key file for table.
 		//    1035: Old key file for table.
+		//    1142: Command denied
 		//    1205: Lock wait timeout exceeded.
 		//    1213: Deadlock found.
 		//    2006: Server has gone away.
 		//    2013: Lost connection to server during query.
+
+		// We cannot do something, try to find out what and act accordingly
+		if ($query_errno == 1142)
+		{
+			$command = substr(trim($db_string), 0, 6);
+			if ($command === 'DELETE' || $command === 'UPDATE' || $command === 'INSERT')
+			{
+				// We can try to ignore it (warning the admin though it's a thing to do)
+				// and serve the page just SELECTing
+				$_SESSION['query_command_denied'][$command] = $query_error;
+
+				// Let the admin know there is a command denied issue
+				if (function_exists('log_error'))
+					log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+
+				return false;
+			}
+		}
 
 		// Log the error.
 		if ($query_errno != 1213 && $query_errno != 1205 && function_exists('log_error'))
@@ -546,7 +571,7 @@ class Database_MySQL implements Database
 		if (function_exists('cache_get_data') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			// Force caching on, just for the error checking.
-			$old_cache = @$modSettings['cache_enable'];
+			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
 
 			if (($temp = cache_get_data('db_last_error', 600)) !== null)
@@ -681,9 +706,7 @@ class Database_MySQL implements Database
 			$context['error_message'] .= '<br /><br />' . sprintf($txt['database_error_versions'], $modSettings['elkVersion']);
 
 		if (allowedTo('admin_forum') && isset($db_show_debug) && $db_show_debug === true)
-		{
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
-		}
 
 		// It's already been logged... don't log it again.
 		fatal_error($context['error_message'], false);
@@ -1077,7 +1100,7 @@ class Database_MySQL implements Database
 	 */
 	function db_optimize_table($table)
 	{
-		global $db_name, $db_prefix;
+		global $db_prefix;
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 

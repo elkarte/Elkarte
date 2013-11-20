@@ -102,7 +102,6 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 	return $subscribers;
 }
 
-
 /**
  * Reapplies all subscription rules for each of the users.
  *
@@ -178,7 +177,6 @@ function reapplySubscriptions($users)
 		);
 	}
 }
-
 
 /**
  * Add or extend a subscription of a user.
@@ -581,6 +579,8 @@ function insertSubscription($insert)
 		),
 		array('id_subscribe')
 	);
+
+	return $db->insert_id('{db_prefix}subscriptions', 'id_subscribe');
 }
 
 /**
@@ -628,7 +628,7 @@ function updateSubscription($update, $ignore_active)
 			email_complete = {string:email_complete}, reminder = {int:reminder}
 		WHERE id_subscribe = {int:current_subscription}',
 		array(
-			'is_active' => $update['isActive'],
+			'is_active' => $update['is_active'],
 			'id_group' => $update['id_group'],
 			'repeatable' => $update['repeatable'],
 			'allow_partial' => $update['allow_partial'],
@@ -639,7 +639,7 @@ function updateSubscription($update, $ignore_active)
 			'length' => $update['length'],
 			'cost' => $update['cost'],
 			'additional_groups' => $update['additional_groups'],
-			'email_complete' => $update['emain_complete'],
+			'email_complete' => $update['email_complete'],
 		)
 	);
 }
@@ -648,9 +648,9 @@ function updateSubscription($update, $ignore_active)
  * Update a non-recurrent subscription
  * (one-time payment)
  *
- * @param array $subscriptionInfo
+ * @param array $subscription_info
  */
-function updateNonrecurrent($subscriptionInfo)
+function updateNonrecurrent($subscription_info)
 {
 	$db = database();
 
@@ -720,7 +720,7 @@ function getSubscriptionDetails($sub_id)
 			'repeatable' => $row['repeatable'],
 			'allow_partial' => $row['allow_partial'],
 			'duration' => $isFlexible ? 'flexible' : 'fixed',
-			'email_complete' => htmlspecialchars($row['email_complete']),
+			'email_complete' => htmlspecialchars($row['email_complete'], ENT_COMPAT, 'UTF-8'),
 			'reminder' => $row['reminder'],
 		);
 	}
@@ -881,7 +881,7 @@ function handleRefund($subscription_info, $member_id, $time)
 	if ($subscription_info['end_time'] - time() < $subscription_info['length'])
 	{
 		// Delete user subscription.
-		removeSubscription($subscription_id, $member_id);
+		removeSubscription($subscription_info['id_subscribe'], $member_id);
 		$subscription_act = time();
 		$status = 0;
 	}
@@ -901,7 +901,7 @@ function handleRefund($subscription_info, $member_id, $time)
 			AND status = {int:status}',
 		array(
 			'current_time' => $subscription_act,
-			'current_subscription' => $subscription_id,
+			'current_subscription' => $subscription_info['id_subscribe'],
 			'current_member' => $member_id,
 			'status' => $status,
 		)

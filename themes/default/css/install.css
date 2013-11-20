@@ -5,23 +5,26 @@ a:link, a:hover, a:visited {
 #wrapper, .frame {
 	width: 90%;
 	max-width: 1140px;
+	margin: 0 auto;
+	padding-top: 12px;
 }
 h1.forumtitle {
 	font-size: 2em;
 	font-family: tahoma;
 	margin: 0;
-	padding: 50px 12px 2px 12px;
+	padding: 35px 0 0 15px;
 	float: left;
 	font-weight: normal;
-	color: #a85400;
+	color: #4b863c;
 	text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px 1px 0 #fff;
 }
 /* Tweak the logo */
 img#logo {
-	margin: 2px 0 0 0;
+	margin: 12px 12px 0 0;
 }
 #inner_wrap {
-	min-height: 80px;
+	min-height: 60px;
+	border-bottom: 1px solid #ccc;
 }
 #inner_wrap .news {
 	height: 80px;
@@ -37,10 +40,10 @@ img#logo {
 }
 #main_steps h2 {
 	font-size: 1.2em;
-	border-bottom: 1px solid #d05800;
+	border-bottom: 1px solid #4b863c;
 	line-height: 1.6em;
 	margin: 0 1em 0.5em 0;
-	color: #d05800;
+	color: #4b863c;
 }
 #main_steps ul {
 	list-style: none;
@@ -100,10 +103,10 @@ img#logo {
 }
 #main_screen h2 {
 	font-size: 1.2em;
-	border-bottom: 1px solid #d05800;
+	border-bottom: 1px solid #4b863c;
 	line-height: 1.6em;
 	margin: 0 0 0.5em 0;
-	color: #d05800;
+	color: #4b863c;
 }
 .panel form div{
 	max-height: 560px;

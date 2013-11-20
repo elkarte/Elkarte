@@ -42,7 +42,7 @@ class OpenID
 		$openid_url = $this->canonize($openid_uri);
 
 		$response_data = $this->getServerInfo($openid_url);
-		if ($response_data === false)
+		if ($response_data === false || empty($response_data['provider']))
 			return 'no_data';
 
 		if (($assoc = $this->getAssociation($response_data['provider'])) == null)
@@ -71,7 +71,7 @@ class OpenID
 		{
 			$openid_identity = urlencode(empty($response_data['delegate']) ? $openid_url : $response_data['delegate']);
 			if (strpos($openid_identity, 'https') === 0)
-				$openid_claimedid = str_replace("http://", "https://", $openid_url);			
+				$openid_claimedid = str_replace("http://", "https://", $openid_url);
 			else
 				$openid_claimedid = $openid_url;
 		}
@@ -214,7 +214,7 @@ class OpenID
 		// Clean things up a bit.
 		$handle = isset($assoc_data['assoc_handle']) ? $assoc_data['assoc_handle'] : '';
 		$issued = time();
-		$expires = $issued + min((int)$assoc_data['expires_in'], 60);
+		$expires = $issued + min((int) $assoc_data['expires_in'], 60);
 		$assoc_type = isset($assoc_data['assoc_type']) ? $assoc_data['assoc_type'] : '';
 
 		// @todo Is this really needed?
@@ -502,8 +502,35 @@ function binary_xor($num1, $num2)
 {
 	$return = '';
 
-	for ($i = 0; $i < strlen($num2); $i++)
+	$str_len = strlen($num2);
+	for ($i = 0; $i < $str_len; $i++)
 		$return .= $num1[$i] ^ $num2[$i];
 
 	return $return;
+}
+
+/**
+ * Retrieve a member settings based on the claimed id
+ * @param string $claimed_id the claimed id
+ *
+ * @return array the member settings
+ */
+function memberByOpenID($claimed_id)
+{
+	$db = database();
+
+	$result = $db->query('', '
+		SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
+			openid_uri
+		FROM {db_prefix}members
+		WHERE openid_uri = {string:openid_uri}',
+		array(
+			'openid_uri' => $claimed_id,
+		)
+	);
+
+	$member_found = $db->fetch_assoc($result);
+	$db->free_result($result);
+
+	return $member_found;
 }

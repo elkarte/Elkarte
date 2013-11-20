@@ -120,10 +120,6 @@
 			elk_session_var + '=' + elk_session_id
 		];
 
-		// Saving a copy in the outbox?
-		if (document.getElementById('outbox'))
-			aSections[aSections.length] = 'outbox=' + parseInt(document.getElementById('outbox').value);
-
 		// Account for wysiwyg
 		if (this.opts.sType && this.opts.sType === 'post')
 			aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');
@@ -191,8 +187,9 @@
 		setInnerHTML(this.opts._oCurDraftDiv, this.opts._sLastSaved);
 
 		// Hide the saved draft infobox in the event they pressed the save draft button at some point
-		if (this.opts.sType === 'post')
-			document.getElementById('draft_section').style.display = 'none';
+		var draft_section = document.getElementById('draft_section');
+		if (draft_section)
+			draft_section.style.display = 'none';
 
 		// Thank you sir, may I have another
 		this.opts._bInDraftMode = false;

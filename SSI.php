@@ -26,6 +26,7 @@ global $boardurl, $webmaster_email, $cookiename;
 global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
 global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 global $smcFunc, $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+global $sourcedir, $boarddir;
 
 // Remember the current configuration so it can be set back.
 $ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
@@ -71,7 +72,7 @@ DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
-$ssi_error_reporting = error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL);
+$ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
 /* Set this to one of three values depending on what you want to happen in the case of a fatal error.
 	false:	Default, will just load the error sub template and die - not putting any theme layers around it.
 	true:	Will load the error sub template AND put the template layers around it (Not useful if on total custom pages).
@@ -97,6 +98,7 @@ require_once(SOURCEDIR . '/Errors.class.php');
 require_once(SUBSDIR . '/Util.class.php');
 require_once(SUBSDIR . '/TemplateLayers.class.php');
 require_once(SOURCEDIR . '/Action.controller.php');
+require_once(SOURCEDIR . '/Positioning.class.php');
 
 // Clean the request variables.
 cleanRequest();
@@ -114,8 +116,7 @@ reloadSettings();
 Util::compat_init();
 
 // Seed the random generator?
-if (empty($modSettings['rand_seed']) || mt_rand(1, 250) == 69)
-	elk_seed_generator();
+elk_seed_generator();
 
 // Check on any hacking attempts.
 if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
@@ -314,6 +315,8 @@ function ssi_logout($redirect_to = '', $output_method = 'echo')
  * Recent post list:
  *  [board] Subject by Poster	Date
  *
+ * @todo this may use getLastPosts with some modification
+ *
  * @param int $num_recent
  * @param array $exclude_boards
  * @param array $include_boards
@@ -366,6 +369,8 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
  * By default will only show if you have permission
  *  to the see the board in question - this can be overriden.
  *
+ * @todo this may use getRecentPosts with some modification
+ *
  * @param array $post_ids
  * @param bool $override_permissions
  * @param string $output_method = 'echo'
@@ -397,6 +402,8 @@ function ssi_fetchPosts($post_ids = array(), $override_permissions = false, $out
 /**
  * This removes code duplication in other queries
  *  - don't call it direct unless you really know what you're up to.
+ *
+ * @todo if ssi_recentPosts and ssi_fetchPosts will use Recent.subs.php this can be removed
  *
  * @param string $query_where
  * @param array $query_where_params
@@ -538,36 +545,55 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	foreach ($stable_icons as $icon)
 		$icon_sources[$icon] = 'images_url';
 
-	// Find all the posts in distinct topics.  Newer ones will have higher IDs.
-	$request = $db->query('substring', '
+	// Find all the posts in distinct topics. Newer ones will have higher IDs.
+	$request = $db->query('', '
 		SELECT
-			m.poster_time, ms.subject, m.id_topic, m.id_member, m.id_msg, b.id_board, b.name AS board_name, t.num_replies, t.num_views,
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
-			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) >= m.id_msg_modified AS is_read,
-			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from') . ', SUBSTRING(m.body, 1, 384) AS body, m.smileys_enabled, m.icon
+			t.id_topic, b.id_board, b.name AS board_name
 		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_last_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)' . (!$user_info['is_guest'] ? '
-			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = b.id_board AND lmr.id_member = {int:current_member})' : '') . '
-		WHERE t.id_last_msg >= {int:min_message_id}
-			' . (empty($exclude_boards) ? '' : '
-			AND b.id_board NOT IN ({array_int:exclude_boards})') . '
-			' . (empty($include_boards) ? '' : '
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
+		WHERE t.id_last_msg >= {int:min_message_id}' . (empty($exclude_boards) ? '' : '
+			AND b.id_board NOT IN ({array_int:exclude_boards})') . '' . (empty($include_boards) ? '' : '
 			AND b.id_board IN ({array_int:include_boards})') . '
 			AND {query_wanna_see_board}' . ($modSettings['postmod_active'] ? '
 			AND t.approved = {int:is_approved}
-			AND m.approved = {int:is_approved}' : '') . '
+			AND ml.approved = {int:is_approved}' : '') . '
 		ORDER BY t.id_last_msg DESC
 		LIMIT ' . $num_recent,
 		array(
-			'current_member' => $user_info['id'],
 			'include_boards' => empty($include_boards) ? '' : $include_boards,
 			'exclude_boards' => empty($exclude_boards) ? '' : $exclude_boards,
 			'min_message_id' => $modSettings['maxMsgID'] - 35 * min($num_recent, 5),
 			'is_approved' => 1,
+		)
+	);
+	$topics = array();
+	while ($row = $db->fetch_assoc($request))
+		$topics[$row['id_topic']] = $row;
+	$db->free_result($request);
+
+	// Did we find anything? If not, bail.
+	if (empty($topics))
+		return array();
+
+	// Find all the posts in distinct topics. Newer ones will have higher IDs.
+	$request = $db->query('substring', '
+		SELECT
+			mf.poster_time, mf.subject, ml.id_topic, mf.id_member, ml.id_msg, t.num_replies, t.num_views, mg.online_color,
+			IFNULL(mem.real_name, mf.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
+			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) >= ml.id_msg_modified AS is_read,
+			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from') . ', SUBSTRING(mf.body, 1, 384) AS body, mf.smileys_enabled, mf.icon
+		FROM {db_prefix}topics AS t
+			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
+			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_last_msg)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = mf.id_member)' . (!$user_info['is_guest'] ? '
+			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
+			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' : '') . '
+			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
+		WHERE t.id_topic IN ({array_int:topic_list})',
+		array(
+			'current_member' => $user_info['id'],
+			'topic_list' => array_keys($topics),
 		)
 	);
 	$posts = array();
@@ -587,10 +613,10 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		// Build the array.
 		$posts[] = array(
 			'board' => array(
-				'id' => $row['id_board'],
-				'name' => $row['board_name'],
-				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['board_name'] . '</a>'
+				'id' => $topics[$row['id_topic']]['id_board'],
+				'name' => $topics[$row['id_topic']]['board_name'],
+				'href' => $scripturl . '?board=' . $topics[$row['id_topic']]['id_board'] . '.0',
+				'link' => '<a href="' . $scripturl . '?board=' . $topics[$row['id_topic']]['id_board'] . '.0">' . $topics[$row['id_topic']]['board_name'] . '</a>',
 			),
 			'topic' => $row['id_topic'],
 			'poster' => array(
@@ -650,37 +676,16 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
  */
 function ssi_topPoster($topNumber = 1, $output_method = 'echo')
 {
-	global $scripturl;
-
-	$db = database();
-
-	// Find the latest poster.
-	$request = $db->query('', '
-		SELECT id_member, real_name, posts
-		FROM {db_prefix}members
-		ORDER BY posts DESC
-		LIMIT ' . $topNumber,
-		array(
-		)
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-		$return[] = array(
-			'id' => $row['id_member'],
-			'name' => $row['real_name'],
-			'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'posts' => $row['posts']
-		);
-	$db->free_result($request);
+	require_once(SUBSDIR . '/Stats.subs.php');
+	$top_posters = topPosters($topNumber);
 
 	// Just return all the top posters.
 	if ($output_method != 'echo')
-		return $return;
+		return $top_posters;
 
 	// Make a quick array to list the links in.
 	$temp_array = array();
-	foreach ($return as $member)
+	foreach ($top_posters as $member)
 		$temp_array[] = $member['link'];
 
 	echo implode(', ', $temp_array);
@@ -694,38 +699,15 @@ function ssi_topPoster($topNumber = 1, $output_method = 'echo')
  */
 function ssi_topBoards($num_top = 10, $output_method = 'echo')
 {
-	global $txt, $scripturl, $user_info, $modSettings;
+	global $txt;
 
-	$db = database();
+	require_once(SUBSDIR . '/Stats.subs.php');
 
 	// Find boards with lots of posts.
-	$request = $db->query('', '
-		SELECT
-			b.name, b.num_topics, b.num_posts, b.id_board,' . (!$user_info['is_guest'] ? ' 1 AS is_read' : '
-			(IFNULL(lb.id_msg, 0) >= b.id_last_msg) AS is_read') . '
-		FROM {db_prefix}boards AS b
-			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
-		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_board}' : '') . '
-		ORDER BY b.num_posts DESC
-		LIMIT ' . $num_top,
-		array(
-			'current_member' => $user_info['id'],
-			'recycle_board' => (int) $modSettings['recycle_board'],
-		)
-	);
-	$boards = array();
-	while ($row = $db->fetch_assoc($request))
-		$boards[] = array(
-			'id' => $row['id_board'],
-			'num_posts' => $row['num_posts'],
-			'num_topics' => $row['num_topics'],
-			'name' => $row['name'],
-			'new' => empty($row['is_read']),
-			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['name'] . '</a>'
-		);
-	$db->free_result($request);
+	$boards = topBoards($num_top);
+
+	foreach ($boards as $id => $board)
+		$boards[$id]['new'] = empty($board['is_read']);
 
 	// If we shouldn't output or have nothing to output, just jump out.
 	if ($output_method != 'echo' || empty($boards))
@@ -758,66 +740,24 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
  */
 function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'echo')
 {
-	global $txt, $scripturl, $modSettings;
+	global $txt, $scripturl;
 
-	$db = database();
+	require_once(SUBSDIR . '/Stats.subs.php');
 
-	if ($modSettings['totalMessages'] > 100000)
-	{
-		// @todo Why don't we use {query(_wanna)_see_board}?
-		$request = $db->query('', '
-			SELECT id_topic
-			FROM {db_prefix}topics
-			WHERE num_' . ($type != 'replies' ? 'views' : 'replies') . ' != 0' . ($modSettings['postmod_active'] ? '
-				AND approved = {int:is_approved}' : '') . '
-			ORDER BY num_' . ($type != 'replies' ? 'views' : 'replies') . ' DESC
-			LIMIT {int:limit}',
-			array(
-				'is_approved' => 1,
-				'limit' => $num_topics > 100 ? ($num_topics + ($num_topics / 2)) : 100,
-			)
-		);
-		$topic_ids = array();
-		while ($row = $db->fetch_assoc($request))
-			$topic_ids[] = $row['id_topic'];
-		$db->free_result($request);
-	}
+	if (function_exists('topTopic' . ucfirst($type)))
+		$function = 'topTopic' . ucfirst($type);
 	else
-		$topic_ids = array();
+		$function = 'topTopicReplies';
 
-	$request = $db->query('', '
-		SELECT m.subject, m.id_topic, t.num_views, t.num_replies
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
-		WHERE {query_wanna_see_board}' . ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '') . (!empty($topic_ids) ? '
-			AND t.id_topic IN ({array_int:topic_list})' : '') . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
-			AND b.id_board != {int:recycle_enable}' : '') . '
-		ORDER BY t.num_' . ($type != 'replies' ? 'views' : 'replies') . ' DESC
-		LIMIT {int:limit}',
-		array(
-			'topic_list' => $topic_ids,
-			'is_approved' => 1,
-			'recycle_enable' => $modSettings['recycle_board'],
-			'limit' => $num_topics,
-		)
-	);
-	$topics = array();
-	while ($row = $db->fetch_assoc($request))
+	$topics = $function($num_topics);
+
+	foreach ($topics as $topic_id => $row)
 	{
 		censorText($row['subject']);
 
-		$topics[] = array(
-			'id' => $row['id_topic'],
-			'subject' => $row['subject'],
-			'num_replies' => $row['num_replies'],
-			'num_views' => $row['num_views'],
-			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['subject'] . '</a>',
-		);
+		$topics[$topic_id]['href'] = $scripturl . '?topic=' . $row['id'] . '.0';
+		$topics[$topic_id]['link'] = '<a href="' . $scripturl . '?topic=' . $row['id'] . '.0">' . $row['subject'] . '</a>';
 	}
-	$db->free_result($request);
 
 	if ($output_method != 'echo' || empty($topics))
 		return $topics;
@@ -901,30 +841,12 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 	// Get the lowest ID we're interested in.
 	$member_id = mt_rand(1, $modSettings['latestMember']);
 
-	$where_query = '
-		id_member >= {int:selected_member}
-		AND is_activated = {int:is_activated}';
-
-	$query_where_params = array(
-		'selected_member' => $member_id,
-		'is_activated' => 1,
-	);
-
-	$result = ssi_queryMembers($where_query, $query_where_params, 1, 'id_member ASC', $output_method);
+	$result = ssi_queryMembers('member_greater_equal', $member_id, 1, 'id_member ASC', $output_method);
 
 	// If we got nothing do the reverse - in case of unactivated members.
 	if (empty($result))
 	{
-		$where_query = '
-			id_member <= {int:selected_member}
-			AND is_activated = {int:is_activated}';
-
-		$query_where_params = array(
-			'selected_member' => $member_id,
-			'is_activated' => 1,
-		);
-
-		$result = ssi_queryMembers($where_query, $query_where_params, 1, 'id_member DESC', $output_method);
+		$result = ssi_queryMembers('member_lesser_equal', $member_id, 1, 'id_member DESC', $output_method);
 	}
 
 	// Just to be sure put the random generator back to something... random.
@@ -948,16 +870,8 @@ function ssi_fetchMember($member_ids = array(), $output_method = 'echo')
 	// Can have more than one member if you really want...
 	$member_ids = is_array($member_ids) ? $member_ids : array($member_ids);
 
-	// Restrict it right!
-	$query_where = '
-		id_member IN ({array_int:member_list})';
-
-	$query_where_params = array(
-		'member_list' => $member_ids,
-	);
-
 	// Then make the query and dump the data.
-	return ssi_queryMembers($query_where, $query_where_params, '', 'id_member', $output_method);
+	return ssi_queryMembers('members', $member_ids, '', 'id_member', $output_method);
 }
 
 /**
@@ -971,16 +885,7 @@ function ssi_fetchGroupMembers($group_id = null, $output_method = 'echo')
 	if ($group_id === null)
 		return;
 
-	$query_where = '
-		id_group = {int:id_group}
-		OR id_post_group = {int:id_group}
-		OR FIND_IN_SET({int:id_group}, additional_groups)';
-
-	$query_where_params = array(
-		'id_group' => $group_id,
-	);
-
-	return ssi_queryMembers($query_where, $query_where_params, '', 'real_name', $output_method);
+	return ssi_queryMembers('group_list', is_array($group_id) ? $group_id : array($group_id), '', 'real_name', $output_method);
 }
 
 /**
@@ -999,22 +904,16 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	if ($query_where === null)
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Members.subs.php');
+	$members_data = retrieveMemberData(array(
+		$query_where => $query_where_params,
+		'limit' => !empty($query_limit) ? (int) $query_limit : 10,
+		'order_by' => $query_order,
+	));
 
-	// Fetch the members in question.
-	$request = $db->query('', '
-		SELECT id_member
-		FROM {db_prefix}members
-		WHERE ' . $query_where . '
-		ORDER BY ' . $query_order . '
-		' . ($query_limit == '' ? '' : 'LIMIT ' . $query_limit),
-		array_merge($query_where_params, array(
-		))
-	);
 	$members = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($members_data as $row)
 		$members[] = $row['id_member'];
-	$db->free_result($request);
 
 	if (empty($members))
 		return array();
@@ -1070,31 +969,16 @@ function ssi_boardStats($output_method = 'echo')
 	if (!allowedTo('view_stats'))
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Boards.subs.php');
+	require_once(SUBSDIR . '/Stats.subs.php');
 
 	$totals = array(
 		'members' => $modSettings['totalMembers'],
 		'posts' => $modSettings['totalMessages'],
-		'topics' => $modSettings['totalTopics']
+		'topics' => $modSettings['totalTopics'],
+		'boards' => fetchBoardsInfo('all', array('count' => true)),
+		'categories' => numCategories(),
 	);
-
-	$result = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}boards',
-		array(
-		)
-	);
-	list ($totals['boards']) = $db->fetch_row($result);
-	$db->free_result($result);
-
-	$result = $db->query('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}categories',
-		array(
-		)
-	);
-	list ($totals['categories']) = $db->fetch_row($result);
-	$db->free_result($result);
 
 	if ($output_method != 'echo')
 		return $totals;
@@ -1180,7 +1064,7 @@ function ssi_logOnline($output_method = 'echo')
  */
 function ssi_login($redirect_to = '', $output_method = 'echo')
 {
-	global $scripturl, $txt, $user_info, $modSettings;
+	global $scripturl, $txt, $user_info, $modSettings, $context, $settings;
 
 	if ($redirect_to != '')
 		$_SESSION['login_url'] = $redirect_to;
@@ -1188,32 +1072,56 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	if ($output_method != 'echo' || !$user_info['is_guest'])
 		return $user_info['is_guest'];
 
+	$context['default_username'] = isset($_POST['user']) ? preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($_POST['user'], ENT_COMPAT, 'UTF-8')) : '';
+
 	echo '
-		<form action="', $scripturl, '?action=login2" method="post" accept-charset="UTF-8">
-			<table border="0" cellspacing="1" cellpadding="0" class="ssi_table">
-				<tr>
-					<td align="right"><label for="user">', $txt['username'], ':</label>&nbsp;</td>
-					<td><input type="text" id="user" name="user" size="9" value="', $user_info['username'], '" class="input_text" /></td>
-				</tr><tr>
-					<td align="right"><label for="passwrd">', $txt['password'], ':</label>&nbsp;</td>
-					<td><input type="password" name="passwrd" id="passwrd" size="9" class="input_password" /></td>
-				</tr>';
+		<script src="', $settings['default_theme_url'], '/scripts/sha1.js"></script>
 
-	// Open ID?
+		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\', \'' . (!empty($context['login_token']) ? $context['login_token'] : '') . '\');"' : '', '>
+		<div class="login">
+			<div class="roundframe">';
+
+	// Did they make a mistake last time?
+	if (!empty($context['login_errors']))
+		echo '
+			<p class="errorbox">', implode('<br />', $context['login_errors']), '</p><br />';
+
+	// Or perhaps there's some special description for this time?
+	if (isset($context['description']))
+		echo '
+				<p class="description">', $context['description'], '</p>';
+
+	// Now just get the basic information - username, password, etc.
+	echo '
+				<dl>
+					<dt>', $txt['username'], ':</dt>
+					<dd><input type="text" name="user" size="20" value="', $context['default_username'], '" class="input_text" autofocus="autofocus" placeholder="', $txt['username'], '" /></dd>
+					<dt>', $txt['password'], ':</dt>
+					<dd><input type="password" name="passwrd" value="" size="20" class="input_password" placeholder="', $txt['password'], '" /></dd>
+				</dl>';
+
 	if (!empty($modSettings['enableOpenID']))
-		echo '<tr>
-					<td colspan="2" align="center"><strong>&mdash;', $txt['or'], '&mdash;</strong></td>
-				</tr><tr>
-					<td align="right"><label for="openid_url">', $txt['openid'], ':</label>&nbsp;</td>
-					<td><input type="text" name="openid_identifier" id="openid_url" class="input_text openid_login" size="17" /></td>
-				</tr>';
+		echo '<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
+				<dl>
+					<dt>', $txt['openid'], ':</dt>
+					<dd><input type="text" name="openid_identifier" class="input_text openid_login" size="17" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="centericon" /></a></dd>
+				</dl>';
 
-	echo '<tr>
-					<td><input type="hidden" name="cookielength" value="-1" /></td>
-					<td><input type="submit" value="', $txt['login'], '" class="button_submit" /></td>
-				</tr>
-			</table>
+	echo '
+				<p><input type="submit" value="', $txt['login'], '" class="button_submit" /></p>
+				<p class="smalltext"><a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a></p>
+				<input type="hidden" name="hash_passwrd" value="" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />
+			</div>
+		</div>
 		</form>';
+
+	// Focus on the correct input - username or password.
+	echo '
+		<script><!-- // --><![CDATA[
+			document.forms.frmLogin.', isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user', '.focus();
+		// ]]></script>';
 
 }
 
@@ -1560,7 +1468,7 @@ function ssi_pollVote()
 
 	if (!isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']) || !isset($_POST['poll']))
 	{
-		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+		echo '<!DOCTYPE html>
 <html>
 <head>
 	<script type="text/javascript"><!-- // --><![CDATA[
@@ -1841,7 +1749,7 @@ function ssi_todaysCalendar($output_method = 'echo')
  * @param int $length
  * @param string $output_method = 'echo'
  */
-function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $output_method = 'echo')
+function ssi_boardNews($board = null, $limit = null, $start = null, $length = null, $preview = 'first', $output_method = 'echo')
 {
 	global $scripturl, $txt, $settings, $modSettings;
 
@@ -1866,7 +1774,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$board = (int) $_GET['board'];
 
 	if ($length === null)
-		$length = isset($_GET['length']) ? (int) $_GET['length'] : 0;
+		$length = isset($_GET['length']) ? (int) $_GET['length'] : 500;
 	else
 		$length = (int) $length;
 
@@ -1900,65 +1808,27 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	foreach ($stable_icons as $icon)
 		$icon_sources[$icon] = 'images_url';
 
-	// Find the post ids.
-	$request = $db->query('', '
-		SELECT t.id_first_msg
-		FROM {db_prefix}topics as t
-		LEFT JOIN {db_prefix}boards as b ON (b.id_board = t.id_board)
-		WHERE t.id_board = {int:current_board}' . ($modSettings['postmod_active'] ? '
-			AND t.approved = {int:is_approved}' : '') . '
-			AND {query_see_board}
-		ORDER BY t.id_first_msg DESC
-		LIMIT ' . $start . ', ' . $limit,
-		array(
-			'current_board' => $board,
-			'is_approved' => 1,
-		)
-	);
-	$posts = array();
-	while ($row = $db->fetch_assoc($request))
-		$posts[] = $row['id_first_msg'];
-	$db->free_result($request);
-
-	if (empty($posts))
-		return array();
+	require_once(SUBSDIR . '/MessageIndex.subs.php');
 
 	// Find the posts.
-	$request = $db->query('', '
-		SELECT
-			m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
-			t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, t.id_last_msg
-		FROM {db_prefix}topics AS t
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-		WHERE t.id_first_msg IN ({array_int:post_list})
-		ORDER BY t.id_first_msg DESC
-		LIMIT ' . count($posts),
-		array(
-			'post_list' => $posts,
-		)
-	);
+	$request = messageIndexTopics($board, 0, $start, $limit, 'first_post', 't.id_topic', array('only_approved' => true, 'include_sticky' => false, 'ascending' => false, 'include_avatars' => false, 'previews' => $length));
+
+	if (empty($request))
+		return;
+
 	$return = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($request as $row)
 	{
-		// If we want to limit the length of the post.
-		if (!empty($length) && Util::strlen($row['body']) > $length)
-		{
-			$row['body'] = Util::substr($row['body'], 0, $length);
-			$cutoff = false;
+		if (!isset($row[$preview . '_body']))
+			$preview = 'first';
 
-			$last_space = strrpos($row['body'], ' ');
-			$last_open = strrpos($row['body'], '<');
-			$last_close = strrpos($row['body'], '>');
-			if (empty($last_space) || ($last_space == $last_open + 3 && (empty($last_close) || (!empty($last_close) && $last_close < $last_open))) || $last_space < $last_open || $last_open == $length - 6)
-				$cutoff = $last_open;
-			elseif (empty($last_close) || $last_close < $last_open)
-				$cutoff = $last_space;
-
-			if ($cutoff !== false)
-				$row['body'] = Util::substr($row['body'], 0, $cutoff);
-			$row['body'] .= '...';
-		}
+		$row['body'] = $row[$preview . '_body'];
+		$row['id_msg'] = $row['id_' . $preview . '_msg'];
+		$row['icon'] = $row[$preview . '_icon'];
+		$row['id_member'] = $row[$preview . '_id_member'];
+		$row['smileys_enabled'] = $row[$preview . '_smileys'];
+		$row['poster_time'] = $row[$preview . '_poster_time'];
+		$row['poster_name'] = $row[$preview . '_member_name'];
 
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -1993,10 +1863,6 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			'is_last' => false
 		);
 	}
-	$db->free_result($request);
-
-	if (empty($return))
-		return $return;
 
 	$return[count($return) - 1]['is_last'] = true;
 
@@ -2030,67 +1896,33 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
  */
 function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 {
-	global $user_info, $scripturl, $modSettings, $txt, $context;
+	global $modSettings, $txt;
 
 	if (empty($modSettings['cal_enabled']) || !allowedTo('calendar_view'))
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Calendar.subs.php');
 
 	// Find all events which are happening in the near future that the member can see.
-	$request = $db->query('', '
-		SELECT
-			cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, cal.id_topic,
-			cal.id_board, t.id_first_msg, t.approved
-		FROM {db_prefix}calendar AS cal
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = cal.id_board)
-			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = cal.id_topic)
-		WHERE cal.start_date <= {date:current_date}
-			AND cal.end_date >= {date:current_date}
-			AND (cal.id_board = {int:no_board} OR {query_wanna_see_board})
-		ORDER BY cal.start_date DESC
-		LIMIT ' . $max_events,
-		array(
-			'current_date' => strftime('%Y-%m-%d', forum_time(false)),
-			'no_board' => 0,
-		)
-	);
+	$date = strftime('%Y-%m-%d', forum_time(false));
+	$events = getEventRange($date, $date, true, $max_events);
+
 	$return = array();
 	$duplicates = array();
-	while ($row = $db->fetch_assoc($request))
+	foreach ($events as $date => $day_events)
 	{
-		// Check if we've already come by an event linked to this same topic with the same title... and don't display it if we have.
-		if (!empty($duplicates[$row['title'] . $row['id_topic']]))
-			continue;
+		foreach ($day_events as $row)
+		{
+			// Check if we've already come by an event linked to this same topic with the same title... and don't display it if we have.
+			if (!empty($duplicates[$row['title'] . $row['id_topic']]))
+				continue;
 
-		// Censor the title.
-		censorText($row['title']);
+			$return[$date][] = $row;
 
-		if ($row['start_date'] < strftime('%Y-%m-%d', forum_time(false)))
-			$date = strftime('%Y-%m-%d', forum_time(false));
-		else
-			$date = $row['start_date'];
-
-		// If the topic it is attached to is not approved then don't link it.
-		if (!empty($row['id_first_msg']) && !$row['approved'])
-			$row['id_board'] = $row['id_topic'] = $row['id_first_msg'] = 0;
-
-		$return[$date][] = array(
-			'id' => $row['id_event'],
-			'title' => $row['title'],
-			'can_edit' => allowedTo('calendar_edit_any') || ($row['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-			'modify_href' => $scripturl . '?action=' . ($row['id_board'] == 0 ? 'calendar;sa=post;' : 'post;msg=' . $row['id_first_msg'] . ';topic=' . $row['id_topic'] . '.0;calendar;') . 'eventid=' . $row['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'href' => $row['id_board'] == 0 ? '' : $scripturl . '?topic=' . $row['id_topic'] . '.0',
-			'link' => $row['id_board'] == 0 ? $row['title'] : '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $row['title'] . '</a>',
-			'start_date' => $row['start_date'],
-			'end_date' => $row['end_date'],
-			'is_last' => false
-		);
-
-		// Let's not show this one again, huh?
-		$duplicates[$row['title'] . $row['id_topic']] = true;
+			// Let's not show this one again, huh?
+			$duplicates[$row['title'] . $row['id_topic']] = true;
+		}
 	}
-	$db->free_result($request);
 
 	foreach ($return as $mday => $array)
 		$return[$mday][count($array) - 1]['is_last'] = true;
@@ -2127,21 +1959,10 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
 	if ($id === null)
 		return;
 
-	$db = database();
+	require_once(SUBSDIR . '/Auth.subs.php');
+	$member = loadExistingMember($id, !$is_username);
 
-	$request = $db->query('', '
-		SELECT passwd, member_name, is_activated
-		FROM {db_prefix}members
-		WHERE ' . ($is_username ? 'member_name' : 'id_member') . ' = {string:id}
-		LIMIT 1',
-		array(
-			'id' => $id,
-		)
-	);
-	list ($pass, $user, $active) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return sha1(strtolower($user) . $password) == $pass && $active == 1;
+	return sha1(strtolower($member['member_name']) . $member['passwd']) == $password && $member['is_activated'] == 1;
 }
 
 /**
@@ -2200,7 +2021,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 	$attachments = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$filename = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($row['filename']));
+		$filename = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8'));
 
 		// Is it an image?
 		$attachments[$row['id_attach']] = array(

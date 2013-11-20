@@ -105,8 +105,8 @@ $helptxt['featuresettings'] = '<strong>Features and Options</strong><br />
 $helptxt['securitysettings'] = '<strong>Security and Moderation</strong><br />
 	This section contains settings relating to the security and moderation of your forum.';
 
-$helptxt['modsettings'] = '<strong>Modification Settings</strong><br />
-	This section should contain any settings added by modifications installed on your forum.';
+$helptxt['addonsettings'] = '<strong>Add-Ons Settings</strong><br />
+	This section should contain any settings added by addons installed on your forum.';
 
 $helptxt['time_format'] = '<strong>Time Format</strong><br />
 	You have the power to adjust how the time and date look for yourself. There are a lot of little letters, but it\'s quite simple.
@@ -153,7 +153,7 @@ $helptxt['registrations'] = '<strong>Registration Management</strong><br />
 		<li>
 			<strong>Edit Registration Agreement</strong><br />
 			This allows you to set the text for the registration agreement displayed when members sign up for your forum.
-			You can add or remove anything from the default registration agreement, which was included.<br /><br />
+			You can add or remove anything from the default registration agreement, which is included with ElkArte.<br /><br />
 		</li>
 		<li>
 			<strong>Set Reserved Names</strong><br />
@@ -213,9 +213,22 @@ $helptxt['smileys'] = '<strong>Smiley Center</strong><br />
 	get confusing for your users using different sets.<br /><br />
 
 	You are also able to edit message icons from here, if you have them enabled on the settings page.';
-$helptxt['calendar'] = '<strong>Manage Calendar</strong><br />
-	Here you can modify the current calendar settings as well as add and remove holidays that appear on the calendar.';
-$helptxt['cal_export'] = 'Exports a text file in the iCal format for importing in to other calendar applications';
+
+$helptxt['calendar'] = '<strong>Manage Calendar</strong><br />Here you can modify the current calendar settings as well as add and remove holidays that appear on the calendar.';
+$helptxt['calendar_settings'] = 'The calendar can be used for showing birthdays, or for showing important moments happening in your community.<br /><br />Remember that usage of the calendar (posting events, viewing events, etc.) is controlled by permissions set on the permissions screen.';
+$helptxt['cal_days_for_index'] = 'Max days in advance on board index:<br />If this is set to 7, the next week\'s worth of events will be shown.';
+$helptxt['cal_showevents'] = 'Enables the highlighting of events on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
+$helptxt['cal_showholidays'] = 'This setting allows you to highlight holidays on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
+$helptxt['cal_showbdays'] = 'This setting allows you to highlight birthdays on the Mini Calendars, Main Calendar, both places, or disable event highlighting.';
+$helptxt['cal_export'] = 'Exports a text file in the iCal format for importing in to other calendar applications.';
+$helptxt['cal_daysaslink'] = 'Show days as link to \'Post Event\':<br />This will allow members to post events for that day, when they click on that date.';
+$helptxt['cal_allow_unlinked'] = 'Allow events not linked to posts:<br />Allow members to post events without requiring it to be linked with a post in a board.';
+$helptxt['cal_defaultboard'] = 'Default Board to Post In:<br />Enter the default board to post events in.';
+$helptxt['cal_showInTopic'] = 'Show linked events in topic display:<br />Check to show a link to the event at the top of topic view.';
+$helptxt['cal_allowspan'] = 'Allow events to span multiple days:<br />Check to allow events to span multiple days.';
+$helptxt['cal_maxspan'] = 'Max number of days an event can span:<br />Enter the maximum number of days that a single event can span.';
+$helptxt['cal_minyear'] = 'Minimum year:<br />Select the &quot;first&quot; year on the calendar list.';
+$helptxt['cal_maxyear'] = 'Maximum year:<br />Select the &quot;last&quot; year on the calendar list<br />';
 
 $helptxt['serversettings'] = '<strong>Server Settings</strong><br />
 	Here you can perform the core configuration for your forum. This section includes the database and url settings, as well as other
@@ -248,7 +261,7 @@ $helptxt['userLanguage'] = 'Turning this option on will allow users to select wh
 $helptxt['trackStats'] = 'Stats:<br />This will allow users to see the latest posts and the most popular topics on your forum.
 		It will also show several statistics, like the most members online, new members and new topics.<hr />
 		Page views:<br />Adds another column to the stats page with the number of pageviews on your forum.';
-$helptxt['enable_disregard'] = 'Enabling this option will allow users to selectively turn off new reply notifications for topics in which they had previously posted.';
+$helptxt['enable_unwatch'] = 'Enabling this option will allow users to selectively turn off new reply notifications for topics in which they had previously posted.';
 $helptxt['titlesEnable'] = 'Switching Custom Titles on will allow members with the relevant permission to create a special title for themselves.
 		This will be shown underneath the name.<br /><em>For example:</em><br />Jeff<br />Cool Guy';
 $helptxt['topbottomEnable'] = 'This will add go up and go down buttons, so that member can go to the top and bottom of a page
@@ -278,9 +291,11 @@ $helptxt['disableTemplateEval'] = 'By default, templates are evaluated instead o
 $helptxt['databaseSession_enable'] = 'This option makes use of the database for session storage - it is best for load balanced servers, but helps with all timeout issues and can make the forum faster.';
 $helptxt['databaseSession_loose'] = 'Turning this on will decrease the bandwidth your forum uses, and make it so clicking back will not reload the page - the downside is that the (new) icons won\'t update, among other things. (unless you click to that page instead of going back to it.)';
 $helptxt['databaseSession_lifetime'] = 'This is the number of seconds for sessions to last after they haven\'t been accessed.  If a session is not accessed for too long, it is said to have &quot;timed out&quot;.  Anything higher than 2400 is recommended.';
-$helptxt['cache_enable'] = 'The software performs caching at a variety of levels. The higher the level of caching enabled the more CPU time will be spent retrieving cached information. If caching is available on your machine it is recommended that you try caching at level 1 first.';
+$helptxt['cache_enable'] = 'ElkArte performs caching at a variety of levels. The higher the level of caching enabled the more CPU time will be spent retrieving cached information. If caching is available on your machine it is recommended that you try caching at level 1 first.';
 $helptxt['cache_memcached'] = 'If you are using memcached you need to provide the server details. This should be entered as a comma separated list as shown in the example below:<br /><br/>	&quot;server1,server2,server3:port,server4&quot;<br /><br />Note that if no port is specified the software will use port 11211. The system will also attempt to perform rough/random load balancing across the specified servers.';
 $helptxt['cache_cachedir'] = 'This setting is only for the filesystem based cache system. It specifies the path to the cache directory.  It is recommended that you place this in /tmp/ if you are going to use this, although it will work in any directory';
+$helptxt['cache_uid'] = 'Some cache systems, for example Xcache, require a userid and password to allow ElkArte access to clear the cache.';
+$helptxt['cache_password'] = 'Some cache systems, for example Xcache, require a userid and password to allow ElkArte access to clear the cache.';
 $helptxt['enableErrorLogging'] = 'This will log any errors, like a failed login, so you can see what went wrong.';
 $helptxt['enableErrorQueryLogging'] = 'This will include the full query sent to the database in the error log.  Requires error logging to be turned on.<br /><br /><strong>Note:  This will affect the ability to filter the error log by the error message.</strong>';
 $helptxt['allow_disableAnnounce'] = 'This will allow users to opt out of notification of topics you announce by checking the &quot;announce topic&quot; checkbox when posting.';
@@ -297,40 +312,38 @@ $helptxt['simpleSearch'] = 'This will show a simple search form and a link to a 
 $helptxt['search_dropdown'] = 'This will show a search selection dropdown next to the quick search box.  From this you can choose to search the current site, current board (if in a board_, current topic (if in a topic) or search for members.';
 $helptxt['max_image_width'] = 'This allows you to set a maximum size for posted pictures. Pictures smaller than the maximum will not be affected. This also determines how attached images are displayed when a thumbnail is clicked on.';
 $helptxt['mail_type'] = 'This setting allows you to choose either PHP\'s default settings, or to override those settings with SMTP.  PHP doesn\'t support using authentication with SMTP (which many hosts require, now) so if you want that you should select SMTP.  Please note that SMTP can be slower, and some servers will not take usernames and passwords.<br /><br />You don\'t need to fill in the SMTP settings if this is set to PHP\'s default.';
-$helptxt['attachment_manager_settings'] = 'Attachments are files that members can upload, and attach to a post.<br /><br />
-		<strong>Check attachment extension</strong>:<br /> Do you want to check the extension of the files?<br />
-		<strong>Allowed attachment extensions</strong>:<br /> You can set the allowed extensions of attached files.<br />
-		<strong>Attachments directory</strong>:<br /> The path to your attachment folder<br />(example: /home/sites/yoursite/www/forum/attachments)<br />
-		<strong>Max attachment directory space</strong> (in KB):<br /> Select how large the attachment folder can be, including all files within it.<br />
-		<strong>Max attachment size per post</strong> (in KB):<br /> Select the maximum filesize of all attachments made per post.  If this is lower than the per-attachment limit, this will be the limit.<br />
-		<strong>Max size per attachment</strong> (in KB):<br /> Select the maximum filesize of each separate attachment.<br />
-		<strong>Max number of attachments per post</strong>:<br /> Select the number of attachments a person can make, per post.<br />
-		<strong>Display attachment as picture in posts</strong>:<br /> If the uploaded file is a picture, this will show it underneath the post.<br />
-		<strong>Resize images when showing under posts</strong>:<br /> If the above option is selected, this will save a separate (smaller) attachment for the thumbnail to decrease bandwidth.<br />
-		<strong>Maximum width and height of thumbnails</strong>:<br /> Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width and height to resize attachments down from.  They will be resized proportionally.';
-$helptxt['attachment_image_paranoid'] = 'Selecting this option will enable very strict security checks on image attachments. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with image re-encoding, in order to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if image re-encoding is not enabled, all attachments failing checks will be rejected.';
-$helptxt['attachment_image_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded image attachments. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static. <br /> This feature is only possible if the GD module is installed on your server.';
+
+$helptxt['attachment_manager_settings'] = 'Here you can configure your Attachment settings with information such as choosing a location to store the uploaded files, maximum visible sizes and limiting file extension use.';
+$helptxt['attachmentEnable'] = 'Enable/Disable the attachment system or disable only new attachments leaving old one available.';
+$helptxt['attachmentRecodeLineEndings'] = 'Enabling this will re-code line endings of text based files (txt, css, html, php, xml) based on your server (Windows, Mac or Unix).';
+$helptxt['automanage_attachments'] = 'This will create a directory structure based on the selected option.  This can be post date (subdividing attachments by year, or by year and month or by year, month and day) or simply adding a new directory when the space limit is reached.  Each directory created will have the same file count and total size restrictions.  This will help prevent directories from reaching a file or size limit and can improve performance by having directories with fewer files.';
+$helptxt['use_sub-directories_for_attachments'] = 'This will create all new directories as sub directory under the main attachment directory.';
+$helptxt['attachmentDirSizeLimit'] = ' Set how large the attachment folder can be.';
+$helptxt['attachmentDirFileLimit'] = 'Set the max number of files an individual attachment directory may contain';
+$helptxt['attachmentPostLimit'] = 'Specify how large a single post\'s upload by a can be in (in KB), this is the total of all attachments made in a post.';
+$helptxt['attachmentSizeLimit'] = 'Specify the largest size a single attachment in a post can be.';
+$helptxt['attachmentNumPerPostLimit'] = 'Select the number of attachments a member can add per post.';
+$helptxt['attachmentCheckExtensions'] = 'Check this box to enable attachment filtering, which will only allow files to be uploaded with the file extensions that you have defined.';
+$helptxt['attachmentExtensions'] = 'Specify what attachment types are allowed, for example: jpg,png,gif  Remember to be careful in what you allow as some file extensions can cause a security risk to your website.';
+$helptxt['attachment_image_paranoid'] = 'Selecting this option will enable very strict security checks on image attachments. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with image re-encoding, in order to have ElkArte try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if image re-encoding is not enabled, all attachments failing checks will be rejected.';
+$helptxt['attachmentShowImages'] = 'If the uploaded file is a picture, this will automatically display it underneath the post.';
+$helptxt['attachmentThumbnails'] = 'Enable this to show post images as a smaller thumbnail image, which when selected will expand to the full sized image.';
+$helptxt['attachment_thumb_png'] = 'When creating thumbnails to display under a post, this will only create them as png files.';
+$helptxt['attachmentThumbWidth'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum width to resize attachments down from.  They will be resized proportionally.';
+$helptxt['attachmentThumbHeight'] = 'Only used with the &quot;Resize images when showing under posts&quot; option, the maximum height to resize attachments down from.  They will be resized proportionally.';
+$helptxt['attachment_image_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded image attachments. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static.<br />This feature is only possible if the GD module is installed on your server.';
 $helptxt['attachment_thumb_memory'] = 'The larger the source image (size & width x height), the higher the memory requirements are for the system to successfully create a thumbnail image.<br />Checking this option, the system will estimate the required memory and will then request that amount.  If successful, only then will it attempt to create the thumbnail.<br />This will result in fewer white screen errors but may result in fewer thumbnails being created.  Leaving this unchecked the system will always try to create the thumbnail (with a fixed amount of memory).  This may result in more white screen errors.';
-$helptxt['avatar_paranoid'] = 'Selecting this option will enable very strict security checks on avatars. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with avatars re-encoding, in order to try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if re-encoding of avatars is not enabled, all avatars failing checks will be rejected.';
+$helptxt['max_image_height'] = 'The maximum displayed height of an attached image.';
+$helptxt['max_image_width'] = 'The maximum displayed width of an attached image.';
+$helptxt['attachmentUploadDir'] = 'Select where you want the files uploaded to be stored on your server. This can be located outside your public html directory for additional security.';
+
+$helptxt['avatar_paranoid'] = 'Selecting this option will enable very strict security checks on avatars. Warning! These extensive checks can fail on valid images too. It is strongly recommended to only use this option together with avatars re-encoding, in order to have SMF try to resample the images which fail the security checks: if successful, they will be sanitized and uploaded. Otherwise, if re-encoding of avatars is not enabled, all avatars failing checks will be rejected.';
 $helptxt['avatar_reencode'] = 'Selecting this option will enable trying to re-encode the uploaded avatars. Image re-encoding offers better security. Note however that image re-encoding also renders all animated images static. <br /> This feature is only possible if the GD module is installed on your server.';
 $helptxt['karmaMode'] = 'Karma is a feature that shows the popularity of a member. Members, if allowed, can
 		\'applaud\' or \'smite\' other members, which is how their popularity is calculated. You can change the
 		number of posts needed to have a &quot;karma&quot;, the time between smites or applauds, and if administrators
 		have to wait this time as well.<br /><br />Whether or not groups of members can smite others is controlled by
 		a permission.  If you have trouble getting this feature to work for everyone, double check your permissions.';
-$helptxt['cal_enabled'] = 'The calendar can be used for showing birthdays, or for showing important moments happening in your community.<br /><br />
-		<strong>Show days as link to \'Post Event\'</strong>:<br />This will allow members to post events for that day, when they click on that date<br />
-		<strong>Max days in advance on board index</strong>:<br />If this is set to 7, the next week\'s worth of events will be shown.<br />
-		<strong>Show holidays on board index</strong>:<br />Show today\'s holidays in a calendar bar on the board index.<br />
-		<strong>Show birthdays on board index</strong>:<br />Show today\'s birthdays in a calendar bar on the board index.<br />
-		<strong>Show events on board index</strong>:<br />Show today\'s events in a calendar bar on the board index.<br />
-		<strong>Default Board to Post In</strong>:<br />What\'s the default board to post events in?<br />
-		<strong>Allow events not linked to posts</strong>:<br />Allow members to post events without requiring it to be linked with a post in a board.<br />
-		<strong>Minimum year</strong>:<br />Select the &quot;first&quot; year on the calendar list.<br />
-		<strong>Maximum year</strong>:<br />Select the &quot;last&quot; year on the calendar list<br />
-		<strong>Allow events to span multiple days</strong>:<br />Check to allow events to span multiple days.<br />
-		<strong>Max number of days an event can span</strong>:<br />Select the maximum days that an event can span.<br /><br />
-		Remember that usage of the calendar (posting events, viewing events, etc.) is controlled by permissions set on the permissions screen.';
 $helptxt['localCookies'] = 'The system uses cookies to store login information on the client computer.
 	Cookies can be stored globally (myserver.com) or locally (myserver.com/path/to/forum).<br />
 	Check this option if you\'re experiencing problems with users getting logged out automatically.<hr />
@@ -354,6 +367,7 @@ $helptxt['enablePostHTML'] = 'This will allow the posting of some basic HTML tag
 $helptxt['themes'] = 'Here you can select whether the default theme can be chosen, what theme guests will use,
 	as well as other options. Click on a theme to the right to change the settings for it.';
 $helptxt['theme_install'] = 'This allows you to install new themes.  You can do this from an already created directory, by uploading an archive for the theme, or by copying the default theme.<br /><br />Note that the archive or directory must have a <span class="tt">theme_info.xml</span> definition file.';
+$helptxt['enableVideoEmbeding'] = 'This allows for standard URLS to be automatically conveted into an embeded video when the post is viewed.  Currently only supports YouTube, Vimo and Dailymotion video links';
 $helptxt['enableEmbeddedFlash'] = 'This option will allow your users to use Flash directly inside their posts,
 	just like images.  This could pose a security risk, although few have successfully exploited it.
 	USE AT YOUR OWN RISK!';
@@ -366,8 +380,10 @@ $helptxt['hotTopicPosts'] = 'Change the number of posts for a topic to reach the
 $helptxt['globalCookies'] = 'Makes log in cookies available across subdomains.  For example, if...<br />
 	Your site is at http://www.sitename.org/,<br />
 	And your forum is at http://forum.sitename.org/,<br />
-	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.elkarte.net) not controlled by you.';
+	Using this option will allow you to access the forum\'s cookie on your site.  Do not enable this if there are other subdomains (like hacker.elkarte.net) not controlled by you.<br>
+	This option does not function when local cookies are enabled.';
 $helptxt['globalCookiesDomain'] = 'Define the main domain to be used when log in cookies are available across subdomains';
+$helptxt['httponlyCookies'] = 'With this setting on, Cookies will not be accessible by scripting languages, such as JavaScript. This setting can help to reduce identity theft through XSS attacks. This may cause issues with some third party scripts but is recommended to be on when possible.';
 $helptxt['secureCookies'] = 'Enabling this option will force the cookies created for users on your forum to be marked as secure. Only enable this option if you are using HTTPS throughout your site as it will break cookie handling otherwise!';
 $helptxt['admin_session_lifetime'] = 'This controls the length of time an admin session can remain active. Once this timer expires the session will end, requiring you to enter your admin credentials to continue accessing the admin area. The minimum value is 5 minutes, the maximum allowed value is 14400 minutes (a day). It is strongly recommended to use a value less than 60 minutes for security reasons.';
 $helptxt['auto_admin_session'] = 'This controls  whether an administrative session is activated during logon or not.';
@@ -411,6 +427,7 @@ $helptxt['autoOptDatabase'] = 'This option optimizes the database every so many 
 $helptxt['autoFixDatabase'] = 'This will automatically fix broken tables and resume like nothing happened.  This can be useful, because the only way to fix it is to REPAIR the table, and this way your forum won\'t be down until you notice.  It does email you when this happens.';
 
 $helptxt['enableParticipation'] = 'This shows a little icon on the topics the user has posted in.';
+$helptxt['enableFollowup'] = 'This allows members to start new topics quoting the text of any message.';
 
 $helptxt['db_persist'] = 'Keeps the connection active to increase performance.  If you aren\'t on a dedicated server, this may cause you problems with your host.';
 $helptxt['ssi_db_user'] = 'Optional setting to use a different database user and password when you are using SSI.php.';
@@ -429,12 +446,9 @@ $helptxt['max_pm_recipients'] = 'This option allows you to set the maximum amoun
 $helptxt['pm_posts_verification'] = 'This setting will force users to enter a code shown on a verification image each time they are sending a personal message. Only users with a post count below the number set will need to enter the code - this should help combat automated spamming scripts.';
 $helptxt['pm_posts_per_hour'] = 'This will limit the number of personal messages which may be sent by a user in a one hour period. This does not affect admins or moderators.';
 
-$helptxt['default_personal_text'] = 'Sets the default text a new user will have as their &quot;personal text.&quot;';
+$helptxt['default_personal_text'] = 'Sets the default text a new user will have as their &quot;personal text.&quot; This option is not available when personal text is disabled, or when users can set personal text on registration for themselves.';
 
 $helptxt['modlog_enabled'] = 'Logs all moderation actions.';
-
-$helptxt['guest_hideContacts'] = 'If selected this option will hide the email addresses and other contact details
-	of all members from any guests on your forum';
 
 $helptxt['registration_method'] = 'This option determines what method of registration is used for people wishing to join your forum. You can select from:<br /><br />
 	<ul class="normallist">
@@ -467,7 +481,7 @@ $helptxt['password_strength'] = 'This setting determines the strength required f
 		<li><strong>Medium:</strong> The password must be at least eight characters long, and can not be part of a users name or email address.</li>
 		<li><strong>High:</strong> As for medium, except the password must also contain a mixture of upper and lower case letters, and at least one number.</li>
 	</ul>';
-$helptxt['enable_password_conversion'] = 'By enabling this setting, the software will attempt to detect passwords stored in other formats and convert them for use in this software.  Typically this is used for converted forums, but may have other uses as well.  Disabling this prevents a user from logging in using their password after a conversion and would need to reset their password.';
+$helptxt['enable_password_conversion'] = 'By enabling this setting, ElkArte will attempt to detect passwords stored in other formats and convert them for use in this software.  Typically this is used for converted forums, but may have other uses as well.  Disabling this prevents a user from logging in using their password after a conversion and would need to reset their password.';
 
 $helptxt['coppaAge'] = 'The value specified in this box will determine the minimum age that new members must be to be granted immediate access to the forums.
 	On registration they will be prompted to confirm whether they are over this age, and if not will either have their application rejected or suspended awaiting parental approval - dependant on the type of restriction chosen.
@@ -490,10 +504,10 @@ $helptxt['make_email_viewable'] = 'If this option is enabled instead of users em
 $helptxt['meta_keywords'] = 'These keywords are sent in the output of every page to indicate to search engines (etc) the key content of your site. They should be a comma separated list of words, and should not use HTML.';
 
 $helptxt['latest_support'] = 'This panel shows you some of the most common problems and questions on your server configuration. Don\'t worry, this information isn\'t logged or anything.<br /><br />If this stays as &quot;Retrieving support information...&quot;, your computer probably cannot connect to the website.';
-$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages or mods, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
+$helptxt['latest_packages'] = 'Here you can see some of the most popular and some random packages, with quick and easy installations.<br /><br />If this section doesn\'t show up, your computer probably cannot connect to <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.';
 $helptxt['latest_themes'] = 'This area shows a few of the latest and most popular themes from <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>.  It may not show up properly if your computer can\'t find <a href="http://www.elkarte.net/" target="_blank" class="new_win">www.elkarte.net/</a>, though.';
 
-$helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that the software will never tell you, or anyone else, what they are.';
+$helptxt['secret_why_blank'] = 'For your security, your password and the answer to your secret question are encrypted so that ElkArte will never tell you, or anyone else, what they are.';
 $helptxt['moderator_why_missing'] = 'Since moderation is done on a board-by-board basis, you have to make members moderators from the <a href="%1$s?action=admin;area=manageboards" target="_blank" class="new_win">board management interface</a>.';
 
 $helptxt['permissions'] = 'Permissions are how you either allow groups to, or deny groups from, doing specific things.<br /><br />You can modify multiple boards at once with the checkboxes, or look at the permissions for a specific group by clicking \'Modify.\'';
@@ -631,7 +645,7 @@ $helptxt['badbehavior_reverse_proxy'] = 'When enabled, Bad Behavior will assume 
 $helptxt['badbehavior_eucookie'] = 'Set this option on if you believe Bad Behavior\'s site security cookie is not exempt from the 2012 EU cookie regulation.</a>';
 $helptxt['badbehavior_httpbl_maxage'] = 'This is the number of days since suspicious activity was last observed from an IP address by Project Honey Pot. Bad Behavior will block requests with a maximum age equal to or less than this setting.';
 $helptxt['badbehavior_httpbl_threat'] = 'This number provides a measure of how suspicious an IP address is, based on activity observed at Project Honey Pot. Bad Behavior will block requests with a threat level equal or higher to this setting. Project Honey Pot has <a href="http://www.projecthoneypot.org/threat_info.php" target="_blank">more information on this parameter</a>.';
-$helptxt['badbehavior_httpbl_key']= 'Bad Behavior is capable of using data from the <a href="http://www.projecthoneypot.org/faq.php#g" target="_blank">http:BL</a> service provided by <a href="http://www.projecthoneypot.org/" target="_blank">Project Honey Pot</a> to screen requests.<br /><br />This is purely optional; however if you wish to use it, you must <a href="http://www.projecthoneypot.org/httpbl_configure.php" target="_blank">sign up for the service</a> and obtain an API key. To disable http:BL use, remove the API key from your settings.';
+$helptxt['badbehavior_httpbl_key'] = 'Bad Behavior is capable of using data from the <a href="http://www.projecthoneypot.org/faq.php#g" target="_blank">http:BL</a> service provided by <a href="http://www.projecthoneypot.org/" target="_blank">Project Honey Pot</a> to screen requests.<br /><br />This is purely optional; however if you wish to use it, you must <a href="http://www.projecthoneypot.org/httpbl_configure.php" target="_blank">sign up for the service</a> and obtain an API key. To disable http:BL use, remove the API key from your settings.';
 $helptxt['badbehavior_verbose'] = 'Enabling verbose mode causes all HTTP requests to be logged. When verbose mode is off, only blocked requests and suspicious requests are logged.<br /><br />Verbose mode is off by default. Using verbose mode is not recommended as it can significantly slow down your site; it exists to capture data from live spammers which are not being blocked.';
 $helptxt['badbehavior_logging'] = 'Should Bad Behavior keep a log of requests? On by default, and it is not recommended to disable it, since it will cause additional spam to get through.';
 $helptxt['badbehavior_strict'] = 'Bad Behavior operates in two blocking modes: normal and strict.<br />When strict mode is enabled, additional checks for (old) software which have been spam sources are enabled, but occasional legitimate users using the same software may be blocked as well.';
@@ -650,6 +664,7 @@ $helptxt['pbe_pm_enabled'] = 'Enable this to allow users to reply by email to PM
 $helptxt['maillist_group_mode'] = 'If enabled outbound post/topic emails will come from the posters Display Name, otherwise it will come from the Site Name.  This is simply a envelope, affecting only how the "From name" appears in the receiving mailbox, the actual from email address is unchanged.';
 $helptxt['maillist_newtopic_change'] = 'This will allow a user to change the subject of a email notification and have it post as a new topic.  The new topic will be started on the same board as the reply was going to.';
 $helptxt['maillist_sitename_address'] = 'This must be the address that is piped to the emailpost.php file or the address of the imap mailbox';
+$helptxt['maillist_help_short'] = 'This feature allows users of your forum to reply to the sites email notifications and have those replies post on the forum.  Please visit the Wiki for full instructions';
 
 $helptxt['frame_security'] = 'The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a frame or an iframe. You can use this additional security restriction on your site against attempts at clickjacking attacks, by ensuring that the content of your site is not embedded into other sites.
 	<br />

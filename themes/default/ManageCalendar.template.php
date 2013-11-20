@@ -25,9 +25,7 @@ function template_edit_holiday()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=managecalendar;sa=editholiday" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -43,6 +41,7 @@ function template_edit_holiday()
 						<dd class="small_caption">
 							<select name="year" id="year" onchange="generateDays();">
 								<option value="0000"', $context['holiday']['year'] == '0000' ? ' selected="selected"' : '', '>', $txt['every_year'], '</option>';
+
 	// Show a list of all the years we allow...
 	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
 		echo '
@@ -83,6 +82,7 @@ function template_edit_holiday()
 						<input type="submit" name="edit" value="', $txt['holidays_button_edit'], '" class="button_submit" />
 						<input type="submit" name="delete" value="', $txt['holidays_button_remove'], '" class="button_submit" />
 						<input type="hidden" name="holiday" value="', $context['holiday']['id'], '" />';
+
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</div>

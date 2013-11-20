@@ -100,8 +100,6 @@ p, fieldset, form, input, button, select, textarea, .editor {
 }
 
 /* Collection of pseudo element clearfixes. */
-/* @todo - Clean up old catbg and titlebg stuff. */
-h3.catbg:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after,
 .category_header:after, .wrapper:after,
 #main_content_section:after, #main_container:after,
 .attachments_bot:after, .editor_wrapper:after {
@@ -111,7 +109,7 @@ h3.catbg:after, h3.titlebg:after, h4.titlebg:after, h4.catbg:after,
 }
 .quickbuttons:after {
 	display: block;
-	clear: right;
+	clear: both;
 	content:"";
 }
 /* @todo */
@@ -140,7 +138,6 @@ a img {
 
 
 
-
 /* Style the different types of inputs to be uniform for all browsers. */
 
 /* NOTE: This does require some browser-specific code to get good results. */
@@ -153,8 +150,7 @@ a img {
 /*
 	.button_submit	-	covers input[type=submit], input[type=button],
 						button[type=submit] and button[type=button]
-
-	.linkbutton	-	covers links, to make them look like a submit button.
+	.linkbutton		-	covers links, to make them look like a submit button.
 	.button_reset	-	covers input[type=reset] and button[type=reset]
 	.input_check	-	covers input[type=checkbox]
 	.input_radio	-	covers input[type=radio]
@@ -224,21 +220,19 @@ input[disabled].input_text {
 }
 /* The OpenID login form */
 .openid_login {
-	padding-left: 18px;
+	padding-left: 20px;
 	background: white url(../images/openid.png) no-repeat;
+	background-position: 2% 50%;
 }
 
 /* Common button styling. */
-/* @todo - Will have to do some shuffling here. */
-/* The old .button_submit class was problematic, due to forcing float right on all buttons. */
-/* It is being replaced with three classes:
-/*					.button_submit is not floated	*/
-/*					.right_submit is right floated	*/
-/*					.left_submit is left floated	*/
-/* The button_reset class may need attention too.	*/
+/* It is being replaced with three classes: */
+/*    .button_submit is not floated    */
+/*    .right_submit is right floated   */
+/*    .left_submit is left floated     */
+/* The button_reset class may need attention too. */
 .button_submit, .right_submit, .left_submit, .button_reset,
 /* Anchors styled to look like buttons. */
-/* The old .button_link class has been replaced with the following three classes. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
@@ -288,7 +282,7 @@ input[disabled].input_text {
 	padding: 2px 6px;
 	vertical-align: middle;
 }
-/* @todo mostly for those go buttons that don't have a form id*/
+/* @todo mostly for those go buttons that don't have a form id */
 .button_submit.submitgo {
 	margin-bottom: 4px;
 }
@@ -429,27 +423,8 @@ em {
 	line-height: 2em;
 }
 
-/* Generic header bars. @todo - To be deprecated. */
-.titlebg, .catbg {
-	padding: 0 6px;
-	background: #ebebeb;
-	background-image: linear-gradient(to bottom, #ebebeb 0%, #c6c6c6 100%);
-	color: #555;
-	font-size: 1.1em;
-}
-.catbg {
-	font-size: 1.2em;
-}
-.catbg select {
-	margin-top: -1px;
-	padding: 1px;
-	height: 2em;
-	font-size: 0.857em;
-}
 /* Styles for main headers. */
-.category_header, .forum_category .category_header,
-/* Generic header bars. @todo - To be deprecated. */
-h3.catbg, h3.titlebg, h4.titlebg, h4.catbg {
+.category_header, .forum_category .category_header {
 	padding: 4px 10px 2px 10px;
 	border: 1px solid #ccc;
 	border-top: 1px solid #ddd;
@@ -485,38 +460,50 @@ h3.catbg, h3.titlebg, h4.titlebg, h4.catbg {
 	color: #777;
 }
 
-h3.catbg a:link, h3.catbg a:visited, h4.catbg a:link, h4.catbg a:visited,
-h3.titlebg a, h3.titlebg, h4.titlebg, h4.titlebg a {
-	color: #555;
-}
-h3.catbg a:hover, h4.catbg a:hover, h3.titlebg a:hover, h4.titlebg a:hover {
-	color: #333;
-	text-decoration: none;
-}
-h3.catbg .icon {
-	margin: 0 5px 0 0;
-	vertical-align: text-top;
-}
-h4.titlebg .icon {
-	float: left;
-	margin: 0 5px 0 0;
-}
 .category_header .icon {
 	margin: 0 5px 0 0;
 	vertical-align: text-top;
 }
 
-/* Upshrinks in cat and title bars. */
-/* @todo - Why is this stranded in this spot? */
-#upshrink_ic, #newsupshrink, .panel_toggle, #quickReplyExpand {
-	float: right;
-	margin: 4px 0 0 0;
-	padding: 4px;
-}
-.collapse {
+h2 a.collapse {
 	margin: 2px 4px -2px 0;
 	float: right;
 }
+
+/* Upshrink image in the general category headers */
+#category_toggle, #category_toggle_more, #upshrink_header {
+	display: block;
+	float:right;
+	padding: 0 16px;
+	border-radius: 2px;
+	overflow: hidden;
+	position: relative;
+}
+#category_toggle span, #category_toggle_more span, #upshrink_header span {
+	background-repeat: no-repeat;
+	background-image: url(../images/_light/expcol.png);
+	position: absolute;
+	top: 50%;
+	margin-top: -30px;
+	left: 50%;
+	margin-left: -58px;
+	padding: 47px 50px;
+}
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	display: block;
+	border-radius: 2px;
+	overflow: hidden;
+	position: relative;
+	padding: 0;
+}
+.collapse {
+	background-position: 0 -25px;
+}
+.expand {
+	background-position: -116px -25px;
+}
+
 
 /* Alternating backgrounds for posts, and several other sections of the forum. */
 .windowbg, #preview_body, .windowbg2 {}
@@ -633,15 +620,10 @@ div.windowbg, div.windowbg2 {
 	border-radius: 7px;
 	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 }
-.generic_list_wrapper .title_bar{
+.generic_list_wrapper .title_bar {
 	border-bottom: 1px solid #fff;
 	border-radius: 0;
 	background: none;
-}
-.generic_list_wrapper .titlebg {
-	border-bottom: 1px solid #aaa;
-	background: none;
-	font-size: 1.1em;
 }
 .generic_list_wrapper .additional_row {
 	margin: 0;
@@ -689,7 +671,16 @@ div.windowbg, div.windowbg2 {
 	color: #eee;
 	cursor: pointer;
 }
-
+legend {
+	font-weight: bold;
+	color: #000;
+	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
+}
+.collapsed legend {
+	background:  url(../images/selected.png) no-repeat scroll left center transparent;
+}
 
 
 
@@ -776,6 +767,15 @@ div.windowbg, div.windowbg2 {
 .bbc_tt {
 	font-family: "dejavu sans mono", "monaco", "lucida console", "courier new", monospace;
 }
+.bbc_footnotes {
+	margin-top: 10px;
+	padding: 4px 8px 4px 0;
+	font-size: small;
+	overflow: auto;
+}
+.footnote_return {
+	font-size: 1.35em;
+}
 
 
 
@@ -809,15 +809,40 @@ div.windowbg, div.windowbg2 {
 	padding: 0;
 }
 #top_section_notice {
-	float: right;
+	float: left;
 	margin: 0;
 	padding: 14px 8px 0 8px;
 	line-height: 1.3em;
+	min-width:38%;
 	/* @todo - See me grumblez in Issue #552. ;) */
+}
+#top_section_notice .toggle_login {
+	padding-top: 2px;
+	display: inline;
+	cursor: pointer;
+}
+#top_section_notice form {
+	white-space: nowrap;
+	width: 100%;
+}
+.top_button {
+	line-height: 1.9em;
+	padding: 3px;
+	margin-left: 1px;
+}
+.top_button img {
+	vertical-align: middle;
+}
+#password_login, #openid_login {
+	display: inline-block;
+	margin-left: 20px;
+}
+#password_login input, #password_login select {
+	margin-left: -5px;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
-	float: left;
+	float: right;
 }
 /* @todo - Simplify. */
 #search_form .input_text, #search_form select, #search_form .button_submit {
@@ -832,24 +857,48 @@ div.windowbg, div.windowbg2 {
 	padding: 2px 2px 0 2px;
 }
 /* The main title. */
-.forumtitle {
+#forumtitle, #forumtitleright {
 	float: left;
 	padding: 10px 10px 6px 8px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
-/* Float these items to the right. @todo - Simplify. */
-#siteslogan, #logo {
+#forumtitlenone {
+	display: none;
+}
+#forumtitleright {
 	float: right;
-	margin: 0;
+}
+/* Float these items to the right. @todo - Simplify. */
+#logobox, #logoboxleft {
+	float: right;
 	padding: 0.95em 12px 0 12px;
-	font-size: 1.8em;
-	line-height: 1.5em;
+	max-width: 40%;
+}
+#logoboxcenter {
+	width: 100%;
+}
+#logoboxleft, #logoboxleft #logo {
+	float: left;
+	padding-bottom: 7px;
+}
+#logoboxcenter, #logoboxcenter #logo, #logoboxcenter #siteslogan {
+	float: none;
+	display: block;
+	margin: 0 auto;
+	text-align: center;
+}
+#siteslogan {
+	clear: both;
 }
 /* Tweak the logo */
 #logo {
 	margin: 0 8px 0 0;
 	padding: 0;
+	float: right;
+}
+#logoboxleft #logo {
+	margin: 0 0 0 8px;
 }
 /* Main forum area. */
 /* Box-shadow only on this one. */
@@ -859,18 +908,19 @@ div.windowbg, div.windowbg2 {
 }
 /* The user info, news, etc.*/
 #news {
-	display: table-cell;
 	vertical-align: top;
-	width: 90%;
 }
 #upper_section>.user {
 	display: table-cell;
 	vertical-align: top;
-	min-width: 24em;
+	min-width: 26em;
 	font-size: 0.857em;
+	white-space: nowrap;
 }
 .greeting {
+	float: right;
 	font-weight: bold;
+	padding-top: 10px;
 }
 /* The login form. */
 #guest_form {
@@ -878,19 +928,28 @@ div.windowbg, div.windowbg2 {
 }
 #guest_form input, #guest_form select {
 	font-size: 1.083em;
-	margin: 0 4px 8px 0;
+	margin: 0 0 8px 0;
 }
 /* User information. @todo - Simplify. */
-#upper_section .avatar {
-	float: left;
-	margin: 0 5px 5px 0;
+#top_section_notice a.avatar {
+	float: right;
+	vertical-align: middle;
+	padding-right: 5px;
 }
 /* No more huge avatars up top. YAY! */
-#upper_section .avatar img {
+#top_section_notice .avatar img, .notifavatar .avatar {
 	width: auto;
 	height: auto;
-	max-width: 60px;
-	max-height: 60px;
+	max-width: 36px;
+	max-height: 36px;
+	border-radius: 2px;
+}
+.modtask {
+	margin: 1em 0 0 0;
+}
+
+.modtask a {
+	font-weight: bold;
 }
 /* The content section */
 #main_content_section {
@@ -962,29 +1021,26 @@ div.windowbg, div.windowbg2 {
 .listlevel1:hover {
 	z-index: 5;
 }
-.listlevel1#collapse_button, .listlevel1#button_logout {
+.listlevel1#collapse_button, .listlevel1#button_profile {
 	float: right;
+}
+.listlevel1#button_profile img {
+	max-width: 1.5em;
+	max-height: 1.5em;
+	margin: 0;
+	margin-right: 0.6em;
+	position: relative;
+	top: 4px;
 }
 /* Level 1 Menu bar: link or button. */
 .linklevel1 {
 	display: block;
 	padding: 0 0.6em;
 }
-#collapse_button .linklevel1 {
-	display: block;
-	padding: 0 16px;
-	border-radius: 2px;
-	overflow: hidden;
-	position: relative;
+.listlevel1#button_profile .linklevel1 {
+	min-width: 5em;
 }
-#upshrink {
-	position: absolute;
-	top: 50%;
-	margin-top: -55px;
-	left: 50%;
-	margin-left: -58px;
-	padding: 47px 50px;
-}
+
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
 	position: absolute;
@@ -1003,6 +1059,10 @@ div.windowbg, div.windowbg2 {
 /* @todo - Check Superfish class. I think .sfhover may be deprecated. */
 .listlevel1:hover .menulevel2, .listlevel1.sfhover .menulevel2 {
 	left: 0;
+}
+.listlevel1#button_profile:hover .menulevel2, .listlevel1#button_profile.sfhover .menulevel2 {
+	left: auto;
+	right: 0;
 }
 /* Hiding Level 3 drop menu off hover. */
 .listlevel1:hover .menulevel3, .listlevel1.sfhover .menulevel3 {
@@ -1058,10 +1118,6 @@ div.windowbg, div.windowbg2 {
 	width: 200px;
 }
 /* @todo */
-#menu_sidebar .catbg {
-	padding: 3px 10px 2px 10px;
-	font-size: 1.1em;
-}
 #menu_sidebar .sidebar_menu {
 	padding: 4px 0 9px 0;
 }
@@ -1234,10 +1290,13 @@ div.windowbg, div.windowbg2 {
 	margin-top: -12px;
 	content:"";
 }
+.quickmod_check {
+	left: 3px;
+}
 /* The rest of them. */
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	background-repeat: no-repeat;
-/* A rare example of where longhand background declarations work well. */
+	/* A rare example of where longhand background declarations work well. */
 	background-image: url(../images/theme/quickbuttons.png);
 }
 /* The long list of sprite coordinates is much less verbose this way. */
@@ -1363,6 +1422,13 @@ div.windowbg, div.windowbg2 {
 .pagesection .floatright input, .pagesection .floatright select {
 	margin-top: 3px;
 }
+.category_header .pagesection .floatright input, .pagesection .floatright select {
+	margin-top: 0;
+}
+/* Necessary for some browsers to keep the pages all on the same line */
+.linavPages {
+	float: left;
+}
 .selectbox, .pagelinks {
 	margin: 5px 0 0 0;
 	color: #555;
@@ -1404,6 +1470,9 @@ div.windowbg, div.windowbg2 {
 	float: left;
 	min-width: 1.5em;
 	text-align: center;
+	cursor: pointer;
+	font-weight: 600;
+	padding: 2px 0;
 }
 .next_page, .previous_page {
 	padding: 0 2px;
@@ -1418,6 +1487,12 @@ div.windowbg, div.windowbg2 {
 /* @todo - Fix for all templates. */
 .small_pagelinks {
 	float: right;
+}
+.small_pagelinks li {
+	float: left;
+}
+.small_pagelinks li {
+	display: inline;
 }
 .small_pagelinks .navPages {
 	padding: 2px 3px 0 3px;
@@ -1435,6 +1510,16 @@ div.windowbg, div.windowbg2 {
 	content: '\00BB';
 	float: left;
 	font-size: 1.3em;
+}
+#pages_scroll_left, #pages_scroll_right {
+	position: absolute;
+	top: 0;
+}
+#pages_scroll_left {
+	left: 0;
+}
+#pages_scroll_right {
+	right: 0;
 }
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
@@ -1547,7 +1632,7 @@ div.windowbg, div.windowbg2 {
 .additional_row {
 	padding: 6px 0;
 }
-.sort {
+.sort_by_item .sort, .sort {
 	margin: 0 0 -4px 4px;
 }
 
@@ -1733,19 +1818,22 @@ dl.settings textarea {
 	margin: -3px 4px 0 4px;
 	vertical-align: middle;
 }
-#ic_recentposts {
+#ic_recentposts, #ps_recentposts, #ps_recenttopics {
 	margin: 0 auto;
 	width: 95%;
 	font-size: 0.857em;
 	border-collapse: collapse;
 }
-#ic_recentposts td, #ic_recentposts th {
+#ic_recentposts td, #ic_recentposts th, #ps_recentposts td, #ps_recentposts th, #ps_recenttopics td, #ps_recenttopics th {
 	padding: 2px 4px;
 	vertical-align: top;
 	text-align: left;
 }
 .recentpost {
 	width: 40%;
+}
+.recenttopic {
+	width: 55%;
 }
 .recentposter {
 	width: 15%;
@@ -1761,8 +1849,35 @@ dl.settings textarea {
 	font-size: 0.857em;
 }
 
-
-
+#sortby {
+	width: 8.4em;
+}
+.topic_sorting:hover #sortby, #sortby:hover {
+	width: 8.4em;
+	left: auto;
+	right: 0;
+}
+.sort_by_item {
+	width: 7em;
+}
+.topic_sorting>li {
+	float: right;
+}
+.topic_sorting {
+	float: right;
+}
+.topic_sorting>li {
+	padding: 0 3px;
+}
+#expanded_pages_container {
+	position: absolute;
+}
+#expanded_pages_container a {
+	background: #fff;
+}
+#expanded_pages_container, #expanded_pages {
+	overflow: hidden;
+}
 
 /* -------------------------------------------- */
 /* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
@@ -1808,17 +1923,15 @@ img.new_posts {
 	margin: 0;
 	font-size: 0.765em;
 }
-#description_board>p{
+#description_board .generalinfo, #forumposts .generalinfo {
 	background: #fff;
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	margin-top: 2px;
-	padding: 4px 12px;
+	padding: 4px 4px 4px 12px;
 }
-.whoisviewing {
-	padding: 4px 0;
-	display: block;
-	font-size: 0.857em;
+#description_board .generalinfo .listlevel2 {
+	white-space:nowrap;
 }
 .topic_listing {
 	background: #e4e4e4;
@@ -1830,7 +1943,7 @@ img.new_posts {
 	border-bottom: 1px solid #ccc;
 	margin: 1px 0 0 0;
 }
-.topic_listing>.topic_sorting_row {
+.topic_sorting>.topic_sorting_row, .topic_listing>.topic_sorting_row {
 	margin: 0;
 }
 .topic_sorting_row, .basic_row {
@@ -1848,6 +1961,13 @@ img.new_posts {
 	vertical-align: middle;
 	width: 2%;
 	padding: 8px 8px 0 8px;
+}
+.sort_by_container {
+	font-size: 0.892em;
+	float: right;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	vertical-align: top;
 }
 .topic_info {
 	display: table-cell;
@@ -1901,6 +2021,8 @@ img.new_posts {
 	float: right;
 	min-width: 14em;
 	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 	color: #777;
 }
@@ -1932,10 +2054,10 @@ img.new_posts {
 	background: #ffffe0;
 }
 .sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
+	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
 }
 .locked_row.sticky_row .topic_info {
-	background: url(../images/icons/quick_sticky.png) no-repeat 98% 4px;
+	background: url(../images/icons/quick_sticky_lock.png) no-repeat 98% 4px;
 }
 /* @todo - Extra classes for search results, etc. See if I can clean them up. */
 .locked_row, .locked_row.core_posts {
@@ -1991,8 +2113,8 @@ img.new_posts {
 	padding: 12px 0;
 }
 .edit_event {
-	margin: 0 10px;
-	vertical-align: top;
+	margin: 0 5px 0 0;
+	vertical-align: middle;
 }
 /* Poll question */
 #poll {
@@ -2006,7 +2128,7 @@ img.new_posts {
 }
 
 /* Poll vote options */
- /* @todo - Slow selectors for the next few declarations here. Change? */
+/* @todo - Slow selectors for the next few declarations here. Change? */
 #poll_options ul.options {
 	margin: 0 0 12px 0;
 	padding: 12px 30px 0 25px;
@@ -2019,6 +2141,7 @@ img.new_posts {
 	padding: 12px 0 12px 25px;
 	border: solid #9999aa;
 	border-width: 1px 0;
+	overflow: auto;
 }
 #poll_options dl.options dt {
 	float: left;
@@ -2084,13 +2207,14 @@ img.new_posts {
 .nextlinks {
 	float: right;
 }
-#whoisviewing {
-	padding: 4px 1em;
+#whoisviewing, #redirectfrom {
 	font-size: 0.857em;
+	padding: 4px 0;
+	display: inline-block;
+
 }
 /* Poster and postarea + moderation area underneath */
-
-#whoisviewing, .forumposts .windowbg, .forumposts .windowbg2,
+.forumposts .windowbg, .forumposts .windowbg2,
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
@@ -2110,7 +2234,8 @@ img.new_posts {
 	vertical-align: top;
 	min-width: 15em;
 	word-wrap: break-word;
-	word-break: hyphenate;
+	word-break: break-all;
+	hyphens: auto;
 	font-size: 0.857em;
 }
 .poster.poster2 {
@@ -2215,16 +2340,25 @@ img.new_posts {
 }
 /* End nifty new flyout. */
 
-.postarea {
-	display: table-cell;
-	vertical-align: top;
+.poster {
+	float: left;
+}
+.post_wrapper {
+	display: block;
 	width: 100%;
-	padding: 0 1em 0 0;
+	clear: both;
+}
+.postarea {
+	display: block;
+	margin: 0 0 0 180px;
+	padding: 0 1em 0 1.5em;
+	max-width: 100%;
 }
 .postarea2 {
 	display: block;
 	padding: 0 1em;
 }
+
 #topic_summary .postarea2 {
 	font-size: 0.857em;
 }
@@ -2308,7 +2442,29 @@ img.new_posts {
 .forumposts .post_separator {
 	display: none;
 }
-
+/* Used by video embed JS when autolinking video links */
+.elk_video {
+	display: block;
+	width: 640px;
+	height: auto;
+	max-height: 480px;
+	border: #27a348 1px solid;
+	border-top: 0;
+}
+.elk_video a img, .elk_video embed {
+	margin: 0 auto;
+	display: block;
+}
+.elk_videoheader {
+	padding: 0 4px 0 6px;
+	width: 630px;
+	max-width: 98%;
+	border: #27a348 1px solid;
+}
+.elk_previewvideo {
+	max-width: 640px;
+	height: auto;
+}
 /* Basic stuff for the bottom of Display.template.php. */
 #moderationbuttons {
 	float: left;
@@ -2338,7 +2494,7 @@ img.new_posts {
 	width: 60em;
 	max-width: 97%;
 }
-#quickReplyOptions form textarea {
+#quickReplyOptions form .quickreply {
 	min-width: 100%;
 	max-width: 100%;
 	width: 635px;
@@ -2401,7 +2557,7 @@ dl.send_mail dd {
 #preview_body {
 	padding: 0.5em 1em;
 	overflow: auto;
-	margin: 0.5em 0 0 0;
+	margin: 2px 0 0;
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	background: #fff;
@@ -2431,6 +2587,7 @@ dl.send_mail dd {
 }
 #post_header img {
 	vertical-align: middle;
+	padding: 0 0 2px 5px;
 }
 ul.post_options {
 	overflow: auto;
@@ -2445,13 +2602,12 @@ ul.post_options li {
 	margin: 1em 0 0 0;
 	background: #fafafa;
 	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
-	border-bottom: 1px solid #ccc;
+	border-bottom: none;
 }
 #postAdditionalOptions, #postDraftOptions {
 	margin: 0 0 1em 0;
 	overflow: auto;
 	border: 1px solid #ccc;
-	border-top: none;
 	border-radius: 0 0 4px 4px;
 	background: #fdfdfd;
 }
@@ -2494,6 +2650,9 @@ ul.post_options li {
 }
 .post_verification #verification_control {
 	margin: 4px 0 4px 12px;
+}
+.verification_control_valid {
+	display: none;
 }
 /* The BBC buttons */
 #bbcBox_message {
@@ -2569,7 +2728,10 @@ ul.post_options li {
 	padding: 6px;
 }
 #edit_poll fieldset input {
-	margin-left: 8.1em;
+	margin-left: 7.8em;
+}
+#chrome fieldset input {
+	margin-left: 7.9em;
 }
 #edit_poll ul.poll_main li {
 	padding-left: 12px;
@@ -2613,7 +2775,6 @@ ul.post_options li {
 }
 .split_topics, .move_topic {
 	margin: auto;
-	width: 710px;
 	text-align: left;
 }
 .split_topics fieldset, .move_topic fieldset {
@@ -2629,6 +2790,11 @@ ul.post_options li {
 }
 #report_topic dl.settings dd {
 	width: 79%;
+}
+#report_comment {
+	width: 75%;
+	height: 10em;
+	padding: 5px;
 }
 
 /* The split topic section. */
@@ -2660,30 +2826,163 @@ dl.merge_topic dd {
 	margin: 6px 0;
 }
 
-
-
+/* Styles for the $TABS	*/
+/* We can't control what jqueryui pollutes the DOM with, so deal with it */
+/* Styles for the profile summary tabs, or any jquery ui tabs */
+/* ---------------------------------------------------------- */
+.ui-tabs {
+	zoom: 1;
+}
+.ui-tabs .ui-tabs-nav {
+	list-style: none;
+	position: relative;
+	padding: 0;
+	margin: 0;
+}
+.ui-tabs .ui-tabs-nav li {
+	position: relative;
+	float: left;
+	margin: 0 3px -1px 0;
+	border: 1px #ccc solid;
+	border-radius: 2px 2px 0 0;
+	color: #fff;
+	font-size: 0.929em;
+	line-height: 2.077em;
+}
+.ui-tabs .ui-tabs-nav li a {
+	display: block;
+	padding: 0 7px;
+	background: #f0f0f0;
+	border-bottom-color: #ccc;
+	outline: none;
+	text-decoration: none;
+	border-radius: 2px 2px 0 0;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav .ui-state-disabled a, .ui-tabs .ui-tabs-nav .ui-state-processing a {
+	cursor: default;
+}
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
+	cursor: pointer;
+}
+.ui-tabs .ui-tabs-hide {
+	display: none;
+}
+.ui-tabs .ui-tabs-nav .ui-state-default a{
+	background: linear-gradient(to bottom, #fff, #e4e4e4) repeat scroll 0 0 #f4f4f4;
+}
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	background: linear-gradient(to bottom, #5ba048, #3d6e32) repeat scroll 0 0 #4b863c;
+	color: #fff;
+	font-weight: 600;
+	border-radius: 2px 2px 0 0;
+}
+.ui-tabs .ui-state-hover {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	color: #555;
+	text-decoration: none;
+}
 
 /*	$PROFILE	*/
 /* ------------------------------------------------------- */
+.ui-tabs .ui-tabs-panel {
+	clear: both;
+	background: none repeat scroll 0 0 #fff;
+	border: 1px solid #ddd;
+	border-top: 1px #ccc solid;
+	padding-top: 8px;
+}
+#profilecenter {
+	background: #efefef;
+	margin: 12px 0 0 0;
+	padding: 8px 8px 16px 8px;
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+	overflow: auto;
+}
+#profilecenter .windowbg, #profilecenter .windowbg2 {
+	overflow: visible;
+	border: none;
+	background: #fff;
+	padding: 0 0 4px;
+}
+.profileblock {
+	padding: 4px 8px;
+	margin-top: 4px;
+	background: none repeat scroll 0 0 #fff;
+}
+.profile_content {
+	overflow: auto;
+	padding: 0 8px;
+}
+.profileblock_left {
+	width: 49%;
+	float: left;
+	margin: 0 0 4px 4px;
+}
+.profileblock_left h3, .profileblock_right h3 {
+	margin-bottom: .8em;
+}
+.profileblock_right {
+	width: 49%;
+	float: right;
+	margin: 0 4px 4px 0;
+}
+.profileblock ul li {
+	display: block;
+	float: left;
+	margin-right: 5px;
+}
+.profileblock ul li:not(:first-child):before {
+	content: "\20\7C\20";
+}
+.profile_attachments {
+	border: 0;
+	border-spacing: 1em;
+	width: 95%;
+	table-layout:fixed;
+	font-size: 0.857em;
+	margin: 0 auto;
+}
+.profile_attachments td, .profile_attachments th {
+	padding: 5px 4px;
+	vertical-align: top;
+	text-align: center;
+}
 
-/* @todo - Yup, it's on the list. */
+.profile_attachment a img {
+	max-width: 120px;
+	max-height: 120px;
+}
+.vcard .avatar {
+	max-width: 40px;
+	max-height: 40px;
+}
+.attach_title {
+	width: 100%;
+	display: block;
+	margin-bottom: 4px;
+}
 /* The basic user info on the left */
 #basicinfo {
 	float: left;
-	width: 20%;
+	width: 30%;
 }
 #basicinfo .windowbg .content {
-	padding-left: 20px;
+	padding-left: 30px;
 }
-#basicinfo ul .cf_icon {
+.profileblock .cf_icon {
 	display: block;
-    float: left;
-    margin: 4px 5px 0 0;
-    height: 20px;
+	float: left;
+	margin: 4px 5px 0 0;
 }
 #detailedinfo {
 	float: right;
-	width: 79.5%;
+	width: 70%;
+	margin-top: 4px;
 }
 #basicinfo h4 {
 	overflow: hidden;
@@ -2700,16 +2999,6 @@ dl.merge_topic dd {
 	display: block;
 	margin: 10px 0 0 0;
 }
-#basicinfo ul {
-	margin: 10px 0 0 0;
-	list-style-type: none;
-}
-#basicinfo ul li {
-	display: block;
-	float: left;
-	margin-right: 5px;
-	height: 20px;
-}
 #basicinfo #userstatus {
 	display: block;
 	clear: both;
@@ -2718,14 +3007,13 @@ dl.merge_topic dd {
 #basicinfo #userstatus img {
 	vertical-align: middle;
 }
-#detailedinfo dl, #tracking dl {
+#detailedinfo dl, #tracking dl, .profileblock dl {
 	clear: right;
 	overflow: auto;
 	margin: 0 0 18px 0;
 	padding: 0 0 15px 0;
-	border-bottom: 1px #ccc solid;
 }
-#detailedinfo dt, #tracking dt {
+#detailedinfo dt, #tracking dt, .profileblock dt {
 	float: left;
 	clear: both;
 	margin: 0 0 3px 0;
@@ -2734,18 +3022,14 @@ dl.merge_topic dd {
 	color: #555;
 	font-weight: bold;
 }
-#detailedinfo dd, #tracking dd {
+#detailedinfo dd, #tracking dd, .profileblock dd {
 	float: left;
 	margin: 0 0 3px 0;
 	padding: 0;
 	width: 65%;
 }
-#detailedinfo .noborder {
-	border-bottom: 0;
-}
-#detailedinfo dt.clear {
-	width: 100%;
-}
+
+
 #personal_picture {
 	display: block;
 	margin-bottom: 4px;
@@ -2795,30 +3079,6 @@ dl.merge_topic dd {
 	width: 50%;
 }
 
-/* Activity by time */
-#activitytime {
-	margin: 6px 0;
-}
-#activitytime .cat_bar, #popularposts .cat_bar, #popularactivity .cat_bar{
-	border-top: 1px solid #999;
-	border-bottom: 1px solid #fff;
-	border-radius: 0;
-	background: none;
-}
-#activitytime .catbg, #popularposts .catbg, #popularactivity .catbg {
-	padding: 6px 6px 5px 6px;
-	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
-	box-shadow: 0 1px 0 #fff inset, 0 -1px 0 #999 inset;
-	color: #555;
-	text-shadow: none;
-	font-size: 1em;
-}
-#activitytime .windowbg2 .flow_hidden {
-	border: none;
-	background: none;
-	box-shadow: none;
-}
 #show_attachments th {
 	text-align: left;
 }
@@ -2900,7 +3160,7 @@ dl.merge_topic dd {
 
 /* @todo - Buddy section stuff. */
 .add_buddy .roundframe, .add_buddy .title_bar {
-	max-width: 70em;
+	margin-top: 5px;
 	border: none;
 	background: none;
 }
@@ -2970,7 +3230,7 @@ dl.merge_topic dd {
 .ignoreboards {
 	margin: 0 2%;
 	padding: 0;
-	width: 90%;
+	width: 45%;
 }
 .ignoreboards a {
 	padding: 1px 0;
@@ -3047,7 +3307,10 @@ dl.merge_topic dd {
 /* ------------------------------------------------------- */
 
 #personal_messages .labels {
-	margin: 11px 0 0;
+	padding: 11px 0 0;
+}
+#personal_messages .signature {
+	overflow: visible;
 }
 #personal_messages .capacity_bar {
 	display: block;
@@ -3216,6 +3479,11 @@ dl.merge_topic dd {
 */
 
 
+/* NOTIFICATIONS	*/
+/* ------------------------------------------------------- */
+.notifavatar .avatar {
+	display: block;
+}
 
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
@@ -3362,6 +3630,12 @@ dl.merge_topic dd {
 	opacity: 1;
 }
 
+a.help .icon {
+	padding: 4px 0 0;
+	position: relative;
+	vertical-align: top;
+}
+
 /* Styles for the tooltips. */
 .tooltip {
 	position: absolute;
@@ -3391,8 +3665,8 @@ dl.merge_topic dd {
 	display: none;
 	width: 100%;
 	height: 100%;
-	/* Should be rgba only, IMHO. */
-	/*	Flat colour fallback would be bad (visually). */
+	/* Flat colour fallback will be bad (visually), ie8 only though. */
+	background: rgb(0,0,0);
 	background: rgba(0,0,0,0.4);
 }
 
@@ -3527,23 +3801,22 @@ dl.merge_topic dd {
 }
 
 #mlsearch {
-  padding-top: 5px;
+	padding-top: 2px;
 }
 #mlsearch_options {
-  position: absolute;
-  display: none;
-  background: #FAFAFA;
-  padding: 0.5em;
-  border: 1px solid #DDDDDD;
-  border-radius: 5px;
+	position: absolute;
+	display: none;
+	background: #FAFAFA;
+	padding: 0.5em;
+	border: 1px solid #DDDDDD;
+	border-radius: 5px;
 }
 #mlsearch_options .mlsearch_option .input_check {
-  margin-left: 0.5em;
+	margin-left: 0.5em;
 }
 #mlsearch_options .mlsearch_option {
-  padding: 0.2em 0;
+	padding: 0.2em 0;
 }
-
 
 /*	$LOGIN		*/
 /* ------------------------------------------------------- */
@@ -3754,44 +4027,12 @@ dl.merge_topic dd {
 /*
 /* Of course, having comments to map em to px for each query is a good idea too.
 
-/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
-@media screen and (min-width: 320px) and (max-width: 480px) {
-	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
-		display: none;
-	}
-	#wrapper, .frame {
-		width: 100%;
-		min-width: 300px;
-	}
-	#main_content_section {
-		padding: 1px 2px 16px 3px;
-	}
-	.poster .avatar {
-		width: 30px;
-	}
-	.poster {
-		width: 110px;
-		font-size: .8em;
-	}
-	.postarea, .moderatorbar {
-		margin: 0 0 0 110px;
-	}
-	.post {
-		margin: 0 0 0 5px;
-	}
-}
-
 /* Styles for print media.
 ------------------------------------------------------- */
 @media print {
 	#headerarea
 	{
 		display: none;
-	}
-
-	.tborder
-	{
-		border: none;
 	}
 }
 
@@ -3809,19 +4050,16 @@ dl.merge_topic dd {
 /* 7" Tablets like Google Nexus (landscape) or other mobile devices *//*
 @media screen and (max-width: 610px) {
 	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
-	 	 display: none;
+		 display: none;
 	 }
 	 #posting_icons, #top_section div ul{
 		 display: none;
 	 }
 	 #collapse_button, #button_home, #button_help, #button_memberlist, #button_search {
-	 	 display: none;
+		 display: none;
 	 }
 	#menu_nav {
 		padding: 0;
-	}
-	.catbg img, .catbg span {
-		display: none;
 	}
 	.poster {
 		margin-bottom: 5px;
@@ -3922,7 +4160,7 @@ dl.merge_topic dd {
 /* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc */
 
 /* This one does 1024 screens at default font size. */
-@media screen and (min-width: 50em) and (max-width: 64em) {
+@media screen and (max-width: 64em) {
 	.board_latest {
 		min-width: 27em;
 	}
@@ -3932,25 +4170,36 @@ dl.merge_topic dd {
 	.board_stats, .topic_stats {
 		display: none;
 	}
+	#password_login select {
+		display: none;
+	}
 }
 /* This one does 800 screens at default font size. */
-@media screen and (min-width: 30em) and (max-width: 50em) {
+@media screen and (max-width: 50em) {
 	.wrapper {
 		min-width: 98%;
 	}
 	.board_latest {
 		min-width: 20em;
 	}
+	.board_name {
+		margin: 0 0 0 56px;
+	}
 	.board_lastposter {
 		display: block;
 	}
-	.board_stats, .topic_stats {
-		display: none;
+	.board_name:after {
+		display: block;
+		clear: both;
+		content:"";
+	}
+	.board_description, .moderators, .childboards {
+		margin: 0 0 0 8px;
 	}
 	/* Playing silly buggers with a sidebar menu option for narrow screens. */
 	#main_container {
-	position:relative;
-	padding: 0 0 0 12px;
+		position: relative;
+		padding: 0 0 0 12px;
 	}
 	#menu_sidebar {
 		position: absolute;
@@ -3963,26 +4212,48 @@ dl.merge_topic dd {
 		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 		z-index: 90;
 	}
-	#menu_sidebar ul, #menu_sidebar .cat_bar {
+	#menu_sidebar ul, #menu_sidebar .category_header {
 		display: none;
 	}
 	#menu_sidebar:hover {
 		width: 200px;
 		padding: 0.8em 1em 1em 0.6em;
 	}
-	#menu_sidebar:hover ul, #menu_sidebar:hover .cat_bar {
+	#menu_sidebar:hover ul, #menu_sidebar:hover .category_header {
 		display: block;
 	}
 	/* End playing silly buggers. */
+	#top_section_notice {
+		min-width: 250px;
+	}
+	#password_login select {
+		display: none;
+	}
 }
 /* This one does 480 screens at default font size. */
 @media screen and (max-width: 30em) {
+	#posting_icons, .table_list .stats, .table_list .lastpost, .table_grid .lastpost {
+		display: none;
+	}
+	#wrapper, .frame {
+		width: 100%;
+		min-width: 300px;
+	}
+	#main_content_section {
+		padding: 1px 2px 16px 3px;
+	}
+	#search_form .input_text {
+		width: 7em;
+	}
+	.post {
+		margin: 0 0 0 5px;
+	}
 	.frame {
 		min-width: 100%;
 		border-radius: 0;
 	}
-	.board_info, .board_latest {
-		display: block;
+	.board_lastpost {
+		display: none;
 	}
 	.board_latest {
 		padding-left: 64px;
@@ -3990,5 +4261,190 @@ dl.merge_topic dd {
 	}
 	.board_description, .moderators {
 		display: none;
+	}
+	.topic_info {
+		display: block;
+		width: 90%;
+		padding: 8px;
+	}
+	.topic_icons {
+		display: none;
+	}
+	.topic_moderation {
+		display: none;
+	}
+	.topic_latest {
+		display: block;
+		padding: 5px;
+		width: 97%;
+	}
+	ul.buttonlist, ul.buttonlist li, .pagelinks {
+		float: none;
+		display: block;
+	}
+	ul.buttonlist:before {
+		display: block;
+		clear: both;
+		content:"";
+	}
+	.pagelinks {
+		height: 30px;
+		/* Necessary for some browsers to keep the pages all on the same line */
+		min-width: 100%;
+	}
+	.topic_name, .topic_starter {
+		margin: 0;
+	}
+	.topic_name h4 {
+		display: block;
+		font-size: 1.4em;
+	}
+	#wrapper {
+		padding-left: 2px;
+		padding-right: 2px;
+	}
+	#gobottom, #gotop {
+		padding-left: 0.25em;
+	}
+	#message_index_jump_to {
+		display: block;
+		float: none;
+	}
+	#news, #logobox, #logoboxleft, #top_section_notice {
+		display: none;
+	}
+	.avatar>.linklevel1>.avatar {
+		max-width: 40px;
+		max-height: 40px;
+	}
+	.postarea {
+		display: block;
+		margin: 0;
+	}
+	#forumposts .windowbg {
+		padding: 5px;
+	}
+	#forumposts h2 img {
+		display: none;
+	}
+	.keyinfo h5 {
+		padding: 3px;
+	}
+	h2 .views_text, h2 .nextlinks {
+		display: block;
+		float: none;
+		line-height: 1.4em;
+	}
+	.modified {
+		display: none;
+	}
+	.childboards {
+		margin: 0 5px;
+	}
+	.board_info, .board_latest {
+		width: 100%;
+	}
+	.board_info a img {
+		width: 20px;
+		height: 20px;
+	}
+	.board_info h3 a {
+		font-size: 1.3em;
+	}
+	.board_latest {
+		padding: 0 8px;
+		max-width: 410px;
+		min-width: 250px;
+	}
+	.board_info:after {
+		display: block;
+		clear: both;
+		content:"";
+	}
+	.board_lastpost {
+		padding-top: 6px;
+	}
+	.icon_anchor {
+		min-width: 0;
+	}
+	.lastpost_link {
+		font-size: 1.1em;
+		display: block;
+	}
+	.recentboard, .recentposter {
+		display: none;
+	}
+	.lastpost_link, .board_lastposter, .board_lasttime {
+		white-space: normal;
+	}
+	#basicinfo, #detailedinfo {
+		float: none;
+		width: 100%;
+	}
+	select, .input_text {
+		max-width: 12em;
+	}
+	.login {
+		width: 100%;
+	}
+	.views_text, .nextlinks {
+		display: none !important;
+	}
+	#top, #gotop, #gobottom {
+		display: none;
+	}
+	#main_menu li, .admin_menu li{
+		float: none;
+	}
+	.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
+		left: -4px;
+	}
+	.listlevel2, .listlevel3 {
+		width: 14em;
+	}
+	.menulevel3 {
+		margin: -2em 0 0 4em;
+		max-width: 15em;
+	}
+	ul.poster {
+		display: block;
+		clear: both;
+		text-align: center;
+	}
+	.poster {
+		float: none;
+		padding: 0 1em 0 1.5em;
+	}
+	.poster .listlevel1 {
+		display: inline-block;
+	}
+	.poster .subsections {
+		max-width: 120px;
+		max-height: 1.5em;
+		float: left;
+	}
+	.poster .subsections>a {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.poster .membergroup {
+		float: right;
+	}
+	.poster .title, .poster .poster_online, .icons img {
+		display: none;
+	}
+	.poster:after, .posterarea:before {
+		display: block;
+		clear: both;
+		content:"";
+		border-bottom: 1px solid #BFBFBF;
+		padding-bottom: 3px;
+	}
+
+	/*	$MODERATE	*/
+	/* ------------------------------------------------------- */
+	.split_topics, .move_topic {
+
 	}
 }

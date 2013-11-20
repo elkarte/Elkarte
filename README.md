@@ -1,7 +1,9 @@
-This is the **Elkarte** development repository.
+[![ElkArte](https://raw.github.com/elkarte/Elkarte/master/themes/default/images/logo.png "ElkArte")](http://www.elkarte.net "ElkArte")
+
+This is the **ElkArte** development repository.
 
 
-Elkarte is a modified version of the SMF forum software.
+ElkArte is a modified version of the SMF forum software.
 
 The software is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
 
@@ -15,6 +17,8 @@ Please see the [Developer's Certificate of Origin](https://github.com/elkarte/El
 by signing off your contributions, you acknowledge that you can and do license your submissions under the license of the project.
 
 Please see [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) for information on how to contribute to the development process.
+
+[![Build Status](https://travis-ci.org/elkarte/Elkarte.png?branch=master)](https://travis-ci.org/elkarte/Elkarte)
 
 Site and IRC
 ===

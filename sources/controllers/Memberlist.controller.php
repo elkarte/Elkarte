@@ -148,10 +148,6 @@ class Memberlist_Controller extends Action_Controller
 			$context['colspan'] += isset($column['colspan']) ? $column['colspan'] : 1;
 		}
 
-		// Define the last column of those that remain
-		end($context['columns']);
-		$context['columns'][key($context['columns'])]['class'] = 'last_th';
-
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=memberlist',
 			'name' => $txt['members_list']
@@ -161,7 +157,7 @@ class Memberlist_Controller extends Action_Controller
 
 		// Build the memberlist button array.
 		$context['memberlist_buttons'] = array(
-			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist' . ';sa=all', 'active'=> true),
+			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active'=> true),
 		);
 
 		// Are there custom fields they can search?
@@ -334,7 +330,7 @@ class Memberlist_Controller extends Action_Controller
 
 				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{
-					$context['members'][$i]['sort_letter'] = htmlspecialchars($this_letter);
+					$context['members'][$i]['sort_letter'] = htmlspecialchars($this_letter, ENT_COMPAT, 'UTF-8');
 					$last_letter = $this_letter;
 				}
 			}
@@ -349,8 +345,6 @@ class Memberlist_Controller extends Action_Controller
 	public function action_mlsearch()
 	{
 		global $txt, $scripturl, $context, $modSettings;
-
-		$db = database();
 
 		$context['page_title'] = $txt['mlist_search'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
@@ -425,7 +419,7 @@ class Memberlist_Controller extends Action_Controller
 			else
 				$condition = '';
 
-			if ($db->db_case_sensitive())
+			if (defined('DB_CASE_SENSITIVE'))
 			{
 				foreach ($fields as $key => $field)
 					$fields[$key] = 'LOWER(' . $field . ')';
@@ -440,13 +434,13 @@ class Memberlist_Controller extends Action_Controller
 				$curField = substr($field, 5);
 				if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
 				{
-					$customJoin[] = 'LEFT JOIN {db_prefix}themes AS t' . $curField . ' ON (t' . $curField . '.variable = {string:t' . $curField . '} AND t' . $curField . '.id_theme = 1 AND t' . $curField . '.id_member = mem.id_member)';
-					$query_parameters['t' . $curField] = $curField;
-					$fields += array($customCount++ => 'IFNULL(t' . $curField . '.value, {string:blank_string})');
+					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
+					$query_parameters['cfd' . $curField] = $curField;
+					$fields += array($customCount++ => 'IFNULL(cfd' . $curField . '.value, {string:blank_string})');
 				}
 			}
 
-			$query = $_POST['search'] == '' ? '= {string:blank_string}' : ($db->db_case_sensitive() ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
+			$query = $_POST['search'] == '' ? '= {string:blank_string}' : (defined('DB_CASE_SENSITIVE') ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 			// Find the members from the database.

@@ -49,12 +49,16 @@ class Maintenance_Controller extends Action_Controller
 				'database' => array(),
 				'members' => array(),
 				'topics' => array(),
+				'topics' => array(),
+				'hooks' => array(),
+				'attachments' => array('label' => $txt['maintain_sub_attachments']),
 			),
 		);
 
 		// So many things you can do - but frankly I won't let you - just these!
 		$subActions = array(
 			'routine' => array(
+				'controller' => $this,
 				'function' => 'action_routine',
 				'activities' => array(
 					'version' => 'action_version_display',
@@ -65,6 +69,7 @@ class Maintenance_Controller extends Action_Controller
 				),
 			),
 			'database' => array(
+				'controller' => $this,
 				'function' => 'action_database',
 				'activities' => array(
 					'optimize' => 'action_optimize_display',
@@ -73,6 +78,7 @@ class Maintenance_Controller extends Action_Controller
 				),
 			),
 			'members' => array(
+				'controller' => $this,
 				'function' => 'action_members',
 				'activities' => array(
 					'reattribute' => 'action_reattribute_display',
@@ -81,6 +87,7 @@ class Maintenance_Controller extends Action_Controller
 				),
 			),
 			'topics' => array(
+				'controller' => $this,
 				'function' => 'action_topics',
 				'activities' => array(
 					'massmove' => 'action_massmove_display',
@@ -88,26 +95,35 @@ class Maintenance_Controller extends Action_Controller
 					'olddrafts' => 'action_olddrafts_display',
 				),
 			),
+			'hooks' => array(
+				'controller' => $this,
+				'function' => 'action_hooks'
+			),
+			'attachments' => array(
+				'file' => 'ManageAttachments.controller.php',
+				'controller' => 'ManageAttachments_Controller',
+				'function' => 'action_maintenance',
+			),
 		);
 
 		call_integration_hook('integrate_manage_maintenance', array(&$subActions));
 
 		// Yep, sub-action time!
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'routine';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'routine';
 
 		// Doing something special?
 		if (isset($_REQUEST['activity']) && isset($subActions[$subAction]['activities'][$_REQUEST['activity']]))
 			$activity = $_REQUEST['activity'];
 
 		// Set a few things.
+		$context[$context['admin_menu_name']]['current_subsection'] = $subAction;
 		$context['page_title'] = $txt['maintain_title'];
 		$context['sub_action'] = $subAction;
 
 		// Finally fall through to what we are doing.
-		$this->{$subActions[$subAction]['function']}();
+		$action = new Action();
+		$action->initialize($subActions, 'routine');
+		$action->dispatch($subAction);
 
 		// Any special activity?
 		if (isset($activity))
@@ -129,8 +145,6 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $db_type, $modSettings, $maintenance;
 
-		$db = database();
-
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');
 
@@ -139,12 +153,7 @@ class Maintenance_Controller extends Action_Controller
 
 		if ($db_type == 'mysql')
 		{
-			$table = db_table();
-
-			$colData = $table->db_list_columns('{db_prefix}messages', true);
-			foreach ($colData as $column)
-				if ($column['name'] == 'body')
-					$body_type = $column['type'];
+			$body_type = fetchBodyType();
 
 			$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
 			$context['convert_to_suggest'] = ($body_type != 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
@@ -327,6 +336,8 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		require_once(SUBSDIR . '/Cache.subs.php');
+
 		checkSession();
 		validateToken('admin-maint');
 
@@ -394,7 +405,7 @@ class Maintenance_Controller extends Action_Controller
 
 			// Make it longer so we can do their limit.
 			if ($body_type == 'text')
-				 resizeMessageTableBody('mediumtext');
+				resizeMessageTableBody('mediumtext');
 			// Shorten the column so we can have a bit (literally per record) less space occupied
 			else
 				resizeMessageTableBody('text');
@@ -481,7 +492,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_optimize_display()
 	{
-		global $db_type, $txt, $context;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 
@@ -533,7 +544,7 @@ class Maintenance_Controller extends Action_Controller
 	 * Totals recounted:
 	 * - fixes for topics with wrong num_replies.
 	 * - updates for num_posts and num_topics of all boards.
-	 * - recounts instant_messages but not unread_messages.
+	 * - recounts personal_messages but not unread_messages.
 	 * - repairs messages pointing to boards with topics pointing to other boards.
 	 * - updates the last message posted in boards and children.
 	 * - updates member count, latest member, topic count, and message count.
@@ -816,24 +827,50 @@ class Maintenance_Controller extends Action_Controller
 
 		checkSession();
 
-		// Find the member.
-		require_once(SUBSDIR . '/Auth.subs.php');
-		$members = findMembers($_POST['to']);
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
 
-		if (empty($members))
-			fatal_lang_error('reattribute_cannot_find_member');
+		$validator->sanitation_rules(array('posts' => 'empty', 'type' => 'trim', 'from_email' => 'trim', 'from_name' => 'trim', 'to' => 'trim'));
+		$validator->validation_rules(array('from_email' => 'valid_email', 'from_name' => 'required', 'to' => 'required', 'type' => 'contains[name,email]'));
+		$validator->validate($_POST);
 
-		$memID = array_shift($members);
-		$memID = $memID['id'];
+		// Do we have a valid set of options to continue?
+		if (($validator->type === 'name' && !empty($validator->from_name)) || ($validator->type === 'email' && !$validator->validation_errors('from_email')))
+		{
+			// Find the member.
+			require_once(SUBSDIR . '/Auth.subs.php');
+			$members = findMembers($validator->to);
 
-		$email = $_POST['type'] == 'email' ? $_POST['from_email'] : '';
-		$membername = $_POST['type'] == 'name' ? $_POST['from_name'] : '';
+			if (empty($members))
+				fatal_lang_error('reattribute_cannot_find_member');
 
-		// Now call the reattribute function.
-		require_once(SUBSDIR . '/Members.subs.php');
-		reattributePosts($memID, $email, $membername, !empty($_POST['posts']));
+			$memID = array_shift($members);
+			$memID = $memID['id'];
 
-		$context['maintenance_finished'] = $txt['maintain_reattribute_posts'];
+			$email = $validator->type == 'email' ? $validator->from_email : '';
+			$membername = $validator->type == 'name' ? $validator->from_name : '';
+
+			// Now call the reattribute function.
+			require_once(SUBSDIR . '/Members.subs.php');
+			reattributePosts($memID, $email, $membername, !$validator->posts);
+
+			$context['maintenance_finished'] = array(
+				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_reattribute_posts'])),
+			);
+		}
+		else
+		{
+			// Show them the correct error
+			if ($validator->type === 'name' && empty($validator->from_name))
+				$error = $validator->validation_errors(array('from_name', 'to'));
+			else
+				$error = $validator->validation_errors(array('from_email', 'to'));
+
+			$context['maintenance_finished'] = array(
+				'errors' => $error,
+				'type' => 'minor',
+			);
+		}
 	}
 
 	/**
@@ -862,24 +899,38 @@ class Maintenance_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$_POST['maxdays'] = empty($_POST['maxdays']) ? 0 : (int) $_POST['maxdays'];
-		if (!empty($_POST['groups']) && $_POST['maxdays'] > 0)
-		{
-			checkSession();
-			validateToken('admin-maint');
+		checkSession();
+		validateToken('admin-maint');
 
+		require_once(SUBSDIR . '/DataValidator.class.php');
+		$validator = new Data_Validator();
+		$validator->sanitation_rules(array('maxdays' => 'intval'));
+		$validator->validation_rules(array('maxdays' => 'required',	'groups' => 'isarray', 'del_type' => 'required'));
+
+		if ($validator->validate($_POST))
+		{
 			$groups = array();
-			foreach ($_POST['groups'] as $id => $dummy)
+			foreach ($validator->groups as $id => $dummy)
 				$groups[] = (int) $id;
-			$time_limit = (time() - ($_POST['maxdays'] * 24 * 3600));
-			$members = purgeMembers($_POST['type'], $groups, $time_limit);
+			$time_limit = (time() - ($validator->maxdays * 24 * 3600));
+
+			require_once(SUBSDIR . '/Maintenance.subs.php');
+			$members = purgeMembers($validator->type, $groups, $time_limit);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($members);
-		}
 
-		$context['maintenance_finished'] = $txt['maintain_members'];
-		createToken('admin-maint');
+			$context['maintenance_finished'] = array(
+				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_members'])),
+			);
+		}
+		else
+		{
+			$context['maintenance_finished'] = array(
+				'errors' => $validator->validation_errors(),
+				'type' => 'minor',
+			);
+		}
 	}
 
 	/**
@@ -903,7 +954,6 @@ class Maintenance_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 		$drafts = getOldDrafts($_POST['draftdays']);
-
 
 		// If we have old drafts, remove them
 		if (count($drafts) > 0)
@@ -996,11 +1046,199 @@ class Maintenance_Controller extends Action_Controller
 	}
 
 	/**
+	 * Generates a list of integration hooks for display
+	 * Accessed through ?action=admin;area=addonsettings;sa=hooks;
+	 * Allows for removal or disabing of selected hooks
+	 */
+	public function action_hooks()
+	{
+		global $scripturl, $context, $txt, $modSettings, $settings;
+
+		require_once(SUBSDIR . '/AddonSettings.subs.php');
+
+		$context['filter_url'] = '';
+		$context['current_filter'] = '';
+		$currentHooks = get_integration_hooks();
+		if (isset($_GET['filter']) && in_array($_GET['filter'], array_keys($currentHooks)))
+		{
+			$context['filter_url'] = ';filter=' . $_GET['filter'];
+			$context['current_filter'] = $_GET['filter'];
+		}
+
+		if (!empty($modSettings['handlinghooks_enabled']))
+		{
+			if (!empty($_REQUEST['do']) && isset($_REQUEST['hook']) && isset($_REQUEST['function']))
+			{
+				checkSession('request');
+				validateToken('admin-hook', 'request');
+
+				if ($_REQUEST['do'] == 'remove')
+					remove_integration_function($_REQUEST['hook'], urldecode($_REQUEST['function']));
+				else
+				{
+					if ($_REQUEST['do'] == 'disable')
+					{
+						// It's a hack I know...but I'm way too lazy!!!
+						$function_remove = $_REQUEST['function'];
+						$function_add = $_REQUEST['function'] . ']';
+					}
+					else
+					{
+						$function_remove = $_REQUEST['function'] . ']';
+						$function_add = $_REQUEST['function'];
+					}
+					$file = !empty($_REQUEST['includedfile']) ? urldecode($_REQUEST['includedfile']) : '';
+
+					remove_integration_function($_REQUEST['hook'], $function_remove, $file);
+					add_integration_function($_REQUEST['hook'], $function_add, $file);
+
+					// clean the cache.
+					require_once(SUBSDIR . '/Cache.subs.php');
+					clean_cache();
+
+					redirectexit('action=admin;area=addonsettings;sa=hooks' . $context['filter_url']);
+				}
+			}
+		}
+
+		$list_options = array(
+			'id' => 'list_integration_hooks',
+			'title' => $txt['maintain_sub_hooks_list'],
+			'items_per_page' => 20,
+			'base_href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			'default_sort_col' => 'hook_name',
+			'get_items' => array(
+				'function' => array($this, 'list_getIntegrationHooks'),
+			),
+			'get_count' => array(
+				'function' => array($this, 'list_getIntegrationHooksCount'),
+			),
+			'no_items_label' => $txt['hooks_no_hooks'],
+			'columns' => array(
+				'hook_name' => array(
+					'header' => array(
+						'value' => $txt['hooks_field_hook_name'],
+					),
+					'data' => array(
+						'db' => 'hook_name',
+					),
+					'sort' =>  array(
+						'default' => 'hook_name',
+						'reverse' => 'hook_name DESC',
+					),
+				),
+				'function_name' => array(
+					'header' => array(
+						'value' => $txt['hooks_field_function_name'],
+					),
+					'data' => array(
+						'function' => create_function('$data', '
+							global $txt;
+
+							if (!empty($data[\'included_file\']))
+								return $txt[\'hooks_field_function\'] . \': \' . $data[\'real_function\'] . \'<br />\' . $txt[\'hooks_field_included_file\'] . \': \' . $data[\'included_file\'];
+							else
+								return $data[\'real_function\'];
+						'),
+					),
+					'sort' =>  array(
+						'default' => 'function_name',
+						'reverse' => 'function_name DESC',
+					),
+				),
+				'file_name' => array(
+					'header' => array(
+						'value' => $txt['hooks_field_file_name'],
+					),
+					'data' => array(
+						'db' => 'file_name',
+					),
+					'sort' =>  array(
+						'default' => 'file_name',
+						'reverse' => 'file_name DESC',
+					),
+				),
+				'status' => array(
+					'header' => array(
+						'value' => $txt['hooks_field_hook_exists'],
+						'style' => 'width:3%;',
+					),
+					'data' => array(
+						'function' => create_function('$data', '
+							global $txt, $settings, $scripturl, $context;
+
+							$change_status = array(\'before\' => \'\', \'after\' => \'\');
+							if ($data[\'can_be_disabled\'] && $data[\'status\'] != \'deny\')
+							{
+								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
+								$change_status[\'after\'] = \'</a>\';
+							}
+							return $change_status[\'before\'] . \'<img src="\' . $settings[\'images_url\'] . \'/admin/post_moderation_\' . $data[\'status\'] . \'.png" alt="\' . $data[\'img_text\'] . \'" title="\' . $data[\'img_text\'] . \'" />\' . $change_status[\'after\'];
+						'),
+						'class' => 'centertext',
+					),
+					'sort' =>  array(
+						'default' => 'status',
+						'reverse' => 'status DESC',
+					),
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'after_title',
+					'value' => $txt['hooks_disable_instructions'] . '<br />
+						' . $txt['hooks_disable_legend'] . ':
+										<ul style="list-style: none;">
+						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_allow.png" alt="' . $txt['hooks_active'] . '" title="' . $txt['hooks_active'] . '" /> ' . $txt['hooks_disable_legend_exists'] . '</li>
+						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" alt="' . $txt['hooks_disabled'] . '" title="' . $txt['hooks_disabled'] . '" /> ' . $txt['hooks_disable_legend_disabled'] . '</li>
+						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_deny.png" alt="' . $txt['hooks_missing'] . '" title="' . $txt['hooks_missing'] . '" /> ' . $txt['hooks_disable_legend_missing'] . '</li>
+					</ul>'
+				),
+			),
+		);
+
+		if (!empty($modSettings['handlinghooks_enabled']))
+		{
+			createToken('admin-hook', 'request');
+
+			$list_options['columns']['remove'] = array(
+				'header' => array(
+					'value' => $txt['hooks_button_remove'],
+					'style' => 'width:3%',
+				),
+				'data' => array(
+					'function' => create_function('$data', '
+						global $txt, $settings, $scripturl, $context;
+
+						if (!$data[\'hook_exists\'])
+							return \'
+							<a href="\' . $scripturl . \'?action=admin;area=addonsettings;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
+								<img src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="\' . $txt[\'hooks_button_remove\'] . \'" title="\' . $txt[\'hooks_button_remove\'] . \'" />
+							</a>\';
+					'),
+					'class' => 'centertext',
+				),
+			);
+			$list_options['form'] = array(
+				'href' => $scripturl . '?action=admin;area=addonsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'name' => 'list_integration_hooks',
+			);
+		}
+
+		require_once(SUBSDIR . '/List.class.php');
+		createList($list_options);
+
+		$context['page_title'] = $txt['maintain_sub_hooks_list'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'list_integration_hooks';
+	}
+
+	/**
 	 * Recalculate all members post counts
 	 * it requires the admin_forum permission.
 	 *
 	 * - recounts all posts for members found in the message table
-	 * - updates the members post count record in the members talbe
+	 * - updates the members post count record in the members table
 	 * - honors the boards post count flag
 	 * - does not count posts in the recyle bin
 	 * - zeros post counts for all members with no posts in the message table
@@ -1057,12 +1295,40 @@ class Maintenance_Controller extends Action_Controller
 				apache_reset_timeout();
 			return;
 		}
+		
 		// No countable posts? set posts counter to 0
-		 updateZeroPostMembers();
+		updateZeroPostMembers();
 
 		// all done
 		unset($_SESSION['total_members']);
 		$context['maintenance_finished'] = $txt['maintain_recountposts'];
 		redirectexit('action=admin;area=maintain;sa=members;done=recountposts');
+	}
+
+	/**
+	 * Simply returns the total count of integration hooks
+	 * Callback for createList().
+	 *
+	 * @return int
+	 */
+	function list_getIntegrationHooksCount()
+	{
+		global $context;
+
+		$context['filter'] = false;
+		if (isset($_GET['filter']))
+			$context['filter'] = $_GET['filter'];
+
+		return integration_hooks_count($context['filter']);
+	}
+
+	/**
+	 * Callback for createList().
+	 *
+	 * @return array
+	 */
+	function list_getIntegrationHooks($start, $per_page, $sort)
+	{
+		return list_integration_hooks_data($start, $per_page, $sort);
 	}
 }

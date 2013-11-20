@@ -79,7 +79,7 @@ class Draft_Controller extends Action_Controller
 
 		// Get things started
 		$user_drafts = array();
-		$msgCount = draftsCount($memID, 0);
+		$msgCount = draftsCount($memID, 0, false);
 		$maxIndex = (int) $modSettings['defaultMaxMessages'];
 
 		// Make sure the starting place makes sense and construct our friend the page index.
@@ -98,8 +98,7 @@ class Draft_Controller extends Action_Controller
 		// Find this user's drafts
 		$limit = $start . ', ' . $maxIndex;
 		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
-		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
-		$user_drafts = load_user_drafts($memID, 0, false, $drafts_keep_days, $order, $limit);
+		$user_drafts = load_user_drafts($memID, 0, false, $order, $limit);
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
@@ -151,8 +150,9 @@ class Draft_Controller extends Action_Controller
 
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
-			'title' => $txt['drafts_show'] . ' - ' . $context['member']['name'],
-			'icon' => 'inbox_hd.png'
+			'title' => $txt['drafts_show'],
+			'icon' => 'inbox_hd.png',
+			'description' => $txt['drafts_show_desc'],
 		);
 
 		$context['sub_template'] = 'showDrafts';
@@ -206,7 +206,7 @@ class Draft_Controller extends Action_Controller
 			$_REQUEST['viewscount'] = 10;
 
 		// Get the count of applicable drafts
-		$msgCount = draftsCount($memID, 1);
+		$msgCount = draftsCount($memID, 1, false);
 
 		// Make sure the starting place makes sense and construct our friend the page index.
 		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;sa=showpmdrafts', $context['start'], $msgCount, $maxIndex);
@@ -224,8 +224,7 @@ class Draft_Controller extends Action_Controller
 		// Go get em'
 		$order = 'ud.id_draft ' . ($reverse ? 'ASC' : 'DESC');
 		$limit = $start . ', ' . $maxIndex;
-		$drafts_keep_days = !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0;
-		$user_drafts = load_user_drafts($memID, 1, false, $drafts_keep_days, $order, $limit);
+		$user_drafts = load_user_drafts($memID, 1, false, $order, $limit);
 
 		// Start counting at the number of the first message displayed.
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];

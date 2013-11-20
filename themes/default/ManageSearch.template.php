@@ -25,9 +25,7 @@ function template_modify_weights()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_weights'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['search_weights'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -106,17 +104,13 @@ function template_select_search_method()
 
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['search_method'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['search_method'], '</h2>
 		<div class="information">
 			<div class="smalltext" style="font-weight: normal;"><a href="', $scripturl, '?action=quickhelp;help=search_why_use_index" onclick="return reqOverlayDiv(this.href);">', $txt['search_create_index_why'], '</a></div>
 		</div>
 
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=method" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_method'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['search_method'], '</h3>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -136,6 +130,7 @@ function template_select_search_method()
 						<dd>
 							', $context['table_info']['index_length'], '
 						</dd>';
+
 	echo '
 					</dl>
 					', $context['double_index'] ? '<div class="noticebox">
@@ -151,23 +146,24 @@ function template_select_search_method()
 	{
 		echo '
 							<dt>
-								<input type="radio" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'fulltext\');"': '', ' class="input_radio" />
+								<input type="radio" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'fulltext\');"' : '', ' class="input_radio" />
 								', $txt['search_method_fulltext_index'], '
 							</dt>
 							<dd>
 
 								<span class="smalltext">';
-	if (empty($context['fulltext_index']) && empty($context['cannot_create_fulltext']))
-		echo '
+		if (empty($context['fulltext_index']) && empty($context['cannot_create_fulltext']))
+			echo '
 									<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createfulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_create'], '</a>]';
-	elseif (empty($context['fulltext_index']) && !empty($context['cannot_create_fulltext']))
-		echo '
+		elseif (empty($context['fulltext_index']) && !empty($context['cannot_create_fulltext']))
+			echo '
 									<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_fulltext_cannot_create'];
-	else
-		echo '
+		else
+			echo '
 									<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=removefulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_remove'], '</a>]<br />
 									<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['fulltext_length'];
-	echo '
+
+		echo '
 									</span>
 							</dd>';
 	}
@@ -190,6 +186,7 @@ function template_select_search_method()
 	else
 		echo '
 									<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex">', $txt['search_index_create_custom'], '</a>]';
+
 	echo '
 								</span>
 							</dd>';
@@ -203,11 +200,11 @@ function template_select_search_method()
 		echo '
 							<dt>
 								<input type="radio" name="search_index" value="', $api['setting_index'], '"', !empty($modSettings['search_index']) && $modSettings['search_index'] == $api['setting_index'] ? ' checked="checked"' : '', ' class="input_radio" />
-								', $api['label'] ,'
+								', $api['label'], '
 							</dt>';
 
-	if ($api['desc'])
-		echo '
+		if ($api['desc'])
+			echo '
 							<dd>
 								<span class="smalltext">', $api['desc'], '</span>
 							</dd>';
@@ -242,9 +239,7 @@ function template_create_index()
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" method="post" accept-charset="UTF-8" name="create_index">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_create_index'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['search_create_index'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<dl class="settings">
@@ -274,16 +269,15 @@ function template_create_index()
 function template_create_index_progress()
 {
 	global $context, $scripturl, $txt;
+
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" name="autoSubmit" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['search_create_index'], '</h3>
-			</div>
+			<h3 class="category_header">', $txt['search_create_index'], '</h3>
 			<div class="windowbg">
 				<div class="content">
-					<div><p>',
-						$txt['search_create_index_not_ready'], '</p>
+					<div>
+						<p>', $txt['search_create_index_not_ready'], '</p>
 						<div class="progress_bar">
 							<div class="full_bar">', $context['percentage'], '%</div>
 							<div class="green_percent" style="width: ', $context['percentage'], '%;">&nbsp;</div>
@@ -304,17 +298,18 @@ function template_create_index_progress()
 		var txt_message = "', $txt['search_create_index_continue'], '";
 		doAutoSubmit();
 	// ]]></script>';
-
 }
 
+/**
+ * Used to show the completion of the search index creation
+ */
 function template_create_index_done()
 {
 	global $scripturl, $txt;
+
 	echo '
 	<div id="admincenter">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['search_create_index'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['search_create_index'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['search_create_index_done'], '</p>
@@ -332,12 +327,11 @@ function template_create_index_done()
 function template_spider_edit()
 {
 	global $context, $scripturl, $txt;
+
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=editspiders;sid=', $context['spider']['id'], '" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $context['page_title'], '</h3>
-			</div>
+			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="information">
 				', $txt['add_spider_desc'], '
 			</div>
@@ -391,9 +385,7 @@ function template_show_spider_logs()
 
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=logs" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['spider_logs_delete'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['spider_logs_delete'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>
@@ -423,9 +415,7 @@ function template_show_spider_stats()
 
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=sengines;sa=stats" method="post" accept-charset="UTF-8">
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['spider_logs_delete'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['spider_logs_delete'], '</h2>
 			<div class="windowbg">
 				<div class="content">
 					<p>
@@ -452,11 +442,7 @@ function template_manage_sphinx()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=managesphinx;save=1" method="post"  accept-charset="UTF-8" name="create_index">
-			<div class="cat_bar">
-				<h3 class="catbg">',
-					$context['page_title'], '
-				</h3>
-			</div>';
+			<h2 class="category_header">', $context['page_title'], '</h2>';
 
 	// any results to show?
 	if (!empty($context['settings_message']))
@@ -480,7 +466,7 @@ function template_manage_sphinx()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<label for="sphinx_data_path_input"><strong>', $txt['sphinx_index_data_path'],'</strong></label><br />
+							<label for="sphinx_data_path_input"><strong>', $txt['sphinx_index_data_path'], '</strong></label><br />
 							<span class="smalltext">', $txt['sphinx_index_data_path_desc'], '</span>
 						</dt>
 						<dd>
@@ -494,28 +480,28 @@ function template_manage_sphinx()
 							<input type="text" name="sphinx_log_path" id="sphinx_log_path_input" value="', isset($modSettings['sphinx_log_path']) ? $modSettings['sphinx_log_path'] : '/var/sphinx/log', '" size="65" />
 						</dd>
 						<dt>
-							<label for="sphinx_stopword_path_input"><strong>',$txt['sphinx_stop_word_path'],'</strong></label><br />
+							<label for="sphinx_stopword_path_input"><strong>', $txt['sphinx_stop_word_path'], '</strong></label><br />
 							<span class="smalltext">', $txt['sphinx_stop_word_path_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="sphinx_stopword_path" id="sphinx_stopword_path_input" value="', isset($modSettings['sphinx_stopword_path']) ? $modSettings['sphinx_stopword_path'] : '', '" size="65" />
 						</dd>
 						<dt>
-							<label for="sphinx_indexer_mem_input"><strong>',$txt['sphinx_memory_limit'],'</strong></label><br />
+							<label for="sphinx_indexer_mem_input"><strong>', $txt['sphinx_memory_limit'], '</strong></label><br />
 							<span class="smalltext">', $txt['sphinx_memory_limit_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '32', '" size="4" /> MB
 						</dd>
 						<dt>
-							<label for="sphinx_searchd_server_input"><strong>', $txt['sphinx_searchd_server'],'</strong></label><br />
+							<label for="sphinx_searchd_server_input"><strong>', $txt['sphinx_searchd_server'], '</strong></label><br />
 							<span class="smalltext">', $txt['sphinx_searchd_server_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="sphinx_searchd_server" id="sphinx_searchd_server_input" value="', isset($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost', '" size="65" />
 						</dd>
 						<dt>
-							<label for="sphinx_searchd_port_input"><strong>',$txt['sphinx_searchd_port'],'</strong></label><br />
+							<label for="sphinx_searchd_port_input"><strong>', $txt['sphinx_searchd_port'], '</strong></label><br />
 							<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
 						</dt>
 						<dd>
@@ -523,7 +509,7 @@ function template_manage_sphinx()
 						</dd>
 						<dt>
 							<label for="sphinxql_searchd_port_input"><strong>', $txt['sphinx_searchd_qlport'], '</strong></label><br />
-							<span class="smalltext">', $txt['sphinx_searchd_qlport_desc'],'</span>
+							<span class="smalltext">', $txt['sphinx_searchd_qlport_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', isset($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '3313', '" size="4" />

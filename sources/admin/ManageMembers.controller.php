@@ -41,6 +41,10 @@ class ManageMembers_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings;
 
+		// Load the essentials.
+		loadLanguage('ManageMembers');
+		loadTemplate('ManageMembers');
+
 		$subActions = array(
 			'all' => array(
 				'controller' => $this,
@@ -74,10 +78,6 @@ class ManageMembers_Controller extends Action_Controller
 
 		// You can't pass!
 		$action->isAllowedTo($subAction);
-
-		// Load the essentials.
-		loadLanguage('ManageMembers');
-		loadTemplate('ManageMembers');
 
 		// Get counts on every type of activation - for sections and filtering alike.
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -151,6 +151,9 @@ class ManageMembers_Controller extends Action_Controller
 			unset($context['tabs']['approve']);
 		}
 
+		$context['page_title'] = $txt['admin_members'];
+		$context['sub_action'] = $subAction;
+
 		$action->dispatch($subAction);
 	}
 
@@ -166,8 +169,6 @@ class ManageMembers_Controller extends Action_Controller
 	public function action_list()
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info;
-
-		$db = database();
 
 		// Set the current sub action.
 		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';
@@ -237,9 +238,9 @@ class ManageMembers_Controller extends Action_Controller
 					'values' => array('0', '1', '2'),
 				),
 				'activated' => array(
-					'db_fields' => array('CASE WHEN is_activated IN (1, 11) THEN 1 ELSE 0 END'),
+					'db_fields' => array('is_activated'),
 					'type' => 'checkbox',
-					'values' => array('0', '1'),
+					'values' => array('0', '1', '11'),
 				),
 				'membername' => array(
 					'db_fields' => array('member_name', 'real_name'),
@@ -286,7 +287,6 @@ class ManageMembers_Controller extends Action_Controller
 			$search_url_params = isset($search_params) ? base64_encode(serialize($search_params)) : null;
 
 			// @todo Validate a little more.
-
 			// Loop through every field of the form.
 			$query_parts = array();
 			$where_params = array();
@@ -361,10 +361,11 @@ class ManageMembers_Controller extends Action_Controller
 					// Replace the wildcard characters ('*' and '?') into MySQL ones.
 					$parameter = strtolower(strtr(Util::htmlspecialchars($search_params[$param_name], ENT_QUOTES), array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_')));
 
-					if ($db->db_case_sensitive())
-						$query_parts[] = '(LOWER(' . implode( ') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
+					if (defined('DB_CASE_SENSITIVE'))
+						$query_parts[] = '(LOWER(' . implode(') LIKE {string:' . $param_name . '_normal} OR LOWER(', $param_info['db_fields']) . ') LIKE {string:' . $param_name . '_normal})';
 					else
-						$query_parts[] = '(' . implode( ' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
+						$query_parts[] = '(' . implode(' LIKE {string:' . $param_name . '_normal} OR ', $param_info['db_fields']) . ' LIKE {string:' . $param_name . '_normal})';
+
 					$where_params[$param_name . '_normal'] = '%' . $parameter . '%';
 				}
 			}
@@ -601,7 +602,7 @@ class ManageMembers_Controller extends Action_Controller
 		if (!allowedTo('profile_remove_any'))
 			unset($listOptions['cols']['check'], $listOptions['form'], $listOptions['additional_rows']);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -620,8 +621,8 @@ class ManageMembers_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		require_once(SUBSDIR . '/Membergroups.subs.php');
 		// Get a list of all the membergroups and postgroups that can be selected.
+		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$groups = getBasicMembergroupData(array(), array('moderator'), null, true);
 
 		$context['membergroups'] = $groups['membergroups'];
@@ -636,7 +637,7 @@ class ManageMembers_Controller extends Action_Controller
 	 * List all members who are awaiting approval / activation, sortable on different columns.
 	 * It allows instant approval or activation of (a selection of) members.
 	 * Called by ?action=admin;area=viewmembers;sa=browse;type=approve
-	 *  or ?action=admin;area=viewmembers;sa=browse;type=activate.
+	 *   or ?action=admin;area=viewmembers;sa=browse;type=activate.
 	 * The form submits to ?action=admin;area=viewmembers;sa=approve.
 	 * Requires the moderate_forum permission.
 	 *
@@ -650,6 +651,7 @@ class ManageMembers_Controller extends Action_Controller
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'admin_browse';
 		$context['browse_type'] = isset($_REQUEST['type']) ? $_REQUEST['type'] : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
+
 		if (isset($context['tabs'][$context['browse_type']]))
 			$context['tabs'][$context['browse_type']]['is_selected'] = true;
 
@@ -967,7 +969,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		// Now that we have all the options, create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -1005,9 +1007,7 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Are we dealing with members who have been waiting for > set amount of time?
 		if (isset($_POST['time_passed']))
-		{
 			$conditions['time_before'] = time() - 86400 * (int) $_POST['time_passed'];
-		}
 		// Coming from checkboxes - validate the members passed through to us.
 		else
 		{
@@ -1017,7 +1017,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		$data = retrieveMemberData($conditions);
-		if($data['member_count'] == 0)
+		if ($data['member_count'] == 0)
 			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
 
 		$member_info = $data['member_info'];
@@ -1052,12 +1052,13 @@ class ManageMembers_Controller extends Action_Controller
 					sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 				}
 			}
+
+			// Update the menu action cache so its forced to refresh
+			cache_put_data('num_menu_errors', null, 900);
 		}
 		// Maybe we're sending it off for activation?
 		elseif ($_POST['todo'] == 'require_activation')
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
-
 			// We have to do this for each member I'm afraid.
 			foreach ($member_info as $member)
 			{
@@ -1083,7 +1084,6 @@ class ManageMembers_Controller extends Action_Controller
 		// Are we rejecting them?
 		elseif ($_POST['todo'] == 'reject' || $_POST['todo'] == 'rejectemail')
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($conditions['members']);
 
 			// Send email telling them they aren't welcome?
@@ -1103,7 +1103,6 @@ class ManageMembers_Controller extends Action_Controller
 		// A simple delete?
 		elseif ($_POST['todo'] == 'delete' || $_POST['todo'] == 'deleteemail')
 		{
-			require_once(SUBSDIR . '/Members.subs.php');
 			deleteMembers($conditions['members']);
 
 			// Send email telling them they aren't welcome?

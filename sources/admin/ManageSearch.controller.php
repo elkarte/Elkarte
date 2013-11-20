@@ -47,20 +47,18 @@ class ManageSearch_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		loadLanguage('Search');
 		loadTemplate('ManageSearch');
 
 		$subActions = array(
-			'settings' => array($this, 'action_searchSettings_display'),
-			'weights' => array($this, 'action_weight'),
-			'method' => array($this, 'action_edit'),
-			'createfulltext' => array($this, 'action_edit'),
-			'removecustom' => array($this, 'action_edit'),
-			'removefulltext' => array($this, 'action_edit'),
-			'createmsgindex' => array($this, 'action_create'),
-			'managesphinx' => array($this, 'action_managesphinx'),
+			'settings' => array($this, 'action_searchSettings_display', 'permission' => 'admin_forum'),
+			'weights' => array($this, 'action_weight', 'permission' => 'admin_forum'),
+			'method' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'createfulltext' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'removecustom' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'removefulltext' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+			'createmsgindex' => array($this, 'action_create', 'permission' => 'admin_forum'),
+			'managesphinx' => array($this, 'action_managesphinx', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_search', array(&$subActions));
@@ -68,11 +66,8 @@ class ManageSearch_Controller extends Action_Controller
 		// Default the sub-action to 'edit search settings'.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'weights';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['search_settings_title'];
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -93,6 +88,8 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions);
 		$action->dispatch($subAction);
 	}
 
@@ -143,6 +140,9 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession();
 
 			call_integration_hook('integrate_save_search_settings');
+
+			if (empty($_POST['search_results_per_page']))
+				$_POST['search_results_per_page'] = !empty($modSettings['search_results_per_page']) ? $modSettings['search_results_per_page'] : $modSettings['defaultMaxMessages'];
 
 			$new_engines = array();
 			foreach ($_POST['engine_name'] as $id => $searchengine)
@@ -206,9 +206,6 @@ class ManageSearch_Controller extends Action_Controller
 				array('title', 'additional_search_engines'),
 				array('callback', 'external_search_engines'),
 		);
-
-		addInlineJavascript('
-		document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
 
 		return $this->_searchSettings->settings($config_vars);
 	}
@@ -302,11 +299,11 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	function action_edit()
 	{
-		global $txt, $context, $modSettings, $db_type, $db_prefix;
+		global $txt, $context, $modSettings;
 
 		// need to work with some db search stuffs
 		$db_search = db_search();
-		$db = database();
+		require_once(SUBSDIR . '/ManageSearch.subs.php');
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_method_title'];
@@ -325,37 +322,15 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			// Make sure it's gone before creating it.
-			$db->query('', '
-				ALTER TABLE {db_prefix}messages
-				DROP INDEX body',
-				array(
-					'db_error_skip' => true,
-				)
-			);
-
-			$db->query('', '
-				ALTER TABLE {db_prefix}messages
-				ADD FULLTEXT body (body)',
-				array(
-				)
-			);
-
 			$context['fulltext_index'] = 'body';
+			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index'], true);
 		}
 		elseif (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'removefulltext' && !empty($context['fulltext_index']))
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$db->query('', '
-				ALTER TABLE {db_prefix}messages
-				DROP INDEX ' . implode(',
-				DROP INDEX ', $context['fulltext_index']),
-				array(
-					'db_error_skip' => true,
-				)
-			);
+			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index']);
 
 			$context['fulltext_index'] = '';
 
@@ -370,15 +345,7 @@ class ManageSearch_Controller extends Action_Controller
 			checkSession('get');
 			validateToken('admin-msm', 'get');
 
-			$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
-			if (!empty($tables))
-			{
-				$db_search->search_query('drop_words_table', '
-					DROP TABLE {db_prefix}log_search_words',
-					array(
-					)
-				);
-			}
+			drop_log_search_words();
 
 			updateSettings(array(
 				'search_custom_index_config' => '',
@@ -403,7 +370,7 @@ class ManageSearch_Controller extends Action_Controller
 			));
 		}
 
-		$context['table_info'] = array(
+		$table_info_defaults = array(
 			'data_length' => 0,
 			'index_length' => 0,
 			'fulltext_length' => 0,
@@ -411,114 +378,8 @@ class ManageSearch_Controller extends Action_Controller
 		);
 
 		// Get some info about the messages table, to show its size and index size.
-		if ($db_type == 'mysql')
-		{
-			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					FROM {string:database_name}
-					LIKE {string:table_name}',
-					array(
-						'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
-						'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
-					)
-				);
-			else
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					LIKE {string:table_name}',
-					array(
-						'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
-					)
-				);
-
-			if ($request !== false && $db->num_rows($request) == 1)
-			{
-				// Only do this if the user has permission to execute this query.
-				$row = $db->fetch_assoc($request);
-				$context['table_info']['data_length'] = $row['Data_length'];
-				$context['table_info']['index_length'] = $row['Index_length'];
-				$context['table_info']['fulltext_length'] = $row['Index_length'];
-				$db->free_result($request);
-			}
-
-			// Now check the custom index table, if it exists at all.
-			if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					FROM {string:database_name}
-					LIKE {string:table_name}',
-					array(
-						'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
-						'table_name' => str_replace('_', '\_', $match[2]) . 'log_search_words',
-					)
-				);
-			else
-				$request = $db->query('', '
-					SHOW TABLE STATUS
-					LIKE {string:table_name}',
-					array(
-						'table_name' => str_replace('_', '\_', $db_prefix) . 'log_search_words',
-					)
-				);
-
-			if ($request !== false && $db->num_rows($request) == 1)
-			{
-				// Only do this if the user has permission to execute this query.
-				$row = $db->fetch_assoc($request);
-				$context['table_info']['index_length'] += $row['Data_length'] + $row['Index_length'];
-				$context['table_info']['custom_index_length'] = $row['Data_length'] + $row['Index_length'];
-				$db->free_result($request);
-			}
-		}
-		elseif ($db_type == 'postgresql')
-		{
-			// In order to report the sizes correctly we need to perform vacuum (optimize) on the tables we will be using.
-			$temp_tables = $db->db_list_tables();
-			foreach ($temp_tables as $table)
-				if ($table == $db_prefix. 'messages' || $table == $db_prefix. 'log_search_words')
-					$db->db_optimize_table($table);
-
-			// PostGreSql has some hidden sizes.
-			$request = $db->query('', '
-				SELECT relname, relpages * 8 *1024 AS "KB" FROM pg_class
-				WHERE relname = {string:messages} OR relname = {string:log_search_words}
-				ORDER BY relpages DESC',
-				array(
-					'messages' => $db_prefix. 'messages',
-					'log_search_words' => $db_prefix. 'log_search_words',
-				)
-			);
-
-			if ($request !== false && $db->num_rows($request) > 0)
-			{
-				while ($row = $db->fetch_assoc($request))
-				{
-					if ($row['relname'] == $db_prefix . 'messages')
-					{
-						$context['table_info']['data_length'] = (int) $row['KB'];
-						$context['table_info']['index_length'] = (int) $row['KB'];
-
-						// Doesn't support fulltext
-						$context['table_info']['fulltext_length'] = $txt['not_applicable'];
-					}
-					elseif ($row['relname'] == $db_prefix. 'log_search_words')
-					{
-						$context['table_info']['index_length'] = (int) $row['KB'];
-						$context['table_info']['custom_index_length'] = (int) $row['KB'];
-					}
-				}
-				$db->free_result($request);
-			}
-			else
-				// Didn't work for some reason...
-				$context['table_info'] = array(
-					'data_length' => $txt['not_applicable'],
-					'index_length' => $txt['not_applicable'],
-					'fulltext_length' => $txt['not_applicable'],
-					'custom_index_length' => $txt['not_applicable'],
-				);
-		}
+		if (method_exists($db_search, 'membersTableInfo'))
+			$context['table_info'] = array_merge($table_info_defaults, $db_search->membersTableInfo());
 		else
 			// Here may be wolves.
 			$context['table_info'] = array(
@@ -558,11 +419,7 @@ class ManageSearch_Controller extends Action_Controller
 	 */
 	function action_create()
 	{
-		global $modSettings, $context, $db_prefix, $txt;
-
-		// Get hang of db_search
-		$db_search = db_search();
-		$db = database();
+		global $modSettings, $context, $txt;
 
 		// Scotty, we need more time...
 		@set_time_limit(600);
@@ -618,118 +475,14 @@ class ManageSearch_Controller extends Action_Controller
 		if ($context['step'] === 0)
 			$context['sub_template'] = 'create_index';
 
+		require_once(SUBSDIR . '/ManageSearch.subs.php');
+
 		// Step 1: insert all the words.
 		if ($context['step'] === 1)
 		{
 			$context['sub_template'] = 'create_index_progress';
 
-			if ($context['start'] === 0)
-			{
-				$tables = $db->db_list_tables(false, $db_prefix . 'log_search_words');
-				if (!empty($tables))
-				{
-					$db_search->search_query('drop_words_table', '
-						DROP TABLE {db_prefix}log_search_words',
-						array(
-						)
-					);
-				}
-
-				$db_search->create_word_search($index_properties[$context['index_settings']['bytes_per_word']]['column_definition']);
-
-				// Temporarily switch back to not using a search index.
-				if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
-					updateSettings(array('search_index' => ''));
-
-				// Don't let simultanious processes be updating the search index.
-				if (!empty($modSettings['search_custom_index_config']))
-					updateSettings(array('search_custom_index_config' => ''));
-			}
-
-			$num_messages = array(
-				'done' => 0,
-				'todo' => 0,
-			);
-
-			$request = $db->query('', '
-				SELECT id_msg >= {int:starting_id} AS todo, COUNT(*) AS num_messages
-				FROM {db_prefix}messages
-				GROUP BY todo',
-				array(
-					'starting_id' => $context['start'],
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
-				$num_messages[empty($row['todo']) ? 'done' : 'todo'] = $row['num_messages'];
-
-			if (empty($num_messages['todo']))
-			{
-				$context['step'] = 2;
-				$context['percentage'] = 80;
-				$context['start'] = 0;
-			}
-			else
-			{
-				// Number of seconds before the next step.
-				$stop = time() + 3;
-				while (time() < $stop)
-				{
-					$inserts = array();
-					$request = $db->query('', '
-						SELECT id_msg, body
-						FROM {db_prefix}messages
-						WHERE id_msg BETWEEN {int:starting_id} AND {int:ending_id}
-						LIMIT {int:limit}',
-						array(
-							'starting_id' => $context['start'],
-							'ending_id' => $context['start'] + $messages_per_batch - 1,
-							'limit' => $messages_per_batch,
-						)
-					);
-					$forced_break = false;
-					$number_processed = 0;
-					while ($row = $db->fetch_assoc($request))
-					{
-						// In theory it's possible for one of these to take friggin ages so add more timeout protection.
-						if ($stop < time())
-						{
-							$forced_break = true;
-							break;
-						}
-
-						$number_processed++;
-						foreach (text2words($row['body'], $context['index_settings']['bytes_per_word'], true) as $id_word)
-						{
-							$inserts[] = array($id_word, $row['id_msg']);
-						}
-					}
-					$num_messages['done'] += $number_processed;
-					$num_messages['todo'] -= $number_processed;
-					$db->free_result($request);
-
-					$context['start'] += $forced_break ? $number_processed : $messages_per_batch;
-
-					if (!empty($inserts))
-						$db->insert('ignore',
-							'{db_prefix}log_search_words',
-							array('id_word' => 'int', 'id_msg' => 'int'),
-							$inserts,
-							array('id_word', 'id_msg')
-						);
-
-					if ($num_messages['todo'] === 0)
-					{
-						$context['step'] = 2;
-						$context['start'] = 0;
-						break;
-					}
-					else
-						updateSettings(array('search_custom_index_resume' => serialize(array_merge($context['index_settings'], array('resume_at' => $context['start'])))));
-				}
-
-				// Since there are still two steps to go, 80% is the maximum here.
-				$context['percentage'] = round($num_messages['done'] / ($num_messages['done'] + $num_messages['todo']), 3) * 80;
-			}
+			list ($context['start'], $context['step'], $context['percentage']) = createSearchIndex($context['start'], $messages_per_batch, $index_properties[$context['index_settings']['bytes_per_word']]['column_definition'], $context['index_settings']);
 		}
 		// Step 2: removing the words that occur too often and are of no use.
 		elseif ($context['step'] === 2)
@@ -738,47 +491,9 @@ class ManageSearch_Controller extends Action_Controller
 				$context['step'] = 3;
 			else
 			{
-				$stop_words = $context['start'] === 0 || empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
-				$stop = time() + 3;
+				list ($context['start'], $context['step']) = removeCommonWordsFromIndex($context['start'], $index_properties[$context['index_settings']['bytes_per_word']]['step_size']);
+
 				$context['sub_template'] = 'create_index_progress';
-				$max_messages = ceil(60 * $modSettings['totalMessages'] / 100);
-
-				while (time() < $stop)
-				{
-					$request = $db->query('', '
-						SELECT id_word, COUNT(id_word) AS num_words
-						FROM {db_prefix}log_search_words
-						WHERE id_word BETWEEN {int:starting_id} AND {int:ending_id}
-						GROUP BY id_word
-						HAVING COUNT(id_word) > {int:minimum_messages}',
-						array(
-							'starting_id' => $context['start'],
-							'ending_id' => $context['start'] + $index_properties[$context['index_settings']['bytes_per_word']]['step_size'] - 1,
-							'minimum_messages' => $max_messages,
-						)
-					);
-					while ($row = $db->fetch_assoc($request))
-						$stop_words[] = $row['id_word'];
-					$db->free_result($request);
-
-					updateSettings(array('search_stopwords' => implode(',', $stop_words)));
-
-					if (!empty($stop_words))
-						$db->query('', '
-							DELETE FROM {db_prefix}log_search_words
-							WHERE id_word in ({array_int:stop_words})',
-							array(
-								'stop_words' => $stop_words,
-							)
-						);
-
-					$context['start'] += $index_properties[$context['index_settings']['bytes_per_word']]['step_size'];
-					if ($context['start'] > $index_properties[$context['index_settings']['bytes_per_word']]['max_size'])
-					{
-						$context['step'] = 3;
-						break;
-					}
-				}
 
 				$context['percentage'] = 80 + round($context['start'] / $index_properties[$context['index_settings']['bytes_per_word']]['max_size'], 3) * 20;
 			}
@@ -790,13 +505,7 @@ class ManageSearch_Controller extends Action_Controller
 			$context['sub_template'] = 'create_index_done';
 
 			updateSettings(array('search_index' => 'custom', 'search_custom_index_config' => serialize($context['index_settings'])));
-			$db->query('', '
-				DELETE FROM {db_prefix}settings
-				WHERE variable = {string:search_custom_index_resume}',
-				array(
-					'search_custom_index_resume' => 'search_custom_index_resume',
-				)
-			);
+			removeSetting('search_custom_index_resume');
 		}
 	}
 
@@ -891,6 +600,7 @@ class ManageSearch_Controller extends Action_Controller
 		{
 			checkSession();
 			validateToken('admin-mssphinx');
+			require_once(SUBSDIR . '/ManageSearch.subs.php');
 
 			createSphinxConfig();
 		}
@@ -952,212 +662,4 @@ function loadSearchAPIs()
 	closedir($dh);
 
 	return $apis;
-}
-
-/**
- * Checks if the message table already has a fulltext index created and returns the key name
- * Determines if a db is capable of creating a fulltext index
- */
-function detectFulltextIndex()
-{
-	global $context, $db_prefix;
-
-	$db = database();
-
-	$request = $db->query('', '
-		SHOW INDEX
-		FROM {db_prefix}messages',
-		array(
-		)
-	);
-	$context['fulltext_index'] = '';
-	if ($request !== false || $db->num_rows($request) != 0)
-	{
-		while ($row = $db->fetch_assoc($request))
-			if ($row['Column_name'] == 'body' && (isset($row['Index_type']) && $row['Index_type'] == 'FULLTEXT' || isset($row['Comment']) && $row['Comment'] == 'FULLTEXT'))
-				$context['fulltext_index'][] = $row['Key_name'];
-		$db->free_result($request);
-
-		if (is_array($context['fulltext_index']))
-			$context['fulltext_index'] = array_unique($context['fulltext_index']);
-	}
-
-	if (preg_match('~^`(.+?)`\.(.+?)$~', $db_prefix, $match) !== 0)
-		$request = $db->query('', '
-			SHOW TABLE STATUS
-			FROM {string:database_name}
-			LIKE {string:table_name}',
-			array(
-				'database_name' => '`' . strtr($match[1], array('`' => '')) . '`',
-				'table_name' => str_replace('_', '\_', $match[2]) . 'messages',
-			)
-		);
-	else
-		$request = $db->query('', '
-			SHOW TABLE STATUS
-			LIKE {string:table_name}',
-			array(
-				'table_name' => str_replace('_', '\_', $db_prefix) . 'messages',
-			)
-		);
-
-	if ($request !== false)
-	{
-		while ($row = $db->fetch_assoc($request))
-			if ((isset($row['Type']) && strtolower($row['Type']) != 'myisam') || (isset($row['Engine']) && strtolower($row['Engine']) != 'myisam'))
-				$context['cannot_create_fulltext'] = true;
-			
-		$db->free_result($request);
-	}
-}
-
-function createSphinxConfig()
-{
-	global $context, $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $db_character_set, $modSettings;
-
-	// set up to ouput a file to the users browser
-	ob_end_clean();
-	header('Pragma: ');
-	if (!$context['browser']['is_gecko'])
-		header('Content-Transfer-Encoding: binary');
-	header('Connection: close');
-	header('Content-Disposition: attachment; filename="sphinx.conf"');
-	header('Content-Type: application/octet-stream');
-
-	$weight_factors = array(
-		'age',
-		'length',
-		'first_message',
-		'sticky',
-	);
-
-	$weight = array();
-	$weight_total = 0;
-	foreach ($weight_factors as $weight_factor)
-	{
-		$weight[$weight_factor] = empty($modSettings['search_weight_' . $weight_factor]) ? 0 : (int) $modSettings['search_weight_' . $weight_factor];
-		$weight_total += $weight[$weight_factor];
-	}
-
-	// weightless, then use defaults
-	if ($weight_total === 0)
-	{
-		$weight = array(
-			'age' => 25,
-			'length' => 25,
-			'first_message' => 25,
-			'sticky' => 25,
-		);
-		$weight_total = 100;
-	}
-
-	// check paths are set, if not use some defaults
-	$modSettings['sphinx_data_path'] = empty($modSettings['sphinx_data_path']) ? '/var/sphinx/data' : $modSettings['sphinx_data_path'];
-	$modSettings['sphinx_log_path'] = empty($modSettings['sphinx_log_path']) ? '/var/sphinx/log' : $modSettings['sphinx_log_path'];
-
-	// output our minimal configuration file to get them started
-	echo '#
-# Sphinx configuration file (sphinx.conf), configured for ElkArte
-#
-# This is the minimum needed clean, simple, functional
-#
-# By default the location of this file would probably be:
-# /usr/local/etc/sphinx.conf
-#
-
-source elkarte_source
-{
-	type				= mysql
-	sql_host 			= ', $db_server, '
-	sql_user			= ', $db_user, '
-	sql_pass			= ', $db_passwd, '
-	sql_db				= ', $db_name, '
-	sql_port			= 3306', empty($db_character_set) ? '' : '
-	sql_query_pre		= SET NAMES ' . $db_character_set, '
-	sql_query_pre		=	\
-		REPLACE INTO ', $db_prefix, 'settings (variable, value) \
-		SELECT \'sphinx_indexed_msg_until\', MAX(id_msg) \
-		FROM ', $db_prefix, 'messages
-	sql_query_range		= \
-		SELECT 1, value \
-		FROM ', $db_prefix, 'settings \
-		WHERE variable = \'sphinx_indexed_msg_until\'
-	sql_range_step		= 1000
-	sql_query			= \
-		SELECT \
-			m.id_msg, m.id_topic, m.id_board, IF(m.id_member = 0, 4294967295, m.id_member) AS id_member, m.poster_time, m.body, m.subject, \
-			t.num_replies + 1 AS num_replies, CEILING(1000000 * ( \
-				IF(m.id_msg < 0.7 * s.value, 0, (m.id_msg - 0.7 * s.value) / (0.3 * s.value)) * ' . $weight['age'] . ' + \
-				IF(t.num_replies < 200, t.num_replies / 200, 1) * ' . $weight['length'] . ' + \
-				IF(m.id_msg = t.id_first_msg, 1, 0) * ' . $weight['first_message'] . ' + \
-				IF(t.is_sticky = 0, 0, 1) * ' . $weight['sticky'] . ' \
-			) / ' . $weight_total . ') AS relevance \
-		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
-		WHERE t.id_topic = m.id_topic \
-			AND s.variable = \'maxMsgID\' \
-			AND m.id_msg BETWEEN $start AND $end
-	sql_attr_uint		= id_topic
-	sql_attr_uint		= id_board
-	sql_attr_uint		= id_member
-	sql_attr_timestamp	= poster_time
-	sql_attr_timestamp	= relevance
-	sql_attr_timestamp	= num_replies
-	sql_query_info		= \
-		SELECT * \
-		FROM ', $db_prefix, 'messages \
-		WHERE id_msg = $id
-}
-
-source elkarte_delta_source : elkarte_source
-{
-	sql_query_pre	= ', isset($db_character_set) ? 'SET NAMES ' . $db_character_set : '', '
-	sql_query_range	= \
-		SELECT s1.value, s2.value \
-		FROM ', $db_prefix, 'settings AS s1, ', $db_prefix, 'settings AS s2 \
-		WHERE s1.variable = \'sphinx_indexed_msg_until\' \
-			AND s2.variable = \'maxMsgID\'
-}
-
-index elkarte_base_index
-{
-	html_strip 		= 1
-	source 			= elkarte_source
-	path 			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
-	stopwords 		= ' . $modSettings['sphinx_stopword_path'], '
-	min_word_len 	= 2
-	charset_type 	= utf-8
-	charset_table 	= 0..9, A..Z->a..z, _, a..z
-}
-
-index elkarte_delta_index : elkarte_base_index
-{
-	source 			= elkarte_delta_source
-	path 			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_delta.index
-}
-
-index elkarte_index
-{
-	type			= distributed
-	local			= elkarte_base_index
-	local			= elkarte_delta_index
-}
-
-indexer
-{
-	mem_limit 		= ', (empty($modSettings['sphinx_indexer_mem']) ? 32 : (int) $modSettings['sphinx_indexer_mem']), 'M
-}
-
-searchd
-{
-	listen 			= ', (empty($modSettings['sphinx_searchd_port']) ? 3312 : (int) $modSettings['sphinx_searchd_port']), '
-	listen 			= ', (empty($modSettings['sphinxql_searchd_port']) ? 3313 : (int) $modSettings['sphinxql_searchd_port']), ':mysql41
-	log 			= ', $modSettings['sphinx_log_path'], '/searchd.log
-	query_log 		= ', $modSettings['sphinx_log_path'], '/query.log
-	read_timeout 	= 5
-	max_children 	= 30
-	pid_file 		= ', $modSettings['sphinx_data_path'], '/searchd.pid
-	max_matches 	= ', (empty($modSettings['sphinx_max_results']) ? 3312 : (int) $modSettings['sphinx_max_results']), '
-}
-';
-	obExit(false, false);
 }

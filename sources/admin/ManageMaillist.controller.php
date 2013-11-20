@@ -39,6 +39,10 @@ class ManageMaillist_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		// Template & language
+		loadTemplate('Maillist');
+		loadLanguage('Maillist');
+
 		// All the functions available
 		$subActions = array(
 			'emaillist' => array($this, 'action_unapproved_email', 'permission' => 'approve_emails'),
@@ -54,27 +58,29 @@ class ManageMaillist_Controller extends Action_Controller
 			'emailparser' => array($this, 'action_list_parsers', 'permission' => 'admin_forum'),
 			'editparser' => array($this, 'action_edit_parsers', 'permission' => 'admin_forum'),
 			'deleteparser' => array($this, 'action_delete_parsers', 'permission' => 'admin_forum'),
+			'sortparsers' => array($this, 'action_sort_parsers', 'permission' => 'admin_forum'),
+			'sortfilters' => array($this, 'action_sort_filters', 'permission' => 'admin_forum'),
 		);
 
-		// Set up the action class
-		$action = new Action();
-		$action->initialize($subActions, 'emaillist');
-
 		// Default to sub action 'emaillist' if none was given
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']][1]) || allowedTo($subActions[$_REQUEST['sa']][1])) ? $_REQUEST['sa'] : 'emaillist';
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && (empty($subActions[$_REQUEST['sa']]['permission']) || allowedTo($subActions[$_REQUEST['sa']]['permission'])) ? $_REQUEST['sa'] : 'emaillist';
 
-		// Template & language
-		loadTemplate('Maillist');
-		loadLanguage('Maillist');
+		// Helper is needed in most places, so load it up front
+		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// Create the title area for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['ml_admin_configuration'],
-			'help' => $txt['maillist_help_short'],
+			'help' => 'maillist_help_short',
 			'description' => $txt['ml_configuration_desc'],
 		);
 
+		$context['page_title'] = $txt['ml_admin_configuration'];
+		$context['sub_action'] = $subAction;
+
 		// If you have the permissions, then go Play
+		$action = new Action();
+		$action->initialize($subActions, 'emaillist');
 		$action->dispatch($subAction);
 	}
 
@@ -93,7 +99,6 @@ class ManageMaillist_Controller extends Action_Controller
 		if (empty($id) || $id <= 0)
 			$id = 0;
 
-		require_once(SUBSDIR . '/Maillist.subs.php');
 		createToken('admin-ml', 'get');
 
 		// Build the list option array to display the email data
@@ -120,10 +125,10 @@ class ManageMaillist_Controller extends Action_Controller
 				'id_email' => array(
 					'header' => array(
 						'value' => $txt['id'],
+						'style' => 'white-space: nowrap;',
 					),
 					'data' => array(
 						'db' => 'id_email',
-						'style' => 'width: 2.2em;',
 					),
 					'sort' => array(
 						'default' => 'id_email ',
@@ -264,7 +269,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'view_email_errors';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -281,23 +286,21 @@ class ManageMaillist_Controller extends Action_Controller
 		validateToken('admin-ml', 'get');
 
 		$id = (int) $_GET['item'];
-
 		if (!empty($id))
 		{
-			require_once(SUBSDIR . '/Maillist.subs.php');
-
-			// load up the email details, no funny biz ;)
+			// Load up the email details, no funny biz ;)
 			$temp_email = list_maillist_unapproved('', '', '', $id);
 
 			if (!empty($temp_email))
 			{
 				if ($temp_email[0]['type'] !== 'p' && allowedTo('approve_emails'))
 				{
-					$data = (int) $temp_email[0]['body'];
+					// The raw email that failed
+					$data = $temp_email[0]['body'];
 
 					// Read/parse this message for viewing
 					require_once(CONTROLLERDIR . '/Emailpost.controller.php');
-					$controller = Emailpost_Controller();
+					$controller = new Emailpost_Controller();
 					$result = $controller->action_pbe_preview($data);
 					$text = isset($result['body']) ? $result['body'] : '';
 					$email_to = isset($result['to']) ? $result['to'] : '';
@@ -315,7 +318,7 @@ class ManageMaillist_Controller extends Action_Controller
 		else
 			$text = $txt['badid'];
 
-		// prep and show the template with what we found
+		// Prep and show the template with what we found
 		$context['body'] = parse_bbc($text);
 		$context['to'] = $txt['to'] . ' ' . (isset($email_to) ? $email_to : '');
 		$context['notice_subject'] = (isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '');
@@ -336,12 +339,10 @@ class ManageMaillist_Controller extends Action_Controller
 		validateToken('admin-ml', 'get');
 
 		$id = (int) $_GET['item'];
+
+		// Remove this entry
 		if (!empty($id))
-		{
-			// remove this entry
-			require_once(SUBSDIR . '/Maillist.subs.php');
 			maillist_delete_error_entry($id);
-		}
 
 		// Flush the cache
 		cache_put_data('num_menu_errors', null, 900);
@@ -370,7 +371,6 @@ class ManageMaillist_Controller extends Action_Controller
 		if (!empty($id) && $id !== -1)
 		{
 			// Load up the email data
-			require_once(SUBSDIR . '/Maillist.subs.php');
 			$temp_email = list_maillist_unapproved('', '', '', $id);
 			if (!empty($temp_email))
 			{
@@ -439,7 +439,6 @@ class ManageMaillist_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/Mail.subs.php');
-		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// We should have been sent an email ID
 		if (isset($_REQUEST['item']))
@@ -452,10 +451,9 @@ class ManageMaillist_Controller extends Action_Controller
 
 			if (!empty($temp_email))
 			{
-				// set the options
+				// Set the options
 				$_POST['item'] = (int) $temp_email[0]['id_email'];
 				$fullerrortext = $txt[$temp_email[0]['error_code']];
-				$shorterrortext = $temp_email[0]['error'];
 
 				// Build the template selection area, first the standard ones
 				$bounce = array('bounce', 'inform');
@@ -517,7 +515,7 @@ class ManageMaillist_Controller extends Action_Controller
 			}
 		}
 
-		// Prep and show the template
+		// Prepare and show the template
 		createToken('admin-ml');
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
 		$context['body'] = parse_bbc($fullerrortext);
@@ -532,16 +530,14 @@ class ManageMaillist_Controller extends Action_Controller
 	 * - Allows to add/edit or delete filters
 	 * - Filters are used to alter text in a post, to remove crud that comes with emails
 	 * - Filters can be defined as regex, the system will check it for valid syntax
-	 * - Uses list_get_filter_parser for the data and list_count_filter_parser for the number
 	 */
 	public function action_list_filters()
 	{
 		global $context, $scripturl, $txt, $settings, $modSettings;
 
 		$id = 0;
-		require_once(SUBSDIR . '/Maillist.subs.php');
 
-		// build the listoption array to display the filters
+		// Build the listoption array to display the filters
 		$listOptions = array(
 			'id' => 'email_filter',
 			'title' => $txt['filters'],
@@ -550,14 +546,14 @@ class ManageMaillist_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailfilters',
 			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => 'list_get_filter_parser',
+				'function' => array($this, 'load_filter_parser'),
 				'params' => array(
 					$id,
 					'filter'
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_count_filter_parser',
+				'function' => array($this, 'count_filter_parser'),
 				'params' => array(
 					$id,
 					'filter'
@@ -652,8 +648,9 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="right_submit" />',
-				),
+					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=maillist;sa=sortfilters">' . $txt['sort_filter'] . '</a>',
+					),
 			),
 		);
 
@@ -663,8 +660,150 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'email_filter';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
+	}
+
+	/**
+	 * Show a full list of all the filters in the system for drag/drop sorting
+	 */
+	public function action_sort_filters()
+	{
+		global $context, $scripturl, $txt;
+
+		$id = 0;
+		$token = createToken('admin-sort');
+
+		// build the listoption array to display the data
+		$listOptions = array(
+			'id' => 'sort_email_fp',
+			'title' => $txt['sort_filter'],
+			'sortable' => true,
+			'items_per_page' => 0,
+			'no_items_label' => $txt['no_filters'],
+			'base_href' => $scripturl . '?action=admin;area=maillist;sa=sortfilters',
+			'get_items' => array(
+				'function' => array($this, 'load_filter_parser'),
+				'params' => array(
+					$id,
+					'filter'
+				),
+			),
+			'get_count' => array(
+				'function' => array($this, 'count_filter_parser'),
+				'params' => array(
+					$id,
+					'filter'
+				),
+			),
+			'columns' => array(
+				'filterorder' => array(
+					'header' => array(
+						'value' => '',
+						'style' => 'display: none',
+					),
+					'data' => array(
+						'db' => 'filter_order',
+						'style' => 'display: none',
+					),
+				),
+				'name' => array(
+					'header' => array(
+						'value' => $txt['filter_name'],
+						'style' => 'white-space: nowrap;width: 10em'
+					),
+					'data' => array(
+						'db' => 'filter_name',
+					),
+				),
+				'from' => array(
+					'header' => array(
+						'value' => $txt['filter_from'],
+					),
+					'data' => array(
+						'db' => 'filter_from',
+					),
+				),
+				'to' => array(
+					'header' => array(
+						'value' => $txt['filter_to'],
+						'style' => 'width:10em;',
+					),
+					'data' => array(
+						'db' => 'filter_to',
+					),
+				),
+				'type' => array(
+					'header' => array(
+						'value' => $txt['filter_type'],
+					),
+					'data' => array(
+						'db' => 'filter_type',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=maillist;sa=sortfilters',
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'after_title',
+					'value' => $txt['filter_sort_description'],
+					'class' => 'windowbg',
+				),
+			),
+			'javascript' => '
+				$().elkSortable({
+					sa: "parserorder",
+					placeholder: "ui-state-highlight",
+					containment: "#sort_email_fp",
+					error: "' . $txt['admin_order_error'] . '",
+					title: "' . $txt['admin_order_title'] . '",
+					href: "?action=admin;;area=maillist;sa=sortfilters",
+					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
+				});
+			',
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['filters'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'sort_email_fp';
+		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
+
+		// Create the list.
+		require_once(SUBSDIR . '/List.class.php');
+		createList($listOptions);
+	}
+
+	/**
+	 * Callback for createList(),
+	 * Returns the number of filters or parsers in the system
+	 *
+	 * @param int $id 0 for all of a certain style
+	 * @param string $style one of filter or parser
+	 */
+	public function count_filter_parser($id, $style)
+	{
+		return list_count_filter_parser($id, $style);
+	}
+
+	/**
+	 * Callback for createList(),
+	 * Returns the details for the filters or parsers in the system
+	 *
+	 * @param int $start
+	 * @param int $chunk_size
+	 * @param string $sort
+	 * @param int $id
+	 * @param string $style
+	 */
+	public function load_filter_parser($start, $chunk_size, $sort, $id, $style)
+	{
+		return list_get_filter_parser($start, $chunk_size, $sort, $id, $style);
 	}
 
 	/**
@@ -684,7 +823,6 @@ class ManageMaillist_Controller extends Action_Controller
 				fatal_lang_error('error_no_id_filter');
 
 			// Load it up and set it as the current values
-			require_once(SUBSDIR . '/Maillist.subs.php');
 			$row = maillist_load_filter_parser($id, 'filter');
 			$modSettings['id_filter'] = $row['id_filter'];
 			$modSettings['filter_type'] = $row['filter_type'];
@@ -752,7 +890,6 @@ class ManageMaillist_Controller extends Action_Controller
 				$config_vars[] = array('text', 'filter_style');
 				$_POST['filter_style'] = 'filter';
 
-				require_once(SUBSDIR . '/Maillist.subs.php');
 				MaillistSettingsClass::saveTableSettings($config_vars, 'postby_emails_filters', array(), $editid, $editname);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
@@ -822,7 +959,6 @@ class ManageMaillist_Controller extends Action_Controller
 			checkSession('get');
 			$id = (int) $_GET['f_id'];
 
-			require_once(SUBSDIR . '/Maillist.subs.php');
 			maillist_delete_filter_parser($id);
 			redirectexit('action=admin;area=maillist;sa=emailfilters;deleted');
 		}
@@ -833,32 +969,29 @@ class ManageMaillist_Controller extends Action_Controller
 	 * - Allows to add/edit or delete parsers
 	 * - Parsers are used to split a message at a line of text
 	 * - Parsers can only be defined as regex, the system will check it for valid syntax
-	 * - Uses list_get_filter_parser for the data and list_count_filter_parser for the number
 	 */
 	public function action_list_parsers()
 	{
 		global $context, $scripturl, $txt, $settings, $modSettings;
 
 		$id = 0;
-		require_once(SUBSDIR . '/Maillist.subs.php');
 
-		// build the listoption array to display the data
+		// Build the listoption array to display the data
 		$listOptions = array(
 			'id' => 'email_parser',
 			'title' => $txt['parsers'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_parsers'],
 			'base_href' => $scripturl . '?action=admin;area=maillist;sa=emailparser',
-			'default_sort_col' => 'name',
 			'get_items' => array(
-				'function' => 'list_get_filter_parser',
+				'function' => array($this, 'load_filter_parser'),
 				'params' => array(
 					$id,
 					'parser'
 				),
 			),
 			'get_count' => array(
-				'function' => 'list_count_filter_parser',
+				'function' => array($this, 'count_filter_parser'),
 				'params' => array(
 					$id,
 					'parser'
@@ -910,10 +1043,10 @@ class ManageMaillist_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '<a href="?action=admin;area=maillist;sa=editparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">
-										<img title="' . $txt['modify'] . '"src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
+										<img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/buttons/modify.png" alt="*" />
 									</a>
 									<a href="?action=admin;area=maillist;sa=deleteparser;f_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['parser_delete_warning']) . ') && submitThisOnce(this);" accesskey="d">
-										<img title="' . $txt['delete'] . '"  src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
+										<img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/buttons/delete.png" alt="*" />
 									</a>',
 							'params' => array(
 								'id_filter' => true,
@@ -940,8 +1073,10 @@ class ManageMaillist_Controller extends Action_Controller
 				),
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_parser'] . '" class="right_submit" />',
-				),
+					'value' => '
+						<input type="submit" name="addparser" value="' . $txt['add_parser'] . '" class="right_submit" />
+						<a class="linkbutton_right" href="' . $scripturl . '?action=admin;area=maillist;sa=sortparsers">' . $txt['sort_parser'] . '</a>',
+					),
 			),
 		);
 
@@ -951,7 +1086,113 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['default_list'] = 'email_parser';
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
+		createList($listOptions);
+	}
+
+	/**
+	 * Show a full list of all the parsers in the system for drag/drop sorting
+	 */
+	public function action_sort_parsers()
+	{
+		global $context, $scripturl, $txt;
+
+		$id = 0;
+		$token = createToken('admin-sort');
+
+		// build the listoption array to display the data
+		$listOptions = array(
+			'id' => 'sort_email_fp',
+			'title' => $txt['sort_parser'],
+			'sortable' => true,
+			'items_per_page' => 0,
+			'no_items_label' => $txt['no_parsers'],
+			'base_href' => $scripturl . '?action=admin;area=maillist;sa=sortparsers',
+			'get_items' => array(
+				'function' => array($this, 'load_filter_parser'),
+				'params' => array(
+					$id,
+					'parser'
+				),
+			),
+			'get_count' => array(
+				'function' => array($this, 'count_filter_parser'),
+				'params' => array(
+					$id,
+					'parser'
+				),
+			),
+			'columns' => array(
+				'filterorder' => array(
+					'header' => array(
+						'value' => '',
+						'style' => 'display: none',
+					),
+					'data' => array(
+						'db' => 'filter_order',
+						'style' => 'display: none',
+					),
+				),
+				'name' => array(
+					'header' => array(
+						'value' => $txt['parser_name'],
+						'style' => 'white-space: nowrap;width: 10em'
+					),
+					'data' => array(
+						'db' => 'filter_name',
+					),
+				),
+				'from' => array(
+					'header' => array(
+						'value' => $txt['parser_from'],
+					),
+					'data' => array(
+						'db' => 'filter_from',
+					),
+				),
+				'type' => array(
+					'header' => array(
+						'value' => $txt['parser_type'],
+					),
+					'data' => array(
+						'db' => 'filter_type',
+					),
+				),
+			),
+			'form' => array(
+				'href' => $scripturl . '?action=admin;area=maillist;sa=sortparsers',
+				'hidden_fields' => array(
+					$context['session_var'] => $context['session_id'],
+				),
+			),
+			'additional_rows' => array(
+				array(
+					'position' => 'after_title',
+					'value' => $txt['parser_sort_description'],
+					'class' => 'windowbg',
+				),
+			),
+			'javascript' => '
+				$().elkSortable({
+					sa: "parserorder",
+					placeholder: "ui-state-highlight",
+					containment: "#sort_email_fp",
+					error: "' . $txt['admin_order_error'] . '",
+					title: "' . $txt['admin_order_title'] . '",
+					href: "?action=admin;;area=maillist;sa=sortparsers",
+					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
+				});
+			',
+		);
+
+		// Set the context values
+		$context['page_title'] = $txt['parsers'];
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'sort_email_fp';
+		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
+
+		// Create the list.
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -971,8 +1212,7 @@ class ManageMaillist_Controller extends Action_Controller
 			if (empty($id) || $id < 0)
 				fatal_lang_error('error_no_id_filter');
 
-			// load this filter so we can edit it
-			require_once(SUBSDIR . '/Maillist.subs.php');
+			// Load this filter so we can edit it
 			$row = maillist_load_filter_parser($id, 'parser');
 
 			$modSettings['id_filter'] = $row['id_filter'];
@@ -1106,7 +1346,6 @@ class ManageMaillist_Controller extends Action_Controller
 			checkSession('get');
 			$id = (int) $_GET['f_id'];
 
-			require_once(SUBSDIR . '/Maillist.subs.php');
 			maillist_delete_filter_parser($id);
 			redirectexit('action=admin;area=maillist;sa=emailparser;deleted');
 		}
@@ -1128,10 +1367,6 @@ class ManageMaillist_Controller extends Action_Controller
 		// Templates and language
 		loadLanguage('Admin');
 		loadTemplate('Admin', 'admin');
-
-		// Get the board selection list for the template
-		require_once(SUBSDIR . '/Maillist.subs.php');
-		$context['boards'] = maillist_board_list();
 
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = array();
@@ -1158,14 +1393,14 @@ class ManageMaillist_Controller extends Action_Controller
 
 			$email_error = false;
 			$board_error = false;
-			$valid_email_regex = '~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~';
 
 			// Basic checking of the email addresses
-			if (preg_match($valid_email_regex, $_POST['maillist_sitename_address']) == 0)
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			if (!Data_Validator::is_valid($_POST, array('maillist_sitename_address' => 'valid_email'), array('maillist_sitename_address' => 'trim')))
 				$email_error = $_POST['maillist_sitename_address'];
-			if (!$email_error && !(empty($_POST['maillist_sitename_help'])) && preg_match($valid_email_regex, $_POST['maillist_sitename_help']) == 0)
+			if (!Data_Validator::is_valid($_POST, array('maillist_sitename_help' => 'valid_email'), array('maillist_sitename_help' => 'trim')))
 				$email_error = $_POST['maillist_sitename_help'];
-			if (!$email_error && !(empty($_POST['maillist_mail_from'])) && preg_match($valid_email_regex, $_POST['maillist_mail_from']) == 0)
+			if (!Data_Validator::is_valid($_POST, array('maillist_mail_from' => 'valid_email'), array('maillist_mail_from' => 'trim')))
 				$email_error = $_POST['maillist_mail_from'];
 
 			// Inbound email set up then we need to check for both valid email and valid board
@@ -1181,14 +1416,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 				foreach ($addresstocheck as $key => $checkme)
 				{
-					$checkme = trim($checkme);
-
-					// Nada?
-					if (empty($checkme))
-						continue;
-
 					// Valid email syntax
-					if (preg_match($valid_email_regex, $checkme) == 0)
+					if (!Data_Validator::is_valid($addresstocheck, array($key => 'valid_email'), array($key => 'trim')))
 					{
 						$email_error = $checkme;
 						$context['error_type'] = 'notice';
@@ -1232,6 +1461,25 @@ class ManageMaillist_Controller extends Action_Controller
 			}
 		}
 
+		// Javascript vars for the "add more" buttons in the receive_email callback
+		$board_list = maillist_board_list();
+		$script = '';
+		$i = 0;
+
+		// Create the board selection list
+		foreach ($board_list as $board_id => $board_name)
+			$script .= $i++ . ': {id:' . $board_id . ', name:' . JavaScriptEscape($board_name) . '},';
+
+		addInlineJavascript('
+		var sEmailParent = \'add_more_email_placeholder\',
+			oEmailOptionsdt = {size: \'50\', name: \'emailfrom[]\', class: \'input_text\'},
+			oEmailOptionsdd = {size: \'1\', type: \'select\', name: \'boardto[]\', class: \'input_select\'},
+			oEmailSelectData = {' . $script . '};
+
+			document.getElementById(\'add_more_board_div\').style.display = \'\';', true
+		);
+
+		$context['boards'] = $board_list;
 		$context['settings_title'] = $txt['ml_emailsettings'];
 		$context['page_title'] = $txt['ml_emailsettings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
@@ -1325,8 +1573,7 @@ class ManageMaillist_Controller extends Action_Controller
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
-		// We'll need this, because bounce templates are stored
-		// with warning templates.
+		// We'll need this, because bounce templates are stored with warning templates.
 		require_once(SUBSDIR . '/Moderation.subs.php');
 
 		// Submitting a new one or editing an existing one then pass this request off
@@ -1433,7 +1680,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['ml_bounce_templates_title'];
 		createToken('mod-mlt');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// Show the list

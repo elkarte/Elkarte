@@ -7,7 +7,6 @@
  *
  * @version 1.0 Alpha
  *
- * Take an email and parse the headers and body section in to an associative array
  */
 
 if (!defined('ELK'))
@@ -42,7 +41,7 @@ if (!defined('ELK'))
  * Optional functions
  *  - $email_message->load_address(); // returns array with to/from/cc addresses
  *  - $email_message->load_key(); // returns the security key is found, also sets
- *			message_key_id, message_type and message_id
+ *      message_key_id, message_type and message_id
  *  - $email_message->load_spam(); // returns boolean on if spam headers are set
  *  - $email_message->load_ip(); // set ip origin of the email if available
  *  - $email_message->load_returnpath(); // load the message return path
@@ -153,7 +152,7 @@ class Email_Parse
 			if (isset($_POST['item']))
 				$this->raw_message = $this->_query_load_email($_POST['item']);
 			// @todo debugging file used for testing
-			elseif (file_exists($location . '/elk-test.eml'))
+			elseif (file_exists($location . '/elk-test.eml') && isAllowedTo('admin_forum'))
 				$this->raw_message = file_get_contents($location . '/elk-test.eml');
 		}
 		else
@@ -188,7 +187,7 @@ class Email_Parse
 				'id' => $id
 			)
 		);
-		list($message) = $db->fetch_row($request);
+		list ($message) = $db->fetch_row($request);
 		$db->free_result($request);
 
 		return $message;
@@ -224,7 +223,7 @@ class Email_Parse
 	 * Separate the email message headers from the message body
 	 *
 	 * The header is separated from the body by
-	 * 	(1) an empty line or
+	 *  (1) the first empty line or
 	 *  (2) a line that does not start with a tab, a field name followed by a colon or a space
 	 */
 	private function _split_headers()
@@ -236,8 +235,8 @@ class Email_Parse
 		if (!preg_match('~^[\w-]+:[ ].*?\r?\n~i', $this->raw_message))
 			return;
 
-		// The header block ends base on condition (1) or (2)
-		if (!preg_match('~^(.*?)\r?\n(?!(\t|[\w-]+:|\r?\n|[ ]))(.*)~s', $this->raw_message, $match))
+		// The header block ends based on condition (1) or (2)
+		if (!preg_match('~^(.*?)\r?\n(?:\r?\n|(?!(\t|[\w-]+:|[ ])))(.*)~s', $this->raw_message, $match))
 			return;
 
 		$this->_header_block = $match[1];
@@ -370,6 +369,7 @@ class Email_Parse
 			// The text/plain content type is the generic subtype for plain text. It is the default specified by RFC 822.
 			case 'text/plain':
 				$this->body = $this->_decode_string($this->body, $this->headers['content-transfer-encoding'], $this->headers['x-parameters']['content-type']['charset']);
+				$this->plain_body = $this->body;
 				break;
 			// The text/html content type is an Internet Media Type as well as a MIME content type.
 			case 'text/html':
@@ -560,7 +560,7 @@ class Email_Parse
 
 	/**
 	 * Converts a header string to ascii/UTF8
-     *
+	 *
 	 * Headers, mostly subject and names may be encoded as quoted printable or base64
 	 * to allow for non ascii characters in those fields. This encoding is separate
 	 * from the message body encoding and must be determined since this encoding is
@@ -633,7 +633,7 @@ class Email_Parse
 
 	/**
 	 * Checks the body text to see if it may need to be further decoded
-     *
+	 *
 	 * Sadly whats in the body text is not always what the header claims, or the
 	 * header is just wrong.  Copy/paste in to email from other apps etc.
 	 * This does an extra check for quoted printable DNA and if found decodes the
@@ -713,7 +713,7 @@ class Email_Parse
 			$this->headers['subject'] = '';
 
 		// Change it to a readable form ...
-		$this->subject = htmlspecialchars($this->_decode_header($this->headers['subject']));
+		$this->subject = htmlspecialchars($this->_decode_header($this->headers['subject']), ENT_COMPAT, 'UTF-8');
 
 		return $this->subject;
 	}

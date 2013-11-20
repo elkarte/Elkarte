@@ -46,7 +46,7 @@ class ManageBoards_Controller extends Action_Controller
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// Format: 'sub-action' => array('function', 'permission')
+		// Format: 'sub-action' => array('controller', 'function', 'permission'=>'need')
 		$subActions = array(
 			'board' => array(
 				'controller' => $this,
@@ -91,13 +91,6 @@ class ManageBoards_Controller extends Action_Controller
 		// Default to sub-action 'main' or 'settings' depending on permissions.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('manage_boards') ? 'main' : 'settings');
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['boards_and_cats'],
@@ -113,8 +106,11 @@ class ManageBoards_Controller extends Action_Controller
 				),
 			),
 		);
+		$context['sub_action'] = $subAction;
 
-		// Call the right function for this sub-action.
+		// You way will end here if you don't have permission.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
@@ -156,6 +152,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		getBoardTree();
 
+		createToken('admin-sort');
 		$context['move_board'] = !empty($_REQUEST['move']) && isset($boards[(int) $_REQUEST['move']]) ? (int) $_REQUEST['move'] : 0;
 
 		$context['categories'] = array();
@@ -184,7 +181,7 @@ class ManageBoards_Controller extends Action_Controller
 		{
 			createToken('admin-bm-' . $context['move_board'], 'request');
 
-			$context['move_title'] = sprintf($txt['mboards_select_destination'], htmlspecialchars($boards[$context['move_board']]['name']));
+			$context['move_title'] = sprintf($txt['mboards_select_destination'], htmlspecialchars($boards[$context['move_board']]['name'], ENT_COMPAT, 'UTF-8'));
 			foreach ($cat_tree as $catid => $tree)
 			{
 				$prev_child_level = 0;
@@ -197,7 +194,7 @@ class ManageBoards_Controller extends Action_Controller
 					if (!isset($context['categories'][$catid]['move_link']))
 						$context['categories'][$catid]['move_link'] = array(
 							'child_level' => 0,
-							'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($boards[$boardid]['name']) . '\'',
+							'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
 							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=before;' . $security,
 						);
 
@@ -205,12 +202,12 @@ class ManageBoards_Controller extends Action_Controller
 					$context['categories'][$catid]['boards'][$boardid]['move_links'] = array(
 						array(
 							'child_level' => $boards[$boardid]['level'],
-							'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name']) . '\'',
+							'label' => $txt['mboards_order_after'] . '\'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
 							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=after;' . $security,
 						),
 						array(
 							'child_level' => $boards[$boardid]['level'] + 1,
-							'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name']) . '\'',
+							'label' => $txt['mboards_order_child_of'] . ' \'' . htmlspecialchars($boards[$boardid]['name'], ENT_COMPAT, 'UTF-8') . '\'',
 							'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_board=' . $boardid . ';move_to=child;' . $security,
 						),
 					);
@@ -239,7 +236,7 @@ class ManageBoards_Controller extends Action_Controller
 				if (empty($boardList[$catid]))
 					$context['categories'][$catid]['move_link'] = array(
 						'child_level' => 0,
-						'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($tree['node']['name']) . '\'',
+						'label' => $txt['mboards_order_before'] . ' \'' . htmlspecialchars($tree['node']['name'], ENT_COMPAT, 'UTF-8') . '\'',
 						'href' => $scripturl . '?action=admin;area=manageboards;sa=move;src_board=' . $context['move_board'] . ';target_cat=' . $catid . ';move_to=top;' . $security,
 					);
 			}
@@ -288,7 +285,7 @@ class ManageBoards_Controller extends Action_Controller
 			$context['category'] = array(
 				'id' => 0,
 				'name' => $txt['mboards_new_cat_name'],
-				'editable_name' => htmlspecialchars($txt['mboards_new_cat_name']),
+				'editable_name' => htmlspecialchars($txt['mboards_new_cat_name'], ENT_COMPAT, 'UTF-8'),
 				'can_collapse' => true,
 				'is_new' => true,
 				'is_empty' => true
@@ -302,7 +299,7 @@ class ManageBoards_Controller extends Action_Controller
 			$context['category'] = array(
 				'id' => $_REQUEST['cat'],
 				'name' => $cat_tree[$_REQUEST['cat']]['node']['name'],
-				'editable_name' => htmlspecialchars($cat_tree[$_REQUEST['cat']]['node']['name']),
+				'editable_name' => htmlspecialchars($cat_tree[$_REQUEST['cat']]['node']['name'], ENT_COMPAT, 'UTF-8'),
 				'can_collapse' => !empty($cat_tree[$_REQUEST['cat']]['node']['can_collapse']),
 				'children' => array(),
 				'is_empty' => empty($cat_tree[$_REQUEST['cat']]['children'])
@@ -470,8 +467,8 @@ class ManageBoards_Controller extends Action_Controller
 			// Just some easy shortcuts.
 			$curBoard = &$boards[$_REQUEST['boardid']];
 			$context['board'] = $boards[$_REQUEST['boardid']];
-			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')));
-			$context['board']['description'] = htmlspecialchars($context['board']['description']);
+			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')), ENT_COMPAT, 'UTF-8');
+			$context['board']['description'] = htmlspecialchars($context['board']['description'], ENT_COMPAT, 'UTF-8');
 			$context['board']['no_children'] = empty($boards[$_REQUEST['boardid']]['tree']['children']);
 			$context['board']['is_recycle'] = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $context['board']['id'];
 		}
@@ -768,8 +765,13 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	private function _initBoardSettingsForm()
 	{
+		global $txt;
+
 		// instantiate the form
 		$this->_boardSettings = new Settings_Form();
+
+		// We need to borrow a string from here
+		loadLanguage('ManagePermissions');
 
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -782,7 +784,7 @@ class ManageBoards_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
-				array('permissions', 'manage_boards', 'helptext' => ''),
+				array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']),
 			'',
 				// Other board settings.
 				array('check', 'countChildPosts'),
@@ -800,10 +802,16 @@ class ManageBoards_Controller extends Action_Controller
 	 */
 	public function settings()
 	{
+		global $txt;
+
+		// We need to borrow a string from here
+		loadLanguage('ManagePermissions');
+
 		// Load the boards list - for the recycle bin!
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$boards = getBoardList(array('not_redirection' => true), true);
 		$recycle_boards = array('');
+
 		foreach ($boards as $board)
 			$recycle_boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
 
@@ -811,7 +819,7 @@ class ManageBoards_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'settings'),
 				// Inline permissions.
-				array('permissions', 'manage_boards', 'helptext' => ''),
+				array('permissions', 'manage_boards', 'helptext' => $txt['permissionhelp_manage_boards']),
 			'',
 				// Other board settings.
 				array('check', 'countChildPosts'),

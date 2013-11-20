@@ -66,9 +66,9 @@ class Util
 		$space_chars = '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}';
 
 		if (empty($modSettings['disableEntityCheck']))
-			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00' . ']|&nbsp;)+$~u', '', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string));
+			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string));
 		else
-			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00' . ']|&nbsp;)+$~u', '', $string);
+			$check = preg_replace('~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00]|&nbsp;)+$~u', '', $string);
 
 		return $check;
 	}
@@ -77,10 +77,12 @@ class Util
 	{
 		global $modSettings;
 
+		// @todo not used
 		$ent_check = empty($modSettings['disableEntityCheck']) ? array('preg_replace_callback(\'~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~\', \'entity_fix__callback\', ', ')') : array('', '');
 
 		$haystack_check = empty($modSettings['disableEntityCheck']) ? preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $haystack) : $haystack;
 		$haystack_arr = preg_split('~(&#' . (empty($modSettings['disableEntityCheck']) ? '\d{1,7}' : '021') . ';|&quot;|&amp;|&lt;|&gt;|&nbsp;|.)~u', $haystack_check, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+		// @todo not used
 		$haystack_size = count($haystack_arr);
 		if (strlen($needle) === 1)
 		{
@@ -178,12 +180,12 @@ class Util
 		if (empty($modSettings['disableEntityCheck']))
 		{
 			$ent_list = '&(#\d{1,7}|quot|amp|lt|gt|nbsp);';
-			return strlen(preg_replace('~' . $ent_list . '|.~u' . '', '_', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string)));
+			return strlen(preg_replace('~' . $ent_list . '|.~u', '_', preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'entity_fix__callback', $string)));
 		}
 		else
 		{
 			$ent_list = '&(#021|quot|amp|lt|gt|nbsp);';
-			return strlen(preg_replace('~' . $ent_list . '|.~u' . '', '_', $string));
+			return strlen(preg_replace('~' . $ent_list . '|.~u', '_', $string));
 		}
 	}
 

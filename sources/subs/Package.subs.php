@@ -59,12 +59,12 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * detects if the file is really a .zip file, and if so returns the result of read_zip_data
  *
  * if destination is null
- *	- returns a list of files in the archive.
+ *  - returns a list of files in the archive.
  *
  * if single_file is true
- * - returns the contents of the file specified by destination, if it exists, or false.
- * - destination can start with * and / to signify that the file may come from any directory.
- * - destination should not begin with a / if single_file is true.
+ *  - returns the contents of the file specified by destination, if it exists, or false.
+ *  - destination can start with * and / to signify that the file may come from any directory.
+ *  - destination should not begin with a / if single_file is true.
  *
  * overwrites existing files with newer modification times if and only if overwrite is true.
  * creates the destination directory if it doesn't exist, and is is specified.
@@ -77,7 +77,6 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  * @param bool single_file = false,
  * @param bool overwrite = false,
  * @param array files_to_extract = null
- * @return array
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -93,11 +92,16 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 		mktree($destination, 0777);
 
 	// No signature?
-	if (strlen($data) < 2)
+	if (strlen($data) < 10)
 		return false;
 
-	$id = unpack('H2a/H2b', substr($data, 0, 2));
-	if (strtolower($id['a'] . $id['b']) != '1f8b')
+	// Unpack the signature so we can see what we have
+	$header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($data, 0, 10));
+	$header['filename'] = '';
+	$header['comment'] = '';
+
+	// the IDentification number, gzip must be 1f8b
+	if (strtolower($header['a'] . $header['b']) != '1f8b')
 	{
 		// Okay, this ain't no tar.gz, but maybe it's a zip file.
 		if (substr($data, 0, 2) == 'PK')
@@ -106,38 +110,59 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 			return false;
 	}
 
-	$flags = unpack('Ct/Cf', substr($data, 2, 2));
-
-	// Not deflate!
-	if ($flags['t'] != 8)
+	// Compression method needs to be 8 = deflate!
+	if ($header['t'] != 8)
 		return false;
-	$flags = $flags['f'];
 
+	// Each bit of this byte represents a processing flag as follows
+	// 0 fTEXT, 1 fHCRC, 2 fEXTRA, 3 fNAME, 4 fCOMMENT, 5 fENCRYPT, 6-7 reserved
+	$flags = $header['f'];
+
+	// Start to read any data defined by the flags
 	$offset = 10;
-	$octdec = array('mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type');
 
-	// "Read" the filename and comment.
-	// @todo Might be mussed.
-	if ($flags & 12)
+	// fEXTRA flag set we simply skip over its entry and the length of its data
+	if ($flags & 4)
 	{
-		while ($flags & 8 && $data{$offset++} != "\0")
-			continue;
-		while ($flags & 4 && $data{$offset++} != "\0")
-			continue;
+		$xlen = unpack('vxlen', substr($data, $offset, 2));
+		$offset += $xlen['xlen'] + 2;
 	}
 
+	// Read the filename, its zero terminated
+	if ($flags & 8)
+	{
+		while ($data[$offset] != "\0")
+			$header['filename'] .= $data[$offset++];
+		$offset++;
+	}
+
+	// Read the comment, its also zero terminated
+	if ($flags & 16)
+	{
+		while ($data[$offset] != "\0")
+			$header['comment'] .= $data[$offset++];
+		$offset++;
+	}
+
+	// "Read" the header CRC
+	if ($flags & 2)
+		$offset += 2; // $crc16 = unpack('vcrc16', substr($data, $offset, 2));
+
+	// We have now arrived at the start of the compressed data,
+	// Its terminated with 4 bytes of CRC and 4 bytes of the original input size
 	$crc = unpack('Vcrc32/Visize', substr($data, strlen($data) - 8, 8));
 	$data = @gzinflate(substr($data, $offset, strlen($data) - 8 - $offset));
 
 	// crc32_compat and crc32 may not return the same results, so we accept either.
-	if ($crc['crc32'] != crc32_compat($data) && $crc['crc32'] != crc32($data))
+	if ($data === false || ($crc['crc32'] != crc32_compat($data) && $crc['crc32'] != crc32($data)))
 		return false;
 
+	$octdec = array('mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type');
 	$blocks = strlen($data) / 512 - 1;
 	$offset = 0;
-
 	$return = array();
 
+	// We have Un-gziped the data, now lets extract the tar files
 	while ($offset < $blocks)
 	{
 		$header = substr($data, $offset << 9, 512);
@@ -238,7 +263,6 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
  * @param type $single_file
  * @param type $overwrite
  * @param type $files_to_extract
- * @return boolean
  */
 function read_zip_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
@@ -254,7 +278,8 @@ function read_zip_data($data, $destination, $single_file = false, $overwrite = f
 	$return = array();
 
 	// Get all the basic zip file info since we are here
-	$zip_info = unpack('vdisks/vrecords/vfiles/Vsize/Voffset/vcomment_length/', $data_ecr[1]);
+	$zip_info = unpack('vdisknum/vdisks/vrecords/vfiles/Vsize/Voffset/vcomment_length', $data_ecr[1]);
+	$zip_info['comment'] = substr($data_ecr[1], 18, $zip_info['comment_length']);
 
 	// Cut file at the central directory file header signature -- 0x02014b50, use unpack if you want any of the data, we don't
 	$file_sections = explode("\x50\x4b\x01\x02", $data);
@@ -445,12 +470,11 @@ function loadInstalledPackages()
  * - an Xml_Array is available in 'xml'.
  *
  * @param string $gzfilename
- * @return array
  */
 function getPackageInfo($gzfilename)
 {
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
-	if (strpos($gzfilename, 'http://') !== false)
+	if (preg_match('~^https?://~i', $gzfilename) === 1)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);
 	else
 	{
@@ -523,7 +547,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		 */
 		function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 		{
-			global $txt;
+			global $txt, $package_ftp;
 
 			$restore_files = array();
 			foreach ($_SESSION['pack_ftp']['original_perms'] as $file => $perms)
@@ -540,7 +564,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 				if ($do_change && isset($_POST['restore_files']) && in_array($file, $_POST['restore_files']))
 				{
 					// Use FTP if we have it.
-					// @todo where does $package_ftp get set?
 					if (!empty($package_ftp))
 					{
 						$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
@@ -653,7 +676,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 				array(
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="restore_perms" value="' . $txt['package_restore_permissions_restore'] . '" class="right_submit" />',
-					'class' => 'titlebg',
+					'class' => 'category_header',
 				),
 				array(
 					'position' => 'after_title',
@@ -678,7 +701,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		}
 
 		// Create the list for display.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		// If we just restored permissions then whereever we are, we are now done and dusted.
@@ -1113,12 +1136,12 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 						if (isset($context[$type]['selected']) && $context[$type]['selected'] == 'default')
 							$context[$type][] = 'default';
 
-						$context[$type]['selected'] = htmlspecialchars($action->fetch('@lang'));
+						$context[$type]['selected'] = htmlspecialchars($action->fetch('@lang'), ENT_COMPAT, 'UTF-8');
 					}
 					else
 					{
 						// We don't want this now, but we'll allow the user to select to read it.
-						$context[$type][] = htmlspecialchars($action->fetch('@lang'));
+						$context[$type][] = htmlspecialchars($action->fetch('@lang'), ENT_COMPAT, 'UTF-8');
 						continue;
 					}
 				}
@@ -1486,7 +1509,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// Adjust things higher even though the starting number is lower so we pick up the right (latest) version
-	list($the_brand,) = explode(' ', $forum_version, 2);
+	list ($the_brand,) = explode(' ', $forum_version, 2);
 	if ($the_brand == 'ElkArte')
 		$the_version = '1' . $the_version;
 
@@ -1674,8 +1697,7 @@ function deltree($dir, $delete_dir = true)
 		if ($delete_dir && isset($package_ftp))
 		{
 			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
-			// @todo $entryname is never set
-			if (!is_writable($dir . '/' . $entryname))
+			if (!is_writable($dir . '/'))
 				$package_ftp->chmod($ftp_file, 0777);
 			$package_ftp->unlink($ftp_file);
 		}
@@ -3312,7 +3334,7 @@ function checkPackageDependency($id)
 		)
 	);
 	while ($row = $db->fetch_row($request));
-		list($version) = $row;
+		list ($version) = $row;
 	$db->free_result($request);
 
 	return $version;
@@ -3366,4 +3388,21 @@ function setPackagesAsUninstalled()
 			'not_installed' => 0,
 		)
 	);
+}
+
+function isAuthorizedServer($remote_url)
+{
+	global $modSettings;
+
+	// Check that the theme is from simplemachines.org, for now... maybe add mirroring later.
+	$servers = @unserialize($modSettings['authorized_package_servers']);
+	if (empty($servers))
+		return false;
+
+	$valid_server = false;
+	foreach ($servers as $server)
+		if (preg_match('~^' . preg_quote($server) . '~', $remote_url) == 0)
+			return true;
+
+	return false;
 }

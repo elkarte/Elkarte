@@ -260,7 +260,7 @@ function cache_get_data($key, $ttl = 120)
 		case 'zend':
 			// Zend's pricey stuff.
 			if (function_exists('zend_shm_cache_fetch'))
-				$value = zend_shm_cache_fetch('ELK::' . $key, $ttl);
+				$value = zend_shm_cache_fetch('ELK::' . $key);
 			elseif (function_exists('output_cache_get'))
 				$value = output_cache_get($key, $ttl);
 			break;
@@ -340,7 +340,7 @@ function get_memcached_server($level = 3)
  *
  * It may only remove the files of a certain type (if the $type parameter is given)
  * Type can be user, data or left blank
- * 	- user clears out user data
+ *  - user clears out user data
  *  - data clears out system / opcode data
  *  - If no type is specified will perfom a complete cache clearing
  * For cache engines that do not distinguish on types, a full cache flush will be done
@@ -349,7 +349,7 @@ function get_memcached_server($level = 3)
  */
 function clean_cache($type = '')
 {
-	global $cache_accelerator, $cache_memcached, $memcached;
+	global $cache_accelerator, $cache_uid, $cache_password, $cache_memcached, $memcached;
 
 	switch ($cache_accelerator)
 	{
@@ -362,7 +362,7 @@ function clean_cache($type = '')
 				if (!$memcached)
 					return;
 
-				// clear it out
+				// clear it out, really invalidate whats there
 				if (function_exists('memcache_flush'))
 					memcache_flush($memcached);
 				else
@@ -407,13 +407,17 @@ function clean_cache($type = '')
 		case 'xcache':
 			if (function_exists('xcache_clear_cache') && function_exists('xcache_count'))
 			{
-				// @todo interface !!!
-				//$_SERVER["PHP_AUTH_USER"] = 'userid';
-				//$_SERVER["PHP_AUTH_PW"] = 'password'; /* not the md5 one in the .ini but the real password */
+				// xcache may need auth credentials, depending on how its been set up
+				if (!empty($cache_uid) && !empty($cache_password))
+				{
+					$_SERVER["PHP_AUTH_USER"] = $cache_uid;
+					$_SERVER["PHP_AUTH_PW"] = $cache_password;
+				}
 
 				// Get the counts so we clear each instance
 				$pcnt = xcache_count(XC_TYPE_PHP);
 				$vcnt = xcache_count(XC_TYPE_VAR);
+
 				// Time to clear the user vars and/or the opcache
 				if ($type === '' || $type === 'user')
 				{
@@ -446,7 +450,7 @@ function clean_cache($type = '')
 
 	// Invalidate cache, to be sure!
 	// ... as long as Load.php can be modified, anyway.
-	@touch(SOURCEDIR . '/' . 'Load.php');
+	@touch(SOURCEDIR . '/Load.php');
 
 	// Give addons a way to trigger cache cleaning.
 	call_integration_hook('integrate_clean_cache');

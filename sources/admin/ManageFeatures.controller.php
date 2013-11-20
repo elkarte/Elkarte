@@ -57,6 +57,12 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_signatureSettings;
 
 	/**
+	 * Notifications settings form
+	 * @var Settings_Form
+	 */
+	protected $_notificationSettings;
+
+	/**
 	 * This function passes control through to the relevant tab.
 	 * @see Action_Controller::action_index()
 	 */
@@ -64,39 +70,56 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $context, $txt, $settings;
 
-		// You need to be an admin around here.
-		isAllowedTo('admin_forum');
-
-		$context['page_title'] = $txt['modSettings_title'];
-
+		// All the actions we know about
 		$subActions = array(
 			'basic' => array(
 				'controller' => $this,
-				'function' => 'action_basicSettings_display'),
+				'function' => 'action_basicSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'layout' => array(
 				'controller' => $this,
-				'function' => 'action_layoutSettings_display'),
+				'function' => 'action_layoutSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'karma' => array(
 				'controller' => $this,
 				'function' => 'action_karmaSettings_display',
-				'enabled' => in_array('k', $context['admin_features'])),
+				'enabled' => in_array('k', $context['admin_features']),
+				'permission' => 'admin_forum'
+			),
 			'pmsettings' => array(
 				'controller' => $this,
-				'function' => 'action_pmsettings'),
+				'function' => 'action_pmsettings',
+				'permission' => 'admin_forum'
+			),
 			'likes' => array(
 				'controller' => $this,
 				'function' => 'action_likesSettings_display',
-				'enabled' => in_array('l', $context['admin_features'])),
+				'enabled' => in_array('l', $context['admin_features']),
+				'permission' => 'admin_forum'
+			),
+			'notification' => array(
+				'controller' => $this,
+				'function' => 'action_notificationSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'sig' => array(
 				'controller' => $this,
-				'function' => 'action_signatureSettings_display'),
+				'function' => 'action_signatureSettings_display',
+				'permission' => 'admin_forum'
+			),
 			'profile' => array(
 				'controller' => $this,
 				'function' => 'action_profile',
-				'enabled' => in_array('cp', $context['admin_features'])),
+				'enabled' => in_array('cp', $context['admin_features']),
+				'permission' => 'admin_forum'
+			),
 			'profileedit' => array(
 				'controller' => $this,
-				'function' => 'action_profileedit'),
+				'function' => 'action_profileedit',
+				'permission' => 'admin_forum'
+			),
 		);
 
 		call_integration_hook('integrate_modify_features', array(&$subActions));
@@ -104,15 +127,12 @@ class ManageFeatures_Controller extends Action_Controller
 		// By default do the basic settings.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions, 'basic');
-
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
 
 		$context['sub_template'] = 'show_settings';
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['modSettings_title'];
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -130,6 +150,9 @@ class ManageFeatures_Controller extends Action_Controller
 				),
 				'likes' => array(
 				),
+				'notification' => array(
+					'description' => $txt['notification_settings_desc'],
+				),
 				'sig' => array(
 					'description' => $txt['signature_settings_desc'],
 				),
@@ -140,6 +163,8 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'basic');
 		$action->dispatch($subAction);
 	}
 
@@ -185,7 +210,13 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initBasicSettingsForm()
 	{
-		global $txt;
+		global $txt, $modSettings;
+
+		// We need to know if personal text is enabled, and if it's in the registration fields option.
+		// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
+		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
+		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
+		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
 
 		// We need some settings! ..ok, some work with our settings :P
 		require_once(SUBSDIR . '/Settings.class.php');
@@ -200,11 +231,11 @@ class ManageFeatures_Controller extends Action_Controller
 				// Basic stuff, titles, flash, permissions...
 				array('check', 'allow_guestAccess'),
 				array('check', 'enable_buddylist'),
-				array('check', 'enable_disregard'),
+				array('check', 'enable_unwatch'),
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
-				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note']),
+				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note'], 'disabled' => !$can_personal_text),
 			'',
 				// Javascript and CSS options
 				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),
@@ -304,6 +335,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'compactTopicPagesEnable'),
 				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
 				array('int', 'defaultMaxMembers'),
+				array('check', 'displayMemberNames'),
 			'',
 				// Stuff that just is everywhere - today, search, online, etc.
 				array('select', 'todayMod', array($txt['today_disabled'], $txt['today_only'], $txt['yesterday_today'], $txt['relative_time'])),
@@ -443,6 +475,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
 				array('int', 'likeWaitCount', 6),
 				array('check', 'likeRestrictAdmins'),
+				array('check', 'likeAllowSelf'),
 			'',
 				array('int', 'likeDisplayLimit', 6)
 		);
@@ -450,6 +483,61 @@ class ManageFeatures_Controller extends Action_Controller
 		call_integration_hook('integrate_likes_settings', array(&$config_vars));
 
 		return $this->_likesSettings->settings($config_vars);
+	}
+
+	/**
+	 * Initializes the notification settings admin page.
+	 */
+	public function action_notificationSettings_display()
+	{
+		global $context, $scripturl;
+
+		// initialize the form
+		$this->_initNotificationSettingsForm();
+		$config_vars = $this->_notificationSettings->settings();
+
+		// Saving the settings?
+		if (isset($_GET['save']))
+		{
+			checkSession();
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=featuresettings;sa=notification');
+		}
+
+		// Prepare the settings for display
+		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=notification';
+		Settings_Form::prepare_db($config_vars);
+	}
+
+	/**
+	 * Retrieve and return all admin settings for notifications.
+	 */
+	private function _initNotificationSettingsForm()
+	{
+		global $txt, $context;
+
+		// We're working with them settings.
+		require_once(SUBSDIR . '/Settings.class.php');
+
+		loadLanguage('Notification');
+
+		// instantiate the form
+		$this->_notificationSettings = new Settings_Form();
+
+		// The notification settings
+		$config_vars = array(
+			array('title', 'notification_settings'),
+			array('check', 'notifications_enabled'),
+			array('check', 'notifications_buddy'),
+		);
+
+		call_integration_hook('integrate_notification_settings', array(&$config_vars));
+
+		// Some context stuff
+		$context['page_title'] = $txt['notification_settings'];
+		$context['sub_template'] = 'show_settings';
+
+		return $this->_notificationSettings->settings($config_vars);
 	}
 
 	/**
@@ -471,7 +559,8 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Disable the max smileys option if we don't allow smileys at all!
-		$context['settings_post_javascript'] = 'document.getElementById(\'signature_max_smileys\').disabled = !document.getElementById(\'signature_allow_smileys\').checked;';
+		addInlineJavascript('
+			document.getElementById(\'signature_max_smileys\').disabled = !document.getElementById(\'signature_allow_smileys\').checked;', true);
 
 		// Load all the signature settings.
 		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
@@ -497,12 +586,12 @@ class ManageFeatures_Controller extends Action_Controller
 			while (!$done)
 			{
 				$changes = array();
-				$update_sigs =  getSignatureFromMembers($applied_sigs);
+				$update_sigs = getSignatureFromMembers($applied_sigs);
 
-				if(empty($update_sigs))
+				if (empty($update_sigs))
 					$done = true;
 
-				foreach($update_sigs as $row)
+				foreach ($update_sigs as $row)
 				{
 					// Apply all the rules we can realistically do.
 					$sig = strtr($row['signature'], array('<br />' => "\n"));
@@ -514,7 +603,8 @@ class ManageFeatures_Controller extends Action_Controller
 					if (!empty($sig_limits[2]))
 					{
 						$count = 0;
-						for ($i = 0; $i < strlen($sig); $i++)
+						$str_len = strlen($sig);
+						for ($i = 0; $i < $str_len; $i++)
 						{
 							if ($sig[$i] == "\n")
 							{
@@ -809,7 +899,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_custom_profile';
 
 		// What about standard fields they can tweak?
-		$standard_fields = array('location', 'gender', 'website', 'posts', 'warning_status');
+		$standard_fields = array('location', 'gender', 'website', 'personal_text', 'posts', 'warning_status');
 
 		// What fields can't you put on the registration page?
 		$context['fields_no_registration'] = array('posts', 'warning_status');
@@ -850,9 +940,10 @@ class ManageFeatures_Controller extends Action_Controller
 
 		createToken('admin-scp');
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
+		// Create a listing for all our standard fields
 		$listOptions = array(
 			'id' => 'standard_profile_fields',
 			'title' => $txt['standard_profile_title'],
@@ -882,7 +973,7 @@ class ManageFeatures_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							$isChecked = $rowData[\'disabled\'] ? \'\' : \' checked="checked"\';
 							$onClickHandler = $rowData[\'can_show_register\'] ? sprintf(\'onclick="document.getElementById(\\\'reg_%1$s\\\').disabled = !this.checked;"\', $rowData[\'id\']) : \'\';
-							return sprintf(\'<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check"%2$s%3$s />\', $rowData[\'id\'], $isChecked, $onClickHandler);
+							return sprintf(\'<input type="checkbox" name="active[]" id="active_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $onClickHandler);
 						'),
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
@@ -897,7 +988,7 @@ class ManageFeatures_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							$isChecked = $rowData[\'on_register\'] && !$rowData[\'disabled\'] ? \' checked="checked"\' : \'\';
 							$isDisabled = $rowData[\'can_show_register\'] ? \'\' : \' disabled="disabled"\';
-							return sprintf(\'<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check"%2$s%3$s />\', $rowData[\'id\'], $isChecked, $isDisabled);
+							return sprintf(\'<input type="checkbox" name="reg[]" id="reg_%1$s" value="%1$s" class="input_check" %2$s %3$s />\', $rowData[\'id\'], $isChecked, $isDisabled);
 						'),
 						'style' => 'width: 20%;',
 						'class' => 'centertext',
@@ -918,13 +1009,16 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 		createList($listOptions);
 
+		// And now we do the same for all of our custom ones
+		$token = createToken('admin-sort');
 		$listOptions = array(
 			'id' => 'custom_profile_fields',
 			'title' => $txt['custom_profile_title'],
 			'base_href' => $scripturl . '?action=admin;area=featuresettings;sa=profile',
-			'default_sort_col' => 'field_name',
+			'default_sort_col' => 'vieworder',
 			'no_items_label' => $txt['custom_profile_none'],
 			'items_per_page' => 25,
+			'sortable' => true,
 			'get_items' => array(
 				'function' => 'list_getProfileFields',
 				'params' => array(
@@ -935,6 +1029,19 @@ class ManageFeatures_Controller extends Action_Controller
 				'function' => 'list_getProfileFieldSize',
 			),
 			'columns' => array(
+				'vieworder' => array(
+					'header' => array(
+						'value' => '',
+						'style' => 'display: none',
+					),
+					'data' => array(
+						'db' => 'vieworder',
+						'style' => 'display: none',
+					),
+					'sort' => array(
+						'default' => 'vieworder',
+					),
+				),
 				'field_name' => array(
 					'header' => array(
 						'value' => $txt['custom_profile_fieldname'],
@@ -945,7 +1052,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 							return sprintf(\'<a href="%1$s?action=admin;area=featuresettings;sa=profileedit;fid=%2$d">%3$s</a><div class="smalltext">%4$s</div>\', $scripturl, $rowData[\'id_field\'], $rowData[\'field_name\'], $rowData[\'field_desc\']);
 						'),
-						'style' => 'width: 62%;',
+						'style' => 'width: 65%;',
 					),
 					'sort' => array(
 						'default' => 'field_name',
@@ -963,24 +1070,25 @@ class ManageFeatures_Controller extends Action_Controller
 							$textKey = sprintf(\'custom_profile_type_%1$s\', $rowData[\'field_type\']);
 							return isset($txt[$textKey]) ? $txt[$textKey] : $textKey;
 						'),
-						'style' => 'width: 15%;',
+						'style' => 'width: 10%;',
 					),
 					'sort' => array(
 						'default' => 'field_type',
 						'reverse' => 'field_type DESC',
 					),
 				),
-				'active' => array(
+				'cust' => array(
 					'header' => array(
 						'value' => $txt['custom_profile_active'],
+						'class' => 'centertext',
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							global $txt;
-
-							return $rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\'];
+							$isChecked = $rowData[\'active\'] ? \' checked="checked"\' :  \'\';
+							return sprintf(\'<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />\', $rowData[\'id_field\'], $isChecked);
 						'),
 						'style' => 'width: 8%;',
+						'class' => 'centertext',
 					),
 					'sort' => array(
 						'default' => 'active DESC',
@@ -997,7 +1105,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 							return $txt[\'custom_profile_placement_\' . (empty($rowData[\'placement\']) ? \'standard\' : ($rowData[\'placement\'] == 1 ? \'withicons\' : \'abovesignature\'))];
 						'),
-						'style' => 'width: 8%;',
+						'style' => 'width: 5%;',
 					),
 					'sort' => array(
 						'default' => 'placement DESC',
@@ -1012,21 +1120,32 @@ class ManageFeatures_Controller extends Action_Controller
 								'id_field' => false,
 							),
 						),
-						'style' => 'width: 15%;',
+						'style' => 'width: 5%;',
 					),
 				),
 			),
 			'form' => array(
 				'href' => $scripturl . '?action=admin;area=featuresettings;sa=profileedit',
 				'name' => 'customProfileFields',
+				'token' => 'admin-scp',
 			),
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
+					'value' => '<input type="submit" name="onoff" value="' . $txt['save'] . '" class="right_submit" />
+					<input type="submit" name="new" value="' . $txt['custom_profile_make_new'] . '" class="right_submit" />',
 				),
 			),
+			'javascript' => '
+				$().elkSortable({
+					sa: "profileorder",
+					error: "' . $txt['admin_order_error'] . '",
+					title: "' . $txt['admin_order_title'] . '",
+					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
+				});
+			',
 		);
+
 		createList($listOptions);
 	}
 
@@ -1080,8 +1199,21 @@ class ManageFeatures_Controller extends Action_Controller
 				'placement' => 0,
 			);
 
+		// Are we toggling which ones are active?
+		if (isset($_POST['onoff']))
+		{
+			checkSession();
+			validateToken('admin-scp');
+
+			// Enable and disable custom fields as required.
+			$enabled = array(0);
+			foreach ($_POST['cust'] as $id)
+				$enabled[] = (int) $id;
+
+			updateRenamedProfileStatus($enabled);
+		}
 		// Are we saving?
-		if (isset($_POST['save']))
+		elseif (isset($_POST['save']))
 		{
 			checkSession();
 			validateToken('admin-ecp');
@@ -1259,13 +1391,11 @@ class ManageFeatures_Controller extends Action_Controller
 					'bbc' => $bbc,
 					'mask' => $mask,
 					'enclose' => $enclose,
-					'placement' => $placement
+					'placement' => $placement,
+					'vieworder' => list_getProfileFieldSize() + 1,
 				);
 				addProfileField($new_field);
 			}
-
-			// As there's currently no option to priorize certain fields over others, let's order them alphabetically.
-			reorderProfileFields();
 		}
 		// Deleting?
 		elseif (isset($_POST['delete']) && $context['field']['colname'])
@@ -1279,7 +1409,7 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		// Rebuild display cache etc.
-		if (isset($_POST['delete']) || isset($_POST['save']))
+		if (isset($_POST['delete']) || isset($_POST['save']) || isset($_POST['onoff']))
 		{
 			checkSession();
 
@@ -1315,7 +1445,6 @@ class ManageFeatures_Controller extends Action_Controller
 			checkSession();
 
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			$limits_to_update = array();
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
 				if (isset($_POST['group'][$group_id]) && $_POST['group'][$group_id] != $group['max_messages'])
@@ -1384,7 +1513,7 @@ class ManageFeatures_Controller extends Action_Controller
 				// Basic stuff, titles, flash, permissions...
 				array('check', 'allow_guestAccess'),
 				array('check', 'enable_buddylist'),
-				array('check', 'enable_disregard'),
+				array('check', 'enable_unwatch'),
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
@@ -1514,11 +1643,26 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
 				array('int', 'likeWaitCount', 6),
 				array('check', 'likeRestrictAdmins'),
+				array('check', 'likeAllowSelf'),
 			'',
 				array('int', 'likeDisplayLimit', 6)
 		);
 
 		call_integration_hook('integrate_likes_settings', array(&$config_vars));
+
+		return $config_vars;
+	}
+
+	/**
+	 * Return notification settings.
+	 * Used in admin center search.
+	 */
+	public function NotificationSettings()
+	{
+		$config_vars = array(
+			array('title', 'notification_settings'),
+			array('check', 'enable_notifications'),
+		);
 
 		return $config_vars;
 	}
@@ -1560,8 +1704,8 @@ class ManageFeatures_Controller extends Action_Controller
  * Just pause the signature applying thing.
  * @todo Move to subs file
  * @todo Merge with other pause functions?
- *		pausePermsSave(), pausAttachmentMaintenance()
- *		pauseRepairProcess()
+ *    pausePermsSave(), pausAttachmentMaintenance()
+ *    pauseRepairProcess()
  */
 function pauseSignatureApplySettings($applied_sigs)
 {

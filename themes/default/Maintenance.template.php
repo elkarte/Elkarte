@@ -14,6 +14,11 @@
  * @version 1.0 Alpha
  */
 
+function template_Maintenance_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * Template for the database maintenance tasks.
  */
@@ -30,9 +35,7 @@ function template_maintain_database()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_optimize'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['maintain_optimize'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=optimize" method="post" accept-charset="UTF-8">
@@ -45,13 +48,9 @@ function template_maintain_database()
 				</form>
 			</div>
 		</div>
-
-		<div class="cat_bar">
-			<h3 class="catbg">
+		<h3 class="category_header">
 			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_backup'], '
-			</h3>
-		</div>
-
+		</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">
@@ -64,8 +63,8 @@ function template_maintain_database()
 		echo '
 					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'noticebox', '">
 					', $txt[$context['suggested_method']],
-					$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
-					'</div>';
+		$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
+		'</div>';
 
 	echo '
 					<p>
@@ -86,11 +85,8 @@ function template_maintain_database()
 
 	// Show an option to convert the body column of the post table to MEDIUMTEXT or TEXT
 	if (isset($context['convert_to']))
-	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt[$context['convert_to'] . '_title'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt[$context['convert_to'] . '_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
@@ -104,7 +100,6 @@ function template_maintain_database()
 				</form>
 			</div>
 		</div>';
-	}
 
 	echo '
 	</div>';
@@ -131,19 +126,19 @@ function template_maintain_routine()
 	foreach ($context['routine_actions'] as $action)
 	{
 		echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $action['title'], '</h3>
-		</div>
+		<h3 class="category_header">', $action['title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $action['url'], '" method="post" accept-charset="UTF-8">
 					<p>', $action['description'], '</p>
 					<div class="submitbutton">
 						<input type="submit" value="', $action['submit'], '" class="button_submit" />';
+
 		if (!empty($action['hidden']))
 			foreach ($action['hidden'] as $name => $val)
 				echo '
 						<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
+
 		echo '
 					</div>
 				</form>
@@ -217,16 +212,10 @@ function template_maintain_members()
 	<div id="manage_maintenance">';
 
 	// If maintenance has finished tell the user.
-	if (!empty($context['maintenance_finished']))
-	echo '
-		<div class="infobox">
-			', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
-		</div>';
+	template_show_error('maintenance_finished');
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_reattribute_posts'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['maintain_reattribute_posts'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=reattribute" method="post" accept-charset="UTF-8">
@@ -265,11 +254,9 @@ function template_maintain_members()
 				</form>
 			</div>
 		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">
-				<a href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_members'], '
-			</h3>
-		</div>
+		<h3 class="category_header">
+			<a href="', $scripturl, '?action=quickhelp;help=maintenance_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['maintain_members'], '
+		</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=purgeinactive" method="post" accept-charset="UTF-8" id="membersForm">
@@ -297,9 +284,7 @@ function template_maintain_members()
 				</form>
 			</div>
 		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_recountposts'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['maintain_recountposts'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=recountposts" method="post" accept-charset="UTF-8" id="membersRecountForm">
@@ -371,9 +356,7 @@ function template_maintain_topics()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_old'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['maintain_old'], '</h2>
 		<div class="windowbg">
 			<div class="content flow_auto">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=pruneold" method="post" accept-charset="UTF-8">';
@@ -395,7 +378,7 @@ function template_maintain_topics()
 						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
 					</p>';
 
-		echo '
+	echo '
 					<p>
 						<a href="#rotLink" onclick="swapRot();"><img src="', $settings['images_url'], '/selected.png" alt="+" id="rotIcon" /></a> <a href="#rotLink" onclick="swapRot();" id="rotText" style="font-weight: bold;">', $txt['maintain_old_all'], '</a>
 					</p>
@@ -440,10 +423,7 @@ function template_maintain_topics()
 				</form>
 			</div>
 		</div>
-
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_old_drafts'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['maintain_old_drafts'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=olddrafts" method="post" accept-charset="UTF-8">
@@ -456,9 +436,7 @@ function template_maintain_topics()
 				</form>
 			</div>
 		</div>
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['move_topics_maintenance'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt['move_topics_maintenance'], '</h3>
 		<div class="windowbg2">
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove" method="post" accept-charset="UTF-8">
@@ -489,9 +467,7 @@ function template_optimize()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt['maintain_optimize'], '</h3>
-		</div>
+		<h2 class="category_header">', $txt['maintain_optimize'], '</h2>
 		<div class="windowbg">
 			<div class="content">
 				<p>
@@ -524,12 +500,11 @@ function template_convert_msgbody()
 
 	echo '
 	<div id="manage_maintenance">
-		<div class="cat_bar">
-			<h3 class="catbg">', $txt[$context['convert_to'] . '_title'], '</h3>
-		</div>
+		<h3 class="category_header">', $txt[$context['convert_to'] . '_title'], '</h3>
 		<div class="windowbg">
 			<div class="content">
 				<p>', $txt['body_checking_introduction'], '</p>';
+
 	if (!empty($context['exceeding_messages']))
 	{
 		echo '
@@ -539,6 +514,7 @@ function template_convert_msgbody()
 					', implode('</li><li>', $context['exceeding_messages']), '
 					</li>
 				</ul>';
+
 		if (!empty($context['exceeding_messages_morethan']))
 			echo '
 				<p>', $context['exceeding_messages_morethan'], '</p>';

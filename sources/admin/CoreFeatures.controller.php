@@ -13,8 +13,7 @@
  *
  * @version 1.0 Alpha
  *
- * This file is here to make it easier for installed mods to have
- * settings and options.
+ * This controller allows to choose the features activated and disactivate them.
  *
  */
 
@@ -45,16 +44,18 @@ class CoreFeatures_Controller extends Action_Controller
 	 *
 	 * Uses internally an array of all the features that can be enabled/disabled.
 	 *  $core_features, each option can have the following:
-	 * 		title		- Text title of this item (If standard string does not exist).
-	 * 		desc		- Description of this feature (If standard string does not exist).
-	 * 		settings	- Array of settings to change (For each name => value) on enable - reverse is done for disable. If > 1 will not change value if set.
-	 * 		setting_callback- Function that returns an array of settings to save - takes one parameter which is value for this feature.
-	 * 		save_callback	- Function called on save, takes state as parameter.
+	 *    title - Text title of this item (If standard string does not exist).
+	 *    desc - Description of this feature (If standard string does not exist).
+	 *    settings - Array of settings to change (For each name => value) on enable - reverse is done for disable. If > 1 will not change value if set.
+	 *    setting_callback - Function that returns an array of settings to save - takes one parameter which is value for this feature.
+	 *    save_callback - Function called on save, takes state as parameter.
 	 *
 	 */
 	public function action_features()
 	{
 		global $txt, $scripturl, $context, $settings, $modSettings;
+
+		require_once(SUBSDIR . '/Admin.subs.php');
 
 		loadTemplate('CoreFeatures');
 
@@ -181,16 +182,7 @@ class CoreFeatures_Controller extends Action_Controller
 			// cp = custom profile fields.
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
-				'save_callback' => create_function('$value', '
-					$db = database();
-
-					if (!$value)
-					{
-						$db->query(\'\', \'
-							UPDATE {db_prefix}custom_fields
-							SET active = 0\');
-					}
-				'),
+				'save_callback' => 'custom_profiles_toggle_callback',
 				'setting_callback' => create_function('$value', '
 					if (!$value)
 						return array(
@@ -212,24 +204,11 @@ class CoreFeatures_Controller extends Action_Controller
 					'drafts_autosave_enabled' => 2,
 					'drafts_show_saved_enabled' => 2,
 				),
-				'setting_callback' => create_function('$value', '
-					$db = database();
-
-					// Set the correct disabled value for the scheduled task.
-					$db->query(\'\', \'
-						UPDATE {db_prefix}scheduled_tasks
-						SET disabled = {int:disabled}
-						WHERE task = {string:task}\',
-						array(
-							\'disabled\' => $value ? 0 : 1,
-							\'task\' => \'remove_old_drafts\',
-						)
-					);
-				'),
+				'setting_callback' => 'drafts_toggle_callback',
 			),
 			// ih = Integration Hooks Handling.
 			'ih' => array(
-				'url' => 'action=admin;area=modsettings;sa=hooks',
+				'url' => 'action=admin;area=addonsettings;sa=hooks',
 				'settings' => array(
 					'handlinghooks_enabled' => 1,
 				),
@@ -287,27 +266,7 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'paid_enabled' => 1,
 				),
-				'setting_callback' => create_function('$value', '
-					$db = database();
-
-					// Set the correct disabled value for scheduled task.
-					$db->query(\'\', \'
-						UPDATE {db_prefix}scheduled_tasks
-						SET disabled = {int:disabled}
-						WHERE task = {string:task}\',
-						array(
-							\'disabled\' => $value ? 0 : 1,
-							\'task\' => \'paid_subscriptions\',
-						)
-					);
-
-					// Should we calculate next trigger?
-					if ($value)
-					{
-						require_once(SUBSDIR . \'/ScheduledTasks.subs.php\');
-						calculateNextTrigger(\'paid_subscriptions\');
-					}
-				'),
+				'setting_callback' => 'subscriptions_toggle_callback',
 			),
 			// rg = report generator.
 			'rg' => array(

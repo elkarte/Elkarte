@@ -63,29 +63,25 @@ class ManageAttachments_Controller extends Action_Controller
 				'file' => 'ManageAvatars.controller.php',
 				'controller' => 'ManageAvatars_Controller',
 				'function' => 'action_index'),
-			'attachpaths' => array ($this, 'action_attachpaths'),
-			'browse' => array ($this, 'action_browse'),
-			'byAge' => array ($this, 'action_byAge'),
-			'bySize' => array ($this, 'action_bySize'),
-			'maintenance' => array ($this, 'action_maintenance'),
-			'moveAvatars' => array ($this, 'action_moveAvatars'),
-			'repair' => array ($this, 'action_repair'),
-			'remove' => array ($this, 'action_remove'),
-			'removeall' => array ($this, 'action_removeall'),
-			'transfer' => array ($this, 'action_transfer'),
+			'attachpaths' => array($this, 'action_attachpaths'),
+			'browse' => array($this, 'action_browse'),
+			'byAge' => array($this, 'action_byAge'),
+			'bySize' => array($this, 'action_bySize'),
+			'maintenance' => array($this, 'action_maintenance'),
+			'moveAvatars' => array($this, 'action_moveAvatars'),
+			'repair' => array($this, 'action_repair'),
+			'remove' => array($this, 'action_remove'),
+			'removeall' => array($this, 'action_removeall'),
+			'transfer' => array($this, 'action_transfer'),
 		);
-
-		$action = new Action();
-		$action->initialize($subActions);
 
 		call_integration_hook('integrate_manage_attachments', array(&$subActions));
 
-		// Pick the correct sub-action.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'browse';
+		$action = new Action();
+		$action->initialize($subActions, 'browse');
 
+		// Pick the correct sub-action.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'browse';
 		$context['sub_action'] = $subAction;
 
 		// Default page title is good.
@@ -118,15 +114,15 @@ class ManageAttachments_Controller extends Action_Controller
 
 		$config_vars = $this->_attachSettingsForm->settings();
 
-		$context['settings_post_javascript'] = '
-	var storing_type = document.getElementById(\'automanage_attachments\');
-	var base_dir = document.getElementById(\'use_subdirectories_for_attachments\');
+		addInlineJavascript('
+	var storing_type = document.getElementById(\'automanage_attachments\'),
+		base_dir = document.getElementById(\'use_subdirectories_for_attachments\');
 
 	createEventListener(storing_type)
 	storing_type.addEventListener("change", toggleSubDir, false);
 	createEventListener(base_dir)
 	base_dir.addEventListener("change", toggleSubDir, false);
-	toggleSubDir();';
+	toggleSubDir();', true);
 
 		call_integration_hook('integrate_modify_attachment_settings');
 
@@ -182,7 +178,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 						$_POST['use_subdirectories_for_attachments'] = 1;
 						$_POST['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
-
 					}
 				}
 			}
@@ -231,13 +226,13 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
 
 		if (!empty($modSettings['automanage_attachments']))
-			$context['valid_basedirectory'] =  !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
+			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
 		else
 			$context['valid_basedirectory'] = true;
 
 		// A bit of razzle dazzle with the $txt strings. :)
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
-		$txt['basedirectory_for_attachments_path']= isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
+		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
 		$txt['attachmentUploadDir_multiple_configure'] = '<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">[' . $txt['attachmentUploadDir_multiple_configure'] . ']</a>';
 		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
@@ -270,10 +265,10 @@ class ManageAttachments_Controller extends Action_Controller
 				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
 				// Posting limits
-				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('warning', empty($testPM) ? 'attachment_postsize_warning' : ''),
-				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
+				array('int', 'attachmentPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
+				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 				// Security Items
 			array('title', 'attachment_security_settings'),
@@ -333,13 +328,13 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
 
 		if (!empty($modSettings['automanage_attachments']))
-			$context['valid_basedirectory'] =  !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
+			$context['valid_basedirectory'] = !empty($modSettings['basedirectory_for_attachments']) && is_writable($modSettings['basedirectory_for_attachments']);
 		else
 			$context['valid_basedirectory'] = true;
 
 		// A bit of razzle dazzle with the $txt strings. :)
 		$txt['attachment_path'] = $context['attachmentUploadDir'];
-		$txt['basedirectory_for_attachments_path']= isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
+		$txt['basedirectory_for_attachments_path'] = isset($modSettings['basedirectory_for_attachments']) ? $modSettings['basedirectory_for_attachments'] : '';
 		$txt['use_subdirectories_for_attachments_note'] = empty($modSettings['attachment_basedirectories']) || empty($modSettings['use_subdirectories_for_attachments']) ? $txt['use_subdirectories_for_attachments_note'] : '';
 		$txt['attachmentUploadDir_multiple_configure'] = '<a href="' . $scripturl . '?action=admin;area=manageattachments;sa=attachpaths">[' . $txt['attachmentUploadDir_multiple_configure'] . ']</a>';
 		$txt['attach_current_dir'] = empty($modSettings['automanage_attachments']) ? $txt['attach_current_dir'] : $txt['attach_last_dir'];
@@ -474,7 +469,7 @@ class ManageAttachments_Controller extends Action_Controller
 							if (!empty($rowData[\'width\']) && !empty($rowData[\'height\']))
 								$link .= sprintf(\' onclick="return reqWin(this.href\' . ($rowData[\'attachment_type\'] == 1 ? \'\' : \' + \\\';image\\\'\') . \', %1$d, %2$d, true);"\', $rowData[\'width\'] + 20, $rowData[\'height\'] + 20);
 
-							$link .= sprintf(\'>%1$s</a>\', preg_replace(\'~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~\', \'&#\\\\1;\', htmlspecialchars($rowData[\'filename\'])));
+							$link .= sprintf(\'>%1$s</a>\', preg_replace(\'~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~\', \'&#\\\\1;\', htmlspecialchars($rowData[\'filename\'], ENT_COMPAT, \'UTF-8\')));
 
 							// Show the dimensions.
 							if (!empty($rowData[\'width\']) && !empty($rowData[\'height\']))
@@ -493,7 +488,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'value' => $txt['attachment_file_size'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData','
+						'function' => create_function('$rowData', '
 							global $txt;
 
 							return sprintf(\'%1$s%2$s\', round($rowData[\'size\'] / 1024, 2), $txt[\'kilobyte\']);
@@ -514,7 +509,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 							// In case of an attachment, return the poster of the attachment.
 							if (empty($rowData[\'id_member\']))
-								return htmlspecialchars($rowData[\'poster_name\']);
+								return htmlspecialchars($rowData[\'poster_name\'], ENT_COMPAT, \'UTF-8\');
 
 							// Otherwise it must be an avatar, return the link to the owner of it.
 							else
@@ -615,7 +610,7 @@ class ManageAttachments_Controller extends Action_Controller
 		);
 
 		// Create the list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 	}
 
@@ -625,16 +620,16 @@ class ManageAttachments_Controller extends Action_Controller
 	 * Calculates file statistics (total file size, number of attachments,
 	 * number of avatars, attachment space available).
 	 *
-	 * @uses the 'maintain' sub template.
+	 * @uses the 'maintenance' sub template.
 	 */
 	public function action_maintenance()
 	{
 		global $context, $modSettings;
 
+		loadTemplate('ManageAttachments');
 		$context['sub_template'] = 'maintenance';
 
 		// We're working with them attachments here!
-		require_once(SUBSDIR . '/Attachments.subs.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// we need our attachments directories...
@@ -714,7 +709,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// someone has to do the dirty work
 		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Deleting an attachment?
 		if ($_REQUEST['type'] != 'avatars')
@@ -739,14 +733,13 @@ class ManageAttachments_Controller extends Action_Controller
 	 * Called from the maintenance screen by
 	 *  ?action=admin;area=manageattachments;sa=bySize.
 	 * Optionally adds a certain text to the messages the attachments were
-	 * 	removed from.
+	 *  removed from.
 	 */
 	public function action_bySize()
 	{
 		checkSession('post', 'admin');
 
 		// we'll need this
-		require_once(SUBSDIR . '/Attachments.subs.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Find humungous attachments.
@@ -774,7 +767,6 @@ class ManageAttachments_Controller extends Action_Controller
 		{
 			// we'll need this
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			$attachments = array();
 			// There must be a quicker way to pass this safety test??
@@ -783,7 +775,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 			if ($_REQUEST['type'] == 'avatars' && !empty($attachments))
 				removeAttachments(array('id_attach' => $attachments));
-			else if (!empty($attachments))
+			elseif (!empty($attachments))
 			{
 				$messages = removeAttachments(array('id_attach' => $attachments), 'messages', true);
 
@@ -827,14 +819,22 @@ class ManageAttachments_Controller extends Action_Controller
 	}
 
 	/**
-	 * This function should find attachments in the database that no longer exist and clear them, and fix filesize issues.
-	 * @todo Move db queries to ManageAttachments.subs.php
+	 * This function will performs many attachment checks and provides ways to fix them
+	 * Checks for the following common issues
+	 *  - Orphan Thumbnails
+	 *  - Attachments that have no thumbnails
+	 *  - Attachments that list thumbnails, but actually, don't have any
+	 *  - Attachments list in the wrong_folder
+	 *  - Attachments that dont exists on disk anylonger
+	 *  - Attachments that are zero size
+	 *  - Attachments that file size does not match the DB size
+	 *  - Attachments that no longer have a message
+	 *  - Avatars with no members associated with them.
+	 *  - Attachments that are in the attachment folder, but not listed in the DB
 	 */
 	public function action_repair()
 	{
 		global $modSettings, $context, $txt;
-
-		$db = database();
 
 		checkSession('get');
 
@@ -860,9 +860,7 @@ class ManageAttachments_Controller extends Action_Controller
 				if (empty($_POST['to_fix']))
 					redirectexit('action=admin;area=manageattachments;sa=maintenance');
 
-				$_SESSION['attachments_to_fix'] = array();
-				// @todo No need to do this I think.
-				foreach ($_POST['to_fix'] as $key => $value)
+				foreach($_POST['to_fix'] as $key => $value)
 					$_SESSION['attachments_to_fix'][] = $value;
 			}
 		}
@@ -890,68 +888,17 @@ class ManageAttachments_Controller extends Action_Controller
 		// Get stranded thumbnails.
 		if ($_GET['step'] <= 0)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments
-				WHERE attachment_type = {int:thumbnail}',
-				array(
-					'thumbnail' => 3,
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = getMaxThumbnail();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_remove = array();
-
-				$result = $db->query('', '
-					SELECT thumb.id_attach, thumb.id_folder, thumb.filename, thumb.file_hash
-					FROM {db_prefix}attachments AS thumb
-						LEFT JOIN {db_prefix}attachments AS tparent ON (tparent.id_thumb = thumb.id_attach)
-					WHERE thumb.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND thumb.attachment_type = {int:thumbnail}
-						AND tparent.id_attach IS NULL',
-					array(
-						'thumbnail' => 3,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					// Only do anything once... just in case
-					if (!isset($to_remove[$row['id_attach']]))
-					{
-						$to_remove[$row['id_attach']] = $row['id_attach'];
-						$context['repair_errors']['missing_thumbnail_parent']++;
-
-						// If we are repairing remove the file from disk now.
-						if ($fix_errors && in_array('missing_thumbnail_parent', $to_fix))
-						{
-							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-							@unlink($filename);
-						}
-					}
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'missing_thumbnail_parent';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove) && in_array('missing_thumbnail_parent', $to_fix))
-					$db->query('', '
-						DELETE FROM {db_prefix}attachments
-						WHERE id_attach IN ({array_int:to_remove})
-							AND attachment_type = {int:attachment_type}',
-						array(
-							'to_remove' => $to_remove,
-							'attachment_type' => 3,
-						)
-					);
+				$removed = findOrphanThumbnails($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['missing_thumbnail_parent'] += count($removed);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
+			// Done here, on to the next
 			$_GET['step'] = 1;
 			$_GET['substep'] = 0;
 			pauseAttachmentMaintenance($to_fix);
@@ -960,157 +907,39 @@ class ManageAttachments_Controller extends Action_Controller
 		// Find parents which think they have thumbnails, but actually, don't.
 		if ($_GET['step'] <= 1)
 		{
-			$thumbnails = maxThumbnails();
+			$thumbnails = maxNoThumb();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_update = array();
-
-				$result = $db->query('', '
-					SELECT a.id_attach
-					FROM {db_prefix}attachments AS a
-						LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)
-					WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND a.id_thumb != {int:no_thumb}
-						AND thumb.id_attach IS NULL',
-					array(
-						'no_thumb' => 0,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					$to_update[] = $row['id_attach'];
-					$context['repair_errors']['parent_missing_thumbnail']++;
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'parent_missing_thumbnail';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_update) && in_array('parent_missing_thumbnail', $to_fix))
-					$db->query('', '
-						UPDATE {db_prefix}attachments
-						SET id_thumb = {int:no_thumb}
-						WHERE id_attach IN ({array_int:to_update})',
-						array(
-							'to_update' => $to_update,
-							'no_thumb' => 0,
-						)
-					);
+				$to_update = findParentsOrphanThumbnails($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['parent_missing_thumbnail'] += count($to_update);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
+			// Another step done, but many to go
 			$_GET['step'] = 2;
 			$_GET['substep'] = 0;
 			pauseAttachmentMaintenance($to_fix);
+
 		}
 
 		// This may take forever I'm afraid, but life sucks... recount EVERY attachments!
 		if ($_GET['step'] <= 2)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments',
-				array(
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = maxAttachment();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 250)
 			{
 				$to_remove = array();
-				$errors_found = array();
-
-				$result = $db->query('', '
-					SELECT id_attach, id_folder, filename, file_hash, size, attachment_type
-					FROM {db_prefix}attachments
-					WHERE id_attach BETWEEN {int:substep} AND {int:substep} + 249',
-					array(
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					// Get the filename.
-					if ($row['attachment_type'] == 1)
-						$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
-					else
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-
-					// File doesn't exist?
-					if (!file_exists($filename))
-					{
-						// If we're lucky it might just be in a different folder.
-						if (!empty($modSettings['currentAttachmentUploadDir']))
-						{
-							// Get the attachment name with out the folder.
-							$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
-
-							if (!is_array($modSettings['attachmentUploadDir']))
-								$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-
-							// Loop through the other folders.
-							foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
-								if (file_exists($dir . '/' . $attachment_name))
-								{
-									$context['repair_errors']['wrong_folder']++;
-									$errors_found[] = 'wrong_folder';
-
-									// Are we going to fix this now?
-									if ($fix_errors && in_array('wrong_folder', $to_fix))
-										attachment_folder($row['id_attach'], $id);
-
-									continue 2;
-								}
-						}
-
-						$to_remove[] = $row['id_attach'];
-						$context['repair_errors']['file_missing_on_disk']++;
-						$errors_found[] = 'file_missing_on_disk';
-					}
-					elseif (filesize($filename) == 0)
-					{
-						$context['repair_errors']['file_size_of_zero']++;
-						$errors_found[] = 'file_size_of_zero';
-
-						// Fixing?
-						if ($fix_errors && in_array('file_size_of_zero', $to_fix))
-						{
-							$to_remove[] = $row['id_attach'];
-							@unlink($filename);
-						}
-					}
-					elseif (filesize($filename) != $row['size'])
-					{
-						$context['repair_errors']['file_wrong_size']++;
-						$errors_found[] = 'file_wrong_size';
-
-						// Fix it here?
-						if ($fix_errors && in_array('file_wrong_size', $to_fix))
-							attachment_filesize($row['id_attach'], filesize($filename));
-					}
-				}
-
-				if (in_array('file_missing_on_disk', $errors_found))
-					$to_fix[] = 'file_missing_on_disk';
-				if (in_array('file_size_of_zero', $errors_found))
-					$to_fix[] = 'file_size_of_zero';
-				if (in_array('file_wrong_size', $errors_found))
-					$to_fix[] = 'file_wrong_size';
-				if (in_array('wrong_folder', $errors_found))
-					$to_fix[] = 'wrong_folder';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove))
-					removeOrphanAttachments($to_remove);
+				$repair_errors = repairAttachmentData($_GET['substep'], $fix_errors, $to_fix);
+				foreach($repair_errors as $key => $value)
+					$context['repair_errors'][$key] += $value;
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
+			// And onward we go
 			$_GET['step'] = 3;
 			$_GET['substep'] = 0;
 			pauseAttachmentMaintenance($to_fix);
@@ -1119,65 +948,12 @@ class ManageAttachments_Controller extends Action_Controller
 		// Get avatars with no members associated with them.
 		if ($_GET['step'] <= 3)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments',
-				array(
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = maxAttachment();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_remove = array();
-
-				$result = $db->query('', '
-					SELECT a.id_attach, a.id_folder, a.filename, a.file_hash, a.attachment_type
-					FROM {db_prefix}attachments AS a
-						LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = a.id_member)
-					WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND a.id_member != {int:no_member}
-						AND a.id_msg = {int:no_msg}
-						AND mem.id_member IS NULL',
-					array(
-						'no_member' => 0,
-						'no_msg' => 0,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					$to_remove[] = $row['id_attach'];
-					$context['repair_errors']['avatar_no_member']++;
-
-					// If we are repairing remove the file from disk now.
-					if ($fix_errors && in_array('avatar_no_member', $to_fix))
-					{
-						if ($row['attachment_type'] == 1)
-							$filename = $modSettings['custom_avatar_dir'] . '/' . $row['filename'];
-						else
-							$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-						@unlink($filename);
-					}
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'avatar_no_member';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove) && in_array('avatar_no_member', $to_fix))
-					$db->query('', '
-						DELETE FROM {db_prefix}attachments
-						WHERE id_attach IN ({array_int:to_remove})
-							AND id_member != {int:no_member}
-							AND id_msg = {int:no_msg}',
-						array(
-							'to_remove' => $to_remove,
-							'no_member' => 0,
-							'no_msg' => 0,
-						)
-					);
+				$to_remove = findOrphanAvatars($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['avatar_no_member'] += count($to_remove);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
@@ -1190,62 +966,12 @@ class ManageAttachments_Controller extends Action_Controller
 		// What about attachments, who are missing a message :'(
 		if ($_GET['step'] <= 4)
 		{
-			$result = $db->query('', '
-				SELECT MAX(id_attach)
-				FROM {db_prefix}attachments',
-				array(
-				)
-			);
-			list ($thumbnails) = $db->fetch_row($result);
-			$db->free_result($result);
+			$thumbnails = maxAttachment();
 
 			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
 			{
-				$to_remove = array();
-
-				$result = $db->query('', '
-					SELECT a.id_attach, a.id_folder, a.filename, a.file_hash
-					FROM {db_prefix}attachments AS a
-						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
-					WHERE a.id_attach BETWEEN {int:substep} AND {int:substep} + 499
-						AND a.id_member = {int:no_member}
-						AND a.id_msg != {int:no_msg}
-						AND m.id_msg IS NULL',
-					array(
-						'no_member' => 0,
-						'no_msg' => 0,
-						'substep' => $_GET['substep'],
-					)
-				);
-				while ($row = $db->fetch_assoc($result))
-				{
-					$to_remove[] = $row['id_attach'];
-					$context['repair_errors']['attachment_no_msg']++;
-
-					// If we are repairing remove the file from disk now.
-					if ($fix_errors && in_array('attachment_no_msg', $to_fix))
-					{
-						$filename = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-						@unlink($filename);
-					}
-				}
-				if ($db->num_rows($result) != 0)
-					$to_fix[] = 'attachment_no_msg';
-				$db->free_result($result);
-
-				// Do we need to delete what we have?
-				if ($fix_errors && !empty($to_remove) && in_array('attachment_no_msg', $to_fix))
-					$db->query('', '
-						DELETE FROM {db_prefix}attachments
-						WHERE id_attach IN ({array_int:to_remove})
-							AND id_member = {int:no_member}
-							AND id_msg != {int:no_msg}',
-						array(
-							'to_remove' => $to_remove,
-							'no_member' => 0,
-							'no_msg' => 0,
-						)
-					);
+				$to_remove = findOrphanAttachments($_GET['substep'], $fix_errors, $to_fix);
+				$context['repair_errors']['attachment_no_msg'] += count($to_remove);
 
 				pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
@@ -1272,7 +998,7 @@ class ManageAttachments_Controller extends Action_Controller
 				{
 					while ($file = readdir($dir))
 					{
-						if ($file == '.' || $file == '..')
+						if ($file == '.' || $file == '..' || $file == '.htaccess')
 							continue;
 
 						if ($files_checked <= $current_check)
@@ -1290,41 +1016,21 @@ class ManageAttachments_Controller extends Action_Controller
 								$attachID = (int) substr($file, 0, strpos($file, '_'));
 								if (!empty($attachID))
 								{
-									$request = $db->query('', '
-										SELECT  id_attach
-										FROM {db_prefix}attachments
-										WHERE id_attach = {int:attachment_id}
-										LIMIT 1',
-										array(
-											'attachment_id' => $attachID,
-										)
-									);
-									if ($db->num_rows($request) == 0)
+									if (!validateAttachID($attachID))
 									{
 										if ($fix_errors && in_array('files_without_attachment', $to_fix))
-										{
 											@unlink($attach_dir . '/' . $file);
-										}
 										else
-										{
 											$context['repair_errors']['files_without_attachment']++;
-											$to_fix[] = 'files_without_attachment';
-										}
 									}
-									$db->free_result($request);
 								}
 							}
 							elseif ($file != 'index.php')
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix))
-								{
 									@unlink($attach_dir . '/' . $file);
-								}
 								else
-								{
 									$context['repair_errors']['files_without_attachment']++;
-									$to_fix[] = 'files_without_attachment';
-								}
 							}
 						}
 						$current_check++;
@@ -1349,24 +1055,21 @@ class ManageAttachments_Controller extends Action_Controller
 		// What stage are we at?
 		$context['completed'] = $fix_errors ? true : false;
 		$context['errors_found'] = !empty($to_fix) ? true : false;
-
 	}
 
 	/**
 	 * This function lists and allows updating of multiple attachments paths.
-	 * @todo Move db queries to ManageAttachments.subs.php
 	 */
 	public function action_attachpaths()
 	{
 		global $modSettings, $scripturl, $context, $txt;
-
-		$db = database();
 
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
 			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
 		if (!isset($modSettings['attachment_basedirectories']))
 			$modSettings['attachment_basedirectories'] = array();
 		elseif (!is_array($modSettings['attachment_basedirectories']))
@@ -1394,16 +1097,15 @@ class ManageAttachments_Controller extends Action_Controller
 					// or is it?
 					if (in_array($path, $modSettings['attachmentUploadDir']) || in_array(BOARDDIR . DIRECTORY_SEPARATOR . $path, $modSettings['attachmentUploadDir']))
 					{
-							$errors[] = $path . ': ' . $txt['attach_dir_duplicate_msg'];
-							continue;
+						$errors[] = $path . ': ' . $txt['attach_dir_duplicate_msg'];
+						continue;
 					}
 
 					// OK, so let's try to create it then.
-					require_once(SUBSDIR . '/Attachments.subs.php');
 					if (automanage_attachments_create_directory($path))
 						$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
 					else
-						$errors[] =  $path . ': ' . $txt[$context['dir_creation_error']];
+						$errors[] = $path . ': ' . $txt[$context['dir_creation_error']];
 				}
 
 				// Changing a directory name?
@@ -1450,17 +1152,7 @@ class ManageAttachments_Controller extends Action_Controller
 					else
 					{
 						// Let's not try to delete a path with files in it.
-						$request = $db->query('', '
-							SELECT COUNT(id_attach) AS num_attach
-							FROM {db_prefix}attachments
-							WHERE id_folder = {int:id_folder}',
-							array(
-								'id_folder' => (int) $id,
-							)
-						);
-
-						list ($num_attach) = $db->fetch_row($request);
-						$db->free_result($request);
+						$num_attach = countAttachmentsInFolders($id);
 
 						// A check to see if it's a used base dir.
 						if (!empty($modSettings['attachment_basedirectories']))
@@ -1525,7 +1217,7 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 
 			// If the user wishes to go back, update the last_dir array
-			if ($_POST['current_dir'] !=  $modSettings['currentAttachmentUploadDir']&& !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
+			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir']&& !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
 					$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
@@ -1538,7 +1230,7 @@ class ManageAttachments_Controller extends Action_Controller
 					$use_subdirectories_for_attachments = 0;
 					if (!empty($modSettings['attachment_basedirectories']))
 						foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
-							if (strpos($modSettings['attachmentUploadDir'][$_POST['current_dir']], $base . DIRECTORY_SEPARATOR) !==false)
+							if (strpos($modSettings['attachmentUploadDir'][$_POST['current_dir']], $base . DIRECTORY_SEPARATOR) !== false)
 							{
 								$use_subdirectories_for_attachments = 1;
 								break;
@@ -1565,15 +1257,7 @@ class ManageAttachments_Controller extends Action_Controller
 				foreach ($new_dirs as $id => $dir)
 				{
 					if ($id != 1)
-						$db->query('', '
-							UPDATE {db_prefix}attachments
-							SET id_folder = {int:default_folder}
-							WHERE id_folder = {int:current_folder}',
-							array(
-								'default_folder' => 1,
-								'current_folder' => $id,
-							)
-						);
+						updateAttachmentIdFolder($id, 1);
 
 					$update = array(
 						'currentAttachmentUploadDir' => 1,
@@ -1616,7 +1300,7 @@ class ManageAttachments_Controller extends Action_Controller
 				//$modSettings['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
 			}
 
-			If (isset($_POST['base_dir']))
+			if (isset($_POST['base_dir']))
 			{
 				foreach ($_POST['base_dir'] as $id => $dir)
 				{
@@ -1655,7 +1339,7 @@ class ManageAttachments_Controller extends Action_Controller
 			if (!empty($_POST['new_base_dir']))
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
-				$_POST['new_base_dir'] = htmlspecialchars($_POST['new_base_dir'], ENT_QUOTES);
+				$_POST['new_base_dir'] = htmlspecialchars($_POST['new_base_dir'], ENT_QUOTES, 'UTF-8');
 
 				$current_dir = $modSettings['currentAttachmentUploadDir'];
 
@@ -1788,7 +1472,7 @@ class ManageAttachments_Controller extends Action_Controller
 				),
 			),
 		);
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		if (!empty($modSettings['attachment_basedirectories']))
@@ -1913,18 +1597,7 @@ class ManageAttachments_Controller extends Action_Controller
 		if (empty($results))
 		{
 			// Get the total file count for the progress bar.
-			$request = $db->query('', '
-				SELECT COUNT(*)
-				FROM {db_prefix}attachments
-				WHERE id_folder = {int:folder_id}
-					AND attachment_type != {int:attachment_type}',
-				array(
-					'folder_id' => $_POST['from'],
-					'attachment_type' => 1,
-				)
-			);
-			list ($total_progress) = $db->fetch_row($request);
-			$db->free_result($request);
+			$total_progress = getFolderAttachmentCount($_POST['from']);
 			$total_progress -= $start;
 
 			if ($total_progress < 1)
@@ -1959,20 +1632,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 				// If limts are set, get the file count and size for the destination folder
 				if ($dir_files <= 0 && (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit'])))
-				{
-					$request = $db->query('', '
-						SELECT COUNT(*), SUM(size)
-						FROM {db_prefix}attachments
-						WHERE id_folder = {int:folder_id}
-							AND attachment_type != {int:attachment_type}',
-						array(
-							'folder_id' => $new_dir,
-							'attachment_type' => 1,
-						)
-					);
-					list ($dir_files, $dir_size) = $db->fetch_row($request);
-					$db->free_result($request);
-				}
+					list ($dir_files, $dir_size) = attachDirProperties($new_dir);
 
 				// Find some attachments to move
 				$request = $db->query('', '
@@ -2003,15 +1663,17 @@ class ManageAttachments_Controller extends Action_Controller
 				$moved = array();
 				while ($row = $db->fetch_assoc($request))
 				{
+					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
+
 					// Size and file count check
 					if (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit']))
 					{
 						$dir_files++;
-						// @todo $source is unitialized at this point. If this isn't a bug, we should comment where it is set as to not add confusion later
 						$dir_size += !empty($row['size']) ? $row['size'] : filesize($source);
 
 						// If we've reached a limit. Do something.
-						if (!empty($modSettings['attachmentDirSizeLimit']) && $dir_size > $modSettings['attachmentDirSizeLimit'] * 1024 || (!empty($modSettings['attachmentDirFileLimit']) && $dir_files >  $modSettings['attachmentDirFileLimit']))
+						if (!empty($modSettings['attachmentDirSizeLimit']) && $dir_size > $modSettings['attachmentDirSizeLimit'] * 1024 || (!empty($modSettings['attachmentDirFileLimit']) && $dir_files > $modSettings['attachmentDirFileLimit']))
 						{
 							if (!empty($_POST['auto']))
 							{
@@ -2038,9 +1700,6 @@ class ManageAttachments_Controller extends Action_Controller
 							}
 						}
 					}
-
-					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-					$dest = $modSettings['attachmentUploadDir'][$new_dir] . '/' . basename($source);
 
 					if (@rename($source, $dest))
 					{
@@ -2098,8 +1757,8 @@ class ManageAttachments_Controller extends Action_Controller
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance#transfer');
 	}
-
 }
+
 /**
  * Function called in-between each round of attachments and avatar repairs.
  * Called by repairAttachments().

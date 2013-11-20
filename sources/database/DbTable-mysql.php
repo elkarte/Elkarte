@@ -12,7 +12,7 @@
  * @version 1.0 Alpha
  *
  * This class implements functionality related to table structure.
- * Intended in particular for add-ons to change it to suit their needs.
+ * Intended in particular for addons to change it to suit their needs.
  *
  */
 
@@ -65,23 +65,23 @@ class DbTable_MySQL extends DbTable
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
 	 *  The columns array should have one sub-array for each column - these sub arrays contain:
-	 *  	'name' = Column name
-	 *  	'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
-	 *  	'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
-	 *  		If not set it will pick a size.
-	 *  	- 'default' = Default value - do not set if no default required.
-	 *  	- 'null' => Can it be null (true or false) - if not set default will be false.
-	 *  	- 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
-	 *  		it should begin counting.
+	 *    'name' = Column name
+	 *    'type' = Type of column - values from (smallint, mediumint, int, text, varchar, char, tinytext, mediumtext, largetext)
+	 *    'size' => Size of column (If applicable) - for example 255 for a large varchar, 10 for an int etc.
+	 *      If not set it will pick a size.
+	 *    - 'default' = Default value - do not set if no default required.
+	 *    - 'null' => Can it be null (true or false) - if not set default will be false.
+	 *    - 'auto' => Set to true to make it an auto incrementing column. Set to a numerical value to set from what
+	 *      it should begin counting.
 	 *  - Adds indexes as specified within indexes parameter. Each index should be a member of $indexes. Values are:
-	 *  	- 'name' => Index name (If left empty it will be generated).
-	 *  	- 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
-	 *  	- 'columns' => Array containing columns that form part of key - in the order the index is to be created.
+	 *    - 'name' => Index name (If left empty it will be generated).
+	 *    - 'type' => Type of index. Choose from 'primary', 'unique' or 'index'. If not set will default to 'index'.
+	 *    - 'columns' => Array containing columns that form part of key - in the order the index is to be created.
 	 *  - parameters: (None yet)
 	 *  - if_exists values:
-	 *  	- 'ignore' will do nothing if the table exists. (And will return true)
-	 *  	- 'overwrite' will drop any existing table of the same name.
-	 *  	- 'error' will return false if the table already exists.
+	 *    - 'ignore' will do nothing if the table exists. (And will return true)
+	 *    - 'overwrite' will drop any existing table of the same name.
+	 *    - 'error' will return false if the table already exists.
 	 *
 	 * @param string $table_name
 	 * @param array $columns in the format specified.
@@ -92,7 +92,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_create_table($table_name, $columns, $indexes = array(), $parameters = array(), $if_exists = 'ignore', $error = 'fatal')
 	{
-		global $db_prefix, $db_character_set;
+		global $db_prefix;
 
 		// Strip out the table name, we might not need it in some cases
 		$real_prefix = preg_match('~^(`?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
@@ -125,7 +125,7 @@ class DbTable_MySQL extends DbTable
 		// Righty - let's do the damn thing!
 		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
 		foreach ($columns as $column)
-			$table_query .= "\n\t" . $this->db_create_query_column($column)  . ',';
+			$table_query .= "\n\t" . $this->_db_create_query_column($column)  . ',';
 
 		// Loop through the indexes next...
 		foreach ($indexes as $index)
@@ -211,7 +211,7 @@ class DbTable_MySQL extends DbTable
 	 */
 	function db_add_column($table_name, $column_info, $parameters = array(), $if_exists = 'update', $error = 'fatal')
 	{
-		global $txt, $db_prefix;
+		global $db_prefix;
 
 		// working hard with the db!
 		$db = database();
@@ -233,20 +233,10 @@ class DbTable_MySQL extends DbTable
 					return false;
 			}
 
-		// Get the specifics...
-		$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
-		list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
-
-		// Allow unsigned integers (mysql only)
-		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')) && !empty($column_info['unsigned']) ? 'unsigned ' : '';
-
-		if ($size !== null)
-			$type = $type . '(' . $size . ')';
-
 		// Now add the thing!
 		$query = '
 			ALTER TABLE ' . $table_name . '
-			ADD ' . $this->db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
+			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
 
 		$db->query('', $query,
 			array(
@@ -339,19 +329,9 @@ class DbTable_MySQL extends DbTable
 		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')))
 			$column_info['unsigned'] = '';
 
-		list ($type, $size) = $this->db_calculate_type($column_info['type'], $column_info['size']);
-
-		// Allow for unsigned integers (mysql only)
-		$unsigned = in_array($type, array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')) && !empty($column_info['unsigned']) ? 'unsigned ' : '';
-
-		if ($size !== null)
-			$type = $type . '(' . $size . ')';
-
 		$db->query('', '
 			ALTER TABLE ' . $table_name . '
-			CHANGE COLUMN `' . $old_column . '` `' . $column_info['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (empty($column_info['null']) ? 'NOT NULL' : '') . ' ' .
-				(!isset($column_info['default']) ? '' : 'default \'' . $db->escape_string($column_info['default']) . '\'') . ' ' .
-				(empty($column_info['auto']) ? '' : 'auto_increment') . ' ',
+			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info),
 			array(
 				'security_override' => true,
 			)
@@ -662,7 +642,7 @@ class DbTable_MySQL extends DbTable
 	 * @param array $column
 	 * @return type
 	 */
-	function db_create_query_column($column)
+	private function _db_create_query_column($column)
 	{
 		// make sure db is available
 		$db = database();

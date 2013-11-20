@@ -26,17 +26,24 @@ class ManageAvatars_Controller extends Action_Controller
 
 	public function action_index()
 	{
+		global $context, $txt;
+
 		// We're working with them settings here.
 		require_once(SUBSDIR . '/Settings.class.php');
 
 		$subActions = array(
-			'display' => array ($this, 'action_avatarSettings_display'));
+			'display' => array($this, 'action_avatarSettings_display')
+		);
+
+		// Not many options
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'display';
+		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['avatar_settings'];
 
 		// call the action handler
-		// this is hardcoded now, to be fixed
 		$action = new Action();
-		$action->initialize($subActions);
-		$action->dispatch('display');
+		$action->initialize($subActions, 'display');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -65,10 +72,10 @@ class ManageAvatars_Controller extends Action_Controller
 			if (isset($_POST['custom_avatar_enabled']) && $_POST['custom_avatar_enabled'] == 1 && (empty($_POST['custom_avatar_dir']) || empty($_POST['custom_avatar_url'])))
 				$_POST['custom_avatar_enabled'] = 0;
 
-				call_integration_hook('integrate_save_avatar_settings');
+			call_integration_hook('integrate_save_avatar_settings');
 
-				Settings_Form::save_db($config_vars);
-				redirectexit('action=admin;area=manageattachments;sa=avatars');
+			Settings_Form::save_db($config_vars);
+			redirectexit('action=admin;area=manageattachments;sa=avatars');
 		}
 
 		// Attempt to figure out if the admin is trying to break things.
@@ -89,7 +96,7 @@ class ManageAvatars_Controller extends Action_Controller
 	/**
 	 * This method retrieves and returns avatar settings.
 	 * It also returns avatar-related permissions profile_server_avatar,
-	 * 	profile_upload_avatar, profile_remote_avatar, profile_gvatar.
+	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
 	 *
 	 * Initializes the avatarSettings form.
 	 */
@@ -97,10 +104,8 @@ class ManageAvatars_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings;
 
-		// instantiate the form
+		// Instantiate the form
 		$this->_avatarSettings = new Settings_Form();
-
-		// initialize it with our settings
 
 		// Check for GD and ImageMagick. It will set up a warning for the admin otherwise.
 		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
@@ -164,7 +169,7 @@ class ManageAvatars_Controller extends Action_Controller
 	/**
 	 * This method retrieves and returns avatar settings.
 	 * It also returns avatar-related permissions profile_server_avatar,
-	 * 	profile_upload_avatar, profile_remote_avatar, profile_gvatar.
+	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
 	 * @deprecated
 	 */
 	public function settings()

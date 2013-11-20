@@ -11,11 +11,11 @@
  *
  * @version 1.0 Alpha
  *
- *  Implementation of PHP's session API.
- * 	What it does:
- * 	- it handles the session data in the database (more scalable.)
- * 	- it uses the databaseSession_lifetime setting for garbage collection.
- * 	- the custom session handler is set by loadSession().
+ * Implementation of PHP's session API.
+ * What it does:
+ *  - it handles the session data in the database (more scalable.)
+ *  - it uses the databaseSession_lifetime setting for garbage collection.
+ *  - the custom session handler is set by loadSession().
  *
  */
 
@@ -65,6 +65,7 @@ function loadSession()
 		// Use database sessions? (they don't work in 4.1.x!)
 		if (!empty($modSettings['databaseSession_enable']))
 		{
+			@ini_set('session.serialize_handler', 'php');
 			session_set_save_handler('sessionOpen', 'sessionClose', 'sessionRead', 'sessionWrite', 'sessionDestroy', 'sessionGC');
 			@ini_set('session.gc_probability', '1');
 		}

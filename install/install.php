@@ -15,8 +15,8 @@
  *
  */
 
-$GLOBALS['current_version'] = '1.0 Alpha';
-$GLOBALS['db_script_version'] = '1-0';
+define('CURRENT_VERSION', '1.0 Alpha');
+define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.1.0';
 
@@ -27,7 +27,7 @@ $GLOBALS['required_php_version'] = '5.1.0';
 $databases = array(
 	'mysql' => array(
 		'name' => 'MySQL',
-		'version' => '4.1.0',
+		'version' => '4.1.13',
 		'version_check' => 'return min(mysqli_get_server_info($db_connection), mysqli_get_client_info($db_connection));',
 		'supported' => function_exists('mysqli_connect'),
 		'default_user' => 'mysqli.default_user',
@@ -42,16 +42,17 @@ $databases = array(
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
 			return true;
 		'),
+		'require_db_confirm' => true,
 	),
 	'postgresql' => array(
 		'name' => 'PostgreSQL',
 		'version' => '8.0',
 		'function_check' => 'pg_connect',
-		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
+		'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'supported' => function_exists('pg_connect'),
 		'utf8_support' => true,
 		'utf8_version' => '8.0',
-		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list($pgl, $version) = explode(" ", $version); return $version;',
+		'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
 		'validate_prefix' => create_function('&$value', '
 			$value = preg_replace(\'~[^A-Za-z0-9_\$]~\', \'\', $value);
 
@@ -65,6 +66,7 @@ $databases = array(
 
 			return true;
 		'),
+		'require_db_confirm' => true,
 	),
 );
 
@@ -128,32 +130,13 @@ function initialize_inputs()
 {
 	global $databases, $incontext;
 
-	// Just so people using older versions of PHP aren't left in the cold.
-	if (!isset($_SERVER['PHP_SELF']))
-		$_SERVER['PHP_SELF'] = isset($GLOBALS['HTTP_SERVER_VARS']['PHP_SELF']) ? $GLOBALS['HTTP_SERVER_VARS']['PHP_SELF'] : 'install.php';
-
 	// Turn off magic quotes runtime and enable error reporting.
 	if (function_exists('set_magic_quotes_runtime'))
 		@set_magic_quotes_runtime(0);
 	error_reporting(E_ALL);
 
-	// Fun.  Low PHP version...
-	if (!isset($_GET))
-	{
-		$GLOBALS['_GET']['step'] = 0;
-		return;
-	}
-
-	if (!isset($_GET['obgz']))
-	{
-		ob_start();
-
-		if (ini_get('session.save_handler') == 'user')
-			@ini_set('session.save_handler', 'files');
-		if (function_exists('session_start'))
-			@session_start();
-	}
-	else
+	// This is the test for support of compression
+	if (isset($_GET['obgz']))
 	{
 		ob_start('ob_gzhandler');
 
@@ -165,21 +148,22 @@ function initialize_inputs()
 			echo '<!DOCTYPE html>
 <html>
 	<head>
-		<title>', htmlspecialchars($_GET['pass_string']), '</title>
+		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
 	</head>
-	<body style="background: #d4d4d4; margin-top: 16%; text-align: center; font-size: 16pt;">
-		<strong>', htmlspecialchars($_GET['pass_string']), '</strong>
+	<body style="background: #d4d4d4; margin-top: 16%; font-size: 16pt;">
+		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
 	</body>
 </html>';
 		exit;
 	}
-
-	// Are we calling the backup css file?
-	if (isset($_GET['infile_css']))
+	else
 	{
-		header('Content-Type: text/css');
-		template_css();
-		exit;
+		ob_start();
+
+		if (ini_get('session.save_handler') == 'user')
+			@ini_set('session.save_handler', 'files');
+		if (function_exists('session_start'))
+			@session_start();
 	}
 
 	// Add slashes, as long as they aren't already being added.
@@ -261,8 +245,6 @@ function load_lang_file()
 	// Override the language file?
 	if (isset($_GET['lang_file']))
 		$_SESSION['installer_temp_lang'] = $_GET['lang_file'];
-	elseif (isset($GLOBALS['HTTP_GET_VARS']['lang_file']))
-		$_SESSION['installer_temp_lang'] = $GLOBALS['HTTP_GET_VARS']['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
 	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']))
@@ -284,7 +266,7 @@ function load_lang_file()
  */
 function load_database()
 {
-	global $db_prefix, $db_connection, $db_character_set, $language;
+	global $db_prefix, $db_connection, $language;
 	global $mbname, $scripturl, $boardurl, $modSettings, $db_type, $db_name, $db_user, $db_persist;
 
 	if (!defined('SOURCEDIR'))
@@ -301,7 +283,6 @@ function load_database()
 	if (!$db_connection)
 	{
 		require_once(SOURCEDIR . '/database/Database.subs.php');
-		require_once(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php');
 
 		if (!$db_connection)
 			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
@@ -334,12 +315,7 @@ function installExit($fallThrough = false)
 
 			call_user_func('template_' . $incontext['sub_template']);
 		}
-		// @todo REMOVE THIS!!
-		else
-		{
-			if (function_exists('doStep' . $_GET['step']))
-				call_user_func('doStep' . $_GET['step']);
-		}
+
 		// Show the footer.
 		template_install_below();
 	}
@@ -392,11 +368,11 @@ function action_welcome()
 	{
 		if ($db['supported'])
 		{
-			if (!file_exists(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql'))
+			if (!file_exists(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql'))
 			{
 				$databases[$key]['supported'] = false;
 				$notFoundSQLFile = true;
-				$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], 'install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+				$txt['error_db_script_missing'] = sprintf($txt['error_db_script_missing'], 'install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
 			}
 			else
 			{
@@ -450,8 +426,7 @@ function action_checkFilesWritable()
 		'themes',
 		'agreement.txt',
 		'Settings.php',
-		'Settings_bak.php',
-		'db_last_error.php'
+		'Settings_bak.php'
 	);
 	foreach ($incontext['detected_languages'] as $lang => $temp)
 		$extra_files[] = 'themes/default/languages/' . $lang;
@@ -748,9 +723,9 @@ function action_databaseSettings()
 			define('SOURCEDIR', dirname(__FILE__) . '/sources');
 
 		// Better find the database file!
-		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.subs.php'))
+		if (!file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php'))
 		{
-			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.subs.php');
+			$incontext['error'] = sprintf($txt['error_db_file'], 'Db-' . $db_type . '.class.php');
 			return false;
 		}
 
@@ -842,7 +817,7 @@ function action_databaseSettings()
  */
 function action_forumSettings()
 {
-	global $txt, $incontext, $databases, $db_connection, $db_type;
+	global $txt, $incontext, $databases, $db_connection, $db_type, $boardurl;
 
 	$incontext['sub_template'] = 'forum_settings';
 	$incontext['page_title'] = $txt['install_settings'];
@@ -914,6 +889,8 @@ function action_forumSettings()
 		return true;
 	}
 
+	definePaths();
+
 	return false;
 }
 
@@ -922,7 +899,7 @@ function action_forumSettings()
  */
 function action_databasePopulation()
 {
-	global $db_character_set, $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
+	global $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 	$incontext['sub_template'] = 'populate_database';
 	$incontext['page_title'] = $txt['db_populate'];
@@ -934,6 +911,8 @@ function action_databasePopulation()
 
 	// Reload settings.
 	require(dirname(__FILE__) . '/Settings.php');
+	definePaths();
+
 	$db = load_database();
 
 	// Before running any of the queries, let's make sure another version isn't already installed.
@@ -952,7 +931,7 @@ function action_databasePopulation()
 		$db->free_result($result);
 
 		// Do they match?  If so, this is just a refresh so charge on!
-		if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != $GLOBALS['current_version'])
+		if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] != CURRENT_VERSION)
 		{
 			$incontext['error'] = $txt['error_versions_do_not_match'];
 			return false;
@@ -975,7 +954,7 @@ function action_databasePopulation()
 		'{$boardurl}' => $boardurl,
 		'{$enableCompressedOutput}' => isset($_POST['compress']) ? '1' : '0',
 		'{$databaseSession_enable}' => isset($_POST['dbsession']) ? '1' : '0',
-		'{$current_version}' => $GLOBALS['current_version'],
+		'{$current_version}' => CURRENT_VERSION,
 		'{$current_time}' => time(),
 		'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
 	);
@@ -992,7 +971,7 @@ function action_databasePopulation()
 		$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 
 	// Read in the SQL.  Turn this on and that off... internationalize... etc.
-	$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $db_type . '.sql')), $replaces));
+	$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $db_type . '.sql')), $replaces));
 
 	// Execute the SQL.
 	$current_statement = '';
@@ -1168,6 +1147,8 @@ function action_adminAccount()
 
 	// Need this to check whether we need the database password.
 	require(dirname(__FILE__) . '/Settings.php');
+	definePaths();
+
 	$db = load_database();
 
 	if (!isset($_POST['username']))
@@ -1175,10 +1156,10 @@ function action_adminAccount()
 	if (!isset($_POST['email']))
 		$_POST['email'] = '';
 
-	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']));
-	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']));
+	$incontext['username'] = htmlspecialchars(stripslashes($_POST['username']), ENT_COMPAT, 'UTF-8');
+	$incontext['email'] = htmlspecialchars(stripslashes($_POST['email']), ENT_COMPAT, 'UTF-8');
 
-	$incontext['require_db_confirm'] = empty($db_type);
+	$incontext['require_db_confirm'] = empty($db_type) || !empty($databases[$db_type]['require_db_confirm']);
 
 	// Only allow create an admin account if they don't have one already.
 	$request = $db->query('', '
@@ -1306,7 +1287,7 @@ function action_adminAccount()
 			if ($request === false)
 			{
 				$incontext['error'] = $txt['error_user_settings_query'] . '<br />
-				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection))) . '</div>';
+				<div style="margin: 2ex;">' . nl2br(htmlspecialchars($db->last_error($db_connection), ENT_COMPAT, 'UTF-8')) . '</div>';
 				return false;
 			}
 
@@ -1334,6 +1315,8 @@ function action_deleteInstall()
 	$incontext['continue'] = 0;
 
 	require(dirname(__FILE__) . '/Settings.php');
+	definePaths();
+
 	$db = load_database();
 
 	if (!defined('SUBSDIR'))
@@ -1954,6 +1937,42 @@ function fixModSecurity()
 		return false;
 }
 
+function definePaths()
+{
+	global $boarddir, $cachedir, $extdir, $languagedir, $sourcedir;
+
+	// Make sure the paths are correct... at least try to fix them.
+	if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+		$boarddir = dirname(__FILE__);
+	if (!file_exists($sourcedir . '/Dispatcher.class.php') && file_exists($boarddir . '/sources'))
+		$sourcedir = $boarddir . '/sources';
+
+	// Check that directories which didn't exist in past releases are initialized.
+	if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+		$cachedir = $boarddir . '/cache';
+	if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+		$extdir = $sourcedir . '/ext';
+	if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+		$languagedir = $boarddir . '/themes/default/languages';
+
+	if (!DEFINED('BOARDDIR'))
+		DEFINE('BOARDDIR', $boarddir);
+	if (!DEFINED('CACHEDIR'))
+		DEFINE('CACHEDIR', $cachedir);
+	if (!DEFINED('EXTDIR'))
+		DEFINE('EXTDIR', $extdir);
+	if (!DEFINED('LANGUAGEDIR'))
+		DEFINE('LANGUAGEDIR', $languagedir);
+	if (!DEFINED('SOURCEDIR'))
+		DEFINE('SOURCEDIR', $sourcedir);
+	if (!DEFINED('ADMINDIR'))
+		DEFINE('ADMINDIR', $sourcedir . '/admin');
+	if (!DEFINED('CONTROLLERDIR'))
+		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+	if (!DEFINED('SUBSDIR'))
+		DEFINE('SUBSDIR', $sourcedir . '/subs');
+}
+
 /**
  * Delete the installer and its additional files.
  * Called by ?delete
@@ -1969,7 +1988,7 @@ function action_deleteInstaller()
 		$ftp->unlink('webinstall.php');
 
 		foreach ($databases as $key => $dummy)
-			$ftp->unlink('install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+			$ftp->unlink('install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
 
 		$ftp->close();
 
@@ -1981,7 +2000,7 @@ function action_deleteInstaller()
 		@unlink(dirname(__FILE__) . '/webinstall.php');
 
 		foreach ($databases as $key => $dummy)
-			@unlink(dirname(__FILE__) . '/install_' . $GLOBALS['db_script_version'] . '_' . $key . '.sql');
+			@unlink(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '_' . $key . '.sql');
 	}
 
 	// Now just redirect to a blank.png...
@@ -2000,6 +2019,7 @@ function template_install_above()
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
 		<link rel="stylesheet" type="text/css" href="themes/default/css/index.css?alp10" />
+		<link rel="stylesheet" type="text/css" href="themes/default/css/index_light.css?alp10" />
 		<link rel="stylesheet" type="text/css" href="themes/default/css/install.css?alp10" />
 		<script type="text/javascript" src="themes/default/scripts/script.js"></script>
 	</head>
@@ -2010,7 +2030,7 @@ function template_install_above()
 				<img id="logo" src="themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
 			</div>
 		</div>
-		<div id="wrapper">
+		<div id="wrapper" class="wrapper">
 			<div id="upper_section">
 				<div id="inner_section">
 					<div id="inner_wrap">';
@@ -2109,14 +2129,14 @@ function template_welcome_message()
 	global $incontext, $installurl, $txt;
 
 	echo '
-	<script type="text/javascript" src="http://www.spudsdesign.com/site/current-version.js?version=' . $GLOBALS['current_version'] . '"></script>
+	<script type="text/javascript" src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
 	<form action="', $incontext['form_url'], '" method="post">
-		<p>', sprintf($txt['install_welcome_desc'], $GLOBALS['current_version']), '</p>
+		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
 			<div style="float: left; width: 2ex; font-size: 2em; color: red;">!!</div>
 			<strong style="text-decoration: underline;">', $txt['error_warning_notice'], '</strong><br />
 			<div style="padding-left: 6ex;">
-				', sprintf($txt['error_script_outdated'], '<em id="ourVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . $GLOBALS['current_version'] . '</em>'), '
+				', sprintf($txt['error_script_outdated'], '<em id="ourVersion" style="white-space: nowrap;">??</em>', '<em id="yourVersion" style="white-space: nowrap;">' . CURRENT_VERSION . '</em>'), '
 			</div>
 		</div>';
 
@@ -2216,7 +2236,7 @@ function template_chmod_files()
 
 	echo '
 		<form action="', $incontext['form_url'], '" method="post">
-			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
+			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
 				<tr>
 					<td style="width:26%; vertical-align:top" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
 					<td>
@@ -2263,7 +2283,7 @@ function template_database_settings()
 	template_warning_divs();
 
 	echo '
-		<table style="width: 100%; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">';
+		<table style="width: 100%; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0">';
 
 	// More than one database type?
 	if (count($incontext['supported_databases']) > 1)
@@ -2417,7 +2437,7 @@ function template_populate_database()
 
 		foreach ($incontext['failures'] as $line => $fail)
 			echo '
-						<li><strong>', $txt['error_db_queries_line'], $line + 1, ':</strong> ', nl2br(htmlspecialchars($fail)), '</li>';
+						<li><strong>', $txt['error_db_queries_line'], $line + 1, ':</strong> ', nl2br(htmlspecialchars($fail, ENT_COMPAT, 'UTF-8')), '</li>';
 
 		echo '
 					</ul>
@@ -2447,7 +2467,7 @@ function template_admin_account()
 	template_warning_divs();
 
 	echo '
-		<table style="width: 100%; margin: 2em 0; border-collapse:collapse; border-spacing: 0; padding: 0; text-align:center;">
+		<table style="width: 100%; margin: 2em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
 			<tr>
 				<td style="width:18%; vertical-align:top" class="textbox"><label for="username">', $txt['user_settings_username'], ':</label></td>
 				<td>

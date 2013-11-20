@@ -46,17 +46,12 @@ class ManageLanguages_Controller extends Action_Controller
 		loadTemplate('ManageLanguages');
 		loadLanguage('ManageSettings');
 
-		$context['page_title'] = $txt['edit_languages'];
-		$context['sub_template'] = 'show_settings';
-
 		$subActions = array(
-			'edit' => array ($this, 'action_edit'),
-			'add' => array ($this, 'action_add'),
-			'settings' => array(
-				$this, 'action_languageSettings_display'
-			),
-			'downloadlang' => array ($this, 'action_downloadlang'),
-			'editlang' => array ($this, 'action_editlang'),
+			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
+// 			'add' => array($this, 'action_add', 'permission' => 'admin_forum'),
+			'settings' => array($this, 'action_languageSettings_display', 'permission' => 'admin_forum'),
+			'downloadlang' => array($this, 'action_downloadlang', 'permission' => 'admin_forum'),
+			'editlang' => array($this, 'action_editlang', 'permission' => 'admin_forum'),
 		);
 
 		call_integration_hook('integrate_manage_languages', array(&$subActions));
@@ -64,6 +59,8 @@ class ManageLanguages_Controller extends Action_Controller
 		// By default we're managing languages.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'edit';
 		$context['sub_action'] = $subAction;
+		$context['page_title'] = $txt['edit_languages'];
+		$context['sub_template'] = 'show_settings';
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -93,7 +90,7 @@ class ManageLanguages_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Package.subs.php');
 			require_once(SUBSDIR . '/Language.subs.php');
 
-			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']));
+			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']), ENT_COMPAT, 'UTF-8');
 
 			$listOptions = array(
 				'id' => 'languages',
@@ -146,7 +143,7 @@ class ManageLanguages_Controller extends Action_Controller
 				),
 			);
 
-			require_once(SUBSDIR . '/List.subs.php');
+			require_once(SUBSDIR . '/List.class.php');
 			createList($listOptions);
 		}
 
@@ -266,9 +263,9 @@ class ManageLanguages_Controller extends Action_Controller
 			),
 			// For highlighting the default.
 			'javascript' => '
-						var prevClass = "";
-						var prevDiv = "";
-						highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language). '");
+						var prevClass = "",
+							prevDiv = "";
+						highlightSelected("list_language_list_' . ($language == '' ? 'english' : $language) . '");
 			',
 		);
 
@@ -280,7 +277,7 @@ class ManageLanguages_Controller extends Action_Controller
 				'class' => 'smalltext alert',
 			);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['sub_template'] = 'show_list';
@@ -615,7 +612,7 @@ class ManageLanguages_Controller extends Action_Controller
 		if (!empty($modSettings['cache_enable']))
 			cache_put_data('known_languages', null, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		createToken('admin-dlang');
@@ -637,7 +634,7 @@ class ManageLanguages_Controller extends Action_Controller
 		$context['sub_template'] = 'modify_language_entries';
 
 		$context['lang_id'] = $_GET['lid'];
-		list($theme_id, $file_id) = empty($_REQUEST['tfid']) || strpos($_REQUEST['tfid'], '+') === false ? array(1, '') : explode('+', $_REQUEST['tfid']);
+		list ($theme_id, $file_id) = empty($_REQUEST['tfid']) || strpos($_REQUEST['tfid'], '+') === false ? array(1, '') : explode('+', $_REQUEST['tfid']);
 
 		// Clean the ID - just in case.
 		preg_match('~([A-Za-z0-9_-]+)~', $context['lang_id'], $matches);
@@ -1039,18 +1036,18 @@ class ManageLanguages_Controller extends Action_Controller
 	 * Format of the array:
 	 *  - either, variable name, description, type (constant), size/possible values, helptext.
 	 *  - or, an empty string for a horizontal rule.
-	 *	- or, a string for a titled section.
+	 *  - or, a string for a titled section.
 	 *
 	 * Initialize _languageSettings form.
 	 */
 	private function _initLanguageSettingsForm()
 	{
-		global $txt, $context;
+		global $txt;
 
 		// We'll want to use them someday. That is, right now.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		// make it happen!
+		// Make it happen!
 		$this->_languageSettings = new Settings_Form();
 
 		// Warn the user if the backup of Settings.php failed.
@@ -1068,7 +1065,7 @@ class ManageLanguages_Controller extends Action_Controller
 		foreach ($languages as $lang)
 			$config_vars['language'][4][$lang['filename']] = array($lang['filename'], strtr($lang['name'], array('-utf8' => ' (UTF-8)')));
 
-		// initialize the little form
+		// Initialize the little form
 		return $this->_languageSettings->settings($config_vars);
 	}
 

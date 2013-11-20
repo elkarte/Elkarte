@@ -23,7 +23,7 @@ if (!defined('ELK'))
  *   filename=[action].controller.php method=action_[sa]
  *   filename=[action]-Controller.php method=action_[sa]
  *
- * An add-on files to handle custom actions will be called if they follow
+ * An addon files to handle custom actions will be called if they follow
  * any of these patterns.
  */
 class Site_Dispatcher
@@ -94,7 +94,7 @@ class Site_Dispatcher
 			// home page: board index
 			if (empty($board) && empty($topic))
 			{
-				// Reminder: hooks need to account for multiple mods setting this hook.
+				// Reminder: hooks need to account for multiple addons setting this hook.
 				call_integration_hook('integrate_frontpage', array(&$default_action));
 
 				// was it, wasn't it....
@@ -140,7 +140,7 @@ class Site_Dispatcher
 			'coppa' => array('Register.controller.php', 'Register_Controller', 'action_coppa'),
 			'deletemsg' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_deletemsg'),
 			'dlattach' => array('Attachment.controller.php', 'Attachment_Controller', 'action_index'),
-			'disregardtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_disregardtopic'),
+			'unwatchtopic' => array('Notify.controller.php', 'Notify_Controller', 'action_unwatchtopic'),
 			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
 			'editpoll2' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll2'),
 			'findmember' => array('Members.controller.php', 'Members_Controller', 'action_findmember'),
@@ -197,9 +197,9 @@ class Site_Dispatcher
 			'xmlpreview' => array('Xmlpreview.controller.php', 'XmlPreview_Controller', 'action_index'),
 		);
 
-		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
+		$adminActions = array('admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
 
-		// allow to extend or change $actionArray through a hook
+		// Allow to extend or change $actionArray through a hook
 		call_integration_hook('integrate_actions', array(&$actionArray));
 
 		// Is it in core legacy actions?
@@ -231,7 +231,7 @@ class Site_Dispatcher
 			}
 		}
 		// fall back to naming patterns.
-		// add-ons can use any of them, and it should Just Work (tm).
+		// addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
 		{
 			// action=drafts => Drafts.php
@@ -251,7 +251,7 @@ class Site_Dispatcher
 				else
 					$this->_function_name = 'action_' . $_GET['action'];
 			}
-			// or... an add-on can do just this!
+			// or... an addon can do just this!
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
 			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))

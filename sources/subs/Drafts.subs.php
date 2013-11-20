@@ -26,7 +26,6 @@ function create_pm_draft($draft, $recipientList)
 		'subject' => 'string-255',
 		'body' => 'string-65534',
 		'to_list' => 'string-255',
-		'outbox' => 'int',
 	);
 	$draft_parameters = array(
 		$draft['reply_id'],
@@ -36,7 +35,6 @@ function create_pm_draft($draft, $recipientList)
 		$draft['subject'],
 		$draft['body'],
 		serialize($recipientList),
-		$draft['outbox'],
 	);
 	$db->insert('',
 		'{db_prefix}user_drafts',
@@ -70,8 +68,7 @@ function modify_pm_draft($draft, $recipientList)
 			poster_time = {int:poster_time},
 			subject = {string:subject},
 			body = {string:body},
-			to_list = {string:to_list},
-			outbox = {int:outbox}
+			to_list = {string:to_list}
 		WHERE id_draft = {int:id_pm_draft}
 		LIMIT 1',
 		array(
@@ -82,7 +79,6 @@ function modify_pm_draft($draft, $recipientList)
 			'body' => $draft['body'],
 			'id_pm_draft' => $draft['id_pm_draft'],
 			'to_list' => serialize($recipientList),
-			'outbox' => $draft['outbox'],
 		)
 	);
 }
@@ -161,7 +157,7 @@ function modify_post_draft($draft)
 			locked = {int:locked},
 			is_sticky = {int:is_sticky}
 		WHERE id_draft = {int:id_draft}',
-		array (
+		array(
 			'id_topic' => $draft['topic_id'],
 			'id_board' => $draft['board'],
 			'poster_time' => time(),
@@ -230,25 +226,26 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * @param int $member_id - user id to get drafts for
  * @param int $draft_type - 0 for post, 1 for pm
  * @param int $topic - if set, load drafts for that specific topic / pm
- * @param int $drafts_keep_days - number of days to consider a draft is still valid
  * @param string $order - optional parameter to order the results
  * @param string $limit - optional parameter to limit the number returned 0,15
  * @return array
  */
-function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_keep_days = 0, $order = '', $limit = '')
+function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = '', $limit = '')
 {
+	global $modSettings;
+
 	$db = database();
 
 	// Load the drafts that the user has available for the given type & action
 	$user_drafts = array();
 	$request = $db->query('', '
 		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
-		FROM {db_prefix}user_drafts as ud' . ($draft_type === 0 ? '
+		FROM {db_prefix}user_drafts AS ud' . ($draft_type === 0 ? '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
-		WHERE ud.id_member = {int:id_member}' . (($draft_type === 0) ? '
-			AND id_topic = {int:id_topic}' : (!empty($topic) ? '
+		WHERE ud.id_member = {int:id_member}' . ($draft_type === 0 ? ($topic !== false ? '
+			AND id_topic = {int:id_topic}' : '') : (!empty($topic) ? '
 			AND id_reply = {int:id_topic}' : '')) . '
-			AND type = {int:draft_type}' . (!empty($drafts_keep_days) ? '
+			AND type = {int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : '') . (!empty($order) ? '
 		ORDER BY {raw:order}' : '') . (!empty($limit) ? '
 		LIMIT {raw:limit}' : ''),
@@ -256,7 +253,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $drafts_k
 			'id_member' => $member_id,
 			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
-			'time' => $drafts_keep_days,
+			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 			'order' => $order,
 			'limit' => $limit,
 		)
@@ -296,7 +293,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 		DELETE FROM {db_prefix}user_drafts
 		WHERE id_draft IN ({array_int:id_draft})' . ($check ? '
 			AND  id_member = {int:id_member}' : ''),
-		array (
+		array(
 			'id_draft' => $id_draft,
 			'id_member' => $member_id ,
 		)
@@ -310,8 +307,9 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
  *
  * @param int $member_id
  * @param int $draft_type
+ * @param int $topic
  */
-function draftsCount($member_id, $draft_type)
+function draftsCount($member_id, $draft_type = 0, $topic = false)
 {
 	global $modSettings;
 
@@ -320,13 +318,16 @@ function draftsCount($member_id, $draft_type)
 	$request = $db->query('', '
 		SELECT COUNT(id_draft)
 		FROM {db_prefix}user_drafts
-		WHERE id_member = {int:id_member}
+		WHERE id_member = {int:id_member}' . ($draft_type === 0 ? '
+			AND id_topic = {int:id_topic}' : (!empty($topic) ? '
+			AND id_reply = {int:id_topic}' : '')) . '
 			AND type={int:draft_type}' . (!empty($modSettings['drafts_keep_days']) ? '
 			AND poster_time > {int:time}' : ''),
 		array(
 			'id_member' => $member_id,
+			'id_topic' => (int) $topic,
 			'draft_type' => $draft_type,
-			'time' => (!empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0),
+			'time' => !empty($modSettings['drafts_keep_days']) ? (time() - ($modSettings['drafts_keep_days'] * 86400)) : 0,
 		)
 	);
 	list ($msgCount) = $db->fetch_row($request);
@@ -413,7 +414,7 @@ function saveDraft()
 		return false;
 
 	// Read in what they sent, if anything
-	$id_draft =  empty($_POST['id_draft']) ? 0 : (int) $_POST['id_draft'];
+	$id_draft = empty($_POST['id_draft']) ? 0 : (int) $_POST['id_draft'];
 	$draft_info = loadDraft($id_draft);
 
 	// If a draft has been saved less than 5 seconds ago, let's not do the autosave again
@@ -434,7 +435,7 @@ function saveDraft()
 	}
 
 	// Be ready for surprises
-	$post_errors = error_context::context('post', 1);
+	$post_errors = Error_Context::context('post', 1);
 
 	// Prepare and clean the data, load the draft array
 	$draft['id_draft'] = $id_draft;
@@ -516,7 +517,7 @@ function savePMDraft($recipientList)
 	// Read in what was sent
 	$id_pm_draft = empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'];
 	$draft_info = loadDraft($id_pm_draft, 1);
-	$post_errors = error_context::context('pm', 1);
+	$post_errors = Error_Context::context('pm', 1);
 
 	// 5 seconds is the same limit we have for posting
 	if (isset($_REQUEST['xml']) && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
@@ -546,7 +547,6 @@ function savePMDraft($recipientList)
 	// Prepare the data
 	$draft['id_pm_draft'] = $id_pm_draft;
 	$draft['reply_id'] = empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'];
-	$draft['outbox'] = empty($_POST['outbox']) ? 0 : 1;
 	$draft['body'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
 	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
 	$draft['id_member'] = $user_info['id'];
@@ -640,7 +640,6 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 		elseif ($type === 1)
 		{
 			// One of those pm drafts? then set it up like we have an error
-			$_REQUEST['outbox'] = !empty($draft_info['outbox']);
 			$_REQUEST['subject'] = !empty($draft_info['subject']) ? $draft_info['subject'] : '';
 			$_REQUEST['message'] = !empty($draft_info['body']) ? $draft_info['body'] : '';
 			$_REQUEST['replied_to'] = !empty($draft_info['id_reply']) ? $draft_info['id_reply'] : 0;

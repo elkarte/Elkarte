@@ -38,8 +38,6 @@ class ManageCalendar_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		isAllowedTo('admin_forum');
-
 		// Everything's gonna need this.
 		loadLanguage('ManageCalendar');
 
@@ -51,9 +49,9 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Little short on the ground of functions here... but things can and maybe will change...
 		$subActions = array(
-			'editholiday' => array($this, 'action_editholiday'),
-			'holidays' => array($this, 'action_holidays'),
-			'settings' => array($this, 'action_calendarSettings_display')
+			'editholiday' => array($this, 'action_editholiday', 'permission' => 'admin_forum'),
+			'holidays' => array($this, 'action_holidays', 'permission' => 'admin_forum'),
+			'settings' => array($this, 'action_calendarSettings_display', 'permission' => 'admin_forum')
 		);
 
 		call_integration_hook('integrate_manage_calendar', array(&$subActions));
@@ -74,9 +72,10 @@ class ManageCalendar_Controller extends Action_Controller
 				),
 			),
 		);
+		$context['sub_action'] = $subAction;
 
 		$action = new Action();
-		$action->initialize($subActions);
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
@@ -93,12 +92,11 @@ class ManageCalendar_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-mc');
 
-			foreach ($_REQUEST['holiday'] as $id => $value)
-				$_REQUEST['holiday'][$id] = (int) $id;
+			$to_remove = array_map('intval', array_keys($_REQUEST['holiday']));
 
 			// Now the IDs are "safe" do the delete...
 			require_once(SUBSDIR . '/Calendar.subs.php');
-			removeHolidays($_REQUEST['holiday']);
+			removeHolidays($to_remove);
 		}
 
 		createToken('admin-mc');
@@ -186,7 +184,7 @@ class ManageCalendar_Controller extends Action_Controller
 			),
 		);
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
 		$context['page_title'] = $txt['manage_holidays'];
@@ -218,7 +216,7 @@ class ManageCalendar_Controller extends Action_Controller
 			checkSession();
 
 			// Not too long good sir?
-			$_REQUEST['title'] =  Util::substr($_REQUEST['title'], 0, 60);
+			$_REQUEST['title'] = Util::substr($_REQUEST['title'], 0, 60);
 			$_REQUEST['holiday'] = isset($_REQUEST['holiday']) ? (int) $_REQUEST['holiday'] : 0;
 
 			if (isset($_REQUEST['delete']))
@@ -260,7 +258,7 @@ class ManageCalendar_Controller extends Action_Controller
 	 */
 	public function action_calendarSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $scripturl;
 
 		// initialize the form
 		$this->_initCalendarSettingsForm();
@@ -274,7 +272,6 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
-		$context['settings_title'] = $txt['calendar_settings'];
 
 		// Saving the settings?
 		if (isset($_GET['save']))
@@ -317,8 +314,9 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Look, all the calendar settings - of which there are many!
 		$config_vars = array(
+			array('title', 'calendar_settings'),
 			// All the permissions:
-			array('permissions', 'calendar_view', 'help' => 'cal_enabled'),
+			array('permissions', 'calendar_view'),
 			array('permissions', 'calendar_post'),
 			array('permissions', 'calendar_edit_own'),
 			array('permissions', 'calendar_edit_any'),

@@ -50,6 +50,20 @@ if (!('getElementsByClassName' in document))
 	}
 }
 
+/**
+ * Sets an auto height so small code blocks collaspe
+ * Sets a height for larger code blocks so and let resize or overflow do its thing as normal
+ */
+function elk_codefix()
+{
+	$('.bbc_code').each(function()
+	{
+		$(this).height("auto");
+		if ($(this).height() > 200)
+			$(this).css('height', '20em');
+	});
+}
+
 // Load an XML document using XMLHttpRequest.
 function getXMLDocument(sUrl, funcCallback)
 {
@@ -334,17 +348,17 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 	// Load the help page content (we just want the text to show)
 	$.ajax({
 		url: desktopURL,
-        type: "GET",
-        dataType: "html",
+		type: "GET",
+		dataType: "html",
 		beforeSend: function () {
-		},
-		success: function (data, textStatus, xhr) {
-			var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
-			oPopup_body.html(help_content);
-		},
-		error: function (xhr, textStatus, errorThrown) {
-			oPopup_body.html(textStatus);
 		}
+	})
+	.done(function (data, textStatus, xhr) {
+		var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
+		oPopup_body.html(help_content);
+	})
+	.fail(function (xhr, textStatus, errorThrown) {
+		oPopup_body.html(textStatus);
 	});
 	return false;
 }
@@ -377,7 +391,7 @@ smc_Popup.prototype.show = function ()
 		if ($('#' + popup_instance.popup_id).has(e.target).length === 0)
 			popup_instance.hide();
 	}).keyup(function(e){
-		if(e.keyCode == 27)
+		if (e.keyCode == 27)
 			popup_instance.hide();
 	});
 	$('#' + this.popup_id).find('.hide_popup').click(function (){ return popup_instance.hide(); });
@@ -726,14 +740,11 @@ function hashModeratePassword(doForm, username, cur_session_id, token)
 }
 
 // Shows the page numbers by clicking the dots (in compact view).
+// @DEPRECATED it is not used. If we don't care about compatibility it can be removed
 function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
 {
 	var replacement = '', i, oldLastPage = 0;
 	var perPageLimit = 50;
-
-	// The dots were bold, the page numbers are not (in most cases).
-	spanNode.style.fontWeight = 'normal';
-	spanNode.onclick = '';
 
 	// Prevent too many pages to be loaded at once.
 	if ((lastPage - firstPage) / perPage > perPageLimit)
@@ -747,10 +758,10 @@ function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
 		replacement += '<a class="navPages" href="' + baseURL.replace(/%1\$d/, i).replace(/%%/g, '%') + '">' + (1 + i / perPage) + '</a> ';
 
 	if (oldLastPage > 0)
-		replacement += '<span style="font-weight: bold; cursor: pointer" onclick="expandPages(this, \'' + baseURL + '\', ' + lastPage + ', ' + oldLastPage + ', ' + perPage + ');"> ... </span> ';
+		replacement += '<span class="expand_pages" role="menuitem" onclick="expandPages(this, \'' + baseURL + '\', ' + lastPage + ', ' + oldLastPage + ', ' + perPage + ');"> ... </span> ';
 
 	// Replace the dots by the new page links.
-	setInnerHTML(spanNode, replacement);
+	setOuterHTML(spanNode, replacement);
 }
 
 function smc_preCacheImage(sSrc)
@@ -843,11 +854,32 @@ elk_Toggle.prototype.init = function ()
 				oImage.onclick = function () {
 					this.instanceRef.toggle();
 					this.blur();
-				}
+				};
 				oImage.style.cursor = 'pointer';
 
 				// Preload the collapsed image.
 				smc_preCacheImage(this.opt.aSwapImages[i].srcCollapsed);
+			}
+		}
+	}
+	// No images to swap, perhaps they want to swap the class?
+	else if ('aSwapClasses' in this.opt)
+	{
+		for (var i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
+		{
+			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
+			if (typeof(oContainer) === 'object' && oContainer !== null)
+			{
+				// Display the image in case it was hidden.
+				if (oContainer.style.display === 'none')
+					oContainer.style.display = '';
+
+				oContainer.instanceRef = this;
+				oContainer.onclick = function () {
+					this.instanceRef.toggle();
+					this.blur();
+				};
+				oContainer.style.cursor = 'pointer';
 			}
 		}
 	}
@@ -869,11 +901,11 @@ elk_Toggle.prototype.init = function ()
 					this.instanceRef.toggle();
 					this.blur();
 					return false;
-				}
+				};
 			}
 		}
 	}
-}
+};
 
 // Collapse or expand the section.
 elk_Toggle.prototype.changeState = function(bCollapse, bInit)
@@ -897,9 +929,10 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		delete this.tmpMethod;
 	}
 
-	// Loop through all the images that need to be toggled.
+	// Loop through all the items that need to be toggled.
 	if ('aSwapImages' in this.opt)
 	{
+		// Swapping images on a click
 		for (var i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
@@ -911,6 +944,24 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 					oImage.src = sTargetSource;
 
 				oImage.alt = oImage.title = bCollapse ? this.opt.aSwapImages[i].altCollapsed : this.opt.aSwapImages[i].altExpanded;
+			}
+		}
+	}
+	else if ('aSwapClasses' in this.opt)
+	{
+		// Or swapping the classes
+		for (var i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
+		{
+			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
+			if (typeof(oContainer) === 'object' && oContainer !== null)
+			{
+				// Only swap the class if the state changed
+				var sTargetClass = bCollapse ? this.opt.aSwapClasses[i].classCollapsed : this.opt.aSwapClasses[i].classExpanded;
+				if (oContainer.className !== sTargetClass)
+					oContainer.className = sTargetClass;
+
+				// And show the new title
+				oContainer.title = oContainer.title = bCollapse ? this.opt.aSwapClasses[i].titleCollapsed : this.opt.aSwapClasses[i].titleExpanded;
 			}
 		}
 	}
@@ -1617,15 +1668,6 @@ function updateActionDef(optNum)
 	}
 }
 
-function elkSetLatestPackages()
-{
-	if (typeof(window.elkLatestPackages) != "undefined")
-		setInnerHTML(document.getElementById("packagesLatest"), window.elkLatestPackages);
-
-	if (tempOldOnload)
-	tempOldOnload();
-}
-
 function highlightSelected(box)
 {
 	if (prevClass != "")
@@ -1664,23 +1706,28 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 		beforeSend: ajax_indicator(true)
 	})
 	.done(function(request) {
+		if (request == '')
+			return;
+
 		var oElement = $(request).find('elk')[0];
 
 		// No errors
 		if (oElement.getElementsByTagName('error').length === 0)
 		{
-			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities(),
-				url = oElement.getElementsByTagName('url')[0].firstChild.nodeValue.removeEntities(),
+			var text = oElement.getElementsByTagName('text'),
+				url = oElement.getElementsByTagName('url'),
 				confirm_elem = oElement.getElementsByTagName('confirm');
 
 			// Update the page so button/link/confirm/etc to reflect the new on or off status
 			if (confirm_elem.length === 1)
 				var confirm_text = confirm_elem[0].firstChild.nodeValue.removeEntities();
 
-			$('.' + btn.className).each(function() {
+			$('.' + btn.className.replace(/(list|link)level\d/g, '').trim()).each(function() {
 				// @todo: the span should be moved somewhere in themes.js?
-				$(this).html('<span>' + text + '</span>');
-				$(this).attr('href', url);
+				if (text.length === 1)
+					$(this).html('<span>' + text[0].firstChild.nodeValue.removeEntities() + '</span>');
+				if (url.length === 1)
+					$(this).attr('href', url[0].firstChild.nodeValue.removeEntities());
 
 				// Replaces the confirmations message with the new one
 				if (typeof(confirm_text) !== 'undefined')
@@ -1708,26 +1755,50 @@ function toggleButtonAJAX(btn, confirmation_msg_variable)
 	return false;
 }
 
+/**
+ * Helper function: displays and remove the ajax indicator and
+ * hides some page elements inside "container_id"
+ * Used by some (one at the moment) ajax buttons
+ * @todo it may be merged into the function if not used anywhere else
+ */
 function toggleHeaderAJAX(btn, container_id)
 {
 	ajax_indicator(true);
+	var text_template = '<h3 class="category_header centertext">{text}</h3>';
 
-	var oXMLDoc = getXMLDocument(btn.href + ';xml;api');
-	var text_template = '<div class="cat_bar"><h3 class="catbg centertext">{text}</h3></div>';
+	$.ajax({
+		type: 'GET',
+		url: btn.href + ';xml;api',
+		context: document.body,
+		beforeSend: ajax_indicator(true)
+	})
+	.done(function(request) {
+		var oElement = $(request).find('elk')[0];
 
-	if (oXMLDoc.responseXML && oXMLDoc.responseXML.getElementsByTagName('elk')[0])
-	{
-		var text = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
+		// No errors
+		if (oElement.getElementsByTagName('error').length === 0)
+		{
+			var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 
-		$('#' + container_id + ' .pagesection').remove();
-		$('#' + container_id + ' .topic_table').remove();
-		$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
-	}
-
-	ajax_indicator(false);
+			$('#' + container_id + ' .pagesection').remove();
+			$('#' + container_id + ' .category_header').remove();
+			$('#' + container_id + ' .topic_listing').remove();
+			$(text_template.replace('{text}', text)).insertBefore('#topic_icons');
+		}
+	})
+	.fail(function(){
+		// ajax failure code
+	 })
+	.always(function() {
+		// turn off the indicator
+		ajax_indicator(false);
+	});
 
 }
 
+/**
+ * Ajaxify the "notify" button in Display
+ */
 function notifyButton(btn)
 {
 	if (typeof(notification_topic_notice) != 'undefined' && !confirm(notification_topic_notice))
@@ -1736,6 +1807,9 @@ function notifyButton(btn)
 	return toggleButtonAJAX(btn, 'notification_topic_notice');
 }
 
+/**
+ * Ajaxify the "notify" button in MessageIndex
+ */
 function notifyboardButton(btn)
 {
 	if (typeof(notification_board_notice) != 'undefined' && !confirm(notification_board_notice))
@@ -1745,12 +1819,18 @@ function notifyboardButton(btn)
 	return false;
 }
 
-function disregardButton(btn)
+/**
+ * Ajaxify the "unwatch" button in Display
+ */
+function unwatchButton(btn)
 {
 	toggleButtonAJAX(btn);
 	return false;
 }
 
+/**
+ * Ajaxify the "mark read" button in MessageIndex
+ */
 function markboardreadButton(btn)
 {
 	toggleButtonAJAX(btn);
@@ -1760,14 +1840,12 @@ function markboardreadButton(btn)
 		$(this).parent().remove();
 	});
 
-	$('.boardicon').each(function() {
-		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
-		$(this).attr("src", src);
-	});
-
 	return false;
 }
 
+/**
+ * Ajaxify the "mark all messages as read" button in BoardIndex
+ */
 function markallreadButton(btn)
 {
 	toggleButtonAJAX(btn);
@@ -1777,7 +1855,7 @@ function markallreadButton(btn)
 		$(this).parent().remove();
 	});
 
-	$('.boardicon').each(function() {
+	$('.board_icon').each(function() {
 		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
 		$(this).attr("src", src);
 	});
@@ -1789,8 +1867,169 @@ function markallreadButton(btn)
 	return false;
 }
 
+/**
+ * Ajaxify the "mark all messages as read" button in Recent
+ */
 function markunreadButton(btn)
 {
-	toggleHeaderAJAX(btn, 'recentposts');
+	toggleHeaderAJAX(btn, 'main_content_section');
 	return false;
 }
+
+/**
+ * This function changes the relative time around the page real-timeish
+ */
+var relative_time_refresh = 0;
+function updateRelativeTime()
+{
+	// In any other case no more than one hour
+	relative_time_refresh = 3600000;
+
+	$('time').each(function() {
+		var oRelativeTime = new relativeTime($(this).attr('datetime')),
+			postdate = new Date($(this).attr('datetime')),
+			today = new Date(),
+			time_text = '',
+			past_time = (today - postdate) / 1000;
+
+		if (oRelativeTime.seconds())
+		{
+			$(this).text(oRttime.now);
+			relative_time_refresh = Math.min(relative_time_refresh, 10000);
+		}
+		else if (oRelativeTime.minutes())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.minutes : oRttime.minute;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 60000);
+		}
+		else if (oRelativeTime.hours())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.hours : oRttime.hour;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.days())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.days : oRttime.day;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.weeks())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.weeks : oRttime.week;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.months())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.months : oRttime.month;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+		else if (oRelativeTime.years())
+		{
+			time_text = oRelativeTime.deltaTime > 1 ? oRttime.years : oRttime.year;
+			$(this).text(time_text.replace('%s', oRelativeTime.deltaTime));
+			relative_time_refresh = Math.min(relative_time_refresh, 3600000);
+		}
+	});
+
+	setTimeout('updateRelativeTime()', relative_time_refresh);
+}
+
+/**
+ * Function/object to handle relative times
+ * sTo is optional, if omitted the relative time it
+ * calculated from sFrom up to "now"
+ */
+function relativeTime (sFrom, sTo)
+{
+	if (typeof sTo == 'undefined')
+		this.dateTo = new Date();
+	else
+		this.dateTo = new Date(sTo);
+
+	this.dateFrom = new Date(sFrom);
+
+	this.time_text = '';
+	this.past_time = (this.dateTo - this.dateFrom) / 1000;
+	this.deltaTime = 0;
+}
+
+relativeTime.prototype.seconds = function ()
+{
+	// Within the first 60 seconds it is just now.
+	if (this.past_time < 60)
+	{
+		this.deltaTime = this.past_time;
+		return true;
+	}
+	return false;
+};
+
+relativeTime.prototype.minutes = function ()
+{
+	// Within the first hour?
+	if (this.past_time >= 60 && Math.round(this.past_time / 60) < 60)
+	{
+		this.deltaTime = Math.round(this.past_time / 60);
+		return true;
+	}
+	return false;
+};
+
+relativeTime.prototype.hours = function ()
+{
+	// Some hours but less than a day?
+	if (Math.round(this.past_time / 60) >= 60 && Math.round(this.past_time / 3600) < 24)
+	{
+		this.deltaTime = Math.round(this.past_time / 3600);
+		return true;
+	}
+	return false;
+};
+
+relativeTime.prototype.days = function ()
+{
+	// Some days ago but less than a week?
+	if (Math.round(this.past_time / 3600) >= 24 && Math.round(this.past_time / (24 * 3600)) < 7)
+	{
+		this.deltaTime = Math.round(this.past_time / (24 * 3600));
+		return true;
+	}
+	return false;
+};
+
+relativeTime.prototype.weeks = function ()
+{
+	// Weeks ago but less than a month?
+	if (Math.round(this.past_time / (24 * 3600)) >= 7 && Math.round(this.past_time / (24 * 3600)) < 30)
+	{
+		this.deltaTime = Math.round(this.past_time / (24 * 3600));
+		return true;
+	}
+	return false;
+};
+
+relativeTime.prototype.months = function ()
+{
+	// Months ago but less than a year?
+	if (Math.round(this.past_time / (24 * 3600)) >= 30 && Math.round(this.past_time / (30 * 24 * 3600)) < 12)
+	{
+		this.deltaTime = Math.round(this.past_time / (30 * 24 * 3600));
+		return true;
+	}
+	return false;
+};
+
+relativeTime.prototype.years = function ()
+{
+	// Oha, we've passed at least a year?
+	if (Math.round(this.past_time / (30 * 24 * 3600)) >= 12)
+	{
+		this.deltaTime = this.dateTo.getFullYear() - this.dateFrom.getFullYear();
+		return true;
+	}
+	return false;
+};

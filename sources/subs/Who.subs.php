@@ -118,9 +118,9 @@ function formatViewers($id, $type)
 }
 
 /**
- * This function reads from the database the add-ons credits,
+ * This function reads from the database the addons credits,
  * and returns them in an array for display in credits section of the site.
- * The add-ons copyright, license, title informations are those saved from <license>
+ * The addons copyright, license, title informations are those saved from <license>
  * and <credits> tags in package.xml.
  *
  * @return array
@@ -137,12 +137,12 @@ function addonsCredits()
 		$request = $db->query('substring', '
 			SELECT version, name, credits
 			FROM {db_prefix}log_packages
-			WHERE install_state = {int:installed_mods}
+			WHERE install_state = {int:installed_adds}
 				AND credits != {string:empty}
 				AND SUBSTRING(filename, 1, 9) != {string:old_patch_name}
 				AND SUBSTRING(filename, 1, 9) != {string:patch_name}',
 			array(
-				'installed_mods' => 1,
+				'installed_adds' => 1,
 				'old_patch_name' => 'smf_patch',
 				'patch_name' => 'elk_patch',
 				'empty' => '',
@@ -425,7 +425,7 @@ function prepareCreditsData()
 	$credits['credits'] = array(
 		array(
 			'pretext' => $txt['credits_intro'],
-			'title' => $txt['credits_team'],
+			'title' => $txt['credits_contributors'],
 			'groups' => array(
 				array(
 					'title' => $txt['credits_groups_dev'],
@@ -453,11 +453,11 @@ function prepareCreditsData()
 		),
 		'software' => array(
 			'<a href="http://www.simplemachines.org/">Simple Machines</a> | &copy; Simple Machines | Licensed under <a href="http://www.simplemachines.org/about/smf/license.php">The BSD License</a>',
-			'<a href="http://jquery.org/">JQuery</a> | &copy; John Resig | Licensed under <a href="http://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt">The MIT License (MIT)</a>',
+			'<a href="http://jquery.org/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://github.com/jquery/jquery/blob/53021dad7f6c7f5c5a1c0d7b0493dd2ceee31166/MIT-LICENSE.txt">The MIT License (MIT)</a>',
+			'<a href="http://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="https://github.com/jquery/jquery-ui/blob/83cbf979788f22ba3bd1668507623c0dd6b57041/MIT-LICENSE.txt">The MIT License (MIT)</a>',
 			'<a href="http://cherne.net/brian/resources/jquery.hoverIntent.html">hoverIntent</a> | &copy; Brian Cherne | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="http://users.tpg.com.au/j_birch/plugins/superfish/">Superfish</a> | &copy; Joel Birch | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 			'<a href="http://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
-			'<a href="http://wayfarerweb.com/jquery/plugins/animadrag/">animaDrag</a> | &copy; Abel Mohler | Licensed under <a href="http://en.wikipedia.org/wiki/MIT_License">The MIT License (MIT)</a>',
 		),
 	);
 
@@ -465,7 +465,7 @@ function prepareCreditsData()
 	// Support for addons that use the <credits> tag via the package manager
 	$credits['credits_addons'] = addonsCredits();
 
-	// An alternative for add-ons credits is to use a hook.
+	// An alternative for addons credits is to use a hook.
 	call_integration_hook('integrate_credits');
 
 	// Copyright information

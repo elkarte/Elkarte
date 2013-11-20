@@ -34,19 +34,22 @@ class PostModeration_Controller extends Action_Controller
 		loadLanguage('ModerationCenter');
 		loadTemplate('ModerationCenter');
 
+		require_once(SUBSDIR . '/Action.class.php');
+
 		// Allowed sub-actions, you know the drill by now!
-		$subactions = array(
-			'approve' => 'action_approve',
-			'attachments' => 'action_unapproved_attachments',
-			'replies' => 'action_unapproved',
-			'topics' => 'action_unapproved',
+		$subActions = array(
+			'approve' =>  array($this, 'action_approve'),
+			'attachments' =>  array($this, 'action_unapproved_attachments'),
+			'replies' =>  array($this, 'action_unapproved'),
+			'topics' =>  array($this, 'action_unapproved'),
 		);
 
 		// Pick something valid...
-		if (!isset($_REQUEST['sa']) || !isset($subactions[$_REQUEST['sa']]))
-			$_REQUEST['sa'] = 'replies';
+		$subAction = !isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]) ? 'replies' : $_REQUEST['sa'];
 
-		$this->{$subactions[$_REQUEST['sa']]}();
+		$action = new Action();
+		$action->initialize($subActions, 'replies');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -206,9 +209,8 @@ class PostModeration_Controller extends Action_Controller
 		);
 
 		// Update the tabs with the correct number of actions to account for brd filtering
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' (' . $context['total_unapproved_posts'] . ')';
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label']. ' (' . $context['total_unapproved_topics'] . ')';
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['reports']['subsections']['open']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['reports']['subsections']['open']['label']. ' (' . $context['total_unapproved_topics'] . ')';
+		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' [' . $context['total_unapproved_posts'] . ']';
+		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label']. ' [' . $context['total_unapproved_topics'] . ']';
 
 		// If we are filtering some boards out then make sure to send that along with the links.
 		if (isset($_REQUEST['brd']))
@@ -347,7 +349,7 @@ class PostModeration_Controller extends Action_Controller
 			}
 		}
 
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		$listOptions = array(

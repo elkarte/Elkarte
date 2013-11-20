@@ -49,9 +49,7 @@ function template_manual()
 	global $context, $scripturl, $txt;
 
 	echo '
-			<div class="cat_bar">
-				<h3 class="catbg">', $txt['manual_elkarte_user_help'], '</h3>
-			</div>
+			<h2 class="category_header">', $txt['manual_elkarte_user_help'], '</h2>
 			<div id="help_container">
 				<div id="helpmain" class="windowbg2 content">
 					<p>', sprintf($txt['manual_welcome'], $context['forum_name']), '</p>
@@ -59,10 +57,9 @@ function template_manual()
 					<ul>';
 
 	foreach ($context['manual_sections'] as $section_id => $wiki_id)
-	{
 		echo '
-						<li><a href="', $context['wiki_url'], '/', $wiki_id, ($txt['lang_dictionary'] != 'en' ? '/' . $txt['lang_dictionary'] : ''), '" target="_blank" class="new_win">', $txt['manual_section_' . $section_id . '_title'], '</a> - ', $txt['manual_section_' . $section_id . '_desc'], '</li>';
-	}
+						<li><a href="', $context['wiki_url'], '/', $wiki_id, ($txt['lang_dictionary'] != 'en' && $txt['lang_dictionary'] != 'english' ? '/' . $txt['lang_dictionary'] : ''), '" target="_blank" class="new_win">', $txt['manual_section_' . $section_id . '_title'], '</a> - ', $txt['manual_section_' . $section_id . '_desc'], '</li>';
+
 
 	echo '
 					</ul>

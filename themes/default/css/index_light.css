@@ -123,16 +123,33 @@ body {
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {
 	color: #50aa3a;
-	font-weight: bold;
 }
 .meaction:before {
-	content:"\2620";
-	font-size: 1.5em;
+	content: "\270c";
+	font-size: 1.7em;
 	line-height: 1em;
-	vertical-align: middle;
+	vertical-align: top;
 }
-
-
+.spoilerheader {
+	font-weight: bold;
+	cursor: pointer;
+	font-size: 0.85em;
+}
+.spoiler {
+	border: 1px solid #ccc;
+	padding: 0.3em;
+	background-color: #eee;
+}
+div.bbc_footnotes {
+	border-top: 1px solid #bfbfbf;
+}
+sup.bbc_footnotes, sup.bbc_footnotes a {
+	color: #50aa3a;
+	font-weight: 700;
+}
+div.bbc_footnotes .meaction{
+	display: inline-block;
+}
 
 
 /*	$AJAX		*/
@@ -191,7 +208,7 @@ body {
 }
 /* News section. */
 #news {
-	padding: 0 0 1em 1em;
+	padding: 0 1em 1em 1em;
 	font-size: 0.929em;
 }
 #news>h2 {
@@ -234,7 +251,6 @@ body {
 /* The footer with copyright links etc. */
 #footer_section {
 	color: #bbb;
-	border-top: 4px solid #aaa;
 	background: #222;
 	border-top: 6px solid #3d6e32;
 	box-shadow: 0 -1px 0 #777, 0 1px 0 #0e0e0e inset;
@@ -243,7 +259,19 @@ body {
 	color: #bbb;
 }
 
-
+#debug_logging a, #debug_logging strong {
+	color: yellow;
+}
+#debug_logging {
+	color: #bbb;
+	background: #222;
+	margin: 0 auto;
+	max-width: 90em;
+	width: 90%;
+}
+#debug_logging_wrapper {
+	background: #222;
+}
 
 
 /*	$MENUS		*/
@@ -273,6 +301,35 @@ body {
 	color: #555;
 	text-decoration: none;
 }
+.poster li.listlevel1:hover {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+}
+.poster li.poster_online:hover .linklevel1 {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	color: #555;
+}
+.poster li.poster_online .nolink {
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	background: #f4f4f4;
+	background-image: linear-gradient(to bottom, #fff, #e4e4e4);
+	box-shadow: 1px 1px 2px #e5e5e5;
+	color: #566e4b;
+    display: block;
+    line-height: 2em;
+    margin: 3px 1.5em;
+    position: relative;
+}
+.poster li.poster_online .nolink img {
+	vertical-align: middle;
+}
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator {
@@ -284,6 +341,7 @@ body {
 	color: #fff;
 	font-weight: 600;
 	box-shadow: 1px 1px 2px #bbb;
+	padding: 0 5px;
 }
 /* Hover effects for those buttons. */
 .linklevel1.active:hover,.listlevel1:hover .linklevel1.active,
@@ -410,6 +468,46 @@ body {
 /*End sidebar flyout coding. */
 
 
+/*	$BOARDICONS	*/
+/* ------------------------------------------------------- */
+.board_icon {
+	display: block;
+	float: left;
+	width: 48px;
+	height: 48px;
+}
+.board_key:before {
+	display: block;
+	float: left;
+	height: 24px;
+	width: 26px;
+	content: "";
+}
+.category_boards a span, .board_key:before {
+	background-repeat: no-repeat;
+	background-image: url(../images/_light/board_icons.png);
+}
+.on_board {
+	background-position: 0 0;
+}
+.on2_board {
+	background-position: -72px 0;
+}
+.off_board {
+	background-position: -144px 0;
+}
+.redirect_board {
+	background-position: -216px 0;
+}
+.new_some_board:before {
+	background-position: -300px -14px;
+}
+.new_none_board:before {
+	background-position: -372px -14px;
+}
+.new_redirect_board:before {
+	background-position: -444px -14px;
+}
 
 
 /*	$LINKTREE	*/
@@ -437,6 +535,10 @@ body {
 .linktree_last, .linktree_last>a,
 .linktree_last>a:hover, .linktree_last strong {
 	color: #fff;
+	text-decoration: none;
+}
+.linktree_last span a {
+	color: #dfdfdf;
 	text-decoration: none;
 }
 .linktree:before {
@@ -511,9 +613,9 @@ body {
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
 /* Set up some general framing classes. @todo */
-/*			.forum_category for board index/child boards. */
-/*			.forumposts for thread pages and recent posts, etc. */
-/*			.content_category for general divisions around the place. */
+/*    .forum_category for board index/child boards.             */
+/*    .forumposts for thread pages and recent posts, etc.       */
+/*    .content_category for general divisions around the place. */
 /* All styled the same in default variant, but available for fun and games. */
 
 /* The board categories and newsfader - some shared styling. */
@@ -566,7 +668,7 @@ body {
 .ic_section_header>a {
 	color: #666;
 }
-#ic_recentposts td {
+#ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
 	border-top: 1px solid #ddd;
 }
 .recentpost>strong>a, .inline>strong>a {
@@ -663,8 +765,17 @@ body {
 /* End alternative layouts. Back to standard stuff. */
 /* ------------------------------------------------ */
 
+/* $PROFILE	*/
+/* ------------------------------------------------------- */
+/* Profile colors */
 
-
+.vcard, .profile_attachment {
+	border: 1px solid #ccc;
+	border-radius: 6px;
+}
+.attachment_title {
+	border-bottom: 1px solid #ccc;
+}
 
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
@@ -774,4 +885,32 @@ body {
 #recentposts .inner blockquote {
 	height: 1.5em;
 	overflow: hidden;
+}
+
+/*	$MEDIA		*/
+/* Experimental media queries.
+/* ------------------------------------------------------- */
+/* NOTE:
+/* When setting break points for media queries, don't set them in pixels.
+/* Use em instead.
+/* Why? Because the point of re-stacking/dropping content is to fit it all
+/* in the available space. This is dependent not just on width in pixels,
+/* but also on the user-selected text size that is set in the browser.
+/*
+/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+/* a user requires text 50% larger than theme default, then their screen is
+/* effectively a lot smaller than its nominal resolution would indicate.
+/* If the break points are set in em, suddenly the media queries become equally
+/* responsive for all users, without any extra code being required.
+/*
+/* Testing em break points is just as easy as testing pixels,
+/* and it will make more people happier. This is cool. :)
+/*
+/* Of course, having comments to map em to px for each query is a good idea too.
+
+/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
+@media screen and (min-width: 320px) and (max-width: 480px) {
+	.board_latest {
+		border-left: 0;
+	}
 }

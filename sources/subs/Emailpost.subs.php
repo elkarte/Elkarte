@@ -14,107 +14,46 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * If html this will convert basic html tags to bbc tags
- * If plain text will convert it to html as though it was markdown and then to bbc
- * Converts links to bbc tags by using pbe_convert_urls function
+ * If the email is html based, this will convert basic html tags to bbc tags
+ * If the email is plain text it will convert it to html based on markdown text
+ * conventions and then that will be converted to bbc.
+ *
+ * requires Html2BBC.class.php for the html to bbc conversion
+ * requires markdown.php for text to html convesions
  *
  * @param string $text
  * @param boolean $html
  */
 function pbe_email_to_bbc($text, $html)
 {
-	// define the limited HTML we will translate to bbc and strip the rest
+	// Define some things that need to be converted/modified, outside normal html or markup
 	$tags = array(
-		// standard html to bbc
-		'~&nbsp;~' => ' ',
-		'~<b(\s(.)*?)*?' . '>~i' => '[b]',
-		'~</b>~i' => '[/b]',
-		'~<i(\s(.)*?)*?' . '>~i' => '[i]',
-		'~</i>~i' => '[/i]',
-		'~<u(\s(.)*?)*?' . '>~i' => '[u]',
-		'~</u>~i' => '[/u]',
-		'~<strong(\s(.)*?)*?' . '>~i' => '[b]',
-		'~</strong>~i' => '[/b]',
-		'~<em(\s(.)*?)*?' . '>~i' => '[i]',
-		'~</em>~i' => '[/i]',
-		'~<s(\s(.)*?)*?' . '>~i' => "[s]",
-		'~</s>~i' => "[/s]",
-		'~<strike(\s(.)*?)*?' . '>~i' => '[s]',
-		'~</strike>~i' => '[/s]',
-		'~<del(\s(.)*?)*?' . '>~i' => '[s]',
-		'~</del>~i' => '[/s]',
-		'~<center(\s(.)*?)*?' . '>~i' => '[center]',
-		'~</center>~i' => '[/center]',
-		'~<pre(\s(.)*?)*?' . '>~i' => '[pre]',
-		'~</pre>~i' => '[/pre]',
-		'~<sub(\s(.)*?)*?' . '>~i' => '[sub]',
-		'~</sub>~i' => '[/sub]',
-		'~<sup(\s(.)*?)*?' . '>~i' => '[sup]',
-		'~</sup>~i' => '[/sup]',
-		'~<tt(\s(.)*?)*?' . '>~i' => '[tt]',
-		'~</tt>~i' => '[/tt]',
-		'~<br(?:\s[^<>]*?)?' . '>~i' => "\n",
-		// some clients do basic tags to take as much space as possible
-		'~<span style="font-style:\s?italic;?">(.*?)</span>~isU' => '[i]$1[/i]',
-		'~\[b\]<span style="font-weight:\s?bold;?">(.*?)</span>\[/b\]~iU' => '[b]$1[/b]',
-		'~<span style="font-weight:\s?bold;?">(.*?)</span>~isU' => '[b]$1[/b]',
-		'~<span style="text-decoration: underline[;]?">(.*)</span>~isU' => '[u]$1[/u]',
-		'~<span dir=\"ltr\">\&lt;(.*)\&gt;</span>~isU' => '$1',
-		'~<span dir=\"ltr\">(.*)</span>~is' => '$1',
-		'~<span class="Apple-style-span" style="font-weight: normal;\s?">(.*)</span>~isU' => '$1',
-		'~<style .*</style>~' => '',
-		// various shapes of rules
-		'~<hr[^<>]*>(\n)?~i' => "[hr]\n$1",
-		// use quotes if we can find them
-		'~<blockquote(\s(.)*?)*?' . '>~i' => "[quote]",
-		'~</blockquote>~i' => "[/quote]",
-		'~<div style="right: auto">~i' => '',
-		'~<div class="gmail_quote">~i' => '',
-		// lists can be nice
-		'~<ul(\s(.)*?)*?' . '>~i' => "[list]\n",
-		'~</ul>~i' => "[/list]\n",
-		'~<ol(\s(.)*?)*?' . '>~i' => "[list type=decimal]\n",
-		'~</ol>~i' => "[/list]\n",
-		'~<li(\s(.)*?)*?' . '>~i' => "[li]",
-		'~</li>~i' => "[/li]\n",
-		// some block elements
-		'~</div>~i' => "\n",
-		'~<p(\s(.)*?)*?' . '>~i' => "\n\n",
-		// tables can be a bit complicated
-		'~<table(\s(.)*?)*?' . '>~i' => '[table]',
-		'~</table>~i' => '[/table]',
-		'~<tr(\s(.)*?)*?' . '>~i' => '[tr]',
-		'~</tr>~i' => '[/tr]',
-		'~<(td|th)\s[^<>]*?colspan="?(\d{1,2})"?.*?' . '>~ie' => 'str_repeat(\'[td][/td]\', $2 - 1) . \'[td]\'',
-		'~<(td|th)(\s(.)*?)*?' . '>~i' => '[td]',
-		'~</(td|th)>~i' => '[/td]',
-		// the ubiquitous "other"
-		'~<\*>~i' => '&lt;*&gt;',
-		'~<title>(.*)</title>~iU' => '',
-		'~(\[b\]){2}From:.*-{36}~s' => 'str_repeat(\'-\', 36)',
 		'~\*\*(.*)\*\*~isUe' => '\'**\'.ltrim(\'$1\').\'**\'',
+		'~<\*>~i' => '&lt;*&gt;',
+		'~-{20,}~' => '<hr>',
+		'~#([0-9a-fA-F]{4,6}\b)~' => '&#35;$1',
 	);
 
-	// We are starting with HTML, our goal is to convert only the best parts of it
-	// to BBC, with email most HTML is unnecessary
+	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	if ($html)
 	{
-		// Some HTML comes in as chunks, separated by line feeds etc, remove the whitespace so we have an html string
-		$text = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $text);
-
 		// Set a gmail flag for special quote processing since its quotes are strange
 		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
 
 		// Convert the email-HTML to BBC
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
+		require_once(SUBSDIR . '/Html2BBC.class.php');
+		$bbc_converter = new Convert_BBC($text);
+		$text = $bbc_converter->get_bbc();
 
-		// Run our parsers to remove the original replied to message before we do any more work
+		// Run our parsers, as defined in the ACP,  to remove the original "replied to" message
+		// before we do any more work.
 		$text_save = $text;
 		$result = pbe_parse_email_message($text);
 
-		// If we have no message they may have replied below and/or inside the original message.
-		// People like this should not be allowed to use the net, or be forced to read their own
-		// messed up emails
+		// If we have no message left after running the parser, then they may have replied
+		// below and/or inside the original message. People like this should not be allowed
+		// to use the net, or be forced to read their own messed up emails
 		if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
 			$text = $text_save;
 	}
@@ -129,32 +68,27 @@ function pbe_email_to_bbc($text, $html)
 		if (empty($result) || trim(strip_tags(pbe_filter_email_message($text))) === '')
 			$text = $text_save;
 
-		// Fix textual quotes so we also fix wrapping issues first!
+		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
 
 		// Convert this (markup) text to html
+		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(EXTDIR . '/markdown/markdown.php');
 		$text = Markdown($text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
-		$text = str_replace('</p>', "\n", $text);
-		$text = preg_replace(array_keys($tags), array_values($tags), $text);
+		require_once(SUBSDIR . '/Html2BBC.class.php');
+		$bbc_converter = new Convert_BBC($text, false);
+		$text = $bbc_converter->get_bbc();
 	}
 
-	// Convert (save) any links before we strip out the remaining HTML tags
-	require_once(SUBSDIR . '/Editor.subs.php');
-	$text = convert_urls($text);
-
-	// Now remove any remaining html tags and convert any special tags
-	$text = str_replace('<div>', "\n", $text);
-	$text = strip_tags($text);
-	$text = htmlspecialchars_decode($text, ENT_QUOTES);
-	$text = str_replace('&nbsp;', ' ', $text);
-
 	// Some tags often end up as just empty tags - remove those.
-	$text = preg_replace('~\[[bisu]\]\s*\[/[bisu]\]~', '', $text);
-	$text = preg_replace('~\[quote\]\s*\[/quote\]~', '', $text);
-	$text = preg_replace('~(\n){3,}~si', "\n\n", $text);
+	$emptytags = array(
+		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
+		'~\[[bisu]\]\s*\[/[bisu]\]~' => '',
+		'~(\n){3,}~si' => "\n\n",
+	);
+	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);
 
 	return $text;
 }
@@ -165,6 +99,8 @@ function pbe_email_to_bbc($text, $html)
  *  - Fixes quotes and quote levels
  *  - Re-flows (unfolds) an email using the EmailFormat.class
  *  - Attempts to remove any exposed email address
+ *
+ * requires: EmailFormat.class.php
  *
  * @param string $body
  * @param boolean $html
@@ -178,13 +114,10 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	// Remove the \r's now so its done
 	$body = trim(str_replace("\r", '', $body));
 
-	// Remove our wrapped image tags (like we do in outbound emails)
-	$body = preg_replace('~\[Image:\s(.*?)\s\]~i', '$1', $body);
-
 	// Remove the riff-raff as defined by the ACP filters
 	$body = pbe_filter_email_message($body);
 
-	// Any old school email wrote: etc style quotes that we need to update
+	// Any old school email john smith wrote: etc style quotes that we need to update
 	$body = pbe_fix_client_quotes($body);
 
 	// Attempt to remove any exposed email addresses that are in the reply
@@ -193,8 +126,11 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	$body = preg_replace('~<(.*?)>(.*@.*?)\n~', '$1' . "\n", $body);
 	$body = preg_replace('~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i', '', $body);
 
-	// Remove multiple sequential blank lines
+	// Remove multiple sequential blank lines, again
 	$body = preg_replace('~(\n){3,}~si', "\n\n", $body);
+
+	// Check for blank quotes
+	$body = preg_replace('~(\[quote(.*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
 	require_once(SUBSDIR . '/EmailFormat.class.php');
@@ -337,19 +273,19 @@ function pbe_email_quote_depth(&$string, $update = true)
 
 	while ($check)
 	{
-		// we have a quote marker, increase our depth and strip the line of that quote marker
+		// We have a quote marker, increase our depth and strip the line of that quote marker
 		if ((substr($string, 0, 2) === '> ') || ($string === '>'))
 		{
 			$level++;
 			$string = substr($string, 2);
 		}
-		// Maybe one a poorly nested quotes ... with no spaces between the >'s or the > and the data
+		// Maybe a poorly nested quote, with no spaces between the >'s or the > and the data with no space
 		elseif ((substr($string, 0, 2) === '>>') || (preg_match('~^>[a-z0-9<-]+~Uis', $string, $matches) == 1))
 		{
 			$level++;
 			$string = substr($string, 1);
 		}
-		// all done getting the depth
+		// All done getting the depth
 		else
 			$check = false;
 	}
@@ -378,12 +314,12 @@ function pbe_parse_email_message(&$body)
 	$request = $db->query('', '
 		SELECT filter_from, filter_type
 		FROM {db_prefix}postby_emails_filters
-		WHERE filter_style = {string:filter_style}',
+		WHERE filter_style = {string:filter_style}
+		ORDER BY filter_order ASC',
 		array(
 			'filter_style' => 'parser'
 		)
 	);
-
 	// Build an array of valid expressions
 	$expressions = array();
 	while ($row = $db->fetch_assoc($request))
@@ -414,7 +350,7 @@ function pbe_parse_email_message(&$body)
 		// If an expression was matched our fine work is done
 		if (!empty($split[1]))
 		{
-			// If we had a find then we clip off the mail clients "reply to" section
+			// If we had a find then we clip off the mail and return above the split
 			$match = true;
 			$body = $split[0];
 			break;
@@ -436,12 +372,12 @@ function pbe_filter_email_message($text)
 {
 	$db = database();
 
-	// load up the text filters from the database, regex first and ordered by id number
+	// load up the text filters from the database, regex first and ordered by the filter order ...
 	$request = $db->query('', '
 		SELECT filter_from, filter_to, filter_type
 		FROM {db_prefix}postby_emails_filters
 		WHERE filter_style = {string:filter_style}
-		ORDER BY id_filter ASC, filter_type ASC',
+		ORDER BY filter_type ASC, filter_order ASC',
 		array(
 			'filter_style' => 'filter'
 		)
@@ -456,7 +392,7 @@ function pbe_filter_email_message($text)
 			if (!empty($row['filter_to']))
 				$row['filter_to'] = str_replace('\n', "\n", $row['filter_to']);
 
-			// Test the regex and if good use, else skip, don't want a bad regex to null the message ;)
+			// Test the regex and if good use, else skip, don't want a bad regex to empty the message!
 			$temp = preg_replace($row['filter_from'], $row['filter_to'], $text);
 			if ($temp != null)
 				$text = $temp;
@@ -478,9 +414,9 @@ function pbe_filter_email_message($text)
  */
 function pbe_clean_email_subject($text, $check = false)
 {
-	global $txt, $modSettings, $context;
+	global $txt, $modSettings, $mbname;
 
-	$sitename = !empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name'];
+	$sitename = !empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname;
 
 	// Find Re: Subject: FW: FWD or [$sitename] in the subject and strip it
 	$re = strpos(strtoupper($text), $txt['RE:']);
@@ -515,8 +451,9 @@ function pbe_clean_email_subject($text, $check = false)
 }
 
 /**
- * Used if the original email could not be removed from the message
+ * Used if the original email could not be removed from the message (top of post)
  *  - Tries to quote the original message instead by using a loose original message search
+ *  - Looks for email client oringinal message tags and converts them to bbc quotes
  *
  * @param string $body
  */
@@ -525,28 +462,34 @@ function pbe_fix_client_quotes($body)
 	global $txt;
 
 	// Define some common quote markers (from the original messages)
-	// @todo ACP for this? ... not sure really since this is really damage repair
+	// @todo ACP for this? ... not sure
 	$regex = array();
 
-	// On mon, jan 12, 2004 at 10:10 AM, Joe Blow wrote: [quote]
+	// On mon, jan 12, 2004 at 10:10 AM, John Smith wrote: [quote]
 	$regex[] = "~(?:" . $txt['email_on'] . ")?\w{3}, \w{3} \d{1,2},\s?\d{4} " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s?\s{1,4}\[quote\]~i";
 
-	// [quote] on: mon jan 12, 2004 Joe Blow wrote:
+	// [quote] on: mon jan 12, 2004 John Smith wrote:
 	$regex[] = "~\[quote\]\s?" . $txt['email_on'] . ": \w{3} \w{3} \d{1,2}, \d{4} (.*)?" . $txt['email_wrote'] . ":\s~i";
 
-	// on jan 12, 2004 at 10:10 PM, Joe Blow wrote:   [quote]
+	// on jan 12, 2004 at 10:10 PM, John Smith wrote:   [quote]
 	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2} [AP]M,(.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
 
-	// on jan 12, 2004 at 10:10, Joe Blow wrote   [quote]
+	// on jan 12, 2004 at 10:10, John Smith wrote   [quote]
 	$regex[] = "~" .  $txt['email_on'] . " \w{3} \d{1,2}, \d{4}, " . $txt['email_at'] . " \d{1,2}:\d{1,2}, (.*)?" . $txt['email_wrote'] . ":\s{1,4}\[quote\]~i";
 
-	// quoting: Joe Blow on stuffz at 10:10:23 AM
+	// quoting: John Smith on stuffz at 10:10:23 AM
 	$regex[] = "~" . $txt['email_quotefrom'] . ": (.*) " . $txt['email_on'] . " .* " . $txt['email_at'] . " \d{1,2}:\d{1,2}:\d{1,2} [AP]M~";
 
-	// quoting Joe Blow <joeblow@blow.com>
+	// quoting John Smith <johnsmith@tardis.com>
 	$regex[] = "~" . $txt['email_quoting'] . " (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i";
 
-	// For each one see if we can do a nice [quote author=joe blow]
+	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
+	$regex[] = "~---\s.*?\"(.*)\"\s+" . $txt['email_wrote'] . ":\s(\[quote\])?~i";
+
+	// --- in some@group.name John Smith wrote
+	$regex[] = "~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s" . $txt['email_wrote'] . ":?~i";
+
+	// For each one see if we can do a nice [quote author=john smith]
 	foreach ($regex as $reg)
 	{
 		if (preg_match_all($reg, $body, $matches, PREG_SET_ORDER))
@@ -577,7 +520,6 @@ function pbe_fix_client_quotes($body)
 function pbe_str_replace_once($needle, $replace, $haystack)
 {
 	// Looks for the first occurrence of $needle in $haystack and replaces it with $replace
-	// This is a single replace
 	$pos = strpos($haystack, $needle);
 	if ($pos === false)
 		return $haystack;
@@ -587,7 +529,7 @@ function pbe_str_replace_once($needle, $replace, $haystack)
 
 /**
  * Does a moderation check on a given user (global)
- *  - Removes permissions of PBE concern that a given moderation level denies
+ *  - Removes permissions of PBE concern that a given moderated level denies
  *
  * @param array $pbe array of user values
  */
@@ -620,6 +562,7 @@ function pbe_check_moderation(&$pbe)
 			'post_reply_any' => 'post_unapproved_replies_any',
 			'post_attachment' => 'post_unapproved_attachments',
 		);
+
 		foreach ($permission_change as $old => $new)
 		{
 			if (!in_array($old, $pbe['user_info']['permissions']))
@@ -627,6 +570,7 @@ function pbe_check_moderation(&$pbe)
 			else
 				$pbe['user_info']['permissions'][] = $new;
 		}
+
 		$pbe['user_info']['permissions'] = array_diff($pbe['user_info']['permissions'], array_keys($permission_change));
 	}
 
@@ -635,8 +579,8 @@ function pbe_check_moderation(&$pbe)
 
 /**
  * Creates a failed email entry in the postby_emails_error table
- * - Attempts to correct for common errors so the admin / moderator
- *   can choose to approve the email
+ * - Attempts an auto-correct for common errors so the admin / moderator
+ *   can choose to approve the email with the corrections
  *
  * @param string $error
  * @param object $email_message
@@ -679,7 +623,7 @@ function pbe_emailError($error, $email_message)
 		}
 	}
 
-	// A valid key but it was not sent to this user ... but we got it from a valid user
+	// A valid key but it was not sent to this user ... but we did get the email from a valid user
 	if ($error === 'error_key_sender_match')
 	{
 		$key_owner = query_key_owner($email_message->message_key_id);
@@ -811,7 +755,7 @@ function pbe_email_attachments($pbe, $email_message)
 
 			// Place them in session since that's where attachmentChecks looks
 			$_SESSION['temp_attachments'][$attachID] = array(
-				'name' => htmlspecialchars(basename($name)),
+				'name' => htmlspecialchars(basename($name), ENT_COMPAT, 'UTF-8'),
 				'tmp_name' => $destName,
 				'size' => strlen($attachment),
 				'id_folder' => $modSettings['currentAttachmentUploadDir'],
@@ -866,13 +810,12 @@ function pbe_email_attachments($pbe, $email_message)
 
 /**
  * Used when a email attempts to start a new topic
- *  - Load the board id that a given email address is assigned
- *  - Returns the board number in which the new topic should go
+ *  - Load the board id that a given email address is assigned to in the ACP
+ *  - Returns the board number in which the new topic must go
  *
  * @param object $email_address
- * @param boolean $check
  */
-function pbe_find_board_number($email_address, $check = false)
+function pbe_find_board_number($email_address)
 {
 	global $modSettings;
 
@@ -899,7 +842,7 @@ function pbe_find_board_number($email_address, $check = false)
 }
 
 /**
- * Converts a post/pm to text for sending in an email
+ * Converts a post/pm to text (markdown) for sending in an email
  * - censors everything it will send
  * - pre-converts select bbc tags to html so they can be markdowned properly
  * - uses parse-bbc to convert remaining bbc to html
@@ -912,11 +855,11 @@ function pbe_find_board_number($email_address, $check = false)
  */
 function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 {
-	global $txt;
+	global $txt, $context;
 
 	loadLanguage('Maillist');
 
-	// Check on some things needed by parse_bbc as autotask does not load em
+	// Check on some things needed by parse_bbc as an autotask does not load them
 	if (!isset($context['browser']))
 		detectBrowser();
 
@@ -943,7 +886,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	// Convert the remaining bbc to html
 	$message = parse_bbc($message, false);
 
-	// Change list style to make text conversion easier
+	// Change list style to something standard to make text conversion easier
 	$message = preg_replace('~<ul class=\"bbc_list\" style=\"list-style-type: decimal;\">(.*?)</ul>~si', "<ol>\\1</ol>", $message);
 
 	// Do we have any tables? if so we add in th's based on the number of cols.
@@ -981,11 +924,11 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	);
 
 	// Convert this to text (markdown)
-	require_once(EXTDIR . '/html2Md/html2markdown.php');
+	require_once(SUBSDIR . '/Html2Markdown.class.php');
 	$mark_down = new Convert_Md($message);
 	$message = $mark_down->get_markdown();
 
-	// Finally the sig, its just plain text
+	// Finally the sig, its goes as just plain text
 	if ($signature !== '')
 	{
 		$signature = parse_bbc($signature, false);
@@ -997,16 +940,18 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 
 /**
  * Loads up the vital user information given an email address
- *  - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads
- *    a subset of that data, enough to validate a user can make a post to a given
- *    board.  Done this way to avoid over-writting user_info etc for those who
- *    maybe running this function (on behalf of the email owner)
+ *  - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads a
+ *    subset of that data, enough to validate that a user can make a post to a given board.
+ *
+ * Done this way to avoid over-writting user_info etc for those who are running
+ * this function (on behalf of the email owner, simliar to profile views etc)
+ *
  * Sets
- *	- pbe['profile']
+ *  - pbe['profile']
  *  - pbe['profile']['options']
  *  - pbe['user_info']
  *  - pbe['user_info']['permissions']
- * -  pbe['user_info']['groups']
+ *  - pbe['user_info']['groups']
  *
  * @param string $email
  */
@@ -1031,7 +976,7 @@ function query_load_user_info($email)
 			'act' => 1,
 		)
 	);
-	list($id_member) = $db->fetch_row($request);
+	list ($id_member) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// No user found ... back we go
@@ -1212,7 +1157,7 @@ function query_key_owner($key)
 			'database_id' => $key
 		)
 	);
-	list($email_to) = $db->fetch_row($request);
+	list ($email_to) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $email_to;
@@ -1277,7 +1222,7 @@ function query_load_subject($message_id, $message_type, $email)
 		// Found them, now we find the PM to them with this ID
 		if ($db->num_rows($request) !== 0)
 		{
-			list($id_member) = $db->fetch_row($request);
+			list ($id_member) = $db->fetch_row($request);
 			$db->free_result($request);
 
 			// Now find this PM ID and make sure it was sent to this member
@@ -1295,10 +1240,10 @@ function query_load_subject($message_id, $message_type, $email)
 		}
 	}
 
-	// if we found the message, topic or PM, return the subject
+	// If we found the message, topic or PM, return the subject
 	if ($db->num_rows($request) != 0)
 	{
-		list($subject) = $db->fetch_row($request);
+		list ($subject) = $db->fetch_row($request);
 		$subject = pbe_clean_email_subject($subject);
 	}
 	$db->free_result($request);
@@ -1399,7 +1344,7 @@ function query_load_board($message_id)
 		)
 	);
 
-	list($board_id) = $db->fetch_row($request);
+	list ($board_id) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	return $board_id === '' ? 0 : $board_id;
@@ -1419,7 +1364,7 @@ function query_load_board_details($board_id, $pbe)
 	// To post a NEW Topic, we need certain board details
 	$request = $db->query('', '
 		SELECT b.count_posts, b.id_profile, b.member_groups, b.id_theme, b.id_board
-		FROM {db_prefix}boards as b
+		FROM {db_prefix}boards AS b
 		WHERE {raw:query_see_board} AND id_board = {int:id_board}',
 		array(
 			'id_board' => $board_id,
@@ -1434,7 +1379,7 @@ function query_load_board_details($board_id, $pbe)
 
 /**
  * Loads the theme settings for the theme this user is using
- *  - Mainly used to determine a userws notify settings
+ *  - Mainly used to determine a users notify settings
  *
  * @param int $id_member
  * @param int $id_theme
@@ -1491,7 +1436,7 @@ function query_get_theme($id_member, $id_theme, $board_info)
  * @param int $id_topic
  * @param boolean $auto_notify
  */
-function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
+function query_notifications($id_member, $id_board, $id_topic, $auto_notify, $permissions)
 {
 	$db = database();
 
@@ -1514,7 +1459,7 @@ function query_notifications($id_member, $id_board, $id_topic, $auto_notify)
 
 	// If they have topic notification on and not board notification then
 	// add this post to the notification log
-	if (!empty($auto_notify) && (in_array('mark_any_notify', $pbe['user_info']['permissions'])) && !$board_notify)
+	if (!empty($auto_notify) && (in_array('mark_any_notify', $permissions)) && !$board_notify)
 	{
 		$db->insert('ignore',
 			'{db_prefix}log_notify',
@@ -1582,7 +1527,7 @@ function query_mark_pms($email_message, $pbe)
 			$total_unread += $row['num'];
 		$db->free_result($result);
 
-		// Update things for when they come to the site
+		// Update things for when they do come to the site
 		updateMemberData($pbe['profile']['id_member'], array('unread_messages' => $total_unread));
 	}
 
@@ -1601,7 +1546,7 @@ function query_mark_pms($email_message, $pbe)
 
 /**
  * Once a key has been used it is removed and can not be used again
- *  - Removes old keys are removed to minimize security issues
+ * Also removes any old keys to minimize security issues
  *
  * @param object $email_message
  */
@@ -1611,6 +1556,7 @@ function query_key_maintenance($email_message)
 
 	$db = database();
 
+	// Olds keys simply expire
 	$days = (!empty($modSettings['maillist_key_active'])) ? $modSettings['maillist_key_active'] : 21;
 	$delete_old = time() - ($days * 24 * 60 * 60);
 
@@ -1639,8 +1585,8 @@ function query_key_maintenance($email_message)
 }
 
 /**
- * After a email post has been made, this updates the users information like
- * they had been on the site to perform the given action.
+ * After a email post has been made, this updates the users information jus like
+ * they are on the site to perform the given action.
  *  - Updates time on line
  *  - Updates last active
  *  - Updates the who's online list with the member and action

@@ -14,6 +14,9 @@
  * @version 1.0 Alpha
  */
 
+/**
+ * Show a status block above the report to staff page
+ */
 function template_report_sent_above()
 {
 	global $txt;
@@ -25,9 +28,13 @@ function template_report_sent_above()
 		</div>';
 }
 
+/**
+ * The main template for displaying a topic, does it all, its the king, the bomb, the real deal
+ */
 function template_main()
 {
-	global $context, $settings, $options, $txt, $scripturl;
+	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+
 	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
 
@@ -37,24 +44,41 @@ function template_main()
 			<h2 class="category_header">
 				<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
 				', $txt['topic'], ': ', $context['subject'], '&nbsp;<span class="views_text">(', $context['num_views_text'], ')</span>
-				<span class="nextlinks">', $context['previous_next'], '</span>
+				<span class="nextlinks">',
+					!empty($context['links']['go_prev']) ? '<a href="' . $context['links']['go_prev'] . '">' . $txt['previous_next_back'] . '</a>' : '',
+					!empty($context['links']['go_next']) ? ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>' : '',
+					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . shorten_text($context['topic_derived_from']['subject'], !empty($modSettings['subject_length']) ? $modSettings['subject_length'] : 24)) . '</em></a>' : '',
+				'</span>
 			</h2>';
 
-	if (!empty($settings['display_who_viewing']))
+	if (!empty($settings['display_who_viewing']) || !empty($context['topic_redirected_from']))
 	{
 		echo '
-			<p id="whoisviewing">';
+			<div class="generalinfo">';
+		if (!empty($settings['display_who_viewing']))
+		{
+			echo '
+				<span id="whoisviewing">';
 
-		// Show just numbers...?
-		if ($settings['display_who_viewing'] == 1)
-				echo count($context['view_members']), ' ', count($context['view_members']) == 1 ? $txt['who_member'] : $txt['members'];
-		// Or show the actual people viewing the topic?
-		else
-			echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . ((empty($context['view_num_hidden']) || $context['can_moderate_forum']) ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
+			// Show just numbers...?
+			if ($settings['display_who_viewing'] == 1)
+				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
+			// Or show the actual people viewing the topic?
+			else
+				echo empty($context['view_members_list']) ? '0 ' . $txt['members'] : implode(', ', $context['view_members_list']) . (empty($context['view_num_hidden']) || $context['can_moderate_forum'] ? '' : ' (+ ' . $context['view_num_hidden'] . ' ' . $txt['hidden'] . ')');
 
-		// Now show how many guests are here too.
-		echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_topic'], '
-			</p>';
+			// Now show how many guests are here too.
+			echo $txt['who_and'], $context['view_num_guests'], ' ', $context['view_num_guests'] == 1 ? $txt['guest'] : $txt['guests'], $txt['who_viewing_topic'], '
+				</span>';
+		}
+		// Is this topic a redirect?
+		if (!empty($context['topic_redirected_from']))
+			echo '
+				<span id="redirectfrom">
+					' . sprintf($txt['no_redir'], '<a href="' . $context['topic_redirected_from']['redir_href'] . '">' . $context['topic_redirected_from']['subject'] . '</a>'), '
+				</span>';
+		echo '
+			</div>';
 	}
 
 	echo '
@@ -81,7 +105,7 @@ function template_main()
 
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '
-				<div class="', $message['approved'] ? ($message['alternate'] == 0 ? 'windowbg' : 'windowbg2') : 'approvebg', '">', $message['id'] != $context['first_message'] ? '
+				<div class="post_wrapper ', $message['approved'] ? ($message['alternate'] == 0 ? 'windowbg' : 'windowbg2') : 'approvebg', '">', $message['id'] != $context['first_message'] ? '
 					<a id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : '') : '';
 
 		// Showing the sidebar posting area?
@@ -89,10 +113,10 @@ function template_main()
 			echo '
 					<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>';
 
-				echo '
+		echo '
 					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
 						<div class="keyinfo">
-						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' .  template_build_poster_div($message, $ignoring) . '</ul>' : '');
+						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>' : '');
 
 		if (!empty($context['follow_ups'][$message['id']]))
 		{
@@ -101,13 +125,11 @@ function template_main()
 								<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1">', $txt['follow_ups'], '</a>
 									<ul class="menulevel2">';
 
-				foreach($context['follow_ups'][$message['id']] as $follow_up)
-				{
-					echo '
-										<li class="listlevel2"><a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
-				}
-
+			foreach ($context['follow_ups'][$message['id']] as $follow_up)
 				echo '
+										<li class="listlevel2"><a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
+
+			echo '
 									</ul>
 								</li>
 							</ul>';
@@ -166,7 +188,7 @@ function template_main()
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
-							<li class="listlevel1 subsections" aria-haspopup="true"><a', ($message['can_modify'] && !empty($options['use_click_menu'])) ? ' href="'. $scripturl. '?action=post;msg='. $message['id']. ';topic='. $context['current_topic']. '.'. $context['start']. '"' :'', ' class="linklevel1 post_options">', $txt['post_options'], '</a>';
+							<li class="listlevel1 subsections" aria-haspopup="true"><a', ($message['can_modify'] && !empty($options['use_click_menu'])) ? ' href="' . $scripturl . '?action=post;msg=' . $message['id'] . ';topic=' . $context['current_topic'] . '.' . $context['start'] . '"' : '', ' class="linklevel1 post_options">', $txt['post_options'], '</a>';
 
 		if ($message['can_modify'] || $message['can_remove'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{
@@ -187,7 +209,7 @@ function template_main()
 			// What about splitting it off the rest of the topic?
 			if ($context['can_split'] && !empty($context['real_num_replies']))
 				echo '
-									<li class="listlevel2"><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="linklevel2 split_button">', $txt['split'], '</a></li>';
+									<li class="listlevel2"><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="linklevel2 split_button">', $txt['split_topic'], '</a></li>';
 
 			// Can we restore topics?
 			if ($context['can_restore_msg'])
@@ -201,12 +223,12 @@ function template_main()
 
 			// Maybe we can unapprove it?
 			if ($message['can_unapprove'])
-						echo '
+				echo '
 									<li class="listlevel2"><a href="', $scripturl, '?action=moderate;area=postmod;sa=approve;topic=', $context['current_topic'], '.', $context['start'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '"  class="linklevel2 unapprove_button">', $txt['unapprove'], '</a></li>';
 
 			// Maybe they want to report this post to the moderator(s)?
 			if ($context['can_report_moderator'])
-						echo '
+				echo '
 									<li class="listlevel2"><a href="' . $scripturl . '?action=reporttm;topic=' . $context['current_topic'] . '.' . $message['counter'] . ';msg=' . $message['id'] . '" class="linklevel2 warn_button">' . $txt['report_to_mod'] . '</a></li>';
 
 			echo '
@@ -219,15 +241,15 @@ function template_main()
 			// Can they like this post?
 			if ($message['can_like'])
 				echo '
-							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 like_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=likepost;topic=', $context['current_topic'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 like_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
 			// Or remove the like they made
 			elseif ($message['can_unlike'])
 				echo '
-							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], 'msg=' . $message['id'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 unlike_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="', $scripturl, '?action=likes;sa=unlikepost;topic=', $context['current_topic'], ';msg=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 unlike_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
 			// Or just view the count
 			else
 				echo '
-							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;'. $message['like_counter']. '&nbsp;'. $txt['likes'] : '&nbsp;', '</a></li>';
+							<li class="listlevel1"><a href="#" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" class="linklevel1 likes_button">', !empty($message['like_counter']) ? '&nbsp;' . $message['like_counter'] . '&nbsp;' . $txt['likes'] : '&nbsp;', '</a></li>';
 		}
 
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
@@ -235,10 +257,9 @@ function template_main()
 			echo '
 							<li class="listlevel1 quick_edit"><a class="linklevel1"><img src="', $settings['images_url'], '/icons/modify_inline.png" alt="', $txt['modify_msg'], '" title="', $txt['modify_msg'], '" class="modifybutton" id="modify_button_', $message['id'], '" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')" />', $txt['quick_edit'], '</a></li>';
 
-		// Can they quote to a new topic? @todo - This needs rethinking for gui layout.
+		// Can they quote to a new topic? @todo - This needs rethinking for GUI layout.
 		if ($context['can_follow_up'])
 			echo '
-
 							<li class="listlevel1"><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel1 quotetonew_button">', $txt['quote_new'], '</a></li>';
 
 		// Can they reply? Have they turned on quick reply?
@@ -297,9 +318,13 @@ function template_main()
 		</div>';
 }
 
+/**
+ * This is quick reply area below all the message body's
+ */
 function template_quickreply_below()
 {
 	global $context, $options, $settings, $txt, $modSettings, $scripturl;
+
 	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
 
@@ -309,7 +334,11 @@ function template_quickreply_below()
 			<a id="quickreply"></a>
 			<div class="forumposts" id="quickreplybox">
 				<h2 class="category_header">
-					<a href="javascript:oQuickReply.swap();"><img src="', $settings['images_url'], '/', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '.png" alt="+" id="quickReplyExpand" class="icon" /></a>
+					<span id="category_toggle">&nbsp;
+						<a href="javascript:oQuickReply.swap();">
+							<span id="quickReplyExpand" class="', $options['display_quick_reply'] > 1 ? 'collapse' : 'expand', '" title="', $txt['hide'], '"></span>
+						</a>
+					</span>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
 				</h2>
 				<div id="quickReplyOptions" class="windowbg"', $options['display_quick_reply'] > 1 ? '' : ' style="display: none"', '>
@@ -319,7 +348,7 @@ function template_quickreply_below()
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
-						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);" >
+						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['notifications_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');': ''), '" >
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />
@@ -347,7 +376,7 @@ function template_quickreply_below()
 		{
 			echo '
 							<div class="quickReplyContent">
-								<textarea cols="600" rows="7" name="message" tabindex="', $context['tabindex']++, '"></textarea>
+								<textarea cols="600" rows="7" class="quickreply" name="message" id="message" tabindex="', $context['tabindex']++, '"></textarea>
 							</div>';
 		}
 		else
@@ -397,154 +426,169 @@ function template_quickreply_below()
 			</div>';
 	}
 
-	// tooltips for likes
-	echo '
-		<script><!-- // --><![CDATA[
-			$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
-		// ]]></script>';
-
-	// draft autosave available and the user has it enabled?
-	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) && !empty($options['display_quick_reply']))
+	// Showing something below, full editor or a text box, we need to load some options
+	if (!empty($options['display_quick_reply']))
+	{
 		echo '
-			<script><!-- // --><![CDATA[
+			<script><!-- // --><![CDATA[';
+
+		// Draft autosave available and the user has it enabled?
+		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+			echo '
 				var oDraftAutoSave = new elk_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
 					sLastID: \'id_draft\',
 					iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
+				});';
+
+		// Notifications enabled and only using a plain text quick reply?
+		if (!empty($modSettings['notifications_enabled']) && empty($options['use_editor_quick_reply']))
+			echo '
+				add_elk_mention(\'#message\');';
+
+		// Show the quick reply
+		echo '
+				var oQuickReply = new QuickReply({
+					bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
+					iTopicId: ', $context['current_topic'], ',
+					iStart: ', $context['start'], ',
+					sScriptUrl: elk_scripturl,
+					sImagesUrl: elk_images_url,
+					sContainerId: "quickReplyOptions",
+					sClassId: "quickReplyExpand",
+					sClassCollapsed: "collapse",
+					sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
+					sClassExpanded: "expand",
+					sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					sJumpAnchor: "quickreply",
+					bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
 				});
 			// ]]></script>';
+	}
 
 	// Spell check for quick modify and quick reply (w/o the editor)
-	if ($context['show_spellchecking'] && (empty($options['use_editor_quick_reply']) || empty($options['display_quick_reply'])))
+	if ($context['show_spellchecking'])
 		echo '
-				<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
-					<input type="hidden" name="spellstring" value="" />
-					<input type="hidden" name="fulleditor" value="" />
-				</form>
-				<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
+			<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
+				<input type="hidden" name="spellstring" value="" />
+				<input type="hidden" name="fulleditor" value="" />
+			</form>
+			<script src="' . $settings['default_theme_url'] . '/scripts/spellcheck.js"></script>';
 
+	// Tooltips for likes
 	echo '
-				<script><!-- // --><![CDATA[';
+			<script><!-- // --><![CDATA[
+				$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+			// ]]></script>';
 
-	if (!empty($options['display_quick_reply']))
-		echo '
-					var oQuickReply = new QuickReply({
-						bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
-						iTopicId: ', $context['current_topic'], ',
-						iStart: ', $context['start'], ',
-						sScriptUrl: elk_scripturl,
-						sImagesUrl: elk_images_url,
-						sContainerId: "quickReplyOptions",
-						sImageId: "quickReplyExpand",
-						sImageCollapsed: "collapse.png",
-						sImageExpanded: "expand.png",
-						sJumpAnchor: "quickreply",
-						bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
-					});';
-
+	// Quick moderation options
+	echo '
+			<script><!-- // --><![CDATA[';
+	
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 		echo '
-					var oInTopicModeration = new InTopicModeration({
-						sSelf: \'oInTopicModeration\',
-						sCheckboxContainerMask: \'in_topic_mod_check_\',
-						aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
+				var oInTopicModeration = new InTopicModeration({
+					sSelf: \'oInTopicModeration\',
+					sCheckboxContainerMask: \'in_topic_mod_check_\',
+					aMessageIds: [\'', implode('\', \'', $removableMessageIDs), '\'],
+					sSessionId: elk_session_id,
+					sSessionVar: elk_session_var,
+					sButtonStrip: \'moderationbuttons\',
+					sButtonStripDisplay: \'moderationbuttons_strip\',
+					sButtonStripClass: \'menuitem\',
+					bUseImageButton: false,
+					bCanRemove: ', $context['can_remove_post'] ? 'true' : 'false', ',
+					sRemoveButtonLabel: \'', $txt['quickmod_delete_selected'], '\',
+					sRemoveButtonImage: \'delete_selected.png\',
+					sRemoveButtonConfirm: \'', $txt['quickmod_confirm'], '\',
+					bCanRestore: ', $context['can_restore_msg'] ? 'true' : 'false', ',
+					sRestoreButtonLabel: \'', $txt['quick_mod_restore'], '\',
+					sRestoreButtonImage: \'restore_selected.png\',
+					sRestoreButtonConfirm: \'', $txt['quickmod_confirm'], '\',
+					bCanSplit: ', $context['can_split'] ? 'true' : 'false', ',
+					sSplitButtonLabel: \'', $txt['quickmod_split_selected'], '\',
+					sSplitButtonImage: \'split_selected.png\',
+					sSplitButtonConfirm: \'', $txt['quickmod_confirm'], '\',
+					sFormId: \'quickModForm\'
+				});';
+
+	// Quick modify can be used
+	echo '
+				if (\'XMLHttpRequest\' in window)
+				{
+					var oQuickModify = new QuickModify({
+						sIconHide: \'xx.png\',
+						sScriptUrl: elk_scripturl,
+						sClassName: \'quick_edit\',
+						sIDSubject: \'post_subject_\',
+						sIDInfo: \'info_\',
+						bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
+						iTopicId: ', $context['current_topic'], ',
+						sTemplateBodyEdit: ', JavaScriptEscape('
+							<div id="quick_edit_body_container" style="width: 90%">
+								<div id="error_box" class="errorbox" style="display:none;"></div>
+								<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
+								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
+								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
+								<input type="hidden" name="msg" value="%msg_id%" />
+								<div class="righttext">
+									<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" class="button_submit" />&nbsp;&nbsp;' . ($context['show_spellchecking'] ? '<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\');" class="button_submit" />&nbsp;&nbsp;' : '') . '<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" class="button_submit" />
+								</div>
+							</div>'), ',
+						sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
+						sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
+						sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
+						sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
+						sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
+						sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
+						sFormRemoveAccessKeys: \'postmodify\'' : '', '
+					});
+
+					aJumpTo[aJumpTo.length] = new JumpTo({
+						sContainerId: "display_jump_to",
+						sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
+						iCurBoardId: ', $context['current_board'], ',
+						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
+						sCurBoardName: "', $context['jump_to']['board_name'], '",
+						sBoardChildLevelIndicator: "==",
+						sBoardPrefix: "=> ",
+						sCatSeparator: "-----------------------------",
+						sCatPrefix: "",
+						sGoButtonLabel: "', $txt['go'], '"
+					});
+
+					aIconLists[aIconLists.length] = new IconList({
+						sBackReference: "aIconLists[" + aIconLists.length + "]",
+						sIconIdPrefix: "msg_icon_",
+						sScriptUrl: elk_scripturl,
+						bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
+						iBoardId: ', $context['current_board'], ',
+						iTopicId: ', $context['current_topic'], ',
 						sSessionId: elk_session_id,
 						sSessionVar: elk_session_var,
-						sButtonStrip: \'moderationbuttons\',
-						sButtonStripDisplay: \'moderationbuttons_strip\',
-						bUseImageButton: false,
-						bCanRemove: ', $context['can_remove_post'] ? 'true' : 'false', ',
-						sRemoveButtonLabel: \'', $txt['quickmod_delete_selected'], '\',
-						sRemoveButtonImage: \'delete_selected.png\',
-						sRemoveButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-						bCanRestore: ', $context['can_restore_msg'] ? 'true' : 'false', ',
-						sRestoreButtonLabel: \'', $txt['quick_mod_restore'], '\',
-						sRestoreButtonImage: \'restore_selected.png\',
-						sRestoreButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-						bCanSplit: ', $context['can_split'] ? 'true' : 'false', ',
-						sSplitButtonLabel: \'', $txt['quickmod_split_selected'], '\',
-						sSplitButtonImage: \'split_selected.png\',
-						sSplitButtonConfirm: \'', $txt['quickmod_confirm'], '\',
-						sFormId: \'quickModForm\'
-					});';
-
-	echo '
-					if (\'XMLHttpRequest\' in window)
-					{
-						var oQuickModify = new QuickModify({
-							sIconHide: \'xx.png\',
-							sScriptUrl: elk_scripturl,
-							sClassName: \'quick_edit\',
-							sIDSubject: \'post_subject_\',
-							sIDInfo: \'info_\',
-							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
-							iTopicId: ', $context['current_topic'], ',
-							sTemplateBodyEdit: ', JavaScriptEscape('
-								<div id="quick_edit_body_container" style="width: 90%">
-									<div id="error_box" class="errorbox" style="display:none;"></div>
-									<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
-									<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
-									<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
-									<input type="hidden" name="msg" value="%msg_id%" />
-									<div class="righttext">
-										<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" class="button_submit" />&nbsp;&nbsp;' . ($context['show_spellchecking'] ? '<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\');" class="button_submit" />&nbsp;&nbsp;' : '') . '<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" class="button_submit" />
-									</div>
-								</div>'), ',
-							sTemplateBodyNormal: ', JavaScriptEscape('%body%'), ',
-							sTemplateSubjectEdit: ', JavaScriptEscape('<input type="text" style="width: 85%;" name="subject" value="%subject%" size="80" maxlength="80" tabindex="' . $context['tabindex']++ . '" class="input_text" />'), ',
-							sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
-							sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
-							sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ',
-							sErrorBorderStyle: ', JavaScriptEscape('1px solid red'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
-							sFormRemoveAccessKeys: \'postmodify\'' : '', '
-						});
-
-						aJumpTo[aJumpTo.length] = new JumpTo({
-							sContainerId: "display_jump_to",
-							sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
-							iCurBoardId: ', $context['current_board'], ',
-							iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
-							sCurBoardName: "', $context['jump_to']['board_name'], '",
-							sBoardChildLevelIndicator: "==",
-							sBoardPrefix: "=> ",
-							sCatSeparator: "-----------------------------",
-							sCatPrefix: "",
-							sGoButtonLabel: "', $txt['go'], '"
-						});
-
-						aIconLists[aIconLists.length] = new IconList({
-							sBackReference: "aIconLists[" + aIconLists.length + "]",
-							sIconIdPrefix: "msg_icon_",
-							sScriptUrl: elk_scripturl,
-							bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
-							iBoardId: ', $context['current_board'], ',
-							iTopicId: ', $context['current_topic'], ',
-							sSessionId: elk_session_id,
-							sSessionVar: elk_session_var,
-							sAction: "messageicons;board=',  $context['current_board'], '" ,
-							sLabelIconList: "', $txt['message_icon'], '",
-							sBoxBackground: "transparent",
-							sBoxBackgroundHover: "#ffffff",
-							iBoxBorderWidthHover: 1,
-							sBoxBorderColorHover: "#adadad" ,
-							sContainerBackground: "#ffffff",
-							sContainerBorder: "1px solid #adadad",
-							sItemBorder: "1px solid #ffffff",
-							sItemBorderHover: "1px dotted gray",
-							sItemBackground: "transparent",
-							sItemBackgroundHover: "#e0e0f0"
-						});
-					}';
+						sAction: "messageicons;board=', $context['current_board'], '" ,
+						sLabelIconList: "', $txt['message_icon'], '",
+						sBoxBackground: "transparent",
+						sBoxBackgroundHover: "#ffffff",
+						iBoxBorderWidthHover: 1,
+						sBoxBorderColorHover: "#adadad" ,
+						sContainerBackground: "#ffffff",
+						sContainerBorder: "1px solid #adadad",
+						sItemBorder: "1px solid #ffffff",
+						sItemBorderHover: "1px dotted gray",
+						sItemBackground: "transparent",
+						sItemBackgroundHover: "#e0e0f0"
+					});
+				}';
 
 	if (!empty($ignoredMsgs))
 		echo '
-					ignore_toggles([', implode(', ', $ignoredMsgs), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
+				ignore_toggles([', implode(', ', $ignoredMsgs), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
 
 	echo '
-				// ]]></script>';
-
+			// ]]></script>';
 }
 
 /**
@@ -653,14 +697,14 @@ function template_build_poster_div($message, $ignoring)
 											<li><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/www_sm.png" alt="' . $message['member']['website']['title'] . '" />' : $txt['www']) . '</a></li>';
 
 			// Don't show the email address if they want it hidden.
-			if (in_array($message['member']['show_email'], array('yes' . 'yes_permission_override' . 'no_through_forum')) && $context['can_send_email'])
+			if (in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
 				$poster_div .= '
 											<li><a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
 
 			// Want to send them a PM, can you? @todo - This seems to be broken and IMO should be dropped anyway, at least if poster div is not hidden.
 			if ($context['can_send_pm'] && !$message['is_message_author'] && !empty($modSettings['onlineEnable']))
-					$poster_div .= '
-											<li><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '"><img src="'. $message['member']['online']['image_href']. '" alt="" /></a></li>';
+				$poster_div .= '
+											<li><a href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '"><img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
 
 			$poster_div .= '
 										</ol>
@@ -679,7 +723,7 @@ function template_build_poster_div($message, $ignoring)
 		}
 	}
 	// Otherwise, show the guest's email.
-	elseif (!empty($message['member']['email']) && in_array($message['member']['show_email'], array('yes' . 'yes_permission_override' . 'no_through_forum')) && $context['can_send_email'])
+	elseif (!empty($message['member']['email']) && in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
 		$poster_div .= '
 									<li class="listlevel2 email"><a class="linklevel2" href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
 
@@ -729,13 +773,12 @@ function template_build_poster_div($message, $ignoring)
 	if (empty($options['hide_poster_area']))
 	{
 		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
-		$poster_div .= '
+			$poster_div .= '
 							<li class="listlevel1 avatar">
 								<a class="linklevel1" href="' . $scripturl . '?action=profile;u=' . $message['member']['id'] . '">
 									' . $message['member']['avatar']['image'] . '
 								</a>
 							</li>';
-
 
 		// Show the post group icons, but not for guests.
 		if (!$message['member']['is_guest'])
@@ -759,7 +802,7 @@ function template_build_poster_div($message, $ignoring)
 		if ($context['can_send_pm'] && $message['is_message_author'])
 		{
 			$poster_div .= '
-							<li class="listlevel1 poster_online"><a class="linklevel1'. ($context['user']['unread_messages'] > 0 ? ' new_pm':''). '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">'. $context['user']['unread_messages'] . '</span>' : '')  . '</a></li>';
+							<li class="listlevel1 poster_online"><a class="linklevel1' . ($context['user']['unread_messages'] > 0 ? ' new_pm' : '') . '" href="' . $scripturl . '?action=pm">' . $txt['pm_short'] . ' ' . ($context['user']['unread_messages'] > 0 ? '<span class="pm_indicator">' . $context['user']['unread_messages'] . '</span>' : '') . '</a></li>';
 		}
 		elseif ($context['can_send_pm'] && !$message['is_message_author'] && !$message['member']['is_guest'])
 		{
@@ -772,7 +815,7 @@ function template_build_poster_div($message, $ignoring)
 		}
 		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']))
 			$poster_div .= '
-							<li class="listlevel1 poster_online">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></li>';
+							<li class="listlevel1 poster_online"><span class="nolink">' . ($message['member']['online']['is_online'] ? $txt['online'] : $txt['offline']) . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></span></li>';
 
 		// Are we showing the warning status?
 		if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
@@ -791,11 +834,9 @@ function template_display_poll_above()
 	global $settings, $context, $txt, $scripturl;
 	echo '
 			<div id="poll">
-				<div class="cat_bar">
-					<h3 class="catbg">
-						<img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '
-					</h3>
-				</div>
+				<h3 class="category_header">
+					<img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '
+				</h3>
 				<div class="windowbg">
 					<div class="content" id="poll_options">
 						<h4 id="pollquestion">
@@ -812,7 +853,7 @@ function template_display_poll_above()
 		foreach ($context['poll']['options'] as $option)
 		{
 			echo '
-						<dt class="', $option['voted_this'] ? ' voted' : '', '">', $option['option'], '</dt>
+						<dt class="', $option['voted_this'] ? 'voted' : '', '">', $option['option'], '</dt>
 						<dd class="statsbar', $option['voted_this'] ? ' voted' : '', '">';
 
 			if ($context['allow_poll_view'])
@@ -831,7 +872,7 @@ function template_display_poll_above()
 			echo '
 						<p><strong>', $txt['poll_total_voters'], ':</strong> ', $context['poll']['total_votes'], '</p>';
 	}
-		// They are allowed to vote! Go to it!
+	// They are allowed to vote! Go to it!
 	else
 	{
 		echo '
@@ -870,7 +911,7 @@ function template_display_poll_above()
 			</div>
 			<div id="pollmoderation">';
 
-		template_button_strip($context['poll_buttons']);
+	template_button_strip($context['poll_buttons']);
 
 	echo '
 			</div>';
@@ -882,11 +923,10 @@ function template_display_poll_above()
 function template_display_calendar_above()
 {
 	global $context, $txt, $settings;
+
 	echo '
 			<div class="linked_events">
-				<div class="title_bar">
-					<h3 class="titlebg">', $txt['calendar_linked_events'], '</h3>
-				</div>
+				<h3 class="category_header">', $txt['calendar_linked_events'], '</h3>
 				<div class="windowbg">
 					<div class="content">
 						<ul>';
@@ -904,6 +944,9 @@ function template_display_calendar_above()
 			</div>';
 }
 
+/**
+ * Used to display items above the page, like page navigation
+ */
 function template_pages_and_buttons_above()
 {
 	global $context;
@@ -913,13 +956,15 @@ function template_pages_and_buttons_above()
 			<a id="msg', $context['first_message'], '"></a>', $context['first_new_message'] ? '<a name="new" id="new"></a>' : '';
 
 	// Show the page index... "Pages: [1]".
-	template_pagesection('normal_buttons', 'right', 'go_down');
+	template_pagesection('normal_buttons', 'right');
 }
 
+/**
+ * Used to display items below the page, like page navigation
+ */
 function template_pages_and_buttons_below()
 {
 	global $context;
-
 
 	// Show the page index... "Pages: [1]".
 	template_pagesection('normal_buttons', 'right');
@@ -930,12 +975,14 @@ function template_pages_and_buttons_below()
 	echo '
 			<div id="moderationbuttons">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
 
-	// Show the jumpto box, or actually...let Javascript do it.
+	// Show the jump-to box, or actually...let Javascript do it.
 	echo '
 			<div id="display_jump_to">&nbsp;</div>';
 }
+
 /**
  * Used to display attachments
+ *
  * @param array $message
  * @param bool $ignoring
  */
@@ -962,7 +1009,7 @@ function template_display_attachments($message, $ignoring)
 
 			if ($context['can_approve'])
 				echo '
-										&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>]';
+										&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=all;mid=', $message['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve_all'], '</a>';
 
 			echo '
 									</legend>';
@@ -983,7 +1030,7 @@ function template_display_attachments($message, $ignoring)
 				echo '
 											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px"/>';
 
-				echo '
+			echo '
 										</div>';
 		}
 
@@ -993,7 +1040,7 @@ function template_display_attachments($message, $ignoring)
 
 		if (!$attachment['is_approved'] && $context['can_approve'])
 			echo '
-											[<a href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>]&nbsp;|&nbsp;[<a href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>] ';
+											<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=approve;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['approve'], '</a>&nbsp;|&nbsp;<a class="linkbutton" href="', $scripturl, '?action=attachapprove;sa=reject;aid=', $attachment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['delete'], '</a>';
 		echo '
 											<br />', $attachment['size'], ($attachment['is_image'] ? ', ' . $attachment['real_width'] . 'x' . $attachment['real_height'] . '<br />' . sprintf($txt['attach_viewed'], $attachment['downloads']) : '<br />' . sprintf($txt['attach_downloaded'], $attachment['downloads'])), '
 										</div>';

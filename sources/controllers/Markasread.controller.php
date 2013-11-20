@@ -154,7 +154,7 @@ class MarkRead_Controller extends Action_Controller
 
 		$markRead = array();
 		foreach ($topics as $id_topic)
-			$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], $logged_topics[$id_topic]);
+			$markRead[] = array($user_info['id'], (int) $id_topic, $modSettings['maxMsgID'], (int) !empty($logged_topics[$id_topic]));
 
 		markTopicsRead($markRead, true);
 
@@ -197,12 +197,12 @@ class MarkRead_Controller extends Action_Controller
 			$earlyMsg = 0;
 		else
 		{
-			list($earlyMsg) = messageAt((int) $_REQUEST['start'], $topic);
+			list ($earlyMsg) = messageAt((int) $_REQUEST['start'], $topic);
 			$earlyMsg--;
 		}
 
 		// Blam, unread!
-		markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['disregarded']), true);
+		markTopicsRead(array($user_info['id'], $topic, $earlyMsg, $topicinfo['unwatched']), true);
 
 		return 'board=' . $board . '.0';
 	}
@@ -214,9 +214,7 @@ class MarkRead_Controller extends Action_Controller
 	 */
 	public function action_markasread()
 	{
-		global $board, $user_info, $board_info, $modSettings;
-
-		$db = database();
+		global $board, $board_info;
 
 		checkSession('get');
 
@@ -267,18 +265,7 @@ class MarkRead_Controller extends Action_Controller
 			// Find all boards with the parents in the board list
 			$boards_to_add = accessibleBoards($boards);
 			if (!empty($boards_to_add))
-			{
-				// we've got some!
-				$logBoardInserts = '';
-				foreach ($boards_to_add as $b)
-					$logBoardInserts[] = array($modSettings['maxMsgID'], $user_info['id'], $b['id_board']);
-					$db->insert('replace',
-					'{db_prefix}log_boards',
-					array('id_msg' => 'int', 'id_member' => 'int', 'id_board' => 'int'),
-					$logBoardInserts,
-					array('id_member', 'id_board')
-				);
-			}
+				markBoardsRead($boards_to_add);
 
 			if (empty($board))
 				return '';

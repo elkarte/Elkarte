@@ -42,6 +42,8 @@ class ManageNews_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
+		loadTemplate('ManageNews');
+
 		// Format: 'sub-action' => array('function', 'permission')
 		$subActions = array(
 			'editnews' => array(
@@ -71,15 +73,6 @@ class ManageNews_Controller extends Action_Controller
 		// Default to sub action 'main' or 'settings' depending on permissions.
 		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
 
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// You way will end here if you don't have permission.
-		$action->isAllowedTo($subAction);
-
-		loadTemplate('ManageNews');
-
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['news_title'],
@@ -97,11 +90,16 @@ class ManageNews_Controller extends Action_Controller
 			),
 		);
 
+		$context['page_title'] = $txt['news_title'];
+		$context['sub_action'] = $subAction;
+
 		// Force the right area...
 		if (substr($subAction, 0, 7) == 'mailing')
 			$context[$context['admin_menu_name']]['current_subsection'] = 'mailingmembers';
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'settings');
 		$action->dispatch($subAction);
 	}
 
@@ -162,7 +160,7 @@ class ManageNews_Controller extends Action_Controller
 		}
 
 		// We're going to want this for making our list.
-		require_once(SUBSDIR . '/List.subs.php');
+		require_once(SUBSDIR . '/List.class.php');
 		require_once(SUBSDIR . '/News.subs.php');
 
 		$context['page_title'] = $txt['admin_edit_news'];
@@ -181,12 +179,9 @@ class ManageNews_Controller extends Action_Controller
 					'data' => array(
 						'function' => create_function('$news', '
 
-							if (is_numeric($news[\'id\']))
-								return \'<textarea id="data_\' . $news[\'id\'] . \'" rows="3" cols="50" name="news[]" style="\' . (isBrowser(\'is_ie8\') ? \'width: 635px; max-width: 85%; min-width: 85%\' : \'width 100%;margin 0 5em\') . \';">\' . $news[\'unparsed\'] . \'</textarea>
+							return \'<textarea id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]" style="width 100%;margin 0 5em;">\' . $news[\'unparsed\'] . \'</textarea>
 								<br />
 								<div id="preview_\' . $news[\'id\'] . \'"></div>\';
-							else
-								return $news[\'unparsed\'];
 						'),
 						'style' => 'width: 50%;',
 					),
@@ -233,7 +228,7 @@ class ManageNews_Controller extends Action_Controller
 					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
 					<span id="moreNewsItems_link" style="display: none;">
-						<a class="linkbutton_right" href="javascript:void(0);" onclick="addNewsItem(); return false;">' . $txt['editnews_clickadd'] . '</a>
+						<a class="linkbutton_right" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',
 				),
 			),
@@ -241,6 +236,8 @@ class ManageNews_Controller extends Action_Controller
 			document.getElementById(\'list_news_lists_last\').style.display = "none";
 			document.getElementById("moreNewsItems_link").style.display = "";
 			var last_preview = 0;
+			var txt_preview = ' . javaScriptEscape($txt['preview']) . ';
+			var txt_news_error_no_news = ' . javaScriptEscape($txt['news_error_no_news']) . ';
 
 			$(document).ready(function () {
 				$("div[id ^= \'preview_\']").each(function () {
@@ -250,44 +247,7 @@ class ManageNews_Controller extends Action_Controller
 					make_preview_btn(preview_id);
 				});
 			});
-
-			function make_preview_btn (preview_id)
-			{
-				var $id = $("#preview_" + preview_id);
-				$id.text(\'' . $txt['preview'] . '\').click(function () {
-					$.ajax({
-						type: "POST",
-						url: "' . $scripturl . '?action=xmlpreview;xml",
-						data: {item: "newspreview", news: $("#data_" + preview_id).val()},
-						context: document.body,
-						success: function(request){
-							if ($(request).find("error").text() == \'\')
-								$(document).find("#box_preview_" + preview_id).html($(request).text());
-							else
-								$(document).find("#box_preview_" + preview_id).text(\'' . $txt['news_error_no_news'] . '\');
-						},
-					});
-				});
-				$id.wrap("<a class=\"linkbutton_right\" href=\"javascript:void(0);\"></a>");
-			}
-
-			function addNewsItem ()
-			{
-				last_preview++;
-				$("#list_news_lists_last").before(' . javaScriptEscape('
-				<tr class="windowbg') . ' + (last_preview % 2 == 0 ? \'\' : \'2\') + ' . javaScriptEscape('">
-					<td style="width: 50%;">
-							<textarea id="data_') . ' + last_preview + ' . javaScriptEscape('" rows="3" cols="65" name="news[]" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 85%; min-width: 85%' : 'width: 100%') . ';"></textarea>
-							<br />
-							<div class="floatright" id="preview_') . ' + last_preview + ' . javaScriptEscape('"></div>
-					</td>
-					<td style="width: 45%;">
-						<div id="box_preview_') . ' + last_preview + ' . javaScriptEscape('" style="overflow: auto; width: 100%; height: 10ex;"></div>
-					</td>
-					<td></td>
-				</tr>') . ');
-				make_preview_btn(last_preview);
-			}',
+		',
 		);
 
 		// Create the request list.
@@ -314,25 +274,43 @@ class ManageNews_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members';
-		$context['groups'] = array();
 
 		$allgroups = getBasicMembergroupData(array('all'), array(), null, true);
-		$context['groups'] = $allgroups['groups'];
+		$groups = $allgroups['groups'];
 
 		foreach ($allgroups['postgroups'] as $postgroup)
 			$pg[] = $postgroup['id'];
 		foreach ($allgroups['membergroups'] as $membergroup)
 			$mg[] = $membergroup['id'];
 
-		$groups = membersInGroups($pg, $mg, true, true);
+		$mem_groups = membersInGroups($pg, $mg, true, true);
 
-		foreach ($groups as $id_group => $member_count)
+		foreach ($mem_groups as $id_group => $member_count)
 		{
-			if (isset($context['groups'][$id_group]['member_count']))
-				$context['groups'][$id_group]['member_count'] += $member_count;
+			if (isset($groups[$id_group]['member_count']))
+				$groups[$id_group]['member_count'] += $member_count;
 			else
-				$context['groups'][$id_group]['member_count'] = $member_count;
+				$groups[$id_group]['member_count'] = $member_count;
 		}
+
+		foreach ($groups as $group)
+		{
+			$groups[$group['id']]['status'] = 'on';
+			$groups[$group['id']]['is_postgroup'] = in_array($group['id'], $pg);
+		}
+
+		$context['groups'] = array(
+			'select_group' => $txt['admin_newsletters_select_groups'],
+			'member_groups' => $groups,
+		);
+
+		foreach ($groups as $group)
+			$groups[$group['id']]['status'] = 'off';
+
+		$context['exclude_groups'] = array(
+			'select_group' => $txt['admin_newsletters_exclude_groups'],
+			'member_groups' => $groups,
+		);
 
 		$context['can_send_pm'] = allowedTo('pm_send');
 	}
@@ -352,9 +330,8 @@ class ManageNews_Controller extends Action_Controller
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
-
-		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : htmlspecialchars($context['forum_name'] . ': ' . $txt['subject']);
-		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . $txt['regards_team'] . "\n\n" . '{$board_url}');
+		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : htmlspecialchars($context['forum_name'] . ': ' . $txt['subject'], ENT_COMPAT, 'UTF-8');
+		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . $txt['regards_team'] . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
 
 		// Needed for the WYSIWYG editor.
 		require_once(SUBSDIR . '/Editor.subs.php');
@@ -448,6 +425,7 @@ class ManageNews_Controller extends Action_Controller
 		// We need a couple strings from the email template file
 		loadLanguage('EmailTemplates');
 		require_once(SUBSDIR . '/News.subs.php');
+
 		// Get a list of all full banned users.  Use their Username and email to find them.
 		// Only get the ones that can't login to turn off notification.
 		$context['recipients']['exclude_members'] = excludeBannedMembers();
@@ -457,7 +435,7 @@ class ManageNews_Controller extends Action_Controller
 		{
 			$mods = getModerators();
 
-			foreach($mods as $row)
+			foreach ($mods as $row)
 			{
 				if (in_array(3, $context['recipients']))
 					$context['recipients']['exclude_members'][] = $row['identifier'];
@@ -467,9 +445,11 @@ class ManageNews_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
+
 		// For progress bar!
 		$context['total_emails'] = count($context['recipients']['emails']);
 		$context['max_id_member'] = maxMemberID();
+
 		// Clean up the arrays.
 		$context['recipients']['members'] = array_unique($context['recipients']['members']);
 		$context['recipients']['exclude_members'] = array_unique($context['recipients']['exclude_members']);
@@ -603,8 +583,8 @@ class ManageNews_Controller extends Action_Controller
 		$_POST['message'] = !empty($_POST['message']) ? $_POST['message'] : '';
 
 		// Save the message and its subject in $context
-		$context['subject'] = htmlspecialchars($_POST['subject']);
-		$context['message'] = htmlspecialchars($_POST['message']);
+		$context['subject'] = htmlspecialchars($_POST['subject'], ENT_COMPAT, 'UTF-8');
+		$context['message'] = htmlspecialchars($_POST['message'], ENT_COMPAT, 'UTF-8');
 
 		// Prepare the message for sending it as HTML
 		if (!$context['send_pm'] && !empty($_POST['send_html']))
@@ -751,8 +731,6 @@ class ManageNews_Controller extends Action_Controller
 
 			// Get the smelly people - note we respect the id_member range as it gives us a quicker query.
 			$recipients = getNewsletterRecipients($sendQuery, $sendParams, $context['start'], $num_at_once, $i);
-
-
 			foreach ($recipients as $row)
 			{
 				$last_id_member = $row['id_member'];

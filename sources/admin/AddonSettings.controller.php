@@ -30,7 +30,7 @@ class AddonSettings_Controller extends Action_Controller
 	protected $_addonSettings;
 
 	/**
-	 * This, my friend, is for all the authors of add-ons out there.
+	 * This, my friend, is for all the authors of addons out there.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -38,34 +38,25 @@ class AddonSettings_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$context['page_title'] = $txt['admin_modifications'];
-
-		$subActions = array(
-			'general' => array($this, 'action_addonSettings_display'),
-			'hooks' => array($this, 'action_hooks'),
-			// Mod authors, once again, if you have a whole section to add do it AFTER this line, and keep a comma at the end.
-		);
-
-		// Make it easier for mods to add new areas.
-		call_integration_hook('integrate_modify_modifications', array(&$subActions));
-
-		// Pick the correct sub-action.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$subAction = $_REQUEST['sa'];
-		else
-			$subAction = 'general';
-
-		// Set up action/subaction stuff.
-		$action = new Action();
-		$action->initialize($subActions);
-
-		// @FIXME
-		// $this->loadGeneralSettingParameters($subActions, 'general');
-		isAllowedTo('admin_forum');
-
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
 
+		$subActions = array(
+			'general' => array($this, 'action_addonSettings_display', 'permission' => 'admin_forum'),
+			// @deprecated: do not rely on this line, use the appropriate hook and tools provided
+			// Mod authors, once again, if you have a whole section to add do it AFTER this line, and keep a comma at the end.
+			// And SET the permission level
+		);
+
+		// Make it easier for addons to add new areas.
+		call_integration_hook('integrate_modify_modifications', array(&$subActions));
+
+		// Pick the correct sub-action.
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'general';
+
+		// @FIXME
+		// $this->loadGeneralSettingParameters($subActions, 'general');
+		$context['page_title'] = $txt['admin_modifications'];
 		$context['sub_template'] = 'show_settings';
 		$context['sub_action'] = $subAction;
 		// END $this->loadGeneralSettingParameters();
@@ -73,17 +64,17 @@ class AddonSettings_Controller extends Action_Controller
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['admin_modifications'],
-			'help' => 'modsettings',
+			'help' => 'addonsettings',
 			'description' => $txt['modification_settings_desc'],
 			'tabs' => array(
 				'general' => array(
-				),
-				'hooks' => array(
 				),
 			),
 		);
 
 		// Call the right function for this sub-action.
+		$action = new Action();
+		$action->initialize($subActions, 'general');
 		$action->dispatch($subAction);
 	}
 
@@ -108,14 +99,14 @@ class AddonSettings_Controller extends Action_Controller
 
 			Settings_Form::save_db($save_vars);
 
-			redirectexit('action=admin;area=modsettings;sa=general');
+			redirectexit('action=admin;area=addonsettings;sa=general');
 		}
 
 		Settings_Form::prepare_db($config_vars);
 	}
 
 	/**
-	 * Initialize the customSettings form with any custom admin settings for or from add-ons.
+	 * Initialize the customSettings form with any custom admin settings for or from addons.
 	 */
 	public function _initAddonSettingsForm()
 	{
@@ -139,14 +130,14 @@ class AddonSettings_Controller extends Action_Controller
 			$context['settings_message'] = '<div class="centertext">' . $txt['modification_no_misc_settings'] . '</div>';
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=modsettings;save;sa=general';
+		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
 		return $this->_addonSettings->settings($config_vars);
 	}
 
 	/**
-	 * Retrieve any custom admin settings for or from add-ons.
+	 * Retrieve any custom admin settings for or from addons.
 	 * This method is used by admin search.
 	 * @deprecated
 	 */
@@ -158,191 +149,6 @@ class AddonSettings_Controller extends Action_Controller
 		call_integration_hook('integrate_general_mod_settings', array(&$config_vars));
 
 		return $config_vars;
-	}
-
-	/**
-	 * Generates a list of integration hooks for display
-	 * Accessed through ?action=admin;area=modsettings;sa=hooks;
-	 * Allows for removal or disabing of selected hooks
-	 */
-	public function action_hooks()
-	{
-		global $scripturl, $context, $txt, $modSettings, $settings;
-
-		require_once(SUBSDIR . '/AddonSettings.subs.php');
-
-		$context['filter_url'] = '';
-		$context['current_filter'] = '';
-		$currentHooks = get_integration_hooks();
-		if (isset($_GET['filter']) && in_array($_GET['filter'], array_keys($currentHooks)))
-		{
-			$context['filter_url'] = ';filter=' . $_GET['filter'];
-			$context['current_filter'] = $_GET['filter'];
-		}
-
-		if (!empty($modSettings['handlinghooks_enabled']))
-		{
-			if (!empty($_REQUEST['do']) && isset($_REQUEST['hook']) && isset($_REQUEST['function']))
-			{
-				checkSession('request');
-				validateToken('admin-hook', 'request');
-
-				if ($_REQUEST['do'] == 'remove')
-					remove_integration_function($_REQUEST['hook'], urldecode($_REQUEST['function']));
-				else
-				{
-					if ($_REQUEST['do'] == 'disable')
-					{
-						// It's a hack I know...but I'm way too lazy!!!
-						$function_remove = $_REQUEST['function'];
-						$function_add = $_REQUEST['function'] . ']';
-					}
-					else
-					{
-						$function_remove = $_REQUEST['function'] . ']';
-						$function_add = $_REQUEST['function'];
-					}
-					$file = !empty($_REQUEST['includedfile']) ? urldecode($_REQUEST['includedfile']) : '';
-
-					remove_integration_function($_REQUEST['hook'], $function_remove, $file);
-					add_integration_function($_REQUEST['hook'], $function_add, $file);
-
-					redirectexit('action=admin;area=modsettings;sa=hooks' . $context['filter_url']);
-				}
-			}
-		}
-
-		$list_options = array(
-			'id' => 'list_integration_hooks',
-			'title' => $txt['hooks_title_list'],
-			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=admin;area=modsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'default_sort_col' => 'hook_name',
-			'get_items' => array(
-				'function' => array($this, 'list_getIntegrationHooks'),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_getIntegrationHooksCount'),
-			),
-			'no_items_label' => $txt['hooks_no_hooks'],
-			'columns' => array(
-				'hook_name' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_hook_name'],
-					),
-					'data' => array(
-						'db' => 'hook_name',
-					),
-					'sort' =>  array(
-						'default' => 'hook_name',
-						'reverse' => 'hook_name DESC',
-					),
-				),
-				'function_name' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_function_name'],
-					),
-					'data' => array(
-						'function' => create_function('$data', '
-							global $txt;
-
-							if (!empty($data[\'included_file\']))
-								return $txt[\'hooks_field_function\'] . \': \' . $data[\'real_function\'] . \'<br />\' . $txt[\'hooks_field_included_file\'] . \': \' . $data[\'included_file\'];
-							else
-								return $data[\'real_function\'];
-						'),
-					),
-					'sort' =>  array(
-						'default' => 'function_name',
-						'reverse' => 'function_name DESC',
-					),
-				),
-				'file_name' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_file_name'],
-					),
-					'data' => array(
-						'db' => 'file_name',
-					),
-					'sort' =>  array(
-						'default' => 'file_name',
-						'reverse' => 'file_name DESC',
-					),
-				),
-				'status' => array(
-					'header' => array(
-						'value' => $txt['hooks_field_hook_exists'],
-						'style' => 'width:3%;',
-					),
-					'data' => array(
-						'function' => create_function('$data', '
-							global $txt, $settings, $scripturl, $context;
-
-							$change_status = array(\'before\' => \'\', \'after\' => \'\');
-							if ($data[\'can_be_disabled\'] && $data[\'status\'] != \'deny\')
-							{
-								$change_status[\'before\'] = \'<a href="\' . $scripturl . \'?action=admin;area=modsettings;sa=hooks;do=\' . ($data[\'enabled\'] ? \'disable\' : \'enable\') . \';hook=\' . $data[\'hook_name\'] . \';function=\' . $data[\'real_function\'] . (!empty($data[\'included_file\']) ? \';includedfile=\' . urlencode($data[\'included_file\']) : \'\') . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">\';
-								$change_status[\'after\'] = \'</a>\';
-							}
-							return $change_status[\'before\'] . \'<img src="\' . $settings[\'images_url\'] . \'/admin/post_moderation_\' . $data[\'status\'] . \'.png" alt="\' . $data[\'img_text\'] . \'" title="\' . $data[\'img_text\'] . \'" />\' . $change_status[\'after\'];
-						'),
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'status',
-						'reverse' => 'status DESC',
-					),
-				),
-			),
-			'additional_rows' => array(
-				array(
-					'position' => 'after_title',
-					'value' => $txt['hooks_disable_instructions'] . '<br />
-						' . $txt['hooks_disable_legend'] . ':
-										<ul style="list-style: none;">
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_allow.png" alt="' . $txt['hooks_active'] . '" title="' . $txt['hooks_active'] . '" /> ' . $txt['hooks_disable_legend_exists'] . '</li>
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" alt="' . $txt['hooks_disabled'] . '" title="' . $txt['hooks_disabled'] . '" /> ' . $txt['hooks_disable_legend_disabled'] . '</li>
-						<li><img src="' . $settings['images_url'] . '/admin/post_moderation_deny.png" alt="' . $txt['hooks_missing'] . '" title="' . $txt['hooks_missing'] . '" /> ' . $txt['hooks_disable_legend_missing'] . '</li>
-					</ul>'
-				),
-			),
-		);
-
-		if (!empty($modSettings['handlinghooks_enabled']))
-		{
-			createToken('admin-hook', 'request');
-
-			$list_options['columns']['remove'] = array(
-				'header' => array(
-					'value' => $txt['hooks_button_remove'],
-					'style' => 'width:3%',
-				),
-				'data' => array(
-					'function' => create_function('$data', '
-						global $txt, $settings, $scripturl, $context;
-
-						if (!$data[\'hook_exists\'])
-							return \'
-							<a href="\' . $scripturl . \'?action=admin;area=modsettings;sa=hooks;do=remove;hook=\' . $data[\'hook_name\'] . \';function=\' . urlencode($data[\'function_name\']) . $context[\'filter_url\'] . \';\' . $context[\'admin-hook_token_var\'] . \'=\' . $context[\'admin-hook_token\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'" onclick="return confirm(\' . javaScriptEscape($txt[\'quickmod_confirm\']) . \');">
-								<img src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="\' . $txt[\'hooks_button_remove\'] . \'" title="\' . $txt[\'hooks_button_remove\'] . \'" />
-							</a>\';
-					'),
-					'class' => 'centertext',
-				),
-			);
-			$list_options['form'] = array(
-				'href' => $scripturl . '?action=admin;area=modsettings;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'name' => 'list_integration_hooks',
-			);
-		}
-
-
-		require_once(SUBSDIR . '/List.subs.php');
-		createList($list_options);
-
-		$context['page_title'] = $txt['hooks_title_list'];
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'list_integration_hooks';
 	}
 
 	/**
@@ -367,32 +173,5 @@ class AddonSettings_Controller extends Action_Controller
 		// By default do the basic settings.
 		$_REQUEST['sa'] = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (!empty($defaultAction) ? $defaultAction : array_pop($temp = array_keys($subActions)));
 		$context['sub_action'] = $_REQUEST['sa'];
-	}
-
-	/**
-	 * Simply returns the total count of integration hooks
-	 * Callback for createList().
-	 *
-	 * @return int
-	 */
-	function list_getIntegrationHooksCount()
-	{
-		global $context;
-
-		$context['filter'] = false;
-		if (isset($_GET['filter']))
-			$context['filter'] = $_GET['filter'];
-
-		return integration_hooks_count($context['filter']);
-	}
-
-	/**
-	 * Callback for createList().
-	 *
-	 * @return array
-	 */
-	function list_getIntegrationHooks($start, $per_page, $sort)
-	{
-		return list_integration_hooks_data($start, $per_page, $sort);
 	}
 }

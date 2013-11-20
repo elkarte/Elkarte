@@ -17,9 +17,9 @@
  *
  * Adding options to one of the setting screens isn't hard. Call prepareDBSettingsContext;
  * The basic format for a checkbox is:
- * 		array('check', 'nameInModSettingsAndSQL'),
+ *    array('check', 'nameInModSettingsAndSQL'),
  * And for a text box:
- * 		array('text', 'nameInModSettingsAndSQL')
+ *    array('text', 'nameInModSettingsAndSQL')
  * (NOTE: You have to add an entry for this at the bottom!)
  *
  * In these cases, it will look for $txt['nameInModSettingsAndSQL'] as the description,
@@ -28,33 +28,33 @@
  * Here's a quick explanation of how to add a new item:
  *
  * - A text input box.  For textual values.
- * 		array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('text', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A text input box.  For numerical values.
- * 		array('int', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('int', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A text input box.  For floating point values.
- * 		array('float', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('float', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A large text input box. Used for textual values spanning multiple lines.
- * 		array('large_text', 'nameInModSettingsAndSQL', 'OptionalNumberOfRows'),
+ *    array('large_text', 'nameInModSettingsAndSQL', 'OptionalNumberOfRows'),
  * - A check box.  Either one or zero. (boolean)
- * 		array('check', 'nameInModSettingsAndSQL'),
+ *    array('check', 'nameInModSettingsAndSQL'),
  * - A selection box.  Used for the selection of something from a list.
- * 		array('select', 'nameInModSettingsAndSQL', array('valueForSQL' => $txt['displayedValue'])),
- * 		Note that just saying array('first', 'second') will put 0 in the SQL for 'first'.
+ *    array('select', 'nameInModSettingsAndSQL', array('valueForSQL' => $txt['displayedValue'])),
+ *    Note that just saying array('first', 'second') will put 0 in the SQL for 'first'.
  * - A password input box. Used for passwords, no less!
- * 		array('password', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
+ *    array('password', 'nameInModSettingsAndSQL', 'OptionalInputBoxWidth'),
  * - A permission - for picking groups who have a permission.
- * 		array('permissions', 'manage_groups'),
+ *    array('permissions', 'manage_groups'),
  * - A BBC selection box.
- * 		array('bbc', 'sig_bbc'),
+ *    array('bbc', 'sig_bbc'),
  *
  * For each option:
- * 	- type (see above), variable name, size/possible values.
- * 	  OR make type '' for an empty string for a horizontal rule.
+ *  - type (see above), variable name, size/possible values.
+ *    OR make type '' for an empty string for a horizontal rule.
  *  - SET preinput - to put some HTML prior to the input box.
  *  - SET postinput - to put some HTML following the input box.
  *  - SET invalid - to mark the data as invalid.
  *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
- *  	array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
+ *    array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
  *
  */
 
@@ -79,21 +79,21 @@ class Settings_Form
 	/**
 	 * Helper method, it sets up the context for the settings.
 	 * - The basic usage of the six numbered key fields are
-	 * - array (0 ,1, 2, 3, 4, 5
-	 *		0 variable name - the name of the saved variable
-	 *		1 label - the text to show on the settings page
-	 *		2 saveto - file or db, where to save the variable name - value pair
-	 *		3 type - type of data to save, int, float, text, check
-	 *		4 size - false or field size
-	 *		5 help - '' or helptxt variable name
-	 *	)
+	 * - array(0 ,1, 2, 3, 4, 5
+	 *    0 variable name - the name of the saved variable
+	 *    1 label - the text to show on the settings page
+	 *    2 saveto - file or db, where to save the variable name - value pair
+	 *    3 type - type of data to save, int, float, text, check
+	 *    4 size - false or field size
+	 *    5 help - '' or helptxt variable name
+	 *  )
 	 *
 	 * the following named keys are also permitted
 	 * 'disabled' => 'postinput' => 'preinput' =>
 	 *
 	 * @param array $config_vars
 	 */
-	function prepare_file()
+	public function prepare_file()
 	{
 		global $context, $modSettings;
 
@@ -103,6 +103,7 @@ class Settings_Form
 			'sourcedir',
 			'cachedir',
 		);
+
 		foreach ($this->_config_vars as $identifier => $config_var)
 		{
 			if (!is_array($config_var) || !isset($config_var[1]))
@@ -130,7 +131,7 @@ class Settings_Form
 					'size' => empty($config_var[4]) ? 0 : $config_var[4],
 					'data' => isset($config_var[4]) && is_array($config_var[4]) && $config_var[3] != 'select' ? $config_var[4] : array(),
 					'name' => $config_var[0],
-					'value' => $config_var[2] == 'file' ? (in_array($varname, $defines) ? constant(strtoupper($varname)): htmlspecialchars($$varname)) : (isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]]) : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
+					'value' => $config_var[2] == 'file' ? (in_array($varname, $defines) ? constant(strtoupper($varname)) : htmlspecialchars($$varname, ENT_COMPAT, 'UTF-8')) : (isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]], ENT_COMPAT, 'UTF-8') : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
 					'disabled' => !empty($context['settings_not_writable']) || !empty($config_var['disabled']),
 					'invalid' => false,
 					'subtext' => !empty($config_var['subtext']) ? $config_var['subtext'] : $subtext,
@@ -161,10 +162,10 @@ class Settings_Form
 	}
 
 	/**
-	* Helper method, it sets up the context for database settings.
-	*
-	* @param array $config_vars
-	*/
+	 * Helper method, it sets up the context for database settings.
+	 *
+	 * @param array $config_vars
+	 */
 	static function prepare_db(&$config_vars)
 	{
 		global $txt, $helptxt, $context, $modSettings;
@@ -197,12 +198,12 @@ class Settings_Form
 
 				$context['config_vars'][$config_var[1]] = array(
 					'label' => isset($config_var['text_label']) ? $config_var['text_label'] : (isset($txt[$config_var[1]]) ? $txt[$config_var[1]] : (isset($config_var[3]) && !is_array($config_var[3]) ? $config_var[3] : '')),
-					'help' => isset($helptxt[$config_var[1]]) ? $config_var[1] : '',
+					'help' => isset($config_var['helptext']) ? $config_var['helptext'] : (isset($helptxt[$config_var[1]]) ? $config_var[1] : ''),
 					'type' => $config_var[0],
 					'size' => !empty($config_var[2]) && !is_array($config_var[2]) ? $config_var[2] : (in_array($config_var[0], array('int', 'float')) ? 6 : 0),
 					'data' => array(),
 					'name' => $config_var[1],
-					'value' => isset($modSettings[$config_var[1]]) ? ($config_var[0] == 'select' ? $modSettings[$config_var[1]] : htmlspecialchars($modSettings[$config_var[1]])) : (in_array($config_var[0], array('int', 'float')) ? 0 : ''),
+					'value' => isset($modSettings[$config_var[1]]) ? ($config_var[0] == 'select' ? $modSettings[$config_var[1]] : htmlspecialchars($modSettings[$config_var[1]], ENT_COMPAT, 'UTF-8')) : (in_array($config_var[0], array('int', 'float')) ? 0 : ''),
 					'disabled' => false,
 					'invalid' => !empty($config_var['invalid']),
 					'javascript' => '',
@@ -263,7 +264,7 @@ class Settings_Form
 		// If we have inline permissions we need to prep them.
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
-			// we'll need to initialize inline permissions sub-form
+			// We'll need to initialize inline permissions sub-form
 			require_once(SUBSDIR . '/Permission.subs.php');
 			InlinePermissions_Form::init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 		}
@@ -287,7 +288,8 @@ class Settings_Form
 			$context['bbc_columns'] = array();
 			$tagsPerColumn = ceil($totalTags / $numColumns);
 
-			$col = 0; $i = 0;
+			$col = 0;
+			$i = 0;
 			foreach ($bbcTags as $tag)
 			{
 				if ($i % $tagsPerColumn == 0 && $i != 0)
@@ -327,8 +329,8 @@ class Settings_Form
 	 * - Contains arrays of the types of data to save into Settings.php.
 	 *
 	 * @param array $config_vars
-	*/
-	function save()
+	 */
+	public function save()
 	{
 		validateToken('admin-ssc');
 
@@ -352,6 +354,7 @@ class Settings_Form
 		$config_passwords = array(
 			'db_passwd',
 			'ssi_db_passwd',
+			'cache_password',
 		);
 
 		// All the strings to write.
@@ -361,7 +364,7 @@ class Settings_Form
 			'cookiename',
 			'webmaster_email',
 			'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
-			'cache_accelerator', 'cache_memcached',
+			'cache_accelerator', 'cache_memcached', 'cache_uid',
 		);
 
 		// All the numeric variables.
@@ -425,10 +428,10 @@ class Settings_Form
 	}
 
 	/**
-	* Helper method for saving database settings.
-	*
-	* @param array $config_vars
-	*/
+	 * Helper method for saving database settings.
+	 *
+	 * @param array $config_vars
+	 */
 	static function save_db(&$config_vars)
 	{
 		validateToken('admin-dbsc');
@@ -519,7 +522,7 @@ class Settings_Form
 	 *   new settings file fail
 	 *
 	 * @param array $config_vars
-	*/
+	 */
 	static function save_file($config_vars)
 	{
 		global $context;
@@ -676,7 +679,7 @@ class Settings_Form
 	 *
 	 * @param array $config_vars = null array of config vars, if null the method returns the current configuration
 	 */
-	function settings($config_vars = null)
+	public function settings($config_vars = null)
 	{
 		if (is_null($config_vars))
 		{
@@ -686,7 +689,7 @@ class Settings_Form
 		else
 		{
 			// We got presents :P
-			$this->_config_vars = is_array($config_vars) ? $config_vars : array ($config_vars);
+			$this->_config_vars = is_array($config_vars) ? $config_vars : array($config_vars);
 			return $this->_config_vars;
 		}
 	}

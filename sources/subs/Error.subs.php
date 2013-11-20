@@ -88,7 +88,6 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	$db = database();
 
-	$db = database();
 	// Find and sort out the errors.
 	$request = $db->query('', '
 		SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
@@ -120,7 +119,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 			'time' => standardTime($row['log_time']),
 			'timestamp' => $row['log_time'],
 			'url' => array(
-				'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url']),
+				'html' => htmlspecialchars((substr($row['url'], 0, 1) == '?' ? $scripturl : '') . $row['url'], ENT_COMPAT, 'UTF-8'),
 				'href' => base64_encode($db->escape_wildcard_string($row['url']))
 			),
 			'message' => array(
@@ -171,7 +170,6 @@ function fetchErrorsByType($filter = null, $sort = null)
 	$sum = 0;
 	$types = array();
 
-	$db = database();
 	// What type of errors do we have and how many do we have?
 	$request = $db->query('', '
 		SELECT error_type, COUNT(*) AS num_errors

@@ -37,11 +37,12 @@ function ml_CustomProfile()
 
 	// Find any custom profile fields that are to be shown for the memberlist?
 	$request = $db->query('', '
-		SELECT col_name, field_name, field_desc, field_type, bbc, enclose
+		SELECT col_name, field_name, field_desc, field_type, bbc, enclose, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE active = {int:active}
 			AND show_memberlist = {int:show}
-			AND private < {int:private_level}',
+			AND private < {int:private_level}
+		ORDER BY vieworder',
 		array(
 			'active' => 1,
 			'show' => 1,
@@ -67,18 +68,18 @@ function ml_CustomProfile()
 			// Build the sort queries.
 			if ($row['field_type'] != 'check')
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 'LENGTH(t' . $curField . '.value) > 0 ASC, IFNULL(t' . $curField . '.value, 1=1) DESC, t' . $curField . '.value DESC',
-					'up' => 'LENGTH(t' . $curField . '.value) > 0 DESC, IFNULL(t' . $curField . '.value, 1=1) ASC, t' . $curField . '.value ASC'
+					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, IFNULL(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
+					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, IFNULL(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
 				);
 			else
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 't' . $curField . '.value DESC',
-					'up' => 't' . $curField . '.value ASC'
+					'down' => 'cfd' . $curField . '.value DESC',
+					'up' => 'cfd' . $curField . '.value ASC'
 				);
 
 			// Build the join and parameters for the sort query
-			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}themes AS t' . $curField . ' ON (t' . $curField . '.variable = {string:t' . $curField . '} AND t' . $curField . '.id_theme = 1 AND t' . $curField . '.id_member = mem.id_member)';
-			$context['custom_profile_fields']['parameters']['t' . $curField] = $row['col_name'];
+			$context['custom_profile_fields']['join'] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_theme = 1 AND cfd' . $curField . '.id_member = mem.id_member)';
+			$context['custom_profile_fields']['parameters']['cfd' . $curField] = $row['col_name'];
 		}
 	}
 	$db->free_result($request);
@@ -119,7 +120,7 @@ function ml_memberCache($cache_step_size)
 	for ($i = 0, $n = $db->num_rows($request); $i < $n; $i += $cache_step_size)
 	{
 		$db->data_seek($request, $i);
-		list($memberlist_cache['index'][$i]) = $db->fetch_row($request);
+		list ($memberlist_cache['index'][$i]) = $db->fetch_row($request);
 	}
 
 	// Set the last one
@@ -197,7 +198,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
 	// Select the members from the database.
 	$request = $db->query('', '
 		SELECT mem.id_member
-		FROM {db_prefix}members AS mem' . ($sort === 'is_online' ? '
+		FROM {db_prefix}members AS mem' . ($sort === 'online' ? '
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)' : ($sort === 'id_group' ? '
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' : '')) . '
 			' . (!empty($context['custom_profile_fields']['join']) ? $context['custom_profile_fields']['join'] : '') . '
@@ -222,7 +223,7 @@ function ml_selectMembers($query_parameters, $where = '', $limit = 0, $sort = ''
  * @param int $limit
  * @param string $sort
  */
-function ml_searchMembers($query_parameters, $customJoin= '', $where = '', $limit = 0)
+function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $limit = 0)
 {
 	global $modSettings;
 

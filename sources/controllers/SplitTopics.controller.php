@@ -41,7 +41,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * requires the split_any permission.
 	 * is accessed with ?action=splittopics.
 	 */
-	function action_splittopics()
+	public function action_splittopics()
 	{
 		global $topic;
 
@@ -49,27 +49,27 @@ class SplitTopics_Controller extends Action_Controller
 		if (empty($topic))
 			fatal_lang_error('numbers_one_to_nine', false);
 
-		// Are you allowed to split topics?
-		isAllowedTo('split_any');
-
-		// Load up the "dependencies" - the template, getMsgMemberID(), and sendNotifications().
+		// Load up the "dependencies" - the template, getMsgMemberID().
 		if (!isset($_REQUEST['xml']))
 			loadTemplate('SplitTopics');
+
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Action.class.php');
 
 		$subActions = array(
-			'selectTopics' => 'action_splitSelectTopics',
-			'execute' => 'action_splitExecute',
-			'index' => 'action_splitIndex',
-			'splitSelection' => 'action_splitSelection',
+			'selectTopics' => array($this, 'action_splitSelectTopics', 'permission' => 'split_any'),
+			'execute' => array($this, 'action_splitExecute', 'permission' => 'split_any'),
+			'index' => array($this, 'action_splitIndex', 'permission' => 'split_any'),
+			'splitSelection' => array($this, 'action_splitSelection', 'permission' => 'split_any'),
 		);
 
 		// ?action=splittopics;sa=LETSBREAKIT won't work, sorry.
-		if (empty($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-			$this->action_splitIndex();
-		else
-			$this->{$subActions[$_REQUEST['sa']]}();
+		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'index';
+
+		$action = new Action();
+		$action->initialize($subActions, 'index');
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * the first message of a topic.
 	 * shows the user three ways to split the current topic.
 	 */
-	function action_splitIndex()
+	public function action_splitIndex()
 	{
 		global $txt, $topic, $context, $modSettings;
 
@@ -129,7 +129,7 @@ class SplitTopics_Controller extends Action_Controller
 			'subject' => $messageInfo['subject']
 		);
 		$context['sub_template'] = 'ask';
-		$context['page_title'] = $txt['split'];
+		$context['page_title'] = $txt['split_topic'];
 	}
 
 	/**
@@ -142,7 +142,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * (3) select topics to split (redirects to action_splitSelectTopics()).
 	 * uses splitTopic function to do the actual splitting.
 	 */
-	function action_splitExecute()
+	public function action_splitExecute()
 	{
 		global $txt, $context, $topic;
 
@@ -199,7 +199,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $this->_new_topic_subject);
-		$context['page_title'] = $txt['split'];
+		$context['page_title'] = $txt['split_topic'];
 
 		splitAttemptMove($boards, $context['new_topic']);
 	}
@@ -210,7 +210,7 @@ class SplitTopics_Controller extends Action_Controller
 	 * uses the main SplitTopics template.
 	 * uses splitTopic function to do the actual splitting.
 	 */
-	function action_splitSelection()
+	public function action_splitSelection()
 	{
 		global $txt, $topic, $context;
 
@@ -244,7 +244,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
-		$context['page_title'] = $txt['split'];
+		$context['page_title'] = $txt['split_topic'];
 
 		splitAttemptMove($boards, $context['new_topic']);
 	}
@@ -259,11 +259,11 @@ class SplitTopics_Controller extends Action_Controller
 	 * shows two independent page indexes for both the selected and
 	 * not-selected messages (;topic=1.x;start2=y).
 	 */
-	function action_splitSelectTopics()
+	public function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $options;
 
-		$context['page_title'] = $txt['split'] . ' - ' . $txt['select_split_posts'];
+		$context['page_title'] = $txt['split_topic'] . ' - ' . $txt['select_split_posts'];
 		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
 
 		// Haven't selected anything have we?

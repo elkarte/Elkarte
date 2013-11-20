@@ -1,8 +1,8 @@
-.catbg, tr.catbg td {
+.category_header {
 	background-color: #6d92aa;
 	color: #fff;
 }
-.titlebg, .titlebg a, .titlebg a:link, .titlebg a:visited {
+.secondary_header, .secondary_header a, .secondary_header a:link, .secondary_header a:visited {
 	background-color: #b6dbff;
 	color: #000;
 	text-decoration: none;
