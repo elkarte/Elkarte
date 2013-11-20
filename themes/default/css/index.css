@@ -569,7 +569,7 @@ div.windowbg, div.windowbg2 {
 }
 
 /* Lotsa boxes. */
-.description, .information, .warningbox, .successbox {
+.description, .information, .warningbox, .successbox, .infobox {
 	margin: 0 0 12px 0;
 	padding: 6px 12px;
 	border: 1px solid #ccc;
@@ -595,6 +595,12 @@ div.windowbg, div.windowbg2 {
 	border-top: 1px solid green;
 	border-bottom: 1px solid green;
 	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
+}
+.infobox {
+	padding-left: 35px;
+	border-top: 1px solid blue;
+	border-bottom: 1px solid blue;
+	background: #eef url(../images/icons/quick_sticky.png) 10px 50% no-repeat;
 }
 
 /* Used for sections that need somewhat larger corners */

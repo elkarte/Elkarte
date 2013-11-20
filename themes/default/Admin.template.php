@@ -855,7 +855,7 @@ function template_show_settings()
 			$context['settings_message'] = array($context['settings_message']);
 
 		echo '
-			<div class="', (empty($context['error_type']) ? 'successbox' : ($context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" id="errors">
+			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" id="errors">
 				<ul>
 					<li>', implode('</li><li>', $context['settings_message']), '</li>
 				</ul>
