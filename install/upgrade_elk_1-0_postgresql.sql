@@ -100,22 +100,11 @@ while (!$is_done)
 	{
 		// The current folder and name
 		$current_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$row['id_folder']] : $modSettings['attachmentUploadDir'];
+		$current_name = $current_folder . '/' . $row['id_attach'] . '_' . $file_hash;
 
-		// The old location of the file.
-		$old_location = getLegacyAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder']);
-
-		// The new file name.
-		$file_hash = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], true);
-
-		// And we try to move it.
-		rename($old_location, $current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk');
-
-		// Only update thif if it was successful.
-		if (file_exists($current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk') && !file_exists($old_location))
-			upgrade_query("
-				UPDATE {$db_prefix}attachments
-				SET file_hash = '$file_hash'
-				WHERE id_attach = $row[id_attach]");
+		// And we try to rename it.
+		if (substr($current_name, -4) != '.elk')
+			@rename($current_name, $current_name . '.elk');
 	}
 	$db->free_result($request);
 
