@@ -2194,7 +2194,7 @@ function template_warning_divs()
 	// A warning message?
 	elseif (!empty($incontext['warning']))
 		echo '
-		<div class="noticebox">
+		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 			<div>
 				', $incontext['warning'], '

@@ -117,7 +117,7 @@ function template_maintenance()
 
 	if (!empty($context['results']))
 		echo '
-		<div class="noticebox">', $context['results'], '</div>';
+		<div class="warningbox">', $context['results'], '</div>';
 
 	echo '
 		<div class="windowbg">

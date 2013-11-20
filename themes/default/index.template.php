@@ -343,11 +343,11 @@ function template_body_above()
 	// Are there any members waiting for approval?
 	if (!empty($context['unapproved_members']))
 		echo '
-		<div class="modtask noticebox">', $context['unapproved_members_text'], '</div>';
+		<div class="modtask warningbox">', $context['unapproved_members_text'], '</div>';
 
 	if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
 		echo '
-		<div class="modtask noticebox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
+		<div class="modtask warningbox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
 
 	// The main content should go here. @todo - Skip nav link.
 	echo '
@@ -605,7 +605,7 @@ function template_show_error($error_id)
 	$error = $context[$error_id];
 
 	echo '
-					<div class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+					<div class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
 
 	// Optional title for our results
 	if (!empty($error['title']))

@@ -3269,7 +3269,7 @@ function template_admin_warning_above()
 	if (!empty($context['security_controls']['admin_session']) || !empty($context['security_controls']['maintenance']))
 	{
 		echo '
-			<div class="noticebox">';
+			<div class="warningbox">';
 
 		if (!empty($context['security_controls']['admin_session']))
 			echo

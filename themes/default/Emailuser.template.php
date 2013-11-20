@@ -214,7 +214,7 @@ function template_report()
 	template_show_error('report_error');
 
 	echo '
-						<p class="noticebox">', $txt['report_to_mod_func'], '</p>
+						<p class="warningbox">', $txt['report_to_mod_func'], '</p>
 						<br />
 						<dl class="settings" id="report_post">';
 

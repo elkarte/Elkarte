@@ -61,7 +61,7 @@ function template_maintain_database()
 				<div class="errorbox">', $txt['safe_mode_enabled'], '</div>';
 	else
 		echo '
-					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'noticebox', '">
+					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'warningbox', '">
 					', $txt[$context['suggested_method']],
 		$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
 		'</div>';
@@ -508,7 +508,7 @@ function template_convert_msgbody()
 	if (!empty($context['exceeding_messages']))
 	{
 		echo '
-				<p class="noticebox">', $txt['exceeding_messages'], '
+				<p class="warningbox">', $txt['exceeding_messages'], '
 				<ul>
 					<li>
 					', implode('</li><li>', $context['exceeding_messages']), '

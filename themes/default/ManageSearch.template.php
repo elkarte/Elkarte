@@ -133,7 +133,7 @@ function template_select_search_method()
 
 	echo '
 					</dl>
-					', $context['double_index'] ? '<div class="noticebox">
+					', $context['double_index'] ? '<div class="warningbox">
 					' . $txt['search_double_index'] . '</div>' : '', '
 					<fieldset class="search_settings">
 						<legend>', $txt['search_index'], '</legend>
@@ -448,7 +448,7 @@ function template_manage_sphinx()
 	if (!empty($context['settings_message']))
 	{
 		echo '
-			<div class="', (empty($context['error_type']) ? 'successbox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
+			<div class="', (empty($context['error_type']) ? 'successbox' : ($context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" id="errors">
 				<ul>
 					<li>', implode('</li><li>', $context['settings_message']), '</li>
 				</ul>

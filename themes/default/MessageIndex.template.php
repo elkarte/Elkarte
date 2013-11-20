@@ -159,7 +159,7 @@ function template_main()
 		{
 			echo '
 			<li class="basic_row">
-				<div class="noticebox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
+				<div class="warningbox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
 			</li>';
 		}
 

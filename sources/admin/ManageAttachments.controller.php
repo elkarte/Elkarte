@@ -1468,7 +1468,7 @@ class ManageAttachments_Controller extends Action_Controller
 					'position' => 'top_of_list',
 					'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['dir']),
 					'style' => 'padding-left: 35px;',
-					'class' => 'noticebox',
+					'class' => 'warningbox',
 				),
 			),
 		);
@@ -1546,7 +1546,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'position' => 'top_of_list',
 						'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['base']),
 						'style' => 'padding-left: 35px',
-						'class' => 'noticebox',
+						'class' => 'warningbox',
 					),
 				),
 			);

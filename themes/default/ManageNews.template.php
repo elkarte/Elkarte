@@ -220,7 +220,7 @@ function template_email_members_compose()
 				', $txt['email_variables'], '
 			</div>
 			<div class="windowbg">
-				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'noticebox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
+				<div class="', empty($context['error_type']) || $context['error_type'] != 'serious' ? 'warningbox' : 'errorbox', '"', empty($context['post_error']['messages']) ? ' style="display: none"' : '', ' id="errors">
 					<dl>
 						<dt>
 							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>

@@ -92,7 +92,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 }
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
 .wrapper, div.windowbg, div.windowbg2,
-.roundframe, .description, .information, .successbox, .noticebox,
+.roundframe, .description, .information, .successbox, .warningbox,
 .category_header, .generic_list_wrapper, .submitbutton {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -569,7 +569,7 @@ div.windowbg, div.windowbg2 {
 }
 
 /* Lotsa boxes. */
-.description, .information, .noticebox, .successbox {
+.description, .information, .warningbox, .successbox {
 	margin: 0 0 12px 0;
 	padding: 6px 12px;
 	border: 1px solid #ccc;
@@ -584,7 +584,7 @@ div.windowbg, div.windowbg2 {
 	padding: 12px;
 }
 /* More little boxes on a hillside. */
-.noticebox {
+.warningbox {
 	padding-left: 35px;
 	border-top: 1px solid #ffd324;
 	border-bottom: 1px solid #ffd324;
