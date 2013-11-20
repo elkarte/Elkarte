@@ -1317,8 +1317,8 @@ CREATE TABLE {$db_prefix}membergroups (
 
 INSERT INTO {$db_prefix}membergroups
 	(id_group, group_name, description, online_color, min_posts, icons, group_type)
-VALUES (1, '{$default_administrator_group}', '', '#FF0000', -1, '5#iconadmin.png', 1),
-	(2, '{$default_global_moderator_group}', '', '#0000FF', -1, '5#icongmod.png', 0),
+VALUES (1, '{$default_administrator_group}', '', '#CD0000', -1, '5#iconadmin.png', 1),
+	(2, '{$default_global_moderator_group}', '', '#0066FF', -1, '5#icongmod.png', 0),
 	(3, '{$default_moderator_group}', '', '', -1, '5#iconmod.png', 0),
 	(4, '{$default_newbie_group}', '', '', 0, '1#icon.png', 0),
 	(5, '{$default_junior_group}', '', '', 50, '2#icon.png', 0),
