@@ -598,9 +598,9 @@ div.windowbg, div.windowbg2 {
 }
 .infobox {
 	padding-left: 35px;
-	border-top: 1px solid blue;
-	border-bottom: 1px solid blue;
-	background: #eef url(../images/icons/quick_sticky.png) 10px 50% no-repeat;
+	border-top: 1px solid #3a87ad;
+	border-bottom: 1px solid #3a87ad;
+	background: #d9edf7 url(../images/icons/quick_sticky.png) 10px 50% no-repeat;
 }
 
 /* Used for sections that need somewhat larger corners */
