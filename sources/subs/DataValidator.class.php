@@ -324,6 +324,9 @@ class Data_Validator
 	 */
 	private function _validate_recursive($input, $field, $rules)
 	{
+		if (!isset($input[$field]))
+			return;
+
 		$sub_validator = new Data_Validator();
 		$fields = array();
 		if ($this->_datatype[$field] === 'array')
