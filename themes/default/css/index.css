@@ -1939,6 +1939,9 @@ img.new_posts {
 #description_board .generalinfo .listlevel2 {
 	white-space:nowrap;
 }
+#description_board .generalinfo {
+	overflow: auto;
+}
 .topic_listing {
 	background: #e4e4e4;
 	box-shadow: 1px 2px 4px #eee;
