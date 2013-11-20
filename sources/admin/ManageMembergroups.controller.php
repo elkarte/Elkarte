@@ -376,7 +376,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			if ($_POST['perm_type'] == 'predefined')
 			{
 				// Set default permission level.
-				require_once(ADMINDIR . '/ManagePermissions.controller.php');
+				require_once(SUBSDIR . '/ManagePermissions.subs.php');
 				setPermissionLevel($_POST['level'], $id_group, null);
 			}
 			// Copy or inherit the permissions!
@@ -395,7 +395,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				}
 
 				// Don't allow copying of a real priviledged person!
-				require_once(ADMINDIR . '/ManagePermissions.controller.php');
+				require_once(SUBSDIR . '/Permissions.subs.php');
 				loadIllegalPermissions();
 
 				copyPermissions($id_group, $copy_id, $context['illegal_permissions']);
@@ -626,7 +626,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Do we need to set inherited permissions?
 			if ($group_inherit != -2 && $group_inherit != $_POST['old_inherit'])
 			{
-				require_once(ADMINDIR . '/ManagePermissions.controller.php');
+				require_once(SUBSDIR . '/Permission.subs.php');
 				updateChildPermissions($group_inherit);
 			}
 
