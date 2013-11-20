@@ -1802,6 +1802,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 
 	// Figure out what the template function is named.
 	$theme_function = 'template_' . $sub_template_name;
+
 	if (function_exists($theme_function))
 		$theme_function();
 	elseif ($fatal === false)
@@ -1952,6 +1953,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 			{
 				$params['local'] = true;
 				$params['dir'] = $settings['theme_dir'] . '/scripts/';
+				$params['url'] = $settings['theme_url'];
 
 				// Fallback if we are not already in the default theme
 				if ($params['fallback'] && ($settings['theme_dir'] !== $settings['default_theme_dir']) && !file_exists($settings['theme_dir'] . '/scripts/' . $filename))
@@ -1961,6 +1963,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 					{
 						$filename = $settings['default_theme_url'] . '/scripts/' . $filename . ($has_cache_staler ? '' : $params['stale']);
 						$params['dir'] = $settings['default_theme_dir'] . '/scripts/';
+						$params['url'] = $settings['default_theme_url'];
 					}
 					else
 						$filename = false;
@@ -1975,7 +1978,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
-					$context['debug']['javascript'][] = $params['basename'] . '(' . basename($params['dir']) . ')';
+					$context['debug']['javascript'][] = $params['basename'] . '(' . (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) . ')';
 			}
 		}
 
