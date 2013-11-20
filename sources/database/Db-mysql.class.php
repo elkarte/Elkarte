@@ -508,7 +508,8 @@ class Database_MySQL implements Database
 		// Decide which connection to use
 		$connection = $connection === null ? $this->_connection : $connection;
 
-		return mysqli_error($connection);
+		if (is_object($connection))
+			return mysqli_error($connection);
 	}
 
 	/**

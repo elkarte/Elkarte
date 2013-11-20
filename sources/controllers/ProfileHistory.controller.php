@@ -174,121 +174,28 @@ class ProfileHistory_Controller extends Action_Controller
 		require_once(SUBSDIR . '/List.class.php');
 		createList($listOptions);
 
-		// @todo cache this
-		// If this is a big forum, or a large posting user, let's limit the search.
-		if ($modSettings['totalMessages'] > 50000 && $user_profile[$memID]['posts'] > 500)
-		{
-			$request = $db->query('', '
-				SELECT MAX(id_msg)
-				FROM {db_prefix}messages AS m
-				WHERE m.id_member = {int:current_member}',
-				array(
-					'current_member' => $memID,
-				)
-			);
-			list ($max_msg_member) = $db->fetch_row($request);
-			$db->free_result($request);
-
-			// There's no point worrying ourselves with messages made yonks ago, just get recent ones!
-			$min_msg_member = max(0, $max_msg_member - $user_profile[$memID]['posts'] * 3);
-		}
-
-		// Default to at least the ones we know about.
-		$ips = array(
-			$user_profile[$memID]['member_ip'],
-			$user_profile[$memID]['member_ip2'],
-		);
-
-		// @todo cache this
 		// Get all IP addresses this user has used for his messages.
-		$request = $db->query('', '
-			SELECT poster_ip
-			FROM {db_prefix}messages
-			WHERE id_member = {int:current_member}
-			' . (isset($min_msg_member) ? '
-				AND id_msg >= {int:min_msg_member} AND id_msg <= {int:max_msg_member}' : '') . '
-			GROUP BY poster_ip',
-			array(
-				'current_member' => $memID,
-				'min_msg_member' => !empty($min_msg_member) ? $min_msg_member : 0,
-				'max_msg_member' => !empty($max_msg_member) ? $max_msg_member : 0,
-			)
-		);
+		$ips = getMembersIPs($memID);
 		$context['ips'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['poster_ip'] . ';u=' . $memID . '">' . $row['poster_ip'] . '</a>';
-			$ips[] = $row['poster_ip'];
-		}
-		$db->free_result($request);
-
-		// Now also get the IP addresses from the error messages.
-		$request = $db->query('', '
-			SELECT COUNT(*) AS error_count, ip
-			FROM {db_prefix}log_errors
-			WHERE id_member = {int:current_member}
-			GROUP BY ip',
-			array(
-				'current_member' => $memID,
-			)
-		);
 		$context['error_ips'] = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $row['ip'] . ';u=' . $memID . '">' . $row['ip'] . '</a>';
-			$ips[] = $row['ip'];
-		}
-		$db->free_result($request);
+
+		foreach ($ips['message_ips'] as $ip)
+			$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $memID . '">' . $ip . '</a>';
+
+		foreach ($ips['error_ips'] as $ip)
+			$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $memID . '">' . $ip . '</a>';
 
 		// Find other users that might use the same IP.
 		$context['members_in_range'] = array();
 
-		$ips = array_unique($ips);
-		if (!empty($ips))
+		$all_ips = array_unique(array_merge($ips['message_ips'], $ips['error_ips']));
+		if (!empty($all_ips))
 		{
-			// Get member ID's which are in messages...
-			$request = $db->query('', '
-				SELECT mem.id_member
-				FROM {db_prefix}messages AS m
-					INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				WHERE m.poster_ip IN ({array_string:ip_list})
-				GROUP BY mem.id_member
-				HAVING mem.id_member != {int:current_member}',
-				array(
-					'current_member' => $memID,
-					'ip_list' => $ips,
-				)
-			);
-			$message_members = array();
-			while ($row = $db->fetch_assoc($request))
-				$message_members[] = $row['id_member'];
-			$db->free_result($request);
-
-			// Fetch their names, cause of the GROUP BY doesn't like giving us that normally.
-			if (!empty($message_members))
-			{
-				require_once(SUBSDIR . '/Members.subs.php');
-
-				// Get the latest activated member's display name.
-				$result = getBasicMemberData($message_members);
-				foreach ($result as $row)
-					$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
-			}
-
-			$request = $db->query('', '
-				SELECT id_member, real_name
-				FROM {db_prefix}members
-				WHERE id_member != {int:current_member}
-					AND member_ip IN ({array_string:ip_list})',
-				array(
-					'current_member' => $memID,
-					'ip_list' => $ips,
-				)
-			);
-			while ($row = $db->fetch_assoc($request))
+			$members_in_range = getMembersInRange($all_ips, $memID);
+			foreach ($members_in_range as $row)
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
-			$db->free_result($request);
 		}
+
 		loadTemplate('ProfileHistory');
 		$context['sub_template'] = 'trackActivity';
 	}

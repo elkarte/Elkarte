@@ -465,7 +465,7 @@ class ManageMaillist_Controller extends Action_Controller
 				}
 
 				// And now any custom ones available for this moderator
-				$context['bounce_templates'] += array_merge($context['bounce_templates'], maillist_templates());
+				$context['bounce_templates'] += array_merge($context['bounce_templates'], maillist_templates('bnctpl', $txt['ml_bounce_template_subject_default']));
 
 				// Replace all the variables in the templates
 				foreach ($context['bounce_templates'] as $k => $name)

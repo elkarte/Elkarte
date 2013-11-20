@@ -354,9 +354,12 @@ function enable_maillist_imap_cron($switch)
 }
 
 /**
- * Load in the custom (public an this users private) bounce email templates
+ * Load in the custom (public an this users private) email templates
+ *
+ * @param string $template_type - the type of template (e.g. 'bounce', 'warntpl', etc.)
+ * @param string $subject - A subject for the template
  */
-function maillist_templates()
+function maillist_templates($template_type, $subject = null)
 {
 	global $user_info, $txt;
 
@@ -370,18 +373,22 @@ function maillist_templates()
 		WHERE comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
-			'tpltype' => 'bnctpl',
+			'tpltype' => $comment_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		$notification_templates[] = array(
+		$template = array(
 			'title' => $row['template_title'],
 			'body' => $row['body'],
-			'subject' => $txt['ml_bounce_template_subject_default'],
 		);
+
+		if ($subject !== null)
+			$template['subject'] = $subject;
+
+		$notification_templates[] = $template;
 	}
 	$db->free_result($request);
 

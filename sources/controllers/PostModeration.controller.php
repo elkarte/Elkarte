@@ -183,9 +183,9 @@ class PostModeration_Controller extends Action_Controller
 			if (!empty($toAction))
 			{
 				if ($curAction == 'approve')
-					approveMessages ($toAction, $details, $context['current_view']);
+					approveMessages($toAction, $details, $context['current_view']);
 				else
-					removeMessages ($toAction, $details, $context['current_view']);
+					removeMessages($toAction, $details, $context['current_view']);
 
 				cache_put_data('num_menu_errors', null, 900);
 			}
