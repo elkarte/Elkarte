@@ -2,7 +2,7 @@
 // Version: 1.0; ManageSmileys
 
 $txt['smiley_sets_save'] = 'Save Changes';
-$txt['smiley_sets_add'] = 'New smiley Set';
+$txt['smiley_sets_add'] = 'New Smiley Set';
 $txt['smiley_sets_delete'] = 'Delete selected';
 $txt['smiley_sets_confirm'] = 'Are you sure you want to remove these smiley sets?\\n\\nNote: This won\\\'t remove the images, just the choices.';
 $txt['smiley_sets_none'] = 'There are currently no smiley sets.';
@@ -49,9 +49,9 @@ $txt['smiley_editsmileys_explain'] = 'Change your smileys here by clicking on th
 $txt['smiley_setorder_explain'] = 'Change the order of the smileys here.';
 $txt['smiley_addsmiley_explain'] = 'Here you can add a new smiley - either from an existing file or by uploading new ones.';
 
-$txt['smiley_set_select_default'] = 'Default Smiley set';
-$txt['smiley_set_new'] = 'Create new Smiley set';
-$txt['smiley_set_modify_existing'] = 'Modify existing Smiley set';
+$txt['smiley_set_select_default'] = 'Default Smiley Set';
+$txt['smiley_set_new'] = 'Create new Smiley Set';
+$txt['smiley_set_modify_existing'] = 'Modify existing Smiley Set';
 $txt['smiley_set_modify'] = 'Modify';
 $txt['smiley_set_import_directory'] = 'Import smileys already in this directory';
 $txt['smiley_set_import_single'] = 'There is one smiley in this smiley set not yet imported. Click';
