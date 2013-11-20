@@ -401,8 +401,8 @@ class ManageSecurity_Controller extends Action_Controller
 		// Any errors to display?
 		if ($context['invalid_badbehavior_httpbl_key'])
 		{
-			$context['settings_message'][] = $txt['setting_badbehavior_httpbl_key_invalid'];
-			$context['error_type'] = 'notice';
+			$context['settings_message'][] = $txt['badbehavior_httpbl_key_invalid'];
+			$context['error_type'] = 'warnig';
 		}
 
 		// Have we blocked anything in the last 7 days?
