@@ -58,8 +58,9 @@ function template_pm_above()
 							', $txt['pm_sent'], '
 						</div>';
 
-	echo '
-						<form action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
+	if (!empty($context['pm_form_url']))
+		echo '
+						<form action="', $context['pm_form_url'], '" method="post" accept-charset="UTF-8" name="pmFolder">';
 }
 
 /**
@@ -70,8 +71,8 @@ function template_pm_below()
 	global $context;
 
 	echo '
-							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						</form>
+							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['pm_form_url']) ? '
+						</form>' : '', '
 					</div>';
 }
 
