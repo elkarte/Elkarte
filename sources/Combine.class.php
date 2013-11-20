@@ -85,10 +85,6 @@ class Site_Combiner
 		// init
 		$this->_archive_dir = CACHEDIR;
 		$this->_archive_url = $boardurl . '/cache';
-
-		// Used to make calls to closure compiler
-		define('URL', 'http://closure-compiler.appspot.com/compile');
-		define('POST_HEADER', 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS');
 	}
 
 	/**
@@ -139,6 +135,8 @@ class Site_Combiner
 			$this->_combineFiles('js');
 
 			// Minify these files to save space,
+			define('URL', 'http://closure-compiler.appspot.com/compile');
+			define('POST_HEADER', 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS');
 			$this->_minified_cache = $this->_jsCompiler();
 
 			// And save them for future users
