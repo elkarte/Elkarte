@@ -428,7 +428,7 @@ class Data_Validator
 								$input[$field] = empty($input[$field]);
 								break;
 							case 'array':
-								is_array($input[$field]) ? $input[$field] : array($input[$field]);
+								$input[$field] = is_array($input[$field]) ? $input[$field] : array($input[$field]);
 								break;
 							case 'isset':
 								$input[$field] = isset($input[$field]);

@@ -1939,8 +1939,6 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 		$lastMin = $min_posts;
 	}
 
-	$members = is_array($members) ? $members : array($members);
-
 	// A big fat CASE WHEN... END is faster than a zillion UPDATE's ;).
 	$db->query('', '
 		UPDATE {db_prefix}members
@@ -1949,7 +1947,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 			END' . ($members !== null ? '
 		WHERE id_member IN ({array_int:members})' : ''),
 		array(
-			'members' => $members,
+			'members' => is_array($members) ? $members : array($members),
 		)
 	);
 }

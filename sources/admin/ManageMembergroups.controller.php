@@ -535,37 +535,53 @@ class ManageMembergroups_Controller extends Action_Controller
 			if (empty($current_group_id))
 				fatal_lang_error('membergroup_does_not_exist', false);
 
-			// Can they really inherit from this group?
-			if (isset($_POST['group_inherit']) && $_POST['group_inherit'] != -2 && !allowedTo('admin_forum'))
-			{
-				$group_inherit = (int) $_POST['group_inherit'];
-				$inherit_type = membergroupById($group_inherit);
-			}
+			require_once(SUBSDIR . '/DataValidator.class.php');
+			$validator = new Data_Validator();
 
-			// Set variables to their proper value.
-			// @todo probably avoid all this...
-			$_POST['max_messages'] = isset($_POST['max_messages']) ? (int) $_POST['max_messages'] : 0;
-			$_POST['min_posts'] = isset($_POST['min_posts']) && isset($_POST['group_type']) && $_POST['group_type'] == -1 && $current_group['id_group'] > 3 ? abs($_POST['min_posts']) : ($current_group['id_group'] == 4 ? 0 : -1);
-			$_POST['icons'] = (empty($_POST['icon_count']) || $_POST['icon_count'] < 0) ? '' : min((int) $_POST['icon_count'], 99) . '#' . $_POST['icon_image'];
-			$_POST['group_desc'] = isset($_POST['group_desc']) && ($current_group['id_group'] == 1 || (isset($_POST['group_type']) && $_POST['group_type'] != -1)) ? trim($_POST['group_desc']) : '';
-			$_POST['group_type'] = !isset($_POST['group_type']) || $_POST['group_type'] < 0 || $_POST['group_type'] > 3 || ($_POST['group_type'] == 1 && !allowedTo('admin_forum')) ? 0 : (int) $_POST['group_type'];
-			$_POST['group_hidden'] = empty($_POST['group_hidden']) || $_POST['min_posts'] != -1 || $current_group['id_group'] == 3 ? 0 : (int) $_POST['group_hidden'];
-			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? (int) $_POST['group_inherit'] : -2;
+			// Cleanup the inputs! :D
+			$validator->sanitation_rules(array(
+				'max_messages' => 'intval',
+				'min_posts' => 'intval|abs',
+				'group_type' => 'intval',
+				'group_desc' => 'trim|Util::htmlspecialchars',
+				'group_name' => 'trim|Util::htmlspecialchars',
+				'group_hidden' => 'intval',
+				'group_inherit' => 'intval',
+				'icon_count' => 'intval',
+				'icon_image' => 'trim|Util::htmlspecialchars',
+				'online_color' => 'trim|valid_color',
+			));
+			$validator->input_processing(array(
+				'boardaccess' => 'array',
+			));
+			$validator->validation_rules(array(
+				'boardaccess' => 'contains[allow,ignore,deny]',
+			));
+
+			$validator->validate($_POST);
+
+			// Can they really inherit from this group?
+			if ($validator->group_inherit != -2 && !allowedTo('admin_forum'))
+				$inherit_type = membergroupById($validator->group_inherit);
+
+			$min_posts = $validator->group_type == -1 && $validator->min_posts >= 0 && $current_group['id_group'] > 3 ? $validator->min_posts : ($current_group['id_group'] == 4 ? 0 : -1);
+			$group_inherit = $current_group['id_group'] > 1 && $current_group['id_group'] != 3 && (empty($inherit_type['group_type']) || $inherit_type['group_type'] != 1) ? $validator->group_inherit : -2;
 
 			//@todo Don't set online_color for the Moderators group?
 
 			// Do the update of the membergroup settings.
 			$properties = array(
-				'max_messages' => $_POST['max_messages'],
-				'min_posts' => $_POST['min_posts'],
-				'group_type' => $_POST['group_type'],
-				'hidden' => $_POST['group_hidden'],
+				'max_messages' => $validator->max_messages,
+				'min_posts' => $min_posts,
+				'group_type' => $validator->group_type < 0 || $validator->group_type > 3 || ($validator->group_type == 1 && !allowedTo('admin_forum')) ? 0 : $validator->group_type,
+				'hidden' => !$validator->group_hidden || $min_posts != -1 || $current_group['id_group'] == 3 ? 0 : $validator->group_hidden,
 				'id_parent' => $group_inherit,
 				'current_group' => $current_group['id_group'],
-				'group_name' => $_POST['group_name'],
-				'online_color' => $_POST['online_color'],
-				'icons' => $_POST['icons'],
-				'description' => $_POST['group_desc'],
+				'group_name' => $validator->group_name,
+				'online_color' => $validator->online_color,
+				'icons' => $validator->icon_count <= 0 ? '' : min($validator->icon_count, 99) . '#' . $validator->icon_image,
+				// /me wonders why admin is *so* special
+				'description' => $current_group['id_group'] == 1 || $validator->group_type != -1 ? $validator->group_desc : '',
 			);
 			updateMembergroupProperties($properties);
 
@@ -574,12 +590,13 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Time to update the boards this membergroup has access to.
 			if ($current_group['id_group'] == 2 || $current_group['id_group'] > 3)
 			{
-				$accesses = empty($_POST['boardaccess']) || !is_array($_POST['boardaccess']) ? array() : $_POST['boardaccess'];
 				$changed_boards['allow'] = array();
 				$changed_boards['deny'] = array();
 				$changed_boards['ignore'] = array();
-				foreach ($accesses as $group_id => $action)
-					$changed_boards[$action][] = (int) $group_id;
+
+				if ($validator->boardaccess)
+					foreach ($validator->boardaccess as $group_id => $action)
+						$changed_boards[$action][] = (int) $group_id;
 
 				foreach (array('allow', 'deny') as $board_action)
 				{
@@ -593,13 +610,13 @@ class ManageMembergroups_Controller extends Action_Controller
 			}
 
 			// Remove everyone from this group!
-			if ($_POST['min_posts'] != -1)
+			if ($min_posts != -1)
 				detachDeletedGroupFromMembers($current_group['id_group']);
 
 			elseif ($current_group['id_group'] != 3)
 			{
 				// Making it a hidden group? If so remove everyone with it as primary group (Actually, just make them additional).
-				if ($_POST['group_hidden'] == 2)
+				if ($validator->group_hidden == 2)
 					setGroupToHidden($current_group['id_group']);
 
 				// Either way, let's check our "show group membership" setting is correct.
@@ -617,7 +634,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			$moderator_string = isset($_POST['group_moderators']) ? trim($_POST['group_moderators']) : '';
 			detachGroupModerators($current_group['id_group']);
 
-			if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $_POST['min_posts'] == -1 && $current_group['id_group'] != 3)
+			if ((!empty($moderator_string) || !empty($_POST['moderator_list'])) && $min_posts == -1 && $current_group['id_group'] != 3)
 			{
 				// Get all the usernames from the string
 				if (!empty($moderator_string))
@@ -667,7 +684,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			));
 
 			// Log the edit.
-			logAction('edited_group', array('group' => $_POST['group_name']), 'admin');
+			logAction('edited_group', array('group' => $validator->group_name), 'admin');
 
 			redirectexit('action=admin;area=membergroups');
 		}
