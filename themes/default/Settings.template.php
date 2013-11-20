@@ -165,6 +165,17 @@ function template_settings()
 			'type' => 'text',
 		),
 		array(
+			'id' => 'header_layout',
+			'label' => $txt['header_layout'],
+			'options' => array(
+				0 => $txt['header_layout_default'],
+				1 => $txt['header_layout_logo_only'],
+				2 => $txt['header_layout_inverted'],
+			),
+			'description' => $txt['header_layout_desc'],
+			'type' => 'select',
+		),
+		array(
 			'id' => 'smiley_sets_default',
 			'label' => $txt['smileys_default_set_for_theme'],
 			'options' => $context['smiley_sets'],

@@ -55,6 +55,16 @@ $txt['theme_variants_user_disable'] = 'Disable user variant selection';
 
 $txt['site_slogan'] = 'Site slogan';
 $txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the default logo.';
+$txt['header_layout'] = 'Header layout';
+$txt['header_layout_desc'] = 'This setting allows you to select one of three layout for the header.
+<ul>
+	<li><strong>Default</strong>: the logo is placed on the right and the name of the community on the left</li>
+	<li><strong>Only logo</strong>: only the logo is displayed, in a centered position</li>
+	<li><strong>Logo on the left</strong>: similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)</li>
+</ul>';
+$txt['header_layout_default'] = 'Default';
+$txt['header_layout_logo_only'] = 'Only logo';
+$txt['header_layout_inverted'] = 'Logo on the left';
 $txt['forum_width'] = 'Forum width';
 $txt['forum_width_desc'] = 'Set the forum width. Examples: 950px, 80%, 1240px.';
 

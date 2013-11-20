@@ -1390,7 +1390,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['session_id'] = $_SESSION['session_value'];
 	$context['forum_name'] = $mbname;
 	$context['forum_name_html_safe'] = Util::htmlspecialchars($context['forum_name']);
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? '' : Util::htmlspecialchars($settings['header_logo_url']);
 	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
 	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;
@@ -1505,6 +1504,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 		if (!empty($context['theme_variant']))
 			loadCSSFile('index' . $context['theme_variant'] . '.css');
 	}
+
+	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . (!empty($context['theme_variant']) ? '/' . $context['theme_variant'] : '') .  '/logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))

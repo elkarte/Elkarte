@@ -857,24 +857,48 @@ legend {
 	padding: 2px 2px 0 2px;
 }
 /* The main title. */
-.forumtitle {
+#forumtitle, #forumtitleright {
 	float: left;
 	padding: 10px 10px 6px 8px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
-/* Float these items to the right. @todo - Simplify. */
-#siteslogan, #logo {
+#forumtitlenone {
+	display: none;
+}
+#forumtitleright {
 	float: right;
-	margin: 0;
+}
+/* Float these items to the right. @todo - Simplify. */
+#logobox, #logoboxleft {
+	float: right;
 	padding: 0.95em 12px 0 12px;
-	font-size: 1.8em;
-	line-height: 1.5em;
+	max-width: 40%;
+}
+#logoboxcenter {
+	width: 100%;
+}
+#logoboxleft, #logoboxleft #logo {
+	float: left;
+	padding-bottom: 7px;
+}
+#logoboxcenter, #logoboxcenter #logo, #logoboxcenter #siteslogan {
+	float: none;
+	display: block;
+	margin: 0 auto;
+	text-align: center;
+}
+#siteslogan {
+	clear: both;
 }
 /* Tweak the logo */
 #logo {
 	margin: 0 8px 0 0;
 	padding: 0;
+	float: right;
+}
+#logoboxleft #logo {
+	margin: 0 0 0 8px;
 }
 /* Main forum area. */
 /* Box-shadow only on this one. */
@@ -4286,7 +4310,7 @@ a.help .icon {
 		display: block;
 		float: none;
 	}
-	#news, #logo, #top_section_notice {
+	#news, #logobox, #logoboxleft, #top_section_notice {
 		display: none;
 	}
 	.avatar>.linklevel1>.avatar {
