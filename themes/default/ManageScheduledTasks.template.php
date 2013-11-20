@@ -27,7 +27,7 @@ function template_view_scheduled_tasks()
 		if (empty($context['scheduled_errors']))
 		{
 			echo '
-	<div id="task_completed" class="infobox">
+	<div id="task_completed" class="successbox">
 		', $txt['scheduled_tasks_were_run'], '
 	</div>';
 		}

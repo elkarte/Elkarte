@@ -54,7 +54,7 @@ function template_pm_above()
 	// Message sent? Show a small indication.
 	if (isset($context['pm_sent']))
 		echo '
-						<div class="infobox">
+						<div class="successbox">
 							', $txt['pm_sent'], '
 						</div>';
 
@@ -823,7 +823,7 @@ function template_send()
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
-					<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+					<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
 		sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
 					</div>';
 

@@ -803,7 +803,7 @@ function template_control_chmod()
 			}
 
 			document.getElementById("ftp_error_div").style.display = "";
-			document.getElementById("ftp_error_div").className = wasSuccess ? "infobox" : "errorbox";
+			document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
 
 			setInnerHTML(document.getElementById("ftp_error_message"), message);
 		}

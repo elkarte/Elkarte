@@ -254,7 +254,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'top_of_list',
-					'value' => isset($_SESSION['email_error']) ? '<div class="' . (isset($_SESSION['email_error_type']) ? 'infobox' : 'errorbox') . '">' . $_SESSION['email_error'] . '</div>' : $txt['heading'],
+					'value' => isset($_SESSION['email_error']) ? '<div class="' . (isset($_SESSION['email_error_type']) ? 'successbox' : 'errorbox') . '">' . $_SESSION['email_error'] . '</div>' : $txt['heading'],
 					'class' => 'windowbg2',
 				),
 			),
@@ -643,7 +643,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => isset($_GET['saved']) ? 'top_of_list' : 'after_title',
-					'value' => isset($_GET['saved']) ? '<div class="infobox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
+					'value' => isset($_GET['saved']) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
 					'class' => 'windowbg2',
 				),
 				array(
@@ -1068,7 +1068,7 @@ class ManageMaillist_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => isset($_GET['saved']) ? 'top_of_list' : 'after_title',
-					'value' => isset($_GET['saved']) ? '<div class="infobox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
+					'value' => isset($_GET['saved']) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
 					'class' => 'windowbg2',
 				),
 				array(

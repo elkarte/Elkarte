@@ -38,7 +38,7 @@ function template_profile_above()
 	// If the profile was update successfully, let the user know this.
 	if (!empty($context['profile_updated']))
 		echo '
-					<div class="infobox">
+					<div class="successbox">
 						', $context['profile_updated'], '
 					</div>';
 }

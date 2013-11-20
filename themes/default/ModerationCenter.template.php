@@ -453,7 +453,7 @@ function template_viewmodreport()
 
 	if (empty($context['report']['mod_comments']))
 		echo '
-									<p class="infobox">', $txt['mc_modreport_no_mod_comment'], '</p>';
+									<p class="successbox">', $txt['mc_modreport_no_mod_comment'], '</p>';
 
 	foreach ($context['report']['mod_comments'] as $comment)
 		echo

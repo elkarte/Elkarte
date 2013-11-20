@@ -31,7 +31,7 @@ function template_report_sent_above()
 
 	// Let them know, if their report was a success!
 	echo '
-		<div class="infobox">
+		<div class="successbox">
 			', $txt['report_sent'], '
 		</div>';
 }

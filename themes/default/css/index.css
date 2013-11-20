@@ -92,7 +92,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 }
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
 .wrapper, div.windowbg, div.windowbg2,
-.roundframe, .description, .information, .infobox, .noticebox,
+.roundframe, .description, .information, .successbox, .noticebox,
 .category_header, .generic_list_wrapper, .submitbutton {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -569,7 +569,7 @@ div.windowbg, div.windowbg2 {
 }
 
 /* Lotsa boxes. */
-.description, .information, .noticebox, .infobox {
+.description, .information, .noticebox, .successbox {
 	margin: 0 0 12px 0;
 	padding: 6px 12px;
 	border: 1px solid #ccc;
@@ -590,7 +590,7 @@ div.windowbg, div.windowbg2 {
 	border-bottom: 1px solid #ffd324;
 	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
 }
-.infobox {
+.successbox {
 	padding-left: 35px;
 	border-top: 1px solid green;
 	border-bottom: 1px solid green;

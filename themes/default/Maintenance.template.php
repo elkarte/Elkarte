@@ -29,7 +29,7 @@ function template_maintain_database()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="infobox">
+			<div class="successbox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -91,7 +91,7 @@ function template_maintain_database()
 			<div class="content">
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">
 					<p>', $txt['mediumtext_introduction'], '</p>',
-					$context['convert_to_suggest'] ? '<p class="infobox">' . $txt['convert_to_suggest_text'] . '</p>' : '', '
+					$context['convert_to_suggest'] ? '<p class="successbox">' . $txt['convert_to_suggest_text'] . '</p>' : '', '
 					<div class="submitbutton">
 						<input type="submit" name="evaluate_conversion" value="', $txt['maintain_run_now'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -119,7 +119,7 @@ function template_maintain_routine()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="infobox">
+			<div class="successbox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -324,7 +324,7 @@ function template_maintain_topics()
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))
 		echo '
-			<div class="infobox">
+			<div class="successbox">
 				', sprintf($txt['maintain_done'], $context['maintenance_finished']), '
 			</div>';
 
@@ -521,7 +521,7 @@ function template_convert_msgbody()
 	}
 	else
 		echo '
-				<p class="infobox">', $txt['convert_to_text'], '</p>';
+				<p class="successbox">', $txt['convert_to_text'], '</p>';
 
 	echo '
 				<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=convertmsgbody" method="post" accept-charset="UTF-8">

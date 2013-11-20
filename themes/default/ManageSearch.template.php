@@ -448,7 +448,7 @@ function template_manage_sphinx()
 	if (!empty($context['settings_message']))
 	{
 		echo '
-			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
+			<div class="', (empty($context['error_type']) ? 'successbox' : ($context['error_type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" id="errors">
 				<ul>
 					<li>', implode('</li><li>', $context['settings_message']), '</li>
 				</ul>
@@ -457,7 +457,7 @@ function template_manage_sphinx()
 
 	echo '
 			<div class="information">
-				<div class="infobox">',
+				<div class="successbox">',
 					$context['page_description'], '
 				</div>
 			</div>

@@ -605,7 +605,7 @@ function template_show_error($error_id)
 	$error = $context[$error_id];
 
 	echo '
-					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+					<div class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
 
 	// Optional title for our results
 	if (!empty($error['title']))

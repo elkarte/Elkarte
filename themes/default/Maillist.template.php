@@ -88,7 +88,7 @@ function template_bounce_email()
 	// Any special messages?
 	if (!empty($context['settings_message']))
 		echo '
-			<div class="infobox">', $context['settings_message'], '</div>';
+			<div class="successbox">', $context['settings_message'], '</div>';
 
 	// The main body
 	echo '
