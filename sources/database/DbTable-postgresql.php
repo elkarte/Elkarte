@@ -160,7 +160,7 @@ class DbTable_PostgreSQL extends DbTable
 			// MySQL supports a length argument, postgre no
 			foreach ($index['columns'] as $id => $col)
 				if (strpos($col, '(') !== false)
-					$index['columns'][$id] = substr($col, 0, strpos($col, '('))
+					$index['columns'][$id] = substr($col, 0, strpos($col, '('));
 
 			$columns = implode(',', $index['columns']);
 
@@ -549,7 +549,7 @@ class DbTable_PostgreSQL extends DbTable
 		// MySQL supports a length argument, postgre no
 		foreach ($index['columns'] as $id => $col)
 			if (strpos($col, '(') !== false)
-				$index['columns'][$id] = substr($col, 0, strpos($col, '('))
+				$index['columns'][$id] = substr($col, 0, strpos($col, '('));
 
 		$columns = implode(',', $index_info['columns']);
 
