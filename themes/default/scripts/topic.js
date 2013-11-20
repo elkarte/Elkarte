@@ -187,8 +187,8 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 	this.bInEditMode = false;
 
 	// redo tips if they are on since we just pulled the rug out on this one
-	if ($.isFunction($.fn.SiteTooltip));
-		$('.preview').SiteTooltip().elk_tooltip_off;
+	if ($.isFunction($.fn.SiteTooltip))
+		$('.preview').SiteTooltip();
 
 	return false;
 };
@@ -867,7 +867,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 	$.ajax({
 		url: desktopURL,
 		type: "GET",
-		dataType: "html",
+		dataType: "html"
 	})
 	.done(function (data) {
 			var $base_obj = $('<div id="temp_help">').html(data).find('#send_topic');
