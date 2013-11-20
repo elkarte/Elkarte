@@ -205,8 +205,8 @@ function load_lang_file()
 		$dir = dir(dirname(__FILE__) . '/themes/default/languages');
 		while ($entry = $dir->read())
 		{
-			if (substr($entry, 0, 8) == 'Install.' && substr($entry, -4) == '.php')
-				$incontext['detected_languages'][$entry] = ucfirst(substr($entry, 8, strlen($entry) - 12));
+			if (is_dir($dir->path . '/' . $entry) && file_exists($dir->path . '/' . $entry . '/Install.' . $entry . '.php'))
+				$incontext['detected_languages']['Install.' . $entry . '.php'] = ucfirst($entry);
 		}
 		$dir->close();
 	}
@@ -247,7 +247,7 @@ function load_lang_file()
 		$_SESSION['installer_temp_lang'] = $_GET['lang_file'];
 
 	// Make sure it exists, if it doesn't reset it.
-	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']))
+	if (!isset($_SESSION['installer_temp_lang']) || preg_match('~[^\\w_\\-.]~', $_SESSION['installer_temp_lang']) === 1 || !file_exists(dirname(__FILE__) . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']))
 	{
 		// Use the first one...
 		list ($_SESSION['installer_temp_lang']) = array_keys($incontext['detected_languages']);
@@ -258,7 +258,7 @@ function load_lang_file()
 	}
 
 	// And now include the actual language file itself.
-	require_once(dirname(__FILE__) . '/themes/default/languages/' . $_SESSION['installer_temp_lang']);
+	require_once(dirname(__FILE__) . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
 }
 
 /**
