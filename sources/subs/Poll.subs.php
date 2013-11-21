@@ -502,6 +502,8 @@ function pollStarters($id_topic, $detailed = false)
 			)
 		);
 	}
+	$pollStarters = array();
+
 	if ($db->num_rows($request) != 0)
 		$pollStarters = $db->fetch_row($request);
 	$db->free_result($request);
