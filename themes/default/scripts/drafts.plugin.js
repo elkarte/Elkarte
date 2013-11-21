@@ -30,7 +30,7 @@
 			return false;
 
 		// Still saving the last one or other?
-		if (this.opts._bInDraftMode)
+		if (this.opts._bInDraftMode === true)
 			this.draftCancel();
 
 		// Get the editor text, either from sceditor or from the quicktext textarea
@@ -92,8 +92,8 @@
 			return false;
 
 		// Still saving the last one or some other?
-		if (this.opts._bInDraftMode)
-			this.draftCancel;
+		if (this.opts._bInDraftMode === true)
+			this.draftCancel();
 
 		// Nothing to save
 		var sPostdata = base.val();

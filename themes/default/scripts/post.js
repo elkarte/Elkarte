@@ -307,7 +307,7 @@ function onDocSent(XMLDoc)
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [
 						'msg_' + ignored_replies[i] + '_body',
-						'msg_' + ignored_replies[i] + '_quote',
+						'msg_' + ignored_replies[i] + '_quote'
 					],
 					aSwapLinks: [
 						{

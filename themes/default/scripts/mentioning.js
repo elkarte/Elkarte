@@ -21,8 +21,8 @@ function elk_mentions(oOptions)
 	this.names = [],
 	this.cached_names = [],
 	this.cached_queries = [],
-	this.mentions,
-	this.$atwho;
+	this.mentions = null,
+	this.$atwho = null;
 
 	this.opt = oOptions;
 	this.attachAtWho();

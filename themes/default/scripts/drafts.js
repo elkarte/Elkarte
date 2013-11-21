@@ -110,7 +110,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 		'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'save_draft=true',
-		elk_session_var + '=' + elk_session_id,
+		elk_session_var + '=' + elk_session_id
 	];
 
 	// Send in document for saving and hope for the best
