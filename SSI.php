@@ -66,7 +66,6 @@ DEFINE('CACHEDIR', $cachedir);
 DEFINE('EXTDIR', $extdir);
 DEFINE('LANGUAGEDIR', $languagedir);
 DEFINE('SOURCEDIR', $sourcedir);
-
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
@@ -227,6 +226,7 @@ if (isset($_GET['ssi_function']) && function_exists('ssi_' . $_GET['ssi_function
 	call_user_func('ssi_' . $_GET['ssi_function']);
 	exit;
 }
+
 if (isset($_GET['ssi_function']))
 	exit;
 // You shouldn't just access SSI.php directly by URL!!
@@ -489,19 +489,19 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		return $posts;
 
 	echo '
-		<table border="0" class="ssi_table">';
+		<table class="ssi_table">';
 	foreach ($posts as $post)
 		echo '
 			<tr>
-				<td align="right" valign="top" nowrap="nowrap">
+				<td class="righttext">
 					[', $post['board']['link'], ']
 				</td>
-				<td valign="top">
+				<td class="top">
 					<a href="', $post['href'], '">', $post['subject'], '</a>
 					', $txt['by'], ' ', $post['poster']['link'], '
 					', $post['is_new'] ? '<a href="' . $scripturl . '?topic=' . $post['topic'] . '.msg' . $post['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>' : '', '
 				</td>
-				<td align="right" nowrap="nowrap">
+				<td class="righttext">
 					', $post['time'], '
 				</td>
 			</tr>';
@@ -531,9 +531,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 
 	// Only some boards?.
 	if (is_array($include_boards) || (int) $include_boards === $include_boards)
-	{
 		$include_boards = is_array($include_boards) ? $include_boards : array($include_boards);
-	}
 	elseif ($include_boards != null)
 	{
 		$output_method = $include_boards;
@@ -648,19 +646,19 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		return $posts;
 
 	echo '
-		<table border="0" class="ssi_table">';
+		<table class="ssi_table">';
 	foreach ($posts as $post)
 		echo '
 			<tr>
-				<td align="right" valign="top" nowrap="nowrap">
+				<td class="righttext top">
 					[', $post['board']['link'], ']
 				</td>
-				<td valign="top">
+				<td class="top">
 					<a href="', $post['href'], '">', $post['subject'], '</a>
 					', $txt['by'], ' ', $post['poster']['link'], '
 					', !$post['is_new'] ? '' : '<a href="' . $scripturl . '?topic=' . $post['topic'] . '.msg' . $post['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>', '
 				</td>
-				<td align="right" nowrap="nowrap">
+				<td class="righttext">
 					', $post['time'], '
 				</td>
 			</tr>';
@@ -716,16 +714,16 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 	echo '
 		<table class="ssi_table">
 			<tr>
-				<th align="left">', $txt['board'], '</th>
-				<th align="left">', $txt['board_topics'], '</th>
-				<th align="left">', $txt['posts'], '</th>
+				<th class="lefttext">', $txt['board'], '</th>
+				<th class="righttext">', $txt['board_topics'], '</th>
+				<th class="righttext">', $txt['posts'], '</th>
 			</tr>';
 	foreach ($boards as $board)
 		echo '
 			<tr>
-				<td>', $board['link'], $board['new'] ? ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a>' : '', '</td>
-				<td align="right">', comma_format($board['num_topics']), '</td>
-				<td align="right">', comma_format($board['num_posts']), '</td>
+				<td>', $board['new'] ? ' <a href="' . $board['href'] . '"><span class="new_posts">' . $txt['new'] . '</span></a> ' : '', $board['link'], '</td>
+				<td class="righttext">', $board['num_topics'], '</td>
+				<td class="righttext">', $board['num_posts'], '</td>
 			</tr>';
 	echo '
 		</table>';
@@ -765,18 +763,18 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 	echo '
 		<table class="ssi_table">
 			<tr>
-				<th align="left"></th>
-				<th align="left">', $txt['views'], '</th>
-				<th align="left">', $txt['replies'], '</th>
+				<th class="lefttext"></th>
+				<th class="righttext">', $txt['views'], '</th>
+				<th class="righttext">', $txt['replies'], '</th>
 			</tr>';
 	foreach ($topics as $topic)
 		echo '
 			<tr>
-				<td align="left">
+				<td class="lefttext">
 					', $topic['link'], '
 				</td>
-				<td align="right">', comma_format($topic['num_views']), '</td>
-				<td align="right">', comma_format($topic['num_replies']), '</td>
+				<td class="righttext">', $topic['num_views'], '</td>
+				<td class="righttext">', $topic['num_replies'], '</td>
 			</tr>';
 	echo '
 		</table>';
@@ -845,9 +843,7 @@ function ssi_randomMember($random_type = '', $output_method = 'echo')
 
 	// If we got nothing do the reverse - in case of unactivated members.
 	if (empty($result))
-	{
 		$result = ssi_queryMembers('member_lesser_equal', $member_id, 1, 'id_member DESC', $output_method);
-	}
 
 	// Just to be sure put the random generator back to something... random.
 	if ($random_type != '')
@@ -909,11 +905,12 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 		$query_where => $query_where_params,
 		'limit' => !empty($query_limit) ? (int) $query_limit : 10,
 		'order_by' => $query_order,
+		'activated_status' => 1,
 	));
 
 	$members = array();
-	foreach ($members_data as $row)
-		$members[] = $row['id_member'];
+	foreach ($members_data['member_info'] as $row)
+		$members[] = $row['id'];
 
 	if (empty($members))
 		return array();
@@ -924,7 +921,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 	// Draw the table!
 	if ($output_method == 'echo')
 		echo '
-		<table border="0" class="ssi_table">';
+		<table class="ssi_table">';
 
 	$query_members = array();
 	foreach ($members as $member)
@@ -940,7 +937,7 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 		if ($output_method == 'echo')
 			echo '
 			<tr>
-				<td align="right" valign="top" nowrap="nowrap">
+				<td class="centertext">
 					', $query_members[$member]['link'], '
 					<br />', $query_members[$member]['blurb'], '
 					<br />', $query_members[$member]['avatar']['image'], '
@@ -1449,6 +1446,7 @@ function ssi_showPoll($topic = null, $output_method = 'echo')
 						</div>
 						', $option['votes'], ' (', $option['percent'], '%)
 					</dd>';
+
 		echo '
 				</dl>
 				<strong>', $txt['poll_total_voters'], ': ', $return['total_votes'], '</strong>
@@ -1471,7 +1469,7 @@ function ssi_pollVote()
 		echo '<!DOCTYPE html>
 <html>
 <head>
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		history.go(-1);
 	// ]]></script>
 </head>
@@ -1715,6 +1713,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 	if (!empty($return['calendar_holidays']))
 		echo '
 			<span class="holiday">' . $txt['calendar_prompt'] . ' ' . implode(', ', $return['calendar_holidays']) . '<br /></span>';
+
 	if (!empty($return['calendar_birthdays']))
 	{
 		echo '
@@ -1725,6 +1724,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		echo '
 			<br />';
 	}
+
 	if (!empty($return['calendar_events']))
 	{
 		echo '
@@ -2077,6 +2077,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 				<th align="left">', $txt['downloads'], '</th>
 				<th align="left">', $txt['filesize'], '</th>
 			</tr>';
+
 	foreach ($attachments as $attach)
 		echo '
 			<tr>
