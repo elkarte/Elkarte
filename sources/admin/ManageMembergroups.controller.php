@@ -395,7 +395,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				}
 
 				// Don't allow copying of a real priviledged person!
-				require_once(SUBSDIR . '/Permissions.subs.php');
+				require_once(SUBSDIR . '/Permission.subs.php');
 				loadIllegalPermissions();
 
 				copyPermissions($id_group, $copy_id, $context['illegal_permissions']);
