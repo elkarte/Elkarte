@@ -402,7 +402,7 @@ class ManageSecurity_Controller extends Action_Controller
 		if ($context['invalid_badbehavior_httpbl_key'])
 		{
 			$context['settings_message'][] = $txt['badbehavior_httpbl_key_invalid'];
-			$context['error_type'] = 'warnig';
+			$context['error_type'] = 'warning';
 		}
 
 		// Have we blocked anything in the last 7 days?
