@@ -152,7 +152,7 @@ function template_main()
 
 	echo '
 	</div>
-	<script type="text/javascript">
+	<script>
 		// Start by creating proper ids and ul childs for use
 		setBoardIds();
 

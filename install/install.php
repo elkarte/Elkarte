@@ -2021,7 +2021,7 @@ function template_install_above()
 		<link rel="stylesheet" type="text/css" href="themes/default/css/index.css?alp10" />
 		<link rel="stylesheet" type="text/css" href="themes/default/css/index_light.css?alp10" />
 		<link rel="stylesheet" type="text/css" href="themes/default/css/install.css?alp10" />
-		<script type="text/javascript" src="themes/default/scripts/script.js"></script>
+		<script src="themes/default/scripts/script.js"></script>
 	</head>
 	<body>
 		<div id="header">
@@ -2129,7 +2129,7 @@ function template_welcome_message()
 	global $incontext, $installurl, $txt;
 
 	echo '
-	<script type="text/javascript" src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
+	<script src="http://elkarte.github.io/Elkarte/site/current-version.js?version=' . CURRENT_VERSION . '"></script>
 	<form action="', $incontext['form_url'], '" method="post">
 		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
 		<div id="version_warning" style="margin: 2ex; padding: 2ex; border: 2px dashed #a92174; color: black; background-color: #fbbbe2; display: none;">
@@ -2151,7 +2151,7 @@ function template_welcome_message()
 
 	// For the latest version stuff.
 	echo '
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			// Latest version?
 			function ourCurrentVersion()
 			{
@@ -2352,7 +2352,7 @@ function template_database_settings()
 
 	// Allow the toggling of input boxes for Postgresql
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		function validatePgsql()
 		{
 			if (document.getElementById(\'db_type_input\').value == \'postgresql\')
@@ -2529,7 +2529,7 @@ function template_delete_install()
 		<div style="margin: 1ex; font-weight: bold;">
 			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], !isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '', '</label>
 		</div>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script><!-- // --><![CDATA[
 			function doTheDelete()
 			{
 				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self;
