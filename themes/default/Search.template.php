@@ -278,6 +278,15 @@ function template_results()
 {
 	global $context, $settings, $options, $txt, $scripturl, $message;
 
+	if (!empty($context['search_ignored']))
+		echo '
+			<div id="search_results">
+				<h3 class="category_header">
+					', $txt['generic_warning'], '
+				</h3>
+				<p class="warningbox">', $txt['search_warning_ignored_word' . (count($context['search_ignored']) == 1 ? '' : 's')], ': ', implode(', ', $context['search_ignored']), '</p>
+			</div>';
+
 	if (isset($context['did_you_mean']) || empty($context['topics']))
 	{
 		echo '

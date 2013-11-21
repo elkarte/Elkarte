@@ -106,6 +106,9 @@ $txt['search_error_indexed_chars'] = 'Invalid number of indexed characters. At l
 $txt['search_error_max_percentage'] = 'Invalid percentage of words to be skipped. Use a value of at least 5%.';
 $txt['error_string_too_long'] = 'Search string must be less than %1$d characters long.';
 
+$txt['search_warning_ignored_word'] = 'This term has been ignored in your search';
+$txt['search_warning_ignored_words'] = 'These terms have been ignored in your search';
+
 $txt['search_adjust_query'] = 'Adjust Search Parameters';
 $txt['search_adjust_submit'] = 'Revise Search';
 $txt['search_did_you_mean'] = 'You may have meant to search for';
