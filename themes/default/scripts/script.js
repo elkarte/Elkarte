@@ -2006,7 +2006,7 @@ relativeTime.prototype.weeks = function ()
 	// Weeks ago but less than a month?
 	if (Math.round(this.past_time / (24 * 3600)) >= 7 && Math.round(this.past_time / (24 * 3600)) < 30)
 	{
-		this.deltaTime = Math.round(this.past_time / (24 * 3600));
+		this.deltaTime = Math.round(this.past_time / (24 * 3600) / 7);
 		return true;
 	}
 	return false;

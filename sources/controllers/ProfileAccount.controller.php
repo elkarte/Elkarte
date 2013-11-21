@@ -39,10 +39,8 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	public function action_issuewarning()
 	{
-		global $txt, $scripturl, $modSettings, $user_info, $mbname;
+		global $txt, $scripturl, $modSettings, $mbname;
 		global $context, $cur_profile;
-
-		$db = database();
 
 		$memID = currentMemberID();
 
@@ -409,8 +407,6 @@ class ProfileAccount_Controller extends Action_Controller
 	function action_deleteaccount2()
 	{
 		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
-
-		$db = database();
 
 		// Try get more time...
 		@set_time_limit(600);

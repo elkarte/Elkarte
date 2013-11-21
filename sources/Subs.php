@@ -616,10 +616,10 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  */
 function relativeTime($timestamp, $show_today = true, $offset_type = false)
 {
-	global $modSettings, $txt;
+	global $txt;
 
 	// We don't want relative times? Bypass to standardTime();
-	if ($modSettings['todayMod'] < 3)
+	// if ($modSettings['todayMod'] < 3)
 		return standardTime($timestamp, $show_today, $offset_type);
 
 	// No use in doing calculations if there's nothing to work with.
