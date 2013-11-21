@@ -4408,6 +4408,10 @@ a.help .icon {
 	.profile_attachments {
 		display: none;
 	}
+	.pagesection div.floatright {
+		float: none;
+		display: block;
+	}
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */
 	.split_topics, .move_topic {
