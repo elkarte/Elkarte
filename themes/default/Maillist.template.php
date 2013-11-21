@@ -22,7 +22,7 @@ function template_show_email()
 		<h3 class="category_header">', $context['notice_subject'], '</h3>
 		<h3 class="category_header">', $context['notice_from'], '</h3>
 		<h3 class="category_header">', $context['to'], '</h3>
-		<div class="noticebox">', $txt['email_failure'], ': ', $context['error_code'], '</div>
+		<div class="warningbox">', $txt['email_failure'], ': ', $context['error_code'], '</div>
 		<div class="content">
 			<dl>
 				<dt>
@@ -88,7 +88,7 @@ function template_bounce_email()
 	// Any special messages?
 	if (!empty($context['settings_message']))
 		echo '
-			<div class="infobox">', $context['settings_message'], '</div>';
+			<div class="successbox">', $context['settings_message'], '</div>';
 
 	// The main body
 	echo '

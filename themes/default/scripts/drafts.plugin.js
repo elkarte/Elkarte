@@ -186,7 +186,7 @@
 		this.opts._oCurDraftDiv = document.getElementById(this.opts.sLastNote);
 		setInnerHTML(this.opts._oCurDraftDiv, this.opts._sLastSaved);
 
-		// Hide the saved draft infobox in the event they pressed the save draft button at some point
+		// Hide the saved draft successbox in the event they pressed the save draft button at some point
 		var draft_section = document.getElementById('draft_section');
 		if (draft_section)
 			draft_section.style.display = 'none';

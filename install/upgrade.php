@@ -3553,7 +3553,7 @@ function template_upgrade_below()
 
 	if (!empty($upcontext['custom_warning']))
 		echo '
-								<div class="noticebox">
+								<div class="warningbox">
 									<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
 									<div>', $upcontext['custom_warning'], '</div>
 								</div>';
@@ -3673,7 +3673,7 @@ function template_welcome_message()
 	// For large, SMF pre-1.1 RC2 forums give them a warning about the possible impact of this upgrade!
 	if ($upcontext['is_large_forum'])
 		echo '
-		<div class="noticebox">
+		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 			<div>
 				', $txt['upgrade_warning_lots_data'], '
@@ -3683,7 +3683,7 @@ function template_welcome_message()
 	// A warning message?
 	if (!empty($upcontext['warning']))
 		echo '
-		<div class="noticebox">
+		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
 			<div>
 				', $upcontext['warning'], '
@@ -3719,7 +3719,7 @@ function template_welcome_message()
 			$updated = (int) ($active / 3600) . ' hours';
 
 		echo '
-		<div class="noticebox">
+		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong>
 			<br />
 			<div>

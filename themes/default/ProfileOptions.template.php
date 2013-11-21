@@ -826,7 +826,7 @@ function template_groupMembership()
 	// Do we have an update message?
 	if (!empty($context['update_message']))
 		echo '
-			<div class="infobox">
+			<div class="successbox">
 				', $context['update_message'], '.
 			</div>';
 

@@ -558,7 +558,7 @@ function template_admin_register()
 
 	if (!empty($context['registration_done']))
 		echo '
-					<div class="infobox">
+					<div class="successbox">
 						', $context['registration_done'], '
 					</div>';
 

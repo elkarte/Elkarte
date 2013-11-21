@@ -717,19 +717,19 @@ function template_control_chmod()
 							<label for="ftp_username">', $txt['package_ftp_username'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" style="width: 98%;" class="input_text" />
+							<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" class="input_text" />
 						</dd>
 						<dt>
 							<label for="ftp_password">', $txt['package_ftp_password'], ':</label>
 						</dt>
 						<dd>
-							<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 98%;" class="input_password" />
+							<input type="password" size="50" name="ftp_password" id="ftp_password" class="input_password" />
 						</dd>
 						<dt>
 							<label for="ftp_path">', $txt['package_ftp_path'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" style="width: 98%;" class="input_text" />
+							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" class="input_text" />
 						</dd>
 					</dl>
 					</fieldset>';
@@ -803,7 +803,7 @@ function template_control_chmod()
 			}
 
 			document.getElementById("ftp_error_div").style.display = "";
-			document.getElementById("ftp_error_div").className = wasSuccess ? "infobox" : "errorbox";
+			document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
 
 			setInnerHTML(document.getElementById("ftp_error_message"), message);
 		}
@@ -1074,7 +1074,7 @@ function template_file_permissions()
 	// ]]></script>';
 
 		echo '
-	<div class="noticebox">
+	<div class="warningbox">
 		<div>
 			<strong>', $txt['package_file_perms_warning'], ':</strong><br>
 				', $txt['package_file_perms_warning_desc'], '

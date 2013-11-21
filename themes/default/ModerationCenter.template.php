@@ -422,7 +422,7 @@ function template_viewmodreport()
 								', sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']), '
 							</h3>
 							<div class="windowbg2">
-								<p class="noticebox">', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '</p>
+								<p class="warningbox">', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '</p>
 								<div class="content">
 									', $context['report']['body'], '
 								</div>
@@ -453,7 +453,7 @@ function template_viewmodreport()
 
 	if (empty($context['report']['mod_comments']))
 		echo '
-									<p class="infobox">', $txt['mc_modreport_no_mod_comment'], '</p>';
+									<p class="successbox">', $txt['mc_modreport_no_mod_comment'], '</p>';
 
 	foreach ($context['report']['mod_comments'] as $comment)
 		echo

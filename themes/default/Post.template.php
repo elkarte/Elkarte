@@ -381,7 +381,7 @@ function template_postarea_above()
 	if (!$context['becomes_approved'])
 	{
 		echo '
-						<div class="infobox">
+						<div class="successbox">
 							', $txt['wait_for_approval'], '
 							<input type="hidden" name="not_approved" value="1" />
 						</div>';
@@ -396,7 +396,7 @@ function template_postarea_above()
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-						<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
 							sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
 						</div>';
 
