@@ -127,9 +127,12 @@ class ManageAttachments_Controller extends Action_Controller
 		call_integration_hook('integrate_modify_attachment_settings');
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
+		// @todo do we really need all this?
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
+		// @todo Just to stay on the safe side, though I'm not sure it's needed
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Saving settings?
 		if (isset($_GET['save']))

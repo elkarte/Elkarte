@@ -83,7 +83,8 @@ while (!$is_done)
 		$current_name = $current_folder . '/' . $row['id_attach'] . '_' . $file_hash;
 
 		// And we try to rename it.
-		@rename($current_name, $current_name . '.elk');
+		if (substr($current_name, -4) != '.elk')
+			@rename($current_name, $current_name . '.elk');
 	}
 	$db->free_result($request);
 
