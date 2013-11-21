@@ -173,9 +173,8 @@ function template_edit_group()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=membergroups;sa=edit;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" name="groupForm" id="groupForm">
-			<h3 class="category_header">', $txt['membergroups_edit_group'], ' - ', $context['group']['name'], '
-			</div>
+		<form id="admin_form_wrapper" name="groupForm" action="', $scripturl, '?action=admin;area=membergroups;sa=edit;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" >
+			<h3 class="category_header">', $txt['membergroups_edit_group'], ' - ', $context['group']['name'], '</h3>
 			<div class="content">
 				<dl class="settings">
 					<dt>
