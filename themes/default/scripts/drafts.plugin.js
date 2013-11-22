@@ -58,8 +58,8 @@
 		// Get the locked an/or sticky values if they have been selected or set that is
 		if (this.opts.sType && this.opts.sType === 'post')
 		{
-			var oLock = document.getElementById('check_lock');
-			var oSticky = document.getElementById('check_sticky');
+			var oLock = document.getElementById('check_lock'),
+				oSticky = document.getElementById('check_sticky');
 
 			if (oLock && oLock.checked)
 				aSections[aSections.length] = 'lock=1';
@@ -105,14 +105,14 @@
 		this.opts._bInDraftMode = true;
 
 		// Get the to and bcc values
-		var aTo = this.draftGetRecipient('recipient_to[]');
-		var aBcc = this.draftGetRecipient('recipient_bcc[]');
+		var aTo = this.draftGetRecipient('recipient_to[]'),
+			aBcc = this.draftGetRecipient('recipient_bcc[]');
 
 		// Get the rest of the form elements that we want to save, and load them up
 		var aSections = [
-			'replied_to=' + parseInt(document.forms.postmodify.elements['replied_to'].value),
-			'id_pm_draft=' + parseInt(document.forms.postmodify.elements['id_pm_draft'].value),
-			'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
+			'replied_to=' + parseInt(document.forms.pmFolder.elements['replied_to'].value),
+			'id_pm_draft=' + parseInt(document.forms.pmFolder.elements['id_pm_draft'].value),
+			'subject=' + escape(document.forms.pmFolder['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'recipient_to=' + aTo,
 			'recipient_bcc=' + aBcc,
@@ -137,7 +137,7 @@
 	 */
 	elk_Drafts.prototype.draftGetRecipient = function (sField)
 	{
-		var oRecipient = document.forms.postmodify.elements[sField],
+		var oRecipient = document.forms.pmFolder.elements[sField],
 			aRecipient = [];
 
 		if (typeof(oRecipient) !== 'undefined')

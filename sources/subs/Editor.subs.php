@@ -506,7 +506,7 @@ function create_control_richedit($editorOptions)
 
 		if (!empty($bbcodes_styles))
 			$context['html_headers'] .= '
-	<style type="text/css">' . $bbcodes_styles . '
+	<style>' . $bbcodes_styles . '
 	</style>';
 	}
 

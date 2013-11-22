@@ -259,7 +259,7 @@ function template_edit_profile_field()
 
 	// Get the javascript bits right!
 	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		updateInputBoxes();
 	// ]]></script>';
 }

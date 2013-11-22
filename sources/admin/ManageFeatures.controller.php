@@ -1141,6 +1141,7 @@ class ManageFeatures_Controller extends Action_Controller
 					sa: "profileorder",
 					error: "' . $txt['admin_order_error'] . '",
 					title: "' . $txt['admin_order_title'] . '",
+					href: "?action=admin;area=featuresettings;sa=profile",
 					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
 				});
 			',

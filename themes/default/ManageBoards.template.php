@@ -152,7 +152,7 @@ function template_main()
 
 	echo '
 	</div>
-	<script type="text/javascript">
+	<script>
 		// Start by creating proper ids and ul childs for use
 		setBoardIds();
 
@@ -165,6 +165,7 @@ function template_main()
 			tag: "' . implode(' ul,', $sortables) . ' ul",
 			connect: ".nolist",
 			containment: "document",
+			href: "?action=admin;area=manageboards",
 			placeholder: "ui-state-highlight",
 			preprocess: "setBoardIds",
 			axis: "",
