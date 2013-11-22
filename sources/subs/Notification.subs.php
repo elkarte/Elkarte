@@ -25,6 +25,7 @@ function countUserNotifications($all = false, $type = '', $id_member = null)
 	global $user_info;
 
 	$db = database();
+	$id_member === null ? $user_info['id'] : (int) $id_member;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
@@ -38,7 +39,7 @@ function countUserNotifications($all = false, $type = '', $id_member = null)
 			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND n.notif_type = {string:current_type}'),
 		array(
-			'current_user' => $id_member === null ? $user_info['id'] : (int) $id_member,
+			'current_user' => $id_member,
 			'current_type' => $type,
 			'is_not_read' => 0,
 			'is_not_deleted' => 2,
@@ -51,7 +52,7 @@ function countUserNotifications($all = false, $type = '', $id_member = null)
 
 	// Counts as maintenance! :P
 	if ($all === false)
-		updateMemberdata($user_info['id'], array('notifications' => $count));
+		updateMemberdata($id_member, array('notifications' => $count));
 
 	return $count;
 }
