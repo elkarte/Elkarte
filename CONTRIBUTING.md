@@ -6,7 +6,7 @@
 
 ## Before You Start
 
-Anyone wishing to contribute to the **[ElkArte](https://github.com/elkarte/Elkarte)** project **MUST read the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) in the repository: 
+Anyone wishing to contribute to the **[ElkArte](https://github.com/elkarte/Elkarte)** project **MUST** read the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) in the repository: 
 By signing off your contributions, you acknowledge that you *can and do license* your submissions under the license of the project. The ElkArte team is prevented from accepting any pull requests from users who have not signed off on thier commits.
 
 ## How to Contribute:
