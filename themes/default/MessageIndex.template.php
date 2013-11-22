@@ -79,7 +79,7 @@ function template_pages_and_buttons_above()
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
-				<span id="whoisviewing">';
+				<br /><span id="whoisviewing">';
 
 			if ($settings['display_who_viewing'] == 1)
 				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];

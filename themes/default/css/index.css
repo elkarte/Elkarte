@@ -1853,7 +1853,9 @@ dl.settings textarea {
 #expanded_pages_container, #expanded_pages {
 	overflow: hidden;
 }
-
+#boarddescription {
+	display: inline-block;
+}
 /* -------------------------------------------- */
 /* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
 /* Code splitting will continue as time and bugz and whatever allow. */
