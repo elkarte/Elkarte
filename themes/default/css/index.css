@@ -3329,8 +3329,18 @@ dl.merge_topic dd {
 	float:left;
 	margin-right:10px;
 }
-
-
+div.labels {
+	display: block;
+	text-align: right;
+}
+.label_pms {
+	float: right;
+}
+.label_pms li {
+		display: inline-block;
+		vertical-align: top;
+		margin-left: 0.5em;
+}
 
 
 /* -------------------------------------------- */
