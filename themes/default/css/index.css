@@ -839,12 +839,8 @@ legend {
 .top_button img {
 	vertical-align: middle;
 }
-#password_login, #openid_login {
+#password_login {
 	display: inline-block;
-	margin-left: 20px;
-}
-#password_login input, #password_login select {
-	margin-left: -5px;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
