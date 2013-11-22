@@ -361,7 +361,7 @@ class Control_Verification_Questions implements Control_Verifications
 			if (!empty($this->_number_questions) && $this->_number_questions <= count($modSettings['question_id_cache'][$this->_questions_language]))
 			{
 				$this->_possible_questions = $modSettings['question_id_cache'][$this->_questions_language];
-				$this->_number_questions = count($this->_possible_questions);
+				$this->_number_questions = min($this->_number_questions, count($this->_possible_questions));
 				$this->_questionIDs = array();
 
 				if ($isNew || $force_refresh)
