@@ -327,12 +327,6 @@ fieldset {
 	overflow: auto;
 	border: none;
 }
-fieldset legend {
-	font-weight: bold;
-}
-.content fieldset {
-	border: double #ccc;
-}
 
 /* Define strong as font-weight: 600; - defaults to bold */
 /* for fonts which do not support numerical font-weight) */
@@ -677,17 +671,6 @@ div.windowbg, div.windowbg2 {
 	color: #eee;
 	cursor: pointer;
 }
-legend {
-	font-weight: bold;
-	color: #000;
-	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
-	cursor: pointer;
-	padding-left: 20px;
-}
-.collapsed legend {
-	background:  url(../images/selected.png) no-repeat scroll left center transparent;
-}
-
 
 
 /* -------------------------------------------- */
@@ -839,12 +822,8 @@ legend {
 .top_button img {
 	vertical-align: middle;
 }
-#password_login, #openid_login {
+#password_login {
 	display: inline-block;
-	margin-left: 20px;
-}
-#password_login input, #password_login select {
-	margin-left: -5px;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
@@ -915,19 +894,9 @@ legend {
 /* The user info, news, etc.*/
 #news {
 	vertical-align: top;
+	padding: 0 0 1em 0;
 }
-#upper_section>.user {
-	display: table-cell;
-	vertical-align: top;
-	min-width: 26em;
-	font-size: 0.857em;
-	white-space: nowrap;
-}
-.greeting {
-	float: right;
-	font-weight: bold;
-	padding-top: 10px;
-}
+
 /* The login form. */
 #guest_form {
 	padding: 0 0 8px 0;
@@ -1884,7 +1853,9 @@ dl.settings textarea {
 #expanded_pages_container, #expanded_pages {
 	overflow: hidden;
 }
-
+#boarddescription {
+	display: inline-block;
+}
 /* -------------------------------------------- */
 /* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
 /* Code splitting will continue as time and bugz and whatever allow. */
@@ -2690,8 +2661,6 @@ ul.post_options li {
 }
 #post_event fieldset {
 	clear: both;
-	padding: 6px;
-	border: double #ccc;
 }
 #post_event #event_main input {
 	float: left;
@@ -2738,9 +2707,6 @@ ul.post_options li {
 }
 #edit_poll fieldset input {
 	margin-left: 7.8em;
-}
-#chrome fieldset input {
-	margin-left: 7.9em;
 }
 #edit_poll ul.poll_main li {
 	padding-left: 12px;
@@ -3363,8 +3329,18 @@ dl.merge_topic dd {
 	float:left;
 	margin-right:10px;
 }
-
-
+div.labels {
+	display: block;
+	text-align: right;
+}
+.label_pms {
+	float: right;
+}
+.label_pms li {
+		display: inline-block;
+		vertical-align: top;
+		margin-left: 0.5em;
+}
 
 
 /* -------------------------------------------- */
