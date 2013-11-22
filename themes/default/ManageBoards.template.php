@@ -165,6 +165,7 @@ function template_main()
 			tag: "' . implode(' ul,', $sortables) . ' ul",
 			connect: ".nolist",
 			containment: "document",
+			href: "?action=admin;area=manageboards",
 			placeholder: "ui-state-highlight",
 			preprocess: "setBoardIds",
 			axis: "",

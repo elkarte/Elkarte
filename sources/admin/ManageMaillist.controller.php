@@ -762,7 +762,7 @@ class ManageMaillist_Controller extends Action_Controller
 					containment: "#sort_email_fp",
 					error: "' . $txt['admin_order_error'] . '",
 					title: "' . $txt['admin_order_title'] . '",
-					href: "?action=admin;;area=maillist;sa=sortfilters",
+					href: "?action=admin;area=maillist;sa=sortfilters",
 					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
 				});
 			',
