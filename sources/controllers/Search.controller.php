@@ -614,6 +614,9 @@ class Search_Controller extends Action_Controller
 		// The remaining words and phrases are all included.
 		$searchArray = array_merge($phraseArray, $wordArray);
 
+		// This is used to remember words that will be ignored (because too short usually)
+		$context['search_ignored'] = array();
+
 		// Trim everything and make sure there are no words that are the same.
 		foreach ($searchArray as $index => $value)
 		{
@@ -629,7 +632,7 @@ class Search_Controller extends Action_Controller
 			// Don't allow very, very short words.
 			elseif (Util::strlen($value) < 2)
 			{
-				$context['search_errors']['search_string_small_words'] = true;
+				$context['search_ignored'][] = $value;
 				unset($searchArray[$index]);
 			}
 			else
@@ -648,7 +651,12 @@ class Search_Controller extends Action_Controller
 
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
-			$context['search_errors']['invalid_search_string' . (!empty($foundBlackListedWords) ? '_blacklist' : '')] = true;
+		{
+			if (!empty($context['search_ignored']))
+				$context['search_errors']['search_string_small_words'] = true;
+			else
+				$context['search_errors']['invalid_search_string' . (!empty($foundBlackListedWords) ? '_blacklist' : '')] = true;
+		}
 		// All words/sentences must match.
 		elseif (empty($search_params['searchtype']))
 			$orParts[0] = $searchArray;

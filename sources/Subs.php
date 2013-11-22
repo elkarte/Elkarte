@@ -2369,8 +2369,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			global $fn_num, $fn_content, $fn_count;
 
 			$fn_num++;
-			$fn_content[] = "<sup id=\"fn$fn_num" . "_" . "$fn_count\">$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a>";
-			return "<a href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
+			$fn_content[] = "<div class=\"target\" id=\"fn$fn_num" . "_" . "$fn_count\"><sup>$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a></div>";
+			return "<a class=\"target\" href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
 
 		$fn_total += $fn_num;
 

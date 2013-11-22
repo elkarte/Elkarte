@@ -492,7 +492,6 @@ class ManageSecurity_Controller extends Action_Controller
 		// Build up our options array
 		$config_vars = array(
 			array('title', 'badbehavior_title'),
-				array('desc', 'badbehavior_desc'),
 				array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
 				array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
 				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
