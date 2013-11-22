@@ -143,6 +143,9 @@ body {
 div.bbc_footnotes {
 	border-top: 1px solid #bfbfbf;
 }
+.bbc_footnotes .target:target {
+	background-color: #d8ffdf;
+}
 sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50aa3a;
 	font-weight: 700;
