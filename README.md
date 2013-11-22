@@ -2,26 +2,28 @@
 
 This is the **ElkArte** development repository.
 
+ElkArte is a completely free software, licensed as open source under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause). Enjoy the benefits of Volunteers from around the world who spend time making ElkArte what it is today.
 
-ElkArte is a modified version of the SMF forum software.
-
-The software is licensed under [BSD 3-clause license](http://www.opensource.org/licenses/BSD-3-Clause).
+ElkArte is a online forum software and much more, including super-cool features such as Posting by Email, Mentioning users, Notifications, Likes and more cool stuff you may already know from the common social networking platforms. Test ElkArte yourself by [visiting ElkArte.net](http://www.elkarte.net).
 
 Contributions to documentation are licensed under [CC-by-SA 3](http://creativecommons.org/licenses/by-sa/3.0). Third party libraries or sets of images, are under their own licenses.
 
-Notes:
-===
+## Setting up an ElkArte Forum:
+
+If you're not here to play with the open source code, but instead would like to set up an ElkArte forum, see our Install Guide. Be warned, however, that ElkArte is still very much beta software, and you will run in to bugs and install problems.  You may even need a background as a developer to set it up successfully.  The system requirements are PHP(5.1+) and a database engine MySql and PostGre are supported.
+
+## Contributing:
+
 Feel free to fork this repository and make your desired changes.
 
-Please see the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) in the repository:
-by signing off your contributions, you acknowledge that you can and do license your submissions under the license of the project.
+Please see the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) in the repository: by signing off your contributions, you acknowledge that you can and do license your submissions under the license of the project.
 
-Please see [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) for information on how to contribute to the development process.
+Please see our [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) secion for information on how to contribute to the ElkArte Project.
 
 [![Build Status](https://travis-ci.org/elkarte/Elkarte.png?branch=master)](https://travis-ci.org/elkarte/Elkarte)
 
-Site and IRC
-===
+## Site and IRC
+
 Join us on IRC, on #elkarte channel on freenode.
 
-Project site: www.elkarte.net
+Project site: [www.elkarte.net](http://www.elkarte.net)
