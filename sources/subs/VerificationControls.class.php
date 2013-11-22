@@ -709,7 +709,7 @@ class Control_Verification_EmptyField implements Control_Verifications
 			return;
 
 		// Building a field with a believable name that will be inserted lives in the template.
-		if ($refresh)
+		if ($refresh || !isset($_SESSION[$this->_options['id'] . '_vv']['empty_field']))
 		{
 			$start = mt_rand(0, 27);
 			$this->_hash = substr(md5(time()), $start, 6);
