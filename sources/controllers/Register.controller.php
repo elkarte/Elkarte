@@ -252,15 +252,16 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context, $user_info;
 
+		// Start collecting together any errors.
+		$reg_errors = Error_Context::context('register', 0);
+
 		// We can't validate the token and the session with OpenID enabled.
 		if(!$verifiedOpenID)
 		{
 			checkSession();
-			validateToken('register');
+			if (!validateToken('register', 'post', true, false))
+				$reg_errors->addError('token_verification');
 		}
-
-		// Start collecting together any errors.
-		$reg_errors = Error_Context::context('register', 0);
 
 		// Did we save some open ID fields?
 		if ($verifiedOpenID && !empty($context['openid_save_fields']))

@@ -14,6 +14,7 @@ $txt['agree_coppa_below'] = 'I am younger than %1$d years old.';
 // Registration form.
 $txt['registration_form'] = 'Registration Form';
 $txt['error_too_quickly'] = 'You went through the registration process too quickly, faster than should normally be possible. Please wait a moment and try again.';
+$txt['error_token_verification'] = 'Token verification failed. Please try again.';
 $txt['need_username'] = 'You need to fill in a username.';
 $txt['no_password'] = 'You didn\'t enter your password.';
 $txt['incorrect_password'] = 'Password incorrect';
