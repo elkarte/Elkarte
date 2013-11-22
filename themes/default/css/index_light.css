@@ -68,8 +68,27 @@ body {
 	color: #666;
 }
 
-
-
+fieldset {
+	border: none;
+	background: transparent;
+	border: 1px solid #ccc;
+	padding: 6px;
+	box-shadow: none;
+	box-shadow: inset -1px -1px 3px #fff;
+	border-radius: 5px;
+	margin: 5px 0;
+}
+legend {
+	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
+	color: #333;
+	font-size: 1.2em;
+	margin-left: 15px;
+}
+.collapsed legend {
+	background:  url(../images/selected.png) no-repeat scroll left center transparent;
+}
 
 /* @todo - Quite a lot more code to be split. */
 
