@@ -380,6 +380,8 @@ class Control_Verification_Questions implements Control_Verifications
 		// Getting some new questions?
 		if ($refresh)
 		{
+			$this->_questionIDs = array();
+
 			// Pick some random IDs
 			if ($this->_number_questions == 1)
 				$this->_questionIDs[] = $this->_possible_questions[array_rand($this->_possible_questions, $this->_number_questions)];
