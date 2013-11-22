@@ -192,7 +192,22 @@ legend {
 	padding: 0 20px;
 	line-height: 1.7em;
 }
-
+#yourVersion, #ourVersion {
+	white-space: nowrap;
+}
+.versionFile {
+	width: 50%;
+}
+.versionFilePad {
+	padding-left: 3ex;
+	width: 50%;
+}
+.versionNumber {
+	width: 25%;
+}
+.censorWords {
+	margin-top: 1ex;
+}
 /* Cleaned this up a bit for less clutter.
 /* Admin and moderation could generally do with a clean up everywhere.
 /* Live news from smf.org and support information. */

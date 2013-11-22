@@ -17,7 +17,7 @@
 /**
  * Recent posts page.
  */
-function template_main()
+function template_recent()
 {
 	global $context, $settings, $txt, $scripturl;
 

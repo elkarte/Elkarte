@@ -57,9 +57,9 @@ function template_admin()
 										<div id="version_details">
 											<strong>', $txt['support_versions'], ':</strong><br />
 											', $txt['support_versions_forum'], ':
-											<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em><br />
+											<em id="yourVersion">', $context['forum_version'], '</em><br />
 											', $txt['support_versions_current'], ':
-											<em id="ourVersion" style="white-space: nowrap;">??</em><br />
+											<em id="ourVersion">??</em><br />
 											', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
@@ -173,9 +173,9 @@ function template_credits()
 								<div class="content">
 									<strong>', $txt['support_versions'], ':</strong><br />
 										', $txt['support_versions_forum'], ':
-									<em id="yourVersion" style="white-space: nowrap;">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
+									<em id="yourVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
 										', $txt['support_versions_current'], ':
-									<em id="ourVersion" style="white-space: nowrap;">??</em><br />';
+									<em id="ourVersion">??</em><br />';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
@@ -325,13 +325,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<thead>
 									<tr class="table_head lefttext">
-										<th scope="col" style="width:50%">
+										<th scope="col" class="versionFile">
 											<strong>', $txt['admin_elkfile'], '</strong>
 										</th>
-										<th scope="col" style="width:25%">
+										<th scope="col" class="versionNumber">
 											<strong>', $txt['dvc_your'], '</strong>
 										</th>
-										<th scope="col" style="width:25%">
+										<th scope="col" class="versionNumber">
 											<strong>', $txt['dvc_current'], '</strong>
 										</th>
 									</tr>
@@ -375,13 +375,13 @@ function template_view_versions()
 	foreach ($context['file_versions'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yoursources', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="oursources', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -396,13 +396,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber>
 											<em id="youradmin">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ouradmin">??</em>
 										</td>
 									</tr>
@@ -416,13 +416,13 @@ function template_view_versions()
 	foreach ($context['file_versions_admin'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="youradmin', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="ouradmin', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -437,13 +437,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="controllers-link">', $txt['dvc_controllers'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourcontrollers">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourcontrollers">??</em>
 										</td>
 									</tr>
@@ -457,13 +457,13 @@ function template_view_versions()
 	foreach ($context['file_versions_controllers'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yourcontrollers', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="ourcontrollers', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -478,13 +478,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="database-link">', $txt['dvc_database'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourdatabase">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourdatabase">??</em>
 										</td>
 									</tr>
@@ -498,13 +498,13 @@ function template_view_versions()
 	foreach ($context['file_versions_database'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yourdatabase', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="ourdatabase', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -519,13 +519,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="subs-link">', $txt['dvc_subs'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yoursubs">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="oursubs">??</em>
 										</td>
 									</tr>
@@ -539,13 +539,13 @@ function template_view_versions()
 	foreach ($context['file_versions_subs'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+									<td class="windowbg2 versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="yoursubs', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2" style="width:25%">
+									<td class="windowbg2 versionNumber">
 										<em id="oursubs', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -560,13 +560,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="default-link">', $txt['dvc_default'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourdefault">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourdefault">??</em>
 										</td>
 									</tr>
@@ -579,13 +579,13 @@ function template_view_versions()
 	foreach ($context['default_template_versions'] as $filename => $version)
 		echo '
 									<tr>
-										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+										<td class="windowbg2 versionFilePad">
 											', $filename, '
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="yourdefault', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="ourdefault', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -598,13 +598,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="Languages-link">', $txt['dvc_languages'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourLanguages">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourLanguages">??</em>
 										</td>
 									</tr>
@@ -619,13 +619,13 @@ function template_view_versions()
 		foreach ($files as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+										<td class="windowbg2 versionFilePad">
 											', $filename, '.<em>', $language, '</em>.php
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="your', $filename, '.', $language, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="our', $filename, '.', $language, '">??</em>
 										</td>
 									</tr>';
@@ -642,13 +642,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg" style="width:50%">
+										<td class="windowbg versionFile">
 											<a href="#" id="Templates-link">', $txt['dvc_templates'], '</a>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="yourTemplates">??</em>
 										</td>
-										<td class="windowbg" style="width:25%">
+										<td class="windowbg versionNumber">
 											<em id="ourTemplates">??</em>
 										</td>
 									</tr>
@@ -661,13 +661,13 @@ function template_view_versions()
 		foreach ($context['template_versions'] as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2" style="width:50%;padding-left: 3ex;">
+										<td class="windowbg2 versionFilePad">
 											', $filename, '
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="yourTemplates', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2" style="width:25%">
+										<td class="windowbg2 versionNumber">
 											<em id="ourTemplates', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -727,16 +727,16 @@ function template_edit_censored()
 	// Show text boxes for censoring [bad   ] => [good  ].
 	foreach ($context['censored_words'] as $vulgar => $proper)
 		echo '
-					<div style="margin-top: 1ex;">
+					<div class="censorWords">
 						<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> => <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
 					</div>';
 
 	// Now provide a way to censor more words.
 	echo '
-					<div style="margin-top: 1ex;">
+					<div class="censorWords">
 						<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> => <input type="text" name="censor_proper[]" size="30" class="input_text" />
 					</div>
-					<div id="moreCensoredWords"></div><div style="margin-top: 1ex; display: none;" id="moreCensoredWords_link">
+					<div id="moreCensoredWords"></div><div class="censorWords" style="display: none;" id="moreCensoredWords_link">
 						<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 					</div>
 					<script><!-- // --><![CDATA[

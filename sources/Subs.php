@@ -3243,10 +3243,10 @@ function template_admin_warning_above()
 		{
 			foreach ($context['security_controls']['files']['to_remove'] as $securityFile)
 			{
-				echo '
-			', $txt['not_removed'], '<strong>', $securityFile, '</strong>',$txt['not_removed_2'],'!<br />';
+                    echo '
+                        ', sprintf($txt['not_removed'], '<strong>' . $securityFile . '</strong>'), '!<br />';
 
-				if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
+                                if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
 					echo '
 			', sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)), '<br />';
 			}

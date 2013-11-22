@@ -857,24 +857,48 @@ legend {
 	padding: 2px 2px 0 2px;
 }
 /* The main title. */
-.forumtitle {
+#forumtitle, #forumtitleright {
 	float: left;
 	padding: 10px 10px 6px 8px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
-/* Float these items to the right. @todo - Simplify. */
-#siteslogan, #logo {
+#forumtitlenone {
+	display: none;
+}
+#forumtitleright {
 	float: right;
-	margin: 0;
+}
+/* Float these items to the right. @todo - Simplify. */
+#logobox, #logoboxleft {
+	float: right;
 	padding: 0.95em 12px 0 12px;
-	font-size: 1.8em;
-	line-height: 1.5em;
+	max-width: 40%;
+}
+#logoboxcenter {
+	width: 100%;
+}
+#logoboxleft, #logoboxleft #logo {
+	float: left;
+	padding-bottom: 7px;
+}
+#logoboxcenter, #logoboxcenter #logo, #logoboxcenter #siteslogan {
+	float: none;
+	display: block;
+	margin: 0 auto;
+	text-align: center;
+}
+#siteslogan {
+	clear: both;
 }
 /* Tweak the logo */
 #logo {
 	margin: 0 8px 0 0;
 	padding: 0;
+	float: right;
+}
+#logoboxleft #logo {
+	margin: 0 0 0 8px;
 }
 /* Main forum area. */
 /* Box-shadow only on this one. */
@@ -4231,10 +4255,6 @@ a.help .icon {
 	.board_lastpost {
 		display: none;
 	}
-	.board_latest {
-		padding-left: 64px;
-		border-left: none;
-	}
 	.board_description, .moderators {
 		display: none;
 	}
@@ -4286,7 +4306,7 @@ a.help .icon {
 		display: block;
 		float: none;
 	}
-	#news, #logo, #top_section_notice {
+	#news, #logobox, #logoboxleft, #top_section_notice {
 		display: none;
 	}
 	.avatar>.linklevel1>.avatar {
@@ -4319,10 +4339,11 @@ a.help .icon {
 	}
 	.board_info, .board_latest {
 		width: 100%;
+		display: block;
 	}
-	.board_info a img {
-		width: 20px;
-		height: 20px;
+	.board_info span {
+		width: 30px;
+		height: 30px;
 	}
 	.board_info h3 a {
 		font-size: 1.3em;
@@ -4339,6 +4360,14 @@ a.help .icon {
 	}
 	.board_lastpost {
 		padding-top: 6px;
+	}
+	.topic_listing>li {
+		border: 1px solid #aaa;
+		box-shadow: 3px 3px 6px #e5e5e5;
+		margin-bottom: 5px;
+	}
+	.topic_name h4 {
+		font-size: 1.8em;
 	}
 	.icon_anchor {
 		min-width: 0;
@@ -4370,7 +4399,12 @@ a.help .icon {
 		display: none;
 	}
 	#main_menu li, .admin_menu li{
-		float: none;
+		float: left;
+		display: block;
+		width: 48%;
+	}
+	#main_menu {
+		clear: left;
 	}
 	.listlevel2:hover .menulevel3, .listlevel2.sfhover .menulevel3 {
 		left: -4px;
@@ -4382,6 +4416,9 @@ a.help .icon {
 		margin: -2em 0 0 4em;
 		max-width: 15em;
 	}
+	.generalinfo {
+		overflow: auto;
+	}
 	ul.poster {
 		display: block;
 		clear: both;
@@ -4389,15 +4426,21 @@ a.help .icon {
 	}
 	.poster {
 		float: none;
-		padding: 0 1em 0 1.5em;
 	}
 	.poster .listlevel1 {
 		display: inline-block;
 	}
+	.poster li.membergroup {
+		display: none;
+	}
+	.poster li.avatar {
+		float: left;
+	}
 	.poster .subsections {
 		max-width: 120px;
 		max-height: 1.5em;
-		float: left;
+		float: right;
+		text-align: right;
 	}
 	.poster .subsections>a {
 		text-overflow: ellipsis;
@@ -4417,7 +4460,52 @@ a.help .icon {
 		border-bottom: 1px solid #BFBFBF;
 		padding-bottom: 3px;
 	}
-
+	.postarea, .forumtitle {
+		padding: 2px;
+	}
+	.linktree .board_moderators, .linktree_last .board_moderators {
+		display: none;
+	}
+	.signature {
+		display: none;
+	}
+	.forumposts .windowbg2 {
+		background-color: #fafafa;
+	}
+	.forumposts .windowbg, .forumposts .windowbg2 {
+		margin-bottom: 6px;
+		border: 1px solid #ccc;
+		box-shadow: 3px 3px 6px #e5e5e5;
+	}
+	.navigate_section, .linktree, .linktree:before, .linktree:after, .linktree_last,
+	.linktree_last:before, .linktree_last:after {
+		border: none !important;
+		background: none !important;
+	}
+	.linktree:after {
+		content: ">";
+	}
+	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a, 
+	.linktree_last>a:hover, .linktree_last strong {
+		color: #666 !important;
+	}
+	#button_admin, #button_home, #moderationbuttons,  a.linklevel1.button_strip_notify,
+	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
+	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
+	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
+	#button_profile, #collapse_button, p.inline.membergroups {
+		display: none !important;
+	}
+	.quickbuttons {
+		margin: 8px 8px 6px 3px;
+	}
+	#search_form {
+		float: none;
+		text-align: center;
+	}
+	.small_pagelinks, .sort_by_container {
+		display: none;
+	}
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */
 	.split_topics, .move_topic {

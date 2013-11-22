@@ -521,8 +521,7 @@ $txt['search_advanced'] = 'Erweiterte Optionen anzeigen';
 $txt['search_simple'] = 'Erweiterte Optionen verstecken';
 
 $txt['security_risk'] = 'GROSSES SICHERHEITSRISIKO:';
-$txt['not_removed'] = 'Sie haben vergessen, ';
-$txt['not_removed_2'] = 'zu entfernen';
+$txt['not_removed'] = 'Sie haben %1$s nicht entfernt';
 $txt['not_removed_extra'] = '%1$s ist eine Sicherungskopie von %2$s, die nicht von ElkArte erzeugt wurde. Sie kann direkt aufgerufen und verwendet werden, um vollen Zugriff auf das Forum zu erhalten. Sie sollten sie umgehend löschen.';
 $txt['generic_warning'] = 'Warnung';
 $txt['agreement_missing'] = 'Sie haben eingestellt, dass neue Benutzer einer Vereinbarung zustimmen müssen, diese (agreement.txt) existiert jedoch nicht.';
@@ -613,7 +612,6 @@ $txt['target_board'] = 'Zielforum';
 $txt['target_topic'] = 'Zielthema';
 $txt['merge_confirm'] = 'Sind Sie sich sicher, dass Sie';
 $txt['with'] = 'zusammenführen möchten mit';
-
 $txt['merge_desc'] = 'Diese Funktion wird die Beiträge zweier Themen in ein Thema zusammenführen. Die Beiträge werden nach der Zeit ihrer Erstellung sortiert. Daher wird der zuerst erstellte Beitrag der erste Beitrag des zusammengeführten Themas sein.';
 
 $txt['theme_template_error'] = 'Konnte die Vorlage \'%1$s\' nicht laden.';
@@ -647,7 +645,6 @@ $txt['more'] = 'mehr';
 
 $txt['hostname'] = 'Hostname';
 $txt['you_are_post_banned'] = 'Verzeihung, %1$s, Sie wurden vom Schreiben von Beiträgen und privaten Nachrichten in diesem Forum ausgeschlossen.';
-
 $txt['ban_reason'] = 'Grund';
 
 $txt['tables_optimized'] = 'Datenbanktabellen optimiert';
