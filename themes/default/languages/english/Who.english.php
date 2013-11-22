@@ -131,7 +131,7 @@ $txt['who_pm_byemail'] = 'Sending a personal message by email.';
 
 // Credits text
 $txt['credits'] = 'Credits';
-$txt['credits_intro'] = 'ElkArte wants to thank everyone who helped make it possible it is today.  It wouldn\'t have been possible without you. Thanks for installing and using our software as well as providing valuable feedback, bug reports, and opinions.';
+$txt['credits_intro'] = 'ElkArte is 100% free and open-source. We encourage and support an active, open community that accepts contributions from the public.  We want to thank everyone who supported the project by providing code, feedback, bug reports, and opinions, as none of this would have been possible without you.  We also want to specially acknowledge <a href="https://github.com/SimpleMachines">SMF</a>, the project that ElkArte was born from.';
 $txt['credits_contributors'] = 'Contributors';
 $txt['credits_and'] = 'and';
 $txt['credits_copyright'] = 'Copyrights';
@@ -141,7 +141,8 @@ $txt['credits_software_graphics'] = 'Software/Graphics';
 $txt['credits_software'] = 'Software';
 $txt['credits_graphics'] = 'Graphics';
 $txt['credits_fonts'] = 'Fonts';
-$txt['credits_groups_dev'] = 'Developers';
+$txt['credits_groups_contrib'] = 'Contributors';
+$txt['credits_contrib_list'] = 'For a complete list of the many individuals that contributed to the design and implementation of Elkarte, please refer to the official GitHub <a href="https://github.com/elkarte/Elkarte/graphs/contributors">list of contributors.</a>';
 $txt['credits_license'] = 'License';
 $txt['credits_copyright'] = 'Copyright';
 $txt['credits_version'] = 'Version';
