@@ -916,13 +916,6 @@ legend {
 #news {
 	vertical-align: top;
 }
-#upper_section>.user {
-	display: table-cell;
-	vertical-align: top;
-	min-width: 26em;
-	font-size: 0.857em;
-	white-space: nowrap;
-}
 .greeting {
 	float: right;
 	font-weight: bold;
