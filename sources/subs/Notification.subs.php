@@ -25,7 +25,7 @@ function countUserNotifications($all = false, $type = '', $id_member = null)
 	global $user_info;
 
 	$db = database();
-	$id_member === null ? $user_info['id'] : (int) $id_member;
+	$id_member = $id_member === null ? $user_info['id'] : (int) $id_member;
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
