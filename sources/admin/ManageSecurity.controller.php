@@ -339,7 +339,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// we're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// instantiate the form
 		$this->_spamSettings = new Settings_Form();
@@ -359,14 +359,7 @@ class ManageSecurity_Controller extends Action_Controller
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 		);
 
-		// @todo: maybe move the list to $modSettings instead of hooking it?
-		// Used in create_control_verification too
-		$known_verifications = array(
-			'captcha',
-			'questions',
-			'emptyfield',
-		);
-		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+		$known_verifications = loadVerificationControls();
 
 		foreach ($known_verifications as $verification)
 		{
@@ -614,7 +607,7 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt;
 
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// Build up our options array
 		$config_vars = array(
@@ -632,14 +625,7 @@ class ManageSecurity_Controller extends Action_Controller
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 		);
 
-		// @todo: maybe move the list to $modSettings instead of hooking it?
-		// Used in create_control_verification too
-		$known_verifications = array(
-			'captcha',
-			'questions',
-			'emptyfield',
-		);
-		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+		$known_verifications = loadVerificationControls();
 
 		foreach ($known_verifications as $verification)
 		{

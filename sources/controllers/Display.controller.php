@@ -252,7 +252,7 @@ class Display_Controller
 		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'post',
 			);

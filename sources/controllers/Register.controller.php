@@ -203,7 +203,7 @@ class Register_Controller extends Action_Controller
 		// Generate a visual verification code to make sure the user is no bot.
 		if (!empty($modSettings['reg_verification']) && $current_step > 1)
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'register',
 			);
@@ -309,7 +309,7 @@ class Register_Controller extends Action_Controller
 			// Check whether the visual verification code was entered correctly.
 			if (!empty($modSettings['reg_verification']))
 			{
-				require_once(SUBSDIR . '/Editor.subs.php');
+				require_once(SUBSDIR . '/VerificationControls.class.php');
 				$verificationOptions = array(
 					'id' => 'register',
 				);
@@ -898,7 +898,7 @@ class Register_Controller extends Action_Controller
 			loadLanguage('Errors');
 
 			// Could they get the right send topic verification code?
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// form validation
@@ -959,7 +959,7 @@ class Register_Controller extends Action_Controller
 		{
 			$context['sub_template'] = 'contact_form';
 
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'contactform',
 			);

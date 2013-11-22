@@ -78,7 +78,7 @@ class Search_Controller extends Action_Controller
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'search',
 			);
@@ -847,7 +847,7 @@ class Search_Controller extends Action_Controller
 				$context['search_errors']['need_verification_code'] = true;
 			else
 			{
-				require_once(SUBSDIR . '/Editor.subs.php');
+				require_once(SUBSDIR . '/VerificationControls.class.php');
 				$verificationOptions = array(
 					'id' => 'search',
 				);
