@@ -740,10 +740,10 @@ function showCodeImage($code)
 	// For non-hard things don't even change fonts.
 	if (!$varyFonts)
 	{
-		$font_list = array($font_list[0]);
+		$font_list = !empty($font_list) ? array($font_list[0]) : $font_list;
 		// Try use Screenge if we can - it looks good!
-		if (in_array('Screenge.ttf', $ttfont_list))
-			$ttfont_list = array('Screenge.ttf');
+		if (in_array('VDS_New.ttf', $ttfont_list))
+			$ttfont_list = array('VDS_New.ttf');
 		else
 			$ttfont_list = empty($ttfont_list) ? array() : array($ttfont_list[0]);
 
