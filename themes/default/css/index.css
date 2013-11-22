@@ -915,6 +915,7 @@ legend {
 /* The user info, news, etc.*/
 #news {
 	vertical-align: top;
+	padding: 0 0 1em 0;
 }
 .greeting {
 	float: right;
