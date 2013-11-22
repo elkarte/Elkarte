@@ -917,11 +917,7 @@ legend {
 	vertical-align: top;
 	padding: 0 0 1em 0;
 }
-.greeting {
-	float: right;
-	font-weight: bold;
-	padding-top: 10px;
-}
+
 /* The login form. */
 #guest_form {
 	padding: 0 0 8px 0;
