@@ -18,8 +18,9 @@ if (!defined('ELK'))
  *
  * @param bool $all : if true counts all the notifications, otherwise only the unread
  * @param string $type : the type of the notification
+ * @param string $id_member : the id of the member the counts are for, defaults to user_info['id']
  */
-function countUserNotifications($all = false, $type = '')
+function countUserNotifications($all = false, $type = '', $id_member = null)
 {
 	global $user_info;
 
@@ -37,7 +38,7 @@ function countUserNotifications($all = false, $type = '')
 			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND n.notif_type = {string:current_type}'),
 		array(
-			'current_user' => $user_info['id'],
+			'current_user' => $id_member === null ? $user_info['id'] : (int) $id_member,
 			'current_type' => $type,
 			'is_not_read' => 0,
 			'is_not_deleted' => 2,
@@ -49,7 +50,8 @@ function countUserNotifications($all = false, $type = '')
 	$db->free_result($request);
 
 	// Counts as maintenance! :P
-	updateMemberdata($user_info['id'], array('notifications' => $count));
+	if ($all === false)
+		updateMemberdata($user_info['id'], array('notifications' => $count));
 
 	return $count;
 }
@@ -175,6 +177,150 @@ function addNotifications($member_from, $members_to, $msg, $type, $time = null, 
 		$inserts,
 		array('id_notification')
 	);
+
+	// Update the member notification count
+	foreach ($inserts as $insert)
+		updateNotificationMenuCount($insert['status'], $insert['id_member']);
+}
+
+/**
+ * Changes a specific notification status for a member
+ * Can be used to mark as read, new, deleted, etc
+ *
+ * note that delete is a "soft-delete" because otherwise anyway we have to remember
+ * when a user was already notified for a certain message (e.g. in case of editing)
+ *
+ * @param int $id_notification the notified id in the db
+ * @param int $status status to update, 'new' => 0,	'read' => 1, 'deleted' => 2, 'unapproved' => 3
+ */
+function changeNotificationStatus($id_notification, $status = 1)
+{
+	global $user_info;
+
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_notifications
+		SET status = {int:status}
+		WHERE id_notification = {int:id_notification}',
+		array(
+			'id_notification' => $id_notification,
+			'status' => $status,
+		)
+	);
+	$success = $db->affected_rows() != 0;
+
+	// Update the top level notification count
+	if ($success)
+		updateNotificationMenuCount($status, $user_info['id']);
+
+	return $success;
+}
+
+/**
+ * Toggles a notification on/off
+ * This is used to turn notifications on when a message is approved
+ *
+ * @param array $msgs array of messages that you want to toggle
+ * @param type $approved direction of the toggle read / unread
+ */
+function toggleNotificationsApproval($msgs, $approved)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}log_notifications
+		SET status = {int:status}
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $msgs,
+			'status' => $approved ? 0 : 3,
+		)
+	);
+
+	// Update the notificaiton menu count for the members that have this message
+	$request = $db->query('', '
+		SELECT id_member, status
+		FROM {db_prefix}log_notifications
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $msgs,
+		)
+	);
+	$status = $approved ? 0 : 3;
+	while ($row = $db->fetch_row($request))
+		updateNotificationMenuCount($status, $row['id_member']);
+	$db->free_result($request);
+}
+
+/**
+ * To validate access to read/unread/delete notifications we need
+ * Called from the validation class
+ */
+function validate_ownnotification($field, $input, $validation_parameters = null)
+{
+	global $user_info;
+
+	if (!isset($input[$field]))
+		return;
+
+	if (!findMemberNotification($input[$field], $user_info['id']))
+	{
+		return array(
+			'field' => $field,
+			'input' => $input[$field],
+			'function' => __FUNCTION__,
+			'param' => $validation_parameters
+		);
+	}
+}
+
+/**
+ * Provided a notification id and a member id,
+ * checks if the notification belongs to that user
+ *
+ * @param integer $id_notification the id of an existing notification
+ * @param integer $id_member id of a member
+ * @return bool true if the notification belongs to the member, false otherwise
+ */
+function findMemberNotification($id_notification, $id_member)
+{
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT id_notification
+		FROM {db_prefix}log_notifications
+		WHERE id_notification = {int:id_notification}
+			AND id_member = {int:id_member}
+		LIMIT 1',
+		array(
+			'id_notification' => $id_notification,
+			'id_member' => $id_member,
+		)
+	);
+	$return = $db->num_rows($request);
+	$db->free_result($request);
+
+	return !empty($return);
+}
+
+/**
+ * Updates the notification count as a result of an action, read, new, delete, etc
+ *
+ * @param type $status
+ * @param type $member_id
+ */
+function updateNotificationMenuCount($status, $member_id)
+{
+	// If its new add to our menu count
+	if ($status === 0)
+		updateMemberdata($member_id, array('notifications' => '+'));
+	// Mark as read we decrease the count
+	elseif ($status === 1)
+		updateMemberdata($member_id, array('notifications' => '-'));
+	// Deleting or unapproving may have been read or not, so a count is required
+	else
+		countUserNotifications(false, '', $member_id);
 }
 
 /**
@@ -1003,109 +1149,6 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 
 	if (isset($current_language) && $current_language != $user_info['language'])
 		loadLanguage('Login');
-}
-
-/**
- * Changes a specific notification status for a member
- * Can be used to mark as read, new, deleted, etc
- *
- * note that delete is a "soft-delete" because otherwise anyway we have to remember
- * when a user was already notified for a certain message (e.g. in case of editing)
- *
- * @param int $id_member the notified member
- * @param int $msg the message the member was notified for
- * @param string $type the type of notification
- * @param int $id_member_from id of member that notified
- * @param int $log_time the time it was notified
- * @param int $status status to update, 'new' => 0,	'read' => 1, 'deleted' => 2, 'unapproved' => 3
- */
-function changeNotificationStatus($id_notification, $status = 1)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}log_notifications
-		SET status = {int:status}
-		WHERE id_notification = {int:id_notification}',
-		array(
-			'id_notification' => $id_notification,
-			'status' => $status,
-		)
-	);
-
-	return $db->affected_rows() != 0;
-}
-
-/**
- * Toggles a notification on/off
- * This is used to turn notifications on when a message is approved
- *
- * @param array $msgs array of messages that you want to toggle
- * @param type $approved direction of the toggle read / unread
- */
-function toggleNotificationsApproval($msgs, $approved)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}log_notifications
-		SET status = {int:status}
-		WHERE id_msg IN ({array_int:messages})',
-		array(
-			'messages' => $msgs,
-			'status' => $approved ? 0 : 3,
-		)
-	);
-}
-
-/**
- * Provided a notification id and a member id,
- * checks if the notification belongs to that user
- *
- * @param integer $id_notification the id of an existing notification
- * @param integer $id_member id of a member
- * @return bool true if the notification belongs to the member, false otherwise
- */
-function findMemberNotification($id_notification, $id_member)
-{
-	$db = database();
-
-	$request = $db->query('', '
-		SELECT id_notification
-		FROM {db_prefix}log_notifications
-		WHERE id_notification = {int:id_notification}
-			AND id_member = {int:id_member}
-		LIMIT 1',
-		array(
-			'id_notification' => $id_notification,
-			'id_member' => $id_member,
-		)
-	);
-	$return = $db->num_rows($request);
-	$db->free_result($request);
-
-	return !empty($return);
-}
-
-/**
- * To validate access to read/unread/delete notifications we need
- */
-function validate_ownnotification($field, $input, $validation_parameters = null)
-{
-	global $user_info;
-
-	if (!isset($input[$field]))
-		return;
-
-	if (!findMemberNotification($input[$field], $user_info['id']))
-	{
-		return array(
-			'field' => $field,
-			'input' => $input[$field],
-			'function' => __FUNCTION__,
-			'param' => $validation_parameters
-		);
-	}
 }
 
 /**
