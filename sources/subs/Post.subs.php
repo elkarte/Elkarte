@@ -1244,7 +1244,7 @@ function approvePosts($msgs, $approve = true)
 	if (!empty($modSettings['notifications_enabled']))
 	{
 		require_once(SUBSDIR . '/Notification.subs.php');
-		toggleNotificationsApproval($msgs, $approve);
+		toggleMentionsApproval($msgs, $approve);
 	}
 
 	// Update the last messages on the boards...

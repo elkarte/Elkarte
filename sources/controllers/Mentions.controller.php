@@ -287,7 +287,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_getNotificationCount($all, $type)
 	{
-		return countUserNotifications($all, $type);
+		return countUserMentions($all, $type);
 	}
 
 	/**
@@ -302,7 +302,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_loadNotifications($start, $limit, $sort, $all, $type)
 	{
-		return getUserNotifications($start, $limit, $sort, $all, $type);
+		return getUserMentions($start, $limit, $sort, $all, $type);
 	}
 
 	/**
@@ -322,7 +322,7 @@ class Mentions_Controller extends Action_Controller
 		if (empty($id_target))
 			return false;
 
-		addNotifications($user_info['id'], $id_target, $this->_validator->msg, $this->_validator->type, $this->_validator->log_time, $this->_data['status']);
+		addMentions($user_info['id'], $id_target, $this->_validator->msg, $this->_validator->type, $this->_validator->log_time, $this->_data['status']);
 	}
 
 	/**
@@ -366,7 +366,7 @@ class Mentions_Controller extends Action_Controller
 
 		$this->_buildUrl();
 
-		changeNotificationStatus($this->_validator->id_notification, $this->_known_status['read']);
+		changeMentionStatus($this->_validator->id_notification, $this->_known_status['read']);
 	}
 
 	/**
@@ -389,13 +389,13 @@ class Mentions_Controller extends Action_Controller
 			switch ($this->_validator->mark)
 			{
 				case 'read':
-					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['read']);
+					changeMentionStatus($this->_validator->id_notification, $this->_known_status['read']);
 					break;
 				case 'unread':
-					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['new']);
+					changeMentionStatus($this->_validator->id_notification, $this->_known_status['new']);
 					break;
 				case 'delete':
-					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['deleted']);
+					changeMentionStatus($this->_validator->id_notification, $this->_known_status['deleted']);
 					break;
 			}
 		}
