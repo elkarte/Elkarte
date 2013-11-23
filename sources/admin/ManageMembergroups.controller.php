@@ -67,7 +67,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				'permission' => 'manage_membergroups'),
 			'members' => array(
 				'controller' => 'Groups_Controller',
-				'function' => 'action_members',
+				'function' => 'action_index',
 				'permission' => 'manage_membergroups',
 				'file' => 'Groups.controller.php',
 				'dir' => CONTROLLERDIR),
