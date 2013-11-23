@@ -477,7 +477,7 @@ function template_quickreply_below()
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
 				});';
 
-		// Notifications enabled and only using a plain text quick reply?
+		// Mentions enabled and only using a plain text quick reply?
 		if (!empty($modSettings['mentions_enabled']) && empty($options['use_editor_quick_reply']))
 			echo '
 				add_elk_mention(\'#message\');';
@@ -520,7 +520,7 @@ function template_quickreply_below()
 	// Quick moderation options
 	echo '
 			<script><!-- // --><![CDATA[';
-	
+
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 		echo '
 				var oInTopicModeration = new InTopicModeration({

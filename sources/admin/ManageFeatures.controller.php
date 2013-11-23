@@ -57,7 +57,7 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_signatureSettings;
 
 	/**
-	 * Notifications settings form
+	 * Mentions settings form
 	 * @var Settings_Form
 	 */
 	protected $_mentionSettings;
@@ -510,7 +510,7 @@ class ManageFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * Retrieve and return all admin settings for notifications.
+	 * Retrieve and return all admin settings for mentions.
 	 */
 	private function _initMentionSettingsForm()
 	{
