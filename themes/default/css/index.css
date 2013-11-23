@@ -912,7 +912,7 @@ div.windowbg, div.windowbg2 {
 	padding-right: 5px;
 }
 /* No more huge avatars up top. YAY! */
-#top_section_notice .avatar img, .notifavatar .avatar {
+#top_section_notice .avatar img, .mentionavatar .avatar {
 	width: auto;
 	height: auto;
 	max-width: 36px;
@@ -3464,9 +3464,9 @@ div.labels {
 */
 
 
-/* NOTIFICATIONS	*/
+/* MENTIONS	*/
 /* ------------------------------------------------------- */
-.notifavatar .avatar {
+.mentionavatar .avatar {
 	display: block;
 }
 
@@ -4355,7 +4355,7 @@ a.help .icon {
 	.linktree:after {
 		content: ">";
 	}
-	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a, 
+	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
 	.linktree_last>a:hover, .linktree_last strong {
 		color: #666 !important;
 	}

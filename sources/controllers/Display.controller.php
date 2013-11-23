@@ -224,7 +224,7 @@ class Display_Controller
 		}
 
 		// Mark the mention as read if requested
-		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
+		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
 			require_once(CONTROLLERDIR . '/Mentions.controller.php');
 
