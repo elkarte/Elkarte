@@ -163,8 +163,8 @@ class Mentions_Controller extends Action_Controller
 						')
 					),
 					'sort' => array(
-						'default' => 'n.id_member_from',
-						'reverse' => 'n.id_member_from DESC',
+						'default' => 'mtn.id_member_from',
+						'reverse' => 'mtn.id_member_from DESC',
 					),
 				),
 				'type' => array(
@@ -188,8 +188,8 @@ class Mentions_Controller extends Action_Controller
 						')
 					),
 					'sort' => array(
-						'default' => 'n.mention_type',
-						'reverse' => 'n.mention_type DESC',
+						'default' => 'mtn.mention_type',
+						'reverse' => 'mtn.mention_type DESC',
 					),
 				),
 				'log_time' => array(
@@ -201,8 +201,8 @@ class Mentions_Controller extends Action_Controller
 						'timeformat' => true,
 					),
 					'sort' => array(
-						'default' => 'n.log_time DESC',
-						'reverse' => 'n.log_time',
+						'default' => 'mtn.log_time DESC',
+						'reverse' => 'mtn.log_time',
 					),
 				),
 				'action' => array(
