@@ -1406,6 +1406,9 @@ function membersBy($query, $query_params, $details = false)
 		),
 		'in_group_primary' => array('id_group = {int:in_group_primary}',),
 		'in_post_group' => array('id_post_group = {int:in_post_group}'),
+		'in_group_no_add' => array(
+			'(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)'
+		),
 	);
 
 	if (is_array($query))
@@ -1482,6 +1485,9 @@ function countMembersBy($query, $query_params)
 		),
 		'in_group_primary' => array('id_group = {int:in_group_primary}',),
 		'in_post_group' => array('id_post_group = {int:in_post_group}'),
+		'in_group_no_add' => array(
+			'(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)'
+		),
 	);
 
 	if (is_array($query))
