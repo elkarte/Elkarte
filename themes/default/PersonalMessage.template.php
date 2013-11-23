@@ -891,11 +891,11 @@ function template_send()
 
 	// Require an image to be typed to save spamming?
 	if ($context['require_verification'])
-		echo '
+		template_control_verification($context['visual_verification_id'], '
 					<div class="post_verification">
-						<strong>', $txt['pm_visual_verification_label'], ':</strong>
-						', template_control_verification($context['visual_verification_id'], 'all'), '
-					</div>';
+						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
+						', '
+					</div>');
 
 	// Send, Preview, spellchecker buttons.
 	echo '

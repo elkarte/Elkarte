@@ -16,8 +16,7 @@
  * This file deals with low-level graphics operations performed on images,
  * specially as needed for avatars (uploaded avatars), attachments, or
  * visual verification images.
- * It uses, for gifs at least, Gif Util. For more information on that,
- * please see its website.
+ *
  * TrueType fonts supplied by www.LarabieFonts.com
  *
  */
@@ -172,7 +171,7 @@ function imageMemoryCheck($sizes)
 {
 	global $modSettings;
 
-	// doing the old 'set it and hope' way?
+	// Doing the old 'set it and hope' way?
 	if (empty($modSettings['attachment_thumb_memory']))
 	{
 		setMemoryLimit('128M');
@@ -184,7 +183,7 @@ function imageMemoryCheck($sizes)
 	// simply a shortcut of 8bpp, 3 channels, 1.66 overhead
 	$needed_memory = ($sizes[0] * $sizes[1] * 5);
 
-	// if we need more, lets try to get it
+	// If we need more, lets try to get it
 	return setMemoryLimit($needed_memory, true);
 }
 
@@ -381,8 +380,8 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 
 		return $success;
 	}
+	// Without Image Magick or GD, no image resizing at all.
 	else
-		// Without Image Magick or GD, no image resizing at all.
 		return false;
 }
 
@@ -447,7 +446,6 @@ function imagecopyresamplebicubic($dst_img, $src_img, $dst_x, $dst_y, $src_x, $s
 		}
 	}
 }
-
 if (!function_exists('imagecreatefrombmp'))
 {
 	/**
@@ -605,7 +603,8 @@ if (!function_exists('imagecreatefrombmp'))
 					imagesetpixel($dst_img, $x, $y, $palette[(($byte) & 128) != 0]);
 					for ($shift = 1; $shift < 8; $shift++)
 					{
-						if (++$x < $info['width']) imagesetpixel($dst_img, $x, $y, $palette[(($byte << $shift) & 128) != 0]);
+						if (++$x < $info['width'])
+							imagesetpixel($dst_img, $x, $y, $palette[(($byte << $shift) & 128) != 0]);
 					}
 				}
 			}
@@ -639,9 +638,9 @@ function gif_outputAsPng($gif, $lpszFileName, $background_color = -1)
 	if (!($fh = @fopen($lpszFileName, 'wb')))
 		return false;
 
-	@fwrite($fh, $fd, strlen($fd));
-	@fflush($fh);
-	@fclose($fh);
+	fwrite($fh, $fd, strlen($fd));
+	fflush($fh);
+	fclose($fh);
 
 	return true;
 }
@@ -650,7 +649,7 @@ function gif_outputAsPng($gif, $lpszFileName, $background_color = -1)
  * Show an image containing the visual verification code for registration.
  * Requires the GD extension.
  * Uses a random font for each letter from default_theme_dir/fonts.
- * Outputs a gif or a png (depending on whether gif ix supported).
+ * Outputs a png if possible, otherwise a gif.
  *
  * @param string $code
  * @return false if something goes wrong.
@@ -660,9 +659,9 @@ function showCodeImage($code)
 	global $gd2, $settings, $user_info, $modSettings;
 
 	// Note: The higher the value of visual_verification_type the harder the verification is - from 0 as disabled through to 4 as "Very hard".
-
 	// What type are we going to be doing?
 	$imageType = $modSettings['visual_verification_type'];
+
 	// Special case to allow the admin center to show samples.
 	if ($user_info['is_admin'] && isset($_GET['type']))
 		$imageType = (int) $_GET['type'];
@@ -740,13 +739,13 @@ function showCodeImage($code)
 	// For non-hard things don't even change fonts.
 	if (!$varyFonts)
 	{
-		$font_list = array($font_list[0]);
+		$font_list = !empty($font_list) ? array($font_list[0]) : $font_list;
+
 		// Try use Screenge if we can - it looks good!
-		if (in_array('Screenge.ttf', $ttfont_list))
-			$ttfont_list = array('Screenge.ttf');
+		if (in_array('VDS_New.ttf', $ttfont_list))
+			$ttfont_list = array('VDS_New.ttf');
 		else
 			$ttfont_list = empty($ttfont_list) ? array() : array($ttfont_list[0]);
-
 	}
 
 	// Create a list of characters to be shown.
@@ -830,6 +829,7 @@ function showCodeImage($code)
 	if (!$disableChars)
 	{
 		$cur_x = 0;
+		$last_index = -1;
 		foreach ($characters as $char_index => $character)
 		{
 			// How much rotation will we give?
@@ -850,13 +850,12 @@ function showCodeImage($code)
 					array(0, 0, 0),
 					array(143, 39, 31),
 				);
-				// @todo why this is not initialized outside the loop?
-				if (!isset($last_index))
-					$last_index = -1;
+
+				// Pick a color, but not the same one twice in a row
 				$new_index = $last_index;
 				while ($last_index == $new_index)
 					$new_index = mt_rand(0, count($colors) - 1);
-				$char_fg_color = $colors[$new_index];
+ 				$char_fg_color = $colors[$new_index];
 				$last_index = $new_index;
 			}
 			elseif ($fontColorType == 'random')
@@ -890,6 +889,7 @@ function showCodeImage($code)
 				elseif ($is_reverse)
 				{
 					imagefilledpolygon($code_image, $fontcord, 4, $fg_color);
+
 					// Put the character back!
 					imagettftext($code_image, $font_size, $angle, $font_x, $font_y, $randomness_color, $fontface, $character['id']);
 				}
@@ -923,6 +923,7 @@ function showCodeImage($code)
 	// Make the background color transparent on the hard image.
 	if (!$simpleBGColor)
 		imagecolortransparent($code_image, $bg_color);
+
 	if ($hasBorder)
 		imagerectangle($code_image, 0, 0, $total_width - 1, $max_height - 1, $fg_color);
 
@@ -943,13 +944,15 @@ function showCodeImage($code)
 				{
 					$x1 = mt_rand(0, $total_width);
 					$x2 = mt_rand(0, $total_width);
-					$y1 = 0; $y2 = $max_height;
+					$y1 = 0;
+					$y2 = $max_height;
 				}
 				else
 				{
 					$y1 = mt_rand(0, $max_height);
 					$y2 = mt_rand(0, $max_height);
-					$x1 = 0; $x2 = $total_width;
+					$x1 = 0;
+					$x2 = $total_width;
 				}
 				imagesetthickness($code_image, mt_rand(1, 2));
 				imageline($code_image, $x1, $y1, $x2, $y2, mt_rand(0, 1) ? $fg_color : $randomness_color);

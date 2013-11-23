@@ -453,7 +453,7 @@ class Emailuser_Controller extends Action_Controller
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']);
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'report',
 			);
@@ -544,7 +544,7 @@ class Emailuser_Controller extends Action_Controller
 		// Could they get the right verification code?
 		if ($user_info['is_guest'] && !empty($modSettings['guests_report_require_captcha']))
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'report',
 			);

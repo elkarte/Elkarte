@@ -402,8 +402,8 @@ function template_quickreply_below()
 
 		// Is visual verification enabled?
 		if ($context['require_verification'])
-			echo '
-							<strong>', $txt['verification'], ':</strong>', template_control_verification($context['visual_verification_id'], 'quick_reply'), '<br />';
+			template_control_verification($context['visual_verification_id'], '
+							<strong>' . $txt['verification'] . ':</strong>', '<br />');
 
 		// Using the full editor
 		if (empty($options['use_editor_quick_reply']))

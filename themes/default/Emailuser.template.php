@@ -239,13 +239,13 @@ function template_report()
 
 	if ($context['require_verification'])
 	{
-		echo '
+		template_control_verification($context['visual_verification_id'], '
 							<dt>
-								', $txt['verification'], ':
+								' . $txt['verification'] . ':
 							</dt>
 							<dd>
-								', template_control_verification($context['visual_verification_id'], 'all'), '
-							</dd>';
+								', '
+							</dd>');
 	}
 
 	echo '

@@ -39,7 +39,7 @@ function template_main()
 						<div id="search_term_input">
 							<strong>', $txt['search_for'], ':</strong>
 							<input type="text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' maxlength="', $context['search_string_limit'], '" size="40" class="input_text" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />
-							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit" />', '
+							', $context['require_verification'] ? '' : '&nbsp;<input type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit" />', '
 						</div>';
 
 		if (empty($modSettings['search_simple_fulltext']))
@@ -47,12 +47,15 @@ function template_main()
 						<p class="smalltext">', $txt['search_example'], '</p>';
 
 		if ($context['require_verification'])
-			echo '
+		{
+			template_control_verification($context['visual_verification_id'], '
 						<div class="verification">
-							<strong>', $txt['search_visual_verification_label'], ':</strong>
-							<br />', template_control_verification($context['visual_verification_id'], 'all'), '<br />
-							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="right_submit"/>
+							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
+							<br />', '<br />');
+			echo '
+							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit"/>
 						</div>';
+		}
 
 		// Show the button to enable advanced search
 		echo '
@@ -139,11 +142,11 @@ function template_main()
 		// Require an image to be typed to save spamming?
 		if ($context['require_verification'])
 		{
-			echo '
+			template_control_verification($context['visual_verification_id'], '
 						<p>
-							<strong>', $txt['verification'], ':</strong>
-							', template_control_verification($context['visual_verification_id'], 'all'), '
-						</p>';
+							<strong>' . $txt['verification'] . ':</strong>
+							', '
+						</p>');
 		}
 
 		// If $context['search_params']['topic'] is set, that means we're searching just one topic.
