@@ -428,9 +428,9 @@ function prepareCreditsData()
 			'title' => $txt['credits_contributors'],
 			'groups' => array(
 				array(
-					'title' => $txt['credits_groups_dev'],
+					'title' => $txt['credits_groups_contrib'],
 					'members' => array(
-						'Add this at some point',
+						$txt['credits_contrib_list'],
 					),
 				),
 			),
