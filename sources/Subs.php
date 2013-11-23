@@ -3615,7 +3615,7 @@ function setupMenuContext()
 				'notification' => array(
 					'title' => $txt['notifications'],
 					'counter' => 'notifications',
-					'href' => $scripturl . '?action=notification',
+					'href' => $scripturl . '?action=mentions',
 					'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 				),
 

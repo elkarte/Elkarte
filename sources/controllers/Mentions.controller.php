@@ -120,7 +120,7 @@ class Mentions_Controller extends Action_Controller
 			'id' => 'list_mentions',
 			'title' => empty($this->_all) ? $txt['my_unread_mentions'] : $txt['my_mentions'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=notification;sa=list' . $this->_url_param,
+			'base_href' => $scripturl . '?action=mentions;sa=list' . $this->_url_param,
 			'default_sort_col' => 'log_time',
 			'default_sort_dir' => 'default',
 			'no_items_label' => $this->_all ? $txt['no_mentions_yet'] : $txt['no_new_mentions'],
@@ -147,7 +147,7 @@ class Mentions_Controller extends Action_Controller
 						'function' => create_function('$row', '
 							global $settings, $scripturl;
 
-							if (isset($settings[\'notifications\'][\'notifier_template\']))
+							if (isset($settings[\'mentions\'][\'mentioner_template\']))
 								return str_replace(
 									array(
 										\'{avatar_img}\',
@@ -159,7 +159,7 @@ class Mentions_Controller extends Action_Controller
 										!empty($row[\'id_member_from\']) ? $scripturl . \'?action=profile;u=\' . $row[\'id_member_from\'] : \'\',
 										$row[\'mentioner\'],
 									),
-									$settings[\'notifications\'][\'notifier_template\']);
+									$settings[\'mentions\'][\'mentioner_template\']);
 						')
 					),
 					'sort' => array(
@@ -181,8 +181,8 @@ class Mentions_Controller extends Action_Controller
 								\'{subject}\',
 							),
 							array(
-								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
-								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
+								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
+								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
 							), $txt[\'mention_\' . $row[\'notif_type\']]);
 						')
@@ -216,11 +216,11 @@ class Mentions_Controller extends Action_Controller
 							$opts = \'\';
 
 							if (empty($row[\'status\']))
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=read;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=read;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
 							else
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=unread;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=unread;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
 
-							return $opts . \'<a href="?action=notification;sa=updatestatus;mark=delete;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
+							return $opts . \'<a href="?action=mentions;sa=updatestatus;mark=delete;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
 					),
 				),
@@ -229,27 +229,27 @@ class Mentions_Controller extends Action_Controller
 				'show_on' => 'top',
 				'links' => array(
 					array(
-						'href' => $scripturl . '?action=notification' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => empty($this->_type),
 						'label' => $txt['mentions_type_all']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=men' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=men' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'men',
 						'label' => $txt['mentions_type_men']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=like' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=like' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'like',
 						'label' => $txt['mentions_type_like']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=rlike' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=rlike' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'rlike',
 						'label' => $txt['mentions_type_rlike']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=buddy' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=buddy' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'buddy',
 						'label' => $txt['mentions_type_buddy']
 					),
@@ -258,7 +258,7 @@ class Mentions_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'top_of_list',
-					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=notification' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
+					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=mentions' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
 				),
 			),
 		);
@@ -267,13 +267,13 @@ class Mentions_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['my_mentions'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_mentions_pages'], $this->_page) : '');
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=notification',
+			'url' => $scripturl . '?action=mentions',
 			'name' => $txt['my_mentions'],
 		);
 
 		if (!empty($this->_type))
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=notification;type=' . $this->_type,
+				'url' => $scripturl . '?action=mentions;type=' . $this->_type,
 				'name' => $txt['mentions_type_' . $this->_type],
 			);
 	}
@@ -400,7 +400,7 @@ class Mentions_Controller extends Action_Controller
 			}
 		}
 
-		redirectexit('action=notification;sa=list' . $this->_url_param);
+		redirectexit('action=mentions;sa=list' . $this->_url_param);
 	}
 
 	/**
