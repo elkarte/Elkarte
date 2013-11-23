@@ -57,6 +57,7 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 		$context['controls']['verification'][$verificationOptions['id']] = array(
 			'id' => $verificationOptions['id'],
 			'max_errors' => isset($verificationOptions['max_errors']) ? $verificationOptions['max_errors'] : 3,
+			'render' => false,
 		);
 	$thisVerification = &$context['controls']['verification'][$verificationOptions['id']];
 
@@ -136,6 +137,8 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	{
 		$instance->createTest($force_refresh);
 		$thisVerification['test'][$test] = $instance->prepareContext();
+		if ($instance->hasVisibleTemplate())
+			$thisVerification['render'] = true;
 	}
 
 	$_SESSION[$verificationOptions['id'] . '_vv']['count'] = empty($_SESSION[$verificationOptions['id'] . '_vv']['count']) ? 1 : $_SESSION[$verificationOptions['id'] . '_vv']['count'] + 1;
@@ -159,12 +162,17 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	return true;
 }
 
+/**
+ * A simple interface that defines all the methods a "Control_Verification"
+ * class must have because used in the process of creating the verification
+ */
 interface Control_Verifications
 {
 	function showVerification($isNew, $force_refresh = true);
 	function createTest($refresh = true);
 	function prepareContext();
 	function doTest();
+	function hasVisibleTemplate();
 	function settings();
 }
 
@@ -206,11 +214,15 @@ class Control_Verification_Captcha implements Control_Verifications
 		if ($isNew)
 		{
 			$this->_show_captcha = !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_option['override_visual']));
-			$this->_text_value = '';
-			$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
 
-			addInlineJavascript('
-				var verification' . $this->_options['id'] . 'Handle = new elkCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
+			if ($this->_show_captcha)
+			{
+				$this->_text_value = '';
+				$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
+
+				addInlineJavascript('
+					var verification' . $this->_options['id'] . 'Handle = new elkCaptcha("' . $this->_image_href . '", "' . $this->_options['id'] . '", ' . ($this->_use_graphic_library ? 1 : 0) . ');', true);
+			}
 		}
 
 		if ($isNew || $force_refresh)
@@ -260,6 +272,11 @@ class Control_Verification_Captcha implements Control_Verifications
 		if (!$this->_verifyCode())
 			return 'wrong_verification_code';
 
+		return true;
+	}
+
+	public function hasVisibleTemplate()
+	{
 		return true;
 	}
 
@@ -429,6 +446,11 @@ class Control_Verification_Questions implements Control_Verifications
 		if (!$this->_verifyAnswers())
 			return 'wrong_verification_answer';
 
+		return true;
+	}
+
+	public function hasVisibleTemplate()
+	{
 		return true;
 	}
 
@@ -664,6 +686,7 @@ class Control_Verification_EmptyField implements Control_Verifications
 {
 	private $_options = null;
 	private $_empty_field = null;
+	private $_field_name = null;
 	private $_tested = false;
 	private $_user_value = null;
 	private $_hash = null;
@@ -715,11 +738,15 @@ class Control_Verification_EmptyField implements Control_Verifications
 		{
 			$start = mt_rand(0, 27);
 			$this->_hash = substr(md5(time()), $start, 6);
+			$this->_field_name = $this->_terms[array_rand($this->_terms)] . '-' . $this->_second_terms[array_rand($this->_second_terms)] . '-' . $this->_hash;
 			$_SESSION[$this->_options['id'] . '_vv']['empty_field'] = '';
-			$_SESSION[$this->_options['id'] . '_vv']['empty_field'] = $this->_terms[array_rand($this->_terms)] . '-' . $this->_second_terms[array_rand($this->_second_terms)] . '-' . $this->_hash;
+			$_SESSION[$this->_options['id'] . '_vv']['empty_field'] = $this->_field_name;
 		}
 		else
+		{
+			$this->_field_name = $_SESSION[$this->_options['id'] . '_vv']['empty_field'];
 			$this->_user_value = !empty($_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']]) ? $_REQUEST[$_SESSION[$this->_options['id'] . '_vv']['empty_field']] : '';
+		}
 	}
 
 	/**
@@ -737,6 +764,7 @@ class Control_Verification_EmptyField implements Control_Verifications
 				// Can be used in the template to show the normally hidden field to add some spice to things
 				'show' => !empty($_SESSION[$this->_options['id'] . '_vv']['empty_field']) && (mt_rand(1, 100) > 60),
 				'user_value' => $this->_user_value,
+				'field_name' => $this->_field_name,
 				// Can be used in the template to randomly add a value to the empty field that needs to be removed when show is on
 				'clear' => (mt_rand(1, 100) > 60),
 			)
@@ -754,6 +782,11 @@ class Control_Verification_EmptyField implements Control_Verifications
 			return 'wrong_verification_answer';
 
 		return true;
+	}
+
+	public function hasVisibleTemplate()
+	{
+		return false;
 	}
 
 	/**

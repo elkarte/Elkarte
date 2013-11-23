@@ -346,13 +346,13 @@ function template_registration_form()
 
 	if ($context['visual_verification'])
 	{
-		echo '
-			<h3 class="category_header">', $txt['verification'], '</h3>
+		template_control_verification($context['visual_verification_id'], '
+			<h3 class="category_header">' . $txt['verification'] . '</h3>
 			<div class="windowbg2">
 				<fieldset class="content centertext">
-					', template_control_verification($context['visual_verification_id'], 'all'), '
+					', '
 				</fieldset>
-			</div>';
+			</div>');
 	}
 
 	echo '
@@ -782,13 +782,13 @@ function template_contact_form()
 
 	if ($context['require_verification'])
 	{
-			echo '
+			template_control_verification($context['visual_verification_id'], '
 					<dt>
-							', $txt['verification'], ':
+							' . $txt['verification'] . ':
 					</dt>
 					<dd>
-							', template_control_verification($context['visual_verification_id'], 'all'), '
-					</dd>';
+							', '
+					</dd>');
 	}
 
 	echo '

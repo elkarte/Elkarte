@@ -17,13 +17,16 @@
 /**
  * What's this, verification?!
  */
-function template_control_verification($verify_id)
+function template_control_verification($verify_id, $before = '', $after = '')
 {
 	global $context;
 
 	$verify_context = &$context['controls']['verification'][$verify_id];
 
 	$i = 0;
+
+	if ($verify_context['render'])
+		echo $before;
 
 	// Loop through each item to show them.
 	foreach ($verify_context['test'] as $key => $verification)
@@ -41,6 +44,9 @@ function template_control_verification($verify_id)
 
 		$i++;
 	}
+
+	if ($verify_context['render'])
+		echo $after;
 }
 
 /**
@@ -96,6 +102,6 @@ function template_control_verification_emptyfield($verify_id, $verify_context)
 	echo '
 			<div class="smalltext verification_control_valid">
 				', $txt['visual_verification_hidden'], ':
-				<input type="text" name="', $_SESSION[$verify_id . '_vv']['empty_field'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : '' ), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
+				<input type="text" name="', $verify_context['field_name'], '" autocomplete="off" size="30" value="', (!empty($verify_context['user_value']) ? $verify_context['user_value'] : '' ), '" tabindex="', $context['tabindex']++, '" class="', $verify_context['is_error'] ? 'border_error ' : '', 'input_text" />
 			</div>';
 }
