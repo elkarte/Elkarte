@@ -228,12 +228,12 @@ class Display_Controller
 		{
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
 
-			$notify = new Mentions_Controller();
-			$notify->setData(array(
+			$mentions = new Mentions_Controller();
+			$mentions->setData(array(
 				'id_notification' => $_REQUEST['item'],
 				'mark' => $_REQUEST['mark'],
 			));
-			$notify->action_markread();
+			$mentions->action_markread();
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.

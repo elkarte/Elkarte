@@ -1774,14 +1774,14 @@ class Post_Controller extends Action_Controller
 		if (!empty($modSettings['notifications_enabled']) && !empty($actually_mentioned))
 		{
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
-			$notify = new Mentions_Controller();
-			$notify->setData(array(
+			$mentions = new Mentions_Controller();
+			$mentions->setData(array(
 				'id_member' => $actually_mentioned,
 				'type' => 'men',
 				'id_msg' => $msgOptions['id'],
 				'status' => $becomesApproved ? 'new' : 'unapproved',
 			));
-			$notify->action_add();
+			$mentions->action_add();
 		}
 
 		if ($board_info['num_topics'] == 0)

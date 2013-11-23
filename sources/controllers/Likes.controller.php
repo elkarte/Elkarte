@@ -69,13 +69,13 @@ class Likes_Controller extends Action_Controller
 				if (!empty($modSettings['notifications_enabled']))
 				{
 					require_once(CONTROLLERDIR . '/Notification.controller.php');
-					$notify = new Mentions_Controller();
-					$notify->setData(array(
+					$mentions = new Mentions_Controller();
+					$mentions->setData(array(
 						'id_member' => $liked_message['id_member'],
 						'type' => 'like',
 						'id_msg' => $id_liked,
 					));
-					$notify->action_add();
+					$mentions->action_add();
 				}
 			}
 		}
@@ -111,13 +111,13 @@ class Likes_Controller extends Action_Controller
 				if (!empty($modSettings['notifications_enabled']))
 				{
 					require_once(CONTROLLERDIR . '/Notification.controller.php');
-					$notify = new Mentions_Controller();
-					$notify->setData(array(
+					$mentions = new Mentions_Controller();
+					$mentions->setData(array(
 						'uid' => $liked_message['id_member'],
 						'type' => 'rlike',
 						'msg' => $id_liked,
 					));
-					$notify->action_add();
+					$mentions->action_add();
 				}
 			}
 		}
