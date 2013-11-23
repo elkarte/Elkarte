@@ -315,7 +315,7 @@ function template_edit_group()
 					</dt>
 					<dd>';
 
-		template_add_edit_group_boards_list('groupForm');
+		template_add_edit_group_boards_list('groupForm', true ,false);
 
 		echo '
 					</dd>';
@@ -417,9 +417,9 @@ function template_edit_group()
  * @param int $form_id
  * @param bool $collapse
  */
-function template_add_edit_group_boards_list($form_id, $collapse = true)
+function template_add_edit_group_boards_list($form_id, $collapse = true, $deny = true)
 {
-	global $context, $txt, $modSettings;
+	global $context, $txt;
 
 	echo '
 							<fieldset id="visible_boards">
@@ -428,7 +428,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 
 	foreach ($context['categories'] as $category)
 	{
-		if (empty($modSettings['deny_boards_access']))
+		if (empty($deny))
 			echo '
 									<li class="category">
 										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_id, '\'); return false;"><strong>', $category['name'], '</strong></a>
@@ -450,7 +450,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 
 		foreach ($category['boards'] as $board)
 		{
-			if (empty($modSettings['deny_boards_access']))
+			if (empty($deny))
 				echo '
 										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
 											<input type="checkbox" name="boardaccess[', $board['id'], ']" id="brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="brd', $board['id'], '">', $board['name'], '</label>
@@ -475,7 +475,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 	echo '
 							</ul>';
 
-	if (empty($modSettings['deny_boards_access']))
+	if (empty($deny))
 		echo '
 								<br />
 								<input type="checkbox" id="checkall_check" class="input_check" onclick="invertAll(this, this.form, \'boardaccess\');" /> <label for="checkall_check"><em>', $txt['check_all'], '</em></label>
