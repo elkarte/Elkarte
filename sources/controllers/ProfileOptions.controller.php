@@ -158,7 +158,7 @@ class ProfileOptions_Controller extends Action_Controller
 				if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
 				{
 					require_once(CONTROLLERDIR . '/Notification.controller.php');
-					$notify = new Notification_Controller();
+					$notify = new Mentions_Controller();
 				}
 
 				// Add the new member to the buddies array.

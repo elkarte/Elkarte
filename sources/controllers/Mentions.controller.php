@@ -14,7 +14,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Notification_Controller extends Action_Controller
+class Mentions_Controller extends Action_Controller
 {
 	/**
 	 * Will hold all available notification types
@@ -62,6 +62,7 @@ class Notification_Controller extends Action_Controller
 			'deleted' => 2,
 			'unapproved' => 3,
 		);
+
 		// @todo is it okay to have it here?
 		call_integration_hook('integrate_add_notification', array(&$this->_known_notifications));
 	}

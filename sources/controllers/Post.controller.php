@@ -1774,7 +1774,7 @@ class Post_Controller extends Action_Controller
 		if (!empty($modSettings['notifications_enabled']) && !empty($actually_mentioned))
 		{
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
-			$notify = new Notification_Controller();
+			$notify = new Mentions_Controller();
 			$notify->setData(array(
 				'id_member' => $actually_mentioned,
 				'type' => 'men',

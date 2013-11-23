@@ -228,7 +228,7 @@ class Display_Controller
 		{
 			require_once(CONTROLLERDIR . '/Notification.controller.php');
 
-			$notify = new Notification_Controller();
+			$notify = new Mentions_Controller();
 			$notify->setData(array(
 				'id_notification' => $_REQUEST['item'],
 				'mark' => $_REQUEST['mark'],
