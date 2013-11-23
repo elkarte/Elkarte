@@ -275,7 +275,7 @@ class Admin_Controller extends Action_Controller
 				'likes' => array($txt['likes'], 'enabled' => in_array('l', $context['admin_features'])),
 				'sig' => array($txt['signature_settings_short']),
 				'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => in_array('cp', $context['admin_features'])),
-				'notification' => array($txt['notifications']),
+				'mention' => array($txt['mention']),
 			)
 		);
 
@@ -951,7 +951,7 @@ class Admin_Controller extends Action_Controller
 			array('layoutSettings', 'area=featuresettings;sa=layout', 'ManageFeatures_Controller'),
 			array('karmaSettings', 'area=featuresettings;sa=karma', 'ManageFeatures_Controller'),
 			array('likesSettings', 'area=featuresettings;sa=likes', 'ManageFeatures_Controller'),
-			array('NotificationSettings', 'area=featuresettings;sa=notification', 'ManageFeatures_Controller'),
+			array('mentionSettings', 'area=featuresettings;sa=mention', 'ManageFeatures_Controller'),
 			array('signatureSettings', 'area=featuresettings;sa=sig', 'ManageFeatures_Controller'),
 			array('securitySettings', 'area=securitysettings;sa=general', 'ManageSecurity_Controller'),
 			array('spamSettings', 'area=securitysettings;sa=spam', 'ManageSecurity_Controller'),

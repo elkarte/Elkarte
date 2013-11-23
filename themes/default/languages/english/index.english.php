@@ -332,7 +332,7 @@ $txt['or'] = 'or';
 
 $txt['no_matches'] = 'Sorry, no matches were found';
 
-$txt['notification'] = 'Notification';
+$txt['mention'] = 'Mentioning';
 $txt['notifications'] = 'Notifications';
 
 $txt['your_ban'] = 'Sorry %1$s, you are banned from using this forum!';

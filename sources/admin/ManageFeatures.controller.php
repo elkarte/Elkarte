@@ -99,9 +99,9 @@ class ManageFeatures_Controller extends Action_Controller
 				'enabled' => in_array('l', $context['admin_features']),
 				'permission' => 'admin_forum'
 			),
-			'notification' => array(
+			'mention' => array(
 				'controller' => $this,
-				'function' => 'action_notificationSettings_display',
+				'function' => 'action_mentionSettings_display',
 				'permission' => 'admin_forum'
 			),
 			'sig' => array(
@@ -150,8 +150,8 @@ class ManageFeatures_Controller extends Action_Controller
 				),
 				'likes' => array(
 				),
-				'notification' => array(
-					'description' => $txt['notification_settings_desc'],
+				'mention' => array(
+					'description' => $txt['mentions_settings_desc'],
 				),
 				'sig' => array(
 					'description' => $txt['signature_settings_desc'],
