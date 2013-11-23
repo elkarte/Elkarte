@@ -93,7 +93,7 @@ class Post_Controller extends Action_Controller
 			$context['preview_subject'] = '';
 		}
 
-		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 			$context['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 
 		// No message is complete without a topic.
@@ -839,9 +839,9 @@ class Post_Controller extends Action_Controller
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 
-		if (!empty($modSettings['notifications_enabled']))
+		if (!empty($modSettings['mentions_enabled']))
 		{
-			$context['notifications_enabled'] = true;
+			$context['mentions_enabled'] = true;
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
 			loadCSSFile('jquery.atwho.css');
 
@@ -1442,7 +1442,7 @@ class Post_Controller extends Action_Controller
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
-		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 		{
 			$query = array('and' => array('member_ids'));
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
@@ -1771,7 +1771,7 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		if (!empty($modSettings['notifications_enabled']) && !empty($actually_mentioned))
+		if (!empty($modSettings['mentions_enabled']) && !empty($actually_mentioned))
 		{
 			require_once(CONTROLLERDIR . '/Mentions.controller.php');
 			$mentions = new Mentions_Controller();

@@ -223,7 +223,7 @@ class Display_Controller
 			}
 		}
 
-		// Mark the notification as read if requested
+		// Mark the mention as read if requested
 		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
 		{
 			require_once(CONTROLLERDIR . '/Mentions.controller.php');
@@ -791,9 +791,9 @@ class Display_Controller
 		if (!empty($context['drafts_autosave']))
 			loadJavascriptFile('drafts.js');
 
-		if (!empty($modSettings['notifications_enabled']))
+		if (!empty($modSettings['mentions_enabled']))
 		{
-			$context['notifications_enabled'] = true;
+			$context['mentions_enabled'] = true;
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
 			loadCSSFile('jquery.atwho.css');
 

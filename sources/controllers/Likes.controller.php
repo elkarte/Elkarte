@@ -66,7 +66,7 @@ class Likes_Controller extends Action_Controller
 				likePost($user_info['id'], $liked_message, '+');
 
 				// Oh noes, taking the like back, let them know so they can complain
-				if (!empty($modSettings['notifications_enabled']))
+				if (!empty($modSettings['mentions_enabled']))
 				{
 					require_once(CONTROLLERDIR . '/Mentions.controller.php');
 					$mentions = new Mentions_Controller();
@@ -107,8 +107,8 @@ class Likes_Controller extends Action_Controller
 			{
 				likePost($user_info['id'], $liked_message, '-');
 
-				// Lets add in a notify to the member that just had their post liked
-				if (!empty($modSettings['notifications_enabled']))
+				// Lets add in a mention to the member that just had their post liked
+				if (!empty($modSettings['mentions_enabled']))
 				{
 					require_once(CONTROLLERDIR . '/Mentions.controller.php');
 					$mentions = new Mentions_Controller();

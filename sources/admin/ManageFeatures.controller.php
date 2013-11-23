@@ -526,15 +526,15 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// The notification settings
 		$config_vars = array(
-			array('title', 'notification_settings'),
-			array('check', 'notifications_enabled'),
-			array('check', 'notifications_buddy'),
+			array('title', 'mentions_settings'),
+			array('check', 'mentions_enabled'),
+			array('check', 'mentions_buddy'),
 		);
 
 		call_integration_hook('integrate_notification_settings', array(&$config_vars));
 
 		// Some context stuff
-		$context['page_title'] = $txt['notification_settings'];
+		$context['page_title'] = $txt['mentions_settings'];
 		$context['sub_template'] = 'show_settings';
 
 		return $this->_notificationSettings->settings($config_vars);
@@ -1661,8 +1661,9 @@ class ManageFeatures_Controller extends Action_Controller
 	public function NotificationSettings()
 	{
 		$config_vars = array(
-			array('title', 'notification_settings'),
-			array('check', 'enable_notifications'),
+			array('title', 'mentions_settings'),
+			array('check', 'mentions_enabled'),
+			array('check', 'mentions_buddy'),
 		);
 
 		return $config_vars;

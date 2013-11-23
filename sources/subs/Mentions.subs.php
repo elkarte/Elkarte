@@ -149,7 +149,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 		$existing[] = $row['id_member'];
 	$db->free_result($request);
 
-	// If the member has already been notified, it's not necessary to do it again
+	// If the member has already been mentioned, it's not necessary to do it again
 	foreach ($members_to as $id_member)
 		if (!in_array($id_member, $existing))
 			$inserts[] = array(
@@ -178,7 +178,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 		array('id_notification')
 	);
 
-	// Update the member notification count
+	// Update the member mention count
 	foreach ($inserts as $insert)
 		updateMentionMenuCount($insert['status'], $insert['id_member']);
 }
@@ -210,7 +210,7 @@ function changeMentionStatus($id_notification, $status = 1)
 	);
 	$success = $db->affected_rows() != 0;
 
-	// Update the top level notification count
+	// Update the top level mentions count
 	if ($success)
 		updateMentionMenuCount($status, $user_info['id']);
 

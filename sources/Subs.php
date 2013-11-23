@@ -3616,7 +3616,7 @@ function setupMenuContext()
 					'title' => $txt['notifications'],
 					'counter' => 'notifications',
 					'href' => $scripturl . '?action=notification',
-					'show' => !$user_info['is_guest'] && !empty($modSettings['notifications_enabled']),
+					'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 				),
 
 				// The old language string made no sense, and was too long.

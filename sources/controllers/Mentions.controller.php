@@ -7,7 +7,7 @@
  *
  * @version 1.0 Alpha
  *
- * Notify members.
+ * Mention members.
  *
  */
 
@@ -76,7 +76,7 @@ class Mentions_Controller extends Action_Controller
 		global $modSettings;
 
 		// I'm not sure this is needed, though better have it. :P
-		if (empty($modSettings['notifications_enabled']))
+		if (empty($modSettings['mentions_enabled']))
 			fatal_lang_error('no_access', false);
 
 		$this->_data = array(
@@ -118,12 +118,12 @@ class Mentions_Controller extends Action_Controller
 
 		$list_options = array(
 			'id' => 'list_mentions',
-			'title' => empty($this->_all) ? $txt['my_unread_notifications'] : $txt['my_notifications'],
+			'title' => empty($this->_all) ? $txt['my_unread_mentions'] : $txt['my_mentions'],
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=notification;sa=list' . $this->_url_param,
 			'default_sort_col' => 'log_time',
 			'default_sort_dir' => 'default',
-			'no_items_label' => $this->_all ? $txt['no_notifications_yet'] : $txt['no_new_notifications'],
+			'no_items_label' => $this->_all ? $txt['no_mentions_yet'] : $txt['no_new_mentions'],
 			'get_items' => array(
 				'function' => array($this, 'list_loadMentions'),
 				'params' => array(
@@ -141,7 +141,7 @@ class Mentions_Controller extends Action_Controller
 			'columns' => array(
 				'id_member_from' => array(
 					'header' => array(
-						'value' => $txt['notification_from'],
+						'value' => $txt['mentions_from'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -169,7 +169,7 @@ class Mentions_Controller extends Action_Controller
 				),
 				'type' => array(
 					'header' => array(
-						'value' => $txt['notification_what'],
+						'value' => $txt['mentions_what'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -184,7 +184,7 @@ class Mentions_Controller extends Action_Controller
 								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
 								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
-							), $txt[\'notification_\' . $row[\'notif_type\']]);
+							), $txt[\'mention_\' . $row[\'notif_type\']]);
 						')
 					),
 					'sort' => array(
@@ -194,7 +194,7 @@ class Mentions_Controller extends Action_Controller
 				),
 				'log_time' => array(
 					'header' => array(
-						'value' => $txt['notification_when'],
+						'value' => $txt['mentions_when'],
 					),
 					'data' => array(
 						'db' => 'log_time',
@@ -207,7 +207,7 @@ class Mentions_Controller extends Action_Controller
 				),
 				'action' => array(
 					'header' => array(
-						'value' => $txt['notification_action'],
+						'value' => $txt['mentions_action'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -216,9 +216,9 @@ class Mentions_Controller extends Action_Controller
 							$opts = \'\';
 
 							if (empty($row[\'status\']))
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=read;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=notification;sa=updatestatus;mark=read;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
 							else
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=unread;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=notification;sa=updatestatus;mark=unread;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
 
 							return $opts . \'<a href="?action=notification;sa=updatestatus;mark=delete;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
@@ -231,50 +231,50 @@ class Mentions_Controller extends Action_Controller
 					array(
 						'href' => $scripturl . '?action=notification' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => empty($this->_type),
-						'label' => $txt['notification_type_all']
+						'label' => $txt['mentions_type_all']
 					),
 					array(
 						'href' => $scripturl . '?action=notification;type=men' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'men',
-						'label' => $txt['notification_type_men']
+						'label' => $txt['mentions_type_men']
 					),
 					array(
 						'href' => $scripturl . '?action=notification;type=like' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'like',
-						'label' => $txt['notification_type_like']
+						'label' => $txt['mentions_type_like']
 					),
 					array(
 						'href' => $scripturl . '?action=notification;type=rlike' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'rlike',
-						'label' => $txt['notification_type_rlike']
+						'label' => $txt['mentions_type_rlike']
 					),
 					array(
 						'href' => $scripturl . '?action=notification;type=buddy' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'buddy',
-						'label' => $txt['notification_type_buddy']
+						'label' => $txt['mentions_type_buddy']
 					),
 				),
 			),
 			'additional_rows' => array(
 				array(
 					'position' => 'top_of_list',
-					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=notification' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['notification_unread'] : $txt['notification_all']) . '</a>',
+					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=notification' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
 				),
 			),
 		);
 
 		createList($list_options);
 
-		$context['page_title'] = $txt['my_notifications'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_notifications_pages'], $this->_page) : '');
+		$context['page_title'] = $txt['my_mentions'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_mentions_pages'], $this->_page) : '');
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=notification',
-			'name' => $txt['my_notifications'],
+			'name' => $txt['my_mentions'],
 		);
 
 		if (!empty($this->_type))
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=notification;type=' . $this->_type,
-				'name' => $txt['notification_type_' . $this->_type],
+				'name' => $txt['mentions_type_' . $this->_type],
 			);
 	}
 

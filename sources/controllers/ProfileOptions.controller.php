@@ -155,7 +155,7 @@ class ProfileOptions_Controller extends Action_Controller
 				);
 
 				// Let them know who's their buddy.
-				if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+				if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 				{
 					require_once(CONTROLLERDIR . '/Mentions.controller.php');
 					$mentions = new Mentions_Controller();
@@ -166,9 +166,9 @@ class ProfileOptions_Controller extends Action_Controller
 				{
 					$buddiesArray[] = (int) $row['id_member'];
 
-					if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+					if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 					{
-						// Set notifications for our buddy.
+						// Set a mentions for our buddy.
 						$mentions->setData(array(
 							'id_member' => $row['id_member'],
 							'type' => 'buddy',
