@@ -110,7 +110,7 @@ class Mentions_Controller extends Action_Controller
 		// Only registered members can be notified
 		is_not_guest();
 
-		require_once(SUBSDIR . '/Notification.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
 		require_once(SUBSDIR . '/List.class.php');
 		loadLanguage('Notification');
 
@@ -421,7 +421,7 @@ class Mentions_Controller extends Action_Controller
 	private function _isAccessible()
 	{
 		require_once(SUBSDIR . '/DataValidator.class.php');
-		require_once(SUBSDIR . '/Notification.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		$this->_validator = new Data_Validator();
 		$sanitization = array(
@@ -429,7 +429,7 @@ class Mentions_Controller extends Action_Controller
 			'mark' => 'trim',
 		);
 		$validation = array(
-			'id_notification' => 'validate_ownnotification',
+			'id_notification' => 'validate_ownmention',
 			'mark' => 'trim|contains[read,unread,delete]',
 		);
 
@@ -477,7 +477,7 @@ class Mentions_Controller extends Action_Controller
 			return false;
 
 		// If everything is fine, let's include our helper functions and prepare for the fun!
-		require_once(SUBSDIR . '/Notification.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
 		loadLanguage('Notification');
 
 		return true;

@@ -407,7 +407,6 @@ function sendBoardNotifications(&$topicData)
 	$db = database();
 
 	require_once(SUBSDIR . '/Mail.subs.php');
-	require_once(SUBSDIR . '/Notification.subs.php');
 
 	// Do we have one or lots of topics?
 	if (isset($topicData['body']))

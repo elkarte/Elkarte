@@ -1243,7 +1243,7 @@ function approvePosts($msgs, $approve = true)
 
 	if (!empty($modSettings['notifications_enabled']))
 	{
-		require_once(SUBSDIR . '/Notification.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
 		toggleMentionsApproval($msgs, $approve);
 	}
 
