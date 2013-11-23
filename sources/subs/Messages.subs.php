@@ -608,9 +608,9 @@ function removeMessage($message, $decreasePostCount = true)
 			)
 		);
 
-		// Remove the notifications!
+		// Remove the mentions!
 		$db->query('', '
-			DELETE FROM {db_prefix}log_notifications
+			DELETE FROM {db_prefix}log_mentions
 			WHERE id_msg = {int:id_msg}',
 			array(
 				'id_msg' => $message,

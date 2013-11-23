@@ -181,15 +181,15 @@ class Mentions_Controller extends Action_Controller
 								\'{subject}\',
 							),
 							array(
-								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
-								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
+								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_mention\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
+								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_mention\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
-							), $txt[\'mention_\' . $row[\'notif_type\']]);
+							), $txt[\'mention_\' . $row[\'mention_type\']]);
 						')
 					),
 					'sort' => array(
-						'default' => 'n.notif_type',
-						'reverse' => 'n.notif_type DESC',
+						'default' => 'n.mention_type',
+						'reverse' => 'n.mention_type DESC',
 					),
 				),
 				'log_time' => array(
@@ -216,11 +216,11 @@ class Mentions_Controller extends Action_Controller
 							$opts = \'\';
 
 							if (empty($row[\'status\']))
-								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=read;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=read;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
 							else
-								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=unread;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=unread;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
 
-							return $opts . \'<a href="?action=mentions;sa=updatestatus;mark=delete;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
+							return $opts . \'<a href="?action=mentions;sa=updatestatus;mark=delete;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
 					),
 				),
@@ -366,7 +366,7 @@ class Mentions_Controller extends Action_Controller
 
 		$this->_buildUrl();
 
-		changeMentionStatus($this->_validator->id_notification, $this->_known_status['read']);
+		changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
 	}
 
 	/**
@@ -377,7 +377,7 @@ class Mentions_Controller extends Action_Controller
 		checkSession('request');
 
 		$this->setData(array(
-			'id_notification' => $_REQUEST['item'],
+			'id_mention' => $_REQUEST['item'],
 			'mark' => $_REQUEST['mark'],
 		));
 
@@ -389,13 +389,13 @@ class Mentions_Controller extends Action_Controller
 			switch ($this->_validator->mark)
 			{
 				case 'read':
-					changeMentionStatus($this->_validator->id_notification, $this->_known_status['read']);
+					changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
 					break;
 				case 'unread':
-					changeMentionStatus($this->_validator->id_notification, $this->_known_status['new']);
+					changeMentionStatus($this->_validator->id_mention, $this->_known_status['new']);
 					break;
 				case 'delete':
-					changeMentionStatus($this->_validator->id_notification, $this->_known_status['deleted']);
+					changeMentionStatus($this->_validator->id_mention, $this->_known_status['deleted']);
 					break;
 			}
 		}
@@ -425,11 +425,11 @@ class Mentions_Controller extends Action_Controller
 
 		$this->_validator = new Data_Validator();
 		$sanitization = array(
-			'id_notification' => 'intval',
+			'id_mention' => 'intval',
 			'mark' => 'trim',
 		);
 		$validation = array(
-			'id_notification' => 'validate_ownmention',
+			'id_mention' => 'validate_ownmention',
 			'mark' => 'trim|contains[read,unread,delete]',
 		);
 

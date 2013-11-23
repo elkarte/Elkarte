@@ -230,7 +230,7 @@ class Display_Controller
 
 			$mentions = new Mentions_Controller();
 			$mentions->setData(array(
-				'id_notification' => $_REQUEST['item'],
+				'id_mention' => $_REQUEST['item'],
 				'mark' => $_REQUEST['mark'],
 			));
 			$mentions->action_markread();

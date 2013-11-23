@@ -329,8 +329,9 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 
+	// Remove the mentions
 	$db->query('', '
-		DELETE FROM {db_prefix}log_notifications
+		DELETE FROM {db_prefix}log_mentions
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,

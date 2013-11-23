@@ -314,9 +314,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		)
 	);
 
-	// Remove all notifications now that the topic is gone
+	// Remove all mentions now that the topic is gone
 	$db->query('', '
-		DELETE FROM {db_prefix}log_notifications
+		DELETE FROM {db_prefix}log_mentions
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $messages,

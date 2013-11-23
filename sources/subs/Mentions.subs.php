@@ -29,15 +29,15 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}log_notifications as n
-			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
+		FROM {db_prefix}log_mentions as mtn
+			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE ({query_see_board} OR n.id_msg = 0)
-			AND n.id_member = {int:current_user}
-			AND n.status != {int:unapproved}' . ($all ? '
-			AND n.status != {int:is_not_deleted}' : '
-			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND n.notif_type = {string:current_type}'),
+		WHERE ({query_see_board} OR mtn.id_msg = 0)
+			AND mtn.id_member = {int:current_user}
+			AND mtn.status != {int:unapproved}' . ($all ? '
+			AND mtn.status != {int:is_not_deleted}' : '
+			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
+			AND mtn.mention_type = {string:current_type}'),
 		array(
 			'current_user' => $id_member,
 			'current_type' => $type,
@@ -52,7 +52,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 
 	// Counts as maintenance! :P
 	if ($all === false)
-		updateMemberdata($id_member, array('notifications' => $count));
+		updateMemberdata($id_member, array('mentions' => $count));
 
 	return $count;
 }
@@ -62,7 +62,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  * callback for createList in action_list of Mentions_Controller
  *
  * @param int $start Query starts sending results from here
- * @param int $limit Number of notifications returned
+ * @param int $limit Number of mentions returned
  * @param string $sort Sorting
  * @param bool $all if show all mentions or only unread ones
  * @param string $type : the type of the mention
@@ -74,21 +74,21 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT n.id_notification, n.id_msg, n.id_member_from, n.log_time, n.notif_type, n.status,
+		SELECT mtn.id_mention, mtn.id_msg, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
 			m.subject, m.id_topic, m.id_board,
-			IFNULL(men.real_name, m.poster_name) as mentioner, men.avatar, men.email_address,
+			IFNULL(mem.real_name, m.poster_name) as mentioner, mem.avatar, mem.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
-		FROM {db_prefix}log_notifications AS n
-			LEFT JOIN {db_prefix}messages AS m ON (n.id_msg = m.id_msg)
+		FROM {db_prefix}log_mentions AS mtn
+			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			LEFT JOIN {db_prefix}members AS men ON (n.id_member_from = men.id_member)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = men.id_member)
-		WHERE ({query_see_board} OR n.id_msg = 0)
-			AND n.id_member = {int:current_user}' . ($all ? '
-			AND n.status != {int:unapproved}
-			AND n.status != {int:is_not_deleted}' : '
-			AND n.status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND n.notif_type = {string:current_type}') . '
+			LEFT JOIN {db_prefix}members AS mem ON (mtn.id_member_from = mem.id_member)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
+		WHERE ({query_see_board} OR mtn.id_msg = 0)
+			AND mtn.id_member = {int:current_user}' . ($all ? '
+			AND mtn.status != {int:unapproved}
+			AND mtn.status != {int:is_not_deleted}' : '
+			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
+			AND mtn.mention_type = {string:current_type}') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
 		array(
@@ -132,9 +132,9 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 	// $time is not checked because it's useless
 	$request = $db->query('', '
 		SELECT id_member
-		FROM {db_prefix}log_notifications
+		FROM {db_prefix}log_mentions
 		WHERE id_member IN ({array_int:members_to})
-			AND notif_type = {string:type}
+			AND mention_type = {string:type}
 			AND id_member_from = {int:member_from}
 			AND id_msg = {int:msg}',
 		array(
@@ -165,17 +165,17 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 		return;
 
 	$db->insert('',
-		'{db_prefix}log_notifications',
+		'{db_prefix}log_mentions',
 		array(
 			'id_member' => 'int',
 			'id_msg' => 'int',
 			'status' => 'int',
 			'id_member_from' => 'int',
 			'log_time' => 'int',
-			'notif_type' => 'string-5',
+			'mention_type' => 'string-5',
 		),
 		$inserts,
-		array('id_notification')
+		array('id_mention')
 	);
 
 	// Update the member mention count
@@ -190,21 +190,21 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
  * note that delete is a "soft-delete" because otherwise anyway we have to remember
  * when a user was already mentioned for a certain message (e.g. in case of editing)
  *
- * @param int $id_notification the mention id in the db
+ * @param int $id_mention the mention id in the db
  * @param int $status status to update, 'new' => 0,	'read' => 1, 'deleted' => 2, 'unapproved' => 3
  */
-function changeMentionStatus($id_notification, $status = 1)
+function changeMentionStatus($id_mention, $status = 1)
 {
 	global $user_info;
 
 	$db = database();
 
 	$db->query('', '
-		UPDATE {db_prefix}log_notifications
+		UPDATE {db_prefix}log_mentions
 		SET status = {int:status}
-		WHERE id_notification = {int:id_notification}',
+		WHERE id_mention = {int:id_mention}',
 		array(
-			'id_notification' => $id_notification,
+			'id_mention' => $id_mention,
 			'status' => $status,
 		)
 	);
@@ -229,7 +229,7 @@ function toggleMentionsApproval($msgs, $approved)
 	$db = database();
 
 	$db->query('', '
-		UPDATE {db_prefix}log_notifications
+		UPDATE {db_prefix}log_mentions
 		SET status = {int:status}
 		WHERE id_msg IN ({array_int:messages})',
 		array(
@@ -241,7 +241,7 @@ function toggleMentionsApproval($msgs, $approved)
 	// Update the mentions menu count for the members that have this message
 	$request = $db->query('', '
 		SELECT id_member, status
-		FROM {db_prefix}log_notifications
+		FROM {db_prefix}log_mentions
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $msgs,
@@ -279,22 +279,22 @@ function validate_ownmention($field, $input, $validation_parameters = null)
  * Provided a mentions id and a member id,
  * checks if the mentions belongs to that user
  *
- * @param integer $id_notification the id of an existing mention
+ * @param integer $id_mention the id of an existing mention
  * @param integer $id_member id of a member
  * @return bool true if the mention belongs to the member, false otherwise
  */
-function findMemberMention($id_notification, $id_member)
+function findMemberMention($id_mention, $id_member)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_notification
-		FROM {db_prefix}log_notifications
-		WHERE id_notification = {int:id_notification}
+		SELECT id_mention
+		FROM {db_prefix}log_mentions
+		WHERE id_mention = {int:id_mention}
 			AND id_member = {int:id_member}
 		LIMIT 1',
 		array(
-			'id_notification' => $id_notification,
+			'id_mention' => $id_mention,
 			'id_member' => $id_member,
 		)
 	);
@@ -314,10 +314,10 @@ function updateMentionMenuCount($status, $member_id)
 {
 	// If its new add to our menu count
 	if ($status === 0)
-		updateMemberdata($member_id, array('notifications' => '+'));
+		updateMemberdata($member_id, array('mentions' => '+'));
 	// Mark as read we decrease the count
 	elseif ($status === 1)
-		updateMemberdata($member_id, array('notifications' => '-'));
+		updateMemberdata($member_id, array('mentions' => '-'));
 	// Deleting or unapproving may have been read or not, so a count is required
 	else
 		countUserMentions(false, '', $member_id);
