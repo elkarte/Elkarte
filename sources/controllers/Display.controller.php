@@ -226,7 +226,7 @@ class Display_Controller
 		// Mark the notification as read if requested
 		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
 		{
-			require_once(CONTROLLERDIR . '/Notification.controller.php');
+			require_once(CONTROLLERDIR . '/Mentions.controller.php');
 
 			$mentions = new Mentions_Controller();
 			$mentions->setData(array(
