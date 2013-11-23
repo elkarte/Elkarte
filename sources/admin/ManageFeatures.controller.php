@@ -519,7 +519,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		loadLanguage('Notification');
+		loadLanguage('Mentions');
 
 		// instantiate the form
 		$this->_notificationSettings = new Settings_Form();

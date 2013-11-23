@@ -112,7 +112,7 @@ class Mentions_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
 		require_once(SUBSDIR . '/List.class.php');
-		loadLanguage('Notification');
+		loadLanguage('Mentions');
 
 		$this->_buildUrl();
 
@@ -478,7 +478,7 @@ class Mentions_Controller extends Action_Controller
 
 		// If everything is fine, let's include our helper functions and prepare for the fun!
 		require_once(SUBSDIR . '/Mentions.subs.php');
-		loadLanguage('Notification');
+		loadLanguage('Mentions');
 
 		return true;
 	}
