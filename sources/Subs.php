@@ -115,7 +115,7 @@ function updateMemberData($members, $data)
 
 	// Everything is assumed to be a string unless it's in the below.
 	$knownInts = array(
-		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'notifications',
+		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'mentions',
 		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'receive_from', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning', 'likes_given', 'likes_received',
@@ -2759,7 +2759,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = &$user_info['messages'];
 		$context['user']['unread_messages'] = &$user_info['unread_messages'];
-		$context['user']['notifications'] = &$user_info['notifications'];
+		$context['user']['mentions'] = &$user_info['mentions'];
 
 		// Personal message popup...
 		if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
@@ -2815,7 +2815,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = 0;
 		$context['user']['unread_messages'] = 0;
-		$context['user']['notifications'] = 0;
+		$context['user']['mentions'] = 0;
 		$context['user']['avatar'] = array();
 		$context['user']['total_time_logged_in'] = array('days' => 0, 'hours' => 0, 'minutes' => 0);
 		$context['user']['popup_messages'] = false;
@@ -3563,7 +3563,7 @@ function setupMenuContext()
 	}
 
 	$menu_count['unread_messages'] = $context['user']['unread_messages'];
-	$menu_count['notifications'] = $context['user']['notifications'];
+	$menu_count['mentions'] = $context['user']['mentions'];
 
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
@@ -3612,9 +3612,9 @@ function setupMenuContext()
 					'show' => $context['allow_pm'],
 				),
 
-				'notification' => array(
-					'title' => $txt['notifications'],
-					'counter' => 'notifications',
+				'mention' => array(
+					'title' => $txt['mention'],
+					'counter' => 'mentions',
 					'href' => $scripturl . '?action=mentions',
 					'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 				),

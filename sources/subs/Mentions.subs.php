@@ -51,7 +51,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$db->free_result($request);
 
 	// Counts as maintenance! :P
-	if ($all === false)
+	if ($all === false && $type === 0)
 		updateMemberdata($id_member, array('mentions' => $count));
 
 	return $count;
@@ -320,5 +320,5 @@ function updateMentionMenuCount($status, $member_id)
 		updateMemberdata($member_id, array('mentions' => '-'));
 	// Deleting or unapproving may have been read or not, so a count is required
 	else
-		countUserMentions(false, '', $member_id);
+		countUserMentions(false, 0, $member_id);
 }
