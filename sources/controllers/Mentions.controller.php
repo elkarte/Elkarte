@@ -17,14 +17,14 @@ if (!defined('ELK'))
 class Mentions_Controller extends Action_Controller
 {
 	/**
-	 * Will hold all available notification types
+	 * Will hold all available mention types
 	 *
 	 * @var array
 	 */
-	private $_known_notifications = array();
+	private $_known_mentions = array();
 
 	/**
-	 * Will hold all available notification status
+	 * Will hold all available mention status
 	 * 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3,
 	 *
 	 * @var array
@@ -50,7 +50,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function __construct()
 	{
-		$this->_known_notifications = array(
+		$this->_known_mentions = array(
 			'men', // mention
 			'like', // message liked
 			'rlike', // like removed
@@ -64,11 +64,11 @@ class Mentions_Controller extends Action_Controller
 		);
 
 		// @todo is it okay to have it here?
-		call_integration_hook('integrate_add_notification', array(&$this->_known_notifications));
+		call_integration_hook('integrate_add_mention', array(&$this->_known_mentions));
 	}
 
 	/**
-	 * Set up the data for the notification based on what was requested
+	 * Set up the data for the mention based on what was requested
 	 * This function is called before the flow is redirected to action_index().
 	 */
 	public function pre_dispatch()
@@ -89,8 +89,8 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * The default action is to show the list of notifications
-	 * This allows ?action=notification to be forwarded to action_list()
+	 * The default action is to show the list of mentions
+	 * This allows ?action=mention to be forwarded to action_list()
 	 */
 	public function action_index()
 	{
@@ -99,15 +99,15 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Creates a list of notificaitons for the user
+	 * Creates a list of mentions for the user
 	 * Allows them to mark them read or unread
-	 * Can sort the various forms of notificaions, likes or mentions
+	 * Can sort the various forms of mentions, likes or @mentions
 	 */
 	public function action_list()
 	{
 		global $context, $txt, $scripturl;
 
-		// Only registered members can be notified
+		// Only registered members can be mentioned
 		is_not_guest();
 
 		require_once(SUBSDIR . '/Mentions.subs.php');
@@ -117,7 +117,7 @@ class Mentions_Controller extends Action_Controller
 		$this->_buildUrl();
 
 		$list_options = array(
-			'id' => 'list_notifications',
+			'id' => 'list_mentions',
 			'title' => empty($this->_all) ? $txt['my_unread_notifications'] : $txt['my_notifications'],
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=notification;sa=list' . $this->_url_param,
@@ -125,14 +125,14 @@ class Mentions_Controller extends Action_Controller
 			'default_sort_dir' => 'default',
 			'no_items_label' => $this->_all ? $txt['no_notifications_yet'] : $txt['no_new_notifications'],
 			'get_items' => array(
-				'function' => array($this, 'list_loadNotifications'),
+				'function' => array($this, 'list_loadMentions'),
 				'params' => array(
 					$this->_all,
 					$this->_type,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNotificationCount'),
+				'function' => array($this, 'list_getMentionCount'),
 				'params' => array(
 					$this->_all,
 					$this->_type,
@@ -280,27 +280,27 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList(),
-	 * Returns the number of notificaitons of $type that a member has
+	 * Returns the number of mentions of $type that a member has
 	 *
-	 * @param bool $all : if true counts all the notifications, otherwise only the unread
-	 * @param string $type : the type of the notification
+	 * @param bool $all : if true counts all the mentions, otherwise only the unread
+	 * @param string $type : the type of mention
 	 */
-	public function list_getNotificationCount($all, $type)
+	public function list_getMentionCount($all, $type)
 	{
 		return countUserMentions($all, $type);
 	}
 
 	/**
 	 * Callback for createList(),
-	 * Returns the notifications of a give type (like/mention) & (unread or all)
+	 * Returns the mentions of a give type (like/mention) & (unread or all)
 	 *
 	 * @param int $start start list number
 	 * @param int $items_per_page how many to show on a page
 	 * @param string $sort which direction are we showing this
-	 * @param bool $all : if true load all the notifications or type, otherwise only the unread
-	 * @param string $type : the type of the notification
+	 * @param bool $all : if true load all the mentions or type, otherwise only the unread
+	 * @param string $type : the type of mention
 	 */
-	public function list_loadNotifications($start, $limit, $sort, $all, $type)
+	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
 		return getUserMentions($start, $limit, $sort, $all, $type);
 	}
@@ -326,7 +326,7 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Sets the specifics of a notification call in this instance
+	 * Sets the specifics of a mention call in this instance
 	 *
 	 * @param array $data must contain uid, type and msg at a minimum
 	 */
@@ -352,7 +352,7 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Did you read the notification? Then let's move it to the graveyard.
+	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
 	 */
@@ -404,19 +404,19 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Builds the link back so you return to the right list of notifications
+	 * Builds the link back so you return to the right list of mentions
 	 */
 	private function _buildUrl()
 	{
 		$this->_all = isset($_REQUEST['all']);
-		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_notifications) ? $_REQUEST['type'] : '';
+		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_mentions) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
 	}
 
 	/**
-	 * Check if the user can access the notification
+	 * Check if the user can access the mention
 	 */
 	private function _isAccessible()
 	{
@@ -454,7 +454,7 @@ class Mentions_Controller extends Action_Controller
 			'msg' => 'intval',
 		);
 		$validation = array(
-			'type' => 'required|contains[' . implode(',', $this->_known_notifications) . ']',
+			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
 			'uid' => 'isarray',
 		);
 
