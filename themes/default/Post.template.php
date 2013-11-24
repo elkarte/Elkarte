@@ -24,12 +24,13 @@ function template_Post_init()
  */
 function template_main()
 {
-	global $context, $settings, $options, $txt, $modSettings;
+	global $context, $txt;
 
 	// Show the actual posting area...
 	echo '
 					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
+	// A placeholder for our mention box if needed
 	if (!empty($context['member_ids']))
 	{
 		echo '
@@ -49,6 +50,27 @@ function template_main()
 					<div class="smalltext">
 						', $context['last_modified_text'], '
 					</div>';
+
+	// Show our submit buttons before any more options
+	echo '
+						<div id="post_confirm_buttons" class="submitbutton">
+							', template_control_richedit_buttons($context['post_box_name']);
+
+	// Option to delete an event if user is editing one.
+	if ($context['make_event'] && !$context['event']['new'])
+		echo '
+							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
+
+	echo '
+						</div>';
+}
+
+/**
+ * Show the additonal options section, allowing locking, sticky, adding of attachments, etc
+ */
+function template_additional_options_below()
+{
+	global $context, $settings, $options, $txt, $modSettings;
 
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
@@ -482,18 +504,7 @@ function template_postarea_below()
 						</div>');
 	}
 
-	// Finally, the submit buttons.
 	echo '
-						<div id="post_confirm_buttons" class="submitbutton">
-							', template_control_richedit_buttons($context['post_box_name']);
-
-	// Option to delete an event if user is editing one.
-	if ($context['make_event'] && !$context['event']['new'])
-		echo '
-							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
-
-	echo '
-						</div>
 					</div>
 				</div>
 			</div>';

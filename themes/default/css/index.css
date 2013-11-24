@@ -277,6 +277,10 @@ input[disabled].input_text {
 	overflow: auto;
 	width: 100%;
 }
+#post_confirm_buttons {
+	padding: 0;
+}
+
 /* @todo - Test this out some more. */
 .submitbutton .button_submit, .submitbutton .linkbutton {
 	padding: 2px 6px;

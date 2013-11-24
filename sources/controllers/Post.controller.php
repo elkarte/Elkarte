@@ -81,6 +81,9 @@ class Post_Controller extends Action_Controller
 		if ($context['make_event'])
 			$template_layers->add('make_event');
 
+		// All those wonderful modifiers and attachments
+		$template_layers->add('additional_options', 200);
+
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
@@ -858,7 +861,7 @@ class Post_Controller extends Action_Controller
 			$this->_prepareDraftsContext($user_info['id'], $topic);
 
 			if (!empty($context['drafts']))
-				$template_layers->add('load_drafts');
+				$template_layers->add('load_drafts', 100);
 		}
 
 		// Needed for the editor and message icons.
