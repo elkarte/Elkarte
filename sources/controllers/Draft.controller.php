@@ -151,7 +151,7 @@ class Draft_Controller extends Action_Controller
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['drafts_show'],
-			'icon' => 'inbox_hd.png',
+			'class' => 'talk',
 			'description' => $txt['drafts_show_desc'],
 		);
 

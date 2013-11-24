@@ -53,7 +53,7 @@ class ProfileHistory_Controller extends Action_Controller
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['history'],
 			'description' => $txt['history_description'],
-			'icon' => 'profile_hd.png',
+			'class' => 'profile',
 			'tabs' => array(
 				'activity' => array(),
 				'ip' => array(),
