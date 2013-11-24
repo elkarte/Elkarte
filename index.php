@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This, as you have probably guessed, is the crux for all functions.
  * Everything should start here, so all the setup and security is done
@@ -19,7 +19,7 @@
  *
  */
 
-$forum_version = 'ElkArte 1.0 Alpha';
+$forum_version = 'ElkArte 1.0 Beta';
 
 // First things first, but not necessarily in that order.
 define('ELK', 1);

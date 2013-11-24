@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -359,7 +359,7 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 	{
 		echo '
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oModeratorSuggest = new smc_AutoSuggest({
 			sSelf: \'oModeratorSuggest\',
@@ -688,7 +688,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		echo '
-		<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 		<script><!-- // --><![CDATA[
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',

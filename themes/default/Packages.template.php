@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -846,10 +846,10 @@ function template_view_operations()
 	<head>
 		<title>', $txt['operation_title'], '</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css?alp21" />
-		<script src="', $settings['default_theme_url'], '/scripts/script.js?alp21"></script>
-		<script src="', $settings['default_theme_url'], '/scripts/theme.js?alp21"></script>
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/admin.css?beta10" />
+		<script src="', $settings['default_theme_url'], '/scripts/script.js?beta10"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/theme.js?beta10"></script>
 	</head>
 	<body>
 		<div class="windowbg">

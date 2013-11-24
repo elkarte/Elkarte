@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -156,7 +156,7 @@ function template_email_members()
 			}
 		});
 	// ]]></script>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oMemberSuggest\',

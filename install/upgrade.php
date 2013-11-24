@@ -11,12 +11,12 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
 // Version information...
-define('CURRENT_VERSION', '1.0 Alpha');
+define('CURRENT_VERSION', '1.0 Beta');
 define('CURRENT_LANG_VERSION', '1.0');
 
 define('REQUIRED_PHP_VERSION', '5.1.0');
@@ -3422,9 +3422,9 @@ function template_upgrade_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['upgrade_upgrade_utility'], '</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?alp10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?alp10" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?alp10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/install.css?beta10" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<script><!-- // --><![CDATA[
 			var elk_scripturl = \'', $upgradeurl, '\';

@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
-define('CURRENT_VERSION', '1.0 Alpha');
+define('CURRENT_VERSION', '1.0 Beta');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.1.0';
@@ -2018,9 +2018,9 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="themes/default/css/index.css?alp10" />
-		<link rel="stylesheet" href="themes/default/css/index_light.css?alp10" />
-		<link rel="stylesheet" href="themes/default/css/install.css?alp10" />
+		<link rel="stylesheet" href="themes/default/css/index.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
 		<script src="themes/default/scripts/script.js"></script>
 	</head>
 	<body>

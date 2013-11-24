@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -107,7 +107,7 @@ function template_admin()
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
-					<script src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
+					<script src="', $settings['default_theme_url'], '/scripts/admin.js?beta10"></script>
 					<script><!-- // --><![CDATA[
 						var oAdminIndex = new elk_AdminIndex({
 							sSelf: \'oAdminCenter\',

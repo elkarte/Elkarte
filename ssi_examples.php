@@ -10,7 +10,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 // Special thanks to Spaceman-Spiff for his contributions to this page.
 
@@ -37,7 +37,7 @@ template_ssi_above();
 ?>
 
 <h2>SSI.php Functions</h2>
-<p><strong>Current Version:</strong> 1.0 Alpha</p>
+<p><strong>Current Version:</strong> 1.0 Beta</p>
 <p>This file is used to demonstrate the capabilities of SSI.php using PHP include functions. The examples show the include tag, then the results of it.</p>
 
 <h2>Include Code</h2>
@@ -499,8 +499,8 @@ function template_ssi_above()
 <html>
 	<head>
 		<title>SSI.php Examples</title>
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?alp21" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?alp21" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css?beta10" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index_light.css?beta10" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style>
 			#wrapper {

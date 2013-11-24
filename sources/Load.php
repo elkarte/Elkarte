@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has the hefty job of loading information for the forum.
  *
@@ -1840,7 +1840,7 @@ function loadCSSFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// static values for all these settings
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// Whoa ... we've done this before yes?
@@ -1926,7 +1926,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 		$filenames = array($filenames);
 
 	// static values for all these files
-	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?alph21' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
+	$params['stale'] = (!isset($params['stale']) || $params['stale'] === true) ? '?beta10' : (is_string($params['stale']) ? ($params['stale'] = $params['stale'][0] === '?' ? $params['stale'] : '?' . $params['stale']) : '');
 	$params['fallback'] = (!empty($params['fallback']) && ($params['fallback'] === false)) ? false : true;
 
 	// dejvu?
