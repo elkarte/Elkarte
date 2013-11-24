@@ -382,7 +382,7 @@ function template_quickreply_below()
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
 						', $context['can_reply_approved'] ? '' : '<em>' . $txt['wait_for_approval'] . '</em>', '
 						', !$context['can_reply_approved'] && $context['require_verification'] ? '<br />' : '', '
-						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['notifications_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');': ''), '" >
+						<form action="', $scripturl, '?board=', $context['current_board'], ';action=post2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" onsubmit="submitonce(this);', (!empty($modSettings['mentions_enabled']) ? 'revalidateMentions(\'postmodify\', \'' . (empty($options['use_editor_quick_reply']) ? 'message' : $context['post_box_name']) . '\');': ''), '" >
 							<input type="hidden" name="topic" value="', $context['current_topic'], '" />
 							<input type="hidden" name="subject" value="', $context['response_prefix'], $context['subject'], '" />
 							<input type="hidden" name="icon" value="xx" />
@@ -477,8 +477,8 @@ function template_quickreply_below()
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
 				});';
 
-		// Notifications enabled and only using a plain text quick reply?
-		if (!empty($modSettings['notifications_enabled']) && empty($options['use_editor_quick_reply']))
+		// Mentions enabled and only using a plain text quick reply?
+		if (!empty($modSettings['mentions_enabled']) && empty($options['use_editor_quick_reply']))
 			echo '
 				add_elk_mention(\'#message\');';
 
@@ -520,7 +520,7 @@ function template_quickreply_below()
 	// Quick moderation options
 	echo '
 			<script><!-- // --><![CDATA[';
-	
+
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 		echo '
 				var oInTopicModeration = new InTopicModeration({

@@ -1360,31 +1360,31 @@ CREATE TABLE {$db_prefix}log_member_notices (
 );
 
 #
-# Sequence for table `log_notifications`
+# Sequence for table `log_mentions`
 #
 
-CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+CREATE SEQUENCE {$db_prefix}log_mentions_id_mention_seq;
 
 #
-# Table structure for table `log_notifications`
+# Table structure for table `log_mentions`
 #
 
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-  id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
+  id_mention int default nextval('{$db_prefix}log_mentions_id_mention_seq'),
   id_member int NOT NULL DEFAULT '0',
   id_msg int NOT NULL DEFAULT '0',
   status int NOT NULL DEFAULT '0',
   id_member_from int NOT NULL DEFAULT '0',
   log_time int NOT NULL DEFAULT '0',
-  notif_type varchar(5) NOT NULL DEFAULT '',
-  PRIMARY KEY (id_notification)
+  mention_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_mention)
 );
 
 #
-# Indexes for table `log_notifications`
+# Indexes for table `log_mentions`
 #
 
-CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
+CREATE INDEX {$db_prefix}log_mentions_id_member ON {$db_prefix}log_mentions (id_member, status);
 
 #
 # Table structure for table `log_notify`
@@ -1799,7 +1799,7 @@ CREATE TABLE {$db_prefix}members (
   last_login int NOT NULL default '0',
   real_name varchar(255) NOT NULL,
   personal_messages smallint NOT NULL default '0',
-  notifications smallint NOT NULL default '0',
+  mentions smallint NOT NULL default '0',
   unread_messages smallint NOT NULL default '0',
   new_pm smallint NOT NULL default '0',
   buddy_list text NOT NULL,

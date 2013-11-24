@@ -223,17 +223,17 @@ class Display_Controller
 			}
 		}
 
-		// Mark the notification as read if requested
-		if (isset($_REQUEST['notifread']) && !empty($virtual_msg))
+		// Mark the mention as read if requested
+		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			require_once(CONTROLLERDIR . '/Notification.controller.php');
+			require_once(CONTROLLERDIR . '/Mentions.controller.php');
 
-			$notify = new Notification_Controller();
-			$notify->setData(array(
-				'id_notification' => $_REQUEST['item'],
+			$mentions = new Mentions_Controller();
+			$mentions->setData(array(
+				'id_mention' => $_REQUEST['item'],
 				'mark' => $_REQUEST['mark'],
 			));
-			$notify->action_markread();
+			$mentions->action_markread();
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
@@ -791,9 +791,9 @@ class Display_Controller
 		if (!empty($context['drafts_autosave']))
 			loadJavascriptFile('drafts.js');
 
-		if (!empty($modSettings['notifications_enabled']))
+		if (!empty($modSettings['mentions_enabled']))
 		{
-			$context['notifications_enabled'] = true;
+			$context['mentions_enabled'] = true;
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
 			loadCSSFile('jquery.atwho.css');
 

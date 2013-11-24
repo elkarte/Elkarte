@@ -191,7 +191,7 @@ function create_control_richedit($editorOptions)
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			loadJavascriptFile('drafts.plugin.js');
 
-		if (!empty($context['notifications_enabled']))
+		if (!empty($context['mentions_enabled']))
 			loadJavascriptFile('mentioning.plugin.js');
 
 		// Our not so concise shortcut line

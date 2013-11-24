@@ -90,7 +90,7 @@ function template_init()
 	);
 
 	// @todo find a better place if we are going to create a notifications template
-	$settings['notifications']['notifier_template'] = '<a href="{mem_url}" class="notifavatar">{avatar_img}{mem_name}</a>';
+	$settings['mentions']['mentioner_template'] = '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>';
 }
 
 /**
@@ -235,7 +235,7 @@ function template_body_above()
 					<input type="hidden" name="hash_passwrd" value="" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
-				
+
 		if (!empty($modSettings['enableOpenID']))
 			echo '
 					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" /></a>';

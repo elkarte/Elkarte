@@ -327,7 +327,7 @@ function onDocSent(XMLDoc)
 	if ($.isFunction($.fn.linkifyvideo))
 		$().linkifyvideo(oEmbedtext, 'preview_body');
 
-	// Preview spoilers
+	// Spoilers, Sweetie
 	$('.spoilerheader').click(function(){
 		$(this).next().children().slideToggle("fast");
 	});

@@ -1241,10 +1241,10 @@ function approvePosts($msgs, $approve = true)
 		);
 	}
 
-	if (!empty($modSettings['notifications_enabled']))
+	if (!empty($modSettings['mentions_enabled']))
 	{
-		require_once(SUBSDIR . '/Notification.subs.php');
-		toggleNotificationsApproval($msgs, $approve);
+		require_once(SUBSDIR . '/Mentions.subs.php');
+		toggleMentionsApproval($msgs, $approve);
 	}
 
 	// Update the last messages on the boards...

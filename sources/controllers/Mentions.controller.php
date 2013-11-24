@@ -7,24 +7,24 @@
  *
  * @version 1.0 Alpha
  *
- * Notify members.
+ * Mention members.
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
-class Notification_Controller extends Action_Controller
+class Mentions_Controller extends Action_Controller
 {
 	/**
-	 * Will hold all available notification types
+	 * Will hold all available mention types
 	 *
 	 * @var array
 	 */
-	private $_known_notifications = array();
+	private $_known_mentions = array();
 
 	/**
-	 * Will hold all available notification status
+	 * Will hold all available mention status
 	 * 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3,
 	 *
 	 * @var array
@@ -50,7 +50,7 @@ class Notification_Controller extends Action_Controller
 	 */
 	public function __construct()
 	{
-		$this->_known_notifications = array(
+		$this->_known_mentions = array(
 			'men', // mention
 			'like', // message liked
 			'rlike', // like removed
@@ -62,12 +62,13 @@ class Notification_Controller extends Action_Controller
 			'deleted' => 2,
 			'unapproved' => 3,
 		);
+
 		// @todo is it okay to have it here?
-		call_integration_hook('integrate_add_notification', array(&$this->_known_notifications));
+		call_integration_hook('integrate_add_mention', array(&$this->_known_mentions));
 	}
 
 	/**
-	 * Set up the data for the notification based on what was requested
+	 * Set up the data for the mention based on what was requested
 	 * This function is called before the flow is redirected to action_index().
 	 */
 	public function pre_dispatch()
@@ -75,7 +76,7 @@ class Notification_Controller extends Action_Controller
 		global $modSettings;
 
 		// I'm not sure this is needed, though better have it. :P
-		if (empty($modSettings['notifications_enabled']))
+		if (empty($modSettings['mentions_enabled']))
 			fatal_lang_error('no_access', false);
 
 		$this->_data = array(
@@ -88,8 +89,8 @@ class Notification_Controller extends Action_Controller
 	}
 
 	/**
-	 * The default action is to show the list of notifications
-	 * This allows ?action=notification to be forwarded to action_list()
+	 * The default action is to show the list of mentions
+	 * This allows ?action=mention to be forwarded to action_list()
 	 */
 	public function action_index()
 	{
@@ -98,40 +99,40 @@ class Notification_Controller extends Action_Controller
 	}
 
 	/**
-	 * Creates a list of notificaitons for the user
+	 * Creates a list of mentions for the user
 	 * Allows them to mark them read or unread
-	 * Can sort the various forms of notificaions, likes or mentions
+	 * Can sort the various forms of mentions, likes or @mentions
 	 */
 	public function action_list()
 	{
 		global $context, $txt, $scripturl;
 
-		// Only registered members can be notified
+		// Only registered members can be mentioned
 		is_not_guest();
 
-		require_once(SUBSDIR . '/Notification.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
 		require_once(SUBSDIR . '/List.class.php');
-		loadLanguage('Notification');
+		loadLanguage('Mentions');
 
 		$this->_buildUrl();
 
 		$list_options = array(
-			'id' => 'list_notifications',
-			'title' => empty($this->_all) ? $txt['my_unread_notifications'] : $txt['my_notifications'],
+			'id' => 'list_mentions',
+			'title' => empty($this->_all) ? $txt['my_unread_mentions'] : $txt['my_mentions'],
 			'items_per_page' => 20,
-			'base_href' => $scripturl . '?action=notification;sa=list' . $this->_url_param,
+			'base_href' => $scripturl . '?action=mentions;sa=list' . $this->_url_param,
 			'default_sort_col' => 'log_time',
 			'default_sort_dir' => 'default',
-			'no_items_label' => $this->_all ? $txt['no_notifications_yet'] : $txt['no_new_notifications'],
+			'no_items_label' => $this->_all ? $txt['no_mentions_yet'] : $txt['no_new_mentions'],
 			'get_items' => array(
-				'function' => array($this, 'list_loadNotifications'),
+				'function' => array($this, 'list_loadMentions'),
 				'params' => array(
 					$this->_all,
 					$this->_type,
 				),
 			),
 			'get_count' => array(
-				'function' => array($this, 'list_getNotificationCount'),
+				'function' => array($this, 'list_getMentionCount'),
 				'params' => array(
 					$this->_all,
 					$this->_type,
@@ -140,13 +141,13 @@ class Notification_Controller extends Action_Controller
 			'columns' => array(
 				'id_member_from' => array(
 					'header' => array(
-						'value' => $txt['notification_from'],
+						'value' => $txt['mentions_from'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
 							global $settings, $scripturl;
 
-							if (isset($settings[\'notifications\'][\'notifier_template\']))
+							if (isset($settings[\'mentions\'][\'mentioner_template\']))
 								return str_replace(
 									array(
 										\'{avatar_img}\',
@@ -158,17 +159,17 @@ class Notification_Controller extends Action_Controller
 										!empty($row[\'id_member_from\']) ? $scripturl . \'?action=profile;u=\' . $row[\'id_member_from\'] : \'\',
 										$row[\'mentioner\'],
 									),
-									$settings[\'notifications\'][\'notifier_template\']);
+									$settings[\'mentions\'][\'mentioner_template\']);
 						')
 					),
 					'sort' => array(
-						'default' => 'n.id_member_from',
-						'reverse' => 'n.id_member_from DESC',
+						'default' => 'mtn.id_member_from',
+						'reverse' => 'mtn.id_member_from DESC',
 					),
 				),
 				'type' => array(
 					'header' => array(
-						'value' => $txt['notification_what'],
+						'value' => $txt['mentions_what'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -180,33 +181,33 @@ class Notification_Controller extends Action_Controller
 								\'{subject}\',
 							),
 							array(
-								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
-								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';notifread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_notification\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
+								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_mention\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
+								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_mention\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
 								$row[\'subject\'],
-							), $txt[\'notification_\' . $row[\'notif_type\']]);
+							), $txt[\'mention_\' . $row[\'mention_type\']]);
 						')
 					),
 					'sort' => array(
-						'default' => 'n.notif_type',
-						'reverse' => 'n.notif_type DESC',
+						'default' => 'mtn.mention_type',
+						'reverse' => 'mtn.mention_type DESC',
 					),
 				),
 				'log_time' => array(
 					'header' => array(
-						'value' => $txt['notification_when'],
+						'value' => $txt['mentions_when'],
 					),
 					'data' => array(
 						'db' => 'log_time',
 						'timeformat' => true,
 					),
 					'sort' => array(
-						'default' => 'n.log_time DESC',
-						'reverse' => 'n.log_time',
+						'default' => 'mtn.log_time DESC',
+						'reverse' => 'mtn.log_time',
 					),
 				),
 				'action' => array(
 					'header' => array(
-						'value' => $txt['notification_action'],
+						'value' => $txt['mentions_action'],
 					),
 					'data' => array(
 						'function' => create_function('$row', '
@@ -215,11 +216,11 @@ class Notification_Controller extends Action_Controller
 							$opts = \'\';
 
 							if (empty($row[\'status\']))
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=read;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=read;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_read.png" alt="*" /></a>&nbsp;\';
 							else
-								$opts = \'<a href="?action=notification;sa=updatestatus;mark=unread;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'notification_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
+								$opts = \'<a href="?action=mentions;sa=updatestatus;mark=unread;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'mentions_markunread\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/mark_unread.png" alt="*" /></a>&nbsp;\';
 
-							return $opts . \'<a href="?action=notification;sa=updatestatus;mark=delete;item=\' . $row[\'id_notification\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
+							return $opts . \'<a href="?action=mentions;sa=updatestatus;mark=delete;item=\' . $row[\'id_mention\'] . \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';"><img style="width:16px;height:16px" title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/delete.png" alt="*" /></a>\';
 						'),
 					),
 				),
@@ -228,80 +229,80 @@ class Notification_Controller extends Action_Controller
 				'show_on' => 'top',
 				'links' => array(
 					array(
-						'href' => $scripturl . '?action=notification' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => empty($this->_type),
-						'label' => $txt['notification_type_all']
+						'label' => $txt['mentions_type_all']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=men' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=men' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'men',
-						'label' => $txt['notification_type_men']
+						'label' => $txt['mentions_type_men']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=like' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=like' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'like',
-						'label' => $txt['notification_type_like']
+						'label' => $txt['mentions_type_like']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=rlike' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=rlike' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'rlike',
-						'label' => $txt['notification_type_rlike']
+						'label' => $txt['mentions_type_rlike']
 					),
 					array(
-						'href' => $scripturl . '?action=notification;type=buddy' . (!empty($this->_all) ? ';all' : ''),
+						'href' => $scripturl . '?action=mentions;type=buddy' . (!empty($this->_all) ? ';all' : ''),
 						'is_selected' => $this->_type === 'buddy',
-						'label' => $txt['notification_type_buddy']
+						'label' => $txt['mentions_type_buddy']
 					),
 				),
 			),
 			'additional_rows' => array(
 				array(
 					'position' => 'top_of_list',
-					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=notification' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['notification_unread'] : $txt['notification_all']) . '</a>',
+					'value' => '<a class="floatright linkbutton" href="' . $scripturl . '?action=mentions' . (!empty($this->_all) ? '' : ';all') . str_replace(';all', '', $this->_url_param) . '">' . (!empty($this->_all) ? $txt['mentions_unread'] : $txt['mentions_all']) . '</a>',
 				),
 			),
 		);
 
 		createList($list_options);
 
-		$context['page_title'] = $txt['my_notifications'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_notifications_pages'], $this->_page) : '');
+		$context['page_title'] = $txt['my_mentions'] . (!empty($this->_page) ? ' - ' . sprintf($txt['my_mentions_pages'], $this->_page) : '');
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=notification',
-			'name' => $txt['my_notifications'],
+			'url' => $scripturl . '?action=mentions',
+			'name' => $txt['my_mentions'],
 		);
 
 		if (!empty($this->_type))
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=notification;type=' . $this->_type,
-				'name' => $txt['notification_type_' . $this->_type],
+				'url' => $scripturl . '?action=mentions;type=' . $this->_type,
+				'name' => $txt['mentions_type_' . $this->_type],
 			);
 	}
 
 	/**
 	 * Callback for createList(),
-	 * Returns the number of notificaitons of $type that a member has
+	 * Returns the number of mentions of $type that a member has
 	 *
-	 * @param bool $all : if true counts all the notifications, otherwise only the unread
-	 * @param string $type : the type of the notification
+	 * @param bool $all : if true counts all the mentions, otherwise only the unread
+	 * @param string $type : the type of mention
 	 */
-	public function list_getNotificationCount($all, $type)
+	public function list_getMentionCount($all, $type)
 	{
-		return countUserNotifications($all, $type);
+		return countUserMentions($all, $type);
 	}
 
 	/**
 	 * Callback for createList(),
-	 * Returns the notifications of a give type (like/mention) & (unread or all)
+	 * Returns the mentions of a give type (like/mention) & (unread or all)
 	 *
 	 * @param int $start start list number
 	 * @param int $items_per_page how many to show on a page
 	 * @param string $sort which direction are we showing this
-	 * @param bool $all : if true load all the notifications or type, otherwise only the unread
-	 * @param string $type : the type of the notification
+	 * @param bool $all : if true load all the mentions or type, otherwise only the unread
+	 * @param string $type : the type of mention
 	 */
-	public function list_loadNotifications($start, $limit, $sort, $all, $type)
+	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
-		return getUserNotifications($start, $limit, $sort, $all, $type);
+		return getUserMentions($start, $limit, $sort, $all, $type);
 	}
 
 	/**
@@ -321,11 +322,11 @@ class Notification_Controller extends Action_Controller
 		if (empty($id_target))
 			return false;
 
-		addNotifications($user_info['id'], $id_target, $this->_validator->msg, $this->_validator->type, $this->_validator->log_time, $this->_data['status']);
+		addMentions($user_info['id'], $id_target, $this->_validator->msg, $this->_validator->type, $this->_validator->log_time, $this->_data['status']);
 	}
 
 	/**
-	 * Sets the specifics of a notification call in this instance
+	 * Sets the specifics of a mention call in this instance
 	 *
 	 * @param array $data must contain uid, type and msg at a minimum
 	 */
@@ -351,7 +352,7 @@ class Notification_Controller extends Action_Controller
 	}
 
 	/**
-	 * Did you read the notification? Then let's move it to the graveyard.
+	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
 	 */
@@ -365,7 +366,7 @@ class Notification_Controller extends Action_Controller
 
 		$this->_buildUrl();
 
-		changeNotificationStatus($this->_validator->id_notification, $this->_known_status['read']);
+		changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
 	}
 
 	/**
@@ -376,7 +377,7 @@ class Notification_Controller extends Action_Controller
 		checkSession('request');
 
 		$this->setData(array(
-			'id_notification' => $_REQUEST['item'],
+			'id_mention' => $_REQUEST['item'],
 			'mark' => $_REQUEST['mark'],
 		));
 
@@ -388,47 +389,47 @@ class Notification_Controller extends Action_Controller
 			switch ($this->_validator->mark)
 			{
 				case 'read':
-					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['read']);
+					changeMentionStatus($this->_validator->id_mention, $this->_known_status['read']);
 					break;
 				case 'unread':
-					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['new']);
+					changeMentionStatus($this->_validator->id_mention, $this->_known_status['new']);
 					break;
 				case 'delete':
-					changeNotificationStatus($this->_validator->id_notification, $this->_known_status['deleted']);
+					changeMentionStatus($this->_validator->id_mention, $this->_known_status['deleted']);
 					break;
 			}
 		}
 
-		redirectexit('action=notification;sa=list' . $this->_url_param);
+		redirectexit('action=mentions;sa=list' . $this->_url_param);
 	}
 
 	/**
-	 * Builds the link back so you return to the right list of notifications
+	 * Builds the link back so you return to the right list of mentions
 	 */
 	private function _buildUrl()
 	{
 		$this->_all = isset($_REQUEST['all']);
-		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_notifications) ? $_REQUEST['type'] : '';
+		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_mentions) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
 	}
 
 	/**
-	 * Check if the user can access the notification
+	 * Check if the user can access the mention
 	 */
 	private function _isAccessible()
 	{
 		require_once(SUBSDIR . '/DataValidator.class.php');
-		require_once(SUBSDIR . '/Notification.subs.php');
+		require_once(SUBSDIR . '/Mentions.subs.php');
 
 		$this->_validator = new Data_Validator();
 		$sanitization = array(
-			'id_notification' => 'intval',
+			'id_mention' => 'intval',
 			'mark' => 'trim',
 		);
 		$validation = array(
-			'id_notification' => 'validate_ownnotification',
+			'id_mention' => 'validate_ownmention',
 			'mark' => 'trim|contains[read,unread,delete]',
 		);
 
@@ -453,7 +454,7 @@ class Notification_Controller extends Action_Controller
 			'msg' => 'intval',
 		);
 		$validation = array(
-			'type' => 'required|contains[' . implode(',', $this->_known_notifications) . ']',
+			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
 			'uid' => 'isarray',
 		);
 
@@ -476,8 +477,8 @@ class Notification_Controller extends Action_Controller
 			return false;
 
 		// If everything is fine, let's include our helper functions and prepare for the fun!
-		require_once(SUBSDIR . '/Notification.subs.php');
-		loadLanguage('Notification');
+		require_once(SUBSDIR . '/Mentions.subs.php');
+		loadLanguage('Mentions');
 
 		return true;
 	}

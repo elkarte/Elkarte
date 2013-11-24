@@ -78,19 +78,19 @@ class Members_Controller extends Action_Controller
 		{
 			$user_info['buddies'][] = $user;
 
-			// Do we want a notification for our newly added buddy?
-			if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+			// Do we want a mention for our newly added buddy?
+			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				require_once(CONTROLLERDIR . '/Notification.controller.php');
-				$notify = new Notification_Controller();
+				require_once(CONTROLLERDIR . '/Mentions.controller.php');
+				$mentions = new Mentions_Controller();
 
-				// Set notifications for our buddy.
-				$notify->setData(array(
+				// Set a mention for our buddy.
+				$mentions->setData(array(
 					'id_member' => $user,
 					'type' => 'buddy',
 					'id_msg' => 0,
 					));
-				$notify->action_add();
+				$mentions->action_add();
 			}
 		}
 
