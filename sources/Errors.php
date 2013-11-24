@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * The purpose of this file is... errors. (hard to guess, I guess?)  It takes
  * care of logging, error messages, error handling, database errors, and
