@@ -218,7 +218,7 @@ class Profile_Controller extends Action_Controller
 					'permission' => $context['user']['is_owner'] ? array('profile_identity_any', 'profile_identity_own') : array('profile_identity_any'),
 				),
 				'notification' => array(
-					'label' => $txt['notification'],
+					'label' => $txt['notifications'],
 					'file' => '/controllers/ProfileOptions.controller.php',
 					'controller' => 'ProfileOptions_Controller',
 					'function' => 'action_notification',
