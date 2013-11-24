@@ -649,7 +649,7 @@ function template_modify_board()
 		</form>
 	</div>
 
-<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 <script><!-- // --><![CDATA[
 	var oModeratorSuggest = new smc_AutoSuggest({
 		sSelf: \'oModeratorSuggest\',

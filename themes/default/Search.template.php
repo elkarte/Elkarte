@@ -222,7 +222,7 @@ function template_main()
 		}
 
 		echo '
-					<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+					<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 					<script><!-- // --><![CDATA[
 						createEventListener(window);
 						window.addEventListener("load", initSearch, false);

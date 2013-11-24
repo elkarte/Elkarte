@@ -2018,9 +2018,9 @@ function template_install_above()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="robots" content="noindex" />
 		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="themes/default/css/index.css?alp10" />
-		<link rel="stylesheet" href="themes/default/css/index_light.css?alp10" />
-		<link rel="stylesheet" href="themes/default/css/install.css?alp10" />
+		<link rel="stylesheet" href="themes/default/css/index.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/index_light.css?beta10" />
+		<link rel="stylesheet" href="themes/default/css/install.css?beta10" />
 		<script src="themes/default/scripts/script.js"></script>
 	</head>
 	<body>

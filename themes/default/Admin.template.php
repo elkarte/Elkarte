@@ -107,7 +107,7 @@ function template_admin()
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
-					<script src="', $settings['default_theme_url'], '/scripts/admin.js?alp21"></script>
+					<script src="', $settings['default_theme_url'], '/scripts/admin.js?beta10"></script>
 					<script><!-- // --><![CDATA[
 						var oAdminIndex = new elk_AdminIndex({
 							sSelf: \'oAdminCenter\',

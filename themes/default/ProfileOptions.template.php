@@ -114,7 +114,7 @@ function template_editBuddies()
 			</div>
 		</div>
 	</form>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oAddBuddySuggest = new smc_AutoSuggest({
 			sSelf: \'oAddBuddySuggest\',
@@ -210,7 +210,7 @@ function template_editIgnoreList()
 			</div>
 		</div>
 	</form>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oAddIgnoreSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddIgnoreSuggest\',
