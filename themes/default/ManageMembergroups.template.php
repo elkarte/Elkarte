@@ -134,7 +134,7 @@ function template_new_group()
 						</dt>
 						<dd>';
 
-	template_add_edit_group_boards_list('new_group', false);
+	template_add_edit_group_boards_list('new_group', false, false);
 
 	echo '
 						</dd>
