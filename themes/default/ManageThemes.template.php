@@ -19,12 +19,12 @@
  */
 function template_main()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a>
+			<a href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a>
 			', $txt['themeadmin_title'], '
 		</h2>
 		<div class="information">
@@ -108,7 +108,7 @@ function template_main()
 
 	echo '
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" class="help" id="theme_install"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['theme_install'], '
+				<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['theme_install'], '
 			</h3>
 			<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
 				<div class="windowbg">
@@ -437,13 +437,13 @@ function template_set_options()
  */
 function template_set_settings()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admin_form_wrapper">
 		<form action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
+				<a href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
 			</h2>
 			<br />';
 
@@ -451,7 +451,7 @@ function template_set_settings()
 	if ($context['theme_settings']['theme_id'] != 1)
 		echo '
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/config_hd.png" alt="" class="icon" /> ', $txt['theme_edit'], '
+				<span class="hdicon cat_img_config">', $txt['theme_edit'], '</span>
 			</h3>
 			<div class="windowbg">
 				<div class="content">
@@ -468,7 +468,7 @@ function template_set_settings()
 
 	echo '
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/config_hd.png" alt="" class="icon" /> ', $txt['theme_url_config'], '
+				<span class="hdicon cat_img_config">', $txt['theme_url_config'], '</span>
 			</h3>
 			<div class="windowbg2">
 				<div class="content">
@@ -506,7 +506,7 @@ function template_set_settings()
 	{
 		echo '
 			<h3 class="category_header">
-				<img class="icon" src="', $settings['images_url'], '/icons/config_hd.png" alt="" /> ', $txt['theme_variants'], '
+				<span class="hdicon cat_img_config">', $txt['theme_variants'], '</span>
 			</h3>
 			<div class="windowbg2">
 				<div class="content">
@@ -539,7 +539,7 @@ function template_set_settings()
 
 	echo '
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/config_hd.png" alt="" class="icon" /> ', $txt['theme_options'], '
+				<span class="hdicon cat_img_config">', $txt['theme_options'], '</span>
 			</h3>
 			<div class="windowbg">
 				<div class="content">

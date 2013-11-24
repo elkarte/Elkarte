@@ -772,7 +772,7 @@ function template_search_results()
 
 function template_send()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt;
 
 	// Show which messages were sent successfully and which failed.
 	if (!empty($context['send_log']))
@@ -814,7 +814,7 @@ function template_send()
 	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
 		<div class="forumposts">
 			<h3 class="category_header">
-					<img src="', $settings['images_url'], '/icons/inbox_hd.png" class="icon" alt="', $txt['new_message'], '" title="', $txt['new_message'], '" />&nbsp;', $txt['new_message'], '
+				<span class="hdicon cat_img_write">', $txt['new_message'], '</span>
 			</h3>';
 
 	echo '
@@ -1543,12 +1543,11 @@ function template_add_rule()
  */
 function template_showPMDrafts()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/message_sm.png" alt="" class="icon" />
-				', $txt['drafts_show'], '
+			<span class="hdicon cat_img_talk">', $txt['drafts_show'], '</span>
 		</h2>';
 	template_pagesection();
 

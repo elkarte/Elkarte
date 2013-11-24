@@ -43,7 +43,7 @@ function template_show_email()
  */
 function template_bounce_email()
 {
-	global $txt, $settings, $context, $scripturl;
+	global $txt, $context, $scripturl;
 
 	// Build the "it bounced" javascript ....
 	echo '
@@ -82,7 +82,7 @@ function template_bounce_email()
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
 		<h3 class="category_header">
-			<img src="', $settings['images_url'], '/icons/mail_hd.png" alt="" class="icon" />', $txt['show_notice'], '
+			<span class="hdicon cat_img_mail">', $txt['show_notice'], '</span>
 		</h3>';
 
 	// Any special messages?
@@ -336,7 +336,7 @@ function template_bounce_template()
 					$("#errors").css({display:"none"});
 					$("#error_list").html(\'\');
 				}
-				
+
 				return false;
 			});
 
