@@ -702,7 +702,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 	require_once(SUBSDIR . '/Stats.subs.php');
 
 	// Find boards with lots of posts.
-	$boards = topBoards($num_top);
+	$boards = topBoards($num_top, true);
 
 	foreach ($boards as $id => $board)
 		$boards[$id]['new'] = empty($board['is_read']);
