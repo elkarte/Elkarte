@@ -1979,6 +1979,8 @@ function definePaths()
  */
 function action_deleteInstaller()
 {
+	global $databases;
+
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
 		$ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
