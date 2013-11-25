@@ -1181,7 +1181,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	$db->free_result($request);
 
 	// This user has voted on all the polls.
-	if ($row === false)
+	if ($row == false)
 		return array();
 
 	// If this is a guest who's voted we'll through ourselves to show poll to show the results.
