@@ -80,7 +80,7 @@ $txt['rich_edit_wont_work'] = 'Your browser does not support Rich Text editing.'
 $txt['rich_edit_function_disabled'] = 'Your browser does not support this function.';
 
 // Use numeric entities in the below five strings.
-$txt['notifyUnsubscribe'] = 'Unsubscribe from this topic by clicking here';
+$txt['notifyUnsubscribe'] = 'Unsubscribe to this topic by clicking here';
 
 $txt['lock_after_post'] = 'Lock after Post';
 $txt['notify_replies'] = 'Notify me of replies.';
