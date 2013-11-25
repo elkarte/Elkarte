@@ -2145,6 +2145,8 @@ CREATE TABLE {$db_prefix}subscriptions(
 # Table structure for table `themes`
 #
 
+# this may look inconsistent, but id_member is *not* unsigned
+
 CREATE TABLE {$db_prefix}themes (
   id_member mediumint(8) NOT NULL default '0',
   id_theme tinyint(4) unsigned NOT NULL default '1',
