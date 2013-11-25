@@ -442,7 +442,7 @@ function saveDraft()
 	$draft['topic_id'] = empty($_REQUEST['topic']) ? 0 : (int) $_REQUEST['topic'];
 	$draft['board'] = $board;
 	$draft['icon'] = empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']);
-	$draft['smileys_enabled'] = isset($_POST['ns']) ? (int) $_POST['ns'] : 0;
+	$draft['smileys_enabled'] = isset($_POST['ns']) ? 0 : 1;
 	$draft['locked'] = isset($_POST['lock']) ? (int) $_POST['lock'] : 0;
 	$draft['sticky'] = isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0;
 	$draft['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));

@@ -46,12 +46,11 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 			'unapproved' => 3,
 		)
 	);
-
 	list ($count) = $db->fetch_row($request);
 	$db->free_result($request);
 
 	// Counts as maintenance! :P
-	if ($all === false && $type === 0)
+	if ($all === false && empty($type))
 		updateMemberdata($id_member, array('mentions' => $count));
 
 	return $count;
@@ -180,7 +179,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 
 	// Update the member mention count
 	foreach ($inserts as $insert)
-		updateMentionMenuCount($insert['status'], $insert['id_member']);
+		updateMentionMenuCount($insert['status'], $insert[0]);
 }
 
 /**

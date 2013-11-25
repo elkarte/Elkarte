@@ -354,14 +354,14 @@ function enable_maillist_imap_cron($switch)
 }
 
 /**
- * Load in the custom (public an this users private) email templates
+ * Load in the custom (public and this users private) email templates
  *
  * @param string $template_type - the type of template (e.g. 'bounce', 'warntpl', etc.)
  * @param string $subject - A subject for the template
  */
 function maillist_templates($template_type, $subject = null)
 {
-	global $user_info, $txt;
+	global $user_info;
 
 	$db = database();
 
@@ -373,7 +373,7 @@ function maillist_templates($template_type, $subject = null)
 		WHERE comment_type = {string:tpltype}
 			AND (id_recipient = {int:generic} OR id_recipient = {int:current_member})',
 		array(
-			'tpltype' => $comment_type,
+			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		)

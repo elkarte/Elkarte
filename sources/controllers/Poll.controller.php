@@ -426,7 +426,7 @@ class Poll_Controller extends Action_Controller
 				// Add an extra choice...
 				$context['choices'][] = array(
 					'id' => $last_id,
-					'number' => $number,
+					'number' => $context['choices'][$last_id - 1]['number'] + 1,
 					'votes' => -1,
 					'label' => '',
 					'is_last' => true

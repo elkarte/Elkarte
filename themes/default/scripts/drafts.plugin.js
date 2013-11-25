@@ -59,13 +59,17 @@
 		if (this.opts.sType && this.opts.sType === 'post')
 		{
 			var oLock = document.getElementById('check_lock'),
-				oSticky = document.getElementById('check_sticky');
+				oSticky = document.getElementById('check_sticky'),
+				oSmile = document.getElementById('check_smileys');
 
 			if (oLock && oLock.checked)
 				aSections[aSections.length] = 'lock=1';
 
 			if (oSticky && oSticky.checked)
 				aSections[aSections.length] = 'sticky=1';
+
+			if (oSmile && oSmile.checked)
+				aSections[aSections.length] = 'ns=1';
 		}
 
 		// Keep track of source or wysiwyg when using the full editor
