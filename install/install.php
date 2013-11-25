@@ -2173,7 +2173,7 @@ function template_welcome_message()
 				if (currentVersion < window.ourVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
-			addLoadEvent(CurrentVersion);
+			addLoadEvent(ourCurrentVersion);
 		// ]]></script>';
 }
 
