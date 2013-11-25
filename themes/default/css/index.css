@@ -278,7 +278,7 @@ input[disabled].input_text {
 	width: 100%;
 }
 #post_confirm_buttons {
-	padding: 0;
+	padding: 0 0 1em 0;
 }
 
 /* @todo - Test this out some more. */
