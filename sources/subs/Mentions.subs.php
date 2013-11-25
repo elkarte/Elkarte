@@ -179,7 +179,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 
 	// Update the member mention count
 	foreach ($inserts as $insert)
-		updateMentionMenuCount($insert['status'], $insert[0]);
+		updateMentionMenuCount($insert[2], $insert[0]);
 }
 
 /**
