@@ -702,7 +702,7 @@ function ssi_topBoards($num_top = 10, $output_method = 'echo')
 	require_once(SUBSDIR . '/Stats.subs.php');
 
 	// Find boards with lots of posts.
-	$boards = topBoards($num_top);
+	$boards = topBoards($num_top, true);
 
 	foreach ($boards as $id => $board)
 		$boards[$id]['new'] = empty($board['is_read']);
@@ -1181,7 +1181,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	$db->free_result($request);
 
 	// This user has voted on all the polls.
-	if ($row === false)
+	if ($row == false)
 		return array();
 
 	// If this is a guest who's voted we'll through ourselves to show poll to show the results.
