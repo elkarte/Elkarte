@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -57,10 +57,10 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_signatureSettings;
 
 	/**
-	 * Notifications settings form
+	 * Mentions settings form
 	 * @var Settings_Form
 	 */
-	protected $_notificationSettings;
+	protected $_mentionSettings;
 
 	/**
 	 * This function passes control through to the relevant tab.
@@ -99,9 +99,9 @@ class ManageFeatures_Controller extends Action_Controller
 				'enabled' => in_array('l', $context['admin_features']),
 				'permission' => 'admin_forum'
 			),
-			'notification' => array(
+			'mention' => array(
 				'controller' => $this,
-				'function' => 'action_notificationSettings_display',
+				'function' => 'action_mentionSettings_display',
 				'permission' => 'admin_forum'
 			),
 			'sig' => array(
@@ -150,8 +150,8 @@ class ManageFeatures_Controller extends Action_Controller
 				),
 				'likes' => array(
 				),
-				'notification' => array(
-					'description' => $txt['notification_settings_desc'],
+				'mention' => array(
+					'description' => $txt['mentions_settings_desc'],
 				),
 				'sig' => array(
 					'description' => $txt['signature_settings_desc'],
@@ -486,58 +486,58 @@ class ManageFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initializes the notification settings admin page.
+	 * Initializes the mentions settings admin page.
 	 */
-	public function action_notificationSettings_display()
+	public function action_mentionSettings_display()
 	{
 		global $context, $scripturl;
 
 		// initialize the form
-		$this->_initNotificationSettingsForm();
-		$config_vars = $this->_notificationSettings->settings();
+		$this->_initMentionSettingsForm();
+		$config_vars = $this->_mentionSettings->settings();
 
 		// Saving the settings?
 		if (isset($_GET['save']))
 		{
 			checkSession();
 			Settings_Form::save_db($config_vars);
-			redirectexit('action=admin;area=featuresettings;sa=notification');
+			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
 
 		// Prepare the settings for display
-		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=notification';
+		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=mention';
 		Settings_Form::prepare_db($config_vars);
 	}
 
 	/**
-	 * Retrieve and return all admin settings for notifications.
+	 * Retrieve and return all admin settings for mentions.
 	 */
-	private function _initNotificationSettingsForm()
+	private function _initMentionSettingsForm()
 	{
 		global $txt, $context;
 
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
 
-		loadLanguage('Notification');
+		loadLanguage('Mentions');
 
 		// instantiate the form
-		$this->_notificationSettings = new Settings_Form();
+		$this->_mentionSettings = new Settings_Form();
 
-		// The notification settings
+		// The mentions settings
 		$config_vars = array(
-			array('title', 'notification_settings'),
-			array('check', 'notifications_enabled'),
-			array('check', 'notifications_buddy'),
+			array('title', 'mentions_settings'),
+			array('check', 'mentions_enabled'),
+			array('check', 'mentions_buddy'),
 		);
 
-		call_integration_hook('integrate_notification_settings', array(&$config_vars));
+		call_integration_hook('integrate_mention_settings', array(&$config_vars));
 
 		// Some context stuff
-		$context['page_title'] = $txt['notification_settings'];
+		$context['page_title'] = $txt['mentions_settings'];
 		$context['sub_template'] = 'show_settings';
 
-		return $this->_notificationSettings->settings($config_vars);
+		return $this->_mentionSettings->settings($config_vars);
 	}
 
 	/**
@@ -1141,6 +1141,7 @@ class ManageFeatures_Controller extends Action_Controller
 					sa: "profileorder",
 					error: "' . $txt['admin_order_error'] . '",
 					title: "' . $txt['admin_order_title'] . '",
+					href: "?action=admin;area=featuresettings;sa=profile",
 					token: {token_var: "' . $token['admin-sort_token_var'] . '", token_id: "' . $token['admin-sort_token'] . '"}
 				});
 			',
@@ -1654,14 +1655,15 @@ class ManageFeatures_Controller extends Action_Controller
 	}
 
 	/**
-	 * Return notification settings.
+	 * Return mentions settings.
 	 * Used in admin center search.
 	 */
-	public function NotificationSettings()
+	public function mentionSettings()
 	{
 		$config_vars = array(
-			array('title', 'notification_settings'),
-			array('check', 'enable_notifications'),
+			array('title', 'mentions_settings'),
+			array('check', 'mentions_enabled'),
+			array('check', 'mentions_buddy'),
 		);
 
 		return $config_vars;

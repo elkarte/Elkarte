@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -339,7 +339,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		// we're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// instantiate the form
 		$this->_spamSettings = new Settings_Form();
@@ -359,14 +359,7 @@ class ManageSecurity_Controller extends Action_Controller
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 		);
 
-		// @todo: maybe move the list to $modSettings instead of hooking it?
-		// Used in create_control_verification too
-		$known_verifications = array(
-			'captcha',
-			'questions',
-			'emptyfield',
-		);
-		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+		$known_verifications = loadVerificationControls();
 
 		foreach ($known_verifications as $verification)
 		{
@@ -401,8 +394,8 @@ class ManageSecurity_Controller extends Action_Controller
 		// Any errors to display?
 		if ($context['invalid_badbehavior_httpbl_key'])
 		{
-			$context['settings_message'][] = $txt['setting_badbehavior_httpbl_key_invalid'];
-			$context['error_type'] = 'notice';
+			$context['settings_message'][] = $txt['badbehavior_httpbl_key_invalid'];
+			$context['error_type'] = 'warning';
 		}
 
 		// Have we blocked anything in the last 7 days?
@@ -492,7 +485,6 @@ class ManageSecurity_Controller extends Action_Controller
 		// Build up our options array
 		$config_vars = array(
 			array('title', 'badbehavior_title'),
-				array('desc', 'badbehavior_desc'),
 				array('check', 'badbehavior_enabled', 'postinput' => $txt['badbehavior_enabled_desc']),
 				array('check', 'badbehavior_logging', 'postinput' => $txt['badbehavior_default_on']),
 				array('check', 'badbehavior_verbose', 'postinput' => $txt['badbehavior_default_off']),
@@ -615,7 +607,7 @@ class ManageSecurity_Controller extends Action_Controller
 	{
 		global $txt;
 
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/VerificationControls.class.php');
 
 		// Build up our options array
 		$config_vars = array(
@@ -633,14 +625,7 @@ class ManageSecurity_Controller extends Action_Controller
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 		);
 
-		// @todo: maybe move the list to $modSettings instead of hooking it?
-		// Used in create_control_verification too
-		$known_verifications = array(
-			'captcha',
-			'questions',
-			'emptyfield',
-		);
-		call_integration_hook('integrate_control_verification', array(&$known_verifications));
+		$known_verifications = loadVerificationControls();
 
 		foreach ($known_verifications as $verification)
 		{

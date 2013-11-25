@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Handle the JavaScript surrounding the admin and moderation center.
  */
@@ -1041,7 +1041,7 @@ function toggleBaseDir ()
 					else if ($(data).find("elk").length !== 0)
 					{
 						// Valid responses get the unobtrusive slider
-						$(ajax_infobar).attr('class', 'infobox');
+						$(ajax_infobar).attr('class', 'successbox');
 						$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
 						setTimeout(function() {
 							$(ajax_infobar).slideUp();

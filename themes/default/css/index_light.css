@@ -67,9 +67,27 @@ body {
 	background-image: linear-gradient(to right, #333 0%, #888 50%, #333 100%);
 	color: #666;
 }
-
-
-
+fieldset {
+	border: none;
+	background: transparent;
+	border: 1px solid #ccc;
+	padding: 6px;
+	box-shadow: none;
+	box-shadow: inset -1px -1px 3px #fff;
+	border-radius: 5px;
+	margin: 5px 0;
+}
+legend {
+	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
+	cursor: pointer;
+	padding-left: 20px;
+	color: #333;
+	font-size: 1.2em;
+	margin-left: 15px;
+}
+.collapsed legend {
+	background:  url(../images/selected.png) no-repeat scroll left center transparent;
+}
 
 /* @todo - Quite a lot more code to be split. */
 
@@ -143,6 +161,9 @@ body {
 div.bbc_footnotes {
 	border-top: 1px solid #bfbfbf;
 }
+.bbc_footnotes .target:target {
+	background-color: #d8ffdf;
+}
 sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50aa3a;
 	font-weight: 700;
@@ -208,7 +229,6 @@ div.bbc_footnotes .meaction{
 }
 /* News section. */
 #news {
-	padding: 0 1em 1em 1em;
 	font-size: 0.929em;
 }
 #news>h2 {

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has the primary job of showing and editing people's profiles.
  * It also allows the user to change some of their or another's preferences,
@@ -218,7 +218,7 @@ class Profile_Controller extends Action_Controller
 					'permission' => $context['user']['is_owner'] ? array('profile_identity_any', 'profile_identity_own') : array('profile_identity_any'),
 				),
 				'notification' => array(
-					'label' => $txt['notification'],
+					'label' => $txt['notifications'],
 					'file' => '/controllers/ProfileOptions.controller.php',
 					'controller' => 'ProfileOptions_Controller',
 					'function' => 'action_notification',

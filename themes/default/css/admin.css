@@ -120,21 +120,10 @@ h3 a.help .icon {
 }
 fieldset {
 	margin-bottom: 6px;
-	border: 1px solid #cacdd3;
 	padding: 6px;
 }
 fieldset dl {
 	margin: 0;
-}
-legend {
-	font-weight: bold;
-	color: #000;
-	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
-	cursor: pointer;
-	padding-left: 20px;
-}
-.collapsed legend  {
-	background:  url(../images/selected.png) no-repeat scroll left center transparent;
 }
 
 /* Styles for the admin home screen.
@@ -521,15 +510,7 @@ dl.settings dd.questions input {
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-#manage_boards, #manage_attachments {
-	background: #efefef;
-	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
-	overflow: auto;
-}
+
 #manage_boards .category_header {
 	border-bottom: 1px solid #bbb;
 }

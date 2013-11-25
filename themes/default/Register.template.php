@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -346,13 +346,13 @@ function template_registration_form()
 
 	if ($context['visual_verification'])
 	{
-		echo '
-			<h3 class="category_header">', $txt['verification'], '</h3>
+		template_control_verification($context['visual_verification_id'], '
+			<h3 class="category_header">' . $txt['verification'] . '</h3>
 			<div class="windowbg2">
 				<fieldset class="content centertext">
-					', template_control_verification($context['visual_verification_id'], 'all'), '
+					', '
 				</fieldset>
-			</div>';
+			</div>');
 	}
 
 	echo '
@@ -510,7 +510,7 @@ function template_verification_sound()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $txt['visual_verification_sound'], '</title>
 		<meta name="robots" content="noindex" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
 		<style>';
 
 	// Just show the help text and a "close window" link.
@@ -558,7 +558,7 @@ function template_admin_register()
 
 	if (!empty($context['registration_done']))
 		echo '
-					<div class="infobox">
+					<div class="successbox">
 						', $context['registration_done'], '
 					</div>';
 
@@ -782,13 +782,13 @@ function template_contact_form()
 
 	if ($context['require_verification'])
 	{
-			echo '
+			template_control_verification($context['visual_verification_id'], '
 					<dt>
-							', $txt['verification'], ':
+							' . $txt['verification'] . ':
 					</dt>
 					<dd>
-							', template_control_verification($context['visual_verification_id'], 'all'), '
-					</dd>';
+							', '
+					</dd>');
 	}
 
 	echo '

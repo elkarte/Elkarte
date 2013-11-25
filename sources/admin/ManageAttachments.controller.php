@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -127,9 +127,12 @@ class ManageAttachments_Controller extends Action_Controller
 		call_integration_hook('integrate_modify_attachment_settings');
 
 		// These are very likely to come in handy! (i.e. without them we're doomed!)
+		// @todo do we really need all this?
 		require_once(ADMINDIR . '/ManagePermissions.controller.php');
 		require_once(ADMINDIR . '/ManageServer.controller.php');
 		require_once(SUBSDIR . '/Settings.class.php');
+		// @todo Just to stay on the safe side, though I'm not sure it's needed
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Saving settings?
 		if (isset($_GET['save']))
@@ -1468,7 +1471,7 @@ class ManageAttachments_Controller extends Action_Controller
 					'position' => 'top_of_list',
 					'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['dir']),
 					'style' => 'padding-left: 35px;',
-					'class' => 'noticebox',
+					'class' => 'warningbox',
 				),
 			),
 		);
@@ -1546,7 +1549,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'position' => 'top_of_list',
 						'value' => $txt['attach_dir_save_problem'] . '<br />' . implode('<br />', $errors['base']),
 						'style' => 'padding-left: 35px',
-						'class' => 'noticebox',
+						'class' => 'warningbox',
 					),
 				),
 			);

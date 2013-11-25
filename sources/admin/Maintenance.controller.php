@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Forum maintenance. Important stuff.
  *
@@ -905,7 +905,7 @@ class Maintenance_Controller extends Action_Controller
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		$validator = new Data_Validator();
 		$validator->sanitation_rules(array('maxdays' => 'intval'));
-		$validator->validation_rules(array('maxdays' => 'required',	'groups' => 'isarray', 'del_type' => 'required'));
+		$validator->validation_rules(array('maxdays' => 'required', 'groups' => 'isarray', 'del_type' => 'required'));
 
 		if ($validator->validate($_POST))
 		{

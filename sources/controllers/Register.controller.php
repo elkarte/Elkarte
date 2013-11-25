@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has two main jobs, but they really are one.  It registers new
  * members, and it helps the administrator moderate member registrations.
@@ -203,7 +203,7 @@ class Register_Controller extends Action_Controller
 		// Generate a visual verification code to make sure the user is no bot.
 		if (!empty($modSettings['reg_verification']) && $current_step > 1)
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'register',
 			);
@@ -252,15 +252,16 @@ class Register_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context, $user_info;
 
+		// Start collecting together any errors.
+		$reg_errors = Error_Context::context('register', 0);
+
 		// We can't validate the token and the session with OpenID enabled.
 		if(!$verifiedOpenID)
 		{
 			checkSession();
-			validateToken('register');
+			if (!validateToken('register', 'post', true, false))
+				$reg_errors->addError('token_verification');
 		}
-
-		// Start collecting together any errors.
-		$reg_errors = Error_Context::context('register', 0);
 
 		// Did we save some open ID fields?
 		if ($verifiedOpenID && !empty($context['openid_save_fields']))
@@ -309,7 +310,7 @@ class Register_Controller extends Action_Controller
 			// Check whether the visual verification code was entered correctly.
 			if (!empty($modSettings['reg_verification']))
 			{
-				require_once(SUBSDIR . '/Editor.subs.php');
+				require_once(SUBSDIR . '/VerificationControls.class.php');
 				$verificationOptions = array(
 					'id' => 'register',
 				);
@@ -898,7 +899,7 @@ class Register_Controller extends Action_Controller
 			loadLanguage('Errors');
 
 			// Could they get the right send topic verification code?
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
 			// form validation
@@ -959,7 +960,7 @@ class Register_Controller extends Action_Controller
 		{
 			$context['sub_template'] = 'contact_form';
 
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'contactform',
 			);

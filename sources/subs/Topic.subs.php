@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains functions for dealing with topics. Low-level functions,
  * i.e. database operations needed to perform.
@@ -314,9 +314,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		)
 	);
 
-	// Remove all notifications now that the topic is gone
+	// Remove all mentions now that the topic is gone
 	$db->query('', '
-		DELETE FROM {db_prefix}log_notifications
+		DELETE FROM {db_prefix}log_mentions
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $messages,

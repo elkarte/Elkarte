@@ -83,7 +83,8 @@ while (!$is_done)
 		$current_name = $current_folder . '/' . $row['id_attach'] . '_' . $file_hash;
 
 		// And we try to rename it.
-		@rename($current_name, $current_name . '.elk');
+		if (substr($current_name, -4) != '.elk')
+			@rename($current_name, $current_name . '.elk');
 	}
 	$db->free_result($request);
 
@@ -612,26 +613,26 @@ CHANGE pm_receive_from receive_from tinyint(4) unsigned NOT NULL default '1';
 ---#
 
 /******************************************************************************/
---- Adding notifications support.
+--- Adding mentions support.
 /******************************************************************************/
 
----# Creating notifications log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-	id_notification int(10) NOT NULL auto_increment,
+---# Creating mentions log table...
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
+	id_mention int(10) NOT NULL auto_increment,
 	id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
 	id_msg int(10) unsigned NOT NULL DEFAULT '0',
 	status tinyint(1) NOT NULL DEFAULT '0',
 	id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
 	log_time int(10) unsigned NOT NULL DEFAULT '0',
 	notif_type varchar(5) NOT NULL DEFAULT '',
-	PRIMARY KEY (id_notification),
+	PRIMARY KEY (id_mention),
 	KEY id_member (id_member,status)
 ) ENGINE=MyISAM;
 ---#
 
 ---# Adding new columns to members...
 ALTER TABLE {$db_prefix}members
-ADD COLUMN notifications smallint(5) NOT NULL default '0';
+ADD COLUMN mentions smallint(5) NOT NULL default '0';
 ---#
 
 --- Fixing personal messages column name

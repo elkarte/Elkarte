@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file takes care of actions on topics:
  * lock/unlock a topic, sticky/unsticky it
@@ -176,12 +176,14 @@ class Topic_Controller extends Action_Controller
 			fatal_lang_error('feature_disabled', false);
 		}
 
+		require_once(SUBSDIR . '/Poll.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
+
 		// Whatever happens don't index this.
 		$context['robot_no_index'] = true;
 
 		// Get the topic starter information.
-		require_once(SUBSDIR . '/Poll.subs.php');
-		$row = pollStarters($topic);
+		$row = pollStarters($topic, true);
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($row))
@@ -324,9 +326,10 @@ class Topic_Controller extends Action_Controller
 
 		// Split the topics up so we can print them.
 		$context['posts'] = topicMessages($topic);
+		$posts_id = array_keys($context['posts']);
 
 		if (!isset($context['topic_subject']))
-			$context['topic_subject'] = $context['posts'][count($context['posts']) - 1]['subject'];
+			$context['topic_subject'] = $context['posts'][min($posts_id)]['subject'];
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
 		if (isset($_REQUEST['images']) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))

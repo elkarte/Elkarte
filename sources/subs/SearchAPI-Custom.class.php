@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -27,7 +27,7 @@ class Custom_Search
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.0 Alpha';
+	public $version_compatible = 'ElkArte 1.0 Beta';
 
 	/**
 	 *This won't work with versions of ElkArte less than this.

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file is mainly meant for controlling the actions related to personal
  * messages. It allows viewing, sending, deleting, and marking personal
@@ -248,6 +248,9 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['get_pmessage'] = 'preparePMContext_callback';
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
+
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->addAfter('subject_list', 'pm');
 
 		$labelQuery = $context['folder'] != 'sent' ? '
 				AND FIND_IN_SET(' . $context['current_label_id'] . ', pmr.labels) != 0' : '';
@@ -536,6 +539,8 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=pm;f=' . $context['folder'] . (isset($_REQUEST['l']) ? ';l=' . (int) $_REQUEST['l'] : '') . ';sort=' . $context['sort_by'] . ($descending ? ';desc' : ''), $start, $max_messages, $modSettings['defaultMaxMessages']);
 		$context['start'] = $start;
 
+		$context['pm_form_url'] = $scripturl . '?action=pm;sa=pmactions;' . ($context['display_mode'] == 2 ? 'conversation;' : '') . 'f=' . $context['folder'] . ';start=' . $context['start'] . ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '');
+
 		// Finally mark the relevant messages as read.
 		if ($context['folder'] != 'sent' && !empty($context['labels'][(int) $context['current_label_id']]['unread_messages']))
 		{
@@ -582,6 +587,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Set the title...
 		$context['page_title'] = $txt['send_message'];
+		$context['pm_form_url'] =  $scripturl . '?action=pm;sa=send2';
 
 		$context['reply'] = isset($_REQUEST['pmsg']) || isset($_REQUEST['quote']);
 
@@ -817,6 +823,8 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
 		if ($context['require_verification'])
 		{
+			require_once(SUBSDIR . '/VerificationControls.class.php');
+
 			$verificationOptions = array(
 				'id' => 'pm',
 			);
@@ -1002,7 +1010,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Wrong verification code?
 		if (!$user_info['is_admin'] && !isset($_REQUEST['xml']) && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'pm',
 			);
@@ -2551,13 +2559,13 @@ function messageIndexBar($area)
 	// Set the selected item.
 	$current_area = $pm_include_data['current_area'];
 	$context['menu_item_selected'] = $current_area;
-	$template_layers = Template_Layers::getInstance();
-
-	$template_layers->addAfter('subject_list', 'pm');
 
 	// Set the template for this area and add the profile layer.
 	if (!isset($_REQUEST['xml']))
+	{
+		$template_layers = Template_Layers::getInstance();
 		$template_layers->add('pm');
+	}
 }
 
 /**
@@ -2846,7 +2854,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 	$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
 	if ($context['require_verification'] && !isset($_REQUEST['xml']))
 	{
-		require_once(SUBSDIR . '/Editor.subs.php');
+		require_once(SUBSDIR . '/VerificationControls.class.php');
 		$verificationOptions = array(
 			'id' => 'pm',
 		);

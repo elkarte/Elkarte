@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -27,7 +27,7 @@ function template_view_scheduled_tasks()
 		if (empty($context['scheduled_errors']))
 		{
 			echo '
-	<div id="task_completed" class="infobox">
+	<div id="task_completed" class="successbox">
 		', $txt['scheduled_tasks_were_run'], '
 	</div>';
 		}

@@ -92,7 +92,7 @@ p, fieldset, form, input, button, select, textarea, .editor {
 }
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
 .wrapper, div.windowbg, div.windowbg2,
-.roundframe, .description, .information, .infobox, .noticebox,
+.roundframe, .description, .information, .successbox, .warningbox,
 .category_header, .generic_list_wrapper, .submitbutton {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -277,6 +277,10 @@ input[disabled].input_text {
 	overflow: auto;
 	width: 100%;
 }
+#post_confirm_buttons {
+	padding: 0;
+}
+
 /* @todo - Test this out some more. */
 .submitbutton .button_submit, .submitbutton .linkbutton {
 	padding: 2px 6px;
@@ -326,12 +330,6 @@ hr {
 fieldset {
 	overflow: auto;
 	border: none;
-}
-fieldset legend {
-	font-weight: bold;
-}
-.content fieldset {
-	border: double #ccc;
 }
 
 /* Define strong as font-weight: 600; - defaults to bold */
@@ -569,7 +567,7 @@ div.windowbg, div.windowbg2 {
 }
 
 /* Lotsa boxes. */
-.description, .information, .noticebox, .infobox {
+.description, .information, .warningbox, .successbox, .infobox {
 	margin: 0 0 12px 0;
 	padding: 6px 12px;
 	border: 1px solid #ccc;
@@ -584,17 +582,23 @@ div.windowbg, div.windowbg2 {
 	padding: 12px;
 }
 /* More little boxes on a hillside. */
-.noticebox {
+.warningbox {
 	padding-left: 35px;
 	border-top: 1px solid #ffd324;
 	border-bottom: 1px solid #ffd324;
 	background: #fff6ca url(../images/profile/warning_moderate.png) 10px 50% no-repeat;
 }
-.infobox {
+.successbox {
 	padding-left: 35px;
 	border-top: 1px solid green;
 	border-bottom: 1px solid green;
 	background: #efe url(../images/icons/field_valid.png) 10px 50% no-repeat;
+}
+.infobox {
+	padding-left: 35px;
+	border-top: 1px solid #3a87ad;
+	border-bottom: 1px solid #3a87ad;
+	background: #d9edf7 url(../images/icons/quick_sticky.png) 10px 50% no-repeat;
 }
 
 /* Used for sections that need somewhat larger corners */
@@ -671,17 +675,6 @@ div.windowbg, div.windowbg2 {
 	color: #eee;
 	cursor: pointer;
 }
-legend {
-	font-weight: bold;
-	color: #000;
-	background: url(../images/selected_open.png) no-repeat scroll left center transparent;
-	cursor: pointer;
-	padding-left: 20px;
-}
-.collapsed legend {
-	background:  url(../images/selected.png) no-repeat scroll left center transparent;
-}
-
 
 
 /* -------------------------------------------- */
@@ -833,12 +826,8 @@ legend {
 .top_button img {
 	vertical-align: middle;
 }
-#password_login, #openid_login {
+#password_login {
 	display: inline-block;
-	margin-left: 20px;
-}
-#password_login input, #password_login select {
-	margin-left: -5px;
 }
 #search_form {
 	padding: 12px 0 4px 8px;
@@ -909,19 +898,9 @@ legend {
 /* The user info, news, etc.*/
 #news {
 	vertical-align: top;
+	padding: 0 0 1em 0;
 }
-#upper_section>.user {
-	display: table-cell;
-	vertical-align: top;
-	min-width: 26em;
-	font-size: 0.857em;
-	white-space: nowrap;
-}
-.greeting {
-	float: right;
-	font-weight: bold;
-	padding-top: 10px;
-}
+
 /* The login form. */
 #guest_form {
 	padding: 0 0 8px 0;
@@ -937,7 +916,7 @@ legend {
 	padding-right: 5px;
 }
 /* No more huge avatars up top. YAY! */
-#top_section_notice .avatar img, .notifavatar .avatar {
+#top_section_notice .avatar img, .mentionavatar .avatar {
 	width: auto;
 	height: auto;
 	max-width: 36px;
@@ -1878,7 +1857,9 @@ dl.settings textarea {
 #expanded_pages_container, #expanded_pages {
 	overflow: hidden;
 }
-
+#boarddescription {
+	display: inline-block;
+}
 /* -------------------------------------------- */
 /* @todo - Code past this point has NOT been split into layout code (index.css) and eye candy (_variant.css) */
 /* Code splitting will continue as time and bugz and whatever allow. */
@@ -1932,6 +1913,9 @@ img.new_posts {
 }
 #description_board .generalinfo .listlevel2 {
 	white-space:nowrap;
+}
+#description_board .generalinfo {
+	overflow: auto;
 }
 .topic_listing {
 	background: #e4e4e4;
@@ -2681,8 +2665,6 @@ ul.post_options li {
 }
 #post_event fieldset {
 	clear: both;
-	padding: 6px;
-	border: double #ccc;
 }
 #post_event #event_main input {
 	float: left;
@@ -2729,9 +2711,6 @@ ul.post_options li {
 }
 #edit_poll fieldset input {
 	margin-left: 7.8em;
-}
-#chrome fieldset input {
-	margin-left: 7.9em;
 }
 #edit_poll ul.poll_main li {
 	padding-left: 12px;
@@ -3354,8 +3333,18 @@ dl.merge_topic dd {
 	float:left;
 	margin-right:10px;
 }
-
-
+div.labels {
+	display: block;
+	text-align: right;
+}
+.label_pms {
+	float: right;
+}
+.label_pms li {
+		display: inline-block;
+		vertical-align: top;
+		margin-left: 0.5em;
+}
 
 
 /* -------------------------------------------- */
@@ -3479,9 +3468,9 @@ dl.merge_topic dd {
 */
 
 
-/* NOTIFICATIONS	*/
+/* MENTIONS	*/
 /* ------------------------------------------------------- */
-.notifavatar .avatar {
+.mentionavatar .avatar {
 	display: block;
 }
 
@@ -4036,121 +4025,6 @@ a.help .icon {
 	}
 }
 
-/* @todo - Just commenting some of this stuff out
-/* until queries are sorted for the new markup, and for break points in em. */
-/* Desktops and laptops *//*
-@media screen and (min-width: 1224px) {}
-/* Large screens *//*
-@media screen and (min-width: 1824px) {}
-/* 10" Tablets (landscape) *//*
-@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {}
-
-/* 10" Tablets (portrait) Drop the stats col replys/views and topics/messages *//*
-@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-/* 7" Tablets like Google Nexus (landscape) or other mobile devices *//*
-@media screen and (max-width: 610px) {
-	 .button_strip_print, .button_strip_send, .stats, .lastpost, .last_th , .nextlinks {
-		 display: none;
-	 }
-	 #posting_icons, #top_section div ul{
-		 display: none;
-	 }
-	 #collapse_button, #button_home, #button_help, #button_memberlist, #button_search {
-		 display: none;
-	 }
-	#menu_nav {
-		padding: 0;
-	}
-	.poster {
-		margin-bottom: 5px;
-		float: none;
-	}
-	.postarea{
-		margin: 0;
-	}
-	.mark_read {
-		margin-bottom: 15px;
-	}
-	#top_section {
-		padding-bottom: 5px;
-	}
-	.dropmenu li
-	{
-		padding: 0;
-	}
-	.unread_links
-	{
-		display: none;
-	}
-	.info {
-		border-right: 1px solid #ccc;
-	}
-	.news {
-		display: none;
-	}
-	.user {
-		float: none;
-		width: 95%;
-	}
-	.poster {
-		float: none;
-		border: 0;
-		box-shadow: none;
-	}
-	.postarea, .moderatorbar {
-		margin: 0;
-	}
-	#basicinfo, #detailedinfo {
-		float: none;
-		width: 95%;
-	}
-	.login {
-		width: 95%;
-	}
-	.pagesection .buttonlist {
-		width: 100%;
-	}
-	input {
-		max-width: 230px;
-	}
-	.quickbuttons .modified {
-		display: none;
-	}
-}
-
-/* mobile devices with low screen resolutions *//*
-@media screen and (max-width: 400px) and (orientation: portrait) {
-	#top_section_notice, #logo, #topic_icons div p, .optional {
-		display: none;
-	}
-
-	#guest_form input {
-		width: 50px;
-	}
-	#message_index_jump_to {
-		display: block;
-		margin-bottom: 7px;
-	}
-	.buttonlist ul li {
-		margin-left: 3px;
-		font-size: 0.8em;
-	}
-	#description_board {
-		display: none;
-	}
-	.pagelinks, .buttonlist {
-	}
-	#main_menu ul li {
-	margin-bottom: 5px;
-	}
-	#post_header dt {
-		width: 90%;
-	}
-	input {
-		max-width: 200px;
-	}
-}
-*/
 /* @todo - WIP - Still needs more elements and stuff. */
 
 /* Not sure how fussy we should get here,
@@ -4485,7 +4359,7 @@ a.help .icon {
 	.linktree:after {
 		content: ">";
 	}
-	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a, 
+	.linktree:hover, .linktree>a:hover, .linktree_last, .linktree_last>a,
 	.linktree_last>a:hover, .linktree_last strong {
 		color: #666 !important;
 	}
@@ -4505,6 +4379,18 @@ a.help .icon {
 	}
 	.small_pagelinks, .sort_by_container {
 		display: none;
+	}
+	.profileblock_left, .profileblock_right {
+		float: none;
+		width: 100%;
+		overflow: auto;
+	}
+	.profile_attachments {
+		display: none;
+	}
+	.pagesection div.floatright {
+		float: none;
+		display: block;
 	}
 	/*	$MODERATE	*/
 	/* ------------------------------------------------------- */

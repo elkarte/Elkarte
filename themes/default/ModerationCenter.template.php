@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -422,7 +422,7 @@ function template_viewmodreport()
 								', sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']), '
 							</h3>
 							<div class="windowbg2">
-								<p class="noticebox">', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '</p>
+								<p class="warningbox">', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '</p>
 								<div class="content">
 									', $context['report']['body'], '
 								</div>
@@ -453,7 +453,7 @@ function template_viewmodreport()
 
 	if (empty($context['report']['mod_comments']))
 		echo '
-									<p class="infobox">', $txt['mc_modreport_no_mod_comment'], '</p>';
+									<p class="successbox">', $txt['mc_modreport_no_mod_comment'], '</p>';
 
 	foreach ($context['report']['mod_comments'] as $comment)
 		echo
@@ -595,7 +595,7 @@ function template_show_notice()
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $context['page_title'], '</title>
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?alp21" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
 	</head>
 	<body>
 		<h2 class="category_header">', $txt['show_notice'], '</h2>

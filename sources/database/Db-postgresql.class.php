@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has all the main functions in it that relate to the database.
  *
@@ -519,13 +519,13 @@ class Database_PostgreSQL implements Database
 
 		$table = str_replace('{db_prefix}', $db_prefix, $table);
 
-		if ($connection === false)
-			$connection = $this->_connection;
+		$connection = $connection === null ? $this->_connection : $connection;
 
 		// Try get the last ID for the auto increment field.
 		$request = $this->query('', 'SELECT CURRVAL(\'' . $table . '_seq\') AS insertID',
 			array(
-			)
+			),
+			$connection
 		);
 		if (!$request)
 			return false;
@@ -533,6 +533,28 @@ class Database_PostgreSQL implements Database
 		$this->free_result($request);
 
 		return $lastID;
+	}
+
+	/**
+	 * Tracking the current row.
+	 * Fetch a row from the resultset given as parameter.
+	 *
+	 * @param resource $request
+	 * @param bool $counter = false
+	 */
+	function fetch_row($request, $counter = false)
+	{
+		global $db_row_count;
+
+		if ($counter !== false)
+			return pg_fetch_row($request, $counter);
+
+		// Reset the row counter...
+		if (!isset($db_row_count[(int) $request]))
+			$db_row_count[(int) $request] = 0;
+
+		// Return the right row.
+		return @pg_fetch_row($request, $db_row_count[(int) $request]++);
 	}
 
 	/**
@@ -563,6 +585,21 @@ class Database_PostgreSQL implements Database
 	function num_fields($request)
 	{
 		return pg_num_fields($request);
+	}
+
+	/**
+	 * Reset the internal result pointer.
+	 *
+	 * @param $request
+	 * @param $counter
+	 */
+	function data_seek($request, $counter)
+	{
+		global $db_row_count;
+
+		$db_row_count[(int) $request] = $counter;
+
+		return true;
 	}
 
 	/**
@@ -599,7 +636,11 @@ class Database_PostgreSQL implements Database
 	 */
 	function last_error($connection = null)
 	{
-		return pg_last_error($connection);
+		// Decide which connection to use
+		$connection = $connection === null ? $this->_connection : $connection;
+
+		if (is_resource($connection))
+			return pg_last_error($connection);
 	}
 
 	/**
@@ -648,74 +689,6 @@ class Database_PostgreSQL implements Database
 
 		// It's already been logged... don't log it again.
 		fatal_error($context['error_message'], false);
-	}
-
-	/**
-	 * Tracking the current row.
-	 * Fetch a row from the resultset given as parameter.
-	 *
-	 * @param resource $request
-	 * @param bool $counter = false
-	 */
-	function fetch_row($request, $counter = false)
-	{
-		global $db_row_count;
-
-		if ($counter !== false)
-			return pg_fetch_row($request, $counter);
-
-		// Reset the row counter...
-		if (!isset($db_row_count[(int) $request]))
-			$db_row_count[(int) $request] = 0;
-
-		// Return the right row.
-		return @pg_fetch_row($request, $db_row_count[(int) $request]++);
-	}
-
-	/**
-	 * Get an associative array
-	 *
-	 * @param $request
-	 * @param $counter
-	 */
-	function fetch_assoc($request, $counter = false)
-	{
-		global $db_row_count;
-
-		if ($counter !== false)
-			return pg_fetch_assoc($request, $counter);
-
-		// Reset the row counter...
-		if (!isset($db_row_count[(int) $request]))
-			$db_row_count[(int) $request] = 0;
-
-		// Return the right row.
-		return @pg_fetch_assoc($request, $db_row_count[(int) $request]++);
-	}
-
-	/**
-	 * Reset the internal result pointer.
-	 *
-	 * @param $request
-	 * @param $counter
-	 */
-	function data_seek($request, $counter)
-	{
-		global $db_row_count;
-
-		$db_row_count[(int) $request] = $counter;
-
-		return true;
-	}
-
-	/**
-	 * Unescape an escaped string!
-	 *
-	 * @param $string
-	 */
-	function unescape_string($string)
-	{
-		return strtr($string, array('\'\'' => '\''));
 	}
 
 	/**
@@ -833,35 +806,6 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
-	 * Dummy function really. Doesn't do anything on PostgreSQL.
-	 *
-	 * @param string $db_name = null
-	 * @param resource $connection = null
-	 */
-	function select_db($db_name = null, $connection = null)
-	{
-		return true;
-	}
-
-	/**
-	 * Get the name (title) of the database system.
-	 */
-	function db_title()
-	{
-		return 'PostgreSQL';
-	}
-
-	/**
-	 * Whether the database system is case sensitive.
-	 *
-	 * @return bool
-	 */
-	function db_case_sensitive()
-	{
-		return true;
-	}
-
-	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
 	 * @param $error_message
@@ -932,6 +876,16 @@ class Database_PostgreSQL implements Database
 			);
 
 		return strtr($string, $replacements);
+	}
+
+	/**
+	 * Unescape an escaped string!
+	 *
+	 * @param $string
+	 */
+	function unescape_string($string)
+	{
+		return strtr($string, array('\'\'' => '\''));
 	}
 
 	/**
@@ -1246,6 +1200,24 @@ class Database_PostgreSQL implements Database
 	}
 
 	/**
+	 * Get the name (title) of the database system.
+	 */
+	function db_title()
+	{
+		return 'PostgreSQL';
+	}
+
+	/**
+	 * Whether the database system is case sensitive.
+	 *
+	 * @return bool
+	 */
+	function db_case_sensitive()
+	{
+		return true;
+	}
+
+	/**
 	 * Escape string for the database input
 	 *
 	 * @param string $string
@@ -1253,6 +1225,27 @@ class Database_PostgreSQL implements Database
 	function escape_string($string)
 	{
 		return pg_escape_string($string);
+	}
+
+	/**
+	 * Get an associative array
+	 *
+	 * @param $request
+	 * @param $counter
+	 */
+	function fetch_assoc($request, $counter = false)
+	{
+		global $db_row_count;
+
+		if ($counter !== false)
+			return pg_fetch_assoc($request, $counter);
+
+		// Reset the row counter...
+		if (!isset($db_row_count[(int) $request]))
+			$db_row_count[(int) $request] = 0;
+
+		// Return the right row.
+		return @pg_fetch_assoc($request, $db_row_count[(int) $request]++);
 	}
 
 	/**
@@ -1278,6 +1271,28 @@ class Database_PostgreSQL implements Database
 		$version = pg_version();
 
 		return $version['client'];
+	}
+
+	/**
+	 * Dummy function really. Doesn't do anything on PostgreSQL.
+	 *
+	 * @param string $db_name = null
+	 * @param resource $connection = null
+	 */
+	function select_db($db_name = null, $connection = null)
+	{
+		return true;
+	}
+
+	/**
+	 * Retrieve the connection object
+	 *
+	 * @return guess what? The connection
+	 */
+	function connection()
+	{
+		// find it, find it
+		return $this->_connection;
 	}
 
 	/**

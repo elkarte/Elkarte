@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains javascript associated with the drafts auto function as it
  * relates to a plain text box (no sceditor invocation)
@@ -110,7 +110,7 @@ elk_DraftAutoSave.prototype.draftSave = function ()
 		'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 		'save_draft=true',
-		elk_session_var + '=' + elk_session_id,
+		elk_session_var + '=' + elk_session_id
 	];
 
 	// Send in document for saving and hope for the best

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains those functions pertaining to posting, and other such
  * operations, including sending emails, ims, blocking spam, preparsing posts,
@@ -1241,10 +1241,10 @@ function approvePosts($msgs, $approve = true)
 		);
 	}
 
-	if (!empty($modSettings['notifications_enabled']))
+	if (!empty($modSettings['mentions_enabled']))
 	{
-		require_once(SUBSDIR . '/Notification.subs.php');
-		toggleNotificationsApproval($msgs, $approve);
+		require_once(SUBSDIR . '/Mentions.subs.php');
+		toggleMentionsApproval($msgs, $approve);
 	}
 
 	// Update the last messages on the boards...

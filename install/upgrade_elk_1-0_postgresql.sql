@@ -100,22 +100,11 @@ while (!$is_done)
 	{
 		// The current folder and name
 		$current_folder = !empty($modSettings['currentAttachmentUploadDir']) ? $modSettings['attachmentUploadDir'][$row['id_folder']] : $modSettings['attachmentUploadDir'];
+		$current_name = $current_folder . '/' . $row['id_attach'] . '_' . $file_hash;
 
-		// The old location of the file.
-		$old_location = getLegacyAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder']);
-
-		// The new file name.
-		$file_hash = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], true);
-
-		// And we try to move it.
-		rename($old_location, $current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk');
-
-		// Only update thif if it was successful.
-		if (file_exists($current_folder . '/' . $row['id_attach'] . '_' . $file_hash . '.elk') && !file_exists($old_location))
-			upgrade_query("
-				UPDATE {$db_prefix}attachments
-				SET file_hash = '$file_hash'
-				WHERE id_attach = $row[id_attach]");
+		// And we try to rename it.
+		if (substr($current_name, -4) != '.elk')
+			@rename($current_name, $current_name . '.elk');
 	}
 	$db->free_result($request);
 
@@ -823,33 +812,33 @@ CHANGE pm_receive_from receive_from tinyint NOT NULL default '1';
 ---#
 
 /******************************************************************************/
---- Adding notifications support.
+--- Adding mentions support.
 /******************************************************************************/
 
----# Creating notifications log index ...
-CREATE SEQUENCE {$db_prefix}log_notifications_id_notification_seq;
+---# Creating mentions log index ...
+CREATE SEQUENCE {$db_prefix}log_mentions_id_mention_seq;
 ---#
 
----# Creating notifications log table...
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-	id_notification int default nextval('{$db_prefix}log_notifications_id_notification_seq'),
+---# Creating mentions log table...
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
+	id_mention int default nextval('{$db_prefix}log_mentions_id_mention_seq'),
 	id_member int NOT NULL DEFAULT '0',
 	id_msg int NOT NULL DEFAULT '0',
 	status int NOT NULL DEFAULT '0',
 	id_member_from int NOT NULL DEFAULT '0',
 	log_time int NOT NULL DEFAULT '0',
 	notif_type varchar(5) NOT NULL DEFAULT '',
-	PRIMARY KEY (id_notification)
+	PRIMARY KEY (id_mention)
 );
 ---#
 
----# Creating notifications log index ...
-CREATE INDEX {$db_prefix}log_notifications_id_member ON {$db_prefix}log_notifications (id_member, status);
+---# Creating mentions log index ...
+CREATE INDEX {$db_prefix}log_mentions_id_member ON {$db_prefix}log_mentions (id_member, status);
 ---#
 
 ---# Adding new columns to members...
 ALTER TABLE {$db_prefix}members
-ADD COLUMN notifications smallint NOT NULL default '0';
+ADD COLUMN mentions smallint NOT NULL default '0';
 ---#
 
 --- Fixing personal messages column name

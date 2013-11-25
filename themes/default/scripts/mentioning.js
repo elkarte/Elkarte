@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains javascript associated with the mentioning function as it
  * relates to a plain text box (no sceditor invocation) eg quick reply no editor
@@ -21,8 +21,8 @@ function elk_mentions(oOptions)
 	this.names = [],
 	this.cached_names = [],
 	this.cached_queries = [],
-	this.mentions,
-	this.$atwho;
+	this.mentions = null,
+	this.$atwho = null;
 
 	this.opt = oOptions;
 	this.attachAtWho();

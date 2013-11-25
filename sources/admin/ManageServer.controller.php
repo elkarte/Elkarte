@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * Contains all the functionality required to be able to edit the core server settings.
  * This includes anything from which an error may result in the forum destroying itself in a firey fury.

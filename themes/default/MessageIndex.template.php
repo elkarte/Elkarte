@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -79,7 +79,7 @@ function template_pages_and_buttons_above()
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
-				<span id="whoisviewing">';
+				<br /><span id="whoisviewing">';
 
 			if ($settings['display_who_viewing'] == 1)
 				echo count($context['view_members']), ' ', count($context['view_members']) === 1 ? $txt['who_member'] : $txt['members'];
@@ -159,7 +159,7 @@ function template_main()
 		{
 			echo '
 			<li class="basic_row">
-				<div class="noticebox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
+				<div class="warningbox" style="margin-bottom:0">! ', $context['unapproved_posts_message'], '</div>
 			</li>';
 		}
 

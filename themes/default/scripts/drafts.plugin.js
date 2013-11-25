@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains javascript associated with the drafts auto function as it
  * relates to an sceditor invocation
@@ -30,7 +30,7 @@
 			return false;
 
 		// Still saving the last one or other?
-		if (this.opts._bInDraftMode)
+		if (this.opts._bInDraftMode === true)
 			this.draftCancel();
 
 		// Get the editor text, either from sceditor or from the quicktext textarea
@@ -58,14 +58,18 @@
 		// Get the locked an/or sticky values if they have been selected or set that is
 		if (this.opts.sType && this.opts.sType === 'post')
 		{
-			var oLock = document.getElementById('check_lock');
-			var oSticky = document.getElementById('check_sticky');
+			var oLock = document.getElementById('check_lock'),
+				oSticky = document.getElementById('check_sticky'),
+				oSmile = document.getElementById('check_smileys');
 
 			if (oLock && oLock.checked)
 				aSections[aSections.length] = 'lock=1';
 
 			if (oSticky && oSticky.checked)
 				aSections[aSections.length] = 'sticky=1';
+
+			if (oSmile && oSmile.checked)
+				aSections[aSections.length] = 'ns=1';
 		}
 
 		// Keep track of source or wysiwyg when using the full editor
@@ -92,8 +96,8 @@
 			return false;
 
 		// Still saving the last one or some other?
-		if (this.opts._bInDraftMode)
-			this.draftCancel;
+		if (this.opts._bInDraftMode === true)
+			this.draftCancel();
 
 		// Nothing to save
 		var sPostdata = base.val();
@@ -105,14 +109,14 @@
 		this.opts._bInDraftMode = true;
 
 		// Get the to and bcc values
-		var aTo = this.draftGetRecipient('recipient_to[]');
-		var aBcc = this.draftGetRecipient('recipient_bcc[]');
+		var aTo = this.draftGetRecipient('recipient_to[]'),
+			aBcc = this.draftGetRecipient('recipient_bcc[]');
 
 		// Get the rest of the form elements that we want to save, and load them up
 		var aSections = [
-			'replied_to=' + parseInt(document.forms.postmodify.elements['replied_to'].value),
-			'id_pm_draft=' + parseInt(document.forms.postmodify.elements['id_pm_draft'].value),
-			'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
+			'replied_to=' + parseInt(document.forms.pmFolder.elements['replied_to'].value),
+			'id_pm_draft=' + parseInt(document.forms.pmFolder.elements['id_pm_draft'].value),
+			'subject=' + escape(document.forms.pmFolder['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
 			'recipient_to=' + aTo,
 			'recipient_bcc=' + aBcc,
@@ -137,7 +141,7 @@
 	 */
 	elk_Drafts.prototype.draftGetRecipient = function (sField)
 	{
-		var oRecipient = document.forms.postmodify.elements[sField],
+		var oRecipient = document.forms.pmFolder.elements[sField],
 			aRecipient = [];
 
 		if (typeof(oRecipient) !== 'undefined')
@@ -186,7 +190,7 @@
 		this.opts._oCurDraftDiv = document.getElementById(this.opts.sLastNote);
 		setInnerHTML(this.opts._oCurDraftDiv, this.opts._sLastSaved);
 
-		// Hide the saved draft infobox in the event they pressed the save draft button at some point
+		// Hide the saved draft successbox in the event they pressed the save draft button at some point
 		var draft_section = document.getElementById('draft_section');
 		if (draft_section)
 			draft_section.style.display = 'none';

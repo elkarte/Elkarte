@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has the primary job of showing and editing people's profiles.
  * It also allows the user to change some of their or another's preferences,
@@ -155,10 +155,10 @@ class ProfileOptions_Controller extends Action_Controller
 				);
 
 				// Let them know who's their buddy.
-				if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+				if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 				{
-					require_once(CONTROLLERDIR . '/Notification.controller.php');
-					$notify = new Notification_Controller();
+					require_once(CONTROLLERDIR . '/Mentions.controller.php');
+					$mentions = new Mentions_Controller();
 				}
 
 				// Add the new member to the buddies array.
@@ -166,15 +166,15 @@ class ProfileOptions_Controller extends Action_Controller
 				{
 					$buddiesArray[] = (int) $row['id_member'];
 
-					if (!empty($modSettings['notifications_enabled']) && !empty($modSettings['notifications_buddy']))
+					if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 					{
-						// Set notifications for our buddy.
-						$notify->setData(array(
+						// Set a mentions for our buddy.
+						$mentions->setData(array(
 							'id_member' => $row['id_member'],
 							'type' => 'buddy',
 							'id_msg' => 0,
 						));
-						$notify->action_add();
+						$mentions->action_add();
 					}
 				}
 				$db->free_result($request);

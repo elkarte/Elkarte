@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * The job of this file is to handle everything related to posting replies,
  * new topics, quotes, and modifications to existing posts.  It also handles
@@ -81,6 +81,9 @@ class Post_Controller extends Action_Controller
 		if ($context['make_event'])
 			$template_layers->add('make_event');
 
+		// All those wonderful modifiers and attachments
+		$template_layers->add('additional_options', 200);
+
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
 
@@ -93,7 +96,7 @@ class Post_Controller extends Action_Controller
 			$context['preview_subject'] = '';
 		}
 
-		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 			$context['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 
 		// No message is complete without a topic.
@@ -738,7 +741,7 @@ class Post_Controller extends Action_Controller
 		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 		if ($context['require_verification'])
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'post',
 			);
@@ -839,9 +842,9 @@ class Post_Controller extends Action_Controller
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 
-		if (!empty($modSettings['notifications_enabled']))
+		if (!empty($modSettings['mentions_enabled']))
 		{
-			$context['notifications_enabled'] = true;
+			$context['mentions_enabled'] = true;
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
 			loadCSSFile('jquery.atwho.css');
 
@@ -858,7 +861,7 @@ class Post_Controller extends Action_Controller
 			$this->_prepareDraftsContext($user_info['id'], $topic);
 
 			if (!empty($context['drafts']))
-				$template_layers->add('load_drafts');
+				$template_layers->add('load_drafts', 100);
 		}
 
 		// Needed for the editor and message icons.
@@ -1008,7 +1011,7 @@ class Post_Controller extends Action_Controller
 		// Wrong verification code?
 		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
-			require_once(SUBSDIR . '/Editor.subs.php');
+			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'post',
 			);
@@ -1442,7 +1445,7 @@ class Post_Controller extends Action_Controller
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
-		if (!empty($modSettings['notifications_enabled']) && !empty($_REQUEST['uid']))
+		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
 		{
 			$query = array('and' => array('member_ids'));
 			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
@@ -1771,17 +1774,17 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		if (!empty($modSettings['notifications_enabled']) && !empty($actually_mentioned))
+		if (!empty($modSettings['mentions_enabled']) && !empty($actually_mentioned))
 		{
-			require_once(CONTROLLERDIR . '/Notification.controller.php');
-			$notify = new Notification_Controller();
-			$notify->setData(array(
+			require_once(CONTROLLERDIR . '/Mentions.controller.php');
+			$mentions = new Mentions_Controller();
+			$mentions->setData(array(
 				'id_member' => $actually_mentioned,
 				'type' => 'men',
 				'id_msg' => $msgOptions['id'],
 				'status' => $becomesApproved ? 'new' : 'unapproved',
 			));
-			$notify->action_add();
+			$mentions->action_add();
 		}
 
 		if ($board_info['num_topics'] == 0)

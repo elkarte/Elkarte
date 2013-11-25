@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This template is, perhaps, the most important template in the theme. It
  * contains the main template layer that displays the header and footer of
@@ -90,7 +90,7 @@ function template_init()
 	);
 
 	// @todo find a better place if we are going to create a notifications template
-	$settings['notifications']['notifier_template'] = '<a href="{mem_url}" class="notifavatar">{avatar_img}{mem_name}</a>';
+	$settings['mentions']['mentioner_template'] = '<a href="{mem_url}" class="mentionavatar">{avatar_img}{mem_name}</a>';
 }
 
 /**
@@ -235,7 +235,7 @@ function template_body_above()
 					<input type="hidden" name="hash_passwrd" value="" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
-				
+
 		if (!empty($modSettings['enableOpenID']))
 			echo '
 					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" /></a>';
@@ -343,11 +343,11 @@ function template_body_above()
 	// Are there any members waiting for approval?
 	if (!empty($context['unapproved_members']))
 		echo '
-		<div class="modtask noticebox">', $context['unapproved_members_text'], '</div>';
+		<div class="modtask warningbox">', $context['unapproved_members_text'], '</div>';
 
 	if (!empty($context['open_mod_reports']) && $context['show_open_reports'])
 		echo '
-		<div class="modtask noticebox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
+		<div class="modtask warningbox"><a href="', $scripturl, '?action=moderate;area=reports">', sprintf($txt['mod_reports_waiting'], $context['open_mod_reports']), '</a></div>';
 
 	// The main content should go here. @todo - Skip nav link.
 	echo '
@@ -378,7 +378,7 @@ function template_body_below()
 					<a id="button_xhtml" href="http://validator.w3.org/check?uri=referer" target="_blank" class="new_win" title="', $txt['valid_html'], '"><span>', $txt['html'], '</span></a>
 				</li>',
 				!empty($modSettings['xmlnews_enable']) && (!empty($modSettings['allow_guestAccess']) || $context['user']['is_logged']) ? '<li><a id="button_rss" href="' . $scripturl . '?action=.xml;type=rss;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5) . '" class="new_win"><span>' . $txt['rss'] . '</span></a></li>' : '',
-				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats'])) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '
+				(!empty($modSettings['badbehavior_enabled']) && !empty($modSettings['badbehavior_display_stats']) && function_exists('bb2_insert_stats')) ? '<li class="copyright">' . bb2_insert_stats() . '</li>' : '', '
 			</ul>';
 
 	// Show the load time?
@@ -605,7 +605,7 @@ function template_show_error($error_id)
 	$error = $context[$error_id];
 
 	echo '
-					<div class="', (!isset($error['type']) ? 'infobox' : ($error['type'] !== 'serious' ? 'noticebox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
+					<div class="', (!isset($error['type']) ? 'successbox' : ($error['type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" ', empty($error['errors']) ? ' style="display: none"' : '', ' id="', $error_id, '">';
 
 	// Optional title for our results
 	if (!empty($error['title']))

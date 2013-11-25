@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains some useful functions for members and membergroups.
  *
@@ -329,8 +329,9 @@ function deleteMembers($users, $check_not_admin = false)
 		)
 	);
 
+	// Remove the mentions
 	$db->query('', '
-		DELETE FROM {db_prefix}log_notifications
+		DELETE FROM {db_prefix}log_mentions
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
@@ -676,7 +677,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	// Right, now let's prepare for insertion.
 	$knownInts = array(
-		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages',
+		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'notifications',
 		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
@@ -1406,6 +1407,9 @@ function membersBy($query, $query_params, $details = false)
 		),
 		'in_group_primary' => array('id_group = {int:in_group_primary}',),
 		'in_post_group' => array('id_post_group = {int:in_post_group}'),
+		'in_group_no_add' => array(
+			'(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)'
+		),
 	);
 
 	if (is_array($query))
@@ -1482,6 +1486,9 @@ function countMembersBy($query, $query_params)
 		),
 		'in_group_primary' => array('id_group = {int:in_group_primary}',),
 		'in_post_group' => array('id_post_group = {int:in_post_group}'),
+		'in_group_no_add' => array(
+			'(id_group = {int:in_group_no_add} AND FIND_IN_SET({int:in_group_no_add}, additional_groups) = 0)'
+		),
 	);
 
 	if (is_array($query))

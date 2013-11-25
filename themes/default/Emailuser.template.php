@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -214,7 +214,7 @@ function template_report()
 	template_show_error('report_error');
 
 	echo '
-						<p class="noticebox">', $txt['report_to_mod_func'], '</p>
+						<p class="warningbox">', $txt['report_to_mod_func'], '</p>
 						<br />
 						<dl class="settings" id="report_post">';
 
@@ -239,13 +239,13 @@ function template_report()
 
 	if ($context['require_verification'])
 	{
-		echo '
+		template_control_verification($context['visual_verification_id'], '
 							<dt>
-								', $txt['verification'], ':
+								' . $txt['verification'] . ':
 							</dt>
 							<dd>
-								', template_control_verification($context['visual_verification_id'], 'all'), '
-							</dd>';
+								', '
+							</dd>');
 	}
 
 	echo '

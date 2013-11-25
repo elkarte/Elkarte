@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains functions for dealing with polls.
  *
@@ -502,8 +502,15 @@ function pollStarters($id_topic, $detailed = false)
 			)
 		);
 	}
+	$pollStarters = array();
+
 	if ($db->num_rows($request) != 0)
-		$pollStarters = $db->fetch_row($request);
+	{
+		if ($detailed)
+			$pollStarters = $db->fetch_assoc($request);
+		else
+			$pollStarters = $db->fetch_row($request);
+	}
 	$db->free_result($request);
 
 	return $pollStarters;

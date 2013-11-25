@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains javascript associated with the current theme
  */
@@ -187,7 +187,7 @@ errorbox_handler.prototype.checkErrors = function ()
 				this.removeError(this.oError_box, $elem);
 		}
 
-		this.oError_box.attr("class", "noticebox");
+		this.oError_box.attr("class", "warningbox");
 	}
 
 	// Hide show the error box based on if we have any errors

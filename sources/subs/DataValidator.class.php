@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  */
 
@@ -324,6 +324,9 @@ class Data_Validator
 	 */
 	private function _validate_recursive($input, $field, $rules)
 	{
+		if (!isset($input[$field]))
+			return;
+
 		$sub_validator = new Data_Validator();
 		$fields = array();
 		if ($this->_datatype[$field] === 'array')
@@ -422,12 +425,13 @@ class Data_Validator
 					elseif (in_array($rule, array('empty', 'array', 'isset')))
 					{
 						// could be done as methods instead ...
-						switch ($rule) {
+						switch ($rule)
+						{
 							case 'empty':
 								$input[$field] = empty($input[$field]);
 								break;
 							case 'array':
-								is_array($input[$field]) ? $input[$field] : array($input[$field]);
+								$input[$field] = is_array($input[$field]) ? $input[$field] : array($input[$field]);
 								break;
 							case 'isset':
 								$input[$field] = isset($input[$field]);
@@ -1130,6 +1134,52 @@ class Data_Validator
 				'param' => $validation_parameters
 			);
 		}
+	}
+
+	/**
+	 * Checks if the input is a valid css-like color
+	 *
+	 * Usage: '[key]' => 'valid_color'
+	 *
+	 * @param string $field
+	 * @param array $input
+	 * @param array or null $validation_parameters
+	 */
+	protected function _validate_valid_color($field, $input, $validation_parameters = null)
+	{
+		if (!isset($input[$field]))
+			return;
+
+		// A color can be a name: there are 140 valid, but a similar list is too long, so let's just use the basic 17
+		if (in_array(strtolower($input[$field]), array('aqua', 'black', 'blue', 'fuchsia', 'gray', 'green', 'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red', 'silver', 'teal', 'white', 'yellow')))
+			return true;
+
+		// An hex code
+		if (preg_match('~^#([a-f0-9]{3}|[a-f0-9]{6})$~i', $input[$field]) === 1)
+			return true;
+
+		// RGB
+		if (preg_match('~^rgb\(\d{1,3},\d{1,3},\d{1,3}\)$~i', str_replace(' ', '', $input[$field])) === 1)
+			return true;
+
+		// RGBA
+		if (preg_match('~^rgba\(\d{1,3},\d{1,3},\d{1,3},(0|0\.\d+|1(\.0*)|\.\d+)\)$~i', str_replace(' ', '', $input[$field])) === 1)
+			return true;
+
+		// HSL
+		if (preg_match('~^hsl\(\d{1,3},\d{1,3}%,\d{1,3}%\)$~i', str_replace(' ', '', $input[$field])) === 1)
+			return true;
+
+		// HSLA
+		if (preg_match('~^hsla\(\d{1,3},\d{1,3}%,\d{1,3}%,(0|0\.\d+|1(\.0*)|\.\d+)\)$~i', str_replace(' ', '', $input[$field])) === 1)
+			return true;
+
+		return array(
+			'field' => $field,
+			'input' => $input[$field],
+			'function' => __FUNCTION__,
+			'param' => $validation_parameters
+		);
 	}
 
 	/**

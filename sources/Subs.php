@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file has all the main functions in it that relate to, well, everything.
  *
@@ -115,7 +115,7 @@ function updateMemberData($members, $data)
 
 	// Everything is assumed to be a string unless it's in the below.
 	$knownInts = array(
-		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages',
+		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'mentions',
 		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'receive_from', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning', 'likes_given', 'likes_received',
@@ -616,10 +616,10 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  */
 function relativeTime($timestamp, $show_today = true, $offset_type = false)
 {
-	global $modSettings, $txt;
+	global $txt;
 
 	// We don't want relative times? Bypass to standardTime();
-	if ($modSettings['todayMod'] < 3)
+	// if ($modSettings['todayMod'] < 3)
 		return standardTime($timestamp, $show_today, $offset_type);
 
 	// No use in doing calculations if there's nothing to work with.
@@ -2369,8 +2369,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			global $fn_num, $fn_content, $fn_count;
 
 			$fn_num++;
-			$fn_content[] = "<sup id=\"fn$fn_num" . "_" . "$fn_count\">$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a>";
-			return "<a href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
+			$fn_content[] = "<div class=\"target\" id=\"fn$fn_num" . "_" . "$fn_count\"><sup>$fn_num&nbsp;</sup>$m[2]<a class=\"footnote_return\" href=\"#ref$fn_num" . "_" . "$fn_count\">&crarr;</a></div>";
+			return "<a class=\"target\" href=\"#fn$fn_num" . "_" . "$fn_count\" id=\"ref$fn_num" . "_" . "$fn_count\">[$fn_num]</a>";'), $message);
 
 		$fn_total += $fn_num;
 
@@ -2759,7 +2759,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = &$user_info['messages'];
 		$context['user']['unread_messages'] = &$user_info['unread_messages'];
-		$context['user']['notifications'] = &$user_info['notifications'];
+		$context['user']['mentions'] = &$user_info['mentions'];
 
 		// Personal message popup...
 		if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
@@ -2815,7 +2815,7 @@ function setupThemeContext($forceload = false)
 	{
 		$context['user']['messages'] = 0;
 		$context['user']['unread_messages'] = 0;
-		$context['user']['notifications'] = 0;
+		$context['user']['mentions'] = 0;
 		$context['user']['avatar'] = array();
 		$context['user']['total_time_logged_in'] = array('days' => 0, 'hours' => 0, 'minutes' => 0);
 		$context['user']['popup_messages'] = false;
@@ -3057,9 +3057,6 @@ function template_footer()
  *
  * @param bool $do_defered = false
  *
- * @todo - Note that type="text/javascript" and type="text/css" are deprecated in HTML5.
- * @todo - There are several occurrences in this function, and the next one.
- * @todo - Full directory search for any strays should be done, then hit the lot of them.
  */
 function template_javascript($do_defered = false)
 {
@@ -3072,23 +3069,23 @@ function template_javascript($do_defered = false)
 		{
 			case 'cdn':
 				echo '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'local':
 				echo '
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
+	<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
+	<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js" id="jqueryui"></script>' : '');
 				break;
 			case 'auto':
 				echo '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" id="jquery"></script>',
 	(!empty($modSettings['jquery_include_ui']) ? '
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
+	<script><!-- // --><![CDATA[
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-1.10.2.min.js"><\/script>\');',
 		(!empty($modSettings['jquery_include_ui']) ? '
 		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jqueryui-1.10.3.min.js"><\/script>\')' : ''), '
@@ -3111,7 +3108,7 @@ function template_javascript($do_defered = false)
 
 			if (!empty($combine_name))
 				echo '
-	<script type="text/javascript" src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
+	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		}
 		else
 		{
@@ -3120,7 +3117,7 @@ function template_javascript($do_defered = false)
 			{
 				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
 					echo '
-	<script type="text/javascript" src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
 			}
 		}
 	}
@@ -3129,7 +3126,7 @@ function template_javascript($do_defered = false)
 	if (!empty($context['javascript_vars']) && !$do_defered)
 	{
 		echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 		$output = array();
 		foreach ($context['javascript_vars'] as $key => $value)
@@ -3148,7 +3145,7 @@ function template_javascript($do_defered = false)
 		if (!empty($context['javascript_inline']['defer']) && $do_defered)
 		{
 			echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 			foreach ($context['javascript_inline']['defer'] as $js_code)
 				echo $js_code;
@@ -3160,7 +3157,7 @@ function template_javascript($do_defered = false)
 		if (!empty($context['javascript_inline']['standard']) && !$do_defered)
 		{
 			echo '
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	<script><!-- // --><![CDATA[';
 
 			foreach ($context['javascript_inline']['standard'] as $js_code)
 				echo $js_code;
@@ -3192,13 +3189,13 @@ function template_css()
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 			if (!empty($combine_name))
 				echo '
-	<link rel="stylesheet" type="text/css" href="', $combine_name, '" id="csscombined" />';
+	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
 		}
 		else
 		{
 			foreach ($context['css_files'] as $id => $file)
 				echo '
-	<link rel="stylesheet" type="text/css" href="', $file['filename'], '" id="', $id,'" />';
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
 		}
 	}
 }
@@ -3269,7 +3266,7 @@ function template_admin_warning_above()
 	if (!empty($context['security_controls']['admin_session']) || !empty($context['security_controls']['maintenance']))
 	{
 		echo '
-			<div class="noticebox">';
+			<div class="warningbox">';
 
 		if (!empty($context['security_controls']['admin_session']))
 			echo
@@ -3566,7 +3563,7 @@ function setupMenuContext()
 	}
 
 	$menu_count['unread_messages'] = $context['user']['unread_messages'];
-	$menu_count['notifications'] = $context['user']['notifications'];
+	$menu_count['mentions'] = $context['user']['mentions'];
 
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
 	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
@@ -3615,11 +3612,11 @@ function setupMenuContext()
 					'show' => $context['allow_pm'],
 				),
 
-				'notification' => array(
-					'title' => $txt['notifications'],
-					'counter' => 'notifications',
-					'href' => $scripturl . '?action=notification',
-					'show' => !$user_info['is_guest'] && !empty($modSettings['notifications_enabled']),
+				'mention' => array(
+					'title' => $txt['mention'],
+					'counter' => 'mentions',
+					'href' => $scripturl . '?action=mentions',
+					'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 				),
 
 				// The old language string made no sense, and was too long.

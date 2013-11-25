@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -28,7 +28,7 @@ function template_PersonalMessage_init()
  */
 function template_pm_above()
 {
-	global $context, $txt, $scripturl;
+	global $context, $txt;
 
 	// The every helpful javascript!
 	echo '
@@ -54,12 +54,13 @@ function template_pm_above()
 	// Message sent? Show a small indication.
 	if (isset($context['pm_sent']))
 		echo '
-						<div class="infobox">
+						<div class="successbox">
 							', $txt['pm_sent'], '
 						</div>';
 
-	echo '
-						<form action="', $scripturl, '?action=pm;sa=pmactions;', $context['display_mode'] == 2 ? 'conversation;' : '', 'f=', $context['folder'], ';start=', $context['start'], $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '" method="post" accept-charset="UTF-8" name="pmFolder">';
+	if (!empty($context['pm_form_url']))
+		echo '
+						<form action="', $context['pm_form_url'], '" method="post" accept-charset="UTF-8" name="pmFolder">';
 }
 
 /**
@@ -70,8 +71,8 @@ function template_pm_below()
 	global $context;
 
 	echo '
-							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						</form>
+							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['pm_form_url']) ? '
+						</form>' : '', '
 					</div>';
 }
 
@@ -211,7 +212,7 @@ function template_folder()
 			if ($context['folder'] !== 'sent' && !empty($context['currently_using_labels']) && $context['display_mode'] != 2)
 			{
 				echo '
-								<div class="labels floatright">';
+								<div class="labels">';
 
 				// Add the label drop down box. @todo: Why inline styles for select?
 				if (!empty($context['currently_using_labels']))
@@ -431,49 +432,51 @@ function template_subject_list()
 					</table>';
 
 	$extra = '
-					<div class="floatright">';
+					<ul class="label_pms">';
 
 	if ($context['show_delete'])
 	{
 		if (!empty($context['currently_using_labels']) && $context['folder'] != 'sent')
 		{
 			$extra .= '
-						<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
-							<option value="">' . $txt['pm_sel_label_title'] . ':</option>
-							<option value="" disabled="disabled">---------------</option>';
+						<li>
+							<select name="pm_action" onchange="if (this.options[this.selectedIndex].value) this.form.submit();" onfocus="loadLabelChoices();">
+								<option value="">' . $txt['pm_sel_label_title'] . ':</option>
+								<option value="" disabled="disabled">---------------</option>';
 
 			$extra .= '
-							<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
+								<option value="" disabled="disabled">' . $txt['pm_msg_label_apply'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-							<option value="add_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+								<option value="add_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-							<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
+								<option value="" disabled="disabled">' . $txt['pm_msg_label_remove'] . ':</option>';
 
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-							<option value="rem_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+								<option value="rem_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
-						</select>
-						<noscript>
-							<input type="submit" value="' . $txt['pm_apply'] . '" class="right_submit" />
-						</noscript>';
+							</select>
+							<noscript>
+								<input type="submit" value="' . $txt['pm_apply'] . '" class="right_submit" />
+							</noscript>
+						</li>';
 		}
 
 		$extra .= '
-						<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />';
+						<li><input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" /></li>';
 	}
 
 	$extra .= '
-					</div>';
+					</ul>';
 
 	template_pagesection(false, false, array('extra' => $extra));
 }
@@ -823,7 +826,7 @@ function template_send()
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
-					<div id="draft_section" class="infobox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+					<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
 		sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
 					</div>';
 
@@ -888,11 +891,11 @@ function template_send()
 
 	// Require an image to be typed to save spamming?
 	if ($context['require_verification'])
-		echo '
+		template_control_verification($context['visual_verification_id'], '
 					<div class="post_verification">
-						<strong>', $txt['pm_visual_verification_label'], ':</strong>
-						', template_control_verification($context['visual_verification_id'], 'all'), '
-					</div>';
+						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
+						', '
+					</div>');
 
 	// Send, Preview, spellchecker buttons.
 	echo '

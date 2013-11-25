@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  *
  * This file contains javascript associated with the posting and previewing
  */
@@ -307,7 +307,7 @@ function onDocSent(XMLDoc)
 					bCurrentlyCollapsed: true,
 					aSwappableContainers: [
 						'msg_' + ignored_replies[i] + '_body',
-						'msg_' + ignored_replies[i] + '_quote',
+						'msg_' + ignored_replies[i] + '_quote'
 					],
 					aSwapLinks: [
 						{
@@ -327,7 +327,7 @@ function onDocSent(XMLDoc)
 	if ($.isFunction($.fn.linkifyvideo))
 		$().linkifyvideo(oEmbedtext, 'preview_body');
 
-	// Preview spoilers
+	// Spoilers, Sweetie
 	$('.spoilerheader').click(function(){
 		$(this).next().children().slideToggle("fast");
 	});

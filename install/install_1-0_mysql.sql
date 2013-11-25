@@ -1025,18 +1025,18 @@ CREATE TABLE {$db_prefix}log_member_notices (
 ) ENGINE=MyISAM;
 
 #
-# Table structure for table `log_notifications`
+# Table structure for table `log_mentions`
 #
 
-CREATE TABLE IF NOT EXISTS {$db_prefix}log_notifications (
-  id_notification int(10) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS {$db_prefix}log_mentions (
+  id_mention int(10) NOT NULL auto_increment,
   id_member mediumint(8) unsigned NOT NULL DEFAULT '0',
   id_msg int(10) unsigned NOT NULL DEFAULT '0',
   status tinyint(1) NOT NULL DEFAULT '0',
   id_member_from mediumint(8) unsigned NOT NULL DEFAULT '0',
   log_time int(10) unsigned NOT NULL DEFAULT '0',
-  notif_type varchar(5) NOT NULL DEFAULT '',
-  PRIMARY KEY (id_notification),
+  mention_type varchar(5) NOT NULL DEFAULT '',
+  PRIMARY KEY (id_mention),
   KEY id_member (id_member,status)
 ) ENGINE=MyISAM;
 
@@ -1317,8 +1317,8 @@ CREATE TABLE {$db_prefix}membergroups (
 
 INSERT INTO {$db_prefix}membergroups
 	(id_group, group_name, description, online_color, min_posts, icons, group_type)
-VALUES (1, '{$default_administrator_group}', '', '#FF0000', -1, '5#iconadmin.png', 1),
-	(2, '{$default_global_moderator_group}', '', '#0000FF', -1, '5#icongmod.png', 0),
+VALUES (1, '{$default_administrator_group}', '', '#CD0000', -1, '5#iconadmin.png', 1),
+	(2, '{$default_global_moderator_group}', '', '#0066FF', -1, '5#icongmod.png', 0),
 	(3, '{$default_moderator_group}', '', '', -1, '5#iconmod.png', 0),
 	(4, '{$default_newbie_group}', '', '', 0, '1#icon.png', 0),
 	(5, '{$default_junior_group}', '', '', 50, '2#icon.png', 0),
@@ -1341,7 +1341,7 @@ CREATE TABLE {$db_prefix}members (
   last_login int(10) unsigned NOT NULL default '0',
   real_name varchar(255) NOT NULL default '',
   personal_messages smallint(5) NOT NULL default '0',
-  notifications smallint(5) NOT NULL default '0',
+  mentions smallint(5) NOT NULL default '0',
   unread_messages smallint(5) NOT NULL default '0',
   new_pm tinyint(3) unsigned NOT NULL default '0',
   buddy_list text NOT NULL,
@@ -2146,7 +2146,7 @@ CREATE TABLE {$db_prefix}subscriptions(
 #
 
 CREATE TABLE {$db_prefix}themes (
-  id_member mediumint(8) unsigned NOT NULL default '0',
+  id_member mediumint(8) NOT NULL default '0',
   id_theme tinyint(4) unsigned NOT NULL default '1',
   variable varchar(255) NOT NULL default '',
   value text NOT NULL,

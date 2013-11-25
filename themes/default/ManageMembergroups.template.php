@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Alpha
+ * @version 1.0 Beta
  */
 
 /**
@@ -35,7 +35,7 @@ function template_new_group()
 
 	echo '
 	<div id="admincenter">
-		<form id="new_group" action="', $scripturl, '?action=admin;area=membergroups;sa=add" method="post" accept-charset="UTF-8">
+		<form id="admin_form_wrapper" name="new_group" action="', $scripturl, '?action=admin;area=membergroups;sa=add" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $txt['membergroups_new_group'], '</h2>
 			<div class="windowbg">
 				<div class="content">
@@ -134,7 +134,7 @@ function template_new_group()
 						</dt>
 						<dd>';
 
-	template_add_edit_group_boards_list('new_group', false);
+	template_add_edit_group_boards_list('new_group', false, false);
 
 	echo '
 						</dd>
@@ -173,9 +173,8 @@ function template_edit_group()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=membergroups;sa=edit;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" name="groupForm" id="groupForm">
-			<h3 class="category_header">', $txt['membergroups_edit_group'], ' - ', $context['group']['name'], '
-			</div>
+		<form id="admin_form_wrapper" name="groupForm" action="', $scripturl, '?action=admin;area=membergroups;sa=edit;group=', $context['group']['id'], '" method="post" accept-charset="UTF-8" >
+			<h3 class="category_header">', $txt['membergroups_edit_group'], ' - ', $context['group']['name'], '</h3>
 			<div class="content">
 				<dl class="settings">
 					<dt>
@@ -316,7 +315,7 @@ function template_edit_group()
 					</dt>
 					<dd>';
 
-		template_add_edit_group_boards_list('groupForm');
+		template_add_edit_group_boards_list('groupForm', true ,false);
 
 		echo '
 					</dd>';
@@ -355,8 +354,12 @@ function template_edit_group()
 			sItemBackground: "transparent",
 			sItemBackgroundHover: "#E0E0F0"
 		});
-	// ]]></script>
-	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+	// ]]></script>';
+
+	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
+	{
+		echo '
+	<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 	<script><!-- // --><![CDATA[
 		var oModeratorSuggest = new smc_AutoSuggest({
 			sSelf: \'oModeratorSuggest\',
@@ -372,17 +375,18 @@ function template_edit_group()
 			sItemListContainerId: \'moderator_container\',
 			aListItems: [';
 
-	foreach ($context['group']['moderators'] as $id_member => $member_name)
-		echo '
+		foreach ($context['group']['moderators'] as $id_member => $member_name)
+			echo '
 						{
 							sItemId: ', JavaScriptEscape($id_member), ',
 							sItemName: ', JavaScriptEscape($member_name), '
 						}', $id_member == $context['group']['last_moderator_id'] ? '' : ',';
 
-	echo '
+		echo '
 			]
 		});
 	// ]]></script>';
+	}
 
 	if ($context['group']['allow_post_group'])
 		echo '
@@ -413,9 +417,9 @@ function template_edit_group()
  * @param int $form_id
  * @param bool $collapse
  */
-function template_add_edit_group_boards_list($form_id, $collapse = true)
+function template_add_edit_group_boards_list($form_id, $collapse = true, $deny = true)
 {
-	global $context, $txt, $modSettings;
+	global $context, $txt;
 
 	echo '
 							<fieldset id="visible_boards">
@@ -424,7 +428,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 
 	foreach ($context['categories'] as $category)
 	{
-		if (empty($modSettings['deny_boards_access']))
+		if (empty($deny))
 			echo '
 									<li class="category">
 										<a href="javascript:void(0);" onclick="selectBoards([', implode(', ', $category['child_ids']), '], \'', $form_id, '\'); return false;"><strong>', $category['name'], '</strong></a>
@@ -446,10 +450,10 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 
 		foreach ($category['boards'] as $board)
 		{
-			if (empty($modSettings['deny_boards_access']))
+			if (empty($deny))
 				echo '
 										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
-											<input type="checkbox" name="boardaccess[', $board['id'], ']" id="brd', $board['id'], '" value="\'allow\'" ', $board['allow'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="brd', $board['id'], '">', $board['name'], '</label>
+											<input type="checkbox" name="boardaccess[', $board['id'], ']" id="brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="brd', $board['id'], '">', $board['name'], '</label>
 										</li>';
 			else
 				echo '
@@ -471,7 +475,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 	echo '
 							</ul>';
 
-	if (empty($modSettings['deny_boards_access']))
+	if (empty($deny))
 		echo '
 								<br />
 								<input type="checkbox" id="checkall_check" class="input_check" onclick="invertAll(this, this.form, \'boardaccess\');" /> <label for="checkall_check"><em>', $txt['check_all'], '</em></label>
@@ -684,7 +688,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		echo '
-		<script src="', $settings['default_theme_url'], '/scripts/suggest.js?alp21"></script>
+		<script src="', $settings['default_theme_url'], '/scripts/suggest.js?beta10"></script>
 		<script><!-- // --><![CDATA[
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
