@@ -201,10 +201,10 @@ function markallreadButton(btn)
 		$(this).parent().remove();
 	});
 
-	$('.board_icon').each(function() {
-		var src = $(this).attr("src").replace(/\/(on|on2)\./, '/off.');
-		$(this).attr("src", src);
-	});
+	// Turn the board icon class to off
+    $('.board_icon').each(function() {
+        $(this).removeClass('on_board on2_board').addClass('off_board');
+    });
 
 	$('.board_new_posts').each(function() {
 		$(this).removeClass('board_new_posts');
@@ -235,10 +235,10 @@ function updateRelativeTime()
 
 	$('time').each(function() {
 		var oRelativeTime = new relativeTime($(this).attr('datetime')),
-				postdate = new Date($(this).attr('datetime')),
-				today = new Date(),
-				time_text = '',
-				past_time = (today - postdate) / 1000;
+			postdate = new Date($(this).attr('datetime')),
+			today = new Date(),
+			time_text = '',
+			past_time = (today - postdate) / 1000;
 
 		if (oRelativeTime.seconds())
 		{
@@ -288,8 +288,11 @@ function updateRelativeTime()
 
 /**
  * Function/object to handle relative times
- * sTo is optional, if omitted the relative time it
+ * sTo is optional, if omitted the relative time is
  * calculated from sFrom up to "now"
+ *
+ * @param {string} sFrom
+ * @param {string} sTo
  */
 function relativeTime(sFrom, sTo)
 {
@@ -313,6 +316,7 @@ relativeTime.prototype.seconds = function()
 		this.deltaTime = this.past_time;
 		return true;
 	}
+
 	return false;
 };
 
@@ -324,6 +328,7 @@ relativeTime.prototype.minutes = function()
 		this.deltaTime = Math.round(this.past_time / 60);
 		return true;
 	}
+
 	return false;
 };
 
@@ -335,6 +340,7 @@ relativeTime.prototype.hours = function()
 		this.deltaTime = Math.round(this.past_time / 3600);
 		return true;
 	}
+
 	return false;
 };
 
@@ -346,6 +352,7 @@ relativeTime.prototype.days = function()
 		this.deltaTime = Math.round(this.past_time / (24 * 3600));
 		return true;
 	}
+
 	return false;
 };
 
@@ -357,6 +364,7 @@ relativeTime.prototype.weeks = function()
 		this.deltaTime = Math.round(this.past_time / (24 * 3600) / 7);
 		return true;
 	}
+
 	return false;
 };
 
@@ -368,6 +376,7 @@ relativeTime.prototype.months = function()
 		this.deltaTime = Math.round(this.past_time / (30 * 24 * 3600));
 		return true;
 	}
+
 	return false;
 };
 
@@ -379,6 +388,7 @@ relativeTime.prototype.years = function()
 		this.deltaTime = this.dateTo.getFullYear() - this.dateFrom.getFullYear();
 		return true;
 	}
+
 	return false;
 };
 
@@ -495,7 +505,7 @@ function add_elk_mention(selector, oOptions)
 /**
  * Drag and drop to reorder ID's via UI Sortable
  *
- * @param {type} $
+ * @param {object} $
  */
 (function($) {
 	'use strict';
@@ -525,12 +535,13 @@ function add_elk_mention(selector, oOptions)
 
 		// Divs to hold our responses
 		var ajax_infobar = document.createElement('div'),
-				ajax_errorbox = document.createElement('div');
+			ajax_errorbox = document.createElement('div');
 
 		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
 		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%'});
 		$("body").append(ajax_infobar);
 		$(ajax_infobar).slideUp();
+
 		$(ajax_errorbox).css({'display': 'none'});
 		$("body").append(ajax_errorbox).attr('id', 'errorContainer');
 
@@ -556,15 +567,15 @@ function add_elk_mention(selector, oOptions)
 					$("#clone").show();
 				}, 1);
 
-				// This process allows page scrolls to work
+				// The above process allows page scrolls to work
 				return $("#clone");
 			},
 			update: function(e, ui) {
 				// Called when an element is dropped in a new location
 				var postdata = '',
-						moved = ui.item.attr('id'),
-						order = [],
-						receiver = ui.item.parent().attr('id');
+					moved = ui.item.attr('id'),
+					order = [],
+					receiver = ui.item.parent().attr('id');
 
 				// Calling a pre processing function?
 				if (oSettings.preprocess !== '')
@@ -580,17 +591,17 @@ function add_elk_mention(selector, oOptions)
 					});
 					postdata = $.param(order);
 				}
+				// Get all id's in all the sortable containers
 				else
-						// Get all id's in all the sortable containers
-						{
-							$(oSettings.tag).each(function() {
-								// Serialize will be 1-n of each nesting / connector
-								if (postdata === "")
-									postdata += $(this).sortable(oSettings.setorder);
-								else
-									postdata += "&" + $(this).sortable(oSettings.setorder);
-							});
-						}
+				{
+					$(oSettings.tag).each(function() {
+						// Serialize will be 1-n of each nesting / connector
+						if (postdata === "")
+							postdata += $(this).sortable(oSettings.setorder);
+						else
+							postdata += "&" + $(this).sortable(oSettings.setorder);
+					});
+				}
 
 				// Add in our security tags and additional options
 				postdata += '&' + elk_session_var + '=' + elk_session_id;
@@ -608,60 +619,60 @@ function add_elk_mention(selector, oOptions)
 					dataType: "xml",
 					data: postdata
 				})
-						.fail(function(jqXHR, textStatus, errorThrown) {
-							$(ajax_infobar).attr('class', 'errorbox');
-							$(ajax_infobar).html(textStatus).slideDown('fast');
-							setTimeout(function() {
-								$(ajax_infobar).slideUp();
-							}, 3500);
-							// Reset the interface?
-							if (oSettings.href !== '')
-								setTimeout(function() {
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					$(ajax_infobar).attr('class', 'errorbox');
+					$(ajax_infobar).html(textStatus).slideDown('fast');
+					setTimeout(function() {
+						$(ajax_infobar).slideUp();
+					}, 3500);
+					// Reset the interface?
+					if (oSettings.href !== '')
+						setTimeout(function() {
+							window.location.href = elk_scripturl + oSettings.href;
+						}, 1000);
+				})
+				.done(function(data, textStatus, jqXHR) {
+					if ($(data).find("error").length !== 0)
+					{
+						// Errors get a modal dialog box and redirect on close
+						$('#errorContainer').append('<p id="errorContent"></p>');
+						$('#errorContent').html($(data).find("error").text());
+						$('#errorContent').dialog({
+							autoOpen: true,
+							title: oSettings.title,
+							modal: true,
+							close: function(event, ui) {
+								// Redirecting due to the error, thats a good idea
+								if (oSettings.href !== '')
 									window.location.href = elk_scripturl + oSettings.href;
-								}, 1000);
-						})
-						.done(function(data, textStatus, jqXHR) {
-							if ($(data).find("error").length !== 0)
-							{
-								// Errors get a modal dialog box and redirect on close
-								$('#errorContainer').append('<p id="errorContent"></p>');
-								$('#errorContent').html($(data).find("error").text());
-								$('#errorContent').dialog({
-									autoOpen: true,
-									title: oSettings.title,
-									modal: true,
-									close: function(event, ui) {
-										// Redirecting due to the error, thats a good idea
-										if (oSettings.href !== '')
-											window.location.href = elk_scripturl + oSettings.href;
-									}
-								});
-							}
-							else if ($(data).find("elk").length !== 0)
-							{
-								// Valid responses get the unobtrusive slider
-								$(ajax_infobar).attr('class', 'infobox');
-								$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
-								setTimeout(function() {
-									$(ajax_infobar).slideUp();
-								}, 3500);
-							}
-							else
-							{
-								// Something "other" happened ...
-								$('#errorContainer').append('<p id="errorContent"></p>');
-								$('#errorContent').html(oSettings.error + ' : ' + textStatus);
-								$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
-							}
-						})
-						.always(function(data, textStatus, jqXHR) {
-							if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
-							{
-								// Reset the token
-								oSettings.token['token_id'] = $(data).find("tokens").find('[type="token"]').text();
-								oSettings.token['token_var'] = $(data).find("tokens").find('[type="token_var"]').text();
 							}
 						});
+					}
+					else if ($(data).find("elk").length !== 0)
+					{
+						// Valid responses get the unobtrusive slider
+						$(ajax_infobar).attr('class', 'infobox');
+						$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
+						setTimeout(function() {
+							$(ajax_infobar).slideUp();
+						}, 3500);
+					}
+					else
+					{
+						// Something "other" happened ...
+						$('#errorContainer').append('<p id="errorContent"></p>');
+						$('#errorContent').html(oSettings.error + ' : ' + textStatus);
+						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+					}
+				})
+				.always(function(data, textStatus, jqXHR) {
+					if (textStatus === 'success' && $(data).find("elk > tokens > token").length !== 0)
+					{
+						// Reset the token
+						oSettings.token['token_id'] = $(data).find("tokens").find('[type="token"]').text();
+						oSettings.token['token_var'] = $(data).find("tokens").find('[type="token_var"]').text();
+					}
+				});
 			}
 		});
 	};
@@ -732,6 +743,7 @@ function setBoardIds() {
 		var $container,
 			lastPositions = new Array();
 
+		// Hovering over an ... we expand it as much as we can
 		function hover_expand($element)
 		{
 			var $expanded_pages_li = $element,
@@ -748,10 +760,10 @@ function setBoardIds() {
 
 			var aModel = $element.closest('.linavPages').prev().find('a').clone();
 
-			if (typeof(lastPositions[firstpage]) == 'undefined')
+			if (typeof(lastPositions[firstpage]) === 'undefined')
 				lastPositions[firstpage] = 0;
 
-			$container = $('<ul id="expanded_pages_container" />');
+			$container = $('<ul id="expanded_pages_container">');
 
 			for (var i = firstpage; i < lastpage; i += perpage)
 			{
@@ -840,14 +852,15 @@ function setBoardIds() {
 			}).click(function (ev) {
 				$expanded_pages_li.attr('onclick', '').unbind('click');
 			});
+
 			$exp_pages.css({
 				'height': $element.outerHeight(),
 				'padding-left': $container.find('#pages_scroll_left').outerWidth(),
 				'margin-left': lastPositions[firstpage]
 			});
-
 		};
 
+		// Used when the user clicks on the ... to expand instead of just a hover expand
 		function expand_pages($element)
 		{
 			var $baseAppend = $($element.closest('.linavPages')),
@@ -861,7 +874,8 @@ function setBoardIds() {
 				baseurl = eval($element.data('baseurl')),
 				first;
 
-			var i, oldLastPage = 0,
+			var i =0,
+				oldLastPage = 0,
 				perPageLimit = 10;
 
 			// Prevent too many pages to be loaded at once.
@@ -884,7 +898,7 @@ function setBoardIds() {
 				$baseAppend.after(boxModelClone);
 
 				// This is needed just to remember where to attach the new expand
-				if (typeof first == 'undefined')
+				if (typeof first === 'undefined')
 					first = boxModelClone;
 			}
 			$baseAppend.remove();
@@ -905,7 +919,7 @@ function setBoardIds() {
 					$zhis.unbind('mouseenter focus');
 				})
 				.bind('mouseenter focus', function() {
-					hover_expand($(this))
+					hover_expand($(this));
 				})
 				.data('perpage', perPage)
 				.data('firstpage', lastPage)
@@ -916,8 +930,7 @@ function setBoardIds() {
 			}
 		}
 
-		this.attr('tabindex', 0)
-		.click(function(e) {
+		this.attr('tabindex', 0).click(function(e) {
 			var $zhis = $(this);
 			e.preventDefault();
 
@@ -926,7 +939,7 @@ function setBoardIds() {
 			$zhis.unbind('mouseenter focus');
 		})
 		.bind('mouseenter focus', function() {
-			hover_expand($(this))
+			hover_expand($(this));
 		});
 	};
 })(jQuery);
@@ -957,17 +970,17 @@ function setBoardIds() {
 			tooltipContent: 'html' // display captured title text as html or text
 		};
 
-		// account for any user options
+		// Account for any user options
 		var oSettings = $.extend({}, $.fn.SiteTooltip.oDefaultsSettings, oInstanceSettings || {});
 
-		// move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
+		// Move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
 		$(this).each(function()
 		{
 			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + htmlspecialchars(this.title) + '</span>').hide();
 			$(this).append(sTitle).attr('title', '');
 		});
 
-		// determine where we are going to place the tooltip, while trying to keep it on screen
+		// Determine where we are going to place the tooltip, while trying to keep it on screen
 		var positionTooltip = function(event)
 		{
 			var iPosx = 0,
@@ -1003,7 +1016,7 @@ function setBoardIds() {
 				h: $(window).height() - 24
 			};
 
-			// don't go off screen with our tooltop
+			// Don't go off screen with our tooltop
 			if ((oPosition.y + oPosition.h > oLimits.y + oLimits.h) && (oPosition.x + oPosition.w > oLimits.x + oLimits.w))
 			{
 				oPosition.x = (oPosition.x - oPosition.w) - 45;
@@ -1018,30 +1031,30 @@ function setBoardIds() {
 				oPosition.y = oPosition.y - (((oPosition.y + oPosition.h) - (oLimits.y + oLimits.h)) + 24);
 			}
 
-			// finally set the position we determined
+			// Finally set the position we determined
 			$('#' + oSettings.tooltipID).css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
 		};
 
-		// used to show a tooltip
+		// Used to show a tooltip
 		var showTooltip = function() {
 			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).show();
 		};
 
-		// used to hide a tooltip
+		// Used to hide a tooltip
 		var hideTooltip = function() {
 			$('#' + oSettings.tooltipID).fadeOut('slow').trigger("unload").remove();
 		};
 
-		// used to keep html encoded
+		// Used to keep html encoded
 		function htmlspecialchars(string)
 		{
 			return $('<span>').text(string).html();
 		}
 
-		// for all of the elements that match the selector on the page, lets set up some actions
+		// For all of the elements that match the selector on the page, lets set up some actions
 		return this.each(function()
 		{
-			// if we find hoverIntent use it
+			// If we find hoverIntent then use it
 			if ($.fn.hoverIntent)
 			{
 				$(this).hoverIntent({
@@ -1054,29 +1067,29 @@ function setBoardIds() {
 			}
 			else
 			{
-				// plain old hover it is
+				// Plain old hover it is
 				$(this).hover(site_tooltip_on, site_tooltip_off);
 			}
 
-			// create the on tip action
+			// Create the on tip action
 			function site_tooltip_on(event)
 			{
 				// If we have text in the hidden span element we created on page load
 				if ($(this).children('.' + oSettings.tooltipSwapClass).text())
 				{
-					// create a ID'ed div with our style class that holds the tooltip info, hidden for now
+					// Create a ID'ed div with our style class that holds the tooltip info, hidden for now
 					$('body').append('<div id="' + oSettings.tooltipID + '" class="' + oSettings.tooltipClass + '"><div id="' + oSettings.tooltipTextID + '" style="display:none;"></div></div>');
 
-					// load information in to our newly created div
-					var tt = $('#' + oSettings.tooltipID);
-					var ttContent = $('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID);
+					// Load information in to our newly created div
+					var tt = $('#' + oSettings.tooltipID),
+						ttContent = $('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID);
 
 					if (oSettings.tooltipContent === 'html')
 						ttContent.html($(this).children('.' + oSettings.tooltipSwapClass).html());
 					else
 						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
 
-					// show then position or it may postion off screen
+					// Show then position or it may postion off screen
 					tt.show();
 					showTooltip();
 					positionTooltip(event);
@@ -1085,23 +1098,24 @@ function setBoardIds() {
 				return false;
 			}
 
-			// create the Bye bye tip
+			// Create the Bye bye tip
 			function site_tooltip_off(event)
 			{
 				hideTooltip(this);
 				return false;
 			}
 
-			// create the tip move with the cursor
+			// Create the tip move with the cursor
 			if (oSettings.followMouse)
 			{
 				$(this).bind("mousemove", function(event) {
 					positionTooltip(event);
+
 					return false;
 				});
 			}
 
-			// clear the tip on a click
+			// Clear the tip on a click
 			$(this).bind("click", function() {
 				hideTooltip(this);
 				return true;
@@ -1112,7 +1126,7 @@ function setBoardIds() {
 })(jQuery);
 
 /**
- * Error box handeler class
+ * Error box handler class
  *
  * @param {type} oOptions
  * @returns {errorbox_handler}
@@ -1178,6 +1192,7 @@ errorbox_handler.prototype.boxVal = function()
 errorbox_handler.prototype.checkErrors = function()
 {
 	var num = this.opt.error_checks.length;
+
 	if (num !== 0)
 	{
 		// Adds the error checking functions
