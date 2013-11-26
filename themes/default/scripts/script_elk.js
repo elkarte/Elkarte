@@ -1257,3 +1257,77 @@ errorbox_handler.prototype.removeError = function(error_box, error_elem)
 		});
 	}
 };
+
+/**
+ * Add a new dt/dd pair above a parent selector
+ * Called most often as a callback option in config options
+ * If oData is supplied, will create a select list, populated with that data
+ * otherwise a standard input box.
+ *
+ * @param {string} parent id of the parent "add more button: we will place this before
+ * @param {object} oDtName object of dt element options (type, class, size)
+ * @param {object} oDdName object of the dd element options (type, clase size)
+ * @param {object} oData optional select box object, 1:{id:value,name:display name}, ...
+ */
+function addAnotherOption(parent, oDtName, oDdName, oData)
+{
+	// Some defaults to use if none are passed
+	oDtName['type'] = oDtName['type'] || 'text';
+	oDtName['class'] = oDtName['class'] || 'input_text';
+	oDtName['size'] = oDtName['size'] || '20';
+
+	oDdName['type'] = oDdName['type'] || 'text';
+	oDdName['class'] = oDdName['class'] || 'input_text';
+	oDdName['size'] = oDdName['size'] || '20';
+	oData = oData || '';
+
+	// Our new <dt> element
+	var newDT = document.createElement('dt'),
+		newInput = document.createElement('input');
+
+	newInput.name = oDtName['name'];
+	newInput.type = oDtName['type'];
+	newInput.setAttribute('class', oDtName['class']);
+	newInput.size = oDtName['size'];
+	newDT.appendChild(newInput);
+
+	// And its matching <dd>
+	var newDD = document.createElement('dd');
+
+	// If we have data for this field make it a select
+	if (oData === '')
+		newInput = document.createElement('input');
+	else
+		newInput = document.createElement('select');
+
+	newInput.name = oDdName['name'];
+	newInput.type = oDdName['type'];
+	newInput.size = oDdName['size'];
+	newInput.setAttribute('class', oDdName['class']);
+	newDD.appendChild(newInput);
+
+	// If its a select box we add in the options
+	if (oData !== '')
+	{
+		// The options are childen of the newInput select box
+		var opt = null,
+			key = null,
+			obj = {};
+
+		for (key in oData)
+		{
+			obj = oData[key];
+			opt = document.createElement("option");
+			opt.name = "option";
+			opt.value = obj.id;
+			opt.innerHTML = obj.name;
+			newInput.appendChild(opt);
+		}
+	}
+
+	// Place the new dt/dd pair before our parent
+	var placeHolder = document.getElementById(parent);
+
+	placeHolder.parentNode.insertBefore(newDT, placeHolder);
+	placeHolder.parentNode.insertBefore(newDD, placeHolder);
+}

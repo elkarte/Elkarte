@@ -35,9 +35,9 @@ elk_AdminIndex.prototype.init = function ()
 	window.adminIndexInstanceRef = this;
 	var fHandlePageLoaded = function () {
 		window.adminIndexInstanceRef.loadAdminIndex();
-	}
+	};
 	addLoadEvent(fHandlePageLoaded);
-}
+};
 
 elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
@@ -52,7 +52,7 @@ elk_AdminIndex.prototype.loadAdminIndex = function ()
 	// Load the text box that sais there's a new version available.
 	if (this.opt.bLoadUpdateNotification)
 		this.checkUpdateAvailable();
-}
+};
 
 elk_AdminIndex.prototype.setAnnouncements = function ()
 {
@@ -64,23 +64,28 @@ elk_AdminIndex.prototype.setAnnouncements = function ()
 		sMessages += this.opt.sAnnouncementMessageTemplate.replace('%href%', window.ourAnnouncements[i].href).replace('%subject%', window.ourAnnouncements[i].subject).replace('%time%', window.ourAnnouncements[i].time).replace('%message%', window.ourAnnouncements[i].message);
 
 	setInnerHTML(document.getElementById(this.opt.sAnnouncementContainerId), this.opt.sAnnouncementTemplate.replace('%content%', sMessages));
-}
+};
 
+/**
+ * Updates the current version container with the current version found in current-version.js
+ */
 elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	if (!('elkVersion' in window))
 		return;
 
-	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId);
-	var oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId);
+	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId),
+		oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId),
+		sCurrentVersion = getInnerHTML(oYourVersionContainer);
 
 	setInnerHTML(oElkVersionContainer, window.elkVersion);
-
-	var sCurrentVersion = getInnerHTML(oYourVersionContainer);
 	if (sCurrentVersion !== window.elkVersion)
 		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
-}
+};
 
+/**
+ * Checks if a new version of ElkArte is available and if so updates the admin info box
+ */
 elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
 	if (!('ourUpdatePackage' in window))
@@ -89,8 +94,8 @@ elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 	var oContainer = document.getElementById(this.opt.sUpdateNotificationContainerId);
 
 	// Are we setting a custom title and message?
-	var sTitle = 'ourUpdateTitle' in window ? window.ourUpdateTitle : this.opt.sUpdateNotificationDefaultTitle;
-	var sMessage = 'ourUpdateNotice' in window ? window.ourUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
+	var sTitle = 'ourUpdateTitle' in window ? window.ourUpdateTitle : this.opt.sUpdateNotificationDefaultTitle,
+		sMessage = 'ourUpdateNotice' in window ? window.ourUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
 
 	setInnerHTML(oContainer, this.opt.sUpdateNotificationTemplate.replace('%title%', sTitle).replace('%message%', sMessage));
 
@@ -105,7 +110,7 @@ elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 		document.getElementById('update_message').style.backgroundColor = '#eebbbb';
 		document.getElementById('update_message').style.color = 'black';
 	}
-}
+};
 
 /*
 	elk_ViewVersions(oOptions)
@@ -132,12 +137,12 @@ elk_ViewVersions.prototype.init = function ()
 		window.viewVersionsInstanceRef.loadViewVersions();
 	}
 	addLoadEvent(fHandlePageLoaded);
-}
+};
 
 elk_ViewVersions.prototype.loadViewVersions = function ()
 {
 	this.determineVersions();
-}
+};
 
 elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 {
@@ -151,7 +156,7 @@ elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 	// Unselect the link and return false.
 	oSendingElement.blur();
 	return false;
-}
+};
 
 elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
@@ -200,7 +205,7 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 
 	// They are the same!
 	return false;
-}
+};
 
 elk_ViewVersions.prototype.determineVersions = function ()
 {
@@ -381,13 +386,22 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	setInnerHTML(document.getElementById('ourLanguages'), oHighCurrent.Languages);
 	if (oLowVersion.Languages)
 		document.getElementById('yourLanguages').style.color = 'red';
-}
+};
 
+/**
+ * Adds a new word containter to the censored word list
+ */
 function addNewWord()
 {
 	setOuterHTML(document.getElementById('moreCensoredWords'), '<div class="censorWords"><input type="text" name="censor_vulgar[]" size="30" class="input_text" /> => <input type="text" name="censor_proper[]" size="30" class="input_text" /><' + '/div><div id="moreCensoredWords"><' + '/div>');
 }
 
+/**
+ * Will enable/disable checkboxes, according to if the BBC globally set or not.
+ *
+ * @param {string} section id of the container
+ * @param {string} disable true or false
+ */
 function toggleBBCDisabled(section, disable)
 {
 	elems = document.getElementById(section).getElementsByTagName('*');
@@ -401,6 +415,10 @@ function toggleBBCDisabled(section, disable)
 	document.getElementById("bbc_" + section + "_select_all").disabled = disable;
 }
 
+/**
+ * Keeps the input boxes display options approriate for the options selected
+ * when adding custom profile fields
+ */
 function updateInputBoxes()
 {
 	curType = document.getElementById("field_type").value;
@@ -430,12 +448,18 @@ function updateInputBoxes()
 	}
 }
 
+/**
+ * Used to add additonal radio button options when editing a custom profile field
+ */
 function addOption()
 {
 	setOuterHTML(document.getElementById("addopt"), '<br /><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" class="input_radio" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /><span id="addopt"></span>');
 	startOptID++;
 }
 
+/**
+ * Adds another question to the registration page
+ */
 function addAnotherQuestion()
 {
 	var placeHolder = document.getElementById('add_more_question_placeholder');
@@ -448,6 +472,12 @@ function addAnotherQuestion()
 	question_last_blank++;
 }
 
+/**
+ * Every question should have an answer, even if its a lie
+ *
+ * @param {string} elem
+ * @param {string} question_name
+ */
 function addAnotherAnswer(elem, question_name)
 {
 	setOuterHTML(elem, add_answer_template.easyReplace({
@@ -456,6 +486,13 @@ function addAnotherAnswer(elem, question_name)
 	}));
 }
 
+/**
+ * Used to add new search engines to the known list
+ *
+ * @param {string} txt_name
+ * @param {string} txt_url
+ * @param {string} txt_word_sep
+ */
 function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 {
 	var placeHolder = document.getElementById('add_more_searches'),
@@ -508,80 +545,6 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
 }
 
 /**
- * Add a new dt/dd pair above a parent selector
- * Called most often as a callback option in config options
- * If oData is supplied, will create a select list, populated with that data
- * otherwise a standard input box.
- *
- * @param {string} parent id of the parent "add more button: we will place this before
- * @param {object} oDtName object of dt element options (type, class, size)
- * @param {object} oDdName object of the dd element options (type, clase size)
- * @param {object} oData optional select box object, 1:{id:value,name:display name}, ...
- */
-function addAnotherOption(parent, oDtName, oDdName, oData)
-{
-	// Some defaults to use if none are passed
-	oDtName['type'] = oDtName['type'] || 'text';
-	oDtName['class'] = oDtName['class'] || 'input_text';
-	oDtName['size'] = oDtName['size'] || '20';
-
-	oDdName['type'] = oDdName['type'] || 'text';
-	oDdName['class'] = oDdName['class'] || 'input_text';
-	oDdName['size'] = oDdName['size'] || '20';
-	oData = oData || '';
-
-	// Our new <dt> element
-	var newDT = document.createElement('dt'),
-		newInput = document.createElement('input');
-
-	newInput.name = oDtName['name'];
-	newInput.type = oDtName['type'];
-	newInput.setAttribute('class', oDtName['class']);
-	newInput.size = oDtName['size'];
-	newDT.appendChild(newInput);
-
-	// And its matching <dd>
-	var newDD = document.createElement('dd');
-
-	// If we have data for this field make it a select
-	if (oData === '')
-		newInput = document.createElement('input');
-	else
-		newInput = document.createElement('select');
-
-	newInput.name = oDdName['name'];
-	newInput.type = oDdName['type'];
-	newInput.size = oDdName['size'];
-	newInput.setAttribute('class', oDdName['class']);
-	newDD.appendChild(newInput);
-
-	// If its a select box we add in the options
-	if (oData !== '')
-	{
-		// The options are childen of the newInput select box
-		var opt = null,
-			key = null,
-			obj = {};
-
-		for (key in oData)
-		{
-			obj = oData[key];
-			opt = document.createElement("option");
-			opt.name = "option";
-			opt.value = obj.id;
-			opt.innerHTML = obj.name;
-			newInput.appendChild(opt);
-		}
-	}
-
-	// Place the new dt/dd pair before our parent
-	var placeHolder = document.getElementById(parent);
-
-	placeHolder.parentNode.insertBefore(newDT, placeHolder);
-	placeHolder.parentNode.insertBefore(newDD, placeHolder);
-}
-
-/**
  * News admin page
  */
 function addAnotherNews()
@@ -599,9 +562,15 @@ function addAnotherNews()
 	make_preview_btn(last_preview);
 }
 
+/**
+ * Makes the preview button when in manage news
+ *
+ * @param {string} preview_id
+ */
 function make_preview_btn (preview_id)
 {
 	var $id = $("#preview_" + preview_id);
+
 	$id.text(txt_preview).click(function () {
 		$.ajax({
 			type: "POST",
@@ -610,22 +579,32 @@ function make_preview_btn (preview_id)
 			context: document.body
 		})
 		.done(function(request) {
-			if ($(request).find("error").text() == '')
+			if ($(request).find("error").text() === '')
 				$(document).find("#box_preview_" + preview_id).html($(request).text());
 			else
 				$(document).find("#box_preview_" + preview_id).text(txt_news_error_no_news);
 		});
 	});
+
 	if (!$id.parent().hasClass('linkbutton_right'))
 		$id.wrap('<a class="linkbutton_right" href="javascript:void(0);"></a>');
 }
 
+/**
+ * Used by manage themes to show the thumbnail of the theme variant chosen
+ *
+ * @param {string} sVariant
+ */
 function changeVariant(sVariant)
 {
 	document.getElementById('variant_preview').src = oThumbnails[sVariant];
 }
 
-// The idea here is simple: don't refresh the preview on every keypress, but do refresh after they type.
+/**
+ * The idea here is simple: don't refresh the preview on every keypress, but do refresh after they type.
+ *
+ * @returns {undefined}
+ */
 function setPreviewTimeout()
 {
 	if (previewTimeout)
@@ -679,6 +658,9 @@ function toggleBreakdown(id_group, forcedisplayType)
 	return false;
 }
 
+/**
+ * Used when editing the search weights for results, calculates the overall total weight
+ */
 function calculateNewValues()
 {
 	var total = 0;
@@ -801,9 +783,10 @@ function select_in_category(cat_id, elem, brd_list)
 	elem.selectedIndex = 0;
 }
 
-/*
-* Server Settings > Caching
-*/
+/**
+ * Server Settings > Caching, toggles input fields on/off as approriate for
+ * a given cache engine selection
+ */
 function toggleCache ()
 {
 	var memcache = document.getElementById('cache_memcached'),
@@ -854,7 +837,7 @@ function toggleCache ()
 	}
 }
 
-/*
+/**
  * Attachments Settings
  */
 function toggleSubDir ()
@@ -885,9 +868,9 @@ function toggleSubDir ()
 
 function toggleBaseDir ()
 {
-	var auto_attach = document.getElementById('automanage_attachments');
-	var sub_dir = document.getElementById('use_subdirectories_for_attachments');
-	var dir_elem = document.getElementById('basedirectory_for_attachments');
+	var auto_attach = document.getElementById('automanage_attachments'),
+		sub_dir = document.getElementById('use_subdirectories_for_attachments'),
+		dir_elem = document.getElementById('basedirectory_for_attachments');
 
 	if (auto_attach.selectedIndex === 0)
 	{
