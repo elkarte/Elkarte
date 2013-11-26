@@ -2586,7 +2586,6 @@ ul.post_options li {
 	margin: 1em 0 0 0;
 	background: #fafafa;
 	background-image: linear-gradient(to bottom, #fafafa 0%, #ebebeb 100%);
-	border-bottom: none;
 }
 #postAdditionalOptions, #postDraftOptions {
 	margin: 0 0 1em 0;
@@ -2594,6 +2593,7 @@ ul.post_options li {
 	border: 1px solid #ccc;
 	border-radius: 0 0 4px 4px;
 	background: #fdfdfd;
+	border-top: none;
 }
 #postMoreOptions, #postAttachment, #postAttachment2 {
 	margin: -1px 0 0 0;
@@ -2623,7 +2623,7 @@ ul.post_options li {
 #postDraftOptions .settings dd{
 	width: 40%;
 }
-#postDraftOptions .settings dd:first-child, #postDraftOptions .settings dt:first-child{
+#postDraftOptions .settings dd:nth-child(2), #postDraftOptions .settings dt:first-child{
 	border-top: none;
 }
 #postDraftOptions .settings strong{
