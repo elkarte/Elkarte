@@ -47,25 +47,29 @@ if (!('getElementsByClassName' in document))
 	document.getElementsByClassName = function(className)
 	{
 		return $('".' + className + '"');
-	}
+	};
 }
 
-// Load an XML document using XMLHttpRequest.
+/**
+ * Load an XML document using XMLHttpRequest.
+ * @param {string} sUrl
+ * @param {string} funcCallback
+ */
 function getXMLDocument(sUrl, funcCallback)
 {
 	if (!window.XMLHttpRequest)
 		return null;
 
 	var oMyDoc = new XMLHttpRequest();
-	var bAsync = typeof(funcCallback) != 'undefined';
+	var bAsync = typeof(funcCallback) !== 'undefined';
 	var oCaller = this;
 	if (bAsync)
 	{
 		oMyDoc.onreadystatechange = function () {
-			if (oMyDoc.readyState != 4)
+			if (oMyDoc.readyState !== 4)
 				return;
 
-			if (oMyDoc.responseXML != null && oMyDoc.status == 200)
+			if (oMyDoc.responseXML !== null && oMyDoc.status === 200)
 			{
 				if (funcCallback.call)
 				{
@@ -87,7 +91,13 @@ function getXMLDocument(sUrl, funcCallback)
 	return oMyDoc;
 }
 
-// Send a post form to the server using XMLHttpRequest.
+/**
+ * Send a post form to the server using XMLHttpRequest.
+ *
+ * @param {string} sUrl
+ * @param {string} sContent
+ * @param {string} funcCallback
+ */
 function sendXMLDocument(sUrl, sContent, funcCallback)
 {
 	if (!window.XMLHttpRequest)
@@ -95,13 +105,13 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 
 	var oSendDoc = new window.XMLHttpRequest();
 	var oCaller = this;
-	if (typeof(funcCallback) != 'undefined')
+	if (typeof(funcCallback) !== 'undefined')
 	{
 		oSendDoc.onreadystatechange = function () {
-			if (oSendDoc.readyState != 4)
+			if (oSendDoc.readyState !== 4)
 				return;
 
-			if (oSendDoc.responseXML != null && oSendDoc.status == 200)
+			if (oSendDoc.responseXML !== null && oSendDoc.status === 200)
 				funcCallback.call(oCaller, oSendDoc.responseXML);
 			else
 				funcCallback.call(oCaller, false);
@@ -143,8 +153,7 @@ String.prototype.php_to8bit = function ()
 
 		return sReturn;
 	}
-
-	else if (this.oCharsetConversion.from.length == 0)
+	else if (this.oCharsetConversion.from.length === 0)
 	{
 		switch (elk_charset)
 		{
