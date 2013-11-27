@@ -18,16 +18,16 @@ var elk_formSubmitted = false;
 var lastKeepAliveCheck = new Date().getTime();
 
 // Some very basic browser detection - from Mozilla's sniffer page.
-var ua = navigator.userAgent.toLowerCase();
-var is_opera = ua.indexOf('opera') != -1;
-var is_ff = (ua.indexOf('firefox') != -1 || ua.indexOf('iceweasel') != -1 || ua.indexOf('icecat') != -1 || ua.indexOf('shiretoko') != -1 || ua.indexOf('minefield') != -1) && !is_opera;
-var is_gecko = ua.indexOf('gecko') != -1 && !is_opera;
-var is_chrome = ua.indexOf('chrome') != -1;
-var is_safari = ua.indexOf('applewebkit') != -1 && !is_chrome;
-var is_webkit = ua.indexOf('applewebkit') != -1;
-var is_ie = ua.indexOf('msie') != -1 && !is_opera;
-var is_iphone = ua.indexOf('iphone') != -1 || ua.indexOf('ipod') != -1;
-var is_android = ua.indexOf('android') != -1;
+var ua = navigator.userAgent.toLowerCase(),
+	is_opera = ua.indexOf('opera') !== -1,
+	is_ff = (ua.indexOf('firefox') !== -1 || ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('shiretoko') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera,
+	is_gecko = ua.indexOf('gecko') !== -1 && !is_opera,
+	is_chrome = ua.indexOf('chrome') !== -1,
+	is_safari = ua.indexOf('applewebkit') !== -1 && !is_chrome,
+	is_webkit = ua.indexOf('applewebkit') !== -1,
+	is_ie = ua.indexOf('msie') !== -1 && !is_opera,
+	is_iphone = ua.indexOf('iphone') !== -1 || ua.indexOf('ipod') !== -1,
+	is_android = ua.indexOf('android') !== -1;
 
 var ajax_indicator_ele = null;
 
@@ -60,9 +60,10 @@ function getXMLDocument(sUrl, funcCallback)
 	if (!window.XMLHttpRequest)
 		return null;
 
-	var oMyDoc = new XMLHttpRequest();
-	var bAsync = typeof(funcCallback) !== 'undefined';
-	var oCaller = this;
+	var oMyDoc = new XMLHttpRequest(),
+		bAsync = typeof(funcCallback) !== 'undefined',
+		oCaller = this;
+
 	if (bAsync)
 	{
 		oMyDoc.onreadystatechange = function () {
@@ -103,8 +104,9 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 	if (!window.XMLHttpRequest)
 		return false;
 
-	var oSendDoc = new window.XMLHttpRequest();
-	var oCaller = this;
+	var oSendDoc = new window.XMLHttpRequest(),
+		oCaller = this;
+
 	if (typeof(funcCallback) !== 'undefined')
 	{
 		oSendDoc.onreadystatechange = function () {
@@ -117,6 +119,7 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 				funcCallback.call(oCaller, false);
 		};
 	}
+
 	oSendDoc.open('POST', sUrl, true);
 	if ('setRequestHeader' in oSendDoc)
 		oSendDoc.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -126,7 +129,7 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 }
 
 /**
- * All of our specialized string handeling functions are defined here
+ * All of our specialized string handling functions are defined here
  * php_to8bit, php_strtr, php_strtolower, php_urlencode, php_htmlspecialchars
  * php_unhtmlspecialchars, php_addslashes, removeEntities, easyReplace
  */
@@ -142,7 +145,8 @@ String.prototype.oCharsetConversion = {
  */
 String.prototype.php_to8bit = function ()
 {
-	var n, sReturn = '';
+	var n,
+		sReturn = '';
 
 	for (var i = 0, iTextLen = this.length; i < iTextLen; i++)
 	{
@@ -225,7 +229,7 @@ String.prototype._replaceEntities = function(sInput, sDummy, sNum)
 };
 
 /**
- * Removes entities from a string and replaces them with a charactercode
+ * Removes entities from a string and replaces them with a character code
  */
 String.prototype.removeEntities = function()
 {
@@ -240,6 +244,7 @@ String.prototype.removeEntities = function()
 String.prototype.easyReplace = function (oReplacements)
 {
 	var sResult = this;
+
 	for (var sSearch in oReplacements)
 		sResult = sResult.replace(new RegExp('%' + sSearch + '%', 'g'), oReplacements[sSearch]);
 
@@ -416,6 +421,7 @@ function isEmptyText(theField)
 	// Strip whitespace off the left side.
 	while (theValue.length > 0 && (theValue.charAt(0) === ' ' || theValue.charAt(0) === '\t'))
 		theValue = theValue.substring(1, theValue.length);
+
 	// Strip whitespace off the right side.
 	while (theValue.length > 0 && (theValue.charAt(theValue.length - 1) === ' ' || theValue.charAt(theValue.length - 1) === '\t'))
 		theValue = theValue.substring(0, theValue.length - 1);
@@ -531,7 +537,7 @@ function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 }
 
 /**
- * Invert all checkboxes at once by clicking a single checkbox.
+ * Invert all check boxes at once by clicking a single checkbox.
  *
  * @param {type} oInvertCheckbox
  * @param {type} oForm
@@ -816,7 +822,7 @@ function elk_Toggle(oOptions)
 	this.init();
 }
 
-// Initilize the toggle class
+// Initialize the toggle class
 elk_Toggle.prototype.init = function ()
 {
 	// The master switch can disable this toggle fully.
@@ -858,7 +864,7 @@ elk_Toggle.prototype.init = function ()
 				};
 				oImage.style.cursor = 'pointer';
 
-				// Preload the collapsed image.
+				// Pre-load the collapsed image.
 				smc_preCacheImage(this.opt.aSwapImages[i].srcCollapsed);
 			}
 		}
@@ -921,7 +927,6 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		this.tmpMethod();
 		delete this.tmpMethod;
 	}
-
 	// Handle custom function hook before expand.
 	else if (!bInit && !bCollapse && 'funcOnBeforeExpand' in this.opt)
 	{
@@ -1012,23 +1017,24 @@ elk_Toggle.prototype.toggle = function()
 };
 
 /**
+ * Creates and shows or hides the sites ajax in progress indicator
  *
  * @param {type} turn_on
  * @returns {undefined}
  */
 function ajax_indicator(turn_on)
 {
-	if (ajax_indicator_ele == null)
+	if (ajax_indicator_ele === null)
 	{
 		ajax_indicator_ele = document.getElementById('ajax_in_progress');
 
-		if (ajax_indicator_ele == null && typeof(ajax_notification_text) != null)
+		if (ajax_indicator_ele === null && typeof(ajax_notification_text) !== null)
 		{
 			create_ajax_indicator_ele();
 		}
 	}
 
-	if (ajax_indicator_ele != null)
+	if (ajax_indicator_ele !== null)
 	{
 		ajax_indicator_ele.style.display = turn_on ? 'block' : 'none';
 	}
@@ -1154,6 +1160,7 @@ function JumpTo(oJumpToOptions)
 JumpTo.prototype.showSelect = function ()
 {
 	var sChildLevelPrefix = '';
+
 	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
@@ -1198,7 +1205,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		}
 
 		if (aBoardsAndCategories[i].isCategory)
+		{
 			oListFragment.appendChild(oDashOption.cloneNode(true));
+		}
 		else
 		{
 			for (j = aBoardsAndCategories[i].childLevel, sChildLevelPrefix = ''; j > 0; j--)
@@ -1211,7 +1220,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		oOption.appendChild(oText);
 
 		if (!this.opt.bNoRedirect)
+		{
 			oOption.value = aBoardsAndCategories[i].isCategory ? '#c' + aBoardsAndCategories[i].id : '?board=' + aBoardsAndCategories[i].id + '.0';
+		}
 		else
 		{
 			if (aBoardsAndCategories[i].isCategory)
@@ -1219,6 +1230,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 			else
 				oOption.value = aBoardsAndCategories[i].id;
 		}
+
 		oListFragment.appendChild(oOption);
 
 		if (aBoardsAndCategories[i].isCategory)
@@ -1328,8 +1340,8 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 // Setup the list of icons once it is received through xmlHTTP.
 IconList.prototype.onIconsReceived = function (oXMLDoc)
 {
-	var icons = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('icon');
-	var sItems = '';
+	var icons = oXMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('icon'),
+		sItems = '';
 
 	for (var i = 0, n = icons.length; i < n; i++)
 		sItems += '<span onmouseover="' + this.opt.sBackReference + '.onItemHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onItemHover(this, false);" onmousedown="' + this.opt.sBackReference + '.onItemMouseDown(this, \'' + icons[i].getAttribute('value') + '\');" style="padding: 2px 3px; line-height: 20px; border: ' + this.opt.sItemBorder + '; background: ' + this.opt.sItemBackground + '"><img src="' + icons[i].getAttribute('url') + '" alt="' + icons[i].getAttribute('name') + '" title="' + icons[i].firstChild.nodeValue + '" style="vertical-align: middle" /></span>';
@@ -1349,8 +1361,10 @@ IconList.prototype.onItemHover = function (oDiv, bMouseOver)
 {
 	oDiv.style.background = bMouseOver ? this.opt.sItemBackgroundHover : this.opt.sItemBackground;
 	oDiv.style.border = bMouseOver ? this.opt.sItemBorderHover : this.opt.sItemBorder;
+
 	if (this.iCurTimeout !== 0)
 		window.clearTimeout(this.iCurTimeout);
+
 	if (bMouseOver)
 		this.onBoxHover(this.oClickedIcon, true);
 	else
@@ -1412,8 +1426,8 @@ IconList.prototype.collapseList = function()
  */
 function elk_itemPos(itemHandle)
 {
-	var itemX = 0;
-	var itemY = 0;
+	var itemX = 0,
+		itemY = 0;
 
 	if ('offsetParent' in itemHandle)
 	{
@@ -1566,36 +1580,56 @@ function cleanFileInput(idElement)
     oElement.unwrap();
 }
 
+/**
+ * Make sure the window backgrounds (zebra stripes) are correct for lists.
+ *
+ * @param {type} oList
+ */
 function applyWindowClasses(oList)
 {
 	var bAlternate = false;
-	oListItems = oList.getElementsByTagName("LI");
+
+	oListItems = oList.getElementsByTagName("li");
+
 	for (i = 0; i < oListItems.length; i++)
 	{
 		// Skip dummies.
-		if (oListItems[i].id == "")
+		if (oListItems[i].id === "")
 			continue;
+
 		oListItems[i].className = "windowbg" + (bAlternate ? "2" : "");
 		bAlternate = !bAlternate;
 	}
 }
 
+/**
+ * When using Go Back due to fatal_error, allows the form to be re-submitted with change
+ * Done as a pageshow event listener for FF only
+ */
 function reActivate()
 {
 	document.forms.postmodify.message.readOnly = false;
 }
 
-// The actual message icon selector.
+/**
+ * The actual message icon selector, shows the chosen icon on the post screen
+ */
 function showimage()
 {
 	document.images.icons.src = icon_urls[document.forms.postmodify.icon.options[document.forms.postmodify.icon.selectedIndex].value];
 }
 
+/**
+ * Enable / Disable the "Only show the results after the poll has expired."
+ * based on if they have entered a time limit or not
+ *
+ * @returns {undefined}
+ */
 function pollOptions()
 {
 	var expire_time = document.getElementById('poll_expire');
 
-	if (isEmptyText(expire_time) || expire_time.value == 0)
+	if (isEmptyText(expire_time) || expire_time.value === 0)
 	{
 		document.forms[form_name].poll_hide[2].disabled = true;
 		if (document.forms[form_name].poll_hide[2].checked)
@@ -1605,17 +1639,26 @@ function pollOptions()
 		document.forms[form_name].poll_hide[2].disabled = false;
 }
 
+/**
+ * Generate the number of days in a given month for a given year
+ * Used to populate the day pulldown in the calendar
+ *
+ * @param {type} offset
+ */
 function generateDays(offset)
 {
 	// Work around JavaScript's lack of support for default values...
-	offset = typeof(offset) != 'undefined' ? offset : '';
+	offset = typeof(offset) !== 'undefined' ? offset : '';
 
-	var days = 0, selected = 0;
-	var dayElement = document.getElementById("day" + offset), yearElement = document.getElementById("year" + offset), monthElement = document.getElementById("month" + offset);
-	var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	var days = 0,
+		selected = 0,
+		dayElement = document.getElementById("day" + offset),
+		yearElement = document.getElementById("year" + offset),
+		monthElement = document.getElementById("month" + offset),
+		monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 	monthLength[1] = 28;
-	if (yearElement.options[yearElement.selectedIndex].value % 4 == 0)
+	if (yearElement.options[yearElement.selectedIndex].value % 4 === 0)
 		monthLength[1] = 29;
 
 	selected = dayElement.selectedIndex;
@@ -1631,21 +1674,36 @@ function generateDays(offset)
 		dayElement.selectedIndex = selected;
 }
 
+/**
+ * Enable/disable the board selection list when a calendar event is linked, or not, to a post
+ *
+ * @param {string} form
+ */
 function toggleLinked(form)
 {
 	form.board.disabled = !form.link_to_board.checked;
 }
 
+/**
+ * load event for search for and PM search, un escapes any existing search
+ * value for back button or change search etc.
+ */
 function initSearch()
 {
-	if (document.forms.searchform.search.value.indexOf("%u") != -1)
-		document.forms.searchform.search.value = unescape(document.forms.searchform.search.value);
+	if (document.forms.searchform.search.value.indexOf("%u") !== -1)
+		document.forms.searchform.search.value = decodeURI(document.forms.searchform.search.value);
 }
 
+/**
+ * Checks or unchecks the list of available boards
+ *
+ * @param {type} ids
+ * @param {string} aFormID
+ */
 function selectBoards(ids, aFormID)
 {
-	var toggle = true;
-	var aForm = document.getElementById(aFormID);
+	var toggle = true,
+		aForm = document.getElementById(aFormID);
 
 	for (i = 0; i < ids.length; i++)
 		toggle = toggle & aForm["brd" + ids[i]].checked;
@@ -1654,29 +1712,42 @@ function selectBoards(ids, aFormID)
 		aForm["brd" + ids[i]].checked = !toggle;
 }
 
+/**
+ * Expands or collapses a container
+ *
+ * @param {string} id
+ * @param {string} icon
+ * @param {int} speed
+ */
 function expandCollapse(id, icon, speed)
 {
+	var	oId = $('#' + id);
+
 	icon = icon || false;
 	speed = speed || 300;
-	var oId = $('#' + id);
 
-	// change the icon on the box as well?
+	// Change the icon on the box as well?
 	if (icon)
 		$('#' + icon).attr("src", elk_images_url + (oId.is(":hidden") !== true ? "/selected.png" : "/selected_open.png"));
 
-	// open or collaspe the content id
+	// Open or collaspe the content id
 	oId.slideToggle(speed);
-
 }
 
+/**
+ * Maintains the personal message rule options to conform with the rule choice
+ * so that the form only makes available the proper choices (input, select, none, etc)
+ *
+ * @param {string} optNum
+ */
 function updateRuleDef(optNum)
 {
-	if (document.getElementById("ruletype" + optNum).value == "gid")
+	if (document.getElementById("ruletype" + optNum).value === "gid")
 	{
 		document.getElementById("defdiv" + optNum).style.display = "none";
 		document.getElementById("defseldiv" + optNum).style.display = "";
 	}
-	else if (document.getElementById("ruletype" + optNum).value == "bud" || document.getElementById("ruletype" + optNum).value == "")
+	else if (document.getElementById("ruletype" + optNum).value === "bud" || document.getElementById("ruletype" + optNum).value === "")
 	{
 		document.getElementById("defdiv" + optNum).style.display = "none";
 		document.getElementById("defseldiv" + optNum).style.display = "none";
@@ -1688,9 +1759,15 @@ function updateRuleDef(optNum)
 	}
 }
 
+/**
+ * Maintains the personal message rule action options to conform with the action choice
+ * so that the form only makes available the proper choice
+ *
+ * @param {string} optNum
+ */
 function updateActionDef(optNum)
 {
-	if (document.getElementById("acttype" + optNum).value == "lab")
+	if (document.getElementById("acttype" + optNum).value === "lab")
 	{
 		document.getElementById("labdiv" + optNum).style.display = "";
 	}
@@ -1700,9 +1777,15 @@ function updateActionDef(optNum)
 	}
 }
 
+/**
+ * Highlight a selection box by changing its class name
+ * @todo depreciated?
+ *
+ * @param {type} box
+ */
 function highlightSelected(box)
 {
-	if (prevClass != "")
+	if (prevClass !== "")
 		prevDiv.className = prevClass;
 
 	prevDiv = document.getElementById(box);
@@ -1711,13 +1794,16 @@ function highlightSelected(box)
 	prevDiv.className = "highlight2";
 }
 
+/**
+ * Auto submits a paused form, such as a maintenance task
+ */
 function doAutoSubmit()
 {
-	var formID = typeof(formName) != 'undefined' ? formName : "autoSubmit";
+	var formID = typeof(formName) !== 'undefined' ? formName : "autoSubmit";
 
-	if (countdown == 0)
+	if (countdown === 0)
 		document.forms[formID].submit();
-	else if (countdown == -1)
+	else if (countdown === -1)
 		return;
 
 	document.forms[formID].cont.value = txt_message + ' (' + countdown + ')';
