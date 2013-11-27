@@ -1564,23 +1564,6 @@ function smc_saveEntities(sFormName, aElementNames, sMask)
 }
 
 /**
- * A function used to clear the attachments on post page.  For security reasons
- * browsers don't let you set the value of a file input, even to an empty string
- * so this work around lets the user clear a choice.
- *
- * @param {type} idElement
- * @returns {undefined}
- */
-function cleanFileInput(idElement)
-{
-	var oElement = $('#' + idElement);
-
-	// Wrap the element in its own form, then reset the wrapper form
-	oElement.wrap('<form>').closest('form').get(0).reset();
-    oElement.unwrap();
-}
-
-/**
  * Make sure the window backgrounds (zebra stripes) are correct for lists.
  *
  * @param {type} oList
