@@ -400,23 +400,27 @@ function replaceText(text, oTextHandle)
 	}
 }
 
-// Checks if the passed input's value is nothing.
+/**
+ * Checks if the passed input's value is nothing.
+ *
+ * @param {string|object} theField
+ */
 function isEmptyText(theField)
 {
 	// Copy the value so changes can be made..
-	if (typeof(theField) == 'string')
+	if (typeof(theField) === 'string')
 		var theValue = theField;
 	else
 		var theValue = theField.value;
 
 	// Strip whitespace off the left side.
-	while (theValue.length > 0 && (theValue.charAt(0) == ' ' || theValue.charAt(0) == '\t'))
+	while (theValue.length > 0 && (theValue.charAt(0) === ' ' || theValue.charAt(0) === '\t'))
 		theValue = theValue.substring(1, theValue.length);
 	// Strip whitespace off the right side.
-	while (theValue.length > 0 && (theValue.charAt(theValue.length - 1) == ' ' || theValue.charAt(theValue.length - 1) == '\t'))
+	while (theValue.length > 0 && (theValue.charAt(theValue.length - 1) === ' ' || theValue.charAt(theValue.length - 1) === '\t'))
 		theValue = theValue.substring(0, theValue.length - 1);
 
-	if (theValue == '')
+	if (theValue === '')
 		return true;
 	else
 		return false;
@@ -431,9 +435,9 @@ function submitonce(theform)
 function submitThisOnce(oControl)
 {
 	// oControl might also be a form.
-	var oForm = 'form' in oControl ? oControl.form : oControl;
+	var oForm = 'form' in oControl ? oControl.form : oControl,
+		aTextareas = oForm.getElementsByTagName('textarea');
 
-	var aTextareas = oForm.getElementsByTagName('textarea');
 	for (var i = 0, n = aTextareas.length; i < n; i++)
 		aTextareas[i].readOnly = true;
 
@@ -453,7 +457,12 @@ function getInnerHTML(oElement)
 		return oElement.innerHTML;
 }
 
-// Set the "outer" HTML of an element.
+/**
+ * Set the "outer" HTML of an element.
+ *
+ * @param {type} oElement
+ * @param {type} sToValue
+ */
 function setOuterHTML(oElement, sToValue)
 {
 	if ('outerHTML' in oElement)
@@ -466,7 +475,12 @@ function setOuterHTML(oElement, sToValue)
 	}
 }
 
-// Checks for variable in theArray.
+/**
+ * Checks for variable in theArray, returns true or false
+ *
+ * @param {string} variable
+ * @param {array} theArray
+ */
 function in_array(variable, theArray)
 {
 	for (var i in theArray)
@@ -476,7 +490,12 @@ function in_array(variable, theArray)
 	return false;
 }
 
-// Checks for variable in theArray.
+/**
+ * Checks for variable in theArray and returns the array key
+ *
+ * @param {string} variable
+ * @param {array} theArray
+ */
 function array_search(variable, theArray)
 {
 	for (var i in theArray)
@@ -486,14 +505,19 @@ function array_search(variable, theArray)
 	return null;
 }
 
-// Find a specific radio button in its group and select it.
+/**
+ * Find a specific radio button in its group and select it.
+ *
+ * @param {type} oRadioGroup
+ * @param {type} sName
+ */
 function selectRadioByName(oRadioGroup, sName)
 {
 	if (!('length' in oRadioGroup))
 		return oRadioGroup.checked = true;
 
 	for (var i = 0, n = oRadioGroup.length; i < n; i++)
-		if (oRadioGroup[i].value == sName)
+		if (oRadioGroup[i].value === sName)
 			return oRadioGroup[i].checked = true;
 
 	return false;
@@ -502,24 +526,33 @@ function selectRadioByName(oRadioGroup, sName)
 function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 {
 	for (var i = 0; i < oForm.length; i++)
-		if (oForm[i].name != undefined && oForm[i].name.substr(0, sMask.length) == sMask && oForm[i].value == sValue)
+		if (oForm[i].name !== undefined && oForm[i].name.substr(0, sMask.length) == sMask && oForm[i].value == sValue)
 			oForm[i].checked = true;
 }
 
-// Invert all checkboxes at once by clicking a single checkbox.
+/**
+ * Invert all checkboxes at once by clicking a single checkbox.
+ *
+ * @param {type} oInvertCheckbox
+ * @param {type} oForm
+ * @param {type} sMask
+ * @param {type} bIgnoreDisabled
+ */
 function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 {
 	for (var i = 0; i < oForm.length; i++)
 	{
-		if (!('name' in oForm[i]) || (typeof(sMask) == 'string' && oForm[i].name.substr(0, sMask.length) != sMask && oForm[i].id.substr(0, sMask.length) != sMask))
+		if (!('name' in oForm[i]) || (typeof(sMask) === 'string' && oForm[i].name.substr(0, sMask.length) !== sMask && oForm[i].id.substr(0, sMask.length) !== sMask))
 			continue;
 
-		if (!oForm[i].disabled || (typeof(bIgnoreDisabled) == 'boolean' && bIgnoreDisabled))
+		if (!oForm[i].disabled || (typeof(bIgnoreDisabled) === 'boolean' && bIgnoreDisabled))
 			oForm[i].checked = oInvertCheckbox.checked;
 	}
 }
 
-// Keep the session alive - always!
+/**
+ * Keep the session alive - always!
+ */
 var lastKeepAliveCheck = new Date().getTime();
 function elk_sessionKeepAlive()
 {
@@ -537,22 +570,33 @@ function elk_sessionKeepAlive()
 }
 window.setTimeout('elk_sessionKeepAlive();', 1200000);
 
-// Set a theme option through javascript.
+/**
+ * Set a theme option through javascript. / ajax
+ * @param {string} option name being set
+ * @param {string} value of the option
+ * @param {string} theme its being set or null for all
+ * @param {string} cur_session_id
+ * @param {string} cur_session_var
+ * @param {string} additional_vars to use in the url request that will be sent
+ */
 function elk_setThemeOption(option, value, theme, cur_session_id, cur_session_var, additional_vars)
 {
 	// Compatibility.
-	if (cur_session_id == null)
+	if (cur_session_id === null)
 		cur_session_id = elk_session_id;
-	if (typeof(cur_session_var) == 'undefined')
+	if (typeof(cur_session_var) === 'undefined')
 		cur_session_var = 'sesc';
 
-	if (additional_vars == null)
+	if (additional_vars === null)
 		additional_vars = '';
 
 	var tempImage = new Image();
 	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + cur_session_var + '=' + cur_session_id + additional_vars + (theme == null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
 }
 
+/**
+ * Resize an avatar with JS
+ */
 function elk_avatarResize()
 {
 	var possibleAvatars = document.getElementsByTagName('img');
@@ -560,7 +604,7 @@ function elk_avatarResize()
 	for (var i = 0; i < possibleAvatars.length; i++)
 	{
 		var tempAvatars = []; j = 0;
-		if (possibleAvatars[i].className != 'avatar')
+		if (possibleAvatars[i].className !== 'avatar')
 			continue;
 
 		// Image.prototype.avatar = possibleAvatars[i];
@@ -571,12 +615,14 @@ function elk_avatarResize()
 		{
 			this.avatar.width = this.width;
 			this.avatar.height = this.height;
-			if (elk_avatarMaxWidth != 0 && this.width > elk_avatarMaxWidth)
+
+			if (elk_avatarMaxWidth !== 0 && this.width > elk_avatarMaxWidth)
 			{
 				this.avatar.height = (elk_avatarMaxWidth * this.height) / this.width;
 				this.avatar.width = elk_avatarMaxWidth;
 			}
-			if (elk_avatarMaxHeight != 0 && this.avatar.height > elk_avatarMaxHeight)
+
+			if (elk_avatarMaxHeight !== 0 && this.avatar.height > elk_avatarMaxHeight)
 			{
 				this.avatar.width = (elk_avatarMaxHeight * this.avatar.width) / this.avatar.height;
 				this.avatar.height = elk_avatarMaxHeight;
@@ -594,16 +640,24 @@ function elk_avatarResize()
 	}
 }
 
+/**
+ * Password hashing for user
+ *
+ * @param {type} doForm
+ * @param {type} cur_session_id
+ * @param {type} token
+ */
 function hashLoginPassword(doForm, cur_session_id, token)
 {
 	// Compatibility.
-	if (cur_session_id == null)
+	if (cur_session_id === null)
 		cur_session_id = elk_session_id;
 
-	if (typeof(hex_sha1) == 'undefined')
+	if (typeof(hex_sha1) === 'undefined')
 		return;
+
 	// Are they using an email address?
-	if (doForm.user.value.indexOf('@') != -1)
+	if (doForm.user.value.indexOf('@') !== -1)
 		return;
 
 	// Unless the browser is Opera, the password will not save properly.
@@ -613,40 +667,64 @@ function hashLoginPassword(doForm, cur_session_id, token)
 	doForm.hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_to8bit().php_strtolower() + doForm.passwrd.value.php_to8bit()) + cur_session_id + token);
 
 	// It looks nicer to fill it with asterisks, but Firefox will try to save that.
-	if (is_ff != -1)
+	if (is_ff !== -1)
 		doForm.passwrd.value = '';
 	else
 		doForm.passwrd.value = doForm.passwrd.value.replace(/./g, '*');
 }
 
+/**
+ * Password hashing for admin login
+ *
+ * @param {type} doForm
+ * @param {type} username
+ * @param {type} cur_session_id
+ * @param {type} token
+ */
 function hashAdminPassword(doForm, username, cur_session_id, token)
 {
-	// Compatibility.
-	if (cur_session_id == null)
-		cur_session_id = elk_session_id;
-
-	if (typeof(hex_sha1) == 'undefined')
+	// Missing sha1.js?
+	if (typeof(hex_sha1) === 'undefined')
 		return;
 
 	doForm.admin_hash_pass.value = hex_sha1(hex_sha1(username.php_to8bit().php_strtolower() + doForm.admin_pass.value.php_to8bit()) + cur_session_id + token);
 	doForm.admin_pass.value = doForm.admin_pass.value.replace(/./g, '*');
 }
 
+/**
+ * Hashing for the moderation login
+ *
+ * @param {type} doForm
+ * @param {type} username
+ * @param {type} cur_session_id
+ * @param {type} token
+ */
 function hashModeratePassword(doForm, username, cur_session_id, token)
 {
-	if (typeof(hex_sha1) == 'undefined')
+	// Missing sha1.js?
+	if (typeof(hex_sha1) === 'undefined')
 		return;
 
 	doForm.moderate_hash_pass.value = hex_sha1(hex_sha1(username.php_to8bit().php_strtolower() + doForm.moderate_pass.value.php_to8bit()) + cur_session_id + token);
 	doForm.moderate_pass.value = doForm.moderate_pass.value.replace(/./g, '*');
 }
 
-// Shows the page numbers by clicking the dots (in compact view).
-// @DEPRECATED it is not used. If we don't care about compatibility it can be removed
+/**
+ * Shows the page numbers by clicking the dots (in compact view).
+ * @todo @DEPRECATED it is not used. If we don't care about compatibility it can be removed
+ *
+ * @param {type} spanNode
+ * @param {type} baseURL
+ * @param {type} firstPage
+ * @param {type} lastPage
+ * @param {type} perPage
+ */
 function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
 {
-	var replacement = '', i, oldLastPage = 0;
-	var perPageLimit = 50;
+	var replacement = '',
+		i = 0,
+		oldLastPage = 0,
+		perPageLimit = 50;
 
 	// Prevent too many pages to be loaded at once.
 	if ((lastPage - firstPage) / perPage > perPageLimit)
@@ -666,6 +744,11 @@ function expandPages(spanNode, baseURL, firstPage, lastPage, perPage)
 	setOuterHTML(spanNode, replacement);
 }
 
+/**
+ * Used by elk_Toggle to add an image to the swap/toggle array
+ *
+ * @param {string} sSrc
+ */
 function smc_preCacheImage(sSrc)
 {
 	if (!('smc_aCachedImages' in window))
@@ -678,7 +761,11 @@ function smc_preCacheImage(sSrc)
 	}
 }
 
-// *** smc_Cookie class.
+/**
+ * smc_Cookie class.
+ * @param {type} oOptions
+ * @returns {smc_Cookie}
+ */
 function smc_Cookie(oOptions)
 {
 	this.opt = oOptions;
@@ -688,7 +775,7 @@ function smc_Cookie(oOptions)
 
 smc_Cookie.prototype.init = function()
 {
-	if ('cookie' in document && document.cookie != '')
+	if ('cookie' in document && document.cookie !== '')
 	{
 		var aCookieList = document.cookie.split(';');
 		for (var i = 0, n = aCookieList.length; i < n; i++)
@@ -697,19 +784,30 @@ smc_Cookie.prototype.init = function()
 			this.oCookies[aNameValuePair[0].replace(/^\s+|\s+$/g, '')] = decodeURIComponent(aNameValuePair[1]);
 		}
 	}
-}
+};
 
 smc_Cookie.prototype.get = function(sKey)
 {
 	return sKey in this.oCookies ? this.oCookies[sKey] : null;
-}
+};
 
 smc_Cookie.prototype.set = function(sKey, sValue)
 {
 	document.cookie = sKey + '=' + encodeURIComponent(sValue);
-}
+};
 
-// *** elk_Toggle class.
+/**
+ * elk_Toggle class.
+ *
+ * Collapses a section of the page
+ * Swaps the collapsed section class or image to indicate the state
+ * Updates links to indicate state and allow reversal of the action
+ * Saves state in a cookie and/or in a theme setting option so the last state
+ * is remembered for the user.
+ *
+ * @param {object} oOptions
+ * @returns {elk_Toggle}
+ */
 function elk_Toggle(oOptions)
 {
 	this.opt = oOptions;
@@ -718,6 +816,7 @@ function elk_Toggle(oOptions)
 	this.init();
 }
 
+// Initilize the toggle class
 elk_Toggle.prototype.init = function ()
 {
 	// The master switch can disable this toggle fully.
@@ -732,8 +831,8 @@ elk_Toggle.prototype.init = function ()
 
 		// Check if the cookie is set.
 		var cookieValue = this.oCookie.get(this.opt.oCookieOptions.sCookieName);
-		if (cookieValue != null)
-			this.opt.bCurrentlyCollapsed = cookieValue == '1';
+		if (cookieValue !== null)
+			this.opt.bCurrentlyCollapsed = cookieValue === '1';
 	}
 
 	// If the init state is set to be collapsed, collapse it.
@@ -746,10 +845,10 @@ elk_Toggle.prototype.init = function ()
 		for (var i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
-			if (typeof(oImage) == 'object' && oImage != null)
+			if (typeof(oImage) === 'object' && oImage !== null)
 			{
 				// Display the image in case it was hidden.
-				if (oImage.style.display == 'none')
+				if (oImage.style.display === 'none')
 					oImage.style.display = '';
 
 				oImage.instanceRef = this;
@@ -792,10 +891,10 @@ elk_Toggle.prototype.init = function ()
 		for (var i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
 			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
-			if (typeof(oLink) == 'object' && oLink != null)
+			if (typeof(oLink) === 'object' && oLink !== null)
 			{
 				// Display the link in case it was hidden.
-				if (oLink.style.display == 'none')
+				if (oLink.style.display === 'none')
 					oLink.style.display = '';
 
 				oLink.instanceRef = this;
@@ -813,7 +912,7 @@ elk_Toggle.prototype.init = function ()
 elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 {
 	// Default bInit to false.
-	bInit = typeof(bInit) == 'undefined' ? false : true;
+	bInit = typeof(bInit) === 'undefined' ? false : true;
 
 	// Handle custom function hook before collapse.
 	if (!bInit && bCollapse && 'funcOnBeforeCollapse' in this.opt)
@@ -838,7 +937,7 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		for (var i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
-			if (typeof(oImage) == 'object' && oImage != null)
+			if (typeof(oImage) === 'object' && oImage !== null)
 			{
 				// Only (re)load the image if it's changed.
 				var sTargetSource = bCollapse ? this.opt.aSwapImages[i].srcCollapsed : this.opt.aSwapImages[i].srcExpanded;
@@ -874,7 +973,7 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		for (var i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
 			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
-			if (typeof(oLink) == 'object' && oLink != null)
+			if (typeof(oLink) === 'object' && oLink !== null)
 				setInnerHTML(oLink, bCollapse ? this.opt.aSwapLinks[i].msgCollapsed : this.opt.aSwapLinks[i].msgExpanded);
 		}
 	}
@@ -882,11 +981,11 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 	// Now go through all the sections to be collapsed.
 	for (var i = 0, n = this.opt.aSwappableContainers.length; i < n; i++)
 	{
-		if (this.opt.aSwappableContainers[i] == null)
+		if (this.opt.aSwappableContainers[i] === null)
 			continue;
 
 		var oContainer = document.getElementById(this.opt.aSwappableContainers[i]);
-		if (typeof(oContainer) == 'object' && oContainer != null)
+		if (typeof(oContainer) === 'object' && oContainer !== null)
 		{
 			if (bCollapse)
 				$(oContainer).slideUp();
@@ -904,14 +1003,19 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 
 	if (!bInit && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
 		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, elk_session_id, elk_session_var, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
-}
+};
 
 elk_Toggle.prototype.toggle = function()
 {
 	// Change the state by reversing the current state.
 	this.changeState(!this.bCollapsed);
-}
+};
 
+/**
+ *
+ * @param {type} turn_on
+ * @returns {undefined}
+ */
 function ajax_indicator(turn_on)
 {
 	if (ajax_indicator_ele == null)
@@ -930,6 +1034,9 @@ function ajax_indicator(turn_on)
 	}
 }
 
+/**
+ * Creates the ajax notification div and adds it to the current screen
+ */
 function create_ajax_indicator_ele()
 {
 	// Create the div for the indicator.
@@ -941,10 +1048,11 @@ function create_ajax_indicator_ele()
 	// Add the image in and link to turn it off.
 	var cancel_link = document.createElement('a');
 	cancel_link.href = 'javascript:ajax_indicator(false)';
+
 	var cancel_img = document.createElement('img');
 	cancel_img.src = elk_images_url + '/icons/quick_remove.png';
 
-	if (typeof(ajax_notification_cancel_text) != 'undefined')
+	if (typeof(ajax_notification_cancel_text) !== 'undefined')
 	{
 		cancel_img.alt = ajax_notification_cancel_text;
 		cancel_img.title = ajax_notification_cancel_text;
@@ -961,6 +1069,12 @@ function create_ajax_indicator_ele()
 	document.body.appendChild(ajax_indicator_ele);
 }
 
+/**
+ * Creates and event listener object for a given object
+ * Object events can then be added with addEventListener
+ *
+ * @param {type} oTarget
+ */
 function createEventListener(oTarget)
 {
 	if (!('addEventListener' in oTarget))
@@ -969,31 +1083,35 @@ function createEventListener(oTarget)
 		{
 			oTarget.addEventListener = function (sEvent, funcHandler, bCapture) {
 				oTarget.attachEvent('on' + sEvent, funcHandler);
-			}
+			};
+
 			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture) {
 				oTarget.detachEvent('on' + sEvent, funcHandler);
-			}
+			};
 		}
 		else
 		{
 			oTarget.addEventListener = function (sEvent, funcHandler, bCapture) {
 				oTarget['on' + sEvent] = funcHandler;
-			}
+			};
+
 			oTarget.removeEventListener = function (sEvent, funcHandler, bCapture) {
 				oTarget['on' + sEvent] = null;
-			}
+			};
 		}
 	}
 }
 
-// This function will retrieve the contents needed for the jump to boxes.
+
+/**
+ * This function will retrieve the contents needed for the jump to boxes.
+ *
+ * @param {type} elem
+ */
 function grabJumpToContent(elem)
 {
-	var oXMLDoc = getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml');
-	var aBoardsAndCategories = new Array();
-	var bIE5x = !('implementation' in document);
-
-	ajax_indicator(true);
+	var oXMLDoc = getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml'),
+		aBoardsAndCategories = new Array();
 
 	if (oXMLDoc.responseXML)
 	{
@@ -1002,26 +1120,20 @@ function grabJumpToContent(elem)
 		{
 			aBoardsAndCategories[aBoardsAndCategories.length] = {
 				id: parseInt(items[i].getAttribute('id')),
-				isCategory: items[i].getAttribute('type') == 'category',
+				isCategory: items[i].getAttribute('type') === 'category',
 				name: items[i].firstChild.nodeValue.removeEntities(),
 				is_current: false,
 				childLevel: parseInt(items[i].getAttribute('childlevel'))
-			}
+			};
 		}
 	}
-
-	ajax_indicator(false);
 
 	for (var i = 0, n = aJumpTo.length; i < n; i++)
 		aJumpTo[i].fillSelect(aBoardsAndCategories);
 
-	if (bIE5x)
-		elem.options[iIndexPointer].selected = true;
-
 	// Internet Explorer needs this to keep the box dropped down.
 	elem.style.width = 'auto';
 	elem.focus();
-
 }
 
 // This'll contain all JumpTo objects on the page.
@@ -1041,7 +1153,7 @@ JumpTo.prototype.showSelect = function ()
 	var sChildLevelPrefix = '';
 	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
-	setInnerHTML(document.getElementById(this.opt.sContainerId), this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled == true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName != undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName != undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect != undefined && this.opt.bNoRedirect == true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel != undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : '')));
+	setInnerHTML(document.getElementById(this.opt.sContainerId), this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : '')));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 }
 
