@@ -358,19 +358,6 @@ smc_Popup.prototype.hide = function ()
 	return false;
 };
 
-/**
- * Remember the current cursor position.
- *
- * @param {object} oTextHandle
- * @returns {undefined}
- */
-function storeCaret(oTextHandle)
-{
-	// Only bother if it will be useful.
-	if ('createTextRange' in oTextHandle)
-		oTextHandle.caretPos = document.selection.createRange().duplicate();
-}
-
 // Replaces the currently selected text with the passed text.
 function replaceText(text, oTextHandle)
 {
