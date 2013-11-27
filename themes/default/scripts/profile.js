@@ -14,6 +14,12 @@
  * This file contains javascript associated with the user profile
  */
 
+
+/**
+ * Function to detect the time offset and populate the offset box
+ *
+ * @param {string} currentTime
+ */
 var localTime = new Date();
 function autoDetectTimeOffset(currentTime)
 {
@@ -35,14 +41,18 @@ function autoDetectTimeOffset(currentTime)
 	return diff;
 }
 
-// Prevent Chrome from auto completing fields when viewing/editing other members profiles
+/**
+ * Prevent Chrome from auto completing fields when viewing/editing other members profiles
+ */
 function disableAutoComplete()
 {
 	if (is_chrome && document.addEventListener)
 		document.addEventListener("DOMContentLoaded", disableAutoCompleteNow, false);
 }
 
-// Once DOMContentLoaded is triggered, call the function
+/**
+ * Once DOMContentLoaded is triggered, call the function
+ */
 function disableAutoCompleteNow()
 {
 	for (var i = 0, n = document.forms.length; i < n; i++)
@@ -55,10 +65,15 @@ function disableAutoCompleteNow()
 	}
 }
 
+/**
+ * Calculates the number of available characters remaining when filling in the
+ * signature box
+ */
 function calcCharLeft()
 {
-	var oldSignature = "", currentSignature = document.forms.creator.signature.value;
-	var currentChars = 0;
+	var oldSignature = "",
+		currentSignature = document.forms.creator.signature.value,
+		currentChars = 0;
 
 	if (!document.getElementById("signatureLeft"))
 		return;
@@ -70,7 +85,6 @@ function calcCharLeft()
 		var currentChars = currentSignature.replace(/\r/, "").length;
 		if (is_opera)
 			currentChars = currentSignature.replace(/\r/g, "").length;
-
 
 		if (currentChars > maxLength)
 			document.getElementById("signatureLeft").className = "error";
@@ -89,7 +103,12 @@ function calcCharLeft()
 	setInnerHTML(document.getElementById("signatureLeft"), maxLength - currentChars);
 }
 
-function ajax_getSignaturePreview (showPreview)
+/**
+ * Gets the signature preview via ajax and populates the preview box
+ *
+ * @param {boolean} showPreview
+ */
+function ajax_getSignaturePreview(showPreview)
 {
 	showPreview = (typeof showPreview === 'undefined') ? false : showPreview;
 	$.ajax({
@@ -113,8 +132,9 @@ function ajax_getSignaturePreview (showPreview)
 		{
 			if (!$("#profile_error").is(":visible"))
 				$("#profile_error").css({display: "", position: "fixed", top: 0, left: 0, width: "100%"});
-			var errors = $(request).find('[type="error"]');
-			var errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
+
+			var errors = $(request).find('[type="error"]'),
+				errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
 
 			for (var i = 0; i < errors.length; i++)
 				errors_html += '<li>' + $(errors).text() + '</li>';
@@ -129,9 +149,15 @@ function ajax_getSignaturePreview (showPreview)
 		}
 		return false;
 	});
+
 	return false;
 }
 
+/**
+ * Allows previewing of server stored avatars stored.
+ *
+ * @param {type} selected
+ */
 function changeSel(selected)
 {
 	if (cat.selectedIndex === -1)
@@ -183,6 +209,9 @@ function changeSel(selected)
 	}
 }
 
+/**
+ * Updates the avatar img preview with the selected one
+ */
 function showAvatar()
 {
 	if (file.selectedIndex === -1)
@@ -197,6 +226,12 @@ function showAvatar()
 	oAvatar.style.height = "";
 }
 
+/**
+ * Allows for the previewing of an externally stored avatar
+ *
+ * @param {string} src
+ * @param {string} sid
+ */
 function previewExternalAvatar(src, sid)
 {
 	sid = (typeof(sid) === 'undefined') ? "avatar" : sid;
