@@ -1549,20 +1549,21 @@ function smc_saveEntities(sFormName, aElementNames, sMask)
 	}
 }
 
-// A function used to clean the attachments on post page
+/**
+ * A function used to clear the attachments on post page.  For security reasons
+ * browsers don't let you set the value of a file input, even to an empty string
+ * so this work around lets the user clear a choice.
+ *
+ * @param {type} idElement
+ * @returns {undefined}
+ */
 function cleanFileInput(idElement)
 {
-	// Simpler solutions work in Opera, IE, Safari and Chrome.
-	if (is_opera || is_ie || is_safari || is_chrome)
-	{
-		document.getElementById(idElement).outerHTML = document.getElementById(idElement).outerHTML;
-	}
-	// What else can we do? By the way, this doesn't work in Chrome and Mac's Safari.
-	else
-	{
-		document.getElementById(idElement).type = 'input';
-		document.getElementById(idElement).type = 'file';
-	}
+	var oElement = $('#' + idElement);
+
+	// Wrap the element in its own form, then reset the wrapper form
+	oElement.wrap('<form>').closest('form').get(0).reset();
+    oElement.unwrap();
 }
 
 function applyWindowClasses(oList)
