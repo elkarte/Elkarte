@@ -1478,16 +1478,21 @@ function addLoadEvent(fNewOnload)
 		aOnloadEvents[aOnloadEvents.length] = fNewOnload;
 }
 
-// Get the text in a code tag.
+/**
+ * Get the text in a code tag by selecting the [select] in the code header
+ *
+ * @param {object} oCurElement
+ * @param {boolean} bActOnElement the passed element contains the code
+ */
 function elkSelectText(oCurElement, bActOnElement)
 {
 	// The place we're looking for is one div up, and next door - if it's auto detect.
-	if (typeof(bActOnElement) == 'boolean' && bActOnElement)
+	if (typeof(bActOnElement) === 'boolean' && bActOnElement)
 		var oCodeArea = document.getElementById(oCurElement);
 	else
 		var oCodeArea = oCurElement.parentNode.nextSibling;
 
-	if (typeof(oCodeArea) != 'object' || oCodeArea == null)
+	if (typeof(oCodeArea) !== 'object' || oCodeArea === null)
 		return false;
 
 	// Start off with my favourite, internet explorer.
@@ -1501,6 +1506,7 @@ function elkSelectText(oCurElement, bActOnElement)
 	else if (window.getSelection)
 	{
 		var oCurSelection = window.getSelection();
+
 		// Safari is special!
 		if (oCurSelection.setBaseAndExtent)
 		{
@@ -1510,8 +1516,8 @@ function elkSelectText(oCurElement, bActOnElement)
 		else
 		{
 			var curRange = document.createRange();
-			curRange.selectNodeContents(oCodeArea);
 
+			curRange.selectNodeContents(oCodeArea);
 			oCurSelection.removeAllRanges();
 			oCurSelection.addRange(curRange);
 		}
@@ -1520,10 +1526,16 @@ function elkSelectText(oCurElement, bActOnElement)
 	return false;
 }
 
-// A function needed to discern HTML entities from non-western characters.
+/**
+ * A function needed to discern HTML entities from non-western characters.
+ *
+ * @param {string} sFormName
+ * @param {array} aElementNames
+ * @param {string} sMask
+ */
 function smc_saveEntities(sFormName, aElementNames, sMask)
 {
-	if (typeof(sMask) == 'string')
+	if (typeof(sMask) === 'string')
 	{
 		for (var i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
 			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) == sMask)
