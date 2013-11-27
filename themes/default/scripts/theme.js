@@ -103,6 +103,13 @@ $(document).ready(function() {
 });
 
 // Adds a button to a certain button strip.
+/**
+ *
+ * @param {type} sButtonStripId
+ * @param {type} bUseImage
+ * @param {type} oOptions
+ * @returns {undefined}
+ */
 function elk_addButton(sButtonStripId, bUseImage, oOptions)
 {
 	var oButtonStrip = document.getElementById(sButtonStripId);

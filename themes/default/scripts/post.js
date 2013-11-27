@@ -14,17 +14,18 @@
  * This file contains javascript associated with the posting and previewing
  */
 
+/**
+ * A q&d wrapper function to call the correct preview function
+ * @todo could make this a class to be cleaner
+ */
 // These are variables the xml response is going to need
 var bPost;
-
-// A q&d wrapper function to call the correct preview function
-// @todo could make this a class to be cleaner
 function previewControl()
 {
 	if (is_ff)
 	{
 		// Firefox doesn't render <marquee> that have been put it using javascript
-		if (document.forms[form_name].elements[post_box_name].value.indexOf('[move]') != -1)
+		if (document.forms[form_name].elements[post_box_name].value.indexOf('[move]') !== -1)
 			return submitThisOnce(document.forms[form_name]);
 	}
 
@@ -53,7 +54,9 @@ function previewControl()
 		return submitThisOnce(document.forms[form_name]);
 }
 
-// Used to preview a post
+/**
+ * Used to preview a post
+ */
 function previewPost()
 {
 	// @todo Currently not sending poll options and option checkboxes.
@@ -82,7 +85,9 @@ function previewPost()
 	return false;
 }
 
-// Used to preview a PM
+/**
+ * Used to preview a PM
+ */
 function previewPM()
 {
 	// define what we want to get from the form
@@ -111,7 +116,9 @@ function previewPM()
 	return false;
 }
 
-// Used to preview a News item
+/**
+ * Used to preview a News item
+ */
 function previewNews()
 {
 	// define what we want to get from the form
@@ -140,7 +147,14 @@ function previewNews()
 	return false;
 }
 
-// Gets the form data for the selected fields so they can be posted via ajax
+/**
+ * Gets the form data for the selected fields so they can be posted via ajax
+ *
+ * @param {array} textFields
+ * @param {array} numericFields
+ * @param {array} checkboxFields
+ * @param {string} form_name
+ */
 function getFields(textFields, numericFields, checkboxFields, form_name)
 {
 	var fields = new Array();
@@ -151,7 +165,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 		if (textFields[i] in document.forms[form_name])
 		{
 			// Handle the editor.
-			if (textFields[i] == post_box_name && $('#' + post_box_name).data('sceditor') != undefined)
+			if (textFields[i] == post_box_name && $('#' + post_box_name).data('sceditor') !== undefined)
 			{
 				fields[fields.length] = textFields[i] + '=' + $('#' + post_box_name).data('sceditor').getText().replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
 				fields[fields.length] = 'message_mode=' + $("#message").data("sceditor").inSourceMode();
@@ -189,7 +203,11 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	return fields;
 }
 
-// Callback function of the XMLhttp request
+/**
+ * Callback function of the XMLhttp request
+ *
+ * @param {object} XMLDoc
+ */
 function onDocSent(XMLDoc)
 {
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
@@ -211,9 +229,9 @@ function onDocSent(XMLDoc)
 	document.getElementById('preview_body').className = 'post';
 
 	// Show a list of errors (if any).
-	var errors = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('errors')[0];
-	var errorList = '';
-	var errorCode = '';
+	var errors = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('errors')[0],
+		errorList = '',
+		errorCode = '';
 
 	// @todo: this should stay together with the rest of the error handling or
 	// should use errorbox_handler (at the moment it cannot be used because is not enough generic)
@@ -228,13 +246,13 @@ function onDocSent(XMLDoc)
 		oError_box.append("<ul id='post_error_list'></ul>");
 
 	// Add the error it and show it
-	setInnerHTML(document.getElementById('post_error_list'), numErrors == 0 ? '' : errorList);
+	setInnerHTML(document.getElementById('post_error_list'), numErrors === 0 ? '' : errorList);
 	if (numErrors === 0)
 		oError_box.css("display", "none");
 
 	// Show a warning if the topic has been locked.
 	if (bPost)
-		document.getElementById('lock_warning').style.display = errors.getAttribute('topic_locked') == 1 ? '' : 'none';
+		document.getElementById('lock_warning').style.display = errors.getAttribute('topic_locked') === 1 ? '' : 'none';
 
 	// Adjust the color of captions if the given data is erroneous.
 	var captions = errors.getElementsByTagName('caption');
@@ -244,9 +262,9 @@ function onDocSent(XMLDoc)
 			document.getElementById('caption_' + captions[i].getAttribute('name')).className = captions[i].getAttribute('class');
 	}
 
-	if (errors.getElementsByTagName('post_error').length == 1)
+	if (errors.getElementsByTagName('post_error').length === 1)
 		document.forms[form_name][post_box_name].style.border = '1px solid red';
-	else if (document.forms[form_name][post_box_name].style.borderColor == 'red' || document.forms[form_name][post_box_name].style.borderColor == 'red red red red')
+	else if (document.forms[form_name][post_box_name].style.borderColor === 'red' || document.forms[form_name][post_box_name].style.borderColor === 'red red red red')
 	{
 		if ('runtimeStyle' in document.forms[form_name][post_box_name])
 			document.forms[form_name][post_box_name].style.borderColor = '';
@@ -279,10 +297,10 @@ function onDocSent(XMLDoc)
 				new_replies[new_replies.length] = newPosts[i].getAttribute("id");
 
 				ignoring = false;
-				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue != 0)
+				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue !== 0)
 					ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute("id");
 
-				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 == 0 ? '2' : '') + ' core_posts"><div class="content" id="msg' + newPosts[i].getAttribute("id") + '"><div class="floatleft"><h5>' + txt_posted_by + ': ' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '</h5><span class="smalltext">&#171;&nbsp;<strong>' + txt_on + ':</strong> ' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + '&nbsp;&#187;</span> <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></div>';
+				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 === 0 ? '2' : '') + ' core_posts"><div class="content" id="msg' + newPosts[i].getAttribute("id") + '"><div class="floatleft"><h5>' + txt_posted_by + ': ' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '</h5><span class="smalltext">&#171;&nbsp;<strong>' + txt_on + ':</strong> ' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue + '&nbsp;&#187;</span> <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></div>';
 
 				if (can_quote)
 					newPostsHTML += '<ul class="quickbuttons" id="msg_' + newPosts[i].getAttribute('id') + '_quote"><li class="listlevel1"><a href="#postmodify" onclick="return insertQuoteFast(' + newPosts[i].getAttribute('id') + ');" class="linklevel1 quote_button">' + txt_bbc_quote + '</a></li></ul>';
@@ -298,7 +316,7 @@ function onDocSent(XMLDoc)
 		}
 
 		var numIgnoredReplies = ignored_replies.length;
-		if (numIgnoredReplies != 0)
+		if (numIgnoredReplies !== 0)
 		{
 			for (var i = 0; i < numIgnoredReplies; i++)
 			{
@@ -333,7 +351,9 @@ function onDocSent(XMLDoc)
 	});
 }
 
-// Add additional poll option fields
+/**
+ * Add additional poll option fields
+ */
 function addPollOption()
 {
 	if (pollOptionNum === 0)
@@ -345,13 +365,16 @@ function addPollOption()
 				pollTabIndex = document.forms[form_name].elements[i].tabIndex;
 			}
 	}
+
 	pollOptionNum++;
 	pollOptionId++;
 	pollTabIndex++;
 	setOuterHTML(document.getElementById('pollMoreOptions'), '<li><label for="options-' + pollOptionId + '">' + txt_option + ' ' + pollOptionNum + '</label>: <input type="text" name="options[' + pollOptionId + ']" id="options-' + pollOptionId + '" value="" size="80" maxlength="255" tabindex="' + pollTabIndex + '" class="input_text" /></li><li id="pollMoreOptions"></li>');
 }
 
-// Add additional attachment selection boxes
+/**
+ * Add additional attachment selection boxes
+ */
 function addAttachment()
 {
 	allowed_attachments = allowed_attachments - 1;
@@ -364,7 +387,11 @@ function addAttachment()
 	return true;
 }
 
-// Insert a quote to the editor via ajax
+/**
+ * Insert a quote to the editor via ajax
+ *
+ * @param {string} messageid
+ */
 function insertQuoteFast(messageid)
 {
 	if (window.XMLHttpRequest)
@@ -375,7 +402,11 @@ function insertQuoteFast(messageid)
 	return true;
 }
 
-// callback for the quotefast function
+/**
+ * callback for the quotefast function
+ *
+ * @param {object} XMLDoc
+ */
 function onDocReceived(XMLDoc)
 {
 	var text = '';
@@ -388,7 +419,11 @@ function onDocReceived(XMLDoc)
 	ajax_indicator(false);
 }
 
-// insert text in to the editor
+/**
+ * Insert text in to the editor
+ *
+ * @param {string} text
+ */
 function onReceiveOpener(text)
 {
 	$('#' + post_box_name).data("sceditor").insert(text);
