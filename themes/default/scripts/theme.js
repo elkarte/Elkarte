@@ -15,7 +15,7 @@
  */
 
 $(document).ready(function() {
-	// menu drop downs
+	// Menu drop downs
 	if (use_click_menu)
 		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}});
 	else
@@ -44,10 +44,11 @@ $(document).ready(function() {
 	// Find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');
 
-	// Fix code blocks
+	// Fix code blocks so they are as compact as possible
 	if (typeof elk_codefix === 'function')
 		elk_codefix();
 
+	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 
 	// Collapsabile fieldsets, pure candy
@@ -66,27 +67,40 @@ $(document).ready(function() {
 	$('.spoilerheader').click(function() {
 		$(this).next().children().slideToggle("fast");
 	});
-});
 
-// Toggles the element height and width styles of an image.
-function elk_ToggleImageDimensions()
-{
-	var oImages = document.getElementsByTagName('IMG');
-	for (oImage in oImages)
-	{
+	// BBC [img] element toggle for height and width styles of an image.
+	$('img').each(function() {
 		// Not a resized image? Skip it.
-		if (oImages[oImage].className === undefined || oImages[oImage].className.indexOf('bbc_img resized') === -1)
-			continue;
+		if ($(this).hasClass('bbc_img resized') === false)
+			return true;
 
-		oImages[oImage].style.cursor = 'pointer';
-		oImages[oImage].onclick = function() {
-			this.style.width = this.style.height = this.style.width === 'auto' ? null : 'auto';
-		};
-	}
-}
+		$(this).css({'cursor': 'pointer'});
+		$(this).click(function() {
+			var $this = $(this),
+				height,
+				width;
 
-// Add a load event for the function above.
-addLoadEvent(elk_ToggleImageDimensions);
+			// No saved data, then lets set it to autp
+			if ($.isEmptyObject($this.data()))
+			{
+				$this.data( "original", { width: $this.css('width'), height: $this.css('height')});
+				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
+				$this.css({'height': $this.css('width') === 'auto' ? null : 'auto'});
+			}
+			else
+			{
+				// Was clicked and saved, so set it back
+				height = $this.data("original").height;
+				width = $this.data("original").width;
+				$this.css({'width': width});
+				$this.css({'height': height});
+
+				// Remove the data
+				$this.removeData();
+			}
+		});
+	});
+});
 
 // Adds a button to a certain button strip.
 function elk_addButton(sButtonStripId, bUseImage, oOptions)
@@ -102,9 +116,10 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 	}
 
 	// Add the button.
-	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0];
-	var oNewButton = document.createElement('li');
-	var oRole = document.createAttribute('role');
+	var oButtonStripList = oButtonStrip.getElementsByTagName('ul')[0],
+		oNewButton = document.createElement('li'),
+		oRole = document.createAttribute('role');
+
 	oRole.value = 'menuitem';
 	oNewButton.setAttributeNode(oRole);
 
