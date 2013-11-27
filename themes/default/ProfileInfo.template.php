@@ -1245,7 +1245,7 @@ function template_profile_block_posts()
 	else
 		echo '
 				<tr>
-					<td colspan="4">', (isset($context['loadaverage']) ? $txt['profile_loadavg'] : $txt['profile_posts_no']), '</td>
+					<td class="norecent">', (isset($context['loadaverage']) ? $txt['profile_loadavg'] : $txt['profile_posts_no']), '</td>
 				</tr>';
 
 	// All done
@@ -1294,7 +1294,7 @@ function template_profile_block_topics()
 	else
 		echo '
 				<tr>
-					<td colspan="3">', $txt['profile_topics_no'], '</td>
+					<td class="norecent">', $txt['profile_topics_no'], '</td>
 				</tr>';
 
 	// All done

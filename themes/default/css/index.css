@@ -1803,6 +1803,10 @@ dl.settings textarea {
 	font-size: 0.857em;
 	border-collapse: collapse;
 }
+#ps_recentposts .norecent, #ps_recenttopics .norecent {
+	padding: 1em;
+	text-align: center;
+}
 #ic_recentposts td, #ic_recentposts th, #ps_recentposts td, #ps_recentposts th, #ps_recenttopics td, #ps_recenttopics th {
 	padding: 2px 4px;
 	vertical-align: top;
