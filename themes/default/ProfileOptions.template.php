@@ -139,7 +139,7 @@ function template_editIgnoreList()
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
 		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['editIgnoreList'], '
+			<span class="hdicon cat_img_profile">', $txt['editIgnoreList'], '</span>
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
@@ -236,7 +236,7 @@ function template_edit_options()
 	echo '
 		<form action="', (!empty($context['profile_custom_submit_url']) ? $context['profile_custom_submit_url'] : $scripturl . '?action=profile;area=' . $context['menu_item_selected'] . ';u=' . $context['id_member']), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data" onsubmit="return checkProfileSubmit();">
 			<h2 class="category_header">
-				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />';
+				<span class="hdicon cat_img_profile">';
 
 	// Don't say "Profile" if this isn't the profile...
 	if (!empty($context['profile_header_text']))
@@ -247,6 +247,7 @@ function template_edit_options()
 				', $txt['profile'];
 
 	echo '
+				</span>
 			</h2>';
 
 	// Have we some description?
@@ -708,13 +709,13 @@ function template_profile_theme_settings()
  */
 function template_action_notification()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl, $modSettings;
 
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=notification;save" method="post" accept-charset="UTF-8" id="notify_options" class="flow_hidden">
 			<h2 class="category_header">
-				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
+				<span class="hdicon cat_img_profile">', $txt['profile'], '</span>
 			</h2>
 			<p class="description">', $txt['notification_info'], '</p>
 			<div class="windowbg2">
@@ -813,13 +814,13 @@ function template_action_notification()
  */
 function template_groupMembership()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=groupmembership;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
 			<h2 class="category_header">
-				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
+				<span class="hdicon cat_img_profile">', $txt['profile'], '</span>
 			</h2>
 			<p class="description">', $txt['groupMembership_info'], '</p>';
 
@@ -974,13 +975,13 @@ function template_groupMembership()
  */
 function template_ignoreboards()
 {
-	global $context, $txt, $settings, $scripturl;
+	global $context, $txt, $scripturl;
 
 	// The main containing header.
 	echo '
 	<form action="', $scripturl, '?action=profile;area=ignoreboards;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
 		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['profile'], '
+			<span class="hdicon cat_img_profile">', $txt['profile'], '</span>
 		</h2>
 		<p class="description">', $txt['ignoreboards_info'], '</p>
 		<div class="windowbg2">
@@ -1444,7 +1445,7 @@ function template_authentication_method()
 		<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 		<form action="', $scripturl, '?action=profile;area=authentication;save" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['authentication'], '
+				<span class="hdicon cat_img_profile">', $txt['authentication'], '</span>
 			</h3>
 			<p class="description">', $txt['change_authentication'], '</p>
 			<div class="windowbg2">

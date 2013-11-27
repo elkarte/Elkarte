@@ -462,6 +462,39 @@ em {
 	margin: 0 5px 0 0;
 	vertical-align: text-top;
 }
+/* Category Header icons as sprites
+------------------------------------------------- */
+.category_header .hdicon, .secondary_header .hdicon {
+	background-image: url(../images/icons/header.png);
+	background-repeat: no-repeat;
+	padding-left: 30px;
+}
+/* broke formatting for compactness */
+.cat_img_attachments {background-position: 0 0;}
+.cat_img_buddies {background-position: 0 -24px;}
+.cat_img_config {background-position: 0 -48px}
+.cat_img_contacts {background-position: 0 -72px;}
+.cat_img_helptopics {background-position: 0 -96px;}
+.cat_img_inbox {background-position: 0 -120px;}
+.cat_img_login {background-position: 0 -144px;}
+.cat_img_mail {background-position: 0 -168px;}
+.cat_img_moderation {background-position: 0 -192px;}
+.cat_img_plus {background-position: 0 -216px;}
+.cat_img_posts {background-position: 0 -240px;}
+.cat_img_profile {background-position: 0 -264px;}
+.cat_img_search {background-position: 0 -288px;}
+.cat_img_stats_info {background-position: 0 -312px;}
+.cat_img_topics {background-position: 0 -336px;}
+.cat_img_write {background-position: 0 -360px;}
+.cat_img_database {background-position: 0 -384px;}
+.cat_img_address {background-position: 0 -408px;}
+.cat_img_calendar {background-position: 0 -432px;}
+.cat_img_minus {background-position: 0 -456px;}
+.cat_img_star {background-position: 0 -480px;}
+.cat_img_clock {background-position: 0 -504px;}
+.cat_img_eye {background-position: 0 -528px;}
+.cat_img_piechart {background-position: 0 -552px;}
+.cat_img_talk {background-position: 0 -576px;}
 
 h2 a.collapse {
 	margin: 2px 4px -2px 0;
@@ -3609,13 +3642,13 @@ div.labels {
 	cursor: help;
 }
 
-.help .icon {
+.help .icon, .hdicon.help {
 	margin: 0;
 	opacity: 0.8;
 	cursor: help;
 }
 
-.help .icon:hover {
+.help .icon:hover, .hdicon.help:hover {
 	opacity: 1;
 }
 

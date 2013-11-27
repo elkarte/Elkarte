@@ -194,7 +194,7 @@ function template_email_members()
  */
 function template_email_members_compose()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
@@ -214,7 +214,7 @@ function template_email_members_compose()
 	<div id="admincenter">
 		<form name="newsmodify" action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['admin_newsletters'], '
+				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['admin_newsletters'], '
 			</h3>
 			<div class="information">
 				', $txt['email_variables'], '
@@ -303,13 +303,13 @@ function template_email_members_compose()
  */
 function template_email_members_send()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="admincenter">
 		<form action="', $scripturl, '?action=admin;area=news;sa=mailingsend" method="post" accept-charset="UTF-8" name="autoSubmit" id="autoSubmit">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" /></a> ', $txt['admin_newsletters'], '
+				<a href="', $scripturl, '?action=quickhelp;help=email_members" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['admin_newsletters'], '
 			</h3>
 			<div class="windowbg">
 				<div class="content">

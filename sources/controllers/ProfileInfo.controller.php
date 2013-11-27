@@ -392,7 +392,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['showPosts'],
 			'description' => $txt['showPosts_help'],
-			'icon' => 'profile_hd.png',
+			'class' => 'profile',
 			'tabs' => array(
 				'messages' => array(
 				),
@@ -859,7 +859,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['statPanel_generalStats'] . ' - ' . $context['member']['name'],
-			'icon' => 'stats_info_hd.png'
+			'class' => 'stats_info'
 		);
 
 		// Number of topics started.

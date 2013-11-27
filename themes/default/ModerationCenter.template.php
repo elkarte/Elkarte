@@ -50,11 +50,11 @@ function template_moderation_center()
  */
 function template_latest_news()
 {
-	global $settings, $txt, $scripturl;
+	global $txt, $scripturl;
 
 	echo '
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" alt="', $txt['help'], '" class="icon" /></a> ', $txt['mc_latest_news'], '
+									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['mc_latest_news'], '
 								</h3>
 								<div class="windowbg">
 									<div class="content">
