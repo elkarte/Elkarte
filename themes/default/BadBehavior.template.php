@@ -20,7 +20,7 @@ function template_badbehavior_log()
 	echo '
 		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=badbehaviorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/icons/helptopics_hd.png" class="icon" alt="', $txt['help'], '" /></a> ', $txt['badbehaviorlog_log'], '
+				<a href="', $scripturl, '?action=quickhelp;help=badbehaviorlog" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['badbehaviorlog_log'], '
 			</h3>
 			', template_pagesection(), '
 			<table class="table_grid" id="error_log">';

@@ -69,7 +69,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['editBuddyIgnoreLists'],
 			'description' => $txt['buddy_ignore_desc'],
-			'icon' => 'profile_hd.png',
+			'class' => 'profile',
 			'tabs' => array(
 				'buddies' => array(),
 				'ignore' => array(),

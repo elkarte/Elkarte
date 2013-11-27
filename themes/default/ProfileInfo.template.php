@@ -207,11 +207,11 @@ function template_action_showPosts()
  */
 function template_action_showPermissions()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />', $txt['showPermissions'], '
+			<span class="hdicon cat_img_profile">', $txt['showPermissions'], '</span>
 		</h2>';
 
 	if ($context['member']['has_all_permissions'])
@@ -363,7 +363,7 @@ function template_action_showPermissions()
  */
 function template_action_statPanel()
 {
-	global $context, $settings, $txt;
+	global $context, $txt;
 
 	// First, show a few text statistics such as post/topic count.
 	echo '
@@ -391,7 +391,7 @@ function template_action_statPanel()
 	echo '
 		<div id="activitytime" class="flow_hidden">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/stats_history.png" alt="" class="icon" />', $txt['statPanel_activityTime'], '
+				<span class="hdicon cat_img_clock">', $txt['statPanel_activityTime'], '</span>
 			</h3>
 			<div class="windowbg2">
 				<div class="content">';
@@ -435,7 +435,7 @@ function template_action_statPanel()
 		<div class="flow_hidden">
 			<div id="popularposts">
 				<h3 class="category_header">
-					<img src="', $settings['images_url'], '/stats_replies.png" alt="" class="icon" />', $txt['statPanel_topBoards'], '
+					<span class="hdicon cat_img_write">', $txt['statPanel_topBoards'], '</span>
 				</h3>
 				<div class="windowbg2">
 					<div class="content">';
@@ -472,7 +472,7 @@ function template_action_statPanel()
 			</div>
 			<div id="popularactivity">
 				<h3 class="category_header">
-					<img src="', $settings['images_url'], '/stats_replies.png" alt="" class="icon" />', $txt['statPanel_topBoardsActivity'], '
+					<span class="hdicon cat_img_piechart">', $txt['statPanel_topBoardsActivity'], '</span>
 				</h3>
 				<div class="windowbg2">
 					<div class="content">';
@@ -515,14 +515,13 @@ function template_action_statPanel()
  */
 function template_viewWarning()
 {
-	global $context, $txt, $settings;
+	global $context, $txt;
 
 	template_load_warning_variables();
 
 	echo '
 		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon" />
-			', sprintf($txt['profile_viewwarning_for_user'], $context['member']['name']), '
+			<span class="hdicon cat_img_profile">', sprintf($txt['profile_viewwarning_for_user'], $context['member']['name']), '</span>
 		</h2>
 		<p class="description">', $txt['viewWarning_help'], '</p>
 		<div class="windowbg">
@@ -579,7 +578,7 @@ function template_profile_block_summary()
 	echo '
 			<div class="profileblock_left">
 				<h3 class="category_header">
-					<img src="', $settings['images_url'], '/icons/profile_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_summary'] . ' - ' . $context['member']['name'] . '</a>' : ($txt['profile_user_summary'] . ' - ' . $context['member']['name']), '
+					<span class="hdicon cat_img_profile">', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_summary'] . ' - ' . $context['member']['name'] . '</a>' : ($txt['profile_user_summary'] . ' - ' . $context['member']['name']), '</span>
 				</h3>
 				<div id="basicinfo">
 					<div class="username">
@@ -667,7 +666,7 @@ function template_profile_block_user_info()
 	echo '
 		<div class="profileblock_right">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/stats_info_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '
+				<span class="hdicon cat_img_stats_info">', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_user_info'] . '</a>' : $txt['profile_user_info'], '</span>
 			</h3>
 			<div class="profileblock">
 					<dl>';
@@ -754,7 +753,7 @@ function template_profile_block_contact()
 	echo '
 		<div class="profileblock_left">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/contacts_hd.png" alt="" class="icon"/>', $txt['profile_contact'], '
+				<span class="hdicon cat_img_contacts">', $txt['profile_contact'], '</span>
 			</h3>
 			<div class="profileblock">
 				<dl>';
@@ -869,12 +868,12 @@ function template_profile_block_contact()
  */
 function template_profile_block_other_info()
 {
-	global $txt, $context, $settings, $scripturl;
+	global $txt, $context, $scripturl;
 
 	echo '
 		<div class="profileblock_right">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/write_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '
+				<span class="hdicon cat_img_write">', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_more'] . '</a>' : $txt['profile_more'], '</span>
 			</h3>
 			<div class="profileblock">';
 
@@ -936,12 +935,12 @@ function template_profile_block_other_info()
  */
 function template_profile_block_user_customprofileinfo()
 {
-	global $txt, $context, $settings, $scripturl;
+	global $txt, $context, $scripturl;
 
 	echo '
 		<div class="profileblock_left">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/plus_hd.png" alt="" class="icon"/>', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '
+				<span class="hdicon cat_img_plus">', ($context['user']['is_owner']) ? '<a href="' . $scripturl . '?action=profile;area=forumprofile;u=' . $context['member']['id'] . '">' . $txt['profile_info'] . '</a>' : $txt['profile_info'], '</span>
 			</h3>
 			<div class="profileblock">';
 
@@ -988,7 +987,7 @@ function template_profile_block_user_customprofileinfo()
  */
 function template_profile_block_moderation()
 {
-	global $txt, $context, $scripturl, $settings;
+	global $txt, $context, $scripturl;
 
 	// Can they view warnings or approve members if so only show this if we needed
 	if (($context['can_view_warning'] && $context['member']['warning']) || (!empty($context['activate_message']) || !empty($context['member']['bans'])))
@@ -996,7 +995,7 @@ function template_profile_block_moderation()
 		echo '
 		<div class="profileblock_right">
 			<h3 class="category_header">
-				<img src="', $settings['images_url'], '/icons/moderation_hd.png" alt="" class="icon"/>', $txt['profile_moderation'], '
+				<span class="hdicon cat_img_moderation">', $txt['profile_moderation'], '</span>
 			</h3>
 			<div class="profileblock">';
 
@@ -1079,7 +1078,7 @@ function template_profile_block_buddies()
 	{
 		echo '
 		<h3 class="category_header">
-			<img src="', $settings['images_url'], '/icons/buddies_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
+			<span class="hdicon cat_img_buddies"><a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a></span>
 		</h3>
 		<div class="windowbg">
 			<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px"' : ''), '>
@@ -1146,7 +1145,7 @@ function template_profile_block_buddies()
  */
 function template_profile_block_attachments()
 {
-	global $settings, $txt, $context, $scripturl;
+	global $txt, $context, $scripturl;
 
 	// Init
 	$i = 0;
@@ -1155,7 +1154,7 @@ function template_profile_block_attachments()
 	// The attachment div
 	echo '
 	<h3 class="category_header">
-		<img src="', $settings['images_url'], '/icons/attachments_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=attach;u=', $context['member']['id'], '">', $txt['profile_attachments'], '</a>
+		<span class="hdicon cat_img_attachments"><a href="', $scripturl, '?action=profile;area=showposts;sa=attach;u=', $context['member']['id'], '">', $txt['profile_attachments'], '</a></span>
 	</h3>
 	<div class="windowbg">
 		<div class="content">
@@ -1211,12 +1210,12 @@ function template_profile_block_attachments()
  */
 function template_profile_block_posts()
 {
-	global $settings, $txt, $context, $scripturl;
+	global $txt, $context, $scripturl;
 
 	// The posts block
 	echo '
 	<h3 class="category_header">
-		<img src="', $settings['images_url'], '/icons/posts_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_posts'], '</a>
+		<span class="hdicon cat_img_posts"><a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_posts'], '</a></span>
 	</h3>
 	<div class="windowbg">
 		<div class="content">
@@ -1262,12 +1261,12 @@ function template_profile_block_posts()
  */
 function template_profile_block_topics()
 {
-	global $settings, $txt, $context, $scripturl;
+	global $txt, $context, $scripturl;
 
 	// The topics block
 	echo '
 	<h3 class="category_header">
-		<img src="', $settings['images_url'], '/icons/topics_hd.png" alt="" class="icon"/><a href="', $scripturl, '?action=profile;area=showposts;sa=topics;u=', $context['member']['id'], '">', $txt['profile_topics'], '</a>
+		<span class="hdicon cat_img_topics"><a href="', $scripturl, '?action=profile;area=showposts;sa=topics;u=', $context['member']['id'], '">', $txt['profile_topics'], '</a></span>
 	</h3>
 	<div class="windowbg">
 		<div class="content">

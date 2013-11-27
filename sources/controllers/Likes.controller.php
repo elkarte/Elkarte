@@ -276,7 +276,7 @@ class Likes_Controller extends Action_Controller
 		// Menu tabs
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['likes_given'],
-			'icon' => 'profile_hd.png',
+			'class' => 'star',
 		);
 
 		// Set the context values
@@ -381,7 +381,7 @@ class Likes_Controller extends Action_Controller
 		// Menu tabs
 		$context[$context['profile_menu_name']]['tab_data'] = array(
 			'title' => $txt['likes_received'],
-			'icon' => 'profile_hd.png',
+			'class' => 'star',
 		);
 
 		// Set the context values
