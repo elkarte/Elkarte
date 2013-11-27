@@ -445,3 +445,20 @@ function onReceiveOpener(text)
 {
 	$('#' + post_box_name).data("sceditor").insert(text);
 }
+
+/**
+ * The actual message icon selector, shows the chosen icon on the post screen
+ */
+function showimage()
+{
+	document.images.icons.src = icon_urls[document.forms.postmodify.icon.options[document.forms.postmodify.icon.selectedIndex].value];
+}
+
+/**
+ * When using Go Back due to fatal_error, allows the form to be re-submitted with change
+ * Done as a pageshow event listener for FF only
+ */
+function reActivate()
+{
+	document.forms.postmodify.message.readOnly = false;
+}

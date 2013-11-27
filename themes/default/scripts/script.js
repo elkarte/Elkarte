@@ -769,8 +769,8 @@ function smc_preCacheImage(sSrc)
 
 /**
  * smc_Cookie class.
- * @param {type} oOptions
- * @returns {smc_Cookie}
+ *
+ * @param {object} oOptions
  */
 function smc_Cookie(oOptions)
 {
@@ -1421,6 +1421,7 @@ IconList.prototype.collapseList = function()
 
 /**
  * Short function for finding the actual screen position of an item.
+ * Used for example to position the suggest member name box
  *
  * @param {object} itemHandle
  */
@@ -1583,23 +1584,6 @@ function applyWindowClasses(oList)
 		oListItems[i].className = "windowbg" + (bAlternate ? "2" : "");
 		bAlternate = !bAlternate;
 	}
-}
-
-/**
- * When using Go Back due to fatal_error, allows the form to be re-submitted with change
- * Done as a pageshow event listener for FF only
- */
-function reActivate()
-{
-	document.forms.postmodify.message.readOnly = false;
-}
-
-/**
- * The actual message icon selector, shows the chosen icon on the post screen
- */
-function showimage()
-{
-	document.images.icons.src = icon_urls[document.forms.postmodify.icon.options[document.forms.postmodify.icon.selectedIndex].value];
 }
 
 /**
