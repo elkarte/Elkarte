@@ -3249,6 +3249,9 @@ function template_admin_warning_above()
 			}
 		}
 
+		if (!empty($context['security_controls']['files']['theme_dir']))
+			echo $context['security_controls']['files']['theme_dir'] . '<br />';
+
 		if (!empty($context['security_controls']['files']['cache']))
 			echo '
 			<strong>', $txt['cache_writable'], '</strong><br />';
