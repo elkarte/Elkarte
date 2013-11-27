@@ -1236,10 +1236,17 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		};
 };
 
+/**
+ * IconList object.
+ *
+ * Allows clicking on a icon to expand out the available options to change
+ * Change is done via ajax
+ * Used for topic icon and member group icon selections
+ *
+ * @param {object} oOptions
+ */
 // A global array containing all IconList objects.
 var aIconLists = new Array();
-
-// *** IconList object.
 function IconList(oOptions)
 {
 	if (!window.XMLHttpRequest)
@@ -1270,7 +1277,7 @@ IconList.prototype.initIcons = function ()
 	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
 			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 0 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: ' + (is_ie ? '0 2px' : '0 2px') + ';" /></div>');
-}
+};
 
 // Event for the mouse hovering over the original icon.
 IconList.prototype.onBoxHover = function (oDiv, bMouseOver)
@@ -1278,7 +1285,7 @@ IconList.prototype.onBoxHover = function (oDiv, bMouseOver)
 	oDiv.style.border = bMouseOver ? this.opt.iBoxBorderWidthHover + 'px solid ' + this.opt.sBoxBorderColorHover : '';
 	oDiv.style.background = bMouseOver ? this.opt.sBoxBackgroundHover : this.opt.sBoxBackground;
 	oDiv.style.padding = bMouseOver ? (2 - this.opt.iBoxBorderWidthHover) + 'px' : '2px';
-}
+};
 
 // Show the list of icons after the user clicked the original icon.
 IconList.prototype.openPopup = function (oDiv, iMessageId)
@@ -1316,7 +1323,7 @@ IconList.prototype.openPopup = function (oDiv, iMessageId)
 		this.oContainerDiv.style.display = 'block';
 
 	document.body.addEventListener('mousedown', this.onWindowMouseDown, false);
-}
+};
 
 // Setup the list of icons once it is received through xmlHTTP.
 IconList.prototype.onIconsReceived = function (oXMLDoc)
@@ -1335,7 +1342,7 @@ IconList.prototype.onIconsReceived = function (oXMLDoc)
 		this.oContainerDiv.style.width = this.oContainerDiv.clientWidth + 'px';
 
 	ajax_indicator(false);
-}
+};
 
 // Event handler for hovering over the icons.
 IconList.prototype.onItemHover = function (oDiv, bMouseOver)
@@ -1348,7 +1355,7 @@ IconList.prototype.onItemHover = function (oDiv, bMouseOver)
 		this.onBoxHover(this.oClickedIcon, true);
 	else
 		this.iCurTimeout = window.setTimeout(this.opt.sBackReference + '.collapseList();', 500);
-}
+};
 
 // Event handler for clicking on one of the icons.
 IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
@@ -1376,7 +1383,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		if ('sLabelIconBox' in this.opt)
 			document.getElementById(this.opt.sLabelIconBox).value = sNewIcon;
 	}
-}
+};
 
 // Event handler for clicking outside the list (will make the list disappear).
 IconList.prototype.onWindowMouseDown = function ()
@@ -1387,7 +1394,7 @@ IconList.prototype.onWindowMouseDown = function ()
 		aIconLists[i].funcParent.tmpMethod();
 		delete aIconLists[i].funcParent.tmpMethod;
 	}
-}
+};
 
 // Collapse the list of icons.
 IconList.prototype.collapseList = function()
@@ -1396,7 +1403,7 @@ IconList.prototype.collapseList = function()
 	this.oContainerDiv.style.display = 'none';
 	this.iCurMessageId = 0;
 	document.body.removeEventListener('mousedown', this.onWindowMouseDown, false);
-}
+};
 
 // Handy shortcuts for getting the mouse position on the screen - only used for IE at the moment.
 function elk_mousePose(oEvent)
