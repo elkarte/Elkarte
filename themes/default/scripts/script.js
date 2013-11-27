@@ -358,7 +358,13 @@ smc_Popup.prototype.hide = function ()
 	return false;
 };
 
-// Replaces the currently selected text with the passed text.
+/**
+ * Replaces the currently selected text with the passed text.
+ * Used by topic.js when inserting a quote into the plain text quick reply (not the editor QR)
+ *
+ * @param {string} text
+ * @param {object} oTextHandle
+ */
 function replaceText(text, oTextHandle)
 {
 	// Attempt to create a text range (IE).
@@ -366,15 +372,15 @@ function replaceText(text, oTextHandle)
 	{
 		var caretPos = oTextHandle.caretPos;
 
-		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? text + ' ' : text;
+		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) === ' ' ? text + ' ' : text;
 		caretPos.select();
 	}
 	// Mozilla text range replace.
 	else if ('selectionStart' in oTextHandle)
 	{
-		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart);
-		var end = oTextHandle.value.substr(oTextHandle.selectionEnd);
-		var scrollPos = oTextHandle.scrollTop;
+		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
+			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
+			scrollPos = oTextHandle.scrollTop;
 
 		oTextHandle.value = begin + text + end;
 
@@ -394,7 +400,13 @@ function replaceText(text, oTextHandle)
 	}
 }
 
-// Surrounds the selected text with text1 and text2.
+/**
+ * Surrounds the selected text with text1 and text2.
+ *
+ * @param {type} text1
+ * @param {type} text2
+ * @param {type} oTextHandle
+ */
 function surroundText(text1, text2, oTextHandle)
 {
 	// Can a text range be created?
