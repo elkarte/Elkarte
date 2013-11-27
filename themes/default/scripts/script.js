@@ -1136,10 +1136,13 @@ function grabJumpToContent(elem)
 	elem.focus();
 }
 
+/**
+ * JumpTo class.
+ * @param {type} oJumpToOptions
+ * @returns {JumpTo}
+ */
 // This'll contain all JumpTo objects on the page.
 var aJumpTo = new Array();
-
-// *** JumpTo class.
 function JumpTo(oJumpToOptions)
 {
 	this.opt = oJumpToOptions;
@@ -1153,17 +1156,16 @@ JumpTo.prototype.showSelect = function ()
 	var sChildLevelPrefix = '';
 	for (var i = this.opt.iCurBoardChildLevel; i > 0; i--)
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
-	setInnerHTML(document.getElementById(this.opt.sContainerId), this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : '')));
+	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : 0) + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sBoardPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
-}
+};
 
 // Fill the jump to box with entries. Method of the JumpTo class.
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
-	var iIndexPointer = 0;
-
 	// Create an option that'll be above and below the category.
 	var oDashOption = document.createElement('option');
+
 	oDashOption.appendChild(document.createTextNode(this.opt.sCatSeparator));
 	oDashOption.disabled = 'disabled';
 	oDashOption.value = '';
@@ -1182,10 +1184,13 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	// Loop through all items to be added.
 	for (var i = 0, n = aBoardsAndCategories.length; i < n; i++)
 	{
-		var j, sChildLevelPrefix, oOption;
+		var j,
+			sChildLevelPrefix,
+			oOption,
+			oText;
 
 		// If we've reached the currently selected board add all items so far.
-		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id == this.opt.iCurBoardId)
+		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id === this.opt.iCurBoardId)
 		{
 				this.dropdownList.insertBefore(oListFragment, this.dropdownList.options[0]);
 				oListFragment = document.createDocumentFragment();
@@ -1195,11 +1200,16 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		if (aBoardsAndCategories[i].isCategory)
 			oListFragment.appendChild(oDashOption.cloneNode(true));
 		else
+		{
 			for (j = aBoardsAndCategories[i].childLevel, sChildLevelPrefix = ''; j > 0; j--)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
+		}
 
 		oOption = document.createElement('option');
-		oOption.appendChild(document.createTextNode((aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix + this.opt.sBoardPrefix) + aBoardsAndCategories[i].name));
+		oText = document.createElement('span');
+		oText.innerHTML = (aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix + this.opt.sBoardPrefix) + aBoardsAndCategories[i].name;
+		oOption.appendChild(oText);
+
 		if (!this.opt.bNoRedirect)
 			oOption.value = aBoardsAndCategories[i].isCategory ? '#c' + aBoardsAndCategories[i].id : '?board=' + aBoardsAndCategories[i].id + '.0';
 		else
@@ -1222,9 +1232,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	if (!this.opt.bNoRedirect)
 		this.dropdownList.onchange = function() {
 			if (this.selectedIndex > 0 && this.options[this.selectedIndex].value)
-				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') == -1 || this.options[this.selectedIndex].value.substr(0, 1) != '?' ? 0 : 1);
-		}
-}
+				window.location.href = elk_scripturl + this.options[this.selectedIndex].value.substr(elk_scripturl.indexOf('?') === -1 || this.options[this.selectedIndex].value.substr(0, 1) !== '?' ? 0 : 1);
+		};
+};
 
 // A global array containing all IconList objects.
 var aIconLists = new Array();
