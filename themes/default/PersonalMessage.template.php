@@ -811,7 +811,7 @@ function template_send()
 
 	// Main message editing box.
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'message\']);">
+	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" id="pmFolder" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
 		<div class="forumposts">
 			<h3 class="category_header">
 					<img src="', $settings['images_url'], '/icons/inbox_hd.png" class="icon" alt="', $txt['new_message'], '" title="', $txt['new_message'], '" />&nbsp;', $txt['new_message'], '
@@ -944,7 +944,7 @@ function template_send()
 	echo '
 		<script><!-- // --><![CDATA[
 			var post_box_name = "', $context['post_box_name'], '";
-			var form_name = "postmodify";
+			var form_name = "pmFolder";
 			var preview_area = "pm";
 			var txt_preview_title = "', $txt['preview_title'], '";
 			var txt_preview_fetch = "', $txt['preview_fetch'], '";';
