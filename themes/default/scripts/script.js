@@ -1478,11 +1478,6 @@ function addLoadEvent(fNewOnload)
 		aOnloadEvents[aOnloadEvents.length] = fNewOnload;
 }
 
-function elkFooterHighlight(element, value)
-{
-	element.src = elk_images_url + '/' + (value ? 'h_' : '') + element.id + '.png';
-}
-
 // Get the text in a code tag.
 function elkSelectText(oCurElement, bActOnElement)
 {
