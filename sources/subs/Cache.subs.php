@@ -185,7 +185,7 @@ function cache_put_data($key, $value, $ttl = 120)
 
 				// Write out the cache file, check that the cache write was successful; all the data must be written
 				// If it fails due to low diskspace, or other, remove the cache file
-				if (file_put_contents(CACHEDIR . '/data_' . $key . '.php', $cache_data, LOCK_EX) !== strlen($cache_data))
+				if (@file_put_contents(CACHEDIR . '/data_' . $key . '.php', $cache_data, LOCK_EX) !== strlen($cache_data))
 					@unlink(CACHEDIR . '/data_' . $key . '.php');
 			}
 			break;
