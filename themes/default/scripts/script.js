@@ -1405,7 +1405,11 @@ IconList.prototype.collapseList = function()
 	document.body.removeEventListener('mousedown', this.onWindowMouseDown, false);
 };
 
-// Short function for finding the actual position of an item.
+/**
+ * Short function for finding the actual screen position of an item.
+ *
+ * @param {object} itemHandle
+ */
 function elk_itemPos(itemHandle)
 {
 	var itemX = 0;
@@ -1415,7 +1419,8 @@ function elk_itemPos(itemHandle)
 	{
 		itemX = itemHandle.offsetLeft;
 		itemY = itemHandle.offsetTop;
-		while (itemHandle.offsetParent && typeof(itemHandle.offsetParent) == 'object')
+
+		while (itemHandle.offsetParent && typeof(itemHandle.offsetParent) === 'object')
 		{
 			itemHandle = itemHandle.offsetParent;
 			itemX += itemHandle.offsetLeft;
@@ -1431,35 +1436,43 @@ function elk_itemPos(itemHandle)
 	return [itemX, itemY];
 }
 
-// This function takes the script URL and prepares it to allow the query string to be appended to it.
+/**
+ * This function takes the script URL and prepares it to allow the query string to be appended to it.
+ *
+ * @param {string} sUrl
+ */
 function elk_prepareScriptUrl(sUrl)
 {
-	return sUrl.indexOf('?') == -1 ? sUrl + '?' : sUrl + (sUrl.charAt(sUrl.length - 1) == '?' || sUrl.charAt(sUrl.length - 1) == '&' || sUrl.charAt(sUrl.length - 1) == ';' ? '' : ';');
+	return sUrl.indexOf('?') === -1 ? sUrl + '?' : sUrl + (sUrl.charAt(sUrl.length - 1) === '?' || sUrl.charAt(sUrl.length - 1) === '&' || sUrl.charAt(sUrl.length - 1) === ';' ? '' : ';');
 }
 
+/**
+ * Load Event function, adds new events to the window onload control
+ *
+ * @param {object} fNewOnload function object or string to call
+ * @type Array
+ */
 var aOnloadEvents = new Array();
 function addLoadEvent(fNewOnload)
 {
 	// If there's no event set, just set this one
-	if (typeof(fNewOnload) == 'function' && (!('onload' in window) || typeof(window.onload) != 'function'))
+	if (typeof(fNewOnload) === 'function' && (!('onload' in window) || typeof(window.onload) !== 'function'))
 		window.onload = fNewOnload;
-
 	// If there's just one event, setup the array.
-	else if (aOnloadEvents.length == 0)
+	else if (aOnloadEvents.length === 0)
 	{
 		aOnloadEvents[0] = window.onload;
 		aOnloadEvents[1] = fNewOnload;
 		window.onload = function() {
 			for (var i = 0, n = aOnloadEvents.length; i < n; i++)
 			{
-				if (typeof(aOnloadEvents[i]) == 'function')
+				if (typeof(aOnloadEvents[i]) === 'function')
 					aOnloadEvents[i]();
-				else if (typeof(aOnloadEvents[i]) == 'string')
+				else if (typeof(aOnloadEvents[i]) === 'string')
 					eval(aOnloadEvents[i]);
 			}
-		}
+		};
 	}
-
 	// This isn't the first event function, add it to the list.
 	else
 		aOnloadEvents[aOnloadEvents.length] = fNewOnload;
