@@ -400,61 +400,6 @@ function replaceText(text, oTextHandle)
 	}
 }
 
-/**
- * Surrounds the selected text with text1 and text2.
- *
- * @param {type} text1
- * @param {type} text2
- * @param {type} oTextHandle
- */
-function surroundText(text1, text2, oTextHandle)
-{
-	// Can a text range be created?
-	if ('caretPos' in oTextHandle && 'createTextRange' in oTextHandle)
-	{
-		var caretPos = oTextHandle.caretPos, temp_length = caretPos.text.length;
-
-		caretPos.text = caretPos.text.charAt(caretPos.text.length - 1) == ' ' ? text1 + caretPos.text + text2 + ' ' : text1 + caretPos.text + text2;
-
-		if (temp_length == 0)
-		{
-			caretPos.moveStart('character', -text2.length);
-			caretPos.moveEnd('character', -text2.length);
-			caretPos.select();
-		}
-		else
-			oTextHandle.focus(caretPos);
-	}
-	// Mozilla text range wrap.
-	else if ('selectionStart' in oTextHandle)
-	{
-		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart);
-		var selection = oTextHandle.value.substr(oTextHandle.selectionStart, oTextHandle.selectionEnd - oTextHandle.selectionStart);
-		var end = oTextHandle.value.substr(oTextHandle.selectionEnd);
-		var newCursorPos = oTextHandle.selectionStart;
-		var scrollPos = oTextHandle.scrollTop;
-
-		oTextHandle.value = begin + text1 + selection + text2 + end;
-
-		if (oTextHandle.setSelectionRange)
-		{
-			var goForward = is_opera ? text1.match(/\n/g).length : 0, goForwardAll = is_opera ? (text1 + text2).match(/\n/g).length : 0;
-			if (selection.length == 0)
-				oTextHandle.setSelectionRange(newCursorPos + text1.length + goForward, newCursorPos + text1.length + goForward);
-			else
-				oTextHandle.setSelectionRange(newCursorPos, newCursorPos + text1.length + selection.length + text2.length + goForwardAll);
-			oTextHandle.focus();
-		}
-		oTextHandle.scrollTop = scrollPos;
-	}
-	// Just put them on the end, then.
-	else
-	{
-		oTextHandle.value += text1 + text2;
-		oTextHandle.focus(oTextHandle.value.length - 1);
-	}
-}
-
 // Checks if the passed input's value is nothing.
 function isEmptyText(theField)
 {
