@@ -555,7 +555,7 @@ div.windowbg, div.windowbg2 {
 .warn_mute {
 	color: red;
 }
-.warn_moderate {
+.warn_moderate, .softalert {
 	color: #ffa500;
 }
 .warn_watch, .success {
@@ -3953,6 +3953,11 @@ a.help .icon {
 	text-decoration: underline;
 }
 
+.ban_cannot_post {
+	margin: 2ex;
+	padding: 2ex;
+	border: 2px dashed;
+}
 
 
 
