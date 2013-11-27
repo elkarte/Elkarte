@@ -1405,26 +1405,6 @@ IconList.prototype.collapseList = function()
 	document.body.removeEventListener('mousedown', this.onWindowMouseDown, false);
 };
 
-// Handy shortcuts for getting the mouse position on the screen - only used for IE at the moment.
-function elk_mousePose(oEvent)
-{
-	var x = 0;
-	var y = 0;
-
-	if (oEvent.pageX)
-	{
-		y = oEvent.pageY;
-		x = oEvent.pageX;
-	}
-	else if (oEvent.clientX)
-	{
-		x = oEvent.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-		y = oEvent.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
-	}
-
-	return [x, y];
-}
-
 // Short function for finding the actual position of an item.
 function elk_itemPos(itemHandle)
 {
