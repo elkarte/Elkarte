@@ -125,6 +125,12 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 	return true;
 }
 
+/**
+ * All of our specialized string handeling functions are defined here
+ * php_to8bit, php_strtr, php_strtolower, php_urlencode, php_htmlspecialchars
+ * php_unhtmlspecialchars, php_addslashes, removeEntities, easyReplace
+ */
+
 // A property we'll be needing for php_to8bit.
 String.prototype.oCharsetConversion = {
 	from: '',
@@ -154,53 +160,83 @@ String.prototype.php_to8bit = function ()
 	return sReturn;
 };
 
-// Character-level replacement function.
+/**
+ * Character-level replacement function.
+ * @param {string} sFrom
+ * @param {string} sTo
+ */
 String.prototype.php_strtr = function (sFrom, sTo)
 {
 	return this.replace(new RegExp('[' + sFrom + ']', 'g'), function (sMatch) {
 		return sTo.charAt(sFrom.indexOf(sMatch));
 	});
-}
+};
 
-// Simulate PHP's strtolower (in SOME cases PHP uses ISO-8859-1 case folding).
+/**
+ * Simulate PHP's strtolower (in SOME cases PHP uses ISO-8859-1 case folding).
+ * @returns {String.prototype@call;php_strtr}
+ */
 String.prototype.php_strtolower = function ()
 {
 	return typeof(elk_iso_case_folding) == 'boolean' && elk_iso_case_folding == true ? this.php_strtr(
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZ\x8a\x8c\x8e\x9f\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde',
 		'abcdefghijklmnopqrstuvwxyz\x9a\x9c\x9e\xff\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe'
 	) : this.php_strtr('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
-}
+};
 
+/**
+ * Simulate php's urlencode function
+ */
 String.prototype.php_urlencode = function()
 {
 	return escape(this).replace(/\+/g, '%2b').replace('*', '%2a').replace('/', '%2f').replace('@', '%40');
-}
+};
 
+/**
+ * Simulate php htmlspecialchars function
+ */
 String.prototype.php_htmlspecialchars = function()
 {
 	return this.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
+};
 
+/**
+ * Simulate php unhtmlspecialchars function
+ */
 String.prototype.php_unhtmlspecialchars = function()
 {
 	return this.replace(/&quot;/g, '"').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
-}
+};
 
+/**
+ * Simulate php addslashes function
+ */
 String.prototype.php_addslashes = function()
 {
 	return this.replace(/\\/g, '\\\\').replace(/'/g, '\\\'');
-}
+};
 
+/**
+ * Callback function for the removeEntities function
+ */
 String.prototype._replaceEntities = function(sInput, sDummy, sNum)
 {
 	return String.fromCharCode(parseInt(sNum));
-}
+};
 
+/**
+ * Removes entities from a string and replaces them with a charactercode
+ */
 String.prototype.removeEntities = function()
 {
 	return this.replace(/&(amp;)?#(\d+);/g, this._replaceEntities);
-}
+};
 
+/**
+ * String replace function, searches a string for x and replaces it with y
+ *
+ * @param {object} oReplacements object of search:replace terms
+ */
 String.prototype.easyReplace = function (oReplacements)
 {
 	var sResult = this;
@@ -208,9 +244,16 @@ String.prototype.easyReplace = function (oReplacements)
 		sResult = sResult.replace(new RegExp('%' + sSearch + '%', 'g'), oReplacements[sSearch]);
 
 	return sResult;
-}
+};
 
-// Open a new window
+/**
+ * Opens a new window
+ *
+ * @param {string} desktopURL
+ * @param {int} alternateWidth
+ * @param {int} alternateHeight
+ * @param {boolean} noScrollbars
+ */
 function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 {
 	if ((alternateWidth && self.screen.availWidth * 0.8 < alternateWidth) || (alternateHeight && self.screen.availHeight * 0.8 < alternateHeight))
@@ -220,7 +263,7 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 		alternateHeight = Math.min(alternateHeight, self.screen.availHeight * 0.8);
 	}
 	else
-		noScrollbars = typeof(noScrollbars) == 'boolean' && noScrollbars == true;
+		noScrollbars = typeof(noScrollbars) === 'boolean' && noScrollbars === true;
 
 	window.open(desktopURL, 'requested_popup', 'toolbar=no,location=no,status=no,menubar=no,scrollbars=' + (noScrollbars ? 'no' : 'yes') + ',width=' + (alternateWidth ? alternateWidth : 480) + ',height=' + (alternateHeight ? alternateHeight : 220) + ',resizable=no');
 
@@ -228,37 +271,47 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 	return false;
 }
 
-// Open a overlay div
+/**
+ * Open a overlay div on the screen
+ *
+ * @param {string} desktopURL
+ * @param {string} sHeader
+ * @param {string} sIcon
+ */
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>';
-	var sIcon = elk_images_url + '/' + (typeof(sIcon) == 'string' ? sIcon : 'helptopics.png');
-	var sHeader = typeof(sHeader) == 'string' ? sHeader : help_popup_heading_text;
+	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>',
+		sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png'),
+		sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
-	var oContainer = new smc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon});
-	var oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
+	var oContainer = new smc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon}),
+		oPopup_body = $('#' + oContainer.popup_id).find('.popup_content');
 
 	// Load the help page content (we just want the text to show)
 	$.ajax({
 		url: desktopURL,
 		type: "GET",
-		dataType: "html",
-		beforeSend: function () {
-		}
+		dataType: "html"
 	})
 	.done(function (data, textStatus, xhr) {
 		var help_content = $('<div id="temp_help">').html(data).find('a[href$="self.close();"]').hide().prev('br').hide().parent().html();
+
 		oPopup_body.html(help_content);
 	})
 	.fail(function (xhr, textStatus, errorThrown) {
 		oPopup_body.html(textStatus);
 	});
+
 	return false;
 }
 
-// *** smc_Popup class.
+/**
+ * smc_Popup class.
+ *
+ * @param {object} oOptions
+ */
 function smc_Popup(oOptions)
 {
 	this.opt = oOptions;
@@ -271,12 +324,13 @@ smc_Popup.prototype.show = function ()
 	popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
 	icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
 
-	// Create the div that will be shown - max-height added here - essential anyway, so better here than in the CSS.
+	// Create the div that will be shown - max-height added here - essential anyway,
+	// so better here than in the CSS.
 	// Mind you, I still haven't figured out why it should be essential. Cargo cult coding FTW. :P
 	// Create the div that will be shown
 	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup" title="Close"></a>' + icon + this.opt.heading + '</h3><div class="popup_content">' + this.opt.content + '</div></div></div>');
 
-	// Show it - Line 370 simplified - stuff moved to CSS file.
+	// Show it
 	this.popup_body = $('#' + this.popup_id).children('.popup_window');
 	this.popup_body.parent().fadeIn(300);
 
@@ -285,23 +339,31 @@ smc_Popup.prototype.show = function ()
 	$(document).mouseup(function (e) {
 		if ($('#' + popup_instance.popup_id).has(e.target).length === 0)
 			popup_instance.hide();
-	}).keyup(function(e){
-		if (e.keyCode == 27)
+	})
+	.keyup(function(e){
+		if (e.keyCode === 27)
 			popup_instance.hide();
 	});
+
 	$('#' + this.popup_id).find('.hide_popup').click(function (){ return popup_instance.hide(); });
 
 	return false;
-}
+};
 
+// Hide the popup
 smc_Popup.prototype.hide = function ()
 {
 	$('#' + this.popup_id).fadeOut(300, function(){ $(this).remove(); });
 
 	return false;
-}
+};
 
-// Remember the current position.
+/**
+ * Remember the current cursor position.
+ *
+ * @param {object} oTextHandle
+ * @returns {undefined}
+ */
 function storeCaret(oTextHandle)
 {
 	// Only bother if it will be useful.
