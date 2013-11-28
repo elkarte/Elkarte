@@ -190,6 +190,7 @@ class Topic_Controller extends Action_Controller
 		if (empty($topicinfo))
 			redirectexit();
 
+		// @todo this code is almost the same as the one in Display.controller.php
 		if ($is_poll)
 		{
 			loadLanguage('Post');
@@ -199,12 +200,14 @@ class Topic_Controller extends Action_Controller
 
 			// Get all the options, and calculate the total votes.
 			$pollOptions = pollOptionsForMember($topicinfo['id_poll'], $user_info['id']);
+
+			// Compute total votes.
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
-			foreach ($pollOptions as $row)
+			foreach ($pollOptions as $choice)
 			{
-				$realtotal += $row['votes'];
-				$pollinfo['has_voted'] |= $row['voted_this'] != -1;
+				$realtotal += $choice['votes'];
+				$pollinfo['has_voted'] |= $choice['voted_this'] != -1;
 			}
 
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
@@ -267,9 +270,9 @@ class Topic_Controller extends Action_Controller
 				'has_voted' => !empty($pollinfo['has_voted']),
 				'starter' => array(
 					'id' => $pollinfo['id_member'],
-					'name' => $topicinfo['poster_name'],
+					'name' => $pollinfo['poster_name'],
 					'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-					'link' => $pollinfo['id_member'] == 0 ? $topicinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $topicinfo['poster_name'] . '</a>'
+					'link' => $pollinfo['id_member'] == 0 ? $pollinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $pollinfo['poster_name'] . '</a>'
 				)
 			);
 
