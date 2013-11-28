@@ -3699,7 +3699,7 @@ a.help .icon {
 /* The actual pop-up wrapper. */
 .popup_window
 {
-	margin: 15% auto;
+	margin: 12% auto;
 	width: 480px;
 	border: 1px solid #777;
 	border-radius: 7px 7px 3px 3px;
@@ -3737,7 +3737,7 @@ a.help .icon {
 {
 	overflow: auto;
 	padding: 10px;
-	max-height: 20em;
+	max-height: 22em;
 	border: 1px solid #bbb;
 	border-bottom: 1px solid #ccc;
 	border-radius: 6px 6px 2px 2px;
@@ -4024,7 +4024,7 @@ a.help .icon {
 	height: 15pt;
 	border-radius: 3px;
 	background-color: #c1ffc1;
-	background-image: linear-gradient(to botttom, #c1ffc1 0%, green 100%);
+	background-image: linear-gradient(to bottom, #c1ffc1 0%, green 100%);
 }
 .progress_bar .blue_percent {
 	z-index: 1;
