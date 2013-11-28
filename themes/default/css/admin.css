@@ -72,11 +72,11 @@ div.quick_tasks {
 
 /* Maillist pages
 ---------------------------------------------*/
-.maillistaction {
+.listaction {
 	text-align: center;
 }
 /* @todo could it be a sprite? */
-.maillistaction img {
+.listaction img {
 	width:16px;
 	height:16px
 }

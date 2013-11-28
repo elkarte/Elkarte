@@ -242,7 +242,7 @@ class ManageMaillist_Controller extends Action_Controller
 								'id_email' => true,
 							),
 						),
-						'class' => 'maillistaction',
+						'class' => 'listaction',
 					),
 				),
 			),
