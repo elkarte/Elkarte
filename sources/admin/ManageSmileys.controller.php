@@ -885,14 +885,14 @@ class ManageSmileys_Controller extends Action_Controller
 					'picture' => array(
 						'data' => array(
 							'sprintf' => array(
-								'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifysmiley;smiley=%1$d"><img src="' . $modSettings['smileys_url'] . '/' . $modSettings['smiley_sets_default'] . '/%2$s" alt="%3$s" style="padding: 2px;" id="smiley%1$d" /><input type="hidden" name="smileys[%1$d][filename]" value="%2$s" /></a>',
+								'format' => '<a href="' . $scripturl . '?action=admin;area=smileys;sa=modifysmiley;smiley=%1$d"><img src="' . $modSettings['smileys_url'] . '/' . $modSettings['smiley_sets_default'] . '/%2$s" alt="%3$s" id="smiley%1$d" /><input type="hidden" name="smileys[%1$d][filename]" value="%2$s" /></a>',
 								'params' => array(
 									'id_smiley' => false,
 									'filename' => true,
 									'description' => true,
 								),
 							),
-							'class' => 'centertext',
+							'class' => 'imagecolumn',
 						),
 					),
 					'code' => array(

@@ -636,6 +636,12 @@ dl.settings dd.questions input {
 	display:none;
 }
 
+/* Styles for the manage smiley section.
+------------------------------------------------- */
+#smiley_list .imagecolumn { 
+padding: 7px 10px;
+}
+
 /* Styles for the manage members section.
 ------------------------------------------------- */
 
