@@ -70,6 +70,17 @@ div.quick_tasks {
 	margin: 4px 0 8px 0;
 }
 
+/* Maillist pages
+---------------------------------------------*/
+.maillistaction {
+	text-align: center;
+}
+/* @todo could it be a sprite? */
+.maillistaction img {
+	width:16px;
+	height:16px
+}
+
 /* Newsletters screen.
 ---------------------------------------------*/
 #admin_newsletters .information {
