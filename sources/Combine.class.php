@@ -78,13 +78,11 @@ class Site_Combiner
 	/**
 	 * Nothing much to do but start
 	 */
-	public function __construct()
+	public function __construct($cachedir, $cacheurl)
 	{
-		global $boardurl;
-
 		// init
-		$this->_archive_dir = CACHEDIR;
-		$this->_archive_url = $boardurl . '/cache';
+		$this->_archive_dir = $cachedir;
+		$this->_archive_url = $cacheurl;
 	}
 
 	/**
@@ -95,8 +93,8 @@ class Site_Combiner
 	 */
 	public function site_js_combine($files, $do_defered)
 	{
-		// No files or missing directory then we are done
-		if (empty($files) || !file_exists($this->_archive_dir))
+		// No files or missing or not writable directory then we are done
+		if (empty($files) || !file_exists($this->_archive_dir) || !is_writable($this->_archive_dir))
 			return false;
 
 		// Get the filenames and last modified time for this batch

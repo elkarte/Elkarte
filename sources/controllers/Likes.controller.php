@@ -115,7 +115,7 @@ class Likes_Controller extends Action_Controller
 					$mentions->setData(array(
 						'id_member' => $liked_message['id_member'],
 						'type' => 'rlike',
-						'msg' => $id_liked,
+						'id_msg' => $id_liked,
 					));
 					$mentions->action_add();
 				}

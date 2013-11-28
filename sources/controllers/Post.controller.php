@@ -36,6 +36,7 @@ class Post_Controller extends Action_Controller
 	{
 		// figure out the right action to do.
 		// hint: I'm post controller. :P
+		$this->action_post();
 	}
 
 	/**

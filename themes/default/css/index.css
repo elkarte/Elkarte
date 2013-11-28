@@ -588,7 +588,7 @@ div.windowbg, div.windowbg2 {
 .warn_mute {
 	color: red;
 }
-.warn_moderate {
+.warn_moderate, .softalert {
 	color: #ffa500;
 }
 .warn_watch, .success {
@@ -1835,6 +1835,10 @@ dl.settings textarea {
 	width: 95%;
 	font-size: 0.857em;
 	border-collapse: collapse;
+}
+#ps_recentposts .norecent, #ps_recenttopics .norecent {
+	padding: 1em;
+	text-align: center;
 }
 #ic_recentposts td, #ic_recentposts th, #ps_recentposts td, #ps_recentposts th, #ps_recenttopics td, #ps_recenttopics th {
 	padding: 2px 4px;
@@ -3695,7 +3699,7 @@ a.help .icon {
 /* The actual pop-up wrapper. */
 .popup_window
 {
-	margin: 15% auto;
+	margin: 12% auto;
 	width: 480px;
 	border: 1px solid #777;
 	border-radius: 7px 7px 3px 3px;
@@ -3733,7 +3737,7 @@ a.help .icon {
 {
 	overflow: auto;
 	padding: 10px;
-	max-height: 20em;
+	max-height: 22em;
 	border: 1px solid #bbb;
 	border-bottom: 1px solid #ccc;
 	border-radius: 6px 6px 2px 2px;
@@ -3982,6 +3986,11 @@ a.help .icon {
 	text-decoration: underline;
 }
 
+.ban_cannot_post {
+	margin: 2ex;
+	padding: 2ex;
+	border: 2px dashed;
+}
 
 
 
@@ -4015,7 +4024,7 @@ a.help .icon {
 	height: 15pt;
 	border-radius: 3px;
 	background-color: #c1ffc1;
-	background-image: linear-gradient(to botttom, #c1ffc1 0%, green 100%);
+	background-image: linear-gradient(to bottom, #c1ffc1 0%, green 100%);
 }
 .progress_bar .blue_percent {
 	z-index: 1;

@@ -3060,7 +3060,7 @@ function template_footer()
  */
 function template_javascript($do_defered = false)
 {
-	global $context, $modSettings, $settings;
+	global $context, $modSettings, $settings, $boardurl;
 
 	// First up, load jquery
 	if (isset($modSettings['jquery_source']) && !$do_defered)
@@ -3103,13 +3103,13 @@ function template_javascript($do_defered = false)
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once(SOURCEDIR . '/Combine.class.php');
-			$combiner = new Site_Combiner;
+			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
-
-			if (!empty($combine_name))
-				echo '
-	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		}
+
+		if (!empty($combine_name))
+			echo '
+	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
 		else
 		{
 			// While we have Javascript files to place in the template
@@ -3174,7 +3174,7 @@ function template_javascript($do_defered = false)
  */
 function template_css()
 {
-	global $context, $modSettings;
+	global $context, $modSettings, $boardurl;
 
 	// Use this hook to work with CSS files pre output
 	call_integration_hook('pre_css_output');
@@ -3185,12 +3185,13 @@ function template_css()
 		if (!empty($modSettings['minify_css_js']))
 		{
 			require_once(SOURCEDIR . '/Combine.class.php');
-			$combiner = new Site_Combiner;
+			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
-			if (!empty($combine_name))
-				echo '
-	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
 		}
+
+		if (!empty($combine_name))
+			echo '
+	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
 		else
 		{
 			foreach ($context['css_files'] as $id => $file)
@@ -3204,7 +3205,7 @@ function template_css()
  * I know this is becoming annoying, though this template
  * *shall* be present for security reasons, so better it stays here
  *
- * @todo rework it and merge into some other kind of general warning-box (i.e. modtask at index.template)
+ * @todo rework it and merge into some other kind of general warning-box (e.g. modtask at index.template)
  */
 function template_admin_warning_above()
 {
@@ -3249,6 +3250,9 @@ function template_admin_warning_above()
 			}
 		}
 
+		if (!empty($context['security_controls']['files']['theme_dir']))
+			echo $context['security_controls']['files']['theme_dir'] . '<br />';
+
 		if (!empty($context['security_controls']['files']['cache']))
 			echo '
 			<strong>', $txt['cache_writable'], '</strong><br />';
@@ -3284,7 +3288,7 @@ function template_admin_warning_above()
 	if (isset($_SESSION['ban']['cannot_post']))
 	{
 		echo '
-			<div class="windowbg alert" style="margin: 2ex; padding: 2ex; border: 2px dashed red;">
+			<div class="windowbg ban_cannot_post">
 				', sprintf($txt['you_are_post_banned'], $user_info['is_guest'] ? $txt['guest_title'] : $user_info['name']);
 
 		if (!empty($_SESSION['ban']['cannot_post']['reason']))
