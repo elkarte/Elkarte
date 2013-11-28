@@ -467,7 +467,7 @@ em {
 .category_header .hdicon, .secondary_header .hdicon {
 	background-image: url(../images/icons/header.png);
 	background-repeat: no-repeat;
-	padding-left: 30px;
+	padding: 3px 0 3px 30px;
 }
 /* broke formatting for compactness */
 .cat_img_attachments {background-position: 0 0;}
