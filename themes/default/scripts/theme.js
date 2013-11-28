@@ -102,8 +102,8 @@ $(document).ready(function() {
 	});
 });
 
-// Adds a button to a certain button strip.
 /**
+ * Adds a button to the quick topic moderation after a checkbox is selected
  *
  * @param {type} sButtonStripId
  * @param {type} bUseImage
@@ -112,8 +112,8 @@ $(document).ready(function() {
  */
 function elk_addButton(sButtonStripId, bUseImage, oOptions)
 {
-	var oButtonStrip = document.getElementById(sButtonStripId);
-	var aItems = oButtonStrip.getElementsByTagName('span');
+	var oButtonStrip = document.getElementById(sButtonStripId),
+		aItems = oButtonStrip.getElementsByTagName('span');
 
 	// Remove the 'last' class from the last item.
 	if (aItems.length > 0)
