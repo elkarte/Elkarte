@@ -535,7 +535,9 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
-	var i, x = new Array();
+	var i,
+		x = new Array();
+
 	x[x.length] = 'subject=' + escape(document.forms.quickModForm['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
 	x[x.length] = 'message=' + escape(document.forms.quickModForm['message'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements['topic'].value);
@@ -845,7 +847,7 @@ function expandThumb(thumbID)
 }
 
 /**
- * Provides a way to toggle an ignored message(s) visability
+ * Provides a way to toggle an ignored message(s) visibility
  *
  * @param {array} msgids
  * @param {string} text
@@ -962,6 +964,7 @@ function addRequiredElem($this_form, classname, focused)
 
 /**
  * Send in the send topic form
+ *
  * @param {type} oPopup_body
  * @param {type} url
  * @param {type} oContainer
