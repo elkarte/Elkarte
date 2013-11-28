@@ -564,7 +564,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							global $txt;
 
-							return \'<span style="color: \' . ($rowData[\'writable\'] ? \'green\' : \'red\') . \';">\' . ($rowData[\'writable\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
+							return \'<span class="\' . ($rowData[\'writable\'] ? \'success\' : \'error\') . \';">\' . ($rowData[\'writable\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
 						'),
 					),
 				),
@@ -576,7 +576,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							global $txt;
 
-							return \'<span style="color: \' . ($rowData[\'version_compare\'] == \'older\' ? \'red\' : ($rowData[\'version_compare\'] == \'same\' ? \'orange\' : \'green\')) . \';">\' . $rowData[\'version\'] . \'</span>\';
+							return \'<span class="\' . ($rowData[\'version_compare\'] == \'older\' ? \'error\' : ($rowData[\'version_compare\'] == \'same\' ? \'softalert\' : \'success\')) . \';">\' . $rowData[\'version\'] . \'</span>\';
 						'),
 					),
 				),

@@ -464,7 +464,7 @@ class Reports_Controller extends Action_Controller
 
 			// Board permissions.
 			foreach ($boards as $board)
-				$group['board_' . $board['id']] = in_array($row['id_group'], $board['groups']) ? '<span class="success">' . $txt['board_perms_allow'] . '</span>' : (!empty($modSettings['deny_boards_access']) && in_array($row['id_group'], $board['deny_groups']) ? '<span class="alert">' . $txt['board_perms_deny'] . '</span>' : 'x');
+				$group['board_' . $board['id']] = in_array($row['id_group'], $board['groups']) ? '<span class="success">' . $txt['board_perms_allow'] . '</span>' : (!empty($modSettings['deny_boards_access']) && in_array($row['id_group'], $board['deny_groups']) ? '<span class="error">' . $txt['board_perms_deny'] . '</span>' : 'x');
 
 			addData($group);
 		}

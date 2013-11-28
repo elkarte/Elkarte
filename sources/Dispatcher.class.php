@@ -164,7 +164,7 @@ class Site_Dispatcher
 			'openidreturn' => array('OpenID.controller.php', 'OpenID_Controller', 'action_openidreturn'),
 			'xrds' => array('OpenID.controller.php', 'OpenID_Controller', 'action_xrds'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
-			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
+// 			'post' => array('Post.controller.php', 'Post_Controller', 'action_post'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
 			'profile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
 			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),

@@ -531,6 +531,9 @@ dl.settings dd.questions input {
 	margin: -10px 0 0;
 	padding: 6px 8px;
 }
+#attach_paths .input_text {
+	width: 100%;
+}
 #manage_boards ul {
 	margin: 0 0 12px;
 }

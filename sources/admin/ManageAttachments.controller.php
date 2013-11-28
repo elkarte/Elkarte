@@ -1416,7 +1416,7 @@ class ManageAttachments_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => create_function('$rowData', '
-							return \'<input type="hidden" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'" /><input type="text" size="40" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'"\' . (!empty($rowData[\'disable_base_dir\']) ? \' disabled="disabled"\' : \'\') . \' class="input_text" style="width: 100%" />\';
+							return \'<input type="hidden" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'" /><input type="text" size="40" name="dirs[\' . $rowData[\'id\'] . \']" value="\' . $rowData[\'path\'] . \'"\' . (!empty($rowData[\'disable_base_dir\']) ? \' disabled="disabled"\' : \'\') . \' class="input_text"/>\';
 						'),
 						'style' => 'width: 40%;',
 					),
