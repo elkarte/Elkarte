@@ -1593,7 +1593,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		updateRelativeTime();', true);
 
 	// Queue our Javascript
-	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'theme.js'));
+	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'script_elk.js', 'theme.js'));
 
 	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())

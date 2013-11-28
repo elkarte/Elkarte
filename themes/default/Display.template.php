@@ -514,7 +514,7 @@ function template_quickreply_below()
 	// Tooltips for likes
 	echo '
 			<script><!-- // --><![CDATA[
-				$(".likes").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
+				$(".like_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 			// ]]></script>';
 
 	// Quick moderation options
