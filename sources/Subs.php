@@ -2717,6 +2717,7 @@ function determineTopicClass(&$topic_context)
 		$topic_context['class'] .= '_sticky';
 
 	// This is so old themes will still work.
+	// @deprecated will be removed from 1.1 do not rely on it
 	$topic_context['extended_class'] = &$topic_context['class'];
 }
 

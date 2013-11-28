@@ -176,11 +176,12 @@ class Topic_Controller extends Action_Controller
 			fatal_lang_error('feature_disabled', false);
 		}
 
-		require_once(SUBSDIR . '/Poll.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Get the topic starter information.
-		$topicinfo = pollStarters($topic, true);
+		$topicinfo = getTopicInfo($topic, 'starter');
+
+		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
 
 		// Whatever happens don't index this.
 		$context['robot_no_index'] = true;
@@ -194,6 +195,7 @@ class Topic_Controller extends Action_Controller
 		if ($is_poll)
 		{
 			loadLanguage('Post');
+			require_once(SUBSDIR . '/Poll.subs.php');
 
 			// Get the question and if it's locked.
 			$pollinfo = pollInfo($topicinfo['id_poll']);
@@ -250,8 +252,6 @@ class Topic_Controller extends Action_Controller
 					unset($guestinfo, $guestvoted, $i);
 				}
 			}
-
-			$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
 
 			// Set up the basic poll information.
 			$context['poll'] = array(

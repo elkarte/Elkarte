@@ -46,7 +46,7 @@ class Display_Controller
 	{
 		global $scripturl, $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
-		global $attachments, $messages_request, $topicinfo, $language;
+		global $attachments, $messages_request, $language;
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
@@ -108,17 +108,12 @@ class Display_Controller
 			$_SESSION['last_read_topic'] = $topic;
 		}
 
-		$topic_parameters = array(
-			'member' => $user_info['id'],
-			'topic' => $topic,
-			'board' => $board,
-		);
 		$topic_selects = array();
 		$topic_tables = array();
 		call_integration_hook('integrate_display_topic', array(&$topic_selects, &$topic_tables, &$topic_parameters));
 
 		// Load the topic details
-		$topicinfo = getTopicInfo($topic_parameters, 'all', $topic_selects, $topic_tables);
+		$topicinfo = getTopicInfo($topic, 'all', $topic_selects, $topic_tables);
 		if (empty($topicinfo))
 			fatal_lang_error('not_a_topic', false);
 
@@ -565,7 +560,7 @@ class Display_Controller
 					'percent' => $bar,
 					'votes' => $option['votes'],
 					'voted_this' => $option['voted_this'] != -1,
-					'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12px" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
+					'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height: 12px" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
 					// Note: IE < 8 requires us to set a width on the container, too.
 					'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . ($bar * 3.5 + 4) . 'px;"><div style="width: ' . $bar * 3.5 . 'px;"></div></div>' : '<div class="bar"></div>',
 					'bar_width' => $barWide,
