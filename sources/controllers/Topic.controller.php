@@ -179,17 +179,18 @@ class Topic_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Poll.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		// Whatever happens don't index this.
-		$context['robot_no_index'] = true;
-
 		// Get the topic starter information.
 		$topicinfo = pollStarters($topic, true);
+
+		// Whatever happens don't index this.
+		$context['robot_no_index'] = true;
+		$is_poll = $topicinfo['id_poll'] > 0 && $modSettings['pollMode'] == '1' && allowedTo('poll_view');
 
 		// Redirect to the boardindex if no valid topic id is provided.
 		if (empty($topicinfo))
 			redirectexit();
 
-		if (!empty($topicinfo['id_poll']))
+		if ($is_poll)
 		{
 			loadLanguage('Post');
 
@@ -314,8 +315,9 @@ class Topic_Controller extends Action_Controller
 
 		// Lets "output" all that info.
 		loadTemplate('Printpage');
-		Template_Layers::getInstance()->removeAll();
-		Template_Layers::getInstance()->add('print');
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+		$template_layers->add('print');
 		$context['board_name'] = $board_info['name'];
 		$context['category_name'] = $board_info['cat']['name'];
 		$context['poster_name'] = $topicinfo['poster_name'];
