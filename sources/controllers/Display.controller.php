@@ -788,13 +788,18 @@ class Display_Controller
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 		if (!empty($context['drafts_save']))
 			loadLanguage('Drafts');
-		if (!empty($context['drafts_autosave']))
+		
+		if (!empty($context['drafts_autosave']) && empty($options['use_editor_quick_reply']))
 			loadJavascriptFile('drafts.js');
 
 		if (!empty($modSettings['mentions_enabled']))
 		{
 			$context['mentions_enabled'] = true;
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
+
+			// Just using the plain text box, not the editor
+			if (empty($options['use_editor_quick_reply']))
+				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.js'));
+
 			loadCSSFile('jquery.atwho.css');
 
 			addInlineJavascript('
