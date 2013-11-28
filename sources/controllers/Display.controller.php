@@ -432,9 +432,10 @@ class Display_Controller
 
 			// Get information on the poll
 			require_once(SUBSDIR . '/Poll.subs.php');
+			// Get the question and if it's locked.
 			$pollinfo = pollInfo($topicinfo['id_poll']);
 
-			// Get the poll options
+			// Get all the options, and calculate the total votes.
 			$pollOptions = pollOptionsForMember($topicinfo['id_poll'], $user_info['id']);
 
 			// Compute total votes.

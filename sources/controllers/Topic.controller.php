@@ -183,21 +183,21 @@ class Topic_Controller extends Action_Controller
 		$context['robot_no_index'] = true;
 
 		// Get the topic starter information.
-		$row = pollStarters($topic, true);
+		$topicinfo = pollStarters($topic, true);
 
 		// Redirect to the boardindex if no valid topic id is provided.
-		if (empty($row))
+		if (empty($topicinfo))
 			redirectexit();
 
-		if (!empty($row['id_poll']))
+		if (!empty($topicinfo['id_poll']))
 		{
 			loadLanguage('Post');
 
 			// Get the question and if it's locked.
-			$pollinfo = pollInfo($row['id_poll']);
+			$pollinfo = pollInfo($topicinfo['id_poll']);
 
 			// Get all the options, and calculate the total votes.
-			$pollOptions = pollOptionsForMember();
+			$pollOptions = pollOptionsForMember($topicinfo['id_poll'], $user_info['id']);
 			$realtotal = 0;
 			$pollinfo['has_voted'] = false;
 			foreach ($pollOptions as $row)
@@ -209,7 +209,7 @@ class Topic_Controller extends Action_Controller
 			// If this is a guest we need to do our best to work out if they have voted, and what they voted for.
 			if ($user_info['is_guest'] && $pollinfo['guest_vote'] && allowedTo('poll_vote'))
 			{
-				if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && strpos($_COOKIE['guest_poll_vote'], ';' . $row['id_poll'] . ',') !== false)
+				if (!empty($_COOKIE['guest_poll_vote']) && preg_match('~^[0-9,;]+$~', $_COOKIE['guest_poll_vote']) && strpos($_COOKIE['guest_poll_vote'], ';' . $topicinfo['id_poll'] . ',') !== false)
 				{
 					// ;id,timestamp,[vote,vote...]; etc
 					$guestinfo = explode(';', $_COOKIE['guest_poll_vote']);
@@ -218,7 +218,7 @@ class Topic_Controller extends Action_Controller
 					foreach ($guestinfo as $i => $guestvoted)
 					{
 						$guestvoted = explode(',', $guestvoted);
-						if ($guestvoted[0] == $row['id_poll'])
+						if ($guestvoted[0] == $topicinfo['id_poll'])
 							break;
 					}
 
@@ -247,11 +247,11 @@ class Topic_Controller extends Action_Controller
 				}
 			}
 
-			$context['user']['started'] = $user_info['id'] == $row['id_member'] && !$user_info['is_guest'];
+			$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
 
 			// Set up the basic poll information.
 			$context['poll'] = array(
-				'id' => $row['id_poll'],
+				'id' => $topicinfo['id_poll'],
 				'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
 				'question' => parse_bbc($pollinfo['question']),
 				'total_votes' => $pollinfo['total'],
@@ -266,9 +266,9 @@ class Topic_Controller extends Action_Controller
 				'has_voted' => !empty($pollinfo['has_voted']),
 				'starter' => array(
 					'id' => $pollinfo['id_member'],
-					'name' => $row['poster_name'],
+					'name' => $topicinfo['poster_name'],
 					'href' => $pollinfo['id_member'] == 0 ? '' : $scripturl . '?action=profile;u=' . $pollinfo['id_member'],
-					'link' => $pollinfo['id_member'] == 0 ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $row['poster_name'] . '</a>'
+					'link' => $pollinfo['id_member'] == 0 ? $topicinfo['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $pollinfo['id_member'] . '">' . $topicinfo['poster_name'] . '</a>'
 				)
 			);
 
@@ -318,8 +318,8 @@ class Topic_Controller extends Action_Controller
 		Template_Layers::getInstance()->add('print');
 		$context['board_name'] = $board_info['name'];
 		$context['category_name'] = $board_info['cat']['name'];
-		$context['poster_name'] = $row['poster_name'];
-		$context['post_time'] = relativeTime($row['poster_time'], false);
+		$context['poster_name'] = $topicinfo['poster_name'];
+		$context['post_time'] = relativeTime($topicinfo['poster_time'], false);
 		$context['parent_boards'] = array();
 		foreach ($board_info['parent_boards'] as $parent)
 			$context['parent_boards'][] = $parent['name'];
