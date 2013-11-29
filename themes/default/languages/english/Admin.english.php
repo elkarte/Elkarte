@@ -358,8 +358,6 @@ $txt['attachment_manager_settings'] = 'Attachment Settings';
 $txt['attachment_manager_avatar_settings'] = 'Avatar Settings';
 $txt['attachment_manager_browse'] = 'Browse Files';
 $txt['attachment_manager_maintenance'] = 'File Maintenance';
-$txt['attachment_manager_save'] = 'Save';
-
 $txt['attachmentEnable'] = 'Attachments mode';
 $txt['attachmentEnable_deactivate'] = 'Disable attachments';
 $txt['attachmentEnable_enable_all'] = 'Enable all attachments';
@@ -461,8 +459,8 @@ $txt['attachment_transfer_no_base'] = 'No base directories available.';
 $txt['attachment_transfer_forum_root'] = 'Forum root directory.';
 $txt['attachment_transfer_no_room'] = 'Directory size or file count limit reached.';
 $txt['attachment_transfer_no_find'] = 'No files were found to transfer.';
-$txt['attachments_transfered'] = '%1$d files were transfered to %2$s';
-$txt['attachments_not_transfered'] = '%1$d files were not transfered.';
+$txt['attachments_transfered'] = '%1$d files were transferred to %2$s';
+$txt['attachments_not_transfered'] = '%1$d files were not transferred.';
 $txt['attachment_transfer_no_dir'] = 'Either the source directory or one of the target options were not selected.';
 $txt['attachment_transfer_same_dir'] = 'You cannot select the same directory as both the source and target.';
 $txt['attachment_transfer_progress'] = 'Please wait. Transfer in progress.';
@@ -493,7 +491,7 @@ $txt['avatar_upload'] = 'Uploadable avatars';
 $txt['avatar_server_stored'] = 'Server-stored avatars';
 $txt['avatar_server_stored_groups'] = 'Member groups allowed to select a server stored avatar';
 $txt['avatar_upload_groups'] = 'Member groups allowed to upload an avatar to the server';
-$txt['avatar_external_url_groups'] = 'Member groups allowed to select an external URL';
+$txt['avatar_external_url_groups'] = 'Member groups allowed to select an avatar from an external URL';
 $txt['avatar_select_permission'] = 'Select permissions for each group';
 $txt['avatar_download_external'] = 'Download avatar at given URL';
 $txt['custom_avatar_enabled'] = 'Upload avatars to...';
@@ -527,8 +525,7 @@ $txt['attach_repair_files_without_attachment'] = '%1$d files do not have a corre
 
 $txt['news_title'] = 'News and Newsletters';
 $txt['news_settings_desc'] = 'Here you can change the settings and permissions related to news and newsletters.';
-$txt['news_settings_submit'] = 'Save';
-$txt['news_mailing_desc'] = 'From this menu you can send messages to all members who\'ve registered and entered their email addresses. You may edit the distribution list, or send messages to all. Useful for important update/news information.';
+$txt['news_mailing_desc'] = 'From this menu you can send messages to all users who\'ve registered and entered their email addresses. You may edit the distribution list, or send messages to all. Useful for important update/news information.';
 $txt['news_error_no_news'] = 'Nothing to preview';
 $txt['groups_edit_news'] = 'Groups allowed to edit news items';
 $txt['groups_send_mail'] = 'Groups allowed to send out forum newsletters';
@@ -563,20 +560,16 @@ $txt['manageposts_topics'] = 'topics';
 
 $txt['manageposts_settings'] = 'Post Settings';
 $txt['manageposts_settings_description'] = 'Here you can set everything related to posts and posting.';
-$txt['manageposts_settings_submit'] = 'Save';
 
 $txt['manageposts_bbc_settings'] = 'Bulletin Board Code';
 $txt['manageposts_bbc_settings_description'] = 'Bulletin board code can be used to add markup to forum messages. For example, to highlight the word \'house\' you can type [b]house[/b]. All Bulletin board code tags are surrounded by square brackets (\'[\' and \']\').';
 $txt['manageposts_bbc_settings_title'] = 'Bulletin Board Code settings';
-$txt['manageposts_bbc_settings_submit'] = 'Save';
 
 $txt['manageposts_topic_settings'] = 'Topic Settings';
 $txt['manageposts_topic_settings_description'] = 'Here you can set all settings involving topics.';
-$txt['manageposts_topic_settings_submit'] = 'Save';
 
 $txt['managedrafts_settings'] = 'Draft Settings';
 $txt['managedrafts_settings_description'] = 'Here you can set all settings involving drafts.';
-$txt['managedrafts_submit'] = 'Save';
 $txt['manage_drafts'] = 'Drafts';
 
 $txt['mail_center'] = 'Maillist Center';
@@ -596,7 +589,7 @@ $txt['enableVideoEmbeding'] = 'Enable auto-embedding of video links.';
 $txt['disable_wysiwyg'] = 'Disable WYSIWYG editor';
 $txt['max_messageLength'] = 'Maximum allowed post size';
 $txt['max_messageLength_zero'] = '0 for no max.';
-$txt['convert_to_mediumtext'] = 'Your database is not setup to accept messages longer than 65535 characters. Please use the <a href="%1$s">database maintenance</a> page to convert the database and then came back to increase the maximum allowed post size.';
+$txt['convert_to_mediumtext'] = 'Your database is not setup to accept messages longer than 65535 characters. Please use the <a href="%1$s">database maintenance</a> page to convert the database and then come back to increase the maximum allowed post size.';
 $txt['topicSummaryPosts'] = 'Posts to show on topic summary';
 $txt['spamWaitTime'] = 'Time required between posts from the same IP';
 $txt['edit_wait_time'] = 'Courtesy edit wait time';
@@ -609,7 +602,7 @@ $txt['preview_characters_zero'] = '0 to disable';
 $txt['enableBBC'] = 'Enable bulletin board code (BBC)';
 $txt['enablePostHTML'] = 'Enable <em>basic</em> HTML in posts';
 $txt['autoLinkUrls'] = 'Automatically link posted URLs';
-$txt['disabledBBC'] = 'Enabled BBC tags';
+$txt['disabledBBC'] = 'Enabled BBC tags'; // << ?!
 $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';

@@ -39,7 +39,7 @@ $txt['scheduled_task_desc_remove_temp_attachments'] = 'Löscht temporäre Dateie
 $txt['scheduled_task_remove_old_drafts'] = 'Alte Entwürfe löschen';
 $txt['scheduled_task_desc_remove_old_drafts'] = 'Lösche Entwürfe, die älter als das im ACP eingestellte Höchstalter für Entwürfe sind.';
 $txt['scheduled_task_remove_old_followups'] = 'Alte Folgenachrichten löschen';
-$txt['scheduled_task_desc_remove_old_followups'] = 'Löscht Antworten, die noch in der Datenbank gespeichert sind, aber nicht mehr auf einen vorhandenen Beitrag zeigen.';
+$txt['scheduled_task_desc_remove_old_followups'] = 'Löscht Folgebeiträge, die noch in der Datenbank gespeichert sind, aber nicht mehr auf einen vorhandenen Beitrag zeigen.';
 $txt['scheduled_task_maillist_fetch_IMAP'] = 'E-Mails via IMAP abrufen';
 $txt['scheduled_task_desc_maillist_fetch_IMAP'] = 'Holt E-Mails für die Rundmailfunktion von einem IMAP-Server ab und verarbeitet sie.';
 
