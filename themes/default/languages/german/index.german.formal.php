@@ -343,7 +343,7 @@ $txt['ban_continue_browse'] = 'Sie können das Forum als Gast weiterhin benutzen
 $txt['mark_as_read'] = 'ALLE Nachrichten als gelesen markieren';
 
 $txt['hot_topics'] = 'Heißes Thema (mehr als %1$d Antworten)';
-$txt['very_hot_topics'] = 'Sehr heißes Thema (mehr als %1$d Antworten)';
+$txt['very_hot_topics'] = 'Brandheißes Thema (mehr als %1$d Antworten)';
 $txt['locked_topic'] = 'Geschlossenes Thema';
 $txt['normal_topic'] = 'Normales Thema';
 $txt['participation_caption'] = 'Thema, in dem Sie geschrieben haben';
