@@ -191,8 +191,9 @@ function create_control_richedit($editorOptions)
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			loadJavascriptFile('drafts.plugin.js');
 
+		// Mentions?
 		if (!empty($context['mentions_enabled']))
-			loadJavascriptFile('mentioning.plugin.js');
+			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.plugin.js'));
 
 		// Our not so concise shortcut line
 		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];

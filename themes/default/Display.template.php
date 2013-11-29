@@ -586,9 +586,9 @@ function template_quickreply_below()
 						iCurBoardId: ', $context['current_board'], ',
 						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "==",
-						sBoardPrefix: "=> ",
-						sCatSeparator: "-----------------------------",
+						sBoardChildLevelIndicator: "&#10134;",
+						sBoardPrefix: "&#10148; ",
+						sCatClass: "jump_to_header",
 						sCatPrefix: "",
 						sGoButtonLabel: "', $txt['go'], '"
 					});
