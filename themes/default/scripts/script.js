@@ -14,8 +14,9 @@
  * This file contains javascript utility functions
  */
 
-var elk_formSubmitted = false;
-var lastKeepAliveCheck = new Date().getTime();
+var elk_formSubmitted = false,
+	lastKeepAliveCheck = new Date().getTime(),
+	ajax_indicator_ele = null;
 
 // Some very basic browser detection - from Mozilla's sniffer page.
 var ua = navigator.userAgent.toLowerCase(),
@@ -28,8 +29,6 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_ie = ua.indexOf('msie') !== -1 && !is_opera,
 	is_iphone = ua.indexOf('iphone') !== -1 || ua.indexOf('ipod') !== -1,
 	is_android = ua.indexOf('android') !== -1;
-
-var ajax_indicator_ele = null;
 
 // Define XMLHttpRequest for IE
 if (!('XMLHttpRequest' in window) && 'ActiveXObject' in window)
@@ -52,6 +51,7 @@ if (!('getElementsByClassName' in document))
 
 /**
  * Load an XML document using XMLHttpRequest.
+ *
  * @param {string} sUrl
  * @param {string} funcCallback
  */
@@ -182,7 +182,7 @@ String.prototype.php_strtr = function (sFrom, sTo)
  */
 String.prototype.php_strtolower = function ()
 {
-	return typeof(elk_iso_case_folding) == 'boolean' && elk_iso_case_folding == true ? this.php_strtr(
+	return typeof(elk_iso_case_folding) === 'boolean' && elk_iso_case_folding === true ? this.php_strtr(
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZ\x8a\x8c\x8e\x9f\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde',
 		'abcdefghijklmnopqrstuvwxyz\x9a\x9c\x9e\xff\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe'
 	) : this.php_strtr('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
@@ -578,6 +578,7 @@ window.setTimeout('elk_sessionKeepAlive();', 1200000);
 
 /**
  * Set a theme option through javascript. / ajax
+ *
  * @param {string} option name being set
  * @param {string} value of the option
  * @param {string} theme its being set or null for all
@@ -823,7 +824,7 @@ function elk_Toggle(oOptions)
 }
 
 // Initialize the toggle class
-elk_Toggle.prototype.init = function ()
+elk_Toggle.prototype.init = function()
 {
 	// The master switch can disable this toggle fully.
 	if ('bToggleEnabled' in this.opt && !this.opt.bToggleEnabled)
@@ -1144,8 +1145,24 @@ function grabJumpToContent(elem)
 
 /**
  * JumpTo class.
+ *
+ * Passed object of options can contain:
+ * sContainerId: container id to place the list in
+ * sClassName: class name to assign items added to the dropdown
+ * sJumpToTemplate: html template to wrap the %dropdown_list%
+ * iCurBoardId: id of the board current active
+ * iCurBoardChildLevel: child level of the currently active board
+ * sCurBoardName: name of the currently active board
+ * sBoardChildLevelIndicator: text/characters used to indent
+ * sBoardPrefix: arrow head
+ * sCatSeparator: hr to use to separate areas
+ * sCatPrefix: Prefix to use in from of the categories
+ * bNoRedirect: boolean for redirect
+ * bDisabled: boolean for disabled
+ * sCustomName: custom name to prefix for the select name=""
+ * sGoButtonLabel: name for the goto button
+ *
  * @param {type} oJumpToOptions
- * @returns {JumpTo}
  */
 // This'll contain all JumpTo objects on the page.
 var aJumpTo = new Array();
@@ -1170,12 +1187,15 @@ JumpTo.prototype.showSelect = function ()
 // Fill the jump to box with entries. Method of the JumpTo class.
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
-	// Create an option that'll be above and below the category.
-	var oDashOption = document.createElement('option');
+	// Create an category seperator option that'll be above and below the category.
+	if (this.opt.sCatSeparator)
+	{
+		var oDashOption = document.createElement('option');
 
-	oDashOption.appendChild(document.createTextNode(this.opt.sCatSeparator));
-	oDashOption.disabled = 'disabled';
-	oDashOption.value = '';
+		oDashOption.appendChild(document.createTextNode(this.opt.sCatSeparator));
+		oDashOption.disabled = 'disabled';
+		oDashOption.value = '';
+	}
 
 	if ('onbeforeactivate' in document)
 		this.dropdownList.onbeforeactivate = null;
@@ -1206,7 +1226,8 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 
 		if (aBoardsAndCategories[i].isCategory)
 		{
-			oListFragment.appendChild(oDashOption.cloneNode(true));
+			if (this.opt.sCatSeparator)
+				oListFragment.appendChild(oDashOption.cloneNode(true));
 		}
 		else
 		{
@@ -1217,6 +1238,11 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		oOption = document.createElement('option');
 		oText = document.createElement('span');
 		oText.innerHTML = (aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix + this.opt.sBoardPrefix) + aBoardsAndCategories[i].name;
+
+		// Applying a category class to this option?
+		if (aBoardsAndCategories[i].isCategory && this.opt.sCatClass)
+			oOption.className = this.opt.sCatClass;
+
 		oOption.appendChild(oText);
 
 		if (!this.opt.bNoRedirect)
@@ -1233,7 +1259,8 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 
 		oListFragment.appendChild(oOption);
 
-		if (aBoardsAndCategories[i].isCategory)
+		// Using a non-selectable text seperator?
+		if (aBoardsAndCategories[i].isCategory && this.opt.sCatSeparator)
 			oListFragment.appendChild(oDashOption.cloneNode(true));
 	}
 
@@ -1254,6 +1281,30 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
  * Allows clicking on a icon to expand out the available options to change
  * Change is done via ajax
  * Used for topic icon and member group icon selections
+ *
+ * Available options
+ * 	sBackReference:
+ * 	sIconIdPrefix:
+ * 	bShowModify:
+ * 	iBoardId:
+ * 	iTopicId:
+ * 	sAction:
+ * 	sLabelIconList:
+ * 	sSessionId:
+ * 	sSessionVar:
+ * 	sScriptUrl:
+ *
+ * 	The following are style elements that can be passed
+ * 	sBoxBackground:
+ * 	sBoxBackgroundHover:
+ * 	iBoxBorderWidthHover:
+ * 	sBoxBorderColorHover:
+ * 	sContainerBackground:
+ * 	sContainerBorder:
+ * 	sItemBorder:
+ * 	sItemBorderHover:
+ * 	sItemBackground:
+ * 	sItemBackgroundHover:
  *
  * @param {object} oOptions
  */
@@ -1465,7 +1516,6 @@ function elk_prepareScriptUrl(sUrl)
  * Load Event function, adds new events to the window onload control
  *
  * @param {object} fNewOnload function object or string to call
- * @type Array
  */
 var aOnloadEvents = new Array();
 function addLoadEvent(fNewOnload)

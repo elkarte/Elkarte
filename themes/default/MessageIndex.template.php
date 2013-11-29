@@ -340,9 +340,9 @@ function template_pages_and_buttons_below()
 						iCurBoardId: ', $context['current_board'], ',
 						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "==",
-						sBoardPrefix: "=> ",
-						sCatSeparator: "-----------------------------",
+						sBoardChildLevelIndicator: "&#10134;",
+						sBoardPrefix: "&#10148; ",
+						sCatClass: "jump_to_header",
 						sCatPrefix: "",
 						bNoRedirect: true,
 						bDisabled: true,
@@ -357,10 +357,10 @@ function template_pages_and_buttons_below()
 						iCurBoardId: ', $context['current_board'], ',
 						iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 						sCurBoardName: "', $context['jump_to']['board_name'], '",
-						sBoardChildLevelIndicator: "==",
-						sBoardPrefix: "=> ",
-						sCatSeparator: "-----------------------------",
+						sBoardChildLevelIndicator: "&#10134;",
+						sBoardPrefix: "&#10148; ",
 						sCatPrefix: "",
+						sCatClass: "jump_to_header",
 						sGoButtonLabel: "', $txt['quick_mod_go'], '"
 					});
 			// ]]></script>
