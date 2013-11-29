@@ -1355,7 +1355,7 @@ function getPermission($group, $profile, $permissions)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$groups[$row['id_group']] = $row;
+		$groups[$row['id_group']][$row['add_deny'] ? 'add' : 'deny'][] = $row['permission'];
 
 	$db->free_result($request);
 
