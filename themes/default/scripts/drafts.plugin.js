@@ -138,6 +138,8 @@
 	/**
 	 * Function to retrieve the to and bcc values from the pseudo arrays
 	 *  - Accounts for either a single or multiple to/bcc recipients
+	 *
+	 * @param {string} sField name of the form elements we are getting
 	 */
 	elk_Drafts.prototype.draftGetRecipient = function (sField)
 	{
@@ -187,8 +189,7 @@
 
 		// Update the form to show we finished, if the id is not set, then set it
 		document.getElementById(this.opts.sLastID).value = this.opts._sCurDraftId;
-		this.opts._oCurDraftDiv = document.getElementById(this.opts.sLastNote);
-		setInnerHTML(this.opts._oCurDraftDiv, this.opts._sLastSaved);
+		document.getElementById(this.opts.sLastNote).innerHTML = this.opts._sLastSaved;
 
 		// Hide the saved draft successbox in the event they pressed the save draft button at some point
 		var draft_section = document.getElementById('draft_section');
@@ -217,19 +218,13 @@
 		_sCurDraftId: null,
 
 		/**
-		 * The div that holds our draft saved text
-		 * @type {Object}
-		 */
-		_oCurDraftDiv: null,
-
-		/**
 		 * How often we are going to save a draft in the background
 		 * @type {Integer}
 		 */
 		_interval_id: null,
 
 		/**
-		 * The text to place in the _oCurDraftDiv, comes from the xml response
+		 * The text to place in the last saved Div, comes from the xml response
 		 * @type {String}
 		 */
 		_sLastSaved: null,
