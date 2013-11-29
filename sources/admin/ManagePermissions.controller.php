@@ -1044,30 +1044,6 @@ class ManagePermissions_Controller extends Action_Controller
 
 		call_integration_hook('integrate_post_moderation_mapping', array(&$mappings));
 
-		// Start this with the guests/members.
-		$context['profile_groups'] = array(
-			-1 => array(
-				'id' => -1,
-				'name' => $txt['membergroups_guests'],
-				'color' => '',
-				'new_topic' => 'disallow',
-				'replies_own' => 'disallow',
-				'replies_any' => 'disallow',
-				'attachment' => 'disallow',
-				'children' => array(),
-			),
-			0 => array(
-				'id' => 0,
-				'name' => $txt['membergroups_members'],
-				'color' => '',
-				'new_topic' => 'disallow',
-				'replies_own' => 'disallow',
-				'replies_any' => 'disallow',
-				'attachment' => 'disallow',
-				'children' => array(),
-			),
-		);
-
 		// Load the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['profile_groups'] = prepareMembergroupPermissions();

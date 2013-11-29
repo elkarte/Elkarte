@@ -1671,11 +1671,33 @@ function getInheritableGroups($id_group = false)
  */
 function prepareMembergroupPermissions()
 {
-	global $modSettings;
+	global $modSettings, $txt;
 
 	$db = database();
 
-	$profile_groups = array();
+	// Start this with the guests/members.
+	$profile_groups = array(
+		-1 => array(
+			'id' => -1,
+			'name' => $txt['membergroups_guests'],
+			'color' => '',
+			'new_topic' => 'disallow',
+			'replies_own' => 'disallow',
+			'replies_any' => 'disallow',
+			'attachment' => 'disallow',
+			'children' => array(),
+		),
+		0 => array(
+			'id' => 0,
+			'name' => $txt['membergroups_members'],
+			'color' => '',
+			'new_topic' => 'disallow',
+			'replies_own' => 'disallow',
+			'replies_any' => 'disallow',
+			'attachment' => 'disallow',
+			'children' => array(),
+		),
+	);
 
 	$request = $db->query('', '
 		SELECT id_group, group_name, online_color, id_parent
