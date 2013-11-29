@@ -191,6 +191,7 @@ function create_control_richedit($editorOptions)
 		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			loadJavascriptFile('drafts.plugin.js');
 
+		// Mentions?
 		if (!empty($context['mentions_enabled']))
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js', 'mentioning.plugin.js'));
 
