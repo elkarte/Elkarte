@@ -586,7 +586,7 @@ function countConfiguredMemberOptions()
  *               - 'all' => any record
  * @param mixed $old_settings can be a string or an array of strings. If empty deletes all settings.
  */
-function removeThemeOptions($theme, $membergroups, $old_settings = array())
+function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
 	$db = database();
 
