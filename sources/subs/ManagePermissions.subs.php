@@ -1349,7 +1349,7 @@ function getPermission($group, $profile, $permissions)
 			AND permission IN ({array_string:permissions})
 			AND id_group IN ({array_int:profile_group_list})',
 		array(
-			'profile_group_list' => array_keys($group),
+			'profile_group_list' => $group,
 			'current_profile' => $profile,
 			'permissions' => $permissions,
 		)

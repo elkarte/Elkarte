@@ -1087,7 +1087,8 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Now get all the permissions!
-		$perm = getPermission($context['profile_groups'], $context['current_profile'], $all_permissions);
+		$perm = getPermission(array_keys($context['profile_groups']), $context['current_profile'], $all_permissions);
+
 		foreach ($perm as $row)
 		{
 			foreach ($mappings as $key => $data)
