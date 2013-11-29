@@ -401,8 +401,8 @@ $txt['attach_dir_empty'] = 'Empty';
 $txt['attach_dir_ok'] = 'OK';
 $txt['attach_dir_basedir'] = 'Base directory';
 
-$txt['attach_dir_desc'] = 'Create new directories or change the current directory below. Directories can be renamed as long as they do not contain a sub-directory. If the new directory is to be in the created within the forum directory structure. Just the directory name can be used. To remove a directory, blank the path input field. Directories can not be deleted if they contain either files or sub-directories (shown in brackets next to the file count).';
-$txt['attach_dir_base_desc'] = 'You may use below to change the current base directory or create a new one. New base directories are also added to the Attachment Directory list. You may also designate an existing directory to be a base directory.';
+$txt['attach_dir_desc'] = 'Create new directories or change the current directory below. Directories can be renamed as long as they do not contain a sub-directory. If the new directory is to be created within the forum directory structure, you\'ll just need to type the directory name. To remove a directory, blank the path input field. Directories can not be deleted if they contain either files or sub-directories (shown in brackets next to the file count).';
+$txt['attach_dir_base_desc'] = 'You may use the area below to change the current base directory or create a new one. New base directories are also added to the Attachment Directory list. You may also designate an existing directory to be a base directory.';
 $txt['attach_dir_save_problem'] = 'Oops, there seems to be a problem.';
 $txt['attachments_no_create'] = 'Unable to create a new attachment directory. Please do so using a FTP client or your site file manager.';
 $txt['attachments_no_write'] = 'This directory has been created but is not writable. Please attempt to do so using a FTP client or your site file manager.';
