@@ -1993,7 +1993,7 @@ img.new_posts {
 .topic_info {
 	display: table-cell;
 	vertical-align: top;
-	width: 70%;
+	width: 80%;
 	padding: 7px 8px 6px 12px;
 }
 .topic_icons {
@@ -2032,7 +2032,7 @@ img.new_posts {
 .topic_latest {
 	display: table-cell;
 	vertical-align: top;
-	width: 30%;
+	width: 20%;
 	min-width: 34em;
 	padding: 7px 4px 6px 4px;
 	font-size: 0.929em;
