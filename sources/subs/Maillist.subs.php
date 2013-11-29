@@ -64,18 +64,7 @@ function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
 			'id' => $id,
 		)
 	);
-	$row = array(
-		'id_email' => 'asd',
-		'error' => 'error_locked',
-		'data_id' => 'aaa',
-		'subject' => 'test',
-		'id_message' => 123,
-		'email_from' => 'me',
-		'message_type' => 't',
-		'message' => 'body',
-		'id_board' => 123
-	);
-// 	while ($row = $db->fetch_assoc($request))
+ 	while ($row = $db->fetch_assoc($request))
 	{
 		$postemail[$i] = array(
 			'id_email' => $row['id_email'],
