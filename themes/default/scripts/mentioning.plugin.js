@@ -19,6 +19,7 @@
 
 	elk_Mentions.prototype.attachAtWho = function(oMentions, $element, oIframeWindow) {
 		var mentioned = document.getElementById('mentioned');
+
 		if (mentioned === null)
 			$('#' + oMentions.opts.editor_id).after(oMentions.opts._mentioned);
 		else
@@ -70,7 +71,7 @@
 					// Update the cache with the values
 					oMentions.opts.cache.names[query] = oMentions.opts._names;
 					oMentions.opts.cache.queries[oMentions.opts.cache.queries.length] = query;
-					
+
 					return oMentions.opts._names;
 				},
 				before_insert: function(value, $li) {
@@ -175,7 +176,7 @@
 			if (!instance.opts.runWithoutWysiwygSupport)
 			{
 				// We need to monitor the iframe window and body to text input
-				var oIframe =  $('#' + oMentions.opts.editor_id).parent().find('iframe')[0],
+				var oIframe = $('#' + oMentions.opts.editor_id).parent().find('iframe')[0],
 					oIframeWindow = oIframe.contentWindow,
 					oIframeBody = $('#' + oMentions.opts.editor_id).parent().find('iframe').contents().find('body')[0];
 
