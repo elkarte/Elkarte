@@ -361,7 +361,10 @@ function template_quickreply_below()
 
 	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
-
+			echo '						<script><!-- // --><![CDATA[
+								var post_box_name = "', $context['post_box_name'], '";
+							// ]]></script>';
+	// Using the quick reply box below the messages and you can reply?
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
 		echo '
@@ -405,7 +408,7 @@ function template_quickreply_below()
 			template_control_verification($context['visual_verification_id'], '
 							<strong>' . $txt['verification'] . ':</strong>', '<br />');
 
-		// Using the full editor
+		// Using the full editor or a plain text box?
 		if (empty($options['use_editor_quick_reply']))
 		{
 			echo '
@@ -458,17 +461,16 @@ function template_quickreply_below()
 					</div>
 				</div>
 			</div>';
-	}
 
-	// Showing something below, full editor or a text box, we need to load some options
-	if (!empty($options['display_quick_reply']))
-	{
-		echo '
+		// Using the plain text box we need to load in some additonal javascript
+		if (empty($options['use_editor_quick_reply']))
+		{
+			echo '
 			<script><!-- // --><![CDATA[';
 
-		// Draft autosave available and the user has it enabled?
-		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			echo '
+			// Draft autosave available and the user has it enabled?
+			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+				echo '
 				var oDraftAutoSave = new elk_DraftAutoSave({
 					sSelf: \'oDraftAutoSave\',
 					sLastNote: \'draft_lastautosave\',
@@ -477,30 +479,35 @@ function template_quickreply_below()
 					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, ',
 				});';
 
-		// Mentions enabled and only using a plain text quick reply?
-		if (!empty($modSettings['mentions_enabled']) && empty($options['use_editor_quick_reply']))
-			echo '
+			// Mentions enabled
+			if (!empty($modSettings['mentions_enabled']))
+				echo '
 				add_elk_mention(\'#message\');';
 
-		// Show the quick reply
-		echo '
-				var oQuickReply = new QuickReply({
-					bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
-					iTopicId: ', $context['current_topic'], ',
-					iStart: ', $context['start'], ',
-					sScriptUrl: elk_scripturl,
-					sImagesUrl: elk_images_url,
-					sContainerId: "quickReplyOptions",
-					sClassId: "quickReplyExpand",
-					sClassCollapsed: "collapse",
-					sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
-					sClassExpanded: "expand",
-					sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
-					sJumpAnchor: "quickreply",
-					bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
-				});
+			echo '
 			// ]]></script>';
+		}
 	}
+
+	// Finally enable the quick reply quote function
+	echo '
+		<script><!-- // --><![CDATA[
+			var oQuickReply = new QuickReply({
+				bDefaultCollapsed: ', !empty($options['display_quick_reply']) && $options['display_quick_reply'] > 1 ? 'false' : 'true', ',
+				iTopicId: ', $context['current_topic'], ',
+				iStart: ', $context['start'], ',
+				sScriptUrl: elk_scripturl,
+				sImagesUrl: elk_images_url,
+				sContainerId: "quickReplyOptions",
+				sClassId: "quickReplyExpand",
+				sClassCollapsed: "collapse",
+				sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
+				sClassExpanded: "expand",
+				sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
+				sJumpAnchor: "quickreply",
+				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true' : 'false', '
+			});
+		// ]]></script>';
 
 	// Spell check for quick modify and quick reply (w/o the editor)
 	if ($context['show_spellchecking'])
