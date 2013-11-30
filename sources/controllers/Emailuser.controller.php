@@ -298,6 +298,7 @@ class Emailuser_Controller extends Action_Controller
 			fatal_lang_error('no_access', false);
 
 		// Does the user want to be contacted at all by you?
+		require_once(SUBSDIR . '/Members.subs.php');
 		if (!canContact($row['id_member']))
 			fatal_lang_error('no_access', false);
 
