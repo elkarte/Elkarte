@@ -33,6 +33,13 @@ abstract class Positioning_Items
 	protected $_position = null;
 
 	/**
+	 * An (unique) id to identify the "item"
+	 *
+	 * @var string
+	 */
+	protected $_name = null;
+
+	/**
 	 * Known positions the item can be added
 	 *
 	 * @var array
@@ -229,6 +236,27 @@ abstract class Positioning_Items
 		$this->_relative = $parent;
 
 		return $this;
+	}
+
+	public function get($name)
+	{
+		// First the easy ones
+		if ($this->_name === $name)
+			return $this;
+
+		// If not, then let's have some fun
+		if (!empty($this->_children))
+		{
+			foreach ($this->_children as $key => $item)
+			{
+				$found = $item->get($name);
+
+				if ($found)
+					return $found;
+			}
+		}
+
+		return false;
 	}
 
 	/**
