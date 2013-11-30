@@ -250,7 +250,7 @@
       Controller.prototype.get_range = function() {
         var thisWin = this.setting.cWindow;
 
-        return this.range || (thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : void 0);
+        return thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : (this.range || void 0);
       };
 
       Controller.prototype.get_ie_range = function() {
