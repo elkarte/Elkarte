@@ -253,7 +253,7 @@ function alterFullTextIndex($table, $indexes, $add = false)
 		foreach ($indexes as $index)
 			$db->query('', '
 				ALTER TABLE ' . $table . '
-				ADD FULLTEXT {string:name} ({string:name})',
+				ADD FULLTEXT {raw:name} ({raw:name})',
 				array(
 					'name' => $index
 				)
