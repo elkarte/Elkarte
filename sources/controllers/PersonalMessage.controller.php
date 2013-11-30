@@ -1687,6 +1687,37 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
 			$context['sub_template'] = 'add_rule';
 
+			addJavascriptVar(array(
+				'criteriaNum' => 0,
+				'actionNum' => 0,
+				'groups' => '[]',
+				'labels' => '[]',
+				'txt_pm_readable_and' => '"' . $txt['pm_readable_and'] . '"',
+				'txt_pm_readable_or' => '"' . $txt['pm_readable_or'] . '"',
+				'txt_pm_readable_member' => '"' . $txt['pm_readable_member'] . '"',
+				'txt_pm_readable_group' => '"' . $txt['pm_readable_group'] . '"',
+				'txt_pm_readable_subject ' => '"' . $txt['pm_readable_subject'] . '"',
+				'txt_pm_readable_body' => '"' . $txt['pm_readable_body'] . '"',
+				'txt_pm_readable_buddy' => '"' . $txt['pm_readable_buddy'] . '"',
+				'txt_pm_readable_label' => '"' . $txt['pm_readable_label'] . '"',
+				'txt_pm_readable_delete' => '"' . $txt['pm_readable_delete'] . '"',
+				'txt_pm_readable_start' => '"' . $txt['pm_readable_start'] . '"',
+				'txt_pm_readable_end' => '"' . $txt['pm_readable_end'] . '"',
+				'txt_pm_readable_then' => '"' . $txt['pm_readable_then'] . '"',
+				'txt_pm_rule_not_defined' => '"' . $txt['pm_rule_not_defined'] . '"',
+				'txt_pm_rule_bud' => '"' . $txt['pm_rule_bud'] . '"',
+				'txt_pm_rule_sub' => '"' . $txt['pm_rule_sub'] . '"',
+				'txt_pm_rule_msg' => '"' . $txt['pm_rule_msg'] . '"',
+				'txt_pm_rule_criteria_pick' => '"' . $txt['pm_rule_criteria_pick'] . '"',
+				'txt_pm_rule_mid' => '"' . $txt['pm_rule_mid'] . '"',
+				'txt_pm_rule_gid' => '"' . $txt['pm_rule_gid'] . '"',
+				'txt_pm_rule_sel_group' => '"' . $txt['pm_rule_sel_group'] . '"',
+				'txt_pm_rule_sel_action' => '"' . $txt['pm_rule_sel_action'] . '"',
+				'txt_pm_rule_label' => '"' . $txt['pm_rule_label'] . '"',
+				'txt_pm_rule_delete' => '"' . $txt['pm_rule_delete'] . '"',
+				'txt_pm_rule_sel_label' => '"' . $txt['pm_rule_sel_label'] . '"'
+			));
+
 			// Current rule information...
 			if ($context['rid'])
 			{
