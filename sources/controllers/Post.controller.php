@@ -846,7 +846,6 @@ class Post_Controller extends Action_Controller
 		if (!empty($modSettings['mentions_enabled']))
 		{
 			$context['mentions_enabled'] = true;
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.js'));
 			loadCSSFile('jquery.atwho.css');
 
 			addInlineJavascript('
