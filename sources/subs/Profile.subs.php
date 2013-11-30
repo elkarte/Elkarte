@@ -2026,6 +2026,7 @@ function profileSaveAvatarData(&$value)
 	$downloadedExternalAvatar = false;
 	if ($value == 'external' && allowedTo('profile_remote_avatar') && stripos($_POST['userpicpersonal'], 'http://') === 0 && strlen($_POST['userpicpersonal']) > 7 && !empty($modSettings['avatar_download_external']))
 	{
+		loadLanguage('Post');
 		if (!is_writable($uploadDir))
 			fatal_lang_error('attachments_no_write', 'critical');
 
