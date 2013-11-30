@@ -215,11 +215,9 @@ class Generic_List
 				// A value straight from the database?
 				if (isset($column['data']['db']))
 					$cur_data['value'] = $list_item[$column['data']['db']];
-
 				// Take the value from the database and make it HTML safe.
 				elseif (isset($column['data']['db_htmlsafe']))
 					$cur_data['value'] = htmlspecialchars($list_item[$column['data']['db_htmlsafe']], ENT_COMPAT, 'UTF-8');
-
 				// Using sprintf is probably the most readable way of injecting data.
 				elseif (isset($column['data']['sprintf']))
 				{
@@ -228,19 +226,15 @@ class Generic_List
 						$params[] = $htmlsafe ? htmlspecialchars($list_item[$sprintf_param], ENT_COMPAT, 'UTF-8') : $list_item[$sprintf_param];
 					$cur_data['value'] = vsprintf($column['data']['sprintf']['format'], $params);
 				}
-
 				// The most flexible way probably is applying a custom function.
 				elseif (isset($column['data']['function']))
 					$cur_data['value'] = $column['data']['function']($list_item);
-
 				// A modified value (inject the database values).
 				elseif (isset($column['data']['eval']))
 					$cur_data['value'] = eval(preg_replace('~%([a-zA-Z0-9\-_]+)%~', '$list_item[\'$1\']', $column['data']['eval']));
-
 				// A literal value.
 				elseif (isset($column['data']['value']))
 					$cur_data['value'] = $column['data']['value'];
-
 				// Empty value.
 				else
 					$cur_data['value'] = '';
@@ -282,7 +276,13 @@ class Generic_List
 
 		// The title is currently optional.
 		if (isset($this->_listOptions['title']))
+		{
 			$list_context['title'] = $this->_listOptions['title'];
+
+			// And the icon is optional for the title
+			if (isset($this->_listOptions['icon']))
+				$list_context['icon'] = $this->_listOptions['icon'];
+		}
 
 		// In case there's a form, share it with the template context.
 		if (isset($this->_listOptions['form']))
