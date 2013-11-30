@@ -461,11 +461,11 @@ function loadAllPermissions()
 			'moderate_board' => array(false, 'general_board'),
 			'approve_posts' => array(false, 'general_board'),
 			'post_new' => array(false, 'topic'),
-			'post_draft' => array(false, 'topic'),
-			'post_autosave_draft' => array(false, 'topic'),
 			'post_unapproved_topics' => array(false, 'topic'),
 			'post_unapproved_replies' => array(true, 'topic'),
 			'post_reply' => array(true, 'topic'),
+			'post_draft' => array(false, 'topic'),
+			'post_autosave_draft' => array(false, 'topic'),
 			'merge_any' => array(false, 'topic'),
 			'split_any' => array(false, 'topic'),
 			'send_topic' => array(false, 'topic'),
@@ -1349,13 +1349,13 @@ function getPermission($group, $profile, $permissions)
 			AND permission IN ({array_string:permissions})
 			AND id_group IN ({array_int:profile_group_list})',
 		array(
-			'profile_group_list' => array_keys($group),
+			'profile_group_list' => $group,
 			'current_profile' => $profile,
 			'permissions' => $permissions,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$groups[$row['id_group']] = $row;
+		$groups[$row['id_group']][$row['add_deny'] ? 'add' : 'deny'][] = $row['permission'];
 
 	$db->free_result($request);
 

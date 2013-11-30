@@ -132,8 +132,7 @@ class Groups_Controller extends Action_Controller
 								$group_name = $rowData[\'group_name\'];
 							else
 							{
-								$color_style = empty($rowData[\'online_color\']) ? \'\' : sprintf(\' style="color: %1$s;"\', $rowData[\'online_color\']);
-								$group_name = sprintf(\'<a href="%1$s;group=%2$d"%3$s>%4$s</a>\', \'' . $base_url . '\', $rowData[\'id_group\'], $color_style, $rowData[\'group_name\']);
+								$group_name = sprintf(\'<a href="%1$s;group=%2$d">%3$s</a>\', \'' . $base_url . '\', $rowData[\'id_group\'], $rowData[\'group_name_color\']);
 							}
 
 							// Add a help option for moderator and administrator.

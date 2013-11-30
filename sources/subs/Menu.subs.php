@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class Menu_Entries extends Positioning_Items
 {
+	public function __construct($id)
+	{
+		parent::__construct($id);
+	}
+
 	/**
 	 * Add a new item to the pile
 	 *
@@ -60,7 +65,7 @@ class Menu_Entries extends Positioning_Items
 				elseif ($this->_position === 'child')
 				{
 					if (!isset($this->_children[$this->_relative]))
-						$this->_children[$this->_relative] = new Menu_Entries();
+						$this->_children[$this->_relative] = new Menu_Entries($key);
 
 					// Always return the valid children of the "current" position
 					return $this->_children[$this->_relative];
@@ -111,7 +116,7 @@ class Standard_Menu extends Menu_Entries
 	public function get($id)
 	{
 		if (!isset($this->_instances[$id]))
-			$this->_instances[$id] = new Menu_Entries();
+			$this->_instances[$id] = new Menu_Entries($id);
 
 		return $this->_instances[$id];
 	}
@@ -159,9 +164,7 @@ class Standard_Menu extends Menu_Entries
 						if (isset($subbutton['children']))
 						{
 							foreach ($subbutton['children']->prepareContext() as $key2 => $subbutton2)
-							{
 								$button['areas'][$key]['subsections'][$key2] = $subbutton2;
-							}
 						}
 					}
 				}
@@ -196,7 +199,7 @@ class Standard_Menu extends Menu_Entries
 
 		// this is a singleton
 		if ($instance === null)
-			$instance = new Standard_Menu();
+			$instance = new Standard_Menu('AllMenus');
 
 		return $instance;
 	}

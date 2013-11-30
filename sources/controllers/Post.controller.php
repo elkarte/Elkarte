@@ -150,8 +150,16 @@ class Post_Controller extends Action_Controller
 				}
 				elseif (!allowedTo('post_reply_any'))
 				{
-					if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_own') && !allowedTo('post_reply_own'))
-						$context['becomes_approved'] = false;
+					if ($modSettings['postmod_active'])
+					{
+						if (allowedTo('post_unapproved_replies_own') && !allowedTo('post_reply_own'))
+							$context['becomes_approved'] = false;
+						// Guests do not have post_unapproved_replies_own permission, so it's always post_unapproved_replies_any
+						elseif ($user_info['is_guest'] && allowedTo('post_unapproved_replies_any'))
+							$context['becomes_approved'] = false;
+						else
+							isAllowedTo('post_reply_own');
+					}
 					else
 						isAllowedTo('post_reply_own');
 				}
@@ -1116,10 +1124,16 @@ class Post_Controller extends Action_Controller
 			}
 			elseif (!allowedTo('post_reply_any'))
 			{
-				if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_own') && !allowedTo('post_reply_own'))
-					$becomesApproved = false;
-				else
-					isAllowedTo('post_reply_own');
+				if ($modSettings['postmod_active'])
+				{
+					if (allowedTo('post_unapproved_replies_own') && !allowedTo('post_reply_own'))
+						$becomesApproved = false;
+					// Guests do not have post_unapproved_replies_own permission, so it's always post_unapproved_replies_any
+					elseif ($user_info['is_guest'] && allowedTo('post_unapproved_replies_any'))
+						$becomesApproved = false;
+					else
+						isAllowedTo('post_reply_own');
+				}
 			}
 
 			if (isset($_POST['lock']))

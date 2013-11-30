@@ -445,7 +445,8 @@ function revalidateMentions(sForm, sInput)
 				var name = $(elem).data('name'),
 					next_char,
 					prev_char,
-					index = body.indexOf(name);
+					index = body.indexOf(name),
+					boundaries_pattern = /[\w]/i;
 
 				// It is undefined coming from a preview
 				if (typeof(name) !== 'undefined')
@@ -457,9 +458,9 @@ function revalidateMentions(sForm, sInput)
 						next_char = body.charAt(index + name.length);
 						prev_char = body.charAt(index - 1);
 
-						if (next_char !== '' && next_char.localeCompare(" ") !== 0)
+						if (next_char !== '' && next_char.search(boundaries_pattern) === 0)
 							$(elem).remove();
-						else if (prev_char !== '' && prev_char.localeCompare(" ") !== 0)
+						else if (prev_char !== '' && prev_char.search(boundaries_pattern) === 0)
 							$(elem).remove();
 					}
 				}

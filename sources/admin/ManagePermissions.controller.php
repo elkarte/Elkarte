@@ -191,8 +191,7 @@ class ManagePermissions_Controller extends Action_Controller
 								$group_name = $rowData[\'group_name\'];
 							else
 							{
-								$color_style = empty($rowData[\'online_color\']) ? \'\' : sprintf(\' style="color: %1$s;"\', $rowData[\'online_color\']);
-								$group_name = sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d"%3$s>%4$s</a>\', $scripturl, $rowData[\'id_group\'], $color_style, $rowData[\'group_name\']);
+								$group_name = sprintf(\'<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
 							}
 
 							// Add a help option for guests, regular members, moderator and administrator.
@@ -330,8 +329,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'function' => create_function('$rowData', '
 								global $scripturl;
 
-								$colorStyle = empty($rowData[\'online_color\']) ? \'\' : sprintf(\' style="color: %1$s;"\', $rowData[\'online_color\']);
-								return sprintf(\'<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d"%3$s>%4$s</a>\', $scripturl, $rowData[\'id_group\'], $colorStyle, $rowData[\'group_name\']);
+								return sprintf(\'<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d">%3$s</a>\', $scripturl, $rowData[\'id_group\'], $rowData[\'group_name_color\']);
 							'),
 						),
 						'sort' => array(
@@ -1046,30 +1044,6 @@ class ManagePermissions_Controller extends Action_Controller
 
 		call_integration_hook('integrate_post_moderation_mapping', array(&$mappings));
 
-		// Start this with the guests/members.
-		$context['profile_groups'] = array(
-			-1 => array(
-				'id' => -1,
-				'name' => $txt['membergroups_guests'],
-				'color' => '',
-				'new_topic' => 'disallow',
-				'replies_own' => 'disallow',
-				'replies_any' => 'disallow',
-				'attachment' => 'disallow',
-				'children' => array(),
-			),
-			0 => array(
-				'id' => 0,
-				'name' => $txt['membergroups_members'],
-				'color' => '',
-				'new_topic' => 'disallow',
-				'replies_own' => 'disallow',
-				'replies_any' => 'disallow',
-				'attachment' => 'disallow',
-				'children' => array(),
-			),
-		);
-
 		// Load the groups.
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		$context['profile_groups'] = prepareMembergroupPermissions();
@@ -1113,25 +1087,23 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Now get all the permissions!
-		$perm = getPermission($context['profile_groups'], $context['current_profile'], $all_permissions);
-		foreach ($perm as $row)
+		$perm = getPermission(array_keys($context['profile_groups']), $context['current_profile'], $all_permissions);
+
+		foreach ($perm as $id_group => $row)
 		{
 			foreach ($mappings as $key => $data)
 			{
 				foreach ($data as $index => $perm)
 				{
-					if ($perm == $row['permission'])
+					// Only bother if it's not denied.
+					if (!empty($row['add']) && in_array($perm, $row['add']))
 					{
-						// Only bother if it's not denied.
-						if ($row['add_deny'])
-						{
-							// Full allowance?
-							if ($index == 0)
-								$context['profile_groups'][$row['id_group']][$key] = 'allow';
-							// Otherwise only bother with moderate if not on allow.
-							elseif ($context['profile_groups'][$row['id_group']][$key] != 'allow')
-								$context['profile_groups'][$row['id_group']][$key] = 'moderate';
-						}
+						// Full allowance?
+						if ($index == 0)
+							$context['profile_groups'][$id_group][$key] = 'allow';
+						// Otherwise only bother with moderate if not on allow.
+						elseif ($context['profile_groups'][$id_group][$key] != 'allow')
+							$context['profile_groups'][$id_group][$key] = 'moderate';
 					}
 				}
 			}

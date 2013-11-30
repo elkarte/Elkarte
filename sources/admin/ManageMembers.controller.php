@@ -892,7 +892,7 @@ class ManageMembers_Controller extends Action_Controller
 							foreach ($rowData[\'duplicate_members\'] as $member)
 							{
 								if ($member[\'id\'])
-									$member_links[] = \'<a href="\' . $scripturl . \'?action=profile;u=\' . $member[\'id\'] . \'" \' . (!empty($member[\'is_banned\']) ? \'style="color: red;"\' : \'\') . \'>\' . $member[\'name\'] . \'</a>\';
+									$member_links[] = \'<a href="\' . $scripturl . \'?action=profile;u=\' . $member[\'id\'] . \'" \' . (!empty($member[\'is_banned\']) ? \'class="alert"\' : \'\') . \'>\' . $member[\'name\'] . \'</a>\';
 								else
 									$member_links[] = $member[\'name\'] . \' (\' . $txt[\'guest\'] . \')\';
 							}

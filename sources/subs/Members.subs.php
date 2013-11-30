@@ -2219,7 +2219,7 @@ function canContact($who)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT receive_from, buddy_list, ignore_list
+		SELECT receive_from, buddy_list, pm_ignore_list
 		FROM {db_prefix}members
 		WHERE id_member = {int:member}',
 		array(
