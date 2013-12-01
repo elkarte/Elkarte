@@ -7,7 +7,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -30,6 +30,7 @@ function elk_AdminIndex(oOptions)
 	this.init();
 }
 
+// Initialize the admin index to handle annoucment, currentversion and updates
 elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
@@ -54,6 +55,7 @@ elk_AdminIndex.prototype.loadAdminIndex = function ()
 		this.checkUpdateAvailable();
 };
 
+// Update the announcement container with news
 elk_AdminIndex.prototype.setAnnouncements = function ()
 {
 	if (!('ourAnnouncements' in window) || !('length' in window.ourAnnouncements))
@@ -63,12 +65,10 @@ elk_AdminIndex.prototype.setAnnouncements = function ()
 	for (var i = 0; i < window.ourAnnouncements.length; i++)
 		sMessages += this.opt.sAnnouncementMessageTemplate.replace('%href%', window.ourAnnouncements[i].href).replace('%subject%', window.ourAnnouncements[i].subject).replace('%time%', window.ourAnnouncements[i].time).replace('%message%', window.ourAnnouncements[i].message);
 
-	setInnerHTML(document.getElementById(this.opt.sAnnouncementContainerId), this.opt.sAnnouncementTemplate.replace('%content%', sMessages));
+	document.getElementById(this.opt.sAnnouncementContainerId).innerHTML = this.opt.sAnnouncementTemplate.replace('%content%', sMessages);
 };
 
-/**
- * Updates the current version container with the current version found in current-version.js
- */
+// Updates the current version container with the current version found in current-version.js
 elk_AdminIndex.prototype.showCurrentVersion = function ()
 {
 	if (!('elkVersion' in window))
@@ -78,14 +78,12 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 		oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId),
 		sCurrentVersion = getInnerHTML(oYourVersionContainer);
 
-	setInnerHTML(oElkVersionContainer, window.elkVersion);
+	oElkVersionContainer.innerHTML = window.elkVersion;
 	if (sCurrentVersion !== window.elkVersion)
-		setInnerHTML(oYourVersionContainer, this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion));
+		oYourVersionContainer.innerHTML = this.opt.sVersionOutdatedTemplate.replace('%currentVersion%', sCurrentVersion);
 };
 
-/**
- * Checks if a new version of ElkArte is available and if so updates the admin info box
- */
+// Checks if a new version of ElkArte is available and if so updates the admin info box
 elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 {
 	if (!('ourUpdatePackage' in window))
@@ -97,7 +95,7 @@ elk_AdminIndex.prototype.checkUpdateAvailable = function ()
 	var sTitle = 'ourUpdateTitle' in window ? window.ourUpdateTitle : this.opt.sUpdateNotificationDefaultTitle,
 		sMessage = 'ourUpdateNotice' in window ? window.ourUpdateNotice : this.opt.sUpdateNotificationDefaultMessage;
 
-	setInnerHTML(oContainer, this.opt.sUpdateNotificationTemplate.replace('%title%', sTitle).replace('%message%', sMessage));
+	oContainer.innerHTML = this.opt.sUpdateNotificationTemplate.replace('%title%', sTitle).replace('%message%', sMessage);
 
 	// Parse in the package download URL if it exists in the string.
 	document.getElementById('update-link').href = this.opt.sUpdateNotificationLink.replace('%package%', window.ourUpdatePackage);
@@ -129,16 +127,18 @@ function elk_ViewVersions (oOptions)
 	this.init();
 }
 
+// initialize the version checker
 elk_ViewVersions.prototype.init = function ()
 {
 	// Load this on loading of the page.
 	window.viewVersionsInstanceRef = this;
 	var fHandlePageLoaded = function () {
 		window.viewVersionsInstanceRef.loadViewVersions();
-	}
+	};
 	addLoadEvent(fHandlePageLoaded);
 };
 
+// Load all the file versions
 elk_ViewVersions.prototype.loadViewVersions = function ()
 {
 	this.determineVersions();
@@ -155,13 +155,16 @@ elk_ViewVersions.prototype.swapOption = function (oSendingElement, sName)
 
 	// Unselect the link and return false.
 	oSendingElement.blur();
+
 	return false;
 };
 
+// compare a current and target version to determine if one is newer/older
 elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
-	var aVersions = aParts = new Array();
-	var aCompare = new Array(sCurrent, sTarget);
+	var aVersions = [],
+		aParts = [],
+		aCompare = new Array(sCurrent, sTarget);
 
 	for (var i = 0; i < 2; i++)
 	{
@@ -207,6 +210,7 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 	return false;
 };
 
+// For each area of ElkArte, determine the current and installed versions
 elk_ViewVersions.prototype.determineVersions = function ()
 {
 	var oHighYour = {
@@ -280,8 +284,8 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		if (!document.getElementById('our' + sFilename))
 			continue;
 
-		var sYourVersion = getInnerHTML(document.getElementById('your' + sFilename));
-		var sCurVersionType;
+		var sYourVersion = getInnerHTML(document.getElementById('your' + sFilename)),
+			sCurVersionType;
 
 		for (var sVersionType in oLowVersion)
 			if (sFilename.substr(0, sVersionType.length) === sVersionType)
@@ -308,8 +312,8 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		else if (this.compareVersions(sYourVersion, ourVersions[sFilename]))
 			oLowVersion[sCurVersionType] = sYourVersion;
 
-		setInnerHTML(document.getElementById('our' + sFilename), ourVersions[sFilename]);
-		setInnerHTML(document.getElementById('your' + sFilename), sYourVersion);
+		document.getElementById('our' + sFilename).innerHTML = ourVersions[sFilename];
+		document.getElementById('your' + sFilename).innerHTML = sYourVersion;
 	}
 
 	if (!('ourLanguageVersions' in window))
@@ -317,15 +321,15 @@ elk_ViewVersions.prototype.determineVersions = function ()
 
 	for (sFilename in window.ourLanguageVersions)
 	{
-		for (var i = 0; i < this.opt.aKnownLanguages.length; i++)
+		for (i = 0; i < this.opt.aKnownLanguages.length; i++)
 		{
 			if (!document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]))
 				continue;
 
-			setInnerHTML(document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]), ourLanguageVersions[sFilename]);
+			document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = ourLanguageVersions[sFilename];
 
 			sYourVersion = getInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]));
-			setInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]), sYourVersion);
+			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sYourVersion;
 
 			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)
 				oHighYour.Languages = sYourVersion;
@@ -613,49 +617,19 @@ function setPreviewTimeout()
 		previewTimeout = null;
 	}
 
-	previewTimeout = window.setTimeout("refreshPreview(true); previewTimeout = null;", 500);
+	previewTimeout = window.setTimeout(function() {refreshPreview(true); previewTimeout = null;}, 500);
 }
 
+/**
+ * Used in manage paid subscriptions to show the fixed duration panel or
+ * the variable duration panel, based on which radio button is selected
+ *
+ * @param {type} toChange
+ */
 function toggleDuration(toChange)
 {
-	if (toChange === 'fixed')
-	{
-		document.getElementById("fixed_area").style.display = "inline";
-		document.getElementById("flexible_area").style.display = "none";
-	}
-	else
-	{
-		document.getElementById("fixed_area").style.display = "none";
-		document.getElementById("flexible_area").style.display = "inline";
-	}
-}
-
-function toggleBreakdown(id_group, forcedisplayType)
-{
-	displayType = document.getElementById("group_hr_div_" + id_group).style.display === "none" ? "" : "none";
-	if (typeof(forcedisplayType) !== "undefined")
-		displayType = forcedisplayType;
-
-	// swap the image
-	document.getElementById("group_toggle_img_" + id_group).src = elk_images_url + "/" + (displayType === "none" ? "selected" : "selected_open") + ".png";
-
-	// show or hide the elements
-	var aContainer = new Array();
-	for (i = 0; i < groupPermissions[id_group].length; i++)
-	{
-		var oContainerTemp = document.getElementById("perm_div_" + id_group + "_" + groupPermissions[id_group][i]);
-		if (typeof(oContainerTemp) === 'object' && oContainerTemp !== null)
-			aContainer[i] = oContainerTemp;
-	}
-	if (displayType === "none")
-		$(aContainer).fadeOut();
-	else
-		$(aContainer).show();
-
-	// remove or add the separators
-	document.getElementById("group_hr_div_" + id_group).style.display = displayType;
-
-	return false;
+	$("#fixed_area").slideToggle(300);
+	$("#flexible_area").slideToggle(300);
 }
 
 /**
@@ -668,37 +642,55 @@ function calculateNewValues()
 	{
 		total += parseInt(document.getElementById('weight' + i + '_val').value);
 	}
-	setInnerHTML(document.getElementById('weighttotal'), total);
-	for (var i = 1; i <= 6; i++)
+
+	document.getElementById('weighttotal').innerHTML = total;
+	for (i = 1; i <= 6; i++)
 	{
-		setInnerHTML(document.getElementById('weight' + i), (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%');
+		document.getElementById('weight' + i).innerHTML = (Math.round(1000 * parseInt(document.getElementById('weight' + i + '_val').value) / total) / 10) + '%';
 	}
 }
 
+/**
+ * Toggle visablity of add smile image source options
+ */
 function switchType()
 {
 	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "";
 	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "";
 }
 
+/**
+ * Toggle visablity of smiley set should the user want differnt images in a set (add smiley)
+ */
 function swapUploads()
 {
 	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "";
 	document.getElementById("uploadSmiley").disabled = !document.getElementById("uploadSmiley").disabled;
 }
 
+/**
+ * Close the options that should not be visable for adding a smiley
+ *
+ * @param {string} element
+ */
 function selectMethod(element)
 {
 	document.getElementById("method-existing").checked = element !== "upload";
 	document.getElementById("method-upload").checked = element === "upload";
 }
 
+/**
+ * Updates the smiley preivew to show the current one chosen
+ */
 function updatePreview()
 {
 	var currentImage = document.getElementById("preview");
 	currentImage.src = elk_smiley_url + "/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
 }
 
+/**
+ * Used in package manager to swap the visabilty of database changes
+ */
 function swap_database_changes()
 {
 	db_vis = !db_vis;
@@ -706,6 +698,9 @@ function swap_database_changes()
 	return false;
 }
 
+/**
+ * Test the given form credentials to test if an FTP connection can be made
+ */
 function testFTP()
 {
 	ajax_indicator(true);
@@ -727,6 +722,13 @@ function testFTP()
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
 }
 
+/**
+ * Part of package manager, expands a folders contents to show permission levels of files it contains
+ * Will use an ajax call to get any permissions it has not loaded
+ *
+ * @param {type} folderIdent
+ * @param {type} folderReal
+ */
 function expandFolder(folderIdent, folderReal)
 {
 	// See if it already exists.
@@ -760,6 +762,9 @@ function expandFolder(folderIdent, folderReal)
 	return false;
 }
 
+/**
+ * Wrapper function to call expandFolder
+ */
 function dynamicExpandFolder()
 {
 	expandFolder(this.ident, this.path);
@@ -767,14 +772,13 @@ function dynamicExpandFolder()
 	return false;
 }
 
-function repeatString(sString, iTime)
-{
-	if (iTime < 1)
-		return '';
-	else
-		return sString + repeatString(sString, iTime - 1);
-}
-
+/**
+ * Used when edit the boards and groups access to them
+ *
+ * @param {type} cat_id
+ * @param {type} elem
+ * @param {type} brd_list
+ */
 function select_in_category(cat_id, elem, brd_list)
 {
 	for (var brd in brd_list)
@@ -866,6 +870,9 @@ function toggleSubDir ()
 		toggleBaseDir();
 }
 
+/**
+ * Called by toggleSubDir as part of manage attachments
+ */
 function toggleBaseDir ()
 {
 	var auto_attach = document.getElementById('automanage_attachments'),

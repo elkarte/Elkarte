@@ -252,6 +252,20 @@ String.prototype.easyReplace = function (oReplacements)
 };
 
 /**
+ * Simulate php str_repeat function
+ *
+ * @param {type} sString
+ * @param {type} iTime
+ */
+function php_str_repeat(sString, iTime)
+{
+	if (iTime < 1)
+		return '';
+	else
+		return sString + php_str_repeat(sString, iTime - 1);
+}
+
+/**
  * Opens a new window
  *
  * @param {string} desktopURL
