@@ -151,9 +151,16 @@ function createMenu($menuData, $menuOptions = array())
 					{
 						// First time this section?
 						if (!isset($menu_context['sections'][$section_id]))
+						{
+							if (isset($menuOptions['counters'], $section['counter']) && !empty($menuOptions['counters'][$section['counter']]))
+								$section['title'] .= sprintf($settings['menu_numeric_notice'][0], $menuOptions['counters'][$section['counter']]);
+
 							$menu_context['sections'][$section_id]['title'] = $section['title'];
+						}
 
 						$menu_context['sections'][$section_id]['areas'][$area_id] = array('label' => isset($area['label']) ? $area['label'] : $txt[$area_id]);
+						if (isset($menuOptions['counters'], $area['counter']) && !empty($menuOptions['counters'][$area['counter']]))
+							$menu_context['sections'][$section_id]['areas'][$area_id]['label'] .= sprintf($settings['menu_numeric_notice'][1], $menuOptions['counters'][$area['counter']]);
 
 						// We'll need the ID as well...
 						$menu_context['sections'][$section_id]['id'] = $section_id;
@@ -181,6 +188,9 @@ function createMenu($menuData, $menuOptions = array())
 										$first_sa = $sa;
 
 									$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa] = array('label' => $sub[0]);
+									if (isset($menuOptions['counters'], $sub['counter']) && !empty($menuOptions['counters'][$sub['counter']]))
+										$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['label'] .= sprintf($settings['menu_numeric_notice'][2], $menuOptions['counters'][$sub['counter']]);
+
 									// Custom URL?
 									if (isset($sub['url']))
 										$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa]['url'] = $sub['url'];
