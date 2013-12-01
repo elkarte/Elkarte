@@ -376,7 +376,7 @@ class ManagePaid_Controller extends Action_Controller
 						'function' => create_function('$rowData', '
 							global $context, $txt;
 
-							return \'<span style="color: \' . ($rowData[\'active\'] ? \'green\' : \'red\') . \'">\' . ($rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
+							return \'<span class="\' . ($rowData[\'active\'] ? \'success\' : \'alert\') . \'">\' . ($rowData[\'active\'] ? $txt[\'yes\'] : $txt[\'no\']) . \'</span>\';
 						'),
 					),
 				),

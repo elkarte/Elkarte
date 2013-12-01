@@ -617,7 +617,7 @@ function sendApprovalNotifications(&$topicData)
 			if ($maillist)
 			{
 				// Convert it to markdown for sending
-				pbe_prepare_text($topicData[$topic][$msgKey]['body'], $topicData[$topic][$msgKey]['subject'], '');
+				pbe_prepare_text($topicData[$topic][$msgKey]['body'], $topicData[$topic][$msgKey]['subject']);
 			}
 			else
 			{

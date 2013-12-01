@@ -179,11 +179,11 @@ class ManageNews_Controller extends Action_Controller
 					'data' => array(
 						'function' => create_function('$news', '
 
-							return \'<textarea id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]" style="width 100%;margin 0 5em;">\' . $news[\'unparsed\'] . \'</textarea>
+							return \'<textarea class="" id="data_\' . $news[\'id\'] . \'" rows="3" name="news[]">\' . $news[\'unparsed\'] . \'</textarea>
 								<br />
 								<div id="preview_\' . $news[\'id\'] . \'"></div>\';
 						'),
-						'style' => 'width: 50%;',
+						'class' => 'newsarea',
 					),
 				),
 				'preview' => array(
@@ -193,9 +193,9 @@ class ManageNews_Controller extends Action_Controller
 					'data' => array(
 						'function' => create_function('$news', '
 
-							return \'<div id="box_preview_\' . $news[\'id\'] . \'" style="overflow: auto; width: 100%; height: 10ex;">\' . $news[\'parsed\'] . \'</div>\';
+							return \'<div id="box_preview_\' . $news[\'id\'] . \'">\' . $news[\'parsed\'] . \'</div>\';
 						'),
-						'style' => 'width: 45%;',
+						'class' => 'newspreview',
 					),
 				),
 				'check' => array(

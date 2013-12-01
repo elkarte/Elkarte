@@ -234,15 +234,15 @@ class ManageMaillist_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=maillist;sa=approve;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img style="width:16px;height:16px" title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;
-						<a href="?action=admin;area=maillist;sa=delete;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img style="width:16px;height:16px" title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="*" /></a><br />
-						<a href="?action=admin;area=maillist;sa=bounce;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img style="width:16px;height:16px" title="' . $txt['bounce'] . '" src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="*" /></a>&nbsp;
-						<a href="?action=admin;area=maillist;sa=view;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img style="width:16px;height:16px" title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/pm_read.png" alt="*" /></a>',
+							'format' => '<a href="?action=admin;area=maillist;sa=approve;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;
+						<a href="?action=admin;area=maillist;sa=delete;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="*" /></a><br />
+						<a href="?action=admin;area=maillist;sa=bounce;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['bounce'] . '" src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="*" /></a>&nbsp;
+						<a href="?action=admin;area=maillist;sa=view;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/pm_read.png" alt="*" /></a>',
 							'params' => array(
 								'id_email' => true,
 							),
 						),
-						'class' => 'centertext',
+						'class' => 'listaction',
 					),
 				),
 			),
