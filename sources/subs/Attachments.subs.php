@@ -1434,7 +1434,7 @@ function getAttachmentPath()
 	// Make sure this thing exists and it is unserialized
 	if (empty($modSettings['attachmentUploadDir']))
 		$attachmentDir = BOARDDIR . '/attachments';
-	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']))
+	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']) && (@unserialize($modSettings['attachmentUploadDir']) !== false))
 		$attachmentDir = unserialize($modSettings['attachmentUploadDir']);
 	else
 		$attachmentDir = $modSettings['attachmentUploadDir'];
