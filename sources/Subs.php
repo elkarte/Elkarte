@@ -3758,7 +3758,7 @@ function setupMenuContext()
 			// @todo - Will look at doing something here, to provide instant access to inbox when using click menus.
 			// @todo - A small pop-up anchor seems like the obvious way to handle it. ;)
 			'pm' => array(
-				'title' => $context['allow_pm'] && !$context['allow_edit_profile'] ? $txt['pm_short'] : $txt['account_short'],
+				'title' => $txt['pm_short'],
 				'counter' => 'unread_messages',
 				'href' => $scripturl . '?action=pm',
 				'show' => $context['allow_pm'],
