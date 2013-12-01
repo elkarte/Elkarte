@@ -383,9 +383,6 @@ class Profile_Controller extends Action_Controller
 			),
 		);
 
-		// Let them modify profile areas easily.
-		call_integration_hook('integrate_profile_areas', array(&$profile_areas));
-
 		// Is there an updated message to show?
 		if (isset($_GET['updated']))
 			$context['profile_updated'] = $txt['profile_updated_own'];
@@ -398,12 +395,14 @@ class Profile_Controller extends Action_Controller
 			),
 		);
 
+		// Let them modify profile areas easily.
+		call_integration_hook('integrate_profile_areas', array(&$profile_areas, &$menuOptions));
+
 		// Actually create the menu!
 		$profile_include_data = createMenu($profile_areas, $menuOptions);
 		unset($profile_areas);
 
 		// If it said no permissions that meant it wasn't valid!
-		// @todo maybe move to createMenu of the class?
 		if ($profile_include_data && empty($profile_include_data['permission']))
 			$profile_include_data['enabled'] = false;
 

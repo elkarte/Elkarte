@@ -2520,6 +2520,9 @@ function messageIndexBar($area)
 		'counters' => !empty($label_counters) ? $label_counters : 0,
 	);
 
+	// Let them modify PM areas easily.
+	call_integration_hook('integrate_pm_areas', array(&$pm_areas, &$menuOptions));
+
 	// Actually create the menu!
 	$pm_include_data = createMenu($pm_areas, $menuOptions);
 	unset($pm_areas);

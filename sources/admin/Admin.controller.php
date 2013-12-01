@@ -568,6 +568,11 @@ class Admin_Controller extends Action_Controller
 		// Make sure the administrator has a valid session...
 		validateSession();
 
+		$menuOptions = array();
+
+		// Let them modify PM areas easily.
+		call_integration_hook('integrate_admin_areas', array(&$admin_areas, &$menuOptions));
+
 		// Actually create the menu!
 		$admin_include_data = createMenu($admin_areas);
 		unset($admin_areas);

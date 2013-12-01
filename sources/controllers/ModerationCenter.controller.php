@@ -266,6 +266,9 @@ class ModerationCenter_Controller extends Action_Controller
 			'disable_url_session_check' => true,
 		);
 
+	// Let them modify PM areas easily.
+	call_integration_hook('integrate_moderation_areas', array(&$moderation_areas, &$menuOptions));
+
 		$mod_include_data = createMenu($moderation_areas, $menuOptions);
 		unset($moderation_areas);
 
