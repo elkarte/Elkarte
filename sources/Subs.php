@@ -2659,10 +2659,6 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// Show the footer.
 		loadSubTemplate(isset($context['sub_template']) ? $context['sub_template'] : 'main');
 
-		// Anything special to put out?
-		if (!empty($context['insert_after_template']) && !isset($_REQUEST['xml']))
-			echo $context['insert_after_template'];
-
 		// Just so we don't get caught in an endless loop of errors from the footer...
 		if (!$footer_done)
 		{

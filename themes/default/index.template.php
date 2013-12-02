@@ -402,6 +402,10 @@ function template_html_below()
 	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
 
+	// Anything special to put out?
+	if (!empty($context['insert_after_template']) && !isset($_REQUEST['xml']))
+		echo $context['insert_after_template'];
+
 	echo '
 </body>
 </html>';
