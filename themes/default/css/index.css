@@ -1952,7 +1952,9 @@ img.new_posts {
 	white-space:nowrap;
 }
 #description_board .generalinfo {
-	overflow: auto;
+	display: table;
+	width: 100%;
+	box-sizing: border-box;
 }
 .topic_listing {
 	background: #e4e4e4;
