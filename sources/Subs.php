@@ -1432,6 +1432,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'test' => '([1-9][\d]?p[xt]|small(?:er)?|large[r]?|x[x]?-(?:small|large)|medium|(0\.[1-9]|[1-9](\.[\d][\d]?)?)?em)\]',
 				'before' => '<span style="font-size: $1;" class="bbc_size">',
 				'after' => '</span>',
+				'disallow_parents' => array('size'),
+				'disallow_before' => '<span>',
+				'disallow_after' => '</span>',
 			),
 			array(
 				'tag' => 'size',
@@ -1443,6 +1446,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
 					$data = $sizes[$data] . \'em\';'
 				),
+				'disallow_parents' => array('size'),
+				'disallow_before' => '<span>',
+				'disallow_after' => '</span>',
 			),
 			array(
 				'tag' => 'spoiler',
@@ -1939,7 +1945,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			// Not allowed in this parent, replace the tags or show it like regular text
 			elseif (isset($possible['disallow_parents']) && ($inside !== null && in_array($inside['tag'], $possible['disallow_parents'])))
 			{
-				if (!isset($possible['disabled_before'], $possible['disabled_after']))
+				if (!isset($possible['disallow_before'], $possible['disallow_after']))
 					continue;
 				$possible['before'] = isset($possible['disallow_before']) ? $tag['disallow_before'] : $possible['before'];
 				$possible['after'] = isset($possible['disallow_after']) ? $tag['disallow_after'] : $possible['after'];
