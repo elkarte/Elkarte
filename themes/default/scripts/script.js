@@ -300,9 +300,10 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>',
-		sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png'),
-		sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
+	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>';
+
+	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png'),
+	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
 	var oContainer = new smc_Popup({heading: sHeader, content: sAjax_indicator, icon: sIcon}),
@@ -426,11 +427,13 @@ function replaceText(text, oTextHandle)
  */
 function isEmptyText(theField)
 {
+	var theValue;
+
 	// Copy the value so changes can be made..
 	if (typeof(theField) === 'string')
-		var theValue = theField;
+		theValue = theField;
 	else
-		var theValue = theField.value;
+		theValue = theField.value;
 
 	// Strip whitespace off the left side.
 	while (theValue.length > 0 && (theValue.charAt(0) === ' ' || theValue.charAt(0) === '\t'))
@@ -612,7 +615,7 @@ function elk_setThemeOption(option, value, theme, cur_session_id, cur_session_va
 		additional_vars = '';
 
 	var tempImage = new Image();
-	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + cur_session_var + '=' + cur_session_id + additional_vars + (theme == null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
+	tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=jsoption;var=' + option + ';val=' + value + ';' + cur_session_var + '=' + cur_session_id + additional_vars + (theme === null ? '' : '&th=' + theme) + ';time=' + (new Date().getTime());
 }
 
 /**
@@ -840,6 +843,9 @@ function elk_Toggle(oOptions)
 // Initialize the toggle class
 elk_Toggle.prototype.init = function()
 {
+	var i = 0,
+		n = 0;
+
 	// The master switch can disable this toggle fully.
 	if ('bToggleEnabled' in this.opt && !this.opt.bToggleEnabled)
 		return;
@@ -863,7 +869,7 @@ elk_Toggle.prototype.init = function()
 	// Initialize the images to be clickable.
 	if ('aSwapImages' in this.opt)
 	{
-		for (var i = 0, n = this.opt.aSwapImages.length; i < n; i++)
+		for (i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
 			if (typeof(oImage) === 'object' && oImage !== null)
@@ -873,10 +879,7 @@ elk_Toggle.prototype.init = function()
 					oImage.style.display = '';
 
 				oImage.instanceRef = this;
-				oImage.onclick = function () {
-					this.instanceRef.toggle();
-					this.blur();
-				};
+				oImage.onclick = function () {this.instanceRef.toggle();this.blur();};
 				oImage.style.cursor = 'pointer';
 
 				// Pre-load the collapsed image.
@@ -887,7 +890,7 @@ elk_Toggle.prototype.init = function()
 	// No images to swap, perhaps they want to swap the class?
 	else if ('aSwapClasses' in this.opt)
 	{
-		for (var i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
+		for (i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
 		{
 			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
 			if (typeof(oContainer) === 'object' && oContainer !== null)
@@ -909,7 +912,7 @@ elk_Toggle.prototype.init = function()
 	// Initialize links.
 	if ('aSwapLinks' in this.opt)
 	{
-		for (var i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
+		for (i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
 			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
 			if (typeof(oLink) === 'object' && oLink !== null)
@@ -932,6 +935,10 @@ elk_Toggle.prototype.init = function()
 // Collapse or expand the section.
 elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 {
+	var i = 0,
+		n = 0,
+		oContainer;
+
 	// Default bInit to false.
 	bInit = typeof(bInit) === 'undefined' ? false : true;
 
@@ -954,7 +961,7 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 	if ('aSwapImages' in this.opt)
 	{
 		// Swapping images on a click
-		for (var i = 0, n = this.opt.aSwapImages.length; i < n; i++)
+		for (i = 0, n = this.opt.aSwapImages.length; i < n; i++)
 		{
 			var oImage = document.getElementById(this.opt.aSwapImages[i].sId);
 			if (typeof(oImage) === 'object' && oImage !== null)
@@ -971,9 +978,9 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 	else if ('aSwapClasses' in this.opt)
 	{
 		// Or swapping the classes
-		for (var i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
+		for (i = 0, n = this.opt.aSwapClasses.length; i < n; i++)
 		{
-			var oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
+			oContainer = document.getElementById(this.opt.aSwapClasses[i].sId);
 			if (typeof(oContainer) === 'object' && oContainer !== null)
 			{
 				// Only swap the class if the state changed
@@ -990,21 +997,21 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 	// Loop through all the links that need to be toggled.
 	if ('aSwapLinks' in this.opt)
 	{
-		for (var i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
+		for (i = 0, n = this.opt.aSwapLinks.length; i < n; i++)
 		{
 			var oLink = document.getElementById(this.opt.aSwapLinks[i].sId);
 			if (typeof(oLink) === 'object' && oLink !== null)
-				setInnerHTML(oLink, bCollapse ? this.opt.aSwapLinks[i].msgCollapsed : this.opt.aSwapLinks[i].msgExpanded);
+				oLink.innerHTML = bCollapse ? this.opt.aSwapLinks[i].msgCollapsed : this.opt.aSwapLinks[i].msgExpanded;
 		}
 	}
 
 	// Now go through all the sections to be collapsed.
-	for (var i = 0, n = this.opt.aSwappableContainers.length; i < n; i++)
+	for (i = 0, n = this.opt.aSwappableContainers.length; i < n; i++)
 	{
 		if (this.opt.aSwappableContainers[i] === null)
 			continue;
 
-		var oContainer = document.getElementById(this.opt.aSwappableContainers[i]);
+		oContainer = document.getElementById(this.opt.aSwappableContainers[i]);
 		if (typeof(oContainer) === 'object' && oContainer !== null)
 		{
 			if (bCollapse)
@@ -1132,12 +1139,14 @@ function createEventListener(oTarget)
 function grabJumpToContent(elem)
 {
 	var oXMLDoc = getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlhttp;sa=jumpto;xml'),
-		aBoardsAndCategories = new Array();
+		aBoardsAndCategories = [],
+		i = 0,
+		n = 0;
 
 	if (oXMLDoc.responseXML)
 	{
 		var items = oXMLDoc.responseXML.getElementsByTagName('elk')[0].getElementsByTagName('item');
-		for (var i = 0, n = items.length; i < n; i++)
+		for (i = 0, n = items.length; i < n; i++)
 		{
 			aBoardsAndCategories[aBoardsAndCategories.length] = {
 				id: parseInt(items[i].getAttribute('id')),
@@ -1149,7 +1158,7 @@ function grabJumpToContent(elem)
 		}
 	}
 
-	for (var i = 0, n = aJumpTo.length; i < n; i++)
+	for (i = 0, n = aJumpTo.length; i < n; i++)
 		aJumpTo[i].fillSelect(aBoardsAndCategories);
 
 	// Internet Explorer needs this to keep the box dropped down.
@@ -1179,7 +1188,7 @@ function grabJumpToContent(elem)
  * @param {type} oJumpToOptions
  */
 // This'll contain all JumpTo objects on the page.
-var aJumpTo = new Array();
+var aJumpTo = [];
 function JumpTo(oJumpToOptions)
 {
 	this.opt = oJumpToOptions;
@@ -1297,33 +1306,33 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
  * Used for topic icon and member group icon selections
  *
  * Available options
- * 	sBackReference:
- * 	sIconIdPrefix:
- * 	bShowModify:
- * 	iBoardId:
- * 	iTopicId:
- * 	sAction:
- * 	sLabelIconList:
- * 	sSessionId:
- * 	sSessionVar:
- * 	sScriptUrl:
+ *	sBackReference:
+ *	sIconIdPrefix:
+ *	bShowModify:
+ *	iBoardId:
+ *	iTopicId:
+ *	sAction:
+ *	sLabelIconList:
+ *	sSessionId:
+ *	sSessionVar:
+ *	sScriptUrl:
  *
- * 	The following are style elements that can be passed
- * 	sBoxBackground:
- * 	sBoxBackgroundHover:
- * 	iBoxBorderWidthHover:
- * 	sBoxBorderColorHover:
- * 	sContainerBackground:
- * 	sContainerBorder:
- * 	sItemBorder:
- * 	sItemBorderHover:
- * 	sItemBackground:
- * 	sItemBackgroundHover:
+ * The following are style elements that can be passed
+ *	sBoxBackground:
+ *	sBoxBackgroundHover:
+ *	iBoxBorderWidthHover:
+ *	sBoxBorderColorHover:
+ *	sContainerBackground:
+ *	sContainerBorder:
+ *	sItemBorder:
+ *	sItemBorderHover:
+ *	sItemBackground:
+ *	sItemBackgroundHover:
  *
  * @param {object} oOptions
  */
 // A global array containing all IconList objects.
-var aIconLists = new Array();
+var aIconLists = [];
 function IconList(oOptions)
 {
 	if (!window.XMLHttpRequest)
@@ -1411,7 +1420,7 @@ IconList.prototype.onIconsReceived = function (oXMLDoc)
 	for (var i = 0, n = icons.length; i < n; i++)
 		sItems += '<span onmouseover="' + this.opt.sBackReference + '.onItemHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onItemHover(this, false);" onmousedown="' + this.opt.sBackReference + '.onItemMouseDown(this, \'' + icons[i].getAttribute('value') + '\');" style="padding: 2px 3px; line-height: 20px; border: ' + this.opt.sItemBorder + '; background: ' + this.opt.sItemBackground + '"><img src="' + icons[i].getAttribute('url') + '" alt="' + icons[i].getAttribute('name') + '" title="' + icons[i].firstChild.nodeValue + '" style="vertical-align: middle" /></span>';
 
-	setInnerHTML(this.oContainerDiv, sItems);
+	this.oContainerDiv.innerHTML = sItems;
 	this.oContainerDiv.style.display = 'block';
 	this.bListLoaded = true;
 
@@ -1451,7 +1460,7 @@ IconList.prototype.onItemMouseDown = function (oDiv, sNewIcon)
 		if (oMessage.getElementsByTagName('error').length === 0)
 		{
 			if ((this.opt.bShowModify && oMessage.getElementsByTagName('modified').length !== 0) && (document.getElementById('modified_' + this.iCurMessageId) !== null))
-				setInnerHTML(document.getElementById('modified_' + this.iCurMessageId), oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
+				document.getElementById('modified_' + this.iCurMessageId).innerHTML = oMessage.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
 
 			this.oClickedIcon.getElementsByTagName('img')[0].src = oDiv.getElementsByTagName('img')[0].src;
 		}
@@ -1531,7 +1540,7 @@ function elk_prepareScriptUrl(sUrl)
  *
  * @param {object} fNewOnload function object or string to call
  */
-var aOnloadEvents = new Array();
+var aOnloadEvents = [];
 function addLoadEvent(fNewOnload)
 {
 	// If there's no event set, just set this one
@@ -1565,11 +1574,13 @@ function addLoadEvent(fNewOnload)
  */
 function elkSelectText(oCurElement, bActOnElement)
 {
+	var oCodeArea = null;
+
 	// The place we're looking for is one div up, and next door - if it's auto detect.
 	if (typeof(bActOnElement) === 'boolean' && bActOnElement)
-		var oCodeArea = document.getElementById(oCurElement);
+		oCodeArea = document.getElementById(oCurElement);
 	else
-		var oCodeArea = oCurElement.parentNode.nextSibling;
+		oCodeArea = oCurElement.parentNode.nextSibling;
 
 	if (typeof(oCodeArea) !== 'object' || oCodeArea === null)
 		return false;
@@ -1614,14 +1625,17 @@ function elkSelectText(oCurElement, bActOnElement)
  */
 function smc_saveEntities(sFormName, aElementNames, sMask)
 {
+	var i = 0,
+		n = 0;
+
 	if (typeof(sMask) === 'string')
 	{
-		for (var i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
+		for (i = 0, n = document.forms[sFormName].elements.length; i < n; i++)
 			if (document.forms[sFormName].elements[i].id.substr(0, sMask.length) == sMask)
 				aElementNames[aElementNames.length] = document.forms[sFormName].elements[i].name;
 	}
 
-	for (var i = 0, n = aElementNames.length; i < n; i++)
+	for (i = 0, n = aElementNames.length; i < n; i++)
 	{
 		if (aElementNames[i] in document.forms[sFormName])
 			document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
@@ -1737,7 +1751,7 @@ function selectBoards(ids, aFormID)
 		aForm = document.getElementById(aFormID);
 
 	for (i = 0; i < ids.length; i++)
-		toggle = toggle & aForm["brd" + ids[i]].checked;
+		toggle = toggle && aForm["brd" + ids[i]].checked;
 
 	for (i = 0; i < ids.length; i++)
 		aForm["brd" + ids[i]].checked = !toggle;

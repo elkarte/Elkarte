@@ -127,7 +127,7 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 
 	if ('sId' in oOptions)
 		oNewButton.id = oOptions.sId;
-	setInnerHTML(oNewButton, '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
+	oNewButton.innerHTML = '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>';
 
 	oButtonStripList.appendChild(oNewButton);
 }

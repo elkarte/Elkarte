@@ -73,14 +73,14 @@ function previewPost()
 	];
 
 	// Get the values from the form
-	var x = new Array();
+	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
 
 	document.getElementById('preview_section').style.display = '';
-	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
-	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
+	document.getElementById('preview_subject').innerHTML = txt_preview_title;
+	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
 	return false;
 }
@@ -102,7 +102,7 @@ function previewPM()
 	];
 
 	// And go get them
-	var x = new Array();
+	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
 	// Send in document for previewing
@@ -110,8 +110,8 @@ function previewPM()
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
-	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
-	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
+	document.getElementById('preview_subject').innerHTML = txt_preview_title;
+	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
 	return false;
 }
@@ -132,7 +132,7 @@ function previewNews()
 	];
 
 	// And go get them
-	var x = new Array();
+	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 	x[x.length] = 'item=newsletterpreview';
 
@@ -141,8 +141,8 @@ function previewNews()
 
 	// Update the preview section with our results
 	document.getElementById('preview_section').style.display = '';
-	setInnerHTML(document.getElementById('preview_subject'), txt_preview_title);
-	setInnerHTML(document.getElementById('preview_body'), txt_preview_fetch);
+	document.getElementById('preview_subject').innerHTML = txt_preview_title;
+	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
 	return false;
 }
@@ -157,10 +157,12 @@ function previewNews()
  */
 function getFields(textFields, numericFields, checkboxFields, form_name)
 {
-	var fields = new Array();
+	var fields = [],
+		i = 0,
+		n = 0;
 
 	// Get all of the text fields
-	for (var i = 0, n = textFields.length; i < n; i++)
+	for (i = 0, n = textFields.length; i < n; i++)
 	{
 		if (textFields[i] in document.forms[form_name])
 		{
@@ -176,7 +178,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	}
 
 	// All of the numeric fields
-	for (var i = 0, n = numericFields.length; i < n; i++)
+	for (i = 0, n = numericFields.length; i < n; i++)
 	{
 		if (numericFields[i] in document.forms[form_name])
 		{
@@ -191,7 +193,7 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 	}
 
 	// And the checkboxes
-	for (var i = 0, n = checkboxFields.length; i < n; i++)
+	for (i = 0, n = checkboxFields.length; i < n; i++)
 	{
 		if (checkboxFields[i] in document.forms[form_name] && document.forms[form_name].elements[checkboxFields[i]].checked)
 			fields[fields.length] = checkboxFields[i] + '=' + document.forms[form_name].elements[checkboxFields[i]].value;
@@ -210,22 +212,27 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
  */
 function onDocSent(XMLDoc)
 {
+	var i = 0,
+		n = 0,
+		numErrors = 0,
+		numCaptions = 0;
+
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk')[0])
 	{
-		document.forms[form_name].preview.onclick = new function () {return true;};
+		document.forms[form_name].preview.onclick = function() {return true;};
 		document.forms[form_name].preview.click();
 		return true;
 	}
 
 	// Show the preview section.
 	var preview = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('preview')[0];
-	setInnerHTML(document.getElementById('preview_subject'), preview.getElementsByTagName('subject')[0].firstChild.nodeValue);
+	document.getElementById('preview_subject').innerHTML = preview.getElementsByTagName('subject')[0].firstChild.nodeValue;
 
 	var bodyText = '';
-	for (var i = 0, n = preview.getElementsByTagName('body')[0].childNodes.length; i < n; i++)
+	for (i = 0, n = preview.getElementsByTagName('body')[0].childNodes.length; i < n; i++)
 		bodyText += preview.getElementsByTagName('body')[0].childNodes[i].nodeValue;
 
-	setInnerHTML(document.getElementById('preview_body'), bodyText);
+	document.getElementById('preview_body').innerHTML = bodyText;
 	document.getElementById('preview_body').className = 'post';
 
 	// Show a list of errors (if any).
@@ -235,7 +242,7 @@ function onDocSent(XMLDoc)
 
 	// @todo: this should stay together with the rest of the error handling or
 	// should use errorbox_handler (at the moment it cannot be used because is not enough generic)
-	for (var i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
+	for (i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
 		errorList += '<li id="post_error_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
@@ -246,7 +253,7 @@ function onDocSent(XMLDoc)
 		oError_box.append("<ul id='post_error_list'></ul>");
 
 	// Add the error it and show it
-	setInnerHTML(document.getElementById('post_error_list'), numErrors === 0 ? '' : errorList);
+	document.getElementById('post_error_list').innerHTML = numErrors === 0 ? '' : errorList;
 	if (numErrors === 0)
 		oError_box.css("display", "none");
 
@@ -256,7 +263,7 @@ function onDocSent(XMLDoc)
 
 	// Adjust the color of captions if the given data is erroneous.
 	var captions = errors.getElementsByTagName('caption');
-	for (var i = 0, numCaptions = errors.getElementsByTagName('caption').length; i < numCaptions; i++)
+	for (i = 0, numCaptions = errors.getElementsByTagName('caption').length; i < numCaptions; i++)
 	{
 		if (document.getElementById('caption_' + captions[i].getAttribute('name')))
 			document.getElementById('caption_' + captions[i].getAttribute('name')).className = captions[i].getAttribute('class');
@@ -282,9 +289,9 @@ function onDocSent(XMLDoc)
 		// Remove the new image from old-new replies!
 		for (i = 0; i < new_replies.length; i++)
 			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
-		new_replies = new Array();
+		new_replies = [];
 
-		var ignored_replies = new Array(),
+		var ignored_replies = [],
 			ignoring = null,
 			newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0},
 			numNewPosts = newPosts.length;
@@ -292,7 +299,7 @@ function onDocSent(XMLDoc)
 		if (numNewPosts !== 0)
 		{
 			var newPostsHTML = '<span id="new_replies"><' + '/span>';
-			for (var i = 0; i < numNewPosts; i++)
+			for (i = 0; i < numNewPosts; i++)
 			{
 				new_replies[new_replies.length] = newPosts[i].getAttribute("id");
 
@@ -318,7 +325,7 @@ function onDocSent(XMLDoc)
 		var numIgnoredReplies = ignored_replies.length;
 		if (numIgnoredReplies !== 0)
 		{
-			for (var i = 0; i < numIgnoredReplies; i++)
+			for (i = 0; i < numIgnoredReplies; i++)
 			{
 				aIgnoreToggles[ignored_replies[i]] = new elk_Toggle({
 					bToggleEnabled: true,

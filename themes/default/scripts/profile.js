@@ -101,7 +101,7 @@ function calcCharLeft()
 		}
 	}
 
-	setInnerHTML(document.getElementById("signatureLeft"), maxLength - currentChars);
+	document.getElementById("signatureLeft").innerHTML = maxLength - currentChars;
 }
 
 /**

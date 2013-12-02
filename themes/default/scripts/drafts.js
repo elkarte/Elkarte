@@ -137,7 +137,7 @@ elk_DraftAutoSave.prototype.onDraftDone = function (XMLDoc)
 	// Update the form to show we finished, if the id is not set, then set it
 	document.getElementById(this.opt.sLastID).value = this.sCurDraftId;
 	oCurDraftDiv = document.getElementById(this.opt.sLastNote);
-	setInnerHTML(oCurDraftDiv, this.sLastSaved);
+	oCurDraftDiv.innerHTML = this.sLastSaved;
 
 	// thank you sir, may I have another
 	this.bInDraftMode = false;

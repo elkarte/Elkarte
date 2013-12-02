@@ -346,48 +346,48 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	}
 
 	// Set the column titles based on the files each contain
-	setInnerHTML(document.getElementById('yoursources'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('oursources'), oHighCurrent.sources);
+	document.getElementById('yoursources').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('oursources').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yoursources').style.color = 'red';
 
-	setInnerHTML(document.getElementById('youradmin'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('ouradmin'), oHighCurrent.sources);
+	document.getElementById('youradmin').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('ouradmin').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('youradmin').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourcontrollers'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('ourcontrollers'), oHighCurrent.sources);
+	document.getElementById('yourcontrollers').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('ourcontrollers').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yourcontrollers').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourdatabase'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('ourdatabase'), oHighCurrent.sources);
+	document.getElementById('yourdatabase').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('ourdatabase').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yourdatabase').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yoursubs'), oLowVersion.sources ? oLowVersion.sources : oHighYour.sources);
-	setInnerHTML(document.getElementById('oursubs'), oHighCurrent.sources);
+	document.getElementById('yoursubs').innerHTML = oLowVersion.sources ? oLowVersion.sources : oHighYour.sources;
+	document.getElementById('oursubs').innerHTML = oHighCurrent.sources;
 	if (oLowVersion.sources)
 		document.getElementById('yoursubs').style.color = 'red';
 
-	setInnerHTML(document.getElementById('yourdefault'), oLowVersion.defaults ? oLowVersion.defaults : oHighYour.defaults);
-	setInnerHTML(document.getElementById('ourdefault'), oHighCurrent.defaults);
+	document.getElementById('yourdefault').innerHTML = oLowVersion.defaults ? oLowVersion.defaults : oHighYour.defaults;
+	document.getElementById('ourdefault').innerHTML = oHighCurrent.defaults;
 	if (oLowVersion.defaults)
 		document.getElementById('yourdefaults').style.color = 'red';
 
 	// Custom theme in use?
 	if (document.getElementById('Templates'))
 	{
-		setInnerHTML(document.getElementById('yourTemplates'), oLowVersion.Templates ? oLowVersion.Templates : oHighYour.Templates);
-		setInnerHTML(document.getElementById('ourTemplates'), oHighCurrent.Templates);
+		document.getElementById('yourTemplates').innerHTML = oLowVersion.Templates ? oLowVersion.Templates : oHighYour.Templates;
+		document.getElementById('ourTemplates').innerHTML = oHighCurrent.Templates;
 
 		if (oLowVersion.Templates)
 			document.getElementById('yourTemplates').style.color = 'red';
 	}
 
-	setInnerHTML(document.getElementById('yourLanguages'), oLowVersion.Languages ? oLowVersion.Languages : oHighYour.Languages);
-	setInnerHTML(document.getElementById('ourLanguages'), oHighCurrent.Languages);
+	document.getElementById('yourLanguages').innerHTML = oLowVersion.Languages ? oLowVersion.Languages : oHighYour.Languages;
+	document.getElementById('ourLanguages').innerHTML = oHighCurrent.Languages;
 	if (oLowVersion.Languages)
 		document.getElementById('yourLanguages').style.color = 'red';
 };
