@@ -399,6 +399,8 @@ function template_body_below()
  */
 function template_html_below()
 {
+	global $context;
+
 	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
 
@@ -417,7 +419,7 @@ function template_html_below()
  */
 function theme_linktree($force_show = false)
 {
-	global $context, $settings, $shown_linktree;
+	global $context, $settings;
 
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
@@ -452,8 +454,6 @@ function theme_linktree($force_show = false)
 
 	echo '
 				</ul>';
-
-	$shown_linktree = true;
 }
 
 /**
