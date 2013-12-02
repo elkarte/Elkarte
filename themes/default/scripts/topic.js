@@ -7,7 +7,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -110,7 +110,7 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 // Cancel out of an edit and return things to back to what they were
 QuickModifyTopic.prototype.modify_topic_cancel = function ()
 {
-	setInnerHTML(this.oCurSubjectDiv, this.sBuffSubject);
+	this.oCurSubjectDiv.innerHTML = this.sBuffSubject;
 	this.set_hidden_topic_areas('');
 	this.bInEditMode = false;
 
@@ -131,7 +131,7 @@ QuickModifyTopic.prototype.set_hidden_topic_areas = function (set_style)
 QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 {
 	// Just template the subject.
-	setInnerHTML(this.oCurSubjectDiv, '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />');
+	this.oCurSubjectDiv.innerHTML = '<input type="text" name="subject" value="' + subject + '" size="60" style="width: 95%;" maxlength="80" class="input_text" /><input type="hidden" name="topic" value="' + this.iCurTopicId + '" /><input type="hidden" name="msg" value="' + this.sCurMessageId.substr(4) + '" />';
 
 	// attach mouse over and out events to this new div
 	this.oCurSubjectDiv.instanceRef = this;
@@ -150,15 +150,15 @@ QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_ses
 		cur_session_var = 'sesc';
 
 	var i,
-		x = new Array();
+		x = [];
 
-	x[x.length] = 'subject=' + document.forms.quickModForm['subject'].value.replace(/&#/g, "&#38;#").php_to8bit().php_urlencode();
-	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements['topic'].value);
-	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements['msg'].value);
+	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_to8bit().php_urlencode();
+	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
+	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
 
 	// Send in the call to save the updated topic subject
 	ajax_indicator(true);
-	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements['topic'].value) + ";" + cur_session_var + "=" + cur_session_id + ";xml", x.join("&"), this.modify_topic_done);
+	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + "action=jsmodify;topic=" + parseInt(document.forms.quickModForm.elements.topic.value) + ";" + cur_session_var + "=" + cur_session_id + ";xml", x.join("&"), this.modify_topic_done);
 
 	return false;
 };
@@ -198,7 +198,7 @@ QuickModifyTopic.prototype.modify_topic_done = function (XMLDoc)
 QuickModifyTopic.prototype.modify_topic_hide_edit = function (subject)
 {
 	// Re-template the subject!
-	setInnerHTML(this.oCurSubjectDiv, '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' +'/a>');
+	this.oCurSubjectDiv.innerHTML = '<a href="' + elk_scripturl + '?topic=' + this.iCurTopicId + '.0">' + subject + '<' +'/a>';
 };
 
 // keypress event ... like enter or escape
@@ -243,7 +243,6 @@ QuickModifyTopic.prototype.modify_topic_mouseover = function (oEvent)
 {
 	this.bMouseOnDiv = true;
 };
-
 
 /**
  * QuickReply object, this allows for selecting the quote button and
@@ -342,7 +341,7 @@ function QuickModify(oOptions)
 	this.sSubjectBuffer = '';
 	this.sInfoBuffer = '';
 	this.bXmlHttpCapable = this.isXmlHttpCapable();
-	this.aAccessKeys = new Array();
+	this.aAccessKeys = [];
 
 	// Show the edit buttons
 	if (this.bXmlHttpCapable)
@@ -436,7 +435,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	sBodyText = sBodyText.replace(/\$/g, '{&dollarfix;$}');
 
 	// Actually create the content, with a bodge for disappearing dollar signs.
-	setInnerHTML(this.oCurMessageDiv, this.opt.sTemplateBodyEdit.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%body%/, sBodyText).replace(/\{&dollarfix;\$\}/g, '$'));
+	this.oCurMessageDiv.innerHTML = this.opt.sTemplateBodyEdit.replace(/%msg_id%/g, this.sCurMessageId.substr(4)).replace(/%body%/, sBodyText).replace(/\{&dollarfix;\$\}/g, '$');
 
 	// Save and hide the existing subject div
 	if (this.opt.sIDSubject !== null)
@@ -457,7 +456,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 		if (this.oCurInfoDiv !== null)
 		{
 			this.sInfoBuffer = getInnerHTML(this.oCurInfoDiv);
-			setInnerHTML(this.oCurInfoDiv, this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$'));
+			this.oCurInfoDiv.innerHTML =  this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
 		}
 	}
 
@@ -473,9 +472,9 @@ QuickModify.prototype.modifyCancel = function ()
 	// Roll back the HTML to its original state.
 	if (this.oCurMessageDiv)
 	{
-		setInnerHTML(this.oCurMessageDiv, this.sMessageBuffer);
-		setInnerHTML(this.oCurInfoDiv, this.sInfoBuffer);
-		setInnerHTML(this.oCurSubjectDiv, this.sSubjectBuffer);
+		this.oCurMessageDiv.innerHTML = this.sMessageBuffer;
+		this.oCurInfoDiv.innerHTML = this.sInfoBuffer;
+		this.oCurSubjectDiv.innerHTML = this.sSubjectBuffer;
 		if (this.oCurSubjectDiv !== null)
 		{
 			this.oCurSubjectDiv.style.display = '';
@@ -515,6 +514,9 @@ QuickModify.prototype.modifyCancel = function ()
 // The function called after a user wants to save his precious message.
 QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 {
+	var i = 0,
+		x = [];
+
 	// We cannot save if we weren't in edit mode.
 	if (!this.bInEditMode)
 		return true;
@@ -525,7 +527,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		if (typeof(document.forms[this.opt.sFormRemoveAccessKeys]))
 		{
 			var aInputs = document.forms[this.opt.sFormRemoveAccessKeys].getElementsByTagName('input');
-			for (var i = 0; i < aInputs.length; i++)
+			for (i = 0; i < aInputs.length; i++)
 			{
 				if (typeof(this.aAccessKeys[aInputs[i].name]) !== 'undefined')
 				{
@@ -535,13 +537,10 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
-	var i,
-		x = new Array();
-
-	x[x.length] = 'subject=' + escape(document.forms.quickModForm['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
-	x[x.length] = 'message=' + escape(document.forms.quickModForm['message'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
-	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements['topic'].value);
-	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements['msg'].value);
+	x[x.length] = 'subject=' + escape(document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
+	x[x.length] = 'message=' + escape(document.forms.quickModForm.message.value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
+	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
+	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
 
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);
@@ -553,6 +552,8 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 // Callback function of the XMLhttp request sending the modified message.
 QuickModify.prototype.onModifyDone = function (XMLDoc)
 {
+	var oErrordiv;
+
 	// We've finished the loading stuff.
 	ajax_indicator(false);
 
@@ -562,8 +563,8 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 		// Mozilla will nicely tell us what's wrong.
 		if (XMLDoc.childNodes.length > 0 && XMLDoc.firstChild.nodeName === 'parsererror')
 		{
-			var oErrordiv = document.getElementById('error_box');
-			setInnerHTML(oErrordiv, XMLDoc.firstChild.textContent);
+			oErrordiv = document.getElementById('error_box');
+			oErrordiv.innerHTML = XMLDoc.firstChild.textContent;
 			oErrordiv.style.display = '';
 		}
 		else
@@ -583,22 +584,22 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 			bodyText += body.childNodes[i].nodeValue;
 
 		this.sMessageBuffer = this.opt.sTemplateBodyNormal.replace(/%body%/, bodyText.replace(/\$/g, '{&dollarfix;$}')).replace(/\{&dollarfix;\$\}/g,'$');
-		setInnerHTML(this.oCurMessageDiv, this.sMessageBuffer);
+		this.oCurMessageDiv.innerHTML = this.sMessageBuffer;
 
 		// Show new subject div, update in case it changed
 		var oSubject = message.getElementsByTagName('subject')[0],
 			sSubjectText = oSubject.childNodes[0].nodeValue.replace(/\$/g, '{&dollarfix;$}');
 
 		this.sSubjectBuffer = this.opt.sTemplateSubjectNormal.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
-		setInnerHTML(this.oCurSubjectDiv, this.sSubjectBuffer);
+		this.oCurSubjectDiv.innerHTML = this.sSubjectBuffer;
 		this.oCurSubjectDiv.style.display = '';
 
 		// Restore the info bar div
-		setInnerHTML(this.oCurInfoDiv, this.sInfoBuffer);
+		this.oCurInfoDiv.innerHTML = this.sInfoBuffer;
 
 		// Show this message as 'modified on x by y'.
 		if (this.opt.bShowModify)
-			setInnerHTML(document.getElementById('modified_' + this.sCurMessageId.substr(4)), message.getElementsByTagName('modified')[0].childNodes[0].nodeValue);
+			document.getElementById('modified_' + this.sCurMessageId.substr(4)).innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
 
 		// Hide the icon if we were told to
 		if (this.opt.sIconHide !== null)
@@ -623,8 +624,8 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	}
 	else if (error)
 	{
-		var oErrordiv = document.getElementById('error_box');
-		setInnerHTML(oErrordiv, error.childNodes[0].nodeValue);
+		oErrordiv = document.getElementById('error_box');
+		oErrordiv.innerHTML = error.childNodes[0].nodeValue;
 		oErrordiv.style.display = '';
 		document.forms.quickModForm.message.style.border = error.getAttribute('in_body') === '1' ? this.opt.sErrorBorderStyle : '';
 		document.forms.quickModForm.subject.style.border = error.getAttribute('in_subject') === '1' ? this.opt.sErrorBorderStyle : '';
@@ -736,19 +737,19 @@ InTopicModeration.prototype.handleClick = function(oCheckbox)
 	// Show the number of messages selected in each of the buttons.
 	if (this.opt.bCanRemove && !this.opt.bUseImageButton)
 	{
-		setInnerHTML(document.getElementById(this.opt.sSelf + '_remove_button_text'), this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']');
+		document.getElementById(this.opt.sSelf + '_remove_button_text').innerHTML = this.opt.sRemoveButtonLabel + ' [' + this.iNumSelected + ']';
 		document.getElementById(this.opt.sSelf + '_remove_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanRestore && !this.opt.bUseImageButton)
 	{
-		setInnerHTML(document.getElementById(this.opt.sSelf + '_restore_button_text'), this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']');
+		document.getElementById(this.opt.sSelf + '_restore_button_text').innerHTML = this.opt.sRestoreButtonLabel + ' [' + this.iNumSelected + ']';
 		document.getElementById(this.opt.sSelf + '_restore_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
 	if (this.opt.bCanSplit && !this.opt.bUseImageButton)
 	{
-		setInnerHTML(document.getElementById(this.opt.sSelf + '_split_button_text'), this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']');
+		document.getElementById(this.opt.sSelf + '_split_button_text').innerHTML = this.opt.sSplitButtonLabel + ' [' + this.iNumSelected + ']';
 		document.getElementById(this.opt.sSelf + '_split_button').style.display = this.iNumSelected < 1 ? "none" : "";
 	}
 
@@ -854,11 +855,11 @@ function expandThumb(thumbID)
  */
 function ignore_toggles(msgids, text)
 {
-	for (i = 0; i < msgids.length; i++)
+	for (var i = 0; i < msgids.length; i++)
 	{
 		var msgid = msgids[i];
 
-		new elk_Toggle({
+		var discard = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: true,
 			aSwappableContainers: [
@@ -892,9 +893,10 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
 	var sAjax_indicator = '<div class="centertext"><img src="' + elk_images_url + '/loading.gif" ></div>',
-		sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png'),
-		sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text,
 		oPopup_body;
+
+	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
+	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Load the help page content (we just want the text to show)
 	$.ajax({
@@ -985,7 +987,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 		$this_form.find('input[name="r_email"]').val(recipient_mail);
 	}
 
-	oPopup_body.find('input[name="send"]').bind('click', function (event) {
+	oPopup_body.find('input[name="send"]').on('click', function (event) {
 		event.preventDefault();
 
 		this_body = $(oPopup_body).html();
@@ -1004,16 +1006,19 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			addRequiredElem($this_form, 'y_name', missing_elems);
 			missing_elems = true;
 		}
+
 		if (sender_mail === '')
 		{
 			addRequiredElem($this_form, 'y_email', missing_elems);
 			missing_elems = true;
 		}
+
 		if (recipient_name === '')
 		{
 			addRequiredElem($this_form, 'r_name', missing_elems);
 			missing_elems = true;
 		}
+
 		if (recipient_mail === '')
 		{
 			addRequiredElem($this_form, 'r_email', missing_elems);
@@ -1029,15 +1034,17 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			data: data
 		})
 		.done(function (request) {
-			var oElement = $(request).find('elk')[0];
+			var oElement = $(request).find('elk')[0],
+				text = null;
+
 			if (oElement.getElementsByTagName('error').length === 0)
 			{
-				var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
-
+				text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 				text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+
 				oPopup_body.html(text);
 				oPopup_body.find('input[name="cancel"]').each(function () {
-					$(this).bind('click', function (event) {
+					$(this).on('click', function (event) {
 						event.preventDefault();
 						oContainer.hide();
 					});
@@ -1047,19 +1054,19 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			{
 				if (oElement.getElementsByTagName('text').length !== 0)
 				{
-					var text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
-
+					text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 					text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
+
 					oPopup_body.html(text);
 					oPopup_body.find('input[name="send"]').each(function () {
-						$(this).bind('click', function (event) {
+						$(this).on('click', function (event) {
 							event.preventDefault();
 							data = $(oPopup_body).find('form').serialize() + '&send=1';
 							sendtopicForm(oPopup_body, url, oContainer);
 						});
 					});
 					oPopup_body.find('input[name="cancel"]').each(function () {
-						$(this).bind('click', function (event) {
+						$(this).on('click', function (event) {
 							event.preventDefault();
 							oContainer.hide();
 						});
