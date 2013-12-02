@@ -2382,7 +2382,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
-			$message .= '<div class="bbc_footnotes">' . implode('<br>', $fn_content) . '</div>';
+			$message .= '<div class="bbc_footnotes">' . implode('', $fn_content) . '</div>';
 	}
 
 	// Allow addons access to what parse_bbc created
