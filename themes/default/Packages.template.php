@@ -805,7 +805,7 @@ function template_control_chmod()
 			document.getElementById("ftp_error_div").style.display = "";
 			document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
 
-			setInnerHTML(document.getElementById("ftp_error_message"), message);
+			document.getElementById("ftp_error_message").innerHTML = message;
 		}
 	// ]]></script>';
 
@@ -954,7 +954,7 @@ function template_file_permissions()
 					var fileName = document.createTextNode(fileItems[i].firstChild.nodeValue);
 
 					// Start by wacking in the spaces.
-					setInnerHTML(curCol, php_str_repeat("&nbsp;", curLevel));
+					curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
 
 					// Create the actual text.
 					if (fileItems[i].getAttribute(\'folder\') == 1)
@@ -985,7 +985,7 @@ function template_file_permissions()
 
 					var writeSpan = document.createElement("span");
 					writeSpan.style.color = fileItems[i].getAttribute(\'writable\') ? "green" : "red";
-					setInnerHTML(writeSpan, fileItems[i].getAttribute(\'writable\') ? \'', $txt['package_file_perms_writable'], '\' : \'', $txt['package_file_perms_not_writable'], '\');
+					writeSpan.innerHTML = fileItems[i].getAttribute(\'writable\') ? \'', $txt['package_file_perms_writable'], '\' : \'', $txt['package_file_perms_not_writable'], '\';
 					curCol.appendChild(writeSpan);
 
 					if (fileItems[i].getAttribute(\'permissions\'))
@@ -1057,7 +1057,7 @@ function template_file_permissions()
 				curCol.className = "smalltext";
 				curCol.width = "40%";
 
-				setInnerHTML(curCol, php_str_repeat("&nbsp;", curLevel));
+				curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
 				curCol.appendChild(document.createTextNode(\'\\u00ab \'));
 				curCol.appendChild(linkData);
 				curCol.appendChild(document.createTextNode(\' \\u00bb\'));

@@ -299,11 +299,11 @@ function template_credits()
 							ourVer = document.getElementById("ourVersion");
 							yourVer = document.getElementById("yourVersion");
 
-							setInnerHTML(ourVer, window.elkVersion);
+							ourVer.innerHTML = window.elkVersion;
 
-							var currentVersion = getInnerHTML(yourVer);
+							var currentVersion = yourVer;
 							if (currentVersion != window.ourVersion)
-								setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
+								yourVer.innerHTML = "<span class=\"alert\">" + currentVersion + "</span>";
 						}
 						addLoadEvent(ourCurrentVersion)
 					// ]]></script>';

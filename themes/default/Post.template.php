@@ -813,7 +813,7 @@ function template_quotefast()
 			}
 			else if (\'innerText\' in stage)
 			{
-				setInnerHTML(stage, quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+				stage.innerHTML = quote.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 

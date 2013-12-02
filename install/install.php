@@ -2167,9 +2167,9 @@ function template_welcome_message()
 				ourVer = document.getElementById("ourVersion");
 				yourVer = document.getElementById("yourVersion");
 
-				setInnerHTML(ourVer, window.ourVersion);
+				ourVer.innerHTML = window.ourVersion;
 
-				var currentVersion = getInnerHTML(yourVer);
+				var currentVersion = yourVer.innerHTML;
 				if (currentVersion < window.ourVersion)
 					document.getElementById(\'version_warning\').style.display = \'\';
 			}
