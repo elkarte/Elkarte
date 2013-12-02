@@ -97,7 +97,7 @@ QuickModifyTopic.prototype.onDocReceived_modify_topic = function (XMLDoc)
 
 	this.sCurMessageId = XMLDoc.getElementsByTagName("message")[0].getAttribute("id");
 	this.oCurSubjectDiv = document.getElementById('msg_' + this.sCurMessageId.substr(4));
-	this.sBuffSubject = getInnerHTML(this.oCurSubjectDiv);
+	this.sBuffSubject = this.oCurSubjectDiv.innerHTML;
 
 	// Here we hide any other things they want hidden on edit.
 	this.set_hidden_topic_areas('none');
@@ -429,7 +429,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 		sBodyText += XMLDoc.getElementsByTagName("message")[0].childNodes[i].nodeValue;
 
 	this.oCurMessageDiv = document.getElementById(this.sCurMessageId);
-	this.sMessageBuffer = getInnerHTML(this.oCurMessageDiv);
+	this.sMessageBuffer = this.oCurMessageDiv.innerHTML;
 
 	// We have to force the body to lose its dollar signs thanks to IE.
 	sBodyText = sBodyText.replace(/\$/g, '{&dollarfix;$}');
@@ -444,7 +444,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 		if (this.oCurSubjectDiv !== null)
 		{
 			this.oCurSubjectDiv.style.display = 'none';
-			this.sSubjectBuffer = getInnerHTML(this.oCurSubjectDiv);
+			this.sSubjectBuffer = this.oCurSubjectDiv.innerHTML;
 		}
 	}
 
@@ -455,7 +455,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 		this.oCurInfoDiv = document.getElementById(this.opt.sIDInfo + this.sCurMessageId.substr(4));
 		if (this.oCurInfoDiv !== null)
 		{
-			this.sInfoBuffer = getInnerHTML(this.oCurInfoDiv);
+			this.sInfoBuffer = this.oCurInfoDiv.innerHTML;
 			this.oCurInfoDiv.innerHTML =  this.opt.sTemplateSubjectEdit.replace(/%subject%/, sSubjectText).replace(/\{&dollarfix;\$\}/g, '$');
 		}
 	}

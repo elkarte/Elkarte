@@ -76,7 +76,7 @@ elk_AdminIndex.prototype.showCurrentVersion = function ()
 
 	var oElkVersionContainer = document.getElementById(this.opt.sOurVersionContainerId),
 		oYourVersionContainer = document.getElementById(this.opt.sYourVersionContainerId),
-		sCurrentVersion = getInnerHTML(oYourVersionContainer);
+		sCurrentVersion = oYourVersionContainer.innerHTML;
 
 	oElkVersionContainer.innerHTML = window.elkVersion;
 	if (sCurrentVersion !== window.elkVersion)
@@ -284,7 +284,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 		if (!document.getElementById('our' + sFilename))
 			continue;
 
-		var sYourVersion = getInnerHTML(document.getElementById('your' + sFilename)),
+		var sYourVersion = document.getElementById('your' + sFilename).innerHTML,
 			sCurVersionType;
 
 		for (var sVersionType in oLowVersion)
@@ -328,7 +328,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 
 			document.getElementById('our' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = ourLanguageVersions[sFilename];
 
-			sYourVersion = getInnerHTML(document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]));
+			sYourVersion = document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML;
 			document.getElementById('your' + sFilename + this.opt.aKnownLanguages[i]).innerHTML = sYourVersion;
 
 			if ((this.compareVersions(oHighYour.Languages, sYourVersion) || oHighYour.Languages === '??') && !oLowVersion.Languages)

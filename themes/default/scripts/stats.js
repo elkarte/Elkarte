@@ -112,7 +112,7 @@ elk_StatsCenter.prototype.init = function()
 			// Determine whether the month is currently collapsed or expanded..
 			oCurMonth.bIsCollapsed = oCurMonth.oCollapseImage.src.indexOf(this.opt.sMonthImageCollapsed) >= 0;
 
-			var sLinkText = getInnerHTML(document.getElementById(this.opt.sMonthLinkIdPrefix + sMonthId));
+			var sLinkText = document.getElementById(this.opt.sMonthLinkIdPrefix + sMonthId).innerHTML;
 
 			// Setup the toggle element for the month.
 			oCurMonth.oToggle = new elk_Toggle({
