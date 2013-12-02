@@ -61,7 +61,7 @@ function smc_AutoSuggest(oOptions)
 	addLoadEvent(this.opt.sSelf + '.init();');
 }
 
-// Initiliaze our autosuggest object, adds events and containers to the element we monitor
+// Initialize our autosuggest object, adds events and containers to the element we monitor
 smc_AutoSuggest.prototype.init = function()
 {
 	if (!window.XMLHttpRequest)

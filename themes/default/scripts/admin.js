@@ -393,7 +393,7 @@ elk_ViewVersions.prototype.determineVersions = function ()
 };
 
 /**
- * Adds a new word containter to the censored word list
+ * Adds a new word container to the censored word list
  */
 function addNewWord()
 {
@@ -420,7 +420,7 @@ function toggleBBCDisabled(section, disable)
 }
 
 /**
- * Keeps the input boxes display options approriate for the options selected
+ * Keeps the input boxes display options appropriate for the options selected
  * when adding custom profile fields
  */
 function updateInputBoxes()
@@ -453,7 +453,7 @@ function updateInputBoxes()
 }
 
 /**
- * Used to add additonal radio button options when editing a custom profile field
+ * Used to add additional radio button options when editing a custom profile field
  */
 function addOption()
 {
@@ -651,7 +651,7 @@ function calculateNewValues()
 }
 
 /**
- * Toggle visablity of add smile image source options
+ * Toggle visibility of add smile image source options
  */
 function switchType()
 {
@@ -660,7 +660,7 @@ function switchType()
 }
 
 /**
- * Toggle visablity of smiley set should the user want differnt images in a set (add smiley)
+ * Toggle visibility of smiley set should the user want differnt images in a set (add smiley)
  */
 function swapUploads()
 {
@@ -669,7 +669,7 @@ function swapUploads()
 }
 
 /**
- * Close the options that should not be visable for adding a smiley
+ * Close the options that should not be visible for adding a smiley
  *
  * @param {string} element
  */
@@ -680,7 +680,7 @@ function selectMethod(element)
 }
 
 /**
- * Updates the smiley preivew to show the current one chosen
+ * Updates the smiley preview to show the current one chosen
  */
 function updatePreview()
 {
@@ -689,7 +689,7 @@ function updatePreview()
 }
 
 /**
- * Used in package manager to swap the visabilty of database changes
+ * Used in package manager to swap the visibility of database changes
  */
 function swap_database_changes()
 {
@@ -788,7 +788,7 @@ function select_in_category(cat_id, elem, brd_list)
 }
 
 /**
- * Server Settings > Caching, toggles input fields on/off as approriate for
+ * Server Settings > Caching, toggles input fields on/off as appropriate for
  * a given cache engine selection
  */
 function toggleCache ()

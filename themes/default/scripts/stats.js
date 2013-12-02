@@ -15,7 +15,7 @@
  */
 
 /**
- * Stats object for expanding / collasping the forum year/month stats section
+ * Stats object for expanding / collapsing the forum year/month stats section
  *
  * @param {object} oOptions
  */
@@ -29,7 +29,7 @@ function elk_StatsCenter(oOptions)
 	this.init();
 }
 
-// Start up the stats area, current year/month expaned, all others collapsed and ready for action
+// Start up the stats area, current year/month expanded, all others collapsed and ready for action
 elk_StatsCenter.prototype.init = function()
 {
 	this.oTable = document.getElementById(this.opt.sTableId);
@@ -190,7 +190,7 @@ elk_StatsCenter.prototype.onBeforeCollapseMonth = function(oToggle)
 	}
 };
 
-// Helper function, called before the month is expaned out, makes the ajax call to get the data
+// Helper function, called before the month is expanded out, makes the ajax call to get the data
 elk_StatsCenter.prototype.onBeforeExpandMonth = function(oToggle)
 {
 	// Ignore if we're still loading the previous batch.

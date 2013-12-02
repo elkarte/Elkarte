@@ -45,7 +45,7 @@ function elk_PersonalMessageSend(oOptions)
 	this.init();
 }
 
-// Initialise the PM receipent selection area
+// Initialise the PM recipient selection area
 elk_PersonalMessageSend.prototype.init = function()
 {
 	if (!this.opt.bBccShowByDefault)

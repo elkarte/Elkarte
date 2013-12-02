@@ -70,7 +70,7 @@
 					// Update the cache with the values
 					oMentions.opts.cache.names[query] = oMentions.opts._names;
 					oMentions.opts.cache.queries[oMentions.opts.cache.queries.length] = query;
-					
+
 					return oMentions.opts._names;
 				},
 				before_insert: function(value, $li) {
@@ -99,7 +99,7 @@
 				iTop = oIframe.top,
 				select_height = 0;
 
-			// atWho adds 3 select areas, presumably for differnet positing on screen (above below etc)
+			// atWho adds 3 select areas, presumably for different positing on screen (above below etc)
 			// This finds the active one and gets the container height
 			// @todo find something better than this
 			// @todo 64 is the character code @

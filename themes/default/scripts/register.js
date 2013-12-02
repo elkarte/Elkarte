@@ -15,7 +15,7 @@
  */
 
 /**
- * Elk Registartion class
+ * Elk Registration class
  *
  * @param {string} name of the registration form
  * @param {int} passwordDifficultyLevel
@@ -292,7 +292,7 @@ elkRegister.prototype.setVerificationImage = function(imageHandle, imageIcon, al
 
 
 /**
- * Sets up the form fields based on the chosen authenticaion method, openID or password
+ * Sets up the form fields based on the chosen authentication method, openID or password
  */
 function updateAuthMethod()
 {

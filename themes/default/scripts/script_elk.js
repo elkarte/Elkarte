@@ -9,7 +9,7 @@
  */
 
 /**
- * Sets an auto height so small code blocks collaspe
+ * Sets an auto height so small code blocks collapse
  * Sets a height for larger code blocks and lets them resize / overflow as normal
  */
 function elk_codefix()
@@ -429,7 +429,7 @@ function revalidateMentions(sForm, sInput)
 				cached_names = all_elk_mentions[i].oMention.cached_names;
 				cached_queries = all_elk_mentions[i].oMention.cached_queries;
 
-				// Keep everying sepeteate with spaces, not newlines or no breakable
+				// Keep everything separated with spaces, not newlines or no breakable
 				body = document.forms[sForm][sInput].value.replace(/[\u00a0\r\n]/g, ' ');
 
 				// The last pulldown box that atWho populated
@@ -437,7 +437,7 @@ function revalidateMentions(sForm, sInput)
 			}
 
 			// Adding a space at the beginning to facilitate catching of mentions at the 1st char
-			// and one at the end to simplify catching any aa last thing in the text
+			// and one at the end to simplify catching any last thing in the text
 			body = ' ' + body + ' ';
 
 			// First check if all those in the list are really mentioned
@@ -482,7 +482,7 @@ function revalidateMentions(sForm, sInput)
  * find the cache values for use in revalidateMentions
  *
  * @param {string} selector id of element that atWho is attached to
- * @param {object} oOptions only set when called from the pluging, contains those options
+ * @param {object} oOptions only set when called from the plugin, contains those options
  */
 var all_elk_mentions = [];
 function add_elk_mention(selector, oOptions)
@@ -1268,7 +1268,7 @@ errorbox_handler.prototype.removeError = function(error_box, error_elem)
  *
  * @param {string} parent id of the parent "add more button: we will place this before
  * @param {object} oDtName object of dt element options (type, class, size)
- * @param {object} oDdName object of the dd element options (type, clase size)
+ * @param {object} oDdName object of the dd element options (type, class size)
  * @param {object} oData optional select box object, 1:{id:value,name:display name}, ...
  */
 function addAnotherOption(parent, oDtName, oDdName, oData)
@@ -1311,7 +1311,7 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 	// If its a select box we add in the options
 	if (oData !== '')
 	{
-		// The options are childen of the newInput select box
+		// The options are children of the newInput select box
 		var opt = null,
 			key = null,
 			obj = {};
