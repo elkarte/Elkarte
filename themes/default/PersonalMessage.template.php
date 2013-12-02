@@ -772,7 +772,7 @@ function template_search_results()
 
 function template_send()
 {
-	global $context, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $settings, $txt;
 
 	// Show which messages were sent successfully and which failed.
 	if (!empty($context['send_log']))
@@ -1041,7 +1041,7 @@ function template_send()
 				sBccLinkContainerId: \'bcc_link_container\',
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
-					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);">(?)</a>'
+					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>'
 	), '
 			});
 		';
