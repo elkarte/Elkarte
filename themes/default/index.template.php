@@ -71,9 +71,12 @@ function template_init()
 	// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
 	// moderation reports, etc. You can style each menu level indicator as desired.
 	$settings['menu_numeric_notice'] = array(
+		// Top level menu entries
 		0 => ' <span class="pm_indicator">%1$s</span>',
-		1 => ' <span class="pm_indicator">%1$s</span>',
-		2 => ' <span>[%1$s]</span>',
+		// First dropdown
+		1 => ' <span>[<strong>%1$s</strong>]</span>',
+		// Second level dropdown
+		2 => ' <span>[<strong>%1$s</strong>]</span>',
 	);
 
 	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
