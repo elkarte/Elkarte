@@ -200,7 +200,7 @@ class Site_Dispatcher
 		$adminActions = array('admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
 
 		// Allow to extend or change $actionArray through a hook
-		call_integration_hook('integrate_actions', array(&$actionArray));
+		call_integration_hook('integrate_actions', array(&$actionArray, &$adminActions));
 
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
