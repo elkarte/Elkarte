@@ -799,6 +799,7 @@ function setBoardIds() {
 			$element.parent().superfish({
 				delay : 300,
 				speed: 175,
+				speedOut: 50,
 				onHide: function () {
 					$container.remove();
 				}
@@ -851,7 +852,7 @@ function setBoardIds() {
 
 				width_elements--;
 			}).click(function (ev) {
-				$expanded_pages_li.attr('onclick', '').unbind('click');
+				$expanded_pages_li.attr('onclick', '').off('click');
 			});
 
 			$exp_pages.css({
@@ -875,7 +876,7 @@ function setBoardIds() {
 				baseurl = eval($element.data('baseurl')),
 				first;
 
-			var i =0,
+			var i = 0,
 				oldLastPage = 0,
 				perPageLimit = 10;
 
@@ -917,9 +918,9 @@ function setBoardIds() {
 
 					expand_pages($zhis);
 
-					$zhis.unbind('mouseenter focus');
+					$zhis.off('mouseenter focus');
 				})
-				.bind('mouseenter focus', function() {
+				.on('mouseenter focus', function() {
 					hover_expand($(this));
 				})
 				.data('perpage', perPage)
@@ -937,9 +938,9 @@ function setBoardIds() {
 
 			expand_pages($zhis);
 
-			$zhis.unbind('mouseenter focus');
+			$zhis.off('mouseenter focus');
 		})
-		.bind('mouseenter focus', function() {
+		.on('mouseenter focus', function() {
 			hover_expand($(this));
 		});
 	};
@@ -1109,7 +1110,7 @@ function setBoardIds() {
 			// Create the tip move with the cursor
 			if (oSettings.followMouse)
 			{
-				$(this).bind("mousemove", function(event) {
+				$(this).on("mousemove", function(event) {
 					positionTooltip(event);
 
 					return false;
@@ -1117,7 +1118,7 @@ function setBoardIds() {
 			}
 
 			// Clear the tip on a click
-			$(this).bind("click", function() {
+			$(this).on("click", function() {
 				hideTooltip(this);
 				return true;
 			});
