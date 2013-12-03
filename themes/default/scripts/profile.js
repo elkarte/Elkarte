@@ -7,13 +7,12 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
  * This file contains javascript associated with the user profile
  */
-
 
 /**
  * Function to detect the time offset and populate the offset box
@@ -23,10 +22,12 @@
 var localTime = new Date();
 function autoDetectTimeOffset(currentTime)
 {
+	var serverTime;
+
 	if (typeof(currentTime) !== 'string')
-		var serverTime = currentTime;
+		serverTime = currentTime;
 	else
-		var serverTime = new Date(currentTime);
+		serverTime = new Date(currentTime);
 
 	// Something wrong?
 	if (!localTime.getTime() || !serverTime.getTime())
@@ -82,7 +83,7 @@ function calcCharLeft()
 	{
 		oldSignature = currentSignature;
 
-		var currentChars = currentSignature.replace(/\r/, "").length;
+		currentChars = currentSignature.replace(/\r/, "").length;
 		if (is_opera)
 			currentChars = currentSignature.replace(/\r/g, "").length;
 
@@ -100,7 +101,7 @@ function calcCharLeft()
 		}
 	}
 
-	setInnerHTML(document.getElementById("signatureLeft"), maxLength - currentChars);
+	document.getElementById("signatureLeft").innerHTML = maxLength - currentChars;
 }
 
 /**
@@ -118,10 +119,11 @@ function ajax_getSignaturePreview(showPreview)
 		context: document.body
 	})
 	.done(function(request) {
+		var i = 0;
 		if (showPreview)
 		{
 			var signatures = new Array("current", "preview");
-			for (var i = 0; i < signatures.length; i++)
+			for (i = 0; i < signatures.length; i++)
 			{
 				$("#" + signatures[i] + "_signature").css({display:""});
 				$("#" + signatures[i] + "_signature_display").css({display:""}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
@@ -136,7 +138,7 @@ function ajax_getSignaturePreview(showPreview)
 			var errors = $(request).find('[type="error"]'),
 				errors_html = '<span>' + $(request).find('[type="errors_occurred"]').text() + '</span><ul>';
 
-			for (var i = 0; i < errors.length; i++)
+			for (i = 0; i < errors.length; i++)
 				errors_html += '<li>' + $(errors).text() + '</li>';
 
 			errors_html += '</ul>';
@@ -165,8 +167,8 @@ function changeSel(selected)
 
 	if (cat.options[cat.selectedIndex].value.indexOf("/") > 0)
 	{
-		var i;
-		var count = 0;
+		var i,
+			count = 0;
 
 		file.style.display = "inline";
 		file.disabled = false;

@@ -299,11 +299,11 @@ function template_credits()
 							ourVer = document.getElementById("ourVersion");
 							yourVer = document.getElementById("yourVersion");
 
-							setInnerHTML(ourVer, window.elkVersion);
+							ourVer.innerHTML = window.elkVersion;
 
-							var currentVersion = getInnerHTML(yourVer);
+							var currentVersion = yourVer;
 							if (currentVersion != window.ourVersion)
-								setInnerHTML(yourVer, "<span class=\"alert\">" + currentVersion + "</span>");
+								yourVer.innerHTML = "<span class=\"alert\">" + currentVersion + "</span>";
 						}
 						addLoadEvent(ourCurrentVersion)
 					// ]]></script>';
@@ -845,8 +845,10 @@ function template_show_settings()
 
 	// Is there a custom title?
 	if (isset($context['settings_title']))
+	{
 		echo '
-			<h3 class="category_header">', $context['settings_title'], '</h3>';
+			<h3 class="category_header">', !empty($context['settings_icon']) ? '<span class="hdicon cat_img_' . $context['settings_icon'] . '"></span>' : '', $context['settings_title'], '</h3>';
+	}
 
 	// any messages or errors to show?
 	if (!empty($context['settings_message']))
@@ -879,12 +881,12 @@ function template_show_settings()
 			</div>';
 			}
 
-			// A title?
+			// A title, maybe even with an icon or a help icon?
 			if ($config_var['type'] == 'title')
 			{
 				echo '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
-						', ($config_var['help'] ? (empty($config_var['class']) ? '<span class="hdicon cat_img_helptopics help"></span>' : '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>') : ''), '
+						', ($config_var['help'] ? (empty($config_var['class']) ? '<span class="hdicon cat_img_helptopics help"></span>' : '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>') : ($config_var['icon'] ? '<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>' : '')), '
 						', $config_var['label'], '
 					</h3>';
 			}

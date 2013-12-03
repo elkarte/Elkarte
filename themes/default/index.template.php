@@ -71,9 +71,12 @@ function template_init()
 	// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
 	// moderation reports, etc. You can style each menu level indicator as desired.
 	$settings['menu_numeric_notice'] = array(
+		// Top level menu entries
 		0 => ' <span class="pm_indicator">%1$s</span>',
-		1 => ' <span class="pm_indicator">%1$s</span>',
-		2 => ' <span>[%1$s]</span>',
+		// First dropdown
+		1 => ' <span>[<strong>%1$s</strong>]</span>',
+		// Second level dropdown
+		2 => ' <span>[<strong>%1$s</strong>]</span>',
 	);
 
 	// This slightly more complex array, instead, will deal with page indexes as frequently requested by Ant :P
@@ -396,8 +399,14 @@ function template_body_below()
  */
 function template_html_below()
 {
+	global $context;
+
 	// load in any javascript that could be deferred to the end of the page
 	template_javascript(true);
+
+	// Anything special to put out?
+	if (!empty($context['insert_after_template']) && !isset($_REQUEST['xml']))
+		echo $context['insert_after_template'];
 
 	echo '
 </body>
@@ -410,7 +419,7 @@ function template_html_below()
  */
 function theme_linktree($force_show = false)
 {
-	global $context, $settings, $shown_linktree;
+	global $context, $settings;
 
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context['linktree']) || (!empty($context['dont_default_linktree']) && !$force_show))
@@ -445,8 +454,6 @@ function theme_linktree($force_show = false)
 
 	echo '
 				</ul>';
-
-	$shown_linktree = true;
 }
 
 /**

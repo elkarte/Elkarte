@@ -89,7 +89,7 @@ function template_issueWarning()
 
 			size = barWidth * (percent/100);
 
-			setInnerHTML(document.getElementById(\'warning_text\'), percent + "%");
+			document.getElementById(\'warning_text\').innerHTML = percent + "%";
 			document.getElementById(\'warning_text\').innerHTML = percent + "%";
 			document.getElementById(\'warning_level\').value = percent;
 			document.getElementById(\'warning_progress\').style.width = size + "px";
@@ -115,7 +115,7 @@ function template_issueWarning()
 				effectText = "', $text, '";';
 
 	echo '
-			setInnerHTML(document.getElementById(\'cur_level_div\'), effectText);
+			document.getElementById(\'cur_level_div\').innerHTML = effectText;
 		}
 
 		// Disable notification boxes as required.

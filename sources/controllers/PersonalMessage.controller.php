@@ -1687,6 +1687,37 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['rid'] = isset($_GET['rid']) && isset($context['rules'][$_GET['rid']])? (int) $_GET['rid'] : 0;
 			$context['sub_template'] = 'add_rule';
 
+			addJavascriptVar(array(
+				'criteriaNum' => 0,
+				'actionNum' => 0,
+				'groups' => '[]',
+				'labels' => '[]',
+				'txt_pm_readable_and' => '"' . $txt['pm_readable_and'] . '"',
+				'txt_pm_readable_or' => '"' . $txt['pm_readable_or'] . '"',
+				'txt_pm_readable_member' => '"' . $txt['pm_readable_member'] . '"',
+				'txt_pm_readable_group' => '"' . $txt['pm_readable_group'] . '"',
+				'txt_pm_readable_subject ' => '"' . $txt['pm_readable_subject'] . '"',
+				'txt_pm_readable_body' => '"' . $txt['pm_readable_body'] . '"',
+				'txt_pm_readable_buddy' => '"' . $txt['pm_readable_buddy'] . '"',
+				'txt_pm_readable_label' => '"' . $txt['pm_readable_label'] . '"',
+				'txt_pm_readable_delete' => '"' . $txt['pm_readable_delete'] . '"',
+				'txt_pm_readable_start' => '"' . $txt['pm_readable_start'] . '"',
+				'txt_pm_readable_end' => '"' . $txt['pm_readable_end'] . '"',
+				'txt_pm_readable_then' => '"' . $txt['pm_readable_then'] . '"',
+				'txt_pm_rule_not_defined' => '"' . $txt['pm_rule_not_defined'] . '"',
+				'txt_pm_rule_bud' => '"' . $txt['pm_rule_bud'] . '"',
+				'txt_pm_rule_sub' => '"' . $txt['pm_rule_sub'] . '"',
+				'txt_pm_rule_msg' => '"' . $txt['pm_rule_msg'] . '"',
+				'txt_pm_rule_criteria_pick' => '"' . $txt['pm_rule_criteria_pick'] . '"',
+				'txt_pm_rule_mid' => '"' . $txt['pm_rule_mid'] . '"',
+				'txt_pm_rule_gid' => '"' . $txt['pm_rule_gid'] . '"',
+				'txt_pm_rule_sel_group' => '"' . $txt['pm_rule_sel_group'] . '"',
+				'txt_pm_rule_sel_action' => '"' . $txt['pm_rule_sel_action'] . '"',
+				'txt_pm_rule_label' => '"' . $txt['pm_rule_label'] . '"',
+				'txt_pm_rule_delete' => '"' . $txt['pm_rule_delete'] . '"',
+				'txt_pm_rule_sel_label' => '"' . $txt['pm_rule_sel_label'] . '"'
+			));
+
 			// Current rule information...
 			if ($context['rid'])
 			{
@@ -2407,121 +2438,96 @@ function messageIndexBar($area)
 
 	require_once(SUBSDIR . '/Menu.subs.php');
 
-	$allMenus = Standard_Menu::context();
-	$pm_menu = $allMenus->get('PM_Menu');
-
-	$pm_menu->addBulk(
-		array(
-			'folders' => array(
-				'title' => $txt['pm_messages'],
+	$pm_areas = array(
+		'folders' => array(
+			'title' => $txt['pm_messages'],
+			'counter' => 'unread_messages',
+			'areas' => array(
+				'send' => array(
+					'label' => $txt['new_message'],
+					'custom_url' => $scripturl . '?action=pm;sa=send',
+					'permission' => allowedTo('pm_send'),
+				),
+				'inbox' => array(
+					'label' => $txt['inbox'],
+					'custom_url' => $scripturl . '?action=pm',
+					'counter' => 'unread_messages',
+				),
+				'sent' => array(
+					'label' => $txt['sent_items'],
+					'custom_url' => $scripturl . '?action=pm;f=sent',
+				),
+				'drafts' => array(
+					'label' => $txt['drafts_show'],
+					'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
+					'permission' => allowedTo('pm_draft'),
+					'enabled' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']),
+				),
 			),
-			'actions' => array(
-				'title' => $txt['pm_actions'],
+		),
+		'labels' => array(
+			'title' => $txt['pm_labels'],
+			'counter' => 'labels_unread_total',
+			'areas' => array(),
+		),
+		'actions' => array(
+			'title' => $txt['pm_actions'],
+			'areas' => array(
+				'search' => array(
+					'label' => $txt['pm_search_bar_title'],
+					'custom_url' => $scripturl . '?action=pm;sa=search',
+				),
+				'prune' => array(
+					'label' => $txt['pm_prune'],
+					'custom_url' => $scripturl . '?action=pm;sa=prune'
+				),
 			),
-			'pref' => array(
-				'title' => $txt['pm_preferences'],
+		),
+		'pref' => array(
+			'title' => $txt['pm_preferences'],
+			'areas' => array(
+				'manlabels' => array(
+					'label' => $txt['pm_manage_labels'],
+					'custom_url' => $scripturl . '?action=pm;sa=manlabels',
+				),
+				'manrules' => array(
+					'label' => $txt['pm_manage_rules'],
+					'custom_url' => $scripturl . '?action=pm;sa=manrules',
+				),
+				'settings' => array(
+					'label' => $txt['pm_settings'],
+					'custom_url' => $scripturl . '?action=pm;sa=settings',
+				),
 			),
-		)
-	);
-
-	$inbox = $pm_menu->childOf('folders')->add('folders_areas');
-	$inbox->addBulk(
-		array(
-			'send' => array(
-				'label' => $txt['new_message'],
-				'custom_url' => $scripturl . '?action=pm;sa=send',
-				'permission' => allowedTo('pm_send'),
-			),
-			'inbox' => array(
-				'label' => $txt['inbox'],
-				'custom_url' => $scripturl . '?action=pm',
-			),
-			'sent' => array(
-				'label' => $txt['sent_items'],
-				'custom_url' => $scripturl . '?action=pm;f=sent',
-			),
-			'drafts' => array(
-				'label' => $txt['drafts_show'],
-				'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
-				'permission' => allowedTo('pm_draft'),
-				'enabled' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']),
-			),
-		)
-	);
-
-	$pm_menu->childOf('actions')->add('actions_areas')->addBulk(
-		array(
-			'search' => array(
-				'label' => $txt['pm_search_bar_title'],
-				'custom_url' => $scripturl . '?action=pm;sa=search',
-			),
-			'prune' => array(
-				'label' => $txt['pm_prune'],
-				'custom_url' => $scripturl . '?action=pm;sa=prune'
-			),
-		)
-	);
-
-	$pm_menu->childOf('pref')->add('pref_areas')->addBulk(
-		array(
-			'manlabels' => array(
-				'label' => $txt['pm_manage_labels'],
-				'custom_url' => $scripturl . '?action=pm;sa=manlabels',
-			),
-			'manrules' => array(
-				'label' => $txt['pm_manage_rules'],
-				'custom_url' => $scripturl . '?action=pm;sa=manrules',
-			),
-			'settings' => array(
-				'label' => $txt['pm_settings'],
-				'custom_url' => $scripturl . '?action=pm;sa=settings',
-			),
-		)
+		),
 	);
 
 	// Handle labels.
-	if (!empty($context['currently_using_labels']))
+	$label_counters = array('unread_messages' => $context['labels'][-1]['unread_messages']);
+	if (empty($context['currently_using_labels']))
+		unset($pm_areas['labels']);
+	else
 	{
-		$pm_menu->after('folders')->add('labels', array(
-				'title' => $txt['pm_labels'],
-		));
+
 		// Note we send labels by id as it will have less problems in the querystring.
-		$unread_in_labels = 0;
-		$labels_area = array();
+		$label_counters['labels_unread_total'] = 0;
 		foreach ($context['labels'] as $label)
 		{
 			if ($label['id'] == -1)
 				continue;
 
 			// Count the amount of unread items in labels.
-			$unread_in_labels += $label['unread_messages'];
+			$label_counters['labels_unread_total'] += $label['unread_messages'];
 
 			// Add the label to the menu.
-			$labels_area['label' . $label['id']] = array(
-				'label' => $label['name'] . (!empty($label['unread_messages']) ? ' (<strong>' . $label['unread_messages'] . '</strong>)' : ''),
+			$pm_areas['labels']['areas']['label' . $label['id']] = array(
+				'label' => $label['name'],
 				'custom_url' => $scripturl . '?action=pm;l=' . $label['id'],
-				'unread_messages' => $label['unread_messages'],
+				'counter' => 'label' . $label['id'],
 				'messages' => $label['messages'],
 			);
+			$label_counters['label' . $label['id']] = $label['unread_messages'];
 		}
-
-		$pm_menu->childOf('labels')->add('labels_areas')->addBulk($labels_area);
-
-		if (!empty($unread_in_labels))
-			$pm_menu->add('labels', array(
-					'title' => $txt['pm_labels'] . ' (' . $unread_in_labels . ')',
-			));
-	}
-
-	// If we have unread messages, make note of the number in the menus
-	if (!empty($context['labels'][-1]['unread_messages']))
-	{
-		$inbox->add('inbox', array(
-			'label' => $txt['inbox'] . ' (<strong>' . $context['labels'][-1]['unread_messages'] . '</strong>)',
-		));
-		$pm_menu->add('folders', array(
-			'title' => $txt['pm_messages'] . ' (' . $context['labels'][-1]['unread_messages'] . ')',
-		));
 	}
 
 	// Do we have a limit on the amount of messages we can keep?
@@ -2542,11 +2548,15 @@ function messageIndexBar($area)
 	$menuOptions = array(
 		'current_area' => $area,
 		'disable_url_session_check' => true,
+		'counters' => !empty($label_counters) ? $label_counters : 0,
 	);
 
+	// Let them modify PM areas easily.
+	call_integration_hook('integrate_pm_areas', array(&$pm_areas, &$menuOptions));
+
 	// Actually create the menu!
-	$pm_include_data = $allMenus->createMenu('PM_Menu', $menuOptions);
-	$allMenus->destroy('PM_Menu');
+	$pm_include_data = createMenu($pm_areas, $menuOptions);
+	unset($pm_areas);
 
 	// No menu means no access.
 	if (!$pm_include_data && (!$user_info['is_guest'] || validateSession()))

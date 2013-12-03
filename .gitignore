@@ -9,4 +9,5 @@ Packages/temp
 .project
 .settings/
 /site
+nbproject/*
 elkupdate.bat

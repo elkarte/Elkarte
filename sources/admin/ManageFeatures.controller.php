@@ -1471,10 +1471,12 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initPMSettingsForm()
 	{
-		global $txt;
+		global $txt, $context;
 
 		// We're working with them settings.
 		require_once(SUBSDIR . '/Settings.class.php');
+
+		$context['permissions_excluded'] = array(-1);
 
 		// instantiate the form
 		$this->_PMSettings = new Settings_Form();

@@ -148,7 +148,7 @@ function template_registration_form()
 					<dl class="register_form" id="authentication_group">
 						<dt>
 							<strong>', $txt['authenticate_label'], ':</strong>
-							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help">(?)</a>
+							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>
 						</dt>
 						<dd>
 							<label for="auth_pass" id="option_auth_pass">
@@ -510,15 +510,17 @@ function template_verification_sound()
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>', $txt['visual_verification_sound'], '</title>
 		<meta name="robots" content="noindex" />
-		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />
-		<style>';
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index.css?beta10" />
+		<link rel="stylesheet" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css?beta10" />';
 
 	// Just show the help text and a "close window" link.
 	echo '
-		</style>
 	</head>
 	<body style="margin: 1ex;">
-		<div class="windowbg description centertext">';
+		<div class="windowbg description centertext">
+			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">
+				<span style="font-size: 4em;">&#128266;</span>
+			</a><br />';
 
 	if (isBrowser('is_ie'))
 		echo '
@@ -528,15 +530,13 @@ function template_verification_sound()
 			</object>';
 	else
 		echo '
-			<object type="audio/x-wav" data="', $context['verification_sound_href'], '">
-				<a href="', $context['verification_sound_href'], '" rel="nofollow">', $context['verification_sound_href'], '</a>
-			</object>';
+			<object type="audio/x-wav" data="', $context['verification_sound_href'], '"></object>';
 
 	echo '
-		<br />
-		<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">', $txt['visual_verification_sound_again'], '</a><br />
-		<a href="', $context['verification_sound_href'], '" rel="nofollow">', $txt['visual_verification_sound_direct'], '</a><br /><br />
-		<a href="javascript:self.close();">', $txt['visual_verification_sound_close'], '</a><br />
+			<br />
+			<a href="', $context['verification_sound_href'], ';sound" rel="nofollow">', $txt['visual_verification_sound_again'], '</a><br />
+			<a href="', $context['verification_sound_href'], '" rel="nofollow">', $txt['visual_verification_sound_direct'], '</a><br /><br />
+			<a href="javascript:self.close();">', $txt['visual_verification_sound_close'], '</a><br />
 		</div>
 	</body>
 </html>';

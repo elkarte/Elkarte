@@ -53,652 +53,513 @@ class Admin_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Action.class.php');
 
 		// Define the menu structure - see subs/Menu.subs.php for details!
-		$allMenus = Standard_Menu::context();
-		$admin_menu = $allMenus->get('Admin_Menu');
-
-		// Add in all of the top level items, like main, config, layout, etc
-		$admin_menu->addBulk(
-			array(
-				'forum' => array(
-					'title' => $txt['admin_main'],
-					'permission' => array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'),
+		$admin_areas = array(
+			'forum' => array(
+				'title' => $txt['admin_main'],
+				'permission' => array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'),
+				'areas' => array(
+					'index' => array(
+						'label' => $txt['admin_center'],
+						'controller' => 'Admin_Controller',
+						'function' => 'action_home',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_administration',
+					),
+					'credits' => array(
+						'label' => $txt['support_credits_title'],
+						'controller' => 'Admin_Controller',
+						'function' => 'action_credits',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_support',
+					),
+					'maillist' => array(
+						'label' => $txt['mail_center'],
+						'file' => 'ManageMaillist.controller.php',
+						'controller' => 'ManageMaillist_Controller',
+						'function' => 'action_index',
+						'icon' => 'mail.png',
+						'class' => 'admin_img_mail',
+						'permission' => array('approve_emails', 'admin_forum'),
+						'enabled' => in_array('pe', $context['admin_features']),
+						'subsections' => array(
+							'emaillist' => array($txt['mm_emailerror'], 'approve_emails'),
+							'emailfilters' => array($txt['mm_emailfilters'], 'admin_forum'),
+							'emailparser' => array($txt['mm_emailparsers'], 'admin_forum'),
+							'emailtemplates' => array($txt['mm_emailtemplates'], 'approve_emails'),
+							'emailsettings' => array($txt['mm_emailsettings'], 'admin_forum'),
+						),
+					),
+					'news' => array(
+						'label' => $txt['news_title'],
+						'file' => 'ManageNews.controller.php',
+						'controller' => 'ManageNews_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_news',
+						'permission' => array('edit_news', 'send_mail', 'admin_forum'),
+						'subsections' => array(
+							'editnews' => array($txt['admin_edit_news'], 'edit_news'),
+							'mailingmembers' => array($txt['admin_newsletters'], 'send_mail'),
+							'settings' => array($txt['settings'], 'admin_forum'),
+						),
+					),
+					'packages' => array(
+						'label' => $txt['package'],
+						'file' => 'Packages.controller.php',
+						'controller' => 'Packages_Controller',
+						'function' => 'action_index',
+						'permission' => array('admin_forum'),
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_packages',
+						'subsections' => array(
+							'browse' => array($txt['browse_packages']),
+							'installed' => array($txt['installed_packages']),
+							'perms' => array($txt['package_file_perms']),
+							'options' => array($txt['package_settings']),
+						),
+					),
+					'packageservers' => array(
+						'label' => $txt['package_servers'],
+						'file' => 'PackageServers.controller.php',
+						'controller' => 'PackageServers_Controller',
+						'function' => 'action_index',
+						'permission' => array('admin_forum'),
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_packages',
+						'subsections' => array(
+							'servers' => array($txt['download_packages']),
+							'upload' => array($txt['upload_packages']),
+						),
+					),
+					'search' => array(
+						'controller' => 'Admin_Controller',
+						'function' => 'action_search',
+						'permission' => array('admin_forum'),
+						'select' => 'index'
+					),
+					'adminlogoff' => array(
+						'controller' => 'Admin_Controller',
+						'function' => 'action_endsession',
+						'label' => $txt['admin_logoff'],
+						'enabled' => empty($modSettings['securityDisable']),
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_exit',
+					),
 				),
-				'config' => array(
-					'title' => $txt['admin_config'],
-					'permission' => array('admin_forum'),
+			),
+			'config' => array(
+				'title' => $txt['admin_config'],
+				'permission' => array('admin_forum'),
+				'areas' => array(
+					'corefeatures' => array(
+						'label' => $txt['core_settings_title'],
+						'file' => 'CoreFeatures.controller.php',
+						'controller' => 'CoreFeatures_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_corefeatures',
+					),
+					'featuresettings' => array(
+						'label' => $txt['modSettings_title'],
+						'file' => 'ManageFeatures.controller.php',
+						'controller' => 'ManageFeatures_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_features',
+						'subsections' => array(
+							'basic' => array($txt['mods_cat_features']),
+							'layout' => array($txt['mods_cat_layout']),
+							'pmsettings' => array($txt['personal_messages']),
+							'karma' => array($txt['karma'], 'enabled' => in_array('k', $context['admin_features'])),
+							'likes' => array($txt['likes'], 'enabled' => in_array('l', $context['admin_features'])),
+							'sig' => array($txt['signature_settings_short']),
+							'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => in_array('cp', $context['admin_features'])),
+							'mention' => array($txt['mention']),
+						),
+					),
+					'securitysettings' => array(
+						'label' => $txt['admin_security_moderation'],
+						'file' => 'ManageSecurity.controller.php',
+						'controller' => 'ManageSecurity_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_security',
+						'subsections' => array(
+							'general' => array($txt['mods_cat_security_general']),
+							'spam' => array($txt['antispam_title']),
+							'badbehavior' => array($txt['badbehavior_title']),
+							'moderation' => array($txt['moderation_settings_short'], 'enabled' => !empty($modSettings['warning_enable'])),
+						),
+					),
+					'languages' => array(
+						'label' => $txt['language_configuration'],
+						'file' => 'ManageLanguages.controller.php',
+						'controller' => 'ManageLanguages_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_languages',
+						'subsections' => array(
+							'edit' => array($txt['language_edit']),
+// 							'add' => array($txt['language_add']),
+							'settings' => array($txt['language_settings']),
+						),
+					),
+					'serversettings' => array(
+						'label' => $txt['admin_server_settings'],
+						'file' => 'ManageServer.controller.php',
+						'controller' => 'ManageServer_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_server',
+						'subsections' => array(
+							'general' => array($txt['general_settings']),
+							'database' => array($txt['database_paths_settings']),
+							'cookie' => array($txt['cookies_sessions_settings']),
+							'cache' => array($txt['caching_settings']),
+							'loads' => array($txt['load_balancing_settings']),
+							'phpinfo' => array($txt['phpinfo_settings']),
+						),
+					),
+					'current_theme' => array(
+						'label' => $txt['theme_current_settings'],
+						'file' => 'ManageThemes.controller.php',
+						'controller' => 'ManageThemes_Controller',
+						'function' => 'action_index',
+						'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_current_theme',
+					),
+					'theme' => array(
+						'label' => $txt['theme_admin'],
+						'file' => 'ManageThemes.controller.php',
+						'controller' => 'ManageThemes_Controller',
+						'function' => 'action_index',
+						'custom_url' => $scripturl . '?action=admin;area=theme',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_themes',
+						'subsections' => array(
+							'admin' => array($txt['themeadmin_admin_title']),
+							'list' => array($txt['themeadmin_list_title']),
+							'reset' => array($txt['themeadmin_reset_title']),
+							'themelist' => array($txt['themeadmin_edit_title'], 'active' => array('edit', 'browse')),
+							'edit' => array($txt['themeadmin_edit_title'], 'enabled' => false),
+							'browse' => array($txt['themeadmin_edit_title'], 'enabled' => false),
+						),
+					),
+					'addonsettings' => array(
+						'label' => $txt['admin_modifications'],
+						'file' => 'AddonSettings.controller.php',
+						'controller' => 'AddonSettings_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_modifications',
+						'subsections' => array(
+							'general' => array($txt['mods_cat_modifications_misc']),
+							// @deprecated: do not rely on this line, use the appropriate hook and tools provided
+							// Addon Authors for a "ADD AFTER" on this line. Ensure you end your change with a comma. For example:
+							// 'shout' => array($txt['shout']),
+							// Note the comma!! The setting with automatically appear with the first mod to be added.
+						),
+					),
 				),
-				'layout' => array(
-					'title' => $txt['layout_controls'],
-					'permission' => array('manage_boards', 'admin_forum', 'manage_smileys', 'manage_attachments', 'moderate_forum'),
+			),
+			'layout' => array(
+				'title' => $txt['layout_controls'],
+				'permission' => array('manage_boards', 'admin_forum', 'manage_smileys', 'manage_attachments', 'moderate_forum'),
+				'areas' => array(
+					'manageboards' => array(
+						'label' => $txt['admin_boards'],
+						'file' => 'ManageBoards.controller.php',
+						'controller' => 'ManageBoards_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_boards',
+						'permission' => array('manage_boards'),
+						'subsections' => array(
+							'main' => array($txt['boardsEdit']),
+							'newcat' => array($txt['mboards_new_cat']),
+							'settings' => array($txt['settings'], 'admin_forum'),
+						),
+					),
+					'postsettings' => array(
+						'label' => $txt['manageposts'],
+						'file' => 'ManagePosts.controller.php',
+						'controller' => 'ManagePosts_Controller',
+						'function' => 'action_index',
+						'permission' => array('admin_forum'),
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_posts',
+						'subsections' => array(
+							'posts' => array($txt['manageposts_settings']),
+							'bbc' => array($txt['manageposts_bbc_settings']),
+							'censor' => array($txt['admin_censored_words']),
+							'topics' => array($txt['manageposts_topic_settings']),
+						),
+					),
+					'managedrafts' => array(
+						'label' => $txt['manage_drafts'],
+						'file' => 'ManageDrafts.controller.php',
+						'controller' => 'ManageDrafts_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_logs',
+						'permission' => array('admin_forum'),
+						'enabled' => in_array('dr', $context['admin_features']),
+					),
+					'managecalendar' => array(
+						'label' => $txt['manage_calendar'],
+						'file' => 'ManageCalendar.controller.php',
+						'controller' => 'ManageCalendar_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_calendar',
+						'permission' => array('admin_forum'),
+						'enabled' => in_array('cd', $context['admin_features']),
+						'subsections' => array(
+							'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
+							'settings' => array($txt['calendar_settings'], 'admin_forum'),
+						),
+					),
+					'managesearch' => array(
+						'label' => $txt['manage_search'],
+						'file' => 'ManageSearch.controller.php',
+						'controller' => 'ManageSearch_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_search',
+						'permission' => array('admin_forum'),
+						'subsections' => array(
+							'weights' => array($txt['search_weights']),
+							'method' => array($txt['search_method']),
+							'managesphinx' => array($txt['search_sphinx']),
+							'settings' => array($txt['settings']),
+						),
+					),
+					'smileys' => array(
+						'label' => $txt['smileys_manage'],
+						'file' => 'ManageSmileys.controller.php',
+						'controller' => 'ManageSmileys_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_smiley',
+						'permission' => array('manage_smileys'),
+						'subsections' => array(
+							'editsets' => array($txt['smiley_sets']),
+							'addsmiley' => array($txt['smileys_add'], 'enabled' => !empty($modSettings['smiley_enable'])),
+							'editsmileys' => array($txt['smileys_edit'], 'enabled' => !empty($modSettings['smiley_enable'])),
+							'setorder' => array($txt['smileys_set_order'], 'enabled' => !empty($modSettings['smiley_enable'])),
+							'editicons' => array($txt['icons_edit_message_icons'], 'enabled' => !empty($modSettings['messageIcons_enable'])),
+							'settings' => array($txt['settings']),
+						),
+					),
+					'manageattachments' => array(
+						'label' => $txt['attachments_avatars'],
+						'file' => 'ManageAttachments.controller.php',
+						'controller' => 'ManageAttachments_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_attachment',
+						'permission' => array('manage_attachments'),
+						'subsections' => array(
+							'browse' => array($txt['attachment_manager_browse']),
+							'attachments' => array($txt['attachment_manager_settings']),
+							'avatars' => array($txt['attachment_manager_avatar_settings']),
+							'attachpaths' => array($txt['attach_directories']),
+							'maintenance' => array($txt['attachment_manager_maintenance']),
+						),
+					),
 				),
-				'members' => array(
-					'title' => $txt['admin_manage_members'],
-					'permission' => array('moderate_forum', 'manage_membergroups', 'manage_bans', 'manage_permissions', 'admin_forum'),
+			),
+			'members' => array(
+				'title' => $txt['admin_manage_members'],
+				'permission' => array('moderate_forum', 'manage_membergroups', 'manage_bans', 'manage_permissions', 'admin_forum'),
+				'areas' => array(
+					'viewmembers' => array(
+						'label' => $txt['admin_users'],
+						'file' => 'ManageMembers.controller.php',
+						'controller' => 'ManageMembers_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_members',
+						'permission' => array('moderate_forum'),
+						'subsections' => array(
+							'all' => array($txt['view_all_members']),
+							'search' => array($txt['mlist_search']),
+						),
+					),
+					'membergroups' => array(
+						'label' => $txt['admin_groups'],
+						'file' => 'ManageMembergroups.controller.php',
+						'controller' => 'ManageMembergroups_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_membergroups',
+						'permission' => array('manage_membergroups'),
+						'subsections' => array(
+							'index' => array($txt['membergroups_edit_groups'], 'manage_membergroups'),
+							'add' => array($txt['membergroups_new_group'], 'manage_membergroups'),
+							'settings' => array($txt['settings'], 'admin_forum'),
+						),
+					),
+					'permissions' => array(
+						'label' => $txt['edit_permissions'],
+						'file' => 'ManagePermissions.controller.php',
+						'controller' => 'ManagePermissions_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_permissions',
+						'permission' => array('manage_permissions'),
+						'subsections' => array(
+							'index' => array($txt['permissions_groups'], 'manage_permissions'),
+							'board' => array($txt['permissions_boards'], 'manage_permissions'),
+							'profiles' => array($txt['permissions_profiles'], 'manage_permissions'),
+							'postmod' => array($txt['permissions_post_moderation'], 'manage_permissions', 'enabled' => $modSettings['postmod_active']),
+							'settings' => array($txt['settings'], 'admin_forum'),
+						),
+					),
+					'regcenter' => array(
+						'label' => $txt['registration_center'],
+						'file' => 'ManageRegistration.controller.php',
+						'controller' => 'ManageRegistration_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_regcenter',
+						'permission' => array('admin_forum', 'moderate_forum'),
+						'subsections' => array(
+							'register' => array($txt['admin_browse_register_new'], 'moderate_forum'),
+							'agreement' => array($txt['registration_agreement'], 'admin_forum'),
+							'reservednames' => array($txt['admin_reserved_set'], 'admin_forum'),
+							'settings' => array($txt['settings'], 'admin_forum'),
+						),
+					),
+					'ban' => array(
+						'label' => $txt['ban_title'],
+						'file' => 'ManageBans.controller.php',
+						'controller' => 'ManageBans_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_ban',
+						'permission' => 'manage_bans',
+						'subsections' => array(
+							'list' => array($txt['ban_edit_list']),
+							'add' => array($txt['ban_add_new']),
+							'browse' => array($txt['ban_trigger_browse']),
+							'log' => array($txt['ban_log']),
+						),
+					),
+					'paidsubscribe' => array(
+						'label' => $txt['paid_subscriptions'],
+						'enabled' => in_array('ps', $context['admin_features']),
+						'file' => 'ManagePaid.controller.php',
+						'controller' => 'ManagePaid_Controller',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_paid',
+						'function' => 'action_index',
+						'permission' => 'admin_forum',
+						'subsections' => array(
+							'view' => array($txt['paid_subs_view']),
+							'settings' => array($txt['settings']),
+						),
+					),
+					'sengines' => array(
+						'label' => $txt['search_engines'],
+						'enabled' => in_array('sp', $context['admin_features']),
+						'file' => 'ManageSearchEngines.controller.php',
+						'controller' => 'ManageSearchEngines_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_engines',
+						'permission' => 'admin_forum',
+						'subsections' => array(
+							'stats' => array($txt['spider_stats']),
+							'logs' => array($txt['spider_logs']),
+							'spiders' => array($txt['spiders']),
+							'settings' => array($txt['settings']),
+						),
+					),
 				),
-				'maintenance' => array(
-					'title' => $txt['admin_maintenance'],
-					'permission' => array('admin_forum'),
+			),
+			'maintenance' => array(
+				'title' => $txt['admin_maintenance'],
+				'permission' => array('admin_forum'),
+				'areas' => array(
+					'maintain' => array(
+						'label' => $txt['maintain_title'],
+						'file' => 'Maintenance.controller.php',
+						'controller' => 'Maintenance_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_maintain',
+						'subsections' => array(
+							'routine' => array($txt['maintain_sub_routine'], 'admin_forum'),
+							'database' => array($txt['maintain_sub_database'], 'admin_forum'),
+							'members' => array($txt['maintain_sub_members'], 'admin_forum'),
+							'topics' => array($txt['maintain_sub_topics'], 'admin_forum'),
+							'hooks' => array($txt['maintain_sub_hooks_list'], 'admin_forum'),
+							'attachments' => array($txt['maintain_sub_attachments'], 'admin_forum'),
+						),
+					),
+					'scheduledtasks' => array(
+						'label' => $txt['maintain_tasks'],
+						'file' => 'ManageScheduledTasks.controller.php',
+						'controller' => 'ManageScheduledTasks_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_scheduled',
+						'subsections' => array(
+							'tasks' => array($txt['maintain_tasks'], 'admin_forum'),
+							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
+						),
+					),
+					'mailqueue' => array(
+						'label' => $txt['mailqueue_title'],
+						'file' => 'ManageMail.controller.php',
+						'controller' => 'ManageMail_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_mail',
+						'subsections' => array(
+							'browse' => array($txt['mailqueue_browse'], 'admin_forum'),
+							'settings' => array($txt['mailqueue_settings'], 'admin_forum'),
+						),
+					),
+					'reports' => array(
+						'enabled' => in_array('rg', $context['admin_features']),
+						'label' => $txt['generate_reports'],
+						'file' => 'Reports.controller.php',
+						'controller' => 'Reports_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_reports',
+					),
+					'logs' => array(
+						'label' => $txt['logs'],
+						'file' => 'AdminLog.controller.php',
+						'controller' => 'AdminLog_Controller',
+						'function' => 'action_index',
+						'icon' => 'transparent.png',
+						'class' => 'admin_img_logs',
+						'subsections' => array(
+							'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc'),
+							'adminlog' => array($txt['admin_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
+							'modlog' => array($txt['moderation_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
+							'banlog' => array($txt['ban_log'], 'manage_bans'),
+							'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => in_array('sp', $context['admin_features'])),
+							'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
+							'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => $scripturl . '?action=admin;area=logs;sa=badbehaviorlog;desc'),
+							'pruning' => array($txt['pruning_title'], 'admin_forum'),
+						),
+					),
+					'repairboards' => array(
+						'label' => $txt['admin_repair'],
+						'file' => 'RepairBoards.controller.php',
+						'controller' => 'RepairBoards_Controller',
+						'function' => 'action_repairboards',
+						'select' => 'maintain',
+						'hidden' => true,
+					),
 				),
-			)
-		);
-
-		// Add the sub items under the "main" menu
-		$forum_areas = $admin_menu->childOf('forum')->add('forum_areas');
-		$forum_areas->addBulk(
-			array(
-				'index' => array(
-					'label' => $txt['admin_center'],
-					'controller' => 'Admin_Controller',
-					'function' => 'action_home',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_administration',
-				),
-				'credits' => array(
-					'label' => $txt['support_credits_title'],
-					'controller' => 'Admin_Controller',
-					'function' => 'action_credits',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_support',
-				),
-				'maillist' => array(
-					'label' => $txt['mail_center'],
-					'file' => 'ManageMaillist.controller.php',
-					'controller' => 'ManageMaillist_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_mail',
-					'permission' => array('approve_emails', 'admin_forum'),
-					'enabled' => in_array('pe', $context['admin_features']),
-				),
-				'news' => array(
-					'label' => $txt['news_title'],
-					'file' => 'ManageNews.controller.php',
-					'controller' => 'ManageNews_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_news',
-					'permission' => array('edit_news', 'send_mail', 'admin_forum'),
-				),
-				'packages' => array(
-					'label' => $txt['package'],
-					'file' => 'Packages.controller.php',
-					'controller' => 'Packages_Controller',
-					'function' => 'action_index',
-					'permission' => array('admin_forum'),
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_packages',
-				),
-				'packageservers' => array(
-					'label' => $txt['package_servers'],
-					'file' => 'PackageServers.controller.php',
-					'controller' => 'PackageServers_Controller',
-					'function' => 'action_index',
-					'permission' => array('admin_forum'),
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_packages',
-				),
-				'search' => array(
-					'controller' => 'Admin_Controller',
-					'function' => 'action_search',
-					'permission' => array('admin_forum'),
-					'select' => 'index'
-				),
-				'adminlogoff' => array(
-					'controller' => 'Admin_Controller',
-					'function' => 'action_endsession',
-					'label' => $txt['admin_logoff'],
-					'enabled' => empty($modSettings['securityDisable']),
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_exit',
-				),
-			)
-		);
-
-		// All the subitems of the mailist function
-		$forum_areas->childOf('maillist')->add('maillist_sub')->addBulk(
-			array(
-				'emaillist' => array($txt['mm_emailerror'], 'approve_emails'),
-				'emailfilters' => array($txt['mm_emailfilters'], 'admin_forum'),
-				'emailparser' => array($txt['mm_emailparsers'], 'admin_forum'),
-				'emailtemplates' => array($txt['mm_emailtemplates'], 'approve_emails'),
-				'emailsettings' => array($txt['mm_emailsettings'], 'admin_forum'),
-			)
-		);
-
-		// Next up the news
-		$forum_areas->childOf('news')->add('news_sub')->addBulk(
-			array(
-				'editnews' => array($txt['admin_edit_news'], 'edit_news'),
-				'mailingmembers' => array($txt['admin_newsletters'], 'send_mail'),
-				'settings' => array($txt['settings'], 'admin_forum'),
-			)
-		);
-
-		// Packages make the forum
-		$forum_areas->childOf('packages')->add('packages_sub')->addBulk(
-			array(
-				'browse' => array($txt['browse_packages']),
-				'installed' => array($txt['installed_packages']),
-				'perms' => array($txt['package_file_perms']),
-				'options' => array($txt['package_settings']),
-			)
-		);
-
-		// Pacakge server menu
-		$forum_areas->childOf('packageservers')->add('packageservers_sub')->addBulk(
-			array(
-				'servers' => array($txt['download_packages']),
-				'upload' => array($txt['upload_packages']),
-			)
-		);
-
-		// All of the items under the conig menu
-		$config_areas = $admin_menu->childOf('config')->add('config_areas');
-		$config_areas->addBulk(
-			array(
-				'corefeatures' => array(
-					'label' => $txt['core_settings_title'],
-					'file' => 'CoreFeatures.controller.php',
-					'controller' => 'CoreFeatures_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_corefeatures',
-				),
-				'featuresettings' => array(
-					'label' => $txt['modSettings_title'],
-					'file' => 'ManageFeatures.controller.php',
-					'controller' => 'ManageFeatures_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_features',
-				),
-				'securitysettings' => array(
-					'label' => $txt['admin_security_moderation'],
-					'file' => 'ManageSecurity.controller.php',
-					'controller' => 'ManageSecurity_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_security',
-				),
-				'languages' => array(
-					'label' => $txt['language_configuration'],
-					'file' => 'ManageLanguages.controller.php',
-					'controller' => 'ManageLanguages_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_languages',
-				),
-				'serversettings' => array(
-					'label' => $txt['admin_server_settings'],
-					'file' => 'ManageServer.controller.php',
-					'controller' => 'ManageServer_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_server',
-				),
-				'current_theme' => array(
-					'label' => $txt['theme_current_settings'],
-					'file' => 'ManageThemes.controller.php',
-					'controller' => 'ManageThemes_Controller',
-					'function' => 'action_index',
-					'custom_url' => $scripturl . '?action=admin;area=theme;sa=list;th=' . $settings['theme_id'],
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_current_theme',
-				),
-				'theme' => array(
-					'label' => $txt['theme_admin'],
-					'file' => 'ManageThemes.controller.php',
-					'controller' => 'ManageThemes_Controller',
-					'function' => 'action_index',
-					'custom_url' => $scripturl . '?action=admin;area=theme',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_themes',
-				),
-				'addonsettings' => array(
-					'label' => $txt['admin_modifications'],
-					'file' => 'AddonSettings.controller.php',
-					'controller' => 'AddonSettings_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_modifications',
-				),
-			)
-		);
-
-		// Sub items of features and settings
-		$config_areas->childOf('featuresettings')->add('featuresettings_sub')->addBulk(
-			array(
-				'basic' => array($txt['mods_cat_features']),
-				'layout' => array($txt['mods_cat_layout']),
-				'pmsettings' => array($txt['personal_messages']),
-				'karma' => array($txt['karma'], 'enabled' => in_array('k', $context['admin_features'])),
-				'likes' => array($txt['likes'], 'enabled' => in_array('l', $context['admin_features'])),
-				'sig' => array($txt['signature_settings_short']),
-				'profile' => array($txt['custom_profile_shorttitle'], 'enabled' => in_array('cp', $context['admin_features'])),
-				'mention' => array($txt['mention']),
-			)
-		);
-
-		// Sub items of security
-		$config_areas->childOf('securitysettings')->add('securitysettings_sub')->addBulk(
-			array(
-				'general' => array($txt['mods_cat_security_general']),
-				'spam' => array($txt['antispam_title']),
-				'badbehavior' => array($txt['badbehavior_title']),
-				'moderation' => array($txt['moderation_settings_short'], 'enabled' => !empty($modSettings['warning_enable'])),
-			)
-		);
-
-		// Sub items of langauges
-		$config_areas->childOf('languages')->add('languages_sub')->addBulk(
-			array(
-				'edit' => array($txt['language_edit']),
-// 				'add' => array($txt['language_add']),
-				'settings' => array($txt['language_settings']),
-			)
-		);
-
-		// Sub items of server
-		$config_areas->childOf('serversettings')->add('serversettings_sub')->addBulk(
-			array(
-				'general' => array($txt['general_settings']),
-				'database' => array($txt['database_paths_settings']),
-				'cookie' => array($txt['cookies_sessions_settings']),
-				'cache' => array($txt['caching_settings']),
-				'loads' => array($txt['load_balancing_settings']),
-				'phpinfo' => array($txt['phpinfo_settings']),
-			)
-		);
-
-		// Sub items of theme
-		$config_areas->childOf('theme')->add('theme_sub')->addBulk(
-			array(
-				'admin' => array($txt['themeadmin_admin_title']),
-				'list' => array($txt['themeadmin_list_title']),
-				'reset' => array($txt['themeadmin_reset_title']),
-				'themelist' => array($txt['themeadmin_edit_title'], 'active' => array('edit', 'browse')),
-				'edit' => array($txt['themeadmin_edit_title'], 'enabled' => false),
-				'browse' => array($txt['themeadmin_edit_title'], 'enabled' => false),
-			)
-		);
-
-		// Sub items of addons
-		$config_areas->childOf('addonsettings')->add('addonsettings_sub')->addBulk(
-			array(
-				'general' => array($txt['mods_cat_modifications_misc']),
-				// @deprecated: do not rely on this line, use the appropriate hook and tools provided
-				// Addon Authors for a "ADD AFTER" on this line. Ensure you end your change with a comma. For example:
-				// 'shout' => array($txt['shout']),
-				// Note the comma!! The setting with automatically appear with the first mod to be added.
-			)
-		);
-
-		// Next up the layout menu items
-		$layout_areas = $admin_menu->childOf('layout')->add('layout_areas');
-		$layout_areas->addBulk(
-			array(
-				'manageboards' => array(
-					'label' => $txt['admin_boards'],
-					'file' => 'ManageBoards.controller.php',
-					'controller' => 'ManageBoards_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_boards',
-					'permission' => array('manage_boards'),
-				),
-				'postsettings' => array(
-					'label' => $txt['manageposts'],
-					'file' => 'ManagePosts.controller.php',
-					'controller' => 'ManagePosts_Controller',
-					'function' => 'action_index',
-					'permission' => array('admin_forum'),
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_posts',
-				),
-				'managedrafts' => array(
-					'label' => $txt['manage_drafts'],
-					'file' => 'ManageDrafts.controller.php',
-					'controller' => 'ManageDrafts_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_logs',
-					'permission' => array('admin_forum'),
-					'enabled' => in_array('dr', $context['admin_features']),
-				),
-				'managecalendar' => array(
-					'label' => $txt['manage_calendar'],
-					'file' => 'ManageCalendar.controller.php',
-					'controller' => 'ManageCalendar_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_calendar',
-					'permission' => array('admin_forum'),
-					'enabled' => in_array('cd', $context['admin_features']),
-				),
-				'managesearch' => array(
-					'label' => $txt['manage_search'],
-					'file' => 'ManageSearch.controller.php',
-					'controller' => 'ManageSearch_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_search',
-					'permission' => array('admin_forum'),
-				),
-				'smileys' => array(
-					'label' => $txt['smileys_manage'],
-					'file' => 'ManageSmileys.controller.php',
-					'controller' => 'ManageSmileys_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_smiley',
-					'permission' => array('manage_smileys'),
-				),
-				'manageattachments' => array(
-					'label' => $txt['attachments_avatars'],
-					'file' => 'ManageAttachments.controller.php',
-					'controller' => 'ManageAttachments_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_attachment',
-					'permission' => array('manage_attachments'),
-				),
-			)
-		);
-
-		// Sub items for manage boards
-		$layout_areas->childOf('manageboards')->add('manageboards_sub')->addBulk(
-			array(
-				'main' => array($txt['boardsEdit']),
-				'newcat' => array($txt['mboards_new_cat']),
-				'settings' => array($txt['settings'], 'admin_forum'),
-			)
-		);
-
-		// Sub items for post settings
-		$layout_areas->childOf('postsettings')->add('postsettings_sub')->addBulk(
-			array(
-				'posts' => array($txt['manageposts_settings']),
-				'bbc' => array($txt['manageposts_bbc_settings']),
-				'censor' => array($txt['admin_censored_words']),
-				'topics' => array($txt['manageposts_topic_settings']),
-			)
-		);
-
-		// Sub items of calendar
-		$layout_areas->childOf('managecalendar')->add('managecalendar_sub')->addBulk(
-			array(
-				'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-				'settings' => array($txt['calendar_settings'], 'admin_forum'),
-			)
-		);
-
-		// Sub items of manage search
-		$layout_areas->childOf('managesearch')->add('managesearch_sub')->addBulk(
-			array(
-				'weights' => array($txt['search_weights']),
-				'method' => array($txt['search_method']),
-				'managesphinx' => array($txt['search_sphinx']),
-				'settings' => array($txt['settings']),
-			)
-		);
-
-		// Sub items of smile
-		$layout_areas->childOf('smileys')->add('smileys_sub')->addBulk(
-			array(
-				'editsets' => array($txt['smiley_sets']),
-				'addsmiley' => array($txt['smileys_add'], 'enabled' => !empty($modSettings['smiley_enable'])),
-				'editsmileys' => array($txt['smileys_edit'], 'enabled' => !empty($modSettings['smiley_enable'])),
-				'setorder' => array($txt['smileys_set_order'], 'enabled' => !empty($modSettings['smiley_enable'])),
-				'editicons' => array($txt['icons_edit_message_icons'], 'enabled' => !empty($modSettings['messageIcons_enable'])),
-				'settings' => array($txt['settings']),
-			)
-		);
-
-		// Sub items of manage attachments
-		$layout_areas->childOf('manageattachments')->add('manageattachments_sub')->addBulk(
-			array(
-				'browse' => array($txt['attachment_manager_browse']),
-				'attachments' => array($txt['attachment_manager_settings']),
-				'avatars' => array($txt['attachment_manager_avatar_settings']),
-				'attachpaths' => array($txt['attach_directories']),
-				'maintenance' => array($txt['attachment_manager_maintenance']),
-			)
-		);
-
-		// And now the member button
-		$members_areas = $admin_menu->childOf('members')->add('members_areas');
-		$members_areas->addBulk(
-			array(
-				'viewmembers' => array(
-					'label' => $txt['admin_users'],
-					'file' => 'ManageMembers.controller.php',
-					'controller' => 'ManageMembers_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_members',
-					'permission' => array('moderate_forum'),
-				),
-				'membergroups' => array(
-					'label' => $txt['admin_groups'],
-					'file' => 'ManageMembergroups.controller.php',
-					'controller' => 'ManageMembergroups_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_membergroups',
-					'permission' => array('manage_membergroups'),
-				),
-				'permissions' => array(
-					'label' => $txt['edit_permissions'],
-					'file' => 'ManagePermissions.controller.php',
-					'controller' => 'ManagePermissions_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_permissions',
-					'permission' => array('manage_permissions'),
-				),
-				'regcenter' => array(
-					'label' => $txt['registration_center'],
-					'file' => 'ManageRegistration.controller.php',
-					'controller' => 'ManageRegistration_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_regcenter',
-					'permission' => array('admin_forum', 'moderate_forum'),
-				),
-				'ban' => array(
-					'label' => $txt['ban_title'],
-					'file' => 'ManageBans.controller.php',
-					'controller' => 'ManageBans_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_ban',
-					'permission' => 'manage_bans',
-				),
-				'paidsubscribe' => array(
-					'label' => $txt['paid_subscriptions'],
-					'enabled' => in_array('ps', $context['admin_features']),
-					'file' => 'ManagePaid.controller.php',
-					'controller' => 'ManagePaid_Controller',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_paid',
-					'function' => 'action_index',
-					'permission' => 'admin_forum',
-				),
-				'sengines' => array(
-					'label' => $txt['search_engines'],
-					'enabled' => in_array('sp', $context['admin_features']),
-					'file' => 'ManageSearchEngines.controller.php',
-					'controller' => 'ManageSearchEngines_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_engines',
-					'permission' => 'admin_forum',
-				),
-			)
-		);
-
-		// Sub items of view members
-		$members_areas->childOf('viewmembers')->add('viewmembers_sub')->addBulk(
-			array(
-				'all' => array($txt['view_all_members']),
-				'search' => array($txt['mlist_search']),
-			)
-		);
-
-		// Sub items of membergroups
-		$members_areas->childOf('membergroups')->add('membergroups_sub')->addBulk(
-			array(
-				'index' => array($txt['membergroups_edit_groups'], 'manage_membergroups'),
-				'add' => array($txt['membergroups_new_group'], 'manage_membergroups'),
-				'settings' => array($txt['settings'], 'admin_forum'),
-			)
-		);
-
-		// Sub items of permissions
-		$members_areas->childOf('permissions')->add('permissions_sub')->addBulk(
-			array(
-				'index' => array($txt['permissions_groups'], 'manage_permissions'),
-				'board' => array($txt['permissions_boards'], 'manage_permissions'),
-				'profiles' => array($txt['permissions_profiles'], 'manage_permissions'),
-				'postmod' => array($txt['permissions_post_moderation'], 'manage_permissions', 'enabled' => $modSettings['postmod_active']),
-				'settings' => array($txt['settings'], 'admin_forum'),
-			)
-		);
-
-		// Sub items of the registration center
-		$members_areas->childOf('regcenter')->add('regcenter_sub')->addBulk(
-			array(
-				'register' => array($txt['admin_browse_register_new'], 'moderate_forum'),
-				'agreement' => array($txt['registration_agreement'], 'admin_forum'),
-				'reservednames' => array($txt['admin_reserved_set'], 'admin_forum'),
-				'settings' => array($txt['settings'], 'admin_forum'),
-			)
-		);
-
-		// Sub items of Ban
-		$members_areas->childOf('ban')->add('ban_sub')->addBulk(
-			array(
-				'list' => array($txt['ban_edit_list']),
-				'add' => array($txt['ban_add_new']),
-				'browse' => array($txt['ban_trigger_browse']),
-				'log' => array($txt['ban_log']),
-			)
-		);
-
-		// Sub items of paid subscriptions
-		$members_areas->childOf('paidsubscribe')->add('paidsubscribe_sub')->addBulk(
-			array(
-				'view' => array($txt['paid_subs_view']),
-				'settings' => array($txt['settings']),
-			)
-		);
-
-		// Sub items of search engines
-		$members_areas->childOf('sengines')->add('sengines_sub')->addBulk(
-			array(
-				'stats' => array($txt['spider_stats']),
-				'logs' => array($txt['spider_logs']),
-				'spiders' => array($txt['spiders']),
-				'settings' => array($txt['settings']),
-			)
-		);
-
-		// Last but not least, maintenance
-		$maintenance_areas = $admin_menu->childOf('maintenance')->add('maintenance_areas');
-		$maintenance_areas->addBulk(
-			array(
-				'maintain' => array(
-					'label' => $txt['maintain_title'],
-					'file' => 'Maintenance.controller.php',
-					'controller' => 'Maintenance_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_maintain',
-				),
-				'scheduledtasks' => array(
-					'label' => $txt['maintain_tasks'],
-					'file' => 'ManageScheduledTasks.controller.php',
-					'controller' => 'ManageScheduledTasks_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_scheduled',
-				),
-				'mailqueue' => array(
-					'label' => $txt['mailqueue_title'],
-					'file' => 'ManageMail.controller.php',
-					'controller' => 'ManageMail_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_mail',
-				),
-				'reports' => array(
-					'enabled' => in_array('rg', $context['admin_features']),
-					'label' => $txt['generate_reports'],
-					'file' => 'Reports.controller.php',
-					'controller' => 'Reports_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_reports',
-				),
-				'logs' => array(
-					'label' => $txt['logs'],
-					'file' => 'AdminLog.controller.php',
-					'controller' => 'AdminLog_Controller',
-					'function' => 'action_index',
-					'icon' => 'transparent.png',
-					'class' => 'admin_img_logs',
-				),
-				'repairboards' => array(
-					'label' => $txt['admin_repair'],
-					'file' => 'RepairBoards.controller.php',
-					'controller' => 'RepairBoards_Controller',
-					'function' => 'action_repairboards',
-					'select' => 'maintain',
-					'hidden' => true,
-				),
-			)
-		);
-
-		// Sub items of routine
-		$maintenance_areas->childOf('maintain')->add('maintain_sub')->addBulk(
-			array(
-				'routine' => array($txt['maintain_sub_routine'], 'admin_forum'),
-				'database' => array($txt['maintain_sub_database'], 'admin_forum'),
-				'members' => array($txt['maintain_sub_members'], 'admin_forum'),
-				'topics' => array($txt['maintain_sub_topics'], 'admin_forum'),
-				'hooks' => array($txt['maintain_sub_hooks_list'], 'admin_forum'),
-				'attachments' => array($txt['maintain_sub_attachments'], 'admin_forum'),
-			)
-		);
-
-		// Sub items of scheduled tasks
-		$maintenance_areas->childOf('scheduledtasks')->add('scheduledtasks_sub')->addBulk(
-			array(
-				'tasks' => array($txt['maintain_tasks'], 'admin_forum'),
-				'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-			)
-		);
-
-		// Sub items of mail queue
-		$maintenance_areas->childOf('mailqueue')->add('mailqueue_sub')->addBulk(
-			array(
-				'browse' => array($txt['mailqueue_browse'], 'admin_forum'),
-				'settings' => array($txt['mailqueue_settings'], 'admin_forum'),
-			)
-		);
-
-		// Sub items of logs
-		$maintenance_areas->childOf('logs')->add('logs_sub')->addBulk(
-			array(
-				'errorlog' => array($txt['errlog'], 'admin_forum', 'enabled' => !empty($modSettings['enableErrorLogging']), 'url' => $scripturl . '?action=admin;area=logs;sa=errorlog;desc'),
-				'adminlog' => array($txt['admin_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
-				'modlog' => array($txt['moderation_log'], 'admin_forum', 'enabled' => in_array('ml', $context['admin_features'])),
-				'banlog' => array($txt['ban_log'], 'manage_bans'),
-				'spiderlog' => array($txt['spider_logs'], 'admin_forum', 'enabled' => in_array('sp', $context['admin_features'])),
-				'tasklog' => array($txt['scheduled_log'], 'admin_forum'),
-				'badbehaviorlog' => array($txt['badbehavior_log'], 'admin_forum', 'enabled' => !empty($modSettings['badbehavior_enabled']), 'url' => $scripturl . '?action=admin;area=logs;sa=badbehaviorlog;desc'),
-				'pruning' => array($txt['pruning_title'], 'admin_forum'),
-			)
+			),
 		);
 
 		// Any files to include for administration?
@@ -707,9 +568,14 @@ class Admin_Controller extends Action_Controller
 		// Make sure the administrator has a valid session...
 		validateSession();
 
+		$menuOptions = array();
+
+		// Let them modify PM areas easily.
+		call_integration_hook('integrate_admin_areas', array(&$admin_areas, &$menuOptions));
+
 		// Actually create the menu!
-		$admin_include_data = $allMenus->createMenu('Admin_Menu');
-		$allMenus->destroy('Admin_Menu');
+		$admin_include_data = createMenu($admin_areas);
+		unset($admin_areas);
 
 		// Nothing valid?
 		if ($admin_include_data == false)
