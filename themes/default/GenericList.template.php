@@ -36,9 +36,7 @@ function template_show_list($list_id = null)
 	// Show the title of the table (if any).
 	if (!empty($cur_list['title']))
 		echo '
-			<h3 class="category_header">
-				', $cur_list['title'], '
-			</h3>';
+			<h3 class="category_header">', !empty($cur_list['icon']) ? '<span class="hdicon cat_img_' . $cur_list['icon'] . '"></span>' : '', $cur_list['title'], '</h3>';
 
 	// Show any data right after the title
 	if (isset($cur_list['additional_rows']['after_title']))
