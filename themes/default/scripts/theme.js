@@ -7,7 +7,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0 Beta
  *
@@ -22,13 +22,13 @@ $(document).ready(function() {
 		$('#main_menu, ul.admin_menu, ul.sidebar_menu, ul.poster, ul.quickbuttons, #sort_by').superfish({delay : 300, speed: 175});
 
 	// Smooth scroll to top.
-	$("a[href=#top]").bind("click", function(e) {
+	$("a[href=#top]").on("click", function(e) {
 		e.preventDefault();
 		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
 	// Smooth scroll to bottom.
-	$("a[href=#bot]").bind("click", function(e) {
+	$("a[href=#bot]").on("click", function(e) {
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
@@ -76,24 +76,20 @@ $(document).ready(function() {
 
 		$(this).css({'cursor': 'pointer'});
 		$(this).click(function() {
-			var $this = $(this),
-				height,
-				width;
+			var $this = $(this);
 
 			// No saved data, then lets set it to autp
 			if ($.isEmptyObject($this.data()))
 			{
-				$this.data( "original", { width: $this.css('width'), height: $this.css('height')});
+				$this.data("bbc_img", {width: $this.css('width'), height: $this.css('height')});
 				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
 				$this.css({'height': $this.css('width') === 'auto' ? null : 'auto'});
 			}
 			else
 			{
 				// Was clicked and saved, so set it back
-				height = $this.data("original").height;
-				width = $this.data("original").width;
-				$this.css({'width': width});
-				$this.css({'height': height});
+				$this.css({'width': $this.data("bbc_img").width});
+				$this.css({'height': $this.data("bbc_img").height});
 
 				// Remove the data
 				$this.removeData();
@@ -105,10 +101,9 @@ $(document).ready(function() {
 /**
  * Adds a button to the quick topic moderation after a checkbox is selected
  *
- * @param {type} sButtonStripId
- * @param {type} bUseImage
- * @param {type} oOptions
- * @returns {undefined}
+ * @param {string} sButtonStripId
+ * @param {boolean} bUseImage
+ * @param {object} oOptions
  */
 function elk_addButton(sButtonStripId, bUseImage, oOptions)
 {
@@ -132,7 +127,7 @@ function elk_addButton(sButtonStripId, bUseImage, oOptions)
 
 	if ('sId' in oOptions)
 		oNewButton.id = oOptions.sId;
-	setInnerHTML(oNewButton, '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>');
+	oNewButton.innerHTML = '<a class="linklevel1" href="' + oOptions.sUrl + '" ' + ('sCustom' in oOptions ? oOptions.sCustom : '') + '><span class="last"' + ('sId' in oOptions ? ' id="' + oOptions.sId + '_text"': '') + '>' + oOptions.sText + '</span></a>';
 
 	oButtonStripList.appendChild(oNewButton);
 }

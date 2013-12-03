@@ -28,9 +28,7 @@ if (!defined('ELK'))
  * Used by action_verificationcode() (Register.controller.php).
  *
  * @param string $word
- * @return boolean false on failure
  */
-
 function createWaveFile($word)
 {
 	global $settings, $user_info;
@@ -100,20 +98,36 @@ function createWaveFile($word)
 	}
 
 	$data_size = strlen($sound_word);
-	$file_size = $data_size + 0x24;
-	$sample_rate = 16000;
+	$chunk_id = 0x52494646; // Contains the letters "RIFF" (0x52494646 in big-endian form).
+	$chunk_size = $data_size + 0x20; // This is the size of the entire file in bytes minus 8 bytes for the two leading fields not included in this count: ChunkID and ChunkSize.
+	$format = 0x57415645; // Contains the letters "WAVE" (0x57415645 big-endian form).
+	$subchunk1ID = 0x666D7420; // Contains the letters "fmt "(0x666d7420 big-endian form).
+	$subchunk1Size = 0x10000000; // 16 for PCM.  This is the size of the rest of the Subchunk which follows this number.
+	$audioFormat = 0x0100; // PCM = 1 (i.e. Linear quantization)
+	$numChannels = 0x0100; // Mono = 1, Stereo = 2, etc.
+	$sample_rate = 0x803E0000; // 8000, 16000, etc
+	$byteRate = 0x803E0000; // = SampleRate * NumChannels * BitsPerSample/8 (for use the same as sample rate)
+	$blockAlign = 0x0100; // = NumChannels * BitsPerSample/8
+	$bitsPerSample = 0x0800; // 8 bits = 8, 16 bits = 16, etc.
+	$subchunk2ID = 0x64617461; // Contains the letters "data" (0x64617461 big-endian form).
 
-	// Disable compression.
-	ob_end_clean();
+	// Create the wav file
+	$wav = pack('NVNNNnnNNnnNV', $chunk_id, $chunk_size, $format, $subchunk1ID, $subchunk1Size, $audioFormat, $numChannels, $sample_rate, $byteRate, $blockAlign, $bitsPerSample, $subchunk2ID, $data_size) . $sound_word;
+	$time = $chunk_size / 16000;
+
+	// Clear anything in the buffers
+	while (@ob_get_level() > 0)
+		@ob_end_clean();
+
+	// Set up our headers
 	header('Content-Encoding: none');
+	header('Content-Duration: ' . round($time, 0));
+	header('Content-Disposition: inline; filename="captcha.wav"');
+	header('Content-Type: audio/x-wav');
+	header('Cache-Control: no-cache');
+	header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
+	header('Content-Length: ' . strlen($wav));
 
 	// Output the wav.
-	header('Content-type: audio/x-wav');
-	header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
-	header('Content-Length: ' . ($file_size + 0x08));
-
-	echo pack('nnVnnnnnnnnVVnnnnV', 0x5249, 0x4646, $file_size, 0x5741, 0x5645, 0x666D, 0x7420, 0x1000, 0x0000, 0x0100, 0x0100, $sample_rate, $sample_rate, 0x0100, 0x0800, 0x6461, 0x7461, $data_size), $sound_word;
-
-	// Noting more to add.
-	die();
+	echo $wav;
 }

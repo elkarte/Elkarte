@@ -33,10 +33,10 @@ function template_pm_above()
 	// The every helpful javascript!
 	echo '
 					<script><!-- // --><![CDATA[
-						var allLabels = {};
-						var currentLabels = {};
-						var txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '";
-						var txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
+						var allLabels = {},
+							currentLabels = {},
+							txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '",
+							txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
 					// ]]></script>
 					<div id="personal_messages">';
 
@@ -451,7 +451,7 @@ function template_subject_list()
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-								<option value="add_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+								<option value="add_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
@@ -460,7 +460,7 @@ function template_subject_list()
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-								<option value="rem_' . $label['id'] . '">&nbsp;' . $label['name'] . '</option>';
+								<option value="rem_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
@@ -943,11 +943,11 @@ function template_send()
 	// The vars used to preview a personal message without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '";
-			var form_name = "pmFolder";
-			var preview_area = "pm";
-			var txt_preview_title = "', $txt['preview_title'], '";
-			var txt_preview_fetch = "', $txt['preview_fetch'], '";';
+			var post_box_name = "', $context['post_box_name'], '",
+				form_name = "pmFolder",
+				preview_area = "pm",
+				txt_preview_title = "', $txt['preview_title'], '",
+				txt_preview_fetch = "', $txt['preview_fetch'], '";';
 
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
@@ -1314,7 +1314,7 @@ function template_rules()
 
 	if (!empty($context['rules']))
 		echo '
-			[<a href="', $scripturl, '?action=pm;sa=manrules;apply;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['pm_js_apply_rules_confirm'], '\');">', $txt['pm_apply_rules'], '</a>]';
+			<a class="linkbutton" href="', $scripturl, '?action=pm;sa=manrules;apply;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['pm_js_apply_rules_confirm'], '\');">', $txt['pm_apply_rules'], '</a>';
 
 	if (!empty($context['rules']))
 		echo '
@@ -1334,39 +1334,7 @@ function template_add_rule()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<script><!-- // --><![CDATA[
-		var criteriaNum = 0;
-		var actionNum = 0;
-		var groups = new Array()
-		var labels = new Array()
-
-		var txt_pm_readable_and = "', $txt['pm_readable_and'], '";
-		var txt_pm_readable_or = "', $txt['pm_readable_or'], '";
-		var txt_pm_readable_member = "', $txt['pm_readable_member'], '";
-		var txt_pm_readable_group = "', $txt['pm_readable_group'], '";
-		var txt_pm_readable_subject  = "', $txt['pm_readable_subject'], '";
-		var txt_pm_readable_body = "', $txt['pm_readable_body'], '";
-		var txt_pm_readable_buddy = "', $txt['pm_readable_buddy'], '";
-		var txt_pm_readable_label = "', $txt['pm_readable_label'], '";
-		var txt_pm_readable_delete = "', $txt['pm_readable_delete'], '";
-		var txt_pm_readable_start = "', $txt['pm_readable_start'], '";
-		var txt_pm_readable_end = "', $txt['pm_readable_end'], '";
-		var txt_pm_readable_then = "', $txt['pm_readable_then'], '";
-
-		var txt_pm_rule_not_defined = "', $txt['pm_rule_not_defined'], '";
-		var txt_pm_rule_bud = "', $txt['pm_rule_bud'], '";
-		var txt_pm_rule_sub = "', $txt['pm_rule_sub'], '";
-		var txt_pm_rule_msg = "', $txt['pm_rule_msg'], '";
-		var txt_pm_rule_criteria_pick = "', $txt['pm_rule_criteria_pick'], '";
-		var txt_pm_rule_mid = "', $txt['pm_rule_mid'], '";
-		var txt_pm_rule_gid = "', $txt['pm_rule_gid'], '";
-		var txt_pm_rule_sel_group = "', $txt['pm_rule_sel_group'], '";
-
-		var txt_pm_rule_sel_action = "', $txt['pm_rule_sel_action'], '";
-		var txt_pm_rule_label = "', $txt['pm_rule_label'], '";
-		var txt_pm_rule_delete = "', $txt['pm_rule_delete'], '";
-		var txt_pm_rule_sel_label = "', $txt['pm_rule_sel_label'], '";
-		';
+	<script><!-- // --><![CDATA[';
 
 	// All of the groups
 	foreach ($context['groups'] as $id => $title)
@@ -1444,7 +1412,7 @@ function template_add_rule()
 
 	echo '
 					<span id="criteriaAddHere"></span><br />
-					<a href="#" onclick="addCriteriaOption(); return false;" id="addonjs1" style="display: none;">(', $txt['pm_rule_criteria_add'], ')</a>
+					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;"  style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
 					<br /><br />
 					', $txt['pm_rule_logic'], ':
 					<select name="rule_logic" id="logic" onchange="rebuildRuleDesc();">
@@ -1495,7 +1463,7 @@ function template_add_rule()
 
 	echo '
 					<span id="actionAddHere"></span><br />
-					<a href="#" onclick="addActionOption(); return false;" id="addonjs2" style="display: none;">(', $txt['pm_rule_add_action'], ')</a>
+					<a href="#" id="addonjs2" class="linkbutton" onclick="addActionOption(); return false;" style="display: none;">', $txt['pm_rule_add_action'], '</a>
 				</fieldset>
 			</div>
 			<h3 class="category_header">', $txt['pm_rule_description'], '</h3>

@@ -210,7 +210,7 @@ function template_select()
 			for (i = 0; i < 2; i++)
 			{
 				pageIndex = XMLDoc.getElementsByTagName("pageIndex")[i];
-				setInnerHTML(document.getElementById("pageindex_" + pageIndex.getAttribute("section")), pageIndex.firstChild.nodeValue);
+				document.getElementById("pageindex_" + pageIndex.getAttribute("section")).innerHTML = pageIndex.firstChild.nodeValue;
 				start[i] = pageIndex.getAttribute("startFrom");
 			}
 			var numChanges = XMLDoc.getElementsByTagName("change").length;

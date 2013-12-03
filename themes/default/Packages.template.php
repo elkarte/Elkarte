@@ -805,7 +805,7 @@ function template_control_chmod()
 			document.getElementById("ftp_error_div").style.display = "";
 			document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
 
-			setInnerHTML(document.getElementById("ftp_error_message"), message);
+			document.getElementById("ftp_error_message").innerHTML = message;
 		}
 	// ]]></script>';
 
@@ -885,6 +885,7 @@ function template_file_permissions()
 			3: "custom",
 			4: "no_change"
 		}
+
 		function dynamicAddMore()
 		{
 			ajax_indicator(true);
@@ -916,11 +917,11 @@ function template_file_permissions()
 				}
 				return false;
 			}
-			var tableHandle = false;
-			var isMore = false;
-			var ident = "";
-			var my_ident = "";
-			var curLevel = 0;
+			var tableHandle = false,
+				isMore = false,
+				ident = "",
+				my_ident = "",
+				curLevel = 0;
 
 			for (var i = 0; i < fileItems.length; i++)
 			{
@@ -944,6 +945,7 @@ function template_file_permissions()
 					curRow.className = "windowbg";
 					curRow.id = "content_" + my_ident;
 					curRow.style.display = "";
+
 					var curCol = document.createElement("td");
 					curCol.className = "smalltext";
 					curCol.width = "40%";
@@ -952,7 +954,7 @@ function template_file_permissions()
 					var fileName = document.createTextNode(fileItems[i].firstChild.nodeValue);
 
 					// Start by wacking in the spaces.
-					setInnerHTML(curCol, repeatString("&nbsp;", curLevel));
+					curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
 
 					// Create the actual text.
 					if (fileItems[i].getAttribute(\'folder\') == 1)
@@ -983,7 +985,7 @@ function template_file_permissions()
 
 					var writeSpan = document.createElement("span");
 					writeSpan.style.color = fileItems[i].getAttribute(\'writable\') ? "green" : "red";
-					setInnerHTML(writeSpan, fileItems[i].getAttribute(\'writable\') ? \'', $txt['package_file_perms_writable'], '\' : \'', $txt['package_file_perms_not_writable'], '\');
+					writeSpan.innerHTML = fileItems[i].getAttribute(\'writable\') ? \'', $txt['package_file_perms_writable'], '\' : \'', $txt['package_file_perms_not_writable'], '\';
 					curCol.appendChild(writeSpan);
 
 					if (fileItems[i].getAttribute(\'permissions\'))
@@ -1001,9 +1003,10 @@ function template_file_permissions()
 						curCol.style.backgroundColor = oRadioColors[j];
 						curCol.align = "center";
 
-						var curInput = createNamedElement("input", "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]", j == 4 ? \'checked="checked"\' : "");
+						var curInput = document.createElement("input");
+						curInput.name = "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]";
 						curInput.type = "radio";
-						curInput.checked = "checked";
+						curInput.checked = (j == 4 ? "checked" : "");
 						curInput.value = oRadioValues[j];
 
 						curCol.appendChild(curInput);
@@ -1020,6 +1023,7 @@ function template_file_permissions()
 						newRow.id = "insert_div_loc_" + my_ident;
 						newRow.style.display = "none";
 						tableHandle.parentNode.insertBefore(newRow, tableHandle);
+
 						var newCol = document.createElement("td");
 						newCol.colspan = 2;
 						newRow.appendChild(newCol);
@@ -1053,7 +1057,7 @@ function template_file_permissions()
 				curCol.className = "smalltext";
 				curCol.width = "40%";
 
-				setInnerHTML(curCol, repeatString("&nbsp;", curLevel));
+				curCol.innerHTML = php_str_repeat("&nbsp;", curLevel);
 				curCol.appendChild(document.createTextNode(\'\\u00ab \'));
 				curCol.appendChild(linkData);
 				curCol.appendChild(document.createTextNode(\' \\u00bb\'));
@@ -1065,7 +1069,8 @@ function template_file_permissions()
 			}
 
 			// Keep track of it.
-			var curInput = createNamedElement("input", "back_look[]");
+			var curInput = document.createElement("input");
+			curInput.name = "back_look[]";
 			curInput.type = "hidden";
 			curInput.value = curPath;
 
