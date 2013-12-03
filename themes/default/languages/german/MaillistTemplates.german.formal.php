@@ -20,7 +20,7 @@
 	@description: A memeber wants to be notified of new topics on a board they are watching
 */
 $txt['pbe_notify_boards_once_body_subject'] = '[{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notify_boards_once_body_body'] = 'A new topic, \'{TOPICSUBJECT}\', has been started in \'{BOARDNAME}\'.
+$txt['pbe_notify_boards_once_body_body'] = 'Ein neues Thema, \'{TOPICSUBJECT}\', wurde in \'{BOARDNAME}\' eröffnet.
 
 {MESSAGE}
 
@@ -28,17 +28,17 @@ $txt['pbe_notify_boards_once_body_body'] = 'A new topic, \'{TOPICSUBJECT}\', has
 
 
 ------------------------------------
-Posting Information: More topics may be posted, but you won\'t receive more email notifications (on this topic) until you return to the board and read some of them.
+Informationen: Es könnten weitere Themen eröffnet worden sein, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie nicht einige von ihnen gelesen haben.
 
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> Sie können diese Nachricht mit Anhängen und/oder Bildern (falls vorhanden) mittels dieses Links lesen:
     {TOPICLINK}
 
-<*> Unsubscribe from this by using this link:
+<*> Sie können das Abonnement hier kündigen:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -54,21 +54,22 @@ Posting Information: More topics may be posted, but you won\'t receive more emai
 	@description: A member wants to be notified of the first new post in a topic on a board they have subscribed to
 */
 $txt['pbe_notify_boards_once_subject'] = '[{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notify_boards_once_body'] = 'A new topic, \'{TOPICSUBJECT}\', has been started in \'{BOARDNAME}\'.
+$txt['pbe_notify_boards_once_body'] = 'Ein neues Thema, \'{TOPICSUBJECT}\', wurde in \'{BOARDNAME}\' eröffnet.
 
-You can see it at
+Sie können es auf
     {TOPICLINK}
+lesen.
 
 
 ------------------------------------
-Posting Information: More topics may be posted, but you won\'t receive more email notifications (on this topic) until you return to the board and read some of them.
+Informationen: Es könnten weitere Themen eröffnet worden sein, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie nicht einige von ihnen gelesen haben.
 
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> Unsubscribe from this by using this link:
+<*> Sie können das Abonnement hier kündigen:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -94,20 +95,20 @@ $txt['pbe_notify_boards_body_body'] = '
 
 
 ------------------------------------
-Posting Information: {POSTERNAME} started the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+Informationen: {POSTERNAME} hat das Thema \'{TOPICSUBJECT}\' im Forum \'{BOARDNAME}\' eröffnet.
 
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> Sie können diese Nachricht mit Anhängen und/oder Bildern (falls vorhanden) mittels dieses Links lesen:
     {TOPICLINK}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
     {TOPICLINKNEW}
 
-<*> Unsubscribe from this by using this link:
+<*> Sie können das Abonnement hier kündigen:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -124,21 +125,22 @@ Posting Information: {POSTERNAME} started the topic \'{TOPICSUBJECT}\' on the \'
 	@description: Notification only of a new topic has been started in a subscribed board
 */
 $txt['pbe_notify_boards_subject'] = '[{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notify_boards_body'] = 'A new topic, \'{TOPICSUBJECT}\', has been started in \'{BOARDNAME}\'.
+$txt['pbe_notify_boards_body'] = 'Ein neues Thema, \'{TOPICSUBJECT}\', wurde in \'{BOARDNAME}\' eröffnet.
 
-You can see it at:
+Sie können es unter
     {TOPICLINK}
+lesen.
 
 ------------------------------------
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
     {TOPICLINKNEW}
 
-<*> Unsubscribe from this by using this link:
+<*> Sie können das Abonnement hier kündigen:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -156,7 +158,7 @@ You can see it at:
 		EMAILREGARDS: The site name signature
 	@description: A reply has been made to a topic in a subscribed board, includes the reply body
 */
-$txt['pbe_notification_reply_body_subject'] = 'Re: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
+$txt['pbe_notification_reply_body_subject'] = 'AW: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
 $txt['pbe_notification_reply_body_body'] = '
 {MESSAGE}
 
@@ -164,20 +166,20 @@ $txt['pbe_notification_reply_body_body'] = '
 
 
 ------------------------------------
-Posting Information: {POSTERNAME} replied to the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
+Informationen: {POSTERNAME} hat auf das Thema \'{TOPICSUBJECT}\' im Forum \'{BOARDNAME}\' geantwortet.
 
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> Sie können diese Nachricht mit Anhängen und/oder Bildern (falls vorhanden) mittels dieses Links lesen:
     {TOPICLINK}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
     {TOPICLINKNEW}
 
-<*> Unsubscribe from this by using this link:
+<*> Sie können das Abonnement hier kündigen:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -192,24 +194,24 @@ Posting Information: {POSTERNAME} replied to the topic \'{TOPICSUBJECT}\' on the
 		EMAILREGARDS: The site name signature
 	@description: A reply has been made to topic in a subscribed board, notification without body
 */
-$txt['pbe_notification_reply_once_subject'] = 'Re: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
-$txt['pbe_notification_reply_once_body'] = '{POSTERNAME} replied to a topic you are watching
+$txt['pbe_notification_reply_once_subject'] = 'AW: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
+$txt['pbe_notification_reply_once_body'] = '{POSTERNAME} hat auf ein von Ihnen beobachtetes Thema geantwortet
 
-View the reply with attachments and/or images (if any) at:
+Sie können die Antwort mit Anhängen und/oder Bildern (falls vorhanden) mittels dieses Links lesen:
     {TOPICLINK}
 
 ------------------------------------
-Posting Information: More replies may be posted, but you won\'t receive any more notifications until you read the topic.
+Informationen: Es könnte weitere Antworten geben, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie sie nicht gelesen haben.
 
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
     {TOPICLINKNEW}
 
-<*> Unsubscribe from this by using this link:
+<*> Sie können das Abonnement hier kündigen:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -227,7 +229,7 @@ Posting Information: More replies may be posted, but you won\'t receive any more
 		EMAILREGARDS: The site name signature
 	@description: Full body email notifcation for the first new reply in a topic
 */
-$txt['pbe_notification_reply_body_once_subject'] = 'Re: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
+$txt['pbe_notification_reply_body_once_subject'] = 'AW: [{FORUMNAMESHORT}] {TOPICSUBJECT}';
 $txt['pbe_notification_reply_body_once_body'] = '
 {MESSAGE}
 
@@ -235,21 +237,21 @@ $txt['pbe_notification_reply_body_once_body'] = '
 
 
 ------------------------------------
-Posting Information: {POSTERNAME} replied to the topic \'{TOPICSUBJECT}\' on the \'{BOARDNAME}\' Board.
-More replies may be posted, but you won\'t receive any more notifications until you read the topic.
+Informationen: {POSTERNAME} hat auf das Thema \'{TOPICSUBJECT}\' im Forum \'{BOARDNAME}\' geantwortet.
+Es könnte weitere Antworten geben, aber Sie werden keine weiteren Benachrichtigungen hierzu erhalten, bevor Sie sie nicht gelesen haben.
 
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> You can see this message with attachments and/or images (if any) by using this link:
+<*> Sie können diese Nachricht mit Anhängen und/oder Bildern (falls vorhanden) mittels dieses Links lesen:
     {TOPICLINK}
 
-<*> You can go to your first unread message in the thread by using this link:
+<*> Hier gelangen Sie zur ersten ungelesenen Nachricht in dieser Diskussion:
     {TOPICLINKNEW}
 
-<*> Unsubscribe from this by using this link:
+<*> Sie können das Abonnement hier kündigen:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -263,20 +265,20 @@ More replies may be posted, but you won\'t receive any more notifications until 
 		FORUMNAMESHORT: Short or nickname for the forum
 	@description: A notification email sent to the receivers of a personal message
 */
-$txt['pbe_new_pm_body_subject'] = 'New Personal Message: {SUBJECT}';
-$txt['pbe_new_pm_body_body'] = 'You have received a personal message from {SENDER} on {FORUMNAMESHORT}
+$txt['pbe_new_pm_body_subject'] = 'Neue private Nachricht: {SUBJECT}';
+$txt['pbe_new_pm_body_body'] = 'Sie haben in {FORUMNAMESHORT} eine private Nachricht von {SENDER} erhalten
 
-The message they sent you is:
+Die Nachricht lautet:
 
 {MESSAGE}
 
 ------------------------------------
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> Reply to this Personal Message here:
+<*> Sie können die private Nachricht mittels dieses Links beantworten:
     {REPLYLINK}
 
 {EMAILREGARDS}';
@@ -290,20 +292,20 @@ The message they sent you is:
 		TOLIST:  The list of users that will receive the personal message.
 	@description: A notification email sent to the receivers of a personal message
 */
-$txt['pbe_new_pm_body_tolist_subject'] = 'New Personal Message: {SUBJECT}';
-$txt['pbe_new_pm_body_tolist_body'] = '{TOLIST} have just been sent a personal message by {SENDER} on {FORUMNAME}
+$txt['pbe_new_pm_body_tolist_subject'] = 'Neue private Nachricht: {SUBJECT}';
+$txt['pbe_new_pm_body_tolist_body'] = '{TOLIST} haben in {FORUMNAME} eine private Nachricht von {SENDER} erhalten
 
-The message they sent is:
+Die Nachricht lautet:
 
 {MESSAGE}
 
 ------------------------------------
-{FORUMNAMESHORT} Links:
+Weiterführende Verweise zu {FORUMNAMESHORT}:
 
-<*> To visit {FORUMNAMESHORT} on the web, go to:
+<*> Um {FORUMNAMESHORT} im Netz aufzurufen, gehen Sie auf:
     {FORUMURL}
 
-<*> Reply to this Personal Message here:
+<*> Sie können die private Nachricht mittels dieses Links beantworten:
     {REPLYLINK}
 
 {EMAILREGARDS}';
