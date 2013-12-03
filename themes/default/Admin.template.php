@@ -37,7 +37,7 @@ function template_admin()
 							<div id="admin_search_box">', $txt['try_searching'], template_admin_quick_search(), '</div>
 							<div id="live_news" class="floatleft">
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="help"><span class="hdicon cat_img_helptopics help"></span></a>', $txt['live'], '
+									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
 								</h3>
 								<div class="windowbg">
 									<div class="content">
@@ -50,7 +50,7 @@ function template_admin()
 	echo '
 							<div id="supportVersionsTable" class="floatright">
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=admin;area=credits"><span class="hdicon cat_img_plus">', $txt['support_title'], '</span></a>
+									<a class="hdicon cat_img_plus" href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
 								</h3>
 								<div class="windowbg">
 									<div class="content">
@@ -214,7 +214,7 @@ function template_credits()
 	// Display latest support questions from ElkArte
 	echo '
 							<h3 class="category_header">
-								<a href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);" class="help"><span class="hdicon cat_img_helptopics help"></span></a>', $txt['support_latest'], '
+								<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);"></a>', $txt['support_latest'], '
 							</h3>
 							<div class="windowbg">
 								<div class="content">
@@ -843,11 +843,11 @@ function template_show_settings()
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
-	// Is there a custom title?
+	// Is there a custom title, maybe even with an icon?
 	if (isset($context['settings_title']))
 	{
 		echo '
-			<h3 class="category_header">', !empty($context['settings_icon']) ? '<span class="hdicon cat_img_' . $context['settings_icon'] . '"></span>' : '', $context['settings_title'], '</h3>';
+			<h3 class="category_header', !empty($context['settings_icon']) ? ' hdicon cat_img_' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h3>';
 	}
 
 	// any messages or errors to show?

@@ -54,7 +54,7 @@ function template_latest_news()
 
 	echo '
 								<h3 class="category_header">
-									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['mc_latest_news'], '
+									<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['mc_latest_news'], '
 								</h3>
 								<div class="windowbg">
 									<div class="content">
@@ -94,7 +94,7 @@ function template_group_requests_block()
 	global $context, $txt, $scripturl;
 
 	echo '
-								<h3 class="category_header">
+								<h3 class="category_header hdicon cat_img_plus">
 									<a href="', $scripturl, '?action=groups;sa=requests">', $txt['mc_group_requests'], '</a>
 								</h3>
 								<div class="windowbg">
@@ -128,7 +128,7 @@ function template_reported_posts_block()
 	global $context, $txt, $scripturl;
 
 	echo '
-								<h3 class="category_header">
+								<h3 class="category_header hdicon cat_img_talk">
 									<a href="', $scripturl, '?action=moderate;area=reports">', $txt['mc_recent_reports'], '</a>
 								</h3>
 								<div class="windowbg">
@@ -162,7 +162,7 @@ function template_watched_users()
 	global $context, $txt, $scripturl;
 
 	echo '
-						<h3 class="category_header">
+						<h3 class="category_header hdicon cat_img_eye">
 							<a href="', $scripturl, '?action=moderate;area=userwatch">', $txt['mc_watched_users'], '</a>
 						</h3>
 						<div class="windowbg">
@@ -197,7 +197,7 @@ function template_notes()
 
 	echo '
 						<form action="', $scripturl, '?action=moderate;area=index" method="post">
-							<h3 class="category_header">', $txt['mc_notes'], '</h3>
+							<h3 class="category_header hdicon cat_img_write">', $txt['mc_notes'], '</h3>
 							<div class="windowbg">
 								<div class="content modbox">
 									<div class="flow_auto">
@@ -237,7 +237,7 @@ function template_action_required()
 	global $context, $txt, $scripturl, $settings;
 
 	echo '
-						<h3 class="category_header">', $txt['mc_required'], ' : ', $context['mc_required'], '</h3>
+						<h3 class="category_header hdicon cat_img_moderation">', $txt['mc_required'], ' : ', $context['mc_required'], '</h3>
 						<div class="windowbg">
 							<div class="content modbox">
 								<ul>';

@@ -137,6 +137,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['modSettings_title'],
+			'class' => 'config',
 			'help' => 'featuresettings',
 			'description' => sprintf($txt['modSettings_desc'], $settings['theme_id'], $context['session_id'], $context['session_var']),
 			'tabs' => array(
@@ -201,6 +202,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=basic';
 		$context['settings_title'] = $txt['mods_cat_features'];
+		$context['settings_icon'] = 'config';
 
 		Settings_Form::prepare_db($config_vars);
 	}
@@ -526,7 +528,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 		// The mentions settings
 		$config_vars = array(
-			array('title', 'mentions_settings'),
+			array('title', 'mentions_settings', 'icon' => 'config'),
 			array('check', 'mentions_enabled'),
 			array('check', 'mentions_buddy'),
 		);
@@ -1014,6 +1016,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$listOptions = array(
 			'id' => 'custom_profile_fields',
 			'title' => $txt['custom_profile_title'],
+			'icon' => 'config',
 			'base_href' => $scripturl . '?action=admin;area=featuresettings;sa=profile',
 			'default_sort_col' => 'vieworder',
 			'no_items_label' => $txt['custom_profile_none'],
@@ -1663,7 +1666,7 @@ class ManageFeatures_Controller extends Action_Controller
 	public function mentionSettings()
 	{
 		$config_vars = array(
-			array('title', 'mentions_settings'),
+			array('title', 'mentions_settings', 'icon' => 'config'),
 			array('check', 'mentions_enabled'),
 			array('check', 'mentions_buddy'),
 		);

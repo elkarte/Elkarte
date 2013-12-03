@@ -154,8 +154,8 @@ function template_issueWarning()
 
 	echo '
 	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=issuewarning" method="post" class="flow_hidden" accept-charset="UTF-8">
-		<h3 class="category_header">
-			<span class="hdicon cat_img_profile">', $context['user']['is_owner'] ? $txt['profile_warning_level'] : $txt['profile_issue_warning'], '</span>
+		<h3 class="category_header hdicon cat_img_profile">
+			', $context['user']['is_owner'] ? $txt['profile_warning_level'] : $txt['profile_issue_warning'], '
 		</h3>';
 
 	if (!$context['user']['is_owner'])
@@ -352,8 +352,8 @@ function template_deleteAccount()
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=deleteaccount;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
-			<h3 class="category_header">
-				<span class="hdicon cat_img_profile">', $txt['deleteAccount'], '</span>
+			<h3 class="category_header hdicon cat_img_profile">
+				', $txt['deleteAccount'], '
 			</h3>';
 
 	// If deleting another account give them a lovely info box.
