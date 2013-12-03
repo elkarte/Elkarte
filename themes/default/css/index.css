@@ -464,37 +464,41 @@ em {
 }
 /* Category Header icons as sprites
 ------------------------------------------------- */
-.category_header .hdicon, .secondary_header .hdicon {
+.hdicon:before {
 	background-image: url(../images/icons/header.png);
 	background-repeat: no-repeat;
-	padding-left: 30px;
+    content: "";
+	float: left;
+    height: 24px;
+    margin-top: 0.25em;
+    padding-left: 30px;
 }
 /* broke formatting for compactness */
-.cat_img_attachments {background-position: 0 0;}
-.cat_img_buddies {background-position: 0 -24px;}
-.cat_img_config {background-position: 0 -48px}
-.cat_img_contacts {background-position: 0 -72px;}
-.cat_img_helptopics {background-position: 0 -96px;}
-.cat_img_inbox {background-position: 0 -120px;}
-.cat_img_login {background-position: 0 -144px;}
-.cat_img_mail {background-position: 0 -168px;}
-.cat_img_moderation {background-position: 0 -192px;}
-.cat_img_plus {background-position: 0 -216px;}
-.cat_img_posts {background-position: 0 -240px;}
-.cat_img_profile {background-position: 0 -264px;}
-.cat_img_search {background-position: 0 -288px;}
-.cat_img_stats_info {background-position: 0 -312px;}
-.cat_img_topics {background-position: 0 -336px;}
-.cat_img_write {background-position: 0 -360px;}
-.cat_img_database {background-position: 0 -384px;}
-.cat_img_address {background-position: 0 -408px;}
-.cat_img_calendar {background-position: 0 -432px;}
-.cat_img_minus {background-position: 0 -456px;}
-.cat_img_star {background-position: 0 -480px;}
-.cat_img_clock {background-position: 0 -504px;}
-.cat_img_eye {background-position: 0 -528px;}
-.cat_img_piechart {background-position: 0 -552px;}
-.cat_img_talk {background-position: 0 -576px;}
+.cat_img_attachments:before {background-position: 0 0;}
+.cat_img_buddies:before {background-position: 0 -24px;}
+.cat_img_config:before {background-position: 0 -48px}
+.cat_img_contacts:before {background-position: 0 -72px;}
+.cat_img_helptopics:before {background-position: 0 -96px;}
+.cat_img_inbox:before {background-position: 0 -120px;}
+.cat_img_login:before {background-position: 0 -144px;}
+.cat_img_mail:before {background-position: 0 -168px;}
+.cat_img_moderation:before {background-position: 0 -192px;}
+.cat_img_plus:before {background-position: 0 -216px;}
+.cat_img_posts:before {background-position: 0 -240px;}
+.cat_img_profile:before {background-position: 0 -264px;}
+.cat_img_search:before {background-position: 0 -288px;}
+.cat_img_stats_info:before {background-position: 0 -312px;}
+.cat_img_topics:before {background-position: 0 -336px;}
+.cat_img_write:before {background-position: 0 -360px;}
+.cat_img_database:before {background-position: 0 -384px;}
+.cat_img_address:before {background-position: 0 -408px;}
+.cat_img_calendar:before {background-position: 0 -432px;}
+.cat_img_minus:before {background-position: 0 -456px;}
+.cat_img_star:before {background-position: 0 -480px;}
+.cat_img_clock:before {background-position: 0 -504px;}
+.cat_img_eye:before {background-position: 0 -528px;}
+.cat_img_piechart:before {background-position: 0 -552px;}
+.cat_img_talk:before {background-position: 0 -576px;}
 
 h2 a.collapse {
 	margin: 2px 4px -2px 0;
@@ -2901,10 +2905,12 @@ dl.merge_topic dd {
 .ui-tabs .ui-tabs-hide {
 	display: none;
 }
-.ui-tabs .ui-tabs-nav .ui-state-default a{
+.ui-tabs .ui-tabs-nav .ui-state-default a {
+	background: #f0f0f0;
 	background: linear-gradient(to bottom, #fff, #e4e4e4) repeat scroll 0 0 #f4f4f4;
 }
 .ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	background: #437837;
 	background: linear-gradient(to bottom, #5ba048, #3d6e32) repeat scroll 0 0 #4b863c;
 	color: #fff;
 	font-weight: 600;
