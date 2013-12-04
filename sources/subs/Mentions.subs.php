@@ -112,6 +112,33 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 	return $mentions;
 }
 
+function prepareMentionMessage($mentions, $type)
+{
+	global $txt, $scripturl, $context;
+
+	foreach ($mentions as $key => $row)
+	{
+		// To ensure it is not done twice
+		if ($row['mention_type'] != $type)
+			continue;
+
+		$mentions[$key]['message'] = str_replace(array(
+				'{msg_link}',
+				'{msg_url}',
+				'{subject}',
+			),
+			array(
+				'<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;mark=read;' . $context['session_var'] . '=' . $context['session_id'] . ';item=' . $row['id_mention'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+				$scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;' . $context['session_var'] . '=' . $context['session_id'] . 'item=' . $row['id_mention'] . '#msg' . $row['id_msg'],
+				$row['subject'],
+			), $txt['mention_' . $row['mention_type']]);
+	}
+
+//_debug($mentions, $type);
+	return $mentions;
+}	
+
+
 /**
  * Inserts a new mention
  * Checks if the mention already exists (in any status) to prevent any duplicates

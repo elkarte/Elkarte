@@ -21,7 +21,7 @@ class Mentions_Controller extends Action_Controller
 	 *
 	 * @var array
 	 */
-	private $_known_mentions = array();
+	protected $_known_mentions = array();
 
 	/**
 	 * Will hold all available mention status
@@ -29,21 +29,25 @@ class Mentions_Controller extends Action_Controller
 	 *
 	 * @var array
 	 */
-	private $_known_status = array();
+	protected $_known_status = array();
 
 	/**
 	 * Holds the instance of the data validation class
 	 *
 	 * @var object
 	 */
-	private $_validator = null;
+	protected $_validator = null;
 
 	/**
 	 * Holds the passed data for this instance, is passed through the validator
 	 *
 	 * @var array
 	 */
-	private $_data = null;
+	protected $_data = null;
+
+	protected $_query_where = array();
+	protected $_query_join = array();
+	protected $_callbacks = array();
 
 	/**
 	 * Start things up, what else does a contructor do
@@ -51,10 +55,30 @@ class Mentions_Controller extends Action_Controller
 	public function __construct()
 	{
 		$this->_known_mentions = array(
-			'men', // mention
-			'like', // message liked
-			'rlike', // like removed
-			'buddy', // added as buddy
+			// mentions
+			'men' => array(
+				'callback' => 'prepareMentionMessage',
+				'query_where' => '',
+				'query_join' => '',
+			),
+			// liked messages
+			'like' => array(
+				'callback' => 'prepareMentionMessage',
+				'query_where' => '',
+				'query_join' => '',
+			),
+			// likes removed
+			'rlike' => array(
+				'callback' => 'prepareMentionMessage',
+				'query_where' => '',
+				'query_join' => '',
+			),
+			// added as buddy
+			'buddy' => array(
+				'callback' => 'prepareMentionMessage',
+				'query_where' => '',
+				'query_join' => '',
+			),
 		);
 		$this->_known_status = array(
 			'new' => 0,
@@ -63,8 +87,22 @@ class Mentions_Controller extends Action_Controller
 			'unapproved' => 3,
 		);
 
-		// @todo is it okay to have it here?
 		call_integration_hook('integrate_add_mention', array(&$this->_known_mentions));
+
+		// prepare the things to use later
+		$wheres = array();
+		$joins = array();
+		foreach ($this->_known_mentions as $key => $mention)
+		{
+			if (!empty($mention['callback']))
+				$this->_callbacks[$key] = $mention['callback'];
+			if (!empty($mention['query_where']))
+				$wheres = $mention['query_where'];
+			if (!empty($mention['query_join']))
+				$joins = $mention['query_join'];
+		}
+		$this->_query_where = array_unique($wheres);
+		$this->_query_join = array_unique($joins);
 	}
 
 	/**
@@ -172,20 +210,7 @@ class Mentions_Controller extends Action_Controller
 						'value' => $txt['mentions_what'],
 					),
 					'data' => array(
-						'function' => create_function('$row', '
-							global $txt, $scripturl, $context;
-
-							return str_replace(array(
-								\'{msg_link}\',
-								\'{msg_url}\',
-								\'{subject}\',
-							),
-							array(
-								\'<a href="\' . $scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;mark=read;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';item=\' . $row[\'id_mention\'] . \'#msg\' . $row[\'id_msg\'] . \'">\' . $row[\'subject\'] . \'</a>\',
-								$scripturl . \'?topic=\' . $row[\'id_topic\'] . \'.msg\' . $row[\'id_msg\'] . \';mentionread;\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'item=\' . $row[\'id_mention\'] . \'#msg\' . $row[\'id_msg\'] . \'\',
-								$row[\'subject\'],
-							), $txt[\'mention_\' . $row[\'mention_type\']]);
-						')
+						'db' => 'message',
 					),
 					'sort' => array(
 						'default' => 'mtn.mention_type',
@@ -288,7 +313,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_getMentionCount($all, $type)
 	{
-		return countUserMentions($all, $type);
+		return countUserMentions($all, $type, $this->_query_where, $this->_query_join);
 	}
 
 	/**
@@ -303,7 +328,18 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
-		return getUserMentions($start, $limit, $sort, $all, $type);
+		$mentions = getUserMentions($start, $limit, $sort, $all, $type, $this->_query_where, $this->_query_join);
+
+		// With only one type is enough to just call that (if it exists)
+		if (!empty($type) && isset($this->_callbacks[$type]))
+			return $this->_callbacks[$type]($mentions, $type);
+
+		// Otherwise we have to test all we know...
+		// @todo find a way to call only what is actually needed 
+		foreach ($this->_callbacks as $type => $callback)
+			$mentions = $callback($mentions, $type);
+
+		return $mentions;
 	}
 
 	/**
@@ -475,7 +511,7 @@ class Mentions_Controller extends Action_Controller
 			'msg' => 'intval',
 		);
 		$validation = array(
-			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
+			'type' => 'required|contains[' . implode(',', array_keys($this->_known_mentions)) . ']',
 			'uid' => 'isarray',
 		);
 
