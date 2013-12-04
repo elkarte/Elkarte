@@ -14,16 +14,19 @@
  * Handle the JavaScript surrounding the admin and moderation center.
  */
 
-/*
-	elk_AdminIndex(oOptions)
-	{
-		public init()
-		public loadAdminIndex()
-		public setAnnouncements()
-		public showCurrentVersion()
-		public checkUpdateAvailable()
-	}
-*/
+/**
+ * 	Admin index class with the following methods
+ * 	elk_AdminIndex(oOptions)
+ * 	{
+ * 		public init()
+ * 		public loadAdminIndex()
+ * 		public setAnnouncements()
+ * 		public showCurrentVersion()
+ * 		public checkUpdateAvailable()
+ * 	}
+ *
+ * @param {object} oOptions
+ */
 function elk_AdminIndex(oOptions)
 {
 	this.opt = oOptions;
@@ -885,4 +888,96 @@ function toggleBaseDir ()
 	}
 	else
 		dir_elem.disabled = !sub_dir.checked;
+}
+
+
+/**
+ * Called from purgeinactive users maintance task, used to show or hide
+ * the membergroup list.  If collapsed will select all the member groups if expanded
+ * unslect them so the user can choose.
+ */
+function swapMembers()
+{
+	var membersForm = document.getElementById('membersForm');
+
+	// Make it close smoothly
+	$("#membersPanel").slideToggle(300);
+
+	membersSwap = !membersSwap;
+	document.getElementById("membersIcon").src = elk_images_url + (membersSwap ? "/selected_open.png" : "/selected.png");
+	document.getElementById("membersText").innerHTML = membersSwap ? maintain_members_choose : maintain_members_all;
+
+	// Check or uncheck them all based on if we are expanding or collasping the area
+	for (var i = 0; i < membersForm.length; i++)
+	{
+		if (membersForm.elements[i].type.toLowerCase() === "checkbox")
+			membersForm.elements[i].checked = !membersSwap;
+	}
+}
+
+/**
+ * Called from reattribute member posts to build the confirm message for the action
+ * Keeps the action button (reattribute) disabled until all necessary fields have been filled
+ */
+function checkAttributeValidity()
+{
+	origText = reattribute_confirm;
+	valid = true;
+
+	// Do all the fields!
+	if (!document.getElementById('to').value)
+		valid = false;
+
+	warningMessage = origText.replace(/%member_to%/, document.getElementById('to').value);
+
+	// Using email address to find the member
+	if (document.getElementById('type_email').checked)
+	{
+		if (!document.getElementById('from_email').value)
+			valid = false;
+
+		warningMessage = warningMessage.replace(/%type%/, '', reattribute_confirm_email).replace(/%find%/, document.getElementById('from_email').value);
+	}
+	// Or the user name
+	else
+	{
+		if (!document.getElementById('from_name').value)
+			valid = false;
+
+		warningMessage = warningMessage.replace(/%type%/, '', reattribute_confirm_username).replace(/%find%/, document.getElementById('from_name').value);
+	}
+
+	document.getElementById('do_attribute').disabled = valid ? false : true;
+
+	// Keep checking for a valid form so we can activate the submit button
+	setTimeout(function() {checkAttributeValidity();}, 500);
+
+	return valid;
+}
+
+/**
+ * Function for showing which boards to prune in an otherwise hidden list.
+ * Used by topic maintenance task, will select all boards when collapsed or allow
+ * specific boards to be chosen when expanded
+ */
+function swapRot()
+{
+	rotSwap = !rotSwap;
+
+	// Toggle icon
+	document.getElementById("rotIcon").src = elk_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
+	document.getElementById("rotText").innerHTML = rotSwap ? maintain_old_choose : maintain_old_all;
+
+	// Toggle panel
+	$("#rotPanel").slideToggle(300);
+
+	// Toggle checkboxes
+	var rotPanel = document.getElementById("rotPanel"),
+		oBoardCheckBoxes = rotPanel.getElementsByTagName("input");
+
+	for (var i = 0; i < oBoardCheckBoxes.length; i++)
+	{
+		if (oBoardCheckBoxes[i].type.toLowerCase() === "checkbox")
+			oBoardCheckBoxes[i].checked = !rotSwap;
+	}
 }
