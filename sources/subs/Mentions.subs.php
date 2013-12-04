@@ -33,9 +33,9 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE ({query_see_board} OR mtn.id_msg = 0)
-			AND mtn.id_member = {int:current_user}
-			AND mtn.status != {int:unapproved}' . ($all ? '
-			AND mtn.status != {int:is_not_deleted}' : '
+			AND mtn.id_member = {int:current_user}' . ($all ? '
+			AND mtn.status != {int:is_not_deleted}
+			AND mtn.status != {int:unapproved}' : '
 			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND mtn.mention_type = {string:current_type}'),
 		array(
@@ -114,6 +114,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 
 /**
  * Inserts a new mention
+ * Checks if the mention already exists (in any status) to prevent any duplicates
  *
  * @param int $member_from the id of the member mentioning
  * @param array $members_to an array of ids of the members mentioned
@@ -163,6 +164,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 	if (empty($inserts))
 		return;
 
+	// Insert the new mentions
 	$db->insert('',
 		'{db_prefix}log_mentions',
 		array(
@@ -180,6 +182,43 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 	// Update the member mention count
 	foreach ($inserts as $insert)
 		updateMentionMenuCount($insert[2], $insert[0]);
+}
+
+/**
+ * Softly and gently removes a 'like' mention when the post is unliked
+ *
+ * @param int $member_from the id of the member mentioning
+ * @param array $members_to an array of ids of the members mentioned
+ * @param int $msg the id of the message involved in the mention
+ * @param int $newstatus status to change the mention to if found as unread, default
+ *  is to set it as read (status = 1)
+ */
+function rlikeMentions($member_from, $members_to, $msg, $newstatus = 1)
+{
+	$db = database();
+
+	// If this like is still unread then we mark it as read and decrease the counter
+	$db->query('', '
+		UPDATE {db_prefix}log_mentions
+		SET status = {int:status}
+		WHERE id_member IN ({array_int:members_to})
+			AND mention_type = {string:type}
+			AND id_member_from = {int:member_from}
+			AND id_msg = {int:msg}
+			AND status = {int:unread}',
+		array(
+			'members_to' => $members_to,
+			'type' => 'like',
+			'member_from' => $member_from,
+			'msg' => $msg,
+			'status' => $newstatus,
+			'unread' => 0,
+		)
+	);
+
+	// Update the member mention count
+	foreach ($members_to as $member)
+		updateMentionMenuCount($newstatus, $member);
 }
 
 /**

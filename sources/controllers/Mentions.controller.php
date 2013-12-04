@@ -327,6 +327,26 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
+	 * Politley remove a mention when a post like is taken back
+	 */
+	public function action_rlike()
+	{
+		global $user_info;
+
+		// Common checks to determine if we can go on
+		if (!$this->_isValid())
+			return;
+
+		// Cleanup, validate and remove the invalid values (0 and $user_info['id'])
+		$id_target = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $user_info['id']));
+
+		if (empty($id_target))
+			return false;
+
+		rlikeMentions($user_info['id'], $id_target, $this->_validator->msg);
+	}
+
+	/**
 	 * Sets the specifics of a mention call in this instance
 	 *
 	 * @param array $data must contain uid, type and msg at a minimum
