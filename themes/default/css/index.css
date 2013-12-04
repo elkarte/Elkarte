@@ -764,15 +764,14 @@ div.windowbg, div.windowbg2 {
 	padding: 12px 0 4px 8px;
 	float: right;
 }
-/* @todo - Simplify. */
-#search_form .input_text, #search_form select, #search_form .button_submit {
+#search_form  * {
 	margin: 0;
 	border-radius: 0;
 	font-size: 0.929em;
 	/* Webkit (bleh) fix. */
 	float: left;
 }
-/* The logo and slogan. @todo - Simplify. */
+/* The logo and slogan. */
 #header {
 	padding: 2px 2px 0 2px;
 }
