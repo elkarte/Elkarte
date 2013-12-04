@@ -91,7 +91,12 @@ legend {
 
 /* @todo - Quite a lot more code to be split. */
 
-
+input, button, select, textarea, .editor {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background: #fff;
+	color: #666;
+}
 
 
 /*	$BBC		*/
