@@ -291,7 +291,8 @@ function template_credits()
 					<script><!-- // --><![CDATA[
 						function ourCurrentVersion()
 						{
-							var ourVer, yourVer;
+							var ourVer,
+								yourVer;
 
 							if (!window.elkVersion)
 								return;
@@ -819,8 +820,8 @@ function template_not_done()
 		</div>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = ', $context['continue_countdown'], ';
-		var txt_message = "', $txt['not_done_continue'], '";
+		var countdown = ', $context['continue_countdown'], ',
+			txt_message = "', $txt['not_done_continue'], '";
 		doAutoSubmit();
 	// ]]></script>';
 }

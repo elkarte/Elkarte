@@ -816,10 +816,7 @@ class PersonalMessage_Controller extends Action_Controller
 		);
 		create_control_richedit($editorOptions);
 
-		// Store the ID for old compatibility.
-		$context['post_box_name'] = $editorOptions['id'];
 		$context['bcc_value'] = '';
-
 		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
 		if ($context['require_verification'])
 		{
@@ -2856,9 +2853,6 @@ function messagePostError($named_recipients, $recipient_ids = array())
 		'preview_type' => 2,
 	);
 	create_control_richedit($editorOptions);
-
-	// ... and store the ID again...
-	$context['post_box_name'] = $editorOptions['id'];
 
 	// Check whether we need to show the code again.
 	$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];

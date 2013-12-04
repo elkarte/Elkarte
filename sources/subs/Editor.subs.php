@@ -166,6 +166,9 @@ function create_control_richedit($editorOptions)
 	// Is this the first richedit - if so we need to ensure things are initialised and that we load all of the needed files
 	if (empty($context['controls']['richedit']))
 	{
+		// Store the name / ID we are creating for template compatibility.
+		$context['post_box_name'] = $editorOptions['id'];
+
 		// Some general stuff.
 		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
@@ -177,6 +180,7 @@ function create_control_richedit($editorOptions)
 		// JS makes the editor go round
 		loadJavascriptFile(array('jquery.sceditor.js', 'jquery.sceditor.bbcode.js', 'jquery.sceditor.elkarte.js', 'post.js'));
 		addJavascriptVar(array(
+			'post_box_name' => '"' . $editorOptions['id'] . '"',
 			'elk_smileys_url' => '"' . $settings['smileys_url'] . '"',
 			'bbc_quote_from' => '"' . addcslashes($txt['quote_from'], "'") . '"',
 			'bbc_quote' => '"' . addcslashes($txt['quote'], "'") . '"',
