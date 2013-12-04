@@ -158,11 +158,7 @@ a img {
 	.input_file		-	covers input[type=file]
 */
 input, button, select, textarea, .editor {
-	border: 1px solid #ccc;
-	border-radius: 2px;
-	background: #fff;
 	font: 83.33%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
-	color: #666;
 }
 /* The following is necessary. */
 /* @todo - Chase down SCEditor colours n stuff. Bleh. :P */
