@@ -24,7 +24,7 @@ function template_main()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a>
+			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=themes" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			', $txt['themeadmin_title'], '
 		</h2>
 		<div class="information">
@@ -108,7 +108,7 @@ function template_main()
 
 	echo '
 			<h3 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['theme_install'], '
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_install" onclick="return reqOverlayDiv(this.href);" id="theme_install" title="', $txt['help'], '"></a> ', $txt['theme_install'], '
 			</h3>
 			<form action="', $scripturl, '?action=admin;area=theme;sa=install" method="post" accept-charset="UTF-8" enctype="multipart/form-data" onsubmit="return confirm(\'', $txt['theme_install_new_confirm'], '\');">
 				<div class="windowbg">
@@ -443,15 +443,15 @@ function template_set_settings()
 	<div id="admin_form_wrapper">
 		<form action="', $scripturl, '?action=admin;area=theme;sa=list;th=', $context['theme_settings']['theme_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
-				<a href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);"><span class="hdicon cat_img_helptopics help" title="', $txt['help'], '"></span></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=theme_settings" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['theme_settings'], ' - ', $context['theme_settings']['name'], '
 			</h2>
 			<br />';
 
 	// @todo Why can't I edit the default theme popup.
 	if ($context['theme_settings']['theme_id'] != 1)
 		echo '
-			<h3 class="category_header">
-				<span class="hdicon cat_img_config">', $txt['theme_edit'], '</span>
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_edit'], '
 			</h3>
 			<div class="windowbg">
 				<div class="content">
@@ -467,8 +467,8 @@ function template_set_settings()
 			</div>';
 
 	echo '
-			<h3 class="category_header">
-				<span class="hdicon cat_img_config">', $txt['theme_url_config'], '</span>
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_url_config'], '
 			</h3>
 			<div class="windowbg2">
 				<div class="content">
@@ -505,8 +505,8 @@ function template_set_settings()
 	if (!empty($context['theme_variants']))
 	{
 		echo '
-			<h3 class="category_header">
-				<span class="hdicon cat_img_config">', $txt['theme_variants'], '</span>
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_variants'], '
 			</h3>
 			<div class="windowbg2">
 				<div class="content">
@@ -538,8 +538,8 @@ function template_set_settings()
 	}
 
 	echo '
-			<h3 class="category_header">
-				<span class="hdicon cat_img_config">', $txt['theme_options'], '</span>
+			<h3 class="category_header hdicon cat_img_config">
+				', $txt['theme_options'], '
 			</h3>
 			<div class="windowbg">
 				<div class="content">

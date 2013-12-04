@@ -23,8 +23,8 @@ function template_main()
 
 	echo '
 				<form action="', $scripturl, '?action=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform" class="standard_category">
-					<h2 class="category_header">
-							', !empty($settings['use_buttons']) ? '<span class="hdicon cat_img_search"></span>' : ' ', $txt['set_parameters'], '
+					<h2 class="category_header', !empty($settings['use_buttons']) ? ' hdicon cat_img_search' : '', '">
+						', $txt['set_parameters'], '
 					</h2>';
 
 	if (!empty($context['search_errors']))
@@ -342,7 +342,7 @@ function template_results()
 				<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm">';
 
 		echo '
-					<h3 class="category_header">
+					<h3 class="category_header hdicon cat_img_search">
 						<span class="floatright">';
 
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -351,7 +351,7 @@ function template_results()
 
 		echo '
 						</span>
-						<span class="hdicon cat_img_search">', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '</span>
+						', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '
 					</h3>';
 
 		// was anything even found?
@@ -493,8 +493,8 @@ function template_results()
 	else
 	{
 		echo '
-				<h3 class="category_header">
-					<span class="hdicon cat_img_search">', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '</span>
+				<h3 class="category_header hdicon cat_img_search">
+					', $txt['mlist_search_results'],':&nbsp;',$context['search_params']['search'], '
 				</h3>';
 		template_pagesection();
 

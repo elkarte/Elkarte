@@ -138,8 +138,8 @@ function template_editIgnoreList()
 
 	echo '
 	<div class="generic_list_wrapper" id="edit_buddies">
-		<h2 class="category_header">
-			<span class="hdicon cat_img_profile">', $txt['editIgnoreList'], '</span>
+		<h2 class="category_header hdicon cat_img_profile">
+			', $txt['editIgnoreList'], '
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
@@ -235,8 +235,7 @@ function template_edit_options()
 	// The main header!
 	echo '
 		<form action="', (!empty($context['profile_custom_submit_url']) ? $context['profile_custom_submit_url'] : $scripturl . '?action=profile;area=' . $context['menu_item_selected'] . ';u=' . $context['id_member']), '" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data" onsubmit="return checkProfileSubmit();">
-			<h2 class="category_header">
-				<span class="hdicon cat_img_profile">';
+			<h2 class="category_header hdicon cat_img_profile">';
 
 	// Don't say "Profile" if this isn't the profile...
 	if (!empty($context['profile_header_text']))
@@ -247,7 +246,6 @@ function template_edit_options()
 				', $txt['profile'];
 
 	echo '
-				</span>
 			</h2>';
 
 	// Have we some description?
@@ -714,8 +712,8 @@ function template_action_notification()
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=notification;save" method="post" accept-charset="UTF-8" id="notify_options" class="flow_hidden">
-			<h2 class="category_header">
-				<span class="hdicon cat_img_profile">', $txt['profile'], '</span>
+			<h2 class="category_header hdicon cat_img_profile">
+				', $txt['profile'], '
 			</h2>
 			<p class="description">', $txt['notification_info'], '</p>
 			<div class="windowbg2">
@@ -819,8 +817,8 @@ function template_groupMembership()
 	// The main containing header.
 	echo '
 		<form action="', $scripturl, '?action=profile;area=groupmembership;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
-			<h2 class="category_header">
-				<span class="hdicon cat_img_profile">', $txt['profile'], '</span>
+			<h2 class="category_header hdicon cat_img_profile">
+				', $txt['profile'], '
 			</h2>
 			<p class="description">', $txt['groupMembership_info'], '</p>';
 
@@ -980,8 +978,8 @@ function template_ignoreboards()
 	// The main containing header.
 	echo '
 	<form action="', $scripturl, '?action=profile;area=ignoreboards;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
-		<h2 class="category_header">
-			<span class="hdicon cat_img_profile">', $txt['profile'], '</span>
+		<h2 class="category_header hdicon cat_img_profile">
+			', $txt['profile'], '
 		</h2>
 		<p class="description">', $txt['ignoreboards_info'], '</p>
 		<div class="windowbg2">
@@ -1444,8 +1442,8 @@ function template_authentication_method()
 	echo '
 		<script src="', $settings['default_theme_url'], '/scripts/register.js"></script>
 		<form action="', $scripturl, '?action=profile;area=authentication;save" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
-			<h3 class="category_header">
-				<span class="hdicon cat_img_profile">', $txt['authentication'], '</span>
+			<h3 class="category_header hdicon cat_img_profile">
+				', $txt['authentication'], '
 			</h3>
 			<p class="description">', $txt['change_authentication'], '</p>
 			<div class="windowbg2">
