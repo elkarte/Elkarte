@@ -447,7 +447,6 @@ h2 a.collapse {
 	display: block;
 	float:right;
 	padding: 0 16px;
-	border-radius: 2px;
 	overflow: hidden;
 	position: relative;
 }
@@ -464,7 +463,6 @@ h2 a.collapse {
 /* Upshrink image in the page top for the header collapse */
 #collapse_button .linklevel1 {
 	display: block;
-	border-radius: 2px;
 	overflow: hidden;
 	position: relative;
 	padding: 0;
@@ -487,28 +485,14 @@ div.windowbg, div.windowbg2 {
 	padding: 10px 0;
 }
 
-/* Custom highlighted text style for modern browsers. */
-/* Nicer than default blue. Needs two separate rules. */
-::-moz-selection {
-	background: #d8ffdf;
-	color: #444;
-}
-::selection {
-	background: #d8ffdf;
-	color: #444;
-}
-
 /* Other highlighted text, such as search results. */
 .highlight {
-	color: #ff7200;
 	font-weight: bold;
 	font-size: 1.1em;
 }
 /* Legacy highlight color, for selected membergroups etc. */
 /* Used by JS to show a selected item. @todo - deprecate? */
 .highlight2 {
-	background: #d1e1ef;
-	color: #555;
 	font-size: 1.1em;
 }
 
@@ -581,9 +565,6 @@ div.windowbg, div.windowbg2 {
 	overflow: hidden;
 	margin: 2px 0 0 0;
 	padding: 9px;
-	border: 1px solid #c5c5c5;
-	border-radius: 7px;
-	background: #f5f5f5;
 }
 .roundframe p {
 	padding: 6px;
@@ -594,19 +575,11 @@ div.windowbg, div.windowbg2 {
 	overflow: auto;
 	margin: 0;
 	padding: 8px 8px 16px 8px;
-	border: 1px solid #ccc;
-	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
 }
-.generic_list_wrapper .title_bar {
-	border-bottom: 1px solid #fff;
-	border-radius: 0;
-	background: none;
-}
+
 .generic_list_wrapper .additional_row {
 	margin: 0;
 	padding: 10px 0 0;
-	border-radius: 0;
 }
 .generic_list_wrapper .information .additional_row {
 	border: none;
@@ -615,8 +588,6 @@ div.windowbg, div.windowbg2 {
 	margin: 0;
 	padding: 0;
 	border: none;
-	border-bottom: 1px solid #fff;
-	background: none;
 }
 
 /* @todo - Ha. Just another silly bunch of divs. */
@@ -632,21 +603,15 @@ div.windowbg, div.windowbg2 {
 	position: absolute;
 	z-index: 100;
 	visibility: hidden;
-	border: 1px solid #bbb;
-	border-radius: 3px;
 }
 .auto_suggest_div:focus {
 	outline: none !important;
-	border: 1px solid #bbb;
 }
 .auto_suggest_item {
 	padding: 1px 4px;
-	background: #ddd;
 }
 .auto_suggest_item_hover {
 	padding: 1px 4px;
-	background: #888;
-	color: #eee;
 	cursor: pointer;
 }
 

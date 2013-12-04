@@ -216,6 +216,65 @@ strong {
 	color: #777;
 }
 
+/* Upshrink image in the general category headers */
+#category_toggle, #category_toggle_more, #upshrink_header {
+	border-radius: 2px;
+}
+
+/* Upshrink image in the page top for the header collapse */
+#collapse_button .linklevel1 {
+	border-radius: 2px;
+}
+
+/* Custom highlighted text style for modern browsers. */
+/* Nicer than default blue. Needs two separate rules. */
+::-moz-selection {
+	background: #d8ffdf;
+	color: #444;
+}
+::selection {
+	background: #d8ffdf;
+	color: #444;
+}
+
+/* Other highlighted text, such as search results. */
+.highlight {
+	color: #ff7200;
+}
+/* Legacy highlight color, for selected membergroups etc. */
+/* Used by JS to show a selected item. @todo - deprecate? */
+.highlight2 {
+	background: #d1e1ef;
+	color: #555;
+}
+
+/* Used for sections that need somewhat larger corners */
+/* @todo - Daft name. Other stuffz. :P */
+.roundframe {
+	overflow: hidden;
+	margin: 2px 0 0 0;
+	padding: 9px;
+}
+
+/* The generic wrapper thingy.  */
+.generic_list_wrapper {
+	border: 1px solid #ccc;
+	border-radius: 7px;
+	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+}
+.generic_list_wrapper .additional_row {
+	border-radius: 0;
+}
+.generic_list_wrapper .title_bar {
+	border-bottom: 1px solid #fff;
+	border-radius: 0;
+	background: none;
+}
+.generic_list_wrapper .information {
+	border-bottom: 1px solid #fff;
+	background: none;
+}
+
 /*	$BBC		*/
 /* ------------------------------------------------------- */
 /* The "Quote:" and "Code:" header parts... */
