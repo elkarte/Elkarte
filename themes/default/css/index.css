@@ -207,8 +207,8 @@ input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 	outline: none;
 	border: 1px solid #999;
 }
-/* Give disabled text input elements a different background color. */
-input[disabled].input_text {
+/* Give disabled input elements a different background color. and no hover effects*/
+input[disabled].input_text, input[type=submit][disabled] {
 	background: #eee;
 }
 /* No borders around checkboxes or radio buttons, and middle aligned. */
@@ -268,6 +268,14 @@ input[disabled].input_text {
 	text-decoration: none;
 	cursor: pointer;
 }
+/* Dont show disabled buttons as active on hover */
+input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
+	border: 1px solid #afafaf;
+	border-top: 1px solid #cfcfcf;
+	border-left: 1px solid #bfbfbf;
+	box-shadow: 1px 1px 2px #e5e5e5;
+}
+
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
 /* Old markup had crud like <div class="smalltext righttext padding ffs zomg"> */
 /* Use new class that is defined to suit, and with a sensible name. */
