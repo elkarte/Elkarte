@@ -839,20 +839,7 @@ div.windowbg, div.windowbg2 {
 	font-size: 1.083em;
 	margin: 0 0 8px 0;
 }
-/* User information. @todo - Simplify. */
-#top_section_notice a.avatar {
-	float: right;
-	vertical-align: middle;
-	padding-right: 5px;
-}
-/* No more huge avatars up top. YAY! */
-#top_section_notice .avatar img, .mentionavatar .avatar {
-	width: auto;
-	height: auto;
-	max-width: 36px;
-	max-height: 36px;
-	border-radius: 2px;
-}
+
 .modtask {
 	margin: 1em 0 0 0;
 }
