@@ -43,6 +43,7 @@ class Maintenance_Controller extends Action_Controller
 		// This uses admin tabs - as it should!
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $txt['maintain_title'],
+			'class' => 'database',
 			'description' => $txt['maintain_info'],
 			'tabs' => array(
 				'routine' => array(),
@@ -1295,7 +1296,7 @@ class Maintenance_Controller extends Action_Controller
 				apache_reset_timeout();
 			return;
 		}
-		
+
 		// No countable posts? set posts counter to 0
 		updateZeroPostMembers();
 

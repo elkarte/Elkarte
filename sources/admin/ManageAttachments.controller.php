@@ -1570,8 +1570,10 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $txt;
 
 		$db = database();
-
+	
 		checkSession();
+
+		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($modSettings['attachment_basedirectories']))
@@ -1612,8 +1614,6 @@ class ManageAttachments_Controller extends Action_Controller
 			// Where are they going?
 			if (!empty($_POST['auto']))
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
-
 				$modSettings['automanage_attachments'] = 1;
 				$modSettings['use_subdirectories_for_attachments'] = $_POST['auto'] == -1 ? 0 : 1;
 				$modSettings['basedirectory_for_attachments'] = $_POST['auto'] > 0 ? $modSettings['attachmentUploadDir'][$_POST['auto']] : $modSettings['basedirectory_for_attachments'];
