@@ -275,6 +275,22 @@ strong {
 	background: none;
 }
 
+/* Styles used by the auto suggest control. */
+.auto_suggest_div {
+	border: 1px solid #bbb;
+	border-radius: 3px;
+}
+.auto_suggest_div:focus {
+	border: 1px solid #bbb;
+}
+.auto_suggest_item {
+	background: #ddd;
+}
+.auto_suggest_item_hover {
+	background: #888;
+	color: #eee;
+}
+
 /*	$BBC		*/
 /* ------------------------------------------------------- */
 /* The "Quote:" and "Code:" header parts... */
@@ -814,7 +830,100 @@ div.bbc_footnotes .meaction{
 }
 
 
+/*	$PAGELINKS	*/
+/* ------------------------------------------------------- */
+.selectbox, .pagelinks {
+	color: #555;
+}
+.pagelinks .navPages {
+	border: 1px solid #afafaf;
+	border-top: 1px solid #bbb;
+	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
+	color: #555;
+}
+.pagelinks .navPages:hover, .pagelinks .current_page  {
+	border: 1px solid #ccc;
+	border-top: 1px solid #afafaf;
+	border-left: 1px solid #afafaf;
+	background: #f0f0f0;
+	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	/* @todo - Simplify. */
+	color: #555;
+	text-decoration: none;
+}
+.pagelinks  :first-child {
+	border-radius: 2px 0 0 2px;
+}
+.pagelinks :last-child {
+	border-radius: 0 2px 2px 0;
+}
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+	content: '\00AB';
+	float: left;
+	font-size: 1.3em;
+}
+.small_pagelinks:after {
+	content: '\00BB';
+	float: left;
+	font-size: 1.3em;
+}
 
+/* Globally accessible top/bottom links. */
+#gotop, #gobottom {
+	border: 1px solid #222;
+	border-bottom: none;
+	border-radius: 20px 0 0 0;
+	background: #eee;
+	color: #eee;
+	opacity: 0.2;
+}
+#gobottom {
+	border-top: none;
+	border-radius: 0 0 0 20px;
+}
+#gotop:hover, #gobottom:hover {
+	color: #444;
+	text-decoration: none;
+	opacity: 1;
+}
+/* Skip navigation link. */
+#top {
+	border: 4px solid #5ba048;
+	border-radius: 0 0 6px 6px;
+	background: #fff;
+}
+
+
+/*	$TABLES		*/
+/* ------------------------------------------------------- */
+
+/* @todo */
+/* A general table class. */
+.table_grid {
+	border: 1px solid #ddd;
+	border-top: none;
+}
+.table_head>th {
+	border-top: 2px solid #ddd;
+	border-bottom: 2px solid #ddd;
+	background: #fff;
+	color: #555;
+}
+/* Basic cells. */
+.table_grid td {
+	border-bottom: 1px solid #ccc;
+}
+.table_grid .alternate_row {
+	background: #fafafa;
+}
+
+/* For Errors.template.php. */
+/* ------------------------------------------------------- */
+#errorfile_table .current {
+	border: 1px solid #444;
+	background: #fff5cd;
+}
 
 /*	$BOARDS		*/
 /* ------------------------------------------------------- */
@@ -880,7 +989,70 @@ div.bbc_footnotes .meaction{
 .recentpost>strong>a, .inline>strong>a {
 	color: #46823c;
 }
-
+#expanded_pages_container a {
+	background: #fff;
+}
+/* The board description and who-is-viewing stuff. */
+#description_board {
+	background: #e4e4e4;
+	border-radius: 4px 4px 0 0;
+	box-shadow: 1px 2px 4px #eee;
+}
+#description_board .generalinfo, #forumposts .generalinfo {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+}
+.topic_listing {
+	background: #e4e4e4;
+	box-shadow: 1px 2px 4px #eee;
+}
+.topic_listing>li {
+	border: 1px solid #ddd;
+	border-bottom: 1px solid #ccc;
+}
+.topic_sorting_row, .basic_row {
+	background: #fff;
+}
+.sort_by_container {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+.topic_name h4 a {
+	color: #4b863c;
+}
+.sticky_row .topic_name h4 a, .locked_row.sticky_row .topic_name h4 a {
+	color: #555;
+}
+.locked_row .topic_name h4 a {
+	color: #777;
+}
+.topic_stats {
+	color: #777;
+}
+.qaction_row {
+	background: #fff;
+}
+.approvetopic_row, .approve_row {
+	background: #fff5cd;
+}
+.sticky_row, .locked_row.sticky_row {
+	background: #ffffe0;
+}
+#topic_icons {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+}
+.jump_to_header {
+	background: #ebebeb;
+	background-image: linear-gradient(to bottom, #fafafa, #eaeaea);
+	color: #566450;
+	box-shadow: 2px 1px rgba(1,1,1,0.07) inset;
+}
+.jump_to_header:hover {
+	background: #f0f0f0;
+	color: #555;
+}
 /* --------------------------------------------------------------------- */
 /* The following are alternative layout orders for the board index rows. */
 /* They are basic demonstrations only. Extra custom styling can be done.
@@ -970,6 +1142,25 @@ div.bbc_footnotes .meaction{
 /* ------------------------------------------------ */
 /* End alternative layouts. Back to standard stuff. */
 /* ------------------------------------------------ */
+
+/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+
+/* The display template (topic view).
+/* Poll vote options */
+/* @todo - Slow selectors for the next few declarations here. Change? */
+#poll_options ul.options {
+
+	border-top: 1px solid #9999aa;
+}
+
+/* Poll results */
+#poll_options dl.options {
+	border: solid #9999aa;
+	border-width: 1px 0;
+}
+
+
 
 /* $PROFILE	*/
 /* ------------------------------------------------------- */
