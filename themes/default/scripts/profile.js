@@ -47,7 +47,7 @@ function autoDetectTimeOffset(currentTime)
  */
 function disableAutoComplete()
 {
-	if (is_chrome && document.addEventListener)
+	if (document.addEventListener)
 		document.addEventListener("DOMContentLoaded", disableAutoCompleteNow, false);
 }
 
