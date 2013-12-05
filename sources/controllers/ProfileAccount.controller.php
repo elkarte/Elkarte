@@ -39,8 +39,7 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	public function action_issuewarning()
 	{
-		global $txt, $scripturl, $modSettings, $mbname;
-		global $context, $cur_profile;
+		global $txt, $scripturl, $modSettings, $mbname, $context, $cur_profile;
 
 		$memID = currentMemberID();
 
@@ -50,6 +49,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// We need this because of template_load_warning_variables
 		loadTemplate('Profile');
+		loadJavascriptFile('profile.js');
 
 		// Get all the actual settings.
 		list ($modSettings['warning_enable'], $modSettings['user_limit']) = explode(',', $modSettings['warning_settings']);
@@ -325,7 +325,7 @@ class ProfileAccount_Controller extends Action_Controller
 		// Create the list for viewing.
 		createList($listOptions);
 
-		$warning_for_message = (int) $_REQUEST['msg'];
+		$warning_for_message = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : false;
 		$warned_message_subject = '';
 
 		// Are they warning because of a message?
@@ -339,6 +339,7 @@ class ProfileAccount_Controller extends Action_Controller
 		}
 
 		require_once(SUBSDIR . '/Maillist.subs.php');
+
 		// Any custom templates?
 		$context['notification_templates'] = array();
 		$notification_templates = maillist_templates('warntpl');
@@ -350,7 +351,7 @@ class ProfileAccount_Controller extends Action_Controller
 				continue;
 
 			$context['notification_templates'][] = array(
-				'title' => $row['template_title'],
+				'title' => $row['title'],
 				'body' => $row['body'],
 			);
 		}

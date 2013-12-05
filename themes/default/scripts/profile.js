@@ -256,3 +256,144 @@ function previewExternalAvatar(src, sid)
 	}
 	document.getElementById(sid).src = src;
 }
+
+/**
+ * Sets the warning bar based on user +/- button click
+ * Also responds to mousedown/move/click events inside the warning bar to set the level
+ * Determines the right color for the bar and sets it
+ * Sets the warning level notification text
+ *
+ * @param {object} curEvent
+ * @param {boolean} isMove
+ * @param {int} changeAmount
+ */
+function setWarningBarPos(curEvent, isMove, changeAmount)
+{
+	// Are we passing the amount to change it by?
+	if (changeAmount)
+	{
+		if (document.getElementById('warning_level').value === 'SAME')
+			percent = currentLevel + changeAmount;
+		else
+			percent = parseInt(document.getElementById('warning_level').value) + changeAmount;
+	}
+	// If not then it's a mouse thing.
+	else
+	{
+		if (!curEvent)
+			curEvent = window.event;
+
+		// If it's a movement check the button state first!
+		if (isMove)
+		{
+			if (!curEvent.button || curEvent.button !== 1)
+				return false;
+		}
+
+		// Get the position of the container.
+		contain = document.getElementById('warning_progress');
+		position = 0;
+		while (contain !== null)
+		{
+			position += contain.offsetLeft;
+			contain = contain.offsetParent;
+		}
+
+		// Where is the mouse?
+		if (curEvent.pageX)
+		{
+			mouse = curEvent.pageX;
+		}
+		else
+		{
+			mouse = curEvent.clientX;
+			mouse += document.documentElement.scrollLeft !== "undefined" ? document.documentElement.scrollLeft : document.body.scrollLeft;
+		}
+
+		// Is this within bounds?
+		if (mouse < position || mouse > position + barWidth)
+			return;
+
+		percent = Math.round(((mouse - position) / barWidth) * 100);
+
+		// Round percent to the nearest 5 - by kinda cheating!
+		percent = Math.round(percent / 5) * 5;
+	}
+
+	// What are the limits?
+	percent = Math.max(percent, minLimit);
+	percent = Math.min(percent, maxLimit);
+
+	// Set up the warning progress bar
+	size = barWidth * (percent / 100);
+	document.getElementById('warning_text').innerHTML = percent + "%";
+	document.getElementById('warning_level').value = percent;
+	document.getElementById('warning_progress').style.width = size + "px";
+
+	// Get the right color.
+	var key;
+	for (key in colors)
+	{
+		if (percent >= key)
+			color = colors[key];
+	}
+
+	document.getElementById('warning_progress').style.backgroundColor = color;
+	document.getElementById('warning_progress').style.backgroundImage = "none";
+
+	// Set the right text so its clear what the level will restrict
+	for (key in effectTexts)
+	{
+		if (percent >= key)
+			effectText = effectTexts[key];
+	}
+
+	document.getElementById('cur_level_div').innerHTML = effectText;
+}
+
+/**
+ * Disable notification boxes as required.  This is in response to slecting the
+ * notify user checkbox in the issue a warning screen
+ */
+function modifyWarnNotify()
+{
+	disable = !document.getElementById('warn_notify').checked;
+	document.getElementById('warn_sub').disabled = disable;
+	document.getElementById('warn_body').disabled = disable;
+	document.getElementById('warn_temp').disabled = disable;
+	document.getElementById('new_template_link').style.display = disable ? 'none' : '';
+	document.getElementById('preview_button').style.display = disable ? 'none' : '';
+}
+
+/**
+ * onclick function, triggerd in response to slecting + or - in the warning screen
+ * Increases the warning level by a defined amount
+ *
+ * @param {int} amount
+ */
+function changeWarnLevel(amount)
+{
+	setWarningBarPos(false, false, amount);
+}
+
+/**
+ * Fills the warning template box based on the one chosen by the user
+ */
+function populateNotifyTemplate()
+{
+	// no selection means no template
+	index = document.getElementById('warn_temp').value;
+	if (index === -1)
+		return false;
+
+	// Otherwise see what we can do...
+	for (var key in templates)
+	{
+		// Found the template, load it and stop
+		if (index === key)
+		{
+			document.getElementById('warn_body').value = templates[key];
+			break;
+		}
+	}
+}
