@@ -18,17 +18,14 @@ var elk_formSubmitted = false,
 	lastKeepAliveCheck = new Date().getTime(),
 	ajax_indicator_ele = null;
 
-// Some very basic browser detection - from Mozilla's sniffer page.
+// Some very basic browser detection
 var ua = navigator.userAgent.toLowerCase(),
-	is_opera = ua.indexOf('opera') !== -1,
-	is_ff = (ua.indexOf('firefox') !== -1 || ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('shiretoko') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera,
-	is_gecko = ua.indexOf('gecko') !== -1 && !is_opera,
-	is_chrome = ua.indexOf('chrome') !== -1,
-	is_safari = ua.indexOf('applewebkit') !== -1 && !is_chrome,
-	is_webkit = ua.indexOf('applewebkit') !== -1,
-	is_ie = ua.indexOf('msie') !== -1 && !is_opera,
-	is_iphone = ua.indexOf('iphone') !== -1 || ua.indexOf('ipod') !== -1,
-	is_android = ua.indexOf('android') !== -1;
+	is_opera = !!window.opera, // Opera 8.0-12, past that it behaves like chrome
+	is_ff = typeof InstallTrigger !== 'undefined' || ((ua.indexOf('iceweasel') !== -1 || ua.indexOf('icecat') !== -1 || ua.indexOf('shiretoko') !== -1 || ua.indexOf('minefield') !== -1) && !is_opera),
+	is_safari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0, // Safari 3+
+	is_chrome = !!window.chrome, // Chrome 1+, Opera 15+
+	is_ie = /*@cc_on!@*/false || !!document.documentMode, // IE6+
+	is_webkit = ua.indexOf('applewebkit') !== -1;
 
 // Define XMLHttpRequest for IE
 if (!('XMLHttpRequest' in window) && 'ActiveXObject' in window)
