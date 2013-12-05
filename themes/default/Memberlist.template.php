@@ -51,11 +51,11 @@ function template_main()
 		{
 			$(\'body\').on(\'click\', mlsearch_opt_hide);
 			$(\'#mlsearch_options\').slideToggle(\'fast\');
-
 		}
+
 		function mlsearch_opt_hide(ev)
 		{
-			if (ev.target.id == \'mlsearch_options\' || ev.target.id == \'mlsearch_input\')
+			if (ev.target.id === \'mlsearch_options\' || ev.target.id === \'mlsearch_input\')
 				return;
 
 			$(\'body\').off(\'click\', mlsearch_opt_hide);

@@ -145,14 +145,17 @@ function template_new_group()
 
 	if ($context['undefined_group'])
 	{
+		// Enable / disable the required posts box when the group type is post based
 		echo '
 			<script><!-- // --><![CDATA[
 				function swapPostGroup(isChecked)
 				{
 					var min_posts_text = document.getElementById(\'min_posts_text\');
+
 					document.getElementById(\'min_posts_input\').disabled = !isChecked;
-					min_posts_text.style.color = isChecked ? "" : "#888888";
+					min_posts_text.style.color = isChecked ? "" : "#888";
 				}
+
 				swapPostGroup(', $context['post_group'] ? 'true' : 'false', ');
 			// ]]></script>';
 	}
@@ -389,6 +392,7 @@ function template_edit_group()
 	}
 
 	if ($context['group']['allow_post_group'])
+		// If post based is selected, disable moderation selection, visability, group description and enable post count,
 		echo '
 		<script><!-- // --><![CDATA[
 			function swapPostGroup(isChecked)
@@ -400,13 +404,20 @@ function template_edit_group()
 
 				document.forms.groupForm.min_posts.disabled = !isChecked;
 				min_posts_text.style.color = isChecked ? "" : "#888";
+
 				document.forms.groupForm.group_desc_input.disabled = isChecked;
 				group_desc_text.style.color = !isChecked ? "" : "#888";
+
 				document.forms.groupForm.group_hidden_input.disabled = isChecked;
 				group_hidden_text.style.color = !isChecked ? "" : "#888";
+
 				document.forms.groupForm.group_moderators.disabled = isChecked;
 				group_moderators_text.style.color = !isChecked ? "" : "#888";
+
+				// Disable the moderator autosuggest box as well
+				oModeratorSuggest.oTextHandle.disabled = isChecked ? true : false;
 			}
+
 			swapPostGroup(', $context['group']['is_post_group'] ? 'true' : 'false', ');
 		// ]]></script>';
 }
