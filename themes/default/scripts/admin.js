@@ -723,6 +723,68 @@ function testFTP()
 }
 
 /**
+ * Generate a "test ftp" button.
+ */
+function generateFTPTest()
+{
+	// Don't ever call this twice!
+	if (generatedButton)
+		return false;
+
+	generatedButton = true;
+
+	// No XML?
+	if (!window.XMLHttpRequest || (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full")))
+		return false;
+
+	// create our test button to call testFTP on click
+	var ftpTest = document.createElement("input");
+	ftpTest.type = "button";
+	ftpTest.className = "right_submit";
+	ftpTest.onclick = testFTP;
+
+	// Set the button value based on which form we are on
+	if (document.getElementById("test_ftp_placeholder"))
+	{
+		ftpTest.value = package_ftp_test;
+		document.getElementById("test_ftp_placeholder").appendChild(ftpTest);
+	}
+	else
+	{
+		ftpTest.value = package_ftp_test_connection;
+		document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
+	}
+}
+
+/**
+ * Callback function of the testFTP function
+ *
+ * @param {type} oXMLDoc
+ */
+function testFTPResults(oXMLDoc)
+{
+	ajax_indicator(false);
+
+	// This assumes it went wrong!
+	var wasSuccess = false,
+		message = package_ftp_test_failed,
+		results = oXMLDoc.getElementsByTagName('results')[0].getElementsByTagName('result');
+
+	// Results show we were a success
+	if (results.length > 0)
+	{
+		if (results[0].getAttribute('success') === 1)
+			wasSuccess = true;
+		message = results[0].firstChild.nodeValue;
+	}
+
+	// place the informative box on screen so the user knows if things went well or poorly
+	document.getElementById("ftp_error_div").style.display = "";
+	document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
+	document.getElementById("ftp_error_message").innerHTML = message;
+}
+
+/**
  * Part of package manager, expands a folders contents to show permission levels of files it contains
  * Will use an ajax call to get any permissions it has not loaded
  *
