@@ -81,8 +81,8 @@ function template_bounce_email()
 
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
-		<h3 class="category_header">
-			<span class="hdicon cat_img_mail">', $txt['show_notice'], '</span>
+		<h3 class="category_header hdicon cat_img_mail">
+			', $txt['show_notice'], '
 		</h3>';
 
 	// Any special messages?

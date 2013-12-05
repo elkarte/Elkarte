@@ -813,8 +813,8 @@ function template_send()
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" id="pmFolder" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
 		<div class="forumposts">
-			<h3 class="category_header">
-				<span class="hdicon cat_img_write">', $txt['new_message'], '</span>
+			<h3 class="category_header hdicon cat_img_write">
+				', $txt['new_message'], '
 			</h3>';
 
 	echo '
@@ -1514,8 +1514,8 @@ function template_showPMDrafts()
 	global $context, $scripturl, $txt;
 
 	echo '
-		<h2 class="category_header">
-			<span class="hdicon cat_img_talk">', $txt['drafts_show'], '</span>
+		<h2 class="category_header hdicon cat_img_talk">
+			', $txt['drafts_show'], '
 		</h2>';
 	template_pagesection();
 

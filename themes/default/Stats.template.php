@@ -28,8 +28,8 @@ function template_main()
 		</h2>
 		<ul class="statistics">
 			<li class="flow_hidden" id="top_row">
-				<h3 class="category_header">
-					<span class="hdicon cat_img_stats_info">', $txt['general_stats'], '</span>
+				<h3 class="category_header hdicon cat_img_stats_info">
+					', $txt['general_stats'], '
 				</h3>
 				<dl class="stats floatleft">
 					<dt>', $txt['total_members'], ':</dt>
@@ -79,8 +79,8 @@ function template_main()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft">
-					<span class="hdicon cat_img_star">', $txt['top_posters'], '</span>
+				<h3 class="category_header floatleft hdicon cat_img_star">
+					', $txt['top_posters'], '
 				</h3>
 				<dl class="stats floatleft">';
 
@@ -98,8 +98,8 @@ function template_main()
 
 	echo '
 				</dl>
-				<h3 class="category_header">
-					<span class="hdicon cat_img_topics">', $txt['top_boards'], '</span>
+				<h3 class="category_header hdicon cat_img_topics">
+					', $txt['top_boards'], '
 				</h3>
 				<dl class="stats">';
 
@@ -119,8 +119,8 @@ function template_main()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft">
-					<span class="hdicon cat_img_talk">', $txt['top_topics_replies'], '</span>
+				<h3 class="category_header floatleft hdicon cat_img_talk">
+					', $txt['top_topics_replies'], '
 				</h3>
 				<dl class="stats floatleft">';
 
@@ -138,8 +138,8 @@ function template_main()
 
 	echo '
 				</dl>
-				<h3 class="category_header">
-					<span class="hdicon cat_img_eye">', $txt['top_topics_views'], '</span>
+				<h3 class="category_header hdicon cat_img_eye">
+					', $txt['top_topics_views'], '
 				</h3>
 				<dl class="stats">';
 
@@ -157,8 +157,8 @@ function template_main()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft">
-					<span class="hdicon cat_img_write">', $txt['top_starters'], '</span>
+				<h3 class="category_header floatleft hdicon cat_img_write">
+					', $txt['top_starters'], '
 				</h3>
 				<dl class="stats floatleft">';
 
@@ -176,8 +176,8 @@ function template_main()
 
 	echo '
 				</dl>
-				<h3 class="category_header">
-					<span class="hdicon cat_img_clock">', $txt['most_time_online'], '</span>
+				<h3 class="category_header hdicon cat_img_clock">
+					', $txt['most_time_online'], '
 				</h3>
 				<dl class="stats">';
 
@@ -199,8 +199,8 @@ function template_main()
 		</ul>
 	</div>
 	<div id="forum_history" class="forum_category">
-		<h2 class="category_header">
-			<span class="hdicon cat_img_clock">', $txt['forum_history'], '</span>
+		<h2 class="category_header hdicon cat_img_clock">
+			', $txt['forum_history'], '
 		</h2>
 		<div class="flow_hidden">';
 
