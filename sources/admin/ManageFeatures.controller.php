@@ -529,6 +529,7 @@ class ManageFeatures_Controller extends Action_Controller
 			array('title', 'mentions_settings'),
 			array('check', 'mentions_enabled'),
 			array('check', 'mentions_buddy'),
+			array('check', 'mentions_dont_notify_rlike'),
 		);
 
 		call_integration_hook('integrate_mention_settings', array(&$config_vars));
@@ -1666,6 +1667,7 @@ class ManageFeatures_Controller extends Action_Controller
 			array('title', 'mentions_settings'),
 			array('check', 'mentions_enabled'),
 			array('check', 'mentions_buddy'),
+			array('check', 'mentions_dont_notify_rlike'),
 		);
 
 		return $config_vars;

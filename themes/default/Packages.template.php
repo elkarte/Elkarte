@@ -386,8 +386,9 @@ function template_view_package()
 	if ($context['uninstalling'] && !empty($context['database_changes']))
 		echo '
 	<script><!-- // --><![CDATA[
-		var database_changes_area = document.getElementById(\'db_changes_div\');
-		var db_vis = false;
+		var database_changes_area = document.getElementById(\'db_changes_div\'),
+			db_vis = false;
+
 		database_changes_area.style.display = "none";
 	// ]]></script>';
 }
@@ -403,7 +404,7 @@ function template_extract_package()
 	{
 		echo '
 	<script><!-- // --><![CDATA[
-		setTimeout("doRedirect();", ', empty($context['redirect_timeout']) ? '5000' : $context['redirect_timeout'], ');
+		setTimeout(function() {doRedirect();}, ', empty($context['redirect_timeout']) ? 5000 : $context['redirect_timeout'], ');
 
 		function doRedirect()
 		{
@@ -753,60 +754,13 @@ function template_control_chmod()
 			document.getElementById(\'need_writable_list\').style.display = \'none\';
 		// ]]></script>';
 
-	// Quick generate the test button.
+	// Set up to generate the FTP test button.
 	echo '
 	<script><!-- // --><![CDATA[
-		// Generate a "test ftp" button.
-		var generatedButton = false;
-		function generateFTPTest()
-		{
-			// Don\'t ever call this twice!
-			if (generatedButton)
-				return false;
-			generatedButton = true;
-
-			// No XML?
-			if (!window.XMLHttpRequest || (!document.getElementById("test_ftp_placeholder") && !document.getElementById("test_ftp_placeholder_full")))
-				return false;
-
-			var ftpTest = document.createElement("input");
-			ftpTest.type = "button";
-			ftpTest.className = "right_submit";
-			ftpTest.onclick = testFTP;
-
-			if (document.getElementById("test_ftp_placeholder"))
-			{
-				ftpTest.value = "', $txt['package_ftp_test'], '";
-				document.getElementById("test_ftp_placeholder").appendChild(ftpTest);
-			}
-			else
-			{
-				ftpTest.value = "', $txt['package_ftp_test_connection'], '";
-				document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
-			}
-		}
-
-		function testFTPResults(oXMLDoc)
-		{
-			ajax_indicator(false);
-
-			// This assumes it went wrong!
-			var wasSuccess = false;
-			var message = "', addcslashes($txt['package_ftp_test_failed'], "'"), '";
-
-			var results = oXMLDoc.getElementsByTagName(\'results\')[0].getElementsByTagName(\'result\');
-			if (results.length > 0)
-			{
-				if (results[0].getAttribute(\'success\') == 1)
-					wasSuccess = true;
-				message = results[0].firstChild.nodeValue;
-			}
-
-			document.getElementById("ftp_error_div").style.display = "";
-			document.getElementById("ftp_error_div").className = wasSuccess ? "successbox" : "errorbox";
-
-			document.getElementById("ftp_error_message").innerHTML = message;
-		}
+		var generatedButton = false,
+			package_ftp_test = "', $txt['package_ftp_test'], '",
+			package_ftp_test_connection = "', $txt['package_ftp_test_connection'], '",
+			package_ftp_test_failed = "', addcslashes($txt['package_ftp_test_failed'], "'"), '";
 	// ]]></script>';
 
 	// Make sure the button gets generated last.
@@ -1363,8 +1317,9 @@ function template_pause_action_permissions()
 	// Just the countdown stuff
 	echo '
 	<script><!-- // --><![CDATA[
-		var countdown = ', $countDown, ';
-		var txt_message = "', $txt['not_done_continue'], '";
+		var countdown = ', $countDown, ',
+			txt_message = "', $txt['not_done_continue'], '";
+
 		doAutoSubmit();
 	// ]]></script>';
 

@@ -96,8 +96,8 @@ function template_announcement_send()
 	</div>
 	<br />
 	<script><!-- // --><![CDATA[
-		var countdown = 2;
-		var txt_message = "', $txt['announce_continue'], '";
+		var countdown = 2,
+			txt_message = "', $txt['announce_continue'], '";
 		doAutoSubmit();
 	// ]]></script>';
 }

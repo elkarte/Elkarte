@@ -20,6 +20,7 @@ $txt['mentions_markunread'] = 'Mark as unread';
 $txt['mentions_settings'] = 'Mention Settings';
 $txt['mentions_enabled'] = 'Enable site mentioning';
 $txt['mentions_buddy'] = 'Add a mention when a member is added to someone\'s buddy list';
+$txt['mentions_dont_notify_rlike'] = 'Don\'t inform the member when a post has a liked removed';
 
 $txt['mention_men'] = 'Mentioned you in the message {msg_link}';
 $txt['mention_like'] = 'Liked your message {msg_link}';

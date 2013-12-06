@@ -274,22 +274,23 @@ function template_email_members_compose()
 	// The functions used to preview a posts without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '";
-			var form_name = "newsmodify";
-			var preview_area = "news";
-			var txt_preview_title = "', $txt['preview_title'], '";
-			var txt_preview_fetch = "', $txt['preview_fetch'], '";
+			var form_name = "newsmodify",
+				preview_area = "news",
+				txt_preview_title = "', $txt['preview_title'], '",
+				txt_preview_fetch = "', $txt['preview_fetch'], '";
 
 			function checkboxes_status (item)
 			{
 				if (item.id == \'send_html\')
 					document.getElementById(\'parse_html\').disabled = !document.getElementById(\'parse_html\').disabled;
+
 				if (item.id == \'send_pm\')
 				{
 					if (!document.getElementById(\'send_html\').checked)
 						document.getElementById(\'parse_html\').disabled = true;
 					else
 						document.getElementById(\'parse_html\').disabled = false;
+
 					document.getElementById(\'send_html\').disabled = !document.getElementById(\'send_html\').disabled;
 				}
 			}
@@ -341,8 +342,9 @@ function template_email_members_send()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		var countdown = 2;
-		var message = "', $txt['email_continue'], '";
+		var countdown = 2,
+			message = "', $txt['email_continue'], '";
+				
 		doAutoSubmit();
 	// ]]></script>';
 }

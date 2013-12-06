@@ -439,7 +439,7 @@ function template_edit_options()
 	if ($context['require_password'])
 		echo '
 				// Did you forget to type your password?
-				if (document.forms.creator.oldpasswrd.value == "")
+				if (document.forms.creator.oldpasswrd.value === "")
 				{
 					alert("', $txt['required_security_reasons'], '");
 					return false;
@@ -947,8 +947,8 @@ function template_groupMembership()
 		// Javascript for the selector stuff.
 		echo '
 		<script><!-- // --><![CDATA[
-			var prevClass = "";
-			var prevDiv = "";';
+			var prevClass = "",
+				prevDiv = "";';
 
 		if (isset($context['groups']['member'][$context['primary_group']]))
 			echo '
@@ -1523,6 +1523,7 @@ function template_authentication_method()
 	};
 	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 	var currentAuthMethod = \'passwd\';
+
 	updateAuthMethod();
 	// ]]></script>';
 }

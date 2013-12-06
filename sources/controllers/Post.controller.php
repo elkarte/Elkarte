@@ -892,9 +892,6 @@ class Post_Controller extends Action_Controller
 		);
 		create_control_richedit($editorOptions);
 
-		// Store the ID.
-		$context['post_box_name'] = $editorOptions['id'];
-
 		$context['attached'] = '';
 		$context['make_poll'] = isset($_REQUEST['poll']);
 

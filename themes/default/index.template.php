@@ -660,15 +660,16 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 {
 	global $context;
 
-	if (!empty($options['page_index_markup']))
+
 	// Hmmm. I'm a tad wary of having floatleft here but anyway............
 	// @todo - Try using table-cell display here. Should do auto rtl support. Less markup, less css. :)
-		$pages = '<ul class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</ul>';
+	if (!empty($options['page_index_markup']))
+		$pages = '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks floatleft" role="menubar">' . $options['page_index_markup'] . '</ul>';
 	else
 	{
 		if (!isset($options['page_index']))
 			$options['page_index'] = 'page_index';
-		$pages = empty($context[$options['page_index']]) ? '' : '<ul class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</ul>';
+		$pages = empty($context[$options['page_index']]) ? '' : '<ul ' . (isset($options['page_index_id']) ? 'id="' . $options['page_index_id'] . '" ' : '') . 'class="pagelinks floatleft" role="menubar">' . $context[$options['page_index']] . '</ul>';
 	}
 
 	if (!isset($options['extra']))

@@ -349,9 +349,6 @@ class ManageNews_Controller extends Action_Controller
 		);
 		create_control_richedit($editorOptions);
 
-		// Store the ID for old compatibility.
-		$context['post_box_name'] = $editorOptions['id'];
-
 		if (isset($context['preview']))
 		{
 			require_once(SUBSDIR . '/Mail.subs.php');

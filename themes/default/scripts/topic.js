@@ -1085,3 +1085,116 @@ function sendtopicForm(oPopup_body, url, oContainer)
 		});
 	});
 }
+
+
+
+/**
+ * Used to split a topic.
+ * Allows selecting a message so it can be moved from the original to the spit topic or back
+ *
+ * @param {string} direction up / down / reset
+ * @param {int} msg_id message id that is being moved
+ */
+function topicSplitselect(direction, msg_id)
+{
+	if (window.XMLHttpRequest)
+	{
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + "action=splittopics;sa=selectTopics;subname=" + topic_subject + ";topic=" + topic_id + "." + start[0] + ";start2=" + start[1] + ";move=" + direction + ";msg=" + msg_id + ";xml", onTopicSplitReceived);
+		return false;
+	}
+	else
+		return true;
+}
+
+/**
+ * Callback function for topicSplitselect
+ *
+ * @param {object} XMLDoc
+ */
+function onTopicSplitReceived(XMLDoc)
+{
+	var i,
+		j,
+		pageIndex;
+
+	// Find the selected and not_selected page index containers
+	for (i = 0; i < 2; i++)
+	{
+		pageIndex = XMLDoc.getElementsByTagName("pageIndex")[i];
+
+		// Update the page container with our xml response
+		document.getElementById("pageindex_" + pageIndex.getAttribute("section")).innerHTML = pageIndex.firstChild.nodeValue;
+		start[i] = pageIndex.getAttribute("startFrom");
+	}
+
+	var numChanges = XMLDoc.getElementsByTagName("change").length,
+		curChange,
+		curSection,
+		curAction,
+		curId,
+		curList,
+		curData,
+		newItem,
+		sInsertBeforeId;
+
+	// Loop through all of the changes returned in the xml response
+	for (i = 0; i < numChanges; i++)
+	{
+		curChange = XMLDoc.getElementsByTagName("change")[i];
+		curSection = curChange.getAttribute("section");
+		curAction = curChange.getAttribute("curAction");
+		curId = curChange.getAttribute("id");
+		curList = document.getElementById("messages_" + curSection);
+
+		// Remove it from the source list so we can insert it in the destination list
+		if (curAction === "remove")
+			curList.removeChild(document.getElementById(curSection + "_" + curId));
+		// Insert a message.
+		else
+		{
+			// By default, insert the element at the end of the list.
+			sInsertBeforeId = null;
+
+			// Loop through the list to try and find an item to insert after.
+			oListItems = curList.getElementsByTagName("li");
+			for (j = 0; j < oListItems.length; j++)
+			{
+				if (parseInt(oListItems[j].id.substr(curSection.length + 1)) < curId)
+				{
+					// This would be a nice place to insert the row.
+					sInsertBeforeId = oListItems[j].id;
+
+					// We're done for now. Escape the loop.
+					j = oListItems.length + 1;
+				}
+			}
+
+			// Let's create a nice container for the message.
+			newItem = document.createElement("li");
+			newItem.className = "windowbg2";
+			newItem.id = curSection + "_" + curId;
+			newItem.innerHTML = '' +
+				'<div class="content">' +
+					'<div class="message_header">' +
+						'<a class="split_icon float' + (curSection === "selected" ? "left" : "right") + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === "selected" ? "up" : "down") + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === "selected" ? 'up' : 'down') + '\', ' + curId + ');">' +
+							'<img src="' + images_url + '/split_' + (curSection === "selected" ? "de" : "") + 'select.png" alt="' + (curSection === "selected" ? "&lt;-" : "-&gt;") + '" />' +
+						'</a>' +
+						'<strong>' + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + '</strong>' +
+						'<br />' +
+						'<em>' + curChange.getElementsByTagName("time")[0].firstChild.nodeValue + '</em>' +
+					'</div>' +
+					'<div class="post">' + curChange.getElementsByTagName("body")[0].firstChild.nodeValue + '</div>' +
+				'</div>';
+
+			// So, where do we insert it?
+			if (typeof sInsertBeforeId === "string")
+				curList.insertBefore(newItem, document.getElementById(sInsertBeforeId));
+			else
+				curList.appendChild(newItem);
+		}
+	}
+
+	// After all changes, make sure the window backgrounds are still correct for both lists.
+	applyWindowClasses(document.getElementById("messages_selected"));
+	applyWindowClasses(document.getElementById("messages_not_selected"));
+}

@@ -85,7 +85,7 @@ function template_registration_form()
 		<script><!-- // --><![CDATA[
 			function verifyAgree()
 			{
-				if (currentAuthMethod == \'passwd\' && document.forms.registration.elk_autov_pwmain.value != document.forms.registration.elk_autov_pwverify.value)
+				if (currentAuthMethod === \'passwd\' && document.forms.registration.elk_autov_pwmain.value !== document.forms.registration.elk_autov_pwverify.value)
 				{
 					alert("', $txt['register_passwords_differ_js'], '");
 					return false;
@@ -390,6 +390,7 @@ function template_registration_form()
 				"password_valid": "', $txt['registration_password_valid'], '"
 			};
 			var verificationHandle = new elkRegister("registration", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
+
 			// Update the authentication status.
 			updateAuthMethod();
 		// ]]></script>';

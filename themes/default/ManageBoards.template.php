@@ -507,14 +507,17 @@ function template_modify_board()
 							<div id="moderator_container"></div>
 						</dd>
 					</dl>
+					<hr />';
+
+	// Add a select all box for the allowed groups section
+	echo '
 					<script><!-- // --><![CDATA[
 						$(document).ready(function () {
 							$(".select_all_box").each(function () {
 								$(this).removeClass(\'select_all_box\');
 							});
 						});
-					// ]]></script>
-					<hr />';
+					// ]]></script>';
 
 	if (empty($context['board']['is_recycle']) && empty($context['board']['topics']))
 		echo '
@@ -682,9 +685,9 @@ function template_modify_board()
 	<script><!-- // --><![CDATA[
 		function refreshOptions()
 		{
-			var redirect = document.getElementById("redirect_enable");
-			var redirectEnabled = redirect ? redirect.checked : false;
-			var nonDefaultTheme = document.getElementById("boardtheme").value == 0 ? false : true;
+			var redirect = document.getElementById("redirect_enable"),
+				redirectEnabled = redirect ? redirect.checked : false,
+				nonDefaultTheme = document.getElementById("boardtheme").value == 0 ? false : true;
 
 			// What to show?
 			document.getElementById("override_theme_div").style.display = redirectEnabled || !nonDefaultTheme ? "none" : "";
@@ -703,6 +706,7 @@ function template_modify_board()
 
 	echo '
 		}
+
 		refreshOptions();
 	// ]]></script>';
 }
