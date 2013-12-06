@@ -123,6 +123,8 @@ class SplitTopics_Controller extends Action_Controller
 			return $this->action_splitSelectTopics();
 		}
 
+		//
+
 		// Basic template information....
 		$context['message'] = array(
 			'id' => $splitAt,
@@ -301,6 +303,10 @@ class SplitTopics_Controller extends Action_Controller
 
 		// Using the "select" sub template.
 		$context['sub_template'] = isset($_REQUEST['xml']) ? 'split' : 'select';
+
+		// All of the js for topic split selection is needed
+		if (!isset($_REQUEST['xml']))
+			loadJavascriptFile('topic.js');
 
 		// Are we using a custom messages per page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];

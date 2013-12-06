@@ -25,131 +25,36 @@ function template_issueWarning()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		function setWarningBarPos(curEvent, isMove, changeAmount)
-		{
-			barWidth = ', $context['warningBarWidth'], ';
+	var barWidth = ', $context['warningBarWidth'], ',
+		currentLevel = ', $context['member']['warning'], ',
+		minLimit = ', $context['min_allowed'], ',
+		maxLimit = ', $context['max_allowed'], ',
+		color = "black",
+		effectText = "";
 
-			// Are we passing the amount to change it by?
-			if (changeAmount)
-			{
-				if (document.getElementById(\'warning_level\').value == \'SAME\')
-					percent = ', $context['member']['warning'], ' + changeAmount;
-				else
-					percent = parseInt(document.getElementById(\'warning_level\').value) + changeAmount;
-			}
-			// If not then it\'s a mouse thing.
-			else
-			{
-				if (!curEvent)
-					var curEvent = window.event;
-
-				// If it\'s a movement check the button state first!
-				if (isMove)
-				{
-					if (!curEvent.button || curEvent.button != 1)
-						return false
-				}
-
-				// Get the position of the container.
-				contain = document.getElementById(\'warning_progress\');
-				position = 0;
-				while (contain != null)
-				{
-					position += contain.offsetLeft;
-					contain = contain.offsetParent;
-				}
-
-				// Where is the mouse?
-				if (curEvent.pageX)
-				{
-					mouse = curEvent.pageX;
-				}
-				else
-				{
-					mouse = curEvent.clientX;
-					mouse += document.documentElement.scrollLeft != "undefined" ? document.documentElement.scrollLeft : document.body.scrollLeft;
-				}
-
-				// Is this within bounds?
-				if (mouse < position || mouse > position + barWidth)
-					return;
-
-				percent = Math.round(((mouse - position) / barWidth) * 100);
-
-				// Round percent to the nearest 5 - by kinda cheating!
-				percent = Math.round(percent / 5) * 5;
-			}
-
-			// What are the limits?
-			minLimit = ', $context['min_allowed'], ';
-			maxLimit = ', $context['max_allowed'], ';
-
-			percent = Math.max(percent, minLimit);
-			percent = Math.min(percent, maxLimit);
-
-			size = barWidth * (percent/100);
-
-			document.getElementById(\'warning_text\').innerHTML = percent + "%";
-			document.getElementById(\'warning_text\').innerHTML = percent + "%";
-			document.getElementById(\'warning_level\').value = percent;
-			document.getElementById(\'warning_progress\').style.width = size + "px";
-
-			// Get the right color.
-			color = "black"';
+	// Colors for the warning level
+	var colors = {';
 
 	foreach ($context['colors'] as $limit => $color)
-		echo '
-			if (percent >= ', $limit, ')
-				color = "', $color, '";';
+		echo $limit, ' : "', $color, '", ';
 
-	echo '
-			document.getElementById(\'warning_progress\').style.backgroundColor = color;
-			document.getElementById(\'warning_progress\').style.backgroundImage = "none";
+	echo '};
 
-			// Also set the right effect.
-			effectText = "";';
+	// Text to describe the effect of the chosen level
+	var effectTexts = {';
 
 	foreach ($context['level_effects'] as $limit => $text)
-		echo '
-			if (percent >= ', $limit, ')
-				effectText = "', $text, '";';
+		echo $limit, ' : "', $text, '", ';
 
-	echo '
-			document.getElementById(\'cur_level_div\').innerHTML = effectText;
-		}
+	echo '}
 
-		// Disable notification boxes as required.
-		function modifyWarnNotify()
-		{
-			disable = !document.getElementById(\'warn_notify\').checked;
-			document.getElementById(\'warn_sub\').disabled = disable;
-			document.getElementById(\'warn_body\').disabled = disable;
-			document.getElementById(\'warn_temp\').disabled = disable;
-			document.getElementById(\'new_template_link\').style.display = disable ? \'none\' : \'\';
-			document.getElementById(\'preview_button\').style.display = disable ? \'none\' : \'\';
-		}
+	// Warning templates that can be sent to the user
+	var templates = {';
 
-		function changeWarnLevel(amount)
-		{
-			setWarningBarPos(false, false, amount);
-		}
+	foreach ($context['notification_templates'] as $limit => $type)
+		echo $limit, ' :"', strtr($type['body'], array('"' => "'", "\n" => '\\n', "\r" => '')), '", ';
 
-		// Warn template.
-		function populateNotifyTemplate()
-		{
-			index = document.getElementById(\'warn_temp\').value;
-			if (index == -1)
-				return false;
-
-			// Otherwise see what we can do...';
-
-	foreach ($context['notification_templates'] as $k => $type)
-		echo '
-			if (index == ', $k, ')
-				document.getElementById(\'warn_body\').value = "', strtr($type['body'], array('"' => "'", "\n" => '\\n', "\r" => '')), '";';
-
-	echo '
-		}
+	echo '};
 	// ]]></script>';
 
 	echo '

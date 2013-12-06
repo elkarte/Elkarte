@@ -713,8 +713,8 @@ function template_warn_template()
 				if ($(request).find("error").text() != \'\')
 				{
 					$("#errors").css({display:""});
-					var errors_html = \'\';
-					var errors = $(request).find(\'error\').each(function() {
+					var errors_html = \'\',
+						errors = $(request).find(\'error\').each(function() {
 						errors_html += $(this).text() + \'<br />\';
 					});
 
@@ -725,8 +725,10 @@ function template_warn_template()
 					$("#errors").css({display:"none"});
 					$("#error_list").html(\'\');
 				}
-			return false;
+
+				return false;
 			});
+
 			return false;
 		}
 	// ]]></script>';

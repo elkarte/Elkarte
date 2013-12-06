@@ -25,7 +25,7 @@ function template_profile_above()
 	<script src="', $settings['default_theme_url'], '/scripts/profile.js"></script>';
 
 	// Prevent Chrome from auto completing fields when viewing/editing other members profiles
-	if (isBrowser('is_chrome') && !$context['user']['is_owner'])
+	if (isBrowser('is_webkit') && !$context['user']['is_owner'])
 		echo '
 	<script><!-- // --><![CDATA[
 		disableAutoComplete();

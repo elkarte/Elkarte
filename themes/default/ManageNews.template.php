@@ -342,8 +342,9 @@ function template_email_members_send()
 	</div>
 
 	<script><!-- // --><![CDATA[
-		var countdown = 2;
-		var message = "', $txt['email_continue'], '";
+		var countdown = 2,
+			message = "', $txt['email_continue'], '";
+				
 		doAutoSubmit();
 	// ]]></script>';
 }

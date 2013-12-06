@@ -133,11 +133,11 @@ function template_additional_options_below()
 			if ($context['num_allowed_attachments'] > 1)
 				echo '
 								<script><!-- // --><![CDATA[
-									var allowed_attachments = ', $context['num_allowed_attachments'], ';
-									var current_attachment = 1;
-									var txt_more_attachments_error = "', $txt['more_attachments_error'], '";
-									var txt_more_attachments = "', $txt['more_attachments'], '";
-									var txt_clean_attach = "', $txt['clean_attach'], '";
+									var allowed_attachments = ', $context['num_allowed_attachments'], ',
+										current_attachment = 1,
+										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
+										txt_more_attachments = "', $txt['more_attachments'], '",
+										txt_clean_attach = "', $txt['clean_attach'], '";
 								// ]]></script>
 							</dd>
 							<dd class="smalltext" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
@@ -739,9 +739,9 @@ function template_spellcheck()
 	// As you may expect - we need a lot of javascript for this... load it from the separate files.
 	echo '
 		<script><!-- // --><![CDATA[
-			var spell_formname = window.opener.spell_formname;
-			var spell_fieldname = window.opener.spell_fieldname;
-			var spell_full = window.opener.spell_full;
+			var spell_formname = window.opener.spell_formname,
+				spell_fieldname = window.opener.spell_fieldname,
+				spell_full = window.opener.spell_full;
 		// ]]></script>
 		<script src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
@@ -800,12 +800,13 @@ function template_quotefast()
 			window.close();';
 	else
 	{
-		// Lucky for us, Internet Explorer has an "innerText" feature which basically converts entities <--> text. Use it if possible ;).
+		// Internet Explorer < 9 does not have DOMParser api so we use the "innerText" feature which
+		// basically converts entities <--> text.  DOMParser works (correctly) with opera 11+
 		echo '
-			var quote = \'', $context['quote']['text'], '\';
-			var stage = \'createElement\' in document ? document.createElement("DIV") : document.getElementById("temporary_posting_area");
+			var quote = \'', $context['quote']['text'], '\',
+				stage = \'createElement\' in document ? document.createElement("div") : document.getElementById("temporary_posting_area");
 
-			if (\'DOMParser\' in window && !(\'opera\' in window))
+			if (\'DOMParser\' in window)
 			{
 				var xmldoc = new DOMParser().parseFromString("<temp>" + \'', $context['quote']['mozilla'], '\'.replace(/\n/g, "_ELK-BREAK_").replace(/\t/g, "_ELK-TAB_") + "</temp>", "text/xml");
 				quote = xmldoc.childNodes[0].textContent.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
@@ -816,13 +817,10 @@ function template_quotefast()
 				quote = stage.innerText.replace(/_ELK-BREAK_/g, "\n").replace(/_ELK-TAB_/g, "\t");
 			}
 
-			if (\'opera\' in window)
-				quote = quote.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, \'"\').replace(/&amp;/g, "&");
-
 			window.opener.onReceiveOpener(quote);
 
 			window.focus();
-			setTimeout("window.close();", 400);';
+			setTimeout(function() {window.close();}, 400);';
 	}
 	echo '
 		// ]]></script>

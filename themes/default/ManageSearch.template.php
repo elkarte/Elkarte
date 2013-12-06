@@ -294,8 +294,9 @@ function template_create_index_progress()
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
-		var countdown = 10;
-		var txt_message = "', $txt['search_create_index_continue'], '";
+		var countdown = 10,
+			txt_message = "', $txt['search_create_index_continue'], '";
+				
 		doAutoSubmit();
 	// ]]></script>';
 }
