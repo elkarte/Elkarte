@@ -122,7 +122,7 @@ class Browser_Detector
 	}
 
 	/**
-	* Determine if the browser is Opera or not
+	* Determine if the browser is Opera or not (for Opera < 15)
 	*
 	* @return boolean true if the browser is Opera otherwise false
 	*/
@@ -326,12 +326,8 @@ class Browser_Detector
 				$this->_browsers['is_ie_compat_view'] = true;
 		}
 
-		// Detect true IE6 and IE7 and not IE in compat mode.
-		$this->_browsers['is_ie7'] = !empty($this->_browsers['is_ie7']) && ($this->_browsers['is_ie_compat_view'] === false);
-		$this->_browsers['is_ie6'] = !empty($this->_browsers['is_ie6']) && ($this->_browsers['is_ie_compat_view'] === false);
-
-		// IE mobile 7 or 9, ... shucks why not
-		if ((!empty($this->_browsers['is_ie7']) && strpos($this->_ua, 'IEMobile/7') !== false) || (!empty($this->_browsers['is_ie9']) && strpos($this->_ua, 'IEMobile/9') !== false))
+		// IE mobile, ... shucks why not
+		if (preg_match('~IEMobile/[0-9][0-9]?\.[0-9]~i', $this->_ua, $msie_match) === 1)
 		{
 			$this->_browsers['is_ie_mobi'] = true;
 			$this->_is_mobile = true;
@@ -343,18 +339,6 @@ class Browser_Detector
 			$this->_browsers['is_tablet_pc'] = true;
 			$this->_is_tablet = true;
 		}
-
-		// And some throwbacks to a bygone era, deposited here like cholesterol in your arteries
-		$this->_browsers += array(
-			'is_ie4' => !empty($this->_browsers['is_ie4']) && !$this->_browsers['is_web_tv'],
-			'is_mac_ie' => strpos($this->_ua, 'MSIE 5.') !== false && strpos($this->_ua, 'Mac') !== false
-		);
-
-		// Before IE8 we need to fix IE... lots!
-		$this->_browsers['ie_standards_fix'] = (($this->_browsers['is_ie6'] === true) || ($this->_browsers['is_ie7'] === true)) ? true : false;
-
-		// We may even need a size fix...
-		$this->_browsers['needs_size_fix'] = (!empty($this->_browsers['is_ie5']) || !empty($this->_browsers['is_ie5.5']) || !empty($this->_browsers['is_ie4'])) && !$this->_browsers['is_mac_ie'];
 	}
 
 	/**
