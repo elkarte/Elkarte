@@ -47,12 +47,12 @@ class DbSearch_PostgreSQL implements DbSearch
 			'create_tmp_log_search_topics' => array(
 				'~mediumint\(\d\)~i' => 'int',
 				'~unsigned~i' => '',
-				'~TYPE=HEAP~i' => '',
+				'~ENGINE=MEMORY~i' => '',
 			),
 			'create_tmp_log_search_messages' => array(
 				'~mediumint\(\d\)' => 'int',
 				'~unsigned~i' => '',
-				'~TYPE=HEAP~i' => '',
+				'~ENGINE=MEMORY~i' => '',
 			),
 			'drop_tmp_log_search_topics' => array(
 				'~IF\sEXISTS~i' => '',
