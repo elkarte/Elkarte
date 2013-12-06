@@ -20,6 +20,7 @@ $txt['mentions_markunread'] = 'Als ungelesen markieren';
 $txt['mentions_settings'] = 'Erwähnungseinstellungen';
 $txt['mentions_enabled'] = 'Erwähnungen aktivieren';
 $txt['mentions_buddy'] = 'Mitglieder benachrichtigen, die zu Freundeslisten hinzugefügt werden';
+$txt['mentions_dont_notify_rlike'] = 'Mitglied nicht informieren, wenn ein Beitrag nicht mehr gefällt';
 
 $txt['mention_men'] = 'Hat Sie in der Nachricht {msg_link} erwähnt';
 $txt['mention_like'] = 'Gefällt Ihre Nachricht {msg_link}';

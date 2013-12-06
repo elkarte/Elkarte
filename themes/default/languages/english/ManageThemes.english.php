@@ -1,7 +1,7 @@
 <?php
 // Version: 1.0; Themes
 
-$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. These settings affect the selection of themes, and which themes guests and other members use.';
+$txt['themeadmin_explain'] = 'Themes are the different looks and feels of your forum. These settings affect the selection of themes and which themes guests and other members use.';
 
 $txt['theme_allow'] = 'Allow members to select their own themes.';
 $txt['theme_guests'] = 'Overall forum default';
@@ -56,7 +56,7 @@ $txt['theme_variants_user_disable'] = 'Disable user variant selection';
 $txt['site_slogan'] = 'Site slogan';
 $txt['site_slogan_desc'] = 'Add your own text for a slogan here. It will replace the default logo.';
 $txt['header_layout'] = 'Header layout';
-$txt['header_layout_desc'] = 'This setting allows you to select one of three layout for the header.
+$txt['header_layout_desc'] = 'This setting allows you to select one of three layouts for the header.
 <br><strong>Default</strong>: the logo is placed on the right and the name of the community on the left
 <br><strong>Only logo</strong>: only the logo is displayed, in a centered position
 <br><strong>Logo on the left</strong>: similar to Default, but with logo and name inverted (i.e. name on the right, logo on the left)';
@@ -110,12 +110,12 @@ $txt['theme_options_title'] = 'Change or reset default options';
 $txt['themeadmin_title'] = 'Themes and Layout Settings';
 $txt['themeadmin_description'] = 'Here you can modify the settings for your themes, update theme selections, reset member options, and the like.';
 $txt['themeadmin_admin_desc'] = 'This page allows you to change the default theme, reset members to all use a certain theme, and choose other settings related to theme selection.  You are also able to install themes from here.<br /><br />Don\'t forget to look at the theme settings for your themes for layout options.';
-$txt['themeadmin_list_desc'] = 'From here, you can view the list of themes you currently have installed, change their paths and settings, and uninstall them.';
+$txt['themeadmin_list_desc'] = 'From here you can view the list of themes you currently have installed, change their paths and settings, and uninstall them.';
 $txt['themeadmin_reset_desc'] = 'Below you will see an interface to change the current theme-specific options for all your members.  You will only see those themes that have their own set of settings.';
 $txt['themeadmin_edit_desc'] = 'Modify the stylesheet and source code of your installed themes.  Please consult the documentation for more information.';
 
 $txt['themeadmin_list_heading'] = 'Theme Settings Overview';
-$txt['themeadmin_list_tip'] = 'Remember, the layout settings may be different between one theme and another.  Click on the theme\'s names below to set their options, change their directory or URL settings, or to find other options.';
+$txt['themeadmin_list_tip'] = 'Remember that the layout settings may be different between one theme and another.  Click on the theme\'s names below to set their options, change their directory or URL settings, or to find other options.';
 $txt['themeadmin_list_theme_dir'] = 'Theme directory (templates)';
 $txt['themeadmin_list_invalid'] = '(Warning! this path is not correct.)';
 $txt['themeadmin_list_theme_url'] = 'URL to above directory';
@@ -151,7 +151,7 @@ $txt['themeadmin_edit_filename'] = 'Filename';
 $txt['themeadmin_edit_modified'] = 'Last Modified';
 $txt['themeadmin_edit_size'] = 'Size';
 $txt['themeadmin_edit_bytes'] = 'B';
-$txt['themeadmin_edit_kilobytes'] = 'KB';
+$txt['themeadmin_edit_kilobytes'] = 'KiB';
 $txt['themeadmin_edit_error'] = 'The file you tried to save generated the following error:';
 $txt['themeadmin_edit_on_line'] = 'Beginning on line';
 $txt['themeadmin_edit_preview'] = 'Preview';

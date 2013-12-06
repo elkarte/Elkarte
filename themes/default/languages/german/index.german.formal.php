@@ -332,7 +332,7 @@ $txt['or'] = 'oder';
 
 $txt['no_matches'] = 'Verzeihung, es gab keine Treffer';
 
-$txt['notification'] = 'Benachrichtigung';
+$txt['mention'] = 'Erwähnungen';
 $txt['notifications'] = 'Benachrichtigungen';
 
 $txt['your_ban'] = 'Pardon, %1$s, Sie wurden aus diesem Forum verbannt!';
