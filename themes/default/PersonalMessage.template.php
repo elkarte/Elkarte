@@ -943,8 +943,7 @@ function template_send()
 	// The vars used to preview a personal message without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '",
-				form_name = "pmFolder",
+			var form_name = "pmFolder",
 				preview_area = "pm",
 				txt_preview_title = "', $txt['preview_title'], '",
 				txt_preview_fetch = "', $txt['preview_fetch'], '";';

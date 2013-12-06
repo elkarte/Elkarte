@@ -361,9 +361,7 @@ function template_quickreply_below()
 
 	// Yeah, I know, though at the moment is the only way...
 	global $removableMessageIDs, $ignoredMsgs;
-			echo '						<script><!-- // --><![CDATA[
-								var post_box_name = "', $context['post_box_name'], '";
-							// ]]></script>';
+
 	// Using the quick reply box below the messages and you can reply?
 	if ($context['can_reply'] && !empty($options['display_quick_reply']))
 	{
@@ -429,10 +427,7 @@ function template_quickreply_below()
 							<div id="smileyBox_message"></div>';
 
 			echo '
-							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '
-							<script><!-- // --><![CDATA[
-								var post_box_name = "', $context['post_box_name'], '";
-							// ]]></script>';
+							', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 		}
 
 		echo '

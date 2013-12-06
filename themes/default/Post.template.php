@@ -528,8 +528,7 @@ function template_postarea_below()
 	// The variables used to preview a post without loading a new page.
 	echo '
 		<script><!-- // --><![CDATA[
-			var post_box_name = "', $context['post_box_name'], '",
-				form_name = "postmodify",
+			var form_name = "postmodify",
 				preview_area = "post",
 				current_board = ', empty($context['current_board']) ? 'null' : $context['current_board'], ',
 				txt_preview_title = "', $txt['preview_title'], '",

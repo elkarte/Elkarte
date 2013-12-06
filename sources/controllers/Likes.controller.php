@@ -117,7 +117,11 @@ class Likes_Controller extends Action_Controller
 						'type' => 'rlike',
 						'id_msg' => $id_liked,
 					));
-					$mentions->action_add();
+					
+					if (!empty($modSettings['mentions_dont_notify_rlike']))
+						$mentions->action_rlike();
+					else
+						$mentions->action_add();
 				}
 			}
 		}
