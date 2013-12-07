@@ -97,6 +97,8 @@ function createMenu($menuData, $menuOptions = array())
 		$menu_context['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
 
 	$include_data = array();
+	// This is necessary only in profile (at least for the core), but we do it always because it's easier
+	$permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
 
 	// Now setup the context correctly.
 	foreach ($menuData as $section_id => $section)
@@ -110,7 +112,7 @@ function createMenu($menuData, $menuOptions = array())
 			// The profile menu has slightly different permissions
 			if (is_array($section['permission']) && isset($section['permission']['own'], $section['permission']['any']))
 			{
-				if (empty($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']) || !allowedTo($section['permission'][$context['user']['is_owner'] ? 'own' : 'any']))
+				if (empty($area['permission'][$permission_set]) || !allowedTo($section['permission'][$permission_set]))
 					continue;
 			}
 			elseif (!allowedTo($section['permission']))
@@ -129,7 +131,7 @@ function createMenu($menuData, $menuOptions = array())
 					// The profile menu has slightly different permissions
 					if (is_array($area['permission']) && isset($area['permission']['own'], $area['permission']['any']))
 					{
-						if (empty($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']) || !allowedTo($area['permission'][$context['user']['is_owner'] ? 'own' : 'any']))
+						if (empty($area['permission'][$permission_set]) || !allowedTo($area['permission'][$permission_set]))
 							continue;
 					}
 					elseif (!allowedTo($area['permission']))
