@@ -14,7 +14,7 @@
  * @version 1.0 Beta
  */
 
-function template_pages_and_buttons_above()
+function template_mlsearch_above()
 {
 	global $context, $scripturl, $txt;
 
@@ -174,7 +174,7 @@ function template_memberlist()
 		</table>';
 }
 
-function template_pages_and_buttons_below()
+function template_mlsearch_below()
 {
 	global $context, $scripturl, $txt;
 

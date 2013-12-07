@@ -511,7 +511,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		// If there are children, but no topics and no ability to post topics...
 		$context['no_topic_listing'] = !empty($context['boards']) && empty($context['topics']) && !$context['can_post_new'];
-		$template_layers->add('pages_and_buttons');
+		$template_layers->add('topic_listing');
 
 		addJavascriptVar(array('notification_board_notice' => $context['is_marked_notify'] ? $txt['notification_disable_board'] : $txt['notification_enable_board']), true);
 

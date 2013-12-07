@@ -45,7 +45,7 @@ class Memberlist_Controller extends Action_Controller
 
 		loadTemplate('Memberlist');
 		$context['sub_template'] = 'memberlist';
-		Template_Layers::getInstance()->add('pages_and_buttons');
+		Template_Layers::getInstance()->add('mlsearch');
 
 		$context['listing_by'] = !empty($_GET['sa']) ? $_GET['sa'] : 'all';
 
