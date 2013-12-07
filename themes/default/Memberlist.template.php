@@ -14,12 +14,9 @@
  * @version 1.0 Beta
  */
 
-/**
- * Displays a sortable listing of all members registered on the forum.
- */
-function template_main()
+function template_pages_and_buttons_above()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	$extra = '
 	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
@@ -61,7 +58,17 @@ function template_main()
 			$(\'body\').off(\'click\', mlsearch_opt_hide);
 			$(\'#mlsearch_options\').slideToggle(\'fast\');
 		}
-	// ]]></script>
+	// ]]></script>';
+
+}
+/**
+ * Displays a sortable listing of all members registered on the forum.
+ */
+function template_memberlist()
+{
+	global $context, $settings, $scripturl, $txt;
+
+	echo '
 	<div id="memberlist">
 		<h2 class="category_header">
 				<span class="floatleft">', $txt['members_list'], '</span>';
@@ -153,6 +160,11 @@ function template_main()
 	echo '
 			</tbody>
 		</table>';
+}
+
+function template_pages_and_buttons_below()
+{
+	global $context, $scripturl, $txt;
 
 	// If it is displaying the result of a search show a "search again" link to edit their criteria.
 	if (isset($context['old_search']))

@@ -44,6 +44,8 @@ class Memberlist_Controller extends Action_Controller
 		isAllowedTo('view_mlist');
 
 		loadTemplate('Memberlist');
+		$context['sub_template'] = 'memberlist';
+		Template_Layers::getInstance()->add('pages_and_buttons');
 
 		$context['listing_by'] = !empty($_GET['sa']) ? $_GET['sa'] : 'all';
 
