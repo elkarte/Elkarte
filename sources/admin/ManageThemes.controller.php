@@ -188,32 +188,8 @@ class ManageThemes_Controller extends Action_Controller
 
 		loadLanguage('Admin');
 
-		// If we aren't submitting - that is, if we are about to...
-		if (!isset($_POST['save']))
-		{
-			loadTemplate('ManageThemes');
-
-			// Make our known themes a little easier to work with.
-			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',', $modSettings['knownThemes']) : array();
-
-			// Load up all the themes.
-			require_once(SUBSDIR . '/Themes.subs.php');
-			$context['themes'] = loadThemes($knownThemes);
-
-			// Can we create a new theme?
-			$context['can_create_new'] = is_writable(BOARDDIR . '/themes');
-			$context['new_theme_dir'] = substr(realpath(BOARDDIR . '/themes/default'), 0, -7);
-
-			// Look for a non existent theme directory. (ie theme87.)
-			$theme_dir = BOARDDIR . '/themes/theme';
-			$i = 1;
-			while (file_exists($theme_dir . $i))
-				$i++;
-			$context['new_theme_name'] = 'theme' . $i;
-
-			createToken('admin-tm');
-		}
-		else
+		// Saving?
+		if (isset($_POST['save']))
 		{
 			checkSession();
 			validateToken('admin-tm');
@@ -237,6 +213,31 @@ class ManageThemes_Controller extends Action_Controller
 				updateMemberData(null, array('id_theme' => (int) $_POST['theme_reset']));
 
 			redirectexit('action=admin;area=theme;' . $context['session_var'] . '=' . $context['session_id'] . ';sa=admin');
+		}
+		// If we aren't submitting - that is, if we are about to...
+		else
+		{
+			loadTemplate('ManageThemes');
+
+			// Make our known themes a little easier to work with.
+			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',', $modSettings['knownThemes']) : array();
+
+			// Load up all the themes.
+			require_once(SUBSDIR . '/Themes.subs.php');
+			$context['themes'] = loadThemes($knownThemes);
+
+			// Can we create a new theme?
+			$context['can_create_new'] = is_writable(BOARDDIR . '/themes');
+			$context['new_theme_dir'] = substr(realpath(BOARDDIR . '/themes/default'), 0, -7);
+
+			// Look for a non existent theme directory. (ie theme87.)
+			$theme_dir = BOARDDIR . '/themes/theme';
+			$i = 1;
+			while (file_exists($theme_dir . $i))
+				$i++;
+			$context['new_theme_name'] = 'theme' . $i;
+
+			createToken('admin-tm');
 		}
 	}
 
