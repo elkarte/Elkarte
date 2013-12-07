@@ -59,6 +59,8 @@ function createMenu($menuData, $menuOptions = array())
 				string $file:		Name of source file required for this area.
 				string $function:	Function to call when area is selected.
 				string $custom_url:	URL to use for this menu item.
+				string $icon:		File name of an icon to use on the menu, if using the sprite class, set as transparent.png
+	 			string $class:		Class name to apply to the icon img, used to apply a sprite icon
 				bool $enabled:		Should this area even be accessible?
 				bool $hidden:		Should this area be visible?
 				string $select:		If set this item will not be displayed - instead the item indexed here shall be.
@@ -171,7 +173,7 @@ function createMenu($menuData, $menuOptions = array())
 
 						// Does this area have its own icon?
 						if (isset($area['icon']))
-							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : '') . 'src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
+							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '<img ' . (isset($area['class']) ? 'class="' . $area['class'] . '" ' : 'style="background: none"') . 'src="' . $context['menu_image_path'] . '/' . $area['icon'] . '" alt="" />&nbsp;&nbsp;';
 						else
 							$menu_context['sections'][$section_id]['areas'][$area_id]['icon'] = '';
 
