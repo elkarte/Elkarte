@@ -121,6 +121,7 @@ class BoardIndex_Controller extends Action_Controller
 			$show_calendar = false;
 
 		$context['page_title'] = sprintf($txt['forum_index'], $context['forum_name']);
+		$context['sub_template'] = 'boards_list';
 
 		// Mark read button
 		$context['mark_read_button'] = array(

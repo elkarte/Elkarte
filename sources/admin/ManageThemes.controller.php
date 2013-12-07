@@ -218,6 +218,7 @@ class ManageThemes_Controller extends Action_Controller
 		else
 		{
 			loadTemplate('ManageThemes');
+			$context['sub_template'] = 'manage_themes';
 
 			// Make our known themes a little easier to work with.
 			$knownThemes = !empty($modSettings['knownThemes']) ? explode(',', $modSettings['knownThemes']) : array();

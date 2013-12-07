@@ -25,7 +25,7 @@ function template_BoardIndex_init()
 /**
  * Main template for displaying the list of boards
  */
-function template_main()
+function template_boards_list()
 {
 	global $context, $settings, $txt, $scripturl;
 

@@ -244,6 +244,7 @@ class ManageBoards_Controller extends Action_Controller
 		call_integration_hook('integrate_boards_main');
 
 		$context['page_title'] = $txt['boards_and_cats'];
+		$context['sub_template'] = 'manage_boards';
 		$context['can_manage_permissions'] = allowedTo('manage_permissions');
 	}
 
