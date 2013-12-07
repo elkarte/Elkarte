@@ -44,6 +44,10 @@ class Reminder_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		global $context;
+
+		$context['sub_template'] = 'reminder';
+
 		// nothing to do, the template will ask for an action to pick
 		createToken('remind');
 	}

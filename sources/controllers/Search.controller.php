@@ -61,7 +61,10 @@ class Search_Controller extends Action_Controller
 
 		// Don't load this in XML mode.
 		if (!isset($_REQUEST['xml']))
+		{
 			loadTemplate('Search');
+			$context['sub_template'] = 'searchform';
+		}
 
 		// Check the user's permissions.
 		isAllowedTo('search_posts');

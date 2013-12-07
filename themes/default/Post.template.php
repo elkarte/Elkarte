@@ -22,7 +22,7 @@ function template_Post_init()
 /**
  * The main template for the post page.
  */
-function template_main()
+function template_post_page()
 {
 	global $context, $txt;
 

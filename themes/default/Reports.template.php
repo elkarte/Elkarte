@@ -58,7 +58,7 @@ function template_report_type()
 /**
  * This is the standard template for showing reports in.
  */
-function template_main()
+function template_generate_report()
 {
 	global $context, $txt;
 
