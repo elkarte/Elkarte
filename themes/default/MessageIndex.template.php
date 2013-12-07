@@ -131,7 +131,7 @@ function template_pages_and_buttons_above()
 /**
  * The actual topic listing.
  */
-function template_main()
+function template_topic_listing()
 {
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 

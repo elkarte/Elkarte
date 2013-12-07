@@ -59,6 +59,7 @@ class MessageIndex_Controller extends Action_Controller
 		loadJavascriptFile('topic.js');
 
 		$context['name'] = $board_info['name'];
+		$context['sub_template'] = 'topic_listing';
 		$context['description'] = $board_info['description'];
 		$template_layers = Template_Layers::getInstance();
 
