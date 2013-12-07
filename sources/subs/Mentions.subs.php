@@ -134,9 +134,8 @@ function prepareMentionMessage($mentions, $type)
 			), $txt['mention_' . $row['mention_type']]);
 	}
 
-//_debug($mentions, $type);
 	return $mentions;
-}	
+}
 
 
 /**
