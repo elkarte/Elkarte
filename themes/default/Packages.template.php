@@ -15,13 +15,6 @@
  */
 
 /**
- * Umm, its the main template
- */
-function template_main()
-{
-}
-
-/**
  * Shows the screen for the package install / uninstall
  * Displays license, readme, and test results
  */

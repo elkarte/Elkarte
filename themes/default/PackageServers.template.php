@@ -15,13 +15,6 @@
  */
 
 /**
- * Simple but important :P
- */
-function template_main()
-{
-}
-
-/**
  * Template used to manage package servers
  */
 function template_servers()
