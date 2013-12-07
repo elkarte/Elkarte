@@ -59,6 +59,17 @@ class Action
 	protected $_default;
 
 	/**
+	 * An (unique) id that triggers a hook
+	 * @var string
+	 */
+	protected $_name;
+
+	public function __construct($name = null)
+	{
+		$this->_name = $name;
+	}
+
+	/**
 	 * Initialize the instance with an array of sub-actions.
 	 * Sub-actions have to be in the format expected for Action::_subActions array,
 	 * indexed by sa.
@@ -67,6 +78,9 @@ class Action
 	 */
 	public function initialize($subactions, $default = '')
 	{
+		if ($this->_name !== null)
+			call_integration_hook('integrate_' . $this->_name, array(&$subactions));
+
 		$this->_subActions = array();
 
 		if (!is_array($subactions))
@@ -76,6 +90,8 @@ class Action
 
 		if (isset($subactions[$default]))
 			$this->_default = $default;
+
+		return isset($_REQUEST['sa']) && isset($this->_subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : $this->_default;
 	}
 
 	/**
