@@ -83,9 +83,12 @@ function template_memberlist()
 			<thead>
 				<tr class="table_head">';
 
+	$table_span = 0;
+
 	// Display each of the column headers of the table.
 	foreach ($context['columns'] as $key => $column)
 	{
+		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
@@ -111,8 +114,17 @@ function template_memberlist()
 	{
 		foreach ($context['members'] as $member)
 		{
+			if (!empty($member['sort_letter']))
+			{
+				echo '
+				<tr class="standard_row" id="letter', $member['sort_letter'], '">
+					<th class="letterspacing" colspan="', $table_span, '">', $member['sort_letter'], '</th>
+				</tr>';
+
+				$alternate = true;
+			}
 			echo '
-				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row"', empty($member['sort_letter']) ? '' : ' id="letter' . $member['sort_letter'] . '"', '>';
+				<tr class="', $alternate ? 'alternate_' : 'standard_', 'row">';
 
 			foreach ($context['columns'] as $column => $values)
 			{
