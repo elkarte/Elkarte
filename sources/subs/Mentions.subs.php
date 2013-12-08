@@ -140,25 +140,13 @@ function prepareMentionMessage($mentions, $type)
 	// Do the permissions checks and replace inappropriate messages
 	if (!empty($boards))
 	{
-		$db = database();
-		$request = $db->query('', '
-			SELECT b.id_board
-			FROM {db_prefix}boards as b
-			WHERE {query_see_board}
-				AND b.id_board IN ({array_int:boards})',
-			array(
-				'boards' => $boards
-			)
-		);
+		require_once(SUBSDIR . '/Boards.subs.php');
 
-		$boards_access = array();
-		while ($row = $db->fetch_assoc($request))
-			$boards_access[] = $row['id_board'];
-		$db->free_result($request);
+		$accessibleBoards = accessibleBoards(null, $boards);
 
 		foreach ($boards as $key => $board)
 		{
-			if (!in_array($board, $boards_access))
+			if (!in_array($board, $accessibleBoards))
 				$mentions[$key]['message'] = $txt['mention_not_accessible'];
 		}
 	}
