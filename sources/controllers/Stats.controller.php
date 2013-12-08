@@ -109,6 +109,21 @@ class Stats_Controller extends Action_Controller
 			'top_statistics',
 		);
 
+		$this->loadGeneralStatistics();
+		$this->loadTopStatistics();
+		$this->loadMontlyActivity();
+
+		// Custom stats (just add a template_layer to add it to the template!)
+		call_integration_hook('integrate_forum_stats');
+	}
+
+	/**
+	 * Load some general statistics of the forum
+	 */
+	public function loadGeneralStatistics()
+	{
+		global $txt, $scripturl, $modSettings, $context;
+
 		// Get averages...
 		$averages = getAverages();
 		// This would be the amount of time the forum has been up... in days...
@@ -176,6 +191,14 @@ class Stats_Controller extends Action_Controller
 			$context['general_statistics']['right'] += array(
 				'average_hits' => comma_format(round($averages['hits'] / $total_days_up, 2)),
 			);
+	}
+
+	/**
+	 * Top posters, boards, replies, etc.
+	 */
+	public function loadTopStatistics()
+	{
+		global $context;
 
 		// Poster top 10.
 		$context['top']['posters'] = topPosters();
@@ -194,6 +217,14 @@ class Stats_Controller extends Action_Controller
 
 		// Time online top 10.
 		$context['top']['time_online'] = topTimeOnline();
+	}
+
+	/**
+	 * Load the huge table of activity by month
+	 */
+	public function loadMontlyActivity()
+	{
+		global $context;
 
 		// Activity by month.
 		monthlyActivity();
@@ -233,13 +264,5 @@ class Stats_Controller extends Action_Controller
 			return;
 
 		getDailyStats(implode(' OR ', $condition_text), $condition_params);
-
-		// Custom stats (just add a template_layer to add it to the template!)
-		call_integration_hook('integrate_forum_stats');
-	}
-
-	public function loadGeneralStatistics()
-	{
-	
 	}
 }
