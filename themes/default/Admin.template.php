@@ -885,7 +885,8 @@ function template_show_settings()
 			// A title, maybe even with an icon or a help icon?
 			if ($config_var['type'] == 'title')
 			{
-				echo '
+				echo
+					(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>
 						', ($config_var['help'] ? (empty($config_var['class']) ? '<span class="hdicon cat_img_helptopics help"></span>' : '<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>') : ($config_var['icon'] ? '<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>' : '')), '
 						', $config_var['label'], '
