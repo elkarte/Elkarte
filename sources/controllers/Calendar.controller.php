@@ -59,6 +59,7 @@ class Calendar_Controller extends Action_Controller
 
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
+		$context['sub_template'] = 'show_calendar';
 
 		// Is this a week view?
 		$context['view_week'] = isset($_GET['viewweek']);
