@@ -46,6 +46,9 @@ class Mentions_Controller extends Action_Controller
 	protected $_data = null;
 
 	protected $_callbacks = array();
+	protected $_type = '';
+	protected $_all = '';
+	protected $_excluded_types = array();
 
 	/**
 	 * Start things up, what else does a contructor do
@@ -56,18 +59,22 @@ class Mentions_Controller extends Action_Controller
 			// mentions
 			'men' => array(
 				'callback' => 'prepareMentionMessage',
+				'enabled' => 'mentions_enabled',
 			),
 			// liked messages
 			'like' => array(
 				'callback' => 'prepareMentionMessage',
+				'enabled' => 'likes_enabled',
 			),
 			// likes removed
 			'rlike' => array(
 				'callback' => 'prepareMentionMessage',
+				'enabled' => 'likes_enabled',
 			),
 			// added as buddy
 			'buddy' => array(
 				'callback' => 'prepareMentionMessage',
+				'enabled' => 'mentions_buddy',
 			),
 		);
 		$this->_known_status = array(
@@ -118,7 +125,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt, $scripturl, $modSettings;
 
 		// Only registered members can be mentioned
 		is_not_guest();
@@ -234,26 +241,6 @@ class Mentions_Controller extends Action_Controller
 						'is_selected' => empty($this->_type),
 						'label' => $txt['mentions_type_all']
 					),
-					array(
-						'href' => $scripturl . '?action=mentions;type=men' . (!empty($this->_all) ? ';all' : ''),
-						'is_selected' => $this->_type === 'men',
-						'label' => $txt['mentions_type_men']
-					),
-					array(
-						'href' => $scripturl . '?action=mentions;type=like' . (!empty($this->_all) ? ';all' : ''),
-						'is_selected' => $this->_type === 'like',
-						'label' => $txt['mentions_type_like']
-					),
-					array(
-						'href' => $scripturl . '?action=mentions;type=rlike' . (!empty($this->_all) ? ';all' : ''),
-						'is_selected' => $this->_type === 'rlike',
-						'label' => $txt['mentions_type_rlike']
-					),
-					array(
-						'href' => $scripturl . '?action=mentions;type=buddy' . (!empty($this->_all) ? ';all' : ''),
-						'is_selected' => $this->_type === 'buddy',
-						'label' => $txt['mentions_type_buddy']
-					),
 				),
 			),
 			'additional_rows' => array(
@@ -263,6 +250,22 @@ class Mentions_Controller extends Action_Controller
 				),
 			),
 		);
+
+		foreach ($this->_known_mentions as $key => $mention)
+		{
+			if (!empty($mention['enabled']) && !empty($modSettings[$mention['enabled']]))
+			{
+				$list_options['list_menu']['links'][] = array(
+					'href' => $scripturl . '?action=mentions;type=' . $key . (!empty($this->_all) ? ';all' : ''),
+					'is_selected' => $this->_type === $key,
+					'label' => $txt['mentions_type_' . $key]
+				);
+				$this->_callbacks[] = $mention['callback'];
+			}
+		}
+
+		if (!empty($this->_callbacks))
+			$this->_callbacks = array_unique($this->_callbacks);
 
 		createList($list_options);
 
@@ -288,7 +291,10 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_getMentionCount($all, $type)
 	{
-		return countUserMentions($all, $type);
+		if (!empty($this->_included_types))
+			return countUserMentions($all, $this->_included_types);
+		else
+			return countUserMentions($all, $type);
 	}
 
 	/**
@@ -303,7 +309,10 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
-		$mentions = getUserMentions($start, $limit, $sort, $all, $type);
+		if (!empty($this->_included_types))
+			$mentions = getUserMentions($start, $limit, $sort, $all, $this->_included_types);
+		else
+			$mentions = getUserMentions($start, $limit, $sort, $all, $type);
 
 		// With only one type is enough to just call that (if it exists)
 		if (!empty($type) && isset($this->_callbacks[$type]))
@@ -438,19 +447,28 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Builds the link back so you return to the right list of mentions
 	 */
-	private function _buildUrl()
+	protected function _buildUrl()
 	{
+		global $modSettings;
+
 		$this->_all = isset($_REQUEST['all']);
 		$this->_type = isset($_REQUEST['type']) && isset($this->_known_mentions[$_REQUEST['type']]) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
+		// If we are showing all the mentions, we are not showing what is disabled
+		if (empty($this->_type))
+		{
+			foreach ($this->_known_mentions as $key => $mention)
+				if (empty($mention['enabled']) || !empty($modSettings[$mention['enabled']]))
+					$this->_included_types[] = $key;
+		}
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
 	}
 
 	/**
 	 * Check if the user can access the mention
 	 */
-	private function _isAccessible()
+	protected function _isAccessible()
 	{
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		require_once(SUBSDIR . '/Mentions.subs.php');
@@ -477,7 +495,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Check if the user can do what he is supposed to do, and validates the input
 	 */
-	private function _isValid()
+	protected function _isValid()
 	{
 		require_once(SUBSDIR . '/DataValidator.class.php');
 		$this->_validator = new Data_Validator();
