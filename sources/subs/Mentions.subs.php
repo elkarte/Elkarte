@@ -18,7 +18,7 @@ if (!defined('ELK'))
  *
  * @param bool $all : if true counts all the mentions, otherwise only the unread
  * @param string $type : the type of the mention
- * @param string $id_member : the id of the member the counts are for, defaults to user_info['id']
+ * @param int $id_member : the id of the member the counts are for, defaults to user_info['id']
  */
 function countUserMentions($all = false, $type = '', $id_member = null)
 {
@@ -120,6 +120,12 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 	return $mentions;
 }
 
+/**
+ * Callback used to prepare the mention message for mentions, likes, removed likes and buddies
+ *
+ * @param array $mentions : Mentions retrieved from the database by getUserMentions
+ * @param string $type : the type of the mention
+ */
 function prepareMentionMessage($mentions, $type)
 {
 	global $txt, $scripturl, $context;

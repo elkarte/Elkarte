@@ -45,10 +45,35 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected $_data = null;
 
+	/**
+	 * A set of functions that will be called passing the mentions retrieved from the db
+	 * Are originally stored in $_known_mentions
+	 *
+	 * @var array
+	 */
 	protected $_callbacks = array();
+
+	/**
+	 * The type of the mention we are looking at (if empty means all of them)
+	 *
+	 * @var string
+	 */
 	protected $_type = '';
-	protected $_all = '';
-	protected $_excluded_types = array();
+
+	/**
+	 * Determine if we are looking only at unread mentions or any kind of
+	 *
+	 * @var boolean
+	 */
+	protected $_all = false;
+
+	/**
+	 * Complementary to $_type, used in case something is disabled to show only
+	 * what is enabled.
+	 *
+	 * @var array
+	 */
+	protected $_included_types = array();
 
 	/**
 	 * Start things up, what else does a contructor do
@@ -77,6 +102,7 @@ class Mentions_Controller extends Action_Controller
 				'enabled' => 'mentions_buddy',
 			),
 		);
+
 		$this->_known_status = array(
 			'new' => 0,
 			'read' => 1,
