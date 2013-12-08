@@ -104,7 +104,6 @@ class Stats_Controller extends Action_Controller
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['stats_center'];
 		$context['sub_template'] = 'statistics';
 
-		$context['show_member_list'] = allowedTo('view_mlist');
 		$context['statistics_callbacks'] = array(
 			'general_statistics',
 			'top_statistics',
@@ -143,7 +142,7 @@ class Stats_Controller extends Action_Controller
 		}
 
 		$context['general_statistics']['left'] = array(
-			'total_members' => $context['show_member_list'] ? '<a href="' . $scripturl . '?action=memberlist">' . comma_format($modSettings['totalMembers']) . '</a>' : comma_format($modSettings['totalMembers']),
+			'total_members' => allowedTo('view_mlist') ? '<a href="' . $scripturl . '?action=memberlist">' . comma_format($modSettings['totalMembers']) . '</a>' : comma_format($modSettings['totalMembers']),
 			'total_posts' => comma_format($modSettings['totalMessages']),
 			'total_topics' => comma_format($modSettings['totalTopics']),
 			'total_cats' => comma_format(numCategories()),
@@ -237,5 +236,10 @@ class Stats_Controller extends Action_Controller
 
 		// Custom stats (just add a template_layer to add it to the template!)
 		call_integration_hook('integrate_forum_stats');
+	}
+
+	public function loadGeneralStatistics()
+	{
+	
 	}
 }
