@@ -30,6 +30,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_mentions as mtn
+<<<<<<< HEAD
 			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE ({query_see_board} OR mtn.id_msg = 0)
@@ -38,6 +39,14 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 			AND mtn.status != {int:unapproved}' : '
 			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
 			AND mtn.mention_type = {string:current_type}'),
+=======
+		WHERE mtn.id_member = {int:current_user}
+			AND mtn.status != {int:unapproved}' . ($all ? '
+			AND mtn.status != {int:is_not_deleted}' : '
+			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
+			AND mtn.mention_type IN ({array_string:current_type})' : '
+			AND mtn.mention_type = {string:current_type}')),
+>>>>>>> Things were going out of control. Let's retrieve everything and just tell the user he can't see the mention... it sucks, but any other thing would be a mess
 		array(
 			'current_user' => $id_member,
 			'current_type' => $type,
@@ -79,15 +88,14 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 		FROM {db_prefix}log_mentions AS mtn
 			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			LEFT JOIN {db_prefix}members AS mem ON (mtn.id_member_from = mem.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE ({query_see_board} OR mtn.id_msg = 0)
-			AND mtn.id_member = {int:current_user}' . ($all ? '
+		WHERE mtn.id_member = {int:current_user}' . ($all ? '
 			AND mtn.status != {int:unapproved}
 			AND mtn.status != {int:is_not_deleted}' : '
-			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : '
-			AND mtn.mention_type = {string:current_type}') . '
+			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
+			AND mtn.mention_type IN ({array_string:current_type})' : '
+			AND mtn.mention_type = {string:current_type}')) . '
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
 		array(
@@ -116,11 +124,17 @@ function prepareMentionMessage($mentions, $type)
 {
 	global $txt, $scripturl, $context;
 
+	$boards = array();
+
 	foreach ($mentions as $key => $row)
 	{
 		// To ensure it is not done twice
 		if ($row['mention_type'] != $type)
 			continue;
+
+		// These things are associated to messages and require permission checks
+		if (in_array($row['mention_type'], array('men', 'like', 'rlike')))
+			$boards[$key] = $row['id_board'];
 
 		$mentions[$key]['message'] = str_replace(array(
 				'{msg_link}',
@@ -132,6 +146,32 @@ function prepareMentionMessage($mentions, $type)
 				$scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;' . $context['session_var'] . '=' . $context['session_id'] . 'item=' . $row['id_mention'] . '#msg' . $row['id_msg'],
 				$row['subject'],
 			), $txt['mention_' . $row['mention_type']]);
+	}
+
+	// Do the permissions checks and replace inappropriate messages
+	if (!empty($boards))
+	{
+		$db = database();
+		$request = $db->query('', '
+			SELECT b.id_board
+			FROM {db_prefix}boards as b
+			WHERE {query_see_board}
+				AND b.id_board IN ({array_int:boards})',
+			array(
+				'boards' => $boards
+			)
+		);
+
+		$boards_access = array();
+		while ($row = $db->fetch_assoc($request))
+			$boards_access[] = $row['id_board'];
+		$db->free_result($request);
+
+		foreach ($boards as $key => $board)
+		{
+			if (!in_array($board, $boards_access))
+				$mentions[$key]['message'] = $txt['mention_not_accessible'];
+		}
 	}
 
 	return $mentions;
