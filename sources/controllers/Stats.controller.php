@@ -104,6 +104,7 @@ class Stats_Controller extends Action_Controller
 		$context['page_title'] = $context['forum_name'] . ' - ' . $txt['stats_center'];
 		$context['sub_template'] = 'statistics';
 
+		// These are the templates that will be used to render the statistics
 		$context['statistics_callbacks'] = array(
 			'general_statistics',
 			'top_statistics',
@@ -113,7 +114,7 @@ class Stats_Controller extends Action_Controller
 		$this->loadTopStatistics();
 		$this->loadMontlyActivity();
 
-		// Custom stats (just add a template_layer to add it to the template!)
+		// Custom stats (just add a template_layer or another callback to add it to the page!)
 		call_integration_hook('integrate_forum_stats');
 	}
 

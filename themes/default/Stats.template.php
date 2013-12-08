@@ -43,7 +43,17 @@ function template_general_statistics()
 {
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
+	// These two are special formatting strings for special elements of the statistics:
+	// The most_online value is an array composed of two elements: number and date,
+	// they will be replaced in the foreach below with the corresponding values.
+	// If you want to change the way to present the field, change this string,
+	// for example if you want to show it as: "123 members on the 20/01/2010" you could use:
+	// $settings['most_online'] = 'number members on the date';
 	$settings['most_online'] = 'number - date';
+	// Similarly to the previous one, this is a "template" for the latest_member stats
+	// The elements available to style this entry are: id, name, href, link.
+	// So, if you want to change it to the plain username you could use:
+	// $settings['latest_member'] = 'name';
 	$settings['latest_member'] = 'link';
 
 	echo '
