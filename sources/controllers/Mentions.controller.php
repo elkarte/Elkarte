@@ -45,8 +45,6 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected $_data = null;
 
-	protected $_query_where = array();
-	protected $_query_join = array();
 	protected $_callbacks = array();
 
 	/**
@@ -58,26 +56,18 @@ class Mentions_Controller extends Action_Controller
 			// mentions
 			'men' => array(
 				'callback' => 'prepareMentionMessage',
-				'query_where' => '',
-				'query_join' => '',
 			),
 			// liked messages
 			'like' => array(
 				'callback' => 'prepareMentionMessage',
-				'query_where' => '',
-				'query_join' => '',
 			),
 			// likes removed
 			'rlike' => array(
 				'callback' => 'prepareMentionMessage',
-				'query_where' => '',
-				'query_join' => '',
 			),
 			// added as buddy
 			'buddy' => array(
 				'callback' => 'prepareMentionMessage',
-				'query_where' => '',
-				'query_join' => '',
 			),
 		);
 		$this->_known_status = array(
@@ -88,21 +78,6 @@ class Mentions_Controller extends Action_Controller
 		);
 
 		call_integration_hook('integrate_add_mention', array(&$this->_known_mentions));
-
-		// prepare the things to use later
-		$wheres = array();
-		$joins = array();
-		foreach ($this->_known_mentions as $key => $mention)
-		{
-			if (!empty($mention['callback']))
-				$this->_callbacks[$key] = $mention['callback'];
-			if (!empty($mention['query_where']))
-				$wheres = $mention['query_where'];
-			if (!empty($mention['query_join']))
-				$joins = $mention['query_join'];
-		}
-		$this->_query_where = array_unique($wheres);
-		$this->_query_join = array_unique($joins);
 	}
 
 	/**
@@ -313,7 +288,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_getMentionCount($all, $type)
 	{
-		return countUserMentions($all, $type, $this->_query_where, $this->_query_join);
+		return countUserMentions($all, $type);
 	}
 
 	/**
@@ -328,7 +303,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function list_loadMentions($start, $limit, $sort, $all, $type)
 	{
-		$mentions = getUserMentions($start, $limit, $sort, $all, $type, $this->_query_where, $this->_query_join);
+		$mentions = getUserMentions($start, $limit, $sort, $all, $type);
 
 		// With only one type is enough to just call that (if it exists)
 		if (!empty($type) && isset($this->_callbacks[$type]))
@@ -466,7 +441,7 @@ class Mentions_Controller extends Action_Controller
 	private function _buildUrl()
 	{
 		$this->_all = isset($_REQUEST['all']);
-		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_mentions) ? $_REQUEST['type'] : '';
+		$this->_type = isset($_REQUEST['type']) && isset($this->_known_mentions[$_REQUEST['type']]) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
