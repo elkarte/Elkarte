@@ -1971,7 +1971,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 				$context['javascript_files'][$this_id] = array('filename' => $filename, 'options' => $params);
 
 				if ($db_show_debug === true)
-					$context['debug']['javascript'][] = $params['basename'] . '(' . (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) . ')';
+					$context['debug']['javascript'][] = $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')';
 			}
 		}
 
