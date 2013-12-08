@@ -30,8 +30,8 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_mentions as mtn
-		WHERE mtn.id_member = {int:current_user}
-			AND mtn.status != {int:unapproved}' . ($all ? '
+		WHERE mtn.id_member = {int:current_user}' . ($all ? '
+			AND mtn.status != {int:unapproved}
 			AND mtn.status != {int:is_not_deleted}' : '
 			AND mtn.status = {int:is_not_read}') . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.mention_type IN ({array_string:current_type})' : '
