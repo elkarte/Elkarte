@@ -83,22 +83,22 @@ class Mentions_Controller extends Action_Controller
 		$this->_known_mentions = array(
 			// mentions
 			'men' => array(
-				'callback' => 'prepareMentionMessage',
+				'callback' => array($this, 'prepareMentionMessage'),
 				'enabled' => 'mentions_enabled',
 			),
 			// liked messages
 			'like' => array(
-				'callback' => 'prepareMentionMessage',
+				'callback' => array($this, 'prepareMentionMessage'),
 				'enabled' => 'likes_enabled',
 			),
 			// likes removed
 			'rlike' => array(
-				'callback' => 'prepareMentionMessage',
+				'callback' => array($this, 'prepareMentionMessage'),
 				'enabled' => 'likes_enabled',
 			),
 			// added as buddy
 			'buddy' => array(
-				'callback' => 'prepareMentionMessage',
+				'callback' => array($this, 'prepareMentionMessage'),
 				'enabled' => 'mentions_buddy',
 			),
 		);
@@ -348,6 +348,57 @@ class Mentions_Controller extends Action_Controller
 		// @todo find a way to call only what is actually needed 
 		foreach ($this->_callbacks as $type => $callback)
 			$mentions = call_user_func_array($callback, array($mentions, $type));
+
+		return $mentions;
+	}
+
+	/**
+	 * Callback used to prepare the mention message for mentions, likes, removed likes and buddies
+	 *
+	 * @param array $mentions : Mentions retrieved from the database by getUserMentions
+	 * @param string $type : the type of the mention
+	 */
+	function prepareMentionMessage($mentions, $type)
+	{
+		global $txt, $scripturl, $context;
+
+		$boards = array();
+
+		foreach ($mentions as $key => $row)
+		{
+			// To ensure it is not done twice
+			if ($row['mention_type'] != $type)
+				continue;
+
+			// These things are associated to messages and require permission checks
+			if (in_array($row['mention_type'], array('men', 'like', 'rlike')))
+				$boards[$key] = $row['id_board'];
+
+			$mentions[$key]['message'] = str_replace(array(
+					'{msg_link}',
+					'{msg_url}',
+					'{subject}',
+				),
+				array(
+					'<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;mark=read;' . $context['session_var'] . '=' . $context['session_id'] . ';item=' . $row['id_mention'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+					$scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;' . $context['session_var'] . '=' . $context['session_id'] . 'item=' . $row['id_mention'] . '#msg' . $row['id_msg'],
+					$row['subject'],
+				), $txt['mention_' . $row['mention_type']]);
+		}
+
+		// Do the permissions checks and replace inappropriate messages
+		if (!empty($boards))
+		{
+			require_once(SUBSDIR . '/Boards.subs.php');
+
+			$accessibleBoards = accessibleBoards(null, $boards);
+
+			foreach ($boards as $key => $board)
+			{
+				if (!in_array($board, $accessibleBoards))
+					$mentions[$key]['message'] = $txt['mention_not_accessible'];
+			}
+		}
 
 		return $mentions;
 	}
