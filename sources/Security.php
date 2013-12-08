@@ -728,9 +728,6 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		$log_error = true;
 	}
 
-	if (strtolower($req->user_agent()) == 'hacker')
-		fatal_error('Sound the alarm!  It\'s a hacker!  Close the castle gates!!', false);
-
 	// Everything is ok, return an empty string.
 	if (!isset($error))
 		return '';
