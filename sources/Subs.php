@@ -4383,9 +4383,12 @@ function pregReplaceCurry($func, $arity)
  * @param string $where adding before or after
  * @param bool $strict search for identical elements, this means it will also check the types of the needle.
  */
-function elk_array_insert($input, $key, $insert, $where = 'before', $strict = false)
+function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = true, $strict = false)
 {
-	$position = array_search($key, array_keys($input), $strict);
+	if ($assoc)
+		$position = array_search($key, array_keys($input), $strict);
+	else
+		$position = array_search($key, $input, $strict);
 
 	// If the key is not found, just insert it at the end
 	if ($position === false)
